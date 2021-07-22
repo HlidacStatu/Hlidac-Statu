@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: /Account/*
+Disallow: /Admin/*
+Disallow: /Api/*
+Disallow: /beta/*
+
+Disallow: /osoba/radek-jonke
+
+Sitemap: https://www.HlidacStatu.cz/sitemap.xml
