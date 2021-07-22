@@ -136,6 +136,13 @@ namespace HlidacStatu.Extensions
         {
             return FirmaStatistics.DotaceCache().Get(firma);
         }
+        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> HoldingStatistikaDotaci(
+    this Firma firma,
+    Relation.AktualnostType aktualnost)
+        {
+            return FirmaStatistics.HoldingDotaceCache().Get((firma, aktualnost));
+        }
+
 
         public static Lib.Analysis.KorupcniRiziko.KIndexData Kindex(this Firma firma, bool useTemp = false)
         {
@@ -264,31 +271,12 @@ namespace HlidacStatu.Extensions
             return icos.Select(ico => Firmy.Get(ico));
         }
 
-        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> HoldingStatisticsDotace(
-            this Firma firma,
-            Relation.AktualnostType aktualnost)
-        {
-            var firmy = firma.Holding(aktualnost).ToArray();
-
-            var statistiky = firmy.Select(f => f.StatistikaDotaci()).Append(firma.StatistikaDotaci()).ToArray();
-
-            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistiky);
-
-            return aggregate;
-        }
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> HoldingStatisticsRegistrSmluv(
             this Firma firma,
-            Relation.AktualnostType aktualnost)
+            Relation.AktualnostType aktualnost, int? obor = null)
         {
-            var firmy = firma.Holding(aktualnost).ToArray();
-
-            var statistiky = firmy.Select(f => f.StatistikaRegistruSmluv()).Append(firma.StatistikaRegistruSmluv())
-                .ToArray();
-
-            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>.Aggregate(statistiky);
-
-            return aggregate;
+            return FirmaStatistics.HoldingCachedStatistics(firma, aktualnost, obor);
         }
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>
@@ -297,14 +285,7 @@ namespace HlidacStatu.Extensions
                 Relation.AktualnostType aktualnost,
                 Smlouva.SClassification.ClassificationsTypes classification)
         {
-            var firmy = firma.Holding(aktualnost).ToArray();
-
-            var statistiky = firmy.Select(f => f.StatistikaRegistruSmluv(classification))
-                .Append(firma.StatistikaRegistruSmluv()).ToArray();
-
-            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>.Aggregate(statistiky);
-
-            return aggregate;
+            return FirmaStatistics.HoldingCachedStatistics(firma, aktualnost, (int)classification);
         }
 
         public static bool PatrimStatuAlespon25procent(this Firma firma) => (firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu25perc);
@@ -545,7 +526,26 @@ namespace HlidacStatu.Extensions
         }
 
 
+        static Util.Cache.CouchbaseCacheManager<InfoFact[], Firma> _infoFactsCache()
+        {
+            var cache = Util.Cache.CouchbaseCacheManager<InfoFact[], Firma>
+                .GetSafeInstance("Firma_InfoFacts",
+                    (firma) => GetInfoFacts(firma),
+                    TimeSpan.FromHours(24),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                    Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                    f => f.ICO);
+
+            return cache;
+        }
+
         public static InfoFact[] InfoFacts(this Firma firma) //otázka jestli tohle nebrat z cachce
+        {
+            return _infoFactsCache().Get(firma);
+        }
+        private static InfoFact[] GetInfoFacts(Firma firma)
         {
             var sName = firma.ObecneJmeno();
             bool sMuzsky = sName == uradName;
@@ -553,6 +553,7 @@ namespace HlidacStatu.Extensions
             List<InfoFact> f = new List<InfoFact>();
             //var stat = new HlidacStatu.Lib.Analysis.SubjectStatistic(this);
             var stat = firma.StatistikaRegistruSmluv();
+            var statHolding = firma.HoldingStatisticsRegistrSmluv( Relation.AktualnostType.Aktualni);
             int rok = DateTime.Now.Year;
             if (DateTime.Now.Month < 2)
                 rok = rok - 1;
@@ -567,6 +568,25 @@ namespace HlidacStatu.Extensions
             }
             else
             {
+                if (stat[rok].PocetSmluv < statHolding[rok].PocetSmluv )
+                {
+                    f.Add(new InfoFact($"V roce <b>{rok}</b> uzavřel{(sMuzsky ? "" : "a")} {sName.ToLower()} " +
+                                       Devmasters.Lang.Plural.Get(stat[rok].PocetSmluv,
+                                           "jednu smlouvu",
+                                           "{0} smlouvy",
+                                           "celkem {0} smluv")
+                                       + $" za <b>{RenderData.ShortNicePrice(stat[rok].CelkovaHodnotaSmluv, html: true)}</b>, "
+                                       + "celý holding "
+                                       + Devmasters.Lang.Plural.Get(stat[rok].PocetSmluv,
+                                           "jednu smlouvu",
+                                           "{0} smlouvy",
+                                           "celkem {0} smluv")
+                                       + $" za <b>{RenderData.ShortNicePrice(stat[rok].CelkovaHodnotaSmluv, html: true)}</b>, "
+
+                        , InfoFact.ImportanceLevel.Summary)
+                    );
+                }
+                else
                 f.Add(new InfoFact($"V roce <b>{rok}</b> uzavřel{(sMuzsky ? "" : "a")} {sName.ToLower()} " +
                                    Devmasters.Lang.Plural.Get(stat[rok].PocetSmluv,
                                        "jednu smlouvu v&nbsp;registru smluv",
@@ -746,8 +766,7 @@ namespace HlidacStatu.Extensions
             }
 
             if (firma.PatrimStatu() == false && firma.IcosInHolding(Relation.AktualnostType.Aktualni).Count() > 2)
-            {
-                var statHolding = firma.HoldingStatisticsRegistrSmluv(Relation.AktualnostType.Aktualni);
+            {                
                 if (statHolding[rok].PocetSmluv > 3)
                 {
                     f.Add(new InfoFact($"V roce <b>{rok}</b> uzavřel celý holding " +

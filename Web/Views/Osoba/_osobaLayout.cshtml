@@ -1,17 +1,29 @@
 ﻿@using HlidacStatu.Datastructures.Graphs
+@using HlidacStatu.Extensions;
+
+
 @model (HlidacStatu.Entities.Osoba osoba, string viewName, string title)
 
 @{
     ViewBag.Title = Model.title;
     ViewBag.HideTitle = true;
 
+    ViewBag.SocialShareTitle = $"{Model.osoba.FullNameWithYear()}";
+    ViewBag.SocialShareText = HlidacStatu.Util.InfoFact.RenderInfoFacts(Model.osoba.InfoFacts(), 4, true, true, ", ");
+    ViewBag.SocialShareType = "article";
+    ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/subjekt?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId;
+    ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"
+                + "<meta property=\"og:image:height\" content=\"1080\" />"
+                + "<meta property=\"og:image:type\" content=\"image/png\" />";
+
+
     Relation.AktualnostType? aktualnost = ViewBag.Aktualnost;
 }
 @section metatags
 {
 
-    @if (Model.osoba != null 
-         && HlidacStatu.Web.Framework.Constants.DontIndexOsoby.Contains(Model.osoba.NameId.ToLower()))
+    @if (Model.osoba != null
+        && HlidacStatu.Web.Framework.Constants.DontIndexOsoby.Contains(Model.osoba.NameId.ToLower()))
     {
         <meta name="robots" content="noindex, noarchive">
     }
@@ -115,13 +127,13 @@
 <div class="row boxes">
     @* Pravý sloupec *@
     <cache expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}_{User.Identity.IsAuthenticated}")">
-        <partial name="RightColumn" model="@Model.osoba"/>
+        <partial name="RightColumn" model="@Model.osoba" />
     </cache>
-    
+
     @* Prázdný sloupec *@
     <div class="col-sm-1"></div>
     <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}_{Model.viewName}_{User.Identity.IsAuthenticated}")">
-        <partial name="@Model.viewName" model="@Model.osoba"/>
+        <partial name="@Model.viewName" model="@Model.osoba" />
     </cache>
-    
+
 </div>

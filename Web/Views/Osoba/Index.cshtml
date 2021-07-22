@@ -202,6 +202,7 @@
     @*dotace*@
 
     @{
+        //var dotaceStat = Model.
         var dotaceAggsH = new Nest.AggregationContainerDescriptor<Dotace>()
             .Terms("icos", s => s
                 .Field(f => f.Prijemce.Ico)
@@ -418,6 +419,8 @@
 
 
     <!--
+        
+    RenderTimes:
         @Html.Raw(string.Join("\n",laps.Laps.Select(m=>$"{m.Name} : {m.ExactElapsedMs:# ##0.00}ms")))
         -->
 </div>

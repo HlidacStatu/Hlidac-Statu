@@ -160,7 +160,7 @@ namespace HlidacStatu.Repositories
 
         public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
         {
-            firma.UpdateVazbyFromDB();
+            //firma.UpdateVazbyFromDB(); //nemelo by tu byt.
             return Relation.AktualniVazby(firma.Vazby(refresh), minAktualnost);
         }
 

@@ -32,7 +32,7 @@
 {
     <script src="/Scripts/typeahead.jquery.min.js"></script>
     <script src="/Scripts/bloodhound.min.js"></script>
-    <link href="/Content/typeaheadjs.css" media="all" rel="stylesheet"/>
+    <link href="/Content/typeaheadjs.css" media="all" rel="stylesheet" />
 }
 
 @section breadcrumb
@@ -168,19 +168,19 @@ else if (Model.HasResults == false)
     <div class="col-xs-12">
         <div class="new-p new-p--big" style="margin-top: 10px;">
             Pro hledaný výraz <span class="emphasized">@(Devmasters.TextUtil.ShortenText(Model.Query, 60, "..."))</span> @HlidacStatu.Util.RenderData.Vysledky.JsmeNasliVysledky(Model.Total).
-            <br/>
+            <br />
             @{
                 var wdModel = new WatchdogViewModel(null, Model.Query,
                     $"Hlídat všechny změny výsledků na dotaz <b>{Devmasters.TextUtil.ShortenText(Model.Query, 60, "...")}</b> v celém Hlídači",
                     buttonCss: "btn btn-warning btn-sm",
                     prefillWDname: $"Změny o {Devmasters.TextUtil.ShortenText(Model.Query, 60, "...")}",
                     showWdList: false, preButtonText: "");
-    <partial name="WebUtil/AddWatchdog" model="wdModel"/>
+                <partial name="WebUtil/AddWatchdog" model="wdModel" />
             }
         </div>
     </div>
 </div>
-<hr/>
+<hr />
 
 @{
     //debug
@@ -292,7 +292,7 @@ else if (Model.HasResults == false)
     {
         if (Model.HasFirmy)
         {
-            htmlLinks.Add(new Tuple<string, string>(Url.Action("HledatFirmy", "Home", new {q = Model.Firmy.Query}), Devmasters.Lang.Plural.Get(Model.Firmy.Total, "<b>jednu firmu</b>", "<b>{0} firmy</b>", "<b>{0} firem</b>")));
+            htmlLinks.Add(new Tuple<string, string>(Url.Action("HledatFirmy", "Home", new { q = Model.Firmy.Query }), Devmasters.Lang.Plural.Get(Model.Firmy.Total, "<b>jednu firmu</b>", "<b>{0} firmy</b>", "<b>{0} firem</b>")));
         }
     }
     else if (part == Model.Datasets.GetType().Name)
@@ -334,12 +334,28 @@ else if (Model.HasResults == false)
             }
         </div>
     </div>
-    <hr/>
+    <hr />
 }
 
 
 <div class="row">
     <div class="col-xs-12 col-sm-12">
+
+        @{
+            //analyze query
+            var splQ = HlidacStatu.Repositories.Searching.SplittingQuery.SplitQuery(Model.Query);
+            string[] prefixes = new string[] { "osobaid:", "ico:" };
+            if (splQ.Parts.Any(m => prefixes.Contains(m.Prefix)))
+            {
+                <div class="row">
+                    @foreach (var osP in splQ.Parts.Where(m => m.Prefix == "osobaid:"))
+                    {
+                        Osoba fo = Osoby.GetByNameId.Get(osP.Value);
+                        await RenderOsobaBox(fo, splQ.Parts.Count(m => m.Prefix == "osobaid:") > 1);
+                    }
+                </div>
+            }
+        }
 
         @*MAIN RESULT*@
         @if (paorder.Count > 0)
@@ -428,7 +444,7 @@ else if (Model.HasResults == false)
 
             if (htmlLinks.Count > 0)
             {
-                <hr style="margin-top:30px;"/>
+                <hr style="margin-top:30px;" />
                 <h3><span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> jsme nalezli ještě v těchto databázích</h3>
                 foreach (var items in htmlLinks.Chunk((htmlLinks.Count / 3) + 1))
                 {
@@ -464,6 +480,164 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
 
 @functions
 {
+    private async Task RenderFirmaBox(Firma f)
+    {
+        if (f == null)
+        {
+            return;
+        }
+
+        var alldata = f.AktualniVazby(Relation.AktualnostType.Nedavny);
+
+        var data = f.AktualniVazby(Relation.AktualnostType.Nedavny)
+            .Where(v => !string.IsNullOrEmpty(v.To.Id))
+            .GroupBy(f => f.To.Id, v => v, (ico, v) => new
+            {
+                ICO = ico,
+                stat = Firmy.Get(ico).StatistikaRegistruSmluv()
+            })
+            .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv).ThenBy(m => m.ICO)
+            .ToArray();
+
+        var osobaStatDescTotalKc = Smlouva.NicePrice(data.Sum(d => d.stat.Summary().CelkovaHodnotaSmluv), html: true, shortFormat: true);
+        string osobaStatDescription = string.Format("{0}{1}",
+            Devmasters.Lang.Plural.GetWithZero((int)alldata.Count(), "Žádná vazba na firmy", "Celkem vazba na <b>{0} firmu</b>", "Celkem vazba na <b>{0} firmy</b>", "Celkem vazba na <b>{0} firem</b>"),
+            Devmasters.Lang.Plural.GetWithZero((int)data.Sum(d => d.stat.Summary().PocetSmluv), "."
+                , ", <b>{0} smlouva</b> v registru smluv za <b>" + osobaStatDescTotalKc + "</b>"
+                , ";, <b>{0} smlouvy</b> v registru smluv za <b>" + osobaStatDescTotalKc + "</b>"
+                , ";, <b>{0} smluv</b> v registru smluv za <b>" + osobaStatDescTotalKc) + "</b>"
+            );
+        var funkceOsoba = f.Description(true, e => true, numOfRecords: 2);
+        string box1Css = "col-sm-4 col-md-3";
+        string box2Css = "col-sm-8 col-md-9";
+
+            <div class="@box1Css">
+                    <a href="@f.GetUrl(true)">@f.Jmeno</a>
+                    <div>
+                        <a class="section-title link--blue" href="@f.GetUrl(true)">
+title
+                        </a>
+                        <div class="new-p new-p--gray new-p--small">
+                            narozeni
+                        </div>
+                        <div class="new-p new-p--gray new-p--small">
+                            status
+                        </div>
+                    </div>
+                </div>
+            <div class="@box2Css">
+
+                @if (!string.IsNullOrWhiteSpace(funkceOsoba))
+                {
+                    <div class="search-result-label">
+                        Funkce
+                    </div>
+                    <div class="new-p">
+                        @Html.Raw(funkceOsoba)
+                    </div>
+                }
+                @if (false && f.Sponzoring().Count() > 0)
+                {
+                    <div class="search-result-label">
+                        Podpora politických stran
+                    </div>
+                    <div class="new-p">
+                        @Html.Raw(f.SponzoringToHtml(5))
+                    </div>
+                }
+                <div class="search-result-label">
+                    Angažovanost
+                </div>
+                <div class="new-p">
+                    @Html.Raw(osobaStatDescription)
+                </div>
+
+            </div>
+    }
+
+    private async Task RenderOsobaBox(Osoba osoba1, bool smaller = false)
+    {
+        if (osoba1 == null)
+        {
+            return;
+        }
+
+        var alldata = osoba1.AktualniVazby(Relation.AktualnostType.Nedavny);
+
+        var data = osoba1.AktualniVazby(Relation.AktualnostType.Nedavny)
+            .Where(v => !string.IsNullOrEmpty(v.To.Id))
+            .GroupBy(f => f.To.Id, v => v, (ico, v) => new
+            {
+                ICO = ico,
+                stat = Firmy.Get(ico).StatistikaRegistruSmluv()
+            })
+            .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv).ThenBy(m => m.ICO)
+            .ToArray();
+
+        var osobaStatDescTotalKc = Smlouva.NicePrice(data.Sum(d => d.stat.Summary().CelkovaHodnotaSmluv), html: true, shortFormat: true);
+        string osobaStatDescription = string.Format("{0}{1}",
+            Devmasters.Lang.Plural.GetWithZero((int)alldata.Count(), "Žádná vazba na firmy", "Celkem vazba na <b>{0} firmu</b>", "Celkem vazba na <b>{0} firmy</b>", "Celkem vazba na <b>{0} firem</b>"),
+            Devmasters.Lang.Plural.GetWithZero((int)data.Sum(d => d.stat.Summary().PocetSmluv), "."
+                , ", <b>{0} smlouva</b> v registru smluv za <b>" + osobaStatDescTotalKc + "</b>"
+                , ";, <b>{0} smlouvy</b> v registru smluv za <b>" + osobaStatDescTotalKc + "</b>"
+                , ";, <b>{0} smluv</b> v registru smluv za <b>" + osobaStatDescTotalKc) + "</b>"
+            );
+        var funkceOsoba = osoba1.Description(true, e => true, numOfRecords: 2);
+        string box1Css = "col-sm-4 col-md-3";
+        string box2Css = "col-sm-8 col-md-9";
+
+        <div class="@box1Css">
+            <div class="person-profile-thumb">
+                <a href="@osoba1.GetUrl(true)">
+                    <div class="profile-picture" style="background-image: url('@osoba1.GetPhotoUrl(true)')">
+                    </div>
+                </a>
+                <div>
+                    <a class="section-title link--blue" href="@osoba1.GetUrl(true)">
+                        @osoba1.FullName()
+                    </a>
+                    <div class="new-p new-p--gray new-p--small">
+                        @osoba1.NarozeniYear()
+                    </div>
+                    <div class="new-p new-p--gray new-p--small">
+                        @osoba1.StatusOsoby().ToNiceDisplayName()
+                    </div>
+                </div>
+            </div>
+        </div>
+        @if (smaller == false)
+        {
+            <div class="@box2Css">
+
+                @if (!string.IsNullOrWhiteSpace(funkceOsoba))
+                {
+                    <div class="search-result-label">
+                        Funkce
+                    </div>
+                    <div class="new-p">
+                        @Html.Raw(funkceOsoba)
+                    </div>
+                }
+                @if (false && osoba1.Sponzoring().Count() > 0)
+                {
+                    <div class="search-result-label">
+                        Podpora politických stran
+                    </div>
+                    <div class="new-p">
+                        @Html.Raw(osoba1.SponzoringToHtml(5))
+                    </div>
+                }
+                <div class="search-result-label">
+                    Angažovanost
+                </div>
+                <div class="new-p">
+                    @Html.Raw(osobaStatDescription)
+                </div>
+
+            </div>
+        }
+    }
+
     private async Task RenderOsoby(int numOfOsob)
     {
         string osobaStatDescription = "";
@@ -487,8 +661,8 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
 
         var osobaStatDescTotalKc = Smlouva.NicePrice(data.Sum(d => d.stat.Summary().CelkovaHodnotaSmluv), html: true, shortFormat: true);
         osobaStatDescription = string.Format("{0}{1}",
-            Devmasters.Lang.Plural.GetWithZero((int) alldata.Count(), "Žádná vazba na firmy", "Celkem vazba na <b>{0} firmu</b>", "Celkem vazba na <b>{0} firmy</b>", "Celkem vazba na <b>{0} firem</b>"),
-            Devmasters.Lang.Plural.GetWithZero((int) data.Sum(d => d.stat.Summary().PocetSmluv), "."
+            Devmasters.Lang.Plural.GetWithZero((int)alldata.Count(), "Žádná vazba na firmy", "Celkem vazba na <b>{0} firmu</b>", "Celkem vazba na <b>{0} firmy</b>", "Celkem vazba na <b>{0} firem</b>"),
+            Devmasters.Lang.Plural.GetWithZero((int)data.Sum(d => d.stat.Summary().PocetSmluv), "."
                 , ", <b>{0} smlouva</b> v registru smluv za <b>" + osobaStatDescTotalKc + "</b>"
                 , ";, <b>{0} smlouvy</b> v registru smluv za <b>" + osobaStatDescTotalKc + "</b>"
                 , ";, <b>{0} smluv</b> v registru smluv za <b>" + osobaStatDescTotalKc) + "</b>"
@@ -572,7 +746,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
             {
                 <div class="row" id="osoba" style="margin-top:40px;">
                     <div class="col-xs-12">
-                        <partial name="SearchResults/SearchResultsOsoby" model="@Model.Osoby"/>
+                        <partial name="SearchResults/SearchResultsOsoby" model="@Model.Osoby" />
                     </div>
                 </div>
             }
@@ -597,7 +771,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
     {
         if (numOfVZ == 0)
         {
-            <hr/>
+            <hr />
             <h4>
                 Našli jsme
                 @Html.Raw(Devmasters.Lang.Plural.Get(Model.VZ.Total,
@@ -630,7 +804,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
 
         <div class="row" id="verejnezakazky">
             <div class="col-xs-12">
-                <partial name="../VerejneZakazky/_SearchResult" model="@Model.VZ"/>
+                <partial name="../VerejneZakazky/_SearchResult" model="@Model.VZ" />
             </div>
         </div>
     }
@@ -639,7 +813,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
     {
         if (numOfDotaci == 0)
         {
-            <hr/>
+            <hr />
             <h4>
                 Našli jsme
                 @Html.Raw(Devmasters.Lang.Plural.Get(Model.Dotace.Total,
@@ -656,7 +830,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
         Model.Dotace.SmallRender = true;
         <div class="row" id="dotace">
             <div class="col-xs-12">
-                <partial name="../Dotace/_SearchResult" model="@Model.Dotace"/>
+                <partial name="../Dotace/_SearchResult" model="@Model.Dotace" />
             </div>
         </div>
     }
@@ -665,7 +839,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
     {
         if (numOfInsolvenci == 0)
         {
-            <hr/>
+            <hr />
             <h4>
                 Našli jsme
                 @Html.Raw(Devmasters.Lang.Plural.Get(Model.Insolvence.Total,
@@ -682,7 +856,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
         Model.Insolvence.SmallRender = true;
         <div class="row" id="insolvence">
             <div class="col-xs-12">
-                <partial name="../Insolvence/_SearchResult" model="@Model.Insolvence"/>
+                <partial name="../Insolvence/_SearchResult" model="@Model.Insolvence" />
             </div>
         </div>
     }
@@ -691,7 +865,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
     {
         if (numOfDSrecords == 0)
         {
-            <hr/>
+            <hr />
             <h4>
                 V dalších databázích jsme našli
                 @Html.Raw(Devmasters.Lang.Plural.Get(Model.Datasets.Total,
@@ -729,18 +903,18 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
 
         <div class="row">
             @{
-        var tabs = Model.Datasets.Results.Where(m => m.Total > 0).OrderByDescending(m => m.Total)
-            .Select(m => $"{m.DataSet.Registration().name}&nbsp;({HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(m.Total)})");
-        List<string> results = new();
+                var tabs = Model.Datasets.Results.Where(m => m.Total > 0).OrderByDescending(m => m.Total)
+                    .Select(m => $"{m.DataSet.Registration().name}&nbsp;({HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(m.Total)})");
+                List<string> results = new();
 
-        foreach (var rds in Model.Datasets.Results
-            .Where(m => m.Total > 0)
-            .OrderByDescending(m => m.Total))
-        {
-            results.Add(rds.RenderResultsInHtml(Model.Query));
-        }
+                foreach (var rds in Model.Datasets.Results
+                    .Where(m => m.Total > 0)
+                    .OrderByDescending(m => m.Total))
+                {
+                    results.Add(rds.RenderResultsInHtml(Model.Query));
+                }
             }
-            <partial name="WebUtil/VerticalTabs" model="@(new VerticalTabsViewModel(tabs?.ToList(), results))"/>
+            <partial name="WebUtil/VerticalTabs" model="@(new VerticalTabsViewModel(tabs?.ToList(), results))" />
         </div>
     }
 
@@ -748,7 +922,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
     {
         if (numOfFirem == 0)
         {
-            <hr/>
+            <hr />
             <h4>
                 Našli jsme
                 @Html.Raw(Devmasters.Lang.Plural.Get(Model.Firmy.Total,
@@ -778,7 +952,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
 
         <h4>Nejvíce relevantní nalezené firmy</h4>
         <div class="row" style="">
-            <partial name="SearchResults/SearchResultsFirmy" model="@Model.Firmy"/>
+            <partial name="SearchResults/SearchResultsFirmy" model="@Model.Firmy" />
         </div>
     }
 
@@ -786,7 +960,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
     {
         if (numOfSmluv == 0)
         {
-            <hr/>
+            <hr />
             <h4>
                 Našli jsme
                 @Html.Raw(Devmasters.Lang.Plural.Get(Model.Smlouvy.Total,
@@ -799,10 +973,10 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
             </h4>
             return;
         }
-    //Model.Smlouvy = SmlouvaRepo.Search.SimpleSearch(Model.Query, 1, new SmlouvaSearchResult().DefaultPageSize(),
-    //        SmlouvaRepo.Search.OrderResult.Relevance,
-    //        anyAggregation: new Nest.AggregationContainerDescriptor<Smlouva>().Sum("sumKc", m => m.Field(f => f.CalculatedPriceWithVATinCZK))
-    //        );
+        //Model.Smlouvy = SmlouvaRepo.Search.SimpleSearch(Model.Query, 1, new SmlouvaSearchResult().DefaultPageSize(),
+        //        SmlouvaRepo.Search.OrderResult.Relevance,
+        //        anyAggregation: new Nest.AggregationContainerDescriptor<Smlouva>().Sum("sumKc", m => m.Field(f => f.CalculatedPriceWithVATinCZK))
+        //        );
         Model.Smlouvy.SmallRender = true;
         Model.Smlouvy.ShowWatchdog = false;
         <div id="smlouvy" class="row">

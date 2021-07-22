@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities.Analysis;
+using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
+
 using Nest;
 
 namespace HlidacStatu.Repositories.Statistics
@@ -23,6 +26,32 @@ namespace HlidacStatu.Repositories.Statistics
                     f => f.ICO);
 
             return cache;
+        }
+        internal static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)> HoldingDotaceCache()
+        {
+            var cache = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)>
+                .GetSafeInstance("Holding_DotaceStatistics",
+                    (obj) => CreateHoldingDotace(obj.firma, obj.aktualnost),
+                    TimeSpan.FromHours(12),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                    Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                    obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
+
+            return cache;
+        }
+
+        public static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CreateHoldingDotace(Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)
+        {
+            var firmy = firma.Holding(aktualnost).ToArray();
+
+            var statistiky = firmy.Select(f => f.StatistikaDotaci()).Append(firma.StatistikaDotaci()).ToArray();
+
+            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistiky);
+
+            return aggregate;
+
         }
 
         public static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CreateDotace(Firma f)
@@ -64,7 +93,35 @@ namespace HlidacStatu.Repositories.Statistics
 
             return new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(f.ICO, statistiky);
         }
-        
+
+        static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor)> _holdingSmlouvaCache
+            = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor)>
+                .GetSafeInstance("Holding_SmlouvyStatistics_v3_",
+                    (obj) => CalculateStats(obj.firma, obj.obor),
+                    TimeSpan.FromHours(12),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                    Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                    obj => obj.firma.ICO + "-" + obj.aktualnost.ToString() + "-" + (obj.obor ?? 0));
+
+        public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> HoldingCachedStatistics(Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor = null)
+        {
+            return _holdingSmlouvaCache.Get((firma, aktualnost, obor));
+        }
+        public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> HoldingCalculateStats(Firma f, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor)
+        {
+            var firmy = f.Holding(aktualnost).ToArray();
+
+            var statistiky = firmy.Select(f => f.StatistikaRegistruSmluv(obor)).Append(f.StatistikaRegistruSmluv(obor))
+                .ToArray();
+
+            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>.Aggregate(statistiky);
+
+            return aggregate;
+
+        }
+
         static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)> _smlouvaCache
             = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
                 .GetSafeInstance("Firma_SmlouvyStatistics_v3_",
@@ -74,13 +131,12 @@ namespace HlidacStatu.Repositories.Statistics
                     Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                     Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
                     Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
-                    obj => obj.firma.ICO + "-"+(obj.obor??0));
+                    obj => obj.firma.ICO + "-" + (obj.obor ?? 0));
 
         public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> CachedStatistics(Firma firma, int? obor)
         {
-            return _smlouvaCache.Get( (firma, obor) );
+            return _smlouvaCache.Get((firma, obor));
         }
-
         public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> CalculateStats(Firma f, int? obor)
         {
             StatisticsSubjectPerYear<Smlouva.Statistics.Data> res = null;
@@ -97,14 +153,14 @@ namespace HlidacStatu.Repositories.Statistics
 
             return res;
         }
-        
+
         private static Util.Cache.CouchbaseCacheManager<Firma.Statistics.VZ, string> _vzCache
             = Util.Cache.CouchbaseCacheManager<Firma.Statistics.VZ, string>.GetSafeInstance("Firma_SmlouvyStatistics", CreateVZ, TimeSpan.FromHours(12),
                 Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                 Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                 Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
                 Devmasters.Config.GetWebConfigValue("CouchbasePassword"));
-        
+
         public static Firma.Statistics.VZ GetVZ(string ico)
         {
             return _vzCache.Get(ico);
@@ -136,20 +192,20 @@ namespace HlidacStatu.Repositories.Statistics
             Dictionary<int, BasicData> _calc_NovaFirmaDodavatel = ES.QueryGrouped.SmlouvyPerYear($"ico:{f.ICO} AND ( hint.pocetDniOdZalozeniFirmy:>-50 AND hint.pocetDniOdZalozeniFirmy:<30 )", Consts.RegistrSmluvYearsList);
 
 
-            Dictionary<int, Firma.Statistics.VZ.Data> data = new ();
+            Dictionary<int, Firma.Statistics.VZ.Data> data = new();
             foreach (var year in Consts.RegistrSmluvYearsList)
             {
                 //var stat = f.Statistic().RatingPerYear[year];
                 data.Add(year, new Firma.Statistics.VZ.Data()
-                    {
-                    }
+                {
+                }
                 );
             }
 
             return new Firma.Statistics.VZ(f.ICO, data);
         }
-        
-        
-        
+
+
+
     }
 }

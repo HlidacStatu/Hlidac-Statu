@@ -283,7 +283,7 @@
 
         @if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count() > 0)
         {
-            var dotaceHoldingStat = Model.HoldingStatisticsDotace(Relation.AktualnostType.Nedavny);
+            var dotaceHoldingStat = Model.HoldingStatistikaDotaci(Relation.AktualnostType.Nedavny);
             var dotaceHoldingSummary = dotaceHoldingStat.Summary();
             var subjectsWithSubsidiesCount = Model.Holding(Relation.AktualnostType.Nedavny)
                 .Where(s => s.StatistikaDotaci().HasStatistics).Count();
