@@ -32,7 +32,7 @@
     "Michal": {
       "commandName": "IIS",
       "launchBrowser": true,
-      "launchUrl": "http://lcore.hlidacstatu.cz",
+      "launchUrl": "http://local.hlidacstatu.cz",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Michal"
       },
