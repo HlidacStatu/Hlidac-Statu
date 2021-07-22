@@ -177,7 +177,9 @@ else
         NemocniceOnlyData[] hdata = hdataQ.Hits
             .Select(m => m.Source)
             .ToArray();
-
+        if (hdata.Count() == 0) {
+            return;
+        }
 
         var chartdata = hdata.OrderBy(o => o.datum)
             .Select(m => new
