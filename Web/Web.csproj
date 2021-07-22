@@ -22,12 +22,18 @@
         aby při publish nevznikla chyba -->
     <ItemGroup>
         <None Remove="_app_offline.htm" />
+        <Compile Remove="publish\**" />
         <Content Remove="App_Data\**" />
+        <Content Remove="publish\**" />
     </ItemGroup>
 
 <!--    Potom je potřeba nakopírovat obsah složky App_data a soubor _app_offline.htm -->
     <ItemGroup>
         <Content Include="App_Data\**" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Remove="publish\**" />
+      <None Remove="publish\**" />
     </ItemGroup>
 
 
