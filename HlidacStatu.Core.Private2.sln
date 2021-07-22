@@ -8,7 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_deploy", "_deploy", "{34338A10-2566-4B27-BE7F-D972FD4CCF01}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		..\gardohundoprivate\.gitignore = ..\gardohundoprivate\.gitignore
+		..\Hlidac-Statu-Private\.gitignore = ..\Hlidac-Statu-Private\.gitignore
 		..\PrivateDocumentation\Deploy\Web\appsettings.Production.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production.json
 		..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json
 		..\PrivateDocumentation\Deploy\Web\deployWeb.bat = ..\PrivateDocumentation\Deploy\Web\deployWeb.bat
@@ -43,7 +43,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZabbixSenderNet", "3rd\Zabb
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZabbixApi", "3rd\ZabbixApi\ZabbixApi.csproj", "{50EBBEF2-32D0-42AC-B5D0-2F1DD1BEB3E0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.OCR.TextReadability", "..\gardohundoprivate\OCR\Lib.OCR.TextReadability\Lib.OCR.TextReadability.csproj", "{B3F13956-BC92-4B49-A375-1882BDA8878C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.OCR.TextReadability", "..\Hlidac-Statu-Private\OCR\Lib.OCR.TextReadability\Lib.OCR.TextReadability.csproj", "{B3F13956-BC92-4B49-A375-1882BDA8878C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Q.Messages", "HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj", "{A684F864-7C53-4985-939A-B7D2E35F9FFB}"
 EndProject
@@ -73,11 +73,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SponzoriLoader", "SponzoriL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PeopleLoader", "PeopleLoader\PeopleLoader.csproj", "{1A2966FE-E825-44DE-A74E-85EA9F79FCF1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Data.VZ.Import", "..\gardohundoprivate\Lib.Data.VZ.Import\Lib.Data.VZ.Import.csproj", "{D6A32076-4918-42A0-88E0-8AF58A8C32A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Data.VZ.Import", "..\Hlidac-Statu-Private\Lib.Data.VZ.Import\Lib.Data.VZ.Import.csproj", "{D6A32076-4918-42A0-88E0-8AF58A8C32A9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Tasks", "..\gardohundoprivate\Lib.Tasks\Lib.Tasks.csproj", "{2B7237F8-F4E5-455F-B9E1-FA9F2A548FD3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Tasks", "..\Hlidac-Statu-Private\Lib.Tasks\Lib.Tasks.csproj", "{2B7237F8-F4E5-455F-B9E1-FA9F2A548FD3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Downloader", "..\gardohundoprivate\Downloader\Downloader.csproj", "{ED3844A4-80B8-4AD1-88A5-FF4C294976F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Downloader", "..\Hlidac-Statu-Private\Downloader\Downloader.csproj", "{ED3844A4-80B8-4AD1-88A5-FF4C294976F5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repositories", "Repositories\Repositories.csproj", "{8B00D0C8-2129-4A20-AB12-38ADEA2F0395}"
 EndProject
@@ -93,9 +93,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{944AEC9D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OCR", "OCR", "{584BE7E5-1233-4848-8C24-0A8A1D82ECC6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground", "..\gardohundoprivate\Playground\Playground.csproj", "{D16EB416-4EC8-4247-B8BF-D20CBE6979EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground", "..\Hlidac-Statu-Private\Playground\Playground.csproj", "{D16EB416-4EC8-4247-B8BF-D20CBE6979EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OCRQueueManager", "..\gardohundoprivate\OCRQueueManager\OCRQueueManager.csproj", "{C1F6EC6A-688B-4832-A02A-2F17368C1880}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OCRQueueManager", "..\Hlidac-Statu-Private\OCRQueueManager\OCRQueueManager.csproj", "{C1F6EC6A-688B-4832-A02A-2F17368C1880}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
