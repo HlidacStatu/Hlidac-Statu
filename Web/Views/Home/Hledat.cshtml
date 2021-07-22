@@ -353,7 +353,16 @@ else if (Model.HasResults == false)
                     {
                         parts++;
                         Osoba fo = Osoby.GetByNameId.Get(osP.Value);
-                        await RenderOsobaBox(fo, splQ.Parts.Count(m => m.Prefix == "osobaid:") > 1);
+                        await RenderOsobaBox(fo, splQ.Parts.Count(m => m.Prefix=="osobaid:") > 1); //Contains(m.Prefix)
+
+                        if (parts % 4 == 0)
+                        {
+                            <div class="clearfix visible-sm-block"></div>
+                        }
+                        if (parts % 3 == 0)
+                        {
+                            <div class="clearfix visible-md-block"></div>
+                        }
                     }
                     @foreach (var fP in splQ.Parts.Where(m => m.Prefix == "ico:"))
                     {
@@ -371,6 +380,7 @@ else if (Model.HasResults == false)
 
                     }
                 </div>
+                <hr style="margin-top:30px" />
             }
         }
 
@@ -607,7 +617,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
             );
         var funkceOsoba = osoba1.Description(true, e => true, numOfRecords: 2);
         string box1Css = "col-sm-4 col-md-3";
-        string box2Css = "col-sm-8 col-md-9";
+        string box2Css = "col-sm-4 col-md-3";
 
         <div class="@box1Css" style="border-right: #eee solid 1px; height: 120px !important; overflow: auto hidden;margin-top:25px">
             <div class="person-profile-thumb">
@@ -634,7 +644,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
         </div>
         @if (smaller == false)
         {
-            <div class="@box2Css">
+            <div class="@box2Css" style="border-right: #eee solid 1px; height: 120px !important; overflow: auto hidden;margin-top:25px">
 
                 @if (!string.IsNullOrWhiteSpace(funkceOsoba))
                 {
