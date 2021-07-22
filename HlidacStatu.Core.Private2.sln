@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_deploy", "_deploy", "{3433
 		..\Hlidac-Statu-Private\.gitignore = ..\Hlidac-Statu-Private\.gitignore
 		..\PrivateDocumentation\Deploy\Web\appsettings.Production.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production.json
 		..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json
+		..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat = ..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat
 		..\PrivateDocumentation\Deploy\Web\deployWeb.bat = ..\PrivateDocumentation\Deploy\Web\deployWeb.bat
 		nuget.config = nuget.config
 		README.MD = README.MD
@@ -95,7 +96,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OCR", "OCR", "{584BE7E5-123
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground", "..\Hlidac-Statu-Private\Playground\Playground.csproj", "{D16EB416-4EC8-4247-B8BF-D20CBE6979EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OCRQueueManager", "..\Hlidac-Statu-Private\OCRQueueManager\OCRQueueManager.csproj", "{C1F6EC6A-688B-4832-A02A-2F17368C1880}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OCRQueueManager", "..\Hlidac-Statu-Private\OCRQueueManager\OCRQueueManager.csproj", "{C1F6EC6A-688B-4832-A02A-2F17368C1880}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
