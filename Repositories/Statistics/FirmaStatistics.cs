@@ -96,8 +96,8 @@ namespace HlidacStatu.Repositories.Statistics
 
         static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor)> _holdingSmlouvaCache
             = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor)>
-                .GetSafeInstance("Holding_SmlouvyStatistics_v3_",
-                    (obj) => CalculateStats(obj.firma, obj.obor),
+                .GetSafeInstance("Holding_SmlouvyStatistics_v1_",
+                    (obj) => HoldingCalculateStats(obj.firma, obj.aktualnost, obj.obor),
                     TimeSpan.FromHours(12),
                     Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                     Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),

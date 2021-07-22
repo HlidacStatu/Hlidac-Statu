@@ -543,7 +543,8 @@ namespace HlidacStatu.Extensions
 
         public static InfoFact[] InfoFacts(this Firma firma) //otázka jestli tohle nebrat z cachce
         {
-            return _infoFactsCache().Get(firma);
+            var inf =  _infoFactsCache().Get(firma);
+            return inf;
         }
         private static InfoFact[] GetInfoFacts(Firma firma)
         {
@@ -577,11 +578,11 @@ namespace HlidacStatu.Extensions
                                            "celkem {0} smluv")
                                        + $" za <b>{RenderData.ShortNicePrice(stat[rok].CelkovaHodnotaSmluv, html: true)}</b>, "
                                        + "celý holding "
-                                       + Devmasters.Lang.Plural.Get(stat[rok].PocetSmluv,
+                                       + Devmasters.Lang.Plural.Get(statHolding[rok].PocetSmluv,
                                            "jednu smlouvu",
                                            "{0} smlouvy",
                                            "celkem {0} smluv")
-                                       + $" za <b>{RenderData.ShortNicePrice(stat[rok].CelkovaHodnotaSmluv, html: true)}</b>, "
+                                       + $" za <b>{RenderData.ShortNicePrice(statHolding[rok].CelkovaHodnotaSmluv, html: true)}</b>, "
 
                         , InfoFact.ImportanceLevel.Summary)
                     );
