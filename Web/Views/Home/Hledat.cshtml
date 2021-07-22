@@ -342,16 +342,33 @@ else if (Model.HasResults == false)
     <div class="col-xs-12 col-sm-12">
 
         @{
-            //analyze query
+            //analyze query and show big boxes
             var splQ = HlidacStatu.Repositories.Searching.SplittingQuery.SplitQuery(Model.Query);
             string[] prefixes = new string[] { "osobaid:", "ico:" };
+            int parts = 0;
             if (splQ.Parts.Any(m => prefixes.Contains(m.Prefix)))
             {
-                <div class="row">
+                <div class="row" style="">
                     @foreach (var osP in splQ.Parts.Where(m => m.Prefix == "osobaid:"))
                     {
+                        parts++;
                         Osoba fo = Osoby.GetByNameId.Get(osP.Value);
                         await RenderOsobaBox(fo, splQ.Parts.Count(m => m.Prefix == "osobaid:") > 1);
+                    }
+                    @foreach (var fP in splQ.Parts.Where(m => m.Prefix == "ico:"))
+                    {
+                        parts++;
+                        Firma fo = Firmy.Get(fP.Value);
+                        await RenderFirmaBox(fo);
+                        if (parts % 4 == 0)
+                        {
+                            <div class="clearfix visible-sm-block"></div>
+                        }
+                        if (parts % 3 == 0)
+                        {
+                            <div class="clearfix visible-md-block"></div>
+                        }
+
                     }
                 </div>
             }
@@ -378,7 +395,7 @@ else if (Model.HasResults == false)
                 {
                     Devmasters.DT.StopWatchEx sw = new();
                     sw.Start();
-                    RenderVZ(numOfVZ);
+                    await RenderVZ(numOfVZ);
                     sw.Stop();
                     viewRenderTimes.Add("VZ", sw.Elapsed);
                 }
@@ -389,7 +406,7 @@ else if (Model.HasResults == false)
                 {
                     Devmasters.DT.StopWatchEx sw = new();
                     sw.Start();
-                    RenderDotace(numOfDotaci);
+                    await RenderDotace(numOfDotaci);
                     sw.Stop();
                     viewRenderTimes.Add("Dotace", sw.Elapsed);
                 }
@@ -486,6 +503,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
         {
             return;
         }
+        var ceo = f.Ceo();
 
         var alldata = f.AktualniVazby(Relation.AktualnostType.Nedavny);
 
@@ -499,60 +517,65 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
             .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv).ThenBy(m => m.ICO)
             .ToArray();
 
-        var osobaStatDescTotalKc = Smlouva.NicePrice(data.Sum(d => d.stat.Summary().CelkovaHodnotaSmluv), html: true, shortFormat: true);
-        string osobaStatDescription = string.Format("{0}{1}",
-            Devmasters.Lang.Plural.GetWithZero((int)alldata.Count(), "Žádná vazba na firmy", "Celkem vazba na <b>{0} firmu</b>", "Celkem vazba na <b>{0} firmy</b>", "Celkem vazba na <b>{0} firem</b>"),
-            Devmasters.Lang.Plural.GetWithZero((int)data.Sum(d => d.stat.Summary().PocetSmluv), "."
-                , ", <b>{0} smlouva</b> v registru smluv za <b>" + osobaStatDescTotalKc + "</b>"
-                , ";, <b>{0} smlouvy</b> v registru smluv za <b>" + osobaStatDescTotalKc + "</b>"
-                , ";, <b>{0} smluv</b> v registru smluv za <b>" + osobaStatDescTotalKc) + "</b>"
-            );
-        var funkceOsoba = f.Description(true, e => true, numOfRecords: 2);
         string box1Css = "col-sm-4 col-md-3";
-        string box2Css = "col-sm-8 col-md-9";
 
-            <div class="@box1Css">
-                    <a href="@f.GetUrl(true)">@f.Jmeno</a>
-                    <div>
-                        <a class="section-title link--blue" href="@f.GetUrl(true)">
-title
-                        </a>
-                        <div class="new-p new-p--gray new-p--small">
-                            narozeni
-                        </div>
-                        <div class="new-p new-p--gray new-p--small">
-                            status
-                        </div>
+        <div class="@box1Css" style="border-right: #eee solid 1px; height: 120px !important; overflow: auto hidden; margin-top: 25px">
+            <div class="person-profile-thumb">
+                <a href="@f.GetUrl(true)">
+                    @if (ceo.Osoba != null && ceo.Osoba.IsValid())
+                    {
+                    <div class="profile-picture" style="background-image: url('@ceo.Osoba.GetPhotoUrl(local: true)')"></div>
+                    }
+                    else
+                    {
+                    <div class="profile-picture" style="background-image: url('/photo/unknown')"></div>
+                    }
+                </a>
+                <div>
+                <a class="section-title link--blue" href="@f.GetUrl(true)">@f.Jmeno</a>
+                    <div class="new-p new-p--gray new-p--small">
+                            @if (f.JsemOVM())
+                            {
+                                <span>Úřad - orgán veřejné moci.</span>
+                            }
+                            else if (f.JsemStatniFirma())
+                            {
+                                <span>Firma (spolu)vlastněná státem či samosprávou.</span>
+                            }
+                            else
+                            {
+                                <span>Soukromá firma.</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(f.StatusFull()))
+                            {
+                                <span class="text-muted">@f.StatusFull().</span>
+                            }
+
+                    </div>
+                    <div class="new-p new-p--gray new-p--small">
+                            @if (f.AktualniVazby(Relation.AktualnostType.Nedavny).Any())
+                                {
+                                    if (f.PatrimStatu())
+                                    {
+                                        <span>
+                                            Řídí <a href="/subjekt/Vazby/@f.ICO">@(Devmasters.Lang.Plural.Get(f.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací")).</a>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            Řídí <a href="/subjekt/Vazby/@f.ICO">@(Devmasters.Lang.Plural.Get(f.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů")).</a>
+                                        </span>
+                                    }
+                                }
+
+                    </div>
+                    <div class="new-p new-p--gray new-p--small">
+                        @Html.Raw(HlidacStatu.Util.InfoFact.RenderInfoFacts(f.InfoFacts(), 1, true, true, ", "))
                     </div>
                 </div>
-            <div class="@box2Css">
-
-                @if (!string.IsNullOrWhiteSpace(funkceOsoba))
-                {
-                    <div class="search-result-label">
-                        Funkce
-                    </div>
-                    <div class="new-p">
-                        @Html.Raw(funkceOsoba)
-                    </div>
-                }
-                @if (false && f.Sponzoring().Count() > 0)
-                {
-                    <div class="search-result-label">
-                        Podpora politických stran
-                    </div>
-                    <div class="new-p">
-                        @Html.Raw(f.SponzoringToHtml(5))
-                    </div>
-                }
-                <div class="search-result-label">
-                    Angažovanost
-                </div>
-                <div class="new-p">
-                    @Html.Raw(osobaStatDescription)
-                </div>
-
             </div>
+        </div>
     }
 
     private async Task RenderOsobaBox(Osoba osoba1, bool smaller = false)
@@ -586,7 +609,7 @@ title
         string box1Css = "col-sm-4 col-md-3";
         string box2Css = "col-sm-8 col-md-9";
 
-        <div class="@box1Css">
+        <div class="@box1Css" style="border-right: #eee solid 1px; height: 120px !important; overflow: auto hidden;margin-top:25px">
             <div class="person-profile-thumb">
                 <a href="@osoba1.GetUrl(true)">
                     <div class="profile-picture" style="background-image: url('@osoba1.GetPhotoUrl(true)')">
@@ -601,6 +624,10 @@ title
                     </div>
                     <div class="new-p new-p--gray new-p--small">
                         @osoba1.StatusOsoby().ToNiceDisplayName()
+                        @if (smaller)
+                        {
+                            @Html.Raw(", " +Devmasters.TextUtil.ShortenText(funkceOsoba,80))
+                        }
                     </div>
                 </div>
             </div>
@@ -641,40 +668,6 @@ title
     private async Task RenderOsoby(int numOfOsob)
     {
         string osobaStatDescription = "";
-        Osoba osoba1 = Model.Osoby.Results.FirstOrDefault();
-        if (osoba1 == null)
-        {
-            return;
-        }
-
-        var alldata = osoba1.AktualniVazby(Relation.AktualnostType.Nedavny);
-
-        var data = osoba1.AktualniVazby(Relation.AktualnostType.Nedavny)
-            .Where(v => !string.IsNullOrEmpty(v.To.Id))
-            .GroupBy(f => f.To.Id, v => v, (ico, v) => new
-            {
-                ICO = ico,
-                stat = Firmy.Get(ico).StatistikaRegistruSmluv()
-            })
-            .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv).ThenBy(m => m.ICO)
-            .ToArray();
-
-        var osobaStatDescTotalKc = Smlouva.NicePrice(data.Sum(d => d.stat.Summary().CelkovaHodnotaSmluv), html: true, shortFormat: true);
-        osobaStatDescription = string.Format("{0}{1}",
-            Devmasters.Lang.Plural.GetWithZero((int)alldata.Count(), "Žádná vazba na firmy", "Celkem vazba na <b>{0} firmu</b>", "Celkem vazba na <b>{0} firmy</b>", "Celkem vazba na <b>{0} firem</b>"),
-            Devmasters.Lang.Plural.GetWithZero((int)data.Sum(d => d.stat.Summary().PocetSmluv), "."
-                , ", <b>{0} smlouva</b> v registru smluv za <b>" + osobaStatDescTotalKc + "</b>"
-                , ";, <b>{0} smlouvy</b> v registru smluv za <b>" + osobaStatDescTotalKc + "</b>"
-                , ";, <b>{0} smluv</b> v registru smluv za <b>" + osobaStatDescTotalKc) + "</b>"
-            );
-        var funkceOsoba = osoba1.Description(true, e => true, numOfRecords: 2);
-        string box1Css = "col-sm-4 col-md-3";
-        string box2Css = "col-sm-8 col-md-9";
-        if (numOfOsob == 0)
-        {
-            box1Css = "col-sm-12";
-            box2Css = "col-sm-12";
-        }
 
 
         <div class="row" id="osoby">
@@ -689,60 +682,10 @@ title
                 </div>
             </div>
         </div>
-        <!-- big result -->
 
-        <div class="row">
-            <div class="@box1Css">
-                <div class="person-profile-thumb">
-                    <a href="@osoba1.GetUrl(true)">
-                        <div class="profile-picture" style="background-image: url('@osoba1.GetPhotoUrl(true)')">
-                        </div>
-                    </a>
-                    <div>
-                        <a class="section-title link--blue" href="@osoba1.GetUrl(true)">
-                            @osoba1.FullName()
-                        </a>
-                        <div class="new-p new-p--gray new-p--small">
-                            @osoba1.NarozeniYear()
-                        </div>
-                        <div class="new-p new-p--gray new-p--small">
-                            @osoba1.StatusOsoby().ToNiceDisplayName()
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="@box2Css">
-
-                @if (!string.IsNullOrWhiteSpace(funkceOsoba))
-                {
-                    <div class="search-result-label">
-                        Funkce
-                    </div>
-                    <div class="new-p">
-                        @Html.Raw(funkceOsoba)
-                    </div>
-                }
-                @if (false && osoba1.Sponzoring().Count() > 0)
-                {
-                    <div class="search-result-label">
-                        Podpora politických stran
-                    </div>
-                    <div class="new-p">
-                        @Html.Raw(osoba1.SponzoringToHtml(5))
-                    </div>
-                }
-                <div class="search-result-label">
-                    Angažovanost
-                </div>
-                <div class="new-p">
-                    @Html.Raw(osobaStatDescription)
-                </div>
-
-            </div>
-        </div>
-        if (Model.Osoby.Total > 1)
+        if (Model.Osoby.Total > 0)
         {
-            if (numOfOsob > 1)
+            if (numOfOsob > 0)
             {
                 <div class="row" id="osoba" style="margin-top:40px;">
                     <div class="col-xs-12">
