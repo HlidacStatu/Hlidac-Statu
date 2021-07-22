@@ -1,0 +1,46 @@
+﻿@model HlidacStatu.Repositories.Searching.OsobaSearchResult
+@using System.Linq;
+
+@{
+    ViewBag.Title = "Politici, osoby s vazbou na politiku, nebo sponzoři";
+    ViewBag.MoreHtml = "<p><b>Tady najdete <a href='/Report/5'>smlouvy soukromých firem s vazbou na politiky</a></b></p>";
+
+
+
+}
+
+
+@section scripts
+{
+    <script src="/Scripts/typeahead.jquery.min.js"></script>
+    <script src="/Scripts/bloodhound.min.js"></script>
+    <link href="/Content/typeaheadjs.css" media="all" rel="stylesheet" />
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+<div class="row">
+    <div class="col-xs-12">
+        <h3>
+            Nalezené osoby
+            <small>
+                @HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(Model.Results.Count(), HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)
+            </small>
+        </h3>
+
+    </div>
+</div>
+
+<partial name="SearchResults/SearchResultsOsoby" model="Model"/>
+
+<partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("Upozornit na chybu"))"/>
+
+<partial name="PolitikDisclaimer" view-data="ViewData"/>
+
+

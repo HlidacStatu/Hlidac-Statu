@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <AssemblyName>HlidacStatu.XLib</AssemblyName>
+        <RootNamespace>HlidacStatu.XLib</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Emails\Templates\ConfirmEmail.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\ConfirmEmail.Html.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\ConfirmEmail.Text.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundContracts.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundContracts.Html.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundContracts.Text.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundContractsIssues.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundContractsIssues.Html.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundContractsIssues.Text.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundContractsIssuesNoPayment.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundContractsIssuesNoPayment.Html.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundContractsIssuesNoPayment.Text.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundDataset.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundDataset.Html.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundDataset.Text.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundInsolvence.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundInsolvence.Html.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundInsolvence.Text.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundZakazky.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundZakazky.Html.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundZakazky.Text.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundZakazkyMarkdownPost.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\FoundZakazkyMarkdownPost.Text.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\GDPR.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\GDPR.Html.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\GDPR.Text.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\NotFoundZakazkyMarkdownPost.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\NotFoundZakazkyMarkdownPost.Text.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\Register.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\Register.Html.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\Register.Text.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\ResetPassword.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\ResetPassword.Html.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\ResetPassword.Text.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Datasets\Datasets.csproj" />
+      <ProjectReference Include="..\Entities\Entities.csproj" />
+      <ProjectReference Include="..\Repositories\Repositories.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Watchdogs\DotaceService.Watchdog.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
+    </ItemGroup>
+
+</Project>

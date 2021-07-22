@@ -1,0 +1,65 @@
+@using Microsoft.AspNetCore.Http.Extensions
+@using HlidacStatu.Repositories
+@model ExportButtonViewModel
+
+@{
+    @if (Model.GaPageEventId == null)
+    {
+        Model.GaPageEventId = Context.Request.Path;
+    }
+    var modalid = Devmasters.TextUtil.GenRandomString(8);<!-- Button trigger modal -->
+    
+}
+
+<a href="#" class="@Model.Style" onclick="ga('send', 'event', 'exportBtn', 'click','@Model.GaPageEventId'); return true;" role="button" data-toggle="modal" data-target="#modal@(modalid)"><span class="small">Exportovat výsledky do Excelu</span></a> <!-- Modal -->
+<div class="modal fade" id="modal@(modalid)" tabindex="-1" role="dialog" aria-labelledby="modal@(modalid)">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">@Model.Title</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Export výsledků hledání. Export obsahuje obvykle prvních @(User.IsInRole("Admin")||User.IsInRole("novinar") ? "10000" : (Model.Query=="*" ? "100" : "1000")) záznamů od první stránky v aktuálním třídění.
+                    Více záznamů není možné vyexportovat, pokud k tomu nemáte speciální oprávnění.
+                </p>
+                <p class="small text-muted">
+                    CSV a Tab delimited souboury jsou kódováné v UTF-8.
+                </p>
+                @if (User?.Identity?.IsAuthenticated == true)
+                {
+                    <p>
+                        <a role="button" class="btn btn-primary btn-sm" target="_blank"
+                           onclick="ga('send', 'event', 'exportBtn', 'export','@Model.GaPageEventId'); return true;"
+                           href="/manage/exportresult/@(Model.Typ)?q=@(System.Net.WebUtility.UrlEncode(Model.Query))&h=@(SmlouvaRepo.Searching.QueryHash(Model.Typ,Model.Query))&o=@(Model.Order)&ct=excel&@(Model.MoreParams)">
+                            Export do Excelu
+                        </a>
+                        @*<a role="button" class="btn btn-default btn-sm" target="_blank"
+                               href="/manage/exportresult/@(typ)?q=@(System.Net.WebUtility.UrlEncode(q))&h=@(SmlouvaRepo.Search.QueryHash(typ,q))&o=@(order)&ct=numbers&@(moreParams)">
+                                Do Apple Numbers
+                            </a>*@
+                        <a role="button" class="btn btn-default btn-sm" target="_blank"
+                           href="/manage/exportresult/@(Model.Typ)?q=@(System.Net.WebUtility.UrlEncode(Model.Query))&h=@(SmlouvaRepo.Searching.QueryHash(Model.Typ,Model.Query))&o=@(Model.Order)&ct=csv&@(Model.MoreParams)">
+                            Do CSV
+                        </a>
+                        <a role="button" class="btn btn-default btn-sm" target="_blank"
+                           href="/manage/exportresult/@(Model.Typ)?q=@(System.Net.WebUtility.UrlEncode(Model.Query))&h=@(SmlouvaRepo.Searching.QueryHash(Model.Typ,Model.Query))&o=@(Model.Order)&ct=tab&@(Model.MoreParams)">
+                            Do Tab delimited
+                        </a>
+                    </p> }
+                else
+                {
+                    <hr />
+                    <p><b>Export funguje pouze, když jste přihlášeni.</b></p>
+                    <p>
+                        <a onclick="ga('send', 'event', 'registerBtn', 'click','@Model.GaPageEventId'); return true;" href="/account/Register?returnUrl=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))">Registrace</a>
+                        je jednoduchá a zdarma. Pokud už jste zaregistrováni, stačí se <a href="/account/Login?returnUrl=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))">přihlásit</a>.
+                    </p>}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Zavřít</button>
+            </div>
+        </div>
+    </div>
+</div>

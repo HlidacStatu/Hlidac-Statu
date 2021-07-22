@@ -1,0 +1,143 @@
+﻿@model HlidacStatu.Entities.Smlouva
+@using HlidacStatu.Extensions
+@using HlidacStatu.Repositories
+@using HlidacStatu.Entities
+
+@{
+
+    bool angPolitiku = false;
+    bool isSponzorStrany = false;
+    if (Model.Prijemce != null)
+    {
+        angPolitiku = Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce })
+            .Where(m => !string.IsNullOrEmpty(m.ico))
+            .Any(m => StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(m.ico));
+        isSponzorStrany = Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce })
+            .Where(m => !string.IsNullOrEmpty(m.ico))
+            .Any(m => Firmy.Get(m.ico).Valid && Firmy.Get(m.ico).IsSponzor());
+    }
+
+
+}
+
+
+            @if (Model.OtherVersions().Length > 0)
+            {
+                <tr>
+                    <td>
+                        <h4>Provázané smlouvy</h4>
+                    </td>
+                    <td>
+                        <div>
+                            Nalezli jsme @(Devmasters.Lang.Plural.Get(Model.OtherVersions().Length, "jednu provázanou smlouvu", "{0} provázané smlouvy", "{0} provázaných smluv")):
+                            <ul>
+                                @foreach (var os in Model.OtherVersions())
+                                {
+                                    <li><a href="/Detail/@os.Id">Verze @os.Id; zveřejněna @os.casZverejneni.ToString("dd.MM.yyyy HH.mm"); @(os.platnyZaznam ? "platná" : "zneplatněna")</a></li>
+                                }
+                            </ul>
+                        </div>
+                        <span class="text-muted small">Toto je seznam smluv, které jsou zneplatněnými verzemi této smlouvy anebo jsou velmi podobné této smlouvě a je vysoká pravděpodobnost, že se jedná zneplatněné verze smlouvy, které nejsou správně označeny jako provázané.</span>
+                    </td>
+                </tr>
+            }
+
+            @if (Model.PodobneSmlouvy().Length > 0)
+            {
+                <tr>
+                    <td>
+                        Podobné smlouvy
+                    </td>
+                    <td>
+                        <div>
+                            Nalezli jsme @(Devmasters.Lang.Plural.Get(Model.PodobneSmlouvy().Length, "jednu podobnou smlouvu", "{0} podobné smlouvy", "{0} podobných smluv")):
+                            <ul>
+                                @foreach (var os in Model.PodobneSmlouvy())
+                                {
+                                    <li><a href="/Detail/@os.Id">Zveřejněna @os.casZverejneni.ToString("dd.MM.yyyy HH.mm"); částka @HlidacStatu.Util.RenderData.NicePrice(os.CalculatedPriceWithVATinCZK) s DPH; @(os.platnyZaznam ? "platná" : "zneplatněna")</a></li>
+                                }
+                            </ul>
+                        </div>
+                        <span class="text-muted small">Toto je seznam smluv, které jsou velmi podobné této smlouvě, mají stejné smluvní strany a předmět smlouvy.</span>
+                    </td>
+                </tr>
+            }
+
+
+
+            @if (angPolitiku)
+            {
+                <tr>
+                    <td>
+                        Angažovanost politicky aktivních osob v soukromé firmě u této smlouvy
+                    </td>
+                    <td>
+
+                        @foreach (var ss in Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce }))
+                        {
+                            if (!string.IsNullOrEmpty(ss.ico) && StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(ss.ico))
+                            {
+                                bool first = true;
+                                foreach (var pId in StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy[ss.ico])
+                                {
+                                    Osoba p = OsobaRepo.PolitickyAktivni
+                                        .Get()
+                                        .Where(m => m.InternalId == pId)
+                                        .FirstOrDefault();
+
+                                    if (first)
+                                    {
+                                        first = false;
+                                        <h3>@ss.nazev </h3>
+                                        <p>
+                                            <a href="/subjekt/@ss.ico">Další smlouvy firmy</a>
+                                        </p>
+                                    }
+                                    if (p != null)
+                                    {
+                                        <p>
+                                            <strong><a href="/politik/@p.NameId">@p.FullName()</a></strong>
+                                            <div style="padding-left:20px;">
+                                                @Html.RenderVazby(p.VazbyProICO(ss.ico))
+                                            </div>
+                                        </p>
+                                    }
+
+                                }
+                            }
+
+                        }
+
+                    </td>
+                </tr>
+            }
+            @if (isSponzorStrany)
+            {
+                <tr>
+                    <td>
+                        Sponzoring politických stran
+                    </td>
+                    <td>
+
+                        @foreach (var subj in Model.Prijemce.Union(new Smlouva.Subjekt[] { Model.Platce }))
+                        {
+                            var firma = Firmy.Get(subj.ico);
+                            if (firma.Valid && firma.IsSponzor() && firma.JsemSoukromaFirma())
+                            {
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">@firma.Jmeno</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        @*@Html.Raw(firma.Description(true, m => m.Type == (int)OsobaEvent.Types.Sponzor))*@
+                                        @Html.Raw(firma.SponzoringToHtml())
+                                    </div>
+                                </div>
+                            }
+
+                        }
+
+                    </td>
+                </tr>
+            }
+            

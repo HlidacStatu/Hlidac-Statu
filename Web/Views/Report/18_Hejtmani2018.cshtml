@@ -1,0 +1,126 @@
+﻿@using System.Linq
+@using HlidacStatu.Datastructures.Graphs
+@using HlidacStatu.Entities
+@using HlidacStatu.Extensions
+@using HlidacStatu.XLib
+@using HlidacStatu.XLib.Render
+@using HlidacStatu.Repositories
+
+@{
+        Layout = "_ReportLayout";
+
+    var showList = OsobaRepo.GetByEvent(e =>
+            e.Type == (int)OsobaEvent.Types.PolitickaPracovni
+            && e.AddInfo.ToLower().StartsWith("hejtman")
+            && (e.DatumDo == null || e.DatumDo >= DateTime.Now ) )
+        .OrderBy(o => o.Prijmeni)
+        .ThenBy(o => o.Jmeno)
+        .ToList();
+    //var allNames = StaticData.HejtmaniOd2020;
+
+    //List<Osoba> showList = null;
+    //showList = OsobaRepo.PolitickyAktivni.Get()
+    //    .Where(p => allNames.Contains(p.NameId))
+    //    .OrderBy(m => m.Prijmeni)
+    //    .ThenBy(m => m.Jmeno)
+    //    .ToList();
+
+    ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
+   {
+                new() { Name="Hejtman",
+                    HtmlRender = (s) => {
+                        Osoba o = (Osoba)s;
+                        return string.Format("<a href='{0}'>{1}</a>", o.GetUrl(), o.FullNameWithYear(true))
+                        + "<br />"
+                        + Devmasters.TextUtil.ShortenText(o.Description(false,m=> true, numOfRecords: 3), 250).Replace("\n", "<br />");
+                    },
+                    OrderValueRender = (s) => {
+                        Osoba o = (Osoba)s;
+                        return o.FullName(false);
+                    }
+                },
+                new() {
+                    Name ="Strana/Hnutí",
+                    HtmlRender = (s) => {
+                        Osoba o = (Osoba)s;
+                        return o.CurrentPoliticalParty();
+                    },
+                    OrderValueRender = (s) => {
+                        Osoba o = (Osoba)s;
+                        return o.CurrentPoliticalParty();
+
+                    }
+                },
+                new() { Name="Angažovanost",
+                    HtmlRender = (s) => {
+                        Osoba o = (Osoba)s;
+                        string sout = "";
+
+                        if (o.Vazby() != null)
+                        {
+                            foreach (var v in o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Take(2))
+                            {
+                                sout = sout + v.Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceString(null,true) + "<br/>";
+                            }
+                            if (o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Count() == 3)
+                            {
+                                sout = sout + o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy
+                                    .Skip(2).First().Value.Summary(HlidacStatu.Lib.Analytics.CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow).ToNiceString(null,true);
+                            }
+                            else if (o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Count() > 2)
+                            {
+                                sout = sout + "<a href='" + o.GetUrl() + "'>" + Devmasters.Lang.Plural.Get(o.Vazby().Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
+                            }
+                        }
+                        else
+                        {
+                            sout="&nbsp;";
+                        }
+                        return sout;
+                    },
+                    OrderValueRender = (s) => {
+                        Osoba o = (Osoba)s;
+                        return o.FullName(false);
+                    }
+                },
+                new() { Name="Sponzor",
+                    HtmlRender = (s) => {
+                        Osoba o = (Osoba)s;
+                        var sum = o.Sponzoring().Sum(m=>m.Hodnota);
+                        if (sum==0)
+                            return "Ne";
+                        else
+                            return "Celkem&nbsp;" + HlidacStatu.Util.RenderData.NicePrice(sum.Value,html:true) + string.Format("<br /><a href='{0}'>podrobnosti</a>", o.GetUrl()) ;
+                    },
+                    OrderValueRender = (s) => {
+                        Osoba o = (Osoba)s;
+                        var val= o.Sponzoring().Sum(m=>m.Hodnota) ;
+                        return HlidacStatu.Util.RenderData.OrderValueFormat(val);
+                    }
+                },
+   });
+
+
+    foreach (var p in showList)
+    {
+
+        poslanciTable.AddRow(p);
+    }
+}
+
+
+
+<h3 id="tblHead">Všichni hejtmani krajů ČR</h3>
+@ChartUtil.RenderReport("", ReportModel.QueueItem.types.table, poslanciTable, @"{
+                 'language': {
+                    'url': '//cdn.datatables.net/plug-ins/1.10.19/i18n/Czech.json'
+                },
+                'order': [4,'desc'],
+                'lengthChange': false,
+                'info': false,
+                'paging': true,
+                'pageLength': 50,
+                'columnDefs': [{ 'visible': false, 'targets': 0 }]
+                }", "tbPoslanci")
+<script>
+</script>

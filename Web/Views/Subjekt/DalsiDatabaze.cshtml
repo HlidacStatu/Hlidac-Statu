@@ -1,0 +1,52 @@
+﻿@model HlidacStatu.Entities.Firma 
+@using System.Linq
+@using HlidacStatu.XLib.Render
+
+@{ 
+        Layout = null;
+}
+
+@* První sloupec *@
+<div class="col-sm-7 col-sm-pull-5 col-xs-12 col-xs-pull-0">
+
+@{
+
+
+    List<string> tabs = new();
+    List<string> results = new();
+    
+
+    var queries = HlidacStatu.Datasets.DatasetRepo.Searching.GetSpecificQueriesForDatasets("ICO", Model.ICO, true);
+    var dsSearch = HlidacStatu.Datasets.Search.DatasetMultiQueryMultiResult.GeneralSearch(queries, 1, 5);
+    if (dsSearch.IsValid && dsSearch.Total > 0)
+    {
+        foreach (var dss in dsSearch.Results.Where(r => r.Total > 0))
+        {
+            tabs.Add($"{dss.DataSet.Registration().name} ({HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(dss.Total)})");
+            results.Add(dss.RenderResultsInHtml(dss.Q, 5));
+        }
+    }
+}
+@if (tabs.Count > 0)
+{
+    <h2 id="_dalsi_db">Informace z dalších databází</h2>
+
+    <ol>
+    @foreach (var dss in dsSearch.Results.Where(r => r.Total > 0))
+    {
+        <li><a href="#@System.Net.WebUtility.UrlEncode(dss.DataSet.Registration().name)">@(dss.DataSet.Registration().name) (@(HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(dss.Total)))</a></li>
+    }
+    </ol>
+
+    foreach (var dss in dsSearch.Results.Where(r => r.Total > 0))
+    {
+        <h3 id="@System.Net.WebUtility.UrlEncode(dss.DataSet.Registration().name)">@dss.DataSet.Registration().name</h3>
+        <p>
+            @Html.Raw(dss.RenderResultsInHtml(dss.Q, 10))
+        </p>
+        <hr class="morespace middle" />
+    }
+
+}
+
+</div>

@@ -1,0 +1,57 @@
+﻿@model HlidacStatu.Datasets.DataSearchRawResult
+@using System.Linq;
+@using Newtonsoft.Json.Linq;
+
+@{
+    ViewBag.Title = "Hledání ";
+    ViewBag.SubTitle = Model?.Q;
+}
+
+@{
+    <h3>Template generovany z properties</h3>
+}
+
+
+<table class="table table-hover">
+    <tbody>
+        @foreach (var item in Model.Result)
+        {
+            JObject obj = null;
+            try
+            {
+                obj = JObject.Parse(item.Item2);
+
+            }
+            catch (Exception e)
+            {
+                HlidacStatu.Util.Consts.Logger.Error("", e);
+                continue;
+            }
+
+            IEnumerable<JProperty> props = obj.Properties();
+            var chosenProps = Model.DataSet.Registration().searchResultTemplate?.properties?.ToList() ?? new List<string>();
+            if (chosenProps.Count > 0)
+            {
+                props = props.Where(m => chosenProps.Contains(m.Name)).OrderBy(o=>chosenProps.IndexOf(o.Name));
+            }
+
+        <tr>
+            @foreach (JProperty jtoken in props)
+            {
+                if (jtoken.Name.ToLower() == "id")
+                {
+                    <td>
+                        <a href="@Model.DataSet.DatasetItemUrl(jtoken.Value.ToString())">@WebUtil.RenderProperty(jtoken,0,1,50)</a>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        @WebUtil.RenderProperty(jtoken, 0, 1, 50)
+                    </td>
+                }
+            }
+        </tr>
+        }
+    </tbody>
+</table>

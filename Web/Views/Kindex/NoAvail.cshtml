@@ -1,0 +1,91 @@
+﻿@model (string id, int? rok, string priv)
+@using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+@using System.Linq;
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+
+
+@{
+}
+
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+    <script src="~/bundles/highcharts"></script>
+    <script src="/scripts/highcharts-6/highcharts-more.js"></script>
+    <script src="/scripts/highcharts-6/modules/heatmap.js"></script>
+    <script src="/scripts/highcharts-6/modules/treemap.js"></script>
+    <script>
+        // Radialize the colors
+        Highcharts.setOptions({
+            colors: Highcharts.map(Highcharts.getOptions().colors, function (color) {
+                return {
+                    radialGradient: {
+                        cx: 0.5,
+                        cy: 0.3,
+                        r: 0.7
+                    },
+                    stops: [
+                        [0, color],
+                        [1, Highcharts.color(color).brighten(-0.3).get('rgb')] // darken
+                    ]
+                };
+            })
+        });
+
+$(document).ready(function(){
+
+    $("#sel_obory").change(function(){
+        $(this).find("option:selected").each(function(){
+            var optionValue = $(this).attr("value");
+            if(optionValue){
+                $(".boxobor").not("." + optionValue).hide();
+                $(".boxobor." + optionValue).show();
+                InitLowBox();
+            } else{
+                $(".boxobor").hide();
+            }
+        });
+    }).change();
+
+    var shown = readCookie("kindexDisclaimerNoteShown");
+    if (shown != "yes") {
+        createCookie("kindexDisclaimerNoteShown", "yes", 2);
+        $('#kindexDisclaimerPopupfbForm').modal('show');
+    }
+
+});
+
+
+    </script>
+
+
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="/kindex">K–Index</a></li>
+        <li>V tuto chvíli nedostupné</li>
+    </ol>
+}
+
+
+<div class="jumbotron">
+    <div class="container">
+        <div class="row">
+            <h2 style="padding-top:0;margin-top:0;margin-bottom:30px">Žebříčky a porovnání</h2>
+            <div >
+                <h4>Žebříčky úřadů a firem a jejich porovnání budou veřejně dostupné od 24. července 2021.</h4>
+            </div>
+            <div >
+<h4>Děkujeme za pochopení</h4>
+            </div>
+        </div>
+
+    </div>
+</div>
+

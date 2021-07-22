@@ -1,0 +1,35 @@
+@using HlidacStatu.Extensions
+@model HlidacStatu.Repositories.Searching.Search.GeneralResult<HlidacStatu.Entities.Firma>
+
+<table class="table table-hover">
+    <tr>
+        <th></th>
+        <th>IČ</th>
+        <th>Název</th>
+        <th>Vznik</th>
+        <th>Počet smluv v RS</th>
+        <th>Hodnota smluv v RS</th>
+    </tr>
+    <tbody>
+    @foreach (var item in Model.Result)
+    {
+        if (item.Valid)
+        {
+            var stat = item.StatistikaRegistruSmluv();
+
+            <tr>
+                <td>
+                    <add-bookmark item="item"></add-bookmark>
+                </td>
+                <td><a href="@item.GetUrl(true)">@item.ICO</a></td>
+                <td>@Html.KIndexLabelLink(item.ICO)<a href="@item.GetUrl(true)">@Devmasters.TextUtil.ShortenText(item.Jmeno, 40, "...")</a></td>
+                <td>@(item.Datum_Zapisu_OR?.ToString("d.M.yyyy"))</td>
+                <td>@HlidacStatu.Util.RenderData.NiceNumber(stat.Sum(stat.YearsAfter2016(), s => s.PocetSmluv))</td>
+                <td>@HlidacStatu.Util.RenderData.NicePrice(stat.Sum(stat.YearsAfter2016(), s => s.CelkovaHodnotaSmluv))</td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>
+
+<partial name="SearchResults/Pagination" model="@(new PaginationViewModel(Model, "/Home/HledatFirmy"))"/>

@@ -1,0 +1,111 @@
+﻿@model ReportDataSource<SponzoringRepo.Strany.StranaPerYear>
+@using HlidacStatu.Entities
+@using HlidacStatu.XLib.Render
+@using System.Linq;
+@using HlidacStatu.Repositories
+@using HlidacStatu.XLib
+
+@{
+    ViewBag.Title = "Sponzoři " + ViewBag.Strana;
+}
+
+@section scripts
+{
+    <script src="/Scripts/typeahead.jquery.min.js"></script>
+    <script src="/Scripts/bloodhound.min.js"></script>
+    <link href="/Content/typeaheadjs.css" media="all" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+        <li>
+            <a href="/sponzori">Sponzoři</a>
+        </li>
+        <li class="active">Sponzoři @ViewBag.Strana</li>
+    </ol>
+}
+
+<h2>Přehled darů po letech</h2>
+@Html.Raw(ChartUtil.RenderReportTableT("", Model, @"{
+         'language': {
+            'url': '//cdn.datatables.net/plug-ins/1.10.12/i18n/Czech.json'
+        },
+        'ordering': false,
+        'order': [0,'asc'],
+        'lengthChange': false,
+        'info': false,
+        'paging': false
+        }")
+    )
+
+<hr style="margin-top:60px"/>
+<h2>Největší sponzoři @ViewBag.Strana celkově</h2>
+
+@{
+    IEnumerable<Sponsors.Sponzorstvi<IBookmarkable>> dataF = null;
+    IEnumerable<Sponsors.Sponzorstvi<IBookmarkable>> dataO = null;
+
+    dataO = SponzoringRepo.AllSponzorsPerYearPerStranaOsoby.Get()
+        .Where(m => m.Strana == ViewBag.Strana)
+        .GroupBy(g => g.Sponzor, sp => sp, (g, sp) => new Sponsors.Sponzorstvi<Osoba>()
+        {
+            Sponzor = g,
+            Rok = null,
+            Strana = sp.OrderBy(s => s.Rok)
+                .Select(s => $"{HlidacStatu.Util.RenderData.ShortNicePrice(s.CastkaCelkem)} pro {Sponsors.GetStranaHtmlLink(s.Strana)}" + (s.Rok.HasValue ? $" ({s.Rok.Value})" : ""))
+                .Aggregate((f, s) => f + ", " + s),
+            CastkaCelkem = sp.Sum(m => m.CastkaCelkem)
+        }
+        )
+        .OrderByDescending(m => m.CastkaCelkem)
+        .Take(200)
+        .Select(s => new Sponsors.Sponzorstvi<IBookmarkable>()
+        {
+            CastkaCelkem = s.CastkaCelkem,
+            Rok = s.Rok,
+            Strana = s.Strana,
+            Sponzor = s.Sponzor
+        });
+    dataF = SponzoringRepo.AllSponzorsPerYearPerStranaFirmy.Get()
+        .Where(m => m.Strana == ViewBag.Strana)
+        .GroupBy(g => g.Sponzor.ICO, sp => sp, (g, sp) => new Sponsors.Sponzorstvi<Firma>()
+        {
+            Sponzor = FirmaRepo.FromIco(g),
+            Rok = null,
+            Strana = sp.OrderBy(s => s.Rok)
+                .Select(s => $"{HlidacStatu.Util.RenderData.ShortNicePrice(s.CastkaCelkem)} pro {Sponsors.GetStranaHtmlLink(s.Strana)}" + (s.Rok.HasValue ? $" ({s.Rok.Value})" : ""))
+                .Aggregate((f, s) => f + ", " + s),
+            CastkaCelkem = sp.Sum(m => m.CastkaCelkem)
+        }
+        )
+        .OrderByDescending(m => m.CastkaCelkem)
+        .Where(m => m.CastkaCelkem >= 100000)
+        .Take(200)
+        .Select(s => new Sponsors.Sponzorstvi<IBookmarkable>()
+        {
+            CastkaCelkem = s.CastkaCelkem,
+            Rok = s.Rok,
+            Strana = s.Strana,
+            Sponzor = s.Sponzor
+        });
+
+
+    var model = new[]
+    {
+        ReportUtil.RenderSponzorství(dataO, false, false),
+        ReportUtil.RenderSponzorství(dataF, false, false)
+    };
+
+}
+
+<cache expires-after="Constants.CachedActionLength.Cache48H" vary-by="@(ViewBag.Strana)">
+    <partial name="Partials/Top_child" model="@(model)" />
+</cache>
+
+<partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("Upozornit na chybu"))"/>

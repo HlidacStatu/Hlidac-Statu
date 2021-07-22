@@ -1,0 +1,61 @@
+﻿@model Osoba
+@using System.Linq
+@using HlidacStatu.Entities;
+@using Devmasters.Enums;
+@using HlidacStatu.Extensions
+
+@{
+    Layout = null;
+
+    int[] types = {
+        (int)OsobaEvent.Types.VolenaFunkce,
+        (int)OsobaEvent.Types.PolitickaPracovni,
+        (int)OsobaEvent.Types.Politicka,
+        (int)OsobaEvent.Types.VerejnaSpravaJine,
+        (int)OsobaEvent.Types.VerejnaSpravaPracovni,
+        (int)OsobaEvent.Types.Osobni,
+        (int)OsobaEvent.Types.Jine
+    };
+
+    var listingNum = 3;
+    var osobaEvents = Model.Events(m => types.Contains(m.Type));
+    var funkceOsobaNum = osobaEvents.Count();
+    var funkceOsoba = Model.Description(true,
+           m => types.Contains(m.Type),
+           template: "<ul>{0}</ul>", itemTemplate: "<li>{0}</li>", itemDelimeter: "");
+
+    var timelineData = osobaEvents
+        .Where(oe => oe.DatumOd != null)
+        .Where(oe => oe.Type != (int)OsobaEvent.Types.Osobni)
+        .Select(oe => (((OsobaEvent.Types)oe.Type).ToNiceDisplayName(),
+            $"{oe.Organizace} - {oe.AddInfo}",
+            oe.DatumOd,
+            oe.DatumDo));
+
+}
+
+
+@* První sloupec *@
+<div class="col-sm-7 col-sm-pull-5 col-xs-12 col-xs-pull-0">
+    
+    @Html.TimelineGraph("timeline", "Typ", "Funkce", timelineData, 370)
+
+    @if (funkceOsobaNum > 0)
+    {
+        <h2>
+            Přehled politických a veřejných funkcí @Model.FullNameWithYear()
+        </h2>
+        <p>
+            @Html.Raw(funkceOsoba)
+        </p>
+    }
+    else
+    {
+        <p>
+            Žádné veřejné a politické funkce této osoby neevidujeme.
+        </p>
+    }
+
+</div>
+
+

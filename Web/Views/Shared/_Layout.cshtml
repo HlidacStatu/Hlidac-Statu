@@ -1,0 +1,578 @@
+﻿@using System.Linq
+@using HlidacStatu.Datasets
+@using HlidacStatu.Entities
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.Extensions.Primitives
+
+@{
+    int PocetReportu = 24;
+
+    try
+    {
+        var query = new StringValues();
+        if (string.IsNullOrEmpty(ViewBag.Query)
+            && Context.Request.Query.TryGetValue("Q", out query)
+        )
+        {
+            ViewBag.Query = query;
+        }
+    }
+    catch (Exception)
+    {
+        if (ViewData.ContainsKey("InvokeErrorAction") == false)
+        {
+            throw;
+        }
+    }
+
+    string title = ViewBag.Title;
+    if (string.IsNullOrEmpty(title))
+    {
+        title = "Hlídač státu. Hlídame je, protože si to zaslouží.";
+    }
+    else
+    {
+        title = title + " - " + "Hlídač státu.";
+    }
+    string description = "Hlídač státu - veřejná kontrola státních a veřejných institucí. Veřejnoprospěšný projekt. Hlídač smluv a registr smluv. Hlídač Webů.";
+    if (!string.IsNullOrEmpty(ViewBag.Description))
+    {
+        description = ViewBag.Description + " Hlídač státu.";
+    }
+
+    bool ShowEmailConfirmation = false;
+    if (User.Identity?.IsAuthenticated ?? false)
+    {
+        if (!string.IsNullOrEmpty(this.User?.Identity?.Name))
+        {
+            var email = this.User?.Identity?.Name;
+            using (DbEntities db = new())
+            {
+                var user = db.Users.AsQueryable().Where(m => m.Email == email && m.EmailConfirmed == false).FirstOrDefault();
+                ShowEmailConfirmation = user != null;
+            }
+        }
+
+    }
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>@title</title>
+    <link rel="canonical" href="https://www.hlidacstatu.cz@(Context.Request.GetEncodedPathAndQuery())" />
+    <meta name="description" content="@description" />
+    <meta name="author" content="Michal Bláha" />
+    <meta name="keywords" content="e-gov, e-government, efektivita státu, efektivní stát, Registr smluv, Hlídač státu, HlidacStatu, HlidacSmluv, Hlídač smluv, politici, smlouvy státu">
+
+    @{
+        string urlfirst = $"{Context.Request.Scheme}://{Context.Request.Host}";
+        string defaultSocialImg = urlfirst + "/content/icons/largetile.png";
+        string url = ViewBag.SocialShareUrl ?? Context.Request.GetDisplayUrl();
+        string text = ViewBag.SocialShareText ?? description;
+        string type = ViewBag.SocialShareType ?? "website";
+        string socialTitle = ViewBag.SocialShareTitle ?? title;
+
+        //additional, HlidacStatu specific
+        string socialhtml = ViewBag.SocialShareHtml ?? "";
+        string socialfooter = ViewBag.SocialShareHtmlFooter ?? "";
+        string socialsubfooter = ViewBag.SocialShareHtmlSubFooter ?? "";
+        string socialfooterimg = ViewBag.SocialShareHtmlFooterImg ?? defaultSocialImg;
+
+        string img = ViewBag.SocialImage ?? defaultSocialImg;
+
+        if (img == defaultSocialImg && string.IsNullOrEmpty(socialhtml) == false)
+        {
+            img = urlfirst + "/socialbanner/page?v=" + System.Net.WebUtility.UrlEncode(Context.Request.GetDisplayUrl());
+        }
+    }
+
+    <link rel="shortcut icon" href="/content/icons/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" sizes="57x57" href="/content/icons/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/content/icons/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/content/icons/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/content/icons/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/content/icons/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/content/icons/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/content/icons/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/content/icons/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/content/icons/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="/content/icons/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/content/icons/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/content/icons/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/content/icons/android-chrome-192x192.png" sizes="192x192">
+    <meta name="msapplication-square70x70logo" content="/content/icons/smalltile.png" />
+    <meta name="msapplication-square150x150logo" content="/content/icons/mediumtile.png" />
+    <meta name="msapplication-wide310x150logo" content="/content/icons/widetile.png" />
+    <meta name="msapplication-square310x310logo" content="/content/icons/largetile.png" />
+
+    <meta name="twitter:site" content="HlidacStatu" />
+    <meta property="fb:app_id" content="803455203348459" />
+    <meta property="og:title" content="@socialTitle" />
+    <meta property="og:url" content="@url" />
+    <meta property="og:site_name" content="Hlídač Státu" />
+    <meta property="og:type" content="@type" />
+    <meta property="og:description" content="@text" />
+    <meta property="og:image" content="@Html.Raw(img.Trim())" />
+    <meta name="twitter:image" content="@Html.Raw(img.Trim())" />
+    @if (img != defaultSocialImg)
+    {
+        <meta name="twitter:card" content="summary_large_image" />
+    }
+    @if (ViewBag.OpenGraphMore != null)
+    {
+        @Html.Raw(ViewBag.OpenGraphMore)
+    }
+    <meta property="og:hlidac_html" content="@socialhtml" />
+    <meta property="og:hlidac_footer" content="@socialfooter" />
+    <meta property="og:hlidac_subfooter" content="@socialsubfooter" />
+    <meta property="og:hlidac_footerimg" content="@socialfooterimg" />
+
+    @RenderSection("metatags", required: false)
+
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&amp;subset=latin-ext" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Cabin:400,400i,600,700&amp;subset=latin-ext" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.9.0/css/all.css" integrity="sha384-vlOMx0hKjUCl4WzuhIhSNZSm2yQCaf0mOU1hEDK/iztH3gU4v5NMmJln9273A6Jz" crossorigin="anonymous" />
+
+
+    <script src="~/bundles/jquery"></script>
+    <script src="~/bundles/bootstrap"></script>
+    <link rel="stylesheet" href="~/content/bundled.css"/>
+    <script src="~/bundles/modernizr"></script>
+    @* <script src="~/lib/jquery/dist/jquery.min.js"></script> *@
+    @* <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> *@
+    @* <script src="~/js/site.js" asp-append-version="true"></script> *@
+    <script>
+            var _showFAD = true;
+            (function (i, s, o, g, r, a, m) {
+                i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                    m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+    
+            ga('create', 'UA-154075-22', 'auto');
+            ga('send', 'pageview');
+    
+            //WebUtil.RenderSmartLookTrackingCode(false)
+    </script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+
+    @Html.Raw(JavaScriptSnippet.FullScript)
+
+    @* //migrace: Tohle by chtělo taky přidat do bundle  *@
+    <link href="/scripts/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/scripts/select2-bootstrap.min.css" />
+    <script src="/scripts/select2.full.min.js"></script>
+    <link rel="stylesheet" href="/Content/select2-search-over.css" />
+
+</head>
+<body class="new-body">
+    <div id="fb-root"></div>
+    <script>
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/cs_CZ/sdk.js#xfbml=1&version=v2.9";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));</script>
+
+    @if (ShowEmailConfirmation)
+    {
+        <div class="alert alert-danger" role="alert" id="msgConfirmationEmailInfo">
+            Nepotvrdil(a) jste nám e-mail použitý při registraci. Bez potvrzení není účet aktivní.
+            <a class="btn btn-default" href="#" role="button" onclick="javascript:ResendConfirmationMail(this)">Odeslat potvrzovací link e-mailem</a>
+
+        </div>
+    }
+
+    @if (IsSectionDefined("toplinemsg"))
+    {
+        @RenderSection("toplinemsg", required: false)
+    }
+    else
+    {
+        if (DateTime.Now < new DateTime(2020, 11, 29, 12, 0, 0))
+        {
+            <div class="alert alert-warning toplinemsg" role="alert" style="">
+                <div class="text-center center-block toplinemsgtxt " style="">
+                    Udělejte radost originálním dárkem a současně podpořte Hlídače státu
+                    <a class="btn btn-default btn-sm" href="https://www.donio.cz/hlidacstatu/?utm_source=hlidacstatu&utm_medium=header&utm_campaign=volby2020a" role="button">Přímo zde</a>
+                </div>
+            </div>
+        }
+    }
+
+    <div class="header__navbar hidden-print">
+        <a href="/" class="logo">
+            <svg width="46" height="46" viewBox="0 0 46 46">
+                <use xlink:href="/content/defs.svg#logo"></use>
+            </svg>
+            Hlídač <strong>Státu</strong>
+        </a>
+        <nav class="navbar__level1">
+            <a href="#" class="hamburger"></a>
+
+            <ul>
+                <li class="navbar__watchers">
+                    <a href="/smlouvy">Smlouvy</a>
+                    <a href="/VerejneZakazky">Veřejné zakázky</a>
+                    <a href="/Dotace">Dotace</a>
+                    <a href="/Insolvence">Insolvence</a>
+                    <a href="/sponzori">Sponzoři</a>
+                    <a href="/StatniWeby">Weby státu<sup style="top:0;text-decoration:none;color:#777;">@(HlidacStatu.Lib.Data.External.Zabbix.ZabTools.Weby()?.Count().ToString() ?? "")</sup></a>
+                </li>
+
+                <li class="hidden-sm hidden-xs">
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <a href="/manage/Watchdogs"
+                           alt="Všichni uložení hlídači" title="Všichni uložení hlídači"
+                           onclick="ga('send', 'event', 'btnWatchDog', 'List', 'authenticated');" role="button"
+                           class="btn btn-warning btn-sm" style="padding-left: 5px;padding-right: 5px;display:block">
+                            <i style="color:black;" class="fas fa-eye"></i>
+                        </a>
+
+                        <a style="display:block;color:#c9302c;" title="Všechny uložené záložky" alt="Všechny uložené záložky" href="/manage/zalozky" class="bookmark bookmarkOn"></a>
+                        <a style="display:block;" href="/Identity/Account/manage/" title="Nastavení účtu" alt="Nastavení účtu"><i class="fas fa-user"></i></a>
+                        <a href="/Identity/Account/Logout?rnd=@Guid.NewGuid().ToString("N")">Odhlásit</a>
+                    }
+                    else
+                    {
+                        string nextUrl = Context.Request.GetEncodedPathAndQuery();
+                        if (nextUrl.ToLower().StartsWith(System.Net.WebUtility.UrlEncode("Identity/account/")))
+                        {
+                            nextUrl = "";
+                        }
+
+                        <a onclick="ga('send', 'event', 'loginBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Login?returnUrl=@(nextUrl)" id="loginLink">
+                            <img src="/Content/img/icon-user.svg" style="padding-right: 8px;">
+                            Přihlášení
+                        </a>
+                        <a onclick="ga('send', 'event', 'registerBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Register?returnUrl=@(nextUrl)" id="regLink">Registrace</a>
+                    }
+                </li>
+
+                <!-- mobile menu items below -->
+                <li class="level2"><a href="/data">Další databáze<sup style="top:0;text-decoration:none;color:#777;">@(DataSetDB.AllDataSets.Get()?.Count().ToString() ?? "")</sup></a></li>
+                <li class="level2"><a href="/reporty">Analýzy a reporty<sup style="top:0;text-decoration:none;color:#777;">@(PocetReportu)</sup></a></li>
+                <li class="level2"><a @Html.GAClick() href="/texty"><b>Zjistili jsme</b></a></li>
+                <li class="level2"><a href="https://www.hlidacstatu.cz/texty/series/tipy/" onclick="return trackOutLink(this,'headermobile');">Tipy „Jak používat Hlídače“</a></li>
+
+                <li class="level2">
+                    <a href="https://www.darujme.cz/projekt/1204683" onclick="return trackOutLink(this,'headermobile');">Podpořte nás</a>
+                    <a href="/PridatSe">Přidejte se k nám</a>
+                </li>
+
+
+                <li class="level2">
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <a onclick="ga('send', 'event', 'bookmarksBtn', 'click','@Context.Request.Path'); return true;" title="Všechny uložené záložky" alt="Všechny uložené záložky" href="/manage/zalozky"><span style="color:#c9302c;" class="bookmark bookmarkOn"></span>Záložky</a>
+                        <a onclick="ga('send', 'event', 'manageBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/manage/" title="Nastavení účtu" alt="Nastavení účtu"><span style="font-family: 'Glyphicons Halflings'" class="glyphicon glyphicon-user"></span>Účet</a>
+                        <a onclick="ga('send', 'event', 'logoffBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Logout?rnd=@Guid.NewGuid().ToString("N")">Odhlásit</a>
+                    }
+                    else
+                    {
+                        <a onclick="ga('send', 'event', 'loginBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Login">Přihlášení</a>
+                        <a onclick="ga('send', 'event', 'registerBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Register">Registrace</a>
+                    }
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    @if (IsSectionDefined("title"))
+    {
+        <div class="hidden-print">
+            @RenderSection("title", required: false)
+        </div>
+    }
+    else
+    {
+        <div class="header__content header__content--compact  hidden-print">
+            <!-- desktop menu items only -->
+            <div class="navbar__level2">
+                <ul>
+                    <li class=""><a href="/data">Další databáze<sup style="top:0;text-decoration:none;color:yellow;">@(DataSetDB.AllDataSets.Get()?.Count().ToString() ?? "")</sup></a></li>
+                    <li class=""><a href="/reporty">Analýzy a reporty<sup style="top:0;text-decoration:none;color:yellow;">@(PocetReportu)</sup></a></li>
+                    <li class=""><a @Html.GAClick() href="/texty"><b>Zjistili jsme</b></a></li>
+                    <li class=""><a href="https://www.hlidacstatu.cz/texty/series/tipy/" onclick="return trackOutLink(this,'header');">Tipy „Jak používat Hlídače“</a></li>
+                </ul>
+                <ul>
+                    <li>
+                        <a href="/pridatse">Přidat se</a>
+                        @*<a href="https://github.com/HlidacStatu/Web/issues" target="_blank" style="color:orange"><span class="glyphicon glyphicon-alert"></span>&nbsp;Nahlásit chybu</a>*@
+                        <a href="https://www.darujme.cz/projekt/1204683" target="_blank" onclick="return trackOutLink(this,'header');">Podpořte nás</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- desktop menu items only -->
+
+            <div class="header__search">
+                <form class="header__search__input-wrapper old-search-input" method="get">
+                    <input value="@ViewBag.Query" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
+                    @if (ViewBag.AdditionalForm != null && false)
+                    {
+                        DoubleForm dform = (DoubleForm)ViewBag.AdditionalForm;
+                        <button class="form-search__btn" style="max-width: 200px; white-space:normal; word-break: break-word; line-height: 1.2em;" formaction="@dform.SecondaryAction">@dform.SecondaryActionLabel</button>
+                        <button class="header__search__btn" formaction="@dform.PrimaryAction">@dform.PrimaryActionLabel</button>
+                    }
+                    else
+                    {
+                        <button class="header__search__btn" formaction="/hledat">Hledat</button>
+                    }
+                </form>
+
+                <form id="new-search-input" class="new-search-input" action="/hledat" method="get">
+                    <div class="select2-wrapper">
+                        <div class="input-group input-group-lg">
+                            <select class="form-control input-lg select2-multiple" id="autocomsearch" multiple="multiple">
+                                @if (!string.IsNullOrWhiteSpace(ViewBag.Query))
+                                {
+                                    foreach (string option in ViewBag.Query.ToString().Split(' '))
+                                    {
+                                        <option value="@option" selected="selected">@option</option>
+                                    }
+                                }
+                            </select>
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" data-select2-open="autocomsearch" style="left:-7px"> hledat</button>
+                            </span>
+                            <input id="search-result-query-data" name="q" type="hidden" />
+                        </div>
+                    </div>
+                </form>
+
+                <div>
+                <button class="header__search__hint btn btn-link new-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
+                    <i class="fas fa-blind"></i> Přepnout na původní hledání
+                </button>
+                <button class="header__search__hint btn btn-link old-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
+                    <i class="fas fa-baby"></i> Přepnout na nové hledání
+                </button>
+                    <a class="header__search__hint" style="padding-top:2px;font-size:15px;text-decoration:none;padding-top:2px;font-size:15px;text-decoration:none;" href="/napoveda">
+                        <i class="far fa-question-square" style=""></i> Nápověda jak vyhledávat
+                    </a>
+                    <a class="header__search__hint pull-right" style="" href="/snadnehledani">
+                        Snadné hledání
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    }
+
+
+<div class="container">
+    
+    @if (IsSectionDefined("breadcrumb"))
+    {
+        @RenderSection("breadcrumb", required: false)
+    }
+
+    @if (
+        !(ViewBag.HideTitle == true)
+        &&
+        !string.IsNullOrEmpty((string) ViewBag.Title)
+        )
+    {
+        <div class="row">
+            <div class="col-xs-12">
+                <h1 class="new-title text-left">
+                    @if (Model as IBookmarkable == null) //ViewBag.ShowBookmarkUrl == true)
+                    {
+                        <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" url="@Context.Request.GetDisplayUrl()" style="font-size:24px;vertical-align:top;"></add-bookmark>
+                    }
+                    else
+                    {
+                        <add-bookmark item="@Model"></add-bookmark>
+                    }
+                    @ViewBag.Title
+
+                    @if (!string.IsNullOrEmpty((string) ViewBag.SubTitle))
+                    {
+                        <small>
+                            @ViewBag.SubTitle
+                        </small>
+                    }
+
+                </h1>
+            </div>
+        </div>
+    }
+    @RenderBody()
+</div>
+    
+    <partial name="BackToTop"/>
+
+    <partial name="_Footer"/>
+
+    @await RenderSectionAsync("footerscripts", required: false)
+    <render-scripts></render-scripts>
+    
+
+    <div id="dar-footer-msg">
+        <div id="ad1">
+            <div class="fund-list grey" style="display: block;">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-10 col-xs-12">
+                            <p class="small">
+                                Pokud vás zaujme nějaký dokument, profil firmy, výsledek hledání či prakticky jakýkoliv údaj na Hlídači,
+                                <b>nemusíte si ho pamatovat</b>. Stačí si ho uložit do záložek a my si to zapamatujeme za vás.
+                            </p>
+                            <p class="small">
+                                Uložení záložky je snadné, stačí kliknout na ikonu  <a style="font-size:120%" href="#" class="bookmark bookmarkOff" onclick="javascript:return false;"></a>.
+                                Pokud už je konkrétní záložka vytvořená, pak je vybarvena červeně <a style="font-size:120%" href="#" class="bookmark bookmarkOn" onclick="javascript:return false;"></a>.
+                            </p>
+                        </div>
+                        <div class="col-sm-2 col-xs-12">
+                            <a style="margin-top:15px;" class="fund-daruj-btn pull-right text-right" onclick="ga('send', 'event', 'darujAdFooter', 'daruj-btn', '1'); return false;" id="fund-daruj-btn" target="_blank" href="#">Chápu, díky!</a>
+                        </div>
+                        <div class="fund-zavri">
+                            <a id="fund-info-btn" onclick="ga('send', 'event', 'darujAdFooter', 'viceinfo', '1');" target="_blank" href="https://www.hlidacstatu.cz/texty/zalozky-si-za-vas-zapamatuji-vse-co-potrebujete/">Více informací</a>
+                            <a id="fund-zavri-btn" onclick="ga('send', 'event', 'darujAdFooter', 'zavri', '1');" style="margin-left:30px;color:#ff5900" href="#"><span class="glyphicon glyphicon-remove"></span></a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <noscript>
+            <style>
+                #dar-footer-msg {
+                    display: none;
+                }
+            </style>
+        </noscript>
+    </div>
+
+
+    @if (!(this.User?.Identity?.IsAuthenticated == true))
+    {
+        <div id="bookmarkInfoAnon" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Záložky</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            Pokud vás zaujme nějaký dokument, profil firmy, výsledek hledání či prakticky jakýkoliv údaj na Hlídači,
+                            <b>nemusíte si ho pamatovat</b>. Stačí si ho uložit do záložek a my si to zapamatujeme za vás.
+                        </p>
+                        <p>
+                            Uložení záložky je snadné, stačí kliknout na ikonu  <a style="font-size:120%" href="#" class="bookmark bookmarkOff" onclick="javascript:return false;"></a>.
+                            Pokud už je konkrétní záložka vytvořená, pak je vybarvena červeně <a style="font-size:120%" href="#" class="bookmark bookmarkOn" onclick="javascript:return false;"></a>.
+                        </p>
+                        <p>Abychom ale vědeli, komu jaké záložky patří, <a href="/Identity/Account/login" class="btn btn-default">musíte se zalogovat</a>.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Zavřít</button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+        string anontitle = "Veřejné zakázky";
+        string anonbody = "Podrobné informace o veřejných zakázkách jsou z licenčních důvodů dostupné pouze registrovaným uživatelům Hlídače Státu. Registrace je zdarma a je velmi jednoduchá.";
+        if (Context.Request.GetDisplayUrl().ToLower().Contains("insolvence"))
+        {
+            anontitle = "Insolvence";
+            anonbody = "Podrobné informace o insolvencích jsou dostupné pouze registrovaným uživatelům Hlídače Státu. Registrace je zdarma a je velmi jednoduchá. "
+                + "<br/><br/><b>Novináři a datový analytici</b> mají přístup ke všem datům, ostatní pouze k insolvencím, které mají vztah ke kontrole státu a firem a osob s ním obchodujícím.";
+        }
+
+        <div id="VZInfoAnon" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">@anontitle</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            @Html.Raw(anonbody)
+                        </p>
+                        <p>Pokud jste již zaregistrováni, <a id="VZInfoAnonLogin" href="/Identity/Account/login?returnUrl=" class="btn btn-default">zalogujte se</a>. </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Zavřít</button>
+                        <a id="VZInfoAnonRegister" onclick="ga('send', 'event', 'registerBtn', 'click','@Context.Request.Path#VZPristupOmezen'); return true;" href="/Identity/account/Register?returnUrl=" class="btn btn-primary">Zaregistrovat se</a>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+        </div><!-- /.modal -->
+
+    }
+@{
+
+    if (IsSectionDefined("onlyembed"))
+    {
+        IgnoreSection("onlyembed");
+    }
+}
+
+</body>
+</html>
+
+
+
+@* <!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] - Web</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/css/site.css"/>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Web</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                    </li>
+                </ul>
+                <partial name="_LoginPartial"/>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="container">
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+</div>
+
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2021 - Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    </div>
+</footer>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+<render-scripts></render-scripts>
+</body>
+</html>*@

@@ -1,0 +1,31 @@
+﻿@using HlidacStatu.Repositories
+@{
+        Layout = "_ReportLayout";
+
+    var model = new HlidacStatu.Repositories.Searching.SmlouvaSearchResult(Context.Request.Query);
+
+    model = SmlouvaRepo.Searching.SimpleSearch("*", model.Page,
+        100, (SmlouvaRepo.Searching.OrderResult)(Convert.ToInt32(model.Order)), platnyZaznam: true);
+
+    model.Chyby = true;
+    model.ShowWatchdog = false;
+}
+
+
+<div class="bs-callout bs-callout-primary">
+    <p>
+        Při zpracování každé jednotlivé smlouvy provádíme důkladnou analýzu formálních údajů, úplnosti, dodavatelů atd.
+        Každou smlouvu označíme podle míry možný nedostatků a chyb. Za chybami se může skrývat jak neskušenost s vkládáním smluv,
+        lajdáctví, tak úmyslně vynechané údaje s cílem znemožnit analýzu smlouvy.
+    </p>
+    <p>
+        Avšak i přes tyto kontroly nemusí být smlouva opravdu chybná, ale může dojít k nesprávnému označení chyby (tento případ může nastat u soukromách osob či zahraničních subjektů).
+        Informace o chybovosti je proto pouze orientační.
+    </p>
+    <a href="/Novinky">Podrobněji analýzu popisujeme zde</a>.
+    <div class="pull-right">@Html.Partial("~/Views/Home/_Symbols.cshtml")</div>
+</div>
+
+<partial name="~/Views/Home/_SearchResult.cshtml" model="model"/>
+
+

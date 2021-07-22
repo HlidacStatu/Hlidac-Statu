@@ -1,0 +1,68 @@
+@model HlidacStatu.Repositories.Searching.DotaceSearchResult
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th></th>
+        <th>Příjemce</th>
+        <th>IČO příjemce</th>
+        <th>Název projektu</th>
+        <th>Datum podpisu</th>
+        <th>Čerpaná částka</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var hit in Model.ElasticResults.Hits)
+    {
+        var dotaceItem = hit.Source;
+        <tr class="@((!string.IsNullOrWhiteSpace(dotaceItem.Duplicita) && dotaceItem.Zdroj.Nazev != "cedr") ? "alert alert-warning" : "") ">
+            <td class="text-nowrap">
+
+                @if (!string.IsNullOrWhiteSpace(dotaceItem.Duplicita) && dotaceItem.Zdroj.Nazev != "cedr")
+                {
+                    <i class="fas fa-exclamation-circle text-warning" title="Potencionální duplicita"></i>
+                }
+                <add-bookmark item="dotaceItem"></add-bookmark>
+
+                <a href="@(dotaceItem.GetUrl(true, Model.Q))">Detail</a>
+            </td>
+            <td>
+                @Html.KIndexLabelLink(dotaceItem.Prijemce.Ico)@Devmasters.TextUtil.ShortenText((string.IsNullOrWhiteSpace(dotaceItem.Prijemce.HlidacJmeno) ?
+                                                                  dotaceItem.Prijemce.ObchodniJmeno :
+                                                                  dotaceItem.Prijemce.HlidacJmeno)
+                                                                  , 40)
+            </td>
+            <td>
+                @if (dotaceItem.Prijemce.Ico != "00000000")
+                {
+                    <a href="/subjekt/@dotaceItem.Prijemce.Ico" title="Informace o subjektu">@dotaceItem.Prijemce.Ico</a>
+                }
+            </td>
+            <td>
+                @dotaceItem.GetNazevDotace()
+            </td>
+            <td class="text-nowrap">
+                @(dotaceItem.DatumPodpisu?.Date.ToString("dd.MM.yyyy") ?? "Neznámé")
+            </td>
+            <td class="text-right number text-nowrap">
+                @if (dotaceItem.DotaceCelkem == null || dotaceItem.DotaceCelkem == 0)
+                {
+                    <code><i class="fas fa-exclamation-circle"></i> Hodnota neznámá</code>
+                }
+                else
+                {
+                    @Html.Raw(HlidacStatu.Util.RenderData.NicePrice((decimal) dotaceItem.DotaceCelkem, html: true))
+                    if (dotaceItem.PujckaCelkem != null && dotaceItem.PujckaCelkem > 0)
+                    {
+                        <br/>
+                        <p class="text-muted">z toho @Html.Raw(HlidacStatu.Util.RenderData.NicePrice((decimal) dotaceItem.PujckaCelkem, html: true)) je půjčka</p>
+                    }
+                }
+
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<partial name="SearchResults/Pagination" model="@(new PaginationViewModel(Model, "/Dotace/hledat"))"/>

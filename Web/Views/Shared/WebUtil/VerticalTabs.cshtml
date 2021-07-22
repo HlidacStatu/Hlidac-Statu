@@ -1,0 +1,43 @@
+@model VerticalTabsViewModel
+
+@{
+    if (Model.GaPageEventId is null)
+    {
+        Model.GaPageEventId = Context.Request.Path;
+    }
+
+    bool first = true;
+    var arrTabnames = Model.Tabnames?.ToArray();
+}
+
+<div class="@Model.ContainerCss verticaltab-container">
+    <div class="@Model.TabColCss verticaltab-menu">
+        <div class="list-group">
+            @for (int i = 0; i < arrTabnames?.Length; i++)
+            {
+                string? s = arrTabnames[i];
+                if (s != null)
+                {
+                    <a href="#" onclick="ga('send', 'event', 'tabVertical', 'change_@i','@Model.GaPageEventId'); return true;" class="list-group-item @(first ? "active" : "")">
+                        @Html.Raw(s)
+                    </a>
+                    first = false;
+                }
+            }
+        </div>
+    </div>
+    <div class="@Model.ContentColCss verticaltab">
+        @{ first = true; }
+        @foreach (var s in Model.Contents)
+        {
+            if (s != null)
+            {
+                <div class="verticaltab-content @(first ? "active" : "")">
+                    @Html.Raw(s)
+                </div>
+                first = false;
+            }
+        }
+    </div>
+
+</div>

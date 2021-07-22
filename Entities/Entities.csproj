@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <AssemblyName>HlidacStatu.Entities</AssemblyName>
+        <RootNamespace>HlidacStatu.Entities</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CsvHelper" Version="27.1.0" />
+      <PackageReference Include="Devmasters.Core" Version="2.3.3" />
+      <PackageReference Include="Devmasters.DT" Version="2.3.0" />
+      <PackageReference Include="Devmasters.Enums" Version="2.2.5" />
+      <PackageReference Include="Devmasters.IO" Version="2.3.0" />
+      <PackageReference Include="Devmasters.Lang" Version="2.3.0" />
+      <PackageReference Include="Enums.NET" Version="4.0.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.7" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.7">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.7" />
+      <PackageReference Include="NEST" Version="7.13.1" />
+      <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Views" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
+      <ProjectReference Include="..\FullTextSearch\FullTextSearch.csproj" />
+      <ProjectReference Include="..\Lib.Analytics\Lib.Analytics.csproj" />
+      <ProjectReference Include="..\Lib.OCR.Api.Client\Lib.OCR.Api.Client.csproj" />
+      <ProjectReference Include="..\Plugin.TransparetniUcty\Plugin.TransparetniUcty.csproj" />
+      <ProjectReference Include="..\Util\Util.csproj" />
+    </ItemGroup>
+
+</Project>

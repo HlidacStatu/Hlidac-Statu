@@ -1,0 +1,60 @@
+﻿@using System.Linq;
+@model HlidacStatu.Web.Models.DokumentListViewModel
+
+@{
+    var tableId = $"documents-{Model.Oddil}";
+    IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlightingData = Model.HighlightingData;
+}
+
+<table id="@tableId" class="table table-condensed table-striped table-hover">
+	<thead>
+		<tr>
+			<th>Dokument</th>
+			<th></th>
+			<th></th>
+		</tr>
+	</thead>
+    <tbody>
+        @foreach (var item in Model.Dokumenty.OrderByDescending(d => d.DatumVlozeni))
+        {
+            string hlres = HlidacStatu.Repositories.Searching.Highlighter.HighlightContent(highlightingData, "dokumenty.plainText", item.PlainText);
+        <tr>
+            <td>
+                <span class="text-muted small">@item.DatumVlozeni.ToShortDateString()</span>
+                <br />
+                @item.Popis
+            </td>
+            <td style="width:80px">
+                @if (item.Lenght > 0)
+                {
+                    <a href="@Url.Action("TextDokumentu", "Insolvence", new { Id = item.Id, qs=Context.Request.Query["qs"] })"><i class="far fa-lg fa-file-alt" alt="textová podoba dokumentu"></i></a>
+                }
+            </td>
+            <td style="width:80px"><a href="@item.Url"><i class="far fa-lg fa-file-pdf" alt="Originál"></i></a></td>
+        </tr>
+            if (hlres != null)
+            {
+                <tr>
+                    <td colspan="3" style="border-top:none">
+                        <div class="highlighting snippet" style="padding-left:20px"><i class="far fa-search fa-lg fa-pull-left fa-border"></i>@Html.Raw(hlres)</div>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<script>
+	$(document).ready(function () {
+		$('#@tableId').DataTable({
+			'language': {
+				'url': '//cdn.datatables.net/plug-ins/1.10.19/i18n/Czech.json'
+			},
+            'ordering': false,
+            'paging': false,
+            'searching': false,
+			'lengthChange': false,
+			'info': false,
+		});
+	});
+</script>

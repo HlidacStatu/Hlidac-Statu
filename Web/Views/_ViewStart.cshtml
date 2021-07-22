@@ -1,0 +1,14 @@
+﻿@{
+    var defLayout = "~/Views/Shared/_Layout.cshtml";
+    if (Context.Request.Query["embed"] == "1")
+    {
+        Context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+        Context.Response.Headers.Add("Content-Security-Policy", "frame-ancestors * ;");
+
+        Layout = "~/Views/Shared/_Embedded.cshtml";
+    }
+    else
+    {
+        Layout = defLayout;
+    }
+}

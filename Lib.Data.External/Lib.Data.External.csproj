@@ -1,0 +1,117 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RootNamespace>HlidacStatu.Lib.Data.External</RootNamespace>
+    <AssemblyName>HlidacStatu.Lib.Data.External</AssemblyName>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>false</UseWindowsForms>
+    <ImportWindowsDesktopTargets>false</ImportWindowsDesktopTargets>
+  </PropertyGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Connected Services\eAgri.DeMinimis.WS\HlidacStatu.Lib.Data.External.eAgri.DeMinimis.WS.processResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Update="Connected Services\eAgri.DeMinimis.WS\HlidacStatu.Lib.Data.External.eAgri.DeMinimis.WS.Response.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Update="DatoveSchranky\descriptor.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Update="StatniPokladna\monitorFin204U.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Update="StatniPokladna\monitorFin212M.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Update="StatniPokladna\monitorPenezniTokyAVlastniKapital.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Update="StatniPokladna\monitorRequest.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Update="StatniPokladna\monitorResponse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Update="StatniPokladna\monitorRozvaha.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Update="StatniPokladna\monitorTypes.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Update="StatniPokladna\monitorUkazatele.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Update="StatniPokladna\monitorVykazZiskuAZtrat.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\3rd\ZabbixApi\ZabbixApi.csproj" />
+    <ProjectReference Include="..\3rd\ZabbixSenderNet-master\ZabbixSenderNet\ZabbixSenderNet.csproj" />
+    <ProjectReference Include="..\Util\Util.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Connected Services\eAgri.DeMinimis.WS\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Connected Services\eAgri.DeMinimis.WS\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.ServiceModel.Duplex" Version="4.8.1" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.8.1" />
+    <PackageReference Include="System.ServiceModel.Federation" Version="4.8.1" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.2.231403">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Connected Services\eAgri.DeMinimis.WS\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="5.2.0" />
+    <PackageReference Include="CsvHelper" Version="27.1.0" />
+    <PackageReference Include="Devmasters.Imaging" Version="2.3.0" />
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
+    <PackageReference Include="Enums.NET" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
+    <PackageReference Include="Neo4j.Driver" Version="1.7.2" />
+    <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
+    <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.0" />
+    <PackageReference Include="NitoAsyncEx.Context.StrongName" Version="1.1.0" />
+    <PackageReference Include="ObjectsComparer" Version="1.4.1" />
+    <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
+    <PackageReference Include="System.Collections.NonGeneric" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.StackTrace" Version="4.3.0" />
+    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.3.0" />
+    <PackageReference Include="System.IO.FileSystem.Watcher" Version="4.3.0" />
+    <PackageReference Include="System.Net.Requests" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
+    <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="System.Xml.ReaderWriter" Version="4.3.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="StatniPokladna\MonitorService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,50 @@
+﻿@model HlidacStatu.Repositories.Searching.InsolvenceSearchResult
+@if (Model?.ElasticResults?.IsValid == false || Model.ElasticResults == null)
+{
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-danger">Položený dotaz má špatnou syntaxi. Zkontrolujte, že je správně.</div>
+            <div>
+                Pokud si myslíte, že dotaz je v pořádku a chyba je na naší straně, <partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("napište nám prosím", "Chyba", "btn btn-link"))"/>.
+                Zkontrolujeme to.
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    @*if (Model.ShowWatchdog && Model.Q != null)
+        {
+            @WebUtil.AddWatchDog(this.User, Model.Q, typeof(Rizeni))
+        }*@
+
+    if (Model.ElasticResults == null)
+    {
+        <span></span>
+    }
+    else if (Model.ElasticResults.Total == 0)
+    {
+        <h2>Žádné insolvence jsme nenalezli.</h2>
+    }
+    else if (Model.ElasticResults.Total > 0)
+    {
+        <hr />
+
+        <div class="row">
+            <div class="col-xs-12">
+                <h3>
+                    Nalezené insolvence
+                    <small>
+                        @HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(Model.ElasticResults.HitsMetadata.Total, false, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)
+                    </small>
+                </h3>
+
+            </div>
+        </div>
+
+        <partial name="SearchResults/SearchResultsInsolvence" model="Model"></partial>
+
+    }
+}
+
+<div style="margin-bottom:50px;"></div>

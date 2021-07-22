@@ -1,0 +1,78 @@
+@using Microsoft.AspNetCore.Html
+@model List<HlidacStatu.Entities.BannedIp>
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h2>Zde můžete ručně banovat konkrétní IP adresy</h2>
+
+<h3>Zabanovat IP adresu</h3>
+<form asp-action="BanIp">
+    <div class="form-group">
+        <label for="ipAddress" class="form-label">Ip adresa:</label>
+        <input type="text" id="ipAddress" name="ipAddress" class="form-control" placeholder="127.0.0.1"/>
+        <label for="expiration" class="form-label">Datum expirace:</label>
+        <input type="text" id="expiration" name="expiration" class="form-control" placeholder="dd.mm.yyyy"/>
+        <label for="lastStatusCode" class="form-label">(Poslední) chybový kód:</label>
+        <input type="text" id="lastStatusCode" name="lastStatusCode" class="form-control" placeholder="400"/>
+        <label for="pathList" class="form-label">Seznam navštívených cest:</label>
+        <input type="text" id="pathList" name="pathList" class="form-control" placeholder="/cestaSChybou?vcetne=parametru"/>
+        <button type="submit" class="btn btn-primary">🍌🍌🍌</button>
+    </div>
+</form>
+
+<h3>Povolit IP adresu</h3>
+<form asp-action="AllowIp">
+    <div class="form-group">
+        <label for="ipAddress-allow" class="form-label">Ip adresa:</label>
+        <input type="text" id="ipAddress-allow" name="ipAddress" class="form-control" placeholder="127.0.0.1"/>
+        <button type="submit" class="btn btn-primary">Povolit</button>
+    </div>
+</form>
+
+<h2>Seznam 🍌</h2>
+
+<div class="row">
+    <div class="col-sm-2">
+        <strong>IP</strong>
+    </div>
+    <div class="col-sm-2">
+        <strong>Expiration</strong>
+    </div>
+    <div class="col-sm-2">
+        <strong>Created at</strong>
+    </div>
+</div>
+
+@foreach (var address in Model.OrderByDescending(ip => ip.Created))
+{
+    <details>
+        <summary>
+            <div class="row">
+                <div class="col-md-2">
+                  <i class="fas fa-plus text-success"></i>&nbsp;&nbsp;&nbsp;@address.Ip
+                </div>
+                <div class="col-md-2">
+                    @address.Expiration
+                </div>
+                <div class="col-md-2">
+                    @address.Created
+                </div>
+            </div>
+        </summary>
+        <dl>
+            <dt>Last status code</dt>
+            <dd>@address.LastStatusCode</dd>
+            <dt>Visited paths</dt>
+            @{
+                IHtmlContent pathListHtml = string.IsNullOrEmpty(address.PathList) ? 
+                    new HtmlString("") : new HtmlString(address.PathList.Replace("\n", "<br>"));
+            }
+            <dd>@pathListHtml</dd>
+            <dt>Created</dt>
+            <dd>@address.Created</dd>
+        </dl>
+    </details>
+}

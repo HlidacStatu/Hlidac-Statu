@@ -1,0 +1,206 @@
+﻿@using HlidacStatu.Entities;
+@using System.Linq;
+@using Devmasters.Collections;
+@using HlidacStatu.Repositories
+@using Nest
+
+@{
+    ViewBag.Title = "Sponzoři politických stran a politiků";
+    ViewBag.SubTitle = "Hlídáme je, protože si to zaslouží!";
+
+    int lastYear = SponzoringRepo.DefaultLastSponzoringYear;
+
+    var topSponzoriOsoby = SponzoringRepo.AllSponzorsPerYearPerStranaOsoby.Get()
+                            .GroupBy(g => g.Sponzor, sp => sp, (g, sp) => new Sponsors.Sponzorstvi<Osoba>()
+                            {
+                                Sponzor = g,
+                                Rok = null,
+                                CastkaCelkem = sp.Sum(m => m.CastkaCelkem),
+                                Strana = sp.GroupBy(g2 => g2.Strana, sp2 => sp2, (g2, sp2) =>
+                                            new Sponsors.Sponzorstvi<Osoba>()
+                                            {
+                                                Sponzor = null,
+                                                Rok = null,
+                                                Strana = g2,
+                                                CastkaCelkem = sp2.Sum(m => m.CastkaCelkem)
+                                            }
+                                            )
+                                            .Select(s2 => $"{s2.Strana}")
+                                            .Aggregate((f2, s2) => f2 + ", " + s2)
+                                            //strana
+                            }
+                            )
+                            .OrderByDescending(m => m.CastkaCelkem)
+                            .Take(7);
+
+}
+@section scripts
+{
+}
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+<p>
+    Na tomto místě hlídame sponzory politických stran tak, jak jsou uvedeni ve výročních zprávách politických stran.
+</p>
+<div class="watcher-blocks">
+
+    <div class="watcher-blocks__wrapper">
+        <!-- block 1 -->
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3>
+                    <i class="far fa-hand-holding-usd"></i>
+                    Parlamentní strany
+                </h3>
+            </div>
+            <div class="block-col ">
+                <p>
+                    Sponzorské dary v roce @lastYear
+                </p>
+            </div>
+
+            <div class="block-row block-part">
+                @{
+                    string[] topStrany = new string[] { "ANO", "ODS", "ČSSD", "Česká pirátská strana","KSČM",
+                        "SPD", "STAN","KDU-ČSL","TOP 09" };
+                    var data = topStrany
+                            .Select(s => SponzoringRepo.StranaPerYears(s))
+                            .Select(s => s.Where(m => m.Rok == lastYear).FirstOrDefault() ?? new SponzoringRepo.Strany.StranaPerYear() { Strana = s.First().Strana, Firmy = null, Osoby = null, Rok = lastYear })
+                            .OrderByDescending(o => o.TotalKc ?? 0)
+                            .Chunk(5);
+
+                    foreach (var chd in data)
+                    {
+                        <div class="block-col block-col--50">
+                            <div class="block-table">
+                                @foreach (var dat in chd)
+                                {
+                                    <div class="table-row">
+                                        <div class="table-col">
+                                            <a href="@Sponsors.GetStranaUrl(dat.Strana)">
+                                                @HlidacStatu.Util.RenderData.StranaZkratka(dat.Strana)
+                                            </a>
+                                        </div>
+                                        <div class="table-col">
+                                            @if (dat.TotalKc.HasValue)
+                                            {
+                                            @HlidacStatu.Util.RenderData.ShortNicePrice(dat.TotalKc.Value, exactScale: HlidacStatu.Util.RenderData.MaxScale.Milion)
+                                            }
+                                            else { 
+                                            <span>neznámé</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    }
+                }
+
+            </div>
+            <div class="block-col block-part">
+                <p class="small">
+                    Zdroj: finační výkazy politických stran ÚDHPSH.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3>
+                    <i class="far fa-coins"></i>
+                    Největší sponzoři za posledních 10 let
+                </h3>
+            </div>
+
+            <div class="block-col block-part">
+                <div class="block-table">
+                    @{
+                        foreach (var sponzor in topSponzoriOsoby)
+                        {
+                            <div class="table-row">
+                                <div class="table-col">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(sponzor.CastkaCelkem, html: true))</div>
+                                <div class="table-col"><a href="@sponzor.Sponzor.GetUrl(true)">@sponzor.Sponzor.FullName()</a> (@Devmasters.TextUtil.ShortenText(sponzor.Strana,20)) </div>
+                            </div>
+                        }
+
+                    }
+
+                </div>
+                <a href="/sponzori/top" class="link">Přehled více než 2000 největších sponzorů (osob i firem) politických stran</a>
+            </div>
+        </div>
+
+        <!-- block Sponzori -->
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3>
+                    <i class="far fa-coins"></i>
+                    Největší sponzoři v @lastYear
+                </h3>
+            </div>
+
+            <div class="block-col block-part">
+                <div class="block-table">
+                    @{
+                        foreach (var sponzor in SponzoringRepo.AllSponzorsPerYearPerStranaOsoby.Get()
+                            .Where(m => m.Rok == lastYear)
+                            .OrderByDescending(m => m.CastkaCelkem)
+                            .Take(7)
+                            )
+                        {
+                            <div class="table-row">
+                                <div class="table-col">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(sponzor.CastkaCelkem, html: true))</div>
+                                <div class="table-col"><a href="@sponzor.Sponzor.GetUrl(true)">@sponzor.Sponzor.FullName()</a> pro <a href="@Sponsors.GetStranaUrl(sponzor.Strana)">@sponzor.Strana</a></div>
+                            </div>
+                        }
+
+                    }
+
+                </div>
+                <a href="/sponzori/top?r=@lastYear" class="link">Další sponzoři</a>
+            </div>
+        </div>
+
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3>
+                    <i class="far fa-coins"></i>
+                    Největší firemní sponzoři v @lastYear
+                </h3>
+            </div>
+
+            <div class="block-col block-part">
+                <div class="block-table">
+                    @{
+                        foreach (var sponzor in SponzoringRepo.AllSponzorsPerYearPerStranaFirmy
+                            .Get()
+                            .Where(m => m.Rok == lastYear)
+                            .OrderByDescending(m => m.CastkaCelkem)
+                            .Take(7)
+                            )
+                        {
+                            <div class="table-row">
+                                <div class="table-col">@Html.Raw(HlidacStatu.Util.RenderData.ShortNicePrice(sponzor.CastkaCelkem, html: true))</div>
+                                <div class="table-col"><a href="@sponzor.Sponzor.GetUrl(true)">@sponzor.Sponzor.BookmarkName()</a> pro <a href="@Sponsors.GetStranaUrl(sponzor.Strana)">@sponzor.Strana</a></div>
+                            </div>
+                        }
+
+                    }
+
+                </div>
+                <a href="/sponzori/top?r=@lastYear" class="link">Další sponzoři</a>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <AssemblyName>HlidacStatu.Repositories</AssemblyName>
+        <RootNamespace>HlidacStatu.Repositories</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
+      <ProjectReference Include="..\Connectors\Connectors.csproj" />
+      <ProjectReference Include="..\Entities\Entities.csproj" />
+      <ProjectReference Include="..\HlidacStatu.Lib.Db.Insolvence\HlidacStatu.Lib.Db.Insolvence.csproj" />
+      <ProjectReference Include="..\Lib.Analytics\Lib.Analytics.csproj" />
+      <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
+      <ProjectReference Include="..\Lib.OCR.Api.Client\Lib.OCR.Api.Client.csproj" />
+      <ProjectReference Include="..\Util\Util.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Devmasters.Cache.Elastic" Version="2.3.0" />
+      <PackageReference Include="NEST" Version="7.13.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <WCFMetadataStorage Include="Temp\Connected Services\Data.External.NespolehlivyPlatceDPH" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,402 @@
+﻿@using System.Linq
+@using HlidacStatu.Datasets
+
+@functions {
+    //string[] colors = new[] { "#050F57", "#ED561B", "#F1CE46", "#a0a0a0", "#d0d0d0", "#1A428F", "#75B259", "#DA3732", "#054E0C", "#060606" };
+    string[] colors = new[] { "#208eb7", "#93e0f0", "#19477d", "#7cee4d", "#8731c2", "#5cdd9f", "#871d32", "#f1cbd5", "#1e7b20", "#f764de", "#c3de9b", "#683c00", "#f2945a", "#334d37", "#f3d426" };
+
+
+    public string GetColor(int poradi)
+    {
+        if (poradi < 0)
+        {
+            return GetColor(colors.Count() + poradi);
+        }
+        if (poradi >= colors.Count())
+        {
+            return GetColor(poradi - colors.Count());
+        }
+        return colors[poradi];
+    }
+
+    public class ministr
+    {
+        public string Id { get; set; }
+        public string Vlada { get; set; }
+        public string Resort { get; set; }
+        public string Pozice { get; set; }
+        public string Jmeno { get; set; }
+        public string Strana { get; set; }
+        public DateTime Zacatek { get; set; }
+        public DateTime Konec { get; set; }
+    }
+
+    public class odpovednost
+    {
+        public List<string> Vlady { get; set; } = new();
+        public string Resort { get; set; }
+        public List<string> Jmena { get; set; } = new();
+        public string Strana { get; set; }
+        public DateTime Zacatek { get; set; } = DateTime.MaxValue;
+        public DateTime Konec { get; set; } = DateTime.MinValue;
+        public int Days { get { return (int)(this.Konec - this.Zacatek).TotalDays; } }
+    }
+
+    public List<odpovednost> DelkyVladnuti(IEnumerable<ministr> data, string resort = null)
+    {
+        var allO = new List<odpovednost>();
+        odpovednost o = null;
+        foreach (var i in data.Where(m => m.Resort == resort).OrderBy(m => m.Zacatek))
+        {
+            if (o?.Strana != i.Strana)
+            {
+                if (o != null)
+                {
+                    allO.Add(o);
+                }
+                o = new odpovednost();
+                if (o.Vlady.Contains(i.Vlada) == false)
+                {
+                    o.Vlady.Add(i.Vlada);
+                }
+                if (o.Jmena.Contains(i.Jmeno) == false)
+                {
+                    o.Jmena.Add(i.Jmeno);
+                }
+                o.Resort = i.Resort;
+                o.Strana = i.Strana;
+                if (i.Zacatek < o.Zacatek)
+                {
+                    o.Zacatek = i.Zacatek;
+                }
+                if (i.Konec > o.Konec)
+                {
+                    o.Konec = i.Konec;
+                }
+            }
+            else
+            {
+                if (o.Vlady.Contains(i.Vlada) == false)
+                {
+                    o.Vlady.Add(i.Vlada);
+                }
+                if (o.Jmena.Contains(i.Jmeno) == false)
+                {
+                    o.Jmena.Add(i.Jmeno);
+                }
+                if (i.Zacatek < o.Zacatek)
+                {
+                    o.Zacatek = i.Zacatek;
+                }
+                if (i.Konec > o.Konec)
+                {
+                    o.Konec = i.Konec;
+                }
+            }
+        }
+        if (o != null)
+        {
+            allO.Add(o);
+        }
+
+        return allO.OrderByDescending(oo => oo.Days).ToList();
+    }
+
+}
+
+@{
+    Layout = "_ReportLayout";
+
+
+    var ds = DataSet.CachedDatasets.Get("ministri");
+
+    Dictionary<int, Tuple<DateTime, string>> obdobi = new()
+{
+        {1998, new Tuple<DateTime,string>(new DateTime(1998, 7, 22),"Zemanova vláda")},
+        {2002, new Tuple<DateTime,string>(new DateTime(2002, 7, 15),"Špidlova vláda")},
+        {2006, new Tuple<DateTime,string>(new DateTime(2006, 10, 4), "První Topolánkova vláda")},
+        {2010, new Tuple<DateTime,string>(new DateTime(2010, 7, 13), "Nečasova vláda")},
+        {2014, new Tuple<DateTime,string>(new DateTime(2014,1,17),"Sobotkova vláda" )},
+        {2017, new Tuple<DateTime,string>(new DateTime(2017,12,6),"Babišova vláda" )},
+    };
+
+    DateTime startDate = DateTime.MinValue;
+    string resort = Context.Request.Query["resort"];
+
+
+    string[] ignore = new string[] { "Předseda vlády", "Místopředseda", "Ministr bez portfeje" };
+
+    List<ministr> ministriAll = ds.SearchData("*", 1, 1000)
+                                .Result.Select(m =>
+                                    new ministr()
+                                    {
+                                        Id = m.id.ToString(),
+                                        Vlada = m.vlada,
+                                        Resort = m.resort,
+                                        Pozice = m.pozice,
+                                        Jmeno = m.jmeno,
+                                        Strana = m.strana,
+                                        Zacatek = m.zacatek,
+                                        Konec = ((DateTime?)m.konec) ?? DateTime.Now
+                                    }
+                                )
+                                .ToList();
+
+    List<ministr> ministri = ministriAll
+                                .Where(m => m.Zacatek >= startDate)
+                                .ToList();
+
+
+    List<string> resorty = ministri
+                                .GroupBy(k => k.Resort)
+                                .OrderByDescending(o => o.Count())
+                                .Select(m => m.Key)
+                                .Where(m => !ignore.Contains(m))
+                                .OrderBy(m => m)
+                                .ToList();
+
+    List<string> strany = ministri
+                            .GroupBy(k => k.Strana)
+                            .OrderBy(o => o.Key)
+                            .Select(m => m.Key)
+                            .ToList();
+
+    if (!resorty.Contains(resort))
+    {
+        resort = "";
+    }
+
+
+    int count = 0;
+
+    List<odpovednost> vladnutiAll = new(resorty.SelectMany(v => DelkyVladnuti(ministri, v)));
+
+}
+<link title="timeline-styles" rel="stylesheet" href="https://cdn.knightlab.com/libs/timeline3/latest/css/timeline.css" />
+<script src="https://cdn.knightlab.com/libs/timeline3/latest/js/timeline.js"></script>
+
+<link rel="stylesheet" src="/scripts/jquery.timeline.min.css">
+
+<script src="/scripts/jquery.timeline.min.js"></script>
+
+@if (string.IsNullOrEmpty(resort))
+{
+<div class="jumbotron">
+    <h1 style="padding-bottom:40px;" class="text-center">Na jakém resortu je která strana nejdéle?</h1>
+    <div>
+        @{
+
+
+            <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+            <script type="text/javascript">
+                google.charts.load("current", { packages: ["timeline"] });
+                google.charts.setOnLoadCallback(drawChart);
+                function drawChart() {
+                    var container = document.getElementById('resortTimeline');
+                    var chart = new google.visualization.Timeline(container);
+                    var dataTable = new google.visualization.DataTable();
+
+                    dataTable.addColumn({ type: 'string', id: 'Resort' });
+                    dataTable.addColumn({ type: 'string', id: 'Jmeno' });
+                    dataTable.addColumn({ type: 'string', id: 'style', role: 'style' });
+                    dataTable.addColumn({ type: 'date', id: 'Start' });
+                    dataTable.addColumn({ type: 'date', id: 'End' });
+                    dataTable.addRows([
+                        //['President', 'John Adams', new Date(1797, 2, 4), new Date(1801, 2, 4)],
+                        //['President', 'Thomas Jefferson', new Date(1801, 2, 4), new Date(1809, 2, 4)]]
+                            @Html.Raw(
+                                  ministri.OrderBy(m => m.Zacatek)
+                                    .Select(m => "["
+                                    + $"'{m.Resort}',"
+                                    + $"'{m.Jmeno} ({m.Strana})',"
+                                    + $"'color: {GetColor(strany.IndexOf(m.Strana))}',"
+                                    + $"new Date({m.Zacatek.ToString("yyyy,M,d")}),"
+                                    + $"new Date({m.Konec.ToString("yyyy,M,d")})"
+                                    + "]")
+                                    .Aggregate((f,s)=>f+",\n"+s)
+                                )
+                    ]);
+
+                    var options = { height:1500,
+                        timeline: {
+                            groupByRowLabel: true }
+                    };
+
+                    chart.draw(dataTable, options);
+                }
+            </script>
+            <div id='resortTimeline'></div>
+
+        }
+    </div>
+    <div>
+        @{ foreach (var r in resorty)
+            {
+                <span style="padding-right:20px">
+                    <a class="btn btn-primary btn-sm" href="/report/28?resort=@r" role="button" style="padding:3px 10px">@r</a>
+                </span>
+            }
+        }
+    </div>
+    <p><a class="btn btn-success btn-sm" href="/report/25" role="button">Ukázat přehled za různá období</a></p>
+</div>
+
+    <meta property="og:hlidac_html" content="@Html.Encode("<h2 style='padding-top:0'>Jak zodpovídají jednotlivé politické strany za fungování státu a jednotlivé resorty?</h2>")" />
+    <meta property="og:hlidac_footer" content="podrobné analýzy najdete v článku" />
+    <meta property="og:hlidac_subfooter" content="vypočítáno ke dni @DateTime.Now.ToString("d. M. yyyy")" />
+
+
+
+    <div class="bs-callout bs-callout-primary">
+        <h4>Jak zodpovídají jednotlivé politické strany za fungování státu a jednotlivé resorty?</h4>
+        <h4>Které strany jsou tradiční a které se jimi stávají?</h4>
+        <div>
+            Na této stránce je pracujeme s počtem dní, které jednotlivé strany řídily. Počítáme jak nejdelší nepřerušené období řízení rezortů, tak celkový počet dní.
+        </div>
+        <div>
+            Přes odkazy níže můžete změnit začátek počítaného období či si vypsat report pouze pro některou ze stran.
+        </div>
+        <div>
+            Zdrojem dat je <a onclick="return trackOutLink(this,'report25');" href="https://cs.wikipedia.org/wiki/Seznam_ministrů_České_republiky" target="_blank">
+                seznam ministrů vlád ČR z Wikipedie
+            </a>, který jsme vyčistili a znormalizovali pomocí OpenRefine. Zdrojová, pročištěná a znormalizovaná data <a href="/data/index/ministri">najdete v databázích Hlídače</a>.
+            <br />
+            Názvy resortů jsme sjednotili či jednodušili tehdy, pokud politická pozice odpovídala za obdobné oblasti, jen se trochu lišil.
+
+        </div>
+    </div>
+
+    return;
+}
+
+
+
+<h2 style="padding-top:20px;">Nejdelší politická zodpovědnost stran za @resort</h2>
+
+<h4><a href="/report/28">Stejná statistika pro ostatní ministerstva</a></h4>
+<div class="row">
+    @{
+        count++;
+        var vladnuti = DelkyVladnuti(ministri, resort);
+        var json = new
+        {
+            title = new { headline = "Ministři na " + resort },
+            events = ministri.Where(m => (m.Resort == resort)).OrderBy(m => m.Zacatek)
+                .Select(m => new
+                {
+                    start_date = new { year = m.Zacatek.Year, month = m.Zacatek.Month, day = m.Zacatek.Day },
+                    end_date = new { year = m.Konec.Year, month = m.Konec.Month, day = m.Konec.Day },
+                    group = m.Strana,
+                    text = new { headline = m.Jmeno },
+                    unique_id = "id" + m.Id
+                })
+        };
+    }
+    <div class="col-xs-12">
+        <h3>@resort</h3>
+        <div class="col-xs-12" style="padding-bottom:30px;display:none">
+            <div id='timeline-embed' style="width: 100%; height: 300px"></div>
+            <script type="text/javascript">
+                // The TL.Timeline constructor takes at least two arguments:
+                // the id of the Timeline container (no '#'), and
+                // the URL to your JSON data file or Google spreadsheet.
+                // the id must refer to an element "above" this code,
+                // and the element must have CSS styling to give it width and height
+                // optionally, a third argument with configuration options can be passed.
+                // See below for more about options.
+                var timeline_json = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(json));
+
+                //timeline = new TL.Timeline('timeline-embed', timeline_json, { start_at_end: true, initial_zoom:1});
+            </script>
+        </div>
+        <div class="col-xs-12">
+
+            <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+            <script type="text/javascript">
+                google.charts.load("current", { packages: ["timeline"] });
+                google.charts.setOnLoadCallback(drawChart);
+                function drawChart() {
+                    var container = document.getElementById('resortTimeline');
+                    var chart = new google.visualization.Timeline(container);
+                    var dataTable = new google.visualization.DataTable();
+
+                    dataTable.addColumn({ type: 'string', id: 'Resort' });
+                    dataTable.addColumn({ type: 'string', id: 'Jmeno' });
+                    dataTable.addColumn({ type: 'string', id: 'style', role: 'style' });
+                    dataTable.addColumn({ type: 'date', id: 'Start' });
+                    dataTable.addColumn({ type: 'date', id: 'End' });
+                    dataTable.addRows([
+                        //['President', 'John Adams', new Date(1797, 2, 4), new Date(1801, 2, 4)],
+                        //['President', 'Thomas Jefferson', new Date(1801, 2, 4), new Date(1809, 2, 4)]]
+                            @Html.Raw(
+                                  ministri.Where(m => (m.Resort == resort)).OrderBy(m => m.Zacatek)
+                                    .Select(m => "["
+                                    + $"'{m.Resort}',"
+                                    + $"'{m.Jmeno} ({m.Strana})',"
+                                    + $"'color: {GetColor(strany.IndexOf(m.Strana))}',"
+                                    + $"new Date({m.Zacatek.ToString("yyyy,M,d")}),"
+                                    + $"new Date({m.Konec.ToString("yyyy,M,d")})"
+                                    + "]")
+                                    .Aggregate((f,s)=>f+",\n"+s)
+                                )
+                    ]);
+
+                    var options = {
+                        timeline: {
+                            groupByRowLabel: true }
+                    };
+
+                    chart.draw(dataTable, options);
+                }
+            </script>
+            <div id='resortTimeline'></div>
+
+        </div>
+        <div class="col-xs-6">
+            <h4>Nejdéle působící strany na @resort</h4>
+            <ol>
+                @foreach (var vl in vladnuti
+                    .GroupBy(k=>k.Strana,v=>v,(k,v)=> new { strana=k, days = v.Sum(ss=>ss.Days) } )
+                    .OrderByDescending(m=>m.days)
+                    
+                    )
+                {
+                <li>
+                    <b>@vl.strana</b> v čele resortu celkem <b>@HlidacStatu.Util.RenderData.NiceNumber(vl.days) dní</b>
+                </li>
+                }
+            </ol>
+        </div>
+
+        <div class="col-xs-6">
+            <h4>Nejdelší nepřetržité působení stran na @resort</h4>
+            <ol>
+                @foreach (var vl in vladnuti.OrderByDescending(m=>m.Days))
+                {
+                <li>
+                    <b>@vl.Strana</b> (@vl.Zacatek.ToString("d.M.yyyy") - @vl.Konec.ToString("d.M.yyyy"))
+                     - nepřetržitě <b>@HlidacStatu.Util.RenderData.NiceNumber(vl.Days) dní</b>
+                </li>
+                }
+            </ol>
+        </div>
+        <div class="col-xs-5" style="border-left: 1px #ddd solid;">
+            <h4>Jednotliví ministři</h4>
+            <ol>
+                @foreach (var vl in ministri.Where(m => (m.Resort == resort)).OrderBy(m => m.Zacatek))
+                {
+                    var celkemD = vladnuti.Where(v => v.Strana == vl.Strana).Sum(m => m.Days);
+                    <li>
+                        @vl.Jmeno <b>@vl.Strana</b>, (@vl.Zacatek.ToString("d.M.yyyy") - @vl.Konec.ToString("d.M.yyyy"))
+                    </li>
+                }
+            </ol>
+        </div>
+    </div>
+
+</div>
+
+<h4><a href="/report/28">Stejná statistika pro ostatní ministerstva</a></h4>
+
+
+

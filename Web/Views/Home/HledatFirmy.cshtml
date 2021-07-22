@@ -1,0 +1,63 @@
+﻿@model HlidacStatu.Repositories.Searching.Search.GeneralResult<HlidacStatu.Entities.Firma>
+@{
+    ViewBag.Title = "Hledání subjektů";
+    ViewBag.ShowBookmarkUrl = true;
+    string subTitle = "";
+    if (!string.IsNullOrEmpty(Context.Request.Query["subtitle"]))
+    {
+        subTitle = Context.Request.Query["subtitle"];
+    }
+
+}
+@section scripts
+{
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li>Hledání subjektů</li>
+        <li class="active">@Model.Query</li>
+    </ol>
+}
+
+@if (Model.HasResult == false)
+{
+
+    <div class="searching container">
+        <div class="row" style="margin-top: 10px;">
+            <div class="col-xs-1">
+                <img style="margin-top:20px; height:30px;width:auto" src="/Content/img/icon-not-found.svg">
+
+            </div>
+            <div class="col-xs-11">
+                <div class="new-p--big">
+                    Pro hledaný výraz <span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> jsme bohužel nic nenašli
+                </div>
+            </div>
+        </div>
+    </div>
+    return;
+}
+
+<div class="row" id="firmy">
+    <div class="col-xs-12">
+        <div class="searching__watcher">
+            <div class="watcher__title">
+                <img src="/Content/img/icon-person-watcher.svg">
+                <h2 class="new-title">
+                    Nalezené subjekty
+                </h2>
+                <span>@HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(Model.Total)</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4>@(subTitle)</h4>
+<div class="row" style="">
+    <partial name="SearchResults/SearchResultsFirmy" model="Model"/>
+</div>
+
+

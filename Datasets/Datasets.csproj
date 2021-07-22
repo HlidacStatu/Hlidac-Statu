@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <AssemblyName>HlidacStatu.Datasets</AssemblyName>
+        <RootNamespace>HlidacStatu.Datasets</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Connectors\Connectors.csproj" />
+      <ProjectReference Include="..\Plugin.TransparetniUcty\Plugin.TransparetniUcty.csproj" />
+      <ProjectReference Include="..\Repositories\Repositories.csproj" />
+    </ItemGroup>
+
+</Project>

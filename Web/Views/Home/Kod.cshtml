@@ -1,0 +1,22 @@
+@model bool
+
+@{
+    ViewBag.Title = "Role přidělena";
+    Layout = "_Layout";
+}
+
+
+@if (Model)
+{
+    <h2>Byla Vám přidělena role pro exkluzivní přístup ke K-Indexu 2020</h2>
+    
+}
+else
+{
+    <h2>Zadejte prosím kód, který jste obdrželi</h2>
+    <form>
+        <label>kód</label>
+        <input id="id" name="id" type="text">
+        <button>Odeslat</button>
+    </form>
+}

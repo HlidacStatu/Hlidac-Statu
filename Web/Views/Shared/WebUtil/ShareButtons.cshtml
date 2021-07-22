@@ -1,0 +1,9 @@
+@model ShareButtonsViewModel
+
+<div class="ssk-group" data-url="@Model.Url" data-text="@Model.Text">
+    @Html.Raw(Model.PrefixHtml)
+    <share-facebook url="@Model.Url"></share-facebook>
+    @Html.Raw(Model.BetweenButtonsHtml)
+    <share-twitter url="@Model.Url" text="@Model.Text"></share-twitter>
+    @Html.Raw(Model.PostfixHtml)
+</div>

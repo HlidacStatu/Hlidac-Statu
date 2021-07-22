@@ -1,0 +1,218 @@
+﻿@model HlidacStatu.Entities.Dotace.Dotace
+
+@{
+    ViewBag.Title = "Hlídač dotací";
+    ViewBag.SubTitle = "Detail dotace";
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="@Url.Action("Index", "Dotace")">Hlídač Dotací</a></li>
+        <li class="active">@ViewBag.SubTitle</li>
+    </ol>
+}
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.css"/>
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
+
+@Html.Partial("_SearchForm", new HlidacStatu.Repositories.Searching.DotaceSearchResult())
+
+<h2>
+    <add-bookmark item="@Model"></add-bookmark>
+    Detail dotace "@Model.GetNazevDotace()"
+</h2>
+
+@if (!string.IsNullOrWhiteSpace(Model.Duplicita) && Model.Zdroj.Nazev != "cedr")
+{
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-circle"></i> Tento záznam je velmi pravděpodobně duplicitou dotace <a href="/Dotace/Detail/@Model.Duplicita.ToLower()">@Model.GetNazevDotace()</a>
+    </div>
+}
+
+@if (Model.Chyba != null)
+{
+    foreach (var chyba in Model.Chyba)
+    {
+        <code><i class="fas fa-exclamation-circle"></i> @chyba</code>
+
+    }
+}
+
+<table class="table table-new table-new--dotted">
+    <tbody>
+        <tr>
+            <th>Příjemce dotace</th>
+            <td>
+                @Model.Prijemce.HlidacJmeno
+            </td>
+        </tr>
+        <tr>
+            <th>Příjemce dotace - jak je uvedeno v datech</th>
+            <td>
+                @Html.KIndexLabelLink(Model.Prijemce.Ico)@Model.Prijemce.ObchodniJmeno
+            </td>
+        </tr>
+        <tr>
+            <th>IČO</th>
+            <td>
+                @if (Model.Prijemce.Ico != "00000000")
+                {
+                    <a href="/dotace/hledat?q=ico:@Model.Prijemce.Ico" title="Vyhledat všechny dotace pro tento subjekt">@Model.Prijemce.Ico</a>
+                }
+            </td>
+        </tr>
+        <tr>
+            <th>Obec příjemce</th>
+            <td>
+                @(Model.Prijemce.Obec)
+            </td>
+        </tr>
+        <tr>
+            <th>Okres příjemce</th>
+            <td>
+                @(Model.Prijemce.Okres)
+            </td>
+        </tr>
+        <tr>
+            <th>Kód projektu</th>
+            <td>
+                @if (!string.IsNullOrWhiteSpace(Model.KodProjektu))
+                {
+                    <a href="/dotace/hledat?q=kod:@Model.KodProjektu" title="Vyhledat podobné dotace">@Model.KodProjektu</a>
+                }
+            </td>
+        </tr>
+        <tr>
+            <th>Název projektu</th>
+            <td>@Model.NazevProjektu</td>
+        </tr>
+        <tr>
+            <th>Název programu</th>
+            <td>@(Model.Program?.Nazev ?? "neuveden")</td>
+        </tr>
+        <tr>
+            <th>Kód programu</th>
+            <td>@(Model.Program?.Kod ?? "neuveden")</td>
+        </tr>
+        <tr>
+            <th>Datum podpisu</th>
+            <td>@(Model.DatumPodpisu?.ToString("dd.MM.yyyy"))</td>
+        </tr>
+        <tr>
+            <th>Celková částka</th>
+            <td>
+                @if (Model.DotaceCelkem == null || Model.DotaceCelkem == 0)
+                {
+                    <code><i class="fas fa-exclamation-circle"></i> Hodnota neznámá</code>
+                }
+                else
+                {
+                    <p>@HlidacStatu.Util.RenderData.NicePrice((decimal)Model.DotaceCelkem)</p>
+                    if (Model.PujckaCelkem != null && Model.PujckaCelkem > 0)
+                    {
+                        <p class="text-muted">z toho @HlidacStatu.Util.RenderData.NicePrice((decimal)Model.PujckaCelkem) je půjčka.</p>
+                    }
+                }
+
+            </td>
+        </tr>
+        <tr>
+            <th>Zdroj</th>
+            <td><a href="@(Model.Zdroj?.Url)">@(Model.Zdroj?.Url)</a> (@(Model.Zdroj?.Nazev))</td>
+        </tr>
+    </tbody>
+</table>
+
+
+<h3 style="margin-top:50px">Rozhodnutí</h3>
+<div>
+    @if (Model.Rozhodnuti != null)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Rok</th>
+                    <th>Požadovaná částka</th>
+                    <th>Částka rozhodnutá</th>
+                    <th>Je půjčkou</th>
+                    <th>Zdroj financí</th>
+                    <th>Poskytovatel financí</th>
+                    <th>Čerpáno celkem</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rozhodnuti in Model.Rozhodnuti.OrderBy(r => r.Rok))
+                {
+                    <tr>
+                        <td>
+                            @rozhodnuti.Rok
+                        </td>
+                        <td class="text-nowrap text-right">
+                            @HlidacStatu.Util.RenderData.NicePrice(rozhodnuti.CastkaPozadovana ?? 0)
+                        </td>
+                        <td class="text-nowrap text-right">
+                            @HlidacStatu.Util.RenderData.NicePrice(rozhodnuti.CastkaRozhodnuta ?? 0)
+                        </td>
+                        <td>
+                            @(rozhodnuti.JePujcka.HasValue && rozhodnuti.JePujcka.Value ? "ano" : "ne")
+                        </td>
+                        <td>
+                            @(rozhodnuti.ZdrojFinanci)
+                        </td>
+                        <td>
+                            @rozhodnuti.Poskytovatel
+                        </td>
+                        <td class="text-nowrap text-right">
+
+                            @if (Model.DotaceCelkem == null || Model.DotaceCelkem == 0)
+                            {
+                                <code><i class="fas fa-exclamation-circle"></i> Hodnota neznámá</code>
+                            }
+                            else
+                            {
+                                @HlidacStatu.Util.RenderData.NicePrice(rozhodnuti.CerpanoCelkem ?? 0)
+
+                            }
+
+                            @if (rozhodnuti?.Cerpani != null
+                                && rozhodnuti.Cerpani.Count == 1
+                                && rozhodnuti.Cerpani.FirstOrDefault()?.Rok != null)
+                            {
+                                <p class="new-p--gray">
+                                    (v roce @rozhodnuti.Cerpani.FirstOrDefault().Rok)
+                                </p>
+                            }
+                        </td>
+
+                    </tr>
+                    if (rozhodnuti?.Cerpani != null
+                        && rozhodnuti.Cerpani.Count > 1)
+                    {
+                        <tr>
+                            <td></td>
+                            <td style="vertical-align:top;" class="text-right">Jednotlivá čerpání</td>
+                            <td colspan="5">
+                                <ul>
+                                    @foreach (var row in rozhodnuti.Cerpani.OrderBy(r => r.Rok))
+                                    {
+                                        <li>
+                                            @(HlidacStatu.Util.RenderData.NicePrice(row.CastkaSpotrebovana ?? 0)) (v roce @row.Rok)
+                                        </li>
+
+                                    }
+                                </ul>
+                            </td>
+                        </tr>
+                    }
+
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <code><i class="fas fa-exclamation-circle"></i> U této dotace neevidujeme žádné rozhodnutí</code>
+    }
+</div>

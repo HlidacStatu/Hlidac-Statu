@@ -1,0 +1,152 @@
+﻿@model  (string id,int rok,string group,string kraj)
+@inject IWebHostEnvironment webHostEnvironment
+
+@using HlidacStatu.Lib.Analysis.KorupcniRiziko
+@using HlidacStatu.Lib.Data
+@using Devmasters.Enums
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+
+@using Microsoft.AspNetCore.Hosting
+
+@{
+    int? selectedYear = ViewBag.SelectedYear;
+    string selectedGroup = ViewBag.SelectedGroup;
+    string selectedKraj = ViewBag.SelectedKraj;
+
+    
+    if (!string.IsNullOrWhiteSpace(ViewBag.LadderTitle))
+    {
+        ViewBag.Title = ViewBag.LadderTitle + " pro " + ViewBag.SelectedYear;
+    }
+    if (!string.IsNullOrEmpty(selectedGroup))
+    {
+        ViewBag.SubTitle = $"pro skupinu {selectedGroup}";
+    }
+    else if (!string.IsNullOrEmpty(selectedKraj))
+    {
+        ViewBag.SubTitle = $"pro kraj {selectedKraj}";
+    }
+    ViewBag.HideTitle = true;
+
+    string part = Context.Request.Query["part"].ToString();
+    string id = Model.id;
+
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="/kindex">K–Index</a></li>
+        <li><a href="/kindex/zebricek">Žebříčky úřadů a organizací</a></li>
+        <li class="active">@(ViewBag.Title + " " + ViewBag.SubTitle)</li>
+        
+    </ol>
+}
+
+<style>
+    .whisp {
+        width: 600px;
+        text-align: left;
+        background: white;
+        border-left: 2px grey solid;
+        border-top: 0px;
+        border-bottom: 1px grey dotted;
+        border-right: 0px grey solid;
+        padding-bottom: 2px;
+    }
+
+    #companies {
+        margin-bottom: 10px;
+    }
+</style>
+
+<cache expires-after="@(Constants.IsDevelopment(webHostEnvironment) ? Constants.CachedActionLength.NoCache : Constants.CachedActionLength.Cache24H)" 
+       vary-by="@($"{id}_{Model.rok}_{Model.group}_{Model.kraj}_{part}")">
+    @{        
+        
+        KIndexData.KIndexParts? selectedPart = null;
+        if (Enum.TryParse(part, out KIndexData.KIndexParts ePart))
+            selectedPart = (KIndexData.KIndexParts)ePart;
+        ViewBag.SelectedPart = selectedPart;
+
+        IEnumerable<SubjectWithKIndex> result = null;
+        Firma.Zatrideni.StatniOrganizaceObor oborFromId;
+        if (Enum.TryParse(id, true, out oborFromId))
+            id = "obor";
+
+        switch (id?.ToLower())
+        {
+            case "obor":
+                if (selectedPart.HasValue)
+                    result = Statistics.GetStatistics(Model.rok)
+                        .SubjektOrderedListPartsCompanyAsc(selectedPart.Value, FirmaRepo.Zatrideni.Subjekty(oborFromId), showNone: true);
+                else
+                    result = Statistics.GetStatistics(Model.rok)
+                        .SubjektOrderedListKIndexCompanyAsc(FirmaRepo.Zatrideni.Subjekty(oborFromId), showNone: true);
+                ViewBag.LadderTopic = oborFromId.ToNiceDisplayName();
+                ViewBag.LadderTitle = oborFromId.ToNiceDisplayName() + " podle K–Indexu";
+                break;
+
+            case "nejlepsi":
+                if (selectedPart.HasValue)
+                    result = Statistics.GetStatistics(Model.rok)
+                        .SubjektOrderedListPartsCompanyAsc(selectedPart.Value)
+                        .Take(100);
+                else
+                    result = Statistics.GetStatistics(Model.rok).SubjektOrderedListKIndexCompanyAsc()
+                        //.Where(s => s.KIndex > 0)
+                        .Take(100);
+                ViewBag.LadderTopic = "Top 100 nejlepších subjektů";
+                ViewBag.LadderTitle = "Top 100 nejlepších subjektů podle K–Indexu";
+                break;
+
+            case "nejhorsi":
+                if (selectedPart.HasValue)
+                    result = Statistics.GetStatistics(Model.rok)
+                        .SubjektOrderedListPartsCompanyAsc(selectedPart.Value)
+                        .OrderByDescending(k => k.KIndex)
+                        .Take(100);
+                else
+                    result = Statistics.GetStatistics(Model.rok).SubjektOrderedListKIndexCompanyAsc()
+                    .OrderByDescending(k => k.KIndex)
+                    .Take(100);
+                ViewBag.LadderTopic = "Nejhůře hodnocené úřady a organizace";
+                ViewBag.LadderTitle = "Nejhůře hodnocené úřady a organizace podle K–Indexu";
+                break;
+
+            case "celkovy":
+                if (selectedPart.HasValue)
+                    result = Statistics.GetStatistics(Model.rok)
+                        .SubjektOrderedListPartsCompanyAsc(selectedPart.Value);
+                else
+                {
+                    result = Statistics.GetStatistics(Model.rok)
+                        .SubjektOrderedListKIndexCompanyAsc()
+                        .Select(subj => { 
+                            subj.Kraj = HlidacStatu.Util.CZ_Nuts.Nace2Kraj(subj.KrajId, "(neznamý)");
+                            return subj;
+                        });
+                }
+                ViewBag.LadderTopic = "Kompletní žebříček úřadů a organizací";
+                ViewBag.LadderTitle = "Kompletní žebříček úřadů a organizací podle K–Indexu";
+                break;
+
+            case "skokani":
+                ViewBag.LadderTitle = "Úřady a organizace, kterým se hodnocení K-Indexu meziročně nejvíce změnilo";
+                <partial name="Partials/Zebricek.Skokani" model="@(Statistics.GetJumpersFromBest(Model.rok).Take(200))"/>
+                break;
+
+            default:
+                <partial name="Partials/Zebricek.Index"/>
+                break;
+        }
+
+        if (result is not null)
+        {
+            <partial name="Partials/Zebricek_child" model="@result"/>
+        }
+    }
+    
+</cache>

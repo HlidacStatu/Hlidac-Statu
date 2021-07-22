@@ -1,0 +1,24 @@
+@page
+@model ConfirmEmailModel
+@{
+    ViewData["Title"] = "Potvrzení ověření e-mailové adresy";
+}
+
+<div>
+    <p>
+        Vaše e-mailová adresa byla ověřena, nyní jste zaregistrovaným uživatelem Hlídače.
+    </p>
+
+    <p>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <a asp-page="./Manage/Index">Můžete pokračovat nastavením svého účtu</a>
+        }
+        else
+        {
+            <a asp-page="Login">Můžete se zalogovat</a>
+        }
+        <span>nebo se podívat</span>
+        <a asp-controller="Home" asp-action="Index">na titulní stranu.</a>
+    </p>
+</div>

@@ -1,0 +1,50 @@
+﻿@{
+
+    ViewBag.Title = "Důležité úřady";
+    ViewBag.SubTitle = "Adresář hlavních úřadů a společností spadajících pod registr smluv.";
+
+}
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="@Url.Action("Smlouvy","Home")">Hlídač Smluv</a></li>
+        <li><a href="@Url.Action("Reporty","Home")">Analytické a souhrnné reporty</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+<cache expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@(User.Identity?.IsAuthenticated.ToString())">
+    <partial name="Partials/Adresar_Child"/>
+</cache>
+
+@section footerscripts
+{
+    <script>
+
+        function ShowAll() {
+            $("li:hidden").show();
+            $("#btnAll").hide();
+            $("#btnBad").show();
+        }
+
+        function ShowBad() {
+            $("li.ok").hide();
+            $("#btnBad").hide();
+            $("#btnAll").show();
+        }
+        @if (!string.IsNullOrEmpty(Context.Request.Query["bad"]))
+        {
+            <text>
+        ShowBad();
+        </text>
+        }
+        else
+        {
+            <text>
+        ShowAll();
+        </text>
+        }
+    </script>
+}
+

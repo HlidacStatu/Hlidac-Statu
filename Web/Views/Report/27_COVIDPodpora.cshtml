@@ -1,0 +1,236 @@
+﻿@using HlidacStatu.Web.Framework.Report
+@using HlidacStatu.Datasets
+@{
+        Layout = "_ReportLayout";
+
+//https://twitter.com/HelenaHorska/status/1255496055782887424/photo/1
+//https://www.echo24.cz/a/Skptx/pomoc-firmam-je-extremne-pomala-vlada-slibila-bilion-realne-poslala-jen-par-miliard
+
+    int pocetDomacnosti = 4347840;
+//    int pocetPracujicich = 5731376 + 160474; // https://www.czso.cz/documents/10180/45709978/300002171132.pdf/8fe48ed6-1480-47f4-b340-a9cef22e9715?version=1.0
+
+    var ds = DataSet.CachedDatasets.Get("pomoc-covid");
+    var data = covid_pomoc.VsechnaPomoc();
+
+    string sprima = "Přímá podpora";
+    string sneprima = "Nepřímá podpora";
+    string szaruka = "Úvěr či záruka za úvěr";
+
+    DateTime keDni = data.OrderByDescending(m => m.udaj_ke_dni).First().udaj_ke_dni;
+
+    decimal vypl_prima = data.Where(m => m.typ_pomoci == sprima).Sum(m => m.vyplacena);
+    decimal vypl_neprima = data.Where(m => m.typ_pomoci == sneprima).Sum(m => m.vyplacena);
+    decimal vypl_zaruka = data.Where(m => m.typ_pomoci == szaruka).Sum(m => m.vyplacena);
+
+    decimal odh_prima = data.Where(m => m.typ_pomoci == sprima).Sum(m => m.odhadovana_celkova_vyse_v_mld_kc);
+    decimal odh_neprima = data.Where(m => m.typ_pomoci == sneprima).Sum(m => m.odhadovana_celkova_vyse_v_mld_kc);
+    decimal odh_zaruka = data.Where(m => m.typ_pomoci == szaruka).Sum(m => m.odhadovana_celkova_vyse_v_mld_kc);
+}
+
+<h1>Slíbeno 1 190 miliard Kč</h1>
+<h2>Jaká je slibovaná a jaká je skutečná pomoc státu podnikatelům z peněz daňových poplatníků v dobách koronavirové epidemie?</h2>
+<p>
+    Dopady pandemie koronaviru a restart ekonomiky by měli politici řešit rychle, jednoduše a účinně. Sliby politiků jsme slyšeli,
+    pojďme se kouknout na skutečnou pomoc.
+    Jde o součást společného projektu s Rekonstrukcí státu <a  onclick="return trackOutLink(this,'Report27');" target="_blank" href="https://www.rekonstrukcestatu.cz/cs/nezhasinat/">„NEZHASÍNAT!”</a>, ve které dodáváme politikům sadu doporučení, jak se popasovat s krizí v mezích zákonů a rozjet ekonomiku efektivně a transparentně.
+</p>
+
+<hr style="margin:50px 100px 50px 100px" />
+<div class="row">
+    <div class="col-xs-12 col-sm-3">
+        <div style="font-size:20px" class="center-block text-center">
+            Do @(keDni.ToString("d. MMMM yyyy")) bylo vyplaceno celkem
+            <div class="text-danger" style="font-size:130%">
+                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(vypl_prima + vypl_neprima + vypl_zaruka, mena: "mld. Kč", html: true))
+                z peněz daňových poplatníků.
+            </div>
+            @*To je @HlidacStatu.Util.RenderData.NicePrice(((vypl_prima + vypl_neprima + vypl_zaruka)*1000000000)/pocetDomacnosti) na jednu domácnost.*@
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-9">
+        <blockquote class="blockquote-reverse">
+            <p class="text-justify">
+                <img src="~/Content/Img/report27sm.png" style="width:200px;height:auto;padding-left:20px" class="img-rounded pull-right" />
+
+                <span style="font-size:0.9em;" class="text-muted">
+                    <i class="fas fa-quote-right fa-2x fa-pull-left"></i>Celková
+                    opatření na podporu ekonomiky v souvislosti s dopady šíření koronaviru činí
+                    <b class="text-danger">1,19 bilionu korun</b>. Z toho přímá podpora je 216 miliard korun a záruky na úvěry 951,5 miliardy
+                    korun.
+                </span>
+
+            </p>
+            <footer>Ministryně financí Alena Schillerová <cite title="Česká televize"><a onclick="return trackOutLink(this,'Report27');" href="https://www.ceskatelevize.cz/ivysilani/1097181328-udalosti/220411000100422/obsah/763721-podpora-ekonomiky">21. dubna 2020 v České televizi</a></cite></footer>
+            <div style="clear:both;"></div>
+        </blockquote>
+        <h3>Pro podporu ekonomiky vláda plánuje zadlužení státu v roce 2020 ve výši  
+            <span class="text-danger"><b>500 miliard Kč</b></span>. 
+        To je <b class="text-danger">dluh @HlidacStatu.Util.RenderData.NicePrice((500m * 1000000000m) / pocetDomacnosti)</b> 
+        na pro každou českou domácnost.
+        </h3>
+    </div>
+</div>
+
+<hr style="margin:50px 100px 50px 100px" />
+
+<h2>Skutečně vyplacená pomoc <small> ke dni @(keDni.ToString("d. MMMM yyyy"))</small></h2>
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="table-new table-new--dotted table-new--wider">
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Odhadovaný objem pomoci</th>
+                        <th>Vyplacená pomoc</th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span style="font-size:25px;font-weight:bold">
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(odh_prima, mena: "mld. Kč", html: true))
+                            </span>
+                        </td>
+                        <td>
+                            <span style="font-size:25px;font-weight:bold">
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(vypl_prima, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
+                            </span>
+                        </td>
+                        <td>Přímá nevratná podpora</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span style="font-size:25px;font-weight:bold">
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(odh_neprima, mena: "mld. Kč", html: true))
+                            </span>
+                        </td>
+                        <td>
+                            <span style="font-size:25px;font-weight:bold">
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(vypl_neprima, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
+                            </span>
+                        </td>
+                        <td>Nepřímá podpora (snížení, odpuštění daní, liberační balíček)</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span style="font-size:25px;font-weight:bold">
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(odh_zaruka, mena: "mld. Kč", html: true))
+                            </span>
+                        </td>
+                        <td>
+                            <span style="font-size:25px;font-weight:bold">
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(vypl_zaruka, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
+                            </span>
+                        </td>
+                        <td>Úvěr či záruka za úvěr</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<h2 style="margin-top:50px;">Detailně jednotlivé programy</h2>
+<div class="row">
+    <div class="col-xs-12">
+        <p>Zdrojová data: databáze <a  onclick="return trackOutLink(this,'Report27');" href="@ds.GetUrl(true)">@(ds.Registration().name) na Hlídači státu</a>. Data jsou získána od jednotlivých úřadů a od <a href="https://twitter.com/HelenaHorska">analytičky RB Heleny Horské</a>.</p>
+        <div class="table-new table-new--dotted">
+            <table>
+                <tbody>
+                    <tr>
+                        <th></th>
+                        <th>Garant</th>
+                        <th>Program pomoci</th>
+                        <th>Odhadovaná celková výše</th>
+                        <th>Vyplaceno</th>
+                        <th>Pomoc dostalo</th>
+                        <th></th>
+                    </tr>
+                    @foreach (var typ in new string[] { sprima, sneprima, szaruka })
+                    {
+
+
+                        <tr><th colspan="5" style="font-size:20px;">@typ</th></tr>
+                        foreach (var item in data
+                                .Where(m => m.typ_pomoci == typ)
+                                .OrderBy(m => m.ministerstvo)
+                                .ThenBy(m => m.program)
+                                )
+                        {
+                            <tr>
+                                <td><a  onclick="return trackOutLink(this,'Report27');" href="/data/Detail/pomoc-covid/@item.id">Detail</a></td>
+                                <td>@item.ministerstvo</td>
+                                <td>
+                                    <span>@item.program</span>
+                                    @if (!string.IsNullOrEmpty(item.url))
+                                    {
+                                        <a href="@item.url"><i class="fas fa-external-link"></i></a>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.odhadovana_celkova_vyse_v_mld_kc > 0)
+                                    {
+                                        <span>@Html.Raw(HlidacStatu.Util.RenderData.NicePrice(item.odhadovana_celkova_vyse_v_mld_kc, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Není známo</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.vyplacena > 0)
+                                    {
+                                        <span>@Html.Raw(HlidacStatu.Util.RenderData.NicePrice(item.vyplacena, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.pocet_subjektu > 0)
+                                    {
+                                        <span>@Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(item.pocet_subjektu, html: true)) subjektů</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.poznamka))
+                                    {
+                                        
+                                        <a title="@item.poznamka" href="/data/Detail/pomoc-covid/@item.id"><i class="far fa-sticky-note"></i></a>
+                                    }
+
+                                </td>
+                            </tr>
+
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<hr style="margin:50px 100px 50px 100px" />
+
+<div class="row">
+    <div class="col-xs-12">
+        <blockquote>
+            <p class="text-justify">
+                <img src="~/Content/Img/report27smbabis.png" style="width:200px;height:auto;padding-right:20px" class="img-rounded pull-left" />
+
+                <span style="font-size:0.9em;" class="text-muted">
+                    <i class="fas fa-quote-right fa-2x fa-pull-left"></i>Naše vláda je připravena udělat maximum pro to, abychom pomohli všem živnostníkům, podnikatelům, malým a středním firmám, rodinným firmám, ale taky samoživitelkám a dalším. Zkrátka všem, kteří přišli kvůli koronaviru o příjem. Jsme na to připraveni v tuto chvíli uvolnit až
+                    <b class="text-danger">tisíc miliard korun</b>.
+                </span>
+            </p>
+            <footer>Premiér ČR Andrej Babiš <cite title="Česká televize"><a  onclick="return trackOutLink(this,'Report27');" href="https://www.irozhlas.cz/zpravy-domov/koronavirus-v-cesku-andrej-babis-chytra-karantena-projev_2004092018_pj">9. dubna 2020 v České televizi</a></cite></footer>
+            <div style="clear:both;"></div>
+        </blockquote>
+        <div style="margin:20px"></div>
+
+    </div>
+</div>
+
+
+<hr style="margin:50px 100px 50px 100px" />
+
+

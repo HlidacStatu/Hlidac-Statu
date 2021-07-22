@@ -1,0 +1,20 @@
+@inject SignInManager<ApplicationUser> SignInManager
+@{
+    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+}
+<ul class="nav flex-column">
+    <li class="small">Účet</li>
+    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">Profil</a></li>
+    <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">E-mail</a></li>
+    <li class="nav-item"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">Heslo</a></li>
+    <li class="nav-item"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">Osobní údaje</a></li>
+    @* @if (hasExternalLogins) *@
+    @* { *@
+    @*     <li id="external-logins" class="nav-item"><a id="external-login" class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins">External logins</a></li> *@
+    @* } *@
+    @* <li class="nav-item"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li> *@
+    <hr/>
+    <li class="small">Užitečné odkazy</li>
+    <li class="nav-item"><a class="nav-link" id="watchdogs" asp-controller="Manage" asp-action="Watchdogs">Seznam vašich hlídačů</a></li>
+    <li class="nav-item"><a class="nav-link" id="watchdogs" asp-controller="ApiV1" asp-action="Index">API klíč</a></li>
+</ul>

@@ -1,0 +1,111 @@
+﻿@using Microsoft.AspNetCore.Http.Extensions
+@using HlidacStatu.Repositories
+@using HlidacStatu.Entities
+@model HlidacStatu.Repositories.Searching.SmlouvaSearchResult
+
+@{
+    if (Model.ElasticResults == null)
+    {
+        return;
+    }
+
+}
+
+<script>
+    function CollapseAll() {
+        $('.issueCol').collapse('toggle');
+    }
+
+    function changeOrder(sel) {
+        var value = sel.value;
+        window.location.href = '@Html.Raw(HlidacStatu.Repositories.Searching.SmlouvaSearchResult.GetSearchUrl(
+                                    Context.Request.Scheme + "://" + Context.Request.Host + Context.Request.Path
+                                    , Model.Q, chyby: Model.Chyby))&order=' + value;
+    }
+
+    function changeChyby(sel) {
+        var value = sel.value;
+        window.location.href = '@Html.Raw(HlidacStatu.Repositories.Searching.SmlouvaSearchResult.GetSearchUrl(
+                                    Context.Request.Scheme + "://" + Context.Request.Host + Context.Request.Path
+                                    , Model.Q, (SmlouvaRepo.Searching.OrderResult)(Convert.ToInt32(Model.Order))))&chyby=' + value;
+    }
+
+</script>
+@if (Model?.ElasticResults?.IsValid == false || Model.ElasticResults == null)
+{
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-danger">Položený dotaz má špatnou syntaxi. Zkontrolujte, že je správně.</div>
+            <div>
+                Pokud si myslíte, že dotaz je v pořádku a chyba je na naší straně, <partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("napište nám prosím", "Chyba", "btn btn-link"))"/>.
+                Zkontrolujeme to.
+            </div>
+        </div>
+    </div>
+    return;
+}
+@if (Model.ShowWatchdog && Model.Q != null)
+{
+
+    <div class="row">
+        <div class="col-sm-6 col-xs-12">
+            @{
+                var wdModel = new WatchdogViewModel(typeof(Smlouva), Model.Q);
+                <partial name="WebUtil/AddWatchdog" model="wdModel"/>
+            }
+            
+        </div>
+        <div class="col-sm-push-1 col-xs-12 col-sm-5">
+            <div class="section-title">
+                Sdílet
+            </div>
+            <div style="margin: 14px 0 16px">
+                <partial name="WebUtil/ShareButtons" 
+                         model="@(new ShareButtonsViewModel(Context.Request.GetDisplayUrl(), 
+                                        $"Hledání {Model.Q}: {Model.Total} ",
+                                        betweenButtonsHtml: "<br />"))"/>
+                
+            </div>
+        </div>
+    </div>
+
+}
+
+@if (Model.Chyby)
+{
+    <div class="row">
+        <div class="col-xs-12">
+            <a class="btn btn-info" role="button" data-toggle="collapse" href="#" onclick="javascript:CollapseAll();return false;" aria-expanded="false" aria-controls="collapseExample">
+                Ukázat nedostatky u všech smluv
+            </a>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-xs-12 col-sm-6">
+        <h3>
+            Nalezené smlouvy
+            <small>
+                @HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(Model.ElasticResults.HitsMetadata.Total, false, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)
+            </small>
+        </h3>
+        @if (Model?.ElasticResults?.Aggregations != null && Model?.ElasticResults?.Aggregations?.ContainsKey("sumKc") == true)
+        {
+            double? sum = ((Nest.ValueAggregate)Model?.ElasticResults?.Aggregations["sumKc"])?.Value;
+            <h4>
+                Celková cena nalezených smluv @Html.Raw(Smlouva.ShortNicePrice(Convert.ToDecimal(sum.Value), html: true))
+            </h4>
+        }
+    </div>
+    <div class="col-xs-12 col-sm-6">
+        <br />
+        @if (Model.Chyby)
+        {
+            @Html.CheckBoxFor(m => m.Chyby, new { @onchange = "changeChyby(this);" }) @Html.LabelFor(m => m.Chyby, "Ukázat chyby")
+        }
+        @Html.DropDownListFor(m => m.Order, Model.OrderList, new { @class = "form-control small pull-right", @style = "width:50%;max-width:300px", @id = "orderList", @onchange = "changeOrder(this);" })
+    </div>
+</div>
+<div style="height:32px;"></div>
+<partial name="SearchResults/SearchResultsSmlouvy" model="Model"/>

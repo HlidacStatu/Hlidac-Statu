@@ -1,0 +1,76 @@
+﻿@model HlidacStatu.Repositories.Searching.DotaceSearchResult
+
+<script>
+    function changeOrder(sel) {
+        var value = sel.value;
+        window.location.href = '@Html.Raw(HlidacStatu.Repositories.Searching.DotaceSearchResult.GetSearchUrl(
+                                    Context.Request.Scheme + "://" + Context.Request.Host + Context.Request.Path
+                                    , Model.Q))&order=' + value;
+    }
+</script>
+
+@if (Model?.ElasticResults?.IsValid == false || Model?.ElasticResults == null)
+{
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-danger">Položený dotaz má špatnou syntaxi. Zkontrolujte, že je správně.</div>
+            <div>
+                Pokud si myslíte, že dotaz je v pořádku a chyba je na naší straně, 
+                <partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("napište nám prosím", "Chyba", "btn btn-link", null))"/>.
+                Zkontrolujeme to.
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    if (Model.ElasticResults == null)
+    {
+        <span></span>
+    }
+    else if (Model.ElasticResults.Total == 0)
+    {
+        <h2>Žádné dotace jsme nenalezli.</h2>
+    }
+    else if (Model.ElasticResults.Total > 0)
+    {
+        <hr />
+
+        <div class="row">
+            <div class="col-xs-12 col-sm-6">
+                <h3>
+                    Nalezené dotace
+                    <small>
+                        @HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(Model.ElasticResults.HitsMetadata.Total, false, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)
+                    </small>
+                </h3>
+                @if (Model?.ElasticResults?.Aggregations != null && Model?.ElasticResults?.Aggregations?.ContainsKey("souhrn") == true)
+                {
+                    double? sum = ((Nest.ValueAggregate)Model?.ElasticResults?.Aggregations["souhrn"])?.Value;
+                    <div>
+                        V celkové hodnotě @HlidacStatu.Util.RenderData.NicePrice((decimal)sum). <sup>*)</sup>
+                        <div class="alert alert-info" role="alert">
+                            <b>*) Celková hodnota</b> je námi vypočítaná hodnota čerpaných dotací, kterou jsme získali z různých zdrojových databází. Takto získané údaje proto mohou být podle kvality vstupních dat zobrazeny v některých případech i duplicitně nebo neúplně. Veškeré údaje proto vždy doporučujeme ověřit.
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <br />
+                @Html.DropDownListFor(m => m.Order, Model.OrderList, new { @class = "form-control small pull-right", @id = "orderListVZ", @style = "width:60%;max-width:300px", @onchange = "changeOrder(this);" })
+            </div>
+        </div>
+        
+        <partial name="SearchResults/SearchResultsDotace" model="Model"/>
+        
+
+        
+
+
+        
+
+
+    }
+}
+
+<div style="margin-bottom:50px;"></div>

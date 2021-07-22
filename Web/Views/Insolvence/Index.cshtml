@@ -1,0 +1,90 @@
+﻿@model HlidacStatu.Web.Models.InsolvenceIndexViewModel
+@using System.Linq;
+@using HlidacStatu.Repositories
+
+
+
+@{
+    DateTime dataForDate = InsolvenceRepo.Searching.SimpleSearch("*", 1, 1,
+            (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc,
+            limitedView: false)
+        .ElasticResults.Hits.First().Source.PosledniZmena;
+
+    ViewBag.Title = "Hlídač insolvencí";
+    ViewBag.SubTitle = "k " + HlidacStatu.Util.RenderData.ToDate(dataForDate);
+
+
+}
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+    <script src="~/bundles/highcharts"></script>
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li class="active">Hlídač Insolvencí</li>
+    </ol>
+}
+
+@*@Html.Action("CachedAction_Child_48H", new { model = Model, NameOfView = "Index.Content.Charts" })*@
+
+
+@Html.Partial("_SearchForm", new HlidacStatu.Repositories.Searching.InsolvenceSearchResult())
+
+@*@Html.Action("CachedAction_Child_48H", new { model = Model, NameOfView = "Index.Content.Politici" })*@
+
+<div class="row">
+
+    <div class="col-xs-12">
+        <h2>Nové společnosti v insolvenci</h2>
+        @{
+            var spolecnosti = Model.NoveFirmyVInsolvenci;
+        }
+
+        <partial name="SearchResults/SearchResultsInsolvence" model="spolecnosti"></partial>
+        
+    </div>
+
+    <div class="col-xs-12">
+        <h2>Nové osoby v insolvenci</h2>
+        @{
+            var osoby = Model.NoveOsobyVInsolvenci;
+        }
+
+        <partial name="SearchResults/SearchResultsInsolvence" model="osoby"></partial>
+    </div>
+</div>
+
+<h2>Ukázky možností</h2>
+<ul>
+    <li>
+        <a href="/insolvence/hledat?Q=*">Naposledy změněná řízení</a>
+    </li>
+    <li>
+        <a href="/insolvence/hledat?Q=datumZalozeni%3A%5B2018-01-01+TO+2018-12-31%5D+AND+soud%3AKSSCEUL">Řízení vzniklá v roce 2018 na krajském soudu v Ústí nad Labem</a>
+    </li>
+    <li>
+        <a href="/insolvence/hledat?Q=jmenodluznik%3A%22Petr+Novák%22">Řízení kde dlužník je osoba se jménem Petr Novák</a>
+    </li>
+    <li>
+        <a href="/insolvence/hledat?Q=Stav%3AKONKURS">Řízení v konkursu</a>
+    </li>
+</ul>
+
+
+
+
+<div class="bs-callout bs-callout-primary small">
+    <h4>Politici a jejich vazby na firmy</h4>
+    <p>
+        Pro nás relevantní vazba politika na firmu je, že daná osoba byla (spolu)majitelem firmy anebo působila ve statutárním orgánu společnosti v době,
+        kdy byla zahájena insolvence přímo na firmu, kde osoba působila, anebo na libovolnou firmu, kde byl tento vztah nepřímý (tzn. firma s politikem vlastnila firmu B, ta firmu C, ktera spadla do insolvence)
+    </p>
+</div>
+
+
+

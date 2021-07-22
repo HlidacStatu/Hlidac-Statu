@@ -1,0 +1,198 @@
+﻿@model HlidacStatu.Datasets.DataSet
+@using System.Linq;
+@using HlidacStatu.Datasets
+
+@{
+    var reg = Model.Registration();
+
+    ViewBag.Title = "Datový zdroj " + Model.Registration().name;
+    ViewBag.SubTitle = "Podrobné informace";
+
+    var email = User.Identity?.Name;
+    bool showEditBtn = (DataSet.Api.SuperUsers.Contains(email)
+        || email == Model.Registration().createdBy
+        );
+
+}
+@section scripts
+{
+    <link rel="stylesheet" href="/scripts/highlight/styles/default.css"/>
+    <script src="/scripts/highlight/highlight.pack.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.highlightme pre').each(function (i, block) {
+                hljs.highlightBlock(block);
+            });
+        });
+
+    </script>
+}
+
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="/data">Další databáze</a></li>
+        <li><a href="@Model.DatasetUrl()">@reg.name</a></li>
+        <li class="active">Technické informace</li>
+        <li class="active pull-right"><a href="/data/manage" class="btn btn-primary btn-sm" style="color:whitesmoke;text-decoration:none">Snadné přidání nového datasetu</a></li>
+    </ol>
+    }
+    <div id="data-detail-content">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <td colspan="2">
+                        <b>@reg.name</b>
+                        @if (!string.IsNullOrEmpty(reg.description))
+                        {
+                            <p>@reg.description</p>
+                        }
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>DatasetId</td>
+                    <td>@reg.datasetId</td>
+                </tr>
+                <tr>
+                    <td>Vytvořen</td>
+                    <td>@HlidacStatu.XLib.RenderTools.DateDiffShort(reg.created, DateTime.Now, "Datový zdroj byl založen před {0}.", "")</td>
+                </tr>
+                <tr>
+                    <td>Záznamy datového zdroje</td>
+                    @{
+                        var first = Model.SearchData("*", 1, 1, "DbCreated");
+                        var last = Model.SearchData("*", 1, 1, "DbCreated desc");
+                    }
+                    <td>
+                        <p>
+                            Datový zdroj @Devmasters.Lang.Plural.GetWithZero((int)Model.SearchData("", 1, 0).Total
+, "neobsahuje žádný záznam", "obsahuje jeden záznam", "obsahuje {0} záznamy", "obsahuje {0} záznamů")
+                        </p>
+                        @if (first.Total > 0)
+                        {
+                            <p>
+                                Nejstarší záznam byl vložen @(Devmasters.DT.Util.Ago((DateTime)first.Result.First().DbCreated, HlidacStatu.Util.Consts.csCulture).ToLower())
+                                , nejnovější @(Devmasters.DT.Util.Ago((DateTime)last.Result.First().DbCreated, HlidacStatu.Util.Consts.csCulture).ToLower()).
+                            </p>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td>Testovací (beta) provoz</td>
+                    <td>@(reg.betaversion ? "Ano" : "Ne")</td>
+                </tr>
+                <tr>
+                    <td>Kontaktovat autora</td>
+                    <td>
+                        <partial name="WebUtil/FeedbackModal" 
+                                 model="@(new FeedbackViewModel("Poslat autorovi zprávu", null, null, null,
+                                            new string[]
+                                            {
+                                                "Chyba", "Chci upozornit na chybu",
+                                                "Stiznost", "Chci si stěžovat",
+                                                "Pochvala", "Chci vás pochválit",
+                                                "NabidkaPomoci", "Nabízím vám pomoc",
+                                                "Jiné", "Jiné",
+                                            }, true, $"dataset|{Model.DatasetId}"))"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Hledání v datovém zdroji</td>
+                    <td>
+                        <form method="get" action="/data/Hledat/@Model.DatasetId" class="form-inline ">
+                            <div class="form-group form-group">
+                                <input type="text" class="form-control form-control--small" id="q" name="q" placeholder="hledaný text">
+                            </div>
+                            <button type="submit" class="btn btn-default btn-sm">Prohledat</button>
+                            <a href="/data/Hledat/@Model.DatasetId?q=*&order=DbCreated+desc" class="btn btn-default btn-sm" style="margin-left:10px">Vypsat poslední záznamy</a>
+                        </form>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td><h3>Technické podrobnosti</h3></td>
+                    <td style="vertical-align:bottom;">
+                        @if (showEditBtn)
+                        {
+                            <a href="/data/Manage/@Model.DatasetId" class="btn btn-info btn-sm"><i class="far fa-edit"></i> Editovat nastavení datasetu</a>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td>Zdroj dat</td>
+                    <td><a href="@reg.origUrl">@reg.origUrl</a></td>
+                </tr>
+                <tr>
+                    <td>Stáhnutí celé databáze</td>
+                    <td>Pro stažení použijte naše API. 
+                    <br/><br/>
+                    Pokud jste zalogováni, můžete použít i tento odkaz: <a href="https://www.hlidacstatu.cz/api/v2/dump/dataset.@(Model.DatasetId)">https://www.hlidacstatu.cz/api/v2/dump/dataset.@(Model.DatasetId)</a></td>
+                </tr>
+                <tr>
+                    <td>Zdrojový kód parseru dat</td>
+                    <td><a href="@reg.sourcecodeUrl">@reg.sourcecodeUrl</a></td>
+                </tr>
+                <tr>
+                    <td>JSON Schéma popisující strukturu a požadavky na data</td>
+                    <td>
+                        <div class="highlightme">
+                            <pre>
+@reg.jsonSchema
+                        </pre>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Template pro zobrazování vyhledaných výsledků</td>
+                    <td>
+                        <div class="highlightme">
+                            <pre>
+@(reg.searchResultTemplate?.body ?? "<i>není nastaven</i>")
+                        </pre>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Template pro zobrazování jednoho záznamu</td>
+                    <td>
+                        <div class="highlightme">
+                            <pre>
+@(reg.detailTemplate?.body ?? "<i>není nastaven</i>")
+                        </pre>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Otestovat strukturu dat</td>
+                    <td>
+                        Pokud chcete otestovat vaše data, zda mají správný formát a splňují požadavky <a href="https://json-schema.org">JSON Schematu</a> této databáze, rádí pomůžeme.
+
+                        <form method="post" action="/data/datasettextjson/@Model.DatasetId">
+                            <div class="form-group">
+                                <label for="jsondata">Zkopírujte sem JEDEN záznam v JSON formátu (stejná data jako posílaná <a href="/api">přes API</a>)</label>
+                                <textarea id="jsondata" name="jsondata" class="form-control" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-default">Odeslat</button>
+
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>Technické podrobnosti</b></td>
+                    <td>
+                        @if (showEditBtn)
+                        {
+                            <a href="/data/Manage/@Model.DatasetId" class="btn btn-info btn-sm"><i class="far fa-edit"></i> Editovat nastavení datasetu</a>
+                        }
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+

@@ -1,0 +1,223 @@
+﻿@model HlidacStatu.Datasets.Registration
+@using System.Text.RegularExpressions;
+@using HlidacStatu.Datasets
+@{
+
+    ViewBag.Title = "Vytvoření nové databáze";
+    ViewBag.SubTitle = "Pro pokročilé";
+    ApiResponseStatus err = ViewBag.ApiResponseError;
+
+}
+@section scripts
+{
+    <link rel="stylesheet" href="/scripts/highlight/styles/default.css"/>
+    <script src="/scripts/highlight/highlight.pack.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.highlightme pre').each(function (i, block) {
+                hljs.highlightBlock(block);
+            });
+        });
+
+    </script>
+}
+
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="/data">Další databáze</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+<div class="row">
+    <div class="col-xs-12">
+        <h2>Vytvoření datasetu</h2>
+        @if (err != null)
+        {
+            <h3 class="text-danger">Chyba při ukládání datasetu</h3>
+            <p class="bg-danger">
+                <b>Chyba</b>: @(err.error?.description)<br />
+                Hodnota: @(err.value?.ToString())<br />
+                ErrorNumber: @(err.error?.number)<br />
+                ErrorDetail: @(err.error?.errorDetail)<br />
+            </p>
+
+        }
+
+        <form method="post" class="form-horizontal form-control-new--small">
+            <div class="form-group">
+                @Html.LabelFor(m => m.datasetId, "Identifikátor datasetu", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-10">
+                    @Html.TextBoxFor(m => m.datasetId, new { @class = "form-control" })
+                    <span class="help-block"><span class="text-danger">Povinné.</span></span>
+                    <span class="help-block">Omezení: musí být alespoň 5 znaků a max. 125 znaků dlouhé. Nesmí obsahovat znaky #, \, /, *, ?, ", &lt;,&gt;, |, [, ]. Pokud některé z těchto pravidel nedodrží, je jméno upraveno při uloženís.</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.name, "Veřejné jméno", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-10">
+                    @Html.TextBoxFor(m => m.name, new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.description, "Popis", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-10">
+                    @Html.TextAreaFor(m => m.description, new { @rows = "6", @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.betaversion, "Je v betaverzi?", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-10">
+                    @Html.CheckBoxFor(m => m.betaversion, new { @class = "" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.allowWriteAccess, "Povolit úpravu dat komukoliv?", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-10">
+                    @Html.CheckBoxFor(m => m.allowWriteAccess, new { @class = "" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.origUrl, "Zdroj dat (URL)", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-10">
+                    @Html.TextBoxFor(m => m.origUrl, new { @type = "url", @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.sourcecodeUrl, "Zdrojový kód parseru dat (URL)", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-10">
+                    @Html.TextBoxFor(m => m.sourcecodeUrl, new { @type = "url", @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.jsonSchema, "JSON Schéma popisující strukturu dat", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-10">
+                    @Html.TextAreaFor(m => m.jsonSchema, new { @rows = "30", @class = "form-control code" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("sorderList", "Atributy, podle kterých je možné data třídit", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-10">
+                    <div class="small-darkgray-text">
+                        Text.popis | jméno atributu
+
+                    </div>
+                    @{
+                        string sorder = "";
+                        for (int i = 0; i < Model.orderList.GetLength(0); i++)
+                        {
+                            sorder = sorder + Model.orderList[i, 0] + "|" + Model.orderList[i, 1] + "\n";
+                        }
+                    }
+                    @Html.TextArea("sorderList", sorder, 5, 80, new { @class = "form-control  code" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("searchResultTemplate_body", "Template pro zobrazování vyhledaných výsledků", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-10">
+                    @Html.TextArea("searchResultTemplate_body", FormatHtml(Model.searchResultTemplate?.body ?? ""), 30, 80, new { @class = "form-control code" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.Label("detailTemplate_body", "Template pro zobrazování jednoho záznamu", new { @class = "col-sm-2 control-label" })
+                <div class="col-sm-10">
+                    @Html.TextArea("detailTemplate_body", FormatHtml(Model.detailTemplate?.body ?? ""), 30, 80, new { @class = "form-control code" })
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-warning btn">Uložit změny</button>
+
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@functions
+{
+    static RegexOptions regexQueryOption = RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline;
+    static string regexval = "(<[^>]*>)|(\\s{1,}{{[^}]*}})";
+    public string FormatHtml(string html)
+    {
+        //stupid Html Formatter
+        //return html;
+
+        int indentLev = 0;
+
+        MatchEvaluator evalMatch = (m) =>
+        {
+            string pre = "";
+            string post = "";
+            var s = m.Value;
+            if (string.IsNullOrEmpty(s))
+            {
+                return string.Empty;
+            }
+            if (s.StartsWith("<span") || s.StartsWith("</span"))
+            {
+                return s;
+            }
+            if (
+                (s.StartsWith("<") && !s.StartsWith("</"))
+            )
+            {
+                indentLev++;
+                pre = "\n" + new string(' ', (indentLev - 1) * 2);
+            }
+            else if (
+                (s.StartsWith("<") && s.EndsWith("/>"))
+            )
+            {
+                pre = "\n" + new string(' ', (indentLev) * 2);
+            }
+            else if (s.StartsWith("</"))
+            {
+                if (indentLev > 1)
+                    pre = "\n" + new string(' ', (indentLev - 1) * 2);
+                post = "\n";
+                indentLev--;
+                if (indentLev < 0)
+                {
+                    indentLev = 0;
+                }
+            }
+            else if (Regex.IsMatch(s, "\\s{1,}{{"))
+            {
+                s = Regex.Replace(s, "^\\s*", "");
+                if (indentLev > 0)
+                    pre = "\n" + new string(' ', (indentLev) * 2);
+                else
+                    pre = "\n";
+            }
+
+            return pre + s + post;
+        };
+
+        var ret = html.Replace("\t", " ");
+        ret = ret.Replace("\r", "\n");
+        ret = Devmasters.TextUtil.ReplaceDuplicates(ret, "\n");
+        ret = Regex.Replace(ret, @"\n\s*(?<t>.*)\n", "\n" + @"${t}");
+
+        ret = Regex.Replace(ret, regexval, evalMatch, regexQueryOption);
+
+        //remove empty lines
+        ret = Regex.Replace(ret, @"^(?:[\t ]*(?:\r?\n|\r))+", "", regexQueryOption);
+
+        return ret;
+    }
+}

@@ -1,0 +1,68 @@
+﻿@model System.Collections.Generic.IEnumerable<string>
+@{
+    //migrace: to je potřeba nastavit pro IIS ve web configu (https://stackoverflow.com/questions/43097433/request-timeout-from-asp-net-core-app-on-iis/43098493#43098493) 
+    //this.Server.ScriptTimeout = 600;
+
+}
+
+<div class="row">
+    <div class="col-xs-12">
+        @using (Html.BeginForm("AddPersons", "Manage", FormMethod.Post, new { @id = "jsonForm", @class = "form-inline", role = "form" }))
+        {
+            <h3>Import politiku (tab delimited)</h3>
+            <p>
+                <pre>
+1 radek = 1 politik
+oddelovac = tabelator
+Řádek musí vždy obsahovat 13 sloupců
+
+pořadí sloupců:
+    <b>Full name \t Jméno \t Příjmení</b> \t Titul před \t Titul za \t <b>Datum narození</b> \t Status osoby \t Politická Strana \t Datum vstupu do strany \t Událost - Organizace \t Událost - Role \t Událost - Datum vzniku \t Událost - typ
+Povinné položky jsou:
+    varianta a) jmeno, prijmeni, narozeni
+    varianta b) fullname, narozeni
+
+formát datumu je vždy: d.m.yyyy - 27.3.1955
+Pokud není status osoby vyplněn, je automaticky nastaveno 3 - Politik
+Status osoby může nabývat stavů:
+    0 = Nepolitická osoba
+    1 = Bývalý politik
+    2 = Osoba s vazbami na politiky
+    3 = Politik
+
+
+Chcete-li přidat událost, je nutné mít vyplněné sloupce:
+    Událost - Organizace, Událost - Role, Událost - typ
+
+Událost - typ může nabývat následujících stavů:
+    0 = Speciální
+    1 = Volená funkce
+    2 = Soukromá pracovní
+    3 = Sponzor
+    4 = Osobní
+    6 = Veřejná správa pracovní
+    7 = Politická
+    9 = Politická pracovní
+    10 = Veřejná správa jiné
+    11 = Jiné
+
+</pre>
+                <div class="alert-danger">Nedávej sem více než 200 osob (řádků) najednou. Mohlo by to selhat. Nevadí, když sem vložíš někoho duplikátně.</div>
+            </p>
+            <textarea name="data" id="data"
+                      style="max-width:none;width:100%;max-height:380px;height:380px;box-sizing: border-box;min-height: 31px;overflow-x: hidden;"></textarea>
+
+                    <button type="submit" class="btn btn-info">Uložit</button>
+        }
+
+        <hr />
+
+        @if (Model != null && Model.Count()>0)
+        {
+            <h3>Id nove vlozenych politiku</h3>
+<pre>
+@(Model.Aggregate((f, s) => f + "\n" + s))
+</pre>
+        }
+    </div>
+</div>

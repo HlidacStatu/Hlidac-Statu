@@ -1,0 +1,78 @@
+﻿@using HlidacStatu.Entities.VZ
+@model HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData
+
+@{
+
+
+}
+
+@if (Model?.ElasticResults?.IsValid == false || Model.ElasticResults == null)
+{
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-danger">Položený dotaz má špatnou syntaxi. Zkontrolujte, že je správně.</div>
+            <div>
+                Pokud si myslíte, že dotaz je v pořádku a chyba je na naší straně, <partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("napište nám prosím", "Chyba", "btn btn-link"))"/>.
+                Zkontrolujeme to.
+            </div>
+        </div>
+    </div>
+    return;
+}
+else
+{
+    if (Model.ShowWatchdog && Model.Q != null)
+    {
+        <partial name="WebUtil/AddWatchdog" model="@(new WatchdogViewModel(typeof(VerejnaZakazka), Model.Q ))"/>
+    }
+
+    if (Model.ElasticResults == null)
+    {
+        <span></span>
+    }
+    else if (Model.ElasticResults.Total == 0)
+    {
+        <h2>Žádné zakázky jsme nenalezli.</h2>
+    }
+    else if (Model.ElasticResults.Total > 0)
+    {
+        <hr />
+
+        <script>
+            function changeOrderVZ(sel) {
+                var value = sel.value;
+                window.location.href = '@Html.Raw(HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData.GetSearchUrl(
+                                           Context.Request.Scheme + "://" + Context.Request.Host + Context.Request.Path
+                                           ,Model.Q, Zahajeny: Model.Zahajeny, oblast: Model.Oblast))&order=' + value;
+            }
+        </script>
+
+        <div class="row">
+            <div class="col-xs-12 col-sm-6">
+                <h3>
+                    Nalezené veřejné zakázky
+                    <small>
+                        @HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(Model.ElasticResults.HitsMetadata.Total, false, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)
+                    </small>
+                </h3>
+                @*@if (Model.Result.Aggregations != null && Model.Result.Aggregations.ContainsKey("sumKc"))
+                    {
+                        double? sum = ((Nest.ValueAggregate)Model.Result.Aggregations["sumKc"]).Value;
+                        <h4>
+                            Celková cena nalezených smluv @Html.Raw(Smlouva.ShortNicePrice(Convert.ToDecimal(sum.Value), html: true))
+                        </h4>
+                    }*@
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <br />
+                @Html.DropDownListFor(m => m.Order, Model.OrderList, new { @class = "form-control small pull-right", @id = "orderListVZ", @style = "width:60%;max-width:300px", @onchange = "changeOrderVZ(this);" })
+            </div>
+        </div>
+
+        <partial name="SearchResults/SearchResultsVZ" model="Model" ></partial>
+        
+    }
+}
+
+
+<div style="margin-bottom:50px;"></div>

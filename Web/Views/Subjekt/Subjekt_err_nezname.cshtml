@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "Neznámá firma";
+    //Response.StatusCode = 404;
+
+}
+<p>
+    Omlouváme se, tuto firmu neznáme. Má opravdu platné ICO?
+</p>
+<p>
+    Pokud si myslíte, že bychom tuto firmu měli znát, .
+    <partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("napište nám prosím podrobnosti"))"/>
+</p>

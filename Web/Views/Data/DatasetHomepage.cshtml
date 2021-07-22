@@ -1,0 +1,168 @@
+﻿@model HlidacStatu.Datasets.DataSet
+@using System.Linq;
+@using System.Reflection.Metadata
+@using HlidacStatu.Datasets
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Searching
+@using HlidacStatu.Util;
+@using HlidacStatu.XLib;
+@using HlidacStatu.XLib.Render
+
+@{
+    var reg = Model.Registration();
+
+    ViewBag.Title = "Databáze " + Model.Registration().name;
+    ViewBag.SubTitle = "Podrobné informace";
+
+    ViewBag.SocialShareTitle = "Databáze " + Model.Registration().name + " na hlidacstatu.cz";
+    ViewBag.SocialShareText = Model.InfoFacts().RenderInfoFacts(2, true, true);
+    ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/dataset?d={DateTime.Now.ToString("d.M.yy")}&v=" + Model.DatasetId;
+    ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"
+                + "<meta property=\"og:image:height\" content=\"1080\" />"
+                + "<meta property=\"og:image:type\" content=\"image/png\" />"
+                ;
+
+
+    var email = User.Identity?.Name;
+
+    bool showEditBtn = (DataSet.Api.SuperUsers.Contains(email)
+        || email == Model.Registration().createdBy
+        );
+
+    var promoRoot = HlidacStatu.Connectors.Init.WebAppRoot + "\\..\\Views\\Data\\Promo\\";
+    string frontPromoViewFileName = promoRoot + $"front_{reg.datasetId}.cshtml";
+    bool showFrontPromo = System.IO.File.Exists(frontPromoViewFileName);
+    string frontPromoViewName = $"~/Views/Data/Promo/front_{reg.datasetId}.cshtml";
+
+    string behindPromoViewFileName = promoRoot + $"behind_{reg.datasetId}.cshtml";
+    bool showBehindPromo = System.IO.File.Exists(behindPromoViewFileName);
+    string behindPromoViewName = $"~/Views/Data/Promo/behind_{reg.datasetId}.cshtml";
+
+
+    ViewBag.AdditionalForm = new HlidacStatu.Web.Framework.DoubleForm() {
+        SecondaryAction = $"/data/Hledat/{Model.DatasetId}",
+        SecondaryActionLabel = $"Hledat pouze v {Devmasters.TextUtil.ShortenText(Model.Registration().name, 40)}"
+    };
+
+}
+@section scripts
+{
+}
+
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="/data">Další databáze</a></li>
+        <li class="active">@reg.name</li>
+        <li class="active pull-right"><a href="/data/manage" class="btn btn-primary btn-sm" style="color:whitesmoke;text-decoration:none">Snadné přidání nového datasetu</a></li>
+    </ol>
+}
+<div id="data-detail-content">
+    <div class="row">
+        <div class="col-xs-12">
+            @if (showFrontPromo)
+            {
+                <cache expires-after="@Constants.CachedActionLength.Cache20Min"
+                       vary-by="@frontPromoViewFileName">
+                    <partial name="@frontPromoViewName" model="@(reg.datasetId)"/>
+                </cache>
+            }
+
+            @if (showFrontPromo == false && showBehindPromo == false)
+            {
+                <p class="lead">@Html.Raw(Devmasters.TextUtil.FormatPlainTextForArticle(reg.description))</p>
+            }
+            <p>@Html.Raw(Model.InfoFacts().RenderInfoFacts(1, true, true, html: true))</p>
+            @if (Model.Registration().betaversion)
+            {
+                <p class="bg-warning" style="padding:15px;"><b>Pozor!</b> Tato databáze zatím pracuje v testovací režimu. Může být nefunkční, obsahovat zkušební, neúplná či testovací data</p>
+            }
+            <hr />
+            <partial name="Partials/_SearchForm" 
+                     model="@(new DataSearchRawResult() { DataSet = Model, Q = Context.Request.Query["qs"] })"/>
+
+
+            @{
+                DataSearchRawResult data = null;
+                try
+                {
+                    string order = string.IsNullOrWhiteSpace(Model.Registration().defaultOrderBy) ? "DbCreated desc" : Model.Registration().defaultOrderBy;
+                    //new HlidacStatu.Connectors.External.DataSets.DataSearchRawResult() { Q="*", Page=1, PageSize = 5, Order = "DbCreated Desc" });
+                    data = Model.SearchDataRaw("*", 1, 5,  order);
+
+                    if (Model.Registration()?.searchResultTemplate?.IsFullTemplate() == true)
+                    {
+                        var results = new Registration.Template.SearchTemplateResults();
+                        results.Total = data.Total;
+                        results.Page = data.Page;
+                        results.Q = data.Q;
+                        results.Result = data.Result
+                            .Select(s => { dynamic d = Newtonsoft.Json.Linq.JObject.Parse(s.Item2); return d; })
+                            .ToArray();
+
+                        var html = Model.Registration().searchResultTemplate.Render(Model, results, data.Q);
+                                @Html.Raw("<h4>Poslední záznamy v databázi</h4><p>" + html + "</p>")
+                            }
+                            else
+                            {
+                                <partial name="Partials/_data_hledat_properties" model="@data"/>
+                            }
+
+                    <div class="text-center">
+                        <ul class="pagination pagination-lg">
+                            <li>
+                                @Html.ActionLink("Další záznamy »","hledat", data.ToRouteValues(1))
+                            </li>
+                        </ul>
+                    </div>
+                }
+                catch (Exception e)
+                {
+                    var msg = e?.InnerException?.Message ?? "Interní chyba";
+                msg = Devmasters.RegexUtil.ReplaceWithRegex(msg, "", @".*: \s* error \s* CS\d{1,8}:");
+
+                    @Html.Raw($"<h2>Chyba v template - zpráva pro autora této databáze</h2><pre>{msg}</pre>")
+                    HlidacStatu.Util.Consts.Logger.Warning("HledatBody_CustomdataTemplate", e);
+
+                    if (msg != "Interní chyba")
+                    {
+                        Model.SendErrorMsgToAuthor(ViewContext.GetDisplayUrl(), msg);
+                }
+            }
+
+
+            }
+            <hr />
+
+            @if (showBehindPromo)
+            {
+                <cache expires-after="@Constants.CachedActionLength.Cache20Min"
+                       vary-by="@behindPromoViewFileName">
+                    <partial name="@behindPromoViewName" model="@(reg.datasetId)"/>
+                </cache>
+            }
+
+            <partial name="WebUtil/FeedbackModal" 
+                     model="@(new FeedbackViewModel("Poslat autorovi zprávu", null, "btn btn-primary btn-sm", null,
+                                new[]{ 
+                                    "Chyba","Chci upozornit na chybu",
+                                    "Stiznost","Chci si stěžovat",
+                                    "Pochvala","Chci vás pochválit",
+                                    "NabidkaPomoci","Nabízím vám pomoc",
+                                    "Jiné","Jiné",
+                                }, true, $"dataset|{Model.DatasetId}"))"/>
+            
+            <a href="/data/TechnickeInfo/@Model.DatasetId" class="btn btn-default btn-sm">Technické detaily</a>
+            @if (showEditBtn)
+            {
+                <a href="/data/Manage/@Model.DatasetId" class="btn btn-info btn-sm" style="margin-left:10px"><i class="far fa-edit"></i> Editovat nastavení datasetu</a>
+            }
+
+        </div>
+    </div>
+
+</div>
+
+<partial name="Partials/_new"/>

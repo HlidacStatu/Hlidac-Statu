@@ -1,0 +1,136 @@
+﻿@using Nest
+@using System.Linq
+@using HlidacStatu.Connectors
+@using HlidacStatu.Entities
+@using HlidacStatu.XLib.Render;
+@using HlidacStatu.Repositories
+
+@{
+        Layout = "_ReportLayout";
+
+    int size = 300;
+
+    AggregationContainerDescriptor<Smlouva> aggs = new AggregationContainerDescriptor<Smlouva>()
+        .Terms("perico", m => m
+            .Order(o => o.Descending("mindate"))
+            .Field("prijemce.ico")
+            .Size(size)
+            .Aggregations(agg => agg
+               .Min("mindate", s => s
+                   .Field(ff => ff.casZverejneni)
+               )
+               .Sum("sumico", s => s
+                   .Field(ff => ff.CalculatedPriceWithVATinCZK)
+               )
+            )
+        )
+        .Terms("perico2", m => m
+            .Order(o => o.Descending("mindate2"))
+            .Field("platce.ico")
+            .Size(size)
+            .Aggregations(agg => agg
+               .Min("mindate2", s => s
+                   .Field(ff => ff.casZverejneni)
+                )
+               .Sum("sumico", s => s
+                   .Field(ff => ff.CalculatedPriceWithVATinCZK)
+               )
+
+            )
+    //.Aggregations(agg => agg
+    //   .Sum("sumico2", s => s
+    //       .Field(ff => ff.CalculatedPriceWithVATinCZK)
+    //   )
+    //)
+    );
+
+
+    var res = SmlouvaRepo.Searching.RawSearch("", 1, 0, anyAggregation: aggs);
+
+    var tmp = ((BucketAggregate)res.Aggregations["perico"])
+    .Items
+    .Concat(((BucketAggregate)res.Aggregations["perico2"]).Items)
+    .Cast<Nest.KeyedBucket<object>>()
+    .Where(m=>m.DocCount == 1)
+    .ToArray();
+    
+    DateTime now = DateTime.Now;
+
+    var items = tmp.GroupBy(p => (string)p.Key,
+        e => new
+        {
+            epoch = (e?.Min("mindate")?.Value ?? e?.Min("mindate2")?.Value) ?? 1 ,
+            sum = e.Sum("sumico").Value,
+        },
+        (k, v) => new
+        {
+            ico = k,
+            epochTime = v.Select(m => m.epoch).Max(),
+            sum = v.Select(m => m.sum).Sum()
+        })
+        .Select(o => new
+        {
+            ico = o.ico,
+            datum = Devmasters.DT.Util.FromEpochTimeToUTC((long)o.epochTime / 1000),
+            sum = o.sum
+        })
+        .Where(m=>(now - m.datum).TotalDays<2)
+        .OrderByDescending(o => o.datum);
+
+
+    ReportDataSource rdsNewestComp = new(new ReportDataSource.Column[]
+   {
+new() { Name="Firma",
+HtmlRender = (s) => {
+    System.Tuple<string,string> data = (System.Tuple<string,string>)s;
+        return string.Format("<a href='/subjekt/{0}'>{1}</a>", data.Item2, data.Item1);
+        },
+        TextRender = (s) => { return ((System.Tuple<string,string>
+    )s).Item1.ToString(); }
+    },
+    new() {
+    Name ="První výskyt v Registru smluv",
+    HtmlRender = (s) => { return ((DateTime)s).ToString("dd.MM.yyyy"); },
+    OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat((DateTime)s); }
+    },
+    new() { Name="Hodnota smluv",
+    HtmlRender = (s) => { return Smlouva.NicePrice((double?)s, html:true, shortFormat:true); },
+    OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(((double)s)); }
+    },
+    }
+    );
+    foreach (var val in items)
+    {
+    rdsNewestComp.AddRow(
+    new Tuple<string, string>
+        (FirmaRepo.NameFromIco(val.ico, true), val.ico),
+        val.datum,
+        val.sum
+        );
+        }
+
+        //chart
+
+
+        var model = new ReportModel();
+        model.Add("newCompanies","", rdsNewestComp);
+
+        }
+
+
+        <div class="row">
+            <div class="col-xs-12">
+                @foreach (var q in model.GetQueue("newCompanies"))
+        {
+                @ChartUtil.RenderReport(q, @"{
+                     'language': {
+                        'url': '//cdn.datatables.net/plug-ins/1.10.19/i18n/Czech.json'
+                    },
+                    'order': [],
+                    'lengthChange': false,
+                    'info': false,
+                    }", q.Key)
+        }
+            </div>
+        </div>
+

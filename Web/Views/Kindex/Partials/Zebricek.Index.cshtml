@@ -1,0 +1,87 @@
+﻿@using Devmasters.Enums;
+@using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+@using System.Linq;
+@using HlidacStatu.Entities
+
+@{
+    Layout = null;
+    ViewBag.Title = "Porovnání K–Index pro různé skupiny úřadů a organizací";
+    //ViewBag.HideTitle = true;
+
+}
+
+<style>
+    .whisp {
+        width: 600px;
+        text-align: left;
+        background: white;
+        border-left: 2px grey solid;
+        border-top: 0px;
+        border-bottom: 1px grey dotted;
+        border-right: 0px grey solid;
+        padding-bottom: 2px;
+    }
+
+    #companies {
+        margin-bottom: 10px;
+    }
+</style>
+
+
+<div class="row">
+    <div class="col-sm-12">
+        <h2>Připravili jsme pro vás několik žebříčků</h2>
+        <div class="row">
+            <div class="col-xs-12">
+                @foreach (var g in Devmasters.Enums.EnumTools.Groups(typeof(Firma.Zatrideni.StatniOrganizaceObor)))
+                {
+                    <h3>@g</h3>
+                    <div>
+                        @foreach (var item in Devmasters.Enums.EnumTools.InGroup(typeof(Firma.Zatrideni.StatniOrganizaceObor), g))
+                        {
+                            <a href="/kindex/zebricek/@item.ToString()" class="btn btn-default"><span class="text-gray">Porovnat</span> @(item.ToNiceDisplayName())</a>
+
+                        }
+                        @if (g == "Samospráva")
+                        {
+                            <div style="border: 1px #ddd dashed;border-radius: 4px 4px 0 0;-webkit-box-shadow: none;box-shadow: none;display:inline-block;padding: 0px 5px 0px 5px;margin-left: 10px;background-color:#f0f0f0">
+                                <form action="/kindex/zebricek/Obce_III_stupne" method="get" class="form-inline">
+                                    <select name="kraj" class="form-control">
+                                        <option value="">(vyberte kraj)</option>
+                                        @Html.Raw(HlidacStatu.Util.CZ_Nuts.Kraje.OrderBy(k => k.Value).Select(k => $"<option value='{k.Value}'>{k.Value}</option>").Aggregate((f, s) => f + s))
+                                    </select>
+                                    <button type="submit" name="specialtype" value="mestavkraji" class="btn btn-default">Porovnat města v kraji</button>
+                                </form>
+                            </div>
+
+
+                        }
+                    </div>
+
+                }
+                <h3>Souhrnné</h3>
+                <div>
+                    <a href="/kindex/zebricek/skokani" class="btn btn-default"><span class="text-gray">Porovnat</span> největší skokany</a>
+                    <a href="/kindex/zebricek/nejlepsi" class="btn btn-default"><span class="text-gray">Porovnat</span> 100 nejlepších</a>
+                    <a href="/kindex/zebricek/nejhorsi" class="btn btn-default"><span class="text-gray">Porovnat</span> 100 nejhorších</a>
+                    <a href="/kindex/zebricek/celkovy" class="btn btn-default"><span class="text-gray">Porovnat</span> všechny</a>
+
+                </div>
+                @if (true)
+                {
+                    <h3>Podle jednotlivých parametrů K-Indexu</h3>
+                    <div>
+                        <form action="/kindex/zebricek/celkovy" method="get" class="form-inline">
+                            <select name="part" class="form-control" style="width:15em">
+                                <option value="">(vyberte parametr)</option>
+                                @Html.Raw(Devmasters.Enums.EnumTools.EnumToEnumerable<KIndexData.KIndexParts>().OrderBy(k => k.Value).Select(k => $"<option value='{k.Value}'>{k.Value.ToNiceDisplayName()}</option>").Aggregate((f, s) => f + s))
+                            </select>
+                            <button type="submit" name="partBtn" value="partBtn" class="btn btn-default">Porovnat podle jednoho parametry K-Indexu</button>
+                        </form>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,142 @@
+﻿@model HlidacStatu.Datasets.Registration
+@using System.Linq;
+@using HlidacStatu.Datasets
+
+@{
+    ViewBag.Title = "Správa databází";
+    var email = User.Identity?.Name;
+
+    bool isFlatDS = (Model?.GetDataset()?.IsFlatStructure()) == true;
+}
+
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="/data">Další databáze</a></li>
+        @if (Model != null)
+        {
+            <li><a href="@Model.GetDataset().DatasetUrl()">@Model.name</a></li>
+        }
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+
+@if (Model != null
+    && (DataSet.Api.SuperUsers.Contains(email) || email == Model.createdBy)
+)
+{
+    <div class="row">
+        <div class="col-xs-12">
+            <a href="/data/Index/@Model.datasetId" class="btn btn-primary" style="margin-left:10px"><i class="far fa-info-circle"></i> Hledání v databázi, procházení dat a informace o datech</a>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h3>Správa datasetu <b>@Model.datasetId</b></h3>
+            <p>@Model.description </p>
+        </div>
+        <div class="col-xs-12 col-sm-4">
+            <a href="/data/edit/@Model.id" class="btn btn-primary"><i class="far fa-cog"></i> Editovat parametry datasetu</a>
+            <p class="text-info">
+                Změna parametrů datasetu (templaty, popisy, viditelnost a další). Nemá žádný vliv na data.
+                Pozor: Není možné změnit ID datasetu a JSON schéma. Pokud je chcete změnit, musíte dataset smazat a založit znovu.
+            </p>
+        </div>
+        <div class="col-xs-12 col-sm-4">
+            <a href="/data/TechnickeInfo/@Model.datasetId" class="btn btn-default"><i class="far fa-info-circle"></i> Technické detaily</a>
+            <p class="text-info">
+                Veřejné technické parametry datasetu, JSON schema, templaty, atd.
+            </p>
+        </div>
+        <div class="col-xs-12 col-sm-4">
+            <a href="/data/Hledat/@Model.datasetId?q=*&order=DbCreated+desc" class="btn btn-default">
+                <i class="far fa-list"></i> Vypsat poslední záznamy
+            </a>
+            <p class="text-info">
+                Vypsání naposledy vložených záznamů
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-sm-4">
+            <a @(!isFlatDS ? " onclick='return false;' style='cursor: not-allowed;opacity: 0.65;' " : "" )
+               class="btn btn-success"
+               href="/data/importdata/@Model.id"><i class="far fa-file-import"></i>Importovat data</a>
+            <p class="text-info">
+                Importovat data z CSV souboru do datasetu.
+            </p>
+            @if (!isFlatDS)
+            {
+                <p class="text-warning">
+                    Nahrání dat do datasetu je možné pouze v případech, kdy máte jednoduchou (plochou)s strukturu dat,
+                    neboli když se data dají zobrazit v Excelu ve formě jedné tabulky. Tento dataset tuto podmínku nesplňuje
+                </p>
+            }
+        </div>
+
+        <div class="col-xs-12 col-sm-4">
+            <a href="/data/backup/@Model.id" class="btn btn-info"><i class="far fa-file-download"></i> Zálohovat nastavení datasetu</a>
+            <p class="text-info">
+                Stáhnutí zálohy nastavení datasetu. <span class="text-danger">POZOR! záloha obsahuje pouze parametry datasetu, nikoliv data. Data můžete stáhnout přes API</span>
+            </p>
+        </div>
+        <div class="col-xs-12 col-sm-4">
+            <a href="/data/delete/@Model.id" class="btn btn-danger" onclick="return confirm('Opravdu smazat?');"><i class="far fa-trash-alt"></i> Smazat dataset</a>
+            <p class="text-danger">
+                Nevratná operace, kdy se smažou všechna data datasetu a jeho nastavení.
+                Doporučujeme si <b>stáhnout zálohu parametrů datasetu</b>.
+            </p>
+        </div>
+    </div>
+    <hr />
+}
+
+<div class="row">
+
+    <div class="col-xs-12">
+        <h3>Vytvoření nového datasetu</h3>
+    </div>
+    <div class="col-xs-12 col-sm-6">
+        <h4>Snadný způsob pro netechnické lidi <i class="far fa-smile-wink"></i></h4>
+        <a href="/data/createSimple" class="btn btn-primary"><i class="far fa-file-csv"></i> Vytvořit pomocí Excelu/CSV...</a>
+        <p>
+            Postup pro netechnické uživatele. Využijte tento postup, pokud máte jednoduchou strukturu dat (typicky Excel, CSV soubor) a neumíte sestavit JSON Schema
+        </p>
+
+    </div>
+    <div class="col-xs-12 col-sm-6">
+        <h4>Obnova ze zálohy nastavení datasetu</h4>
+        <a href="/data/createFromBackup" class="btn btn-primary"><i class="far fa-file-csv"></i> Vytvořit pomocí ze zálohy nastavení datasetu</a>
+        <p>
+            Postup pro netechnické uživatele. Využijte tento postup, pokud jste si stáhli zálohu nastavení datasetu.
+        </p>
+
+    </div>
+    <div class="col-xs-12 col-sm-12">
+        <hr />
+    </div>
+    <div class="col-xs-12 col-sm-6">
+        <h4>Pro pokročilé</h4>
+        <a href="/data/createAdv" class="btn btn-primary"><i class="far fa-layer-plus"></i> Vytvořit s JSON Schema</a>
+        <p>
+            Postup pro vývojáře a pokročilé uživatele, kteří znají strukturu dat
+            a dokážou ji popsat jako JSON Schema dle <a href="https://hlidacstatu.docs.apiary.io/">dokumentace</a>.
+        </p>
+    </div>
+    <div class="col-xs-12 col-sm-6">
+        <h4>Pro vývojáře</h4>
+        <a href="/api" class="btn btn-primary"><i class="far fa-file-code"></i> Vytvořit přes API</a>
+        <p>
+            Postup pro vývojáře, kteří znají JSON schema, umí pracovat s REST API. Způsob,
+            který dává největší volnost a možnosti
+            a umožňuje pracovat i s nejsložitějšími datovými strukturami.
+        </p>
+    </div>
+
+</div>
+<partial name="Partials/_new"/>

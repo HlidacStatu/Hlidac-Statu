@@ -1,0 +1,48 @@
+@using HlidacStatu.Extensions
+@using HlidacStatu.Datastructures.Graphs
+@using HlidacStatu.Repositories
+@model HlidacStatu.Repositories.Searching.OsobaSearchResult
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th>Osoba</th>
+        <th>Popis</th>
+        <th>Vazby</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Results)
+    {
+        <tr>
+            <td style="white-space: nowrap;">
+                <span style='white-space:nowrap'>
+                    <add-bookmark item="item"></add-bookmark>&nbsp;<a href="@item.GetUrl()"><b>@Html.Raw(item.FullNameWithYear(true))</b></a>
+                </span>
+            </td>
+            <td>
+                @Html.Raw(item.Description(true, m => true, 3, withSponzoring: true))
+            </td>
+            <td>
+                @if (item.Vazby() != null)
+                {
+                    foreach (var v in item.AktualniVazby(Relation.AktualnostType.Nedavny).Take(2))
+                    {
+                        WebUtil.RenderOsobaVazba(v);
+                    }
+                    if (item.AktualniVazby(Relation.AktualnostType.Nedavny).Length == 3)
+                    {
+                        WebUtil.RenderOsobaVazba(item.Vazby()[2]);
+                    }
+                    else if (item.AktualniVazby(Relation.AktualnostType.Nedavny).Length > 2)
+                    {
+                        <span>@Devmasters.Lang.Plural.Get(item.Vazby().Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb")</span>
+                    }
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<partial name="SearchResults/Pagination" model="@(new PaginationViewModel(Model, "/Home/HledatOsoby"))"/>

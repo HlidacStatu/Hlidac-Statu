@@ -1,0 +1,30 @@
+﻿@model HlidacStatu.Lib.Analysis.TemplatedQuery
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+    <script src="~/bundles/highcharts"></script>
+}
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+<cache expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@(ViewData[Constants.CacheKeyName])">
+@if (Model.NameOfView.ToLower() == "analyzaplatcu")
+{
+    <partial name="Partials/AnalyzaPlatcu" model="Model"/>
+}
+else if (Model.NameOfView.ToLower() == "analyzaprijemcu")
+{
+    <partial name="Partials/AnalyzaPrijemcu" model="Model"/>
+}
+else
+{
+    <partial name="Partials/AnalyzaStart" model="Model"/>
+}
+</cache>

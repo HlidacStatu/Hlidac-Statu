@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = "Neplatné ICO";
+}
+
+
+<p>
+    Omlouváme se, tuto firmu neznáme, domníváme se, že má neplatné IČO.
+</p>
+<p>
+    České IČO je osmimístné číslo, včetně '0' na začátku. Zde najdete <a href="https://cs.wikipedia.org/wiki/Identifikačn%C3%AD_č%C3%ADslo_osoby#Struktura_I.C4.8CO">podrobnosti o struktuře a ověření platnosti ICO</a>.
+</p>
+<p>
+    Pokud si myslíte, že bychom tuto firmu měli znát či je chyba na naší straně,
+    
+    <partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("napište nám prosím podrobnosti"))"/>
+</p>

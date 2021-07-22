@@ -1,0 +1,118 @@
+﻿@using Nest
+@using HlidacStatu.XLib.Render;
+@using HlidacStatu.Extensions
+@using HlidacStatu.Repositories
+@using HlidacStatu.Entities
+
+
+@{
+        Layout = "_ReportLayout";
+
+    int size = 100;
+    AggregationContainerDescriptor<Smlouva> aggs = new AggregationContainerDescriptor<Smlouva>()
+        .Terms("perIco", m => m
+            .Field("platce.ico")
+            .Size(size)
+            .Order(o => o.Descending("_count"))
+        );
+
+
+    var res = SmlouvaRepo.Searching.SimpleSearch("hint.skrytaCena:1", 1, 0,
+        SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggs, platnyZaznam: true);
+
+    ReportDataSource rdsPerIco = new(new ReportDataSource.Column[]
+    {
+        new()
+        {
+            Name = "IČO",
+            HtmlRender = (s) =>
+            {
+                Tuple<string, string> data = (Tuple<string, string>) s;
+                return string.Format(@"<a href='/subjekt/{0}'>{1}</a>", data.Item2, data.Item1);
+            },
+            TextRender = (s) => { return ((Tuple<string, string>) s).Item1.ToString(); },
+            ValueRender = (s) => { return $"\"{((System.Tuple<string, string>) s).Item1.ToString()}\""; }
+        },
+        new()
+        {
+            Name = "Počet smluv bez uvedené ceny",
+            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(Convert.ToInt64(s)); },
+            ValueRender = (s) => { return Convert.ToInt64(s).ToString("F0",HlidacStatu.Util.Consts.enCulture); }
+        },
+        new()
+        {
+            Name = "Počet všech smluv",
+            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(Convert.ToInt64(s)); },
+            ValueRender = (s) => { return Convert.ToInt64(s).ToString("F0",HlidacStatu.Util.Consts.enCulture); }
+        },
+        new()
+        {
+            Name = "% smluv bez cen",
+            HtmlRender = (s) => { return ((double) s).ToString("P1"); },
+            ValueRender = (s) => { return Convert.ToInt64(s).ToString("F1",HlidacStatu.Util.Consts.enCulture); },
+            TextRender = (s) => { return ((double) s).ToString("P1"); },
+            OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat((double) s); }
+        },
+    }
+        );
+
+    foreach (KeyedBucket<object> val in ((BucketAggregate) res.ElasticResults.Aggregations["perIco"]).Items)
+    {
+        var ico = (string) val.Key;
+        var f = Firmy.Get(ico);
+        rdsPerIco.AddRow(
+            new Tuple<string, string>(f.Jmeno, (string) val.Key),
+            val.DocCount.ToString(),
+            f.StatistikaRegistruSmluv().Summary().PocetSmluv,
+            (double) val.DocCount / (double) f.StatistikaRegistruSmluv().Summary().PocetSmluv
+            );
+    }
+
+
+    var model = new ReportModel();
+    model.Add("perIcoChart_d", "Plátci utajující hodnotu smluv",
+        Html.SimpleBarChart(
+            false, false,
+            400,
+            "perIco_d",
+            "Úřady", "Počet smluv",
+            rdsPerIco.Filter(10))
+        );
+    model.Add("perIcoTable", "", rdsPerIco);
+
+}
+
+<p class="text-muted">Odběratelé skrývající nebo neuvádějící hodnotu smlouvy</p>
+<p>
+    <a href="/Report/13">Úplný seznam smluv bez uvedené hodnoty smlouvy</a>
+</p>
+<div class="row">
+    <div class="col-xs-12">
+        @foreach (var q in model.GetQueue("perIcoChart_d"))
+        {
+            @ChartUtil.RenderReport(q, @"{
+                 'language': {
+                    'url': '//cdn.datatables.net/plug-ins/1.10.19/i18n/Czech.json'
+                },
+                'order': [[3,'desc']],
+                'lengthChange': false,
+                'info': false,
+                }", q.Key)
+        }
+
+
+    </div>
+    <div class="col-xs-12">
+        @foreach (var q in model.GetQueue("perIcoTable"))
+        {
+            @ChartUtil.RenderReport(q, @"{
+                 'language': {
+                    'url': '//cdn.datatables.net/plug-ins/1.10.19/i18n/Czech.json'
+                },
+                'order': [[3,'desc']],
+                'lengthChange': false,
+                'info': false,
+                }", q.Key)
+        }
+    </div>
+</div>

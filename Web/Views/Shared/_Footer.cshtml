@@ -1,0 +1,60 @@
+@using HlidacStatu.Repositories
+<div class="box-cta" id="fundingAdFooter">
+    <div class="container">
+        <div class="box-cta__content">
+            <h2 class="box-cta__title">
+                Pomozte nám udržovat český stát transparentní
+            </h2>
+            <p class="box-cta__text">
+                Za tři roky nám <span class="box-cta__text-highlighted">@StaticData.DarujmeStats.Get().projectStats.donorsCount</span> lidí darovalo <span class="box-cta__text-highlighted">
+                    @HlidacStatu.Util.RenderData.NicePrice(StaticData.DarujmeStats.Get().projectStats.collectedAmountEstimate.cents / 100)
+                </span>.
+            </p>
+            <ul class="box-cta__list">
+                <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Kontrolujeme politiky a úředníky, zda s našimi penězi zacházejí správně.</li>
+                <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Stali jsme se důležitým zdrojem informací pro novináře.</li>
+                <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Zvyšujeme transparentnost českého státu.</li>
+                <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Pomáháme státu zavádět moderní e-government.</li>
+            </ul>
+
+            <p>
+                <a href="https://www.darujme.cz/projekt/1204683" class="btn btn-primary" target="_blank">
+                    Pomozte nám i vy
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<div class="footer">
+    <div class="footer__content">
+        <div class="footer__content__col">
+            <a href="https://texty.hlidacstatu.cz/o-serveru">O nás</a>
+            <a href="https://texty.hlidacstatu.cz/vize">Naše vize</a>
+            <a href="https://texty.hlidacstatu.cz/kodex">Náš kodex</a>
+            <a href="https://texty.hlidacstatu.cz/kontakt">Kontakt</a>
+            <a href="https://texty.hlidacstatu.cz/pro-media">Pro média, loga</a>
+        </div>
+        <div class="footer__content__gap"></div>
+        <div class="footer__content__col">
+            <a href="https://texty.hlidacstatu.cz/team">Team</a>
+            <a href="https://texty.hlidacstatu.cz/pomohu-spravnemu-fungovani-cr/" style="color:#3c763d;font-weight:bold">Podpořte nás!<i class="fas fa-heart" style="color:red"></i></a>
+            <a href="/api">API a Open data pro vývojáře</a>
+            <a href="https://texty.hlidacstatu.cz/provoznipodminky/">Podmínky užívání a ochrana soukromí</a>
+            <a href="https://texty.hlidacstatu.cz/series/tipy/">Tipy, nápověda</a>
+        </div>
+        <div class="footer__content__gap"></div>
+        <div class="footer__content__col">
+            <a href="https://texty.hlidacstatu.cz/kontakt/" target="_blank" style="color:orange"><span class="glyphicon glyphicon-alert"></span>&nbsp;Nahlásit chybu</a>
+            <span>Sledujte nás</span>
+            <div>
+                <a href="https://www.facebook.com/hlidacstatu"><img src="/Content/img/icon-fb.svg" alt="icon facebook"></a>
+                <a href="https://twitter.com/hlidacstatu"><img src="/Content/img/icon-twitter.svg" alt="icon twitter"></a>
+            </div>
+            <div><a href="https://texty.hlidacstatu.cz/k-index/">K-index: Hlídáme stát s odvahou!</a>/<a href="https://texty.hlidacstatu.cz/k-index-watchdog-bravely-monitors-public-corruption/">EN</a></div>
+            <div style="padding-top:25px;font-size:9px;color:#050505">CORE5 @(System.Reflection.Assembly.GetEntryAssembly().GetName().Version) @(System.IO.File.GetLastWriteTime(System.Reflection.Assembly.GetEntryAssembly().Location).ToString("yyyy-MM-dd HH:mm"))</div>
+        </div>
+    </div>
+
+</div>

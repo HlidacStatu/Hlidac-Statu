@@ -1,0 +1,80 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RootNamespace>HlidacStatu.Lib</RootNamespace>
+    <AssemblyName>HlidacStatu.Lib</AssemblyName>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWindowsForms>false</UseWindowsForms>
+    <ImportWindowsDesktopTargets>false</ImportWindowsDesktopTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Stage|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Stage\</OutputPath>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Postal">
+      <HintPath>..\3rd\binaries\Postal.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\PrivateInternals\OCR\Lib.OCR.TextReadability\Lib.OCR.TextReadability.csproj" />
+    <ProjectReference Include="..\3rd\DotNet.Highcharts\DotNet.Highcharts.csproj" />
+    <ProjectReference Include="..\3rd\ZabbixApi\ZabbixApi.csproj" />
+    <ProjectReference Include="..\3rd\ZabbixSenderNet-master\ZabbixSenderNet\ZabbixSenderNet.csproj" />
+    <ProjectReference Include="..\FullTextSearch\FullTextSearch.csproj" />
+    <ProjectReference Include="..\HlidacStatu.Lib.Db.Insolvence\HlidacStatu.Lib.Db.Insolvence.csproj" />
+    <ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
+    <ProjectReference Include="..\Lib.Analytics\Lib.Analytics.csproj" />
+    <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
+    <ProjectReference Include="..\Lib.OCR.Api.Client\Lib.OCR.Api.Client.csproj" />
+    <ProjectReference Include="..\LibCore\LibCore.csproj" />
+    <ProjectReference Include="..\Plugin.TransparetniUcty\Plugin.TransparetniUcty.csproj" />
+    <ProjectReference Include="..\Repositories\Repositories.csproj" />
+    <ProjectReference Include="..\Util\Util.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Devmasters.Cache.Elastic" Version="2.3.0" />
+    <PackageReference Include="Devmasters.Core" Version="2.3.2" />
+    <PackageReference Include="Dynamitey" Version="2.0.10.189" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
+    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
+    <PackageReference Include="System.ServiceModel.Duplex" Version="4.8.1" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.8.1" />
+    <PackageReference Include="System.ServiceModel.Federation" Version="4.8.1" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.2.231403">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Analysis\ACore.cs" />
+    <Compile Remove="Analysis\BasicDataChange.cs" />
+    <Compile Remove="Analysis\ComplexStatistic.cs" />
+    <Compile Remove="Analysis\ContractsStatisticData.cs" />
+    <Compile Remove="Analysis\OsobaStatistic.cs" />
+    <Compile Remove="Analysis\QueryStatistic.cs" />
+    <Compile Remove="Analysis\SubjectStatistic.cs" />
+    <Compile Remove="Analysis\SubjectWithSubjectStatistic.cs" />
+    <Compile Remove="Data\Dotace\DotaceService.Watchdog.cs" />
+    <Compile Remove="Data\Insolvence\ElementId.cs" />
+    <Compile Remove="Data\Person.cs" />
+    <Compile Remove="EnhancedZaznam_old.cs" />
+    <Compile Remove="Render\IReportDataSource.cs" />
+    <Compile Remove="Searching\Rules\FullQueryReplace.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,74 @@
+﻿@model HlidacStatu.Entities.Firma
+@using System.Linq;
+@using HlidacStatu.Extensions
+
+@{
+    Layout = null;
+    ViewBag.Title = "Další informace " + Model.Jmeno;
+}
+<style>
+    .chart-tooltip-shared {
+        margin: 5px;
+        border: none;
+    }
+
+        .chart-tooltip-shared td + td {
+            color: #333333;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .chart-tooltip-shared td {
+            padding: 5px;
+        }
+
+    .chart-title-shared {
+        color: #28313B;
+        font-family: Cabin;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>
+
+@* První sloupec *@
+<div class="col-sm-7 col-sm-pull-5 col-xs-12 col-xs-pull-0">
+
+    @if (Model.KategorieOVM().Count() > 0)
+    {
+        <div>
+            <h4>Kategorie OVM (orgánů veřejné moci)</h4>
+            <p class="text-muted sub-header-info">Všechny kategorie, ve kterých je úřad veden v RPP (Registr práv a povinností). </p>
+            @foreach (var cat in Model.KategorieOVM())
+            {
+                <div>@(cat.nazev)&nbsp;<a href="/HledatFirmy?q=kategorieid:@(cat.id)&subtitle=@(System.Net.WebUtility.UrlEncode($"Subjekty v kategorii {cat.nazev}"))"><i title="Najít další organizace v této kategorii" alt="Najít další organizace v této kategorii" class="fas fa-search"></i></a></div>
+            }
+        </div>
+    }
+
+
+    @if (HlidacStatu.Repositories.StaticData.OrganizacniStrukturyUradu.Get().TryGetValue(Model.ICO, out var podrizeneOrg))
+    {
+        var sum = new HlidacStatu.Entities.OrgStrukturyStatu.Summary(podrizeneOrg);
+        <div>
+            <hr />
+            <h4>Organizační struktura</h4>
+            <p>
+                @if (sum.Urady > 0)
+                {
+                <p>
+                    @Html.Raw(sum.Description(Model.ICO))
+                </p>
+            }
+
+                <ul>
+                    @foreach (var org in podrizeneOrg)
+                    {
+                        <li>Organizační struktura pro <a href="/subjekt/OrganizacniStruktura/@Model.ICO?orgId=@org.id">@org.oznaceni</a></li>
+                    }
+                </ul>
+            </div>
+            <hr />
+        }
+
+
+</div>

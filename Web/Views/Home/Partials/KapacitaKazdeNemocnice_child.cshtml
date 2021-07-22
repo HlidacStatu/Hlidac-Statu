@@ -1,0 +1,426 @@
+﻿@model string
+@using System.Linq
+@using Devmasters.Collections
+@using HlidacStatu.XLib.Render
+
+@{
+    var clientQ = NemocniceOnlyData.Client()
+        .Search<NemocniceOnlyData>(s => s
+            .Query(q => q.QueryString(qs => qs.Query($"datum:[{DateTime.Now.AddDays(-60):yyyy-MM-dd} TO *]")))
+            .Size(2000)
+            .Sort(so => so.Descending(a => a.datum))
+        );
+    NemocniceOnlyData[] nemocnice = clientQ
+        .Hits
+        .Select(m => m.Source)
+        .ToArray();
+
+    var kraje = nemocnice.Select(m => m.kraj_nazev).Distinct();
+
+    string[] prefered = new string[] {"Hlavní město Praha", "Středočeský kraj", "Jihomoravský kraj", "Moravskoslezský kraj"};
+    List<string> krajeSort = prefered
+        .Union(kraje
+            .Where(m => prefered.Contains(m) == false)
+            .OrderBy(m => m)
+        )
+        .ToList();
+
+
+}
+
+<script>
+    var hs = parseInt(window.location.hash.replace("#", ""));
+    if (Number.isInteger(hs)) {
+        window.location.replace("/kapacitaKazdeNemocnice/" + hs);
+    }
+</script>
+
+
+<div class="jumbotron">
+    <h2 style="padding-bottom:40px;" class="text-center">
+        Vytížení intenzivní péče v jednotlivých nemocnicích
+    </h2>
+    <p>
+        Data o kapacitách nemocnic, která Ministerstvo zdravotnictví po pěti měsících utajování oficiálně zveřejnilo.
+    </p>
+
+</div>
+
+<div class="bs-callout bs-callout-primary small">
+    <h4>Základní pojmy</h4>
+    <p>
+        <dl>
+            <dt>COVID lůžka</dt>
+            <dd>
+                Lůžka speciálně vyhrazena pro infekční pacienty. Kromě obvykle fyzické izolace ve vyhrazeném prostoru je zde
+                povinná vyšší ochrana lékařů a sester (ochranný oblek), obvykle kratší směny, speciální režim zaměstnanců.
+            </dd>
+            <dt>neCOVID lůžka</dt>
+            <dd>
+                Obvyklá JIP/ARO/lůžka s kyslíkem, bez jinak obvyklého speciálního režimu.
+                Podle možností nemocnice je možné některá z těchto lůžek změnit na COVID lůžka.
+                To má samozřejmě vliv třeba na léčbu těch, které přivezou od dopravní nehody
+            </dd>
+
+        </dl>
+    </p>
+</div>
+
+
+@if (string.IsNullOrEmpty(Model))
+{
+    <div class="row">
+        <div class="col-xs-12">
+            <h3>Vyberte si v seznamu nemocnici, pro kterou chcete znát aktuální kapacitu</h3>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row">
+        <div class="col-xs-12">
+            @{
+                RenderH(Model);   
+            }
+        </div>
+    </div>
+    <hr/>
+}
+<h4>Rychlá navigace</h4>
+<div class="row">
+    <div class="col-xs-12">
+        <ul>
+            <li>
+                <a href="/kapacitanemocnic">Aktuální kapacity pro celé kraje</a>
+            </li>
+        </ul>
+    </div>
+    <div class="col-xs-12">Seznam nemocnic po krajích:</div>
+
+    @foreach (var chk in krajeSort.Chunk(7))
+    {
+        int count = 0;
+        foreach (var k in chk)
+        {
+            count++;
+            <div class="col-xs-12 col-sm-6">
+                <ul>
+                    <li>
+                        <b>@k</b>
+                        <ul>
+                            @foreach (var h in nemocnice.Where(m => m.kraj_nazev == k).Select(m => new {zz_id = m.zz_id, zz_nazev = m.zz_nazev}).Distinct().OrderBy(o => o.zz_nazev))
+                            {
+                                <li>
+                                    <a href="/KapacitaKazdeNemocnice/@h.zz_id">@h.zz_nazev</a>
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            if (count % 2 == 0)
+            {
+                <div class="clearfix"></div>
+            }
+        }
+    }
+    <div class="col-xs-12">
+        <hr/>
+        <ul>
+            <li>
+                <a href="/kapacitanemocnic">Aktuální kapacity pro celé kraje</a>
+            </li>
+            <li>
+                <a href="/kapacitanemocnic#nemocnice">Tabulka aktuálních kapacit jednotlivých nemocnic</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+
+<h2 id="opendata">Open Data</h2>
+<ul>
+    <li>
+        <a href="/data/index/kapacity-nemocnic" target="_blank">Data se statistikami po krajich</a>
+    </li>
+    <li>
+        <a href="/KapacitaNemocnicData/last" target="_blank">Aktuální stav kapacit jednotlivých nemocnic</a>
+    </li>
+</ul>
+
+
+@functions {
+
+    public string TColor(int val)
+    {
+        if (val < 0)
+        {
+            return "#A00000";
+        }
+        else if (val > 0)
+        {
+            return "#00A000";
+        }
+        else
+        {
+            return "#000000";
+        }
+    }
+
+    private void RenderH(string nemocniceId)
+    {
+        var hdataQ = NemocniceOnlyData.Client().Search<NemocniceOnlyData>(s => s
+            .Query(q => q.QueryString(qs => qs.Query($"datum:[{DateTime.Now.AddMonths(-2).AddDays(-1):yyyy-MM-dd} TO *] AND zz_id.keyword:{nemocniceId}")))
+            .Size(80)
+            .Sort(so => so.Descending(a => a.datum))
+            );
+        NemocniceOnlyData[] hdata = hdataQ.Hits
+            .Select(m => m.Source)
+            .ToArray();
+
+
+        var chartdata = hdata.OrderBy(o => o.datum)
+            .Select(m => new
+            {
+                date = m.datum,
+                data = m
+            });
+
+        NemocniceOnlyData h = hdata.First();
+
+        var jipKapacita10p = hdata
+            .Where(m => (DateTime.Now.Date - m.datum).TotalDays <= 25)
+            .Count(m => m.luzka_aro_jip_kapacita_perc() < 0.1m);
+        var luzkaO2Kapacita10p = hdata
+            .Where(m => (DateTime.Now.Date - m.datum).TotalDays <= 25)
+            .Count(m => m.luzka_standard_kyslik_kapacita_perc() < 0.1m);
+        var ecmo10p = hdata
+            .Where(m => (DateTime.Now.Date - m.datum).TotalDays <= 25)
+            .Count(m => m.ecmo_kapacita_perc() < 0.1m);
+        var upv10p = hdata
+            .Where(m => (DateTime.Now.Date - m.datum).TotalDays <= 25)
+            .Count(m => m.upv_kapacita_perc() < 0.1m);
+
+        <h2 id="@h.zz_kod">@h.zz_nazev</h2>
+        if (jipKapacita10p + luzkaO2Kapacita10p + ecmo10p + upv10p > 0)
+        {
+            <p class="text-danger">
+                <b>Souhrn za poslední 4 týdny</b>
+                <ul class="text-danger">
+                    @if (jipKapacita10p > 0)
+                    {
+                        <li>Kritický nedostatek JIP lůžek <span class="text-gray">(&lt;10 % volných)</span> nastal <b>@Devmasters.Lang.Plural.Get(jipKapacita10p, "v jeden den", "ve {0} dnech", "v celkem {0} dnech")</b> z 28 dnů. </li>
+                    }
+                    @if (luzkaO2Kapacita10p > 0)
+                    {
+                        <li>Kritický nedostatek lůžek s kyslíkem <span class="text-gray">(&lt;10 % volných)</span> nastal <b>@Devmasters.Lang.Plural.Get(luzkaO2Kapacita10p, "v jeden den", "ve {0} dnech", "v celkem {0} dnech")</b> z 28 dní.</li>
+                    }
+                    @if (ecmo10p > 0)
+                    {
+                        <li>Kritický nedostatek přístrojů ECMO pro podporu životních funkcí nejvážnějších případů <span class="text-gray">(&lt;10 % volných)</span> nastal <b>@Devmasters.Lang.Plural.Get(ecmo10p, "v jeden den", "ve {0} dnech", "v celkem {0} dnech")</b> z 28 dní.</li>
+                    }
+                    @if (upv10p > 0)
+                    {
+                        <li>Kritický nedostatek přístrojů pro úplnou plicní ventilaci s kyslíkem <span class="text-gray">(&lt;10 % volných)</span> nastal <b>@Devmasters.Lang.Plural.Get(upv10p, "v jeden den", "ve {0} dnech", "v celkem {0} dnech")</b> z 28 dní.</li>
+                    }
+                </ul>
+
+            </p>
+        }
+
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 singlebox">
+                <h4>Lůžka (ARO+JIP dospělí)</h4>
+                <p>
+                    Celkem @h.luzka_aro_jip_kapacita_celkem, volných @(h.luzka_aro_jip_kapacita_volna_covid_pozitivni + h.luzka_aro_jip_kapacita_volna_covid_negativni) (@HlidacStatu.Util.RenderData.NicePercent(h.luzka_aro_jip_kapacita_perc()))
+                    <br/>
+                    Volná lůžka: COVID <span style="font-size:125%;font-weight:bold">@h.luzka_aro_jip_kapacita_volna_covid_pozitivni</span> / neCOVID <span style="font-size:125%">@h.luzka_aro_jip_kapacita_volna_covid_negativni</span>
+
+                    @*<br />
+                        Změna volných od @first.lastModified.ToString("dd.MM."): <span style="font-weight:normal;color:@TColor(diffH.AROJIP_luzka_covid)">@(diffH.AROJIP_luzka_covid.ToString("+#;-#;0"))</span> / <span style="font-weight:normal;color:@TColor(diffH.AROJIP_luzka_necovid)">@(diffH.AROJIP_luzka_necovid.ToString("+#;-#;0"))</span>*@
+                </p>
+                <p>
+                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[]
+                    {
+                        (name:"ARO+JIP volná neCOVID lůžka",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.luzka_aro_jip_kapacita_volna_covid_negativni})
+                            ),
+                        (name:"ARO+JIP volná COVID lůžka",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.luzka_aro_jip_kapacita_volna_covid_pozitivni})
+                            ),
+                        (name:"ARO+JIP COVID lůžka celkem",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.luzka_aro_jip_kapacita_celkem})
+                            )
+                    },
+                        "", "počet", 200, minY: 0)
+                </p>
+            </div>
+            <div class="clearfix hidden-md hidden-lg"></div>
+
+            <div class="col-xs-12 col-sm-6 singlebox">
+                <h4>Lůžka (standardní s kyslíkem)</h4>
+                <p>
+                    Celkem @h.luzka_standard_kyslik_kapacita_celkem, volných @(h.luzka_standard_kyslik_kapacita_volna_covid_pozitivni + h.luzka_standard_kyslik_kapacita_volna_covid_negativni) (@HlidacStatu.Util.RenderData.NicePercent(h.luzka_standard_kyslik_kapacita_perc()))
+                    <br/>
+                    Volná lůžka: COVID <span style="font-size:125%;font-weight:bold">@h.luzka_standard_kyslik_kapacita_volna_covid_pozitivni</span> / neCOVID <span style="font-size:125%">@h.luzka_standard_kyslik_kapacita_volna_covid_negativni</span>
+                    @*<br />
+                        Změna volných od @first.lastUpdated.ToString("dd.MM."): <span style="font-weight:normal;color:@TColor(diffH.Standard_luzka_s_kyslikem_covid)">@(diffH.Standard_luzka_s_kyslikem_covid.ToString("+#;-#;0"))</span> / <span style="font-weight:normal;color:@TColor(diffH.Standard_luzka_s_kyslikem_necovid)">@(diffH.Standard_luzka_s_kyslikem_necovid.ToString("+#;-#;0"))</span>*@
+                </p>
+                <p>
+                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[]
+                    {
+                        (name:"volná neCOVID lůžka s kyslíkem",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.luzka_standard_kyslik_kapacita_volna_covid_negativni})
+                            ),
+                        (name:"volná COVID lůžka s kyslíkem",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.luzka_standard_kyslik_kapacita_volna_covid_pozitivni})
+                            ),
+                        (name:"COVID lůžka s kyslíkem celkem",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.luzka_standard_kyslik_kapacita_celkem})
+                            )
+                    },
+                        "", "počet", 200, minY: 0)
+                </p>
+            </div>
+            <div class="clearfix "></div>
+
+            <div class="col-xs-12 col-sm-6 singlebox">
+                <h4>Přístroje ECMO <small>podpora nejvážnějších případů, plicní řízení</small></h4>
+
+                <p>
+                    Celkem @h.ecmo_kapacita_celkem, volných: @h.ecmo_kapacita_volna (@HlidacStatu.Util.RenderData.NicePercent(h.ecmo_kapacita_perc()))
+                    @*<br />
+                        Změna volných od @first.lastUpdated.ToString("dd.MM."): <span style="font-weight:normal;color:@TColor(diffH.ECMO_volna)">@(diffH.ECMO_volna.ToString("+#;-#;0"))</span>*@
+                </p>
+                <p>
+                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[]
+                    {
+                        (name:"Přístroje ECMO celkem",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.ecmo_kapacita_celkem})
+                            ),
+                        (name:"Přístroje ECMO volné",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.ecmo_kapacita_volna})
+                            )
+                    },
+                        "", "počet", 200, minY: 0)
+                </p>
+            </div>
+            <div class="clearfix hidden-md hidden-lg"></div>
+
+            <div class="col-xs-12 col-sm-6 singlebox">
+                <h4>Přístroje UPV <small>umělá plicní ventilace</small></h4>
+                <p>
+                    Celkem @h.upv_kapacita_celkem, volných: @h.upv_kapacita_volna (@HlidacStatu.Util.RenderData.NicePercent(h.upv_kapacita_perc()))
+                    @*<br />
+                        Změna volných od @first.lastUpdated.ToString("dd.MM."): <span style="font-weight:normal;color:@TColor(diffH.UPV_volna)">@(diffH.UPV_volna.ToString("+#;-#;0"))</span>*@
+                </p>
+                <p>
+                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[]
+                    {
+                        (name:"Přístroje UPV celkem",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.upv_kapacita_celkem})
+                            ),
+                        (name:"Přístroje UPV volné",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.upv_kapacita_volna})
+                            )
+                    },
+                        "", "počet", 200, minY: 0)
+                </p>
+
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="col-xs-12 col-sm-6 singlebox">
+                <h4>Přístroje CRRT <small>kontinuální dialýza</small></h4>
+                <p>
+                    Celkem @h.crrt_kapacita_celkem, volných: @h.crrt_kapacita_volna (@HlidacStatu.Util.RenderData.NicePercent(h.crrt_kapacita_perc()))
+                    @*<br />
+                        Změna volných od @first.lastUpdated.ToString("dd.MM."): <span style="font-weight:normal;color:@TColor(diffH.CRRT_volna)">@(diffH.CRRT_volna.ToString("+#;-#;0"))</span>*@
+                </p>
+                <p>
+                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[]
+                    {
+                        (name:"Přístroje CRRT celkem",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.crrt_kapacita_celkem})
+                            ),
+                        (name:"Přístroje CRRT volné",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.crrt_kapacita_volna})
+                            )
+                    },
+                        "", "počet", 200, minY: 0)
+                </p>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 singlebox">
+                <h4>Dostupné ventilátory <small>přenosné + operační sál</small></h4>
+                <p>
+                    Celkem @(h.ventilatory_prenosne_kapacita_celkem + h.ventilatory_operacni_sal_kapacita_celkem)
+                    <br/>
+                    @*Změna počtu od @first.lastUpdated.ToString("dd.MM."): <span style="font-weight:normal;color:@TColor((diffH.Ventilatory_prenosne_celkem+diffH.Ventilatory_operacnisal_celkem))">@((h.Ventilatory_prenosne_celkem+h.Ventilatory_operacnisal_celkem).ToString("+#;-#;0"))</span>
+                        <br />*@
+                </p>
+                <p>
+                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[]
+                    {
+                        (name:"Dostupné ventilátory přenosné+oper.sál",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.ventilatory_prenosne_kapacita_celkem + m.data.ventilatory_operacni_sal_kapacita_celkem})
+                            )
+                    },
+                        "", "počet", 200, minY: 0)
+                </p>
+            </div>
+
+            <div class="clearfix"></div>
+
+
+            <div class="col-xs-12 col-sm-6 singlebox">
+                <h4>Lůžka IP (UPV +/- ) nově vyhrazená pro COVID pozitivní pacienty <small> která byla původně určena k poskytování jiného typu péče</small></h4>
+                <p>
+                    Celkem @h.reprofilizovana_kapacita_luzka_aro_jip_kapacita_celkem, volných: @h.reprofilizovana_kapacita_luzka_aro_jip_kapacita_volna (@HlidacStatu.Util.RenderData.NicePercent(h.crrt_kapacita_perc()))
+                    @*<br />
+                        Změna volných od @first.lastUpdated.ToString("dd.MM."): <span style="font-weight:normal;color:@TColor(diffH.CRRT_volna)">@(diffH.CRRT_volna.ToString("+#;-#;0"))</span>*@
+                </p>
+                <p>
+                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[]
+                    {
+                        (name:"Reprofilizovana lůžka IP celkem",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.reprofilizovana_kapacita_luzka_aro_jip_kapacita_celkem})
+                            ),
+                        (name:"Reprofilizovana lůžka IP volná",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.reprofilizovana_kapacita_luzka_aro_jip_kapacita_volna})
+                            )
+                    },
+                        "", "počet", 200, minY: 0)
+                </p>
+            </div>
+
+            <div class="col-xs-12 col-sm-6 singlebox">
+                <h4>Lůžka standardní s kyslíkem nově vyhrazená pro COVID pozitivní pacienty <small> která byla původně určena k poskytování jiného typu péče </small></h4>
+                <p>
+                    Celkem @h.reprofilizovana_kapacita_luzka_standard_kyslik_kapacita_celkem, volných: @h.reprofilizovana_kapacita_luzka_standard_kyslik_kapacita_volna (@HlidacStatu.Util.RenderData.NicePercent(h.crrt_kapacita_perc()))
+                    <br/>
+                    @*Změna počtu od @first.lastUpdated.ToString("dd.MM."): <span style="font-weight:normal;color:@TColor((diffH.Ventilatory_prenosne_celkem+diffH.Ventilatory_operacnisal_celkem))">@((h.Ventilatory_prenosne_celkem+h.Ventilatory_operacnisal_celkem).ToString("+#;-#;0"))</span>
+                        <br />*@
+                </p>
+                <p>
+                    @ChartUtil.SimpleLineChart(new (string name, IEnumerable<ReportDataTimeValue> values)[]
+                    {
+                        (name:"Reprofilizovana lůžka s kyslíkem celkem",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.reprofilizovana_kapacita_luzka_standard_kyslik_kapacita_celkem})
+                            ),
+                        (name:"Reprofilizovana lůžka s kyslíkem volná",
+                            values:chartdata.Select(m => new ReportDataTimeValue() {Date = m.date, Value = m.data.reprofilizovana_kapacita_luzka_standard_kyslik_kapacita_volna})
+                            )
+                    },
+                        "", "počet", 200, minY: 0)
+                </p>
+            </div>
+
+            <div class="clearfix"></div>
+
+        </div>
+        <hr/>
+    }
+}
+

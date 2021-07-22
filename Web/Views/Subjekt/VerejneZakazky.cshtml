@@ -1,0 +1,39 @@
+﻿@model HlidacStatu.Entities.Firma 
+@using System.Linq;
+@using HlidacStatu.Repositories
+
+@{ 
+    Layout = null;
+    var Data = VerejnaZakazkaRepo.Searching.GetVZForHolding(Model.ICO);
+}
+
+
+<div class="col-sm-7 col-sm-pull-5 col-xs-12 col-xs-pull-0">
+    <div>
+        <h4>Veřejné zakázky</h4>
+        @{
+            var resVZdodav = VerejnaZakazkaRepo.Searching.SimpleSearch("icododavatel:" + Model.ICO, null, 1, 0, "1");
+            var resVZzadav = VerejnaZakazkaRepo.Searching.SimpleSearch("icozadavatel:" + Model.ICO, null, 1, 0, "1");
+            Dictionary<string, long> vzakaz = new();
+            vzakaz.Add("dodavatel|dodavatel|dodavatele|dodavatelem", resVZdodav.Total);
+            vzakaz.Add("zadavatel|zadavatel|zadavatele|zadavatelem", resVZzadav.Total);
+
+            foreach (var kv in vzakaz.OrderByDescending(m => m.Value))
+            {
+                var text = kv.Key.Split('|');
+                string surl = WebUtil.GetSearchUrl("/verejnezakazky/hledat", $"ico{text[0]}:" + Model.ICO);
+
+                <p>
+                    @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
+                    @Html.Raw(Devmasters.Lang.Plural.GetWithZero((int)kv.Value, $" jsme ve veřejných zakázkach jako {text[2]} nenašli",
+                                            $" se vyskytuje v <a href='{surl}'><b>jedné</b> veřejné zakázce</a> jako {text[1]}", $" se vyskytuje v <a href='{surl}'><b>{{0}}</b> veřejných zakázkách</a> jako {text[1]}", $" se vyskytuje v <a href='{surl}'><b>{{0}}</b> veřejných zakázkach</a> jako {text[1]}")).
+                </p>
+            }
+        }
+
+        <hr />
+        <h4>Data</h4>
+
+    </div>
+
+</div>

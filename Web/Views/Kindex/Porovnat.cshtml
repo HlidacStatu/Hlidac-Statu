@@ -1,0 +1,297 @@
+﻿@model List<HlidacStatu.Lib.Analysis.KorupcniRiziko.SubjectWithKIndexAnnualData>
+
+@using Devmasters.Enums;
+@using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+@using System.Linq;
+
+@{
+
+    int selectedYear = ViewBag.SelectedYear;
+
+    ViewBag.Title = "K–Index porovnání";
+    //ViewBag.SubTitle = "pro " + firma.Jmeno;
+    ViewBag.HideTitle = true;
+
+    //Statistics statistics = Statistics.GetStatistics(selectedYear);
+
+    string ukazatTxt = "ukázat detail";
+    string schovatTxt = "schovat detail";
+
+}
+
+@section scripts
+{
+
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="/kindex">K–Index</a></li>
+        <li><a href="/kindex/porovnat">Porovnání úřadů a organizací</a></li>
+        <li class="active">@(ViewBag.Title + " " + ViewBag.SubTitle)</li>
+    </ol>
+}
+
+<style>
+    .whisp {
+        width: 100%;
+        text-align: left;
+        background-color: white;
+        border-left: 2px grey solid;
+        border-top: 0px;
+        border-bottom: 1px grey dotted;
+        border-right: 2px grey solid;
+        padding-bottom: 2px;
+    }
+
+        .whisp:focus {
+            background-color: lightblue;
+        }
+
+    #companies {
+        margin-bottom: 10px;
+        position: absolute;
+        z-index: 10;
+    }
+
+    .porovnani {
+        font-size: 15px;
+        vertical-align: top;
+    }
+
+    .porovnaniHead {
+        min-width: 160px;
+        width: 160px;
+    }
+
+</style>
+
+<h2>Porovnání vybraných K–Indexů pro rok @selectedYear</h2>
+
+<div class="row">
+    <div class="col-sm-12">
+        <h3 class="">
+            Porovnání pro další roky:
+            @foreach (int year in Consts.AvailableCalculationYears)
+            {
+                if (year != selectedYear)
+                {
+                    <a style="padding-right:20px;" href="?rok=@year"><i class="fas fa-arrow-square-right"></i>@year</a>
+                }
+                else
+                {
+                    <span style="padding-right:20px;"><i class="far fa-arrow-square-right"></i>@year</span>
+                }
+            }
+        </h3>
+    </div>
+</div>
+
+<div style="position:relative">
+    <label for="addComparison">Chcete-li přidat do porovnání další subjekt, použijte tento vyhledávací box</label>
+    <input placeholder="Přidat úřad/firmu" type="text" name="addComparison" id="addComparison" class="form-control companyahead input-lg" oninput="FindCompany(this)" />
+    <div id="companies">
+
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+
+        <table class="table table-no-border" id="tabulkaPorovnani" @(Model.Count == 0 ? "style=display:none;" : "") >
+            <tbody>
+                <tr id="nazev">
+                    <td style="width:290px">firma</td>
+                    
+                    @foreach ( (var cmp, int i) in Model.Select((value, i) => (value, i)) )
+                    {
+                        <th class="porovnaniHead number @(cmp.Ico)_@(i)">
+                            <a href="#" onclick="RemoveCompany('@(cmp.Ico)_@(i)'); return false;" style="color: red; float:right; margin-left: 5px;"><i class="far fa-trash-alt"></i></a> <a href="/kindex/detail/@cmp.Ico">@(Devmasters.TextUtil.ShortenText(@cmp.Jmeno, 55))</a>
+                        </th>
+                    }
+
+                </tr>
+                <tr id="kindex">
+                    <th>Celková známka</th>
+                    
+                    @foreach ((var cmp, int i) in Model.Select((value, i) => (value, i)))
+                    {
+                        <td class="porovnani total number @(cmp.Ico)_@(i)">
+                            @Html.KIndexIcon(cmp?.AnnualData?.KIndexLabel ?? KIndexData.KIndexLabelValues.None, "width: 30px", true)
+                        </td>
+                    }
+                </tr>
+
+                @foreach (KIndexData.KIndexParts velicina in Enum.GetValues(typeof(KIndexData.KIndexParts)))
+                {
+                    <tr id="@velicina">
+                        <th>
+                            @velicina.ToNiceDisplayName()
+                            <small><a href="#detail_@((KIndexData.KIndexParts)velicina)" onclick="showHelp(this,'#detail_@(velicina)');return false;">@ukazatTxt</a></small>
+                            <div id="detail_@velicina" style="display:none">
+                                <div class="row">
+                                    <div class="col-xs-11 col-lg-offset-1 box-stats" style="background-color:#f9f9fe">
+                                        @(Html.Raw(KIndexData.DetailInfo.PartsDescription(velicina)))
+                                    </div>
+                                </div>
+                            </div>
+                        </th>
+                        
+                        @foreach ((var cmp, int i) in Model.Select((value, i) => (value, i)))
+                        {
+                            var hodnota = cmp.AnnualData?
+                                .KIndexVypocet?.Radky?
+                                .Where(r => r.Velicina == (int)velicina)
+                                .Select(r => r.Hodnota)
+                                .FirstOrDefault();
+
+                            <td class="porovnani number @(cmp.Ico)_@(i)">
+                                @if (cmp.AnnualData != null && cmp.AnnualData.KIndexReady)
+                                {
+                                    if(velicina == KIndexData.KIndexParts.PercSmlouvyPod50kBonus)
+                                    {
+                                        <p>@(hodnota?.ToString("F2"))</p>
+                                    }
+                                    else
+                                    {
+                                        @Html.KIndexIcon(KIndexData.DetailInfo.KIndexLabelForPart(velicina, hodnota ?? 0),
+                                            "height:25px",
+                                            showNone: true,
+                                            title: KIndexData.KIndexCommentForPart(velicina, cmp.AnnualData))
+                                    }
+
+                                }
+                                else
+                                {
+                                    <p>K-Index pro toto období nebyl spočítán</p>
+                                }
+                                @*@(hodnota?.ToString("F2") ?? "Chybí K–Index")*@
+
+                            </td>
+                        }
+                        
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<script>
+
+    function FindCompany(caller) {
+        let req = "/kindex/findcompany/" + caller.value;
+        $.get(req, function (data) {
+            EmptyCompanies();
+            data.forEach(comp => {
+                var button = $('<button/>',
+                    {
+                        text: comp.name,
+                        class: 'whisp',
+                        click: function () { AddCompany(comp.ico, 2019); EmptyCompanies(); CleanSearchBox(); }
+                    });
+
+                $("#companies").append(button);
+            });
+        }, "json");
+        Navigate();
+        
+    }
+
+    function EmptyCompanies() {
+        $('#companies').empty();
+    }
+
+    function CleanSearchBox() {
+        $('#addComparison').val("").focus();
+    }
+
+    function ShowTable() {
+        $('#tabulkaPorovnani').css('display', 'block');
+    }
+
+    function AddCompany(ico, year) {
+        let url = new URL(window.location.href);
+        let separator = (url.pathname.toLowerCase().endsWith("porovnat")) ? "/" : ",";
+        url.pathname = url.pathname + separator + ico;
+        window.history.pushState("", "", url.href);
+
+        let unique = `${Date.now()}`;
+        let req = "/kindex/KindexForIco/" + ico + "?year=" + year;
+        $.get(req, function (data) {
+            $("#nazev").append(`<th class="porovnaniHead number ${data.ico}_${unique}" style="width: 150px"><a href="#" onclick="RemoveCompany('${data.ico}_${unique}'); return false;" style="color: red; float:right; margin-left: 5px;"><i class="far fa-trash-alt"></i></a><a href="/kindex/detail/${data.ico}">${data.jmeno}</a></th>`);
+            $(`#kindex`).append(`<td class="porovnani number ${data.ico}_${unique}">${data.kindex}</td>`);
+            data.radky.forEach(radek => {
+                if (radek.velicinaName === "PercSmlouvyPod50kBonus") {
+                    $(`#${radek.velicinaName}`).append(`<td class="porovnani number ${data.ico}_${unique}">${(data.kindexReady) ? `<p>${radek.value}</p>` : "K-Index pro toto období nebyl spočítán"}</td>`);
+                }
+                else {
+                    $(`#${radek.velicinaName}`).append(`<td class="porovnani number ${data.ico}_${unique}">${(data.kindexReady) ? radek.label : "K-Index pro toto období nebyl spočítán"}</td>`);
+                }
+            });
+
+        }, "json");
+
+        ShowTable();
+    }
+
+    function RemoveCompany(icoWithHash) {
+        let ico = icoWithHash.replace(/_.*/, "");
+        let re = new RegExp(`,?${ico}`, "");
+        let href = window.location.href.replace(re, "").replace("/,", "/");
+        window.history.pushState("", "", href);
+
+        $(`.${icoWithHash}`).remove();
+    }
+
+    function Navigate() {
+
+        var index = -1;
+
+        jQuery(parent).on('keydown', function (e) {
+            var checkboxes = $('#companies').find('button.whisp');
+            if (e.keyCode == 38) {
+                if (index > 0) {
+                    index = index - 1;
+                }
+                checkboxes[index].focus();
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            else if (e.keyCode == 40) {
+                if (index < checkboxes.length - 1) {
+                    index = index + 1;
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                else {
+                    index = checkboxes.length - 1;
+                }
+                checkboxes[index].focus();
+            }
+            else if (e.keyCode == 27) {
+                EmptyCompanies();
+                CleanSearchBox();
+            }
+
+        });
+    }
+
+
+    function showHelp(btn, id) {
+        var visible = $(btn).text().includes('@Html.Raw(ukazatTxt)');
+        if (visible) {
+            $(id).show(300);
+            $(btn).text('@Html.Raw(schovatTxt)');
+        }
+        else {
+            $(id).hide(300);
+            $(btn).text('@Html.Raw(ukazatTxt)');
+        }
+    }
+
+</script>

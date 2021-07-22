@@ -1,0 +1,19 @@
+﻿@using HlidacStatu.Repositories
+@{
+        Layout = "_ReportLayout";
+
+    var model = new HlidacStatu.Repositories.Searching.SmlouvaSearchResult(Context.Request.Query, SmlouvaRepo.Searching.OrderResult.DateAddedDesc);
+    model.Q = "hint.skrytaCena:1";
+    model = SmlouvaRepo.Searching.SimpleSearch(model.Q, model.Page,
+100, (SmlouvaRepo.Searching.OrderResult)(Convert.ToInt32(model.Order)), platnyZaznam: true);
+
+    //model.Chyby = true;
+}
+
+
+<p class="text-muted">Smlouvy bez uvedené ceny</p>
+<p><a href="/Report/12">Přehledný souhrn největších odběratelů skrývajících nebo neuvádějícíxh hodnotu smlouvy</a></p>
+
+<partial name="~/Views/Home/_SearchResult.cshtml" model="model"/>
+
+

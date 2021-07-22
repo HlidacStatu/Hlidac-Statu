@@ -1,0 +1,126 @@
+﻿@model HlidacStatu.Datasets.DataSearchRawResult
+@using System.Linq;
+@using HlidacStatu.Datasets
+@using HlidacStatu.XLib
+@using HlidacStatu.XLib.Render
+
+@{
+    var registration = Model.DataSet.Registration();
+    ViewBag.Title = registration.name;
+    ViewBag.SubTitle = Model?.Q;
+}
+
+@section scripts
+{
+    <script>
+    function changeOrder(sel) {
+    var value = sel.value;
+    window.location.href = '@Html.Raw(DataSearchResult.GetSearchUrl(
+       Context.Request.Scheme + "://" + Context.Request.Host + Context.Request.Path
+       ,Model.Q))&order=' + value;
+    }
+    </script>
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="/data">Další databáze</a></li>
+        <li><a href="@Model.DataSet.DatasetUrl()">@registration.name</a></li>
+        <li class="active">@ViewBag.SubTitle</li>
+        <li class="active pull-right"><a href="/data/manage" class="btn btn-primary btn-sm" style="color:whitesmoke;text-decoration:none">Snadné přidání nového datasetu</a></li>
+    </ol>
+}
+
+<partial name="Partials/_SearchForm" 
+         model="@Model"/>
+
+@if (Model.Q != null && Model.DataSet.Registration().searchResultTemplate?.IsFullTemplate() == true)
+{
+    <partial name="WebUtil/AddWatchdog" 
+             model="@(new WatchdogViewModel(typeof(DataSet), Model.Q, datasetId: Model.DataSet.DatasetId))"/>
+}
+
+
+@if (Model.IsValid == false)
+{
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-danger">Položený dotaz má špatnou syntaxi. Zkontrolujte, že je správně.</div>
+            <div>
+                Pokud si myslíte, že dotaz je v pořádku a chyba je na naší strane, 
+                <partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("napište nám prosím", "Chyba", "btn btn-warning"))"/> 
+                Zkontrolujeme to.
+            </div>
+        </div>
+    </div>
+    return;
+}
+
+@if (Model.Result == null || Model.Result.Count() == 0)
+{
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="alert alert-info">Na váš dotaz jsme nenalezli žádné výsledky.</div>
+        </div>
+    </div>
+
+    return;
+}
+
+<hr style="margin-top: 35px;padding-bottom:15px;" />
+<h2>@(HlidacStatu.Util.RenderData.Vysledky.NasliJsmeVysledky(Model.ElasticResultsRaw.HitsMetadata.Total, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)) na výraz <span class="emphasized">@Model.Q</span>.</h2>
+<div class="row">
+    <div class="col-xs-12 col-sm-6">
+    </div>
+    <div class="col-xs-12 col-sm-6">
+        Třídit výsledky podle :
+        @Html.DropDownListFor(m => m.Order, Model.OrderList, new { @class = "form-control", @id = "orderList", @onchange = "changeOrder(this);" })
+    </div>
+</div>
+
+@{
+    try
+    {
+
+        if (Model.DataSet.Registration()?.searchResultTemplate?.IsFullTemplate() == true)
+        {
+            var model = new Registration.Template.SearchTemplateResults();
+            model.Total = Model.Total;
+            model.Page = Model.Page;
+            model.Q = Model.Q;
+            model.Result = Model.Result
+                .Select(s => { dynamic d = Newtonsoft.Json.Linq.JObject.Parse(s.Item2); return d; })
+                .ToArray();
+
+            var html = Model.DataSet.Registration().searchResultTemplate.Render(Model.DataSet, model, model.Q);
+            @Html.Raw(html)
+
+        }
+        else
+        {
+            <partial name="Partials/_data_hledat_properties" model="@Model"/>
+        }
+    }
+    catch (Exception e)
+    {
+        var msg = e?.InnerException?.Message ?? "Interní chyba";
+        msg = Devmasters.RegexUtil.ReplaceWithRegex(msg, "", @".*: \s* error \s* CS\d{1,8}:");
+
+        @Html.Raw($"<h2>Chyba v template - zpráva pro autora této databáze</h2><pre>{msg}</pre>")
+        HlidacStatu.Util.Consts.Logger.Warning("HledatBody_CustomdataTemplate", e);
+
+        if (msg != "Interní chyba")
+        {
+            Model.DataSet.SendErrorMsgToAuthor(ViewContext.GetDisplayUrl(), msg);
+        }
+    }
+
+
+}
+
+<partial name="SearchResults/Pagination" 
+         model="@(new PaginationViewModel(Model, $"/Data/Hledat/{Model.DataSet.DatasetId}", exportType: Model.DataSet.IsFlatStructure() ? "dataset" : null, exportMoreParams: $"ds={Model.DataSet.Registration().datasetId}"))"/>
+
+<partial name="Partials/_new"/>

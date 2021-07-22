@@ -1,0 +1,220 @@
+﻿@using System.Text.RegularExpressions;
+@using System.Net
+@{
+    /**/
+
+    ViewBag.Title = "Statistika OCR serverů";
+    ViewBag.SubTitle = "";
+
+    var dataCache = new Devmasters.Cache
+    .LocalMemory.LocalMemoryCache<string>(TimeSpan.FromMinutes(2), "Ocrstat.data.json",
+        (o) =>
+        {
+            return new WebClient().DownloadString("https://ocr.hlidacstatu.cz/stats.ashx");
+        });
+
+
+    dynamic json = Newtonsoft.Json.Linq.JObject.Parse(dataCache.Get());
+
+    var ocrservers = (json.servers as Newtonsoft.Json.Linq.JArray)
+        .Select(m => new { server = m.Value<string>("server"), done = m.Value<int>("doneIn24h") })
+        .ToArray()
+        ;
+
+    var slowServers = (json.slowServers as Newtonsoft.Json.Linq.JArray)
+        .Select(m => new
+        {
+            server = m.Value<string>("server"),
+            avgTime = m.Value<int>("avgtime"),
+            numCelkem = m.Value<int>("numCelkem"),
+            numSlow = m.Value<int>("numSlow"),
+            order = m.Value<int>("ord")
+        })
+        .ToArray()
+        ;
+
+
+
+    string cnnStr = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection");
+    string sql = @"select 'Celkem' as 'type',
+(select count(*) from ItemToOcrQueue with (nolock) where started is null) as waiting,
+(select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is null) as running,
+(select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is not null and done > DATEADD(dy,-1,getdate())) as doneIn24H,
+(select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is null and started< dateadd(hh,-24,getdate())) as errors
+union
+select distinct t.itemtype as 'type',
+(select count(*) from ItemToOcrQueue with (nolock) where started is null and itemtype = t.itemtype) as waiting,
+(select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is null and itemtype = t.itemtype) as running,
+(select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is not null
+and done > DATEADD(dy,-1,getdate()) and itemtype = t.itemtype) as doneIn24H,
+(select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is null
+and started< dateadd(hh,-24,getdate()) and itemtype = t.itemtype) as errors
+from ItemToOcrQueue t with (nolock)
+order by type";
+
+    string sdata = $"<p>Za posledních 24 hodin jsme našimi OCR servery vydolovali data z celkem "
+        + $"<b>{Devmasters.Lang.Plural.GetWithZero((int)json.queueStat.doneIn24hours - (int)json.queueStat.imgDoneIn24hours, "0 dokumentů", "1 dokumentu", "{0} dokumentů", "{0} dokumentů")}</b>"
+        + $" a <b>{Devmasters.Lang.Plural.GetWithZero((int)json.queueStat.imgDoneIn24hours, "0 scanů", "1 scan", "{0} scany", "{0} scanů")}</b>, ";
+
+    List<string> sdatalist = new List<string>();
+
+    using (var p = new Devmasters.PersistLib())
+    {
+        var ds = p.ExecuteDataset(cnnStr, System.Data.CommandType.Text, sql, null);
+        foreach (System.Data.DataRow dr in ds.Tables[0].Rows)
+        {
+            int num = (int)dr[3];
+            string col0 = ((string)dr[0]).ToLower();
+            if (col0.ToLower() == "dataset")
+            {
+                sdatalist.Add(Devmasters.Lang.Plural.Get(num, "<b>jeden</b> záznam datasetu", "<b>{0}</b> záznamy datasetů", "<b>{0}</b> záznamů datasetů"));
+            }
+            else if (col0.ToLower() == "insolvence")
+            {
+                sdatalist.Add(Devmasters.Lang.Plural.Get(num, "<b>jednu</b> insolvenci", "<b>{0}</b> insolvence", "<b>{0}</b> insolvencí"));
+            }
+            if (col0.ToLower() == "smlouva")
+            {
+                sdatalist.Add(Devmasters.Lang.Plural.Get(num, "<b>jednu</b> smlouvu", "<b>{0}</b> smlouvy", "<b>{0}</b> smluv"));
+            }
+            if (col0.ToLower() == "verejnazakazka")
+            {
+                sdatalist.Add(Devmasters.Lang.Plural.Get(num, "<b>jednu</b> veř.zakázku", "<b>{0}</b> veř.zakázky", "<b>{0}</b> veř.zakázek"));
+            }
+
+        }
+    }
+    sdata = sdata + "" + sdatalist.Aggregate((f, s) => f + ", " + s) + ".</p>";
+    sdata = sdata + $"<p>Za posledních hodinu jsme našimi OCR servery vydolovali data z celkem <b>{Devmasters.Lang.Plural.GetWithZero((int)json.queueStat.doneIn1hour - (int)json.queueStat.imgDoneIn1hour, "0 dokumentů", "1 dokumentu", "{0} dokumentů", "{0} dokumentů")}</b>"
+         + $" dokumentů a <b>{Devmasters.Lang.Plural.GetWithZero((int)json.queueStat.imgDoneIn1hour, "0 scanů", "1 scany", "{0} scanů", "{0} scanů")}</b>.</p>";
+
+
+    sdata += $"<p> Na zpracování čeká <b>{json.queueStat.inQueue}</b> dokumentů a <b>{json.queueStat.processing}</b> se právě zpracovává."
+        + $". Právě probíhá OCR <b>{Devmasters.Lang.Plural.GetWithZero((int)json.queueStat.imgprocessing, "0 scanů", "1 scanu", "{0} scanů", "{0} scanů")}</b>, "
+        + $" <b>{Devmasters.Lang.Plural.GetWithZero((int)json.queueStat.imgInQueue, "žádné nečekají", "1 scan čeká", "další {0} scany čekají", "dalších {0} scanů čeká")}</b> ve frontě.</p>";
+
+}
+@section scripts
+{
+
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+<p style="font-size:100%">V rámci zpracovávání dat na Hlídači probíhá i intezivní dolování textových dat ze zdrojových dokumentů.</p>
+
+<p style="font-size:100%">Pro OCR dolování používáme jak vlastní servery, tak servery našich fanoušků, kteří dali k dispozici část svého přebytečného výpočetního výkonu pro potřebu Hlídače státu.</p>
+
+<p style="font-size:100%">Pro sdílení výpočetního výkonu jsme připravili velmi jednoduchý Docker balíček - <a href="https://github.com/HlidacStatu/OcrMinion" target="_blank">OCR Minion</a>, který je možné nainstalovat téměř na jakékoliv zařízení, včetně např. domácích NAS serverů.</p>
+<p>Detaily o <a href="https://github.com/HlidacStatu/OcrMinion" target="_blank">OCR Minion</a> najdete na našem GitHubu <a href="https://github.com/HlidacStatu/OcrMinion" target="_blank">https://github.com/HlidacStatu/OcrMinion</a></p>
+<hr />
+
+<p style="font-size:130%">@Html.Raw(sdata)</p>
+
+<h3>Žebříček OCR Minion strojů za posledních 24 hodin</h3>
+
+<script>
+    var tbl_topMinion;
+    var tbl_slowMinion;
+    $(document).ready(function () {
+        tbl_topMinion = $('#topMinion').DataTable({
+            'language': {
+                'url': '//cdn.datatables.net/plug-ins/1.10.19/i18n/Czech.json'
+            },
+            'order': [],
+            'lengthChange': false,
+            'info': false,
+            'pageLength': 5,
+            "searching": false,
+
+        });
+        tbl_slowMinion = $('#slowMinion').DataTable({
+            'language': {
+                'url': '//cdn.datatables.net/plug-ins/1.10.19/i18n/Czech.json'
+            },
+            'order': [],
+            'lengthChange': false,
+            'info': false,
+            "searching": false,
+            'paging': true
+        });
+    });
+</script>
+<div class="row">
+    <div class="col-xs-12 col-md-6">
+        <table id="topMinion" class="table  table-hover table-condensed table-bordered" style="width:auto;">
+            <thead>
+                <tr>
+                    <th style="font-size:120%;padding:15px">Jméno/provozovatel OCR Minion</th>
+                    <th style="font-size:120%;padding:15px">OCR stránek za 24 hod</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in ocrservers.Where(m => m.server.Contains("@")).OrderByDescending(o => o.done))
+                {
+                    Regex mr = new Regex(@"(?<prefix>.*)@(?<mid>(.|\w)*) (?<end>\. .*)$", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.CultureInvariant);
+                    Match mc = mr.Match(s.server);
+                    string pref = mc.Groups["prefix"].Value;
+                    string mid = mc.Groups["mid"].Value;
+                    string end = mc.Groups["end"].Value;
+                    if (mc.Success)
+                    {
+                        string sanon = pref + "@"
+                            + mid.Substring(0, 1) + "..."
+                            + mid.Substring(mid.Length - 1, 1)
+                            + end;
+
+                        //string pref = HlidacStatu.Util.ParseTools.RegexGroupValue(s.server, , "");
+                        //string mid = HlidacStatu.Util.ParseTools.RegexGroupValue(s.server, @"(?<prefix>.*)@(?<mid>(.|\w)*) (?<end>\. .*)$", "");
+
+
+                        <tr>
+                            <td>@sanon</td>
+                            <td data-order="@(s.done.ToString("0000000"))">@s.done</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<hr />
+
+<h3>Pomalé OCR Minion - seznam "nejpomalejších"</h3>
+<div class="row">
+    <div class="col-xs-12 col-md-6">
+        <p>
+            Některé OCR Minion dolují text z obrázku velmi dlouho. Obvyklá doba se pohybuje do 2 minut. Pokud to trvá více než 10 minut na stránku, pak je výkon stroje, na kterém OCR Minion běží, příliš pomalý.
+            Zkušenost ukazuje, že není důležitý počet současně běžících instancích OCR Minion, ale rychlost a priorita přiděleného CPU. <b>Určitě nepouštějte na jednom fyzickém stroji více instancí OCR Minion než je 80% dostupných CPU jader.</b>
+        </p>
+        <table id="slowMinion" class="table  table-hover table-condensed table-bordered" style="width:auto">
+            <thead>
+                <tr>
+                    <th style="font-size:120%;padding:15px">OCR Minion</th>
+                    <th style="font-size:120%;padding:15px">Průměrná doba OCR jedné fotky (v s.)</th>
+                    <th style="font-size:120%;padding:15px">Celkem zpracováno</th>
+                    <th style="font-size:120%;padding:15px">OCR trvající déle než 2 min</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in slowServers.Where(m => m.server.Contains("@") && m.numSlow > 0).OrderByDescending(o => o.order).Take(40))
+                {
+                    <tr>
+                        <td>@HlidacStatu.Util.RenderData.EmailAnonymizer(s.server)</td>
+                        <td data-order="@(s.avgTime.ToString("0000000"))">@HlidacStatu.Util.RenderData.NiceNumber(s.avgTime)</td>
+                        <td data-order="@(s.numCelkem.ToString("0000000"))">@HlidacStatu.Util.RenderData.NiceNumber(s.numCelkem)</td>
+                        <td data-order="@(s.numSlow.ToString("0000000"))">@HlidacStatu.Util.RenderData.NiceNumber(s.numSlow)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

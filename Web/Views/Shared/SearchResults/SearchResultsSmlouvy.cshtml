@@ -1,0 +1,157 @@
+@using Devmasters.Enums
+@model HlidacStatu.Repositories.Searching.SmlouvaSearchResult
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th>&nbsp;</th>
+        <th>Smlouva podepsána</th>
+        @if (Model.SmallRender == false)
+        {
+            <th>Smlouva zveřejněna</th>
+        }
+        <th title="Publikující smluvní strana">Plátce</th>
+        <th title="Smluvní strana/y">Dodavatel/é</th>
+        <th>Maximální hodnota<br/>smlouvy s DPH</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model?.ElasticResults.Hits)
+    {
+        var rec = item.Source;
+
+        var confLevel = rec.GetConfidenceLevel();
+        string bgLevel = "", iconLevel = "";
+
+
+        if (confLevel > HlidacStatu.Entities.Issues.ImportanceLevel.Formal)
+        {
+            bgLevel = HlidacStatu.Entities.Issues.Importance.GetCssClass(confLevel, true);
+            iconLevel = HlidacStatu.Entities.Issues.Importance.GetIcon(confLevel);
+        }
+
+        <tr class="bg@(bgLevel) first">
+            <td>
+                <span style='white-space:nowrap'>
+                    @Html.Raw(iconLevel)<add-bookmark item="rec"></add-bookmark>&nbsp;
+                    <a href="@rec.GetUrl(true, Model.Q)">
+                        <b>@rec.Id</b>
+                    </a>
+                </span>
+            </td>
+            <td>@rec.datumUzavreni.ToShortDateString()</td>
+            @if (Model.SmallRender == false)
+            {
+                <td>
+                    @if (rec.platnyZaznam)
+                    {
+                        @rec.casZverejneni.ToShortDateString()
+                    }
+                    else
+                    {
+                        <span class="text-warning">Zneplatněná smlouva</span>
+                    }
+                </td>
+            }
+            <td>
+                @if (!string.IsNullOrEmpty(rec.Platce?.ico))
+                {
+                    @Html.KIndexLabelLink(rec.Platce.ico)<a href="/Subjekt/@rec.Platce.ico">@rec.Platce.nazev</a>
+                }
+                else
+                {
+                    @(rec.Platce?.nazev)
+                }
+            </td>
+            <td>
+                @if (rec.Prijemce.Count() == 1)
+                {
+                    if (!string.IsNullOrEmpty(rec.Prijemce[0].ico))
+                    {
+                        @Html.KIndexLabelLink(rec.Prijemce[0].ico)<a href="/Subjekt/@rec.Prijemce[0].ico">@rec.Prijemce[0].nazev</a>
+                    }
+                    else
+                    {
+                        @rec.Prijemce[0].nazev
+                    }
+                }
+                else
+                {
+                    <ol>
+                        @foreach (var subj in rec.Prijemce.Take(2))
+                        {
+                            if (!string.IsNullOrEmpty(subj.ico))
+                            {
+                                <li>
+                                    @Html.KIndexLabelLink(subj.ico)<a href="/Subjekt/@subj.ico">@subj.nazev</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li>@subj.nazev</li>
+                            }
+                        }
+                    </ol>
+                    @(rec.Prijemce.Count() > 2 ? Devmasters.Lang.Plural.Get(rec.Prijemce.Count() - 2, "+{0} dodavatel;+{0} další dodavatelé;+{0} dalších dodavatelů") : "")
+                }
+            </td>
+            <td>@Html.Raw(rec.NicePrice(html: true))</td>
+
+        </tr>
+        <tr class="bg@(bgLevel) last">
+            <td></td>
+            <td colspan="@(Model.SmallRender ? "5" : "6")">
+                @Devmasters.TextUtil.ShortenText(rec.predmet, 200)
+                @if (Model.SmallRender && rec.GetRelevantClassification().Any())
+                {
+                    <span class="text-success">&nbsp;|&nbsp;<b>Obor</b>: @(rec.GetRelevantClassification().First().ClassifTypeName())</span>
+                }
+                else if (rec.GetRelevantClassification().Any())
+                {
+                    <span class="text-success">&nbsp;|&nbsp;<b>Obor smlouvy</b>: @(string.Join(" / ", rec.GetRelevantClassification().Select(m => m.ClassifTypeName())))</span>
+                }
+            </td>
+        </tr>
+
+        if (Model.Chyby)
+        {
+            if (rec.Issues != null && rec.Issues.Where(m => m.Public).Count() > 0)
+            {
+                <tr class="bg@(bgLevel) last">
+                    <td class="joined">&nbsp;</td>
+                    <td colspan="5" class="joined">
+                        <h5>
+                            Počet nedostatků: @(rec.Issues.Where(m => m.Public).Count())
+                            <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseRec_@(rec.Id)" aria-expanded="false" aria-controls="collapseRec_@(rec.Id)">
+                                Ukázat
+                            </button>
+                        </h5>
+                        <div class="collapse issueCol" id="collapseRec_@(rec.Id)">
+
+                            <ul class="list-group">
+
+                                @foreach (var iss in rec.Issues.Where(m => m.Public).OrderByDescending(m => m.Importance))
+                                {
+                                    if (iss.Public && iss.Importance != HlidacStatu.Entities.Issues.ImportanceLevel.NeedHumanReview)
+                                    {
+                                        <li title="@iss.Importance.ToNiceDisplayName()" class="list-group-item list-group-item@(HlidacStatu.Entities.Issues.Importance.GetCssClass(iss.Importance, true))">
+                                            <span class="glyphicon glyphicon-eye-open" style="font-size:75%;" aria-hidden="true"></span>&nbsp;@iss.Title : @iss.TextDescription
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </td>
+                    <td class="joined">&nbsp;</td>
+                </tr>
+            }
+        }
+        if (Model.AdditionalRender != null)
+        {
+            @Html.Raw(Model.AdditionalRender(rec))
+        }
+    }
+    </tbody>
+</table>
+
+<partial name="SearchResults/Pagination" model="@(new PaginationViewModel(Model, "/Home/HledatSmlouvy", exportType: "smlouvy"))"/>

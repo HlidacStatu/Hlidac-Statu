@@ -1,0 +1,121 @@
+@model FeedbackUniversalViewModel
+
+
+@if (Model.MustAuth == false || (Model.MustAuth && User.Identity?.IsAuthenticated == true))
+{<!-- Button trigger modal -->
+    <button class="@Model.Style" data-toggle="modal" data-target="#@(Model.IdPrefix)fbForm">@Model.BtnText</button> <!-- Modal -->
+    <div class="modal fade" id="@(Model.IdPrefix)fbForm" tabindex="-1" role="dialog"
+         aria-labelledby="@(Model.IdPrefix)fbTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="@(Model.IdPrefix)fbTitle">
+                        @Model.HeaderText
+                    </h4>
+                    @Html.Raw(Model.SubText)
+                </div>
+
+                <!-- Modal Body -->
+                <form class="form-horizontal" role="form">
+                    <div class="modal-body">
+
+                        <input type="hidden" name="@(Model.IdPrefix)fbUrl" id="@(Model.IdPrefix)fbUrl" value="@ViewContext.GetDisplayUrl()" />
+
+                        @if (!string.IsNullOrWhiteSpace(Model.NoteLabel))
+                        {
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"
+                                       for="@(Model.IdPrefix)fbInputTxt">@Model.NoteLabel</label>
+                                    <div class="col-sm-10">
+                                        <textarea class="form-control" id="@(Model.IdPrefix)fbInputTxt" cols="60" rows="5" placeholder="Text zprávy"></textarea>
+                                    </div>
+                                </div>
+                            }
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"
+                                   for="@(Model.IdPrefix)fbInputEmail">Váš email</label>
+                            <div class="col-sm-10">
+                                <input type="email" class="form-control"
+                                       id="@(Model.IdPrefix)fbInputEmail" placeholder="Email" value="@(User.Identity?.Name)" />
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            Zrušit
+                        </button>
+                        <button type="button" onclick="send@(Model.IdPrefix)();" class="btn btn-primary" data-dismiss="modal">
+                            Odeslat
+                        </button>
+                        <br />
+                        <div><a class="btn btn-default btn-sm" href="/Kontakt">Další kontakty zde</a></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+    function send@(Model.IdPrefix)() {
+        var prf = '#@(Model.IdPrefix)';
+        var email = $(prf + "fbInputEmail").val();
+        var text = $(prf + "fbInputTxt").val();
+        var url = $(prf + "fbUrl").val();
+
+        $.get("@Model.Url", { email: email, txt: text, url: url, data: "@Model.AddData", auth: @Model.MustAuth.ToString().ToLower() })
+          .always(function () {
+              alert("Děkujeme za zaslání zprávy.");
+          });
+    }
+    </script>
+}
+else
+{
+    <!-- Button trigger modal -->
+    <button class="@Model.Style" data-toggle="modal" data-target="#@(Model.IdPrefix)fbForm">@Model.BtnText</button>
+    <!-- Modal -->
+    <div class="modal fade" id="@(Model.IdPrefix)fbForm" tabindex="-1" role="dialog"
+         aria-labelledby="@(Model.IdPrefix)fbTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h4 class="modal-title" id="@(Model.IdPrefix)fbTitle">
+                        Musíte být přihlášeni
+                    </h4>
+                </div>
+
+                <!-- Modal Body -->
+                <form class="form-horizontal" role="form">
+                    <div class="modal-body">
+                        <p>Pro poslání vzkazu musíte být přihlášeni.</p>
+                        <p>
+                            <login-link></login-link>
+                        </p>
+
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            Zavřít
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}

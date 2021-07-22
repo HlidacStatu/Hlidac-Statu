@@ -1,0 +1,46 @@
+﻿@{
+    ViewBag.Title = "Hlídač státu";
+    ViewBag.SubTitle = "Hlídáme je, protože si to zaslouží!";
+    ViewBag.HideAd = true;
+}
+@section scripts
+{
+    <script>
+        _showFAD = false;
+    </script>
+    <script src="/Scripts/typeahead.jquery.min.js"></script>
+    <script src="/Scripts/bloodhound.min.js"></script>
+    <link href="/Content/typeaheadjs.css" media="all" rel="stylesheet" />
+}
+
+<div class="row">
+    <div class="col-sm-6 ">
+        <div class="col-block-shadow">
+            <h3>Novinky, analýzy, komentáře</h3>
+            <div>
+                @if (HlidacStatu.XLib.StaticData.LastBlogPosts.Get() != null)
+                {
+                    foreach (var post in HlidacStatu.XLib.StaticData.LastBlogPosts.Get().Take(8))
+                    {
+                        <dl>
+                            <dt><a href="@post.Link">@Devmasters.TextUtil.RemoveHTML(System.Net.WebUtility.HtmlDecode(post.Title.Rendered))</a></dt>
+                            <dd><em>@(post.Date?.ToString("d. MMMM yyyy"))</em></dd>
+                            <dd>
+                                @Devmasters.TextUtil.RemoveHTML(System.Net.WebUtility.HtmlDecode(post.Excerpt.Rendered))
+                            </dd>
+                        </dl>
+                    }
+                }
+                <div>
+                    <a href="/texty">Starší články</a>
+                </div>
+            </div>
+        </div>
+    </div><!-- /.col-lg-4 -->
+    <div class="col-sm-6">
+        <div class="col-block-shadow">
+            <div class="fb-page" data-href="https://www.facebook.com/HlidacStatu" data-tabs="timeline" data-width="500" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/HlidacStatu" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/HlidacStatu">Hlídač státu</a></blockquote></div>
+        </div>
+    </div><!-- /.col-lg-4 -->
+</div>
+<div class="clearfix"></div>

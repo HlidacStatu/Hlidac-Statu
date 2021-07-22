@@ -1,0 +1,340 @@
+﻿@model HlidacStatu.Entities.Insolvence.InsolvenceDetail
+@using System.Linq;
+@using HlidacStatu.Entities.Insolvence
+@using HlidacStatu.Extensions;
+
+
+@{
+
+    ViewBag.Title = "Hlídač insolvencí";
+    ViewBag.SubTitle = "Insolvence " + Model.Rizeni.SpisovaZnacka;
+
+
+    var dluznici = Model.Rizeni.Dluznici.OrderBy(o => o.PlneJmeno).Select(o => new OsobaViewModel { Osoba = o });
+    var veritele = Model.Rizeni.Veritele.OrderBy(o => o.PlneJmeno).Select(o => new OsobaViewModel { Osoba = o });
+    var spravci = Model.Rizeni.Spravci.OrderBy(o => o.PlneJmeno).Select(o => new OsobaViewModel { Osoba = o });
+
+    IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlightingData = ViewBag.Highlighting as IReadOnlyDictionary<string, IReadOnlyCollection<string>>;
+    bool highlighting = highlightingData?.Keys?.Contains("dokumenty.plainText") == true;
+
+
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="@Url.Action("Index", "Insolvence")">Hlídač Insolvencí</a></li>
+        <li class="active">@ViewBag.SubTitle</li>
+    </ol>
+}
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.css" />
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+
+
+
+@Html.Partial("_SearchForm", new HlidacStatu.Repositories.Searching.InsolvenceSearchResult())
+
+
+<h2>
+    @*@WebUtil.AddBookmark(this.User, Model)*@
+    Insolvenční řízení @Model.Rizeni.SpisovaZnacka
+</h2>
+@if (!LimitedAccess.IsAuthenticatedOrSearchCrawler(Context.Request))
+{
+    <h3>Omezený přístup pouze pro registrované uživatele.</h3>
+    <p>
+        Podrobné informace o insolvencích jsou dostupné pouze registrovaným uživatelům Hlídače Státu.
+        <b>Registrace je zdarma a je velmi jednoduchá</b>. Stačí vám pouze platný email.
+    </p>
+    <p>Pokud jste již zaregistrováni, <a onclick="ga('send', 'event', 'loginBtn', 'click','@Context.Request.Path#PristupOmezen'); return true;" href="/account/Login?returnUrl=@Url.Action()" class="btn btn-default">zalogujte se</a>. </p>
+    <p>
+        <a onclick="ga('send', 'event', 'registerBtn', 'click','@Context.Request.Path#PristupOmezen'); return true;"
+           href="/account/Register?returnUrl=@Url.Action()" class="btn btn-primary">Zaregistrovat se</a>
+    </p>
+    <script>
+        $(function () {
+            $("#VZInfoAnon").modal('show');
+        });
+    </script>
+}
+else
+{
+    // if (Model.Rizeni.Odstraneny)
+    // {
+    //  šablona je unloaded
+    //     @Html.Partial("_OdstranenoZIR")
+    // }
+    // else 
+    if (!Model.Rizeni.OnRadar)
+    {
+        @Html.Partial("_OnRadarInfo")
+    }
+
+    @Html.Partial("_Status", Model)
+}
+
+
+
+<h3 style="margin-top:50px">Informace o řízení</h3>
+<div class="hidden-xs">
+    <table class="table solid">
+        <tbody>
+            <tr>
+                <td>
+                    <span class="text-muted small">Soud</span>
+                    <br />
+                    @Model.Rizeni.SoudFullName()
+                </td>
+                <td>
+                    <span class="text-muted small">Spisová značka</span><br />
+                    @Model.Rizeni.SpisovaZnacka
+                </td>
+                <td>
+                    <span class="text-muted small">Zahájení insolvenčního řízení</span><br />
+                    @(Model.Rizeni.DatumZalozeni?.Date.ToShortDateString() ?? "Neznámé")
+                </td>
+                <td>
+                    <span class="text-muted small">Naposledy změněno</span><br />
+                    @Model.Rizeni.PosledniZmena.Date.ToShortDateString()
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="text-muted small">Aktuální stav</span>
+                    <br /><span title="@Model.Rizeni.StavRizeniDetail()">@Model.Rizeni.StavRizeni()</span>
+                </td>
+                <td colspan="2">
+                    <span class="text-muted small">Stálé URL řízení na Hlídači Státu</span><br />
+                    <a href="@(Model.GetUrl(true))" target="_blank">
+                        @(Model.GetUrl(true))
+                    </a>
+                </td>
+                <td>
+                    <span class="text-muted small">Zdroj dat</span><br />
+                    @{
+                        if (!string.IsNullOrEmpty(Model.Rizeni.Url) && !Model.Rizeni.Vyskrtnuto.HasValue)
+                        {
+                            var url = Model.Rizeni.Url.Contains("evidence_upadcu_detail")
+                                ? Model.Rizeni.Url
+                                : Model.Rizeni.Url.Replace("https://isir.justice.cz/isir/ueu/", "https://isir.justice.cz/isir/ueu/evidence_upadcu_detail.do?id=");
+                            <a href="@url" target="_blank"><code>@url</code></a>
+                        }
+                        else
+                        {
+                            var parts = Model.Rizeni.SpisovaZnacka.Split(new[] { " ", "/" }, StringSplitOptions.None);
+                            <a href="https://isir.justice.cz/isir/ueu/vysledek_lustrace.do?bc_vec=@(parts[1])&rocnik=@(parts[2])&aktualnost=AKTUALNI_I_UKONCENA" target="_blank">Vyhledat v insolvenčním rejstříku</a>
+                        }
+                    }
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2">
+                    <span class="text-muted small">
+                        Sledování změn řízení
+                    </span><br />
+                    <partial name="WebUtil/AddWatchdog" 
+                             model="@(new WatchdogViewModel(typeof(Rizeni), $"id:\"{Model.Rizeni.SpisovaZnacka}\"", "Hlídat změny v tomto řízení", prefillWDname: $"Insolvence {Model.Rizeni.SpisovaZnacka}", showWdList: false, buttonCss: "btn btn-warning btn-sm"))"/>
+                </td>
+                <td colspan="2">
+                    <span class="text-muted small">
+                        Sdílení
+                    </span><br />
+                    <share-facebook></share-facebook>
+                    <share-twitter text="@($"Insolvenční řízení '{Model.Rizeni.BookmarkName()}' na @HlidacStatu - {Model.Rizeni.InfoFacts().First().Render(false)}")"></share-twitter>
+                    @if (Model.Rizeni.OnRadar)
+                    {
+                        <share-widget></share-widget>
+                    }
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+</div>
+<div class="visible-xs-block">
+    <table class="table table-striped">
+        <tbody>
+            <tr>
+                <td>Soud</td>
+                <td>
+                    <span>@Model.Rizeni.SoudFullName()</span>
+                </td>
+            </tr>
+            <tr>
+                <td>Spisová značka</td>
+                <td>@Model.Rizeni.SpisovaZnacka</td>
+            </tr>
+            <tr>
+                <td>Aktuální stav</td>
+                <td>
+                    <span title="@Model.Rizeni.StavRizeniDetail()">@Model.Rizeni.StavRizeni()</span>
+                </td>
+            </tr>
+            <tr>
+                <td>Zahájení insolvenčního řízení</td>
+                <td>
+                    @(Model.Rizeni.DatumZalozeni?.Date.ToShortDateString() ?? "Neznámé")
+                </td>
+            </tr>
+            <tr>
+                <td>Naposledy změněno</td>
+                <td>
+                    @Model.Rizeni.PosledniZmena.Date.ToShortDateString()
+                </td>
+            </tr>
+            <tr>
+                <td>Stálé URL řízení na Hlídači Státu</td>
+                <td>
+                    <a href="@(Model.GetUrl(true))" target="_blank">
+                        <code>@(Model.GetUrl(true))</code>
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Sledování změn řízení
+                </td>
+                <td>
+                    <partial name="WebUtil/AddWatchdog" 
+                             model="@(new WatchdogViewModel(typeof(Rizeni), $"id:\"{Model.Rizeni.SpisovaZnacka}\"", "Hlídat změny v tomto řízení", prefillWDname: $"Insolvence {Model.Rizeni.SpisovaZnacka}", showWdList: false, buttonCss: "btn btn-warning btn-sm"))"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Sdílení</td>
+                <td>
+                    <share-facebook></share-facebook>
+                    <share-twitter text="@($"Insolvenční řízení '{Model.Rizeni.BookmarkName()}' na @HlidacStatu - {Model.Rizeni.InfoFacts().First().Render(false)}")"></share-twitter>
+                    <share-widget></share-widget>
+                </td>
+            </tr>
+            <tr>
+                <td>Zdroj dat</td>
+                <td>
+                    <a href="@Model.Rizeni.UrlInIR()" target="_blank">Vyhledat v insolvenčním rejstříku</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<h3>Účastníci řízení</h3>
+
+@{
+    var id = Guid.NewGuid().ToString("N") + "_";
+}
+
+<div class="col-xs-12">
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#@(id)1" onclick="ga('send', 'event', 'tabHorizontal', 'change_1','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)1" role="tab" data-toggle="tab">
+                @Html.Raw($"Dlužníci ({Model.Rizeni?.Dluznici?.Count ?? 0})")
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#@(id)2" onclick="ga('send', 'event', 'tabHorizontal', 'change_2','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)2" role="tab" data-toggle="tab">
+                @Html.Raw($"Věřitelé ({Model.Rizeni?.Veritele?.Count ?? 0})")
+            </a>
+        </li>
+        <li role="presentation">
+            <a href="#@(id)3" onclick="ga('send', 'event', 'tabHorizontal', 'change_3','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)3" role="tab" data-toggle="tab">
+                @Html.Raw($"Insolveční správci ({Model.Rizeni?.Spravci?.Count ?? 0})")
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="@(id)1">
+            <partial name="_PeopleList" model="@(new PeopleListViewModel(dluznici,"D",true,Model.Rizeni.OnRadar))"/>
+        </div>first = false;
+        <div role="tabpanel" class="tab-pane" id="@(id)2">
+            <partial name="_PeopleList" model="@(new PeopleListViewModel(veritele,"V",true,false))"/>
+        </div>first = false;
+        <div role="tabpanel" class="tab-pane" id="@(id)3">
+            <partial name="_PeopleList" model="@(new PeopleListViewModel(spravci,"S",true,Model.Rizeni.OnRadar))"/>
+        </div>first = false;
+    </div>
+
+</div>
+
+<h3 style="margin-top:50px">Poslední dokumenty k řízení</h3>
+<div>
+    @{var dokumentu = Model.Rizeni.Dokumenty.Count();}
+    <table class="table table-condensed table-striped">
+        <tbody>
+            @{
+                Dictionary<Dokument, string> docs = new Dictionary<Dokument, string>();
+                for (int i = 0; i < dokumentu; i++)
+                {
+                    var doc = Model.Rizeni.Dokumenty[i];
+                    if (highlighting == false)
+                    {
+                        docs.Add(doc, null);
+                    }
+                    else
+                    {
+                        docs.Add(doc, HlidacStatu.Repositories.Searching.Highlighter.HasHighlightedContent(highlightingData, "dokumenty.plainText", doc.PlainText) ? "1" : "0");
+                    }
+                }
+
+            }
+            @foreach (var item in docs.OrderByDescending(o => o.Value).ThenByDescending(d => d.Key.DatumVlozeni).Take(10))
+            {
+                <tr>
+                    <td>
+                        <span class="text-muted small">
+                            @item.Key.DatumVlozeni.ToShortDateString()
+                        </span><br />
+                        @item.Key.Popis
+                    </td>
+                    <td style="width:50px">
+                        @if (item.Key.Lenght > 0)
+                        {
+                            <a href="@Url.Action("TextDokumentu", "Insolvence", new { Id = item.Key.Id, qs = Context.Request.Query["qs"] })"><i class="far fa-lg fa-file-alt" alt="textová podoba dokumentu"></i></a>
+                        }
+                    </td>
+                    <td style="width:50px">
+                        <a href="@item.Key.Url" target="_blank"><i class="far fa-lg fa-file-pdf" alt="Originál"></i></a>
+                    </td>
+                </tr>
+                if (highlighting && item.Value == "1")
+                {
+                    <tr>
+                        <td colspan="3" style="border-top:none">
+                            <highlight-content highlights="highlightingData" 
+                                               path="dokumenty.plainText" 
+                                               content-to-compare="@item.Key.PlainText" 
+                                               prefix="@("<blockquote class='small'>")"
+                                               postfix="@("</blockquote>")"></highlight-content>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    <div class="text-right">
+        <a href="@Url.Action("Dokumenty", "Insolvence", new { id = Model.Rizeni.UrlId(), qs = Context.Request.Query["qs"] })">Všechny dokumenty (@Model.Rizeni.Dokumenty.Count())</a>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
+</script>
+
+
+@section onlyembed
+{
+    <div class="onlyembed">
+        <div class="container text">
+            <h3>Insolvence @Devmasters.TextUtil.ShortenText(Model.Rizeni.SpisovaZnacka, 60)</h3>
+            <p>@Html.Raw(HlidacStatu.Util.InfoFact.RenderInfoFacts(Model.Rizeni.InfoFacts(), 2, true, true, html: true)) </p>
+            <p><a href="@Model.GetUrl(true)" target="_top">Více informací o insolvenčním řízení</a></p>
+        </div>
+        <img src="@($"/socialbanner/insolvence?d={DateTime.Now.ToString("yyMMdd")}&v={Model.Rizeni.SpisovaZnacka}")"
+             style="width:100%;height:auto;padding:1em 0 0 0;min-width:250px;" />
+    </div>
+}

@@ -1,0 +1,71 @@
+﻿@using HlidacStatu.Datasets
+@model CreateSimpleModel
+@{
+
+    ViewBag.Title = "Přidání datasetu pro normální lidi : Typy hodnot";
+    ViewBag.SubTitle = "Postup pro netechnické uživatele";
+
+    ApiResponseStatus err = ViewBag.ApiResponseError;
+
+}
+@section scripts
+{
+
+}
+
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="/data">Další databáze</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+@if (err != null)
+{
+    <h3 class="text-danger">Chyba při ukládání datasetu</h3>
+    <p class="bg-danger">
+        <b>Chyba</b>: @(err.error?.description)<br />
+        Hodnota: @(err.value?.ToString())<br />
+        ErrorNumber: @(err.error?.number)<br />
+        ErrorDetail: @(err.error?.errorDetail)<br />
+    </p>
+
+}
+
+<div class="row">
+    <div class="col-xs-12 ">
+        <h2>Dataset úspěšně vytvořen!</h2>
+        <p>
+            Gratulujeme, dataset byl úspěšně vytvořen. V tuto chvíli neobsahuje žádná data.
+        </p>
+        @if (Model.NumOfRows == 0)
+        {
+            <p>
+                CSV soubor, který jsme použili pro vytvoření tohoto datasetu, neobsahuje žádná data.
+                Můžete je kdykoliv (najednou i po částech) nahrát ve <a href="@Url.Action("manage",new { id = Model.Name })">správě datasetu</a>.
+            </p>
+            <p>
+                <a class="btn btn-success" href="@Url.Action("importdata",new { id = Model.DatasetId })">Nahrát nová data do datasetu</a>
+                <a class="btn btn-primary" href="@Url.Action("manage",new { id = Model.DatasetId })">Spravovat dataset</a>
+                <a class="btn btn-default" href="/">Zpět na titulku</a>
+            </p>
+
+        }
+        else
+        {
+            <p>
+                CSV soubor, který jsme použili pro vytvoření tohoto datasetu,
+                obsahuje <b>@Devmasters.Lang.Plural.Get(Model.NumOfRows, "jeden záznam", "{0} záznamy", "{0} záznamů")</b>.
+                Tyto záznamy můžeme nyní uložit do datasetu. Stejně tak data můžete později (najednou i po částech) nahrát do Hlídače ve <a href="@Url.Action("manage",new { id = Model.Name })">správě datasetu</a>.
+            </p>
+            <p>
+                <a class="btn btn-success" href="@Url.Action("importdata",new { id = Model.DatasetId, fileid= Model.FileId, delimiter=Model.Delimiter })">Nahrát @Devmasters.Lang.Plural.Get(Model.NumOfRows, "jeden záznam", "{0} záznamy", "{0} záznamů") nyní</a>
+                <a class="btn btn-primary" href="@Url.Action("manage",new { id = Model.DatasetId })">Spravovat dataset</a>
+                <a class="btn btn-default" href="/">Zpět na titulku</a>
+            </p>
+        }
+    </div>
+</div>

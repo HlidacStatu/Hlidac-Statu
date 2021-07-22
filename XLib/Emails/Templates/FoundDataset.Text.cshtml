@@ -1,0 +1,37 @@
+﻿Content-Type: text/plain; charset=utf-8
+
+Dobrý den.
+Našli jsme nové záznamy pro hlídače nových údajů "@Model.WDName".
+
+V době @Model.Interval @Model.TotalTxt z databáze "@Model.Dataset.Registration().name" pro tento dotaz
+@Model.Query
+
+@if (Model.AddResults > 0)
+{
+    <text>
+        Zobrazujeme prvních 30 záznamů
+    </text>
+}
+
+@foreach (dynamic item in @Model.Results)
+{
+
+    <text>#ITEMTEMPLATE#</text>
+
+}
+
+Více: @(Model.SearchQuery)?utm_source=hlidac&utm_medium=emailtxt&utm_campaign=detail
+============================================
+
+
+@if (Model.AddResults > 0)
+{
+    <text>
+        Zobrazit všechny nalezené záznamy: @(Model.SearchQuery)&utm_source=hlidac&utm_medium=emailtxt&utm_campaign=more
+    </text>
+}
+
+
+
+@Model.EmailFooterText
+

@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>HlidacStatu.ClassificationRepair</AssemblyName>
+    <RootNamespace>HlidacStatu.ClassificationRepair</RootNamespace>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="appsettings.json.sample" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="appsettings.json.sample" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="2.13.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj" />
+    <ProjectReference Include="..\HlidacStatu.Q\HlidacStatu.Q.csproj" />
+  </ItemGroup>
+</Project>

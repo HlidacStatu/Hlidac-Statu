@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <AssemblyName>HlidacStatu.DbManagers</AssemblyName>
+        <RootNamespace>HlidacStatu.DbManagers</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Devmasters.Core" Version="2.3.3" />
+      <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Entities\Entities.csproj" />
+      <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
+      <ProjectReference Include="..\Util\Util.csproj" />
+    </ItemGroup>
+
+</Project>

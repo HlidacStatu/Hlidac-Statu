@@ -1,0 +1,111 @@
+@using Devmasters.Enums
+@model HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th>Zakázka</th>
+        <th>Poslední změna</th>
+        <th>Lhůta pro nabídky</th>
+        <th>Zadavatel</th>
+        <th>Dodavatelé</th>
+        <th>Název</th>
+        <th>Cena</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.ElasticResults.Hits.Select(m => m.Source))
+    {
+        <tr class="first">
+            <td style="white-space: nowrap;">
+                <span style='white-space:nowrap'>
+                    <add-bookmark item="item"></add-bookmark>&nbsp;
+                    @if (LimitedAccess.IsAuthenticatedOrSearchCrawler(Context.Request))
+                    {
+                        <a href="@item.GetUrl(true, Model.Q)">
+                            @item.EvidencniCisloZakazky
+                        </a>
+                    }
+                    else
+                    {
+                        <a href='#' data-toggle='modal' data-target='#VZInfoAnon' data-url='@item.GetUrl(true, Model.Q)'>@item.EvidencniCisloZakazky</a>
+                    }
+                </span>
+            </td>
+            <td>
+                @(item.PosledniZmena?.ToShortDateString())
+            </td>
+            <td>
+                @(item.LhutaDoruceni?.ToShortDateString() ?? "neuvedena")
+            </td>
+            <td>
+                @if (item.Zadavatel != null)
+                {
+                    if (HlidacStatu.Util.DataValidators.CheckCZICO(item.Zadavatel.ICO))
+                    {
+                        @Html.KIndexLabelLink(item.Zadavatel.ICO)<a href="/subjekt/@item.Zadavatel.ICO">@item.Zadavatel.Jmeno</a>
+                    }
+                    else
+                    {
+                        <span>@item.Zadavatel.Jmeno</span>
+                    }
+                }
+            </td>
+            <td>
+                @if (item.Dodavatele != null && item.Dodavatele.Count() > 0)
+                {
+                    foreach (var d in item.Dodavatele.Take(2))
+                    {
+                        if (HlidacStatu.Util.DataValidators.CheckCZICO(d.ICO))
+                        {
+                            @Html.KIndexLabelLink(d.ICO)<a href="/subjekt/@d.ICO">@d.Jmeno</a>
+                            <br/>
+                        }
+                        else
+                        {
+                            <span>@d.Jmeno</span>
+                            <br/>
+                        }
+                    }
+                    @(item.Dodavatele.Count() > 2 ? Devmasters.Lang.Plural.Get(item.Dodavatele.Count() - 2, "+{0} dodavatel;+{0} další dodavatelé;+{0} dalších dodavatelů") : "")
+                }
+            </td>
+            <td>
+                @Devmasters.TextUtil.ShortenText(item.NazevZakazky, 50)
+            </td>
+            <td class="number">
+                <b>
+                    @if (item.KonecnaHodnotaBezDPH.HasValue)
+                    {
+                        @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(item.KonecnaHodnotaBezDPH.Value, html: true, shortFormat: Model.SmallRender))
+                    }
+                    else if (item.OdhadovanaHodnotaBezDPH.HasValue)
+                    {
+                        <span>odhad.cena </span>
+                        @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(item.OdhadovanaHodnotaBezDPH.Value, html: true, shortFormat: Model.SmallRender))
+                    }
+                    else
+                    {
+                        <span></span>
+                    }
+                </b>
+            </td>
+        </tr>
+        if (Model.SmallRender == false)
+        {
+            <tr class="last">
+                <td></td>
+                <td colspan="2">
+                    <span class="small">@(item.LastestFormular()?.DruhFormulare().ToNiceDisplayName())</span>
+                </td>
+                <td colspan="4">
+                    <span class="small">
+                        @Devmasters.TextUtil.ShortenText(item.PopisZakazky, 900, "...")
+                    </span>
+                </td>
+            </tr>
+        }
+    }
+    </tbody >
+</table >
+<partial name="SearchResults/Pagination" model="@(new PaginationViewModel(Model, "/VZ/Hledat"))"/>

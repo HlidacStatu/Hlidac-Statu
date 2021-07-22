@@ -1,0 +1,44 @@
+@using HlidacStatu.Extensions
+@using HlidacStatu.Datastructures.Graphs
+@using HlidacStatu.Repositories
+@model HlidacStatu.Entities.Firma
+
+<p>
+    @if (Model.JsemOVM())
+    {
+        <span>Úřad - orgán veřejné moci.</span>
+    }
+    else if (Model.JsemStatniFirma())
+    {
+        <span>Firma (spolu)vlastněná státem či samosprávou.</span>
+    }
+    else
+    {
+        <span>Soukromá firma.</span>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.StatusFull()))
+    {
+        <span class="text-muted">@Model.StatusFull().</span>
+    }
+    @if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Any())
+    {
+        if (Model.PatrimStatu())
+        {
+            <span>
+                Řídí <a href="/subjekt/Vazby/@Model.ICO">@(Devmasters.Lang.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací")).</a>
+            </span>
+        }
+        else
+        {
+            <span>
+                Řídí <a href="/subjekt/Vazby/@Model.ICO">@(Devmasters.Lang.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů")).</a>
+            </span>
+        }
+    }
+    @if (Model.KategorieOVM().Any())
+    {
+        <span>
+            Je součástí <a href="/subjekt/DalsiInformace/@Model.ICO">@Devmasters.Lang.Plural.Get(Model.KategorieOVM().Count(), "jedné kategorie", "{0} kategorií", "{0} kategorií") orgánu veřejné moci.</a>
+        </span>
+    }
+</p>

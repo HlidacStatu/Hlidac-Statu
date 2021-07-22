@@ -1,0 +1,52 @@
+﻿@using HlidacStatu.Repositories
+@{
+
+    var csv = new CsvHelper.CsvReader(System.IO.File.OpenText(HlidacStatu.Connectors.Init.WebAppDataPath + "Novyzastupitele.csv"),
+        new CsvHelper.Configuration.CsvConfiguration(HlidacStatu.Util.Consts.csCulture) { HasHeaderRecord = true, Delimiter = ";" });
+
+    //var csv =
+
+}
+
+
+<div class="clearfix" style="padding-bottom:30px;"></div>
+
+<div>
+    <table class="table table-hover table-condensed">
+        <tr>
+            <th></th>
+            <th>Zastupitelstvo</th>
+            <th>Jméno</th>
+            <th>Příjmení</th>
+            <th>Věk</th>
+            <th>Strana</th>
+            <th>Plné jméno</th>
+            <th></th>
+        </tr>
+        @while (csv.Read())
+        {
+
+            if (OsobaRepo.PolitickyAktivni.Get().Any(m => m.Jmeno == csv.GetField<string>(1).Trim() && m.Prijmeni == csv.GetField<string>(2).Trim()))
+            {
+            }
+            else
+            {
+                <tr>
+
+                    <td></td>
+
+                    <td>@(csv.GetField<string>(0))</td>
+                    <td>@(csv.GetField<string>(1))</td>
+                    <td>@(csv.GetField<string>(2))</td>
+                    <td>@(csv.GetField<string>(3))</td>
+                    <td>@(csv.GetField<string>(4))</td>
+                    <td>@(csv.GetField<string>(5))</td>
+                    <td><a href="/pridatPolitika?jmeno=@(csv.GetField<string>(1))&prijmeni=@(csv.GetField<string>(2))&strana=@(csv.GetField<string>(4))">Doplnit údaje</a></td>
+
+                </tr>
+            }
+        }
+    </table>
+
+
+</div>

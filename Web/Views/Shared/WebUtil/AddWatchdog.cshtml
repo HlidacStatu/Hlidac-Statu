@@ -1,0 +1,245 @@
+@using Microsoft.AspNetCore.Http.Extensions
+@using HlidacStatu.Entities
+@using HlidacStatu.Entities.Insolvence
+@using HlidacStatu.Entities.VZ
+@using HlidacStatu.Datasets
+@model WatchdogViewModel
+
+@{
+    string dataTypeName = "smlouvy";
+    string dataTypeName2 = "smluv";
+    if (Model.Datatype == typeof(VerejnaZakazka))
+    {
+        dataTypeName = "zakázky";
+        dataTypeName2 = "zakázek";
+    }
+    else if (Model.Datatype == typeof(Rizeni))
+    {
+        dataTypeName = "insolvence";
+        dataTypeName2 = "insolvencí";
+    }
+    else if (Model.Datatype == typeof(DataSet))
+    {
+        dataTypeName = "záznamy v databázi";
+        dataTypeName2 = "záznamů v databázích";
+    }
+    else if (Model.Datatype == null)
+    {
+        dataTypeName = "informace na Hlídači";
+        dataTypeName2 = "informací v celém Hlídači";
+    }
+
+    string datatypeApi = Model.Datatype?.Name ?? WatchDog.AllDbDataType;
+    if (!string.IsNullOrEmpty(Model.DatasetId))
+    {
+        datatypeApi = datatypeApi + "." + Model.DatasetId;
+    }
+
+    var periodList = Devmasters.Enums.EnumTools
+        .EnumToEnumerable(typeof(WatchDog.PeriodTime))
+        .Select(m => new SelectListItem() {Value = m.Value, Text = "" + m.Key, Disabled = (Convert.ToInt32(m.Value) < 2)})
+        .ToList();
+
+    string uid = Guid.NewGuid().ToString("N");
+
+    if (Model.ButtonCss == null)
+    {
+        Model.ButtonCss = "btn btn-warning";
+    }
+
+    if (Model.ButtonText == null)
+    {
+        Model.ButtonText = $"Hlídat nové {dataTypeName}";
+        if (!string.IsNullOrEmpty(Model.Query))
+        {
+            Model.ButtonText += $" pro hledání '{Devmasters.TextUtil.ShortenText(Model.Query, 30, "...")}'";
+        }
+    }
+    if (Model.PreButtonText == null)
+    {
+        Model.PreButtonText = $@"
+<div class=""section-title"">
+Hlídání nových {dataTypeName2}
+</div>
+<div class=""flex-row flex-row--center"" style=""margin: 14px 0 16px"">
+<div style=""margin-right: 20px"">
+<img src=""/Content/img/icon-person-watcher.svg"">
+</div>
+<div class=""new-p"">
+Máme pro vás denné sledovat <b>nové {dataTypeName} odpovídající tomuto dotazu</b> a upozornit vás emailem, že se objevily nové?
+</div>
+</div>
+<div>
+";
+    }
+    if (string.IsNullOrEmpty(Model.PreButtonText))
+    {
+        Model.PostButtonText = "";
+    }
+    if (Model.PostButtonText == null)
+    {
+        Model.PostButtonText = "</div>";
+    }
+    if (User.Identity?.IsAuthenticated == true)
+    {
+        var availableWatchdogs = int.MaxValue;
+
+
+        <text>
+            @Html.Raw(Model.PreButtonText)
+            @if (availableWatchdogs > 0)
+            {
+                <a href="#" class="@Model.ButtonCss"
+                   onclick="ga('send', 'event', 'btnWatchDog', 'AddNew', 'authenticated');" role="button" data-toggle="modal" data-target="#addWDform@(uid)">
+                    @if (Model.ShowButtonIcon)
+                    {
+                        <span class="glyphicon glyphicon-eye-open dark"></span>
+                    }
+                    <span class="btn-emphasized">@Html.Raw(Model.ButtonText)</span>
+                </a>
+            }
+            else
+            {
+                <a href="/manage/outOfWatchdogs" class="@Model.ButtonCss"
+                    onclick="ga('send', 'event', 'btnWatchDog', 'OutOf', 'authenticated');" role="button">
+                    @if (Model.ShowButtonIcon)
+                    {
+                        <span class="glyphicon glyphicon-eye-open dark"></span>
+                    }
+                    <span class="btn-emphasized">@Html.Raw(Model.ButtonText)</span>
+                </a>
+            }
+
+            @if (Model.ShowWDList)
+            {
+                <a href="/manage/Watchdogs" class="@Model.ButtonCss"
+                   style="padding-left:15px;padding-right:15px"
+                   alt="Všichni uložení hlídači" title="Všichni uložení hlídači"
+                   onclick="ga('send', 'event', 'btnWatchDog', 'List', 'authenticated');" role="button">
+                    @if (Model.ShowButtonIcon)
+                    {
+                        <span class="glyphicon glyphicon-eye-open dark"></span>@:&nbsp;<span class="glyphicon glyphicon-th-list"></span>
+                    }
+                    else
+                    {
+                        <span>Všichni uložení hlídači</span>
+                    }
+                </a>
+            }
+            @Html.Raw(Model.PostButtonText)
+            <!-- Modal -->
+            <div class="modal fade" id="addWDform@(uid)" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" onclick="ga('send', 'event', 'btnWatchDog', 'CloseBtnIcon', 'authenticated');" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">Přidání nového hlídače</h4>
+                        </div>
+                        <div class="modal-body text-left">
+                            <div>
+                                <div class="col-xs-12">
+                                    <label for="txt" class="control-label">Pojmenování hlídače</label>
+                                    <div>
+                                        <input type="text" class="form-control--small" name="wdname@(uid)" id="wdname@(uid)" placeholder="Pojmenování hlídače pro přehlednost" value="@Model.PrefillWDname">
+                                    </div>
+                                </div>
+                                <div class="col-xs-12">
+                                    <label for="period@(uid)" class="control-label">Jak často máme kontrolovat nové @dataTypeName?</label>
+                                    <div>
+                                        <select class="form-control--small" name="period@(uid)" id="period@(uid)">
+                                            @foreach (var kv in periodList)
+                                            {
+                                                if (kv.Value == "2")
+                                                {
+                                                    <option value="@kv.Value" selected="selected" disabled="@(kv.Disabled)">@kv.Text</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@kv.Value" disabled="@(kv.Disabled)" >@kv.Text</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                @if (Model.Datatype == typeof(Smlouva))
+                                {
+                                    <div class="col-xs-12">
+                                        <label for="focus@(uid)" class="control-label">Typ upozornění</label>
+                                        <div>
+                                            <select class="form-control--small" name="focus@(uid)" id="focus@(uid)">
+                                                <option value="0">Zašlete mi přehled o nových smlouvách v Registru smluv</option>
+                                                <option value="1">Upozorněte mě na problémy v nových smlouvách</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                }
+                                else if (Model.Datatype == typeof(VerejnaZakazka))
+                                {
+                                    <div class="col-xs-12">
+                                        <label for="focus@(uid)" class="control-label">Typ veřejných zakázek</label>
+                                        <div>
+                                            <select class="form-control--small" name="focus@(uid)" id="focus@(uid)">
+                                                <option value="0">Zašlete mi info o jakékoliv změně veřejné zakázky</option>
+                                                <option value="1">Upozorněte mě pouze na zakázky do kterých se dá ještě přihlásit</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <input type="hidden" name="focus@(uid)" id="focus@(uid)" value="0">
+                                }
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Zavřít</button>
+                            <a href="#" role="button" class="btn btn-success" onclick="javascript: ga('send', 'event', 'btnWatchDog', 'AddNew', 'authenticated');AddNewWD('@Model.Query.Replace("'", "\\'")','@datatypeApi',$('#wdname@(uid)').val(),$('#period@(uid)').val(), $('#focus@(uid)').val(), this);return false;">Přidat hlídače</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </text>
+    }
+    else
+    {
+        <text>
+            @Html.Raw(Model.PreButtonText)
+            <a href="#" onclick="ga('send', 'event', 'btnWatchDog', 'AddNew', 'anonym');" class="@Model.ButtonCss" role="button" data-toggle="modal" data-target="#addWDhelp@(uid)">
+                @if (Model.ShowButtonIcon)
+                {
+                    <span class="glyphicon glyphicon-eye-open dark"></span>
+                }
+                <span class="btn-emphasized">@Html.Raw(Model.ButtonText)</span>
+            </a>
+            @Html.Raw(Model.PostButtonText)
+            <!-- Modal -->
+            <div class="modal fade" id="addWDhelp@(uid)" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" onclick="ga('send', 'event', 'btnWatchDog', 'CloseBtnIcon', 'authenticated');" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 class="modal-title">Musíte být přihlášeni</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                <code>Hlídač nových smluv</code> posílá upozornění pouze zaregistrovaným uživatelům.
+                            </p>
+                            <p>
+                                Registrace je jednoduchá a zdarma. Pokud už jste zaregistrováni, stačí se přihlásit.
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" onclick="ga('send', 'event', 'btnWatchDog', 'CloseForm', 'anonym');" class="btn btn-default" data-dismiss="modal">Zavřít</button>
+                            <a onclick="ga('send', 'event', 'registerBtn', 'click','/@this.Path'); return true;" href="/account/register?returnUrl=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))" onclick="ga('send', 'event', 'btnWatchDog', 'Register', 'anonym');" role="button" class="btn btn-primary">Zdarma zaregistrovat</a>
+                            <a onclick="ga('send', 'event', 'registerBtn', 'click','/@this.Path'); return true;" href="/account/login?returnUrl=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))" onclick="ga('send', 'event', 'btnWatchDog', 'Login', 'anonym');" role="button" class="btn btn-success">Přihlásit se</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </text>
+    }
+}

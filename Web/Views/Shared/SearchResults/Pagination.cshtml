@@ -1,0 +1,55 @@
+@model PaginationViewModel
+
+@{
+    if (! int.TryParse(Context.Request.Query["page"], out int page))
+    {
+        page = 1;
+    };
+
+    bool isPreviousEnabled = page != 1;
+    bool isNextEnabled = Model.Result.Total >= page * Model.Result.PageSize 
+                         && page * Model.Result.PageSize < Model.Result.MaxResultWindow();
+    
+    //překopírování ostatních parametrů nikde neurčených
+    string otherQueryParams = "";
+
+    string[] paramFilter = new[] {"q", "page"};
+    var additionalQueryParams = Context.Request.Query
+        .Where(q => paramFilter.All(f => f != q.Key.ToLower())); 
+            
+    foreach (var queryParam in additionalQueryParams)
+    {
+        foreach (var paramValue in queryParam.Value)
+        {
+            otherQueryParams += $"&{queryParam.Key}={paramValue}";
+        }
+    }
+    
+}
+
+<div class="text-center">
+    <ul class="pagination pagination-lg">
+        @if (isPreviousEnabled)
+        {
+            var routeValues = Model.Result.ToRouteValues(page - 1);
+            <li>
+                <a href="@Model.UriPath?q=@(routeValues.Q)&page=@(routeValues.Page)@otherQueryParams" >« Předchozí</a>
+            </li>
+        }
+        @if (isNextEnabled)
+        {
+            var routeValues = Model.Result.ToRouteValues(page + 1);
+            <li>
+                <a href="@Model.UriPath?q=@(routeValues.Q)&page=@(routeValues.Page)@otherQueryParams" >Následující »</a>
+            </li>
+        }
+
+        
+        @if (Model.ExportType is not null)
+        {
+            <li>
+                <partial name="WebUtil/ExportButton" model="@(new ExportButtonViewModel(Model.ExportType, Model.Result.Query, Model.Result.Order, moreParams: Model.ExportMoreParams))"/>
+            </li>
+        }
+    </ul>
+</div>

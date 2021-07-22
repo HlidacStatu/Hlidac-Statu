@@ -1,0 +1,93 @@
+﻿@model HlidacStatu.Entities.Firma
+@using System.Linq
+@using HlidacStatu.Extensions
+@using HlidacStatu.XLib.Render
+@using HlidacStatu.Repositories
+
+@{
+    Layout = null;
+
+    //ViewBag.Title = "Obchody " + Model.Jmeno + " s firmami sponzorující politické strany";
+}
+
+
+@* První sloupec *@
+<div class="col-sm-7 col-sm-pull-5 col-xs-12 col-xs-pull-0">
+
+                <p class="text-muted sub-header-info">
+                Přehled finančních a nefinančních podpor politickým stranám. Podpory větší než 5000 Kč zobrazujeme po dobu 10 let, menší podpory po dobu 5 let.
+            </p>
+
+    @{
+        var sponzoring = Model.Sponzoring()
+            .GroupBy(s => (rok: s.DarovanoDne?.Year ?? 0, ico: s.IcoPrijemce),
+            (key, val) => (Rok: key.rok, Ico: key.ico, Dar: val.Sum(x => x.Hodnota ?? 0)))
+            .ToList();
+
+        var sponzoringData = new ReportDataSource<(int Rok, string Ico, decimal Dar)>(
+            new[]
+            {
+                    new ReportDataSource<(int Rok, string Ico, decimal Dar)>.Column()
+                    {
+                        Name = "Rok",
+                        CssClass = "number",
+                        HtmlRender = (x) => x.Rok.ToString(),
+                        TextRender = (x) => x.Rok.ToString()
+
+                    },
+                    new ReportDataSource<(int Rok, string Ico, decimal Dar)>.Column()
+                    {
+                        Name = "Politická strana",
+                        HtmlRender = (x) =>
+                        $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmeno(x.Ico)}</a>"
+                    },
+                    new ReportDataSource<(int Rok, string Ico, decimal Dar)>.Column()
+                    {
+                        Name = "Celkem darovali",
+                        TextRender = (x) => $"{x.Dar.ToString("N0")} Kč",
+                        HtmlRender = (x) => $"{x.Dar.ToString("N0")}&nbsp;Kč",
+                        OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Dar),
+                        CssClass = "number"
+                    },
+
+                });
+        foreach (var dar in sponzoring.OrderByDescending(m => m.Rok))
+        {
+            sponzoringData.AddRow(dar);
+        }
+        sponzoringData.Title = "Přehled darů politickým stranám";
+    }
+    @if (sponzoring.Count > 0)
+    {
+        <div>
+            <h4>Přímé sponzorování politických stran</h4>
+            @Html.DataToHTMLTable(sponzoringData)
+        </div>
+    }
+    else
+    {
+        <p>
+            @Html.SubjektTypTrojice(Model, "Tento úřad žádnou politickou stranu v posledních 10 letech nesponzoroval", "Tato organizace žádnou politickou stranu v posledních 10 letech nesponzorovala", "Tato firma žádnou politickou stranu v posledních 10 letech nesponzorovala").
+        </p>
+    }
+
+    @if (StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO))
+    {
+        <hr />
+        <div>
+            <h4>Sponzorování politických stran osobami angažovanými v tomto subjektu</h4>
+            <ul>
+                @foreach (var os in StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy[Model.ICO])
+                {
+                    var o = Osoby.GetById.Get(os);
+                    var sponz = o.Sponzoring();
+                    <li>
+                        <a href="@o.GetUrl()">@o.FullNameWithYear()</a> sponzoroval @HlidacStatu.Util.RenderData.RenderList(sponz.Select(m => m.JmenoPrijemce()).Distinct(), ending: "")
+                        v celkové výši <b>@HlidacStatu.Util.RenderData.NicePrice(sponz.Sum(m => m.Hodnota) ?? 0)</b>.
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+
+</div>

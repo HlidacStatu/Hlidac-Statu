@@ -1,0 +1,80 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+		<VersionSuffix>1.0.0.$([System.DateTime]::UtcNow.ToString(mmff))</VersionSuffix>
+		<AssemblyVersion Condition=" '$(VersionSuffix)' == '' ">1.0.0.0</AssemblyVersion>
+		<AssemblyVersion Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)</AssemblyVersion>
+		<Version Condition=" '$(VersionSuffix)' == '' ">1.0.0.0</Version>
+		<Version Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)</Version>
+		<TargetFramework>net5.0</TargetFramework>
+        <UserSecretsId>aspnet-Web-D6658176-CBA9-44EA-823F-F6C01A8F3EE9</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <AssemblyName>HlidacStatu.Web</AssemblyName>
+        <RootNamespace>HlidacStatu.Web</RootNamespace>
+<!--    Zapíná kontrolu (warningy) na potencionální null reference error -->
+        <Nullable>enable</Nullable>
+<!--    Generuje XML dokumentaci (komentáře metod) pro swagger -->
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    </PropertyGroup>
+
+<!--    Některé soubory (automaticky kopírované) je potřeba nejprve odstranit ze seznamu, 
+        aby při publish nevznikla chyba -->
+    <ItemGroup>
+        <None Remove="_app_offline.htm" />
+        <Content Remove="App_Data\**" />
+    </ItemGroup>
+
+<!--    Potom je potřeba nakopírovat obsah složky App_data a soubor _app_offline.htm -->
+    <ItemGroup>
+        <Content Include="App_Data\**" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <PackageReference Include="Devmasters.Core" Version="2.3.3" />
+        <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.2.0" />
+        <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.311" />
+        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.17.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.7">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.1.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Datasets\Datasets.csproj" />
+      <ProjectReference Include="..\DBUpgrader\DBUpgrader.csproj" />
+      <ProjectReference Include="..\DetectFaces\DetectFaces.csproj" />
+      <ProjectReference Include="..\Entities\Entities.csproj" />
+      <ProjectReference Include="..\HlidacStatu.ExportData\HlidacStatu.ExportData.csproj" />
+      <ProjectReference Include="..\HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj" />
+      <ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
+      <ProjectReference Include="..\HlidacStatu.Q\HlidacStatu.Q.csproj" />
+      <ProjectReference Include="..\KIndexGenerator\KIndexGenerator.csproj" />
+      <ProjectReference Include="..\LibCore\LibCore.csproj" />
+      <ProjectReference Include="..\Plugin.Enhancers\Plugin.Enhancers.csproj" />
+      <ProjectReference Include="..\Plugin.IssueAnalyzers\Plugin.IssueAnalyzers.csproj" />
+      <ProjectReference Include="..\Util\Util.csproj" />
+      <ProjectReference Include="..\XLib\XLib.csproj" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <None Update="Logger.log4net">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>
