@@ -143,6 +143,22 @@ namespace HlidacStatu.Web
                 c.SwaggerEndpoint("/swagger/v2/swagger.json", "API V2");
                 //c.RoutePrefix = "api/v2/swagger";
             });
+
+
+            //redirect rules
+            app.Use(async (context, next) =>
+            {
+                var url = context.Request.Path.Value;
+
+                // Redirect to an external URL
+                if (url?.ToLower()?.StartsWith("/account/")==true)
+                {
+                    context.Response.Redirect("https://www.hlidacstatu.cz/Identity" + url + context.Request.QueryString.Value);
+                    return;   // short circuit
+                }
+
+                await next();
+            });
             
             app.UseRouting();
 
