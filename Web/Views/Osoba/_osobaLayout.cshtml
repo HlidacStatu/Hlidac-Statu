@@ -11,7 +11,7 @@
     ViewBag.SocialShareTitle = $"{Model.osoba.FullNameWithYear()}";
     ViewBag.SocialShareText = HlidacStatu.Util.InfoFact.RenderInfoFacts(Model.osoba.InfoFacts(), 4, true, true, ", ");
     ViewBag.SocialShareType = "article";
-    ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/subjekt?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId;
+    ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId;
     ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"
                 + "<meta property=\"og:image:height\" content=\"1080\" />"
                 + "<meta property=\"og:image:type\" content=\"image/png\" />";
@@ -55,6 +55,15 @@
     <script src="/scripts/highcharts-6/modules/treemap.js"></script>
     @* Přidá barevnou paletu ke grafům *@
     @Html.GraphTheme()
+}
+@section onlyembed
+{
+    @*@Html.Action("CachedAction_Child_12H", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed", key = Model.NameId, param1 = aktualnost.ToString() })*@
+    @*@Html.Action("Osoba_child", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed" })*@
+
+    <a href="@Model.osoba.GetUrl(false)" target="_top">
+    <img src="@($"https://www.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId)" style="width:95%;height:auto;max-width:@(ViewBag.MaxWidth)px" />
+    </a>
 }
 
 <style>

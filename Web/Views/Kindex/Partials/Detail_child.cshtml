@@ -43,7 +43,7 @@
 
     Statistics statistics = Statistics.GetStatistics(selectedYear);
 
-    Func<decimal, decimal, decimal, int> sirkaGrafu = (hodnota, koeficient, celek) => { return (int) Math.Round((hodnota * koeficient / celek * 100), 0); };
+    Func<decimal, decimal, decimal, int> sirkaGrafu = (hodnota, koeficient, celek) => { return (int)Math.Round((hodnota * koeficient / celek * 100), 0); };
 
     Func<decimal, int, int> kindexMeter = (kind, labelValue) =>
     {
@@ -58,14 +58,14 @@
         decimal widthPerc = Math.Ceiling(calculation * 100);
 
         int result = (labelValue == 5)
-            ? (int) Math.Ceiling((widthPerc / ((maxValue - 5 * constant) / constant)))
-            : (int) widthPerc;
+            ? (int)Math.Ceiling((widthPerc / ((maxValue - 5 * constant) / constant)))
+            : (int)widthPerc;
 
 
         return (result > 100) ? 100 : result;
 
 //return (int)Math.Round(((kind / constant) - labelValue) *100 ,0);
-    };
+};
 }
 
 
@@ -160,7 +160,7 @@
         </alert-modal>
 
         <partial name="WebUtil/FeedbackUniversal"
-                 model="@(new FeedbackUniversalViewModel("Přepočítat K-Index", "Pokud jste upravili své smlouvy v registru smluv, můžete si nechat přepočítat svůj K-Index. Přepočítání může trvat v závislosti na vytížení našich serverů několik dní. Pro přepočítání musíte být zaregistrováni.", "Důvod pro přepočítání", "Přepočítat K-Index", "/kindex/recalculateFeedback", mustAuth: true, addData: Model.Ico))"/>
+                 model="@(new FeedbackUniversalViewModel("Přepočítat K-Index", "Pokud jste upravili své smlouvy v registru smluv, můžete si nechat přepočítat svůj K-Index. Přepočítání může trvat v závislosti na vytížení našich serverů několik dní. Pro přepočítání musíte být zaregistrováni.", "Důvod pro přepočítání", "Přepočítat K-Index", "/kindex/recalculateFeedback", mustAuth: true, addData: Model.Ico))" />
 
     </div>
 }
@@ -222,6 +222,13 @@ else
                     </div>
                 </div>
             }
+            <div>
+                <span style="vertical-align: top; font-size: 18px;margin-right:3px;">Sdílet K-Index </span>
+                <share-facebook></share-facebook>
+                <share-twitter text="Hodnocení K-Index od @@HlidacStatu pro @Model.Jmeno"></share-twitter>
+                <share-widget></share-widget>
+            </div>
+
         </div>
     </div>
 }
@@ -248,17 +255,16 @@ else
         @foreach (var feedback in feedbacks)
         {
             <a href="/kindex/feedback/@feedback.Id">@(feedback.SignDate?.ToString("dd.MM.yyyy") ?? "???") @feedback.Author</a>
-            <br/>
+            <br />
         }
     </div>
 }
-
 <div class="bs-callout bs-callout-primary" style="padding-bottom:30px;">
     <h4>Rating K–Index</h4>
     <p>
         Veřejná správa a státní firmy hospodaří s prostředky občanů ČR. Každá organizace se chová jinak,
         dodržuje zákon, metodiky a doporučení v různé míře. Zanalyzovali jsme více než
-        @HlidacStatu.Util.RenderData.NiceNumber((decimal) Math.Round(StaticData.BasicStatisticData.Get()[0] / 10000) * 10000) smluv, dvacet tisíc organizací a
+        @HlidacStatu.Util.RenderData.NiceNumber((decimal)Math.Round(StaticData.BasicStatisticData.Get()[0] / 10000) * 10000) smluv, dvacet tisíc organizací a
         zanalyzovali jejich transparentnost, dodržování zákona a nakládání s veřejnými penězi.
     </p>
     <p>
@@ -291,7 +297,7 @@ else
     return;
 }
 <div style="padding:20px 0;"></div>
-<hr style="width:30%;margin:auto"/>
+<hr style="width:30%;margin:auto" />
 <div style="padding:20px 0;"></div>
 
 <h2>Podrobný výpočet K–Indexu pro organizaci @(firma.Jmeno)</h2>
@@ -519,171 +525,171 @@ else
 
         <table class="table table-no-border">
             <tbody>
-            <tr>
-                <td style="font-size:15px;">
-                    <b>Parametr</b><br/>
-                </td>
-                <td style="font-size: 15px; text-align: right">
-                    <b>Hodnota parametru</b>
-                </td>
-                <td style="font-size: 15px;">
-                    <b>Komentář</b>
-                </td>
-            </tr>
-            @foreach (var part in EnumTools.EnumToEnumerable<KIndexData.KIndexParts>())
-            {
-                var radek = currYear.KIndexVypocet.Radky.FirstOrDefault(m => m.VelicinaPart == part.Value);
-                if (radek == null)
-                {
-                    break;
-                }
-
-
                 <tr>
                     <td style="font-size:15px;">
-                        @radek.VelicinaLongName
-                        <small>
-                            <a href="#detail_@((KIndexData.KIndexParts) radek.Velicina)" onclick="showHelp(this,'#detail_@(radek.Velicina)');return false;">@ukazatTxt</a>
-                        </small>
+                        <b>Parametr</b><br />
                     </td>
-                    <td style="text-align:right;font-size: 15px;vertical-align: top; color: @(KIndexData.KIndexLabelColor(KIndexData.DetailInfo.KIndexLabelForPart((KIndexData.KIndexParts) radek.Velicina, radek.Hodnota)))">
-                        @Html.KIndexIcon(KIndexData.DetailInfo.KIndexLabelForPart(radek.VelicinaPart, radek.Hodnota), "height:25px")
+                    <td style="font-size: 15px; text-align: right">
+                        <b>Hodnota parametru</b>
                     </td>
-                    <td>
-                        @(KIndexData.KIndexCommentForPart(radek.VelicinaPart, currYear))
+                    <td style="font-size: 15px;">
+                        <b>Komentář</b>
                     </td>
                 </tr>
-                <tr style="border-bottom:dotted 2px #E0E6ED">
+                @foreach (var part in EnumTools.EnumToEnumerable<KIndexData.KIndexParts>())
+                {
+                    var radek = currYear.KIndexVypocet.Radky.FirstOrDefault(m => m.VelicinaPart == part.Value);
+                    if (radek == null)
+                    {
+                        break;
+                    }
+
+
+                    <tr>
+                        <td style="font-size:15px;">
+                            @radek.VelicinaLongName
+                            <small>
+                                <a href="#detail_@((KIndexData.KIndexParts) radek.Velicina)" onclick="showHelp(this,'#detail_@(radek.Velicina)');return false;">@ukazatTxt</a>
+                            </small>
+                        </td>
+                        <td style="text-align:right;font-size: 15px;vertical-align: top; color: @(KIndexData.KIndexLabelColor(KIndexData.DetailInfo.KIndexLabelForPart((KIndexData.KIndexParts) radek.Velicina, radek.Hodnota)))">
+                            @Html.KIndexIcon(KIndexData.DetailInfo.KIndexLabelForPart(radek.VelicinaPart, radek.Hodnota), "height:25px")
+                        </td>
+                        <td>
+                            @(KIndexData.KIndexCommentForPart(radek.VelicinaPart, currYear))
+                        </td>
+                    </tr>
+                    <tr style="border-bottom:dotted 2px #E0E6ED">
+                        <td colspan="4" style="padding:0">
+                            <div id="detail_@radek.Velicina" style="display:none">
+                                <div class="row">
+                                    <div class="col-xs-11 col-lg-offset-1 box-stats">
+                                        <h3>
+                                            Číselná hodnota parametru je @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(radek.Hodnota, true)).
+                                            Hodnotu tohoto parametru hodnotíme
+                                            @Html.KIndexIcon(KIndexData.DetailInfo.KIndexLabelForPart(radek.VelicinaPart, radek.Hodnota), "height:19px").
+
+                                        </h3>
+                                        @switch (radek.VelicinaPart)
+                                        {
+                                            case KIndexData.KIndexParts.PercentBezCeny:
+                                            case KIndexData.KIndexParts.PercSeZasadnimNedostatkem:
+                                            case KIndexData.KIndexParts.PercSmluvUlimitu:
+                                            case KIndexData.KIndexParts.PercNovaFirmaDodavatel:
+                                            case KIndexData.KIndexParts.PercUzavrenoOVikendu:
+                                            case KIndexData.KIndexParts.PercSmlouvySPolitickyAngazovanouFirmou:
+                                                await ParametrDetail(currYear, radek.VelicinaPart, statistics);
+                                                break;
+                                            case KIndexData.KIndexParts.KoncentraceDodavateluObory:
+                                                await KoncentraceDetailObory(currYear, radek.VelicinaPart, statistics);
+                                                break;
+
+                                            case KIndexData.KIndexParts.CelkovaKoncentraceDodavatelu:
+                                            case KIndexData.KIndexParts.KoncentraceDodavateluBezUvedeneCeny:
+                                            case KIndexData.KIndexParts.KoncentraceDodavateluCenyULimitu:
+                                                await KoncentraceDetail(currYear, radek.VelicinaPart, statistics);
+                                                break;
+                                            case KIndexData.KIndexParts.PercSmlouvyPod50kBonus:
+                                                await ParametrDescr(currYear, radek.VelicinaPart, false, "well");
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td>
+                        <span style="font-weight:bold;font-size:130%">Součet bodů = K–Index</span>
+                        <small>
+                            <a href="#detail_celkem" onclick="showHelp(this,'#detail_celkem');return false;">@ukazatTxt</a>
+                        </small>
+                    </td>
+                    <td style="text-align:right">@Html.KIndexIcon(currYear.KIndexLabel, "height:30px")</td>
+                    <td style="font-size:130%">
+                        Počet bodů <b>@kindexValue.ToString("F2")</b>
+                    </td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
                     <td colspan="4" style="padding:0">
-                        <div id="detail_@radek.Velicina" style="display:none">
+                        <div id="detail_celkem" style="display:none">
                             <div class="row">
                                 <div class="col-xs-11 col-lg-offset-1 box-stats">
-                                    <h3>
-                                        Číselná hodnota parametru je @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(radek.Hodnota, true)).
-                                        Hodnotu tohoto parametru hodnotíme
-                                        @Html.KIndexIcon(KIndexData.DetailInfo.KIndexLabelForPart(radek.VelicinaPart, radek.Hodnota), "height:19px").
+                                    <p>
+                                        Počet bodů <b>@kindexValue.ToString("F2")</b> znamená pro @Model.Jmeno celkově
+                                        @(statistics.SubjektRank(Model.Ico)). místo z @(statistics.SubjektOrderedListKIndexAsc.Count).
+                                    </p>
+                                    <p>
+                                        Výpočet celkového počtu bodů je jednoduchý. Sečtou se body u jednotlivých parametrů a
+                                        výsledek se poté (pro lepší čitelnost) vynásobí deseti.
+                                    </p>
+                                    <p>
+                                        <table class="table table-condensed table-no-border" style="width:auto">
+                                            <thead>
+                                                <tr>
+                                                    <th>Parametr</th>
+                                                    <th>Počet bodů</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var r in currYear.KIndexVypocet.Radky
+                                                   .Where(m => m.VelicinaPart != KIndexData.KIndexParts.PercSmlouvyPod50kBonus)
+                                                   )
+                                                {
+                                                    <tr>
+                                                        <td>@r.VelicinaLongName</td>
+                                                        <td class="number">+ @(r.Hodnota.ToString("N4")) </td>
+                                                    </tr>
+                                                }
+                                                <tr>
+                                                    <td>
+                                                        Mezisoučet
+                                                        <br />(pro lepší čitelnost)
+                                                    </td>
+                                                    <td class="number" style="border-top:2px double black">
 
-                                    </h3>
-                                    @switch (radek.VelicinaPart)
-                                    {
-                                        case KIndexData.KIndexParts.PercentBezCeny:
-                                        case KIndexData.KIndexParts.PercSeZasadnimNedostatkem:
-                                        case KIndexData.KIndexParts.PercSmluvUlimitu:
-                                        case KIndexData.KIndexParts.PercNovaFirmaDodavatel:
-                                        case KIndexData.KIndexParts.PercUzavrenoOVikendu:
-                                        case KIndexData.KIndexParts.PercSmlouvySPolitickyAngazovanouFirmou:
-                                            await ParametrDetail(currYear, radek.VelicinaPart, statistics);
-                                            break;
-                                        case KIndexData.KIndexParts.KoncentraceDodavateluObory:
-                                            await KoncentraceDetailObory(currYear, radek.VelicinaPart, statistics);
-                                            break;
+                                                        @(currYear.KIndexVypocet.Radky
+                                                    .Where(m => m.VelicinaPart != KIndexData.KIndexParts.PercSmlouvyPod50kBonus)
+                                                    .Sum(m => m.Hodnota).ToString("N3"))
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        x 10 (pro lepší čitelnost)
+                                                    </td>
+                                                    <td class="number" style="border-top:2px double black">
+                                                        @(currYear.KIndexVypocet.Radky
+                                                    .Where(m => m.VelicinaPart != KIndexData.KIndexParts.PercSmlouvyPod50kBonus)
+                                                    .Sum(m => m.Hodnota * 10).ToString("N2"))
+                                                    </td>
+                                                </tr>
+                                                @if (currYear.KIndexVypocet.Radky.FirstOrDefault(m => m.VelicinaPart == KIndexData.KIndexParts.PercSmlouvyPod50kBonus)?.Hodnota > 0)
+                                                {
+                                                    <tr>
+                                                        <td>Odečíst bonus za transparentnost</td>
+                                                        <td class="number">@HlidacStatu.Util.RenderData.NiceNumber(currYear.KIndexVypocet.Radky.FirstOrDefault(m => m.VelicinaPart == KIndexData.KIndexParts.PercSmlouvyPod50kBonus).Hodnota)</td>
+                                                    </tr>
+                                                }
+                                                <tr>
+                                                    <td>
+                                                        <b>Výsledný K-Index</b>
+                                                    </td>
+                                                    <td class="number" style="border-top:2px double black;font-weight:bold">@currYear.KIndexVypocet.Vypocet().ToString("N")</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </p>
+                                    <img src="/kindex/PercentileBanner/@Model.Ico" style="width:80%;max-width:800px;height:auto" />
 
-                                        case KIndexData.KIndexParts.CelkovaKoncentraceDodavatelu:
-                                        case KIndexData.KIndexParts.KoncentraceDodavateluBezUvedeneCeny:
-                                        case KIndexData.KIndexParts.KoncentraceDodavateluCenyULimitu:
-                                            await KoncentraceDetail(currYear, radek.VelicinaPart, statistics);
-                                            break;
-                                        case KIndexData.KIndexParts.PercSmlouvyPod50kBonus:
-                                            await ParametrDescr(currYear, radek.VelicinaPart, false, "well");
-                                            break;
-                                        default:
-                                            break;
-                                    }
                                 </div>
                             </div>
                         </div>
                     </td>
                 </tr>
-            }
-            <tr>
-                <td>
-                    <span style="font-weight:bold;font-size:130%">Součet bodů = K–Index</span>
-                    <small>
-                        <a href="#detail_celkem" onclick="showHelp(this,'#detail_celkem');return false;">@ukazatTxt</a>
-                    </small>
-                </td>
-                <td style="text-align:right">@Html.KIndexIcon(currYear.KIndexLabel, "height:30px")</td>
-                <td style="font-size:130%">
-                    Počet bodů <b>@kindexValue.ToString("F2")</b>
-                </td>
-                <td>&nbsp;</td>
-            </tr>
-            <tr>
-                <td colspan="4" style="padding:0">
-                    <div id="detail_celkem" style="display:none">
-                        <div class="row">
-                            <div class="col-xs-11 col-lg-offset-1 box-stats">
-                                <p>
-                                    Počet bodů <b>@kindexValue.ToString("F2")</b> znamená pro @Model.Jmeno celkově
-                                    @(statistics.SubjektRank(Model.Ico)). místo z @(statistics.SubjektOrderedListKIndexAsc.Count).
-                                </p>
-                                <p>
-                                    Výpočet celkového počtu bodů je jednoduchý. Sečtou se body u jednotlivých parametrů a
-                                    výsledek se poté (pro lepší čitelnost) vynásobí deseti.
-                                </p>
-                                <p>
-                                    <table class="table table-condensed table-no-border" style="width:auto">
-                                        <thead>
-                                        <tr>
-                                            <th>Parametr</th>
-                                            <th>Počet bodů</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @foreach (var r in currYear.KIndexVypocet.Radky
-                                            .Where(m => m.VelicinaPart != KIndexData.KIndexParts.PercSmlouvyPod50kBonus)
-                                            )
-                                        {
-                                            <tr>
-                                                <td>@r.VelicinaLongName</td>
-                                                <td class="number">+ @(r.Hodnota.ToString("N4")) </td>
-                                            </tr>
-                                        }
-                                        <tr>
-                                            <td>
-                                                Mezisoučet
-                                                <br/>(pro lepší čitelnost)
-                                            </td>
-                                            <td class="number" style="border-top:2px double black">
-
-                                                @(currYear.KIndexVypocet.Radky
-                                                    .Where(m => m.VelicinaPart != KIndexData.KIndexParts.PercSmlouvyPod50kBonus)
-                                                    .Sum(m => m.Hodnota).ToString("N3"))
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                x 10 (pro lepší čitelnost)
-                                            </td>
-                                            <td class="number" style="border-top:2px double black">
-                                                @(currYear.KIndexVypocet.Radky
-                                                    .Where(m => m.VelicinaPart != KIndexData.KIndexParts.PercSmlouvyPod50kBonus)
-                                                    .Sum(m => m.Hodnota * 10).ToString("N2"))
-                                            </td>
-                                        </tr>
-                                        @if (currYear.KIndexVypocet.Radky.FirstOrDefault(m => m.VelicinaPart == KIndexData.KIndexParts.PercSmlouvyPod50kBonus)?.Hodnota > 0)
-                                        {
-                                            <tr>
-                                                <td>Odečíst bonus za transparentnost</td>
-                                                <td class="number">@HlidacStatu.Util.RenderData.NiceNumber(currYear.KIndexVypocet.Radky.FirstOrDefault(m => m.VelicinaPart == KIndexData.KIndexParts.PercSmlouvyPod50kBonus).Hodnota)</td>
-                                            </tr>
-                                        }
-                                        <tr>
-                                            <td>
-                                                <b>Výsledný K-Index</b>
-                                            </td>
-                                            <td class="number" style="border-top:2px double black;font-weight:bold">@currYear.KIndexVypocet.Vypocet().ToString("N")</td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </p>
-                                <img src="/kindex/PercentileBanner/@Model.Ico" style="width:80%;max-width:800px;height:auto"/>
-
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
 
             </tbody>
         </table>
@@ -697,7 +703,7 @@ else
 
 @if (previousKindexes.Count() > 0)
 {
-    <hr style="margin-top:50px"/>
+    <hr style="margin-top:50px" />
     <p>
         U tohoto subjektu jsme K-Index už @(previousKindexes.Count())x přepočítali. Můžete se podívat i na historické výsledky K-Indexu.
     </p>
@@ -718,7 +724,7 @@ else
     //KIndexData
 }
 
-<hr style="margin-top:50px"/>
+<hr style="margin-top:50px" />
 
 @functions
 {
@@ -777,7 +783,7 @@ else
         {
             <h3>Jaké jsou obvyklé hodnoty parametru @vradek.VelicinaLongName?</h3>
             <div class="well well-sm">
-                <img src="/kindex/PercentileBanner/@Model.Ico?part=@((int) vradek.VelicinaPart)" style="width:80%;max-width:800px;height:auto"/>
+                <img src="/kindex/PercentileBanner/@Model.Ico?part=@((int) vradek.VelicinaPart)" style="width:80%;max-width:800px;height:auto" />
             </div>
         }
     }
@@ -834,7 +840,7 @@ else
 
                     <h3>Jaké jsou obvyklé hodnoty tohoto parametru?</h3>
                     <div class="well well-sm">
-                        <img src="/kindex/PercentileBanner/@Model.Ico?part=@((int) vradek.VelicinaPart)" style="margin-left:-15%;width:115%;max-width:900px;height:auto"/>
+                        <img src="/kindex/PercentileBanner/@Model.Ico?part=@((int) vradek.VelicinaPart)" style="margin-left:-15%;width:115%;max-width:900px;height:auto" />
                     </div>
                 </div>
                 <div class="col-xs-12 col-sm-6">
@@ -842,42 +848,42 @@ else
                     <low-box width="500">
                         <table class="table table-new table-new--dotted table-hover">
                             <thead>
-                            <tr>
-                                <th></th>
-                                <th>Dodavatel</th>
-                                <th>Počet smluv</th>
-                                @if (showHodnota)
-                                {
-                                    <th>Kalkulovaná částka* v Kč</th>
-                                }
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach (var souh in koncentrace.Dodavatele.OrderByDescending(m => m.HodnotaSmluv).Take(100))
-                            {
-                                var q = $"icoplatce:{currYear.Ico} AND datumUzavreni:[{currYear.Rok}-01-01 TO {currYear.Rok + 1}-01-01}} AND icoPrijemce:{souh.Ico}";
                                 <tr>
-                                    <td>
-                                        <a href="/HledatSmlouvy?Q=@System.Net.WebUtility.UrlEncode(q)">
-                                            <i class="far fa-file-search"></i>
-                                        </a>
-                                    </td>
-                                    <td>@Firmy.GetJmeno(souh.Ico)</td>
-                                    <td class="number">@HlidacStatu.Util.RenderData.NiceNumber(souh.PocetSmluv)</td>
+                                    <th></th>
+                                    <th>Dodavatel</th>
+                                    <th>Počet smluv</th>
                                     @if (showHodnota)
                                     {
-                                        <td class="number text-nowrap">@HlidacStatu.Util.RenderData.NicePrice(souh.HodnotaSmluv)</td>
+                                        <th>Kalkulovaná částka* v Kč</th>
                                     }
                                 </tr>
-                            }
+                            </thead>
+                            <tbody>
+                                @foreach (var souh in koncentrace.Dodavatele.OrderByDescending(m => m.HodnotaSmluv).Take(100))
+                                {
+                                    var q = $"icoplatce:{currYear.Ico} AND datumUzavreni:[{currYear.Rok}-01-01 TO {currYear.Rok + 1}-01-01}} AND icoPrijemce:{souh.Ico}";
+                                    <tr>
+                                        <td>
+                                            <a href="/HledatSmlouvy?Q=@System.Net.WebUtility.UrlEncode(q)">
+                                                <i class="far fa-file-search"></i>
+                                            </a>
+                                        </td>
+                                        <td>@Firmy.GetJmeno(souh.Ico)</td>
+                                        <td class="number">@HlidacStatu.Util.RenderData.NiceNumber(souh.PocetSmluv)</td>
+                                        @if (showHodnota)
+                                        {
+                                            <td class="number text-nowrap">@HlidacStatu.Util.RenderData.NicePrice(souh.HodnotaSmluv)</td>
+                                        }
+                                    </tr>
+                                }
                             </tbody>
                             <tfoot>
-                            <tr>
-                                <td colspan="@(showHodnota ? 4 : 3)">
-                                    *) Kalkulováná částka je suma smluv s hodnotou a smluv bez uvedené ceny, kde jsme použili průměrnou hodnotu smluv
-                                    @(Model.Jmeno) v @(currYear.Rok) ve výši @HlidacStatu.Util.RenderData.NicePrice(koncentrace.PrumernaHodnotaSmluvProVypocet)
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colspan="@(showHodnota ? 4 : 3)">
+                                        *) Kalkulováná částka je suma smluv s hodnotou a smluv bez uvedené ceny, kde jsme použili průměrnou hodnotu smluv
+                                        @(Model.Jmeno) v @(currYear.Rok) ve výši @HlidacStatu.Util.RenderData.NicePrice(koncentrace.PrumernaHodnotaSmluvProVypocet)
+                                    </td>
+                                </tr>
                             </tfoot>
                         </table>
                     </low-box>
@@ -899,7 +905,7 @@ else
             <div class="col-xs-12 col-sm-6">
                 <h3>Jaké jsou obvyklé hodnoty tohoto parametru?</h3>
                 <div class="well well-sm">
-                    <img src="/kindex/PercentileBanner/@Model.Ico?part=@((int) vradek.VelicinaPart)" style="width:115%;margin-left:-15%;:800px;height:auto"/>
+                    <img src="/kindex/PercentileBanner/@Model.Ico?part=@((int) vradek.VelicinaPart)" style="width:115%;margin-left:-15%;:800px;height:auto" />
                 </div>
             </div>
 
@@ -944,23 +950,23 @@ else
                         </p>
                     }
                     <a class="btn btn-default" href="/hledatsmlouvy?q=@System.Net.WebUtility.UrlEncode(currYear.Info(part).Query(ro.Obor))">Vyhledat odpovídající smlouvy</a>
-                    <hr style="width:50%"/>
+                    <hr style="width:50%" />
                     <div class="row">
                         <div class="col-xs-12">
                             @{
-                KoncentraceDodavateluIndexy koncentrace = currYear.KoncetraceDodavateluObory
-                    .First(o => o.OborName == ro.Obor)
-                    .Koncentrace;
+                                KoncentraceDodavateluIndexy koncentrace = currYear.KoncetraceDodavateluObory
+                                    .First(o => o.OborName == ro.Obor)
+                                    .Koncentrace;
 
-                List<Tuple<string, decimal>> data = koncentrace.TopDodavatele(3)
-                    .OrderByDescending(m => m.HodnotaSmluv)
-                    .Select(m => new Tuple<string, decimal>(Firmy.GetJmeno(m.Ico), m.HodnotaSmluv))
-                    .Take(12)
-                    .ToList();
-                if (koncentrace.HodnotaSmluvProVypocet - data.Sum(m => m.Item2) > 0)
-                {
-                    data.Add(new Tuple<string, decimal>("ostatní", koncentrace.HodnotaSmluvProVypocet - data.Sum(m => m.Item2)));
-                }
+                                List<Tuple<string, decimal>> data = koncentrace.TopDodavatele(3)
+                                    .OrderByDescending(m => m.HodnotaSmluv)
+                                    .Select(m => new Tuple<string, decimal>(Firmy.GetJmeno(m.Ico), m.HodnotaSmluv))
+                                    .Take(12)
+                                    .ToList();
+                                if (koncentrace.HodnotaSmluvProVypocet - data.Sum(m => m.Item2) > 0)
+                                {
+                                    data.Add(new Tuple<string, decimal>("ostatní", koncentrace.HodnotaSmluvProVypocet - data.Sum(m => m.Item2)));
+                                }
                             }
                             <div class="row">
                                 <div class="col-xs-12 col-sm-6">
@@ -970,37 +976,37 @@ else
                                     <low-box width="250">
                                         <table class="table table-new table-new--dotted table-hover">
                                             <thead>
-                                            <tr>
-                                                <th></th>
-                                                <th>Dodavatel</th>
-                                                <th>Počet smluv</th>
-                                                <th>Kalkulovaná částka* v Kč</th>
-                                            </tr>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>Dodavatel</th>
+                                                    <th>Počet smluv</th>
+                                                    <th>Kalkulovaná částka* v Kč</th>
+                                                </tr>
                                             </thead>
                                             <tbody>
-                                            @foreach (var souh in koncentrace.Dodavatele.OrderByDescending(m => m.HodnotaSmluv).Take(100))
-                                            {
-                                                var q = $"icoplatce:{currYear.Ico} AND datumUzavreni:[{currYear.Rok}-01-01 TO {currYear.Rok + 1}-01-01}} AND icoPrijemce:{souh.Ico}";
-                                                q = q + $" AND oblast:{ro.Obor}";
-                                                <tr>
-                                                    <td>
-                                                        <a href="/HledatSmlouvy?Q=@System.Net.WebUtility.UrlEncode(q)">
-                                                            <i class="far fa-file-search"></i>
-                                                        </a>
-                                                    </td>
-                                                    <td>@Firmy.GetJmeno(souh.Ico)</td>
-                                                    <td class="number">@HlidacStatu.Util.RenderData.NiceNumber(souh.PocetSmluv)</td>
-                                                    <td class="number text-nowrap">@HlidacStatu.Util.RenderData.NicePrice(souh.HodnotaSmluv)</td>
-                                                </tr>
-                                            }
+                                                @foreach (var souh in koncentrace.Dodavatele.OrderByDescending(m => m.HodnotaSmluv).Take(100))
+                                                {
+                                                    var q = $"icoplatce:{currYear.Ico} AND datumUzavreni:[{currYear.Rok}-01-01 TO {currYear.Rok + 1}-01-01}} AND icoPrijemce:{souh.Ico}";
+                                                    q = q + $" AND oblast:{ro.Obor}";
+                                                    <tr>
+                                                        <td>
+                                                            <a href="/HledatSmlouvy?Q=@System.Net.WebUtility.UrlEncode(q)">
+                                                                <i class="far fa-file-search"></i>
+                                                            </a>
+                                                        </td>
+                                                        <td>@Firmy.GetJmeno(souh.Ico)</td>
+                                                        <td class="number">@HlidacStatu.Util.RenderData.NiceNumber(souh.PocetSmluv)</td>
+                                                        <td class="number text-nowrap">@HlidacStatu.Util.RenderData.NicePrice(souh.HodnotaSmluv)</td>
+                                                    </tr>
+                                                }
                                             </tbody>
                                             <tfoot>
-                                            <tr>
-                                                <td colspan="4">
-                                                    *) Kalkulováná částka je suma smluv s hodnotou a smluv bez uvedené ceny, kde jsme použili průměrnou hodnotu smluv
-                                                    @(Model.Jmeno) v @(currYear.Rok) ve výši @HlidacStatu.Util.RenderData.NicePrice(koncentrace.PrumernaHodnotaSmluvProVypocet)
-                                                </td>
-                                            </tr>
+                                                <tr>
+                                                    <td colspan="4">
+                                                        *) Kalkulováná částka je suma smluv s hodnotou a smluv bez uvedené ceny, kde jsme použili průměrnou hodnotu smluv
+                                                        @(Model.Jmeno) v @(currYear.Rok) ve výši @HlidacStatu.Util.RenderData.NicePrice(koncentrace.PrumernaHodnotaSmluvProVypocet)
+                                                    </td>
+                                                </tr>
                                             </tfoot>
 
                                         </table>
