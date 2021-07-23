@@ -3,7 +3,7 @@
 
 @model (HlidacStatu.Entities.Firma firma, string viewName, string title)
 
-@{ 
+@{
     ViewBag.Title = Model.title;
     ViewBag.HideTitle = true;
 
@@ -21,8 +21,8 @@
 @section metatags
 {
 
-    @if ( Model.firma != null 
-         && HlidacStatu.Web.Framework.Constants.DontIndexICOS.Contains(Model.firma.ICO.ToLower()))
+    @if (Model.firma != null
+        && HlidacStatu.Web.Framework.Constants.DontIndexICOS.Contains(Model.firma.ICO.ToLower()))
     {
         <meta name="robots" content="noindex, noarchive">
     }
@@ -53,15 +53,24 @@
     <script src="/scripts/highcharts-6/modules/heatmap.js"></script>
     <script src="/scripts/highcharts-6/modules/treemap.js"></script>
     @* Přidá barevnou paletu ke grafům *@
-    @Html.GraphTheme() 
+    @Html.GraphTheme()
 }
+@section onlyembed
+{
+    @*@Html.Action("CachedAction_Child_12H", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed", key = Model.NameId, param1 = aktualnost.ToString() })*@
+    @*@Html.Action("Osoba_child", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed" })*@
 
+    <a href="@Model.firma.GetUrl(false)" target="_top">
+    <img src="@($"https://www.hlidacstatu.cz/socialbanner/subjekt?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.firma.ICO)" style="height:95%;width:auto;max-width:@(ViewBag.MaxWidth)px" />
+    </a>
+}
 <style>
     .sub-header-info {
         padding-bottom: 10px;
         font-size: 1em;
         margin-top: -4px;
     }
+
     .my-0 {
         margin-top: 0px;
         margin-bottom: 0px;
@@ -93,10 +102,12 @@
         text-transform: none;
         font-size: 14px;
     }
+
     .moreinfolink {
         padding-top: 10px;
         display: block;
     }
+
     hr {
         border-top: 3px dotted #E0E6ED;
         margin-top: 24px;
@@ -115,22 +126,22 @@
         }
     </h3>
     <cache expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}")">
-        <partial name="WebUtil/CompanySummary" model="@Model.firma"/>
+        <partial name="WebUtil/CompanySummary" model="@Model.firma" />
     </cache>
 </div>
-    <hr />
-    
+<hr />
+
 
 <div class="row boxes">
     @* Pravý sloupec *@
     <cache enabled="false" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{User.Identity.IsAuthenticated}")">
-        <partial name="RightColumn" model="@Model.firma"/>
+        <partial name="RightColumn" model="@Model.firma" />
     </cache>
-    
-@* Prázdný sloupec *@
+
+    @* Prázdný sloupec *@
     <div class="col-sm-1"></div>
     <cache expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{Model.viewName}_{User.Identity.IsAuthenticated}")">
-        <partial name="@Model.viewName" model="@Model.firma"/>
+        <partial name="@Model.viewName" model="@Model.firma" />
     </cache>
 
 </div>

@@ -23,6 +23,9 @@ namespace HlidacStatu.LibCore.Services
         
         private ConcurrentDictionary<string, Attacker> Attackers { get; } = new();
 
+        const int SaveTimeBetweentAttacksInSec = 15*60; //inSec
+        const int PenaltyLimit = 150; //inSec
+
         public bool IsAttacker(IPAddress? ipAddress, int statusCode, string? path)
         {
             if (statusCode < 400)
@@ -40,25 +43,28 @@ namespace HlidacStatu.LibCore.Services
             
             var diff = (currentTime - attacker.Last).TotalSeconds;
 
-            if (diff >= 600)
+            //calculatePenalty
+            int penalty = statusCode switch
             {
-                attacker.Num = 1;
+                466 => 5, // hacker, možná použít Hlidac.ErrorCodes enum pro chybové kódy
+                >= 500 => 2, // server errors
+                >= 400 => 1, // not found, forbidden, ...
+                _ => 0
+            };
+
+
+            if (diff >= SaveTimeBetweentAttacksInSec && penalty > 0)
+            {
+                attacker.Num = penalty;
                 attacker.Paths.Clear();
             }
-            else
+            else if (penalty > 0)   
             {
-                attacker.Num += 1;
+                attacker.Num += penalty;
             }
             attacker.Paths.Add(path);
 
-            return statusCode switch
-            {
-                //migrace: přidat generování 466 response do error controlleru v případě problematických requestů podle global.asax
-                466 => attacker.Num > 10, // hacker, možná použít Hlidac.ErrorCodes enum pro chybové kódy
-                >=500 => attacker.Num > 15, // server errors
-                >=400 => attacker.Num > 20, // not found, forbidden, ...
-                _ => false
-            };
+            return attacker.Num > PenaltyLimit;
         }
 
         public string PathsForIp(IPAddress? ipAddress)

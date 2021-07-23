@@ -839,11 +839,12 @@ text zpravy: {txt}
 
         public ActionResult Widget(string id, string width)
         {
-            string path = Path.Combine(_hostingEnvironment.WebRootPath, "/Scripts/widget.js");  
+            string path = Path.Combine(_hostingEnvironment.WebRootPath, "Scripts\\widget.js");  
 
             string widgetjs = System.IO.File.ReadAllText(path)
                 .Replace("#RND#", id ?? Devmasters.TextUtil.GenRandomString(4))
-                .Replace("#MAXWIDTH#", width != null ? ",maxWidth:" + width : "")
+                .Replace("#MAXWIDTH#", width != null ? width.ToString() : "")
+                .Replace("#MAXWIDTHSCRIPT#", width != null ? ",maxWidth:" + width : "")
                 .Replace("#WEBROOT#", HttpContext.Request.Scheme + "://" + HttpContext.Request.Host)
                 ;
             return Content(widgetjs, "text/javascript");
@@ -1228,6 +1229,10 @@ text zpravy: {txt}
             }
 
             return Redirect(url);
+        }
+        public ActionResult Tmp()
+        {
+            return View();
         }
     }
 }

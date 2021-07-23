@@ -130,11 +130,11 @@
             if (widget.indexOf("?") !== -1)
                 widget = widget + '&embed=1';
             else
-                widget = widget + '?embed=1';
+                widget = widget + '?embed=1&maxwidth=#MAXWIDTH#';
             var caller = encodeURIComponent(window.document.location);
             var iframeContent = ''
                 + '<div style="text-align: right !important;font-size:80%"><a href="' + origPage + '" target="_top">Ukázat celou stránku</a>. (c) Hlídač Státu</div>'
-                + '<iframe onload="iFrameResize({ log: false #MAXWIDTH# });" style="border: 0;width:100%" frameborder="0" width="100%" border="0" cellspacing="0" src="' + widget
+                + '<iframe onload="iFrameResize({ log: false #MAXWIDTHSCRIPT# });" style="border: 0;width:100%" frameborder="0" width="100%" border="0" cellspacing="0" src="' + widget
                 + '&calledFrom=' + caller + '"></iframe>'
                 //+ '<div style="text-align: right !important;font-size:80%"><a href="' + origPage + '" target="_top">Ukázat celou stránku</a> z HlidacStatu.cz</div>'
             ;

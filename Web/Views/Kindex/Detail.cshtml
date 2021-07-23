@@ -117,6 +117,15 @@ $(document).ready(function(){
         <li class="active">@(ViewBag.Title + " " + ViewBag.SubTitle)</li>
     </ol>
 }
+@section onlyembed
+{
+    @*@Html.Action("CachedAction_Child_12H", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed", key = Model.NameId, param1 = aktualnost.ToString() })*@
+    @*@Html.Action("Osoba_child", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed" })*@
+
+    <a href="@kidx.GetUrl(false,Model.rok)" target="_top">
+    <img src="@($"https://www.hlidacstatu.cz/socialbanner/kindex?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.id)" style="height:95%;width:auto;max-width:@(ViewBag.MaxWidth)px" />
+    </a>
+}
 
 
 @if (this.User.IsInRole("Admin"))
