@@ -123,7 +123,7 @@ $(document).ready(function(){
     @*@Html.Action("Osoba_child", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed" })*@
 
     <a href="@kidx.GetUrl(false,Model.rok)" target="_top">
-    <img src="@($"https://www.hlidacstatu.cz/socialbanner/kindex?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.id)" style="height:95%;width:auto;max-width:@(ViewBag.MaxWidth)px" />
+        <img src="@($"https://www.hlidacstatu.cz/socialbanner/kindex?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.id)" style="width:95%;height:auto;max-width:@(ViewBag.MaxWidth)px;" />
     </a>
 }
 

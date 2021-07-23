@@ -61,7 +61,7 @@
     @*@Html.Action("Osoba_child", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed" })*@
 
     <a href="@Model.firma.GetUrl(false)" target="_top">
-    <img src="@($"https://www.hlidacstatu.cz/socialbanner/subjekt?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.firma.ICO)" style="height:95%;width:auto;max-width:@(ViewBag.MaxWidth)px" />
+    <img src="@($"https://www.hlidacstatu.cz/socialbanner/subjekt?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.firma.ICO)" style="width:95%;height:auto;max-width:@(ViewBag.MaxWidth)px" />
     </a>
 }
 <style>
