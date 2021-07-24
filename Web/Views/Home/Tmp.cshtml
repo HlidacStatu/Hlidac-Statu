@@ -79,7 +79,7 @@
         // show loading animation and hide the suggestions dropdown
         tagify.loading(true).dropdown.hide()
 
-        fetch('http://local.hlidacstatu.cz/beta/autocomplete2/?_type=query&q=' + value, { signal: controller.signal })
+        fetch('/beta/autocomplete2/?_type=query&q=' + value, { signal: controller.signal })
             .then(RES => RES.json())
             .then(function (inp) {
                 // update inwhitelist Array in-place
