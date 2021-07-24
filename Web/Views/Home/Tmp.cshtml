@@ -7,13 +7,118 @@
     int aa = 1 + 2 - 3;
     //int b = 12 / aa;
 }
+@section Scripts
+{
+    <script src="https://unpkg.com/@@yaireo/tagify"></script>
+    <script src="https://unpkg.com/@@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
+    <link href="https://unpkg.com/@@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+
+
+}
 
 <h2>Current time: @(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff"))</h2>
 
+<hr />
+
+<form id="new-search-input" class="new-search-input" method="get">
+    <div class="select2-wrapper">
+        <div class="input-group input-group-lg">
+            <input class="form-control input-lg" name="qq" />
+            <span class="input-group-btn">
+                <button class="btn btn-primary" style="left:-7px"> hledat</button>
+            </span>
+        </div>
+    </div>
+</form>
+<script>
+    // initialize Tagify
+    var qqtags_parsed = '';
+    var input = document.querySelector('input[name=qq]'),
+        // init Tagify script on the above inputs
+        tagify = new Tagify(input, {
+            keepInvalidTags: true,
+            duplicates: false,
+            templates: {
+                dropdownItem: suggestionItemTemplate
+            },
+            whitelist: [],
+            callbacks: {
+                add: console.log,  // callback when adding a tag
+                remove: console.log,   // callback when removing a tag
+                change: onChange
+            }
+        }), controller; // for aborting the call
+
+    tagify.on('input', onInput);
+
+    function onChange(e) {
+        if (e === undefined) {
+            return;
+        }
+        // string [{"value":"test"}', '{"value":"test2"}] to JSON Object
+        var tags = JSON.parse(e.detail.value);
+        // Converts into a simple array ["test", "test2"], then convert to string "test,test2"
+        qqtags_parsed = tags.map(item =>
+            {
+                if (item.id) return item.id;
+                else return item.value;
+            })
+            .join(' ');
+
+    };
+
+    // A good place to pull server suggestion list accoring to the prefix/value
+    function onInput(e) {
+        var value = e.detail.value
+        tagify.whitelist = null // reset the whitelist
+
+        // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
+        controller && controller.abort()
+        controller = new AbortController()
+
+        // show loading animation and hide the suggestions dropdown
+        tagify.loading(true).dropdown.hide()
+
+        fetch('http://local.hlidacstatu.cz/beta/autocomplete2/?_type=query&q=' + value, { signal: controller.signal })
+            .then(RES => RES.json())
+            .then(function (inp) {
+                // update inwhitelist Array in-place
+                var newWhiteList = inp.map(function (i) {
+                    return {
+                        id: i.id,
+                        value: i.text,
+                        searchBy: i.description,
+                        imageElement: i.imageElement,
+                        type: i.type,
+                        description: i.description,
+                        //    priority: i.priority
+                    }
+                })
+                tagify.whitelist = newWhiteList;
+                tagify.loading(false).dropdown.show(value) // render the suggestions dropdown
+            })
+    }
+
+    function suggestionItemTemplate(tagData) {
+        return `
+        <div ${this.getAttributes(tagData)}
+            class='tagify__dropdown__item ${tagData.class ? tagData.class : ""}'
+            tabindex="0"
+            role="option">
+            <div class='tagify__dropdown__item__avatar-wrap'>
+                <i class='${tagData.imageElement}'></i>
+            </div>
+            <strong>${tagData.value}</strong>
+            <span>${tagData.type} - ${tagData.description}</span>
+        </div>
+    `
+    }
+
+</script>
+<hr />
 
 
-
-<img src="~/Content/kindex/iconD.svg" style="height:30px" />
+@*<img src="~/Content/kindex/iconD.svg" style="height:30px" />
 <br />
 <img src="~/Content/kindex/iconD.svg" style="height:130px" />
 
@@ -29,7 +134,7 @@
 </div>
 
 <partial name="WebUtil/DynamicModal"
-            model="@(new DynamicModalViewModel($"/api/v1/modalclassification/234234", "(Má být smlouva označena jako platná?).", loadingText: "Ověřuji platnost smlouvy v registru smluv", style: "padding:0;margin:0"))"/>
+         model="@(new DynamicModalViewModel($"/api/v1/modalclassification/234234", "(Má být smlouva označena jako platná?).", loadingText: "Ověřuji platnost smlouvy v registru smluv", style: "padding:0;margin:0"))" />
 
 
 
@@ -43,4 +148,4 @@
 <hr />
 
 <script src='/widget/asdf?width=500' type='text/javascript'></script>
-<div id='asdf' style='width:500px' widget-page='/kindex/detail/00006947'></div>
+<div id='asdf' style='width:500px' widget-page='/kindex/detail/00006947'></div>*@
