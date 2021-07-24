@@ -49,7 +49,7 @@ h1 {
 }
 
     .link:hover, .link--small:hover, .link--blue:hover, .navbar__level1 ul li a:hover, .navbar__level2 ul li a:hover, .watcher-block .block-list a:hover, .watcher-block .block-status-list .status-item a:hover, .footer__content__col a:hover, .link--big:hover, .header__content .header__search__hint:hover, .breadcrumb a:hover, .link:active, .link--small:active, .link--blue:active, .navbar__level1 ul li a:active, .navbar__level2 ul li a:active, .watcher-block .block-list a:active, .watcher-block .block-status-list .status-item a:active, .footer__content__col a:active, .link--big:active, .header__content .header__search__hint:active, .breadcrumb a:active, .link:focus, .link--small:focus, .link--blue:focus, .navbar__level1 ul li a:focus, .navbar__level2 ul li a:focus, .watcher-block .block-list a:focus, .watcher-block .block-status-list .status-item a:focus, .footer__content__col a:focus, .link--big:focus, .header__content .header__search__hint:focus, .breadcrumb a:focus, .link:active:hover, .link--small:active:hover, .link--blue:active:hover, .navbar__level1 ul li a:active:hover, .navbar__level2 ul li a:active:hover, .watcher-block .block-list a:active:hover, .watcher-block .block-status-list .status-item a:active:hover, .footer__content__col a:active:hover, .link--big:active:hover, .header__content .header__search__hint:active:hover, .breadcrumb a:active:hover, .link:active:focus, .link--small:active:focus, .link--blue:active:focus, .navbar__level1 ul li a:active:focus, .navbar__level2 ul li a:active:focus, .watcher-block .block-list a:active:focus, .watcher-block .block-status-list .status-item a:active:focus, .footer__content__col a:active:focus, .link--big:active:focus, .header__content .header__search__hint:active:focus, .breadcrumb a:active:focus {
-        color: #0074E4 !important;
+        color: #0074E4;
         text-decoration: none;
     }
 
@@ -60,7 +60,7 @@ h1 {
 .link--blue, .navbar__level1 ul li a, .navbar__level2 ul li a, .watcher-block .block-list a, .watcher-block .block-status-list .status-item a, .footer__content__col a {
     font-size: 16px;
     letter-spacing: 0.36px;
-    color: #0074E4 !important;
+    color: #0074E4;
     text-decoration: none;
     text-transform: none;
     margin: 0;
