@@ -20,22 +20,24 @@
 
 <hr />
 
-<form id="new-search-input" class="new-search-input" method="get">
+<form id="new-search-input2" class="new-search-input" method="get">
     <div class="select2-wrapper">
         <div class="input-group input-group-lg">
-            <input class="form-control input-lg" name="qq" />
+            <input class="form-control input-lg nopadding" name="qq" id="new-search-input2-q" />
             <span class="input-group-btn">
-                <button class="btn btn-primary" style="left:-7px"> hledat</button>
+                <button class="btn btn-primary" style="left:-7px;top:-5px" onsubmit="javascript:fixQuery(this)" onclick="javascript:fixQuery(this)"> hledat</button>
             </span>
         </div>
     </div>
 </form>
 <script>
     // initialize Tagify
-    var qqtags_parsed = '';
-    var input = document.querySelector('input[name=qq]'),
+    var search_parsed = '';
+    var searchform = document.querySelector('#new-search-input2'); // just an example
+
+    var input = document.querySelector('#new-search-input2-q');
         // init Tagify script on the above inputs
-        tagify = new Tagify(input, {
+    var tagify = new Tagify(input, {
             keepInvalidTags: true,
             duplicates: false,
             templates: {
@@ -50,21 +52,47 @@
         }), controller; // for aborting the call
 
     tagify.on('input', onInput);
+    tagify.on("dropdown:show", onSuggestionsListUpdate);
+    tagify.on('keydown', onTagifyKeyDown);
+
+    function fixQuery(e) {
+        input.value = search_parsed;
+        return true;
+    }
+
+    function onTagifyKeyDown(e) {
+        if (e.detail.originalEvent.key == 'Enter' &&         // "enter" key pressed
+            !tagify.state.inputText &&  // assuming user is not in the middle oy adding a tag
+            !tagify.state.editing       // user not editing a tag
+        ) {
+            setTimeout(() => { fixQuery(); searchform.submit(); });  // put some buffer to make sure tagify has done with whatever, to be on the safe-side
+        }
+
+    }
+    // ES2015 argument destructuring
+    function onSuggestionsListUpdate({ detail: suggestionsElm }) {
+        console.log(suggestionsElm)
+    }
+    // ES2015 argument destructuring
+    function onSuggestionsListUpdateFull(e) {
+        console.log(e);
+    }
 
     function onChange(e) {
         if (e === undefined) {
             return;
         }
         // string [{"value":"test"}', '{"value":"test2"}] to JSON Object
-        var tags = JSON.parse(e.detail.value);
-        // Converts into a simple array ["test", "test2"], then convert to string "test,test2"
-        qqtags_parsed = tags.map(item =>
-            {
+        if (e.detail.value) {
+            var tags = JSON.parse(e.detail.value);
+            // Converts into a simple array ["test", "test2"], then convert to string "test,test2"
+            search_parsed = tags.map(item => {
                 if (item.id) return item.id;
                 else return item.value;
             })
-            .join(' ');
-
+                .join(' ');
+        }
+        else search_parsed = '';
     };
 
     // A good place to pull server suggestion list accoring to the prefix/value
@@ -79,7 +107,7 @@
         // show loading animation and hide the suggestions dropdown
         tagify.loading(true).dropdown.hide()
 
-        fetch('/beta/autocomplete2/?_type=query&q=' + value, { signal: controller.signal })
+        fetch('/beta/autocomplete/?type=query&q=' + value, { signal: controller.signal })
             .then(RES => RES.json())
             .then(function (inp) {
                 // update inwhitelist Array in-place
@@ -88,7 +116,7 @@
                         id: i.id,
                         value: i.text,
                         searchBy: i.description,
-                        imageElement: i.imageElement,
+                        html: encodeURIComponent(i.imageElement),
                         type: i.type,
                         description: i.description,
                         //    priority: i.priority
@@ -101,51 +129,92 @@
 
     function suggestionItemTemplate(tagData) {
         return `
-        <div ${this.getAttributes(tagData)}
-            class='tagify__dropdown__item ${tagData.class ? tagData.class : ""}'
-            tabindex="0"
-            role="option">
-            <div class='tagify__dropdown__item__avatar-wrap'>
-                <i class='${tagData.imageElement}'></i>
+        <div class='tagify__dropdown__item ${tagData.class ? tagData.class : ""}' tabindex="0" role="option" ${this.getAttributes(tagData)}>
+        <div class='clearfix'>
+            <div class='tagify__dropdown__item__avatar'>${decodeURIComponent(tagData.html)}</div>
+            <div class='tagify__dropdown__item__info'>
+                <div class='tagify__dropdown__item__title'>${tagData.value}</div>
+                <div class='tagify__dropdown__item__descr'>${tagData.description}</div>
+                <div class='tagify__dropdown__item__stat'><i>${tagData.type}</i></div>
             </div>
-            <strong>${tagData.value}</strong>
-            <span>${tagData.type} - ${tagData.description}</span>
         </div>
-    `
+        </div>`
     }
 
 </script>
 <hr />
 
+<style>
+    .tagify.nopadding {
+        padding: 0 !important;
+    }
+
+    .tagify__dropdown__item__title {
+        color: black;
+        font-weight: 700;
+        word-wrap: break-word;
+        line-height: 1.1;
+        margin-bottom: 4px;
+    }
+
+    .tagify__dropdown__item__descr {
+        font-size: 13px;
+        color: #777;
+        margin-top: 4px;
+        /* max-height: 35px; */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .tagify__dropdown__item__stat {
+        display: inline-block;
+        color: #aaa;
+        font-size: 11px;
+    }
+
+    .tagify__dropdown__item__info {
+        margin-left: 70px;
+    }
+
+    .tagify__dropdown__item__avatar {
+        float: left;
+        width: 45px;
+        margin-right: 10px;
+        font-size: 45px;
+        color: #CCCCCC;
+        position: relative;
+    }
+</style>
 
 @*<img src="~/Content/kindex/iconD.svg" style="height:30px" />
-<br />
-<img src="~/Content/kindex/iconD.svg" style="height:130px" />
+    <br />
+    <img src="~/Content/kindex/iconD.svg" style="height:130px" />
 
 
-<div class="row">
+    <div class="row">
 
-    <div class="col-xs-3 ">
-        <div class="low-box">
-            <p>malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
-            <p class="line"><a href="#" class="more">Read More</a></p>
+        <div class="col-xs-3 ">
+            <div class="low-box">
+                <p>malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+                <p class="line"><a href="#" class="more">Read More</a></p>
+            </div>
         </div>
     </div>
-</div>
 
-<partial name="WebUtil/DynamicModal"
-         model="@(new DynamicModalViewModel($"/api/v1/modalclassification/234234", "(Má být smlouva označena jako platná?).", loadingText: "Ověřuji platnost smlouvy v registru smluv", style: "padding:0;margin:0"))" />
-
+    <partial name="WebUtil/DynamicModal"
+             model="@(new DynamicModalViewModel($"/api/v1/modalclassification/234234", "(Má být smlouva označena jako platná?).", loadingText: "Ověřuji platnost smlouvy v registru smluv", style: "padding:0;margin:0"))" />
 
 
-<div class="clearfix"></div>
-<hr />
 
-<script src='/widget/porj5?width=500' type='text/javascript'></script>
-<div id='porj5' style='width:500px' widget-page='/Subjekt/00281859'></div>
+    <div class="clearfix"></div>
+    <hr />
 
-<div class="clearfix"></div>
-<hr />
+    <script src='/widget/porj5?width=500' type='text/javascript'></script>
+    <div id='porj5' style='width:500px' widget-page='/Subjekt/00281859'></div>
 
-<script src='/widget/asdf?width=500' type='text/javascript'></script>
-<div id='asdf' style='width:500px' widget-page='/kindex/detail/00006947'></div>*@
+    <div class="clearfix"></div>
+    <hr />
+
+    <script src='/widget/asdf?width=500' type='text/javascript'></script>
+    <div id='asdf' style='width:500px' widget-page='/kindex/detail/00006947'></div>*@
