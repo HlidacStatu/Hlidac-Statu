@@ -81,12 +81,12 @@
 
         <div class="header__search">
             <label class="label" for="Q">Prohledat všechny Hlídače státu:</label>
-            <form class="header__search__input-wrapper old-search-input" action="/hledat" method="get">
+            <form class="header__search__input-wrapper old-search-input" action="/hledat" id="old-search-input" method="get" style="visibility:visible">
                 <input value="" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
                 <button class="header__search__btn">Hledat</button>
             </form>
 
-            @if (false) //newsearch
+                @if (false) //newsearch
                 {
                     <form id="new-search-input" class="new-search-input" action="/hledat" method="get" style="visibility:hidden">
                         <div class="select2-wrapper">
@@ -110,10 +110,10 @@
                 }
                 else //newsearch2
                 {
-                    <form id="new-search-input" class="new-search-input" method="get" action="/hledat">
+                    <form id="new-search-input" class="new-search-input " method="get" action="/hledat" style="visibility:hidden">
                         <div class="new-search-wrapper">
-                            <div class="input-group input-group-lg">
-                                <input class="form-control input-lg nopadding" name="q" id="new-search-input-q" />
+                            <div class="input-group">
+                                <input class="form-control nopadding " name="q" value="@(ViewBag.Query)" id="new-search-input-q" />
                                 <span class="input-group-btn">
                                     <button id="new-search-input-btn" class="btn btn-primary" style="left:-7px;top:-5px"> hledat</button>
                                 </span>
@@ -123,6 +123,7 @@
                     <script>
                         MakeAutocomplete('#new-search-input');
                     </script>
+
                 }
 
             <div>

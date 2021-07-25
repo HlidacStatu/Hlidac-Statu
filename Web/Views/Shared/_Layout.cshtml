@@ -361,10 +361,10 @@
                 }
                 else //newsearch2
                 {
-                    <form id="new-search-input" class="new-search-input" method="get" action="/hledat">
+                    <form id="new-search-input" class="new-search-input " method="get" action="/hledat" style="visibility:hidden">
                         <div class="new-search-wrapper">
                             <div class="input-group">
-                                <input class="form-control nopadding" name="q" value="@(ViewBag.Query)" id="new-search-input-q" />
+                                <input class="form-control nopadding " name="q" value="@(ViewBag.Query)" id="new-search-input-q" />
                                 <span class="input-group-btn">
                                     <button id="new-search-input-btn" class="btn btn-primary" style="left:-7px;top:-5px"> hledat</button>
                                 </span>
@@ -374,6 +374,7 @@
                     <script>
                         MakeAutocomplete('#new-search-input');
                     </script>
+
                 }
                 <div>
                     <button class="header__search__hint btn btn-link new-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">

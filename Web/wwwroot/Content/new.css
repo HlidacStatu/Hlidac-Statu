@@ -3039,6 +3039,10 @@ a.form-search__hint:active:focus {
     margin-left: 70px;
 }
 
+ .tagify__tag > div.tagify__tag-item {
+ }
+
+
 .tagify__tag-item i, .tagify__tag-item img {
     margin-right: 5px;
     height: 22px;

@@ -104,12 +104,12 @@
         }
 
     }
-
+    //${tagData.html ? decodeURIComponent(tagData.html) : ''}
     function tagItemTemplate(tagData) {
         try {
             return `<tag title='${tagData.value}' contenteditable='false' spellcheck="false" class='tagify__tag ${tagData.class ? tagData.class : ""}' ${this.getAttributes(tagData)}>
                         <x title='remove tag' class='tagify__tag__removeBtn'></x>
-                        <div class='tagify__tag-item'>${tagData.html ? decodeURIComponent(tagData.html) : ''}
+                        <div class='tagify__tag-item'>
                             <span class='tagify__tag-text'>${tagData.value}</span>
                         </div>
                     </tag>`
