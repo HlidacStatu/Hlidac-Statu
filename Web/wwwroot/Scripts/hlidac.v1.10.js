@@ -442,8 +442,10 @@ function formatOptions(data) {
 }
 
 function toggleSearchComponent() {
-    $('.old-search-input').toggle();
-    $('.new-search-input').toggle();
+    $('#old-search-input').toggle();
+    $('#new-search-input').toggle();
+    $('button.old-search-input').toggle();
+    $('button.new-search-input').toggle();
 }
 
 function setOldSearchAsDefault() {
@@ -520,13 +522,19 @@ $(document).ready(function () {
     // set default search input
     var defaultSearch = parseInt(readCookie("defaultOldSearch"));
     if (isNaN(defaultSearch) || defaultSearch == 0) {
-        $('.old-search-input').hide();
-        $('.new-search-input').show();
+        $('#old-search-input').hide();
+        $('#new-search-input').show(); 
+        $('button.old-search-input').hide();
+        $('button.new-search-input').show();
 
     } else {
-        $('.old-search-input').show();
-        $('.new-search-input').hide();
+        $('#old-search-input').show(); 
+        $('#new-search-input').hide();
+        $('button.old-search-input').show();
+        $('button.new-search-input').hide();
     }
+    $('#new-search-input').css("visibility", "visible");
+    $('#old-search-input').css("visibility", "visible");
 
     $('button.old-search-input').click(toggleSearchComponent).click(setNewSearchAsDefault)
     $('button.new-search-input').click(toggleSearchComponent).click(setOldSearchAsDefault)

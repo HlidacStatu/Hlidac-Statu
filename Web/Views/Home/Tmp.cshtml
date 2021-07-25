@@ -9,9 +9,6 @@
 }
 @section Scripts
 {
-    <script src="https://unpkg.com/@@yaireo/tagify"></script>
-    <script src="https://unpkg.com/@@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
-    <link href="https://unpkg.com/@@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
 
 }
 
@@ -19,67 +16,34 @@
 
 <hr />
 
-<form id="new-search-input2" class="new-search-input" method="get">
+@*<form id="new-search-input2" class="new-search-input" method="get" action="/hledat">
     <div class="select2-wrapper">
         <div class="input-group input-group-lg">
-            <input class="form-control input-lg nopadding" name="qq" id="new-search-input2-q" />
+            <input class="form-control input-lg nopadding" name="q" id="new-search-input2-q" />
             <span class="input-group-btn">
-                <button class="btn btn-primary" style="left:-7px;top:-5px" onsubmit="javascript:onTagifyFixQuery(this)" onclick="javascript:onTagifyFixQuery(this)"> hledat</button>
+                <button id="new-search-input2-btn" class="btn btn-primary" style="left:-7px;top:-5px"> hledat</button>
             </span>
         </div>
     </div>
-</form>
+    <script>
+        MakeAutocomplete('#new-search-input2');
+    </script>
+</form>*@
 
-<script src="/scripts/autocomplete.js"></script>
-<script>
-    MakeAutocomplete('#new-search-input2');
-</script>
 
 <hr />
 
-<style>
-    .tagify.nopadding {
-        padding: 0 !important;
-    }
-
-    .tagify__dropdown__item__title {
-        color: black;
-        font-weight: 700;
-        word-wrap: break-word;
-        line-height: 1.1;
-        margin-bottom: 4px;
-    }
-
-    .tagify__dropdown__item__descr {
-        font-size: 13px;
-        color: #777;
-        margin-top: 4px;
-        /* max-height: 35px; */
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .tagify__dropdown__item__stat {
-        display: inline-block;
-        color: #aaa;
-        font-size: 11px;
-    }
-
-    .tagify__dropdown__item__info {
-        margin-left: 70px;
-    }
-
-    .tagify__dropdown__item__avatar {
-        float: left;
-        width: 45px;
-        margin-right: 10px;
-        font-size: 45px;
-        color: #CCCCCC;
-        position: relative;
-    }
-</style>
-
+<hr />
+@*<div class="tagify__dropdown__item " tabindex="0" role="option" id="osobaid:andrej-babis" value="Andrej Babiš (Ing. )" searchby="Ing. Andrej Babiš (*1954), poslanec (od 2013)  - Poslanecká sněmovna PČR, premiér (od 2017)  - Vláda České republiky. Ing. Andrej Babiš mezi roky 2012 - 19 sponzoroval stranu ANO 2011 v celkové výši 30 mil. Kč. Nejvyšší sponzorský dar byl ve výši 8 mil. Kč. " html="%3Cimg%20src%3D'https%3A%2F%2Fwww.hlidacstatu.cz%2FPhoto%2Fandrej-babis'%20%2F%3E" type="Politik" description="Ing. Andrej Babiš (*1954), poslanec (od 2013)  - Poslanecká sněmovna PČR, premiér (od 2017)  - Vláda České republiky. Ing. Andrej Babiš mezi roky 2012 - 19 sponzoroval stranu ANO 2011 v celkové výši 30 mil. Kč. Nejvyšší sponzorský dar byl ve výši 8 mil. Kč. " tagifysuggestionidx="0">
+    <div class="clearfix">
+        <div class="tagify__dropdown__item__avatar"><img src="https://www.hlidacstatu.cz/Photo/andrej-babis"></div>
+        <div class="tagify__dropdown__item__info">
+            <div class="tagify__dropdown__item__title">Andrej Babiš (Ing. )</div>
+            <div class="tagify__dropdown__item__descr">Ing. Andrej Babiš (*1954), poslanec (od 2013) - Poslanecká sněmovna PČR, premiér (od 2017) - Vláda České republiky. Ing. Andrej Babiš mezi roky 2012 - 19 sponzoroval stranu ANO 2011 v celkové výši 30 mil. Kč. Nejvyšší sponzorský dar byl ve výši 8 mil. Kč. </div>
+            <div class="tagify__dropdown__item__stat"><i>Politik</i></div>
+        </div>
+    </div>
+</div>*@
 @*<img src="~/Content/kindex/iconD.svg" style="height:30px" />
     <br />
     <img src="~/Content/kindex/iconD.svg" style="height:130px" />

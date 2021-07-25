@@ -3000,3 +3000,71 @@ a.form-search__hint:active:focus {
 .link--blue {
     color: #0074E4 !important;
 }
+
+
+/* ***** TAGIFY ********* */
+.tagify.nopadding {
+    padding: 0 !important;
+}
+
+.new-search-wrapper .tagify__input {
+    font-size: 15px;
+}
+
+.tagify__dropdown__item__title {
+    color: black;
+    font-weight: 700;
+    word-wrap: break-word;
+    line-height: 1.1;
+    margin-bottom: 4px;
+}
+
+.tagify__dropdown__item__descr {
+    font-size: 13px;
+    color: #777;
+    margin-top: 4px;
+    /* max-height: 35px; */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tagify__dropdown__item__stat {
+    display: inline-block;
+    color: #aaa;
+    font-size: 11px;
+}
+
+.tagify__dropdown__item__info {
+    margin-left: 70px;
+}
+
+.tagify__tag-item i, .tagify__tag-item img {
+    margin-right: 5px;
+    height: 22px;
+}
+
+.tagify__tag-item > .tagify__tag-text {
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
+    white-space: nowrap;
+    font-size: 15px;
+    vertical-align: middle;
+}
+
+.tagify__dropdown__item__avatar {
+    float: left;
+    width: 50px;
+    height: auto;
+    margin-right: 10px;
+    font-size: 45px;
+    color: #CCCCCC;
+    position: relative;
+}
+
+    .tagify__dropdown__item__avatar img {
+        width: 50px;
+        vertical-align: top;
+    }

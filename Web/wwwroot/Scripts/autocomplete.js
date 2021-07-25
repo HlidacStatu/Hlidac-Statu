@@ -3,12 +3,18 @@
     var search_parsed = '';
     var searchform = document.querySelector(elementSel); // '#new-search-input2'
 
-    var input = document.querySelector(elementSel+'-q');
+    var input = document.querySelector(elementSel + '-q');
+    var btn = document.querySelector(elementSel + '-btn');
+    btn.onclick = function (e) { onTagifyFixQuery(input) };
+    btn.onsubmit = function (e) { onTagifyFixQuery(input) };
+
     // init Tagify script on the above inputs
     var tagify = new Tagify(input, {
         keepInvalidTags: true,
         duplicates: false,
+        pasteAsTags: false,
         templates: {
+            tag: tagItemTemplate,
             dropdownItem: suggestionItemTemplate
         },
         whitelist: [],
@@ -26,17 +32,13 @@
     //tagify.on('input', onTagifyInput);
     //tagify.on('keydown', onTagifyKeyDown);
 
-    function onTagifyFixQuery(e) {
-        input.value = search_parsed;
-        return true;
-    }
 
     function onTagifyKeyDown(e) {
         if (e.detail.originalEvent.key == 'Enter' &&         // "enter" key pressed
             !tagify.state.inputText &&  // assuming user is not in the middle oy adding a tag
             !tagify.state.editing       // user not editing a tag
         ) {
-            setTimeout(() => { onTagifyFixQuery(); searchform.submit(); });  // put some buffer to make sure tagify has done with whatever, to be on the safe-side
+            setTimeout(() => { onTagifyFixQuery(input); searchform.submit(); });  // put some buffer to make sure tagify has done with whatever, to be on the safe-side
         }
     }
 
@@ -77,6 +79,7 @@
 
         // show loading animation and hide the suggestions dropdown
         tagify.loading(true).dropdown.hide()
+        try {
 
         fetch('/beta/autocomplete/?type=query&q=' + value, { signal: controller.signal })
             .then(RES => RES.json())
@@ -96,7 +99,24 @@
                 tagify.whitelist = newWhiteList;
                 tagify.loading(false).dropdown.show(value) // render the suggestions dropdown
             })
+        } catch (err) {
+
+        }
+
     }
+
+    function tagItemTemplate(tagData) {
+        try {
+            return `<tag title='${tagData.value}' contenteditable='false' spellcheck="false" class='tagify__tag ${tagData.class ? tagData.class : ""}' ${this.getAttributes(tagData)}>
+                        <x title='remove tag' class='tagify__tag__removeBtn'></x>
+                        <div class='tagify__tag-item'>${tagData.html ? decodeURIComponent(tagData.html) : ''}
+                            <span class='tagify__tag-text'>${tagData.value}</span>
+                        </div>
+                    </tag>`
+        }
+        catch (err) { }
+    }
+
 
     function suggestionItemTemplate(tagData) {
         return `
@@ -111,4 +131,11 @@
         </div>
         </div>`
     }
+
+    function onTagifyFixQuery(input) {
+        input.value = search_parsed;
+        return true;
+    }
+
+
 }
