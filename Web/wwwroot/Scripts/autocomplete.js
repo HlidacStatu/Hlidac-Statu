@@ -71,6 +71,15 @@
     // A good place to pull server suggestion list accoring to the prefix/value
     function onTagifyInput(e) {
         var value = e.detail.value
+        if (!value) {
+            tagify.whitelist = [] // reset the whitelist
+            return;
+        }
+        if (value.length <=2) {
+            tagify.whitelist = [] // reset the whitelist
+            return;
+        }
+
         tagify.whitelist = null // reset the whitelist
 
         // https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
@@ -81,24 +90,24 @@
         tagify.loading(true).dropdown.hide()
         try {
 
-        fetch('/beta/autocomplete/?type=query&q=' + value, { signal: controller.signal })
-            .then(RES => RES.json())
-            .then(function (inp) {
-                // update inwhitelist Array in-place
-                var newWhiteList = inp.map(function (i) {
-                    return {
-                        id: i.id,
-                        value: i.text,
-                        searchBy: i.description,
-                        html: encodeURIComponent(i.imageElement),
-                        type: i.type,
-                        description: i.description,
-                        //    priority: i.priority
-                    }
+            fetch('/api/autocomplete?type=query&q=' + value, { signal: controller.signal })
+                .then(RES => RES.json())
+                .then(function (inp) {
+                    // update inwhitelist Array in-place
+                    var newWhiteList = inp.map(function (i) {
+                        return {
+                            id: i.id,
+                            value: i.text,
+                            searchBy: i.description,
+                            html: encodeURIComponent(i.imageElement),
+                            type: i.type,
+                            description: i.description,
+                            //    priority: i.priority
+                        }
+                    })
+                    tagify.whitelist = newWhiteList;
+                    tagify.loading(false).dropdown.show(value) // render the suggestions dropdown
                 })
-                tagify.whitelist = newWhiteList;
-                tagify.loading(false).dropdown.show(value) // render the suggestions dropdown
-            })
         } catch (err) {
 
         }

@@ -28,12 +28,16 @@ namespace FullTextSearch
 
         private void BuildIndex(IEnumerable<T> inputObjects)
         {
+            Devmasters.DT.StopWatchLaps swl = new Devmasters.DT.StopWatchLaps();
+            var intv = swl.AddAndStartLap($"BuildIndex for {inputObjects.Count()} items");
             foreach (T inputObject in inputObjects)
             {
                 var sentence = new Sentence<T>(inputObject, _tokenizer);
 
                 SortedTokens.AddTokens(sentence.Tokens);
             }
+            intv.Stop();
+            Log.Logger.Info(string.Join("\n", swl.Laps.Select(m => $"{m.Name} : {m.ExactElapsedMs:# ##0.00}ms")));
         }
 
         /// <summary>
@@ -45,8 +49,12 @@ namespace FullTextSearch
         /// <returns></returns>
         public IEnumerable<Result<T>> Search(string query, int count, Func<T,int> sortFunctionDescending = null)
         {
+            Devmasters.DT.StopWatchLaps swl = new Devmasters.DT.StopWatchLaps();
+            var intv = swl.AddAndStartLap($"{query}: tokenize");
             var tokenizedQuery = _tokenizer.Tokenize(query);
 
+            intv.Stop();
+            intv = swl.AddAndStartLap($"{query}: sort tokens");
             List<ScoredSentence<T>> results = new List<ScoredSentence<T>>();
             foreach(string queryToken in tokenizedQuery)
             {
@@ -59,6 +67,8 @@ namespace FullTextSearch
                     results.AddRange(scoredSentences);
                 }
             }
+            intv.Stop();
+            intv = swl.AddAndStartLap($"{query}: group by score");
 
             var summedResults = results
                 .AsParallel()
@@ -66,11 +76,15 @@ namespace FullTextSearch
                     (sentence, result) => new ScoredSentence<T>(sentence, result.Sum(x => x.Score)))
                 .ToList();
 
+            intv.Stop();
+            intv = swl.AddAndStartLap($"{query}: calc score");
             // přidat score za nejdelší řetězec
-            foreach(ScoredSentence<T> result in summedResults)
+            foreach (ScoredSentence<T> result in summedResults)
             {
                 result.Score += ScoreSentence(result.Sentence, tokenizedQuery); 
             }
+            intv.Stop();
+            intv = swl.AddAndStartLap($"{query}: final order");
 
             var final = summedResults
                 .AsParallel()
@@ -83,12 +97,22 @@ namespace FullTextSearch
                         return chosenResult;
                     })
                 .OrderByDescending(x => x.Score);
+            intv.Stop();
 
             if (sortFunctionDescending != null)
             {
+                intv = swl.AddAndStartLap($"{query}: after final resort descending");
                 final = final.ThenByDescending(x => sortFunctionDescending(x.Sentence.Original));
+                intv.Stop();
             }
+            if (swl.Summary().ExactElapsedMs >= 500d)
+            {
+                Log.Logger.Info(
+                    string.Join("\n", swl.Laps.Select(m => $"{m.Name} : {m.ExactElapsedMs:# ##0.00}ms"))
+                    + $"\nTOTAL : {swl.Summary().ExactElapsedMs:# ##0.00}ms"
+                    );
 
+            }
             return final
                 .Take(count)
                 .Select(x => new Result<T>()

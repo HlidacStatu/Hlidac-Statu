@@ -4,4 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Devmasters.DT" Version="2.3.0" />
+  </ItemGroup>
+
 </Project>

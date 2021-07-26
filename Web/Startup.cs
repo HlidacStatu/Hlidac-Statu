@@ -193,7 +193,7 @@ namespace HlidacStatu.Web
             //force init autocomplete cache
             new System.Threading.Thread(() =>
             {
-                using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent("https://www.hlidacstatu.cz/beta/autocomplete/?q=flakan&term=flakan&_type=query&q=flakan"))
+                using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent("https://www.hlidacstatu.cz/api/autocomplete/?q=flakan&term=flakan&_type=query&q=flakan"))
                 {
                     net.Timeout = 3*60000;
                     var s = net.GetContent();
