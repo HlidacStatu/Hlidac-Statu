@@ -210,9 +210,9 @@ namespace HlidacStatu.Web
                 string[] cssPaths = new[]
                 {
                     "wwwroot/Content/bootstrap.css",
-                    "wwwroot/Content/GlobalSite.v1.9.css",
+                    "wwwroot/Content/GlobalSite.v1.10.css",
                     "wwwroot/Content/social-share-kit.css",
-                    "wwwroot/Content/new.css"
+                    "wwwroot/Content/new.v1.10.css"
                 };
                 pipeline.AddCssBundle("/Content/bundled.css", cssPaths)
                     .UseContentRoot() // tohle je tady potřeba, protože při standardním použití se špatně generují relativní cesty ve stylech (bootstrap.css)
