@@ -427,7 +427,9 @@ namespace HlidacStatu.Repositories
                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "Autocomplete",
                    (o) =>
                    {
+                       Util.Consts.Logger.Info("Starting AutocompleteRepo.GenerateAutocomplete");
                        return AutocompleteRepo.GenerateAutocomplete().ToList();
+                       Util.Consts.Logger.Info("End AutocompleteRepo.GenerateAutocomplete");
                    });
 
                 FulltextSearchForAutocomplete = new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<FullTextSearch.Index<Autocomplete>>(
