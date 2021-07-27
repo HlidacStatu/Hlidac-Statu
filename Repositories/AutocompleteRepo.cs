@@ -259,28 +259,26 @@ namespace HlidacStatu.Repositories
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
 
-            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?, int?>>(
-                DirectDB.GetList<string, string, string, int?, int?>(sql).ToArray(),
-                (f) => {
+            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?>>(
+                DirectDB.GetList<string, string, string, int?>(sql).ToArray(),
+                (f) =>
+                {
                     string img = "<i class='fas fa-university'></i>";
 
-                    if (f.Item5 == 1)
+                    var fi = Firmy.Get(f.Item2);
+                    if (fi.Valid)
                     {
-                        var fi = Firmy.Get(f.Item2);
-                        if (fi.Valid)
-                        {
-                            var o = fi.Ceo().Osoba;
-                            if (o != null)
-                                img = $"<img src='{o.GetPhotoUrl(false)}' />";
-                        }                            
-                    };
+                        var o = fi.Ceo().Osoba;
+                        if (o != null)
+                            img = $"<img src='{o.GetPhotoUrl(false)}' />";
+                    }
 
                     var res = new Autocomplete()
                     {
                         Id = $"ico:{f.Item2}",
                         Text = f.Item1,
                         Type = "úřad",
-                        Description = FixKraj(f.Item3) ,
+                        Description = FixKraj(f.Item3),
                         Priority = 2,
                         ImageElement = img
                     };
@@ -322,29 +320,27 @@ namespace HlidacStatu.Repositories
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
 
-            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?, int?>>(
-                DirectDB.GetList<string, string, string, int?, int?>(sql).ToArray(),
-                (f) => {
+            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string>>(
+                DirectDB.GetList<string, string, string>(sql).ToArray(),
+                (f) =>
+                {
                     Autocomplete res = null;
                     string img = "<i class='fas fa-city'></i>";
 
-                    if (f.Item5 == 1)
+                    var fi = Firmy.Get(f.Item2);
+                    if (fi.Valid)
                     {
-                        var fi = Firmy.Get(f.Item2);
-                        if (fi.Valid)
-                        {
-                            var o = fi.Ceo().Osoba;
-                            if (o != null)
-                                img = $"<img src='{o.GetPhotoUrl(false)}' />";
-                        }
-                    };
+                        var o = fi.Ceo().Osoba;
+                        if (o != null)
+                            img = $"<img src='{o.GetPhotoUrl(false)}' />";
+                    }
 
                     var synonyms = new Autocomplete[2];
                     synonyms[0] = new Autocomplete()
                     {
                         Id = $"ico:{f.Item2}",
                         Text = f.Item1,
-                        Type = "obec" ,
+                        Type = "obec",
                         Description = FixKraj(f.Item3),
                         Priority = 2,
                         ImageElement = img
@@ -402,7 +398,7 @@ namespace HlidacStatu.Repositories
 
                                return new Devmasters.Batch.ActionOutputData();
                            }
-                           , null, progressWriter.Write, !debug, prefix:"LoadPeople ");
+                           , null, progressWriter.Write, !debug, prefix: "LoadPeople ");
 
             }
             return results;
