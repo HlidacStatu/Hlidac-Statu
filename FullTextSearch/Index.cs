@@ -55,39 +55,30 @@ namespace FullTextSearch
 
             intv.Stop();
             intv = swl.AddAndStartLap($"{query}: sort tokens");
-            List<ScoredSentence<T>> results = new List<ScoredSentence<T>>();
-            foreach(string queryToken in tokenizedQuery)
-            {
-                // tokeny, které odpovídají query
-                var filteredTokens = SortedTokens.FindTokens(queryToken);
-
-                foreach(var token in filteredTokens)
-                {
-                    var scoredSentences = ScoreToken(token, queryToken);
-                    results.AddRange(scoredSentences);
-                }
-            }
+            
+            var foundSentences = AndSearch(tokenizedQuery);
+            if (!foundSentences.Any())
+                return Enumerable.Empty<Result<T>>();
+            
+            
             intv.Stop();
-            intv = swl.AddAndStartLap($"{query}: group by score");
-
-            var summedResults = results
-                .AsParallel()
-                .GroupBy(r => r.Sentence,
-                    (sentence, result) => new ScoredSentence<T>(sentence, result.Sum(x => x.Score)))
-                .ToList();
-
-            intv.Stop();
+            // intv = swl.AddAndStartLap($"{query}: group by score");
+            //
+            // var summedResults = results
+            //     .GroupBy(r => r.Sentence,
+            //         (sentence, result) => new ScoredSentence<T>(sentence, result.Sum(x => x.Score)))
+            //     .ToList();
+            //
+            // intv.Stop();
             intv = swl.AddAndStartLap($"{query}: calc score");
-            // přidat score za nejdelší řetězec
-            foreach (ScoredSentence<T> result in summedResults)
-            {
-                result.Score += ScoreSentence(result.Sentence, tokenizedQuery); 
-            }
+            
+            var summedResults = ScoreSentences(foundSentences, tokenizedQuery);
+            
             intv.Stop();
             intv = swl.AddAndStartLap($"{query}: final order");
 
+            // zbaví se duplicit (synonym)
             var final = summedResults
-                .AsParallel()
                 .GroupBy(sentence => sentence.Sentence.Original,
                     (key, scoredSentences) =>
                     {
@@ -99,12 +90,14 @@ namespace FullTextSearch
                 .OrderByDescending(x => x.Score);
             intv.Stop();
 
+            // pokud existují priority, seřadí ještě pořadí výsledků podle priorit
             if (sortFunctionDescending != null)
             {
                 intv = swl.AddAndStartLap($"{query}: after final resort descending");
                 final = final.ThenByDescending(x => sortFunctionDescending(x.Sentence.Original));
                 intv.Stop();
             }
+            
             if (swl.Summary().ExactElapsedMs >= 500d)
             {
                 Log.Logger.Info(
@@ -113,6 +106,7 @@ namespace FullTextSearch
                     );
 
             }
+            
             return final
                 .Take(count)
                 .Select(x => new Result<T>()
@@ -123,20 +117,42 @@ namespace FullTextSearch
                 
         }
 
-        // Neověřuju na začátku, jestli jsou stejné
-        // předpokládám, že sem už stejné texty lezou - asi chybně
-        private List<ScoredSentence<T>> ScoreToken(Token<T> token, string queryToken)
+        //najde všechny věty, kde se tokeny vyskytují
+        private IEnumerable<Sentence<T>> AndSearch(string[] tokenizedQuery)
         {
-            double basicScore = queryToken.Length;
-            
-            // bonus for whole word
-            if (_options.WholeWordBonusMultiplier.HasValue 
-                && queryToken.Length == token.Word.Length)
+            IEnumerable<Sentence<T>> results = Enumerable.Empty<Sentence<T>>();
+            if (tokenizedQuery.Length == 0)
+                return results;
+
+            IEnumerable<Sentence<T>> previousSentences = null;
+            foreach (string queryToken in tokenizedQuery)
             {
-                basicScore *= _options.WholeWordBonusMultiplier.Value;
+                var foundTokens = SortedTokens.FindTokens(queryToken);
+                var foundSentences = foundTokens.SelectMany(t => t.Sentences);
+
+                if (previousSentences is null)
+                {
+                    previousSentences = foundSentences;
+                    continue;
+                }
+
+                previousSentences = previousSentences.Intersect(foundSentences);
+            }
+            return previousSentences;
+        }
+
+        //oskóruje věty
+        private List<ScoredSentence<T>> ScoreSentences(IEnumerable<Sentence<T>> foundSentences, string[] tokenizedQuery)
+        {
+            var result = new List<ScoredSentence<T>>();
+            
+            foreach (var sentence in foundSentences)
+            {
+                var score = ScoreSentence(sentence, tokenizedQuery);
+                result.Add(new ScoredSentence<T>(sentence, score)); 
             }
 
-            return token.Sentences.Select(s => new ScoredSentence<T>(s, basicScore)).ToList();
+            return result;
         }
 
         private Double ScoreSentence(Sentence<T> sentence, string[] tokenizedQuery)
@@ -146,66 +162,57 @@ namespace FullTextSearch
 
             double score = 0;
 
-            int tokenPosition = 0;
-            // bonus for first three words
-            if (_options.FirstWordsBonus != null)
+            int firstWordBonusTokenPosition = 0;
+            int chainBonusTokenPosition = 0;
+            double chainScore = 0;
+
+            for (int wordPosition = 0; wordPosition < sentence.Tokens.Count; wordPosition++)
             {
-                for (int wordPosition = 0; wordPosition < _options.FirstWordsBonus.BonusWordsCount; wordPosition++)
+                // token score
+                score += ScoreToken(sentence.Tokens[wordPosition], tokenizedQuery);
+
+                // bonus for first words
+                if (_options.FirstWordsBonus != null 
+                    && wordPosition < _options.FirstWordsBonus.BonusWordsCount
+                    && firstWordBonusTokenPosition < tokenizedQuery.Length)
                 {
-                    if (wordPosition >= sentence.Tokens.Count
-                        || tokenPosition >= tokenizedQuery.Length)
-                        break;
-                    
-                    string queryToken = tokenizedQuery[tokenPosition];
-                    if (sentence.Tokens[wordPosition].Word.StartsWith(queryToken))
+                    string queryToken = tokenizedQuery[firstWordBonusTokenPosition];
+                    if (sentence.Tokens[wordPosition].StartsWith(queryToken))
                     {
                         score += queryToken.Length 
-                            * (_options.FirstWordsBonus.MaxBonusMultiplier - 
-                                (_options.FirstWordsBonus.BonusMultiplierDegradation * wordPosition));
+                                 * (_options.FirstWordsBonus.MaxBonusMultiplier - 
+                                    (_options.FirstWordsBonus.BonusMultiplierDegradation * wordPosition));
 
-                        tokenPosition++;
+                        firstWordBonusTokenPosition++;
                     }
                 }
-            }
-
-            //bonus for longest word chain
-            tokenPosition = 0;
-            double chainScore = 0;
-            // bonus for first three words
-            if (_options.ChainBonusMultiplier.HasValue)
-            {
-                for (int wordPosition = 0; wordPosition < sentence.Tokens.Count; wordPosition++)
+                
+                // bonus for longest word chain
+                if (_options.ChainBonusMultiplier.HasValue
+                    && chainBonusTokenPosition < tokenizedQuery.Length)
                 {
-                    if (tokenPosition >= tokenizedQuery.Length)
-                        break;
-                    
-                    string queryToken = tokenizedQuery[tokenPosition];
-                    if (sentence.Tokens[wordPosition].Word.StartsWith(queryToken))
+                    string queryToken = tokenizedQuery[chainBonusTokenPosition];
+                    if (sentence.Tokens[wordPosition].StartsWith(queryToken))
                     {
                         chainScore += queryToken.Length;
-                        tokenPosition++;
+                        chainBonusTokenPosition++;
                     }
-                    else if (chainScore > 0) // after previous match there is no other match
+                    else if (chainScore > 0) // ends after missing match
                         break;
+                
+                    if (chainScore > 1)
+                        score += chainScore * _options.ChainBonusMultiplier.Value; //todo: put it to options
                 }
-
-                if (chainScore > 1)
-                    score += chainScore * _options.ChainBonusMultiplier.Value; //todo: put it to options
+                
             }
 
             // Query == sentence
-            // toto téměř nikdy nenastane! sentence je potřeba rozdělit do chlívků
-            // podle parametrů, ze kterých se pomocí reflexe vytvořili věty
-            // pak je potřeba vyhledávat pouze v těchto chlívcích!
             if (sentence.Text == string.Join(" ", tokenizedQuery))
             {
                 return score + _options.ExactMatchBonus ?? 0;
             }
 
             // sentence starts with query without its last word
-            // toto téměř nikdy nenastane! sentence je potřeba rozdělit do chlívků
-            // podle parametrů, ze kterých se pomocí reflexe vytvořili věty
-            // pak je potřeba vyhledávat pouze v těchto chlívcích!
             if (tokenizedQuery.Length > 2) // 3+ words
             {
                 string shorterQuery = string.Join(" ", tokenizedQuery.Take(tokenizedQuery.Length - 1));
@@ -216,12 +223,32 @@ namespace FullTextSearch
 
             }
 
-            // Má smysl scorovat nejdelší shodný substring? Zatím si myslím, že asi ne,
-            // protože by to mohlo zamíchat pořadím. Navíc takový výpočet není levný
-            // a pro velký počet dokumentů by to mohlo znamenat pomalé hledání.
-
             return score;
         }
 
+        private double ScoreToken(Token<T> token, string[] queryTokens)
+        {
+            double overallScore = 0;
+
+            foreach (var queryToken in queryTokens)
+            {
+                if (token.StartsWith(queryToken))
+                {
+                    double basicScore = queryToken.Length;
+                    
+                    // bonus for whole word
+                    if (_options.WholeWordBonusMultiplier.HasValue 
+                        && queryToken.Length == token.Word.Length)
+                    {
+                        basicScore *= _options.WholeWordBonusMultiplier.Value;
+                    }
+
+                    overallScore += basicScore;
+                }
+                
+            }
+
+            return overallScore;
+        }
     }
 }

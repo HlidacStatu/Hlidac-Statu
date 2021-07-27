@@ -31,6 +31,14 @@ namespace FullTextSearch
             }
         }
 
+        /// <summary>
+        /// Shortcut for Token.Word.StartsWith
+        /// </summary>
+        public bool StartsWith(string value)
+        {
+            return Word.StartsWith(value);
+        }
+
         public override string ToString()
         {
             return Word;
