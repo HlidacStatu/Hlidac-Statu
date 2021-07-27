@@ -64,11 +64,6 @@ namespace HlidacStatu.Web.Controllers
 
         public ActionResult Porovnat(string id, int? rok = null)
         {
-            if (!Framework.HtmlExtensions.ShowFutureKIndex(User))
-            {
-                //todo: přidat base view, kde pokud nebude žádná hodnota v id, tak zobrazíme základní porovnání
-                return View("NoAvail");
-            }
 
             SetViewbagSelectedYear(ref rok);
 
@@ -105,10 +100,6 @@ namespace HlidacStatu.Web.Controllers
         }
         public ActionResult Zebricek(string id, int? rok = null, string group = null, string kraj = null, string part = null)
         {
-            if (!Framework.HtmlExtensions.ShowFutureKIndex(User))
-            {
-                return View("NoAvail");
-            }
 
             SetViewbagSelectedYear(ref rok, Statistics.KIndexStatTotal.Get().Max(m => m.Rok));
             ViewBag.SelectedLadder = id;
@@ -138,9 +129,10 @@ namespace HlidacStatu.Web.Controllers
                     break;
 
                 case "celkovy":
-                    ViewBag.LadderTopic = "Kompletní žebříček úřadů a organizací";
-                    ViewBag.LadderTitle = "Kompletní žebříček úřadů a organizací podle K–Indexu";
-                    break;
+                    return View("NoAvail");
+                    //ViewBag.LadderTopic = "Kompletní žebříček úřadů a organizací";
+                    //ViewBag.LadderTitle = "Kompletní žebříček úřadů a organizací podle K–Indexu";
+                    //break;
 
                 case "skokani":
                     ViewBag.LadderTitle = "Úřady a organizace, kterým se hodnocení K-Indexu meziročně nejvíce změnilo";

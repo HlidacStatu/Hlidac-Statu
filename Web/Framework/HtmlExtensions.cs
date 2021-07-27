@@ -155,7 +155,8 @@ namespace HlidacStatu.Web.Framework
 
         public static bool ShowFutureKIndex(System.Security.Principal.IPrincipal user)
         {
-            return IfInRoles(user, "TK-KIndex-2021");
+            return true;
+            //return IfInRoles(user, "TK-KIndex-2021");
         }
 
         public static Restricted ShowFutureKIndex(this IHtmlHelper self, System.Security.Principal.IPrincipal user)
