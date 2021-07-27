@@ -17,6 +17,9 @@ namespace HlidacStatu.Repositories
     //migrace: tohle není repo - přestěhovat jinam => až budeme vytvářet samostatnou api
     public static class AutocompleteRepo
     {
+
+        static Devmasters.Batch.ActionProgressWriter progressWriter = new Devmasters.Batch.ActionProgressWriter(0.1f, Devmasters.Batch.ProgressWriters.ConsoleWriter_EndsIn);
+
         static bool debug = System.Diagnostics.Debugger.IsAttached;
         /// <summary>
         /// Generates autocomplete data
@@ -35,7 +38,7 @@ namespace HlidacStatu.Repositories
             IEnumerable<Autocomplete> operators = new List<Autocomplete>();
 
             ParallelOptions po = new ParallelOptions();
-            po.MaxDegreeOfParallelism = System.Diagnostics.Debugger.IsAttached ? 1 : po.MaxDegreeOfParallelism;
+            po.MaxDegreeOfParallelism = debug ? 1 : po.MaxDegreeOfParallelism;
 
             Parallel.Invoke(po,
                 () =>
@@ -207,7 +210,7 @@ namespace HlidacStatu.Repositories
                         Id = $"ico:{f.Item2}",
                         Text = f.Item1,
                         Type = ("firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
-                        Description = FixKraj(f.Item3) + (f.Item5 == 1 ? ", obchoduje se státem" : ""),
+                        Description = FixKraj(f.Item3) + " " + info,
                         Priority = 0,
                         ImageElement = "<i class='fas fa-industry-alt'></i>"
                     };
@@ -215,7 +218,7 @@ namespace HlidacStatu.Repositories
                     lock (lockObj)
                         results.Add(res);
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, null, !debug, prefix: "LoadSoukrFirmy ");
+                }, null, progressWriter.Write, !debug, prefix: "LoadSoukrFirmy ");
 
             return results;
         }
@@ -286,7 +289,7 @@ namespace HlidacStatu.Repositories
                         results.Add(res);
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, null, !debug, prefix: "LoadUrady ");
+                }, null, progressWriter.Write, !debug, prefix: "LoadUrady ");
 
             return results;
         }
@@ -356,7 +359,7 @@ namespace HlidacStatu.Repositories
                     lock (lockObj)
                         results.Add(res);
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, null, !debug, prefix: "LoadObce ");
+                }, null, progressWriter.Write, !debug, prefix: "LoadObce ");
 
             return results;
         }
@@ -399,7 +402,7 @@ namespace HlidacStatu.Repositories
 
                                return new Devmasters.Batch.ActionOutputData();
                            }
-                           , null,null,!debug, prefix:"LoadPeople ");
+                           , null, progressWriter.Write, !debug, prefix:"LoadPeople ");
 
             }
             return results;

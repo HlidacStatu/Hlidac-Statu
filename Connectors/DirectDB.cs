@@ -131,11 +131,22 @@ namespace HlidacStatu.Connectors
         {
             var dval = dr[index];
             bool isDbNull = Devmasters.PersistLib.IsNull(dval);
-            if (isDbNull)
-                return default(T);
-            else
-                return (T)dr[index];
 
+            var baseType = Nullable.GetUnderlyingType(typeof(T));
+            if (baseType != null)
+            {
+                if (isDbNull)
+                    return default(T);
+                else
+                    return (T)Convert.ChangeType(dr[index],baseType);
+            }
+            else
+            {
+                if (isDbNull)
+                    return default(T);
+                else
+                    return (T)dr[index];
+            }
         }
 
         public static void NoResult(string sql, params IDataParameter[] param)
