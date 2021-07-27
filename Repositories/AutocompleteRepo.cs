@@ -203,7 +203,11 @@ namespace HlidacStatu.Repositories
                     {
                         var fi = Firmy.Get(f.Item2);
                         if (fi.Valid)
-                            info = InfoFact.RenderInfoFacts(fi.InfoFacts(), 2, true, false, "", "{0}", false);
+                        {
+                            var stat = fi.StatistikaRegistruSmluv().Summary();
+                            info = Devmasters.Lang.Plural.Get(stat.PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv")
+                                + " za celkem " + Smlouva.NicePrice(stat.CelkovaHodnotaSmluv, html: false, shortFormat: true);
+                        }
                     }
                     res = new Autocomplete()
                     {
