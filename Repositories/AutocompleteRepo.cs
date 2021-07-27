@@ -17,6 +17,7 @@ namespace HlidacStatu.Repositories
     //migrace: tohle není repo - přestěhovat jinam => až budeme vytvářet samostatnou api
     public static class AutocompleteRepo
     {
+        static bool debug = System.Diagnostics.Debugger.IsAttached;
         /// <summary>
         /// Generates autocomplete data
         /// ! Slow, long running operation
@@ -165,7 +166,7 @@ namespace HlidacStatu.Repositories
         //používá se v administraci eventů pro naše politiky
         public static IEnumerable<Autocomplete> GenerateAutocompleteFirmyOnly()
         {
-            string sql = "select distinct Jmeno, ICO from Firma where LEN(ico) = 8 AND Kod_PF > 110;";
+            string sql = $"select {(debug ? "top 20" : "")} distinct Jmeno, ICO from Firma where LEN(ico) = 8 AND Kod_PF > 110;";
             var results = DirectDB.GetList<string, string>(sql)
                 .Select(f => new Autocomplete()
                 {
@@ -180,7 +181,7 @@ namespace HlidacStatu.Repositories
         {
             // Kod_PF < 110  - cokoliv co nejsou fyzické osoby, podnikatelé
             // Podnikatelé nejsou zařazeni, protože je jich poté moc a vznikají tam duplicity
-            string sql = $@"select Jmeno, ICO, KrajId, status, isInRs
+            string sql = $@"select {(debug ? "top 20" : "")} Jmeno, ICO, KrajId, status, isInRs
                              from Firma 
                             where LEN(ico) = 8 
                               AND Kod_PF > 110
@@ -189,7 +190,7 @@ namespace HlidacStatu.Repositories
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
 
-            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?, int?>>(DirectDB.GetList<string, string, string, int?, int?>(sql),
+            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?, int?>>(DirectDB.GetList<string, string, string, int?, int?>(sql).ToArray(),
                 (f) =>
                 {
                     Autocomplete res = null;
@@ -214,7 +215,7 @@ namespace HlidacStatu.Repositories
                     lock (lockObj)
                         results.Add(res);
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, null, true, prefix: "LoadSoukrFirmy ");
+                }, null, null, !debug, prefix: "LoadSoukrFirmy ");
 
             return results;
         }
@@ -222,7 +223,7 @@ namespace HlidacStatu.Repositories
         //státní firmy
         private static List<Autocomplete> LoadStateCompanies()
         {
-            string sql = $@"select Jmeno, ICO, KrajId, status 
+            string sql = $@"select {(debug ? "top 20" : "")} Jmeno, ICO, KrajId, status 
                              from Firma 
                             where IsInRS = 1 
                               AND LEN(ico) = 8 
@@ -245,7 +246,7 @@ namespace HlidacStatu.Repositories
         //úřady
         private static List<Autocomplete> LoadAuthorities()
         {
-            string sql = $@"select Jmeno, ICO, KrajId , status
+            string sql = $@"select {(debug ? "top 20" : "")} Jmeno, ICO, KrajId , status
                              from Firma 
                             where IsInRS = 1 
                               AND LEN(ico) = 8 
@@ -256,7 +257,7 @@ namespace HlidacStatu.Repositories
             List<Autocomplete> results = new List<Autocomplete>();
 
             Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?, int?>>(
-                DirectDB.GetList<string, string, string, int?, int?>(sql),
+                DirectDB.GetList<string, string, string, int?, int?>(sql).ToArray(),
                 (f) => {
                     string img = "<i class='fas fa-university'></i>";
 
@@ -285,13 +286,13 @@ namespace HlidacStatu.Repositories
                         results.Add(res);
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, null, true, prefix: "LoadUrady ");
+                }, null, null, !debug, prefix: "LoadUrady ");
 
             return results;
         }
         private static List<Autocomplete> LoadSynonyms()
         {
-            string sql = $@"select text, query, type, priority, imageElement, description from AutocompleteSynonyms where active=1;";
+            string sql = $@"select {(debug ? "top 20" : "")} text, query, type, priority, imageElement, description from AutocompleteSynonyms where active=1;";
             var results = DirectDB.GetList<string, string, string, int, string, string>(sql)
                 .AsParallel()
                 .Select(f => new Autocomplete()
@@ -308,7 +309,7 @@ namespace HlidacStatu.Repositories
         //obce
         private static List<Autocomplete> LoadCities()
         {
-            string sql = $@"select Jmeno, ICO, KrajId 
+            string sql = $@"select {(debug ? "top 20" : "")} Jmeno, ICO, KrajId 
                              from Firma 
                             where IsInRS = 1 
                               AND LEN(ico) = 8
@@ -319,7 +320,7 @@ namespace HlidacStatu.Repositories
             List<Autocomplete> results = new List<Autocomplete>();
 
             Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?, int?>>(
-                DirectDB.GetList<string, string, string, int?, int?>(sql),
+                DirectDB.GetList<string, string, string, int?, int?>(sql).ToArray(),
                 (f) => {
                     Autocomplete res = null;
                     string img = "<i class='fas fa-city'></i>";
@@ -355,7 +356,7 @@ namespace HlidacStatu.Repositories
                     lock (lockObj)
                         results.Add(res);
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, null, true, prefix: "LoadObce ");
+                }, null, null, !debug, prefix: "LoadObce ");
 
             return results;
         }
@@ -398,7 +399,7 @@ namespace HlidacStatu.Repositories
 
                                return new Devmasters.Batch.ActionOutputData();
                            }
-                           , null,null,true, prefix:"LoadPeople ");
+                           , null,null,!debug, prefix:"LoadPeople ");
 
             }
             return results;
