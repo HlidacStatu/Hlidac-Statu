@@ -216,7 +216,7 @@ namespace FullTextSearch
             if (tokenizedQuery.Length > 2) // 3+ words
             {
                 string shorterQuery = string.Join(" ", tokenizedQuery.Take(tokenizedQuery.Length - 1));
-                if (sentence.Text.StartsWith(shorterQuery) )
+                if (sentence.Text.StartsWith(shorterQuery, StringComparison.Ordinal) )
                 {
                     return score + _options.AlmostExactMatchBonus ?? 0;
                 }

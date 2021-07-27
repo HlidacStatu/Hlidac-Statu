@@ -35,7 +35,7 @@ namespace FullTextSearch
             var subdictionary = GetSubdictionary(word);
             
             return subdictionary
-                .Where(t => t.Key.StartsWith(word))
+                .Where(t => t.Key.StartsWith(word, StringComparison.Ordinal))
                 .Select(x => x.Value);
         }
 

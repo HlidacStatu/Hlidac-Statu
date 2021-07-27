@@ -36,7 +36,8 @@ namespace FullTextSearch
         /// </summary>
         public bool StartsWith(string value)
         {
-            return Word.StartsWith(value);
+            //return Word.StartsWith(value);
+            return Word.StartsWith(value, StringComparison.Ordinal);
         }
 
         public override string ToString()
