@@ -214,7 +214,7 @@ namespace HlidacStatu.Repositories
                     lock (lockObj)
                         results.Add(res);
                     return new Devmasters.Batch.ActionOutputData();
-                }, true);
+                }, null, null, true, prefix: "LoadSoukrFirmy ");
 
             return results;
         }
@@ -285,7 +285,7 @@ namespace HlidacStatu.Repositories
                         results.Add(res);
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, true);
+                }, null, null, true, prefix: "LoadUrady ");
 
             return results;
         }
@@ -355,7 +355,7 @@ namespace HlidacStatu.Repositories
                     lock (lockObj)
                         results.Add(res);
                     return new Devmasters.Batch.ActionOutputData();
-                }, true);
+                }, null, null, true, prefix: "LoadObce ");
 
             return results;
         }
@@ -398,8 +398,7 @@ namespace HlidacStatu.Repositories
 
                                return new Devmasters.Batch.ActionOutputData();
                            }
-                           , true
-                           );
+                           , null,null,true, prefix:"LoadPeople ");
 
             }
             return results;
