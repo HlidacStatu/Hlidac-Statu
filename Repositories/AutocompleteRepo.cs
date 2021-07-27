@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 using Devmasters.Enums;
+
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
@@ -33,7 +35,7 @@ namespace HlidacStatu.Repositories
 
             ParallelOptions po = new ParallelOptions();
             po.MaxDegreeOfParallelism = System.Diagnostics.Debugger.IsAttached ? 1 : po.MaxDegreeOfParallelism;
-            
+
             Parallel.Invoke(po,
                 () =>
                 {
@@ -147,7 +149,7 @@ namespace HlidacStatu.Repositories
                 }
                 );
 
-                Consts.Logger.Info("GenerateAutocomplete done");
+            Consts.Logger.Info("GenerateAutocomplete done");
 
             return companies
             .Concat(stateCompanies)
@@ -178,41 +180,61 @@ namespace HlidacStatu.Repositories
         {
             // Kod_PF < 110  - cokoliv co nejsou fyzické osoby, podnikatelé
             // Podnikatelé nejsou zařazeni, protože je jich poté moc a vznikají tam duplicity
-            string sql = $@"select Jmeno, ICO, KrajId 
+            string sql = $@"select Jmeno, ICO, KrajId, status, isInRs
                              from Firma 
                             where LEN(ico) = 8 
                               AND Kod_PF > 110
                               AND (Typ is null OR Typ={(int)Firma.TypSubjektuEnum.Soukromy});";
-            var results = DirectDB.GetList<string, string, string>(sql)
-                .AsParallel()
-                .Select(f => new Autocomplete()
+
+            var lockObj = new object();
+            List<Autocomplete> results = new List<Autocomplete>();
+
+            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?, int?>>(DirectDB.GetList<string, string, string, int?, int?>(sql),
+                (f) =>
                 {
-                    Id = $"ico:{f.Item2}",
-                    Text = f.Item1,
-                    Type = "firma",
-                    Description = FixKraj(f.Item3),
-                    Priority = 0,
-                    ImageElement = "<i class='fas fa-industry-alt'></i>"
-                }).ToList();
+                    Autocomplete res = null;
+                    string info = "";
+
+                    if (f.Item5 == 1)
+                    {
+                        var fi = Firmy.Get(f.Item2);
+                        if (fi.Valid)
+                            info = InfoFact.RenderInfoFacts(fi.InfoFacts(), 2, true, false, "", "{0}", false);
+                    }
+                    res = new Autocomplete()
+                    {
+                        Id = $"ico:{f.Item2}",
+                        Text = f.Item1,
+                        Type = ("firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
+                        Description = FixKraj(f.Item3) + (f.Item5 == 1 ? ", obchoduje se státem" : ""),
+                        Priority = 0,
+                        ImageElement = "<i class='fas fa-industry-alt'></i>"
+                    };
+
+                    lock (lockObj)
+                        results.Add(res);
+                    return new Devmasters.Batch.ActionOutputData();
+                }, true);
+
             return results;
         }
 
         //státní firmy
         private static List<Autocomplete> LoadStateCompanies()
         {
-            string sql = $@"select Jmeno, ICO, KrajId 
+            string sql = $@"select Jmeno, ICO, KrajId, status 
                              from Firma 
                             where IsInRS = 1 
                               AND LEN(ico) = 8 
                               AND Kod_PF > 110
                               AND Typ={(int)Firma.TypSubjektuEnum.PatrimStatu};";
-            var results = DirectDB.GetList<string, string, string>(sql)
+            var results = DirectDB.GetList<string, string, string, int?>(sql)
                 .AsParallel()
                 .Select(f => new Autocomplete()
                 {
                     Id = $"ico:{f.Item2}",
                     Text = f.Item1,
-                    Type = "státní firma",
+                    Type = ("státní firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
                     Description = FixKraj(f.Item3),
                     Priority = 1,
                     ImageElement = "<i class='fas fa-industry-alt'></i>"
@@ -223,23 +245,48 @@ namespace HlidacStatu.Repositories
         //úřady
         private static List<Autocomplete> LoadAuthorities()
         {
-            string sql = $@"select Jmeno, ICO, KrajId 
+            string sql = $@"select Jmeno, ICO, KrajId , status
                              from Firma 
                             where IsInRS = 1 
                               AND LEN(ico) = 8 
                               AND Kod_PF > 110
                               AND Typ={(int)Firma.TypSubjektuEnum.Ovm};";
-            var results = DirectDB.GetList<string, string, string>(sql)
-                .AsParallel()
-                .Select(f => new Autocomplete()
-                {
-                    Id = $"ico:{f.Item2}",
-                    Text = f.Item1,
-                    Type = "úřad",
-                    Description = FixKraj(f.Item3),
-                    Priority = 2,
-                    ImageElement = "<i class='fas fa-university'></i>"
-                }).ToList();
+
+            var lockObj = new object();
+            List<Autocomplete> results = new List<Autocomplete>();
+
+            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?, int?>>(
+                DirectDB.GetList<string, string, string, int?, int?>(sql),
+                (f) => {
+                    string img = "<i class='fas fa-university'></i>";
+
+                    if (f.Item5 == 1)
+                    {
+                        var fi = Firmy.Get(f.Item2);
+                        if (fi.Valid)
+                        {
+                            var o = fi.Ceo().Osoba;
+                            if (o != null)
+                                img = $"<img src='{o.GetPhotoUrl(false)}' />";
+                        }                            
+                    };
+
+                    var res = new Autocomplete()
+                    {
+                        Id = $"ico:{f.Item2}",
+                        Text = f.Item1,
+                        Type = "úřad",
+                        Description = FixKraj(f.Item3) ,
+                        Priority = 2,
+                        ImageElement = img
+                    };
+
+                    lock (lockObj)
+                        results.Add(res);
+
+                    return new Devmasters.Batch.ActionOutputData();
+                }, true);
+
             return results;
         }
         private static List<Autocomplete> LoadSynonyms()
@@ -267,29 +314,48 @@ namespace HlidacStatu.Repositories
                               AND LEN(ico) = 8
                               AND Stav_subjektu = 1 
                               AND Typ={(int)Firma.TypSubjektuEnum.Obec};";
-            var results = DirectDB.GetList<string, string, string>(sql)
-                .AsParallel()
-                .SelectMany(f =>
-                {
+
+            var lockObj = new object();
+            List<Autocomplete> results = new List<Autocomplete>();
+
+            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?, int?>>(
+                DirectDB.GetList<string, string, string, int?, int?>(sql),
+                (f) => {
+                    Autocomplete res = null;
+                    string img = "<i class='fas fa-city'></i>";
+
+                    if (f.Item5 == 1)
+                    {
+                        var fi = Firmy.Get(f.Item2);
+                        if (fi.Valid)
+                        {
+                            var o = fi.Ceo().Osoba;
+                            if (o != null)
+                                img = $"<img src='{o.GetPhotoUrl(false)}' />";
+                        }
+                    };
+
                     var synonyms = new Autocomplete[2];
                     synonyms[0] = new Autocomplete()
                     {
                         Id = $"ico:{f.Item2}",
                         Text = f.Item1,
-                        Type = "obec",
+                        Type = "obec" ,
                         Description = FixKraj(f.Item3),
                         Priority = 2,
-                        ImageElement = "<i class='fas fa-industry-alt'></i>"
+                        ImageElement = img
                     };
-
                     synonyms[1] = synonyms[0].Clone();
                     string synonymText = Regex.Replace(f.Item1,
                         @"^(Město|Městská část|Městys|Obec|Statutární město) ?",
                         "",
                         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                     synonyms[1].Text = synonymText;
-                    return synonyms;
-                }).ToList();
+
+                    lock (lockObj)
+                        results.Add(res);
+                    return new Devmasters.Batch.ActionOutputData();
+                }, true);
 
             return results;
         }
@@ -301,7 +367,7 @@ namespace HlidacStatu.Repositories
             List<Autocomplete> results = new List<Autocomplete>();
             using (DbEntities db = new DbEntities())
             {
-                
+
                 Devmasters.Batch.Manager.DoActionForAll<Osoba>(db.Osoba.AsQueryable()
                        .Where(o => o.Status == (int)Osoba.StatusOsobyEnum.Politik
                            || o.Status == (int)Osoba.StatusOsobyEnum.Sponzor),

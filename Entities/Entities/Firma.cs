@@ -109,10 +109,13 @@ namespace HlidacStatu.Entities
         }
 
 
-
         public string StatusFull(bool shortText = false)
         {
-            switch (Status)
+            return StatusFull(this.Status, shortText);
+        }
+        public static string StatusFull(int? status, bool shortText = false)
+        {
+            switch (status)
             {
                 case 1:
                     return shortText ? "" : "";
