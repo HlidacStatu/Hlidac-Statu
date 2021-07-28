@@ -172,7 +172,8 @@ namespace FullTextSearch
             for (int wordPosition = 0; wordPosition < sentence.Tokens.Count; wordPosition++)
             {
                 // token score
-                score += ScoreToken(sentence.Tokens[wordPosition], tokensToScore);
+                if(tokensToScore.Count > 0)
+                    score += ScoreToken(sentence.Tokens[wordPosition], tokensToScore);
 
                 // bonus for first words
                 if (_options.FirstWordsBonus != null 
@@ -231,9 +232,6 @@ namespace FullTextSearch
 
         private double ScoreToken(Token<T> token, HashSet<string> queryTokens)
         {
-            if (queryTokens.Count == 0)
-                return 0;
-            
             double overallScore = 0;
             string hit = "";
 
