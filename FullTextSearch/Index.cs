@@ -165,11 +165,12 @@ namespace FullTextSearch
             int firstWordBonusTokenPosition = 0;
             int chainBonusTokenPosition = 0;
             double chainScore = 0;
+            HashSet<string> tokensToScore = new HashSet<string>(tokenizedQuery);
 
             for (int wordPosition = 0; wordPosition < sentence.Tokens.Count; wordPosition++)
             {
                 // token score
-                score += ScoreToken(sentence.Tokens[wordPosition], tokenizedQuery);
+                score += ScoreToken(sentence.Tokens[wordPosition], tokensToScore);
 
                 // bonus for first words
                 if (_options.FirstWordsBonus != null 
@@ -226,9 +227,13 @@ namespace FullTextSearch
             return score;
         }
 
-        private double ScoreToken(Token<T> token, string[] queryTokens)
+        private double ScoreToken(Token<T> token, HashSet<string> queryTokens)
         {
+            if (queryTokens.Count == 0)
+                return 0;
+            
             double overallScore = 0;
+            string hit = "";
 
             foreach (var queryToken in queryTokens)
             {
@@ -244,10 +249,15 @@ namespace FullTextSearch
                     }
 
                     overallScore += basicScore;
+                    hit = queryToken;
+                    break;
                 }
-                
             }
 
+            //one word is only matched once!
+            if(!string.IsNullOrWhiteSpace(hit))
+                queryTokens.Remove(hit);
+            
             return overallScore;
         }
     }
