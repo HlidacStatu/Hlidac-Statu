@@ -65,6 +65,10 @@ namespace HlidacStatu.Entities
                 [GroupValue("Samospráva")]
                 [NiceDisplayName("Obce s rozšířenou působností")]
                 Obce_III_stupne = 11,
+                [Disabled()]
+                [GroupValue("Samospráva")]
+                [NiceDisplayName("Obce")]
+                Obce = 14,
                 [GroupValue("Samospráva")]
                 [NiceDisplayName("Statutární města")]
                 Statutarni_mesta = 103,

@@ -306,24 +306,18 @@ namespace HlidacStatu.Repositories
         //obce
         private static List<Autocomplete> LoadCities()
         {
-            string sql = $@"select Jmeno, ICO, KrajId 
-                             from Firma 
-                            where IsInRS = 1 
-                              AND LEN(ico) = 8
-                              AND Stav_subjektu = 1 
-                              AND Typ={(int)Firma.TypSubjektuEnum.Obec};";
 
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
 
-            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string>>(
-                DirectDB.GetList<string, string, string>(sql).ToArray(),
+            Devmasters.Batch.Manager.DoActionForAll<Firma.Zatrideni.Item>(
+                HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty( Firma.Zatrideni.StatniOrganizaceObor.Obce) ,
                 (f) =>
                 {
                     Autocomplete res = null;
                     string img = "<i class='fas fa-city'></i>";
 
-                    var fi = Firmy.Get(f.Item2);
+                    var fi = Firmy.Get(f.Ico);
                     if (fi.Valid)
                     {
                         var o = fi.Ceo().Osoba;
@@ -334,15 +328,15 @@ namespace HlidacStatu.Repositories
                     var synonyms = new Autocomplete[2];
                     synonyms[0] = new Autocomplete()
                     {
-                        Id = $"ico:{f.Item2}",
-                        Text = f.Item1,
+                        Id = $"ico:{f.Ico}",
+                        Text = f.Jmeno,
                         Type = "obec",
-                        Description = FixKraj(f.Item3),
+                        Description = f.Kraj,
                         Priority = 2,
                         ImageElement = img
                     };
                     synonyms[1] = synonyms[0].Clone();
-                    string synonymText = Regex.Replace(f.Item1,
+                    string synonymText = Regex.Replace(f.Jmeno,
                         @"^(Město|Městská část|Městys|Obec|Statutární město) ?",
                         "",
                         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
@@ -350,7 +344,10 @@ namespace HlidacStatu.Repositories
 
                     if (res != null)
                         lock (lockObj)
-                            results.Add(res);
+                        {
+                            results.Add(synonyms[0]);
+                            results.Add(synonyms[1]);
+                        }
                     return new Devmasters.Batch.ActionOutputData();
                 }, null, progressWriter.Write, true, prefix: "LoadObce ");
 
