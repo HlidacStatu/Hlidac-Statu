@@ -170,7 +170,7 @@ namespace HlidacStatu.Repositories
         //používá se v administraci eventů pro naše politiky
         public static IEnumerable<Autocomplete> GenerateAutocompleteFirmyOnly()
         {
-            string sql = $"select {(debug ? "top 20" : "")} distinct Jmeno, ICO from Firma where LEN(ico) = 8 AND Kod_PF > 110;";
+            string sql = $"select distinct Jmeno, ICO from Firma where LEN(ico) = 8 AND Kod_PF > 110;";
             var results = DirectDB.GetList<string, string>(sql)
                 .Select(f => new Autocomplete()
                 {
@@ -185,7 +185,7 @@ namespace HlidacStatu.Repositories
         {
             // Kod_PF < 110  - cokoliv co nejsou fyzické osoby, podnikatelé
             // Podnikatelé nejsou zařazeni, protože je jich poté moc a vznikají tam duplicity
-            string sql = $@"select {(debug ? "top 20" : "")} Jmeno, ICO, KrajId, status, isInRs
+            string sql = $@"select Jmeno, ICO, KrajId, status, isInRs
                              from Firma 
                             where LEN(ico) = 8 
                               AND Kod_PF > 110
@@ -213,7 +213,7 @@ namespace HlidacStatu.Repositories
                             results.Add(res);
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, progressWriter.Write, !debug, prefix: "LoadSoukrFirmy ");
+                }, null, progressWriter.Write, true, prefix: "LoadSoukrFirmy ");
 
             return results;
         }
@@ -221,7 +221,7 @@ namespace HlidacStatu.Repositories
         //státní firmy
         private static List<Autocomplete> LoadStateCompanies()
         {
-            string sql = $@"select {(debug ? "top 20" : "")} Jmeno, ICO, KrajId, status 
+            string sql = $@"select Jmeno, ICO, KrajId, status 
                              from Firma 
                             where IsInRS = 1 
                               AND LEN(ico) = 8 
@@ -244,7 +244,7 @@ namespace HlidacStatu.Repositories
         //úřady
         private static List<Autocomplete> LoadAuthorities()
         {
-            string sql = $@"select {(debug ? "top 20" : "")} Jmeno, ICO, KrajId , status
+            string sql = $@"select Jmeno, ICO, KrajId , status
                              from Firma 
                             where IsInRS = 1 
                               AND LEN(ico) = 8 
@@ -283,13 +283,13 @@ namespace HlidacStatu.Repositories
                             results.Add(res);
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, progressWriter.Write, !debug, prefix: "LoadUrady ");
+                }, null, progressWriter.Write, true, prefix: "LoadUrady ");
 
             return results;
         }
         private static List<Autocomplete> LoadSynonyms()
         {
-            string sql = $@"select {(debug ? "top 20" : "")} text, query, type, priority, imageElement, description from AutocompleteSynonyms where active=1;";
+            string sql = $@"select text, query, type, priority, imageElement, description from AutocompleteSynonyms where active=1;";
             var results = DirectDB.GetList<string, string, string, int, string, string>(sql)
                 .AsParallel()
                 .Select(f => new Autocomplete()
@@ -306,7 +306,7 @@ namespace HlidacStatu.Repositories
         //obce
         private static List<Autocomplete> LoadCities()
         {
-            string sql = $@"select {(debug ? "top 20" : "")} Jmeno, ICO, KrajId 
+            string sql = $@"select Jmeno, ICO, KrajId 
                              from Firma 
                             where IsInRS = 1 
                               AND LEN(ico) = 8
@@ -352,7 +352,7 @@ namespace HlidacStatu.Repositories
                         lock (lockObj)
                             results.Add(res);
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, progressWriter.Write, !debug, prefix: "LoadObce ");
+                }, null, progressWriter.Write, true, prefix: "LoadObce ");
 
             return results;
         }
@@ -395,7 +395,7 @@ namespace HlidacStatu.Repositories
 
                                return new Devmasters.Batch.ActionOutputData();
                            }
-                           , null, progressWriter.Write, !debug, prefix: "LoadPeople ");
+                           , null, progressWriter.Write, true, prefix: "LoadPeople ");
 
             }
             return results;
