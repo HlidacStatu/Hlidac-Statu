@@ -26,8 +26,9 @@ namespace HlidacStatu.Repositories
         /// ! Slow, long running operation
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<Autocomplete> GenerateAutocomplete()
+        public static IEnumerable<Autocomplete> GenerateAutocomplete(bool debug = false)
         {
+            AutocompleteRepo.debug = debug;
             IEnumerable<Autocomplete> companies = new List<Autocomplete>();
             IEnumerable<Autocomplete> stateCompanies = new List<Autocomplete>();
             IEnumerable<Autocomplete> authorities = new List<Autocomplete>();
@@ -38,7 +39,7 @@ namespace HlidacStatu.Repositories
             IEnumerable<Autocomplete> operators = new List<Autocomplete>();
 
             ParallelOptions po = new ParallelOptions();
-            po.MaxDegreeOfParallelism = debug ? 1 : po.MaxDegreeOfParallelism;
+            po.MaxDegreeOfParallelism = debug ? 1 : 10;
 
             Parallel.Invoke(po,
                 () =>
