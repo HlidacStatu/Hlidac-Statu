@@ -197,30 +197,20 @@ namespace HlidacStatu.Repositories
                 (f) =>
                 {
                     Autocomplete res = null;
-                    string info = "";
-
-                    if (f.Item5 == 1)
-                    {
-                        var fi = Firmy.Get(f.Item2);
-                        if (fi.Valid)
-                        {
-                            var stat = fi.StatistikaRegistruSmluv().Summary();
-                            info = Devmasters.Lang.Plural.Get(stat.PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv")
-                                + " za celkem " + Smlouva.NicePrice(stat.CelkovaHodnotaSmluv, html: false, shortFormat: true);
-                        }
-                    }
                     res = new Autocomplete()
                     {
                         Id = $"ico:{f.Item2}",
                         Text = f.Item1,
                         Type = ("firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
-                        Description = FixKraj(f.Item3) + " " + info,
+                        Description = FixKraj(f.Item3),
                         Priority = 0,
                         ImageElement = "<i class='fas fa-industry-alt'></i>"
                     };
 
-                    lock (lockObj)
-                        results.Add(res);
+                    if (res != null)
+                        lock (lockObj)
+                            results.Add(res);
+
                     return new Devmasters.Batch.ActionOutputData();
                 }, null, progressWriter.Write, !debug, prefix: "LoadSoukrFirmy ");
 
@@ -287,8 +277,9 @@ namespace HlidacStatu.Repositories
                         ImageElement = img
                     };
 
-                    lock (lockObj)
-                        results.Add(res);
+                    if (res != null)
+                        lock (lockObj)
+                            results.Add(res);
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, null, progressWriter.Write, !debug, prefix: "LoadUrady ");
@@ -356,8 +347,9 @@ namespace HlidacStatu.Repositories
                         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                     synonyms[1].Text = synonymText;
 
-                    lock (lockObj)
-                        results.Add(res);
+                    if (res != null)
+                        lock (lockObj)
+                            results.Add(res);
                     return new Devmasters.Batch.ActionOutputData();
                 }, null, progressWriter.Write, !debug, prefix: "LoadObce ");
 
