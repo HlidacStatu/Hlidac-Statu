@@ -310,9 +310,8 @@ namespace HlidacStatu.Repositories
 
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
-
-            Devmasters.Batch.Manager.DoActionForAll<Firma.Zatrideni.Item>(
-                HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty( Firma.Zatrideni.StatniOrganizaceObor.Obce) ,
+            var obce = HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty(Firma.Zatrideni.StatniOrganizaceObor.Obce);
+            Devmasters.Batch.Manager.DoActionForAll<Firma.Zatrideni.Item>(obce,
                 (f) =>
                 {
                     Autocomplete res = null;
@@ -343,7 +342,6 @@ namespace HlidacStatu.Repositories
                         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                     synonyms[1].Text = synonymText;
 
-                    if (res != null)
                         lock (lockObj)
                         {
                             results.Add(synonyms[0]);
