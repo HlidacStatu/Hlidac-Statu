@@ -32,6 +32,8 @@ namespace FullTextSearch
             var intv = swl.AddAndStartLap($"BuildIndex for {inputObjects.Count()} items");
             foreach (T inputObject in inputObjects)
             {
+                if (inputObject == null)
+                    continue;
                 var sentence = new Sentence<T>(inputObject, _tokenizer);
 
                 SortedTokens.AddTokens(sentence.Tokens);
