@@ -18,6 +18,16 @@
                 <a href="@Model.GetUrl()">
                     <div class="photo">
                         <div class="profile-picture" style="background-image: url('@Model.GetPhotoUrl(local: true)')"></div>
+                        <div style="padding-right: 16px; top: -10px; position: relative;" class="text-muted small text-center">
+                            @if (Model.HasPhoto())
+                            {
+                                <a href="/manage/changephoto/@(Model.NameId)">změnit foto</a>
+                            }
+                            else
+                            { 
+                            <a href="/manage/changephoto/@(Model.NameId)">přidat foto</a>
+                            }
+                        </div>
                     </div>
                 </a>
             </div>
@@ -46,11 +56,11 @@
         <h4>Chci hlídat</h4>
         <div>
             @{
-                var wdModel = new WatchdogViewModel(null, $"OsobaId:{Model.NameId}", $"Vše o <b>{Model.FullName()}</b>", 
+                var wdModel = new WatchdogViewModel(null, $"OsobaId:{Model.NameId}", $"Vše o <b>{Model.FullName()}</b>",
                     buttonCss: "btn btn-warning btn-xs", prefillWDname: $"Novinky pro {Model.FullName()}",
-                    showWdList: false, preButtonText: "" );
-                
-                <partial name="WebUtil/AddWatchdog" model="wdModel"/>
+                    showWdList: false, preButtonText: "");
+
+                <partial name="WebUtil/AddWatchdog" model="wdModel" />
             }
 
         </div>
