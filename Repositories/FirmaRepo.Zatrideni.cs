@@ -62,6 +62,7 @@ namespace HlidacStatu.Repositories
                     case Firma.Zatrideni.StatniOrganizaceObor.Mestske_casti_Prahy:
                     case Firma.Zatrideni.StatniOrganizaceObor.OVM_pro_evidenci_skutecnych_majitelu:
                     case Firma.Zatrideni.StatniOrganizaceObor.Obce_III_stupne:
+                    case Firma.Zatrideni.StatniOrganizaceObor.Obce:
                         icos = GetSubjektyFromRPP((int)obor);
                         break;
                     case Firma.Zatrideni.StatniOrganizaceObor.Vsechny_ustredni_organy_statni_spravy:

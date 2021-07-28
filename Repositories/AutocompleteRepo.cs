@@ -46,6 +46,20 @@ namespace HlidacStatu.Repositories
                 {
                     try
                     {
+                        Consts.Logger.Info("GenerateAutocomplete Loading cities");
+                        cities = LoadCities();
+                        Consts.Logger.Info("GenerateAutocomplete Loading cities done");
+                    }
+                    catch (Exception e)
+                    {
+                        Consts.Logger.Error("GenerateAutocomplete Cities error ", e);
+                    }
+                },
+
+                () =>
+                {
+                    try
+                    {
                         Consts.Logger.Info("GenerateAutocomplete Loading companies");
                         companies = LoadCompanies();
                         Consts.Logger.Info("GenerateAutocomplete Loading companies done");
@@ -83,19 +97,6 @@ namespace HlidacStatu.Repositories
                     }
                 },
 
-                () =>
-                {
-                    try
-                    {
-                        Consts.Logger.Info("GenerateAutocomplete Loading cities");
-                        cities = LoadCities();
-                        Consts.Logger.Info("GenerateAutocomplete Loading cities done");
-                    }
-                    catch (Exception e)
-                    {
-                        Consts.Logger.Error("GenerateAutocomplete Cities error ", e);
-                    }
-                },
 
                 () =>
                 {
