@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
 namespace FullTextSearch
 {
@@ -58,6 +59,29 @@ namespace FullTextSearch
         {
             return string.IsNullOrEmpty(word) ? NullChar : word.FirstOrDefault();
         }
+        
+        
+        public byte[] Serialize()
+        {
+            var structure = _innerStructure
+                .SelectMany(s => s.Value.SelectMany(x => x.Value.Sentences))
+                .Distinct()
+                .Select(v => new SerializableSentence<T>(v))
+                .ToList();
+            
+            return JsonSerializer.SerializeToUtf8Bytes(structure);
+            //return jsonUtf8Bytes;
+
+            // JsonSerializerOptions serializerOptions = new JsonSerializerOptions()
+            // {
+            //     ReferenceHandler = ReferenceHandler.Preserve
+            // };
+            //
+            //return JsonSerializer.Serialize(structure);
+
+            
+        }
+        
         
     }
         

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
 namespace FullTextSearch
 {
@@ -13,10 +14,8 @@ namespace FullTextSearch
         private readonly Options _options;
 
         public Index(IEnumerable<T> inputObjects)
+            : this(inputObjects, Tokenizer.DefaultTokenizer(), Options.DefaultOptions())
         {
-            _tokenizer = Tokenizer.DefaultTokenizer();
-            _options = Options.DefaultOptions();
-            BuildIndex(inputObjects);
         }
 
         public Index(IEnumerable<T> inputObjects, ITokenizer tokenizer, Options options)
@@ -24,6 +23,47 @@ namespace FullTextSearch
             _tokenizer = tokenizer;
             _options = options;
             BuildIndex(inputObjects);
+        }
+
+        //ctor for deserialization        
+        private Index(TokenTree<T> sortedTokens, ITokenizer tokenizer, Options options)
+        {
+            _tokenizer = Tokenizer.DefaultTokenizer();
+            _options = Options.DefaultOptions();
+            SortedTokens = sortedTokens;
+
+            // foreach (var sentence in sentences)
+            // {
+            //     SortedTokens.AddTokens(sentence.Tokens);
+            // }
+        }
+
+        public static Index<T> Deserialize(byte[] json, ITokenizer tokenizer = null, Options options = null)
+        {
+            //json to Sentence list
+            tokenizer = tokenizer ?? Tokenizer.DefaultTokenizer();
+            options = options ?? Options.DefaultOptions();
+            
+            List<SerializableSentence<T>> deserializedSentences =
+                JsonSerializer.Deserialize<List<SerializableSentence<T>>>(json);
+
+            if (deserializedSentences is null)
+                throw new Exception("Deserialization failed");
+
+            var tokenTree = new TokenTree<T>();
+            
+            foreach (var deserializedSentence in deserializedSentences)
+            {
+                var sentence = new Sentence<T>(deserializedSentence, tokenizer);
+                tokenTree.AddTokens(sentence.Tokens);
+            }
+                
+            return new Index<T>(tokenTree, tokenizer, options);
+        }
+        
+        public byte[] Serialize()
+        {
+            return SortedTokens.Serialize();
         }
 
         private void BuildIndex(IEnumerable<T> inputObjects)
@@ -38,6 +78,7 @@ namespace FullTextSearch
 
                 SortedTokens.AddTokens(sentence.Tokens);
             }
+
             intv.Stop();
             Log.Logger.Info(string.Join("\n", swl.Laps.Select(m => $"{m.Name} : {m.ExactElapsedMs:# ##0.00}ms")));
         }
@@ -50,7 +91,8 @@ namespace FullTextSearch
         /// <param name="sortFunctionDescending">Sorts results with the same weight descending</param>
         /// <param name="filterFunction">Reduce returned results</param>
         /// <returns></returns>
-        public IEnumerable<Result<T>> Search(string query, int count, Func<T,int> sortFunctionDescending = null, Func<T,bool> filterFunction = null )
+        public IEnumerable<Result<T>> Search(string query, int count, Func<T, int> sortFunctionDescending = null,
+            Func<T, bool> filterFunction = null)
         {
             Devmasters.DT.StopWatchLaps swl = new Devmasters.DT.StopWatchLaps();
             var intv = swl.AddAndStartLap($"{query}: tokenize");
@@ -58,24 +100,24 @@ namespace FullTextSearch
 
             intv.Stop();
             intv = swl.AddAndStartLap($"{query}: sort tokens");
-            
+
             var foundSentences = AndSearch(tokenizedQuery);
-            
+
             if (filterFunction != null)
             {
                 foundSentences = foundSentences
-                    .Where(x => filterFunction(x.Original) );
+                    .Where(x => filterFunction(x.Original));
             }
-            
+
             if (!foundSentences.Any())
                 return Enumerable.Empty<Result<T>>();
             intv.Stop();
 
             intv = swl.AddAndStartLap($"{query}: calc score");
 
-            
+
             var summedResults = ScoreSentences(foundSentences, tokenizedQuery);
-            
+
             intv.Stop();
             intv = swl.AddAndStartLap($"{query}: final order");
 
@@ -99,16 +141,15 @@ namespace FullTextSearch
                 final = final.ThenByDescending(x => sortFunctionDescending(x.Sentence.Original));
                 intv.Stop();
             }
-            
+
             if (swl.Summary().ExactElapsedMs >= 500d)
             {
                 Log.Logger.Info(
                     string.Join("\n", swl.Laps.Select(m => $"{m.Name} : {m.ExactElapsedMs:# ##0.00}ms"))
                     + $"\nTOTAL : {swl.Summary().ExactElapsedMs:# ##0.00}ms"
-                    );
-
+                );
             }
-            
+
             return final
                 .Take(count)
                 .Select(x => new Result<T>()
@@ -116,7 +157,6 @@ namespace FullTextSearch
                     Original = x.Sentence.Original,
                     Score = x.Score
                 });
-                
         }
 
         //najde všechny věty, kde se tokeny vyskytují
@@ -140,6 +180,7 @@ namespace FullTextSearch
 
                 previousSentences = previousSentences.Intersect(foundSentences);
             }
+
             return previousSentences;
         }
 
@@ -147,11 +188,11 @@ namespace FullTextSearch
         private List<ScoredSentence<T>> ScoreSentences(IEnumerable<Sentence<T>> foundSentences, string[] tokenizedQuery)
         {
             var result = new List<ScoredSentence<T>>();
-            
+
             foreach (var sentence in foundSentences)
             {
                 var score = ScoreSentence(sentence, tokenizedQuery);
-                result.Add(new ScoredSentence<T>(sentence, score)); 
+                result.Add(new ScoredSentence<T>(sentence, score));
             }
 
             return result;
@@ -172,25 +213,25 @@ namespace FullTextSearch
             for (int wordPosition = 0; wordPosition < sentence.Tokens.Count; wordPosition++)
             {
                 // token score
-                if(tokensToScore.Count > 0)
+                if (tokensToScore.Count > 0)
                     score += ScoreToken(sentence.Tokens[wordPosition], tokensToScore);
 
                 // bonus for first words
-                if (_options.FirstWordsBonus != null 
+                if (_options.FirstWordsBonus != null
                     && wordPosition < _options.FirstWordsBonus.BonusWordsCount
                     && firstWordBonusTokenPosition < tokenizedQuery.Length)
                 {
                     string queryToken = tokenizedQuery[firstWordBonusTokenPosition];
                     if (sentence.Tokens[wordPosition].StartsWith(queryToken))
                     {
-                        score += queryToken.Length 
-                                 * (_options.FirstWordsBonus.MaxBonusMultiplier - 
+                        score += queryToken.Length
+                                 * (_options.FirstWordsBonus.MaxBonusMultiplier -
                                     (_options.FirstWordsBonus.BonusMultiplierDegradation * wordPosition));
 
                         firstWordBonusTokenPosition++;
                     }
                 }
-                
+
                 // bonus for longest word chain
                 if (_options.ChainBonusMultiplier.HasValue
                     && chainBonusTokenPosition < tokenizedQuery.Length)
@@ -203,11 +244,10 @@ namespace FullTextSearch
                     }
                     else if (chainScore > 0) // ends after missing match
                         break;
-                
+
                     if (chainScore > 1)
                         score += chainScore * _options.ChainBonusMultiplier.Value; //todo: put it to options
                 }
-                
             }
 
             // Query == sentence
@@ -220,11 +260,10 @@ namespace FullTextSearch
             if (tokenizedQuery.Length > 2) // 3+ words
             {
                 string shorterQuery = string.Join(" ", tokenizedQuery.Take(tokenizedQuery.Length - 1));
-                if (sentence.Text.StartsWith(shorterQuery, StringComparison.Ordinal) )
+                if (sentence.Text.StartsWith(shorterQuery, StringComparison.Ordinal))
                 {
                     return score + _options.AlmostExactMatchBonus ?? 0;
                 }
-
             }
 
             return score;
@@ -240,9 +279,9 @@ namespace FullTextSearch
                 if (token.StartsWith(queryToken))
                 {
                     double basicScore = queryToken.Length;
-                    
+
                     // bonus for whole word
-                    if (_options.WholeWordBonusMultiplier.HasValue 
+                    if (_options.WholeWordBonusMultiplier.HasValue
                         && queryToken.Length == token.Word.Length)
                     {
                         basicScore *= _options.WholeWordBonusMultiplier.Value;
@@ -255,9 +294,9 @@ namespace FullTextSearch
             }
 
             //one word is only matched once!
-            if(!string.IsNullOrWhiteSpace(hit))
+            if (!string.IsNullOrWhiteSpace(hit))
                 queryTokens.Remove(hit);
-            
+
             return overallScore;
         }
     }

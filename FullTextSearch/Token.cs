@@ -5,13 +5,15 @@ namespace FullTextSearch
 {
     public class Token<T> : IEquatable<Token<T>>
     {
-        public string Word { get; set; }
+        private readonly int _wordHash;
+        public string Word { get; }
         public List<Sentence<T>> Sentences { get; set; } = new List<Sentence<T>>();
 
         public Token(Sentence<T> sentence, string word)
         {
             Word = word;
             Sentences.Add(sentence);
+            _wordHash = Word.GetHashCode();
         }
 
         public void MergeWith(Token<T> merged)
@@ -47,12 +49,13 @@ namespace FullTextSearch
 
         public override int GetHashCode()
         {
-            return Word.GetHashCode();
+            return _wordHash;
         }
 
         public bool Equals(Token<T> other)
         {
-            return Word.Equals(other.Word, StringComparison.InvariantCultureIgnoreCase);
+            return _wordHash == other?.GetHashCode();
+            //return Word.Equals(other.Word, StringComparison.Ordinal);
         }
     }
 }
