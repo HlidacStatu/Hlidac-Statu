@@ -48,8 +48,9 @@ namespace FullTextSearch
         /// <param name="query">What is searched for</param>
         /// <param name="count">How many results gets back</param>
         /// <param name="sortFunctionDescending">Sorts results with the same weight descending</param>
+        /// <param name="filterFunction">Reduce returned results</param>
         /// <returns></returns>
-        public IEnumerable<Result<T>> Search(string query, int count, Func<T,int> sortFunctionDescending = null)
+        public IEnumerable<Result<T>> Search(string query, int count, Func<T,int> sortFunctionDescending = null, Func<T,bool> filterFunction = null )
         {
             Devmasters.DT.StopWatchLaps swl = new Devmasters.DT.StopWatchLaps();
             var intv = swl.AddAndStartLap($"{query}: tokenize");
@@ -59,20 +60,19 @@ namespace FullTextSearch
             intv = swl.AddAndStartLap($"{query}: sort tokens");
             
             var foundSentences = AndSearch(tokenizedQuery);
+            
+            if (filterFunction != null)
+            {
+                foundSentences = foundSentences
+                    .Where(x => filterFunction(x.Original) );
+            }
+            
             if (!foundSentences.Any())
                 return Enumerable.Empty<Result<T>>();
-            
-            
             intv.Stop();
-            // intv = swl.AddAndStartLap($"{query}: group by score");
-            //
-            // var summedResults = results
-            //     .GroupBy(r => r.Sentence,
-            //         (sentence, result) => new ScoredSentence<T>(sentence, result.Sum(x => x.Score)))
-            //     .ToList();
-            //
-            // intv.Stop();
+
             intv = swl.AddAndStartLap($"{query}: calc score");
+
             
             var summedResults = ScoreSentences(foundSentences, tokenizedQuery);
             

@@ -316,7 +316,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                             .Highlight(h => Tools.GetHighlight<Smlouva>(withHighlighting))
                             .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null)
                     );
-                    if (res != null && res.IsValid == false && res.ServerError.Status == 429)
+                    if (res != null && res.IsValid == false && res.ServerError?.Status == 429)
                     {
                         Thread.Sleep(100);
                         res = client
@@ -331,7 +331,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                                 .Highlight(h => Tools.GetHighlight<Smlouva>(withHighlighting))
                                 .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null)
                         );
-                        if (res.IsValid == false && res.ServerError.Status == 429)
+                        if (res.IsValid == false && res.ServerError?.Status == 429)
                         {
                             Thread.Sleep(200);
                             res = client

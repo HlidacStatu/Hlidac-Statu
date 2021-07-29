@@ -206,7 +206,8 @@ namespace HlidacStatu.Repositories
                         Type = ("firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
                         Description = FixKraj(f.Item3),
                         Priority = 0,
-                        ImageElement = "<i class='fas fa-industry-alt'></i>"
+                        ImageElement = "<i class='fas fa-industry-alt'></i>",
+                        Category = Autocomplete.CategoryEnum.Company
                     };
 
                     if (res != null)
@@ -237,7 +238,8 @@ namespace HlidacStatu.Repositories
                     Type = ("státní firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
                     Description = FixKraj(f.Item3),
                     Priority = 1,
-                    ImageElement = "<i class='fas fa-industry-alt'></i>"
+                    ImageElement = "<i class='fas fa-industry-alt'></i>",
+                    Category = Autocomplete.CategoryEnum.StateCompany
                 }).ToList();
             return results;
         }
@@ -276,7 +278,8 @@ namespace HlidacStatu.Repositories
                         Type = "úřad",
                         Description = FixKraj(f.Item3),
                         Priority = 2,
-                        ImageElement = img
+                        ImageElement = img,
+                        Category = Autocomplete.CategoryEnum.Authority
                     };
 
                     if (res != null)
@@ -288,6 +291,7 @@ namespace HlidacStatu.Repositories
 
             return results;
         }
+        
         private static List<Autocomplete> LoadSynonyms()
         {
             string sql = $@"select text, query, type, priority, imageElement, description from AutocompleteSynonyms where active=1;";
@@ -300,10 +304,12 @@ namespace HlidacStatu.Repositories
                     Type = f.Item3,
                     Description = FixKraj(f.Item6),
                     Priority = f.Item4,
-                    ImageElement = f.Item5
+                    ImageElement = f.Item5,
+                    Category = Autocomplete.CategoryEnum.Synonym
                 }).ToList();
             return results;
         }
+        
         //obce
         private static List<Autocomplete> LoadCities()
         {
@@ -333,7 +339,8 @@ namespace HlidacStatu.Repositories
                         Type = "obec",
                         Description = f.Kraj,
                         Priority = 2,
-                        ImageElement = img
+                        ImageElement = img,
+                        Category = Autocomplete.CategoryEnum.City
                     };
                     synonyms[1] = synonyms[0].Clone();
                     string synonymText = Regex.Replace(f.Jmeno,
@@ -377,7 +384,8 @@ namespace HlidacStatu.Repositories
                                    ImageElement = $"<img src='{o.GetPhotoUrl(false)}' />",
                                    Description = InfoFact.RenderInfoFacts(
                                        o.InfoFacts().Where(i => i.Level != InfoFact.ImportanceLevel.Stat).ToArray(),
-                                       2, true, false, "", "{0}", false)
+                                       2, true, false, "", "{0}", false),
+                                   Category = Autocomplete.CategoryEnum.Person
                                };
 
                                synonyms[1] = synonyms[0].Clone();
@@ -429,6 +437,7 @@ namespace HlidacStatu.Repositories
                     Type = "Oblast smluv - upřesnění dotazu",
                     Description = $"Oblast {GetNiceNameForEnum(enumType, e)} - smlouvy z registru smluv",
                     ImageElement = $"<img src='/content/hlidacloga/Hlidac-statu-ctverec-norm.png' />",
+                    Category = Autocomplete.CategoryEnum.Oblast
                 };
 
                 synonyms[1] = synonyms[0].Clone();
@@ -451,6 +460,7 @@ namespace HlidacStatu.Repositories
                     Description = $"Logický operátor OR (NEBO)",
                     ImageElement = $"<img src='/content/hlidacloga/Hlidac-statu-ctverec-norm.png' />",
                     Priority = 3,
+                    Category = Autocomplete.CategoryEnum.Operator
                 },
                 new Autocomplete()
                 {
@@ -460,6 +470,7 @@ namespace HlidacStatu.Repositories
                     Description = $"Logický operátor AND (A)",
                     ImageElement = $"<img src='/content/hlidacloga/Hlidac-statu-ctverec-norm.png' />",
                     Priority = 3,
+                    Category = Autocomplete.CategoryEnum.Operator
                 }
             };
         }

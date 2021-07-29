@@ -11,7 +11,9 @@ namespace HlidacStatu.Entities
         public string Type { get; set; }
         public string Description { get; set; }
         public int Priority { get; set; }
-
+        
+        public CategoryEnum Category { get; set; }
+        
         public Autocomplete Clone() => (Autocomplete) MemberwiseClone();
 
         public bool Equals(Autocomplete other)
@@ -32,6 +34,19 @@ namespace HlidacStatu.Entities
         public override int GetHashCode()
         {
             return (Id != null ? StringComparer.InvariantCultureIgnoreCase.GetHashCode(Id) : 0);
+        }
+        
+        public enum CategoryEnum
+        {
+            Company,
+            StateCompany,
+            Authority,
+            City,
+            Person,
+            Oblast,
+            Synonym,
+            Operator,
+            Kindex
         }
     }
 
