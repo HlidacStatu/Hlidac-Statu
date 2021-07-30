@@ -251,7 +251,7 @@ namespace FullTextSearch
             }
 
             // Query == sentence
-            if (sentence.Text == string.Join(" ", tokenizedQuery))
+            if (CompareLists(sentence, tokenizedQuery))
             {
                 return score + _options.ExactMatchBonus ?? 0;
             }
@@ -259,8 +259,7 @@ namespace FullTextSearch
             // sentence starts with query without its last word
             if (tokenizedQuery.Length > 2) // 3+ words
             {
-                string shorterQuery = string.Join(" ", tokenizedQuery.Take(tokenizedQuery.Length - 1));
-                if (sentence.Text.StartsWith(shorterQuery, StringComparison.Ordinal))
+                if (CompareLists(sentence, tokenizedQuery, shortComparison: true))
                 {
                     return score + _options.AlmostExactMatchBonus ?? 0;
                 }
@@ -298,6 +297,22 @@ namespace FullTextSearch
                 queryTokens.Remove(hit);
 
             return overallScore;
+        }
+        
+        private bool CompareLists(Sentence<T> sentence, string[] tokenizedQuery, bool shortComparison = false)
+        {
+            int difference = shortComparison ? 1 : 0;
+            
+            if (sentence.Tokens.Count != tokenizedQuery.Length + difference)
+                return false;
+
+            for (int i = 0; i < sentence.Tokens.Count - difference; i++)
+            {
+                if (!string.Equals(sentence.Tokens[i].Word, tokenizedQuery[i], StringComparison.Ordinal))
+                    return false;
+            }
+
+            return true;
         }
     }
 }
