@@ -12,7 +12,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Cache.Couchbase" Version="2.3.0" />
+    <PackageReference Include="Devmasters.Cache.Couchbase" Version="2.3.1" />
     <PackageReference Include="Devmasters.Collections" Version="2.3.1.2" />
     <PackageReference Include="Devmasters.Core" Version="2.3.3" />
     <PackageReference Include="Devmasters.DT" Version="2.3.0" />
