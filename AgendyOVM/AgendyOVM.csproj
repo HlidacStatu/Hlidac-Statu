@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Devmasters.Args" Version="2.3.0" />
+    <PackageReference Include="Devmasters.Batch" Version="2.3.2.3" />
+    <PackageReference Include="Devmasters.Cache" Version="2.3.1" />
+    <PackageReference Include="Devmasters.Net" Version="2.3.0" />
+    <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.2.0" />
+  </ItemGroup>
+
+</Project>

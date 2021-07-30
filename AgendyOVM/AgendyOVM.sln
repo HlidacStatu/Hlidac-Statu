@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31515.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgendyOVM", "AgendyOVM.csproj", "{B1B0F742-1EE1-43B3-B858-FC92933F2317}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B1B0F742-1EE1-43B3-B858-FC92933F2317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1B0F742-1EE1-43B3-B858-FC92933F2317}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1B0F742-1EE1-43B3-B858-FC92933F2317}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1B0F742-1EE1-43B3-B858-FC92933F2317}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D2C2E7C8-EE9A-4797-8EB1-99EC50DF0026}
+	EndGlobalSection
+EndGlobal
