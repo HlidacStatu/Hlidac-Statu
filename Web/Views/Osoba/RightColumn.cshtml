@@ -15,21 +15,21 @@
 
         <div class="col-sm-4">
             <div class="person-profile-thumb">
-                <a href="@Model.GetUrl()">
-                    <div class="photo">
+                <div class="photo">
+                    <a href="@Model.GetUrl()">
                         <div class="profile-picture" style="background-image: url('@Model.GetPhotoUrl(local: true)')"></div>
-                        <div style="padding-right: 16px; top: -10px; position: relative;" class="text-muted small text-center">
-                            @if (Model.HasPhoto())
-                            {
-                                <a href="/manage/changephoto/@(Model.NameId)">změnit foto</a>
-                            }
-                            else
-                            { 
+                    </a>
+                    <div style="padding-right: 16px; position: relative;" class="text-muted small text-center">
+                        @if (Model.HasPhoto())
+                        {
+                            <a href="/manage/changephoto/@(Model.NameId)">změnit foto</a>
+                        }
+                        else
+                        {
                             <a href="/manage/changephoto/@(Model.NameId)">přidat foto</a>
-                            }
-                        </div>
+                        }
                     </div>
-                </a>
+                </div>
             </div>
         </div>
         <div class="col-sm-8">
