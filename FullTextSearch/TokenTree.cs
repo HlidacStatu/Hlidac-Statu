@@ -49,7 +49,7 @@ namespace FullTextSearch
                 return subdictionary;
             }
 
-            var emptyDictionary = new Dictionary<string, Token<T>>();
+            var emptyDictionary = new Dictionary<string, Token<T>>(StringComparer.Ordinal);
             _innerStructure.Add(key, emptyDictionary);
             
             return emptyDictionary;

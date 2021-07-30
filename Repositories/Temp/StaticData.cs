@@ -41,7 +41,7 @@ namespace HlidacStatu.Repositories
         public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_nedavne_Cache = null;
         public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_vsechny_Cache = null;
 
-        public static Devmasters.Cache.File.BinaryFileCache Autocomplete_Cache = null;
+        public static Devmasters.Cache.File.FileCache<byte[]> Autocomplete_Cache = null;
         public static Devmasters.Cache.File.FileCache<List<Autocomplete>> Autocomplete_Firmy_Cache = null;
         public static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<FullTextSearch.Index<Autocomplete>> FulltextSearchForAutocomplete = null;
 
@@ -423,7 +423,7 @@ namespace HlidacStatu.Repositories
                        return AnalysisCalculation.GetFirmyCasovePodezreleZalozene();
                    });
 
-                Autocomplete_Cache = new Devmasters.Cache.File.BinaryFileCache
+                Autocomplete_Cache = new Devmasters.Cache.File.FileCache<byte[]>
                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "AutocompleteV2",
                    (o) =>
                    {
