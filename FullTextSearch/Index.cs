@@ -101,13 +101,13 @@ namespace FullTextSearch
             intv.Stop();
             intv = swl.AddAndStartLap($"{query}: sort tokens");
 
-            var foundSentences = AndSearch(tokenizedQuery);
+            var foundSentences = AndSearch(tokenizedQuery, filterFunction);
 
-            if (filterFunction != null)
-            {
-                foundSentences = foundSentences
-                    .Where(x => filterFunction(x.Original));
-            }
+            // if (filterFunction != null)
+            // {
+            //     foundSentences = foundSentences
+            //         .Where(x => filterFunction(x.Original));
+            // }
 
             if (!foundSentences.Any())
                 return Enumerable.Empty<Result<T>>();
@@ -160,7 +160,7 @@ namespace FullTextSearch
         }
 
         //najde všechny věty, kde se tokeny vyskytují
-        private IEnumerable<Sentence<T>> AndSearch(string[] tokenizedQuery)
+        private IEnumerable<Sentence<T>> AndSearch(string[] tokenizedQuery, Func<T, bool> filterFunction = null)
         {
             IEnumerable<Sentence<T>> results = Enumerable.Empty<Sentence<T>>();
             if (tokenizedQuery.Length == 0)
@@ -171,6 +171,12 @@ namespace FullTextSearch
             {
                 var foundTokens = SortedTokens.FindTokens(queryToken);
                 var foundSentences = foundTokens.SelectMany(t => t.Sentences);
+                
+                if (filterFunction != null)
+                {
+                    foundSentences = foundSentences
+                        .Where(x => filterFunction(x.Original));
+                }
 
                 if (previousSentences is null)
                 {
