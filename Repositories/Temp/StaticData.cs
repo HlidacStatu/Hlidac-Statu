@@ -424,7 +424,7 @@ namespace HlidacStatu.Repositories
                    });
 
                 Autocomplete_Cache = new Devmasters.Cache.File.BinaryFileCache
-                   (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "Autocomplete",
+                   (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "AutocompleteV2",
                    (o) =>
                    {
                        Util.Consts.Logger.Info("Starting AutocompleteRepo.GenerateAutocomplete");
