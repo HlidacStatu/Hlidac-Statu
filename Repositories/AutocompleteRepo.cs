@@ -228,7 +228,8 @@ namespace HlidacStatu.Repositories
                             where IsInRS = 1 
                               AND LEN(ico) = 8 
                               AND Kod_PF > 110
-                              AND Typ={(int)Firma.TypSubjektuEnum.PatrimStatu};";
+                              AND Typ in ({(int)Firma.TypSubjektuEnum.PatrimStatu}
+                                ,{(int)Firma.TypSubjektuEnum.PatrimStatu25perc});";
             var results = DirectDB.GetList<string, string, string, int?>(sql)
                 .AsParallel()
                 .Select(f => new Autocomplete()
