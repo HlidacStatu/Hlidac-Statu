@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore;
 namespace HlidacStatu.Entities
 {
     [Table("Sponzoring")]
-    [Microsoft.EntityFrameworkCore.Index(nameof(IcoDarce), Name = "idx_sponzoring_IcoDarce")]
-    [Microsoft.EntityFrameworkCore.Index(nameof(IcoPrijemce), Name = "idx_sponzoring_IcoPrijemce")]
-    [Microsoft.EntityFrameworkCore.Index(nameof(OsobaIdDarce), Name = "idx_sponzoring_OsobaIdDarce")]
-    [Microsoft.EntityFrameworkCore.Index(nameof(OsobaIdPrijemce), Name = "idx_sponzoring_OsobaIdPrijemce")]
+    [Index(nameof(IcoDarce), Name = "idx_sponzoring_IcoDarce")]
+    [Index(nameof(IcoPrijemce), Name = "idx_sponzoring_IcoPrijemce")]
+    [Index(nameof(OsobaIdDarce), Name = "idx_sponzoring_OsobaIdDarce")]
+    [Index(nameof(OsobaIdPrijemce), Name = "idx_sponzoring_OsobaIdPrijemce")]
     public partial class Sponzoring
     {
         [Key]

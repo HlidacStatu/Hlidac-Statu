@@ -469,37 +469,6 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private static DateTime minBigSponzoringDate = new DateTime(DateTime.Now.Year - 10, 1, 1);
-        private static DateTime minSmallSponzoringDate = new DateTime(DateTime.Now.Year - 5, 1, 1);
-        private static decimal smallSponzoringThreshold = 10000;
-
-        public static Expression<Func<Sponzoring, bool>> SponzoringLimitsPredicate = s =>
-            (s.Hodnota > smallSponzoringThreshold && s.DarovanoDne >= minBigSponzoringDate)
-            || (s.Hodnota <= smallSponzoringThreshold && s.DarovanoDne >= minSmallSponzoringDate);
-
-        public static IEnumerable<Sponzoring> Sponzoring(this Osoba osoba, Expression<Func<Sponzoring, bool>> predicate)
-        {
-            using (DbEntities db = new DbEntities())
-            {
-                var osobySponzoring = db.Sponzoring
-                    .AsNoTracking()
-                    .Where(s => s.OsobaIdDarce == osoba.InternalId)
-                    .Where(SponzoringLimitsPredicate)
-                    .Where(predicate)
-                    .ToList();
-
-                //sponzoring z navazanych firem kdyz byl statutar
-                var firmySponzoring = Osoby.CachedFirmySponzoring.Get(osoba.InternalId)
-                    .AsQueryable()
-                    .Where(SponzoringLimitsPredicate)
-                    .Where(predicate)
-                    .ToList();
-
-                osobySponzoring.AddRange(firmySponzoring);
-
-                return osobySponzoring;
-            }
-        }
 
         public static IEnumerable<Sponzoring> SponzoringsUnfiltered(this Osoba osoba,
             Expression<Func<Sponzoring, bool>> predicate)

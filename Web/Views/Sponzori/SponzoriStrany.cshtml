@@ -1,0 +1,118 @@
+@model List<HlidacStatu.Entities.Views.SponzoringSummed>
+
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using Microsoft.AspNetCore.Html
+
+
+@{
+    decimal suma = Model.Sum(m => m.DarCelkem);
+
+    ViewBag.Title = $"Sponzoři {ViewBag.Strana}";
+    
+    Osoba topOsoba = ViewBag.TopOsoba;
+
+    ViewBag.SocialShareTitle = ViewBag.Title;
+    ViewBag.SocialShareText = $"{Model.Count} sponzorů, kteří darovali straně {ViewBag.Strana} v součtu {HlidacStatu.Util.RenderData.ShortNicePrice(suma)}."; 
+
+    ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/quote?d={DateTime.Now.ToString("d.M.yy")}"
+            + "&t=" + System.Net.WebUtility.UrlEncode(ViewBag.SocialShareTitle)
+            + "&b=" + System.Net.WebUtility.UrlEncode(ViewBag.SocialShareText)
+            + ((topOsoba != null) ? ("&f=" + System.Net.WebUtility.UrlEncode(topOsoba.FullNameWithYear() + " " + HlidacStatu.Util.RenderData.ShortNicePrice(ViewBag.TopOsobaAmount))) : "")
+            + "&st=" + System.Net.WebUtility.UrlEncode("k " + DateTime.Now.Date.ToString("dd.MM.yyyy"))
+            + ((topOsoba != null) ? ("&img=" + System.Net.WebUtility.UrlEncode(topOsoba.GetPhotoUrl())) : "" )
+            + "&rat=16x9"
+            ;
+    ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"
+    + "<meta property=\"og:image:height\" content=\"1080\" />"
+    + "<meta property=\"og:image:type\" content=\"image/png\" />"
+    ;
+
+    ViewBag.ShowBookmarkUrl = true;
+}
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+}
+
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="/sponzori">Sponzoři</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+
+<h3>Osoby sponzorující @ViewBag.Strana</h3>
+<p>U strany @ViewBag.Strana evidujeme celkem @Model.Count sponzorů, kteří darovali celkem @HlidacStatu.Util.RenderData.ShortNicePrice(suma).</p>
+<a asp-controller="Sponzori" asp-action="FiremniSponzoriStrany" asp-route-id="@ViewBag.Strana">Zobrazit sponzorující firmy</a>
+
+<div class="row">
+    <div>
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="osoby">
+                <div class="col-xs-12">
+                    
+                    @{
+                        var tableId = "sponzoringOsoby";
+                        var dataTableOptions = new HtmlString(@"{
+                                 'language': {
+                                    'url': '//cdn.datatables.net/plug-ins/1.10.12/i18n/Czech.json'
+                                },
+                                'paging': true,
+                                'pageLength': 15,
+                                'order': [1,'desc'],
+                                'lengthChange': false,
+                                'info': false
+                                }");
+                        var title = "Sponzorující osoby";
+                    }
+                    <script>
+                        var tbl_@(tableId);
+                        $(document).ready(function () {
+                        tbl_@(tableId) = $('#@(tableId)').DataTable(@dataTableOptions);
+                        });
+                    </script>
+                    <h3>@title</h3>
+                    <table id="@tableId" class="table-sorted table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>Sponzor</th>
+                            <th>Částka</th>
+                            <th>Rok</th>
+                        </tr>
+                        </thead>
+                        <tbody class="list">
+                            @foreach (var row in Model)
+                            {
+                                <tr>
+                                    <td data-order="@HlidacStatu.Util.RenderData.OrderValueFormat(row.Jmeno)">
+                                        <a asp-controller="Osoba" asp-action="Index" asp-route-id="@row.Id">@row.Jmeno</a>
+                                    </td>
+                                    <td data-order="@HlidacStatu.Util.RenderData.OrderValueFormat(row.DarCelkem)">
+                                        @HlidacStatu.Util.RenderData.NicePriceHtml(row.DarCelkem)
+                                    </td>
+                                    <td data-order="@row.Rok">
+                                        @row.Rok
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+</div>
+
+<partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("Upozornit na chybu"))"/>

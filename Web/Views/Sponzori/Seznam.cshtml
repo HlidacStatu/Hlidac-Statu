@@ -1,5 +1,6 @@
 ﻿@using HlidacStatu.XLib.Render
 @using HlidacStatu.Entities
+@using Microsoft.AspNetCore.Html
 
 @model ReportDataSource<Sponsors.Sponzorstvi<IBookmarkable>>[]
 
@@ -21,8 +22,8 @@
     <ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
         <li><a href="/sponzori">Sponzoři</a></li>
-        @(!string.IsNullOrEmpty(strana) ? $"<li><a href='{Sponsors.GetStranaUrl(strana)}'>{strana}</a></li>" : "")
-        @(rok.HasValue ? $"<li>{rok}</li>" : "")
+        @(!string.IsNullOrEmpty(strana) ? new HtmlString($"<li><a href='{Sponsors.GetStranaUrl(strana)}'>{strana}</a></li>") : "")
+        @(rok.HasValue ? new HtmlString($"<li>{rok}</li>") : "")
         <li class="active">@ViewBag.Title</li>
     </ol>
 }

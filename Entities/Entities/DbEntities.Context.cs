@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using HlidacStatu.Entities.Views;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Entities
@@ -20,6 +21,7 @@ namespace HlidacStatu.Entities
             var connectionString = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection"); 
             return new DbContextOptionsBuilder()
                 .UseSqlServer(connectionString)
+                //.EnableSensitiveDataLogging(true)
                 .Options;
         }
         
@@ -181,8 +183,10 @@ namespace HlidacStatu.Entities
         public virtual DbSet<Sponzoring> Sponzoring { get; set; }
         public virtual DbSet<BannedIp> BannedIps { get; set; }
         
-        //view
+        //views
         public DbSet<FindPersonDTO> FindPersonView { get; set; }
+        public DbSet<SponzoringOverview> SponzoringOverviewView { get; set; }
+        public DbSet<SponzoringSummed> SponzoringSummedView { get; set; }
     
        
     }

@@ -63,7 +63,7 @@ namespace HlidacStatu.Repositories
                         osoby.AddRange(Politici.Get());
                         var osobyQ = db.Osoba.AsQueryable()
                             //migrace: SponzoringLimitsPredicate hodit do repositories
-                            .Where(m => db.Sponzoring.Any(SponzoringLimitsPredicate))
+                            .Where(m => db.Sponzoring.Any(SponzoringRepo.SponzoringLimitsPredicate))
                             .Where(m => m.Status == (int) Osoba.StatusOsobyEnum.VazbyNaPolitiky ||
                                         m.Status == (int) Osoba.StatusOsobyEnum.Sponzor)
                             .AsNoTracking()
