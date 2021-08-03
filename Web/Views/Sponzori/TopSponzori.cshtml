@@ -53,7 +53,9 @@
 <h3>Osoby sponzorující politické strany celkovou částkou vyšší než 100&nbsp;000&nbsp;Kč
     @(rok != 0 ? $" v roce {rok}" : " souhrnně za posledních 10 let")
 </h3>
-<a asp-controller="Sponzori" asp-action="TopSponzoriFirmy" asp-route-rok="@rok">Zobrazit sponzorující firmy</a>
+
+
+<a asp-controller="Sponzori" asp-action="TopSponzoriFirmy" asp-route-rok="@(rok == 0 ? null : rok)">Zobrazit sponzorující firmy</a>
 
 <div style="margin-top:20px;margin-bottom:40px;">
     <ul class="list-inline">
@@ -65,7 +67,7 @@
         {
             <li><b>Souhrnně za 10 let</b></li>
         }
-        @for (int year = SponzoringRepo.DefaultLastSponzoringYear - 10; year < SponzoringRepo.DefaultLastSponzoringYear; year++)
+        @for (int year = DateTime.Now.Year - 10; year <= SponzoringRepo.DefaultLastSponzoringYear; year++)
         {
             if (rok == year)
             {
