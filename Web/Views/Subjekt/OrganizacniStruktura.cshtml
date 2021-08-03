@@ -46,7 +46,15 @@
 <script type="text/javascript">
 
     function circleRadius(d) {
-        return Math.max((d.size / flare.size) * maxCircleRadius, 8);
+        return Math.max((d.size / flareSize()) * maxCircleRadius, 8);
+    }
+    
+    //workaround for empty sizes
+    function flareSize()
+    {
+        if (flare.size === 0)
+            return 1;
+        return flare.size;
     }
 
         var flare = @Html.Raw(json);
@@ -175,9 +183,9 @@
 
       // Enter any new links at the parent's previous position.
       link.enter().insert("path", "g")
-          .attr("stroke-width", d => Math.max((d.target.size / flare.size) * maxStrokeWidth, 3))
+          .attr("stroke-width", d => Math.max((d.target.size / flareSize()) * maxStrokeWidth, 3))
           //.attr("stroke", d => { return "#" + (220 - Math.max(Math.ceil((d.target.size / flare.size) * 220), 1)).toString(16).repeat(3)})
-          .attr("stroke", d => { let koef = Math.abs(Math.log10(d.target.size/ flare.size)) + 1; return "#" + Math.ceil( 220 - ((d.target.size/ flare.size)*220*koef)).toString(16).repeat(3)})
+          .attr("stroke", d => { let koef = Math.abs(Math.log10(Math.max(d.target.size,1)/ flareSize())) + 1; return "#" + Math.ceil( 220 - ((d.target.size/ flareSize())*220*koef)).toString(16).repeat(3)})
           .attr("stroke-opacity", 5)
           .attr("class", "link")
           .attr("d", function(d) {
