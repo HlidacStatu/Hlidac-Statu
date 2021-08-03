@@ -26,10 +26,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Views" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
       <ProjectReference Include="..\FullTextSearch\FullTextSearch.csproj" />
       <ProjectReference Include="..\Lib.Analytics\Lib.Analytics.csproj" />

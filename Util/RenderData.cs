@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Devmasters.Enums;
+using Microsoft.AspNetCore.Html;
 
 namespace HlidacStatu.Util
 {
@@ -77,16 +78,7 @@ namespace HlidacStatu.Util
             }
         }
 
-        public static string[,] NazvyStranŹkratky = {
-            {"strana zelených","SZ"},
-            {"česká pirátská strana","Piráti" },
-            {"pirátská strana","Piráti" },
-            {"strana práv občanů","SPO" },
-            {"svoboda a přímá demokracie","SPD" },
-            {"rozumní - stop migraci a diktátu eu","Rozumní" },
-            {"věci veřejné","VV" },
-            {"starostové a nezávislí","STAN" },
-        };
+        
 
         public static string RenderCharWithCH(char c)
         {
@@ -121,40 +113,6 @@ namespace HlidacStatu.Util
 
         }
 
-        public static string StranaZkratka(string strana, int maxlength = 20)
-        {
-            if (string.IsNullOrEmpty(strana))
-                return string.Empty;
-
-            var lstrana = strana.ToLower();
-            //je na seznamu?
-            for (int i = 0; i < NazvyStranŹkratky.GetLength(0); i++)
-            {
-                if (NazvyStranŹkratky[i, 0] == lstrana)
-                    return NazvyStranŹkratky[i, 1];
-            }
-
-            var words = Devmasters.TextUtil.GetWords(strana);
-            if (Devmasters.TextUtil.CountWords(strana) > 3)
-            {
-                //vratim zkratku z prvnich pismen
-                var res = "";
-                foreach (var w in words)
-                {
-                    char ch = w.First();
-                    if (
-                        System.Globalization.CharUnicodeInfo.GetUnicodeCategory(ch) == System.Globalization.UnicodeCategory.UppercaseLetter
-                        ||
-                        System.Globalization.CharUnicodeInfo.GetUnicodeCategory(ch) == System.Globalization.UnicodeCategory.TitlecaseLetter
-                        )
-                        res = res + ch;
-                }
-                if (res.Length > 2)
-                    return res;
-            }
-            return Devmasters.TextUtil.ShortenText(strana, maxlength);
-        }
-
         
 
         public static string NicePrice(decimal number, string valueIfZero = "0 {0}", string mena = "Kč", bool html = false, bool shortFormat = false, ShowDecimalVal showDecimal = ShowDecimalVal.Hide)
@@ -168,6 +126,17 @@ namespace HlidacStatu.Util
             else
                 return ShortNicePrice(number, valueIfZero, mena, html, showDecimal, MaxScale.Jeden);
         }
+        
+        public static IHtmlContent NicePriceHtml(decimal number, string valueIfZero = "0 {0}", string mena = "Kč", bool shortFormat = false, ShowDecimalVal showDecimal = ShowDecimalVal.Hide)
+        {
+            var result = shortFormat
+                ? ShortNicePrice(number, valueIfZero, mena, html: true, showDecimal)
+                : ShortNicePrice(number, valueIfZero, mena, html: true, showDecimal, MaxScale.Jeden);
+
+            return new HtmlString(result);
+
+        }
+        
         static string tableOrderValueFormat = "000000000000000#";
         public static string OrderValueFormat(string n) { return n ; }
         public static string OrderValueFormat(double? n) { return ((n ?? 0) * 1000000).ToString(tableOrderValueFormat); }

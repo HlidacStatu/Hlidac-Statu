@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using HlidacStatu.Entities;
 
@@ -14,6 +15,63 @@ namespace HlidacStatu.Repositories
             {
                 return db.ZkratkaStrany.ToDictionary(z => z.Ico, e => e.KratkyNazev);
             }
+        }
+        
+        public static string IcoStrany(string zkratka)
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                return db.ZkratkaStrany
+                    .AsNoTracking()
+                    .Where(zs => zs.KratkyNazev.ToLower() == zkratka.Trim().ToLower())
+                    .Select(zs => zs.Ico)
+                    .FirstOrDefault();
+            }
+        }
+        
+        public static string[,] NazvyStranŹkratky = {
+            {"strana zelených","SZ"},
+            {"česká pirátská strana","Piráti" },
+            {"pirátská strana","Piráti" },
+            {"strana práv občanů","SPO" },
+            {"svoboda a přímá demokracie","SPD" },
+            {"rozumní - stop migraci a diktátu eu","Rozumní" },
+            {"věci veřejné","VV" },
+            {"starostové a nezávislí","STAN" },
+        };
+        
+        public static string StranaZkratka(string strana, int maxlength = 20)
+        {
+            if (string.IsNullOrEmpty(strana))
+                return string.Empty;
+
+            var lstrana = strana.ToLower();
+            //je na seznamu?
+            for (int i = 0; i < NazvyStranŹkratky.GetLength(0); i++)
+            {
+                if (NazvyStranŹkratky[i, 0] == lstrana)
+                    return NazvyStranŹkratky[i, 1];
+            }
+
+            var words = Devmasters.TextUtil.GetWords(strana);
+            if (Devmasters.TextUtil.CountWords(strana) > 3)
+            {
+                //vratim zkratku z prvnich pismen
+                var res = "";
+                foreach (var w in words)
+                {
+                    char ch = w.First();
+                    if (
+                        System.Globalization.CharUnicodeInfo.GetUnicodeCategory(ch) == System.Globalization.UnicodeCategory.UppercaseLetter
+                        ||
+                        System.Globalization.CharUnicodeInfo.GetUnicodeCategory(ch) == System.Globalization.UnicodeCategory.TitlecaseLetter
+                    )
+                        res = res + ch;
+                }
+                if (res.Length > 2)
+                    return res;
+            }
+            return Devmasters.TextUtil.ShortenText(strana, maxlength);
         }
     }
 }

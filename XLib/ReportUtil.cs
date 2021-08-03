@@ -5,6 +5,7 @@ using System.Net;
 using Devmasters.Enums;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities.Analysis;
+using HlidacStatu.Entities.Views;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;
@@ -142,108 +143,108 @@ namespace HlidacStatu.XLib
             return coreColumns;
         }
 
-        public static ReportDataSource<SponzoringRepo.Strany.StranaPerYear> RenderPerYearsTable(IEnumerable<SponzoringRepo.Strany.StranaPerYear> dataPerYear)
-        {
-            ReportDataSource<SponzoringRepo.Strany.StranaPerYear> rokyTable = new ReportDataSource<SponzoringRepo.Strany.StranaPerYear>(
-                new[]
-                {
-                    new ReportDataSource<SponzoringRepo.Strany.StranaPerYear>.Column()
-                    {
-                        Name = "Rok",
-                        HtmlRender = (s) => { return s.Rok.ToString(); }
-                    },
-                    new ReportDataSource<SponzoringRepo.Strany.StranaPerYear>.Column()
-                    {
-                        Name = "Sponzoring osob",
-                        HtmlRender = (s) =>
-                        {
-                            SponzoringRepo.Strany.StranaPerYear data = (SponzoringRepo.Strany.StranaPerYear) s;
-                            if (data.Osoby.Num > 0)
-                                return string.Format(@"{0}, počet darů: {1} za {2}",
-                                    Sponsors.GetStranaSponzoringHtmlLink(data.Strana, data.Rok, Sponsors.SponzoringDataType.Osoby),
-                                    data.Osoby.Num, Util.RenderData.NicePrice(data.Osoby.Sum, "výši neznáme"));
-                            else
-                                return "";
-                        }
-                    },
-                    new ReportDataSource<SponzoringRepo.Strany.StranaPerYear>.Column()
-                    {
-                        Name = "Sponzoring firem",
-                        HtmlRender = (s) =>
-                        {
-                            SponzoringRepo.Strany.StranaPerYear data = (SponzoringRepo.Strany.StranaPerYear) s;
-                            if (data.Firmy.Num > 0)
-                                return string.Format(@"{0}, počet darů: {1} za {2}",
-                                    Sponsors.GetStranaSponzoringHtmlLink(data.Strana, data.Rok, Sponsors.SponzoringDataType.Firmy),
-                                    data.Firmy.Num, Util.RenderData.NicePrice(data.Firmy.Sum, "výši neznáme"));
-                            else
-                                return "";
-                        }
-                    },
-                });
+        // public static ReportDataSource<SponzoringRepo.Strany.StranaPerYear> RenderPerYearsTable(IEnumerable<SponzoringRepo.Strany.StranaPerYear> dataPerYear)
+        // {
+        //     ReportDataSource<SponzoringRepo.Strany.StranaPerYear> rokyTable = new ReportDataSource<SponzoringRepo.Strany.StranaPerYear>(
+        //         new[]
+        //         {
+        //             new ReportDataSource<SponzoringRepo.Strany.StranaPerYear>.Column()
+        //             {
+        //                 Name = "Rok",
+        //                 HtmlRender = (s) => { return s.Rok.ToString(); }
+        //             },
+        //             new ReportDataSource<SponzoringRepo.Strany.StranaPerYear>.Column()
+        //             {
+        //                 Name = "Sponzoring osob",
+        //                 HtmlRender = (s) =>
+        //                 {
+        //                     SponzoringRepo.Strany.StranaPerYear data = (SponzoringRepo.Strany.StranaPerYear) s;
+        //                     if (data.Osoby.Num > 0)
+        //                         return string.Format(@"{0}, počet darů: {1} za {2}",
+        //                             Sponsors.GetStranaSponzoringHtmlLink(data.Strana, data.Rok, Sponsors.SponzoringDataType.Osoby),
+        //                             data.Osoby.Num, Util.RenderData.NicePrice(data.Osoby.Sum, "výši neznáme"));
+        //                     else
+        //                         return "";
+        //                 }
+        //             },
+        //             new ReportDataSource<SponzoringRepo.Strany.StranaPerYear>.Column()
+        //             {
+        //                 Name = "Sponzoring firem",
+        //                 HtmlRender = (s) =>
+        //                 {
+        //                     SponzoringRepo.Strany.StranaPerYear data = (SponzoringRepo.Strany.StranaPerYear) s;
+        //                     if (data.Firmy.Num > 0)
+        //                         return string.Format(@"{0}, počet darů: {1} za {2}",
+        //                             Sponsors.GetStranaSponzoringHtmlLink(data.Strana, data.Rok, Sponsors.SponzoringDataType.Firmy),
+        //                             data.Firmy.Num, Util.RenderData.NicePrice(data.Firmy.Sum, "výši neznáme"));
+        //                     else
+        //                         return "";
+        //                 }
+        //             },
+        //         });
+        //
+        //
+        //     foreach (var r in dataPerYear.OrderBy(m => m.Rok))
+        //     {
+        //         rokyTable.AddRow(r);
+        //     }
+        //
+        //     return rokyTable;
+        // }
 
-
-            foreach (var r in dataPerYear.OrderBy(m => m.Rok))
-            {
-                rokyTable.AddRow(r);
-            }
-
-            return rokyTable;
-        }
-
-        public static ReportDataSource<Sponsors.Sponzorstvi<IBookmarkable>> RenderSponzorství(
-            IEnumerable<Sponsors.Sponzorstvi<IBookmarkable>> data, bool showYear = true, bool linkStrana = true)
-        {
-            var yearCol = new ReportDataSource<Sponsors.Sponzorstvi<IBookmarkable>>.Column()
-            {
-                Name = "Rok",
-                HtmlRender = (s) => { return s.Rok?.ToString(); },
-                OrderValueRender = (s) => { return Util.RenderData.OrderValueFormat(s.Rok ?? 0); },
-                CssClass = "number"
-            };
-            ReportDataSource<Sponsors.Sponzorstvi<IBookmarkable>> rokyTable = new ReportDataSource<Sponsors.Sponzorstvi<IBookmarkable>>(
-                new[]
-                {
-                    new ReportDataSource<Sponsors.Sponzorstvi<IBookmarkable>>.Column()
-                    {
-                        Name = "Sponzor",
-                        HtmlRender = (s) =>
-                        {
-                            return $"<a href='{s.Sponzor.GetUrl(true)}'>{s.Sponzor.BookmarkName()}</a>";
-                        },
-                        OrderValueRender =
-                            (s) => { return Util.RenderData.OrderValueFormat(s.Sponzor.BookmarkName()); },
-                    },
-                    new ReportDataSource<Sponsors.Sponzorstvi<IBookmarkable>>.Column()
-                    {
-                        Name = "Částka",
-                        HtmlRender = (s) => { return Util.RenderData.NicePrice(s.CastkaCelkem, html: true); },
-                        OrderValueRender = (s) => { return Util.RenderData.OrderValueFormat(s.CastkaCelkem); },
-                        CssClass = "number"
-                    },
-                    new ReportDataSource<Sponsors.Sponzorstvi<IBookmarkable>>.Column()
-                    {
-                        Name = "Strana",
-                        HtmlRender = (s) =>
-                        {
-                            if (linkStrana)
-                                return Sponsors.GetStranaHtmlLink(s.Strana);
-                            else
-                                return s.Strana;
-                        },
-                        OrderValueRender = (s) => { return Util.RenderData.OrderValueFormat(s.Strana); },
-                    },
-                });
-            if (showYear)
-                rokyTable.Columns.Add(yearCol);
-
-
-            foreach (var r in data.OrderBy(m => m.Rok))
-            {
-                rokyTable.AddRow(r);
-            }
-
-            return rokyTable;
-        }
+        // public static ReportDataSource<SponzoringSummed> RenderSponsoring(
+        //     IEnumerable<SponzoringSummed> data, bool showYear = true, bool linkStrana = true)
+        // {
+        //     var yearCol = new ReportDataSource<SponzoringSummed>.Column()
+        //     {
+        //         Name = "Rok",
+        //         HtmlRender = (s) => { return s.Rok.ToString(); },
+        //         OrderValueRender = (s) => { return Util.RenderData.OrderValueFormat(s.Rok); },
+        //         CssClass = "number"
+        //     };
+        //     ReportDataSource<SponzoringSummed> rokyTable = new ReportDataSource<SponzoringSummed>(
+        //         new[]
+        //         {
+        //             new ReportDataSource<SponzoringSummed>.Column()
+        //             {
+        //                 Name = "Sponzor",
+        //                 HtmlRender = (s) =>
+        //                 {
+        //                     return $"<a href='{s.Sponzor.GetUrl(true)}'>{s.Sponzor.BookmarkName()}</a>";
+        //                 },
+        //                 OrderValueRender =
+        //                     (s) => { return Util.RenderData.OrderValueFormat(s.Sponzor.BookmarkName()); },
+        //             },
+        //             new ReportDataSource<SponzoringSummed>.Column()
+        //             {
+        //                 Name = "Částka",
+        //                 HtmlRender = (s) => { return Util.RenderData.NicePrice(s.CastkaCelkem, html: true); },
+        //                 OrderValueRender = (s) => { return Util.RenderData.OrderValueFormat(s.CastkaCelkem); },
+        //                 CssClass = "number"
+        //             },
+        //             new ReportDataSource<SponzoringSummed>.Column()
+        //             {
+        //                 Name = "Strana",
+        //                 HtmlRender = (s) =>
+        //                 {
+        //                     if (linkStrana)
+        //                         return Sponsors.GetStranaHtmlLink(s.Strana);
+        //                     else
+        //                         return s.Strana;
+        //                 },
+        //                 OrderValueRender = (s) => { return Util.RenderData.OrderValueFormat(s.Strana); },
+        //             },
+        //         });
+        //     if (showYear)
+        //         rokyTable.Columns.Add(yearCol);
+        //
+        //
+        //     foreach (var r in data.OrderBy(m => m.Rok))
+        //     {
+        //         rokyTable.AddRow(r);
+        //     }
+        //
+        //     return rokyTable;
+        // }
     }
 }

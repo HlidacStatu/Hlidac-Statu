@@ -430,14 +430,7 @@ namespace HlidacStatu.Extensions
 
         public static IEnumerable<Sponzoring> Sponzoring(this Firma firma, Expression<Func<Sponzoring, bool>> predicate)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                return db.Sponzoring
-                    .AsNoTracking()
-                    .Where(predicate)
-                    .Where(s => s.IcoDarce == firma.ICO)
-                    .ToArray();
-            }
+            return SponzoringRepo.GetByDarce(firma.ICO, predicate);
         }
 
         public static OsobaEvent AddOrUpdateEvent(this Firma firma, OsobaEvent ev, string user)

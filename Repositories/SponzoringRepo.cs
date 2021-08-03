@@ -1,32 +1,75 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Devmasters.Collections;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 using HlidacStatu.Entities;
-using HlidacStatu.Extensions;
+using HlidacStatu.Entities.Views;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using Nest;
 
 namespace HlidacStatu.Repositories
 {
     public static class SponzoringRepo
     {
-        public static IEnumerable<Sponzoring> GetByDarce(int osobaId)
+        public static string[] VelkeStrany = new string[]
+        {
+            "ANO", "ODS", "ČSSD", "Česká pirátská strana", "KSČM",
+            "SPD", "STAN", "KDU-ČSL", "TOP 09",
+            "Svobodní", "Strana zelených"
+        };
+
+        public static string[] TopStrany = VelkeStrany.Take(9).ToArray();
+
+        public static int DefaultLastSponzoringYear = 2019;
+
+        
+        private static DateTime minBigSponzoringDate = new DateTime(DateTime.Now.Year - 10, 1, 1);
+        private static DateTime minSmallSponzoringDate = new DateTime(DateTime.Now.Year - 5, 1, 1);
+        private static decimal smallSponzoringThreshold = 10000;
+
+        public static Expression<Func<Sponzoring, bool>> SponzoringLimitsPredicate = s =>
+            (s.Hodnota > smallSponzoringThreshold && s.DarovanoDne >= minBigSponzoringDate)
+            || (s.Hodnota <= smallSponzoringThreshold && s.DarovanoDne >= minSmallSponzoringDate);
+        
+        public static Expression<Func<SponzoringSummed, bool>> SponzoringSummedLimitsPredicate = s =>
+            (s.DarCelkem > smallSponzoringThreshold && s.Rok >= minBigSponzoringDate.Year)
+            || (s.DarCelkem <= smallSponzoringThreshold && s.Rok >= minSmallSponzoringDate.Year);
+        
+        
+        public static List<Sponzoring> GetByDarce(int osobaId, Expression<Func<Sponzoring, bool>> predicate)
         {
             using (DbEntities db = new DbEntities())
             {
-                return db.Sponzoring.AsQueryable()
-                    .Where(s => s.OsobaIdDarce == osobaId);
+                var osobySponzoring = db.Sponzoring
+                    .AsNoTracking()
+                    .Where(s => s.OsobaIdDarce == osobaId)
+                    .Where(SponzoringLimitsPredicate)
+                    .Where(predicate)
+                    .ToList();
+
+                //sponzoring z navazanych firem kdyz byl statutar
+                var firmySponzoring = Osoby.CachedFirmySponzoring.Get(osobaId)
+                    .AsQueryable()
+                    .Where(SponzoringLimitsPredicate)
+                    .Where(predicate)
+                    .ToList();
+
+                osobySponzoring.AddRange(firmySponzoring);
+
+                return osobySponzoring;
             }
         }
 
-        public static IEnumerable<Sponzoring> GetByDarce(string icoDarce)
+        public static List<Sponzoring> GetByDarce(string icoDarce, Expression<Func<Sponzoring, bool>> predicate)
         {
             using (DbEntities db = new DbEntities())
             {
-                return db.Sponzoring.AsQueryable()
-                    .Where(s => s.IcoDarce == icoDarce);
+                return db.Sponzoring
+                    .AsNoTracking()
+                    .Where(predicate)
+                    .Where(s => s.IcoDarce == icoDarce)
+                    .ToList();
             }
         }
 
@@ -139,250 +182,151 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static IEnumerable<Sponsors.Sponzorstvi<IBookmarkable>> AllTimeTopSponzorsPerStrana(string strana,
-            int top = int.MaxValue, int? minYear = null)
+        //přidat cache
+        public static async Task<List<SponzoringOverview>> PartiesPerYearsOverview(int? year, CancellationToken cancellationToken)
         {
-            var o = AllTimeTopSponzorsPerStranaOsoby(strana, top * 50, minYear);
-            var f = AllTimeTopSponzorsPerStranaFirmy(strana, top * 50, minYear);
-
-            return o.Select(m => (Sponsors.Sponzorstvi<IBookmarkable>) m)
-                .Union(f.Select(m => (Sponsors.Sponzorstvi<IBookmarkable>) m))
-                .OrderByDescending(m => m.CastkaCelkem)
-                .Take(top);
-        }
-
-        public static IEnumerable<Sponsors.Sponzorstvi<Osoba>> AllTimeTopSponzorsPerStranaOsoby(string strana,
-            int top = int.MaxValue, int? minYear = null)
-        {
-            minYear = minYear ?? DateTime.Now.Year - 10;
-            return AllSponzorsPerYearPerStranaOsoby.Get()
-                    .Where(m => m.Strana == strana && m.Rok >= minYear)
-                    .GroupBy(k => k.Sponzor, sp => sp, (k, sp) => new Sponsors.Sponzorstvi<Osoba>()
-                    {
-                        Sponzor = k,
-                        CastkaCelkem = sp.Sum(m => m.CastkaCelkem),
-                        Rok = 0,
-                        Strana = strana
-                    })
-                    .OrderByDescending(o => o.CastkaCelkem)
-                    .Take(top)
-                ;
-        }
-
-        public static IEnumerable<Sponsors.Sponzorstvi<Firma>> AllTimeTopSponzorsPerStranaFirmy(string strana,
-            int top = int.MaxValue, int? minYear = null)
-        {
-            minYear = minYear ?? DateTime.Now.Year - 10;
-
-            return AllSponzorsPerYearPerStranaFirmy.Get()
-                    .Where(m => m.Strana == strana && m.Rok >= minYear)
-                    .GroupBy(k => k.Sponzor, sp => sp, (k, sp) => new Sponsors.Sponzorstvi<Firma>()
-                    {
-                        Sponzor = k,
-                        CastkaCelkem = sp.Sum(m => m.CastkaCelkem),
-                        Rok = 0,
-                        Strana = strana
-                    })
-                    .OrderByDescending(o => o.CastkaCelkem)
-                    .Take(top)
-                ;
-        }
-
-        public static Devmasters.Cache.LocalMemory.LocalMemoryCache<IEnumerable<Strany.StranaPerYear>>
-            GetStranyPerYear
-                = new Devmasters.Cache.LocalMemory.LocalMemoryCache<IEnumerable<Strany.StranaPerYear>>(
-                    TimeSpan.FromDays(4), "sponzori_stranyPerYear", (obj) =>
-                    {
-                        using (DbEntities db = new DbEntities())
-                        {
-                            var resultO = db.Sponzoring.AsQueryable()
-                                .Where(m => m.DarovanoDne != null && m.OsobaIdDarce != null)
-                                .ToArray()
-                                .Select(m => new {rok = m.DarovanoDne.Value.Year, oe = m})
-                                .GroupBy(g => new {rok = g.rok, strana = g.oe.JmenoPrijemce()}, oe => oe.oe, (r, oe) =>
-                                    new Strany.StranaPerYear()
-                                    {
-                                        Rok = r.rok,
-                                        Strana = r.strana,
-                                        Osoby = new Strany.AggSum()
-                                            {Num = oe.Count(), Sum = oe.Sum(s => s.Hodnota) ?? 0}
-                                    });
-
-                            var resultF = db.Sponzoring.AsQueryable()
-                                .Where(m => m.DarovanoDne != null && m.IcoDarce != null)
-                                .ToArray()
-                                .Select(m => new {rok = m.DarovanoDne.Value.Year, oe = m})
-                                .GroupBy(g => new {rok = g.rok, strana = g.oe.JmenoPrijemce()}, oe => oe.oe, (r, oe) =>
-                                    new Strany.StranaPerYear()
-                                    {
-                                        Rok = r.rok,
-                                        Strana = r.strana,
-                                        Firmy = new Strany.AggSum()
-                                            {Num = oe.Count(), Sum = oe.Sum(s => s.Hodnota) ?? 0}
-                                    });
-
-                            var roky = resultO.FullOuterJoin(resultF, o => o, f => f,
-                                (o, f, k) => new Strany.StranaPerYear()
-                                {
-                                    Strana = k.Strana,
-                                    Rok = k.Rok,
-                                    Osoby = o?.Osoby ?? new Strany.AggSum(),
-                                    Firmy = f?.Firmy ?? new Strany.AggSum()
-                                }, cmp: new Strany.StranaPerYear.PerYearStranaEquality()
-                            );
-
-                            return roky;
-                        }
-                    });
-
-        public static IEnumerable<Strany.StranaPerYear> StranaPerYears(string strana)
-        {
-            return GetStranyPerYear.Get().Where(m => m.Strana == strana);
-        }
-
-        public static Strany.StranaPerYear StranaPerYears(string strana, int year)
-        {
-            var ret = GetStranyPerYear.Get().Where(m => m.Strana == strana && m.Rok == year).FirstOrDefault();
-            if (ret == null)
-                ret = new Strany.StranaPerYear() {Strana = strana, Rok = year};
-            return ret;
-        }
-
-        public static Devmasters.Cache.LocalMemory.LocalMemoryCache<IEnumerable<Sponsors.Sponzorstvi<Osoba>>>
-            AllSponzorsPerYearPerStranaOsoby
-                = new Devmasters.Cache.LocalMemory.LocalMemoryCache<IEnumerable<Sponsors.Sponzorstvi<Osoba>>>(
-                    TimeSpan.FromDays(4), "ucty_index_allSponzoriOsoby", (obj) =>
-                    {
-                        List<Sponsors.Sponzorstvi<Osoba>> result = new List<Sponsors.Sponzorstvi<Osoba>>();
-                        using (DbEntities db = new DbEntities())
-                        {
-                            var res = db.Sponzoring
-                                .Where(OsobaRepo.SponzoringLimitsPredicate)
-                                .Join(db.Osoba, oe => oe.OsobaIdDarce, o => o.InternalId,
-                                    (oe, o) => new {osoba = o, oe = oe})
-                                .OrderByDescending(o => o.oe.Hodnota)
-                                .ToArray()
-                                .GroupBy(
-                                    g => new
-                                    {
-                                        osoba = g.osoba, rok = g.oe.DarovanoDne.Value.Year,
-                                        strana = g.oe.JmenoPrijemce()
-                                    }, oe => oe.oe, (o, oe) => new Sponsors.Sponzorstvi<Osoba>()
-                                    {
-                                        Sponzor = o.osoba,
-                                        CastkaCelkem = oe.Sum(e => e.Hodnota) ?? 0,
-                                        Rok = o.rok,
-                                        Strana = o.strana
-                                    })
-                                .OrderByDescending(o => o.CastkaCelkem);
-                            result.AddRange(res);
-                        }
-
-                        return result;
-                    });
-
-        public static Devmasters.Cache.LocalMemory.LocalMemoryCache<IEnumerable<Sponsors.Sponzorstvi<Firma>>>
-            AllSponzorsPerYearPerStranaFirmy
-                = new(
-                    TimeSpan.FromDays(4), "sponzori_index_allSponzoriFirmy", (obj) =>
-                    {
-                        List<Sponsors.Sponzorstvi<Firma>> result = new();
-                        using (DbEntities db = new DbEntities())
-                        {
-                            var res = db.Sponzoring.AsQueryable()
-                                .Where(s => s.IcoDarce != null)
-                                .OrderByDescending(o => o.Hodnota)
-                                .ToArray()
-                                .GroupBy(
-                                    g => new
-                                    {
-                                        Ico = g.IcoDarce, rok = g.DarovanoDne.Value.Year, strana = g.JmenoPrijemce()
-                                    }, oe => oe, (o, oe) => new Sponsors.Sponzorstvi<Firma>()
-                                    {
-                                        Sponzor = FirmaRepo.FromIco(o.Ico),
-                                        CastkaCelkem = oe.Sum(e => e.Hodnota) ?? 0,
-                                        Rok = o.rok,
-                                        Strana = o.strana
-                                    })
-                                .OrderByDescending(o => o.CastkaCelkem);
-                            result.AddRange(res);
-                        }
-
-                        return result;
-                    });
-
-
-        public static string[] VelkeStrany = new string[]
-        {
-            "ANO", "ODS", "ČSSD", "Česká pirátská strana", "KSČM",
-            "SPD", "STAN", "KDU-ČSL", "TOP 09",
-            "Svobodní", "Strana zelených"
-        };
-
-        public static string[] TopStrany = VelkeStrany.Take(9).ToArray();
-
-        public static int DefaultLastSponzoringYear = DateTime.Now.AddMonths(-7).AddYears(-1).Year;
-
-        static SponzoringRepo()
-        {
-            var maxYear = VelkeStrany.Select(
-                    strana => StranaPerYears(strana).Max(m => m.Rok)
-                )
-                .Max();
-            DefaultLastSponzoringYear = maxYear;
-        }
-
-
-        public class Strany
-        {
-            public class AggSum
+            int rok = year ?? 0;
+            int yearSwitch = year.HasValue? 0 : 1;
+            
+            using (DbEntities db = new DbEntities())
             {
-                public int Num { get; set; } = 0;
-                public decimal Sum { get; set; } = 0;
-            }
-
-            public class PerStrana : AggSum
-            {
-                public string Strana { get; set; }
-            }
-
-            public class StranaPerYear
-            {
-                public string Strana { get; set; }
-
-                public int Rok { get; set; }
-                public AggSum Osoby { get; set; } = new AggSum();
-
-                public AggSum Firmy { get; set; } = new AggSum();
-
-                public decimal? TotalKc
-                {
-                    get { return Osoby?.Sum + Firmy?.Sum; }
-                }
-
-
-                public class PerYearStranaEquality : IEqualityComparer<StranaPerYear>
-                {
-                    public bool Equals(StranaPerYear x, StranaPerYear y)
-                    {
-                        if (x == null || y == null)
-                            return false;
-
-                        return x.Rok == y.Rok && x.Strana == y.Strana;
-                    }
-
-                    public int GetHashCode(StranaPerYear obj)
-                    {
-                        //http://stackoverflow.com/a/4630550
-                        return
-                            new
-                            {
-                                obj.Rok,
-                                obj.Strana
-                            }.GetHashCode();
-                    }
-                }
+                return await db.SponzoringOverviewView.FromSqlInterpolated(
+                    $@"SELECT zs.KratkyNazev, IcoPrijemce as IcoStrany
+                      ,Year(DarovanoDne) as Rok, SUM(Hodnota) as DaryCelkem
+                      ,SUM(case when icodarce is null or Len(IcoDarce) < 3 then Hodnota end) as DaryOsob
+                      ,SUM(case when icodarce is not null and Len(IcoDarce) >= 3 then Hodnota end) as DaryFirem
+                      ,COUNT(distinct osobaiddarce) as PocetDarujicichOsob
+                      ,COUNT(distinct icodarce) as PocetDarujicichFirem
+                      FROM Sponzoring sp
+                      Left Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
+                      WHERE (year(sp.DarovanoDne) = {rok} or 1={yearSwitch})
+                      group by zs.KratkyNazev, IcoPrijemce, Year(DarovanoDne)")
+                    .ToListAsync(cancellationToken);
             }
         }
+
+        public static async Task<List<SponzoringSummed>> PeopleSponsors(string party, CancellationToken cancellationToken)
+        {
+            string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
+            int tenYearsBack = DateTime.Now.Year - 10;
+            
+            using (DbEntities db = new DbEntities())
+            {
+                return await db.SponzoringSummedView.FromSqlInterpolated(
+                    $@"SELECT zs.KratkyNazev as NazevStrany
+                       ,sp.IcoPrijemce as IcoStrany
+	                   ,SUM(Hodnota) as DarCelkem
+	                   ,Year(DarovanoDne) as Rok
+	                   ,os.NameId as Id
+	                   ,RTRIM(LTRIM(isnull(os.TitulPred,'') + ' ' + os.Jmeno + ' ' + os.Prijmeni + ' ' + isnull(os.TitulPo,''))) as Jmeno
+                    FROM Sponzoring sp
+                    LEFT Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
+                    join Osoba os on sp.OsobaIdDarce = os.InternalId
+                    where OsobaIdDarce > 0
+                      and sp.IcoPrijemce = {icoStrany}
+                      and year(sp.DarovanoDne) >= {tenYearsBack}
+                    group by zs.KratkyNazev, IcoPrijemce, Year(DarovanoDne)
+                      , os.NameId, os.TitulPred, os.Jmeno, os.Prijmeni, os.TitulPo")
+                    .Where(SponzoringSummedLimitsPredicate)
+                    .ToListAsync(cancellationToken);
+            }
+        }
+        
+        public static async Task<List<SponzoringSummed>> CompanySponsors(string party, CancellationToken cancellationToken)
+        {
+            string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
+            int tenYearsBack = DateTime.Now.Year - 10;
+            
+            using (DbEntities db = new DbEntities())
+            {
+                return await db.SponzoringSummedView.FromSqlInterpolated(
+                        $@"SELECT zs.KratkyNazev as NazevStrany
+                               ,sp.IcoPrijemce as IcoStrany
+	                           ,SUM(Hodnota) as DarCelkem
+	                           ,Year(DarovanoDne) as Rok
+	                           ,fi.ICO as Id
+	                           ,fi.Jmeno as Jmeno
+                            FROM Sponzoring sp
+                            LEFT Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
+                            join Firma fi on sp.IcoDarce = fi.ICO
+                            where IcoDarce is not null and sp.IcoPrijemce = {icoStrany}
+                              and year(sp.DarovanoDne) >= {tenYearsBack}
+                            group by zs.KratkyNazev, IcoPrijemce, Year(DarovanoDne), fi.ICO, fi.Jmeno")
+                    .ToListAsync(cancellationToken);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="year">If null it returns sum for all years</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static async Task<List<SponzoringSummed>> BiggestPeopleSponsors(int? year, CancellationToken cancellationToken, int? take = null)
+        {
+            int rok = year ?? 0;
+            int yearSwitch = year.HasValue? 0 : 1;
+            int tenYearsBack = DateTime.Now.Year - 10;
+            
+            using (DbEntities db = new DbEntities())
+            {
+                var request = db.SponzoringSummedView.FromSqlInterpolated(
+                    $@"SELECT null as NazevStrany
+                               ,null as IcoStrany
+	                           ,SUM(Hodnota) as DarCelkem
+	                           ,{rok} as Rok
+	                           ,os.NameId as Id
+	                           ,RTRIM(LTRIM(isnull(os.TitulPred,'') + ' ' + os.Jmeno + ' ' + os.Prijmeni + ' ' + isnull(os.TitulPo,''))) as Jmeno
+                            FROM Sponzoring sp
+                            join Osoba os on sp.OsobaIdDarce = os.InternalId
+                            where (year(sp.DarovanoDne) = {rok} or 1={yearSwitch}) and OsobaIdDarce > 0
+                              and year(sp.DarovanoDne) >= {tenYearsBack}
+                            group by os.NameId, os.TitulPred, os.Jmeno, os.Prijmeni, os.TitulPo")
+                    .OrderByDescending(x => x.DarCelkem);
+
+                if (take != null)
+                    return await request.Take(take.Value).ToListAsync(cancellationToken);
+                
+                return await request.ToListAsync(cancellationToken);
+            }
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="year">If null it returns sum for all years</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static async Task<List<SponzoringSummed>> BiggestCompanySponsors(int? year, CancellationToken cancellationToken, int? take = null)
+        {
+            int rok = year ?? 0;
+            int yearSwitch = year.HasValue? 0 : 1;
+            int tenYearsBack = DateTime.Now.Year - 10;
+
+            using (DbEntities db = new DbEntities())
+            {
+                var request = db.SponzoringSummedView.FromSqlInterpolated(
+                    $@"SELECT null as NazevStrany
+                               ,null as IcoStrany
+	                           ,SUM(Hodnota) as DarCelkem
+	                           ,{rok} as Rok
+	                           ,fi.ICO as Id
+	                           ,fi.Jmeno as Jmeno
+                            FROM Sponzoring sp
+                            join Firma fi on sp.IcoDarce = fi.ICO
+                            where (year(sp.DarovanoDne) = {rok} or 1={yearSwitch}) and IcoDarce is not null
+                              and year(sp.DarovanoDne) >= {tenYearsBack}
+                            group by fi.ICO, fi.Jmeno")
+                    .OrderByDescending(x => x.DarCelkem);;
+                
+                if (take != null)
+                    return await request.Take(take.Value).ToListAsync(cancellationToken);
+                
+                return await request.ToListAsync(cancellationToken);
+                
+            }
+        }
+
+
     }
 }

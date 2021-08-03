@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Devmasters.Collections;
-using HlidacStatu.Lib;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
