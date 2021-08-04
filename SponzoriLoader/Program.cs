@@ -19,9 +19,10 @@ namespace SponzoriLoader
 
         private static readonly string[] _addresses = new string[]
         {
-            "https://zpravy.udhpsh.cz/export/vfz2017-index.json",
-            "https://zpravy.udhpsh.cz/zpravy/vfz2018.json",
-            "https://zpravy.udhpsh.cz/zpravy/vfz2019.json"
+            // "https://zpravy.udhpsh.cz/export/vfz2017-index.json",
+            // "https://zpravy.udhpsh.cz/zpravy/vfz2018.json",
+            // "https://zpravy.udhpsh.cz/zpravy/vfz2019.json",
+            "https://zpravy.udhpsh.cz/zpravy/vfz2020.json"
         };
 
         private static readonly string _user = "sponzorLoader";
@@ -31,6 +32,8 @@ namespace SponzoriLoader
 
         static async Task Main(string[] args)
         {
+            HlidacStatu.Connectors.InitializeConfigServices.Initialize(new []{"Petr"});
+            
             _partyNames = LoadPartyNames();
             var peopleDonations = new Donations(new DonorEqualityComparer());
             var companyDonations = new Donations(new DonorEqualityComparer());

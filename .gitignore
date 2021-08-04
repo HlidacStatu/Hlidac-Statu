@@ -366,3 +366,5 @@ Web/App_Data/dump/*
 Web/App_Data/autocomplete.json
 
 Web/appsettings.*.json
+
+SponzoriLoader/appsettings.Petr.json
