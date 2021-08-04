@@ -13,7 +13,7 @@ using HlidacStatu.Repositories;
 namespace SponzoriLoader
 {
 
-    class Program
+    public class Program
     {
         private static readonly HttpClient _client = new HttpClient();
 

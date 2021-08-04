@@ -2,7 +2,7 @@
 
 namespace SponzoriLoader
 {
-    class Donations
+    public class Donations
     {
         private Dictionary<Donor,List<Gift>> AllDonations { get; set; }
 

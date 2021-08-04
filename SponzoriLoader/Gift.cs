@@ -3,7 +3,7 @@ using HlidacStatu.Entities;
 
 namespace SponzoriLoader
 {
-    class Gift
+    public class Gift
     {
         public DateTime Date { get; set; }
         public string Party { get; set; }
