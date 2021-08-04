@@ -88,13 +88,28 @@ namespace HlidacStatu.Entities.OrgStrukturyStatu
 
             }
 
+            string employs = "";
+            if (mistoPracovniPocet > 0 || mistoSluzebniPocet > 0)
+            {
+                employs = $"pracovní: {mistoPracovniPocet}; služební: {mistoSluzebniPocet}";
+            }
+
+            string manages = "";
+            int ridiPracovnich = RidiPracovnich();
+            int ridiSluzebnich = RidiSluzebnich();
+
+            if (ridiPracovnich > 0 || ridiSluzebnich > 0)
+            {
+                manages = $"podřízených p: {ridiPracovnich}; s: {ridiSluzebnich}";
+            }
+            
             var current = new D3GraphHierarchy()
             {
                 name = oznaceni,
                 size = CelkemZamestnava(),
                 children = children,
-                employs = $"pracovní: {mistoPracovniPocet}; služební: {mistoSluzebniPocet}",
-                manages = $"podřízených p: {RidiPracovnich()}; s: {RidiSluzebnich()}"
+                employs = employs,
+                manages = manages
 
             };
 
