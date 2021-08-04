@@ -605,7 +605,7 @@ tbl_" + _tableId + @" = $('#" + _tableId + @"').DataTable(" + dataTableOptions +
                 case OsobaEvent.SocialNetwork.Zaznam_zastupitelstva:
                     return self.Raw(
                         $"<a title='Záznam zastupitelstva' {(intoNewTab ? "target='_blank'" : "")}href='{value}'><i class='fab fa-youtube {htmlclass}'></i></a>"
-                        + $"<a title='Přepis záznamu zastupitelstva na Hlídači státu' {(intoNewTab ? "target='_blank'" : "")}href='/data/Hledat/zasedani-zastupitelstev?Q={ico}%3A00261891&order=datum%20desc'><img src='/content/img/Hlidac-statu-ctverec-notext.svg' style='{hsiconstyle};width:auto;vertical-align:baseline;padding-left:2px;padding-right:2px;' /></a>");
+                        + $"<a title='Přepis záznamu zastupitelstva na Hlídači státu' {(intoNewTab ? "target='_blank'" : "")}href='/data/Hledat/zasedani-zastupitelstev?Q=ico:{ico}&order=datum%20desc'><img src='/content/img/Hlidac-statu-ctverec-notext.svg' style='{hsiconstyle};width:auto;vertical-align:baseline;padding-left:2px;padding-right:2px;' /></a>");
                 default:
                     return self.Raw("");
             }
