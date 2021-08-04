@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Net;
+
 using HlidacStatu.Q.Simple.Tasks;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace HlidacStatu.Web.Controllers
@@ -23,8 +26,11 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>taskid</returns>
         [AuthorizeAndAudit(Roles = "Admin,internalQ")]
         [HttpPost, Route("Voice2TextNewTask/{datasetId}/{itemId}")]
-        public ActionResult<string> Voice2TextNewTask([FromRoute]string datasetId, [FromRoute]string itemId, int priority=0)
+        public ActionResult<string> Voice2TextNewTask([FromRoute] string datasetId, [FromRoute] string itemId, int priority = 0)
         {
+            try
+            {
+
             using (HlidacStatu.Q.Simple.Queue<Voice2Text> sq = new Q.Simple.Queue<Voice2Text>(
                 Voice2Text.QName_priority(priority),
                 Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString"))
@@ -33,6 +39,13 @@ namespace HlidacStatu.Web.Controllers
                 sq.Send(new Voice2Text() { dataset = datasetId, itemid = itemId });
                 return $"OK";
             }
+            }
+            catch (Exception e)
+            {
+                HlidacStatu.Util.Consts.Logger.Fatal("Voice2TextNewTask", e);
+                throw;
+            }
+
         }
 
 
@@ -47,13 +60,21 @@ namespace HlidacStatu.Web.Controllers
             Voice2Text task = null;
             foreach (var p in Voice2Text.Priorities)
             {
-
-                using (HlidacStatu.Q.Simple.Queue<Voice2Text> sq = new Q.Simple.Queue<Voice2Text>(Voice2Text.QName_priority(p),
-                    Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")))
+                try
                 {
-                    task = sq.GetAndAck();
-                    if (task != null)
-                        return task;
+
+                    using (HlidacStatu.Q.Simple.Queue<Voice2Text> sq = new Q.Simple.Queue<Voice2Text>(Voice2Text.QName_priority(p),
+                        Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")))
+                    {
+                        task = sq.GetAndAck();
+                        if (task != null)
+                            return task;
+                    }
+                }
+                catch (Exception e)
+                {
+                    HlidacStatu.Util.Consts.Logger.Fatal("Voice2TextGetTask", e);
+                    throw;
                 }
             }
             if (task == null)
@@ -71,18 +92,27 @@ namespace HlidacStatu.Web.Controllers
         [HttpPost, Route("Voice2TextDone")]
         public ActionResult<string> Voice2TextDone([FromBody] Voice2Text task)
         {
-            using (HlidacStatu.Q.Simple.Queue<TaskResult<Voice2Text>> sq
-                = new Q.Simple.Queue<TaskResult<Voice2Text>>(Voice2Text.QName_done, Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")))
+            try
             {
-                TaskResult<Voice2Text> result = new TaskResult<Voice2Text>()
+
+                using (HlidacStatu.Q.Simple.Queue<TaskResult<Voice2Text>> sq
+                    = new Q.Simple.Queue<TaskResult<Voice2Text>>(Voice2Text.QName_done, Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")))
                 {
-                    Payload = task,
-                    Created = DateTime.Now,
-                    Result = "done",
-                    User = this.ApiAuth?.ApiCall?.User,
-                    FromIP = this.HostIpAddress
-                };
-                sq.Send(result);
+                    TaskResult<Voice2Text> result = new TaskResult<Voice2Text>()
+                    {
+                        Payload = task,
+                        Created = DateTime.Now,
+                        Result = "done",
+                        User = this.ApiAuth?.ApiCall?.User,
+                        FromIP = this.HostIpAddress
+                    };
+                    sq.Send(result);
+                }
+            }
+            catch (Exception e)
+            {
+                HlidacStatu.Util.Consts.Logger.Fatal("Voice2TextDone", e);
+                throw;
             }
 
 
@@ -95,20 +125,29 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>taskid</returns>
         [AuthorizeAndAudit(Roles = "Admin,internalQ")]
         [HttpPost, Route("Voice2TextFailed/{requeueAsTheLast}")]
-        public ActionResult<string> Voice2TextFailed([FromRoute]bool requeueAsTheLast, [FromBody] Voice2Text task)
+        public ActionResult<string> Voice2TextFailed([FromRoute] bool requeueAsTheLast, [FromBody] Voice2Text task)
         {
-            using (HlidacStatu.Q.Simple.Queue<TaskResult<Voice2Text>> sq
-                = new Q.Simple.Queue<TaskResult<Voice2Text>>(Voice2Text.QName_failed, Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")))
+            try
             {
-                TaskResult<Voice2Text> result = new TaskResult<Voice2Text>()
+
+                using (HlidacStatu.Q.Simple.Queue<TaskResult<Voice2Text>> sq
+                    = new Q.Simple.Queue<TaskResult<Voice2Text>>(Voice2Text.QName_failed, Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")))
                 {
-                    Payload = task,
-                    Created = DateTime.Now,
-                    Result = "failed",
-                    User = this.ApiAuth?.ApiCall?.User,
-                    FromIP = this.HostIpAddress
-                };
-                sq.Send(result);
+                    TaskResult<Voice2Text> result = new TaskResult<Voice2Text>()
+                    {
+                        Payload = task,
+                        Created = DateTime.Now,
+                        Result = "failed",
+                        User = this.ApiAuth?.ApiCall?.User,
+                        FromIP = this.HostIpAddress
+                    };
+                    sq.Send(result);
+                }
+            }
+            catch (Exception e)
+            {
+                HlidacStatu.Util.Consts.Logger.Fatal("Voice2TextFailed", e);
+                throw;
             }
 
             return "OK";
