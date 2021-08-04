@@ -166,7 +166,7 @@
             {
                 <p>
                     Zásadní nedostatky za letošní rok v rozporu se zákonem jsme zjistili u
-                    <a class="text-danger" href="/hledatsmlouvy?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND chyby:zasadni AND datumUzavreni:[{currentYear}-01-01 TO @(currentYear + 1)-01-01}}")">
+                    <a class="text-danger" href="/hledatsmlouvy?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND chyby:zasadni AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}")">
                         @if (numFatalIssue.Relation == TotalHitsRelation.GreaterThanOrEqualTo)
                         {
                             @Html.Raw(Devmasters.Lang.Plural.GetWithZero((int)numFatalIssue.Value, "<strong>0 </strong>smluv.", "<strong>jedné </strong>smlouvy.", "<strong>{0} </strong>smluv.", "<strong>více než {0:### ### ##0} </strong>smluv.")) }
@@ -190,7 +190,7 @@
                         <span>Zároveň vážné nedostatky za letošní rok jsme zjistili u</span>
                     }
 
-                    <a class="text-danger" href="/hledatsmlouvy?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND chyby:vazne AND datumUzavreni:[{currentYear}-01-01 TO @(currentYear + 1)-01-01}}")">
+                    <a class="text-danger" href="/hledatsmlouvy?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND chyby:vazne AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}")">
                         @if (numFatalIssue.Relation == TotalHitsRelation.GreaterThanOrEqualTo)
                         {
                             @Html.Raw(Devmasters.Lang.Plural.GetWithZero((int)numVazneIssue.Value, "<strong>0 </strong>smluv.", "<strong>jedné </strong>smlouvy.", "<strong>{0} </strong>smluv.", "<strong>více než {0:### ### ##0} </strong>smluv.")) }
