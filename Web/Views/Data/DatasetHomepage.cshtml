@@ -7,6 +7,9 @@
 @using HlidacStatu.Util;
 @using HlidacStatu.XLib;
 @using HlidacStatu.XLib.Render
+@using Microsoft.AspNetCore.Mvc.ViewEngines
+
+@inject ICompositeViewEngine CompositeVE
 
 @{
     var reg = Model.Registration();
@@ -29,14 +32,14 @@
         || email == Model.Registration().createdBy
         );
 
-    var promoRoot = HlidacStatu.Connectors.Init.WebAppRoot + "\\..\\Views\\Data\\Promo\\";
-    string frontPromoViewFileName = promoRoot + $"front_{reg.datasetId}.cshtml";
-    bool showFrontPromo = System.IO.File.Exists(frontPromoViewFileName);
+    //bool showFrontPromo = System.IO.File.Exists(frontPromoViewFileName);
     string frontPromoViewName = $"~/Views/Data/Promo/front_{reg.datasetId}.cshtml";
+    bool showFrontPromo = CompositeVE.GetView(null, frontPromoViewName, isMainPage: false).Success;
 
-    string behindPromoViewFileName = promoRoot + $"behind_{reg.datasetId}.cshtml";
-    bool showBehindPromo = System.IO.File.Exists(behindPromoViewFileName);
+
     string behindPromoViewName = $"~/Views/Data/Promo/behind_{reg.datasetId}.cshtml";
+    bool showBehindPromo = CompositeVE.GetView(null, behindPromoViewName, isMainPage: false).Success;
+    //bool showBehindPromo = System.IO.File.Exists(behindPromoViewFileName);
 
 
     ViewBag.AdditionalForm = new HlidacStatu.Web.Framework.DoubleForm() {
@@ -65,7 +68,7 @@
             @if (showFrontPromo)
             {
                 <cache expires-after="@Constants.CachedActionLength.Cache20Min"
-                       vary-by="@frontPromoViewFileName">
+                       vary-by="@frontPromoViewName">
                     <partial name="@frontPromoViewName" model="@(reg.datasetId)"/>
                 </cache>
             }
@@ -139,7 +142,7 @@
             @if (showBehindPromo)
             {
                 <cache expires-after="@Constants.CachedActionLength.Cache20Min"
-                       vary-by="@behindPromoViewFileName">
+                       vary-by="@behindPromoViewName">
                     <partial name="@behindPromoViewName" model="@(reg.datasetId)"/>
                 </cache>
             }
