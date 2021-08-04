@@ -76,6 +76,18 @@
       <ProjectReference Include="..\XLib\XLib.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Update="Views\Data\Promo\front_stav-mostu.cshtml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Update="Views\Data\Promo\front_vyjadreni-politiku.cshtml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Update="Views\Data\Promo\front_zasedani-zastupitelstev.cshtml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 
     <ItemGroup>
       <None Update="Logger.log4net">
