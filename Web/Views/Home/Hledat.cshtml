@@ -343,7 +343,9 @@ else if (Model.HasResults == false)
 
         @{
             //analyze query and show big boxes
-            var splQ = HlidacStatu.Repositories.Searching.SplittingQuery.SplitQuery(Model.Query);
+            var fixedQ = Tools.FixInvalidQuery(Model.Query, SmlouvaRepo.Searching.Irules, Tools.DefaultQueryOperators );
+
+            var splQ = HlidacStatu.Repositories.Searching.SplittingQuery.SplitQuery(fixedQ);
             string[] prefixes = new string[] { "osobaid:", "ico:" };
             int parts = 0;
             if (splQ.Parts.Any(m => prefixes.Contains(m.Prefix)))
