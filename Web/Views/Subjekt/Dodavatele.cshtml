@@ -60,8 +60,8 @@
                        <br/>{3}", data.Item2, data.Item1, Model.ICO,
                        WebUtil.AddSearchBtn("/hledatSmlouvy","icoPlatce:" + data.Item2 + " AND icoPrijemce:" + Model.ICO,"smlouvy mezi subjekty"));
                 },
-                ValueRender = (s) => { return "\"" + ((Tuple<string,string>)s).Item1.ToString() + "\""; },
-                TextRender = (s) => { return ((Tuple<string,string>)s).Item1.ToString(); }
+                ValueRender = (s) => { return "\"" + ((Tuple<string,string>)s).Item1.ToString().Replace("\"", "\\\"") + "\""; },
+                TextRender = (s) => { return ((Tuple<string,string>)s).Item1.ToString().Replace("\"", "\\\""); }
             },
             new  ReportDataSource.Column() { Name="Počet smluv",
                 OrderValueRender = (s) => { return HlidacStatu.Util.RenderData.OrderValueFormat(Convert.ToInt64( s)); },
@@ -79,8 +79,8 @@
                         , data.Item2, data.Item1, Model.ICO
                         ,WebUtil.AddSearchBtn("/hledatSmlouvy","icoPlatce:" + data.Item2 + " AND icoPrijemce:" + Model.ICO,"smlouvy mezi subjekty"));
                 },
-                ValueRender = (s) => { return "\"" + ((Tuple<string,string>)s).Item1.ToString() + "\""; },
-                TextRender = (s) => { return ((Tuple<string,string>)s).Item1.ToString(); }
+                ValueRender = (s) => { return "\"" + ((Tuple<string,string>)s).Item1.ToString().Replace("\"", "\\\"") + "\""; },
+                TextRender = (s) => { return ((Tuple<string,string>)s).Item1.ToString().Replace("\"", "\\\""); }
             },
             new  ReportDataSource.Column() { Name="Součet cen",
                 HtmlRender = (s) => { return Smlouva.NicePrice((double?)s, html:true, shortFormat:true); },
