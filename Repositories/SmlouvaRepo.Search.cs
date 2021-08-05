@@ -108,7 +108,7 @@ namespace HlidacStatu.Repositories
             };
 
 
-            public static IRule[] irules = new IRule[] {
+            public static IRule[] Irules = new IRule[] {
                new OsobaId("osobaid:","ico:" ),
                new Holding("holdingprijemce:","icoprijemce:" ),
                new Holding("holdingplatce:","icoplatce:" ),
@@ -149,7 +149,7 @@ namespace HlidacStatu.Repositories
 
             public static QueryContainer GetSimpleQuery(string query)
             {
-                var qc = SimpleQueryCreator.GetSimpleQuery<Smlouva>(query, irules);
+                var qc = SimpleQueryCreator.GetSimpleQuery<Smlouva>(query, Irules);
                 return qc;
             }
 
@@ -234,7 +234,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
 
                 if (fixQuery)
                 {
-                    query = Tools.FixInvalidQuery(query, irules, Tools.DefaultQueryOperators );
+                    query = Tools.FixInvalidQuery(query, Irules, Tools.DefaultQueryOperators );
                     result.Q = query;
                 }
 

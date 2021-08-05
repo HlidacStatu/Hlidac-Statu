@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="urn:cz:mfcr:monitor:schemas:MonitorSUZ:v1"
+    xmlns:mon="urn:cz:mfcr:monitor:schemas:MonitorTypes:v1"
+    targetNamespace="urn:cz:mfcr:monitor:schemas:MonitorSUZ:v1" elementFormDefault="qualified"
+    attributeFormDefault="unqualified" version="1">
+    <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorTypes:v1"
+        schemaLocation="monitorTypes.xsd"/>
+    <xs:element name="SchvaleniUZ">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="SchvalovatelOrgan" type="mon:SimpleTextType"/>
+                <xs:element name="SchvaleniStav" type="mon:SimpleTextType"/>
+                <xs:element name="SchvaleniDatum" type="mon:DatumType"/>
+                <xs:element name="Vyjadreni" type="mon:SimpleTextType"/>                
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

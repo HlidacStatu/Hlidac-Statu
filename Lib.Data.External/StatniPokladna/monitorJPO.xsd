@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="urn:cz:mfcr:monitor:schemas:MonitorJPO:v1"
+    xmlns:mon="urn:cz:mfcr:monitor:schemas:MonitorTypes:v1"
+    targetNamespace="urn:cz:mfcr:monitor:schemas:MonitorJPO:v1" elementFormDefault="qualified"
+    attributeFormDefault="unqualified" version="1">
+    <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorTypes:v1"
+        schemaLocation="monitorTypes.xsd"/>
+    <xs:element name="JinePravnickeOsoby">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="Radek">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:choice>
+                                <xs:element name="OsobaPravnickaIC" type="mon:OrganizaceICType"/>
+                                <xs:element name="OsobaPravnickaNerezidentKod" type="mon:NerezidentKodType"/>
+                            </xs:choice>
+                            <xs:element name="OsobaPravnickaNazev" type="mon:SimpleTextType"/>
+                            <xs:element name="VlivProcentni" type="mon:PodilProcentoType"/>
+                            <xs:element name="VlivProcentniNeprimy" type="mon:PodilProcentoType"/>
+                            <xs:element name="KapitalZakladniPodil" type="mon:PodilProcentoType"/>
+                            <xs:element name="KapitalZakladniPodilNeprimy" type="mon:PodilProcentoType"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

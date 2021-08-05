@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:cz:mfcr:monitor:schemas:MonitorFinOSS:v1" xmlns:mon="urn:cz:mfcr:monitor:schemas:MonitorTypes:v1" targetNamespace="urn:cz:mfcr:monitor:schemas:MonitorFinOSS:v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+    <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorTypes:v1" schemaLocation="monitorTypes.xsd"/>
+        
+    <xs:complexType name="EDSType">
+        <xs:annotation>
+            <xs:documentation xml:lang="cz">Evidenční dotační systém a správa majetku ve vlastnictví státu</xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:restriction base="mon:SimpleTextType">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="20"/>
+            </xs:restriction>
+        </xs:simpleContent>
+    </xs:complexType>  
+    
+    <xs:complexType name="UcelType">
+        <xs:annotation>
+            <xs:documentation xml:lang="cz">Účel</xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:restriction base="mon:SimpleTextType">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="10"/>
+            </xs:restriction>
+        </xs:simpleContent>
+    </xs:complexType> 
+
+    <xs:complexType name="PVSType">
+        <xs:annotation>
+            <xs:documentation xml:lang="cz">PVS</xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:restriction base="mon:SimpleTextType">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="15"/>
+            </xs:restriction>
+        </xs:simpleContent>
+    </xs:complexType> 
+    
+    <xs:element name="FinOSS">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="PrijmyRozpoctove">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="cz">I. Rozpočtové příjmy</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element maxOccurs="unbounded" minOccurs="0" name="Radek">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Paragraf" type="mon:ParagrafRozpoctovaSkladbaType"/>
+                                        <xs:element name="Polozka" type="mon:PolozkaRozpoctovaSkladbaType"/>
+                                        <xs:element name="Zdroj" type="mon:NumberType" minOccurs="0"/>
+                                        <xs:element name="EDS" type="EDSType" minOccurs="0"/>
+                                        <xs:element name="Ucel" type="UcelType" minOccurs="0"/>
+                                        <xs:element name="PVS" type="PVSType" minOccurs="0"/>                                        
+                                        <xs:element name="RozpocetSchvaleny" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetPoZmenach" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="Vysledek" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="Obligo" type="mon:FinancniCastkaType"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="VydajeRozpoctove">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="cz">II. Rozpočtové výdaje</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element maxOccurs="unbounded" minOccurs="0" name="Radek">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Paragraf" type="mon:ParagrafRozpoctovaSkladbaType"/>
+                                        <xs:element name="Polozka" type="mon:PolozkaRozpoctovaSkladbaType"/>
+                                        <xs:element name="Zdroj" type="mon:NumberType" minOccurs="0"/>
+                                        <xs:element name="EDS" type="EDSType" minOccurs="0"/>
+                                        <xs:element name="Ucel" type="UcelType" minOccurs="0"/>
+                                        <xs:element name="PVS" type="PVSType" minOccurs="0"/>                                         
+                                        <xs:element name="RozpocetSchvaleny" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetPoZmenach" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetKonecny" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="Vysledek" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="Obligo" type="mon:FinancniCastkaType"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>                
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

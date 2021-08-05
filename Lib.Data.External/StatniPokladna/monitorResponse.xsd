@@ -4,10 +4,16 @@
     xmlns:mon="urn:cz:mfcr:monitor:schemas:MonitorTypes:v1"
     xmlns:roz="urn:cz:mfcr:monitor:schemas:MonitorRozvaha:v1"
     xmlns:vzz="urn:cz:mfcr:monitor:schemas:MonitorVykazZiskuAZtrat:v1"
+    xmlns:suz="urn:cz:mfcr:monitor:schemas:MonitorSUZ:v1"
+    xmlns:jpo="urn:cz:mfcr:monitor:schemas:MonitorJPO:v1"
     xmlns:fin212m="urn:cz:mfcr:monitor:schemas:MonitorFin212M:v1"
     xmlns:fin204u="urn:cz:mfcr:monitor:schemas:MonitorFin204U:v1"
-    xmlns:penvk="urn:cz:mfcr:monitor:schemas:MonitorPenezniTokyAVlastniKapital:v1" 
+    xmlns:finspo="urn:cz:mfcr:monitor:schemas:MonitorFinSPO:v1"
+    xmlns:fin112sf="urn:cz:mfcr:monitor:schemas:MonitorFin112SF:v1"
+    xmlns:finoss="urn:cz:mfcr:monitor:schemas:MonitorFinOSS:v1"
+    xmlns:penvk="urn:cz:mfcr:monitor:schemas:MonitorPenezniTokyAVlastniKapital:v1"
     xmlns:ukaz="urn:cz:mfcr:monitor:schemas:MonitorUkazatele:v1"
+    xmlns:moni="urn:cz:mfcr:monitor:schemas:MonitorMonitoring:v1"
     targetNamespace="urn:cz:mfcr:monitor:schemas:MonitorResponse:v1" elementFormDefault="qualified"
     attributeFormDefault="unqualified" version="1">
 
@@ -19,12 +25,22 @@
         schemaLocation="monitorVykazZiskuAZtrat.xsd"/>
     <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorPenezniTokyAVlastniKapital:v1"
         schemaLocation="monitorPenezniTokyAVlastniKapital.xsd"/>
+    <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorSUZ:v1" schemaLocation="monitorSUZ.xsd"/>
+    <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorJPO:v1" schemaLocation="monitorJPO.xsd"/>
     <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorFin212M:v1"
         schemaLocation="monitorFin212M.xsd"/>
     <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorFin204U:v1"
         schemaLocation="monitorFin204U.xsd"/>
+    <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorFinSPO:v1"
+        schemaLocation="monitorFinSPO.xsd"/>
+    <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorFin112SF:v1"
+        schemaLocation="monitorFin112SF.xsd"/>
+    <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorFinOSS:v1"
+        schemaLocation="monitorFinOSS.xsd"/>    
     <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorUkazatele:v1"
-        schemaLocation="monitorUkazatele.xsd"/>    
+        schemaLocation="monitorUkazatele.xsd"/>
+    <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorMonitoring:v1"
+        schemaLocation="monitorMonitoring.xsd"/>
 
     <xs:element name="MonitorResponse">
         <xs:complexType>
@@ -36,9 +52,15 @@
                             <xs:element ref="roz:Rozvaha"/>
                             <xs:element ref="vzz:VykazZiskuAZtrat"/>
                             <xs:element ref="penvk:PenezniTokyAVlastniKapital"/>
+                            <xs:element ref="suz:SchvaleniUZ"/>
+                            <xs:element ref="jpo:JinePravnickeOsoby"/>
                             <xs:element ref="fin212m:Fin212M"/>
-							<xs:element ref="fin204u:Fin204U"/>
-							<xs:element ref="ukaz:UkazateleUJ"/>
+                            <xs:element ref="fin204u:Fin204U"/>
+                            <xs:element ref="finspo:FinSPO"/>
+                            <xs:element ref="fin112sf:Fin112SF"/>
+                            <xs:element ref="finoss:FinOSS"/>
+                            <xs:element ref="ukaz:UkazateleUJ"/>
+                            <xs:element ref="moni:Monitoring"/>
                         </xs:choice>
                     </xs:complexType>
                 </xs:element>

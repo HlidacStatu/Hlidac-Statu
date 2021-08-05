@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="urn:cz:mfcr:monitor:schemas:MonitorFinSPO:v1"
+    xmlns:mon="urn:cz:mfcr:monitor:schemas:MonitorTypes:v1"
+    targetNamespace="urn:cz:mfcr:monitor:schemas:MonitorFinSPO:v1" elementFormDefault="qualified"
+    attributeFormDefault="unqualified" version="1">
+    <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorTypes:v1"
+        schemaLocation="monitorTypes.xsd"/>
+    <xs:element name="FinSPO">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="CastI">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element maxOccurs="unbounded" minOccurs="0" name="Radek">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Polozka" type="mon:PolozkaType"/>
+                                        <xs:element name="SyntetickyUcet" type="mon:SyntetickyUcetType"/>
+                                        <xs:element name="RozpocetSchvaleny" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="SkutecnostRokMinuly" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetSchvalenyVyhledRokN1" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetSchvalenyVyhledRokN2" type="mon:FinancniCastkaType"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="CastII">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element maxOccurs="unbounded" minOccurs="0" name="Radek">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="Polozka" type="mon:PolozkaType"/>
+                                        <xs:element name="RozpocetSchvaleny" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="SkutecnostRokMinuly" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetSchvalenyVyhledRokN1" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetSchvalenyVyhledRokN2" type="mon:FinancniCastkaType"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

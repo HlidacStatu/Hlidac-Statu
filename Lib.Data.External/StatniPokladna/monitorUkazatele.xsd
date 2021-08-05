@@ -13,6 +13,7 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="NazevUJ" type="NazevUJType"/>
+                            <xs:element name="DruhOrganizace" type="DruhOrganizaceType"/>
                             <xs:element minOccurs="0" name="Kapitola" type="KapitolaType"/>
                             <xs:element name="Kraj" type="KrajType" minOccurs="0"/>
                             <xs:element name="Okres" type="OkresType" minOccurs="0"/>
@@ -53,6 +54,17 @@
             </xs:restriction>
         </xs:simpleContent>
     </xs:complexType>
+    <xs:complexType name="DruhOrganizaceType">
+        <xs:annotation>
+            <xs:documentation xml:lang="cz">Identifikace druhu účetní jednotky.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:restriction base="mon:SimpleTextType">
+                <xs:maxLength value="255"/>
+                <xs:minLength value="1"/>
+            </xs:restriction>
+        </xs:simpleContent>
+    </xs:complexType>    
     <xs:complexType name="KapitolaType">
         <xs:annotation>
             <xs:documentation xml:lang="cz">Identifikace kapitoly (kód a název).</xs:documentation>
@@ -77,7 +89,7 @@
     </xs:complexType>
     <xs:complexType name="OkresType">
         <xs:annotation>
-            <xs:documentation xml:lang="cz">Identifikace okresu (název).</xs:documentation>
+            <xs:documentation xml:lang="cz">Identifikace okresu (NUTS a název).</xs:documentation>
         </xs:annotation>
         <xs:simpleContent>
             <xs:restriction base="mon:SimpleTextType">
@@ -88,7 +100,7 @@
     </xs:complexType>
     <xs:complexType name="ZrizovatelType">
         <xs:annotation>
-            <xs:documentation xml:lang="cz">Identifikace okresu (název).</xs:documentation>
+            <xs:documentation xml:lang="cz">Identifikace zřizovatele (IČ a název).</xs:documentation>
         </xs:annotation>
         <xs:simpleContent>
             <xs:restriction base="mon:SimpleTextType">

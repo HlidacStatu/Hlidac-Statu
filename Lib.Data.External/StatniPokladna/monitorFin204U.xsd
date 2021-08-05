@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns="urn:cz:mfcr:monitor:schemas:MonitorFin204U:v1"
-    xmlns:mon="urn:cz:mfcr:monitor:schemas:MonitorTypes:v1"
-    targetNamespace="urn:cz:mfcr:monitor:schemas:MonitorFin204U:v1" elementFormDefault="qualified"
-    attributeFormDefault="unqualified" version="1">
-    <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorTypes:v1"
-        schemaLocation="monitorTypes.xsd"/>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:cz:mfcr:monitor:schemas:MonitorFin204U:v1" xmlns:mon="urn:cz:mfcr:monitor:schemas:MonitorTypes:v1" targetNamespace="urn:cz:mfcr:monitor:schemas:MonitorFin204U:v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1">
+    <xs:import namespace="urn:cz:mfcr:monitor:schemas:MonitorTypes:v1" schemaLocation="monitorTypes.xsd"/>
 
     <xs:simpleType name="FondNazevType">
         <xs:restriction base="xs:string">
@@ -41,10 +36,21 @@
             <xs:restriction base="mon:SimpleTextType">
                 <xs:minLength value="1"/>
                 <xs:maxLength value="5"/>
-                <xs:pattern value="([0]|\d{5})"/>
             </xs:restriction>
         </xs:simpleContent>
     </xs:complexType>
+    
+    <xs:complexType name="EDSType">
+        <xs:annotation>
+            <xs:documentation xml:lang="cz">Evidenční dotační systém a správa majetku ve vlastnictví státu</xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:restriction base="mon:SimpleTextType">
+                <xs:minLength value="1"/>
+                <xs:maxLength value="20"/>
+            </xs:restriction>
+        </xs:simpleContent>
+    </xs:complexType>    
 
     <xs:complexType name="nazevType">
         <xs:annotation>
@@ -103,14 +109,10 @@
                             <xs:element maxOccurs="unbounded" minOccurs="0" name="Radek">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element name="Paragraf"
-                                            type="mon:ParagrafRozpoctovaSkladbaType"/>
-                                        <xs:element name="Polozka"
-                                            type="mon:PolozkaRozpoctovaSkladbaType"/>
-                                        <xs:element name="RozpocetSchvaleny"
-                                            type="mon:FinancniCastkaType"/>
-                                        <xs:element name="RozpocetPoZmenach"
-                                            type="mon:FinancniCastkaType"/>
+                                        <xs:element name="Paragraf" type="mon:ParagrafRozpoctovaSkladbaType"/>
+                                        <xs:element name="Polozka" type="mon:PolozkaRozpoctovaSkladbaType"/>
+                                        <xs:element name="RozpocetSchvaleny" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetPoZmenach" type="mon:FinancniCastkaType"/>
                                         <xs:element name="Vysledek" type="mon:FinancniCastkaType"/>
                                     </xs:sequence>
                                 </xs:complexType>
@@ -128,16 +130,11 @@
                             <xs:element maxOccurs="unbounded" minOccurs="0" name="Radek">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element name="Paragraf"
-                                            type="mon:ParagrafRozpoctovaSkladbaType"/>
-                                        <xs:element name="Polozka"
-                                            type="mon:PolozkaRozpoctovaSkladbaType"/>
-                                        <xs:element name="RozpocetSchvaleny"
-                                            type="mon:FinancniCastkaType"/>
-                                        <xs:element name="RozpocetPoZmenach"
-                                            type="mon:FinancniCastkaType"/>
-                                        <xs:element name="RozpocetKonecny"
-                                            type="mon:FinancniCastkaType"/>
+                                        <xs:element name="Paragraf" type="mon:ParagrafRozpoctovaSkladbaType"/>
+                                        <xs:element name="Polozka" type="mon:PolozkaRozpoctovaSkladbaType"/>
+                                        <xs:element name="RozpocetSchvaleny" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetPoZmenach" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetKonecny" type="mon:FinancniCastkaType"/>
                                         <xs:element name="Vysledek" type="mon:FinancniCastkaType"/>
                                     </xs:sequence>
                                 </xs:complexType>
@@ -156,12 +153,9 @@
                                 <xs:complexType>
                                     <xs:sequence>
                                         <xs:element name="RadekCislo" type="mon:RadekCisloType"/>
-                                        <xs:element name="StavPocatecni"
-                                            type="mon:FinancniCastkaType" minOccurs="0"/>
-                                        <xs:element name="StavKonecObdobi"
-                                            type="mon:FinancniCastkaType"/>
-                                        <xs:element name="ZmenaStavu" type="mon:FinancniCastkaType"
-                                            minOccurs="0"/>
+                                        <xs:element name="StavPocatecni" type="mon:FinancniCastkaType" minOccurs="0"/>
+                                        <xs:element name="StavKonecObdobi" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="ZmenaStavu" type="mon:FinancniCastkaType" minOccurs="0"/>
                                     </xs:sequence>
                                 </xs:complexType>
                             </xs:element>
@@ -181,16 +175,14 @@
                                         <xs:element maxOccurs="unbounded" minOccurs="0" name="Radek">
                                             <xs:complexType>
                                                 <xs:sequence>
-                                                  <xs:element name="Paragraf"
-                                                  type="mon:ParagrafRozpoctovaSkladbaType"/>
-                                                  <xs:element name="RadekCislo"
-                                                  type="mon:RadekCisloType"/>
-                                                  <xs:element name="Vysledek"
-                                                  type="mon:FinancniCastkaType"/>
+                                                  <xs:element name="Paragraf" type="mon:ParagrafRozpoctovaSkladbaType"/>
+                                                  <xs:element name="RadekCislo" type="mon:RadekCisloType"/>
+                                                  <xs:element name="Vysledek" type="mon:FinancniCastkaType"/>
                                                 </xs:sequence>
                                             </xs:complexType>
                                         </xs:element>
                                     </xs:sequence>
+                                    <xs:attribute name="FondKod" type="FondNazevType"/>
                                 </xs:complexType>
                             </xs:element>
                             <xs:element minOccurs="0" name="Rekapitulace">
@@ -199,12 +191,9 @@
                                         <xs:element maxOccurs="unbounded" minOccurs="0" name="Radek">
                                             <xs:complexType>
                                                 <xs:sequence>
-                                                  <xs:element name="Paragraf"
-                                                  type="mon:ParagrafRozpoctovaSkladbaType"/>
-                                                  <xs:element name="RadekCislo"
-                                                  type="mon:RadekCisloType"/>
-                                                  <xs:element name="Vysledek"
-                                                  type="mon:FinancniCastkaType"/>
+                                                  <xs:element name="Paragraf" type="mon:ParagrafRozpoctovaSkladbaType"/>
+                                                  <xs:element name="RadekCislo" type="mon:RadekCisloType"/>
+                                                  <xs:element name="Vysledek" type="mon:FinancniCastkaType"/>
                                                 </xs:sequence>
                                             </xs:complexType>
                                         </xs:element>
@@ -212,7 +201,6 @@
                                 </xs:complexType>
                             </xs:element>
                         </xs:sequence>
-                        <xs:attribute name="FondNazev" type="FondNazevType"/>
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="JednotkyZaznamoveVybrane">
@@ -243,19 +231,13 @@
                                 <xs:complexType>
                                     <xs:sequence>
                                         <xs:element name="RadekCislo" type="mon:RadekCisloType"/>
-                                        <xs:element name="RozpocetSchvaleny"
-                                            type="mon:FinancniCastkaType"/>
-                                        <xs:element name="RozpocetPoZmenach"
-                                            type="mon:FinancniCastkaType"/>
-                                        <xs:element name="RozpocetKonecny"
-                                            type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetSchvaleny" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetPoZmenach" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetKonecny" type="mon:FinancniCastkaType"/>
                                         <xs:element name="Vysledek" type="mon:FinancniCastkaType"/>
-                                        <xs:element name="ProstredkyMimorozpoctove"
-                                            type="mon:FinancniCastkaType"/>
-                                        <xs:element name="NarokyVydajeNespotrebovane"
-                                            type="mon:FinancniCastkaType"/>
-                                        <xs:element name="PrevodProstredkuRF"
-                                            type="mon:FinancniCastkaType"/>
+                                        <xs:element name="ProstredkyMimorozpoctove" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="NarokyVydajeNespotrebovane" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="PrevodProstredkuRF" type="mon:FinancniCastkaType"/>
                                     </xs:sequence>
                                 </xs:complexType>
                             </xs:element>
@@ -272,16 +254,12 @@
                             <xs:element maxOccurs="unbounded" minOccurs="0" name="Radek">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element name="ProgramCislo"
-                                            type="FinancovaniProgramoveType"/>
-                                        <xs:element name="Polozka"
-                                            type="mon:PolozkaRozpoctovaSkladbaType"/>
-                                        <xs:element name="RozpocetSchvaleny"
-                                            type="mon:FinancniCastkaType"/>
-                                        <xs:element name="RozpocetPoZmenach"
-                                            type="mon:FinancniCastkaType"/>
-                                        <xs:element name="RozpocetKonecny"
-                                            type="mon:FinancniCastkaType"/>
+                                        <xs:element name="ProgramCislo" type="FinancovaniProgramoveType" minOccurs="0"/>
+                                        <xs:element name="EDS" type="EDSType" minOccurs="0"/>
+                                        <xs:element name="Polozka" type="mon:PolozkaRozpoctovaSkladbaType"/>
+                                        <xs:element name="RozpocetSchvaleny" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetPoZmenach" type="mon:FinancniCastkaType"/>
+                                        <xs:element name="RozpocetKonecny" type="mon:FinancniCastkaType"/>
                                         <xs:element name="Vysledek" type="mon:FinancniCastkaType"/>
                                     </xs:sequence>
                                 </xs:complexType>
@@ -298,10 +276,9 @@
                             <xs:element maxOccurs="unbounded" minOccurs="0" name="Radek">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element name="ZnakUcelovy" type="mon:ZnakUcelovyType"/>
-                                        <xs:element name="JednotkaUzemniKod" type="mon:NutsKodType"/>
-                                        <xs:element name="Polozka"
-                                            type="mon:PolozkaRozpoctovaSkladbaType"/>
+                                        <xs:element name="ZnakUcelovy" type="mon:ZnakUcelovyType"/>                                        
+                                        <xs:element name="Polozka" type="mon:PolozkaRozpoctovaSkladbaType"/>
+                                        <xs:element name="PrijemceNuts" type="mon:NutsKodType"/>
                                         <xs:element name="Vysledek" type="mon:FinancniCastkaType"/>
                                     </xs:sequence>
                                 </xs:complexType>

@@ -42,7 +42,7 @@
     </wsdl:binding>
     <wsdl:service name="MonitorService">
         <wsdl:port name="MonitorServicePort" binding="MonitorExtractBinding">
-            <soap:address location="http://monitor.statnipokladna.cz/monitorws"/>
+            <soap:address location="https://monitor.statnipokladna.cz/api/monitorws"/>
         </wsdl:port>
     </wsdl:service>
 </wsdl:definitions>
