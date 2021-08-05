@@ -180,7 +180,7 @@ else
         <div class="row">
             <div class="col-xs-12">
                 <div class="text-right">
-                    <a href="@Url.Action("data", "StatniWeby",new { Id=Model.hostid, h = Model.hash })">Stahnout dostupnost v JSON (Open Data)</a>
+                    <a asp-controller="ApiV2Weby" asp-action="Status" asp-route-id="@Model.hostid">Stahnout dostupnost v JSON (Open Data)</a>
                 </div>
             </div>
 
