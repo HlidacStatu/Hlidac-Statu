@@ -9,10 +9,9 @@ namespace HlidacStatu.Web.Framework.Api
     {
 
 
-        public static Models.ApiV1Models.DumpInfoModel[] GetDumps()
+        public static Models.ApiV1Models.DumpInfoModel[] GetDumps(string baseUrl = "https://www.hlidacstatu.cz/api/v1/")
         {
 
-            string baseUrl = "https://www.hlidacstatu.cz/api/v1/";
             List<DumpInfoModel> data = new List<DumpInfoModel>();
             
             foreach (var fi in new System.IO.DirectoryInfo(StaticData.Dumps_Path).GetFiles("*.zip"))

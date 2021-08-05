@@ -54,7 +54,7 @@ namespace HlidacStatu.Web.Controllers
         [HttpGet("dumps")]
         public ActionResult<Models.ApiV1Models.DumpInfoModel[]> Dumps()
         {
-            return Framework.Api.Dumps.GetDumps();
+            return Framework.Api.Dumps.GetDumps("https://www.hlidacstatu.cz/api/v2/");
         }
 
         [AuthorizeAndAudit]
