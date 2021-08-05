@@ -251,19 +251,19 @@
             @if (statistics.Summary().PocetSmluvSeZasadnimNedostatkem > 0)
             {
             <p>
-                @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", "( chyby:zasadni )")}'>{Devmasters.Lang.Plural.Get(statistics.Summary().PocetSmluvSeZasadnimNedostatkem, "Jedna smlouvu má", "{0} smlouvy mají", "{0} smluv má")}</a> zásadní nedostatek");
+                @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND chyby:zasadni )")}'>{Devmasters.Lang.Plural.Get(statistics.Summary().PocetSmluvSeZasadnimNedostatkem, "Jedna smlouvu má", "{0} smlouvy mají", "{0} smluv má")}</a> zásadní nedostatek");
             </p>
         }
             @if (statistics.Summary().PocetSmluvULimitu > 0)
             {
                 <p>
-                    @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", "( hint.smlouvaULimitu:>0 )")}'>{Devmasters.Lang.Plural.Get(statistics.Summary().PocetSmluvULimitu, "Jednu smlouva je", "{0} smlouvy jsou", "{0} smluv je")}</a> s hodnotou těsně pod limitem veřejných zakázek");
+                    @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND hint.smlouvaULimitu:>0 )")}'>{Devmasters.Lang.Plural.Get(statistics.Summary().PocetSmluvULimitu, "Jednu smlouva je", "{0} smlouvy jsou", "{0} smluv je")}</a> s hodnotou těsně pod limitem veřejných zakázek");
                 </p>
             }
             @if (Model.PatrimStatu() && (statistics.Summary().PercentSmluvPolitiky > 0))
             {
                 <p>
-                    @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", "( sVazbouNaPolitikyNedavne:true ) ")}'>{(statistics.Summary().PercentSmluvPolitiky.ToString("P1"))}</a> smluv s firmami navázanými na politiky");
+                    @Html.Raw($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND sVazbouNaPolitikyNedavne:true ) ")}'>{(statistics.Summary().PercentSmluvPolitiky.ToString("P1"))}</a> smluv s firmami navázanými na politiky");
                 </p>
             }
             </p>
@@ -313,15 +313,15 @@
                                 sentences.Add($"Celkem {statistics[y].PercentSmluvBezCeny.ToString("P1")} smluv má skrytou cenu");
                                 if (statistics[y].PocetSmluvSeZasadnimNedostatkem > 0)
                                 {
-                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", "( chyby:zasadni )", y)}'>{Devmasters.Lang.Plural.Get(statistics[y].PocetSmluvSeZasadnimNedostatkem, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> má zásadní nedostatek");
+                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND chyby:zasadni )", y)}'>{Devmasters.Lang.Plural.Get(statistics[y].PocetSmluvSeZasadnimNedostatkem, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> má zásadní nedostatek");
                                 }
                                 if (statistics[y].PocetSmluvULimitu > 0)
                                 {
-                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", "( hint.smlouvaULimitu:>0 )", y)}'>{Devmasters.Lang.Plural.Get(statistics[y].PocetSmluvULimitu, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> je s hodnotou těsně pod limitem veřejných zakázek");
+                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND hint.smlouvaULimitu:>0 )", y)}'>{Devmasters.Lang.Plural.Get(statistics[y].PocetSmluvULimitu, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> je s hodnotou těsně pod limitem veřejných zakázek");
                                 }
                                 if (Model.PatrimStatu() && (statistics[y].PercentSmluvPolitiky > 0))
                                 {
-                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", "( sVazbouNaPolitikyNedavne:true ) ", y)}'>{(statistics[y].PercentSmluvPolitiky.ToString("P1"))}</a> smluv s firmami navázanými na politiky");
+                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( ico:{Model.ICO} AND sVazbouNaPolitikyNedavne:true ) ", y)}'>{(statistics[y].PercentSmluvPolitiky.ToString("P1"))}</a> smluv s firmami navázanými na politiky");
                                     //@
                                 }
                             }
@@ -339,16 +339,14 @@
                         <li>
                             @{
                                 sentences.Clear();
-                                sentences.Add(NiceString($"/hledatSmlouvy", $"ico:{Model.ICO}", (int)statHoldingAktual[y].PocetSmluv, statHoldingAktual[y].CelkovaHodnotaSmluv, y));
+                                sentences.Add(NiceString($"/hledatSmlouvy", $"holding:{Model.ICO}", (int)statHoldingAktual[y].PocetSmluv, statHoldingAktual[y].CelkovaHodnotaSmluv, y));
                                 if (Model.PatrimStatu())
                                 {
                                     sentences.Add("z toho "
-                                        + NiceString($"/hledatSmlouvy", $"( hint.vztahSeSoukromymSubjektem:>0+) AND ico:{Model.ICO}", (int)statHoldingAktual[y].PocetSmluvSeSoukromymSubj, statHoldingAktual[y].CelkovaHodnotaSmluvSeSoukrSubj, y)
+                                        + NiceString($"/hledatSmlouvy", $"( hint.vztahSeSoukromymSubjektem:>0+) AND holding:{Model.ICO}", (int)statHoldingAktual[y].PocetSmluvSeSoukromymSubj, statHoldingAktual[y].CelkovaHodnotaSmluvSeSoukrSubj, y)
                                         + " se soukromými subjekty"
                                         );
-
                                 }
-
                             }
                             @Html.Raw(HlidacStatu.Util.RenderData.RenderList(sentences))
                         </li>
@@ -358,15 +356,15 @@
                                 sentences.Add($"Celkem {statHoldingAktual[y].PercentSmluvBezCeny.ToString("P1")} smluv má skrytou cenu");
                                 if (statHoldingAktual[y].PocetSmluvSeZasadnimNedostatkem > 0)
                                 {
-                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", "( chyby:zasadni )", y)}'>{Devmasters.Lang.Plural.Get(statHoldingAktual[y].PocetSmluvSeZasadnimNedostatkem, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> má zásadní nedostatek");
+                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( holding:{Model.ICO} AND chyby:zasadni )", y)}'>{Devmasters.Lang.Plural.Get(statHoldingAktual[y].PocetSmluvSeZasadnimNedostatkem, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> má zásadní nedostatek");
                                 }
                                 if (statHoldingAktual[y].PocetSmluvULimitu > 0)
                                 {
-                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", "( hint.smlouvaULimitu:>0 )", y)}'>{Devmasters.Lang.Plural.Get(statHoldingAktual[y].PocetSmluvULimitu, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> je s hodnotou těsně pod limitem veřejných zakázek");
+                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( holding:{Model.ICO} AND hint.smlouvaULimitu:>0 )", y)}'>{Devmasters.Lang.Plural.Get(statHoldingAktual[y].PocetSmluvULimitu, "jednu smlouvu", "{0} smlouvy", "{0} smluv")}</a> je s hodnotou těsně pod limitem veřejných zakázek");
                                 }
                                 if (Model.PatrimStatu() && (statHoldingAktual[y].PercentSmluvPolitiky > 0))
                                 {
-                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", "( sVazbouNaPolitikyNedavne:true ) ", y)}'>{(statHoldingAktual[y].PercentSmluvPolitiky.ToString("P1"))}</a> smluv s firmami navázanými na politiky");
+                                    sentences.Add($"<a href='{ValidUrl("/hledatSmlouvy", $"( holding:{Model.ICO} AND sVazbouNaPolitikyNedavne:true ) ", y)}'>{(statHoldingAktual[y].PercentSmluvPolitiky.ToString("P1"))}</a> smluv s firmami navázanými na politiky");
                                     //@
                                 }
                             }
