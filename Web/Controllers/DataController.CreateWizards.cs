@@ -381,7 +381,6 @@ namespace HlidacStatu.Web.Controllers
         [Authorize]
         public ActionResult ImportData(string id, CreateSimpleModel model)
         {
-            var email = Request?.HttpContext?.User?.Identity?.Name;
             model = model ?? new CreateSimpleModel();
             model.DatasetId = id;
             if (string.IsNullOrEmpty(id))
@@ -391,7 +390,7 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return Redirect("/data");
 
-            if (ds.HasAdminAccess(email) == false)
+            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
                 return View("NoAccess");
 
 
@@ -436,7 +435,6 @@ namespace HlidacStatu.Web.Controllers
         [Authorize]
         public ActionResult ImportData(string id, string delimiter, string data, IFormCollection form, IFormFile file)
         {
-            var email = Request?.HttpContext?.User?.Identity?.Name;
             if (string.IsNullOrEmpty(id))
                 return Redirect("/data");
 
@@ -444,7 +442,7 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return Redirect("/data");
 
-            if (ds.HasAdminAccess(email) == false)
+            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
                 return View("NoAccess");
 
             datasetIndexStatCache.Invalidate();
@@ -481,7 +479,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize]
         public ActionResult ImportDataProcess(string id, CreateSimpleModel model, IFormCollection form)
         {
-            var email = Request?.HttpContext?.User?.Identity?.Name;
+            
             ViewBag.NumOfRows = 0;
 
             model.DatasetId = id;
@@ -496,7 +494,7 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return Redirect("/data");
 
-            if (ds.HasAdminAccess(email) == false)
+            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
                 return View("NoAccess");
 
             datasetIndexStatCache.Invalidate();
@@ -681,6 +679,7 @@ namespace HlidacStatu.Web.Controllers
             try
             {
 
+                var email = Request?.HttpContext?.User?.Identity?.Name;
                 Devmasters.Batch.Manager.DoActionForAll<Tuple<object, string>>(items,
                     (item) =>
                     {

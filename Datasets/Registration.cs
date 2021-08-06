@@ -1,4 +1,5 @@
 ﻿    using System;
+    using System.Security.Claims;
     using HlidacStatu.Entities;
 
     namespace HlidacStatu.Datasets
@@ -107,6 +108,27 @@
         {
             return datasetId;
         }   
+        
+        public bool HasAdminAccess(ClaimsPrincipal user)
+        {
+            if (user is null)
+                return false;
+
+            if (user.IsInRole("Admin"))
+                return true;
+            
+            string email = user.Identity?.Name;
+            
+            if (string.IsNullOrEmpty(email))
+                return false;
+
+            email = email.ToLower();
+
+            if (string.IsNullOrEmpty(this.createdBy))
+                return false; //only superadmins have access
+
+            return this.createdBy.ToLower() == email;
+        }
 
     }
 

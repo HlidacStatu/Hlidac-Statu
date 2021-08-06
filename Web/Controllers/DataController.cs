@@ -88,7 +88,7 @@ namespace HlidacStatu.Web.Controllers
                 if (ds == null)
                     return Redirect("/data");
 
-                if (ds.HasAdminAccess(Request?.HttpContext?.User?.Identity?.Name) == true)
+                if (ds.HasAdminAccess(Request?.HttpContext?.User))
                     return View(ds?.Registration());
             }
             return View();
@@ -100,7 +100,7 @@ namespace HlidacStatu.Web.Controllers
             var ds = DataSet.CachedDatasets.Get(id);
             if (ds == null)
                 return Redirect("/data");
-            if (ds.HasAdminAccess(email) == false)
+            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
                 return View("NoAccess");
 
             string[] neverDelete = new string[] { "veklep", "rozhodnuti-uohs", "centralniregistroznameni", "datasourcesdb" };
@@ -126,7 +126,7 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return RedirectToAction("index");
 
-            if (ds.HasAdminAccess(Request?.HttpContext?.User?.Identity?.Name) == false)
+            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
             {
                 ViewBag.DatasetId = id;
                 return View("NoAccess");
@@ -151,7 +151,7 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return RedirectToAction("index");
 
-            if (ds.HasAdminAccess(Request?.HttpContext?.User?.Identity?.Name) == false)
+            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
             {
                 ViewBag.DatasetId = id;
                 return View("NoAccess");
@@ -172,9 +172,8 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return RedirectToAction("index");
 
-            var logged = Request?.HttpContext?.User?.Identity?.Name;
 
-            if (ds.HasAdminAccess(logged) == false)
+            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
             {
                 ViewBag.DatasetId = id;
                 return View("NoAccess");
@@ -192,10 +191,10 @@ namespace HlidacStatu.Web.Controllers
 
             newReg = WebFormToRegistration(newReg, form);
             if (string.IsNullOrEmpty(newReg.createdBy))
-                newReg.createdBy = logged;
+                newReg.createdBy = Request?.HttpContext?.User?.Identity?.Name;
 
 
-            var res = DataSet.Api.Update(newReg, logged);
+            var res = DataSet.Api.Update(newReg, Request?.HttpContext?.User);
             if (res.valid)
                 return RedirectToAction("Edit", "Data", new { id = ds.DatasetId });
             else

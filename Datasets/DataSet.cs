@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Net.Mail;
+using System.Security.Claims;
 using Elasticsearch.Net;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
@@ -213,20 +214,15 @@ namespace HlidacStatu.Datasets
             return _mapping;
         }
 
-        public bool HasAdminAccess(string email)
+        public bool HasAdminAccess(ClaimsPrincipal user)
         {
-            if (string.IsNullOrEmpty(email))
+            if (user is null)
                 return false;
 
-            email = email.ToLower();
-
-            if (Api.SuperUsers.Contains(email))
+            if (user.IsInRole("Admin"))
                 return true;
-
-            if (string.IsNullOrEmpty(Registration().createdBy))
-                return false; //only superadmins have access
-
-            return Registration().createdBy.ToLower() == email;
+            
+            return Registration()?.HasAdminAccess(user) ?? false;
         }
 
         public virtual DataSearchResult SearchData(string queryString, int page, int pageSize, string sort = null,
