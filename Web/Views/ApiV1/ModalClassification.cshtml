@@ -1,10 +1,12 @@
 ﻿@model Tuple<string, string>
 @using System.Linq;
 @using HlidacStatu.Entities
-@{ Layout = null;
-                string smlouvaId = Model.Item1;
+@{
+    Layout = null;
+    string smlouvaId = Model.Item1;
 
-                string modalId = Model.Item2; }
+    string modalId = Model.Item2;
+}
 
 <!-- Modal Header -->
 <div class="modal-header">
@@ -33,25 +35,27 @@
                         .Select(m => new { value = Convert.ToInt32(m.Value), key = m.Key })
                         .Where(m => m.value % 100 == 0)
                         .OrderBy(m => m.key)
-                    )
+                        )
                     {
-        <div>
-            <label>
-                <input type="checkbox" name="@(modalId)InputTxt" value="@(main.value)_@main.key" /><b>@main.key</b>
-            </label>
-        </div> foreach (var item in Devmasters.Enums.EnumTools
+                        <div>
+                            <label>
+                                <input type="checkbox" name="@(modalId)InputTxt" value="@(main.value)_@main.key"/><b>@main.key</b>
+                            </label>
+                        </div>
+                        foreach (var item in Devmasters.Enums.EnumTools
                             .EnumToEnumerable(typeof(Smlouva.SClassification.ClassificationsTypes))
                             .Select(m => new { value = Convert.ToInt32(m.Value), key = m.Key })
                             .Where(m => m.value % 100 != 0)
                             .Where(m => m.value - (m.value % 100) == main.value)
                             .OrderBy(m => m.key)
-                        )
+                            )
                         {
-        <div>
-            <label>
-                &nbsp;&nbsp;&nbsp;<input type="checkbox" name="@(modalId)InputTxt" value="@(item.value)_@item.key" />@(item.key)
-            </label>
-        </div>}
+                            <div>
+                                <label>
+                                    &nbsp;&nbsp;&nbsp;<input type="checkbox" name="@(modalId)InputTxt" value="@(item.value)_@item.key"/>@(item.key)
+                                </label>
+                            </div>
+                        }
                     }
                 </div>
             </div>

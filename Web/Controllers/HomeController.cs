@@ -645,6 +645,15 @@ text zpravy: {txt}
             {
                 query += " holding:" + qs["holding"];
             }
+            
+            if (!string.IsNullOrWhiteSpace(qs["obory"]))
+            {
+                foreach (var obor in qs["obory"])
+                {
+                    query += " oblast:" + obor;
+                }
+            }
+            
             query = query.Trim();
 
             if (!string.IsNullOrWhiteSpace(query))
