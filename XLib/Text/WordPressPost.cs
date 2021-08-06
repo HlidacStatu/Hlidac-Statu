@@ -9,6 +9,7 @@
 
 using System;
 using System.Globalization;
+using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -274,8 +275,15 @@ namespace HlidacStatu.XLib.Text
 
     public partial class Title
     {
+        private string _rendered;
+        
         [JsonProperty("rendered", NullValueHandling = NullValueHandling.Ignore)]
-        public string Rendered { get; set; }
+        public string Rendered
+        {
+            get => _rendered;
+            set => _rendered = HttpUtility.HtmlDecode(value);
+            
+        }
     }
 
     public partial class WpPost
@@ -298,6 +306,7 @@ namespace HlidacStatu.XLib.Text
             {
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
+            
         };
     }
 }
