@@ -1,23 +1,31 @@
-﻿@{
+﻿@using HlidacStatu.Entities
+@using Devmasters.Enums
+@{
     ViewBag.Title = "Snadné hledání smluv podle více parametrů";
 
 }
+
 @section scripts
 {
     <script src="/Scripts/typeahead.jquery.min.js"></script>
     <script src="/Scripts/bloodhound.min.js"></script>
-    <link href="/Content/typeaheadjs.css" media="all" rel="stylesheet" />
+    <link href="/Content/typeaheadjs.css" media="all" rel="stylesheet"/>
 
-    <link rel="stylesheet" type="text/css" href="/content/bootstrap-datetimepicker.min.css" />
+    <link rel="stylesheet" type="text/css" href="/content/bootstrap-datetimepicker.min.css"/>
     <script type="text/javascript" charset="utf8" src="~/Scripts/moment.min.js"></script>
     <script type="text/javascript" charset="utf8" src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
 
 }
+
 @section breadcrumb
 {
     <ol class="breadcrumb">
-        <li><a href="/">Hlídač Státu</a></li>
-        <li><a href="@Url.Action("Smlouvy","Home")">Hlídač Smluv</a></li>
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Smlouvy", "Home")">Hlídač Smluv</a>
+        </li>
         <li class="active">@ViewBag.Title</li>
     </ol>
 }
@@ -54,7 +62,7 @@
                     <input type="text" class="form-control" name="textsmlouvy" id="textsmlouvy" placeholder="Slova">
                 </div>
             </div>
-            <hr />
+            <hr/>
             <h4>Vyhledávání podle smluvních stran</h4>
             <div class="form-group">
                 <label for="subjektIco" class="col-sm-2 control-label">Úřad, plátce, objednatel</label>
@@ -66,14 +74,14 @@
             </div>
 
             <div class="form-group">
-                <label for="subjektIco" class="col-sm-2 control-label">Dodavatel,<br />příjemce peněz</label>
+                <label for="subjektIco" class="col-sm-2 control-label">Dodavatel,<br/>příjemce peněz</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" name="icoPrijemce" id="icoPrijemce" placeholder="ICO příjemce">
                     <input type="text" class="form-control" name="dsPrijemce" id="dsPrijemce" placeholder="Datová schránka příjemce">
                     <input type="text" class="form-control" name="jmenoPrijemce" id="jmenoPrijemce" placeholder="Jméno nebo část jména příjemce">
                 </div>
             </div>
-            <hr />
+            <hr/>
             <h4>Vyhledávání podle další kritérií</h4>
             <div class="form-group">
                 <label for="cenaOd" class="col-sm-2 control-label">Hodnota smlouvy, veřejné zakázky</label>
@@ -84,7 +92,7 @@
             </div>
 
             <div class="form-group">
-                <label for="podepsanoOd" class="col-sm-2 control-label">Smlouva nebo zakázka <br />zveřejněna od-do data</label>
+                <label for="podepsanoOd" class="col-sm-2 control-label">Smlouva nebo zakázka <br/>zveřejněna od-do data</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" name="zverejnenoOd" id="zverejnenoOd" placeholder="Zveřejneno od data">
                     <input type="text" class="form-control" name="zverejnenoDo" id="zverejnenoDo" placeholder="Zveřejneno do data">
@@ -100,7 +108,7 @@
             </div>
 
             <div class="form-group">
-                <label for="podepsanoOd" class="col-sm-2 control-label">Smlouva nebo zakázka <br />podepsána od-do data</label>
+                <label for="podepsanoOd" class="col-sm-2 control-label">Smlouva nebo zakázka <br/>podepsána od-do data</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" name="podepsanoOd" id="podepsanoOd" placeholder="podepsáno od data">
                     <input type="text" class="form-control" name="podepsanoDo" id="podepsanoDo" placeholder="podepsáno do data">
@@ -119,7 +127,7 @@
                 <label for="politik" class="col-sm-2 control-label">Smlouvy s vazbou na osobu</label>
                 <div class="col-sm-8">
                     <input class="form-control typeahead" type="text" placeholder="Jméno osoby">
-                    <input type="hidden" name="osobaNamedId" id="osobaNamedId" />
+                    <input type="hidden" name="osobaNamedId" id="osobaNamedId"/>
                 </div>
             </div>
             <div class="form-group">
@@ -128,21 +136,56 @@
                     <input type="text" class="form-control" name="holding" id="holding" placeholder="IČO matky holdingu">
                 </div>
             </div>
+
+            <div class="form-group">
+                <label for="obory" class="col-sm-2 control-label">Smlouvy podle oborů do kterých patří</label>
+                <div class="col-sm-8">
+                    <div class="checkbox" style="height:400px;overflow-y:auto;border:1px #d0d0d0 solid;width:80%;overflow-x:hidden;padding:10px;">
+                        @{
+                            var classifications = Enum.GetValues<Smlouva.SClassification.ClassificationsTypes>()
+                                .Select(m => new
+                                {
+                                    stringValue = m.ToString("G"),
+                                    name = m.ToNiceDisplayName(),
+                                    intValue = (int)m
+                                }).ToList(); 
+                        }
+                        
+                        @foreach (var main in classifications.Where(m => m.intValue % 100 == 0).OrderBy(m => m.name))
+                        {
+                            <div>
+                                <label>
+                                    <input type="checkbox" name="obory" value="@(main.stringValue)"/><b>@main.name</b>
+                                </label>
+                            </div>
+                            foreach (var item in classifications.Where(m => m.intValue % 100 != 0)
+                                .Where(m => m.intValue - (m.intValue % 100) == main.intValue)
+                                .OrderBy(m => m.name))
+                            {
+                                <div>
+                                    <label>
+                                        &nbsp;&nbsp;&nbsp;<input type="checkbox" name="obory" value="@(item.stringValue)"/>@(item.name)
+                                    </label>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <div class="col-sm-12">
                     <button type="submit" name="hledatvse" value="1" class="btn btn-primary">Hledat v celém Hlídači</button>
-                    <br />
+                    <br/>
                     <button type="submit" name="hledatsmlouvy" value="1" class="btn btn-default btn-sm">Hledat pouze ve smlouvách</button>
                     <button type="submit" name="hledatvz" value="1" class="btn btn-default btn-sm">Hledat pouze ve veřejných zakázkách</button>
                 </div>
             </div>
-
         }
 
     </div>
 </div>
 <div class="clearfix"></div>
-
 
 
 <script>
