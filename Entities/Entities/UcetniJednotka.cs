@@ -7,10 +7,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Entities
 {
-    [Keyless]
     [Table("UcetniJednotka")]
     public partial class UcetniJednotka
     {
+        [Key]
+        public int Id { get; set; }
+        
         [Required]
         [Column("ico")]
         [StringLength(20)]
