@@ -73,14 +73,12 @@ namespace HlidacStatu.Datasets
                     dataset.created = DateTime.Now;
                     bool skipallowWriteAccess = user.IsInRole("Admin");
 
-                    //pokud se lisi autor (byl pri updatu zmodifikovan), muze to udelat pouze superUser nebo orig autor
-                    if (dataset.createdBy != oldReg.createdBy)
+                    //pokud se lisi autor (byl pri updatu zmodifikovan), muze to udelat pouze Admin
+                    if (!skipallowWriteAccess && updatedBy != oldReg.createdBy)
                     {
-                        if (!user.IsInRole("Admin") && updatedBy != oldReg.createdBy)
-                        {
-                            return ApiResponseStatus.DatasetNoPermision;
-                        }
+                        return ApiResponseStatus.DatasetNoPermision;
                     }
+                    
                     if (updatedBy != oldReg?.createdBy?.ToLower())
                     {
                         if (!user.IsInRole("Admin"))
