@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.Mail;
 using System.Security.Claims;
+using HlidacStatu.Entities;
 using Newtonsoft.Json.Schema;
 
 namespace HlidacStatu.Datasets
@@ -11,11 +12,12 @@ namespace HlidacStatu.Datasets
     {
         public static class Api
         {
-            public static ApiResponseStatus Update(Registration dataset, ClaimsPrincipal user)
+            public static ApiResponseStatus Update(Registration dataset, ApplicationUser user)
             {
+                if (user == null) throw new ArgumentNullException(nameof(user));
                 try
                 {
-                    string updatedBy = user.Identity?.Name?.ToLower() ?? "";
+                    string updatedBy = user.Email?.ToLower() ?? "";
                     string id = dataset.datasetId;
                     if (string.IsNullOrEmpty(id))
                         return ApiResponseStatus.DatasetNotFound;

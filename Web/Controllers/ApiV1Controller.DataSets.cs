@@ -314,9 +314,9 @@ namespace HlidacStatu.Web.Controllers
                 //Response.StatusCode = 401;
                 return Json(ApiResponseStatus.ApiUnauthorizedAccess);
             }
-            
-            if(ModelState.IsValid)
-                return Json(DataSet.Api.Update(data, apiAuth.ApiCall?.User));
+
+            if (ModelState.IsValid)
+                return Json(DataSet.Api.Update(data, ApplicationUser.GetByEmail(apiAuth.ApiCall.User))); //blablablabla apiAuth.ApiCall?.User));
 
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             var errorsStringified = string.Join(";\n", errors);
@@ -348,7 +348,8 @@ namespace HlidacStatu.Web.Controllers
             {
                 try
                 {
-                    return Json(DataSet.Api.Update(data, apiAuth.ApiCall?.User?.ToLower()));
+                    return Json(DataSet.Api.Update(data,
+                        ApplicationUser.GetByEmail(apiAuth.ApiCall.User))); //blablablabla apiAuth.ApiCall?.User?.ToLower()));
                 }
                 catch (DataSetException dse)
                 {

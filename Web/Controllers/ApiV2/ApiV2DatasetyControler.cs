@@ -222,7 +222,7 @@ namespace HlidacStatu.Web.Controllers
             ApiResponseStatus res;
             try
             {
-                res = DataSet.Api.Update(data, this.ApiAuth.ApiCall.User);
+                res = DataSet.Api.Update(data, AuthUser()); //blablablabla this.ApiAuth.ApiCall.User);
             }
             catch (Exception ex)
             {

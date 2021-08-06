@@ -194,7 +194,7 @@ namespace HlidacStatu.Web.Controllers
                 newReg.createdBy = Request?.HttpContext?.User?.Identity?.Name;
 
 
-            var res = DataSet.Api.Update(newReg, Request?.HttpContext?.User);
+            var res = DataSet.Api.Update(newReg, ApplicationUser.GetByEmail(Request?.HttpContext?.User?.Identity?.Name));
             if (res.valid)
                 return RedirectToAction("Edit", "Data", new { id = ds.DatasetId });
             else

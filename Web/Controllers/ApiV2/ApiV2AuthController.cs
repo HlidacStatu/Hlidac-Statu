@@ -25,7 +25,7 @@ namespace HlidacStatu.Web.Controllers
         [NonAction]
         public ApplicationUser AuthUser()
         {
-            ApplicationUser user = ApplicationUser.GetByEmail(this?.User?.Identity?.Name);
+            ApplicationUser user = ApplicationUser.GetByEmail(ApiAuth.ApiCall.User);
             return user;
         }
 
