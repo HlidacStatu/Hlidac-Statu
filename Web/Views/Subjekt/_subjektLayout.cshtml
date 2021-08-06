@@ -134,13 +134,13 @@
 
 <div class="row boxes">
     @* Pravý sloupec *@
-    <cache enabled="false" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{User.Identity.IsAuthenticated}")">
+    <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{User.Identity.IsAuthenticated}")">
         <partial name="RightColumn" model="@Model.firma" />
     </cache>
 
     @* Prázdný sloupec *@
     <div class="col-sm-1"></div>
-    <cache expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{Model.viewName}_{User.Identity.IsAuthenticated}")">
+    <cache  enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
         <partial name="@Model.viewName" model="@Model.firma" />
     </cache>
 

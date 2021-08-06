@@ -841,7 +841,8 @@ namespace HlidacStatu.Repositories
                 renderedIds, withStats, highlightSubjId);
         }
         
-        private static string PrintFlatRelations(Datastructures.Graphs.Graph.MergedEdge parent, int level, IEnumerable<Datastructures.Graphs.Graph.Edge> relations, Relation.TiskEnum typ,
+        private static string PrintFlatRelations(Datastructures.Graphs.Graph.MergedEdge parent, int level, 
+            IEnumerable<Datastructures.Graphs.Graph.Edge> relations, Relation.TiskEnum typ,
        List<string> renderedIds, bool withStats = true, string highlightSubjId = null)
         {
             int space = 2;
@@ -852,7 +853,7 @@ namespace HlidacStatu.Repositories
             if (renderedIds == null)
                 renderedIds = new List<string>();
 
-            var rels = relations
+            var rels = relations 
                 .Where(m =>
                     (
                     (parent != null && m.From?.UniqId == parent.To?.UniqId)

@@ -141,7 +141,7 @@
 
     @* Prázdný sloupec *@
     <div class="col-sm-1"></div>
-    <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}_{Model.viewName}_{User.Identity.IsAuthenticated}")">
+    <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
         <partial name="@Model.viewName" model="@Model.osoba" />
     </cache>
 

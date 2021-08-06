@@ -9,7 +9,7 @@
     ViewBag.Title = "Přehled vazeb";
     ViewBag.SubTitle = "Subjekt " + Model.Jmeno + "(" + Model.ICO + ")";
     Relation.AktualnostType aktualnost = Relation.AktualnostType.Nedavny;
-    if (EnumsNET.Enums.TryParse<Relation.AktualnostType>(ViewBag.param1, out Relation.AktualnostType xen))
+    if (EnumsNET.Enums.TryParse<Relation.AktualnostType>(ViewBag.Aktualnost.ToString(), out Relation.AktualnostType xen))
     {
         aktualnost = xen;
     }
