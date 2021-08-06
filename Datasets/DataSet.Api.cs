@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Mail;
+using System.Security.Claims;
 using Newtonsoft.Json.Schema;
 
 namespace HlidacStatu.Datasets
@@ -10,12 +11,11 @@ namespace HlidacStatu.Datasets
     {
         public static class Api
         {
-            public static string[] SuperUsers = new string[] {"michal@michalblaha.cz" };
-            public static ApiResponseStatus Update(Registration dataset, string updatedBy)
+            public static ApiResponseStatus Update(Registration dataset, ClaimsPrincipal user)
             {
                 try
                 {
-                    updatedBy = updatedBy?.ToLower() ?? "";
+                    string updatedBy = user.Identity?.Name?.ToLower() ?? "";
                     string id = dataset.datasetId;
                     if (string.IsNullOrEmpty(id))
                         return ApiResponseStatus.DatasetNotFound;
@@ -58,7 +58,7 @@ namespace HlidacStatu.Datasets
                     //update object
                     if (!string.IsNullOrWhiteSpace(dataset.jsonSchema)
                         && dataset.jsonSchema != oldReg.jsonSchema
-                        && SuperUsers.Contains(updatedBy)
+                        && user.IsInRole("Admin")
                         )
                     {
                         //update jsonSchema
@@ -69,19 +69,19 @@ namespace HlidacStatu.Datasets
 
                     dataset.datasetId = oldReg.datasetId;
                     dataset.created = DateTime.Now;
-                    bool skipallowWriteAccess = SuperUsers.Contains(updatedBy);
+                    bool skipallowWriteAccess = user.IsInRole("Admin");
 
                     //pokud se lisi autor (byl pri updatu zmodifikovan), muze to udelat pouze superUser nebo orig autor
                     if (dataset.createdBy != oldReg.createdBy)
                     {
-                        if (!SuperUsers.Contains(updatedBy) && updatedBy != oldReg.createdBy)
+                        if (!user.IsInRole("Admin") && updatedBy != oldReg.createdBy)
                         {
                             return ApiResponseStatus.DatasetNoPermision;
                         }
                     }
                     if (updatedBy != oldReg?.createdBy?.ToLower())
                     {
-                        if (!SuperUsers.Contains(updatedBy))
+                        if (!user.IsInRole("Admin"))
                             dataset.createdBy = updatedBy; //pokud updatovano nekym jinym nez autorem (a je mozne to modifikovat), pak createdBy se zmeni na autora. Pokud 
                     }
                     if (dataset.searchResultTemplate != null && !string.IsNullOrEmpty(dataset.searchResultTemplate?.body))

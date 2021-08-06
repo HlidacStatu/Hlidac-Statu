@@ -28,9 +28,7 @@
 
     var email = User.Identity?.Name;
 
-    bool showEditBtn = (DataSet.Api.SuperUsers.Contains(email)
-        || email == Model.Registration().createdBy
-        );
+    bool showEditBtn = (Model != null && Model.HasAdminAccess(Context.User));
 
     //bool showFrontPromo = System.IO.File.Exists(frontPromoViewFileName);
     string frontPromoViewName = $"~/Views/Data/Promo/front_{reg.datasetId}.cshtml";

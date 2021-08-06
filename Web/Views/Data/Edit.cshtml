@@ -73,7 +73,7 @@
                 @Html.TextAreaFor(m => m.description, new { @rows = "6", @class = "form-control" })
             </div>
         </div>
-        @if (DataSet.Api.SuperUsers.Contains(logged))
+        @if (Context.User.IsInRole("Admin"))
         {
             <div class="form-group">
                 @Html.LabelFor(m => m.createdBy, "Vytvořil", new { @class = "col-sm-2 control-label" })

@@ -24,9 +24,7 @@
 }
 
 
-@if (Model != null
-    && (DataSet.Api.SuperUsers.Contains(email) || email == Model.createdBy)
-)
+@if (Model != null && Model.HasAdminAccess(Context.User))
 {
     <div class="row">
         <div class="col-xs-12">

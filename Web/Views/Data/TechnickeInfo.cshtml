@@ -9,9 +9,7 @@
     ViewBag.SubTitle = "Podrobné informace";
 
     var email = User.Identity?.Name;
-    bool showEditBtn = (DataSet.Api.SuperUsers.Contains(email)
-        || email == Model.Registration().createdBy
-        );
+    bool showEditBtn = (Model != null && Model.HasAdminAccess(Context.User));
 
 }
 @section scripts
