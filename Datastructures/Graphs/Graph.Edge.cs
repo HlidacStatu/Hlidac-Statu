@@ -29,6 +29,7 @@ namespace HlidacStatu.Datastructures.Graphs
             public DateTime? RelFrom { get; set; }
             public DateTime? RelTo { get; set; }
             public string Descr { get; set; }
+            public int VazbaType { get; set; }
             public int Distance { get; set; }
             public Relation.AktualnostType Aktualnost { get; set; }
 

@@ -125,7 +125,7 @@
             </a>
         }
     </h3>
-    <cache expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}")">
+    <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}")">
         <partial name="WebUtil/CompanySummary" model="@Model.firma" />
     </cache>
 </div>

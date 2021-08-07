@@ -387,6 +387,7 @@ namespace HlidacStatu.Repositories
             rel.From = fromNode;
             rel.To = toNode;
             rel.Distance = distance;
+            rel.VazbaType = ang.kod_ang;
             rel.RelFrom = (DateTime?) PersistLib.IsNull(ang.fromDate, null);
             if (rel.RelFrom < minDate)
                 rel.RelFrom = null;
@@ -479,7 +480,10 @@ namespace HlidacStatu.Repositories
                 default:
 
                     if (ang.kod_ang < 0)
-                        relRelationship = (Firma.RelationSimpleEnum) ang.kod_ang;
+                    {
+                        relRelationship = (Firma.RelationSimpleEnum)ang.kod_ang;
+                        descr = relRelationship.ToNiceDisplayName();
+                    }
                     else
                     {
                         //rel.Relationship = Relation.RelationDescriptionEnum.Jednatel;

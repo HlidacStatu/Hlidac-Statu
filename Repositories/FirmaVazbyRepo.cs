@@ -158,7 +158,21 @@ namespace HlidacStatu.Repositories
             return Relation.AktualniVazby(firma._parentVazbyOsoby, minAktualnost);
         }
 
-        public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
+        private static Firma[] _vsechnyDcerinnePodrizene(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
+        {
+            var vazby = firma.AktualniVazby(minAktualnost, refresh);
+
+            var data = vazby
+                .Where(v => v.To != null && v.To.Type == HlidacStatu.Datastructures.Graphs.Graph.Node.NodeType.Company)
+                        .GroupBy(f => f.To.Id, v => v, (ico, v) => new
+                        {
+                            ICO = ico,
+                            Firma = Firmy.Get(ico)
+                        });
+            return data.Select(m => m.Firma).ToArray();
+        }
+
+            public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
         {
             //firma.UpdateVazbyFromDB(); //nemelo by tu byt.
             return Relation.AktualniVazby(firma.Vazby(refresh), minAktualnost);

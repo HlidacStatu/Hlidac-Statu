@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
+
 using Microsoft.EntityFrameworkCore;
 
 #nullable disable
@@ -8,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace HlidacStatu.Entities
 {
     [Table("UcetniJednotka")]
+    [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
     public partial class UcetniJednotka
     {
         [Key]
@@ -96,5 +99,10 @@ namespace HlidacStatu.Entities
         [Column("psc")]
         [StringLength(20)]
         public string Psc { get; set; }
+
+        private string GetDebuggerDisplay()
+        {
+            return $"{ZrizovatelIco}->({StartDate:yyyy-MM-dd}-{EndDate:yyyy-MM-dd})->{Ico}";
+        }
     }
 }
