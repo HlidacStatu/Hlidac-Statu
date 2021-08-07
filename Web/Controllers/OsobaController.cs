@@ -24,7 +24,7 @@ namespace HlidacStatu.Web.Controllers
         {
             if (TryGetOsoba(id, out var osoba, out var result))
             {
-                (Osoba osoba, string viewName, string title) model = (osoba, "Dotace", $"Dotace");
+                (Osoba osoba, string viewName, string title) model = (osoba, "Dotace", $"{osoba.FullName()} - Dotace");
                 return View("_osobaLayout", model);
             }
 
@@ -34,7 +34,7 @@ namespace HlidacStatu.Web.Controllers
         {
             if (TryGetOsoba(id, out var osoba, out var result))
             {
-                (Osoba osoba, string viewName, string title) model = (osoba, "Funkce", $"Veřejné a politické funkce");
+                (Osoba osoba, string viewName, string title) model = (osoba, "Funkce", $"{osoba.FullName()} - Veřejné a politické funkce");
                 return View("_osobaLayout", model);
             }
 
@@ -45,7 +45,7 @@ namespace HlidacStatu.Web.Controllers
         {
             if (TryGetOsoba(id, out var osoba, out var result))
             {
-                (Osoba osoba, string viewName, string title) model = (osoba, "Sponzoring", $"Sponzoring politických stran");
+                (Osoba osoba, string viewName, string title) model = (osoba, "Sponzoring", $"{osoba.FullName()} - Sponzoring politických stran");
                 return View("_osobaLayout", model);
             }
 
@@ -55,7 +55,7 @@ namespace HlidacStatu.Web.Controllers
         {
             if (TryGetOsoba(id, out var osoba, out var result))
             {
-                (Osoba osoba, string viewName, string title) model = (osoba, "DalsiDatabaze", $"Další databáze");
+                (Osoba osoba, string viewName, string title) model = (osoba, "DalsiDatabaze", $"{osoba.FullName()} - Další databáze");
                 return View("_osobaLayout", model);
             }
 
@@ -66,7 +66,7 @@ namespace HlidacStatu.Web.Controllers
         {
             if (TryGetOsoba(id, out var osoba, out var result))
             {
-                (Osoba osoba, string viewName, string title) model = (osoba, "RegistrSmluv", $"Registr smluv");
+                (Osoba osoba, string viewName, string title) model = (osoba, "RegistrSmluv", $"{osoba.FullName()} - Registr smluv");
                 return View("_osobaLayout", model);
             }
 
@@ -88,7 +88,7 @@ namespace HlidacStatu.Web.Controllers
 
                 ViewBag.Aktualnost = aktualnost;
 
-                (Osoba osoba, string viewName, string title) model = (osoba, "Vazby", $"{popis}");
+                (Osoba osoba, string viewName, string title) model = (osoba, "Vazby", $"{osoba.FullName()} - {popis}");
                 return View("_osobaLayout", model);
             }
 
@@ -101,7 +101,7 @@ namespace HlidacStatu.Web.Controllers
         {
             if (TryGetOsoba(id, out var osoba, out var result))
             {
-                (Osoba osoba, string viewName, string title) model = (osoba, "InsolvencniRejstrik", $"Insolvenční rejstřík" );
+                (Osoba osoba, string viewName, string title) model = (osoba, "InsolvencniRejstrik", $"{osoba.FullName()} - Insolvenční rejstřík" );
                 return View("_osobaLayout", model);
                 //return View((Firma: firma, Data: new List<int>()));
             }
