@@ -1802,8 +1802,10 @@ namespace HlidacStatu.Entities
 
 
         [ShowNiceDisplayName()]
-        public enum RelationEnum
+        public enum _Obso_RelationEnum
         {
+            [NiceDisplayName("Zřizovatel příspěvkové organizace")]
+            ZrizovatelPO = -10,
             [NiceDisplayName("Osobní vztah")]
             OsobniVztah = -3,
             [NiceDisplayName("Vliv")]
@@ -1904,7 +1906,7 @@ namespace HlidacStatu.Entities
 
 
         [ShowNiceDisplayName()]
-        public enum RelationSimpleEnum
+        public enum _Obso_RelationSimpleEnum
         {
             [NiceDisplayName("Osobní vztah")]
             OsobniVztah = -3,

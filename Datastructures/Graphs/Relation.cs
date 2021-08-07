@@ -119,6 +119,8 @@ namespace HlidacStatu.Datastructures.Graphs
         [ShowNiceDisplayName()]
         public enum RelationSimpleEnum
         {
+            [NiceDisplayName("Zřizovatel příspěvkové organizace")]
+            ZrizovatelPO = -10,
             [NiceDisplayName("Osobní vztah")]
             OsobniVztah = -3,
             [NiceDisplayName("Vliv")]

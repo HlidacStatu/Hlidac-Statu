@@ -404,9 +404,9 @@ namespace HlidacStatu.Repositories
             return rel;
         }
 
-        private static Tuple<Firma.RelationSimpleEnum, string> AngazovanostDataToRelationSimple(AngazovanostData ang)
+        private static Tuple<HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum, string> AngazovanostDataToRelationSimple(AngazovanostData ang)
         {
-            Firma.RelationSimpleEnum relRelationship = Firma.RelationSimpleEnum.Jiny;
+            HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Jiny;
             string descr = ang.descr;
             /*
        3  - prokura
@@ -420,14 +420,14 @@ namespace HlidacStatu.Repositories
             switch (ang.kod_ang)
             {
                 case 1:
-                    relRelationship = Firma.RelationSimpleEnum.Statutarni_organ;
+                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Statutarni_organ;
                     if (string.IsNullOrEmpty(descr))
-                        descr = Firma.RelationSimpleEnum.Jednatel.ToNiceDisplayName();
+                        descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Jednatel.ToNiceDisplayName();
                     break;
                 case 3:
-                    relRelationship = Firma.RelationSimpleEnum.Statutarni_organ;
+                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Statutarni_organ;
                     if (string.IsNullOrEmpty(descr))
-                        descr = Firma.RelationSimpleEnum.Prokura.ToNiceDisplayName();
+                        descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Prokura.ToNiceDisplayName();
                     break;
                 case 4:
                 case 7:
@@ -437,16 +437,16 @@ namespace HlidacStatu.Repositories
                 case 26:
                 case 28:
                 case 31:
-                    relRelationship = Firma.RelationSimpleEnum.Statutarni_organ;
+                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Statutarni_organ;
                     if (string.IsNullOrEmpty(descr))
-                        descr = Firma.RelationSimpleEnum.Dozorci_rada.ToNiceDisplayName();
+                        descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Dozorci_rada.ToNiceDisplayName();
                     break;
                 case 33:
                 case 34:
                 case 35:
-                    relRelationship = Firma.RelationSimpleEnum.Zakladatel;
+                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Zakladatel;
                     if (string.IsNullOrEmpty(descr))
-                        descr = Firma.RelationSimpleEnum.Dozorci_rada.ToNiceDisplayName();
+                        descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Dozorci_rada.ToNiceDisplayName();
                     break;
                 case 5:
                 case 9:
@@ -454,14 +454,14 @@ namespace HlidacStatu.Repositories
                 case 15:
                 case 19:
                 case 24:
-                    relRelationship = Firma.RelationSimpleEnum.Spolecnik;
+                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Spolecnik;
                     if (string.IsNullOrEmpty(descr))
-                        descr = Firma.RelationSimpleEnum.Spolecnik.ToNiceDisplayName();
+                        descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Spolecnik.ToNiceDisplayName();
                     break;
                 case 100:
-                    relRelationship = Firma.RelationSimpleEnum.Souhrnny;
+                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Souhrnny;
                     if (string.IsNullOrEmpty(descr))
-                        descr = Firma.RelationSimpleEnum.Jednatel.ToNiceDisplayName();
+                        descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Jednatel.ToNiceDisplayName();
                     break;
                 case 23: //
                 case 29: //
@@ -475,27 +475,27 @@ namespace HlidacStatu.Repositories
                 case 41: //
                 case 42: //
                 case 99:
-                    relRelationship = Firma.RelationSimpleEnum.Jiny;
+                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Jiny;
                     break;
                 default:
 
                     if (ang.kod_ang < 0)
                     {
-                        relRelationship = (Firma.RelationSimpleEnum)ang.kod_ang;
+                        relRelationship = (HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum)ang.kod_ang;
                         descr = relRelationship.ToNiceDisplayName();
                     }
                     else
                     {
                         //rel.Relationship = Relation.RelationDescriptionEnum.Jednatel;
-                        relRelationship = Firma.RelationSimpleEnum.Jiny;
+                        relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Jiny;
                         if (string.IsNullOrEmpty(descr))
-                            descr = Firma.RelationSimpleEnum.Jednatel.ToNiceDisplayName();
+                            descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Jednatel.ToNiceDisplayName();
                     }
 
                     break;
             }
 
-            return new Tuple<Firma.RelationSimpleEnum, string>(relRelationship, descr);
+            return new Tuple<HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum, string>(relRelationship, descr);
         }
 
         public static IEnumerable<Datastructures.Graphs.Graph.Edge> GetDirectParentRelationsFirmy(string ico)
