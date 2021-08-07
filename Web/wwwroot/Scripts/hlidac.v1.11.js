@@ -456,7 +456,7 @@ function setNewSearchAsDefault() {
 }
 
 $(document).ready(function () {
-
+/*
     $('#autocomsearch').select2({
         theme: "bootstrap",
         minimumInputLength: 2,
@@ -499,25 +499,26 @@ $(document).ready(function () {
     });
 
     //submit behaviour
-    $("#new-search-input").on('submit', function (e) {
-        var searchval = $('#autocomsearch').val().join(' ');
+    //$("#new-search-input").on('submit', function (e) {
+    //    var searchval = $('#autocomsearch').val().join(' ');
 
-        $('#search-result-query-data').val(searchval);
-    });
+    //    $('#search-result-query-data').val(searchval);
+    //});
 
-    $('#autocomsearch').on("select2:open", function (e) {
-        menuOpened = true;
-    });
-    $('#autocomsearch').on("select2:close", function (e) {
-        menuOpened = false;
-    });
+    //$('#autocomsearch').on("select2:open", function (e) {
+    //    menuOpened = true;
+    //});
+    //$('#autocomsearch').on("select2:close", function (e) {
+    //    menuOpened = false;
+    //});
 
     //on enter keypress
-    $('.select2-search__field').on('keydown', function (e) {
-        if (e.keyCode === 13 && menuOpened == false) {
-            $("#new-search-input").submit();
-        }
-    });
+    //$('.select2-search__field').on('keydown', function (e) {
+    //    if (e.keyCode === 13 && menuOpened == false) {
+    //        $("#new-search-input").submit();
+    //    }
+    //});
+    */
 
     // set default search input
     var defaultSearch = parseInt(readCookie("defaultOldSearch"));

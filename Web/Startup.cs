@@ -228,7 +228,8 @@ namespace HlidacStatu.Web
                 {
                     "Scripts/bootstrap.js",
                     "Scripts/respond.js",
-                    "Scripts/hlidac.v1.10.js",
+                    "Scripts/hlidac.v1.11.js",
+                    //"Scripts/autocomplete.v1.1.js",
                     "Scripts/fuckadblock.min.js",
                     "Scripts/social-share-kit.min.js"
                 };

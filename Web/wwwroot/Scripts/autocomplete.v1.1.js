@@ -12,6 +12,7 @@
     var tagify = new Tagify(input, {
         keepInvalidTags: true,
         duplicates: false,
+        tagTextProp: 'text',
         pasteAsTags: false,
         templates: {
             tag: tagItemTemplate,
@@ -29,7 +30,8 @@
     var controller; // for aborting the call
 
     tagify.on("dropdown:show", onSuggestionsListUpdate);
-    //tagify.on('input', onTagifyInput);
+    tagify.on('dropdown:select', debugMe);
+    tagify.on('add', debugMe);
     //tagify.on('keydown', onTagifyKeyDown);
 
 
@@ -40,6 +42,11 @@
         ) {
             setTimeout(() => { onTagifyFixQuery(input); searchform.submit(); });  // put some buffer to make sure tagify has done with whatever, to be on the safe-side
         }
+    }
+
+    // ES2015 argument destructuring
+    function debugMe(e) {
+        console.log(e);
     }
 
     // ES2015 argument destructuring
@@ -70,12 +77,12 @@
 
     // A good place to pull server suggestion list accoring to the prefix/value
     function onTagifyInput(e) {
-        var value = e.detail.value
-        if (!value) {
+        var qvalue = e.detail.value;
+        if (!qvalue) {
             tagify.whitelist = [] // reset the whitelist
             return;
         }
-        if (value.length <=2) {
+        if (qvalue.length <=2) {
             tagify.whitelist = [] // reset the whitelist
             return;
         }
@@ -90,15 +97,16 @@
         tagify.loading(true).dropdown.hide()
         try {
 
-            fetch('/api/autocomplete?type=query&q=' + value, { signal: controller.signal })
+            fetch('/api/autocomplete?type=query&q=' + qvalue, { signal: controller.signal })
                 .then(RES => RES.json())
                 .then(function (inp) {
                     // update inwhitelist Array in-place
-                    var newWhiteList = inp.map(function (i) {
+                    var newWhiteList = inp.map(function (i,n) {
                         return {
                             id: i.id,
-                            value: i.text,
-                            searchBy: i.description,
+                            value: n+1,
+                            text: i.text,
+                            searchBy: qvalue,
                             html: encodeURIComponent(i.imageElement),
                             type: i.type,
                             description: i.description,
@@ -106,7 +114,7 @@
                         }
                     })
                     tagify.whitelist = newWhiteList;
-                    tagify.loading(false).dropdown.show(value) // render the suggestions dropdown
+                    tagify.loading(false).dropdown.show(qvalue) // render the suggestions dropdown
                 })
         } catch (err) {
 
@@ -116,10 +124,10 @@
     //${tagData.html ? decodeURIComponent(tagData.html) : ''}
     function tagItemTemplate(tagData) {
         try {
-            return `<tag title='${tagData.value}' contenteditable='false' spellcheck="false" class='tagify__tag ${tagData.class ? tagData.class : ""}' ${this.getAttributes(tagData)}>
+            return `<tag title='${tagData.text}' contenteditable='false' spellcheck="false" class='tagify__tag ${tagData.class ? tagData.class : ""}' ${this.getAttributes(tagData)}>
                         <x title='remove tag' class='tagify__tag__removeBtn'></x>
                         <div class='tagify__tag-item'>
-                            <span class='tagify__tag-text'>${tagData.value}</span>
+                            <span class='tagify__tag-text'>${tagData.text}</span>
                         </div>
                     </tag>`
         }
@@ -133,7 +141,7 @@
         <div class='clearfix'>
             <div class='tagify__dropdown__item__avatar'>${decodeURIComponent(tagData.html)}</div>
             <div class='tagify__dropdown__item__info'>
-                <div class='tagify__dropdown__item__title'>${tagData.value}</div>
+                <div class='tagify__dropdown__item__title'>${tagData.text}</div>
                 <div class='tagify__dropdown__item__descr'>${tagData.description}</div>
                 <div class='tagify__dropdown__item__stat'><i>${tagData.type}</i></div>
             </div>

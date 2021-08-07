@@ -38,10 +38,11 @@
         _showFAD = false;
     </script>
 
-    <script src="https://unpkg.com/@@yaireo/tagify"></script>
-    <script src="https://unpkg.com/@@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
-    <link href="https://unpkg.com/@@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
-    <script src="/scripts/autocomplete.js"></script>
+    <!-- tagify -->
+    <script src="@Html.Raw("https://unpkg.com/@yaireo/tagify")"></script>
+    <script src="@Html.Raw("https://unpkg.com/@yaireo/tagify/dist/tagify.polyfills.min.js")"></script>
+    <link href="@Html.Raw("https://unpkg.com/@yaireo/tagify/dist/tagify.css")" rel="stylesheet" type="text/css" />
+    <script src="/scripts/autocomplete.v1.1.js"></script>
     <script type="text/javascript">
         window.smartlook || (function (d) {
             var o = smartlook = function () { o.api.push(arguments) }, h = d.getElementsByTagName('head')[0];
