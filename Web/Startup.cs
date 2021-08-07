@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace HlidacStatu.Web
 {
@@ -31,14 +32,14 @@ namespace HlidacStatu.Web
         {
             //inicializace statických proměnných
             Devmasters.Config.Init(Configuration);
-            
+
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
-            
+
 
             DBUpgrades.DBUpgrader.UpgradeDatabases(Connectors.DirectDB.DefaultCnnStr);
 
-            string connectionString = Configuration.GetConnectionString("DefaultConnection"); 
+            string connectionString = Configuration.GetConnectionString("DefaultConnection");
             // for scoped services (mainly for identity)
             services.AddDbContext<DbEntities>(options =>
                 options.UseSqlServer(connectionString));
@@ -66,7 +67,7 @@ namespace HlidacStatu.Web
             services.AddSingleton<AttackerDictionaryService>(); //migrace: Přejmenovat attackerDictionaryService
 
             services.AddApplicationInsightsTelemetry();
-            
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v2", new OpenApiInfo
@@ -87,7 +88,7 @@ namespace HlidacStatu.Web
                         Url = new Uri("https://www.hlidacstatu.cz/texty/licence/"),
                     }
                 });
-                
+
                 c.AddSecurityDefinition("apiKey", new OpenApiSecurityScheme()
                 {
                     Type = SecuritySchemeType.ApiKey,
@@ -95,13 +96,32 @@ namespace HlidacStatu.Web
                     Name = "Authorization",
                     In = ParameterLocation.Header
                 });
-                
+
                 //migrace: otestovat swagger
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = "HlidacStatu.Web.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
+
+            services.AddHealthChecks()
+                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000, tags: new[] { "webserver","process", "memory" })
+                .AddCheck<Framework.HealthChecks.RandomHealthCheck>("random1", tags: new[] { "random" })
+                .AddDiskStorageHealthCheck(set => { set.AddDrive(@"C:\",1024*10); },"Systémový disk ", HealthStatus.Degraded, tags: new[] { "webserver" }) //10GB
+                .AddDiskStorageHealthCheck(set => { set.AddDrive(@"C:\", 1024 * 5); }, "Systémový disk bez mista", HealthStatus.Unhealthy, tags: new[] { "webserver" }) //5GB
+                .AddSqlServer(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 * from AspNetUsers", "SQL server", HealthStatus.Unhealthy, tags: new[] { "network", "db" })
+                .AddSmtpHealthCheck(set => { set.Host = "10.10.100.60"; set.ConnectionType = HealthChecks.Network.Core.SmtpConnectionType.PLAIN; },"SMTP", HealthStatus.Degraded, tags: new[] { "network"})
+                .AddCheck<Framework.HealthChecks.ElasticSearchClusterStatus>("Elastic cluster", tags: new[] { "network", "elastic" })
+                ;
+            services.AddHealthChecksUI( set=> 
+                    {
+                        set.AddHealthCheckEndpoint("Hlidac státu", "/health");
+                        set.SetHeaderText("Hlídač státu status page");
+                        set.MaximumHistoryEntriesPerEndpoint(50);
+                    }
+                )
+                .AddSqlServerStorage(Configuration["ConnectionStrings:HealthChecksConnection"]);
+
 
         }
 
@@ -151,7 +171,7 @@ namespace HlidacStatu.Web
                 var url = context.Request.Path.Value;
 
                 // Redirect to an external URL
-                if (url?.ToLower()?.StartsWith("/account/")==true)
+                if (url?.ToLower()?.StartsWith("/account/") == true)
                 {
                     context.Response.Redirect("https://www.hlidacstatu.cz/Identity" + url + context.Request.QueryString.Value);
                     return;   // short circuit
@@ -159,11 +179,23 @@ namespace HlidacStatu.Web
 
                 await next();
             });
-            
+
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+            {
+                Predicate = _ => true,
+                ResponseWriter = HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
+            });
+            app.UseHealthChecksUI(set =>
+                {
+                    set.UIPath = "/status";
+
+                }
+            );
 
             app.UseEndpoints(endpoints =>
             {
@@ -174,18 +206,18 @@ namespace HlidacStatu.Web
                 endpoints.MapControllerRoute(
                     name: "home",
                     pattern: "{action}/{id?}",
-                    defaults: new {controller="Home"});
-                
+                    defaults: new { controller = "Home" });
+
                 endpoints.MapControllerRoute(
                     name: "directIndex",
                     pattern: "{controller}/{id?}",
-                    defaults: new {action="Index"});
-                
+                    defaults: new { action = "Index" });
+
                 endpoints.MapControllerRoute(
                     name: "DataController",
                     pattern: "Data/{action}/{id?}/{dataid?}",
-                    defaults: new { controller = "Data", action = "Index"});
-                
+                    defaults: new { controller = "Data", action = "Index" });
+
                 endpoints.MapRazorPages();
             });
 
@@ -195,7 +227,7 @@ namespace HlidacStatu.Web
             {
                 using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent("https://www.hlidacstatu.cz/api/autocomplete/?q=flakan&term=flakan&_type=query&q=flakan"))
                 {
-                    net.Timeout = 3*60000;
+                    net.Timeout = 3 * 60000;
                     var s = net.GetContent();
                 }
             }).Start();
@@ -223,7 +255,7 @@ namespace HlidacStatu.Web
                 pipeline.AddJavaScriptBundle("/bundles/jqueryval", "Scripts/jquery.validate*");
 
                 pipeline.AddJavaScriptBundle("/bundles/modernizr", "Scripts/modernizr-2.8.3.js");
-                
+
                 string[] bootstrapPaths = new[]
                 {
                     "Scripts/bootstrap.js",
@@ -255,18 +287,18 @@ namespace HlidacStatu.Web
             services.AddDefaultIdentity<ApplicationUser>(options =>
                 {
                     options.SignIn.RequireConfirmedAccount = true;
-                
+
                     options.User.RequireUniqueEmail = true;
-                
+
                     options.Password.RequiredLength = 6;
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequireDigit = false;
                     options.Password.RequireLowercase = false;
                     options.Password.RequireUppercase = false;
-                
+
                     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
                     options.Lockout.MaxFailedAccessAttempts = 5;
-                    
+
                 })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DbEntities>();
