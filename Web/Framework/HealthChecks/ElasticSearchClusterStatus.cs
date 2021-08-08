@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 
+using Nest;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,22 +12,62 @@ namespace HlidacStatu.Web.Framework.HealthChecks
 {
     public class ElasticSearchClusterStatus : IHealthCheck
     {
+        private Options options;
+
+        public class Options
+        {
+            public string[] ElasticServerUris { get; set; }
+            public int? ExpectedNumberOfNodes { get; set; } = null;
+
+        }
+        public ElasticSearchClusterStatus(Options options)
+        {
+            this.options = options;
+        }
+
+        static ElasticClient _client = null;
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             try
             {
-                var res = await Repositories.ES.Manager.GetESClient().Cluster.HealthAsync();
+
+                //var singlePool = new Elasticsearch.Net.SingleNodeConnectionPool(new Uri(esUrl));
+                var pool = new Elasticsearch.Net.StaticConnectionPool(options.ElasticServerUris
+                    .Where(m => !string.IsNullOrWhiteSpace(m))
+                    .Select(u => new Uri(u))
+                    );
+
+                var settings = new ConnectionSettings(pool)
+                    .DisableAutomaticProxyDetection(false)
+                    .RequestTimeout(TimeSpan.FromSeconds(10))
+                    .SniffLifeSpan(null)
+                    ;
+
+                if (_client==null)
+                    _client = new ElasticClient(settings);
+
+                var res = await _client.Cluster.HealthAsync();
+                    
                 var numberOfNodes = res?.NumberOfNodes ?? 0;
+
+                string report = $"Num. of nodes:{numberOfNodes}";
+                if (options.ExpectedNumberOfNodes.HasValue && options.ExpectedNumberOfNodes.Value != numberOfNodes)
+                    report = report + $", {options.ExpectedNumberOfNodes} expected.";
+                else
+                    report = report + ".";
 
                 switch (res?.Status)
                 {
                     case Elasticsearch.Net.Health.Red: 
-                        return HealthCheckResult.Unhealthy($"Num. of nodes:{numberOfNodes}");
+                        return HealthCheckResult.Unhealthy(report);
                     case Elasticsearch.Net.Health.Yellow:
-                        return HealthCheckResult.Degraded($"Num. of nodes:{numberOfNodes}");
+                        return HealthCheckResult.Degraded(report);
                     case Elasticsearch.Net.Health.Green:
-                        return HealthCheckResult.Healthy($"Num. of nodes:{numberOfNodes}");
+                        if (options.ExpectedNumberOfNodes.HasValue && options.ExpectedNumberOfNodes.Value != numberOfNodes)
+                            return HealthCheckResult.Degraded(report);
+                        else
+                            return HealthCheckResult.Healthy(report);
                     default:
                         return HealthCheckResult.Degraded($"Unknown status");
                 }

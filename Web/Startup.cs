@@ -104,21 +104,15 @@ namespace HlidacStatu.Web
                 c.IncludeXmlComments(xmlPath);
             });
 
-            services.AddHealthChecks()
-                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000, tags: new[] { "webserver","process", "memory" })
-                .AddCheck<Framework.HealthChecks.RandomHealthCheck>("random1", tags: new[] { "random" })
-                .AddDiskStorageHealthCheck(set => { set.AddDrive(@"C:\",1024*10); },"Systémový disk ", HealthStatus.Degraded, tags: new[] { "webserver" }) //10GB
-                .AddDiskStorageHealthCheck(set => { set.AddDrive(@"C:\", 1024 * 5); }, "Systémový disk bez mista", HealthStatus.Unhealthy, tags: new[] { "webserver" }) //5GB
-                .AddSqlServer(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 * from AspNetUsers", "SQL server", HealthStatus.Unhealthy, tags: new[] { "network", "db" })
-                .AddSmtpHealthCheck(set => { set.Host = "10.10.100.60"; set.ConnectionType = HealthChecks.Network.Core.SmtpConnectionType.PLAIN; },"SMTP", HealthStatus.Degraded, tags: new[] { "network"})
-                .AddCheck<Framework.HealthChecks.ElasticSearchClusterStatus>("Elastic cluster", tags: new[] { "network", "elastic" })
-                ;
-            services.AddHealthChecksUI( set=> 
-                    {
-                        set.AddHealthCheckEndpoint("Hlidac státu", "/health");
-                        set.SetHeaderText("Hlídač státu status page");
-                        set.MaximumHistoryEntriesPerEndpoint(50);
-                    }
+            AddAllHealtChecks(services);
+
+            services.AddHealthChecksUI(set =>
+                   {
+                       set.AddHealthCheckEndpoint("Hlidac státu", "/health");
+                       set.SetHeaderText("Hlídač státu status page");
+                       set.MaximumHistoryEntriesPerEndpoint(50);
+                       
+                   }
                 )
                 .AddSqlServerStorage(Configuration["ConnectionStrings:HealthChecksConnection"]);
 
@@ -193,7 +187,8 @@ namespace HlidacStatu.Web
             app.UseHealthChecksUI(set =>
                 {
                     set.UIPath = "/status";
-
+                    set.AsideMenuOpened = false;
+                    set.AddCustomStylesheet("wwwroot\\content\\CustomHealthCheckUI.css");
                 }
             );
 
@@ -282,24 +277,25 @@ namespace HlidacStatu.Web
             });
         }
 
+
         private void AddIdentity(IServiceCollection services)
         {
             services.AddDefaultIdentity<ApplicationUser>(options =>
-                {
-                    options.SignIn.RequireConfirmedAccount = true;
+            {
+                options.SignIn.RequireConfirmedAccount = true;
 
-                    options.User.RequireUniqueEmail = true;
+                options.User.RequireUniqueEmail = true;
 
-                    options.Password.RequiredLength = 6;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequireDigit = false;
-                    options.Password.RequireLowercase = false;
-                    options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 6;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
 
-                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                    options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
 
-                })
+            })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DbEntities>();
 
@@ -309,5 +305,48 @@ namespace HlidacStatu.Web
                 )
             ;
         }
+
+        private void AddAllHealtChecks(IServiceCollection services)
+        {
+            services
+                .AddHealthChecks()
+                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000, tags: new[] { "webserver", "process", "memory" })
+                .AddSqlServer(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 * from AspNetUsers", "SQL server", HealthStatus.Unhealthy, tags: new[] { "network", "db" })
+                .AddElasticSearchClusterStatus(new Framework.HealthChecks.ElasticSearchClusterStatus.Options()
+                    {
+                         ExpectedNumberOfNodes = 16,
+                         ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';')
+                    }
+                    ,"Elastic cluster", tags: new[] { "network", "elastic" })
+                .AddDiskStorageHealthCheck(set =>
+                    { set.AddDrive(@"C:\", 1024 * 10); },
+                        "Systémový disk ", HealthStatus.Degraded, tags: new[] { "webserver" }
+                    ) //10GB
+                    .AddDiskStorageHealthCheck(set =>
+                { set.AddDrive(@"C:\", 1024 * 5); },
+                    "Systémový disk bez mista", HealthStatus.Unhealthy, tags: new[] { "webserver" }
+                ) //5GB
+                .AddNetworkDiskStorage(new Framework.HealthChecks.NetworkDiskStorageHealthCheck.Options()
+                    {
+                        UNCPath = Devmasters.Config.GetWebConfigValue("FileCachePath"),
+                        DegradedMinimumFreeMegabytes = 10 * 1024, //10G 
+                        UnHealthtMinimumFreeMegabytes= 1 * 1024 //1GB
+                    }, "Cache disk", HealthStatus.Unhealthy, tags: new[] { "webserver" }
+                    ) //5GB
+                .AddCouchbase(new Framework.HealthChecks.CouchbaseHealthCheck.Options() 
+                    {
+                        ServerUris = Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                        Bucket= Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                        Username= Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                        Password= Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                        Service = Framework.HealthChecks.CouchbaseHealthCheck.Service.KeyValue
+                    }
+                    , "Couchbase")
+                .AddSmtpHealthCheck(set => { set.Host = "10.10.100.60"; set.Port = 25; set.ConnectionType = HealthChecks.Network.Core.SmtpConnectionType.PLAIN; }, "SMTP", HealthStatus.Degraded, tags: new[] { "network" })
+                .AddCheck<Framework.HealthChecks.RandomHealthCheck>("random1", tags: new[] { "random" })
+
+                ;
+        }
+
     }
 }
