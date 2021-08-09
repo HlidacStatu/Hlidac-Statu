@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 
 namespace HlidacStatu.Web.Framework.HealthChecks
 {
-    public class NetworkDiskStorageHealthCheck : IHealthCheck
+    public class NetworkDiskStorage : IHealthCheck
     {
         private Options options;
 
@@ -31,7 +31,7 @@ namespace HlidacStatu.Web.Framework.HealthChecks
             public long DegradedMinimumFreeMegabytes { get; set; } = 10;
         }
 
-        public NetworkDiskStorageHealthCheck(Options options)
+        public NetworkDiskStorage(Options options)
         {
             this.options = options;
         }
@@ -55,7 +55,7 @@ namespace HlidacStatu.Web.Framework.HealthChecks
                 decimal totalMBytes = (decimal)((decimal)uTotalNumberOfBytes / 1048576m); //1024*2014
 
                 decimal percentFree = freeMBytesAvailable / totalMBytes;
-                string report = $"Free space: {freeMBytesAvailable:N0}MB, {percentFree:P2}% of total";
+                string report = $"Free space: {freeMBytesAvailable:N0}MB, {percentFree:P2} of total";
 
                 if (freeMBytesAvailable < options.UnHealthtMinimumFreeMegabytes)
                     return Task.FromResult(HealthCheckResult.Unhealthy(description: report));

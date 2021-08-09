@@ -311,40 +311,56 @@ namespace HlidacStatu.Web
             services
                 .AddHealthChecks()
                 .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000, tags: new[] { "webserver", "process", "memory" })
-                .AddSqlServer(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 * from AspNetUsers", "SQL server", HealthStatus.Unhealthy, tags: new[] { "network", "db" })
-                .AddElasticSearchClusterStatus(new Framework.HealthChecks.ElasticSearchClusterStatus.Options()
-                    {
-                         ExpectedNumberOfNodes = 16,
-                         ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';')
-                    }
+                .AddSqlServer(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 username from AspNetUsers", "SQL server", HealthStatus.Unhealthy, tags: new[] { "network", "db" })
+
+                .AddHealthCheckWithOptions<Framework.HealthChecks.ElasticSearchClusterStatus, Framework.HealthChecks.ElasticSearchClusterStatus.Options>(
+                    new Framework.HealthChecks.ElasticSearchClusterStatus.Options()
+                        {
+                             ExpectedNumberOfNodes = 16,
+                             ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';')
+                        }
                     ,"Elastic cluster", tags: new[] { "network", "elastic" })
-                .AddDiskStorageHealthCheck(set =>
-                    { set.AddDrive(@"C:\", 1024 * 10); },
-                        "Systémový disk ", HealthStatus.Degraded, tags: new[] { "webserver" }
-                    ) //10GB
-                    .AddDiskStorageHealthCheck(set =>
-                { set.AddDrive(@"C:\", 1024 * 5); },
-                    "Systémový disk bez mista", HealthStatus.Unhealthy, tags: new[] { "webserver" }
-                ) //5GB
-                .AddNetworkDiskStorage(new Framework.HealthChecks.NetworkDiskStorageHealthCheck.Options()
+
+                .AddHealthCheckWithOptions<Framework.HealthChecks.ElasticSearchNodesFreeDisk, Framework.HealthChecks.ElasticSearchNodesFreeDisk.Options>(
+                    new Framework.HealthChecks.ElasticSearchNodesFreeDisk.Options()
                     {
-                        UNCPath = Devmasters.Config.GetWebConfigValue("FileCachePath"),
-                        DegradedMinimumFreeMegabytes = 10 * 1024, //10G 
-                        UnHealthtMinimumFreeMegabytes= 1 * 1024 //1GB
-                    }, "Cache disk", HealthStatus.Unhealthy, tags: new[] { "webserver" }
-                    ) //5GB
-                .AddCouchbase(new Framework.HealthChecks.CouchbaseHealthCheck.Options() 
-                    {
-                        ServerUris = Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                        Bucket= Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                        Username= Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                        Password= Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
-                        Service = Framework.HealthChecks.CouchbaseHealthCheck.Service.KeyValue
+                        ExpectedNumberOfNodes = 16,
+                        ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
+                        MinimumFreeSpaceInPercent = 15m
                     }
+                    , "Elastic nodes disk space", tags: new[] { "network", "elastic" })
+
+                .AddHealthCheckWithOptions<Framework.HealthChecks.NetworkDiskStorage, Framework.HealthChecks.NetworkDiskStorage.Options>(
+                    new Framework.HealthChecks.NetworkDiskStorage.Options()
+                        {
+                            UNCPath = "c:\\",
+                            DegradedMinimumFreeMegabytes = 10 * 1024, //10G 
+                            UnHealthtMinimumFreeMegabytes = 1 * 1024 //1GB
+                        }, "System disk", HealthStatus.Unhealthy, tags: new[] { "webserver" }
+                )
+
+                .AddHealthCheckWithOptions<Framework.HealthChecks.NetworkDiskStorage, Framework.HealthChecks.NetworkDiskStorage.Options>(
+                    new Framework.HealthChecks.NetworkDiskStorage.Options()
+                        {
+                            UNCPath = Devmasters.Config.GetWebConfigValue("FileCachePath"),
+                            DegradedMinimumFreeMegabytes = 10 * 1024, //10G 
+                            UnHealthtMinimumFreeMegabytes= 1 * 1024 //1GB
+                        }, "Cache disk", HealthStatus.Unhealthy, tags: new[] { "webserver" }
+                )
+
+                .AddHealthCheckWithOptions<Framework.HealthChecks.CouchbaseHealthCheck, Framework.HealthChecks.CouchbaseHealthCheck.Options>(
+                    new Framework.HealthChecks.CouchbaseHealthCheck.Options() 
+                        {
+                            ServerUris = Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                            Bucket= Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                            Username= Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                            Password= Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                            Service = Framework.HealthChecks.CouchbaseHealthCheck.Service.KeyValue
+                        }
                     , "Couchbase")
+
                 .AddSmtpHealthCheck(set => { set.Host = "10.10.100.60"; set.Port = 25; set.ConnectionType = HealthChecks.Network.Core.SmtpConnectionType.PLAIN; }, "SMTP", HealthStatus.Degraded, tags: new[] { "network" })
                 .AddCheck<Framework.HealthChecks.RandomHealthCheck>("random1", tags: new[] { "random" })
-
                 ;
         }
 

@@ -6,22 +6,24 @@ using System.Collections.Generic;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class ElasticSearchClusterStatusHealthCheckBuilderExtensions
+    public static class GenericHealthCheckBuilderExtensions
     {
-        const string NAME = "ElasticSearchClusterStatus";
-        public static IHealthChecksBuilder AddElasticSearchClusterStatus(
+        public static IHealthChecksBuilder AddHealthCheckWithOptions<T, TOptions>(
             this IHealthChecksBuilder builder, 
-            HlidacStatu.Web.Framework.HealthChecks.ElasticSearchClusterStatus.Options options, 
+            TOptions options, 
             string name = default, HealthStatus? failureStatus = default, IEnumerable<string> tags = default, TimeSpan? timeout = default)
+        where T : IHealthCheck
         {
+            name = name ?? typeof(T).Name;
+            T instance = (T)Activator.CreateInstance(typeof(T), options);
 
-           
             return builder.Add(new HealthCheckRegistration(
-                name ?? NAME,
-                sp => new HlidacStatu.Web.Framework.HealthChecks.ElasticSearchClusterStatus(options),
+                name,
+                instance,
                 failureStatus,
                 tags,
                 timeout));
         }
+
     }
 }
