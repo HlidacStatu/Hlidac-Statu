@@ -8,64 +8,67 @@ using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Framework.HealthChecks
 {
-    public class OCRQueue : IHealthCheck
+    public class OCRServer : IHealthCheck
     {
+        Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<OCRDataStat> ocrDataStat = new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<OCRDataStat>(
+            TimeSpan.FromMinutes(2), "ocrDataStat_net",
+            _ =>
+            {
+                try
+                {
+                    string json = "";
+                    using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent("http://ocr.hlidacstatu.cz/stats.ashx"))
+                    {
+                        net.Timeout = 1000 * 10;
+                        net.Tries = 2;
+                        json = net.GetContent().Text;
+                        if (string.IsNullOrEmpty(json))
+                            return new OCRDataStat();
+                    }
+                    var st = Newtonsoft.Json.JsonConvert.DeserializeObject<OCRDataStat>(json);
+                    return st;
+
+                }
+                catch (Exception)
+                {
+                    return new OCRDataStat();
+
+                }
+            }
+            );
         public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             try
             {
-                string json = "";
-
-                var ocrQueueSQL = @"select distinct t.itemtype as 'type',
-		            (select count(*) from ItemToOcrQueue with (nolock) where started is null and itemtype = t.itemtype) as waiting,
-		            (select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is null and itemtype = t.itemtype) as running,
-		            (select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is not null 
-		            and done > DATEADD(dy,-1,getdate()) and itemtype = t.itemtype) as doneIn24H,
-		            (select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is null 
-		            and started< dateadd(hh,-24,getdate()) and itemtype = t.itemtype) as errors
-		            from ItemToOcrQueue t with (nolock)
-		            order by type"; ;
-
-                var ocrQueue = HlidacStatu.Connectors.DirectDB.GetList<string, int, int, int, int>(ocrQueueSQL);
-
-                var report = $"Current queue: {string.Join(", ", ocrQueue.Select(m=>$"{m.Item1}:waiting {m.Item2}"))}";
+                var st = ocrDataStat.Get();
+                var report = $"OCR in 24 hours: {st.queueStat.doneIn24hours}, imgs {st.queueStat.imgDoneIn24hours}. {st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10))} live OCRServers";
 
                 List<string> issues = new List<string>();
 
                 bool degraded = false;
                 bool bad = false;
 
-
-                if (ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").FirstOrDefault()?.Item2 > 10000)
+                //degraded
+                if (st.queueStat.doneIn24hours < 20000)
                 {
-                    issues.Add($"ERR: VerejnaZakazka Queue {ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").First().Item2} done");
+                    issues.Add($"ERR: only {st.queueStat.doneIn24hours} done");
                     bad = true;
                 }
-                if (ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").FirstOrDefault()?.Item2 > 6000)
+                else if (st.queueStat.doneIn24hours < 50000)
                 {
-                    issues.Add($"Warn: VerejnaZakazka only {ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").First().Item2} done");
+                    issues.Add($"Warn: only {st.queueStat.doneIn24hours} done");
                     degraded = true;
                 }
 
-                if (ocrQueue.Where(m => m.Item1 == "Smlouva").FirstOrDefault()?.Item2 > 6000)
+                //degraded
+                if (st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10)) < 3)
                 {
-                    issues.Add($"ERR: Smlouvy Queue {ocrQueue.Where(m => m.Item1 == "Smlouva").First().Item2} done");
+                    issues.Add($"ERR: only {st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10))} Active OCR servers");
                     bad = true;
                 }
-                if (ocrQueue.Where(m => m.Item1 == "Smlouva").FirstOrDefault()?.Item2 > 4000)
+                if (st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10)) < 4)
                 {
-                    issues.Add($"Warn: Smlouvy only {ocrQueue.Where(m => m.Item1 == "Smlouva").First().Item2} done");
-                    degraded = true;
-                }
-
-                if (ocrQueue.Where(m => m.Item1 == "Dataset").FirstOrDefault()?.Item2 > 3000)
-                {
-                    issues.Add($"ERR: Dataset Queue {ocrQueue.Where(m => m.Item1 == "Dataset").First().Item2} done");
-                    bad = true;
-                }
-                if (ocrQueue.Where(m => m.Item1 == "Smlouva").FirstOrDefault()?.Item2 > 1000)
-                {
-                    issues.Add($"Warn: Dataset only {ocrQueue.Where(m => m.Item1 == "Dataset").First().Item2} done");
+                    issues.Add($"Warn: only {st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10))} Active OCR servers");
                     degraded = true;
                 }
 
@@ -75,6 +78,7 @@ namespace HlidacStatu.Web.Framework.HealthChecks
                     return Task.FromResult(HealthCheckResult.Degraded(report + string.Join("! ", issues)));
                 else
                     return Task.FromResult(HealthCheckResult.Healthy(report));
+
 
             }
             catch (Exception e)
@@ -91,10 +95,10 @@ namespace HlidacStatu.Web.Framework.HealthChecks
 
         public class OCRDataStat
         {
-            public Queuestat queueStat { get; set; }
-            public Server[] servers { get; set; }
-            public Ocrserver[] ocrservers { get; set; }
-            public Slowserver[] slowServers { get; set; }
+            public Queuestat queueStat { get; set; } = new Queuestat();
+            public Server[] servers { get; set; } = new Server[] { };
+            public Ocrserver[] ocrservers { get; set; } = new Ocrserver[] { };
+            public Slowserver[] slowServers { get; set; } = new Slowserver[] { };
 
             public class Queuestat
             {

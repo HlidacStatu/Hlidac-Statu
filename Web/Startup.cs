@@ -310,7 +310,7 @@ namespace HlidacStatu.Web
         {
             services
                 .AddHealthChecks()
-                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000, tags: new[] { "webserver", "process", "memory" })
+                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000, name: "Web server allocated memory", tags: new[] { "webserver", "process", "memory" })
                 .AddSqlServer(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 username from AspNetUsers", "SQL server", HealthStatus.Unhealthy, tags: new[] { "network", "db" })
 
                 .AddHealthCheckWithOptions<Framework.HealthChecks.ElasticSearchClusterStatus, Framework.HealthChecks.ElasticSearchClusterStatus.Options>(
@@ -360,7 +360,8 @@ namespace HlidacStatu.Web
                     , "Couchbase")
 
                 .AddSmtpHealthCheck(set => { set.Host = "10.10.100.60"; set.Port = 25; set.ConnectionType = HealthChecks.Network.Core.SmtpConnectionType.PLAIN; }, "SMTP", HealthStatus.Degraded, tags: new[] { "network" })
-                .AddCheck<Framework.HealthChecks.RandomHealthCheck>("random1", tags: new[] { "random" })
+                .AddCheck<Framework.HealthChecks.OCRServer>("OCR servers")
+                .AddCheck<Framework.HealthChecks.OCRQueue>("OCR Queues")
                 ;
         }
 
