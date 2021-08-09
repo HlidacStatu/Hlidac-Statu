@@ -182,7 +182,7 @@ namespace HlidacStatu.Web
             app.UseHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
             {
                 Predicate = _ => true,
-                ResponseWriter = HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
+                ResponseWriter = global::HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
             });
             app.UseHealthChecksUI(set =>
                 {
@@ -310,19 +310,24 @@ namespace HlidacStatu.Web
         {
             services
                 .AddHealthChecks()
-                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000, name: "Web server allocated memory", tags: new[] { "webserver", "process", "memory" })
-                .AddSqlServer(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 username from AspNetUsers", "SQL server", HealthStatus.Unhealthy, tags: new[] { "network", "db" })
 
-                .AddHealthCheckWithOptions<Framework.HealthChecks.ElasticSearchClusterStatus, Framework.HealthChecks.ElasticSearchClusterStatus.Options>(
-                    new Framework.HealthChecks.ElasticSearchClusterStatus.Options()
+                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000, name: "Web server allocated memory", tags: new[] { "webserver", "process", "memory" })
+
+                .AddHealthCheckWithResponseTime(
+                    new global::HealthChecks.SqlServer.SqlServerHealthCheck(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 username from AspNetUsers"), 
+                    "SQL server", HealthStatus.Unhealthy, tags: new[] { "network", "db" }
+                )
+
+                .AddHealthCheckWithOptions<Web.HealthChecks.ElasticSearchClusterStatus, Web.HealthChecks.ElasticSearchClusterStatus.Options>(
+                    new Web.HealthChecks.ElasticSearchClusterStatus.Options()
                         {
                              ExpectedNumberOfNodes = 16,
                              ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';')
                         }
                     ,"Elastic cluster", tags: new[] { "network", "elastic" })
 
-                .AddHealthCheckWithOptions<Framework.HealthChecks.ElasticSearchNodesFreeDisk, Framework.HealthChecks.ElasticSearchNodesFreeDisk.Options>(
-                    new Framework.HealthChecks.ElasticSearchNodesFreeDisk.Options()
+                .AddHealthCheckWithOptions<Web.HealthChecks.ElasticSearchNodesFreeDisk, Web.HealthChecks.ElasticSearchNodesFreeDisk.Options>(
+                    new Web.HealthChecks.ElasticSearchNodesFreeDisk.Options()
                     {
                         ExpectedNumberOfNodes = 16,
                         ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
@@ -330,8 +335,8 @@ namespace HlidacStatu.Web
                     }
                     , "Elastic nodes disk space", tags: new[] { "network", "elastic" })
 
-                .AddHealthCheckWithOptions<Framework.HealthChecks.NetworkDiskStorage, Framework.HealthChecks.NetworkDiskStorage.Options>(
-                    new Framework.HealthChecks.NetworkDiskStorage.Options()
+                .AddHealthCheckWithOptions<Web.HealthChecks.NetworkDiskStorage, Web.HealthChecks.NetworkDiskStorage.Options>(
+                    new Web.HealthChecks.NetworkDiskStorage.Options()
                         {
                             UNCPath = "c:\\",
                             DegradedMinimumFreeMegabytes = 10 * 1024, //10G 
@@ -339,8 +344,8 @@ namespace HlidacStatu.Web
                         }, "System disk", HealthStatus.Unhealthy, tags: new[] { "webserver" }
                 )
 
-                .AddHealthCheckWithOptions<Framework.HealthChecks.NetworkDiskStorage, Framework.HealthChecks.NetworkDiskStorage.Options>(
-                    new Framework.HealthChecks.NetworkDiskStorage.Options()
+                .AddHealthCheckWithOptions<Web.HealthChecks.NetworkDiskStorage, Web.HealthChecks.NetworkDiskStorage.Options>(
+                    new Web.HealthChecks.NetworkDiskStorage.Options()
                         {
                             UNCPath = Devmasters.Config.GetWebConfigValue("FileCachePath"),
                             DegradedMinimumFreeMegabytes = 10 * 1024, //10G 
@@ -348,20 +353,53 @@ namespace HlidacStatu.Web
                         }, "Cache disk", HealthStatus.Unhealthy, tags: new[] { "webserver" }
                 )
 
-                .AddHealthCheckWithOptions<Framework.HealthChecks.CouchbaseHealthCheck, Framework.HealthChecks.CouchbaseHealthCheck.Options>(
-                    new Framework.HealthChecks.CouchbaseHealthCheck.Options() 
+                .AddHealthCheckWithOptions<Web.HealthChecks.Couchbase, Web.HealthChecks.Couchbase.Options>(
+                    new Web.HealthChecks.Couchbase.Options() 
                         {
                             ServerUris = Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                             Bucket= Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                             Username= Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
                             Password= Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
-                            Service = Framework.HealthChecks.CouchbaseHealthCheck.Service.KeyValue
+                            Service = Web.HealthChecks.Couchbase.Service.KeyValue
                         }
-                    , "Couchbase")
+                    , "Couchbase", tags: new[] { "cache" })
 
-                .AddSmtpHealthCheck(set => { set.Host = "10.10.100.60"; set.Port = 25; set.ConnectionType = HealthChecks.Network.Core.SmtpConnectionType.PLAIN; }, "SMTP", HealthStatus.Degraded, tags: new[] { "network" })
-                .AddCheck<Framework.HealthChecks.OCRServer>("OCR servers")
-                .AddCheck<Framework.HealthChecks.OCRQueue>("OCR Queues")
+                .AddHealthCheckWithResponseTime(
+                    new global::HealthChecks.Network.SmtpHealthCheck(new global::HealthChecks.Network.SmtpHealthCheckOptions()
+                    {
+                        Host = "10.10.100.60",
+                        Port= 25,
+                        ConnectionType = global::HealthChecks.Network.Core.SmtpConnectionType.PLAIN
+                    }),
+                    "SMTP", HealthStatus.Degraded, tags: new[] { "network" }
+                )
+
+                .AddCheck<Web.HealthChecks.OCRServer>("OCR servers", tags: new[] { "OCR cloud" })
+                .AddCheck<Web.HealthChecks.OCRQueue>("OCR queues", tags: new[] { "OCR cloud" })
+                .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
+                    new Web.HealthChecks.DockerContainer.Options()
+                        {
+                            DockerAPIUri = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.100.145").Split(';')[0],
+                            ContainerNames = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.100.145").Split(';')[1].Split(','),                            
+                        }, "Docker .145", HealthStatus.Unhealthy, tags: new[] { "docker" })
+                .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
+                    new Web.HealthChecks.DockerContainer.Options()
+                    {
+                        DockerAPIUri = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.100.146").Split(';')[0],
+                        ContainerNames = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.100.146").Split(';')[1].Split(','),
+                    }, "Docker .146", HealthStatus.Unhealthy, tags: new[] { "docker" })
+                .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
+                    new Web.HealthChecks.DockerContainer.Options()
+                    {
+                        DockerAPIUri = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.150.200").Split(';')[0],
+                        ContainerNames = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.150.200").Split(';')[1].Split(','),
+                    }, "Docker .200", HealthStatus.Unhealthy, tags: new[] { "docker" })
+                .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
+                    new Web.HealthChecks.DockerContainer.Options()
+                    {
+                        DockerAPIUri = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.150.201").Split(';')[0],
+                        ContainerNames = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.150.201").Split(';')[1].Split(','),
+                    }, "Docker .201", HealthStatus.Unhealthy, tags: new[] { "docker" })
                 ;
         }
 

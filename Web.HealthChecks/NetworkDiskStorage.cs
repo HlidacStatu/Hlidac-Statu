@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 
-namespace HlidacStatu.Web.Framework.HealthChecks
+namespace HlidacStatu.Web.HealthChecks
 {
     public class NetworkDiskStorage : IHealthCheck
     {

@@ -98,7 +98,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground", "..\Hlidac-Sta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OCRQueueManager", "..\Hlidac-Statu-Private\OCRQueueManager\OCRQueueManager.csproj", "{C1F6EC6A-688B-4832-A02A-2F17368C1880}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmark", "..\Hlidac-Statu-Private\Benchmark\Benchmark.csproj", "{58E9869B-AFD2-45A8-A005-D5E3F5D2307F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark", "..\Hlidac-Statu-Private\Benchmark\Benchmark.csproj", "{58E9869B-AFD2-45A8-A005-D5E3F5D2307F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.HealthChecks", "Web.HealthChecks\Web.HealthChecks.csproj", "{29719100-304E-478A-966A-7A4593843E28}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -262,6 +264,10 @@ Global
 		{58E9869B-AFD2-45A8-A005-D5E3F5D2307F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58E9869B-AFD2-45A8-A005-D5E3F5D2307F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58E9869B-AFD2-45A8-A005-D5E3F5D2307F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29719100-304E-478A-966A-7A4593843E28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29719100-304E-478A-966A-7A4593843E28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29719100-304E-478A-966A-7A4593843E28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29719100-304E-478A-966A-7A4593843E28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace HlidacStatu.Web.Framework.HealthChecks
+namespace HlidacStatu.Web.HealthChecks
 {
     public class ElasticSearchNodesFreeDisk : IHealthCheck
     {
@@ -47,12 +47,12 @@ namespace HlidacStatu.Web.Framework.HealthChecks
                     .SniffLifeSpan(null)
                     ;
 
-                if (_client==null)
+                if (_client == null)
                     _client = new ElasticClient(settings);
 
                 var res = await _client.Nodes.StatsAsync((r) => r.Metric(Elasticsearch.Net.NodesStatsMetric.Fs));
 
-                List<Tuple<string,Nest.FileSystemStats.TotalFileSystemStats>> nodesStat = new List<Tuple<string, Nest.FileSystemStats.TotalFileSystemStats>>();
+                List<Tuple<string, Nest.FileSystemStats.TotalFileSystemStats>> nodesStat = new List<Tuple<string, Nest.FileSystemStats.TotalFileSystemStats>>();
 
                 if (res.IsValid == false)
                     return new HealthCheckResult(context.Registration.FailureStatus, exception: new Exception(res?.ServerError?.ToString()));
@@ -66,8 +66,8 @@ namespace HlidacStatu.Web.Framework.HealthChecks
 
                 if (res.NodeStatistics.Failed > 0)
                 {
-                    var failureRes = string.Join(' ', 
-                        res.NodeStatistics.Failures.Select(m => $"{(m.AdditionalProperties.ContainsKey("node_id") ? m.AdditionalProperties["node_id"] +":": "")} {m.ToString()}\n")
+                    var failureRes = string.Join(' ',
+                        res.NodeStatistics.Failures.Select(m => $"{(m.AdditionalProperties.ContainsKey("node_id") ? m.AdditionalProperties["node_id"] + ":" : "")} {m.ToString()}\n")
                         );
                     return new HealthCheckResult(context.Registration.FailureStatus, description: failureRes);
 
@@ -86,22 +86,23 @@ namespace HlidacStatu.Web.Framework.HealthChecks
 
                 Func<Tuple<string, Nest.FileSystemStats.TotalFileSystemStats>, bool> isOKTest = null;
                 if (options.MinimumFreeSpaceInMegabytes.HasValue)
-                    isOKTest = new Func<Tuple<string, FileSystemStats.TotalFileSystemStats>, bool>(m => 
-                        (m.Item2.AvailableInBytes / (1024*1024)) > options.MinimumFreeSpaceInMegabytes);
+                    isOKTest = new Func<Tuple<string, FileSystemStats.TotalFileSystemStats>, bool>(m =>
+                        (m.Item2.AvailableInBytes / (1024 * 1024)) > options.MinimumFreeSpaceInMegabytes);
                 else
                     isOKTest = new Func<Tuple<string, FileSystemStats.TotalFileSystemStats>, bool>(m =>
-                        ((decimal)m.Item2.AvailableInBytes / (decimal)m.Item2.TotalInBytes) > (options.MinimumFreeSpaceInPercent/100));
+                        ((decimal)m.Item2.AvailableInBytes / (decimal)m.Item2.TotalInBytes) > (options.MinimumFreeSpaceInPercent / 100));
+
+                report += $" Total available {nodesStat.Sum(m => m.Item2.AvailableInBytes) / (1024 * 1024 * 1024):N0}GB from {nodesStat.Sum(m => m.Item2.TotalInBytes) / (1024 * 1024 * 1024):N0}GB.";
 
                 if (nodesStat.All(isOKTest))
                     return new HealthCheckResult(HealthStatus.Healthy, description: report);
 
                 report += "\n\n";
-                foreach (var item in nodesStat.Where(m=>!isOKTest(m)))
+                foreach (var item in nodesStat.Where(m => !isOKTest(m)))
                 {
                     report += $"{item.Item1} free {item.Item2.AvailableInBytes / (1024 * 1024)}MB ({((decimal)item.Item2.AvailableInBytes / (decimal)item.Item2.TotalInBytes):P1})\n";
-
                 }
-                    return new HealthCheckResult(context.Registration.FailureStatus, description: report);
+                return new HealthCheckResult(context.Registration.FailureStatus, description: report);
             }
             catch (Exception ex)
             {

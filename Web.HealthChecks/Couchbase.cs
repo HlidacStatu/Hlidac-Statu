@@ -8,9 +8,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace HlidacStatu.Web.Framework.HealthChecks
+namespace HlidacStatu.Web.HealthChecks
 {
-    public class CouchbaseHealthCheck : IHealthCheck
+    public class Couchbase : IHealthCheck
     {
         private Options options;
 
@@ -33,7 +33,7 @@ namespace HlidacStatu.Web.Framework.HealthChecks
             public string[] ServerUris { get; set; }
         }
 
-        public CouchbaseHealthCheck(Options options)
+        public Couchbase(Options options)
         {
             this.options = options;
         }
@@ -49,24 +49,24 @@ namespace HlidacStatu.Web.Framework.HealthChecks
             cluster.Authenticate(authenticator);
             var cbucket = cluster.OpenBucket(options.Bucket);
 
-            Couchbase.Core.Monitoring.IPingReport? pingReport = null;
+            global::Couchbase.Core.Monitoring.IPingReport? pingReport = null;
             if (this.options.Service == null)
                 pingReport = cbucket.Ping();
             else
-                pingReport = cbucket.Ping((Couchbase.Core.Monitoring.ServiceType)options.Service.Value);
+                pingReport = cbucket.Ping((global::Couchbase.Core.Monitoring.ServiceType)options.Service.Value);
 
             var statuses = pingReport.Services
                 .SelectMany(m => m.Value)
                 .Where(m => m.State.HasValue)
                 .GroupBy(m => m.State.Value);
 
-            if (statuses.All(m => m.Key == Couchbase.Core.Monitoring.ServiceState.Ok || m.Key == Couchbase.Core.Monitoring.ServiceState.Connected))
+            if (statuses.All(m => m.Key == global::Couchbase.Core.Monitoring.ServiceState.Ok || m.Key == global::Couchbase.Core.Monitoring.ServiceState.Connected))
                 return Task.FromResult(HealthCheckResult.Healthy());
 
             var report = "";
             var delimiter = "\r\n";
             foreach (var status in statuses
-                .Where(m=>!(m.Key == Couchbase.Core.Monitoring.ServiceState.Ok || m.Key == Couchbase.Core.Monitoring.ServiceState.Connected))
+                .Where(m=>!(m.Key == global::Couchbase.Core.Monitoring.ServiceState.Ok || m.Key == global::Couchbase.Core.Monitoring.ServiceState.Connected))
                 )
             {
                 foreach (var item in status)

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace HlidacStatu.Web.Framework.HealthChecks
+namespace HlidacStatu.Web.HealthChecks
 {
     public class ElasticSearchClusterStatus : IHealthCheck
     {

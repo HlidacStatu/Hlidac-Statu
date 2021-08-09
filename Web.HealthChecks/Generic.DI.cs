@@ -25,5 +25,24 @@ namespace Microsoft.Extensions.DependencyInjection
                 timeout));
         }
 
+
+        public static IHealthChecksBuilder AddHealthCheckWithResponseTime(
+            this IHealthChecksBuilder builder,
+            IHealthCheck instance,
+            string name = default, HealthStatus? failureStatus = default, IEnumerable<string> tags = default, TimeSpan? timeout = default)
+        {
+            if (instance == null)
+                throw new ArgumentNullException("instance");
+
+            name = name ?? instance.GetType().Name;
+            return builder.Add(new HealthCheckRegistration(
+                name,
+                new HlidacStatu.Web.HealthChecks.WithResponseTime(instance),
+                failureStatus,
+                tags,
+                timeout));
+        }
+
+        
     }
 }

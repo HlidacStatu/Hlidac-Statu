@@ -85,6 +85,7 @@
       <ProjectReference Include="..\Plugin.Enhancers\Plugin.Enhancers.csproj" />
       <ProjectReference Include="..\Plugin.IssueAnalyzers\Plugin.IssueAnalyzers.csproj" />
       <ProjectReference Include="..\Util\Util.csproj" />
+      <ProjectReference Include="..\Web.HealthChecks\Web.HealthChecks.csproj" />
       <ProjectReference Include="..\XLib\XLib.csproj" />
     </ItemGroup>
 
@@ -93,6 +94,11 @@
       <None Update="Logger.log4net">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <Folder Include="Framework\HealthChecks\" />
     </ItemGroup>
 
 </Project>
