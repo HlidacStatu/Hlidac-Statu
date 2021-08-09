@@ -60,9 +60,9 @@ namespace HlidacStatu.Web.HealthChecks
                 switch (res?.Status)
                 {
                     case Elasticsearch.Net.Health.Red: 
-                        return HealthCheckResult.Unhealthy(report);
+                        return HealthCheckResult.Unhealthy(report + $" Cluster status RED! {res.UnassignedShards} unassigned shards. {res.InitializingShards} initializing shards.");
                     case Elasticsearch.Net.Health.Yellow:
-                        return HealthCheckResult.Degraded(report);
+                        return HealthCheckResult.Degraded(report + $" Cluster status YELLOW! {res.UnassignedShards} unassigned shards. {res.InitializingShards} initializing shards.");
                     case Elasticsearch.Net.Health.Green:
                         if (options.ExpectedNumberOfNodes.HasValue && options.ExpectedNumberOfNodes.Value != numberOfNodes)
                             return HealthCheckResult.Degraded(report);
