@@ -12,6 +12,7 @@ namespace HlidacStatu.Web.HealthChecks
     {
         public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
+
             if (DateTime.UtcNow.Minute % 2 == 0)
             {
                 return Task.FromResult(HealthCheckResult.Healthy());

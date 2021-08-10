@@ -104,17 +104,17 @@ namespace HlidacStatu.Web
                 c.IncludeXmlComments(xmlPath);
             });
 
-            //AddAllHealtChecks(services);
+            AddAllHealtChecks(services);
 
-            //services.AddHealthChecksUI(set =>
-            //       {
-            //           set.AddHealthCheckEndpoint("Hlidac státu", "/health");
-            //           set.SetHeaderText("Hlídač státu status page");
-            //           set.MaximumHistoryEntriesPerEndpoint(50);
+            services.AddHealthChecksUI(set =>
+                   {
+                       set.AddHealthCheckEndpoint("Hlidac státu", "/health");
+                       set.SetHeaderText("Hlídač státu status page");
+                       set.MaximumHistoryEntriesPerEndpoint(50);
                        
-            //       }
-            //    )
-            //    .AddSqlServerStorage(Configuration["ConnectionStrings:HealthChecksConnection"]);
+                   }
+                )
+                .AddSqlServerStorage(Configuration["ConnectionStrings:HealthChecksConnection"]);
 
 
         }
@@ -179,18 +179,18 @@ namespace HlidacStatu.Web
             app.UseAuthentication();
             app.UseAuthorization();
 
-            //app.UseHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
-            //{
-            //    Predicate = _ => true,
-            //    ResponseWriter = global::HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
-            //});
-            //app.UseHealthChecksUI(set =>
-            //    {
-            //        set.UIPath = "/status";
-            //        set.AsideMenuOpened = false;
-            //        set.AddCustomStylesheet("wwwroot\\content\\CustomHealthCheckUI.css");
-            //    }
-            //);
+            app.UseHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+            {
+                Predicate = _ => true,
+                ResponseWriter = global::HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
+            });
+            app.UseHealthChecksUI(set =>
+                {
+                    set.UIPath = "/status";
+                    set.AsideMenuOpened = false;
+                    set.AddCustomStylesheet("wwwroot\\content\\CustomHealthCheckUI.css");
+                }
+            );
 
             app.UseEndpoints(endpoints =>
             {

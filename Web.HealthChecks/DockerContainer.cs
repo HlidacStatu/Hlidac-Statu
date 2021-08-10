@@ -38,63 +38,65 @@ namespace HlidacStatu.Web.HealthChecks
         {
             try
             {
-                Docker.DotNet.DockerClient cli = new Docker.DotNet.DockerClientConfiguration(
+                using (Docker.DotNet.DockerClient cli = new Docker.DotNet.DockerClientConfiguration(
                     new Uri(options.DockerAPIUri), null, TimeSpan.FromSeconds(3)
                     )
-                    .CreateClient();
-
-                string result = "";
-                bool bad = false;
-                foreach (var containerName in options.ContainerNames)
+                    .CreateClient())
                 {
-                    Docker.DotNet.Models.ContainerState stat =null;
-                    try
-                    {
-                        stat = cli.Containers.InspectContainerAsync(containerName).Result?.State;
-                    }
-                    catch (Docker.DotNet.DockerContainerNotFoundException)
-                    {
-                        bad = true;
-                        result += $"{containerName}: doesnt exists\n";
-                    }
-                    catch (System.AggregateException aex)
-                    { 
-                        if (aex.InnerException?.GetType() == typeof(Docker.DotNet.DockerContainerNotFoundException) )
-                        {
-                            bad = true;
-                            result += $"{containerName}: doesn't exists\n";
-                        }
-                        else 
-                        {
-                            bad = true;
-                            result += $"{containerName}: error {aex.ToString()}\n";
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        bad = true;
-                        result += $"{containerName}: error {e.ToString()}\n";
 
-                    }
-                    if (stat == null)
+                    string result = "";
+                    bool bad = false;
+                    foreach (var containerName in options.ContainerNames)
                     {
-                        bad = true;
-                        result += $"{containerName}: docker not responding\n";
+                        Docker.DotNet.Models.ContainerState stat = null;
+                        try
+                        {
+                            stat = cli.Containers.InspectContainerAsync(containerName).Result?.State;
+                        }
+                        catch (Docker.DotNet.DockerContainerNotFoundException)
+                        {
+                            bad = true;
+                            result += $"{containerName}: doesnt exists\n";
+                        }
+                        catch (System.AggregateException aex)
+                        {
+                            if (aex.InnerException?.GetType() == typeof(Docker.DotNet.DockerContainerNotFoundException))
+                            {
+                                bad = true;
+                                result += $"{containerName}: doesn't exists\n";
+                            }
+                            else
+                            {
+                                bad = true;
+                                result += $"{containerName}: error {aex.ToString()}\n";
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            bad = true;
+                            result += $"{containerName}: error {e.ToString()}\n";
+
+                        }
+                        if (stat == null)
+                        {
+                            bad = true;
+                            result += $"{containerName}: docker not responding\n";
+                        }
+                        else if (stat.Running == false)
+                        {
+                            bad = true;
+                            result += $"{containerName}: is {stat.Status}";
+                            if (!string.IsNullOrEmpty(stat.Error)) result += $" Error {stat.Error}";
+                            result += "\n";
+                        }
+                        else
+                        {
+                            result += $"{containerName}: is {stat.Status}\n";
+                        }
                     }
-                    else if (stat.Running == false)
-                    {
-                        bad = true;
-                        result += $"{containerName}: is {stat.Status}";
-                        if (!string.IsNullOrEmpty(stat.Error)) result += $" Error {stat.Error}";
-                        result += "\n";
-                    }
-                    else
-                    {
-                        result += $"{containerName}: is {stat.Status}\n";
-                    }
+
+                    return Task.FromResult(HealthCheckResult.Healthy(result));
                 }
-
-                return Task.FromResult(HealthCheckResult.Healthy(result));
             }
             catch (Exception e)
             {
