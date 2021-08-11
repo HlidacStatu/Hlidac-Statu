@@ -223,6 +223,66 @@ namespace HlidacStatu.Extensions
             return string.Empty;
         }
 
+        public static (Osoba o, OsobaVazby ov)[] Osoby_v_OR(this Firma firma, Relation.AktualnostType aktualnost)
+        {
+            DateTime toDate = (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue;
+            if (aktualnost == Relation.AktualnostType.Aktualni)
+                toDate = DateTime.Now.Date;
+            else if (aktualnost == Relation.AktualnostType.Nedavny)
+                toDate = DateTime.Now.Date.Add(-1 * Relation.NedavnyVztahDelka);
+
+            using (DbEntities db = new DbEntities())
+            {
+                var osv = db.OsobaVazby.AsQueryable()
+                    .Where(m => m.VazbakIco == firma.ICO)
+                    .Where(m => m.DatumDo == null || m.DatumDo >= toDate);
+
+                var res = db.Osoba
+                    .AsQueryable()
+                    .Join(osv, o => o.InternalId, ov => ov.OsobaId, (o, ov) => new Tuple<Osoba, OsobaVazby>(o, ov))
+                    .Select<Tuple<Osoba, OsobaVazby>, (Osoba o, OsobaVazby ov)>(m => new(m.Item1, m.Item2));
+                //var res = from os in db.Osoba
+                //          join ov in db.OsobaVazby on new { id = os.InternalId }  equals new { id = ov.OsobaId }
+                //          select new(os, ov);
+                //var sql = res.ToQueryString();
+
+                return res.ToArray();
+            }
+        }
+        public static (string jmeno, string prijmeni, DateTime? poslednizmena)[] CeoFromRPP(this Firma firma)
+        {
+            List<(string jmeno, string prijmeni, DateTime? poslednizmena)> osoby = new List<(string jmeno, string prijmeni, DateTime? poslednizmena)>();
+            var rppReq = Manager.GetESClient_RPP_OVM().Get<HlidacStatu.Lib.Data.External.RPP.OVMFull>(firma.ICO);
+            if (rppReq.Found && rppReq.Source.angazovaneOsoby?.Count() > 0)
+            {
+                var rppOs = rppReq.Source.angazovaneOsoby;
+                foreach (var os in rppOs)
+                {
+                    if (os?.fyzickaOsoba != null)
+                    {
+                        osoby.Add(new(os.fyzickaOsoba.jmeno, os.fyzickaOsoba.prijmeni, os.fyzickaOsoba.datumPosledniZmeny));
+                    }
+                }
+
+            }
+            return osoby.ToArray();
+
+        }
+        public static HlidacStatu.Lib.Data.External.RPP.OVMFull.Osoba[] CeoFromRPP_Full(this Firma firma)
+        {
+            List<(string jmeno, string prijmeni, DateTime? poslednizmena)> osoby = new List<(string jmeno, string prijmeni, DateTime? poslednizmena)>();
+            var rppReq = Manager.GetESClient_RPP_OVM().Get<HlidacStatu.Lib.Data.External.RPP.OVMFull>(firma.ICO);
+            if (rppReq.Found && rppReq.Source.angazovaneOsoby?.Count() > 0)
+            {
+                Lib.Data.External.RPP.OVMFull.Osoba[] rppOs = rppReq.Source.angazovaneOsoby;
+                return rppReq.Source.angazovaneOsoby ?? new HlidacStatu.Lib.Data.External.RPP.OVMFull.Osoba[] { };
+
+            }
+            return new HlidacStatu.Lib.Data.External.RPP.OVMFull.Osoba[]{ };
+            
+        }
+
+
         /// <summary>
         /// Find last known CEO
         /// </summary>
@@ -536,7 +596,7 @@ namespace HlidacStatu.Extensions
 
         public static InfoFact[] InfoFacts(this Firma firma) //otázka jestli tohle nebrat z cachce
         {
-            var inf =  _infoFactsCache().Get(firma);
+            var inf = _infoFactsCache().Get(firma);
             return inf;
         }
         private static InfoFact[] GetInfoFacts(Firma firma)
@@ -547,7 +607,7 @@ namespace HlidacStatu.Extensions
             List<InfoFact> f = new List<InfoFact>();
             //var stat = new HlidacStatu.Lib.Analysis.SubjectStatistic(this);
             var stat = firma.StatistikaRegistruSmluv();
-            var statHolding = firma.HoldingStatisticsRegistrSmluv( Relation.AktualnostType.Aktualni);
+            var statHolding = firma.HoldingStatisticsRegistrSmluv(Relation.AktualnostType.Aktualni);
             int rok = DateTime.Now.Year;
             if (DateTime.Now.Month < 2)
                 rok = rok - 1;
@@ -562,7 +622,7 @@ namespace HlidacStatu.Extensions
             }
             else
             {
-                if (stat[rok].PocetSmluv < statHolding[rok].PocetSmluv )
+                if (stat[rok].PocetSmluv < statHolding[rok].PocetSmluv)
                 {
                     f.Add(new InfoFact($"V roce <b>{rok}</b> uzavřel{(sMuzsky ? "" : "a")} {sName.ToLower()} " +
                                        Devmasters.Lang.Plural.Get(stat[rok].PocetSmluv,
@@ -581,14 +641,14 @@ namespace HlidacStatu.Extensions
                     );
                 }
                 else
-                f.Add(new InfoFact($"V roce <b>{rok}</b> uzavřel{(sMuzsky ? "" : "a")} {sName.ToLower()} " +
-                                   Devmasters.Lang.Plural.Get(stat[rok].PocetSmluv,
-                                       "jednu smlouvu v&nbsp;registru smluv",
-                                       "{0} smlouvy v&nbsp;registru smluv",
-                                       "celkem {0} smluv v&nbsp;registru smluv")
-                                   + $" za <b>{RenderData.ShortNicePrice(stat[rok].CelkovaHodnotaSmluv, html: true)}</b>. "
-                    , InfoFact.ImportanceLevel.Summary)
-                );
+                    f.Add(new InfoFact($"V roce <b>{rok}</b> uzavřel{(sMuzsky ? "" : "a")} {sName.ToLower()} " +
+                                       Devmasters.Lang.Plural.Get(stat[rok].PocetSmluv,
+                                           "jednu smlouvu v&nbsp;registru smluv",
+                                           "{0} smlouvy v&nbsp;registru smluv",
+                                           "celkem {0} smluv v&nbsp;registru smluv")
+                                       + $" za <b>{RenderData.ShortNicePrice(stat[rok].CelkovaHodnotaSmluv, html: true)}</b>. "
+                        , InfoFact.ImportanceLevel.Summary)
+                    );
 
                 (decimal zmena, decimal? procentniZmena) =
                     stat.ChangeBetweenYears(rok - 1, rok, s => s.CelkovaHodnotaSmluv);
@@ -760,7 +820,7 @@ namespace HlidacStatu.Extensions
             }
 
             if (firma.PatrimStatu() == false && firma.IcosInHolding(Relation.AktualnostType.Aktualni).Count() > 2)
-            {                
+            {
                 if (statHolding[rok].PocetSmluv > 3)
                 {
                     f.Add(new InfoFact($"V roce <b>{rok}</b> uzavřel celý holding " +

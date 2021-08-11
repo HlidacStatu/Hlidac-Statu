@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+
 using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
 using HlidacStatu.Util;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories
@@ -32,7 +35,7 @@ namespace HlidacStatu.Repositories
                 return events.ToList();
             }
         }
-        
+
         public static List<OsobaEvent> GetByOsobaId(int osobaId)
         {
             using (DbEntities db = new DbEntities())
@@ -112,111 +115,229 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        //migrace: tohle půjde přesunout do extension osoby
-        public static OsobaEvent AddOrUpdateEvent(this Osoba osoba, OsobaEvent ev, string user)
+        public static OsobaEvent AddCleverCEOIntoOsobaEvent(
+            this Osoba osoba, Firma CeoOf, DateTime? dateFrom, DateTime? dateTo,
+            string zdroj,
+            bool overrideExisting,
+            string changingUser)
         {
-            if (ev == null || osoba == null)
-                return null;
-
-            ev.OsobaId = osoba.InternalId;
-
-            return CreateOrUpdate(ev, user);
-        }
-
-        private static OsobaEvent GetDuplicate(OsobaEvent osobaEvent, DbEntities db)
-        {
-            return db.OsobaEvent.AsQueryable()
-                .Where(ev =>
-                    ev.OsobaId == osobaEvent.OsobaId
-                    && ev.Ico == osobaEvent.Ico
-                    && ev.AddInfo == osobaEvent.AddInfo
-                    && ev.AddInfoNum == osobaEvent.AddInfoNum
-                    && ev.DatumOd == osobaEvent.DatumOd
-                    && ev.Type == osobaEvent.Type
-                    && ev.Organizace == osobaEvent.Organizace)
-                .FirstOrDefault();
-        }
-
-        private static OsobaEvent CreateEvent(OsobaEvent osobaEvent, string user, DbEntities db)
-        {
-            if (osobaEvent.OsobaId == 0 && string.IsNullOrWhiteSpace(osobaEvent.Ico))
-                throw new Exception("Cant attach event to a person or to a company since their reference is empty");
-
-            osobaEvent.Organizace = ParseTools.NormalizaceStranaShortName(osobaEvent.Organizace);
-            osobaEvent.Created = DateTime.Now;
-            db.OsobaEvent.Add(osobaEvent);
-            db.SaveChanges();
-            if (osobaEvent.OsobaId > 0)
+            string pozice = osoba.Pohlavi == "f" ? "Ředitelka" : "Ředitel";
+            OsobaEvent.Types type = OsobaEvent.Types.VerejnaSpravaPracovni;
+            if (CeoOf.ICO == "48136450") //CNB
             {
-                OsobaRepo.FlushCache(osobaEvent.OsobaId);
+                pozice = osoba.Pohlavi == "f" ? "Guvernérka" : "Guvernér";
+                type = OsobaEvent.Types.VerejnaSpravaPracovni;
+            }
+            else if (CeoOf.ICO == "00064581") //Praha
+            {
+                pozice = osoba.Pohlavi == "f" ? "Primátorka" : "Primátor";
+                type = OsobaEvent.Types.PolitickaPracovni;
+            }
+            else if (CeoOf.ICO == "49467352") //NSZ
+            {
+                pozice = osoba.Pohlavi == "f" ? "Nejvyšší státní zástupkyně" : "Nejvyšší státní zástupce";
+                type = OsobaEvent.Types.VerejnaSpravaPracovni;
+            }
+            else if (CeoOf.ICO == "48510190") //NS
+            {
+                pozice = osoba.Pohlavi == "f" ? "Předsedkyně nejvyššího soudu" : "Předseda nejvyššího soudu";
+                type = OsobaEvent.Types.VerejnaSpravaPracovni;
+            }
+            else if (CeoOf.ICO == "75003716") //NSZ
+            {
+                pozice = osoba.Pohlavi == "f" ? "Předsedkyně nejvyššího správního soudu" : "Předseda nejvyššího správního soudu";
+                type = OsobaEvent.Types.VerejnaSpravaPracovni;
             }
 
-            AuditRepo.Add(Audit.Operations.Update, user, osobaEvent, null);
-            return osobaEvent;
-        }
 
-        private static OsobaEvent UpdateEvent(OsobaEvent eventToUpdate, OsobaEvent osobaEvent, string user,
-            DbEntities db)
-        {
-            if (eventToUpdate is null)
-                throw new ArgumentNullException(nameof(eventToUpdate), "Argument can't be null");
-            if (osobaEvent is null)
-                throw new ArgumentNullException(nameof(osobaEvent), "Argument can't be null");
-            if (db is null)
-                throw new ArgumentNullException(nameof(db), "Argument can't be null");
-
-            var eventOriginal = eventToUpdate.ShallowCopy();
-            NormalizeOsobaEvent(osobaEvent);
-
-            if (!string.IsNullOrWhiteSpace(osobaEvent.Ico))
-                eventToUpdate.Ico = osobaEvent.Ico;
-            if (osobaEvent.OsobaId > 0)
-                eventToUpdate.OsobaId = osobaEvent.OsobaId;
-
-            eventToUpdate.DatumOd = osobaEvent.DatumOd;
-            eventToUpdate.DatumDo = osobaEvent.DatumDo;
-            eventToUpdate.Organizace = ParseTools.NormalizaceStranaShortName(osobaEvent.Organizace);
-            eventToUpdate.AddInfoNum = osobaEvent.AddInfoNum;
-            eventToUpdate.AddInfo = osobaEvent.AddInfo;
-            eventToUpdate.Title = osobaEvent.Title;
-            eventToUpdate.Type = osobaEvent.Type;
-            eventToUpdate.Zdroj = osobaEvent.Zdroj;
-            eventToUpdate.Status = osobaEvent.Status;
-            eventToUpdate.Ceo = osobaEvent.Ceo;
-            eventToUpdate.Created = DateTime.Now;
-
-            db.SaveChanges();
-            if (osobaEvent.OsobaId > 0)
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Verejne_vysoke_skoly))
             {
-                OsobaRepo.FlushCache(osobaEvent.OsobaId);
+                pozice = osoba.Pohlavi == "f" ? "Rektorka" : "Rektor";
+                type = OsobaEvent.Types.VerejnaSpravaPracovni;
+            }
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Kraje_Praha))
+            {
+                pozice = osoba.Pohlavi == "f" ? "Hejtmanka" : "Hejtman";
+                type = OsobaEvent.Types.PolitickaPracovni;
+            }
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Ministerstva))
+            {
+                pozice = osoba.Pohlavi == "f" ? "Ministryně" : "Ministr";
+                type = OsobaEvent.Types.PolitickaPracovni;
+            }
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Statutarni_mesta))
+            {
+                pozice = osoba.Pohlavi == "f" ? "Primátorka" : "Primátor";
+                type = OsobaEvent.Types.PolitickaPracovni;
+            }
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Obce))
+            {
+                pozice = osoba.Pohlavi == "f" ? "Starostka" : "Starosta";
+                type = OsobaEvent.Types.PolitickaPracovni;
+            }
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Zakladni_a_stredni_skoly))
+            {
+                pozice = osoba.Pohlavi == "f" ? "Ředitelka" : "Ředitel";
+                type = OsobaEvent.Types.VerejnaSpravaPracovni;
+            }
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Vrchni_statni_zastupitelstvi))
+            {
+                pozice = osoba.Pohlavi == "f" ? "Vrchní státní zástupkyně" : "Vrchní státní zástupce";
+                type = OsobaEvent.Types.VerejnaSpravaPracovni;
+            }
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Krajska_statni_zastupitelstvi))
+            {
+                pozice = osoba.Pohlavi == "f" ? "Krajská státní zástupkyně" : "Krajský státní zástupce";
+                type = OsobaEvent.Types.VerejnaSpravaPracovni;
+            }
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Krajske_soudy))
+            {
+                pozice = osoba.Pohlavi == "f" ? "Předsedkyně krajského soudu" : "Předseda krajského soudu";
+                type = OsobaEvent.Types.VerejnaSpravaPracovni;
+            }
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Soudy))
+            {
+                pozice = osoba.Pohlavi == "f" ? "Předsedkyně soudu" : "Předseda soudu";
+                type = OsobaEvent.Types.VerejnaSpravaPracovni;
             }
 
-            AuditRepo.Add(Audit.Operations.Update, user, eventToUpdate, eventOriginal);
-            return eventToUpdate;
-        }
-
-        public static void Delete(OsobaEvent osobaEvent, string user)
-        {
-            if (osobaEvent.Pk > 0)
+            //find duplicate
+            using (var db = new DbEntities())
             {
-                using (DbEntities db = new DbEntities())
+                var exists = db.OsobaEvent.AsNoTracking().AsQueryable()
+                    .Where(ev =>
+                        ev.OsobaId == osoba.InternalId
+                        && ev.Ico == CeoOf.ICO
+                        && ev.Ceo == 1)
+                    .FirstOrDefault();
+                if (exists != null)
                 {
-                    db.OsobaEvent.Attach(osobaEvent);
-                    db.Entry(osobaEvent).State = EntityState.Deleted;
-                    AuditRepo.Add<OsobaEvent>(Audit.Operations.Delete, user, osobaEvent, null);
-                    Osoby.CachedEvents.Delete(osobaEvent.OsobaId);
-                    db.SaveChanges();
+                    if (overrideExisting)
+                        db.OsobaEvent.Remove(exists);
+                    else
+                        return exists;
                 }
             }
+
+            OsobaEvent newOE = new OsobaEvent(osoba.InternalId, null, "", type);
+            newOE.AddInfo = pozice;
+            newOE.Ceo = 1;
+            newOE.DatumOd = dateFrom;
+            newOE.DatumDo = dateTo;
+            newOE.Ico = CeoOf.ICO;
+            newOE.Organizace = CeoOf.Jmeno;
+            newOE.Zdroj = zdroj;
+            return AddOrUpdateEvent(osoba, newOE, changingUser);
+       
+
+
+    }
+
+    //migrace: tohle půjde přesunout do extension osoby
+    public static OsobaEvent AddOrUpdateEvent(this Osoba osoba, OsobaEvent ev, string user)
+    {
+        if (ev == null || osoba == null)
+            return null;
+
+        ev.OsobaId = osoba.InternalId;
+
+        return CreateOrUpdate(ev, user);
+    }
+
+    private static OsobaEvent GetDuplicate(OsobaEvent osobaEvent, DbEntities db)
+    {
+        return db.OsobaEvent.AsQueryable()
+            .Where(ev =>
+                ev.OsobaId == osobaEvent.OsobaId
+                && ev.Ico == osobaEvent.Ico
+                && ev.AddInfo == osobaEvent.AddInfo
+                && ev.AddInfoNum == osobaEvent.AddInfoNum
+                && ev.DatumOd == osobaEvent.DatumOd
+                && ev.Type == osobaEvent.Type
+                && ev.Organizace == osobaEvent.Organizace)
+            .FirstOrDefault();
+    }
+
+    private static OsobaEvent CreateEvent(OsobaEvent osobaEvent, string user, DbEntities db)
+    {
+        if (osobaEvent.OsobaId == 0 && string.IsNullOrWhiteSpace(osobaEvent.Ico))
+            throw new Exception("Cant attach event to a person or to a company since their reference is empty");
+
+        osobaEvent.Organizace = ParseTools.NormalizaceStranaShortName(osobaEvent.Organizace);
+        osobaEvent.Created = DateTime.Now;
+        db.OsobaEvent.Add(osobaEvent);
+        db.SaveChanges();
+        if (osobaEvent.OsobaId > 0)
+        {
+            OsobaRepo.FlushCache(osobaEvent.OsobaId);
         }
 
-        private static void NormalizeOsobaEvent(OsobaEvent osobaEvent)
+        AuditRepo.Add(Audit.Operations.Update, user, osobaEvent, null);
+        return osobaEvent;
+    }
+
+    private static OsobaEvent UpdateEvent(OsobaEvent eventToUpdate, OsobaEvent osobaEvent, string user,
+        DbEntities db)
+    {
+        if (eventToUpdate is null)
+            throw new ArgumentNullException(nameof(eventToUpdate), "Argument can't be null");
+        if (osobaEvent is null)
+            throw new ArgumentNullException(nameof(osobaEvent), "Argument can't be null");
+        if (db is null)
+            throw new ArgumentNullException(nameof(db), "Argument can't be null");
+
+        var eventOriginal = eventToUpdate.ShallowCopy();
+        NormalizeOsobaEvent(osobaEvent);
+
+        if (!string.IsNullOrWhiteSpace(osobaEvent.Ico))
+            eventToUpdate.Ico = osobaEvent.Ico;
+        if (osobaEvent.OsobaId > 0)
+            eventToUpdate.OsobaId = osobaEvent.OsobaId;
+
+        eventToUpdate.DatumOd = osobaEvent.DatumOd;
+        eventToUpdate.DatumDo = osobaEvent.DatumDo;
+        eventToUpdate.Organizace = ParseTools.NormalizaceStranaShortName(osobaEvent.Organizace);
+        eventToUpdate.AddInfoNum = osobaEvent.AddInfoNum;
+        eventToUpdate.AddInfo = osobaEvent.AddInfo;
+        eventToUpdate.Title = osobaEvent.Title;
+        eventToUpdate.Type = osobaEvent.Type;
+        eventToUpdate.Zdroj = osobaEvent.Zdroj;
+        eventToUpdate.Status = osobaEvent.Status;
+        eventToUpdate.Ceo = osobaEvent.Ceo;
+        eventToUpdate.Created = DateTime.Now;
+
+        db.SaveChanges();
+        if (osobaEvent.OsobaId > 0)
         {
-            osobaEvent.AddInfo = osobaEvent.AddInfo?.Trim();
-            osobaEvent.Organizace = osobaEvent.Organizace?.Trim();
-            osobaEvent.Ico = osobaEvent.Ico?.Trim();
-            osobaEvent.Note = osobaEvent.Note?.Trim();
-            osobaEvent.Title = osobaEvent.Title?.Trim();
+            OsobaRepo.FlushCache(osobaEvent.OsobaId);
+        }
+
+        AuditRepo.Add(Audit.Operations.Update, user, eventToUpdate, eventOriginal);
+        return eventToUpdate;
+    }
+
+    public static void Delete(OsobaEvent osobaEvent, string user)
+    {
+        if (osobaEvent.Pk > 0)
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                db.OsobaEvent.Attach(osobaEvent);
+                db.Entry(osobaEvent).State = EntityState.Deleted;
+                AuditRepo.Add<OsobaEvent>(Audit.Operations.Delete, user, osobaEvent, null);
+                Osoby.CachedEvents.Delete(osobaEvent.OsobaId);
+                db.SaveChanges();
+            }
         }
     }
+
+    private static void NormalizeOsobaEvent(OsobaEvent osobaEvent)
+    {
+        osobaEvent.AddInfo = osobaEvent.AddInfo?.Trim();
+        osobaEvent.Organizace = osobaEvent.Organizace?.Trim();
+        osobaEvent.Ico = osobaEvent.Ico?.Trim();
+        osobaEvent.Note = osobaEvent.Note?.Trim();
+        osobaEvent.Title = osobaEvent.Title?.Trim();
+    }
+}
 }

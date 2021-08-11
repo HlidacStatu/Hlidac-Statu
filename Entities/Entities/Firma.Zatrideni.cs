@@ -49,6 +49,10 @@ namespace HlidacStatu.Entities
 
                 [Disabled]
                 [GroupValue("Justice")]
+                [NiceDisplayName("Vrchní státní zastupitelství")]
+                Vrchni_statni_zastupitelstvi = 134,
+                [Disabled]
+                [GroupValue("Justice")]
                 [NiceDisplayName("Krajská státní zastupitelství")]
                 Krajska_statni_zastupitelstvi = 143,
                 [GroupValue("Justice")]

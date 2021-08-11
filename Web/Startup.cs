@@ -183,6 +183,9 @@ namespace HlidacStatu.Web
             {
                 Predicate = _ => true,
                 ResponseWriter = global::HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
+            }).UseHealthChecks("/_health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+            {
+                Predicate = _ => true,
             });
             app.UseHealthChecksUI(set =>
                 {
@@ -336,7 +339,7 @@ namespace HlidacStatu.Web
                 .AddHealthCheckWithOptions<Web.HealthChecks.ElasticSearchNodesFreeDisk, Web.HealthChecks.ElasticSearchNodesFreeDisk.Options>(
                     new Web.HealthChecks.ElasticSearchNodesFreeDisk.Options()
                     {
-                        ExpectedNumberOfNodes = 16,
+                           ExpectedNumberOfNodes = 16,
                         ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
                         MinimumFreeSpaceInPercent = 15m
                     }
