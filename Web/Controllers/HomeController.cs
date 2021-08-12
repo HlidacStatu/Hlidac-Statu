@@ -1239,6 +1239,10 @@ text zpravy: {txt}
 
             return Redirect(url);
         }
+        public ActionResult Status()
+        {
+            return View(Models.HealthCheckStatusModel.CurrentData.Get());
+        }
         public ActionResult Tmp()
         {
             return View();

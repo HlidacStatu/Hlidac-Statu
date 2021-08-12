@@ -12,16 +12,7 @@ namespace HlidacStatu.Web.HealthChecks
 {
     public class DockerContainer : IHealthCheck
     {
-        public static void Test()
-        {
-
-            Docker.DotNet.DockerClient cli = new Docker.DotNet.DockerClientConfiguration(
-                new Uri("http://10.10.100.145:888"), null, TimeSpan.FromSeconds(3)
-                )
-                .CreateClient();
-
-            var stat = cli.Containers.InspectContainerAsync("couchbase1").Result?.State;
-        }
+       
         private Options options;       
 
         public class Options

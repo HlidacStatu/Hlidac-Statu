@@ -1,0 +1,46 @@
+@model HealthCheckStatusModel
+
+@{
+    ViewBag.Title = "Stav jednotlivých komponent Hlídače státu";
+}
+
+
+@if (Model.name == "NoData")
+{
+    <h2>Data o dostupnosti služeb se nepodařilo načíst</h2>
+    return;
+}
+
+
+<p style="font-size:24px; padding: 10px 0px 10px 0px">@Html.Raw(Model.htmlIcon) @Model.czStatus</p>
+
+<hr />
+<h2>Stav jednotlivých komponent Hlídače státu</h2>
+
+<table class="table table-dotted table-striped">
+    <thead>
+        <tr>
+            <td>Služba</td>
+            <td>Stav</td>
+            <td>Detail</td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tag in Model.entries.Select(m=>m.firstTag).Distinct())
+        {
+            <tr>
+                <td style="background-color:#dddddd" colspan="4"><b>@tag</b></td>
+            </tr>
+            @foreach (var item in Model.entries.Where(m => m.firstTag == tag).OrderBy(o => o.name))
+            {
+            <tr>
+                <td>@item.name</td>
+                <td>@Html.Raw(item.htmlIcon) @item.czStatus</td>
+                <td>@Html.Raw(HlidacStatu.Web.Models.HealthCheckStatusModel.ToHtml(item.description))</td>
+                <td></td>
+            </tr>
+                }
+            }
+    </tbody>
+</table>
