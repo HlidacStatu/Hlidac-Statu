@@ -386,6 +386,8 @@ namespace HlidacStatu.Web
 
                 .AddCheck<Web.HealthChecks.OCRServer>("OCR servers", tags: new[] { "OCR cloud" })
                 .AddCheck<Web.HealthChecks.OCRQueue>("OCR queues", tags: new[] { "OCR cloud" })
+                .AddCheck<Web.HealthChecks.SmlouvyZpracovane>("Zpracované smlouvy", tags: new[] { "data" })
+                .AddCheck<Web.HealthChecks.VerejneZakazkyZpracovane>("Zpracované VZ", tags: new[] { "data" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
                     new Web.HealthChecks.DockerContainer.Options()
                         {
