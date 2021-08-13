@@ -199,8 +199,9 @@ namespace HlidacStatu.Datasets
                             sort = sort.Replace(".keywork", "", StringComparison.OrdinalIgnoreCase).Trim();
                         if (allProps.Any(k=>string.Equals(k,sort, StringComparison.OrdinalIgnoreCase)))
                         {
-                            if (txtProps.Any(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase)))
-                                sort = sort + ".keyword";
+                            var found = txtProps.First(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase));
+                            if (found != null)
+                                sort = found + ".keyword";
                             sortD = sortD.Field(sort, SortOrder.Descending);
                         }
 
@@ -213,8 +214,9 @@ namespace HlidacStatu.Datasets
                             sort = sort.Replace(".keywork", "", StringComparison.OrdinalIgnoreCase).Trim();
                         if (allProps.Any(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase)))
                         {
-                            if (txtProps.Any(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase)))
-                                sort = sort + ".keyword";
+                            var found = txtProps.First(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase));
+                            if (found != null)
+                                sort = found + ".keyword";
                             sortD = sortD.Field(sort, SortOrder.Descending);
                         }
                         sortD = sortD.Field(sort, SortOrder.Ascending);
