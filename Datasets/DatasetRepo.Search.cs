@@ -187,19 +187,39 @@ namespace HlidacStatu.Datasets
 
                 if (!string.IsNullOrEmpty(sort))
                 {
+                    var allProps = ds.GetMappingList();
+                    var txtProps = ds.GetTextMappingList();
+
                     if (sort.EndsWith(DataSearchResult.OrderDesc) ||
                         sort.ToLower().EndsWith(DataSearchResult.OrderDescUrl))
                     {
                         sort = sort.Replace(DataSearchResult.OrderDesc, "").Replace(DataSearchResult.OrderDescUrl, "")
                             .Trim();
-                        sortD = sortD.Field(sort, SortOrder.Descending);
+                        if (sort.EndsWith(".keyword", StringComparison.OrdinalIgnoreCase))
+                            sort = sort.Replace(".keywork", "", StringComparison.OrdinalIgnoreCase).Trim();
+                        if (allProps.Any(k=>string.Equals(k,sort, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            if (txtProps.Any(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase)))
+                                sort = sort + ".keyword";
+                            sortD = sortD.Field(sort, SortOrder.Descending);
+                        }
+
                     }
                     else
                     {
                         sort = sort.Replace(DataSearchResult.OrderAsc, "").Replace(DataSearchResult.OrderAscUrl, "")
                             .Trim();
+                        if (sort.EndsWith(".keyword", StringComparison.OrdinalIgnoreCase))
+                            sort = sort.Replace(".keywork", "", StringComparison.OrdinalIgnoreCase).Trim();
+                        if (allProps.Any(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            if (txtProps.Any(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase)))
+                                sort = sort + ".keyword";
+                            sortD = sortD.Field(sort, SortOrder.Descending);
+                        }
                         sortD = sortD.Field(sort, SortOrder.Ascending);
                     }
+
                 }
 
 

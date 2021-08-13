@@ -24,7 +24,7 @@ namespace HlidacStatu.LibCore.Services
         private ConcurrentDictionary<string, Attacker> Attackers { get; } = new();
 
         const int SaveTimeBetweentAttacksInSec = 15*60; //inSec
-        const int PenaltyLimit = 150; //inSec
+        const int PenaltyLimit = 1500; //inSec
 
         public bool IsAttacker(IPAddress? ipAddress, int statusCode, string? path)
         {
@@ -32,6 +32,8 @@ namespace HlidacStatu.LibCore.Services
                 return false;
 
             var ipString = IpToString(ipAddress);
+            if (ipString.StartsWith("10.10") || ipString == "77.93.208.131")
+                return false;
             
             var currentTime = DateTime.Now;
             Attackers.TryAdd(ipString, new Attacker(currentTime, 0));
@@ -44,14 +46,19 @@ namespace HlidacStatu.LibCore.Services
             var diff = (currentTime - attacker.Last).TotalSeconds;
 
             //calculatePenalty
-            int penalty = statusCode switch
-            {
-                466 => 5, // hacker, možná použít Hlidac.ErrorCodes enum pro chybové kódy
-                >= 500 => 2, // server errors
-                >= 400 => 1, // not found, forbidden, ...
-                _ => 0
-            };
+            int penalty = 0;
 
+            if (statusCode == 466)
+                penalty = 50;
+            else if (statusCode >= 500)
+                penalty = 20; // server errors
+            else if (statusCode >= 400 && path.StartsWith("/api"))
+                penalty = 1; // not found, forbidden, ... in API
+            else if (statusCode >= 400)
+                penalty = 10; // not found, forbidden, ...
+            else
+                penalty = 0;
+            
 
             if (diff >= SaveTimeBetweentAttacksInSec && penalty > 0)
             {
