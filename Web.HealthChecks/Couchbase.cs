@@ -78,7 +78,7 @@ namespace HlidacStatu.Web.HealthChecks
 
 
                     if (statuses.All(m => m.Key == global::Couchbase.Core.Monitoring.ServiceState.Ok || m.Key == global::Couchbase.Core.Monitoring.ServiceState.Connected))
-                        return Task.FromResult(HealthCheckResult.Healthy());
+                        return Task.FromResult(HealthCheckResult.Healthy(report));
 
                     var delimiter = "\r\n";
                     foreach (var status in statuses

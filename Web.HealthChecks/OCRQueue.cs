@@ -28,7 +28,7 @@ namespace HlidacStatu.Web.HealthChecks
 
                 var ocrQueue = HlidacStatu.Connectors.DirectDB.GetList<string, int, int, int, int>(ocrQueueSQL);
 
-                var report = $"Current queue:\n {string.Join("\n", ocrQueue.Select(m=>$"{m.Item1}:waiting {m.Item2}"))}\n";
+                var report = $"Velikost fronty:\n {string.Join("\n", ocrQueue.Select(m=>$"{m.Item1}:čeká {m.Item2}"))}\n";
 
                 List<string> issues = new List<string>();
 
@@ -70,9 +70,9 @@ namespace HlidacStatu.Web.HealthChecks
                 }
 
                 if (bad)
-                    return Task.FromResult(HealthCheckResult.Unhealthy(report + string.Join("", issues)));
+                    return Task.FromResult(HealthCheckResult.Unhealthy(report +"\n" + string.Join("", issues)));
                 else if (degraded)
-                    return Task.FromResult(HealthCheckResult.Degraded(report + string.Join("", issues)));
+                    return Task.FromResult(HealthCheckResult.Degraded(report + "\n" + string.Join("", issues)));
                 else
                     return Task.FromResult(HealthCheckResult.Healthy(report));
 
