@@ -64,10 +64,22 @@ namespace HlidacStatu.Web.HealthChecks
                         .Where(m => m.State.HasValue)
                         .GroupBy(m => m.State.Value);
 
+
+                    var report = "";
+                    var info = cluster.CreateManager().ListBuckets().Value.FirstOrDefault(m => m.Name == "hlidac");
+                    if (info != null)
+                    {
+                        report += $"Nodes\n{string.Join("", info.Nodes.Select((n,i)=>$"Node{i}: {n.Status}\n"))}";
+                        report += $"Stats\n{info?.BasicStats?.ItemCount} záznamů\n"
+                            + $"{info?.BasicStats?.MemUsed / (1024 * 1024):N0} MB RAM\n"
+                            + $"{info?.BasicStats?.OpsPerSec:N2} op/s\n"
+                            + $"\n";
+                    }
+
+
                     if (statuses.All(m => m.Key == global::Couchbase.Core.Monitoring.ServiceState.Ok || m.Key == global::Couchbase.Core.Monitoring.ServiceState.Connected))
                         return Task.FromResult(HealthCheckResult.Healthy());
 
-                    var report = "";
                     var delimiter = "\r\n";
                     foreach (var status in statuses
                         .Where(m => !(m.Key == global::Couchbase.Core.Monitoring.ServiceState.Ok || m.Key == global::Couchbase.Core.Monitoring.ServiceState.Connected))

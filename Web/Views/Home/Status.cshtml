@@ -1,23 +1,30 @@
 @model HealthCheckStatusModel
 
 @{
-    ViewBag.Title = "Stav jednotlivých komponent Hlídače státu";
+    ViewBag.Title = "Infrastruktura Hlídače státu";
 }
 
 
 @if (Model.name == "NoData")
 {
-    <h2>Data o dostupnosti služeb se nepodařilo načíst</h2>
+    <div class="jumbotron">
+      <h1>@Html.Raw(Model.htmlIcon) Data o dostupnosti služeb se nepodařilo načíst</h1>
+      <p><a class="btn btn-primary btn-lg" href="/status?r=@(HlidacStatu.Util.Consts.Rnd.Next(0, 1000))" role="button">Načíst znovu</a></p>
+    </div>
     return;
 }
 
 
-<p style="font-size:24px; padding: 10px 0px 10px 0px">@Html.Raw(Model.htmlIcon) @Model.czStatus</p>
+<div class="jumbotron small">
+  <h1>@Html.Raw(Model.htmlIcon) @Model.czStatus</h1>
+  <p>Stav k @(Model.lastExecuted.ToString("dd. MM. yyyy HH:mm:ss"))</p>
+    <p><a class="btn btn-primary btn-lg" href="/status?r=@(HlidacStatu.Util.Consts.Rnd.Next(0, 1000))" role="button">Načíst znovu</a></p>
+</div>
 
 <hr />
 <h2>Stav jednotlivých komponent Hlídače státu</h2>
 
-<table class="table table-dotted table-striped">
+<table class="table table-new table-dotted table-striped">
     <thead>
         <tr>
             <td>Služba</td>

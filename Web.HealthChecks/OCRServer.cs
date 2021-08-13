@@ -41,7 +41,9 @@ namespace HlidacStatu.Web.HealthChecks
             try
             {
                 var st = ocrDataStat.Get();
-                var report = $"OCR in 24 hours: {st.queueStat.doneIn24hours}, imgs {st.queueStat.imgDoneIn24hours}. {st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10))} live OCRServers";
+                var report = $"OCR in 24 hours\n{st.queueStat.doneIn24hours} souborů, z toho {st.queueStat.imgDoneIn24hours} OCR obrázků."
+                    +$"{st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10))} běžících OCRServerů\n"
+                    +$"{st.servers.Length-1} běžících OCR Minions ({st.servers.Where(m=>m.server!= "hlidacCoreOCR").Sum(m=>m.doneIn24h)} OCR za 24 hod)";
 
                 List<string> issues = new List<string>();
 
@@ -51,31 +53,31 @@ namespace HlidacStatu.Web.HealthChecks
                 //degraded
                 if (st.queueStat.doneIn24hours < 20000)
                 {
-                    issues.Add($"ERR: only {st.queueStat.doneIn24hours} done");
+                    issues.Add($"ERR: pouze {st.queueStat.doneIn24hours} zpracováno");
                     bad = true;
                 }
                 else if (st.queueStat.doneIn24hours < 50000)
                 {
-                    issues.Add($"Warn: only {st.queueStat.doneIn24hours} done");
+                    issues.Add($"Warn: pouze {st.queueStat.doneIn24hours} zpracováno");
                     degraded = true;
                 }
 
                 //degraded
                 if (st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10)) < 3)
                 {
-                    issues.Add($"ERR: only {st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10))} Active OCR servers");
+                    issues.Add($"ERR: pouze {st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10))} běžících OCR serverů");
                     bad = true;
                 }
                 if (st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10)) < 4)
                 {
-                    issues.Add($"Warn: only {st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10))} Active OCR servers");
+                    issues.Add($"Warn: pouze {st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10))} běžících OCR serverů");
                     degraded = true;
                 }
 
                 if (bad)
-                    return Task.FromResult(HealthCheckResult.Unhealthy(report + string.Join("! ", issues)));
+                    return Task.FromResult(HealthCheckResult.Unhealthy(report + string.Join("\n", issues)));
                 else if (degraded)
-                    return Task.FromResult(HealthCheckResult.Degraded(report + string.Join("! ", issues)));
+                    return Task.FromResult(HealthCheckResult.Degraded(report + string.Join("\n", issues)));
                 else
                     return Task.FromResult(HealthCheckResult.Healthy(report));
 

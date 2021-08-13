@@ -321,7 +321,7 @@ namespace HlidacStatu.Web
             services
                 .AddHealthChecks()
 
-                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000, name: "Web server allocated memory", tags: new[] { "Web server", "process", "memory" })
+                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000, name: "Web server využitá pamět", tags: new[] { "Web server", "process", "memory" })
 
                 .AddHealthCheckWithResponseTime(
                     new global::HealthChecks.SqlServer.SqlServerHealthCheck(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 username from AspNetUsers"),

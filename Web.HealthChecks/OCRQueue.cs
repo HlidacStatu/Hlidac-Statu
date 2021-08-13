@@ -28,7 +28,7 @@ namespace HlidacStatu.Web.HealthChecks
 
                 var ocrQueue = HlidacStatu.Connectors.DirectDB.GetList<string, int, int, int, int>(ocrQueueSQL);
 
-                var report = $"Current queue: {string.Join(", ", ocrQueue.Select(m=>$"{m.Item1}:waiting {m.Item2}"))}";
+                var report = $"Current queue:\n {string.Join("\n", ocrQueue.Select(m=>$"{m.Item1}:waiting {m.Item2}"))}\n";
 
                 List<string> issues = new List<string>();
 
@@ -38,41 +38,41 @@ namespace HlidacStatu.Web.HealthChecks
 
                 if (ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").FirstOrDefault()?.Item2 > 10000)
                 {
-                    issues.Add($"ERR: VerejnaZakazka Queue {ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").First().Item2} done");
+                    issues.Add($"ERR: VerejnaZakazka pouze {ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").First().Item2} hotovo!\n");
                     bad = true;
                 }
                 if (ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").FirstOrDefault()?.Item2 > 6000)
                 {
-                    issues.Add($"Warn: VerejnaZakazka only {ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").First().Item2} done");
+                    issues.Add($"Warn: VerejnaZakazka  {ocrQueue.Where(m => m.Item1 == "VerejnaZakazka").First().Item2} hotovo!\n");
                     degraded = true;
                 }
 
                 if (ocrQueue.Where(m => m.Item1 == "Smlouva").FirstOrDefault()?.Item2 > 6000)
                 {
-                    issues.Add($"ERR: Smlouvy Queue {ocrQueue.Where(m => m.Item1 == "Smlouva").First().Item2} done");
+                    issues.Add($"ERR: Smlouvy pouze {ocrQueue.Where(m => m.Item1 == "Smlouva").First().Item2} hotovo!\n");
                     bad = true;
                 }
                 if (ocrQueue.Where(m => m.Item1 == "Smlouva").FirstOrDefault()?.Item2 > 4000)
                 {
-                    issues.Add($"Warn: Smlouvy only {ocrQueue.Where(m => m.Item1 == "Smlouva").First().Item2} done");
+                    issues.Add($"Warn: Smlouvy  {ocrQueue.Where(m => m.Item1 == "Smlouva").First().Item2} hotovo!\n");
                     degraded = true;
                 }
 
                 if (ocrQueue.Where(m => m.Item1 == "Dataset").FirstOrDefault()?.Item2 > 3000)
                 {
-                    issues.Add($"ERR: Dataset Queue {ocrQueue.Where(m => m.Item1 == "Dataset").First().Item2} done");
+                    issues.Add($"ERR: Dataset pouze {ocrQueue.Where(m => m.Item1 == "Dataset").First().Item2} hotovo!\n");
                     bad = true;
                 }
                 if (ocrQueue.Where(m => m.Item1 == "Smlouva").FirstOrDefault()?.Item2 > 1000)
                 {
-                    issues.Add($"Warn: Dataset only {ocrQueue.Where(m => m.Item1 == "Dataset").First().Item2} done");
+                    issues.Add($"Warn: Dataset  {ocrQueue.Where(m => m.Item1 == "Dataset").First().Item2} hotovo!\n");
                     degraded = true;
                 }
 
                 if (bad)
-                    return Task.FromResult(HealthCheckResult.Unhealthy(report + string.Join("! ", issues)));
+                    return Task.FromResult(HealthCheckResult.Unhealthy(report + string.Join("", issues)));
                 else if (degraded)
-                    return Task.FromResult(HealthCheckResult.Degraded(report + string.Join("! ", issues)));
+                    return Task.FromResult(HealthCheckResult.Degraded(report + string.Join("", issues)));
                 else
                     return Task.FromResult(HealthCheckResult.Healthy(report));
 
