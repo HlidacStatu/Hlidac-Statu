@@ -409,6 +409,14 @@ namespace HlidacStatu.Web
                         MinRecordsInInterval = 10,
                         Interval = HealthChecks.DatasetZpracovane.IntervalEnum.Week
                     }, "Dataset Rozhodnuti UOHS", HealthStatus.Unhealthy, tags: new[] { "Data" })
+                .AddHealthCheckWithOptions<Web.HealthChecks.DatasetyStatistika, Web.HealthChecks.DatasetyStatistika.Options>(
+                    new Web.HealthChecks.DatasetyStatistika.Options()
+                    {
+                        Exclude = new string[] { "rozhodnuti-uohs", "veklep", "vyjadreni-politiku" },
+                        Interval = HealthChecks.DatasetyStatistika.IntervalEnum.Month
+                    }, "Statistiky malých databází", HealthStatus.Unhealthy, tags: new[] { "Data" })
+
+
 
                 .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
                     new Web.HealthChecks.DockerContainer.Options()

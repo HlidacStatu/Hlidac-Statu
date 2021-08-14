@@ -41,7 +41,7 @@ namespace HlidacStatu.Web.HealthChecks
             try
             {
                 var st = ocrDataStat.Get();
-                var report = $"OCR in 24 hours\n{st.queueStat.doneIn24hours} souborů, z toho {st.queueStat.imgDoneIn24hours} OCR obrázků."
+                var report = $"OCR in 24 hours\n{st.queueStat.doneIn24hours} souborů, z toho {st.queueStat.imgDoneIn24hours} OCR obrázků.\n"
                     +$"{st.ocrservers.Count(m => m.created > DateTime.Now.AddMinutes(-10))} běžících OCRServerů\n"
                     +$"{st.servers.Length-1} běžících OCR Minions ({st.servers.Where(m=>m.server!= "hlidacCoreOCR").Sum(m=>m.doneIn24h)} OCR za 24 hod)";
 

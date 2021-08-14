@@ -1,6 +1,6 @@
 ﻿
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-
+using Devmasters.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +13,17 @@ namespace HlidacStatu.Web.HealthChecks
     public class DatasetZpracovane : IHealthCheck
     {
 
+        [Devmasters.Enums.ShowNiceDisplayName]
         public enum IntervalEnum
         {
+            [Devmasters.Enums.NiceDisplayName("Den")]
             Day,
+            [Devmasters.Enums.NiceDisplayName("Týden")]
             Week,
-            Month
+            [Devmasters.Enums.NiceDisplayName("Měsíc")]
+            Month,
+            [Devmasters.Enums.NiceDisplayName("Rok")]
+            Year
         }
 
         private Options options;
@@ -68,7 +74,7 @@ namespace HlidacStatu.Web.HealthChecks
                     var res = HlidacStatu.Datasets.DatasetRepo.Searching.SearchDataRaw(ds, $"DbCreated:{dateQ}", 1, 1,
                         "0", exactNumOfResults: true);
 
-                    result += $"{dateFrom:yyyy-MM-dd} - {dateTo:MM-dd}: {res.Total} zaznamů \n";
+                    result += $"{res.Total} zaznamů za {options.Interval.ToNiceDisplayName()} \n";
                     if (res.Total < options.MinRecordsInInterval)
                         bad = true;
 
