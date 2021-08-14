@@ -65,6 +65,9 @@ namespace HlidacStatu.LibCore.MiddleWares
         {
             var ipString = ipAddress?.ToString() ?? "_empty";
 
+            if (AttackerDictionaryService.whitelistedIps.Contains(ipString))
+                return;
+
             await BannedIpRepoCached.BanIp(ipString, expiration, lastStatusCode, pathList);
         }
 

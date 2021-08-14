@@ -19,6 +19,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task BanIp(string ipAddress, DateTime expiration, int lastStatusCode, string pathList)
         {
+
             await using var dbContext = new DbEntities();
 
             var bannedIp = await dbContext.BannedIps

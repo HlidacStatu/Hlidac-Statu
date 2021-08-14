@@ -26,7 +26,7 @@ namespace HlidacStatu.LibCore.Services
 
         const int SaveTimeBetweentAttacksInSec = 15*60; //inSec
         const int PenaltyLimit = 1500; //inSec
-        static string[] whitelistedIps = new string[] { "77.93.208.131", "217.31.202.16", "89.22.68.163" };
+        public static string[] whitelistedIps = new string[] { "77.93.208.131", "217.31.202.16", "89.22.68.163" };
 
         public bool IsAttacker(IPAddress? ipAddress, int statusCode, string? path)
         {
@@ -52,6 +52,8 @@ namespace HlidacStatu.LibCore.Services
 
             if (statusCode == 466)
                 penalty = 50;
+            else if (path == "/health")
+                penalty = 0;
             else if (statusCode >= 500)
                 penalty = 20; // server errors
             else if (statusCode >= 400 && path.StartsWith("/api"))

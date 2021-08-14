@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -24,6 +25,9 @@ namespace HlidacStatu.Web.Controllers
 
             DateTime.TryParseExact(expiration, "d.M.yyyy", CultureInfo.CurrentCulture,
                 DateTimeStyles.AllowWhiteSpaces, out var expirationDate);
+
+            if (LibCore.Services.AttackerDictionaryService.whitelistedIps.Contains(ipAddress))
+                return View();
 
             await BannedIpRepoCached.BanIp(ipAddress, expirationDate, lastStatusCode, pathList);
 
