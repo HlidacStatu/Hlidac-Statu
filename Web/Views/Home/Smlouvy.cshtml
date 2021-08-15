@@ -52,7 +52,7 @@
                     Smlouvy uveřejněné
                     @for (int i = 1; i < 8; i++)
                     {
-                        <a href="/Hledat?Q=zverejneno:@(DateTime.Now.AddDays(-1*i).ToString("yyyy-MM-dd"))">@(i == 1 ? "včera" : DateTime.Now.AddDays(-1 * i).ToString("d.M"))</a>
+                        <a href="/HledatSmlouvy?Q=zverejneno:@(DateTime.Now.AddDays(-1*i).ToString("yyyy-MM-dd"))">@(i == 1 ? "včera" : DateTime.Now.AddDays(-1 * i).ToString("d.M"))</a>
                         @(i < 7 ? ", " : ".")
 
                     }
