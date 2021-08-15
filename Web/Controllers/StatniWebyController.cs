@@ -126,9 +126,14 @@ namespace HlidacStatu.Web.Controllers
 
             if (data != null)
             {
+                var dataArr = data.ToArray();
+                for (int i = 0; i < dataArr.Length; i++)
+                {
+                    dataArr[i].Host.publicname = Devmasters.TextUtil.ShortenText(dataArr[i].Host.publicname, 40);
+                }
                 var dataready = new
                 {
-                    data = data.AsEnumerable()
+                    data = dataArr.AsEnumerable()
                       .Select((x, l) => x.DataForChart(fromDate, toDate, l))
                       .SelectMany(x => x)
                       .ToArray(),
