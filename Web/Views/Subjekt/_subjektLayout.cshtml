@@ -117,6 +117,7 @@
 
 <div class="head">
     <h3>
+        <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" item="@Model.firma" style="font-size:24px;vertical-align:top;"></add-bookmark>
         @Html.KIndexLabelLink(Model.firma.ICO, 30, linkToKindex: true)@Model.title
         @if (this.User?.IsInRole("canEditData") == true)
         {

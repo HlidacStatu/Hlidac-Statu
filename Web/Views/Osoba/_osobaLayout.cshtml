@@ -1,5 +1,8 @@
 ﻿@using HlidacStatu.Datastructures.Graphs
 @using HlidacStatu.Extensions;
+@using HlidacStatu.Web.TagHelpers;
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.Extensions.Primitives
 
 
 @model (HlidacStatu.Entities.Osoba osoba, string viewName, string title)
@@ -121,6 +124,7 @@
 
 <div class="head">
     <h3>
+        <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" item="@Model.osoba" style="font-size:24px;vertical-align:top;"></add-bookmark>
         @Model.osoba.FullNameWithYear()
         @if (this.User?.IsInRole("canEditData") == true)
         {
