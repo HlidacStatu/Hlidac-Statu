@@ -26,7 +26,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             executionTimeout = executionTimeout ?? TimeSpan.FromMinutes(2);
 
             DateTime started = DateTime.Now;
-            using (var cl = new ClientLow(pdfUrl, command, format, pages))
+            using (var cl = new ClientLow(ConnectionPool.DefaultInstance(),pdfUrl, command, format, pages))
             {
                 ApiResult<CamelotResult> res = null;
                 var session = await cl.StartSessionAsync();
