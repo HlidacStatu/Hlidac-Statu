@@ -36,6 +36,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
         public Table[] Tables { get; set; } = new Table[] { };
         public int FoundTables { get; set; }
         public string Format { get; set; }
+        public string Algorithm { get; set; }
         public long ElapsedTimeInMs { get; set; }
 
     }

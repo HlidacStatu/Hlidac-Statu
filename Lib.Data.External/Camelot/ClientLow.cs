@@ -37,24 +37,38 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             conn = connection;
         }
 
-        public async Task<ApiResult<string>> StartSessionAsync()
+        public async Task<ApiResult<string>> StartSessionAsync(int numberOfTries = 10)
         {
             try
             {
-                using (System.Net.WebClient wc = new System.Net.WebClient())
+                for (int i = 0; i < numberOfTries; i++)
                 {
-                    string url = conn.GetEndpointUrl();
-                    url += "/Camelot/StartSessionWithUrl?url=" + System.Net.WebUtility.UrlEncode(this.PdfUrl);
-                    url += "&command=" + this.Command.ToString().ToLower();
-                    url += "&format=" + this.Format.ToString().ToLower();
-                    url += "&pages=" + this.Pages;
+                    using (System.Net.WebClient wc = new System.Net.WebClient())
+                    {
+                        string url = conn.GetEndpointUrl();
+                        url += "/Camelot/StartSessionWithUrl?url=" + System.Net.WebUtility.UrlEncode(this.PdfUrl);
+                        url += "&command=" + this.Command.ToString().ToLower();
+                        url += "&format=" + this.Format.ToString().ToLower();
+                        url += "&pages=" + this.Pages;
 
-                    var json = await wc.DownloadStringTaskAsync(new Uri(url));
-                    var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<string>>(json);
+                        var json = await wc.DownloadStringTaskAsync(new Uri(url));
+                        var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<string>>(json);
 
-                    this.SessionId = res.Data;
-                    return res;
-                }
+                        if (res.ErrorCode == 0)
+                        {
+                            this.SessionId = res.Data;
+                            return res;
+                        }
+                        else if (res.ErrorCode == 429)
+                        {
+                            Console.WriteLine("Error 429 waiting");
+                            System.Threading.Thread.Sleep(1000+3*i);
+                        }
+                        else
+                            return res;
+                    }
+                } //for
+                return new ApiResult<string>(false);
 
             }
             catch (Exception e)

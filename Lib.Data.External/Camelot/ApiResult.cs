@@ -12,6 +12,8 @@ namespace HlidacStatu.Lib.Data.External.Camelot
         public ApiResult() { }
         public ApiResult(bool success) { this.Success = success; }
         public bool Success { get; set; } = true;
+        public int ErrorCode { get; set; } = 0;
+        public string ErrorDescription { get; set; } = "";
 
     }
 
