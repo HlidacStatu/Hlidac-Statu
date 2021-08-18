@@ -47,6 +47,11 @@ namespace HlidacStatu.Lib.Data.External.Camelot
                     using (System.Net.WebClient wc = new System.Net.WebClient())
                     {
                         string baseUrl = conn.GetEndpointUrl();
+                        if (i > 0)
+                        {
+                            Console.WriteLine($"try {i} for url {baseUrl}");
+                            logger.Debug($"try {i} for url {baseUrl}");
+                        }
                         string url = baseUrl + "/Camelot/StartSessionWithUrl?url=" + System.Net.WebUtility.UrlEncode(this.PdfUrl);
                         url += "&command=" + this.Command.ToString().ToLower();
                         url += "&format=" + this.Format.ToString().ToLower();
@@ -63,13 +68,20 @@ namespace HlidacStatu.Lib.Data.External.Camelot
                         }
                         else if (res.ErrorCode == 429)
                         {
-                            Console.WriteLine("Error 429 waiting");
+                            Console.WriteLine($"try {i} Error 429 waiting because of {baseUrl}");
+                            logger.Debug($"try {i} Error 429 waiting because of {baseUrl}");
                             System.Threading.Thread.Sleep(1000 + 3 * i);
                         }
                         else
+                        {
+                            Console.WriteLine($"unexspected API response {url} {res.ErrorCode}:{res.ErrorDescription} ");
+                            logger.Debug($"unexspected API response {url} {res.ErrorCode}:{res.ErrorDescription} ");
+
                             return res;
+                        }
                     }
                 } //for
+                logger.Error($"no free resources");
                 return new ApiResult<string>(false);
 
             }
