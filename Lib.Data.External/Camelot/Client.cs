@@ -12,21 +12,28 @@ namespace HlidacStatu.Lib.Data.External.Camelot
         public static async Task<CamelotResult[]> GetMaxTablesFromPDFAsync(string pdfUrl, CamelotResult.Formats format = CamelotResult.Formats.HTML, string pages = "all", TimeSpan? executionTimeout = null)
         {
             List<CamelotResult> res = new List<CamelotResult>();
-            var resLatt = await GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.lattice, format, pages);
-            if (resLatt.Status != CamelotResult.Statuses.Error.ToString())
-                res.Add(resLatt);
-            var resStre = await GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.stream, format, pages);
-            if (resStre.Status != CamelotResult.Statuses.Error.ToString())
-                res.Add(resStre);
+            Parallel.Invoke(
+                 () =>
+                {
+                    var resLatt = GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.lattice, format, pages).Result;
+                    if (resLatt.Status != CamelotResult.Statuses.Error.ToString())
+                        res.Add(resLatt);
+                },
+                () =>
+                {
+                    var resStre = GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.stream, format, pages).Result;
+                    if (resStre.Status != CamelotResult.Statuses.Error.ToString())
+                        res.Add(resStre);
+                });
 
             return res.ToArray();
         }
         public static async Task<CamelotResult> GetTablesFromPDFAsync(string pdfUrl, ClientLow.Commands command, CamelotResult.Formats format = CamelotResult.Formats.HTML, string pages = "all", TimeSpan? executionTimeout = null)
         {
-            executionTimeout = executionTimeout ?? TimeSpan.FromMinutes(2);
+            executionTimeout = executionTimeout ?? TimeSpan.FromMinutes(15);
 
             DateTime started = DateTime.Now;
-            using (var cl = new ClientLow(ConnectionPool.DefaultInstance(),pdfUrl, command, format, pages))
+            using (var cl = new ClientLow(ConnectionPool.DefaultInstance(), pdfUrl, command, format, pages))
             {
                 ApiResult<CamelotResult> res = null;
                 var session = await cl.StartSessionAsync();
