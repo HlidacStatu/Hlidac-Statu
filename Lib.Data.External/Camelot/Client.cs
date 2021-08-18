@@ -12,19 +12,23 @@ namespace HlidacStatu.Lib.Data.External.Camelot
         public static async Task<CamelotResult[]> GetMaxTablesFromPDFAsync(string pdfUrl, CamelotResult.Formats format = CamelotResult.Formats.HTML, string pages = "all", TimeSpan? executionTimeout = null)
         {
             List<CamelotResult> res = new List<CamelotResult>();
+            CamelotResult resLatt = null;
+            CamelotResult resStre = null;
             Parallel.Invoke(
                  () =>
                 {
-                    var resLatt = GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.lattice, format, pages).Result;
+                    resLatt = GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.lattice, format, pages).Result;
                     if (resLatt.Status != CamelotResult.Statuses.Error.ToString())
                         res.Add(resLatt);
                 },
                 () =>
                 {
-                    var resStre = GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.stream, format, pages).Result;
+                     resStre = GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.stream, format, pages).Result;
                     if (resStre.Status != CamelotResult.Statuses.Error.ToString())
                         res.Add(resStre);
                 });
+            if (resLatt.ErrorOccured() && resStre.ErrorOccured())
+                return null;
 
             return res.ToArray();
         }
@@ -45,6 +49,17 @@ namespace HlidacStatu.Lib.Data.External.Camelot
                     {
                         if (res.Data.Status.ToLower() == "done")
                             return res.Data;
+                    }
+                    else
+                    {
+                        return new CamelotResult()
+                        {
+                            Status = CamelotResult.Statuses.Error.ToString(),                            
+                            ElapsedTimeInMs = (long)executionTimeout.Value.TotalMilliseconds,
+                            FoundTables = 0,
+                            ScriptOutput = "APIClient: Session disappeard",
+                            Format = format.ToString()
+                        };
                     }
                     if ((DateTime.Now - started) > executionTimeout)
                     {

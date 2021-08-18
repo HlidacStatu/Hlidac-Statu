@@ -39,6 +39,11 @@ namespace HlidacStatu.Lib.Data.External.Camelot
         public string Algorithm { get; set; }
         public long ElapsedTimeInMs { get; set; }
 
+        public bool ErrorOccured()
+        {
+            return this.Status.ToLower() == "error";
+        }
+
     }
 
 }
