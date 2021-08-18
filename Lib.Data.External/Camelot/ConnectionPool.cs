@@ -17,7 +17,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
         }
 
         System.Random rnd = new Random(666);
-        private  System.Collections.Concurrent.ConcurrentDictionary<string, EndpointStatus> pool = new System.Collections.Concurrent.ConcurrentDictionary<string, EndpointStatus>();
+        private System.Collections.Concurrent.ConcurrentDictionary<Guid, EndpointStatus> pool = new System.Collections.Concurrent.ConcurrentDictionary<Guid, EndpointStatus>();
         private System.Timers.Timer timer = new System.Timers.Timer();
         bool insideTimer = false;
         private static object lockObj = new object();
@@ -26,7 +26,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
         private ConnectionPool()
         {
             timer.Interval = 1 * 60 * 1000; //1 min
-            timer.Elapsed += (s,e)=>CheckAllUris();
+            timer.Elapsed += (s, e) => CheckAllUris();
             timer.Start();
         }
 
@@ -37,15 +37,15 @@ namespace HlidacStatu.Lib.Data.External.Camelot
 
             insideTimer = true;
             DateTime now = DateTime.Now;
-            foreach (var url in pool.Keys)
+            foreach (var id in pool.Keys)
             {
-                if (pool.TryGetValue(url, out var status))
+                if (pool.TryGetValue(id, out var status))
                 {
                     if (status.Live == false
                         || (now - status.Checked).TotalMinutes < 5
                         || (now - status.Used).TotalMinutes < 5
                         )
-                        CheckUrl(url, false);
+                        CheckEndpoint(id, false);
                 }
 
             }
@@ -68,7 +68,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
         public ConnectionPool(IEnumerable<Uri> uris)
             : this(uris?.Select(m => m.AbsoluteUri)) { }
         public ConnectionPool(IEnumerable<string> uris)
-            :this()
+            : this()
         {
             if (uris == null)
                 throw new ArgumentNullException("uris");
@@ -83,7 +83,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
                 if (Uri.TryCreate(url, UriKind.Absolute, out var xxx))
                 {
                     logger.Debug($"Added {url} into pool");
-                    pool.TryAdd(url, new EndpointStatus() { Url = url });
+                    pool.TryAdd(Guid.NewGuid(), new EndpointStatus() { Url = url });
                 }
             }
             if (uris.Count() == 0)
@@ -92,25 +92,28 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             CheckAllUris();
         }
 
-        private bool CheckUrl(string uri, bool useIt)
+        private bool CheckEndpoint(Guid id, bool useIt)
         {
-            string url = uri + "/Camelot/Version";
-            try
+            if (pool.TryGetValue(id, out var status))
             {
-                using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent(url))
+                string url = status.Url + "/Camelot/Version";
+                try
                 {
-                    logger.Debug($"Testing {url} ");
-                    net.Tries = 1;
-                    net.Timeout = 2000;
-                    var version = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotVersion>>(net.GetContent().Text);
-                    DeclareLiveEndpoint(uri, useIt);
-                    return true;
-                }
+                    using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent(url))
+                    {
+                        logger.Debug($"Testing {url} ");
+                        net.Tries = 1;
+                        net.Timeout = 2000;
+                        var version = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotVersion>>(net.GetContent().Text);
+                        DeclareLiveEndpoint(id, useIt);
+                        return true;
+                    }
 
-            }
-            catch (Exception)
-            {
-                DeclareDeadEndpoint(uri);
+                }
+                catch (Exception)
+                {
+                    status.Live = false;
+                }
             }
             return false;
 
@@ -121,24 +124,27 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             var liveUris = pool.Values.Where(m => m.Live).OrderBy(m => m.Used);
             if (liveUris.Count() == 0)
             {
-                foreach (var url in pool.Keys)
+                foreach (var id in pool.Keys)
                 {
-                    if (CheckUrl(url, true))
-                        return url;
+                    if (pool.TryGetValue(id, out var status))
+                    {
+                        if (CheckEndpoint(id, true))
+                            return status.Url;
+                    }
                 }
                 throw new ApplicationException("No working api enpoint. All are dead");
             }
-            var choosen= liveUris.First();
+            var choosen = liveUris.First();
             choosen.Used = DateTime.Now;
             logger.Debug($"Returns {choosen.Url} ");
 
-            return choosen.Url; 
+            return choosen.Url;
         }
-        public void DeclareLiveEndpoint(string url, bool useIt)
+        public void DeclareLiveEndpoint(Guid id, bool useIt)
         {
-            if (pool.TryGetValue(url, out var item))
+            if (pool.TryGetValue(id, out var item))
             {
-                logger.Info($"Url {url} is live.");
+                logger.Info($"Url {item.Url} is live.");
                 item.Live = true;
                 item.Checked = DateTime.Now;
                 if (useIt)
@@ -148,11 +154,14 @@ namespace HlidacStatu.Lib.Data.External.Camelot
 
         public void DeclareDeadEndpoint(string url)
         {
-            if (pool.TryGetValue(url, out var item))
+            foreach (var kv in pool.Where(m=>m.Value.Url == url))
             {
-                logger.Warning($"Url {url} is dead.");
-                item.Live = false;
-                item.Checked = DateTime.Now;
+                if (pool.TryGetValue(kv.Key, out var item))
+                {
+                    logger.Warning($"Url {url} is dead.");
+                    item.Live = false;
+                    item.Checked = DateTime.Now;
+                }
             }
         }
     }
