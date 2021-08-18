@@ -448,6 +448,10 @@ namespace HlidacStatu.Web
                         DockerAPIUri = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.150.204").Split(';')[0],
                         ContainerNames = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.150.204").Split(';')[1].Split(','),
                     }, "Docker .204", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+
+                .AddHealthCheckWithOptions<Web.HealthChecks.CamelotApis, Web.HealthChecks.CamelotApis.Options>(
+                    new Web.HealthChecks.CamelotApis.Options() { CamelotAPIUris = Devmasters.Config.GetWebConfigValue("Camelot.Service.Api").Split(';')}, 
+                    "Camelot APIs", HealthStatus.Unhealthy, tags: new[] { "Docker" })
                 ;
         }
 
