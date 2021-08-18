@@ -33,22 +33,24 @@ namespace HlidacStatu.Web.HealthChecks
             {
                 foreach (var url in options.CamelotAPIUris)
                 {
-                    using (ClientLow cl = new ClientLow(new SingleConnection(url), "", ClientLow.Commands.lattice))
+                    if (Uri.TryCreate(url, UriKind.Absolute, out var xxx))
                     {
-                        var ver = cl.VersionAsync().Result;
-                        if (ver.Success)
-                            sb.AppendLine($"{url} ({ver.Data?.apiVersion}/{ver.Data?.camelotVersion})");
-                        else
-                            sb.AppendLine($"{url} ({ver.ErrorCode}:{ver.ErrorDescription})");
-                        var st = cl.StatisticAsync().Result;
-                        if (st.Success)
-                            sb.AppendLine($"   {st.Data?.CurrentThreads}/{st.Data?.MaxThreads}, parsed {st.Data?.ParsedFiles}");
-                        else
-                            sb.AppendLine($" ({st.ErrorCode}:{st.ErrorDescription})");
+                        using (ClientLow cl = new ClientLow(new SingleConnection(url), "", ClientLow.Commands.lattice))
+                        {
+                            var ver = cl.VersionAsync().Result;
+                            if (ver.Success)
+                                sb.AppendLine($"{url} ({ver.Data?.apiVersion}/{ver.Data?.camelotVersion})");
+                            else
+                                sb.AppendLine($"{url} ({ver.ErrorCode}:{ver.ErrorDescription})");
+                            var st = cl.StatisticAsync().Result;
+                            if (st.Success)
+                                sb.AppendLine($"   {st.Data?.CurrentThreads}/{st.Data?.MaxThreads}, parsed {st.Data?.ParsedFiles}");
+                            else
+                                sb.AppendLine($" ({st.ErrorCode}:{st.ErrorDescription})");
 
-                        sb.AppendLine();
+                            sb.AppendLine();
+                        }
                     }
-
                 }
                 return Task.FromResult(HealthCheckResult.Healthy(sb.ToString()));
 
