@@ -36,9 +36,16 @@ namespace HlidacStatu.Web.HealthChecks
                     using (ClientLow cl = new ClientLow(new SingleConnection(url), "", ClientLow.Commands.lattice))
                     {
                         var ver = cl.VersionAsync().Result;
+                        if (ver.Success)
+                            sb.AppendLine($"{url} ({ver.Data?.apiVersion}/{ver.Data?.camelotVersion})");
+                        else
+                            sb.AppendLine($"{url} ({ver.ErrorCode}:{ver.ErrorDescription})");
                         var st = cl.StatisticAsync().Result;
-                        sb.AppendLine($"{url} ({ver.Data?.apiVersion}/{ver.Data?.camelotVersion})");
-                        sb.AppendLine($"   {st.Data?.CurrentThreads}/{st.Data?.MaxThreads}, parsed {st.Data?.ParsedFiles}");
+                        if (st.Success)
+                            sb.AppendLine($"   {st.Data?.CurrentThreads}/{st.Data?.MaxThreads}, parsed {st.Data?.ParsedFiles}");
+                        else
+                            sb.AppendLine($" ({st.ErrorCode}:{st.ErrorDescription})");
+
                         sb.AppendLine();
                     }
 
