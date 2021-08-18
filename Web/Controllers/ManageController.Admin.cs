@@ -23,6 +23,20 @@ namespace HlidacStatu.Web.Controllers
 
 
         [Authorize(Roles = "canEditData")]
+        [HttpGet]
+        public ActionResult ShowPrilohaTables(string s, string p)
+        {
+            Smlouva sml = SmlouvaRepo.Load(s);
+            Smlouva.Priloha pr = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == p);
+            if (sml == null || pr == null)
+                return NotFound();
+
+            Lib.Data.External.Camelot.CamelotResult[] res = Extensions.SmlouvaPrilohaExtension.GetTablesFromPriloha(sml, pr);
+
+            return View(res);
+        }
+
+        [Authorize(Roles = "canEditData")]
         [HttpPost]
         public ActionResult ZmenaSmluvnichStran(string id, IFormCollection form)
         {

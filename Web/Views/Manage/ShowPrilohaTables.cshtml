@@ -1,0 +1,29 @@
+﻿@model HlidacStatu.Lib.Data.External.Camelot.CamelotResult[]
+@using HlidacStatu.Entities;
+@using HlidacStatu.Repositories
+@using System.Linq;
+
+@{
+    ViewBag.Title = "Tabulky v priloze";
+    if (Model == null)
+    {
+        <h2>Data neexistuji, asi chyba</h2>
+        return;
+    }
+}
+
+@for (int i = 0; i < Model.Length; i++)
+{
+    if (Model[i].FoundTables > 0)
+    {
+        <h2>Nalezene tabulky - algoritmus @(Model[i].Format)</h2>
+        @foreach (var tbl in Model[i].Tables.OrderBy(m => m.Page).ThenBy(m => m.TableInPage))
+        {
+            <div><b>Strana @tbl.Page</b>, tabulka na stránce <b>@tbl.TableInPage</b></div>
+            <div style="background-color:#e0e0e0">
+                @Html.Raw(tbl.Content.Replace("\\n","\n").Replace("\\t"," ")) @*TODO check Scripts, Cross site scripting*@
+            </div>
+        }
+    }
+}
+

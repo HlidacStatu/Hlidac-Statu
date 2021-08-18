@@ -311,6 +311,13 @@
                         else
                         {
                             <div>
+                                @if (this.User?.IsInRole("canEditData") == true && priloha.nazevSouboru.EndsWith("pdf"))
+                                {
+                                    <a target="_blank" href="/manage/ShowPrilohaTables?s=@Model.Id&p=@priloha.hash.Value">
+                                        <i class="fal fa-table" style="color:red;"></i>
+                                    </a>
+                                }
+
                                 @priloha.nazevSouboru :
                                 <a href="@priloha.odkaz" target="_blank">Originál</a>
                                 @if (weHaveCopy)

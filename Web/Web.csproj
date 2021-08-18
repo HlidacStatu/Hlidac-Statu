@@ -81,6 +81,7 @@
       <ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
       <ProjectReference Include="..\HlidacStatu.Q\HlidacStatu.Q.csproj" />
       <ProjectReference Include="..\KIndexGenerator\KIndexGenerator.csproj" />
+      <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
       <ProjectReference Include="..\LibCore\LibCore.csproj" />
       <ProjectReference Include="..\Plugin.Enhancers\Plugin.Enhancers.csproj" />
       <ProjectReference Include="..\Plugin.IssueAnalyzers\Plugin.IssueAnalyzers.csproj" />
