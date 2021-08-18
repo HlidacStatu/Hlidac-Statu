@@ -9,13 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_deploy", "_deploy", "{3433
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		..\Hlidac-Statu-Private\.gitignore = ..\Hlidac-Statu-Private\.gitignore
-		..\PrivateDocumentation\Deploy\Web\appsettings.Production.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production.json
-		..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json
-		..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat = ..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat
-		..\PrivateDocumentation\Deploy\Web\deployWeb.bat = ..\PrivateDocumentation\Deploy\Web\deployWeb.bat
 		nuget.config = nuget.config
 		README.MD = README.MD
-		..\PrivateDocumentation\Deploy\Web\web.Production.config = ..\PrivateDocumentation\Deploy\Web\web.Production.config
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibCore", "LibCore\LibCore.csproj", "{D2C52FF3-87BF-41E5-965C-120ABB4DED86}"
@@ -100,7 +95,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OCRQueueManager", "..\Hlida
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark", "..\Hlidac-Statu-Private\Benchmark\Benchmark.csproj", "{58E9869B-AFD2-45A8-A005-D5E3F5D2307F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.HealthChecks", "Web.HealthChecks\Web.HealthChecks.csproj", "{29719100-304E-478A-966A-7A4593843E28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.HealthChecks", "Web.HealthChecks\Web.HealthChecks.csproj", "{29719100-304E-478A-966A-7A4593843E28}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{34192F9D-C058-47A1-8EEF-88993F679C8D}"
+	ProjectSection(SolutionItems) = preProject
+		..\PrivateDocumentation\Deploy\Web\appsettings.Production.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production.json
+		..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json
+		..\PrivateDocumentation\Deploy\Web\deployWeb.bat = ..\PrivateDocumentation\Deploy\Web\deployWeb.bat
+		..\PrivateDocumentation\Deploy\Web\web.Production.config = ..\PrivateDocumentation\Deploy\Web\web.Production.config
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Downloader", "Downloader", "{256417D4-C1D7-4747-A227-D860BCC5A2B1}"
+	ProjectSection(SolutionItems) = preProject
+		..\PrivateDocumentation\Deploy\Downloader\appsettings.Production.json = ..\PrivateDocumentation\Deploy\Downloader\appsettings.Production.json
+		..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat = ..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -287,6 +296,8 @@ Global
 		{D16EB416-4EC8-4247-B8BF-D20CBE6979EE} = {C1833D67-B269-41C4-9556-3F9D7511B378}
 		{C1F6EC6A-688B-4832-A02A-2F17368C1880} = {944AEC9D-9A67-477D-811D-66DC2142299A}
 		{58E9869B-AFD2-45A8-A005-D5E3F5D2307F} = {C1833D67-B269-41C4-9556-3F9D7511B378}
+		{34192F9D-C058-47A1-8EEF-88993F679C8D} = {34338A10-2566-4B27-BE7F-D972FD4CCF01}
+		{256417D4-C1D7-4747-A227-D860BCC5A2B1} = {34338A10-2566-4B27-BE7F-D972FD4CCF01}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
