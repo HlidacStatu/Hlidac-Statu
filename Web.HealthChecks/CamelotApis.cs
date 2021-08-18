@@ -31,11 +31,11 @@ namespace HlidacStatu.Web.HealthChecks
             System.Text.StringBuilder sb = new System.Text.StringBuilder(1024);
             try
             {
-                foreach (var url in options.CamelotAPIUris)
+                foreach (var url in options.CamelotAPIUris.Distinct())
                 {
                     if (Uri.TryCreate(url, UriKind.Absolute, out var xxx))
                     {
-                        using (ClientLow cl = new ClientLow(new SingleConnection(url), "", ClientLow.Commands.lattice))
+                        using (ClientLow cl = new ClientLow(url))
                         {
                             var ver = cl.VersionAsync().Result;
                             if (ver.Success)

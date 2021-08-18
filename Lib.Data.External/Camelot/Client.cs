@@ -23,7 +23,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
                 },
                 () =>
                 {
-                     resStre = GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.stream, format, pages).Result;
+                    resStre = GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.stream, format, pages).Result;
                     if (resStre.Status != CamelotResult.Statuses.Error.ToString())
                         res.Add(resStre);
                 });
@@ -37,43 +37,70 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             executionTimeout = executionTimeout ?? TimeSpan.FromMinutes(15);
 
             DateTime started = DateTime.Now;
-            using (var cl = new ClientLow(ConnectionPool.DefaultInstance(), pdfUrl, command, format, pages))
+            try
             {
-                ApiResult<CamelotResult> res = null;
-                var session = await cl.StartSessionAsync();
-                do
+
+                using (var cl = new ClientParse(ConnectionPool.DefaultInstance(), pdfUrl, command, format, pages))
                 {
-                    System.Threading.Thread.Sleep(500);
-                    res = await cl.GetSessionAsync();
-                    if (res.Success)
+                    ApiResult<CamelotResult> res = null;
+                    var session = await cl.StartSessionAsync();
+                    if (session.Success == false)
                     {
-                        if (res.Data.Status.ToLower() == "done")
-                            return res.Data;
-                    }
-                    else
-                    {
-                        return new CamelotResult()
-                        {
-                            Status = CamelotResult.Statuses.Error.ToString(),                            
-                            ElapsedTimeInMs = (long)executionTimeout.Value.TotalMilliseconds,
-                            FoundTables = 0,
-                            ScriptOutput = "APIClient: Session disappeard",
-                            Format = format.ToString()
-                        };
-                    }
-                    if ((DateTime.Now - started) > executionTimeout)
-                    {
+
                         return new CamelotResult()
                         {
                             Status = CamelotResult.Statuses.Error.ToString(),
                             ElapsedTimeInMs = (long)executionTimeout.Value.TotalMilliseconds,
                             FoundTables = 0,
-                            ScriptOutput = "APIClient: Timeout expired",
+                            ScriptOutput = session.ErrorDescription,
                             Format = format.ToString()
                         };
                     }
-                } while (true);
+                    do
+                    {
+                        System.Threading.Thread.Sleep(1000);
+                        res = await cl.GetSessionAsync();
+                        if (res.Success)
+                        {
+                            if (res.Data.Status.ToLower() == "done")
+                                return res.Data;
+                        }
+                        else
+                        {
+                            return new CamelotResult()
+                            {
+                                Status = CamelotResult.Statuses.Error.ToString(),
+                                ElapsedTimeInMs = (long)executionTimeout.Value.TotalMilliseconds,
+                                FoundTables = 0,
+                                ScriptOutput = "APIClient: Session disappeard",
+                                Format = format.ToString()
+                            };
+                        }
+                        if ((DateTime.Now - started) > executionTimeout)
+                        {
+                            return new CamelotResult()
+                            {
+                                Status = CamelotResult.Statuses.Error.ToString(),
+                                ElapsedTimeInMs = (long)executionTimeout.Value.TotalMilliseconds,
+                                FoundTables = 0,
+                                ScriptOutput = "APIClient: Timeout expired",
+                                Format = format.ToString()
+                            };
+                        }
+                    } while (true);
 
+                }
+            }
+            catch (Exception e)
+            {
+                return new CamelotResult()
+                {
+                    Status = CamelotResult.Statuses.Error.ToString(),
+                    ElapsedTimeInMs = (long)executionTimeout.Value.TotalMilliseconds,
+                    FoundTables = 0,
+                    ScriptOutput = e.ToString(),
+                    Format = format.ToString()
+                };
             }
 
         }

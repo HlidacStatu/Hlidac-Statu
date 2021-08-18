@@ -9,10 +9,6 @@ namespace HlidacStatu.Lib.Data.External.Camelot
     public class ClientLow
         : IAsyncDisposable, IDisposable
     {
-        public string PdfUrl { get; }
-        public Commands Command { get; }
-        public CamelotResult.Formats Format { get; }
-        public string Pages { get; }
 
         public enum Commands
         {
@@ -24,65 +20,31 @@ namespace HlidacStatu.Lib.Data.External.Camelot
 
         private bool disposedValue;
 
-        private IApiConnection conn = null;
-        private string usedApiEndpoint = null;
+        public string ApiEndpoint { get; private set; } = null;
 
         private static Devmasters.Logging.Logger logger = new Devmasters.Logging.Logger("Camelot.ClientLow");
-        public ClientLow(IApiConnection connection,
-            string pdfUrl, Commands command, CamelotResult.Formats format = CamelotResult.Formats.HTML, string pages = "all")
+        public ClientLow(string apiEndpoint)
         {
-            PdfUrl = pdfUrl;
-            Command = command;
-            Format = format;
-            Pages = pages;
-            conn = connection;
+            this.ApiEndpoint = apiEndpoint;
         }
 
-        public async Task<ApiResult<string>> StartSessionAsync(int numberOfTries = 10)
+        public async Task<ApiResult<string>> StartSessionAsync(string pdfUrl, Commands command, CamelotResult.Formats format, string pages = "all")
         {
             try
             {
-                for (int i = 0; i < numberOfTries; i++)
-                {
                     using (System.Net.WebClient wc = new System.Net.WebClient())
                     {
-                        string baseUrl = conn.GetEndpointUrl();
-                        if (i > 0)
-                        {
-                            Console.WriteLine($"try {i} for url {baseUrl}");
-                            logger.Debug($"try {i} for url {baseUrl}");
-                        }
-                        string url = baseUrl + "/Camelot/StartSessionWithUrl?url=" + System.Net.WebUtility.UrlEncode(this.PdfUrl);
-                        url += "&command=" + this.Command.ToString().ToLower();
-                        url += "&format=" + this.Format.ToString().ToLower();
-                        url += "&pages=" + this.Pages;
+                        string baseUrl = ApiEndpoint;
+                        string url = baseUrl + "/Camelot/StartSessionWithUrl?url=" + System.Net.WebUtility.UrlEncode(pdfUrl);
+                        url += "&command=" + command.ToString().ToLower();
+                        url += "&format=" + format.ToString().ToLower();
+                        url += "&pages=" + pages;
 
                         var json = await wc.DownloadStringTaskAsync(new Uri(url));
                         var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<string>>(json);
 
-                        if (res.ErrorCode == 0)
-                        {
-                            this.usedApiEndpoint = baseUrl;
-                            this.SessionId = res.Data;
-                            return res;
-                        }
-                        else if (res.ErrorCode == 429)
-                        {
-                            Console.WriteLine($"try {i} Error 429 waiting because of {baseUrl}");
-                            logger.Debug($"try {i} Error 429 waiting because of {baseUrl}");
-                            System.Threading.Thread.Sleep(1000 + 3 * i);
-                        }
-                        else
-                        {
-                            Console.WriteLine($"unexspected API response {url} {res.ErrorCode}:{res.ErrorDescription} ");
-                            logger.Debug($"unexspected API response {url} {res.ErrorCode}:{res.ErrorDescription} ");
-
-                            return res;
-                        }
+                        return res;
                     }
-                } //for
-                logger.Error($"no free resources");
-                return new ApiResult<string>(false);
 
             }
             catch (Exception e)
@@ -91,13 +53,13 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             }
         }
 
-        public async Task<ApiResult<CamelotResult>> GetSessionAsync()
+        public async Task<ApiResult<CamelotResult>> GetSessionAsync(string sessionId)
         {
             try
             {
                 using (System.Net.WebClient wc = new System.Net.WebClient())
                 {
-                    string url = (usedApiEndpoint ?? conn.GetEndpointUrl()) + "/Camelot/GetSession?sessionId=" + System.Net.WebUtility.UrlEncode(this.SessionId);
+                    string url = ApiEndpoint + "/Camelot/GetSession?sessionId=" + System.Net.WebUtility.UrlEncode(sessionId);
 
                     var json = await wc.DownloadStringTaskAsync(new Uri(url));
                     var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotResult>>(json);
@@ -112,13 +74,13 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             }
         }
 
-        public async Task<ApiResult> EndSessionAsync()
+        public async Task<ApiResult> EndSessionAsync(string sessionId)
         {
             try
             {
                 using (System.Net.WebClient wc = new System.Net.WebClient())
                 {
-                    string url = (usedApiEndpoint ?? conn.GetEndpointUrl()) + "/Camelot/EndSession?sessionId=" + System.Net.WebUtility.UrlEncode(this.SessionId);
+                    string url = ApiEndpoint + "/Camelot/EndSession?sessionId=" + System.Net.WebUtility.UrlEncode(sessionId);
 
                     var json = await wc.DownloadStringTaskAsync(new Uri(url));
                     var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotResult>>(json);
@@ -138,7 +100,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             {
                 using (System.Net.WebClient wc = new System.Net.WebClient())
                 {
-                    string url = (usedApiEndpoint ?? conn.GetEndpointUrl()) + "/Camelot/Version";
+                    string url = ApiEndpoint + "/Camelot/Version";
 
                     var json = await wc.DownloadStringTaskAsync(new Uri(url));
                     var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotVersion>>(json);
@@ -158,7 +120,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             {
                 using (System.Net.WebClient wc = new System.Net.WebClient())
                 {
-                    string url = (usedApiEndpoint ?? conn.GetEndpointUrl()) + "/Camelot/Statistic";
+                    string url = ApiEndpoint + "/Camelot/Statistic";
 
                     var json = await wc.DownloadStringTaskAsync(new Uri(url));
                     var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotStatistics>>(json);
@@ -178,10 +140,6 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             {
                 if (disposing)
                 {
-                    if (!string.IsNullOrEmpty(this.SessionId))
-                    {
-                        var res = this.EndSessionAsync().Result;
-                    }
 
                     // TODO: dispose managed state (managed objects)
                 }
@@ -208,7 +166,6 @@ namespace HlidacStatu.Lib.Data.External.Camelot
 
         public async ValueTask DisposeAsync()
         {
-            await this.EndSessionAsync();
             Dispose(false);
         }
     }

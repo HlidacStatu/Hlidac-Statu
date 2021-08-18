@@ -12,7 +12,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
         {
             public string Url { get; set; }
             public DateTime Checked { get; set; } = DateTime.MinValue;
-            public bool Live { get; set; } = false;
+            public bool Ready { get; set; } = false;
             public DateTime Used { get; set; } = DateTime.MinValue;
         }
 
@@ -41,7 +41,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             {
                 if (pool.TryGetValue(id, out var status))
                 {
-                    if (status.Live == false
+                    if (status.Ready == false
                         || (now - status.Checked).TotalMinutes < 5
                         || (now - status.Used).TotalMinutes < 5
                         )
@@ -96,7 +96,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
         {
             if (pool.TryGetValue(id, out var status))
             {
-                string url = status.Url + "/Camelot/Version";
+                string url = status.Url + "/Camelot/Statistic";
                 try
                 {
                     using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent(url))
@@ -104,15 +104,18 @@ namespace HlidacStatu.Lib.Data.External.Camelot
                         logger.Debug($"Testing {url} ");
                         net.Tries = 1;
                         net.Timeout = 2000;
-                        var version = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotVersion>>(net.GetContent().Text);
-                        DeclareLiveEndpoint(id, useIt);
+                        var stat = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotStatistics>>(net.GetContent().Text);
+                        if (stat.Success && stat.Data.CurrentThreads <= stat.Data.MaxThreads)
+                            DeclareLiveEndpoint(id, useIt);
+                        else
+                            status.Ready = false;
                         return true;
                     }
 
                 }
                 catch (Exception)
                 {
-                    status.Live = false;
+                    status.Ready = false;
                 }
             }
             return false;
@@ -121,7 +124,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
 
         public string GetEndpointUrl()
         {
-            var liveUris = pool.Values.Where(m => m.Live).OrderBy(m => m.Used);
+            var liveUris = pool.Values.Where(m => m.Ready).OrderBy(m => m.Used);
             if (liveUris.Count() == 0)
             {
                 foreach (var id in pool.Keys)
@@ -145,7 +148,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             if (pool.TryGetValue(id, out var item))
             {
                 logger.Info($"Url {item.Url} is live.");
-                item.Live = true;
+                item.Ready = true;
                 item.Checked = DateTime.Now;
                 if (useIt)
                     item.Used = item.Checked;
@@ -159,7 +162,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
                 if (pool.TryGetValue(kv.Key, out var item))
                 {
                     logger.Warning($"Url {url} is dead.");
-                    item.Live = false;
+                    item.Ready = false;
                     item.Checked = DateTime.Now;
                 }
             }
