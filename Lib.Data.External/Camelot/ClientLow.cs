@@ -25,6 +25,21 @@ namespace HlidacStatu.Lib.Data.External.Camelot
         private string[] apiUrls = null;
         private bool disposedValue;
 
+        public ClientLow(Uri[] apiEndpoints,
+            string pdfUrl, Commands command, CamelotResult.Formats format = CamelotResult.Formats.HTML, string pages = "all")
+        {
+            PdfUrl = pdfUrl;
+            Command = command;
+            Format = format;
+            Pages = pages;
+
+            if (apiEndpoints == null || apiEndpoints.Length == 0 )
+                throw new ArgumentException("Missing configuration key Camelot.Service.Api");
+            else
+                apiUrls = apiEndpoints.Select(m=>m.AbsoluteUri).ToArray();
+
+        }
+
         public ClientLow(string pdfUrl, Commands command, CamelotResult.Formats format = CamelotResult.Formats.HTML, string pages = "all")
         {
             PdfUrl = pdfUrl;

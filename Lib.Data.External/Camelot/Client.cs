@@ -21,7 +21,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
 
             return res.ToArray();
         }
-        public static async Task<CamelotResult> GetTablesFromPDFAsync(string pdfUrl, ClientLow.Commands command, CamelotResult.Formats format = CamelotResult.Formats.HTML, string pages = "all", TimeSpan? executionTimeout = null)
+        public static async Task<CamelotResult> GetTablesFromPDFAsync(string pdfUrl, ClientLow.Commands command, CamelotResult.Formats format = CamelotResult.Formats.HTML, string pages = "all", TimeSpan? executionTimeout = null, Uri[] apiEndpoints = null)
         {
             executionTimeout = executionTimeout ?? TimeSpan.FromMinutes(2);
 
