@@ -46,7 +46,7 @@ namespace HlidacStatu.Web.HealthChecks
                                 sb.AppendLine($"{anonUrl} ({ver.ErrorCode}:{ver.ErrorDescription})");
                             var st = cl.StatisticAsync().Result;
                             if (st.Success)
-                                sb.AppendLine($"stats: threads {st.Data?.CurrentThreads}/{st.Data?.MaxThreads}, {st.Data?.ParsedFiles} parsed, {st.Data?.Calls} api calls");
+                                sb.AppendLine($"stats: threads {st.Data?.CurrentThreads}/{st.Data?.MaxThreads}, {HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ParsedFiles ?? 0, true)} parsed, {HlidacStatu.Util.RenderData.NiceNumber(st.Data?.Calls ??0,true)} api calls");
                             else
                                 sb.AppendLine($" ({st.ErrorCode}:{st.ErrorDescription})");
 
