@@ -311,7 +311,7 @@
                         else
                         {
                             <div>
-                                @if (this.User?.IsInRole("canEditData") == true && priloha.nazevSouboru.EndsWith("pdf"))
+                                @if (this.User?.IsInRole("canEditData") == true && priloha.nazevSouboru.ToLower().EndsWith("pdf"))
                                 {
                                     <a target="_blank" href="/manage/ShowPrilohaTables?s=@Model.Id&p=@priloha.hash.Value">
                                         <i class="fal fa-table" style="color:red;"></i>
