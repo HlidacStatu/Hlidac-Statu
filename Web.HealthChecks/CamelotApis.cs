@@ -38,7 +38,7 @@ namespace HlidacStatu.Web.HealthChecks
                         using (ClientLow cl = new ClientLow(url))
                         {
                             Uri uri = new Uri(url);
-                            string anonUrl = (string)uri.Host.TakeLast(7) + ":" + uri.Port;
+                            string anonUrl = string.Join("", uri.Host.TakeLast(7)) + ":" + uri.Port;
                             var ver = cl.VersionAsync().Result;
                             if (ver.Success)
                                 sb.AppendLine($"{anonUrl} ({ver.Data?.apiVersion}/{ver.Data?.camelotVersion})");
