@@ -28,7 +28,8 @@ namespace HlidacStatu.Extensions
 
 
             Smlouva s = SmlouvaRepo.Load(key[0]);
-            Smlouva.Priloha p = s?.Prilohy?.FirstOrDefault(m => m.hash.Value == key[1]);
+            
+            Smlouva.Priloha p = s?.Prilohy?.FirstOrDefault(m => (m.hash?.Value ?? Devmasters.Crypto.Hash.ComputeHashToHex(m.odkaz ?? "")) == key[1]);
 
             if (p == null)
                 return null;
