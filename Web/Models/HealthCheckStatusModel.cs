@@ -20,7 +20,7 @@ namespace HlidacStatu.Web.Models
                             )
                         )
                         {
-                            
+
                             net.Timeout = 10 * 1000;
                             net.Tries = 2;
                             var json = net.GetContent(System.Text.Encoding.UTF8).Text;
@@ -60,6 +60,7 @@ namespace HlidacStatu.Web.Models
             };
         }
 
+        public static List<string> statuses = new List<string>() { "healthy", "degraded", "unhealthy" };
         public int id { get; set; }
         public string status { get; set; }
         public DateTime onStateFrom { get; set; }

@@ -6,23 +6,23 @@
 
 @section metatags
 {
-      <meta http-equiv="refresh" content="60">
+    <meta http-equiv="refresh" content="60">
 }
 
 
 @if (Model.name == "NoData")
 {
     <div class="jumbotron">
-      <h1>@Html.Raw(Model.htmlIcon) Data o dostupnosti služeb se nepodařilo načíst</h1>
-      <p><a class="btn btn-primary btn-lg" href="/status?r=@(HlidacStatu.Util.Consts.Rnd.Next(0, 1000))" role="button">Načíst znovu</a></p>
+        <h1>@Html.Raw(Model.htmlIcon) Data o dostupnosti služeb se nepodařilo načíst</h1>
+        <p><a class="btn btn-primary btn-lg" href="/status?r=@(HlidacStatu.Util.Consts.Rnd.Next(0, 1000))" role="button">Načíst znovu</a></p>
     </div>
     return;
 }
 
 
 <div class="jumbotron small">
-  <h1>@Html.Raw(Model.htmlIcon) @Model.czStatus</h1>
-  <p>Stav k @(Model.lastExecuted.ToString("dd. MM. yyyy HH:mm:ss"))</p>
+    <h1>@Html.Raw(Model.htmlIcon) @Model.czStatus</h1>
+    <p>Stav k @(Model.lastExecuted.ToString("dd. MM. yyyy HH:mm:ss"))</p>
     <p><a class="btn btn-primary btn-lg" href="/status?r=@(HlidacStatu.Util.Consts.Rnd.Next(0, 1000))" role="button">Načíst znovu</a></p>
 </div>
 
@@ -39,20 +39,39 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var tag in Model.entries.Select(m=>m.firstTag).Distinct())
+        @{
+            //pořadí
+            List<string> tags = new List<string>();
+            @foreach (var status in HealthCheckStatusModel.statuses.Reverse<string>())
+            {
+                @foreach (var tag in Model.entries
+                    .Where(s => s.status.Equals(status, StringComparison.OrdinalIgnoreCase))
+                    .Select(m => m.firstTag)
+                    .Distinct()
+                    .OrderBy(o=>o))
+                {
+                    if (tags.Contains(tag) == false)
+                        tags.Add(tag);
+                }
+            }
+        }
+        @foreach (var tag in tags)
         {
             <tr>
                 <td style="background-color:#dddddd" colspan="4"><b>@tag</b></td>
             </tr>
-            @foreach (var item in Model.entries.Where(m => m.firstTag == tag).OrderBy(o => o.name))
+            @foreach (var item in Model.entries
+               .Where(m => m.firstTag == tag)
+               .OrderByDescending(o => HealthCheckStatusModel.statuses.IndexOf(o.status.ToLower()))
+               .ThenBy(o => o.name))
             {
-            <tr>
-                <td>@item.name</td>
-                <td>@Html.Raw(item.htmlIcon) @item.czStatus</td>
-                <td>@Html.Raw(HlidacStatu.Web.Models.HealthCheckStatusModel.ToHtml(item.description))</td>
-                <td></td>
-            </tr>
-                }
+                <tr>
+                    <td>@item.name</td>
+                    <td>@Html.Raw(item.htmlIcon) @item.czStatus</td>
+                    <td>@Html.Raw(HlidacStatu.Web.Models.HealthCheckStatusModel.ToHtml(item.description))</td>
+                    <td></td>
+                </tr>
             }
+        }
     </tbody>
 </table>
