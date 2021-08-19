@@ -16,10 +16,10 @@
 {
     if (Model[i].FoundTables > 0)
     {
-        <h2 style="padding-top:20px;">Nalezene tabulky - algoritmus @(i+1)</h2>
+        <h2 style="padding-top:20px;" id="@(Model[i].Algorithm)">Nalezene tabulky - algoritmus @(Model[i].Algorithm)</h2>
         @foreach (var tbl in Model[i].Tables.OrderBy(m => m.Page).ThenBy(m => m.TableInPage))
         {
-            <div style="font-size:120%;padding:5px;"><b>Strana @tbl.Page</b>, tabulka na stránce <b>@tbl.TableInPage</b></div>
+            <div style="font-size:120%;padding:15px 0 5px 0;" id="@($"{Model[i].Algorithm}_{tbl.Page}_{tbl.TableInPage}") "><b>Strana @tbl.Page</b>, tabulka na stránce <b>@tbl.TableInPage</b></div>
             <div style="background-color:#e0e0e0">
                 @Html.Raw(tbl.Content.Replace("\\n","\n").Replace("\\t"," ")) @*TODO check Scripts, Cross site scripting*@
             </div>

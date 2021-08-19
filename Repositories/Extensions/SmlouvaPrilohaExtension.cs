@@ -53,7 +53,8 @@ namespace HlidacStatu.Extensions
         {
             if (s == null || p == null)
                 return null;
-            var keyval = s.Id + "|" + p.hash.Value;
+            string hash = p.hash?.Value ?? Devmasters.Crypto.Hash.ComputeHashToHex(p.odkaz?? "");
+            var keyval = s.Id + "|" + hash;
             var key = new KeyAndId() { ValueForData = keyval, CacheNameOnDisk = $"priloha_tbls_{keyval}" };
             if (rewriteStems)
             {

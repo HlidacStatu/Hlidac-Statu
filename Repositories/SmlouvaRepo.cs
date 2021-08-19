@@ -653,7 +653,7 @@ namespace HlidacStatu.Repositories
 
                 var res = includePrilohy
                     ? c.Get<Smlouva>(idVerze)
-                    : c.Get<Smlouva>(idVerze, s => s.SourceExcludes(sml => sml.Prilohy));
+                    : c.Get<Smlouva>(idVerze, s => s.SourceExcludes("prilohy.plainTextContent"));
 
 
                 if (res.Found)
