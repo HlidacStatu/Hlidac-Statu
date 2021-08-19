@@ -34,6 +34,9 @@ namespace HlidacStatu.Extensions
             if (p == null)
                 return null;
 
+            if (p.nazevSouboru.ToLower().EndsWith("pdf") == false)
+                return null;
+
             try
             {
                 Lib.Data.External.Camelot.CamelotResult[] myRes = HlidacStatu.Lib.Data.External.Camelot.Client.GetMaxTablesFromPDFAsync(
@@ -50,14 +53,16 @@ namespace HlidacStatu.Extensions
 
         }
 
-        public static Lib.Data.External.Camelot.CamelotResult[] GetTablesFromPriloha(Smlouva s,  Smlouva.Priloha p, bool rewriteStems = false)
+        public static Lib.Data.External.Camelot.CamelotResult[] GetTablesFromPriloha(Smlouva s,  Smlouva.Priloha p, bool forceUpdate = false)
         {
             if (s == null || p == null)
                 return null;
+
+
             string hash = p.hash?.Value ?? Devmasters.Crypto.Hash.ComputeHashToHex(p.odkaz?? "");
             var keyval = s.Id + "|" + hash;
             var key = new KeyAndId() { ValueForData = keyval, CacheNameOnDisk = $"priloha_tbls_{keyval}" };
-            if (rewriteStems)
+            if (forceUpdate)
             {
                 prilohaTblsCacheManager.Delete(key);
             }
