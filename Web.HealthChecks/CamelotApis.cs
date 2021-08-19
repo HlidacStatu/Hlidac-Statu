@@ -37,14 +37,16 @@ namespace HlidacStatu.Web.HealthChecks
                     {
                         using (ClientLow cl = new ClientLow(url))
                         {
+                            Uri uri = new Uri(url);
+                            string anonUrl = (string)uri.Host.TakeLast(7) + ":" + uri.Port;
                             var ver = cl.VersionAsync().Result;
                             if (ver.Success)
-                                sb.AppendLine($"{url} ({ver.Data?.apiVersion}/{ver.Data?.camelotVersion})");
+                                sb.AppendLine($"{anonUrl} ({ver.Data?.apiVersion}/{ver.Data?.camelotVersion})");
                             else
-                                sb.AppendLine($"{url} ({ver.ErrorCode}:{ver.ErrorDescription})");
+                                sb.AppendLine($"{anonUrl} ({ver.ErrorCode}:{ver.ErrorDescription})");
                             var st = cl.StatisticAsync().Result;
                             if (st.Success)
-                                sb.AppendLine($"   {st.Data?.CurrentThreads}/{st.Data?.MaxThreads}, parsed {st.Data?.ParsedFiles}");
+                                sb.AppendLine($"stats: threads {st.Data?.CurrentThreads}/{st.Data?.MaxThreads}, {st.Data?.ParsedFiles} parsed, {st.Data?.Calls} api calls");
                             else
                                 sb.AppendLine($" ({st.ErrorCode}:{st.ErrorDescription})");
 
