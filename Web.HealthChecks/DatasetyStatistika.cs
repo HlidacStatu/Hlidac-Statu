@@ -124,7 +124,10 @@ namespace HlidacStatu.Web.HealthChecks
                 sb.Append("<table class='table table-new table-dotted'>");
                 sb.Append($"<thead><tr><td>dataset</td><td>celkem zaznamu</td><td>za {options.Interval.ToNiceDisplayName()}</td><td>posl.změna</td></tr></thead>");
                 sb.Append("<tbody>");
-                foreach (var ds in data.Where(ds=>options.Exclude.Contains(ds.Dataset.DatasetId)==false))
+                foreach (var ds in data
+                    .Where(ds=>options.Exclude.Contains(ds.Dataset.DatasetId)==false)
+                    .OrderByDescending(o=>o.PosledniZmena)
+                    )
                 {
                     sb.Append("<tr>");
                     sb.Append($"<td>{ds.Dataset.DatasetId}</td><td>{ds.PocetCelkem}</td><td>{ds.PocetZaInterval[options.Interval]}</td><td>{ds.PosledniZmena:dd.MM.yy}</td>");
