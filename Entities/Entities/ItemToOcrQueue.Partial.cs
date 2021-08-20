@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,8 +20,8 @@ namespace HlidacStatu.Entities
         {
             IQueryable<ItemToOcrQueue> sql = null;
             sql = db.ItemToOcrQueue.AsQueryable()
-                .Where(m => m.Done.Equals(null)
-                        && m.Started.Equals(null));
+                .Where(m => m.Done == null
+                        && m.Started == null);
 
             if (itemType != null)
                 sql = sql.Where(m => m.ItemType == itemType.ToString());
@@ -84,6 +86,7 @@ namespace HlidacStatu.Entities
             {
                 IQueryable<ItemToOcrQueue> sql = CreateQuery(db, itemType, itemSubType);
                 sql = sql.Where(m => m.ItemId == itemId );
+                var _sql = sql.ToQueryString();
                 if (sql.Any()) //already in the queue
                     return new Lib.OCR.Api.Result()
                     {
