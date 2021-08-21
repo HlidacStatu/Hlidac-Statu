@@ -14,7 +14,11 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             List<CamelotResult> res = new List<CamelotResult>();
             CamelotResult resLatt = null;
             CamelotResult resStre = null;
-            Parallel.Invoke(
+            ParallelOptions po = new ParallelOptions();
+            if (System.Diagnostics.Debugger.IsAttached)
+                po = new ParallelOptions() { MaxDegreeOfParallelism = 1 };
+
+            Parallel.Invoke(po,
                  () =>
                 {
                     resLatt = GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.lattice, format, pages).Result;

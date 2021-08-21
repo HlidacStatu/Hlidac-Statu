@@ -51,7 +51,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
                         logger.Debug($"try {i} Error 429 waiting because of {cl.ApiEndpoint}");
                         cl.Dispose();
                         cl = new ClientLow(conn.GetEndpointUrl());
-                        System.Threading.Thread.Sleep(200 + 3 * i);
+                        System.Threading.Thread.Sleep(200 + 3000 * i);
                     }
                     else
                     {
