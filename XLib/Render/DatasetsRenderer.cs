@@ -60,7 +60,7 @@ namespace HlidacStatu.XLib.Render
                 }
                 if (dataSearchResultBase.Total > actualNumToRender)
                 {
-                    content = $"<h4>Zobrazujeme {Devmasters.Lang.Plural.Get(actualNumToRender, "první výsledek","první {0} výsledky","prvních {0} výsledků")}</h4>" 
+                    content = $"<h4>Zobrazujeme {Devmasters.Lang.CS.Plural.Get(actualNumToRender, "první výsledek","první {0} výsledky","prvních {0} výsledků")}</h4>" 
                         + content
                         + $"<div class=\"text-center\"><a class=\"btn btn-default btn-default-new\" href=\"{dataSearchResultBase.DataSet.DatasetSearchUrl(query)}\">zobrazit všechny nalezené záznamy</a></div>";
                 }

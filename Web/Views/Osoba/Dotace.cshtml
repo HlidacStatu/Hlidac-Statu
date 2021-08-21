@@ -106,14 +106,14 @@
             </h4>
 
             <p>
-                <b>@Devmasters.Lang.Plural.Get(items.Count, "Jedna navázaná společnost", "{0} navázané společnosti", "{0} navázaných společností")</b>
+                <b>@Devmasters.Lang.CS.Plural.Get(items.Count, "Jedna navázaná společnost", "{0} navázané společnosti", "{0} navázaných společností")</b>
                 na osobu @Model.Jmeno @Model.Prijmeni
-                @Devmasters.Lang.Plural.Get(items.Count,
+                @Devmasters.Lang.CS.Plural.Get(items.Count,
         "dostala",
         "dostaly",
         "dostalo")
 
-                @Html.Raw(Devmasters.Lang.Plural.Get((int)dotaceSearchH.Total,
+                @Html.Raw(Devmasters.Lang.CS.Plural.Get((int)dotaceSearchH.Total,
                           " <a href='" + durlH + "'><b>jednu dotaci</b></a>" + sdotaceHKc,
                           " <a href='" + durlH + "'><b>{0} dotace</b></a>" + sdotaceHKc,
                           " <a href='" + durlH + "'><b>{0} dotací</b></a>" + sdotaceHKc))

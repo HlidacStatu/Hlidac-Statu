@@ -121,14 +121,14 @@ namespace HlidacStatu.Entities
 
         public string PohlaviCalculated()
         {
-            var sex = new Devmasters.Lang.Vokativ(FullName()).Sex;
+            var sex = new Devmasters.Lang.CS.Vokativ(FullName()).Sex;
             switch (sex)
             {
-                case Devmasters.Lang.Vokativ.SexEnum.Woman:
+                case Devmasters.Lang.CS.Vokativ.SexEnum.Woman:
                     return "f";
-                case Devmasters.Lang.Vokativ.SexEnum.Man:
+                case Devmasters.Lang.CS.Vokativ.SexEnum.Man:
                     return "m";
-                case Devmasters.Lang.Vokativ.SexEnum.Unknown:
+                case Devmasters.Lang.CS.Vokativ.SexEnum.Unknown:
                 default:
                     return "";
             }

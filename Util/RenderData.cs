@@ -441,7 +441,7 @@ namespace HlidacStatu.Util
         }
         public static string LimitedList(int maxItems, IEnumerable<string> data, string format = "{0}",
             string itemsDelimiter = "\n", string lastItemDelimiter = "\n",
-            string moreTextPrefix = null, Devmasters.Lang.PluralDef morePluralForm = null,
+            string moreTextPrefix = null, Devmasters.Lang.CS.PluralDef morePluralForm = null,
             bool moreNumberFormat = true
             )
         {
@@ -449,7 +449,7 @@ namespace HlidacStatu.Util
         }
         public static string LimitedList(int maxItems, IEnumerable<string[]> data, string format = "{0}",
            string itemsDelimiter = "\n", string lastItemDelimiter = "\n", 
-           string moreTextPrefix = null, Devmasters.Lang.PluralDef morePluralForm = null,
+           string moreTextPrefix = null, Devmasters.Lang.CS.PluralDef morePluralForm = null,
            bool moreNumberFormat = true
            )
         {
@@ -478,7 +478,7 @@ namespace HlidacStatu.Util
                         more = moreTextPrefix;
                 }
                 if (morePluralForm != null)
-                    more = more + Devmasters.Lang.Plural.Get(diff,morePluralForm);
+                    more = more + Devmasters.Lang.CS.Plural.Get(diff,morePluralForm);
 
             }
             sb.Append(more);

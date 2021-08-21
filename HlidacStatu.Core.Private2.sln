@@ -111,6 +111,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Downloader", "Downloader", 
 		..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat = ..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.Tasks.OCR", "..\Hlidac-Statu-Private\Lib.Tasks.OCR\Lib.Tasks.OCR.csproj", "{08056481-688D-44A9-BC3A-3A5B0FE2BDFF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -277,6 +279,10 @@ Global
 		{29719100-304E-478A-966A-7A4593843E28}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29719100-304E-478A-966A-7A4593843E28}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29719100-304E-478A-966A-7A4593843E28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08056481-688D-44A9-BC3A-3A5B0FE2BDFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08056481-688D-44A9-BC3A-3A5B0FE2BDFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08056481-688D-44A9-BC3A-3A5B0FE2BDFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08056481-688D-44A9-BC3A-3A5B0FE2BDFF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -298,6 +304,7 @@ Global
 		{58E9869B-AFD2-45A8-A005-D5E3F5D2307F} = {C1833D67-B269-41C4-9556-3F9D7511B378}
 		{34192F9D-C058-47A1-8EEF-88993F679C8D} = {34338A10-2566-4B27-BE7F-D972FD4CCF01}
 		{256417D4-C1D7-4747-A227-D860BCC5A2B1} = {34338A10-2566-4B27-BE7F-D972FD4CCF01}
+		{08056481-688D-44A9-BC3A-3A5B0FE2BDFF} = {944AEC9D-9A67-477D-811D-66DC2142299A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}

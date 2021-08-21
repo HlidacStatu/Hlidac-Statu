@@ -66,7 +66,7 @@ new() { Name="Angažovanost ve firmách",
             }
             else if (o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmy.Count() > 2)
             {
-                sout = sout + "<a href='" + o.GetUrl() + "'>" + Devmasters.Lang.Plural.Get(o.Vazby().Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
+                sout = sout + "<a href='" + o.GetUrl() + "'>" + Devmasters.Lang.CS.Plural.Get(o.Vazby().Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb") + "</a>";
             }
         }
         return sout;

@@ -936,7 +936,7 @@ namespace HlidacStatu.Repositories
                                 subjName,
                                 PrintFlatRelations(rel, level + 1, relations, typ, renderedIds, withStats),
                                 last ? "" : "connect",
-                                Devmasters.Lang.Plural.Get(stat.Summary().PocetSmluv, Util.Consts.csCulture, "{0} smlouva","{0} smlouvy","{0} smluv"),
+                                Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, Util.Consts.csCulture, "{0} smlouva","{0} smlouvy","{0} smluv"),
                                 Smlouva.NicePrice(stat.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true),
                                 "aktualnost" + ((int)rel.Aktualnost).ToString(),
                                 (rel.Aktualnost < Relation.AktualnostType.Aktualni) ? rel.Doba(format:"/{0}/") : string.Empty

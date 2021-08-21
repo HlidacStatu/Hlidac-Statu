@@ -88,13 +88,13 @@ namespace HlidacStatu.Extensions
 
             if (rizeni.Dluznici.Count > 0)
             {
-                sumTxt = Devmasters.Lang.Plural.GetWithZero(rizeni.Dluznici.Count,
+                sumTxt = Devmasters.Lang.CS.Plural.GetWithZero(rizeni.Dluznici.Count,
                     "",
                     "Dlužníkem je " + rizeni.Dluznici.First().FullNameWithYear(),
                     "Dlužníky jsou " + rizeni.Dluznici.Select(m => m.FullNameWithYear()).Aggregate((f, s) => f + ", " + s),
                     "Dlužníky jsou" + rizeni.Dluznici.Take(3).Select(m => m.FullNameWithYear())
                                         .Aggregate((f, s) => f + ", " + s)
-                                    + "a " + Devmasters.Lang.Plural.Get(rizeni.Dluznici.Count - 3, " jeden další", "{0} další",
+                                    + "a " + Devmasters.Lang.CS.Plural.Get(rizeni.Dluznici.Count - 3, " jeden další", "{0} další",
                                         "{0} dalších")
                                     + ". "
                 );
@@ -107,7 +107,7 @@ namespace HlidacStatu.Extensions
 
             if (rizeni.Veritele.Count > 0)
             {
-                sumTxt = Devmasters.Lang.Plural.GetWithZero(rizeni.Veritele.Count,
+                sumTxt = Devmasters.Lang.CS.Plural.GetWithZero(rizeni.Veritele.Count,
                     "",
                     "Evidujeme jednoho věřitele.",
                     "Evidujeme {0} věřitele.",

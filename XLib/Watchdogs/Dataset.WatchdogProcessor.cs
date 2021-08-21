@@ -127,7 +127,7 @@ namespace HlidacStatu.XLib.Watchdogs
                 var s = "<table><tr><td height='30' style='line-height: 50px; min-height: 50px;'></td></tr></table>"
                         + @"<table border='0' cellpadding='4' width='100%'><tr><td>"
                         + @"<a href='" + DataSet.DatasetSearchUrl(data.SearchQuery, false) + "'>"
-                        + Devmasters.Lang.Plural.Get(data.Total - dataToRender.Count(),
+                        + Devmasters.Lang.CS.Plural.Get(data.Total - dataToRender.Count(),
                             "Další nalezená záznam",
                             "Další {0} nalezené záznamy",
                             "Dalších {0} nalezených záznamů"

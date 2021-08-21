@@ -20,9 +20,9 @@
     var ostatAll = Model.StatistikaRegistrSmluv(aktualnost);
     var ostat = ostatAll.SoukromeFirmy.Values.AggregateStats().Summary(CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow);
     var statDescription = string.Format("Celkem {0} v reg.smluv od 2016 za celkem {1}, {2}",
-        Devmasters.Lang.Plural.Get(ostat.PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv"),
+        Devmasters.Lang.CS.Plural.Get(ostat.PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv"),
         Smlouva.NicePrice(ostat.CelkovaHodnotaSmluv, html: true, shortFormat: true),
-        Devmasters.Lang.Plural.Get(ostatAll.SoukromeFirmy.Count, "angažován(a) v 1 firmě;angažován(a) v {0} firmách;angažován(a) v {0} firmách")
+        Devmasters.Lang.CS.Plural.Get(ostatAll.SoukromeFirmy.Count, "angažován(a) v 1 firmě;angažován(a) v {0} firmách;angažován(a) v {0} firmách")
         );
 }
 
@@ -58,7 +58,7 @@
                         {
                             <span>
                                 <a href="@Url.Action("Hledat", "Home", new { Q = "ico:" + ico })">
-                                    @Devmasters.Lang.Plural.Get(vPerIco.Value.Summary(CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow ).PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv")
+                                    @Devmasters.Lang.CS.Plural.Get(vPerIco.Value.Summary(CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow ).PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv")
                                 </a>
                                 <br />celkem @Html.Raw(Smlouva.NicePrice(vPerIco.Value.Summary(CoreStat.UsualYearsInterval.FromUsualFirstYearUntilNow ).CelkovaHodnotaSmluv, html: true, shortFormat: true))
                             </span>
@@ -84,7 +84,7 @@
         {
             <p>
                 @Model.FullName() se angažuje či angažoval
-                <b>@Devmasters.Lang.Plural.Get(numBezSmluv, "v jedné firmě", "v dalších {0} firmách", "v dalších {0} společnostech")</b>,
+                <b>@Devmasters.Lang.CS.Plural.Get(numBezSmluv, "v jedné firmě", "v dalších {0} firmách", "v dalších {0} společnostech")</b>,
                 které nemají žádné obchodní vztahy se státem (uložené v registru smluv).
             </p>
         }

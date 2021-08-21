@@ -90,7 +90,7 @@
             lblText = "smlouvy se koncentrují u malého počtu partnerů.";
             break;
         case Riziko.RizikoValues.F:
-            lblText = $"většina smluv dle počtu či objemu je uzavřena s {Devmasters.Lang.Plural.Get(kindex.CelkovaKoncentraceDodavatelu.TopDodavatele().Count(), "jedním smluvním partnerem;s {0} smluvními partnery;s {0} smluvními partnery")}.";
+            lblText = $"většina smluv dle počtu či objemu je uzavřena s {Devmasters.Lang.CS.Plural.Get(kindex.CelkovaKoncentraceDodavatelu.TopDodavatele().Count(), "jedním smluvním partnerem;s {0} smluvními partnery;s {0} smluvními partnery")}.";
             break;
         default:
             lblText = "";

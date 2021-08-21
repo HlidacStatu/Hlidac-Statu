@@ -32,8 +32,8 @@
             HtmlRender = (s) => {
                 AnalysisCalculation.IcoSmlouvaMinMax data = (AnalysisCalculation.IcoSmlouvaMinMax)s;
                 return ((data.days.Value < 0)
-                        ? ("Firma založena " + Devmasters.Lang.Plural.Get((int)Math.Abs(data.days.Value),"{0} den;{0} dny;{0} dnů") + " po podepsání smlouvy")
-                        : ("Firma založena " + Devmasters.Lang.Plural.Get((int)Math.Abs(data.days.Value),"{0} den;{0} dny;{0} dnů") + " před podepsáním smlouvy")
+                        ? ("Firma založena " + Devmasters.Lang.CS.Plural.Get((int)Math.Abs(data.days.Value),"{0} den;{0} dny;{0} dnů") + " po podepsání smlouvy")
+                        : ("Firma založena " + Devmasters.Lang.CS.Plural.Get((int)Math.Abs(data.days.Value),"{0} den;{0} dny;{0} dnů") + " před podepsáním smlouvy")
                        )
                     ;
 
@@ -56,7 +56,7 @@
                 var stat = Firmy.Get(data.ico).StatistikaRegistruSmluv();
 
                 return "<a href=\"/hledatsmlouvy?Q=ico:" + data.ico + "\">" +
-                    Devmasters.Lang.Plural.Get(stat.Summary().PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv") +
+                    Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv") +
                 "</a>" +
                 "<br />celkem " +
                 Smlouva.NicePrice(stat.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true)

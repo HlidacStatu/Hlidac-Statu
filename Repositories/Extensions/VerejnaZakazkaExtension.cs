@@ -34,7 +34,7 @@ namespace HlidacStatu.Extensions
             else
                 return $"{verejnaZakazka.CPVText(verejnaZakazka.CPV[0])} ({verejnaZakazka.CPV[0]})"
                        + $"{verejnaZakazka.CPVText(verejnaZakazka.CPV[1])} ({verejnaZakazka.CPV[1]}) "
-                       + Devmasters.Lang.Plural.Get(verejnaZakazka.CPV.Length - 2, "a další obor", "+ {0} obory",
+                       + Devmasters.Lang.CS.Plural.Get(verejnaZakazka.CPV.Length - 2, "a další obor", "+ {0} obory",
                            "+ {0} oborů")
                     ;
         }
@@ -148,7 +148,7 @@ namespace HlidacStatu.Extensions
                         }
 
                         f.Add(new InfoFact($"V dodavateli {Firmy.GetJmeno(ss.ICO)} se "
-                                           + Devmasters.Lang.Plural.Get(politici.Count()
+                                           + Devmasters.Lang.CS.Plural.Get(politici.Count()
                                                , " angažuje jedna politicky angažovaná osoba - "
                                                , " angažují {0} politicky angažované osoby - "
                                                , " angažuje {0} politicky angažovaných osob - ")

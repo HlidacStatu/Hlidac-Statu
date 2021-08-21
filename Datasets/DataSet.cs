@@ -1217,7 +1217,7 @@ namespace HlidacStatu.Datasets
                     }
                     else
                     {
-                        minMax += Devmasters.Lang.Plural.GetWithZero(total, "Neobsahuje žádný záznam",
+                        minMax += Devmasters.Lang.CS.Plural.GetWithZero(total, "Neobsahuje žádný záznam",
                                       "Obsahuje <b>jeden záznam</b>", "Obsahuje <b>{0} záznamy</b>",
                                       "Obsahuje <b>{0} záznamů</b>")
                                   + ", nejstarší byl vložen <b>"

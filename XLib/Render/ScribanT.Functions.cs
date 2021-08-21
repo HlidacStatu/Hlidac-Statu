@@ -187,7 +187,7 @@ namespace HlidacStatu.XLib.Render
                         var celkem = stat.Sum(stat.YearsAfter2016(), s => s.CelkovaHodnotaSmluv); 
 
                         string niceString = $"<a href='/hledatSmlouvy?q=ico:{firma.ICO}'>" +
-                            Devmasters.Lang.Plural.Get(pocet, "{0} smlouva;{0} smlouvy;{0} smluv") +
+                            Devmasters.Lang.CS.Plural.Get(pocet, "{0} smlouva;{0} smlouvy;{0} smluv") +
                             "</a>" + (twoLines ? "<br />" : " za ") +
                             "celkem " + Smlouva.NicePrice(celkem, html: true, shortFormat: true);
 
@@ -372,7 +372,7 @@ namespace HlidacStatu.XLib.Render
 
             public static string fn_Pluralize(int number, string zeroText, string oneText, string twoText, string moreText)
             {
-                return Devmasters.Lang.Plural.GetWithZero(number, zeroText, oneText, twoText, moreText);
+                return Devmasters.Lang.CS.Plural.GetWithZero(number, zeroText, oneText, twoText, moreText);
             }
 
             public static string fn_GetRegexGroupValue(string text, string regex, string groupname)

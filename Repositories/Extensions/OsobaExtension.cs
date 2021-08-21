@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Devmasters;
 using Devmasters.Enums;
-using Devmasters.Lang;
+using Devmasters.Lang.CS;
 using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Entities;

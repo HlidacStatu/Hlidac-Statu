@@ -59,7 +59,7 @@ Query ="\"účtenkovka\" AND ico:00006947", UrlTemplate = "/HledatSmlouvy?Q={0}"
                             <div>
                                 V roce @y  
                                 <strong>
-                                    <a href="@item.Url()">@Devmasters.Lang.Plural.Get(iy.PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv")</a>
+                                    <a href="@item.Url()">@Devmasters.Lang.CS.Plural.Get(iy.PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv")</a>
                                 </strong>
     
                                 za celkem <strong>@Html.Raw(Smlouva.NicePrice(iy.CelkovaHodnotaSmluv, html: true, shortFormat: true))</strong>.

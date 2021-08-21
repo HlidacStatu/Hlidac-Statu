@@ -68,7 +68,7 @@
     {
         var f = Firmy.Get(ico);
         var stat = f.StatistikaRegistruSmluv();
-        var pocetSmluv = Devmasters.Lang.Plural.Get(stat.Summary().PocetSmluv, "{0} smlouvu;{0} smlouvy;{0} smluv");
+        var pocetSmluv = Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, "{0} smlouvu;{0} smlouvy;{0} smluv");
         var smlouvyText = $" - Nalezeli jsme {pocetSmluv} v Registru smluv o celkové hodnotě <strong>{HlidacStatu.Util.RenderData.NicePrice(stat.Summary().CelkovaHodnotaSmluv, mena: "Kč")}</strong>.";
 
         var sponzori = StaticData.SponzorujiciFirmy_Vsechny.Get()
@@ -80,7 +80,7 @@
         var vazby = new List<int>();
         StaticData.FirmySVazbamiNaPolitiky_vsechny_Cache.Get().SoukromeFirmy.TryGetValue(ico, out vazby);
         var politici = vazby == null ? new List<Osoba>() : OsobaRepo.PolitickyAktivni.Get()?.Where(p => vazby.Contains(p.InternalId)).ToList() ?? new List<Osoba>();
-        var maji = Devmasters.Lang.Plural.Get(politici.Count(), "má;mají;mají");
+        var maji = Devmasters.Lang.CS.Plural.Get(politici.Count(), "má;mají;mají");
 
 	    string provazaniPolitici = "";
 	    if (politici.Any())

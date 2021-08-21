@@ -114,10 +114,10 @@
                 <a class="text-danger" href="/hledatsmlouvy?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND chyby:zasadni AND datumUzavreni:[{currentYear}-01-01+TO {currentYear + 1}-01-01}}")">
                     @if (numFatalIssue.Relation == TotalHitsRelation.GreaterThanOrEqualTo)
                     {
-                        @Html.Raw(Devmasters.Lang.Plural.GetWithZero((int)numFatalIssue.Value, "<strong>0</strong> smluv.", "<strong>jedné</strong> smlouvy.", "<strong>{0} </strong>smluv.", "<strong>více než {0:### ### ##0} </strong>smluv.")) }
+                        @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)numFatalIssue.Value, "<strong>0</strong> smluv.", "<strong>jedné</strong> smlouvy.", "<strong>{0} </strong>smluv.", "<strong>více než {0:### ### ##0} </strong>smluv.")) }
                     else
                     {
-                        @Html.Raw(Devmasters.Lang.Plural.GetWithZero((int)numFatalIssue.Value, "<strong>0</strong> smluv.", "<strong>jedné</strong> smlouvy.", "<strong>{0} </strong>smluv.", "<strong>{0:### ### ##0} </strong>smluv."))
+                        @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)numFatalIssue.Value, "<strong>0</strong> smluv.", "<strong>jedné</strong> smlouvy.", "<strong>{0} </strong>smluv.", "<strong>{0:### ### ##0} </strong>smluv."))
                     }
                     Tyto smlouvy jsou velmi pravděpodobně neplatné.
                 </a>
@@ -138,10 +138,10 @@
                 <a class="text-danger" href="/hledatsmlouvy?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND chyby:vazne AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}")">
                     @if (numFatalIssue.Relation == TotalHitsRelation.GreaterThanOrEqualTo)
                     {
-                        @Html.Raw(Devmasters.Lang.Plural.GetWithZero((int)numVazneIssue.Value, "<strong>0 </strong>smluv.", "<strong>jedné </strong>smlouvy.", "<strong>{0} </strong>smluv.", "<strong>více než {0:### ### ##0} </strong>smluv.")) }
+                        @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)numVazneIssue.Value, "<strong>0 </strong>smluv.", "<strong>jedné </strong>smlouvy.", "<strong>{0} </strong>smluv.", "<strong>více než {0:### ### ##0} </strong>smluv.")) }
                     else
                     {
-                        @Html.Raw(Devmasters.Lang.Plural.GetWithZero((int)numVazneIssue.Value, "<strong>0 </strong>smluv.", "<strong>jedné </strong>smlouvy.", "<strong>{0} </strong>smluv.", "<strong>{0:### ### ##0} </strong>smluv."))
+                        @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)numVazneIssue.Value, "<strong>0 </strong>smluv.", "<strong>jedné </strong>smlouvy.", "<strong>{0} </strong>smluv.", "<strong>{0:### ### ##0} </strong>smluv."))
                     }
                 </a>
             </p>
@@ -150,7 +150,7 @@
         <p>
             V roce @(currentSeasonYear) uzavřel @(Model.JsemOVM()? "úřad" : "subjekt")
             <a href="/hledat?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND datumUzavreni:[{currentSeasonYear}-01-01 TO {currentSeasonYear + 1}-01-01}}")">
-                @Html.Raw(Devmasters.Lang.Plural.GetWithZero((int)seasonStat.PocetSmluv, "<strong>0 </strong>smluv", "<strong>jednu </strong>smlouvu", "<strong>{0} </strong>smluvy", "<strong>{0:### ### ##0} </strong>smluv"))
+                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)seasonStat.PocetSmluv, "<strong>0 </strong>smluv", "<strong>jednu </strong>smlouvu", "<strong>{0} </strong>smluvy", "<strong>{0:### ### ##0} </strong>smluv"))
             </a>
             za <strong>@(Html.Raw(Smlouva.NicePrice(seasonStat.CelkovaHodnotaSmluv, html: true, shortFormat: true)))</strong>
 
@@ -179,7 +179,7 @@
         <p>
             V @(currentSeasonYear) utajil hodnotu kontraktu u
             <a href="/hledat?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND hint.skrytaCena:1 AND datumUzavreni:[{currentSeasonYear}-01-01 TO {currentSeasonYear + 1}-01-01}}")">
-                @Html.Raw(Devmasters.Lang.Plural.GetWithZero((int)seasonStat.PocetSmluvBezCeny, "<strong>0 </strong>smluv,", "<strong>jedné </strong>smlouvy,", "<strong>{0} </strong>smluv,", "<strong>{0:### ### ##0} </strong>smluv,"))
+                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)seasonStat.PocetSmluvBezCeny, "<strong>0 </strong>smluv,", "<strong>jedné </strong>smlouvy,", "<strong>{0} </strong>smluv,", "<strong>{0:### ### ##0} </strong>smluv,"))
             </a> což je celkem @(seasonStat.PercentSmluvBezCeny.ToString("P2")) ze všech.
         </p>
         @if (statistics.CurrentSeasonStatistics().PoOblastech?.Count > 0)
@@ -225,7 +225,7 @@
                             string surl = WebUtil.GetSearchUrl("/verejnezakazky/hledat", $"ico{text[0]}:" + Model.ICO);
 
                             <li>
-                                @Html.Raw(Devmasters.Lang.Plural.Get(kv.Value, $"v <a href='{surl}'><b>jedné</b> veřejné zakázce</a> jako {text[1]}",
+                                @Html.Raw(Devmasters.Lang.CS.Plural.Get(kv.Value, $"v <a href='{surl}'><b>jedné</b> veřejné zakázce</a> jako {text[1]}",
                                     $"v <a href='{surl}'><b>{{0}}</b> veřejných zakázkách</a> jako {text[1]}",
                                     $"v <a href='{surl}'><b>{{0}}</b> veřejných zakázkach</a> jako {text[1]}")).
                             </li>
@@ -262,7 +262,7 @@
         {
             <p>
                 @(Model.JsemOVM()? "Úřad" : "Subjekt") @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
-                @Html.Raw(Devmasters.Lang.Plural.GetWithZero(dotaceSummary.PocetDotaci,
+                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(dotaceSummary.PocetDotaci,
                         " nedostal žádnou dotaci.",
                         " dostal <a href='" + durl + "'><b>jednu dotaci</b></a>" + sdotaceKc,
                         " dostal <a href='" + durl + "'><b>{0} dotace</b></a>" + sdotaceKc,
@@ -273,7 +273,7 @@
         {
             <p>
                 Firma @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
-                @Html.Raw(Devmasters.Lang.Plural.GetWithZero(dotaceSummary.PocetDotaci,
+                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(dotaceSummary.PocetDotaci,
                                             " nedostala žádnou dotaci.",
                                             " dostala <a href='" + durl + "'><b>jednu dotaci</b></a>" + sdotaceKc,
                                             " dostala <a href='" + durl + "'><b>{0} dotace</b></a>" + sdotaceKc,
@@ -299,22 +299,22 @@
                 if (Model.JsemOVM())
                 {
                     <p>
-                        <b>@Devmasters.Lang.Plural.Get(subjectsWithSubsidiesCount, "Jedna podřízená organizace", "{0} podřízená organizace", "{0} podřízených organizací")</b>
+                        <b>@Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount, "Jedna podřízená organizace", "{0} podřízená organizace", "{0} podřízených organizací")</b>
                         (z celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Length))
                         úřadu @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
-                        @Devmasters.Lang.Plural.Get(subjectsWithSubsidiesCount,
+                        @Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount,
                                                     "dostala",
                                                     "dostaly",
                                                     "dostalo")
-                        @Html.Raw(Devmasters.Lang.Plural.Get(totalCountDotaceHolding - dotaceSummary.PocetDotaci,
+                        @Html.Raw(Devmasters.Lang.CS.Plural.Get(totalCountDotaceHolding - dotaceSummary.PocetDotaci,
                                                                                 " ještě <b>jednu dotaci</b>" + sdotaceHDiffKc,
                                                                                 " další <b>{0} dotace</b>" + sdotaceHDiffKc,
                                                                                 " dalších <b>{0} dotací</b>" + sdotaceHDiffKc))
                     </p>
                     <p>
                         Úřad <b>@(Model.Jmeno)</b> včetně podřízených organizací dostal celkem
-                        @Html.Raw(Devmasters.Lang.Plural.Get(totalCountDotaceHolding,
+                        @Html.Raw(Devmasters.Lang.CS.Plural.Get(totalCountDotaceHolding,
                                                 " <a href='" + durlH + "'><b>jednu dotaci</b></a>" + sdotaceHKc,
                                                 " <a href='" + durlH + "'><b>{0} dotace</b></a>" + sdotaceHKc,
                                                 " <a href='" + durlH + "'><b>{0} dotací</b></a>" + sdotaceHKc))
@@ -322,22 +322,22 @@
                 else
                 {
                     <p>
-                        <b>@Devmasters.Lang.Plural.Get(subjectsWithSubsidiesCount, "Jedna dceřiná společnost", "{0} dceřiné společnosti", "{0} dceřiných společností")</b>
+                        <b>@Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount, "Jedna dceřiná společnost", "{0} dceřiné společnosti", "{0} dceřiných společností")</b>
                         (z celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Length))
                         firmy @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
-                        @Devmasters.Lang.Plural.Get(subjectsWithSubsidiesCount,
+                        @Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount,
                                                     "dostala",
                                                     "dostaly",
                                                     "dostalo")
-                        @Html.Raw(Devmasters.Lang.Plural.Get(totalCountDotaceHolding - dotaceSummary.PocetDotaci,
+                        @Html.Raw(Devmasters.Lang.CS.Plural.Get(totalCountDotaceHolding - dotaceSummary.PocetDotaci,
                                                                                 " ještě <b>jednu dotaci</b>" + sdotaceHDiffKc,
                                                                                 " další <b>{0} dotace</b>" + sdotaceHDiffKc,
                                                                                 " dalších <b>{0} dotací</b>" + sdotaceHDiffKc))
                     </p>
                     <p>
                         Celý holding včetně <b>@(Model.Jmeno)</b> dostal celkem
-                        @Html.Raw(Devmasters.Lang.Plural.Get(totalCountDotaceHolding,
+                        @Html.Raw(Devmasters.Lang.CS.Plural.Get(totalCountDotaceHolding,
                                                 " <a href='" + durlH + "'><b>jednu dotaci</b></a>" + sdotaceHKc,
                                                 " <a href='" + durlH + "'><b>{0} dotace</b></a>" + sdotaceHKc,
                                                 " <a href='" + durlH + "'><b>{0} dotací</b></a>" + sdotaceHKc))
@@ -348,13 +348,13 @@
                 if (Model.JsemOVM())
                 {
                     <p>
-                        <b>@Devmasters.Lang.Plural.Get(subjectsWithSubsidiesCount, "Jedna podřízená organizace", "{0} podřízená organizace", "{0} podřízených organizací")</b>
+                        <b>@Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount, "Jedna podřízená organizace", "{0} podřízená organizace", "{0} podřízených organizací")</b>
                         úřadu @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35) nedostaly žádné dotace.
                     </p> }
                 else
                 {
                     <p>
-                        <b>@Devmasters.Lang.Plural.Get(subjectsWithSubsidiesCount, "Jedna dceřiná společnost", "{0} dceřiné společnosti", "{0} dceřiných společností")</b>
+                        <b>@Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount, "Jedna dceřiná společnost", "{0} dceřiné společnosti", "{0} dceřiných společností")</b>
                         firmy @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35) nedostaly žádné dotace.
                     </p>}
             }
@@ -397,7 +397,7 @@
                         string surl = WebUtil.GetSearchUrl("/insolvence/hledat", $"ico{text[0]}:" + Model.ICO);
 
                         <li>
-                            @Html.Raw(Devmasters.Lang.Plural.Get((int)kv.Value,
+                            @Html.Raw(Devmasters.Lang.CS.Plural.Get((int)kv.Value,
                                              " se vyskytuje v <a href='" + surl + "'><b>jedné insolvenci</b></a>", " se vyskytuje v <a href='" + surl + "'><b>{0} insolvencích</b></a>", " se vyskytuje v <a href='" + surl + "'><b>{0} insolvencích</b></a>")) jako @text[1].
                                         </li>
                                     }
@@ -470,7 +470,7 @@ StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
                     s firmou, která sponzorovala politické straný (nebo její majitel).
                 </p>
                 <p>
-                    @Model.Jmeno uzavřel <b>@Devmasters.Lang.Plural.Get(uradSVazbami.Pocet, "{0} smlouvu;{0} smlouvy;{0} smluv")</b> smluv (tj. <b>@numPercent</b> všech smluv) s firmami a osobami podporující politické strany.
+                    @Model.Jmeno uzavřel <b>@Devmasters.Lang.CS.Plural.Get(uradSVazbami.Pocet, "{0} smlouvu;{0} smlouvy;{0} smluv")</b> smluv (tj. <b>@numPercent</b> všech smluv) s firmami a osobami podporující politické strany.
                 </p>
                 <a href="/subjekt/ObchodySeSponzory/@Model.ICO" class="moreinfolink text-uppercase"><strong>Zobrazit podrobnosti o vazbách se sponzory politických stran</strong></a>
 
@@ -556,7 +556,7 @@ StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
             </p>
             <p>
                 O @(Model.JsemOVM() ? "úřadu" : "subjektu" ) jsme našli @(HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(dsSearch.Total))
-                @Html.Raw(Devmasters.Lang.Plural.Get(dsSearch.Results.Count(m => m.Total > 0), "v <b>jedné</b> databázi", "ve <b>{0} databázích</b>", "v <b>{0} databázích</b>")).
+                @Html.Raw(Devmasters.Lang.CS.Plural.Get(dsSearch.Results.Count(m => m.Total > 0), "v <b>jedné</b> databázi", "ve <b>{0} databázích</b>", "v <b>{0} databázích</b>")).
                 @if (dsSearch.Results.Count(m => m.Total > 0) > 1)
                 {
                     <text>
@@ -597,20 +597,20 @@ StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
                 if (Model.PatrimStatu())
                 {
                     <span>
-                        Řídí <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací").</a>
+                        Řídí <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací").</a>
                     </span>
                 }
                 else
                 {
                     <span>
-                        Řídí <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů").</a>
+                        Řídí <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů").</a>
                     </span>
                 }
             }
             @if (Model.KategorieOVM().Count() > 0)
             {
                 <span>
-                    Je součástí <a href="/subjekt/DalsiInformace/@Model.ICO">@Devmasters.Lang.Plural.Get(Model.KategorieOVM().Count(), "jedné kategorie", "{0} kategorií", "{0} kategorií") orgánu veřejné moci.</a>
+                    Je součástí <a href="/subjekt/DalsiInformace/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.KategorieOVM().Count(), "jedné kategorie", "{0} kategorií", "{0} kategorií") orgánu veřejné moci.</a>
                 </span>
             }
         </p>

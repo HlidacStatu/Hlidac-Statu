@@ -39,7 +39,7 @@
 
             public static RenderedContent DataContent(long total, RenderedContent data)
             {
-                string stotal = Devmasters.Lang.Plural.Get(total, "jeden záznam", "{0} záznamy", "{0} záznamů");
+                string stotal = Devmasters.Lang.CS.Plural.Get(total, "jeden záznam", "{0} záznamy", "{0} záznamů");
                 return new RenderedContent()
                 {
                     ContentHtml = string.Format(headerTemplateHtml, data.ContentTitle, stotal, FixTable(data).ContentHtml),

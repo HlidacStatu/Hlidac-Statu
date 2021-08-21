@@ -259,7 +259,7 @@
         }
         <li class="@sclass">
             @Html.KIndexLabelLink(firma.ICO)<a href="/subjekt/@firma.ICO">@(firma.Jmeno)</a> (
-            @Devmasters.Lang.Plural.Get(item.Summary().PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv");
+            @Devmasters.Lang.CS.Plural.Get(item.Summary().PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv");
             celkem @Html.Raw(Smlouva.NicePrice(item.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true))
 
             @Html.Raw(

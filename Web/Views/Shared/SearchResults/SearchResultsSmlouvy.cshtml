@@ -92,7 +92,7 @@
                             }
                         }
                     </ol>
-                    @(rec.Prijemce.Count() > 2 ? Devmasters.Lang.Plural.Get(rec.Prijemce.Count() - 2, "+{0} dodavatel;+{0} další dodavatelé;+{0} dalších dodavatelů") : "")
+                    @(rec.Prijemce.Count() > 2 ? Devmasters.Lang.CS.Plural.Get(rec.Prijemce.Count() - 2, "+{0} dodavatel;+{0} další dodavatelé;+{0} dalších dodavatelů") : "")
                 }
             </td>
             <td>@Html.Raw(rec.NicePrice(html: true))</td>

@@ -158,7 +158,7 @@
             {
                 <p>
                     Úřad @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
-                    @Html.Raw(Devmasters.Lang.Plural.GetWithZero(dotacePocet,
+                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(dotacePocet,
                         " nedostal žádnou dotaci.",
                         " dostal <a href='" + durl + "'><b>jednu dotaci</b></a>" + sdotaceKc,
                         " dostal <a href='" + durl + "'><b>{0} dotace</b></a>" + sdotaceKc,
@@ -169,7 +169,7 @@
             {
                 <p>
                     Firma @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
-                    @Html.Raw(Devmasters.Lang.Plural.GetWithZero(dotacePocet,
+                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(dotacePocet,
                         " nedostala žádnou dotaci.",
                         " dostala <a href='" + durl + "'><b>jednu dotaci</b></a>" + sdotaceKc,
                         " dostala <a href='" + durl + "'><b>{0} dotace</b></a>" + sdotaceKc,
@@ -191,22 +191,22 @@
                     if (Model.JsemOVM())
                     {
                         <p>
-                            <b>@Devmasters.Lang.Plural.Get(subCompaniesWithSubsidiesCount, "Jedna podřízená organizace", "{0} podřízená organizace", "{0} podřízených organizací")</b>
+                            <b>@Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount, "Jedna podřízená organizace", "{0} podřízená organizace", "{0} podřízených organizací")</b>
                             (z celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Length))
                             úřadu @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
-                            @Devmasters.Lang.Plural.Get(subCompaniesWithSubsidiesCount,
+                            @Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount,
                                 "dostala",
                                 "dostaly",
                                 "dostalo")
-                            @Html.Raw(Devmasters.Lang.Plural.Get(totalCountDotaceHolding - dotacePocet,
+                            @Html.Raw(Devmasters.Lang.CS.Plural.Get(totalCountDotaceHolding - dotacePocet,
                                 " ještě <b>jednu dotaci</b>" + sdotaceHDiffKc,
                                 " další <b>{0} dotace</b>" + sdotaceHDiffKc,
                                 " dalších <b>{0} dotací</b>" + sdotaceHDiffKc))
                         </p>
                         <p>
                             Úřad <b>@(Model.Jmeno)</b> včetně podřízených organizací dostal celkem
-                            @Html.Raw(Devmasters.Lang.Plural.Get(totalCountDotaceHolding,
+                            @Html.Raw(Devmasters.Lang.CS.Plural.Get(totalCountDotaceHolding,
                                     " <a href='" + durlH + "'><b>jednu dotaci</b></a>" + sdotaceHKc,
                                     " <a href='" + durlH + "'><b>{0} dotace</b></a>" + sdotaceHKc,
                                     " <a href='" + durlH + "'><b>{0} dotací</b></a>" + sdotaceHKc))
@@ -214,22 +214,22 @@
                     else
                     {
                         <p>
-                            <b>@Devmasters.Lang.Plural.Get(subCompaniesWithSubsidiesCount, "Jedna dceřiná společnost", "{0} dceřiné společnosti", "{0} dceřiných společností")</b>
+                            <b>@Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount, "Jedna dceřiná společnost", "{0} dceřiné společnosti", "{0} dceřiných společností")</b>
                             (z celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Length))
                             firmy @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
-                            @Devmasters.Lang.Plural.Get(subCompaniesWithSubsidiesCount,
+                            @Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount,
                                 "dostala",
                                 "dostaly",
                                 "dostalo")
-                            @Html.Raw(Devmasters.Lang.Plural.Get(totalCountDotaceHolding - dotacePocet,
+                            @Html.Raw(Devmasters.Lang.CS.Plural.Get(totalCountDotaceHolding - dotacePocet,
                                 " ještě <b>jednu dotaci</b>" + sdotaceHDiffKc,
                                 " další <b>{0} dotace</b>" + sdotaceHDiffKc,
                                 " dalších <b>{0} dotací</b>" + sdotaceHDiffKc))
                         </p>
                         <p>
                             Celý holding včetně <b>@(Model.Jmeno)</b> dostal celkem
-                            @Html.Raw(Devmasters.Lang.Plural.Get(totalCountDotaceHolding,
+                            @Html.Raw(Devmasters.Lang.CS.Plural.Get(totalCountDotaceHolding,
                                 " <a href='" + durlH + "'><b>jednu dotaci</b></a>" + sdotaceHKc,
                                 " <a href='" + durlH + "'><b>{0} dotace</b></a>" + sdotaceHKc,
                                 " <a href='" + durlH + "'><b>{0} dotací</b></a>" + sdotaceHKc))
@@ -241,7 +241,7 @@
                     {
                         <p>
                             <b>
-                                @Devmasters.Lang.Plural.Get(subCompaniesWithSubsidiesCount,
+                                @Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount,
                                    "Jedna podřízená organizace",
                                    "{0} podřízená organizace",
                                    "{0} podřízených organizací")
@@ -253,7 +253,7 @@
                     {
                         <p>
                             <b>
-                                @Devmasters.Lang.Plural.Get(subCompaniesWithSubsidiesCount,
+                                @Devmasters.Lang.CS.Plural.Get(subCompaniesWithSubsidiesCount,
                                    "Jedna dceřiná společnost",
                                    "{0} dceřiné společnosti",
                                    "{0} dceřiných společností")

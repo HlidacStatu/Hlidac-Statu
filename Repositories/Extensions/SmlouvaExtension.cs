@@ -141,7 +141,7 @@ namespace HlidacStatu.Extensions
                         }
 
                         f.Add(new InfoFact($"V dodavateli {Firmy.GetJmeno(ss.ico)} se "
-                                           + Devmasters.Lang.Plural.Get(politici.Count()
+                                           + Devmasters.Lang.CS.Plural.Get(politici.Count()
                                                , " angažuje jedna politicky angažovaná osoba - "
                                                , " angažují {0} politicky angažované osoby - "
                                                , " angažuje {0} politicky angažovaných osob - ")

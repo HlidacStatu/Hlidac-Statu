@@ -280,7 +280,7 @@
                 {
                     <div class="searching__counter">
                         <a class="link--blue link--big" href="@Url.Action("HledatSmlouvy", globalSearch.Smlouvy.ToRouteValues(1))">
-                            @Devmasters.Lang.Plural.Get(globalSearch.Smlouvy.Total, "jednu smlouvu", "{0} smlouvy", "{0} smluv")
+                            @Devmasters.Lang.CS.Plural.Get(globalSearch.Smlouvy.Total, "jednu smlouvu", "{0} smlouvy", "{0} smluv")
                         </a>
                     </div>
                 }
@@ -288,7 +288,7 @@
                 {
                     <div class="searching__counter">
                         <a class="link--blue link--big" href="/Osoby?Q=@System.Net.WebUtility.UrlEncode(globalSearch.Query)&ftx=@globalSearch.OsobaFtx.ToString()">
-                            @Devmasters.Lang.Plural.Get(globalSearch.Osoby.Total, "jednoho politika", "{0} politiky", "{0} politiků")
+                            @Devmasters.Lang.CS.Plural.Get(globalSearch.Osoby.Total, "jednoho politika", "{0} politiky", "{0} politiků")
                         </a>
                     </div>
                 }
@@ -296,7 +296,7 @@
                 {
                     <div class="searching__counter">
                         <a class="link--blue link--big" href="@Url.Action("Hledat", "VerejneZakazky", globalSearch.VZ.ToRouteValues(1))">
-                            @Devmasters.Lang.Plural.Get(globalSearch.VZ.Total, "jednu veřejnou zakázku", "{0} veřejné zakázky", "{0} veřejných zakázek")
+                            @Devmasters.Lang.CS.Plural.Get(globalSearch.VZ.Total, "jednu veřejnou zakázku", "{0} veřejné zakázky", "{0} veřejných zakázek")
                         </a>
                     </div>
                 }
