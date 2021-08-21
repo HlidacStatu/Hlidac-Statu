@@ -19,7 +19,7 @@
     <PackageReference Include="Devmasters.DT" Version="2.4.2" />
     <PackageReference Include="Devmasters.Enums" Version="2.4.5" />
     <PackageReference Include="Devmasters.IO" Version="2.4.0" />
-    <PackageReference Include="Devmasters.Lang" Version="2.4.3" />
+    <PackageReference Include="Devmasters.Lang" Version="2.4.4" />
     <PackageReference Include="Devmasters.Net" Version="2.4.1" />
     <PackageReference Include="DnsClient" Version="1.5.0" />
     <PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" />
