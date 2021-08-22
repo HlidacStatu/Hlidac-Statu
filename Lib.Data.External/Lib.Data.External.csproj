@@ -50,6 +50,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Hlidac-Statu-Private\HlidacStatu.DetectJobs\HlidacStatu.DetectJobs.csproj" />
     <ProjectReference Include="..\3rd\ZabbixApi\ZabbixApi.csproj" />
     <ProjectReference Include="..\3rd\ZabbixSenderNet-master\ZabbixSenderNet\ZabbixSenderNet.csproj" />
     <ProjectReference Include="..\Util\Util.csproj" />

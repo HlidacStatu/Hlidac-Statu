@@ -5,11 +5,14 @@
 
 @{
     ViewBag.Title = "Tabulky v priloze";
+
     if (Model == null)
     {
         <h2>Data neexistuji, asi chyba</h2>
         return;
     }
+
+    var tbls = Model.Select(m => new HlidacStatu.Lib.Data.External.Camelot.CamelotResultWithJobs(m)).ToArray();
 }
 
 @for (int i = 0; i < Model.Length; i++)
@@ -17,11 +20,31 @@
     if (Model[i].FoundTables > 0)
     {
         <h2 style="padding-top:20px;" id="@(Model[i].Algorithm)">Nalezene tabulky - algoritmus @(Model[i].Algorithm)</h2>
-        @foreach (var tbl in Model[i].Tables.OrderBy(m => m.Page).ThenBy(m => m.TableInPage))
+        @foreach (var tbl in tbls[i].TablesWithJobs
+          .OrderByDescending(m => m.FoundJobs.Length)
+          .ThenBy(m => m.Page)
+          .ThenBy(m => m.TableInPage))
         {
             <div style="font-size:120%;padding:15px 0 5px 0;" id="@($"{Model[i].Algorithm}_{tbl.Page}_{tbl.TableInPage}") "><b>Strana @tbl.Page</b>, tabulka na stránce <b>@tbl.TableInPage</b></div>
+            @if (tbl.FoundJobs.Length > 0)
+            {
+                <div style="background-color:rgb(232 252 201)">
+                    <table>
+                        @foreach (var f in tbl.FoundJobs)
+                        {
+                            <tr>
+                                <td>@(string.Join(";",f.Names))</td>
+                                @foreach (var pr in f.Prices)
+                                {
+                                    <td><span style="padding:0px 20px 0 10px;">@(pr.ToString("N0"))</span></td>
+                                }
+                            </tr>
+                        }
+                    </table>
+                </div>
+            }
             <div style="background-color:#e0e0e0">
-                @Html.Raw(tbl.Content.Replace("\\n","\n").Replace("\\t"," ")) @*TODO check Scripts, Cross site scripting*@
+                @Html.Raw(tbl.Content.Replace("\\n", "\n").Replace("\\t", " ")) @*TODO check Scripts, Cross site scripting*@
             </div>
         }
     }
