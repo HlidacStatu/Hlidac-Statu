@@ -35,32 +35,6 @@
       <EmbeddedResource Remove="publish\**" />
       <None Remove="publish\**" />
     </ItemGroup>
-    <ItemGroup>
-      <Content Include="..\..\..\..\Users\michal\.nuget\packages\devmasters.lang\2.4.4\contentFiles\any\net5.0\cs_CZ.aff" Link="cs_CZ.aff">
-        <Private>False</Private>
-        <NuGetPackageVersion>2.4.4</NuGetPackageVersion>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <NuGetItemType>Content</NuGetItemType>
-        <NuGetPackageId>Devmasters.Lang</NuGetPackageId>
-        <Pack>false</Pack>
-      </Content>
-      <Content Include="..\..\..\..\Users\michal\.nuget\packages\devmasters.lang\2.4.4\contentFiles\any\net5.0\cs_CZ.dic" Link="cs_CZ.dic">
-        <Private>False</Private>
-        <NuGetPackageVersion>2.4.4</NuGetPackageVersion>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <NuGetItemType>Content</NuGetItemType>
-        <NuGetPackageId>Devmasters.Lang</NuGetPackageId>
-        <Pack>false</Pack>
-      </Content>
-      <Content Include="..\..\..\..\Users\michal\.nuget\packages\devmasters.lang\2.4.4\contentFiles\any\net5.0\cs_CZ.stopwords" Link="cs_CZ.stopwords">
-        <Private>False</Private>
-        <NuGetPackageVersion>2.4.4</NuGetPackageVersion>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <NuGetItemType>Content</NuGetItemType>
-        <NuGetPackageId>Devmasters.Lang</NuGetPackageId>
-        <Pack>false</Pack>
-      </Content>
-    </ItemGroup>
 
 
     <ItemGroup>
