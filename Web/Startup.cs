@@ -341,7 +341,7 @@ namespace HlidacStatu.Web
                     {
                         ExpectedNumberOfNodes = 16,
                         ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-                        MinimumFreeSpaceInPercent = 15m
+                        MinimumFreeSpaceInMegabytes= 5000
                     }
                     , "Elastic nodes disk space", tags: new[] { "DB", "elastic" })
 
