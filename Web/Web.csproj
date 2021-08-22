@@ -21,6 +21,9 @@
 <!--    Některé soubory (automaticky kopírované) je potřeba nejprve odstranit ze seznamu, 
         aby při publish nevznikla chyba -->
     <ItemGroup>
+        <None Remove="cs_CZ.aff" />
+        <None Remove="cs_CZ.dic" />
+        <None Remove="cs_CZ.stopwords" />
         <None Remove="_app_offline.htm" />
         <Compile Remove="publish\**" />
         <Content Remove="App_Data\**" />
@@ -34,6 +37,17 @@
     <ItemGroup>
       <EmbeddedResource Remove="publish\**" />
       <None Remove="publish\**" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="cs_CZ.aff">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="cs_CZ.dic">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="cs_CZ.stopwords">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 
