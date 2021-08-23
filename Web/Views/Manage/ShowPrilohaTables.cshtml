@@ -25,7 +25,7 @@
           .ThenBy(m => m.Page)
           .ThenBy(m => m.TableInPage))
         {
-            <div style="font-size:120%;padding:15px 0 5px 0;" id="@($"{Model[i].Algorithm}_{tbl.Page}_{tbl.TableInPage}") "><b>Strana @tbl.Page</b>, tabulka na stránce <b>@tbl.TableInPage</b></div>
+            <div style="font-size:120%;padding:15px 0 5px 0;" id="@($"{Model[i].Algorithm}_{tbl.Page}_{tbl.TableInPage}")"><b>Strana @tbl.Page</b>, tabulka na stránce <b>@tbl.TableInPage</b></div>
             @if (tbl.FoundJobs.Length > 0)
             {
                 <div style="background-color:rgb(232 252 201)">
