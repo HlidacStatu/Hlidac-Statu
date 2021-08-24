@@ -94,7 +94,9 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
                  )
                 {
                     issues.Add(
-                    new Issue(this, (int)IssueType.IssueTypes.SmlouvaZverejnenaPozde_NemuselaBytZverejnena, "Smlouva nebyla zveřejněna do 3 měsíců od podpisu", "Smlouva nemusela být zveřejnena v registru smluv. Do registru smluv byla zveřejněna později než po 3 měsících, na platnost smlouvy to nemá vliv.")
+                    new Issue(this, (int)IssueType.IssueTypes.SmlouvaZverejnenaPozde_NemuselaBytZverejnena, 
+                    "Smlouva nebyla zveřejněna do 3 měsíců od podpisu", 
+                    "Smlouva nemusela být zveřejnena v registru smluv, je zveřejněna dobrovolně nad rámec zákona. Do registru smluv byla zveřejněna později než po 3 měsících, na platnost smlouvy to nemá vliv.")
                     );
 
                 }
