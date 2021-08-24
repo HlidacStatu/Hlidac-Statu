@@ -30,6 +30,7 @@ namespace HlidacStatu.Entities.Issues
             SmlouvaZverejnenaPozdeNezacalaPlatit = 21,
             Zcela_Chybi_identifikace_smluvni_strany = 22,
             SmlouvaZverejnenaPozde_DodatekVynutilPublikaci = 23,
+            SmlouvaZverejnenaPozde_NemuselaBytZverejnena = 24,
 
             Nulova_hodnota_smlouvy = 100,
             Cena_bez_DPH_nulova = 101,
@@ -88,6 +89,7 @@ namespace HlidacStatu.Entities.Issues
                     case IssueTypes.Nulova_hodnota_smlouvy_u_dodatku:
                     case IssueTypes.Nulova_hodnota_smlouvy_ostatni:
                     case IssueTypes.SmlouvaZverejnenaPozde_DodatekVynutilPublikaci:
+                    case IssueTypes.SmlouvaZverejnenaPozde_NemuselaBytZverejnena:
                         return ImportanceLevel.Formal;
 
                     case IssueTypes.Chybi_ICO:

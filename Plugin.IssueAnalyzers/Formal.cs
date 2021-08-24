@@ -87,7 +87,19 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
                  (item.datumUzavreni.AddMonths(3).AddDays(1) <= prvniZverejneni)
                 )
             {
-                issues.Add(
+                if (
+                    (item.hodnotaBezDph > 0 && item.hodnotaBezDph <= 50000)
+                    || (item.hodnotaVcetneDph> 0 && item.hodnotaVcetneDph <= (50000m * 1.21m))
+                    || (item.CalculatedPriceWithVATinCZK <= (50000m * 1.21m))
+                 )
+                {
+                    issues.Add(
+                    new Issue(this, (int)IssueType.IssueTypes.SmlouvaZverejnenaPozde_NemuselaBytZverejnena, "Smlouva nebyla zveřejněna do 3 měsíců od podpisu", "Smlouva nemusela být zveřejnena v registru smluv. Do registru smluv byla zveřejněna později než po 3 měsících, na platnost smlouvy to nemá vliv.")
+                    );
+
+                }
+                else
+                    issues.Add(
                     new Issue(this, (int)IssueType.IssueTypes.SmlouvaZverejnenaPozdeNezacalaPlatit, "Smlouva nebyla zveřejněna do 3 měsíců od podpisu a nikdy nezačala platit", "Smlouva nebyla uveřejněna do 3 měsíců od uzavření smlouvy (dle § 7 odst. 1) a je tak automaticky zrušena od počátku, nikdy nezačala platit.")
                     );
             }
@@ -108,11 +120,11 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
             //simple vztahy 
             // publikujici strana = jedina strana smlouvy
             if (
-                item.Prijemce.Count() == 1 && item.Prijemce.Any(m => m.ico == item.Platce.ico )
+                item.Prijemce.Count() == 1 && item.Prijemce.Any(m => m.ico == item.Platce.ico)
                 )
                 issues.Add(new Issue(this, (int)IssueType.IssueTypes.Stejne_strany_smlouvy, "Stejné strany smlouvy", string.Format("Dodavatel i objednatel jsou stejní '{0}'", item.Platce.nazev)));
             else if (
-                item.Prijemce.Any(m => m.ico == item.Platce.ico )
+                item.Prijemce.Any(m => m.ico == item.Platce.ico)
                 )
             {
                 issues.Add(new Issue(this, (int)IssueType.IssueTypes.Chybne_strany_smlouvy, "Chybné strany smlouvy", "Objednatel je i na straně dodavatele"));
