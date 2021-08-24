@@ -90,7 +90,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
                 if (
                     (item.hodnotaBezDph > 0 && item.hodnotaBezDph <= 50000)
                     || (item.hodnotaVcetneDph> 0 && item.hodnotaVcetneDph <= (50000m * 1.21m))
-                    || (item.CalculatedPriceWithVATinCZK <= (50000m * 1.21m))
+                    || (item.CalculatedPriceWithVATinCZK > 0 && item.CalculatedPriceWithVATinCZK <= (50000m * 1.21m) )
                  )
                 {
                     issues.Add(
