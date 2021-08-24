@@ -23,11 +23,12 @@ namespace HlidacStatu.Lib.Data.External.Camelot
         private static object lockObj = new object();
         private static ConnectionPool instance = null;
         private static Devmasters.Logging.Logger logger = new Devmasters.Logging.Logger("Camelot.ConnectionPool");
+        public readonly string apiKey;
+
         private ConnectionPool()
         {
             timer.Interval = 1 * 60 * 1000; //1 min
             timer.Elapsed += (s, e) => CheckAllUris();
-            timer.Start();
         }
 
         private void CheckAllUris()
@@ -59,15 +60,17 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             {
                 if (instance == null)
                 {
-                    instance = new ConnectionPool(Devmasters.Config.GetWebConfigValue("Camelot.Service.Api").Split(";"));
+                    instance = new ConnectionPool(Devmasters.Config.GetWebConfigValue("Camelot.Service.Api").Split(";"), Devmasters.Config.GetWebConfigValue("Camelot.Service.Api.Key"));
                 }
             }
             return instance;
         }
 
-        public ConnectionPool(IEnumerable<Uri> uris)
-            : this(uris?.Select(m => m.AbsoluteUri)) { }
-        public ConnectionPool(IEnumerable<string> uris)
+        public string GetApiKey() => this.apiKey;
+
+        public ConnectionPool(IEnumerable<Uri> uris, string apiKey)
+            : this(uris?.Select(m => m.AbsoluteUri), apiKey) { }
+        public ConnectionPool(IEnumerable<string> uris, string apiKey)
             : this()
         {
             if (uris == null)
@@ -89,7 +92,10 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             if (uris.Count() == 0)
                 throw new ArgumentException("No valid API Endpoints");
 
+            this.apiKey = apiKey;
+
             CheckAllUris();
+            timer.Start();
         }
 
         private bool CheckEndpoint(Guid id, bool useIt)
@@ -101,6 +107,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
                 {
                     using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent(url))
                     {
+                        net.RequestParams.Headers.Add("Authorization", apiKey);
                         logger.Debug($"Testing {url} ");
                         net.Tries = 1;
                         net.Timeout = 2000;

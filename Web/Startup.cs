@@ -94,8 +94,10 @@ namespace HlidacStatu.Web
                     Type = SecuritySchemeType.ApiKey,
                     Description = "API Key Authentication",
                     Name = "Authorization",
-                    In = ParameterLocation.Header
+                    In = ParameterLocation.Header,
+                    Scheme = "apiKey"
                 });
+                c.OperationFilter<AddApiAuthHeaderParameter>();
 
                 //migrace: otestovat swagger
                 // Set the comments path for the Swagger JSON and UI.

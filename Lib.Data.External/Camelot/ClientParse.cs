@@ -30,7 +30,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             Format = format;
             Pages = pages;
             conn = connection;
-            cl = new ClientLow(conn.GetEndpointUrl());
+            cl = new ClientLow(conn.GetEndpointUrl(), connection.GetApiKey());
         }
 
         public async Task<ApiResult<string>> StartSessionAsync(int numberOfTries = 10)
@@ -50,7 +50,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
                         this.SessionId = null;
                         logger.Debug($"try {i} Error 429 waiting because of {cl.ApiEndpoint}");
                         cl.Dispose();
-                        cl = new ClientLow(conn.GetEndpointUrl());
+                        cl = new ClientLow(conn.GetEndpointUrl(), conn.GetApiKey());
                         System.Threading.Thread.Sleep(200 + 3000 * i);
                     }
                     else
@@ -104,7 +104,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
                 return new ApiResult<CamelotResult>(false);
             }
         }
-        public async Task<ApiResult<CamelotVersion>> VersionAsync()
+        public async Task<ApiResult<CamelotVersionData>> VersionAsync()
         {
             try
             {
@@ -114,7 +114,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             }
             catch (Exception e)
             {
-                return new ApiResult<CamelotVersion>(false);
+                return new ApiResult<CamelotVersionData>(false);
             }
         }
         public async Task<ApiResult<CamelotStatistics>> StatisticAsync()

@@ -23,9 +23,15 @@ namespace HlidacStatu.Lib.Data.External.Camelot
         public string ApiEndpoint { get; private set; } = null;
 
         private static Devmasters.Logging.Logger logger = new Devmasters.Logging.Logger("Camelot.ClientLow");
-        public ClientLow(string apiEndpoint)
+        private readonly string apiKey;
+
+        public ClientLow(IApiConnection cnn)
+         :  this(cnn.GetEndpointUrl(),cnn.GetApiKey()) {}
+
+        public ClientLow(string apiEndpoint, string apiKey)
         {
             this.ApiEndpoint = apiEndpoint;
+            this.apiKey = apiKey;
         }
 
         public async Task<ApiResult<string>> StartSessionAsync(string pdfUrl, Commands command, CamelotResult.Formats format, string pages = "all")
@@ -34,6 +40,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             {
                     using (System.Net.WebClient wc = new System.Net.WebClient())
                     {
+                        wc.Headers.Add("Authorization", apiKey);
                         string baseUrl = ApiEndpoint;
                         string url = baseUrl + "/Camelot/StartSessionWithUrl?url=" + System.Net.WebUtility.UrlEncode(pdfUrl);
                         url += "&command=" + command.ToString().ToLower();
@@ -59,6 +66,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             {
                 using (System.Net.WebClient wc = new System.Net.WebClient())
                 {
+                    wc.Headers.Add("Authorization", apiKey);
                     string url = ApiEndpoint + "/Camelot/GetSession?sessionId=" + System.Net.WebUtility.UrlEncode(sessionId);
 
                     var json = await wc.DownloadStringTaskAsync(new Uri(url));
@@ -80,6 +88,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             {
                 using (System.Net.WebClient wc = new System.Net.WebClient())
                 {
+                    wc.Headers.Add("Authorization", apiKey);
                     string url = ApiEndpoint + "/Camelot/EndSession?sessionId=" + System.Net.WebUtility.UrlEncode(sessionId);
 
                     var json = await wc.DownloadStringTaskAsync(new Uri(url));
@@ -94,7 +103,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
                 return new ApiResult<CamelotResult>(false);
             }
         }
-        public async Task<ApiResult<CamelotVersion>> VersionAsync()
+        public async Task<ApiResult<CamelotVersionData>> VersionAsync()
         {
             try
             {
@@ -103,7 +112,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
                     string url = ApiEndpoint + "/Camelot/Version";
 
                     var json = await wc.DownloadStringTaskAsync(new Uri(url));
-                    var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotVersion>>(json);
+                    var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotVersionData>>(json);
 
                     return res;
                 }
@@ -111,7 +120,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             }
             catch (Exception e)
             {
-                return new ApiResult<CamelotVersion>(false);
+                return new ApiResult<CamelotVersionData>(false);
             }
         }
         public async Task<ApiResult<CamelotStatistics>> StatisticAsync()
@@ -120,6 +129,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             {
                 using (System.Net.WebClient wc = new System.Net.WebClient())
                 {
+                    wc.Headers.Add("Authorization", apiKey);
                     string url = ApiEndpoint + "/Camelot/Statistic";
 
                     var json = await wc.DownloadStringTaskAsync(new Uri(url));

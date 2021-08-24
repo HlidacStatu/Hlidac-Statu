@@ -35,13 +35,13 @@ namespace HlidacStatu.Web.HealthChecks
                 {
                     if (Uri.TryCreate(url, UriKind.Absolute, out var xxx))
                     {
-                        using (ClientLow cl = new ClientLow(url))
+                        using (ClientLow cl = new ClientLow(url, Devmasters.Config.GetWebConfigValue("Camelot.Service.Api.Key")))
                         {
                             Uri uri = new Uri(url);
                             string anonUrl = string.Join("", uri.Host.TakeLast(7)) + ":" + uri.Port;
                             var ver = cl.VersionAsync().Result;
                             if (ver.Success)
-                                sb.AppendLine($"{anonUrl} ({ver.Data?.apiVersion}/{ver.Data?.camelotVersion})");
+                                sb.AppendLine($"{anonUrl} ({ver.Data?.DockerVersion}/{ver.Data?.CamelotVersion})");
                             else
                                 sb.AppendLine($"{anonUrl} ({ver.ErrorCode}:{ver.ErrorDescription})");
                             var st = cl.StatisticAsync().Result;

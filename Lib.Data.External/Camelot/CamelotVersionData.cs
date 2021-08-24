@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Data.External.Camelot
 {
-    public class CamelotVersion
+    public class CamelotVersionData
     {
-        public string camelotVersion { get; set; }
-        public string apiVersion { get; set; }
+        public string CamelotVersion { get; set; }
+        public string DockerVersion { get; set; }
 
     }
 }
