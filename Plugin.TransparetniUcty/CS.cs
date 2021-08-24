@@ -76,7 +76,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
             {
                 //apikey je v https://www.csas.cz/applications/inlets/_commons/aem/configuration/config.js?cacheBust=2035
                 urlContent.RequestParams.Headers.Add("WEB-API-key: 08aef2f7-8b72-4ae1-831e-2155d81f46dd");
-                urlContent.Referer = "https://www.csas.cz/cs/transparentni-ucty";
+                urlContent.Referer = "https://www.csas.cz";
                 urlContent.IgnoreHttpErrors = true;
 
                 return urlContent.GetContent(Encoding.UTF8).Text;
@@ -93,12 +93,12 @@ namespace HlidacStatu.Plugin.TransparetniUcty
 
         private string GetAccountDetailPageUrl(string accountNumber)
         {
-            return $"https://www.csas.cz/webapi/api/v2/transparentAccounts/{accountNumber}";
+            return $"https://api.csas.cz/webapi/api/v3/transparentAccounts/{accountNumber}";
         }
 
         private string GetTransactionsPageUrl(string accountNumber, DateTime from, int page)
         {
-            return $"https://www.csas.cz/webapi/api/v2/transparentAccounts/{accountNumber}/transactions?dateFrom={from.ToString("yyyy-MM-dd")}&dateTo={DateTime.Now.ToString("yyyy-MM-dd")}&order=DESC&page={page}&size=100&sort=processingDate";
+            return $"https://api.csas.cz/webapi/api/v3/transparentAccounts/{accountNumber}/transactions?dateFrom={from.ToString("yyyy-MM-dd")}&dateTo={DateTime.Now.ToString("yyyy-MM-dd")}&order=DESC&page={page}&size=100&sort=processingDate";
         }
 
         private string FormatAccountNumber()

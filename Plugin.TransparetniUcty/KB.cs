@@ -1,92 +1,167 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Devmasters;
+using System.Text.Json;
 using HlidacStatu.Util;
-using HtmlAgilityPack;
+using Polly;
+using Polly.Retry;
 
 namespace HlidacStatu.Plugin.TransparetniUcty
 {
     public class KB : BaseTransparentniUcetParser
     {
-        public override string Name { get { return "KB"; } }
+        public override string Name => "KB";
+
+        // which status codes should trigger retry
+        private static readonly HttpStatusCode[] HttpStatusCodesWorthRetrying = {
+            HttpStatusCode.RequestTimeout, // 408
+            HttpStatusCode.InternalServerError, // 500
+            HttpStatusCode.BadGateway, // 502
+            HttpStatusCode.ServiceUnavailable, // 503
+            HttpStatusCode.GatewayTimeout // 504
+        };
+
+        // definition of retry policy
+        private readonly RetryPolicy<HttpResponseMessage> RetryPolicy = Policy
+            .Handle<HttpRequestException>()
+            .OrResult<HttpResponseMessage>(r => HttpStatusCodesWorthRetrying.Contains(r.StatusCode))
+            .WaitAndRetry(new[]
+            {
+                TimeSpan.FromSeconds(10),
+                TimeSpan.FromSeconds(20),
+                TimeSpan.FromSeconds(30)
+            });
 
         public KB(IBankovniUcet ucet) : base(MapOldUrls(ucet))
         { }
 
         protected override IEnumerable<IBankovniPolozka> DoParse(DateTime? fromDate = null, DateTime? toDate = null)
         {
-            TULogger.Info($"Zpracovavam ucet {Ucet.CisloUctu} s url {Ucet.Url}");
+            string apiUrl = "https://www.kb.cz/transparentsapi/transactions/"; //api base address
+            int chunk = 10000; // how many items should be loaded
+            
             var polozky = new List<IBankovniPolozka>();
-            var page = 0;
-            var duplications = 0;
+            
+            TULogger.Info($"Zpracovavam ucet {Ucet.CisloUctu} s url {Ucet.Url}");
+            string cisloUctuBezKoncovky = Ucet.CisloUctu.Split('/', 
+                StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .FirstOrDefault();
+
+            if (string.IsNullOrWhiteSpace(cisloUctuBezKoncovky))
+            {
+                TULogger.Info($"Nedokazu oddelit cislo uctu od kodu banky. Cislo uctu [{Ucet.CisloUctu}]");
+                return polozky;
+            }
+            
             var httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri(apiUrl);
+            httpClient.Timeout = TimeSpan.FromMinutes(3);
+
+            var page = 0;
+            bool containsNextPage = false;
 
             do
             {
-                var doc = new HtmlDocument();
-                doc.LoadHtml(MakeRequest(++page, httpClient));
-
-                var rows = GetTransactionItems(doc);
-                if (rows == null || rows.Length == 0)
+                var response = RetryPolicy.Execute(() =>
                 {
-                    TULogger.Warning($"Nenalezeny zadne zaznamy pro ucet {Ucet.CisloUctu}");
-                    return polozky;
-                }
+                    var request =
+                        new HttpRequestMessage(HttpMethod.Get, $"{cisloUctuBezKoncovky}?skip={page * chunk}&size={chunk}");
+                    return httpClient.Send(request);
+                });
 
-                foreach (var row in rows)
+            
+                if (response.IsSuccessStatusCode)
                 {
-                    var cells = row.Descendants("td").Select(c => c.InnerHtml).ToArray();
-                    if (cells.Length == 0) continue; //skip this, it's not row with data
+                    using var reader = new StreamReader(response.Content.ReadAsStream());
+                    var content = reader.ReadToEnd();
+                    var result = JsonSerializer.Deserialize<Root>(content);
 
-                    IBankovniPolozka p = new SimpleBankovniPolozka();
-                    p.CisloUctu = Ucet.CisloUctu;
-                    p.Datum = ParseDate(cells[0]);
-                    p.Castka = ParsePrice(cells[1], p.Datum);
-
-                    var symbols = cells[2].Split('/').Select(TextUtil.NormalizeToBlockText).ToArray();
-                    p.VS = symbols.Length > 0 && symbols[0] != "—" ? symbols[0] : string.Empty;
-                    p.KS = symbols.Length > 1 && symbols[1] != "—" ? symbols[1] : string.Empty;
-                    p.SS = symbols.Length > 2 && symbols[2] != "—" ? symbols[2] : string.Empty;
-
-                    var descriptions = cells[3].Split(new[] {"<br>"}, StringSplitOptions.None)
-                        .Select(d => TextUtil.NormalizeToBlockText(WebUtility.HtmlDecode(d))).ToArray();
-
-                    if (descriptions.Length > 0)
+                    if (result?.items is null || result?.items?.Count() == 0)
                     {
-                        var account = descriptions[0].Split(new[] {"(", ")"}, StringSplitOptions.None)
-                            .Select(TextUtil.NormalizeToBlockText)
-                            .ToArray();
-                        p.NazevProtiuctu = account.Length > 0 ? account[0] : string.Empty;
-                        p.CisloProtiuctu = account.Length > 1 ? account[1] : string.Empty;
+                        TULogger.Info($"Ucet neobsahuje zadne polozky.");
+                        break;
                     }
-                    p.PopisTransakce = descriptions.Length > 1 ? descriptions[1] : string.Empty;
-                    p.ZpravaProPrijemce = descriptions.Length > 2 ? string.Join("; ", descriptions.Skip(2)) : string.Empty;
-
-                    p.ZdrojUrl = Ucet.Url;
-
-                    if (fromDate.HasValue && p.Datum < fromDate) return polozky;
-                    if (IsAlreadyExist(polozky, p))
+                        
+                    foreach (var item in result.items)
                     {
-                        duplications++;
-                        if (duplications > 5)
+                        DateTime datum = ParseDate(item.date);
+                        if (fromDate != null && datum < fromDate)
+                            continue;
+                        if (toDate != null && datum > toDate)
+                            continue;
+                        
+                        var itemSymbols = item.symbols.Replace(" ", "").Split('/');
+                        var notes = item.notes.Split("<br />");
+                        string nazevProtiuctu = "";
+                        string popisTransakce = "";
+                        string zpravaPrijemci = "";
+                        if (notes.Length == 3) // příchozí transakce
                         {
-                            return polozky;
+                            popisTransakce = notes[1];
+                            nazevProtiuctu = notes[0];
+                            zpravaPrijemci = notes[2];
                         }
+                        if (notes.Length == 2) // odchozí transakce
+                        {
+                            popisTransakce = notes[0];
+                            nazevProtiuctu = notes[1];
+                        }
+                        
+                        polozky.Add(new SimpleBankovniPolozka
+                        {
+                            AddId = item.id,
+                            CisloUctu = Ucet.CisloUctu,
+                            Castka = ParsePrice(item.amount, datum),
+                            Datum = datum,
+                            VS = itemSymbols.Length >= 1 ? itemSymbols[0] : "",
+                            KS = itemSymbols.Length >= 2 ? itemSymbols[1] : "",
+                            SS = itemSymbols.Length >= 3 ? itemSymbols[2] : "",
+                            NazevProtiuctu = nazevProtiuctu,
+                            PopisTransakce = popisTransakce,
+                            ZpravaProPrijemce = zpravaPrijemci,
+                            ZdrojUrl = apiUrl + cisloUctuBezKoncovky,
+                            CisloProtiuctu = ""
+                        });
                     }
-                    else if (!(toDate.HasValue && p.Datum > toDate.Value))
-                    {
-                        duplications = 0;
-                        polozky.Add(p);
-                    }
+                    
+                    containsNextPage = result?.loadMore ?? false;
                 }
-                TULogger.Debug($"[{page}] {Ucet.CisloUctu} - {polozky.Last().Datum} / celkem {polozky.Count}");
-                Console.WriteLine($"[{page}] {Ucet.CisloUctu} - {polozky.Last().Datum} / celkem {polozky.Count}");
+                else
+                {
+                    TULogger.Info($"Chyba {response.StatusCode}");
+                    break;
+                }
+                
+                page++;
+            } while (containsNextPage);
 
-            } while (true);
+
+            
+            return polozky;
+
         }
+        
+        
+        public class Item
+        {
+            public string id { get; set; }
+            public string date { get; set; }
+            public string amount { get; set; }
+            public string symbols { get; set; }
+            public string notes { get; set; }
+        }
+
+        public class Root
+        {
+            public bool loadMore { get; set; }
+            public List<Item> items { get; set; }
+
+        }
+
+        
 
         private bool IsAlreadyExist(List<IBankovniPolozka> polozky, IBankovniPolozka p)
         {
@@ -110,7 +185,8 @@ namespace HlidacStatu.Plugin.TransparetniUcty
 
         private DateTime ParseDate(string value)
         {
-            var dat = Devmasters.DT.Util.ToDateTime(value, "d. M. yyyy");
+            
+            var dat = Devmasters.DT.Util.ToDateTime(value.Replace("&nbsp;", " "), "d. M. yyyy");
             if (dat.HasValue)
             {
                 return dat.Value;
@@ -120,12 +196,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
             throw new ApplicationException($"KB: chybejici datum pro ucet {Ucet.CisloUctu}");
         }
 
-        private static HtmlNode[] GetTransactionItems(HtmlDocument doc)
-        {
-            return doc.DocumentNode.Descendants("table")
-                .FirstOrDefault(t => t.InnerHtml.Contains("Datum zaúčtování"))?.Descendants("tr")?.ToArray();
-        }
-
+        
         private string MakeRequest(int page, HttpClient httpClient)
         {
             var content = new FormUrlEncodedContent(new[]
