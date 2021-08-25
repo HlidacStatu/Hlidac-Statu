@@ -9,7 +9,7 @@ namespace HlidacStatu.Web.Framework.Api
     {
 
 
-        public static Models.ApiV1Models.DumpInfoModel[] GetDumps(string baseUrl = "https://www.hlidacstatu.cz/api/v2/")
+        public static Models.ApiV1Models.DumpInfoModel[] GetDumps(string baseUrl = "https://www.hlidacstatu.cz/api/v1/")
         {
 
             List<DumpInfoModel> data = new List<DumpInfoModel>();

@@ -7,6 +7,7 @@ using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.ComponentModel;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -57,9 +58,16 @@ namespace HlidacStatu.Web.Controllers
             return Framework.Api.Dumps.GetDumps();
         }
 
+
         [AuthorizeAndAudit]
+        [HttpGet("dump/{datatype}")]
+        public ActionResult<HttpResponseMessage> Dump([FromRoute] string datatype)
+        {
+            return Dump(datatype, "");
+        }
+            [AuthorizeAndAudit]
         [HttpGet("dump/{datatype}/{date?}")]
-        public ActionResult<HttpResponseMessage> Dump([FromRoute]string datatype, [FromRoute]string date)
+        public ActionResult<HttpResponseMessage> Dump([FromRoute]string datatype, [FromRoute(Name ="date")] [DefaultValue("")] string date = "null")
         {
             if (datatype.Contains("..") || datatype.Contains("\\"))
             {
