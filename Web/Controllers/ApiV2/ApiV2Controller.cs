@@ -77,10 +77,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 try
                 {
-                    using (FileStream FS = System.IO.File.OpenRead(fn))
-                    {
-                        return File(FS, "application/zip", System.IO.Path.GetFileName(fn), true);
-                    }
+                        return File(System.IO.File.ReadAllBytes(fn), "application/zip", System.IO.Path.GetFileName(fn), true);
                 }
                 catch (Exception e)
                 {
