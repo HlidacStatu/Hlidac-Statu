@@ -25,7 +25,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
 
                     var score = HlidacStatu.DetectJobs.InHtmlTables.TableWithWordsAndNumbers(
                         tbl.Content, 
-                        HlidacStatu.DetectJobs.InHtmlTables.SpecificWords, out var foundJobs);
+                        HlidacStatu.DetectJobs.InHtmlTables.SpecificWords, out var foundJobs, out var cells);
                     if (foundJobs != null)
                         tbl.FoundJobs = foundJobs.ToArray();
                     else
