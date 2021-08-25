@@ -51,7 +51,7 @@
 *.exe   binary
 *.pdb   binary
 *.zip   binary
-
+*.pdf   binary
 
 ###############################################################################
 # diff behavior for common document formats

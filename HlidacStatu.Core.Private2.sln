@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_deploy", "_deploy", "{3433
 		..\Hlidac-Statu-Private\.gitignore = ..\Hlidac-Statu-Private\.gitignore
 		nuget.config = nuget.config
 		README.MD = README.MD
+		.gitattributes = .gitattributes
+		..\Hlidac-Statu-Private\.gitattributes = ..\Hlidac-Statu-Private\.gitattributes
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibCore", "LibCore\LibCore.csproj", "{D2C52FF3-87BF-41E5-965C-120ABB4DED86}"
