@@ -54,13 +54,20 @@ namespace HlidacStatu.Web.Controllers
         [HttpGet("dumps")]
         public ActionResult<Models.ApiV1Models.DumpInfoModel[]> Dumps()
         {
-            return Framework.Api.Dumps.GetDumps("https://www.hlidacstatu.cz/api/v2/");
+            return Framework.Api.Dumps.GetDumps();
         }
 
         [AuthorizeAndAudit]
         [HttpGet("dump/{datatype}/{date?}")]
         public ActionResult<HttpResponseMessage> Dump([FromRoute]string datatype, [FromRoute]string date)
         {
+            if (datatype.Contains("..") || datatype.Contains("\\"))
+            {
+                HlidacStatu.Util.Consts.Logger.Error("Wrong datatype name");
+                return StatusCode(466);
+
+            }
+
             DateTime? specificDate = Devmasters.DT.Util.ToDateTime(date, "yyyy-MM-dd");
             string onlyfile = $"{datatype}.dump" +
                               (specificDate.HasValue ? "-" + specificDate.Value.ToString("yyyy-MM-dd") : "");
@@ -68,21 +75,11 @@ namespace HlidacStatu.Web.Controllers
 
             if (System.IO.File.Exists(fn))
             {
-                long FileL = (new FileInfo(fn)).Length;
-                byte[] bytes = new byte[1024 * 1024];
                 try
                 {
                     using (FileStream FS = System.IO.File.OpenRead(fn))
                     {
-                        HttpResponseMessage response = new HttpResponseMessage();
-                        response.StatusCode = HttpStatusCode.OK;
-                        response.Content = new StreamContent(FS, 1024 * 64);
-                        response.Content.Headers.ContentDisposition =
-                            new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
-                            {
-                                FileName = System.IO.Path.GetFileName(fn)
-                            };
-                        return response;
+                        return File(FS, "application/zip", System.IO.Path.GetFileName(fn), true);
                     }
                 }
                 catch (Exception e)

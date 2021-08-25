@@ -9,7 +9,7 @@ namespace HlidacStatu.Web.Framework.Api
     {
 
 
-        public static Models.ApiV1Models.DumpInfoModel[] GetDumps(string baseUrl = "https://www.hlidacstatu.cz/api/v1/")
+        public static Models.ApiV1Models.DumpInfoModel[] GetDumps(string baseUrl = "https://www.hlidacstatu.cz/api/v2/")
         {
 
             List<DumpInfoModel> data = new List<DumpInfoModel>();
@@ -26,7 +26,7 @@ namespace HlidacStatu.Web.Framework.Api
                 data.Add(
                     new DumpInfoModel()
                     {
-                        url = baseUrl + $"dump?datatype={name}&date={date?.ToString("yyyy-MM-dd") ?? ""}",
+                        url = baseUrl + $"dump/{name}/{date?.ToString("yyyy-MM-dd") ?? ""}",
                         created = fi.LastWriteTimeUtc,
                         date = date,
                         fulldump = date.HasValue == false,
