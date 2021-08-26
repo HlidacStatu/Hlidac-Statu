@@ -1,0 +1,51 @@
+﻿@model Tuple<string, string, int>
+@using HlidacStatu.Entities;
+@using HlidacStatu.Repositories
+@using System.Linq;
+
+@{
+    ViewBag.Title = "Náhled stranky";
+    Smlouva sml = SmlouvaRepo.Load(this.Context.Request.Query["s"].ToString());
+    Smlouva.Priloha priloha = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == this.Context.Request.Query["p"].ToString());
+
+
+    if (Model == null)
+    {
+        <h2>Data neexistuji, asi chyba</h2>
+        return;
+    }
+
+}
+
+<div class="row" style="font-size:16px;font-weight:bold;padding-bottom:10px;">
+    <div class="col-xs-6 left">
+    @if (Model.Item3 > 1)
+    {
+        <a href="ShowPrilohaTablesOnePage?s=@Context.Request.Query["s"].ToString()&p=@Context.Request.Query["p"].ToString()&page=@(Model.Item3-1)">
+            &lt;&lt; Předchozí strana @(Model.Item3-1)
+        </a>
+    }
+    </div>
+    <div class="col-xs-5 text-right">
+        <a href="ShowPrilohaTablesOnePage?s=@Context.Request.Query["s"].ToString()&p=@Context.Request.Query["p"].ToString()&page=@(Model.Item3+1)">
+            Následující strana @(Model.Item3+1) &gt;&gt;
+        </a>
+    </div>
+</div>
+<img style="width:95%;height:auto;border:2px solid #a0a0a0" src="ShowPrilohaTablesOnePageImg?s=@Model.Item1&p=@Model.Item2&page=@Model.Item3" />
+
+<div class="row" style="font-size:16px;font-weight:bold;padding-top:10px;">
+    <div class="col-xs-6 left">
+    @if (Model.Item3 > 1)
+    {
+        <a href="ShowPrilohaTablesOnePage?s=@Context.Request.Query["s"].ToString()&p=@Context.Request.Query["p"].ToString()&page=@(Model.Item3-1)">
+            &lt;&lt; Předchozí strana @(Model.Item3-1)
+        </a>
+    }
+    </div>
+    <div class="col-xs-5 text-right">
+        <a href="ShowPrilohaTablesOnePage?s=@Context.Request.Query["s"].ToString()&p=@Context.Request.Query["p"].ToString()&page=@(Model.Item3+1)">
+            Následující strana @(Model.Item3+1) &gt;&gt;
+        </a>
+    </div>
+</div>

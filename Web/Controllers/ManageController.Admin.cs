@@ -6,6 +6,8 @@ using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.IO;
+using System.Drawing.Imaging;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -36,15 +38,67 @@ namespace HlidacStatu.Web.Controllers
             return View(res);
         }
 
+
+        [Authorize(Roles = "canEditData")]
+        [HttpGet]
+        public ActionResult ShowPrilohaTablesOnePage(string s, string p,int page)
+        {
+            Smlouva sml = SmlouvaRepo.Load(s);
+            Smlouva.Priloha pr = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == p);
+            if (sml == null || pr == null)
+                return NotFound();
+
+            if (page < 1)
+                page = 1;
+
+            return View(new Tuple<string,string,int>(s,p,page));
+        }
+
+        [Authorize(Roles = "canEditData")]
+        [HttpGet]
+        public ActionResult ShowPrilohaTablesOnePageImg(string s, string p, int page)
+        {
+            Smlouva sml = SmlouvaRepo.Load(s);
+            Smlouva.Priloha pr = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == p);
+            if (sml == null || pr == null)
+                return NotFound();
+
+            string fn = Connectors.Init.PrilohaLocalCopy.GetFullPath(sml, pr);
+            bool weHaveCopy = System.IO.File.Exists(fn);
+            byte[] pdfBin = null;
+            if (weHaveCopy)
+                pdfBin = System.IO.File.ReadAllBytes(fn);
+            else
+            {
+                using (var wc = new System.Net.WebClient())
+                {
+                    pdfBin = wc.DownloadData(pr.odkaz);
+                }
+            }
+            if (pdfBin == null)
+                return NotFound();
+
+            //  prepare codec parameters
+
+            using (var _img = PDFtoImage.Conversion.ToImage(pdfBin, page: page-1))
+            {
+                using (var stream = new MemoryStream())
+                {
+                    _img.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    return File(stream.ToArray(), "image/jpeg");
+                }
+            }
+        }
+
         [Authorize(Roles = "canEditData")]
         [HttpPost]
         public ActionResult ZmenaSmluvnichStran(string id, IFormCollection form)
         {
             ViewBag.SmlouvaId = id;
-            if (string.IsNullOrEmpty(form["platce"]) 
+            if (string.IsNullOrEmpty(form["platce"])
                 || string.IsNullOrEmpty(form["prijemce"])
                 )
-                {
+            {
                 ModelState.AddModelError("Check", "Nastav smluvni strany");
                 return View();
             }

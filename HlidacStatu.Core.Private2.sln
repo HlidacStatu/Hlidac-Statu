@@ -7,12 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web", "Web\Web.csproj", "{F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_deploy", "_deploy", "{34338A10-2566-4B27-BE7F-D972FD4CCF01}"
 	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		..\Hlidac-Statu-Private\.gitattributes = ..\Hlidac-Statu-Private\.gitattributes
 		.gitignore = .gitignore
 		..\Hlidac-Statu-Private\.gitignore = ..\Hlidac-Statu-Private\.gitignore
 		nuget.config = nuget.config
 		README.MD = README.MD
-		.gitattributes = .gitattributes
-		..\Hlidac-Statu-Private\.gitattributes = ..\Hlidac-Statu-Private\.gitattributes
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibCore", "LibCore\LibCore.csproj", "{D2C52FF3-87BF-41E5-965C-120ABB4DED86}"
@@ -115,7 +115,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Downloader", "Downloader", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Tasks.OCR", "..\Hlidac-Statu-Private\Lib.Tasks.OCR\Lib.Tasks.OCR.csproj", "{08056481-688D-44A9-BC3A-3A5B0FE2BDFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HlidacStatu.DetectJobs", "..\Hlidac-Statu-Private\HlidacStatu.DetectJobs\HlidacStatu.DetectJobs.csproj", "{D8D2A560-D515-479B-86A6-D5BED1C094E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.DetectJobs", "..\Hlidac-Statu-Private\HlidacStatu.DetectJobs\HlidacStatu.DetectJobs.csproj", "{D8D2A560-D515-479B-86A6-D5BED1C094E5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{ACC852FC-5016-48E7-80DF-ABD60A162FB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -298,6 +300,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{C3E3826A-CCC3-4D59-867D-E5846A0D86B7} = {584BE7E5-1233-4848-8C24-0A8A1D82ECC6}
 		{B3F13956-BC92-4B49-A375-1882BDA8878C} = {584BE7E5-1233-4848-8C24-0A8A1D82ECC6}
+		{0B3B079C-A1EC-4B27-BBF0-FD5F83977A28} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{BBC1B0D6-3095-414A-9A60-03A2614F2166} = {C1833D67-B269-41C4-9556-3F9D7511B378}
 		{D5324949-3560-49F2-AA95-60FA5FFAED1D} = {C1833D67-B269-41C4-9556-3F9D7511B378}
 		{3B9E1A42-44F8-438C-86DB-A9D0989C7A78} = {C1833D67-B269-41C4-9556-3F9D7511B378}

@@ -5,6 +5,9 @@
 
 @{
     ViewBag.Title = "Tabulky v priloze";
+    Smlouva sml = SmlouvaRepo.Load(this.Context.Request.Query["s"].ToString());
+    Smlouva.Priloha priloha = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == this.Context.Request.Query["p"].ToString());
+
 
     if (Model == null)
     {
@@ -21,11 +24,15 @@
     {
         <h2 style="padding-top:20px;" id="@(Model[i].Algorithm)">Nalezene tabulky - algoritmus @(Model[i].Algorithm)</h2>
         @foreach (var tbl in tbls[i].TablesWithJobs
-          .OrderByDescending(m => m.FoundJobs.Length)
-          .ThenBy(m => m.Page)
-          .ThenBy(m => m.TableInPage))
+         .OrderByDescending(m => m.FoundJobs.Length)
+         .ThenBy(m => m.Page)
+         .ThenBy(m => m.TableInPage))
         {
-            <div style="font-size:120%;padding:15px 0 5px 0;" id="@($"{Model[i].Algorithm}_{tbl.Page}_{tbl.TableInPage}")">@(Model[i].Algorithm)<b>Strana @tbl.Page</b>, tabulka na stránce <b>@tbl.TableInPage</b></div>
+            <div style="font-size:120%;padding:15px 0 5px 0;" id="@($"{Model[i].Algorithm}_{tbl.Page}_{tbl.TableInPage}")">
+                @(Model[i].Algorithm) <b>Strana @tbl.Page</b>, tabulka na stránce <b>@tbl.TableInPage</b>
+                <a target="_blank" href="ShowPrilohaTablesOnePage?s=@(this.Context.Request.Query["s"].ToString())&p=@(this.Context.Request.Query["p"].ToString())&page=@tbl.Page">Ukázat stránku</a>
+                <a target="_blank" href="@(priloha.odkaz)">Otevřít PDF</a> 
+            </div>
             @if (tbl.FoundJobs.Length > 0)
             {
                 <div style="background-color:rgb(232 252 201)">
