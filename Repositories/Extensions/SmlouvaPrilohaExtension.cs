@@ -40,7 +40,7 @@ namespace HlidacStatu.Extensions
             try
             {
                 Lib.Data.External.Camelot.CamelotResult[] myRes = HlidacStatu.Lib.Data.External.Camelot.Client.GetMaxTablesFromPDFAsync(
-                    p.odkaz, HlidacStatu.Lib.Data.External.Camelot.CamelotResult.Formats.HTML).Result;
+                    p.odkaz, HlidacStatu.Lib.Data.External.Camelot.CamelotResult.Formats.JSON).Result;
 
                 return Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(myRes));
 
@@ -61,7 +61,7 @@ namespace HlidacStatu.Extensions
 
             string hash = p.hash?.Value ?? Devmasters.Crypto.Hash.ComputeHashToHex(p.odkaz?? "");
             var keyval = s.Id + "|" + hash;
-            var key = new KeyAndId() { ValueForData = keyval, CacheNameOnDisk = $"priloha_tbls_{keyval}" };
+            var key = new KeyAndId() { ValueForData = keyval, CacheNameOnDisk = $"prlh_tblsJSON_{keyval}" };
             if (forceUpdate)
             {
                 prilohaTblsCacheManager.Delete(key);
