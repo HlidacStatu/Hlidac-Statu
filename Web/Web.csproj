@@ -21,9 +21,6 @@
 <!--    Některé soubory (automaticky kopírované) je potřeba nejprve odstranit ze seznamu, 
         aby při publish nevznikla chyba -->
     <ItemGroup>
-        <None Remove="cs_CZ.aff" />
-        <None Remove="cs_CZ.dic" />
-        <None Remove="cs_CZ.stopwords" />
         <None Remove="_app_offline.htm" />
         <Compile Remove="publish\**" />
         <Content Remove="App_Data\**" />
@@ -38,18 +35,6 @@
       <EmbeddedResource Remove="publish\**" />
       <None Remove="publish\**" />
     </ItemGroup>
-    <ItemGroup>
-      <Content Include="cs_CZ.aff">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="cs_CZ.dic">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="cs_CZ.stopwords">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
-
 
     <ItemGroup>
         <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="5.0.1" />
@@ -64,6 +49,7 @@
         <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="5.0.1" />
         <PackageReference Include="CouchbaseNetClient" Version="2.7.23" />
         <PackageReference Include="Devmasters.Core" Version="2.4.3" />
+        <PackageReference Include="Devmasters.Lang" Version="2.4.5" />
         <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.2.0" />
         <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.311" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.17.0" />
