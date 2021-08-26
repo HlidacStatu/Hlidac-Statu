@@ -18,6 +18,8 @@ namespace HlidacStatu.Web
 {
     public class Startup
     {
+        private bool _shouldRunHealthcheckFeature = false;
+        
         public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
         {
             Configuration = configuration;
@@ -39,6 +41,10 @@ namespace HlidacStatu.Web
 
             DBUpgrades.DBUpgrader.UpgradeDatabases(Connectors.DirectDB.DefaultCnnStr);
 
+            string healthcheckFeatureOption = Devmasters.Config.GetWebConfigValue("RunHealthcheckFeature");
+            _shouldRunHealthcheckFeature = !string.IsNullOrWhiteSpace(healthcheckFeatureOption) &&
+                                           healthcheckFeatureOption == "true";
+            
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             // for scoped services (mainly for identity)
             services.AddDbContext<DbEntities>(options =>
@@ -106,7 +112,10 @@ namespace HlidacStatu.Web
                 c.IncludeXmlComments(xmlPath);
             });
 
-            AddAllHealtChecks(services);
+            
+            
+            if(_shouldRunHealthcheckFeature)
+                AddAllHealtChecks(services);
 
             //services.AddHealthChecksUI(set =>
             //       {
@@ -181,21 +190,25 @@ namespace HlidacStatu.Web
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+            if (_shouldRunHealthcheckFeature)
             {
-                Predicate = _ => true,
-                ResponseWriter = global::HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
-            }).UseHealthChecks("/_health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
-            {
-                Predicate = _ => true,
-            });
-            //app.UseHealthChecksUI(set =>
-            //    {
-            //        set.UIPath = "/status";
-            //        set.AsideMenuOpened = false;
-            //        set.AddCustomStylesheet("wwwroot\\content\\CustomHealthCheckUI.css");
-            //    }
-            //);
+                app.UseHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+                {
+                    Predicate = _ => true,
+                    ResponseWriter = global::HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
+                }).UseHealthChecks("/_health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+                {
+                    Predicate = _ => true,
+                });
+                //app.UseHealthChecksUI(set =>
+                //    {
+                //        set.UIPath = "/status";
+                //        set.AsideMenuOpened = false;
+                //        set.AddCustomStylesheet("wwwroot\\content\\CustomHealthCheckUI.css");
+                //    }
+                //);
+            }
+            
 
             app.UseEndpoints(endpoints =>
             {
@@ -322,38 +335,36 @@ namespace HlidacStatu.Web
         {
             services
                 .AddHealthChecks()
-
-                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000, name: "Web server využitá pamět", tags: new[] { "Web server", "process", "memory" })
-
+                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000, 
+                    name: "Web server využitá pamět", 
+                    tags: new[] { "Web server", "process", "memory" })
                 .AddHealthCheckWithResponseTime(
                     new global::HealthChecks.SqlServer.SqlServerHealthCheck(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 username from AspNetUsers"),
                     "SQL server", HealthStatus.Unhealthy, tags: new[] { "DB", "db" }
                 )
-
                 .AddHealthCheckWithOptions<Web.HealthChecks.ElasticSearchClusterStatus, Web.HealthChecks.ElasticSearchClusterStatus.Options>(
                     new Web.HealthChecks.ElasticSearchClusterStatus.Options()
                     {
                         ExpectedNumberOfNodes = 16,
                         ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';')
-                    }
-                    , "Elastic cluster", tags: new[] { "DB", "elastic" })
-
+                    }, 
+                    "Elastic cluster", tags: new[] { "DB", "elastic" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.ElasticSearchNodesFreeDisk, Web.HealthChecks.ElasticSearchNodesFreeDisk.Options>(
                     new Web.HealthChecks.ElasticSearchNodesFreeDisk.Options()
                     {
                         ExpectedNumberOfNodes = 16,
                         ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
                         MinimumFreeSpaceInMegabytes= 5000
-                    }
-                    , "Elastic nodes disk space", tags: new[] { "DB", "elastic" })
-
+                    }, 
+                    "Elastic nodes disk space", tags: new[] { "DB", "elastic" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.NetworkDiskStorage, Web.HealthChecks.NetworkDiskStorage.Options>(
                     new Web.HealthChecks.NetworkDiskStorage.Options()
                     {
                         UNCPath = "c:\\",
                         DegradedMinimumFreeMegabytes = 10 * 1024, //10G 
                         UnHealthtMinimumFreeMegabytes = 1 * 1024 //1GB
-                    }, "System disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
+                    }, 
+                    "System disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
                 )
 
                 .AddHealthCheckWithOptions<Web.HealthChecks.NetworkDiskStorage, Web.HealthChecks.NetworkDiskStorage.Options>(
@@ -362,9 +373,9 @@ namespace HlidacStatu.Web
                         UNCPath = Devmasters.Config.GetWebConfigValue("FileCachePath"),
                         DegradedMinimumFreeMegabytes = 10 * 1024, //10G 
                         UnHealthtMinimumFreeMegabytes = 1 * 1024 //1GB
-                    }, "Cache disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
+                    }, 
+                    "Cache disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
                 )
-
                 .AddHealthCheckWithOptions<Web.HealthChecks.Couchbase, Web.HealthChecks.Couchbase.Options>(
                     new Web.HealthChecks.Couchbase.Options()
                     {
@@ -373,9 +384,8 @@ namespace HlidacStatu.Web
                         Username = Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
                         Password = Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
                         Service = Web.HealthChecks.Couchbase.Service.KeyValue
-                    }
-                    , "Couchbase", tags: new[] { "Cache" })
-
+                    }, 
+                    "Couchbase", tags: new[] { "Cache" })
                 .AddHealthCheckWithResponseTime(
                     new global::HealthChecks.Network.SmtpHealthCheck(new global::HealthChecks.Network.SmtpHealthCheckOptions()
                     {
@@ -385,7 +395,6 @@ namespace HlidacStatu.Web
                     }),
                     "SMTP", HealthStatus.Degraded, tags: new[] { "Web server" }
                 )
-
                 .AddCheck<Web.HealthChecks.OCRServer>("OCR servers", tags: new[] { "OCR cloud" })
                 .AddCheck<Web.HealthChecks.OCRQueue>("OCR queues", tags: new[] { "OCR cloud" })
                 .AddCheck<Web.HealthChecks.SmlouvyZpracovane>("Zpracované smlouvy", tags: new[] { "Data" })
@@ -417,9 +426,6 @@ namespace HlidacStatu.Web
                         Exclude = new string[] { "rozhodnuti-uohs", "veklep", "vyjadreni-politiku" },
                         Interval = HealthChecks.DatasetyStatistika.IntervalEnum.Month
                     }, "Statistiky malých databází", HealthStatus.Unhealthy, tags: new[] { "Data" })
-
-
-
                 .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
                     new Web.HealthChecks.DockerContainer.Options()
                     {
