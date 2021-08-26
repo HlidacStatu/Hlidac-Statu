@@ -12,7 +12,7 @@
       <PackageReference Include="Devmasters.DT" Version="2.4.2" />
       <PackageReference Include="Devmasters.Enums" Version="2.4.5" />
       <PackageReference Include="Devmasters.IO" Version="2.4.0" />
-      <PackageReference Include="Devmasters.Lang" Version="2.4.5" />
+      <PackageReference Include="Devmasters.Lang" Version="2.4.8" />
       <PackageReference Include="Enums.NET" Version="4.0.0" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.8" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.8">
