@@ -20,26 +20,14 @@ namespace HlidacStatu.LibCore.MiddleWares
         }
         public async Task Invoke(HttpContext httpContext)
         {
-            Exception e = null;
-            try
-            {
                 await _next(httpContext);
-
-            }
-            catch (Exception exc)
-            {
-                e = exc;
-            }
-            if (e != null | httpContext.Response.StatusCode >= 500)
+            if (httpContext.Response.StatusCode >= 500)
             {
                 try
                 {
                     var exceptionHandlerPathFeature = httpContext.Features.Get<IExceptionHandlerPathFeature>();
 
-                    if (e == null)
-                        e = exceptionHandlerPathFeature?.Error;
-
-                    var str = Devmasters.Net.WebContextLogger.LogFatalWebError(e, httpContext, true, "");
+                    var str = Devmasters.Net.WebContextLogger.LogFatalWebError(exceptionHandlerPathFeature?.Error, httpContext, true, "");
                     if (httpContext.Items.ContainsKey(ItemKeyName))
                     {
                         var prevStr = httpContext.Items[ItemKeyName] as string;
