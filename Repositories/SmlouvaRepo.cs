@@ -252,7 +252,7 @@ namespace HlidacStatu.Repositories
                 if (classificationOverride.CorrectCat2.HasValue)
                     types.Add(new Smlouva.SClassification.Classification()
                     {
-                        TypeValue = classificationOverride.CorrectCat1.Value,
+                        TypeValue = classificationOverride.CorrectCat2.Value,
                         ClassifProbability = 0.8m
                     });
 
