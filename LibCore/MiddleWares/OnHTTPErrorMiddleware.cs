@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,13 +20,29 @@ namespace HlidacStatu.LibCore.MiddleWares
         }
         public async Task Invoke(HttpContext httpContext)
         {
+            try
+            {
                 await _next(httpContext);
+            }
+            catch (Exception e)
+            {
+                var str = Devmasters.Net.WebContextLogger.LogFatalWebError(e, httpContext, true, "");
+                
+                if (httpContext.Items.ContainsKey(ItemKeyName))
+                {
+                    var prevStr = httpContext.Items[ItemKeyName] as string;
+                    httpContext.Items[ItemKeyName]=prevStr + "\n\n====== NextException ======="+str;
+                }
+                else
+                    httpContext.Items.Add(ItemKeyName, str);
+                throw;
+            }
+            
             if (httpContext.Response.StatusCode >= 500)
             {
                 try
                 {
                     var exceptionHandlerPathFeature = httpContext.Features.Get<IExceptionHandlerPathFeature>();
-
                     var str = Devmasters.Net.WebContextLogger.LogFatalWebError(exceptionHandlerPathFeature?.Error, httpContext, true, "");
                     if (httpContext.Items.ContainsKey(ItemKeyName))
                     {
@@ -47,7 +63,6 @@ namespace HlidacStatu.LibCore.MiddleWares
             {
                 try
                 {
-                    var exceptionHandlerPathFeature = httpContext.Features.Get<IExceptionHandlerPathFeature>();
                     var str = Devmasters.Net.WebContextLogger.Log404WebError(httpContext?.Request);
                     if (httpContext.Items.ContainsKey(ItemKeyName))
                     {
