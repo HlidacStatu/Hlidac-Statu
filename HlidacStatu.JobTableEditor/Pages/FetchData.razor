@@ -1,49 +1,60 @@
 ﻿@page "/fetchdata"
 
 @using HlidacStatu.JobTableEditor.Data
-@inject WeatherForecastService ForecastService
+@inject JobService JobService
 
-<h1>Weather forecast</h1>
+<h1>Job editor</h1>
 
-<p>This component demonstrates fetching data from a service.</p>
-
-@if (forecasts == null)
+@if (table == null)
 {
     <p>
-        <em>Loading...</em>
+        <button onclick="@LoadNewTable()">Load New Table</button>
     </p>
 }
 else
 {
     <table class="table">
-        <thead>
-        <tr>
-            <th>Date</th>
-            <th>Temp. (C)</th>
-            <th>Temp. (F)</th>
-            <th>Summary</th>
-        </tr>
-        </thead>
         <tbody>
-        @foreach (var forecast in forecasts)
+        @foreach (var row in table.Cells)
         {
             <tr>
-                <td>@forecast.Date.ToShortDateString()</td>
-                <td>@forecast.TemperatureC</td>
-                <td>@forecast.TemperatureF</td>
-                <td>@forecast.Summary</td>
+                @foreach (var cell in row)
+                {
+                    <td >
+                        <button @onclick="@(() => ColorChange(cell))">⚙</button>
+                        <input type="text" class="form-control" @bind="@cell.Value">
+                    </td>
+                }
             </tr>
         }
         </tbody>
     </table>
+    
+    <button onclick="@SaveTable()">Save changes</button>
 }
 
 @code {
-    private WeatherForecast[] forecasts;
+    private SomeTable table;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        //forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
     }
 
+    private async Task LoadNewTable()
+    {
+        table = await JobService.GetNewTable();
+    }
+
+    private async Task SaveTable()
+    {
+        await JobService.SaveChanges(table);
+    }
+
+    private void ColorChange(CellShell cell)
+    {
+        cell.RotateType();
+        
+    }
+    
 }
