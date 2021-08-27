@@ -368,3 +368,5 @@ Web/App_Data/autocomplete.json
 Web/appsettings.*.json
 
 SponzoriLoader/appsettings.Petr.json
+
+HlidacStatu.JobTableEditor/appsettings.json
