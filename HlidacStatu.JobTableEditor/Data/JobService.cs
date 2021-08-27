@@ -16,15 +16,31 @@ namespace HlidacStatu.JobTableEditor.Data
             //Get Data from queue
             Smlouva item = SmlouvaRepo.Load("13894880", includePrilohy: false);
             Smlouva.Priloha pril = item.Prilohy.First(m => m.hash.Value == "6411d84d9c37b3691c7f8cdc6017989920f5e66d483cf335589b408e1c7a88cb");
-            var tbls = SmlouvaPrilohaExtension.GetTablesFromPriloha(item, pril);
+            var tbls = SmlouvaPrilohaExtension.GetTablesFromPriloha(item, pril, false);
             //zajima te pouze Strana 7, 2 tabulka na stránce, algorithm stream
             var tbl = tbls.First(m => m.Algorithm == "stream").Tables.First(t => t.Page == 7 && t.TableInPage == 2);
-            List<InHtmlTables.Job> foundJobs = null;
-            InHtmlTables.Cell[][] cells = null;
-            var score = HlidacStatu.DetectJobs.InHtmlTables.TableWithWordsAndNumbers(tbl.ParsedContent(), HlidacStatu.DetectJobs.InHtmlTables.SpecificWords, out foundJobs, out cells);
+            var score = InHtmlTables.TableWithWordsAndNumbers(tbl.ParsedContent(),
+                InHtmlTables.SpecificWords,
+                out var foundJobs,
+                out var cells);
             
             await Task.Delay(200);
-            return new SomeTable();
+
+            var st = new SomeTable();
+
+            CellShell[][] cellShells = new CellShell[cells.Length][];
+            for (int row = 0; row < cells.Length; row++)
+            {
+                cellShells[row] = new CellShell[cells[row].Length];
+                for (int col = 0; col < cells[row].Length; col++)
+                {
+                    cellShells[row][col] = new CellShell(cells[row][col], row, col);
+                }
+            }
+
+            st.Cells = cellShells;
+
+            return st;
         }
 
         public async Task SaveChanges(SomeTable table)
@@ -38,6 +54,7 @@ namespace HlidacStatu.JobTableEditor.Data
     public class SomeTable
     {
         public CellShell[][] Cells { get; set; }
+
     }
 
     public class CellShell
@@ -57,15 +74,8 @@ namespace HlidacStatu.JobTableEditor.Data
             Column = column;
             Cell = cell;
             Id = $"[{Row}][{Column}]";
-
             CellType = cell.CellType;
-            Value = cell.CellType switch
-            {
-                InHtmlTables.Cell.GuessedCellType.Position => string.Join(' ', cell.FoundKeywords.Keys),
-                InHtmlTables.Cell.GuessedCellType.Price or
-                    InHtmlTables.Cell.GuessedCellType.PriceWithVAT => cell.FoundNumbers.FirstOrDefault().ToString("N"),
-                _ => cell.Text
-            };
+            SetMergedValue(); //pre-set Value to be displayed
         }
 
         public void RotateType()
@@ -74,6 +84,23 @@ namespace HlidacStatu.JobTableEditor.Data
             int nextPosition = Array.IndexOf(allEnums, CellType) + 1;
             CellType = nextPosition == allEnums.Length ? allEnums[0] : allEnums[nextPosition];
         }
+
+        public void SetMergedValue()
+        {
+            Value = CellType switch
+            {
+                InHtmlTables.Cell.GuessedCellType.Position => string.Join(' ', Cell.FoundKeywords.Keys),
+                InHtmlTables.Cell.GuessedCellType.Price or
+                    InHtmlTables.Cell.GuessedCellType.PriceWithVAT => Cell.FoundNumbers.FirstOrDefault().ToString("N2"),
+                _ => Cell.Text
+            };
+        }
+
+        public void SetOriginalValue()
+        {
+            Value = Cell.Text;
+        }
+        
     }
     
 }

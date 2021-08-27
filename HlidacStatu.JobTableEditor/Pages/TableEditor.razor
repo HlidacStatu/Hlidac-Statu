@@ -1,7 +1,8 @@
 ﻿@page "/tableEditor"
 
 @using HlidacStatu.JobTableEditor.Data
-@using HlidacStatu.DetectJobs
+@using HlidacStatu.JobTableEditor.Components
+
 @inject JobService JobService
 
 <h1>Job editor</h1>
@@ -9,7 +10,7 @@
 @if (table == null)
 {
     <p>
-        <button onclick="@LoadNewTable()">Load New Table</button>
+        <button @onclick="LoadNewTable">Load New Table</button>
     </p>
 }
 else
@@ -21,22 +22,19 @@ else
             <tr>
                 @foreach (var cell in row)
                 {
-                    <td class="@cellStyle">
-                        <button @onclick="@(() => ColorChange(cell))">⚙</button>
-                        <input type="text" class="form-control" @bind="@cell.Value">
-                    </td>
+                    <Cell CellShell="@cell"></Cell>
                 }
             </tr>
         }
         </tbody>
     </table>
 
-    <button onclick="@SaveTable()">Save changes</button>
+    <button @onclick="SaveTable">Save changes</button>
 }
 
 @code {
     private SomeTable table;
-    private string cellStyle;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -51,20 +49,6 @@ else
     private async Task SaveTable()
     {
         await JobService.SaveChanges(table);
-    }
-
-    private void ColorChange(CellShell cell)
-    {
-        cell.RotateType();
-
-        cellStyle = cell.CellType switch 
-        {
-            InHtmlTables.Cell.GuessedCellType.Unknown => "",
-            InHtmlTables.Cell.GuessedCellType.Position => "bg-primary",
-            InHtmlTables.Cell.GuessedCellType.Price => "bg-success",
-            InHtmlTables.Cell.GuessedCellType.PriceWithVAT => "bg-warning",
-            _ => ""
-        };
     }
 
 }
