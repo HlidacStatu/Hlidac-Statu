@@ -185,7 +185,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<BannedIp> BannedIps { get; set; }
         
         public virtual DbSet<InDocJobs> InDocJobs { get; set; }
-        public virtual DbSet<InDocJobs> InDocTables { get; set; }
+        public virtual DbSet<InDocTables> InDocTables { get; set; }
 
         //views
         public DbSet<FindPersonDTO> FindPersonView { get; set; }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 #nullable disable
 
-namespace HlidacStatu.Entities.Entities
+namespace HlidacStatu.Entities
 {
     public class InDocJobs
     {

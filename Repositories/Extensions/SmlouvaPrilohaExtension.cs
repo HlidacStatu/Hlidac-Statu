@@ -59,7 +59,7 @@ namespace HlidacStatu.Extensions
                 return null;
 
 
-            string hash = p.hash?.Value ?? Devmasters.Crypto.Hash.ComputeHashToHex(p.odkaz?? "");
+            string hash = p.UniqueHash();
             var keyval = s.Id + "|" + hash;
             var key = new KeyAndId() { ValueForData = keyval, CacheNameOnDisk = $"prlh_tblsJSON_{keyval}" };
             if (forceUpdate)
