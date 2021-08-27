@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities.Views;
+﻿using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities.Views;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -183,6 +184,9 @@ namespace HlidacStatu.Entities
         public virtual DbSet<Sponzoring> Sponzoring { get; set; }
         public virtual DbSet<BannedIp> BannedIps { get; set; }
         
+        public virtual DbSet<InDocJobs> InDocJobs { get; set; }
+        public virtual DbSet<InDocJobs> InDocTables { get; set; }
+
         //views
         public DbSet<FindPersonDTO> FindPersonView { get; set; }
         public DbSet<SponzoringOverview> SponzoringOverviewView { get; set; }

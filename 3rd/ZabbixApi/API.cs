@@ -83,6 +83,7 @@ namespace ZabbixApi
         private string sendRequest(string jsonParams)
         {
             WebRequest request = WebRequest.Create(zabbixURL);
+            
             if (basicAuth != null) request.Headers.Add("Authorization", "Basic " + basicAuth);
             request.ContentType = "application/json-rpc";
             request.Method = "POST";
