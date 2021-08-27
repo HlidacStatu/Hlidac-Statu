@@ -68,6 +68,7 @@ CREATE TABLE [dbo].[InDocTables](
 	[smlouvaID] [nvarchar](20) NOT NULL,
 	[prilohaHash] [nvarchar](90) NOT NULL,
 	[page] [int] NOT NULL,
+	[json] [nvarchar(MAX)] NOT NULL,
 	[tableOnPage] [int] NOT NULL,
 	[algorithm] [nvarchar](50) NOT NULL,
 	[precalculatedScore] [money] NOT NULL,

@@ -133,7 +133,10 @@ namespace HlidacStatu.Entities.XSD {
         
         /// <remarks/>
         public tHash hash;
-        
+        public string UniqueHash()
+        {
+            return this.hash?.Value ?? Devmasters.Crypto.Hash.ComputeHashToHex(this.odkaz ?? "");
+        }
         /// <remarks/>
         public string odkaz;
     }

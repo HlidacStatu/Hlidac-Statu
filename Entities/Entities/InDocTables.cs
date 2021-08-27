@@ -4,9 +4,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 #nullable disable
 
-namespace HlidacStatu.Entities.Entities
+namespace HlidacStatu.Entities
 {
-    public class InDocTables
+    [Table("InDocTables")]
+    public partial class InDocTables
     {
         [Key]
         public long Pk { get; set; }
@@ -19,6 +20,10 @@ namespace HlidacStatu.Entities.Entities
         [Required]
         [StringLength(90)]
         public string PrilohaHash { get; set; }
+
+        [Required]
+        public string Json { get; set; }
+
         [Required]
         public int Page { get; set; }
         [Required]
@@ -44,7 +49,22 @@ namespace HlidacStatu.Entities.Entities
         public string Note { get; set; }
         public string Tags { get; set; }
         public int? CheckElapsedInMs { get; set; }
-        
-        
+
+
+        public enum CheckStatuses : int
+        { 
+            WaitingInQueue = 0,
+            InProgress = 1,
+            Done = 2,
+            ForNextReview = 3,
+        }
+
+        [NotMapped()]
+        public CheckStatuses CheckStatus 
+        { 
+            get { return (CheckStatuses)this.Status; }
+            set { this.Status = (int)value; }
+        }
+
     }
 }
