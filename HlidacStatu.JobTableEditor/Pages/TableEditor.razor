@@ -1,6 +1,7 @@
-﻿@page "/fetchdata"
+﻿@page "/tableEditor"
 
 @using HlidacStatu.JobTableEditor.Data
+@using HlidacStatu.DetectJobs
 @inject JobService JobService
 
 <h1>Job editor</h1>
@@ -20,7 +21,7 @@ else
             <tr>
                 @foreach (var cell in row)
                 {
-                    <td >
+                    <td class="@cellStyle">
                         <button @onclick="@(() => ColorChange(cell))">⚙</button>
                         <input type="text" class="form-control" @bind="@cell.Value">
                     </td>
@@ -29,16 +30,17 @@ else
         }
         </tbody>
     </table>
-    
+
     <button onclick="@SaveTable()">Save changes</button>
 }
 
 @code {
     private SomeTable table;
+    private string cellStyle;
 
     protected override async Task OnInitializedAsync()
     {
-        //forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    //forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
     }
 
     private async Task LoadNewTable()
@@ -54,7 +56,15 @@ else
     private void ColorChange(CellShell cell)
     {
         cell.RotateType();
-        
+
+        cellStyle = cell.CellType switch 
+        {
+            InHtmlTables.Cell.GuessedCellType.Unknown => "",
+            InHtmlTables.Cell.GuessedCellType.Position => "bg-primary",
+            InHtmlTables.Cell.GuessedCellType.Price => "bg-success",
+            InHtmlTables.Cell.GuessedCellType.PriceWithVAT => "bg-warning",
+            _ => ""
+        };
     }
-    
+
 }
