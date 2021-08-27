@@ -41,13 +41,21 @@ CREATE TABLE [dbo].[InDocJobs](
 GO
 
 
+USE [Firmy]
+GO
 
-/****** Object:  Table [dbo].[InDocTables]    Script Date: 26.08.2021 21:51:43 ******/
+ALTER TABLE [dbo].[InDocTables] DROP CONSTRAINT [DF_InDocTables_status]
+GO
+
+ALTER TABLE [dbo].[InDocTables] DROP CONSTRAINT [DF_InDocTables_precalculatedScore]
+GO
+
+/****** Object:  Table [dbo].[InDocTables]    Script Date: 27.08.2021 5:56:41 ******/
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[InDocTables]') AND type in (N'U'))
 DROP TABLE [dbo].[InDocTables]
 GO
 
-/****** Object:  Table [dbo].[InDocTables]    Script Date: 26.08.2021 21:51:43 ******/
+/****** Object:  Table [dbo].[InDocTables]    Script Date: 27.08.2021 5:56:41 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -63,6 +71,9 @@ CREATE TABLE [dbo].[InDocTables](
 	[tableOnPage] [int] NOT NULL,
 	[algorithm] [nvarchar](50) NOT NULL,
 	[precalculatedScore] [money] NOT NULL,
+	[preFoundRows] [int] NULL,
+	[preFoundCols] [int] NULL,
+	[preFoundJobs] [int] NULL,
 	[status] [int] NOT NULL,
 	[checkedBy] [nvarchar](250) NULL,
 	[checkedDate] [datetime] NULL,
@@ -81,6 +92,7 @@ GO
 
 ALTER TABLE [dbo].[InDocTables] ADD  CONSTRAINT [DF_InDocTables_status]  DEFAULT ((0)) FOR [status]
 GO
+
 
 
 ";
