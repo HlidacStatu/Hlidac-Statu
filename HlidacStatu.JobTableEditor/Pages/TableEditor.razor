@@ -30,10 +30,13 @@ else
     </table>
 
     <button @onclick="SaveTable">Save changes</button>
+    <button @onclick="SuperviseTable">Send to supervisor</button>
+    <button @onclick="NonsenseTable">This table is full of 💩</button>
 }
 
 @code {
     private SomeTable table;
+    private DateTime tableOpenedAt;
 
 
     protected override async Task OnInitializedAsync()
@@ -44,11 +47,24 @@ else
     private async Task LoadNewTable()
     {
         table = await JobService.GetNewTable();
+        tableOpenedAt = DateTime.Now;
     }
 
     private async Task SaveTable()
     {
+        var elapsedTime = tableOpenedAt - DateTime.Now;
+        table.ProcessingTime = elapsedTime;
         await JobService.SaveChanges(table);
+    }
+
+    private void SuperviseTable()
+    {
+        throw new NotImplementedException();
+    }
+
+    private void NonsenseTable()
+    {
+        throw new NotImplementedException();
     }
 
 }

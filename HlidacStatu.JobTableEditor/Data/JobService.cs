@@ -54,7 +54,9 @@ namespace HlidacStatu.JobTableEditor.Data
     public class SomeTable
     {
         public CellShell[][] Cells { get; set; }
-
+        public TimeSpan ProcessingTime { get; set; }
+        public string Author { get; set; }
+        
     }
 
     public class CellShell
