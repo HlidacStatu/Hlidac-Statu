@@ -1,0 +1,48 @@
+@using HlidacStatu.JobTableEditor.Data
+@using Microsoft.AspNetCore.Components
+@using HlidacStatu.DetectJobs
+
+<td class="@cellStyle">
+    <button @onclick="ColorChange">⚙</button>
+    <button @onclick="CellShell.SetOriginalValue">O</button>
+    <button @onclick="CellShell.SetMergedValue">M</button>
+    <input type="text" class="form-control" @bind="@CellShell.Value" />
+</td>
+
+
+@code {
+    
+    [Parameter]
+    public CellShell CellShell { get; set; }
+    
+    private string cellStyle;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        SetCellStyle(CellShell.CellType);
+    }
+    
+    private void ColorChange()
+    {
+        CellShell.RotateType();
+        SetCellStyle(CellShell.CellType);
+    }
+
+    private void SetCellStyle(InHtmlTables.Cell.GuessedCellType cellType)
+    {
+        cellStyle = cellType switch 
+        {
+            InHtmlTables.Cell.GuessedCellType.Unknown => "",
+            InHtmlTables.Cell.GuessedCellType.Position => "bg-primary",
+            InHtmlTables.Cell.GuessedCellType.Price => "bg-success",
+            InHtmlTables.Cell.GuessedCellType.PriceWithVAT => "bg-warning",
+            _ => ""
+            };
+    }
+    
+    // input type by se mohl měnit podle toho, jestli pracuji s pozicí, nebo cenou
+    // mohla by se taky udělat validace na správně zadanou cenu
+    
+    //+ validace pokud se při načtení tabulky liší (merged value vs original value)?
+
+}

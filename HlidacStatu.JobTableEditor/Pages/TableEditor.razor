@@ -1,0 +1,54 @@
+﻿@page "/tableEditor"
+
+@using HlidacStatu.JobTableEditor.Data
+@using HlidacStatu.JobTableEditor.Components
+
+@inject JobService JobService
+
+<h1>Job editor</h1>
+
+@if (table == null)
+{
+    <p>
+        <button @onclick="LoadNewTable">Load New Table</button>
+    </p>
+}
+else
+{
+    <table class="table">
+        <tbody>
+        @foreach (var row in table.Cells)
+        {
+            <tr>
+                @foreach (var cell in row)
+                {
+                    <Cell CellShell="@cell"></Cell>
+                }
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <button @onclick="SaveTable">Save changes</button>
+}
+
+@code {
+    private SomeTable table;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+    //forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    }
+
+    private async Task LoadNewTable()
+    {
+        table = await JobService.GetNewTable();
+    }
+
+    private async Task SaveTable()
+    {
+        await JobService.SaveChanges(table);
+    }
+
+}
