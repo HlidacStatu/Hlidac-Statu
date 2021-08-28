@@ -280,25 +280,23 @@ namespace HlidacStatu.XLib.Render
         public decimal Value { get; set; }
     }
 
-    public class Series
-    {
+    public class Series : Series<SeriesData> {
+        [JsonProperty("color")]
+        public string Color { get; set; }
+
         public enum SeriesType
         {
             column, line
         }
-
-        private int? _yAxis = null;
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-        [JsonProperty("color")]
-        public string Color { get; set; }
         [JsonProperty("type")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public SeriesType Type { get; set; } = SeriesType.column;
+        public SeriesType? Type { get; set; } = null;
+
+
+        private int? _yAxis = null;
         [JsonProperty("yAxis")]
-        public int YAxis 
-        { 
+        public int YAxis
+        {
             get
             {
                 if (_yAxis is null)
@@ -319,12 +317,29 @@ namespace HlidacStatu.XLib.Render
             set
             {
                 _yAxis = value;
-            } 
+            }
         }
-        [JsonProperty("data")]
-        public SeriesData[] Data { get; set; }
         [JsonProperty("tooltip")]
         public SeriesTooltip SeriesTooltip { get; set; }
+
+    }
+    public class SeriesTextValue : Series<SeriesDataTextValue> {
+        [JsonProperty("colorByPoint")]
+        public bool ColorByPoint { get; set; } 
+
+
+    }
+
+    public class Series<T>
+    {
+
+
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("data")]
+        public T[] Data { get; set; }
     }
 
     public class SeriesTooltip
@@ -347,6 +362,19 @@ namespace HlidacStatu.XLib.Render
         }
         [JsonProperty("x")]
         public int X { get; set; }
+        [JsonProperty("y")]
+        public decimal Y { get; set; }
+    }
+    public class SeriesDataTextValue
+    {
+        public SeriesDataTextValue() { }
+        public SeriesDataTextValue(string name, decimal value)
+        {
+            Name = name;
+            Y = value;
+        }
+        [JsonProperty("name")]
+        public string Name { get; set; }
         [JsonProperty("y")]
         public decimal Y { get; set; }
     }

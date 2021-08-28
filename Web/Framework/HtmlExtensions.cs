@@ -288,6 +288,63 @@ namespace HlidacStatu.Web.Framework
             }
         }
 
+
+
+        public static IHtmlContent PieChart(this IHtmlHelper htmlHelper,
+            string title,
+            SeriesTextValue data,
+            int height = 300,
+            string xTooltip = "Rok",
+            string yTitleLeft = "Hodnota (Kč)",
+            string yTitleRight = "")
+        {
+            string random = Guid.NewGuid().ToString("N");
+            var sb = new System.Text.StringBuilder();
+
+            sb.AppendLine($"<div id='{random}' ></div>");
+            sb.AppendLine("<script type='text/javascript'>");
+            sb.AppendLine($"var g_{random};");
+            sb.AppendLine("$(document).ready(function () {");
+            //sb.AppendLine(GraphTheme());
+            sb.AppendLine($"g_{random} = new Highcharts.Chart(");
+
+            var anon = new
+            {
+                chart = new
+                {
+                    spacingTop = 30,
+                    renderTo = random,
+                    height = (height),
+                    type = "pie",
+                },
+                legend = new
+                {
+                    enabled = false,
+                    //reversed = true,
+                    symbolHeight = 15,
+                    symbolWidth = 15,
+                    squareSymbol = true
+                },
+                title = new
+                {
+                    y = -10,
+                    useHtml = true,
+                    align = "left",
+                    text = $"<span class=\"chart_title\">{title}</span>",
+                },
+                navigation = new { buttonOptions = new { enabled = false } },
+                series = new SeriesTextValue[] { data }
+
+            };
+
+
+            var ser = Newtonsoft.Json.JsonConvert.SerializeObject(anon, new Newtonsoft.Json.JsonSerializerSettings() { NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore });
+            sb.Append(ser);
+            sb.Append(");});");
+            sb.AppendLine("</script>");
+            return htmlHelper.Raw(sb.ToString());
+        }
+
         public static IHtmlContent ColumnGraph(this IHtmlHelper htmlHelper,
             string title,
             Series[] series,
