@@ -119,7 +119,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.DetectJobs", ".
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{ACC852FC-5016-48E7-80DF-ABD60A162FB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HlidacStatu.JobTableEditor", "HlidacStatu.JobTableEditor\HlidacStatu.JobTableEditor.csproj", "{EF59CD86-CAF1-439C-A76D-2FECC4897B7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.JobTableEditor", "HlidacStatu.JobTableEditor\HlidacStatu.JobTableEditor.csproj", "{EF59CD86-CAF1-439C-A76D-2FECC4897B7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.Data.External.Tables", "Lib.Data.External.Tables\Lib.Data.External.Tables.csproj", "{956497F7-9609-442E-8AB1-5F0AEEBF8081}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -299,6 +301,10 @@ Global
 		{EF59CD86-CAF1-439C-A76D-2FECC4897B7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF59CD86-CAF1-439C-A76D-2FECC4897B7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF59CD86-CAF1-439C-A76D-2FECC4897B7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{956497F7-9609-442E-8AB1-5F0AEEBF8081}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{956497F7-9609-442E-8AB1-5F0AEEBF8081}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{956497F7-9609-442E-8AB1-5F0AEEBF8081}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{956497F7-9609-442E-8AB1-5F0AEEBF8081}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

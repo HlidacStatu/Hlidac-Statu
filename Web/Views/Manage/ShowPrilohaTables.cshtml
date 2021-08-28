@@ -1,4 +1,4 @@
-﻿@model HlidacStatu.Lib.Data.External.Camelot.CamelotResult[]
+﻿@model HlidacStatu.Lib.Data.External.Tables.Camelot.CamelotResult[]
 @using HlidacStatu.Entities;
 @using HlidacStatu.Repositories
 @using System.Linq;
@@ -15,7 +15,7 @@
         return;
     }
 
-    var tbls = Model.Select(m => new HlidacStatu.Lib.Data.External.Camelot.CamelotResultWithJobs(m)).ToArray();
+    var tbls = Model.Select(m => new HlidacStatu.Lib.Data.External.Tables.Camelot.CamelotResultWithJobs(m)).ToArray();
 }
 
 @for (int i = 0; i < Model.Length; i++)

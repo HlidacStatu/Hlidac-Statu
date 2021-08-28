@@ -1,6 +1,6 @@
 ﻿using Couchbase;
 
-using HlidacStatu.Lib.Data.External.Camelot;
+using HlidacStatu.Lib.Data.External.Tables.Camelot;
 
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HlidacStatu.Lib.Data.External.Camelot
+namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
     public class CamelotVersionData
     {

@@ -33,7 +33,7 @@ namespace HlidacStatu.Web.Controllers
             if (sml == null || pr == null)
                 return NotFound();
 
-            Lib.Data.External.Camelot.CamelotResult[] res = Extensions.SmlouvaPrilohaExtension.GetTablesFromPriloha(sml, pr);
+            Lib.Data.External.Tables.Result[] res = Extensions.SmlouvaPrilohaExtension.GetTablesFromPriloha(sml, pr);
 
             return View(res);
         }

@@ -4,39 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HlidacStatu.Lib.Data.External.Camelot
+namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
     public class Client
     {
 
-        public static async Task<CamelotResult[]> GetMaxTablesFromPDFAsync(string pdfUrl, CamelotResult.Formats format = CamelotResult.Formats.HTML, string pages = "all", TimeSpan? executionTimeout = null)
-        {
-            List<CamelotResult> res = new List<CamelotResult>();
-            CamelotResult resLatt = null;
-            CamelotResult resStre = null;
-            ParallelOptions po = new ParallelOptions();
-            if (System.Diagnostics.Debugger.IsAttached)
-                po = new ParallelOptions() { MaxDegreeOfParallelism = 1 };
 
-            Parallel.Invoke(po,
-                 () =>
-                {
-                    resLatt = GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.lattice, format, pages).Result;
-                    if (resLatt.Status != CamelotResult.Statuses.Error.ToString())
-                        res.Add(resLatt);
-                },
-                () =>
-                {
-                    resStre = GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.stream, format, pages).Result;
-                    if (resStre.Status != CamelotResult.Statuses.Error.ToString())
-                        res.Add(resStre);
-                });
-            if (resLatt.ErrorOccured() && resStre.ErrorOccured())
-                return null;
-
-            return res.ToArray();
-        }
-        public static async Task<CamelotResult> GetTablesFromPDFAsync(string pdfUrl, ClientLow.Commands command, CamelotResult.Formats format = CamelotResult.Formats.HTML, string pages = "all", TimeSpan? executionTimeout = null)
+        public static async Task<CamelotResult> GetTablesFromPDFAsync(string pdfUrl, ClientLow.Commands command, CamelotResult.Formats format = CamelotResult.Formats.JSON, string pages = "all", TimeSpan? executionTimeout = null)
         {
             executionTimeout = executionTimeout ?? TimeSpan.FromMinutes(15);
 

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-		<VersionSuffix>1.0.0.$([System.DateTime]::UtcNow.ToString(mmff))</VersionSuffix>
+		<!--<VersionSuffix>1.0.0.$([System.DateTime]::UtcNow.ToString(mmff))</VersionSuffix>-->
 		<AssemblyVersion Condition=" '$(VersionSuffix)' == '' ">1.0.0.0</AssemblyVersion>
 		<AssemblyVersion Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)</AssemblyVersion>
 		<Version Condition=" '$(VersionSuffix)' == '' ">1.0.0.0</Version>
@@ -51,25 +51,25 @@
         <PackageReference Include="Devmasters.Core" Version="2.4.3" />
         <PackageReference Include="Devmasters.Lang" Version="2.4.8" />
         <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.2.0" />
-        <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.311" />
-        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.17.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.8" />
+        <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.319" />
+        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.18.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.9" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.8" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.8" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.8" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.8" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.8" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.8" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.8">
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.9" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.9" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.9" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.9">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="5.0.8" />
+        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="5.0.9" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
         <PackageReference Include="PDFtoImage" Version="1.1.3" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.4" />
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.1.4" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.5" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.1.5" />
     </ItemGroup>
 
     <ItemGroup>
@@ -83,6 +83,7 @@
       <ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
       <ProjectReference Include="..\HlidacStatu.Q\HlidacStatu.Q.csproj" />
       <ProjectReference Include="..\KIndexGenerator\KIndexGenerator.csproj" />
+      <ProjectReference Include="..\Lib.Data.External.Tables\Lib.Data.External.Tables.csproj" />
       <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
       <ProjectReference Include="..\LibCore\LibCore.csproj" />
       <ProjectReference Include="..\Plugin.Enhancers\Plugin.Enhancers.csproj" />

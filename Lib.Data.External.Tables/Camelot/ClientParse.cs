@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HlidacStatu.Lib.Data.External.Camelot
+namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
 
     public class ClientParse
@@ -101,7 +101,7 @@ namespace HlidacStatu.Lib.Data.External.Camelot
             }
             catch (Exception e)
             {
-                return new ApiResult<CamelotResult>(false);
+                return new ApiResult(false);
             }
         }
         public async Task<ApiResult<CamelotVersionData>> VersionAsync()

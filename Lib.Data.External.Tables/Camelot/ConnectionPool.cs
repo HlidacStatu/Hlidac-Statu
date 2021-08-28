@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HlidacStatu.Lib.Data.External.Camelot
+namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
     //hloupe reseni
     public class ConnectionPool : IApiConnection
