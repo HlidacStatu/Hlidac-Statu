@@ -3,6 +3,8 @@
 @using Nest;
 @using Devmasters.Enums;
 @using System.Linq;
+@using HlidacStatu.XLib.Render;
+@using HlidacStatu.Lib.Analytics;
 @using HlidacStatu.Datasets
 @using HlidacStatu.Datastructures.Graphs
 @using HlidacStatu.Entities
@@ -148,7 +150,7 @@
         }
 
         <p>
-            V roce @(currentSeasonYear) uzavřel @(Model.JsemOVM()? "úřad" : "subjekt")
+            V roce @(currentSeasonYear) uzavřel @(Model.JsemOVM() ? "úřad" : "subjekt")
             <a href="/hledat?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND datumUzavreni:[{currentSeasonYear}-01-01 TO {currentSeasonYear + 1}-01-01}}")">
                 @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)seasonStat.PocetSmluv, "<strong>0 </strong>smluv", "<strong>jednu </strong>smlouvu", "<strong>{0} </strong>smluvy", "<strong>{0:### ### ##0} </strong>smluv"))
             </a>
@@ -190,6 +192,55 @@
                 Největší smlouvy v @(currentSeasonYear) byly uzavřeny v oblastech
                 @Html.Raw(HlidacStatu.Util.RenderData.LimitedList(4, obls, itemsDelimiter: ", ", lastItemDelimiter: ", ", moreTextPrefix: " a dalších."))
             </p>
+        }
+        @if (statistics.Summary(statistics.YearsAfter2016()).PocetSmluv > 0)
+        {
+            <div class="row">
+                <div class="col-sm-12 col-xs-12">
+                    <hr />
+                    @{ 
+                        var statisticsAfter2016 = statistics
+                            .Where(s => statistics.YearsAfter2016().Contains(s.Year))
+                            .OrderBy(s => s.Year);
+                        //Graf hodnota smluv
+                        var hodnotaSmluvGraphData = new Series[]
+                        {
+                            new()
+                            {
+                                Name = "Hodnota smluv",
+                                Type = Series.SeriesType.column,
+                                Data = statisticsAfter2016
+                                    .Select(x => new SeriesData(x.Year, x.Value.CelkovaHodnotaSmluv)).ToArray(),
+                                SeriesTooltip = new SeriesTooltip()
+                                {
+                                    ValueSuffix = " Kč"
+                                }
+                            },
+                            new()
+                            {
+                                Name = "Hodnota smluv se soukromými subjekty",
+                                Type = Series.SeriesType.column,
+                                Data = statisticsAfter2016
+                                    .Select(x => new SeriesData(x.Year, x.Value.CelkovaHodnotaSmluvSeSoukrSubj)).ToArray(),
+                                SeriesTooltip = new SeriesTooltip()
+                                {
+                                    ValueSuffix = " Kč"
+                                }
+                            },
+                            new()
+                            {
+                                Name = "Počet smluv bez ceny",
+                                Data = statisticsAfter2016
+                                    .Select(x => new SeriesData(x.Year, x.Value.PocetSmluvBezCeny)).ToArray(),
+                                Type = Series.SeriesType.line,
+
+                            }
+                        };
+                    }
+                    @Html.ColumnGraph("Hodnota smluv po letech", hodnotaSmluvGraphData, yTitleRight: "Počet smluv")
+                </div>
+
+            </div>
         }
         <a href="/subjekt/RegistrSmluv/@Model.ICO" class="moreinfolink text-uppercase"><strong>Zobrazit podrobnosti o registru smluv</strong></a>
     </div>
@@ -253,6 +304,8 @@
         @{
             //var dotaceService = new DotaceService();
             var dotaceSummary = Model.StatistikaDotaci().Summary();
+            var dotaceHoldingStat = Model.HoldingStatistikaDotaci(Relation.AktualnostType.Nedavny);
+            var dotaceHoldingSummary = dotaceHoldingStat.Summary();
             string durl = "/dotace/hledat?Q=ico%3A+" + Model.ICO;
             //var dotaceStat = dotaceSummary.PocetDotaci;
 
@@ -283,8 +336,6 @@
 
         @if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count() > 0)
         {
-            var dotaceHoldingStat = Model.HoldingStatistikaDotaci(Relation.AktualnostType.Nedavny);
-            var dotaceHoldingSummary = dotaceHoldingStat.Summary();
             var subjectsWithSubsidiesCount = Model.Holding(Relation.AktualnostType.Nedavny)
                 .Where(s => s.StatistikaDotaci().HasStatistics).Count();
 
@@ -358,6 +409,47 @@
                         firmy @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35) nedostaly žádné dotace.
                     </p>}
             }
+        }
+
+        @if (dotaceHoldingSummary.PocetDotaci > 0)
+        {
+            string holdingSubsidiesTitle = $"Přehled čerpání dotací ";
+            if (Model.JsemOVM())
+            {
+                holdingSubsidiesTitle += (Model.IcosInHolding(Relation.AktualnostType.Nedavny).Count() > 0 ? "úřadu včetně podřízených organizací" : "úřadu");
+            }
+            else
+            {
+                holdingSubsidiesTitle += (Model.IcosInHolding(Relation.AktualnostType.Nedavny).Count() > 0 ? "firmy" : "holdingu");
+            }
+
+            var holdingFirmy = Model.Holding(Relation.AktualnostType.Nedavny).ToList();
+            var holdingFirmyWithSubsidies = holdingFirmy.Where(c => c.StatistikaDotaci().HasStatistics).Append(Model);
+
+            var holdingStats = StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(
+                holdingFirmyWithSubsidies.Select(f => f.StatistikaDotaci())
+            );
+            var holdingGraphData = new Series[]
+            {
+                new()
+                {
+                    Name = "Celkem Kč",
+                    Type = Series.SeriesType.column,
+                    Data = holdingStats
+                        .Where(x => x.Year > 0)
+                        .OrderBy(x => x.Year)
+                        .Select(x => new SeriesData(x.Year, x.Value.CelkemCerpano)).ToArray(),
+                    SeriesTooltip = new SeriesTooltip()
+                    {
+                        ValueSuffix = " Kč"
+                    }
+                },
+
+            };
+            <div>
+                <hr />
+                @Html.ColumnGraph(holdingSubsidiesTitle, holdingGraphData, yTitleLeft: "Celkem čerpáno", yTitleRight: "")
+            </div>
         }
 
         <a href="/subjekt/Dotace/@Model.ICO" class="moreinfolink text-uppercase"><strong>Zobrazit podrobnosti o dotacích</strong></a>
