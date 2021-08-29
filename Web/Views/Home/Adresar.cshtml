@@ -40,13 +40,13 @@
 
 @if (string.IsNullOrEmpty(Model.oborName))
 {
-    <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@(User.Identity?.IsAuthenticated.ToString())">
+    <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H">
         <partial name="Partials/Adresar_Index" />
     </cache>
 }
 else
 {
-    <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@(User.Identity?.IsAuthenticated.ToString())">
+    <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.oborName}_{Model.kraj}")">
         <partial name="Partials/Adresar_List" model=Model />
     </cache>
 
