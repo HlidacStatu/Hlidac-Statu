@@ -12,33 +12,42 @@ namespace HlidacStatu.Lib.Data.External.Tables
     {
         public class Table
         {
-            public string Content { get; set; }
+            string _context = "";
+            public string Content {
+                get { return _context; }
+                set { _parsedContent = null; _context = value; }
+            }
             public long Page { get; set; }
             public long TableInPage { get; set; }
 
+
+            private string[][] _parsedContent = null;
             public string[][] ParsedContent()
             {
-                string[][] cells = new string[0][];
-
-                var json = Newtonsoft.Json.Linq.JArray.Parse(this.Content);
-                var numRows = json.Count;
-                var numCells = 0;
-                if (numRows > 0)
+                if (_parsedContent == null)
                 {
-                    cells = new string[numRows][];
-                    for (int r = 0; r < numRows; r++)
+                    string[][] cells = new string[0][];
+
+                    var json = Newtonsoft.Json.Linq.JArray.Parse(this.Content);
+                    var numRows = json.Count;
+                    var numCells = 0;
+                    if (numRows > 0)
                     {
-                        var row = (Newtonsoft.Json.Linq.JObject)json[r];
-                        cells[r] = new string[row.Count];
-                        for (int c = 0; c < row.Count; c++)
+                        cells = new string[numRows][];
+                        for (int r = 0; r < numRows; r++)
                         {
-                            cells[r][c] = row.GetValue(c.ToString()).Value<string>();
+                            var row = (Newtonsoft.Json.Linq.JObject)json[r];
+                            cells[r] = new string[row.Count];
+                            for (int c = 0; c < row.Count; c++)
+                            {
+                                cells[r][c] = row.GetValue(c.ToString()).Value<string>();
+                            }
+
                         }
-
                     }
+                    _parsedContent = cells;
                 }
-
-                return cells;
+                return _parsedContent;
             }
         }
         public enum Statuses

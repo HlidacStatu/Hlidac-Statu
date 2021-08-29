@@ -1,10 +1,13 @@
-﻿@model HlidacStatu.Lib.Data.External.Tables.Camelot.CamelotResult[]
+﻿@model HlidacStatu.Lib.Data.External.Tables.Result[]
 @using HlidacStatu.Entities;
 @using HlidacStatu.Repositories
 @using System.Linq;
 
 @{
     ViewBag.Title = "Tabulky v priloze";
+
+
+
     Smlouva sml = SmlouvaRepo.Load(this.Context.Request.Query["s"].ToString());
     Smlouva.Priloha priloha = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == this.Context.Request.Query["p"].ToString());
 
@@ -30,8 +33,9 @@
         {
             <div style="font-size:120%;padding:15px 0 5px 0;" id="@($"{Model[i].Algorithm}_{tbl.Page}_{tbl.TableInPage}")">
                 @(Model[i].Algorithm) <b>Strana @tbl.Page</b>, tabulka na stránce <b>@tbl.TableInPage</b>
-                <a target="_blank" href="ShowPrilohaTablesOnePage?s=@(this.Context.Request.Query["s"].ToString())&p=@(this.Context.Request.Query["p"].ToString())&page=@tbl.Page">Ukázat stránku</a>
-                <a target="_blank" href="@(priloha.odkaz)">Otevřít PDF</a> 
+                <br/>
+                <a target="_blank" href="ShowPrilohaTablesOnePage?s=@(this.Context.Request.Query["s"].ToString())&p=@(this.Context.Request.Query["p"].ToString())&page=@tbl.Page"><i class="far fa-file-alt"></i> Ukázat stránku</a>
+                <a target="_blank" href="@(priloha.odkaz)" style="padding-left:20px"><i class="far fa-file-pdf"></i> Otevřít celé PDF</a> 
             </div>
             @if (tbl.FoundJobs.Length > 0)
             {
@@ -51,7 +55,18 @@
                 </div>
             }
             <div style="background-color:#e0e0e0">
-                @Html.Raw(tbl.Content.Replace("\\n", "\n").Replace("\\t", " ")) @*TODO check Scripts, Cross site scripting*@
+                <table class="table table-bordered table-striped table-condensed">
+                @foreach (var r in tbl.ParsedContent())
+                {
+                    <tr>
+                        @foreach (var c in r)
+                        {
+                            <td>@c</td>
+                        }
+                    </tr>
+
+                }
+                    </table>
             </div>
         }
     }

@@ -9,7 +9,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
     public class CamelotResultWithJobs : CamelotResult
     {
 
-        public CamelotResultWithJobs(CamelotResult cr)
+        public CamelotResultWithJobs(Result cr)
         {
             if (cr == null)
                 throw new ArgumentNullException("cr");
@@ -24,7 +24,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     tbl.TableInPage = crT.TableInPage;
 
                     var score = HlidacStatu.DetectJobs.InHtmlTables.TableWithWordsAndNumbers(
-                        tbl.Content, 
+                        tbl.ParsedContent(), 
                         HlidacStatu.DetectJobs.InHtmlTables.SpecificWords, out var foundJobs, out var cells);
                     if (foundJobs != null)
                         tbl.FoundJobs = foundJobs.ToArray();
@@ -38,8 +38,6 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             this.ElapsedTimeInMs = cr.ElapsedTimeInMs;
             this.Format = cr.Format;
             this.FoundTables = cr.FoundTables;
-            this.ScriptOutput = cr.ScriptOutput;
-            this.SessionId = cr.SessionId;
             this.Status = cr.Status;
             this.Tables = cr.Tables;
 
