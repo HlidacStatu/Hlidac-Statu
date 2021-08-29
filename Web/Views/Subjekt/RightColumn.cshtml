@@ -49,7 +49,7 @@
         else
         {
             var rppOsoby = Model.CeoFromRPP();
-            if (rppOsoby.Count()>0)
+            if (rppOsoby.Count() > 0)
             {
                 <div class="col-sm-4">
                     <div class="person-profile-thumb">
@@ -62,9 +62,8 @@
                     <p class="py-0 my-0 text-muted">Zastupovaný</p>
                     @foreach (var os in rppOsoby)
                     {
-                            <p class="py-0 my-0 lead">@($"{os.jmeno.Capitalize()} {os.prijmeni.Capitalize()}")</p>
-                            <p class="py-0 my-0 text-muted small">změna @(os.poslednizmena?.ToString("dd.MM.yyyy"))</p>
-                        }
+                        <p class="py-0 my-0 lead">@($"{os.jmeno.Capitalize()} {os.prijmeni.Capitalize()}")</p>
+                        <p class="py-0 my-0 text-muted small">změna @(os.poslednizmena?.ToString("dd.MM.yyyy"))</p>
                     }
                 </div>
             }
