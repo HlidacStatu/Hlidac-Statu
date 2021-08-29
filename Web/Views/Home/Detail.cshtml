@@ -424,7 +424,7 @@
         Stálé URL tohoto záznamu na tomto serveru:
     </td>
     <td>
-        <a href="@Url.Action("Detail", new {id = Model.Id})" target="_blank">https://www.hlidacstatu.cz@(Url.Action("Detail", new {id = Model.Id}))</a>
+        <a href="@Model.GetUrl()" target="_blank">https://www.hlidacstatu.cz@(Url.Action("Detail", new {id = Model.Id}))</a>
     </td>
 </tr>
 <tr>
