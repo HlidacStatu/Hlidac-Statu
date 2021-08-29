@@ -276,7 +276,7 @@
         @if (Model.ciziMena != null && Model.ciziMena.mena != null)
         {
             @Html.Raw(Model.ciziMena.hodnota > 0 && Model.ciziMena.mena != "CZK" ?
-                "<p>Cena v cizí měně: <b>{Smlouva.NicePrice(Model.ciziMena.hodnota, Model.ciziMena.mena, html: true)}</b></p>" : "")
+                $"<p>Cena v cizí měně: <b>{Smlouva.NicePrice(Model.ciziMena.hodnota, Model.ciziMena.mena, html: true)}</b></p>" : "")
         }
     </td>
 </tr>
