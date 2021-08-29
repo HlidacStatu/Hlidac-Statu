@@ -39,32 +39,6 @@ namespace HlidacStatu.Repositories
                     case Firma.Zatrideni.StatniOrganizaceObor.Vse:
                         icos = GetAllSubjektyFromRPP();
                         break;
-                    case Firma.Zatrideni.StatniOrganizaceObor.Zdravotni_ustavy:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Hasicsky_zachranny_sbor:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Krajske_hygienicke_stanice:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Krajska_statni_zastupitelstvi:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Krajske_soudy:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Soudy:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Statutarni_mesta:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Verejne_vysoke_skoly:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Krajska_reditelstvi_policie:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Statni_fondy:
-                    case Firma.Zatrideni.StatniOrganizaceObor.OSSZ:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Kraje_Praha:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Zdravotni_pojistovny:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Katastralni_urady:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Ministerstva:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Organizacni_slozky_statu:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Dalsi_ustredni_organy_statni_spravy:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Celni_urady:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Financni_urady:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Konzervatore:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Mestske_casti_Prahy:
-                    case Firma.Zatrideni.StatniOrganizaceObor.OVM_pro_evidenci_skutecnych_majitelu:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Obce_III_stupne:
-                    case Firma.Zatrideni.StatniOrganizaceObor.Obce:
-                        icos = GetSubjektyFromRPP((int)obor);
-                        break;
                     case Firma.Zatrideni.StatniOrganizaceObor.Vsechny_ustredni_organy_statni_spravy:
                         icos = GetSubjektyFromRPP((int)Firma.Zatrideni.StatniOrganizaceObor.Dalsi_ustredni_organy_statni_spravy)
                             .Concat(GetSubjektyFromRPP((int)Firma.Zatrideni.StatniOrganizaceObor.Ministerstva))
@@ -168,7 +142,8 @@ namespace HlidacStatu.Repositories
                         icos = GetSubjektyFromSQL(sql);
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        icos = GetSubjektyFromRPP((int)obor);
+                        break;
                 }
                 bool removeKraj = false;
                 switch (obor)

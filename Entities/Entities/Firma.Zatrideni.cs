@@ -94,14 +94,18 @@ namespace HlidacStatu.Entities
                 [GroupValue("Státní úřady a organizace")]
                 [NiceDisplayName("Státní fondy")]
                 Statni_fondy = 980,
+
                 [Disabled]
                 [GroupValue("Státní úřady a organizace")]
                 [NiceDisplayName("Okresní správy sociálního zabezpečení")]
                 OSSZ = 128,
+
                 [Disabled]
                 [GroupValue("Státní úřady a organizace")]
                 [NiceDisplayName("Katastrální úřady")]
                 Katastralni_urady = 127,
+
+                [SortValue(90)]
                 [GroupValue("Státní úřady a organizace")]
                 [NiceDisplayName("Ministerstva")]
                 Ministerstva = 2926,
@@ -109,6 +113,7 @@ namespace HlidacStatu.Entities
                 [NiceDisplayName("Organizační složky státu")]
                 Organizacni_slozky_statu = 191,
 
+                [SortValue(100)]
                 [GroupValue("Státní úřady a organizace")]
                 [NiceDisplayName("Všechny ústřední orgány státní správy")]
                 Vsechny_ustredni_organy_statni_spravy = 10104,

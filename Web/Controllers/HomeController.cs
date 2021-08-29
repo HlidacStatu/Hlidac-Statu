@@ -671,9 +671,10 @@ text zpravy: {txt}
             return View();
         }
 
-        public ActionResult Adresar()
+        public ActionResult Adresar(string id, string kraj = null)
         {
-            return View();
+            (string oborName, string kraj) model = (id, kraj);
+            return View(model);
         }
 
         public ActionResult Politici(string prefix)

@@ -1,0 +1,146 @@
+﻿@model (string oborName, string kraj)
+
+@using HlidacStatu.Lib;
+@using System.Linq;
+@using Devmasters.Collections
+@using Devmasters
+@using HlidacStatu.Entities
+@using HlidacStatu.Extensions
+@using HlidacStatu.Repositories
+@using Devmasters.Enums
+@using System.Linq
+
+@{
+    Firma.Zatrideni.StatniOrganizaceObor? oborFromId = null;
+    if (Enum.TryParse<Firma.Zatrideni.StatniOrganizaceObor>(Model.oborName, true, out var ob))
+    {
+        oborFromId = ob;
+    }
+
+
+}
+
+@if (oborFromId.HasValue == false)
+{
+    <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@(User.Identity?.IsAuthenticated.ToString())">
+        <partial name="Partials/Adresar_Index" />
+    </cache>
+
+    return;
+}
+
+@{
+    var subjIco = HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty(oborFromId.Value);
+    if (!string.IsNullOrEmpty(Model.kraj))
+    {
+        subjIco = subjIco
+            .Where(m => m.Kraj == Model.kraj)
+            .ToArray();
+    }
+    IEnumerable<Firma> subjs = subjIco.Select(m => Firmy.Get(m.Ico));
+}
+<style>
+
+    .my-0 {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+
+    .py-0 {
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
+</style>
+
+<div class="text-muted">Nezobrazujeme všechny subjekty tohoto typu, ale ty, které jsou zastoupeny v registru smluv</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <table class="table table-new table-new--dotted table-hover">
+            @foreach (var firma in subjs.OrderBy(o=>o.Jmeno))
+            {
+                HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = firma.StatistikaRegistruSmluv();
+                var ceo = firma.Ceo();
+
+                <tr>
+                    <td>
+                        <h4>
+                            @Html.KIndexLabelLink(firma.ICO, 25)
+                            <a href="/subjekt/@firma.ICO">
+                                @(firma.Jmeno)
+                            </a>
+                        </h4>
+                    </td>
+                    <td>
+                        @Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv") za
+                        celkem @Html.Raw(Smlouva.NicePrice(stat.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true))
+                        , u <b>@stat.Summary().PercentSmluvBezCeny.ToString("P2")</b> smluv skrývá cenu
+                    </td>
+                    <td>
+                        @if (ceo.Osoba != null && ceo.Osoba.IsValid())
+                        {
+                            <div class="person-profile-thumb person-profile-thumb--small" style="float:left">
+                                <a href="@ceo.Osoba.GetUrl()">
+                                    <div class="photo">
+                                        <div class="profile-picture" style="width:40px;height:40px;background-image: url('@ceo.Osoba.GetPhotoUrl(local: true)')"></div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div>
+                                <p class="py-0 my-0"><a href="@ceo.Osoba.GetUrl()">@ceo.Osoba.FullName()</a> <span class="text-muted">@ceo.Role</span></p>
+                            </div>
+                        }
+                        else
+                        {
+                            var rppOsoby = firma.CeoFromRPP();
+                            if (rppOsoby.Count() > 0)
+                            {
+                                <div class="person-profile-thumb person-profile-thumb--small" style="float:left">
+                                    <div class="photo">
+                                        <div class="profile-picture" style="width:20px;height:20px;background-image: url('/photo/unknown')"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    @foreach (var os in rppOsoby)
+                                    {
+                                        <p class="py-0 my-0">@($"{os.jmeno.Capitalize()}")&nbsp;@($"{os.prijmeni.Capitalize()}")</p>
+                                    }
+                                </div>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
+</div>
+
+<partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("Upozornit na chybu"))" />
+
+
+
+@functions
+{
+    private void SubjectStatistic(Firma firma)
+    {
+        HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> item = firma.StatistikaRegistruSmluv();
+
+        string icon = string.Empty;
+        string sclass = "ok";
+
+        <li class="@sclass">
+            @Html.KIndexLabelLink(firma.ICO)<a href="/subjekt/@firma.ICO">@(firma.Jmeno)</a> (
+            @Devmasters.Lang.CS.Plural.Get(item.Summary().PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv");
+            celkem @Html.Raw(Smlouva.NicePrice(item.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true))
+
+            @Html.Raw(
+                firma.ICO == "66003008" ?
+                    string.Format(", <abbr title='{0:P2} smluv bez cen'>{0:P2} smluv skrývá cenu</abbr>", item.Summary().PercentSmluvBezCeny)
+                    : string.Format(", <abbr title='{0:P2} smluv bez cen'>{0:P2} bez ceny</abbr>", item.Summary().PercentSmluvBezCeny)
+                )
+            )@Html.Raw(icon)
+        </li>
+    }
+}
