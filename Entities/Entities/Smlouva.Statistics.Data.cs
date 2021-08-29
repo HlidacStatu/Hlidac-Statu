@@ -1,7 +1,8 @@
-﻿using HlidacStatu.Lib.Analytics;
+﻿using HlidacStatu.Entities.Entities.Analysis;
+using HlidacStatu.Lib.Analytics;
+
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities.Entities.Analysis;
 
 namespace HlidacStatu.Entities
 {
@@ -22,7 +23,7 @@ namespace HlidacStatu.Entities
                 public decimal SumKcSmluvBezSmluvniStrany { get; set; } = 0;
 
                 public long PocetSmluvSponzorujiciFirmy { get; set; } = 0;
-                public long PocetSmluvBezCenySponzorujiciFirmy  { get; set; }
+                public long PocetSmluvBezCenySponzorujiciFirmy { get; set; }
                 public decimal SumKcSmluvSponzorujiciFirmy { get; set; } = 0;
 
                 public long PocetSmluvSeZasadnimNedostatkem { get; set; }

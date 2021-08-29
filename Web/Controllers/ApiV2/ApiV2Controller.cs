@@ -1,13 +1,14 @@
-﻿using System.Net.Http;
-using System.Net;
-using System;
-using System.IO;
-using HlidacStatu.Repositories;
+﻿using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
-using HlidacStatu.Web.Models.Apiv2;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Swashbuckle.AspNetCore.Annotations;
+
+using System;
 using System.ComponentModel;
+using System.Net;
+using System.Net.Http;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -30,7 +31,7 @@ namespace HlidacStatu.Web.Controllers
         // /api/v2/{id}
         [AuthorizeAndAudit]
         [HttpGet("ping/{text}")]
-        public ActionResult<string> Ping([FromRoute]string text)
+        public ActionResult<string> Ping([FromRoute] string text)
         {
             return "pong " + text;
         }
@@ -65,9 +66,9 @@ namespace HlidacStatu.Web.Controllers
         {
             return Dump(datatype, "");
         }
-            [AuthorizeAndAudit]
+        [AuthorizeAndAudit]
         [HttpGet("dump/{datatype}/{date?}")]
-        public ActionResult<HttpResponseMessage> Dump([FromRoute]string datatype, [FromRoute(Name ="date")] [DefaultValue("")] string date = "null")
+        public ActionResult<HttpResponseMessage> Dump([FromRoute] string datatype, [FromRoute(Name = "date")][DefaultValue("")] string date = "null")
         {
             if (datatype.Contains("..") || datatype.Contains("\\"))
             {
@@ -85,7 +86,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 try
                 {
-                        return File(System.IO.File.ReadAllBytes(fn), "application/zip", System.IO.Path.GetFileName(fn), true);
+                    return File(System.IO.File.ReadAllBytes(fn), "application/zip", System.IO.Path.GetFileName(fn), true);
                 }
                 catch (Exception e)
                 {

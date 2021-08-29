@@ -1,6 +1,9 @@
 ﻿using Devmasters.Enums;
+
 using HlidacStatu.Util;
+
 using Nest;
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -361,7 +364,7 @@ namespace HlidacStatu.Entities.VZ
             return false;
         }
 
-        
+
 
         public string FormattedCena(bool html)
         {
@@ -632,7 +635,7 @@ namespace HlidacStatu.Entities.VZ
         public static VerejnaZakazka FromHtml(string html, int displayId)
         {
             throw new NotImplementedException("not finished yet. See XML parser");
-         
+
         }
 
         public string ToAuditJson()
@@ -657,7 +660,7 @@ namespace HlidacStatu.Entities.VZ
         public bool NotInterestingToShow() { return false; }
 
 
-        
+
 
 
 
@@ -670,7 +673,7 @@ namespace HlidacStatu.Entities.VZ
         }
         public class ExportedVZ
         {
-            public class SubjectExport 
+            public class SubjectExport
             {
                 public SubjectExport() { }
 
@@ -700,7 +703,7 @@ namespace HlidacStatu.Entities.VZ
         }
         public VerejnaZakazka Export(bool allData = false)
         {
-            VerejnaZakazka vz = (VerejnaZakazka) MemberwiseClone();
+            VerejnaZakazka vz = (VerejnaZakazka)MemberwiseClone();
             if (allData == false)
             {
                 if (vz.Dokumenty != null)

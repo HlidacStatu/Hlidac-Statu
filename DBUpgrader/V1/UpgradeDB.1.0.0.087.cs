@@ -4,13 +4,13 @@
 namespace HlidacStatu.DBUpgrades
 {
     public static partial class DBUpgrader
-	{
-		private partial class UpgradeDB
-		{
-			[DatabaseUpgradeMethod("1.0.0.87")]
-			public static void Init_1_0_0_87(IDatabaseUpgrader du)
-			{
-				string sql = @"
+    {
+        private partial class UpgradeDB
+        {
+            [DatabaseUpgradeMethod("1.0.0.87")]
+            public static void Init_1_0_0_87(IDatabaseUpgrader du)
+            {
+                string sql = @"
 update firma
 set typ = 0
 where typ is null
@@ -75,8 +75,8 @@ END
 
 
 ";
-				du.RunDDLCommands(sql);
-			}
-		}
-	}
+                du.RunDDLCommands(sql);
+            }
+        }
+    }
 }

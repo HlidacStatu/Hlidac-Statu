@@ -3,15 +3,15 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.59")]
-			public static void Init_1_0_0_59(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.59")]
+            public static void Init_1_0_0_59(IDatabaseUpgrader du)
+            {
                 string sql = @"SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -45,7 +45,7 @@ END CATCH
 END
 GO
 ";
-    du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
             }
 
@@ -54,5 +54,5 @@ GO
 
         }
 
-	}
+    }
 }

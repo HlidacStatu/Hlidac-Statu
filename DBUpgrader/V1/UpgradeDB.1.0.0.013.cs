@@ -3,16 +3,16 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.13")]
-			public static void Init_1_0_0_13(IDatabaseUpgrader du)
-			{
-				string sql = @"
+            [DatabaseUpgradeMethod("1.0.0.13")]
+            public static void Init_1_0_0_13(IDatabaseUpgrader du)
+            {
+                string sql = @"
 
 IF  EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_AspNetUserTokens_Count]') AND type = 'D')
 BEGIN
@@ -88,15 +88,15 @@ GO
 insert into AspNetUserTokens
 select id, NEWID() as token, getdate() as created, null as lastaccess, 0 as [count] from AspNetUsers
 ";
-				du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
 
-			}
-
-	
+            }
 
 
-		}
 
-	}
+
+        }
+
+    }
 }

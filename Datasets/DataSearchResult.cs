@@ -1,9 +1,9 @@
-﻿using System;
+﻿using HlidacStatu.Repositories;
+using HlidacStatu.Repositories.Searching;
+
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.Searching;
 
 namespace HlidacStatu.Datasets
 {
@@ -19,7 +19,7 @@ namespace HlidacStatu.Datasets
         {
         }
 
-        
+
     }
     public class DataSearchRawResult
     : DataSearchResultBase<Tuple<string, string>>
@@ -101,9 +101,9 @@ namespace HlidacStatu.Datasets
                 });
             }
             return list;
-                //Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(SmlouvaRepo.Search.OrderResult)).Select(
-                //    m => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem() { Value = m.Value, Text = "Řadit " + m.Key }
-                //    ).ToList();
+            //Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(SmlouvaRepo.Search.OrderResult)).Select(
+            //    m => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem() { Value = m.Value, Text = "Řadit " + m.Key }
+            //    ).ToList();
         }
 
 
@@ -168,7 +168,7 @@ namespace HlidacStatu.Datasets
             return ret;
         }
 
-        
+
 
     }
 }

@@ -36,7 +36,7 @@ namespace HlidacStatu.Entities
         [Column("comment")]
         [StringLength(500)]
         public string Comment { get; set; }
-        
+
         public enum ReviewAction
         {
             Denied = 0,

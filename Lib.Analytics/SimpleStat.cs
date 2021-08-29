@@ -13,10 +13,11 @@
 
         public SimpleStat Add(SimpleStat other)
         {
-            return new SimpleStat() {
+            return new SimpleStat()
+            {
                 CelkemCena = CelkemCena + other?.CelkemCena ?? 0,
                 Pocet = Pocet + other?.Pocet ?? 0
-                };
+            };
         }
 
         public override int NewSeasonStartMonth()

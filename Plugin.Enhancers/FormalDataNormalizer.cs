@@ -1,12 +1,9 @@
 ﻿using Devmasters.Collections;
-using HlidacStatu.Lib;
-using HlidacStatu.Entities.Enhancers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Enhancers;
+
+using System.Collections.Generic;
 
 namespace HlidacStatu.Plugin.Enhancers
 {
@@ -35,7 +32,7 @@ namespace HlidacStatu.Plugin.Enhancers
 
         List<string> ciziStaty = new List<string>();
         public void SetInstanceData(object data)
-        { 
+        {
             var test = data as List<string>;
             if (test != null)
                 ciziStaty = test;
@@ -62,20 +59,20 @@ namespace HlidacStatu.Plugin.Enhancers
             return changed;
         }
 
-        private string GetNormalizedIco(string ico,string parametrName, ref Smlouva item)
+        private string GetNormalizedIco(string ico, string parametrName, ref Smlouva item)
         {
             if (!string.IsNullOrEmpty(ico))
             {
                 var newIco = System.Text.RegularExpressions.Regex.Replace(ico, @"[^0-9]", string.Empty);
                 newIco = Util.ParseTools.NormalizeIco(newIco);
-                if (newIco != ico && Util.DataValidators.CheckCZICO(newIco) && Util.DataValidators.IsFirmaIcoZahranicni(ico)==false)
+                if (newIco != ico && Util.DataValidators.CheckCZICO(newIco) && Util.DataValidators.IsFirmaIcoZahranicni(ico) == false)
                 {
                     item.Enhancements = item.Enhancements.AddOrUpdate(new Enhancement("Normalizováno IČO", "", parametrName, ico, newIco, this));
                     changed = true;
                     return newIco;
                 }
             }
-                return ico;
+            return ico;
         }
 
     }

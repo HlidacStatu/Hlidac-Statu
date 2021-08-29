@@ -43,7 +43,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
                     //je nasleduji dal nez 1 min?
                     if (i < data.Length - 1 && (RoundToMin(data[i + 1].clock) - prev.Time).TotalMinutes > 2)
                     {
-                        avail.Add(new ZabAvailability() { Time = d.AddMinutes(1), Response = curr.value, DownloadSpeed = null, HttpStatusCode = null});
+                        avail.Add(new ZabAvailability() { Time = d.AddMinutes(1), Response = curr.value, DownloadSpeed = null, HttpStatusCode = null });
                     }
                     //jinak to preskoc
                 }

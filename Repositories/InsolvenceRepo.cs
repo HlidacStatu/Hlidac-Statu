@@ -1,11 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using HlidacStatu.Entities.Insolvence;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
+
 using Microsoft.EntityFrameworkCore;
+
 using Nest;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
@@ -22,7 +25,7 @@ namespace HlidacStatu.Repositories
                     ? client.Get<Rizeni>(spisovaZnacka)
                     : client.Get<Rizeni>(spisovaZnacka, s => s
                             .SourceExcludes("dokumenty.plainText")
-                        //.SourceExclude("")
+                    //.SourceExclude("")
                     );
 
                 if (rizeni.Found)
@@ -99,7 +102,7 @@ namespace HlidacStatu.Repositories
         private static InsolvenceSearchResult NewSubjektVInsolvenci(int count, string typ, bool limitedView)
         {
             var rs = InsolvenceRepo.Searching.SimpleSearch("dluznici.typ:" + typ, 1, count,
-                (int) InsolvenceSearchResult.InsolvenceOrderResult.DateAddedDesc, false, limitedView, null);
+                (int)InsolvenceSearchResult.InsolvenceOrderResult.DateAddedDesc, false, limitedView, null);
 
             return rs;
 
@@ -126,7 +129,7 @@ namespace HlidacStatu.Repositories
                     .From(page * size)
                     .Query(q => q.MatchAll())
                     .Scroll("1m")
-                    .TrackTotalHits(page * size == 0 ? true : (bool?) null)
+                    .TrackTotalHits(page * size == 0 ? true : (bool?)null)
                 );
             };
 
@@ -135,17 +138,17 @@ namespace HlidacStatu.Repositories
                 searchFunc, (hit, param) =>
                 {
                     ids.Add(hit.Id);
-                    return new Devmasters.Batch.ActionOutputData() {CancelRunning = false, Log = null};
+                    return new Devmasters.Batch.ActionOutputData() { CancelRunning = false, Log = null };
                 }, null, outputWriter, progressWriter, false, prefix: "get_id_Insolvence ", blockSize: 10);
             return ids;
         }
-        
+
         private static QueryContainer SpisovaZnackaQuery(string spisovaZnacka)
         {
             return new QueryContainerDescriptor<Osoba>().QueryString(qs =>
                 qs.Query($"spisovaZnacka:\"{spisovaZnacka}\""));
         }
-        
+
         private static string ParseId(string id)
         {
             return id.Replace("_", " ").Replace("-", "/");

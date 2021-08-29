@@ -138,7 +138,7 @@ namespace HlidacStatu.Connectors
                 if (isDbNull)
                     return default(T);
                 else
-                    return (T)Convert.ChangeType(dr[index],baseType);
+                    return (T)Convert.ChangeType(dr[index], baseType);
             }
             else
             {

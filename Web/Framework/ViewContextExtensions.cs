@@ -1,6 +1,7 @@
-using System.Security.Principal;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.Rendering;
+
+using System.Security.Principal;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -10,7 +11,7 @@ namespace HlidacStatu.Web.Framework
         {
             return viewContext.HttpContext.Request.Path;
         }
-        
+
         public static string GetRequestPathAndQuery(this ViewContext viewContext)
         {
             return viewContext.HttpContext.Request.GetEncodedPathAndQuery();
@@ -20,7 +21,7 @@ namespace HlidacStatu.Web.Framework
         {
             return viewContext.HttpContext.User.Identity?.IsAuthenticated ?? false;
         }
-        
+
         public static IIdentity? GetUserIdentity(this ViewContext viewContext)
         {
             return viewContext.HttpContext.User.Identity;
@@ -30,7 +31,7 @@ namespace HlidacStatu.Web.Framework
         {
             return viewContext.HttpContext.Request.GetDisplayUrl();
         }
-        
-        
+
+
     }
 }

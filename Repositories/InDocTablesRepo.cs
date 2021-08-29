@@ -1,7 +1,8 @@
 ﻿using HlidacStatu.Entities;
-using System.Linq;
 
 using Microsoft.EntityFrameworkCore;
+
+using System.Linq;
 
 
 namespace HlidacStatu.Repositories
@@ -39,9 +40,9 @@ namespace HlidacStatu.Repositories
             {
                 var tbl = db.InDocTables
                     .AsNoTracking()
-                    .FirstOrDefault(m=>m.Pk==tblPK);
+                    .FirstOrDefault(m => m.Pk == tblPK);
 
-                if (tbl!=null)
+                if (tbl != null)
                     ChangeStatus(tbl, status, checkedBy, checkElapsedTimeInMS);
             }
         }

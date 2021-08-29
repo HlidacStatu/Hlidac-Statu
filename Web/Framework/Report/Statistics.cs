@@ -1,10 +1,12 @@
-﻿using Nest;
-using System;
-using System.Linq;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatu.XLib.Render;
+
+using Nest;
+
+using System;
+using System.Linq;
 
 namespace HlidacStatu.Web.Framework.Report
 {
@@ -108,7 +110,7 @@ namespace HlidacStatu.Web.Framework.Report
                                         },
                     OrderValueRender = (s) => {
                             DateTime dt = ((DateTime)s).ToUniversalTime();
-                            return HlidacStatu.Util.RenderData.OrderValueFormat(dt); 
+                            return HlidacStatu.Util.RenderData.OrderValueFormat(dt);
                     },
                 },
                 new() { Name="Součet cen",

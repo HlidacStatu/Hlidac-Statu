@@ -1,10 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.OsobyES;
 using HlidacStatu.Repositories.ES;
+
 using Nest;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
@@ -43,7 +45,7 @@ namespace HlidacStatu.Repositories
             ISearchResponse<OsobaES> initialResponse = _esClient.Search<OsobaES>
             (scr => scr.From(0)
                 .Take(scrollSize)
-                .Query(_query => _query.Term(_field => _field.Status, (int) Osoba.StatusOsobyEnum.Politik))
+                .Query(_query => _query.Term(_field => _field.Status, (int)Osoba.StatusOsobyEnum.Politik))
                 .Scroll(scrollTimeout));
 
             if (!initialResponse.IsValid || string.IsNullOrEmpty(initialResponse.ScrollId))

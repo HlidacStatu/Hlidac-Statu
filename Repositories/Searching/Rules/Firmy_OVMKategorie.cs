@@ -1,7 +1,8 @@
-﻿using System;
+﻿using HlidacStatu.Repositories.ES;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Repositories.ES;
 
 namespace HlidacStatu.Repositories.Searching.Rules
 {
@@ -16,7 +17,7 @@ namespace HlidacStatu.Repositories.Searching.Rules
         {
             get
             {
-                return new string[] { "kategorieid:","kategorie:" };
+                return new string[] { "kategorieid:", "kategorie:" };
             }
         }
 

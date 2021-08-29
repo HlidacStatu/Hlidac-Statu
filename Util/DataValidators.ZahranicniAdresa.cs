@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 
 namespace HlidacStatu.Util
 {
@@ -19,7 +15,7 @@ namespace HlidacStatu.Util
             public string Adresa { get; private set; }
             public string Country { get; set; }
 
-            public  bool IsZahranicniAdresa()
+            public bool IsZahranicniAdresa()
             {
 
                 return Country != null;

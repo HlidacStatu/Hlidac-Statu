@@ -10,7 +10,7 @@ namespace HlidacStatu.Connectors.IO
         int hashLen = 0;
         string root = "";
         protected Func<T, string> funcToGetId = null;
-        public DistributedFilePath(int hashLength, string root, Func<T,string> getId)
+        public DistributedFilePath(int hashLength, string root, Func<T, string> getId)
         {
             hashLen = hashLength;
             this.root = root.Trim();
@@ -39,7 +39,7 @@ namespace HlidacStatu.Connectors.IO
 
         public virtual string GetFullPath(T obj, string filename)
         {
-            return GetFullDir(obj) +  filename;
+            return GetFullDir(obj) + filename;
         }
 
         public virtual string GetFullDir(T obj)
@@ -50,7 +50,7 @@ namespace HlidacStatu.Connectors.IO
 
         public virtual string GetRelativeDir(T obj)
         {
-            return GetHash(obj)+ "\\";
+            return GetHash(obj) + "\\";
 
         }
 

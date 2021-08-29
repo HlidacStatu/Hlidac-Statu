@@ -1,8 +1,10 @@
+using Devmasters.Cache.LocalMemory;
+
+using HlidacStatu.Entities;
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Devmasters.Cache.LocalMemory;
-using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories
 {
@@ -10,12 +12,12 @@ namespace HlidacStatu.Repositories
     {
         private const string CacheKey = "BannedIps_service";
         private static readonly AutoUpdatedLocalMemoryCache<List<BannedIp>> _cache;
-        
+
         static BannedIpRepoCached()
         {
             _cache = new AutoUpdatedLocalMemoryCache<List<BannedIp>>(
-                TimeSpan.FromSeconds(30), 
-                CacheKey, 
+                TimeSpan.FromSeconds(30),
+                CacheKey,
                 (_) => BannedIpRepo.GetBannedIps()
             );
         }

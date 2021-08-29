@@ -1,17 +1,20 @@
+using Devmasters;
+using Devmasters.Enums;
+using Devmasters.Lang.CS;
+
+using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.Entities;
+using HlidacStatu.Lib.Analytics;
+using HlidacStatu.Repositories;
+using HlidacStatu.Repositories.Statistics;
+using HlidacStatu.Util;
+
+using Microsoft.EntityFrameworkCore;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Devmasters;
-using Devmasters.Enums;
-using Devmasters.Lang.CS;
-using HlidacStatu.Datastructures.Graphs;
-using HlidacStatu.Lib.Analytics;
-using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.Statistics;
-using HlidacStatu.Util;
-using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Extensions
 {
@@ -27,7 +30,7 @@ namespace HlidacStatu.Extensions
             ret = SmlouvaRepo.Searching.SimpleSearch("osobaid:" + osoba.NameId, 1, 1, 0).Total > 0;
             if (ret) return ret;
 
-            ret =  VerejnaZakazkaRepo.Searching.SimpleSearch("osobaid:" + osoba.NameId, null, 1, 1, "0").Total >
+            ret = VerejnaZakazkaRepo.Searching.SimpleSearch("osobaid:" + osoba.NameId, null, 1, 1, "0").Total >
                    0;
             if (ret) return ret;
 
@@ -38,9 +41,9 @@ namespace HlidacStatu.Extensions
         public static bool IsPolitikBasedOnEvents(this Osoba osoba)
         {
             var ret = osoba.Events(ev =>
-                    ev.Type == (int) OsobaEvent.Types.Politicka
-                    || ev.Type == (int) OsobaEvent.Types.PolitickaPracovni
-                    || ev.Type == (int) OsobaEvent.Types.VolenaFunkce
+                    ev.Type == (int)OsobaEvent.Types.Politicka
+                    || ev.Type == (int)OsobaEvent.Types.PolitickaPracovni
+                    || ev.Type == (int)OsobaEvent.Types.VolenaFunkce
                 )
                 .Where(ev =>
                     (ev.DatumDo.HasValue && ev.DatumDo > minLookBack) ||
@@ -54,7 +57,7 @@ namespace HlidacStatu.Extensions
         public static string CurrentPoliticalParty(this Osoba osoba)
         {
             return osoba.Events(ev =>
-                    ev.Type == (int) OsobaEvent.Types.Politicka
+                    ev.Type == (int)OsobaEvent.Types.Politicka
                     && (ev.AddInfo == "člen strany"
                         || ev.AddInfo == "předseda strany"
                         || ev.AddInfo == "předsedkyně strany"
@@ -78,7 +81,7 @@ namespace HlidacStatu.Extensions
                 case Osoba.StatusOsobyEnum.NeniPolitik:
                     if (osoba.IsPolitikBasedOnEvents())
                     {
-                        osoba.Status = (int) Osoba.StatusOsobyEnum.Politik;
+                        osoba.Status = (int)Osoba.StatusOsobyEnum.Politik;
                         return true;
                     }
 
@@ -90,13 +93,13 @@ namespace HlidacStatu.Extensions
                 case Osoba.StatusOsobyEnum.Sponzor:
                     if (osoba.IsPolitikBasedOnEvents())
                     {
-                        osoba.Status = (int) Osoba.StatusOsobyEnum.Politik;
+                        osoba.Status = (int)Osoba.StatusOsobyEnum.Politik;
                         return true;
                     }
 
                     if (osoba.IsSponzor() == false && osoba.MaVztahySeStatem() == false)
                     {
-                        osoba.Status = (int) Osoba.StatusOsobyEnum.NeniPolitik;
+                        osoba.Status = (int)Osoba.StatusOsobyEnum.NeniPolitik;
                         return true;
                     }
 
@@ -105,18 +108,18 @@ namespace HlidacStatu.Extensions
                     bool chgnd = false;
                     if (osoba.IsPolitikBasedOnEvents() == false)
                     {
-                        osoba.Status = (int) Osoba.StatusOsobyEnum.NeniPolitik;
+                        osoba.Status = (int)Osoba.StatusOsobyEnum.NeniPolitik;
                         chgnd = true;
                     }
 
                     if (chgnd && osoba.IsSponzor() == false && osoba.MaVztahySeStatem() == false)
                     {
-                        osoba.Status = (int) Osoba.StatusOsobyEnum.NeniPolitik;
+                        osoba.Status = (int)Osoba.StatusOsobyEnum.NeniPolitik;
                         chgnd = true;
                     }
                     else
                     {
-                        osoba.Status = (int) Osoba.StatusOsobyEnum.Politik;
+                        osoba.Status = (int)Osoba.StatusOsobyEnum.Politik;
                         chgnd = false;
                     }
 
@@ -173,12 +176,12 @@ namespace HlidacStatu.Extensions
 
         public static IEnumerable<SocialContact> GetSocialContacts(this Osoba osoba)
         {
-            return osoba.Events(oe => oe.Type == (int) OsobaEvent.Types.SocialniSite)
+            return osoba.Events(oe => oe.Type == (int)OsobaEvent.Types.SocialniSite)
                 .Select(oe => new SocialContact
                 {
                     Network = Enum.TryParse<OsobaEvent.SocialNetwork>(oe.Organizace, true, out var socialNetwork)
                         ? socialNetwork
-                        : (OsobaEvent.SocialNetwork?) null,
+                        : (OsobaEvent.SocialNetwork?)null,
                     NetworkText = oe.Organizace,
                     Contact = oe.AddInfo
                 });
@@ -224,7 +227,7 @@ namespace HlidacStatu.Extensions
         {
             if (deletePrevious)
             {
-                var oes = osoba.Events(m => m.Type == (int) OsobaEvent.Types.Specialni);
+                var oes = osoba.Events(m => m.Type == (int)OsobaEvent.Types.Specialni);
                 foreach (var o in oes)
                 {
                     OsobaEventRepo.Delete(o, user);
@@ -246,7 +249,7 @@ namespace HlidacStatu.Extensions
             oe.Zdroj = zdroj;
             oe.DatumOd = new DateTime(rokOd, 1, 1, 0, 0, 0, DateTimeKind.Local);
             oe.DatumDo = rokDo == null
-                ? (DateTime?) null
+                ? (DateTime?)null
                 : new DateTime(rokDo.Value, 12, 31, 0, 0, 0, DateTimeKind.Local);
             return osoba.AddOrUpdateEvent(oe, user);
         }
@@ -261,7 +264,7 @@ namespace HlidacStatu.Extensions
             oe.Zdroj = zdroj;
             oe.DatumOd = new DateTime(rokOd, 1, 1, 0, 0, 0, DateTimeKind.Local);
             oe.DatumDo = rokDo == null
-                ? (DateTime?) null
+                ? (DateTime?)null
                 : new DateTime(rokDo.Value, 12, 31, 0, 0, 0, DateTimeKind.Local);
             return osoba.AddOrUpdateEvent(oe, user);
         }
@@ -531,7 +534,7 @@ namespace HlidacStatu.Extensions
         {
             return osoba.GetPhotoUrl();
         }
-        
+
         public static IOrderedEnumerable<Osoba> OrderPoliticiByImportance(this IEnumerable<Osoba> source)
         {
             return source.OrderBy(o =>

@@ -33,26 +33,26 @@ namespace HlidacStatu.Entities
         public string Algorithm { get; set; }
         [Required]
         public decimal PrecalculatedScore { get; set; }
-        
+
         public int? PreFoundRows { get; set; }
         public int? PreFoundCols { get; set; }
         public int? PreFoundJobs { get; set; }
         [Required]
         public int Status { get; set; }
-        
+
         [StringLength(250)]
         public string CheckedBy { get; set; }
-        
+
         [Column(TypeName = "datetime")]
         public DateTime? CheckedDate { get; set; }
-        
+
         public string Note { get; set; }
         public string Tags { get; set; }
         public int? CheckElapsedInMs { get; set; }
 
 
         public enum CheckStatuses : int
-        { 
+        {
             WaitingInQueue = 0,
             InProgress = 1,
             Done = 2,
@@ -60,8 +60,8 @@ namespace HlidacStatu.Entities
         }
 
         [NotMapped()]
-        public CheckStatuses CheckStatus 
-        { 
+        public CheckStatuses CheckStatus
+        {
             get { return (CheckStatuses)this.Status; }
             set { this.Status = (int)value; }
         }

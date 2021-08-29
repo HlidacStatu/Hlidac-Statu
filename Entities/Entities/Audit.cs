@@ -33,6 +33,6 @@ namespace HlidacStatu.Entities
             Search,
             UserSearch
         }
-        
+
     }
 }

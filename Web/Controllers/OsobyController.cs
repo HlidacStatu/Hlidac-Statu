@@ -1,5 +1,5 @@
-﻿using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
+﻿using HlidacStatu.Repositories;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers
@@ -10,7 +10,7 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult Index(string prefix, string q, bool ftx = false)
         {
             if (!string.IsNullOrEmpty(q))
-                return RedirectToAction("Hledat",new { q=q });
+                return RedirectToAction("Hledat", new { q = q });
 
             return View();
         }

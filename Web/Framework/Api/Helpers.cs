@@ -9,7 +9,7 @@ namespace HlidacStatu.Web.Framework.Api
         {
             if (!req.CanRead)
                 return "";
-            
+
             string ret = "";
             if (req.CanSeek)
                 req.Position = 0;

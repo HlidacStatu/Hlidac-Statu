@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.ExportData
 {
@@ -13,7 +13,7 @@ namespace HlidacStatu.ExportData
                 throw new ArgumentNullException("rows");
             if (rows.Count() == 0)
                 throw new ArgumentOutOfRangeException("rows", "Contains no data");
-            
+
             var first = rows.First();
 
 
@@ -24,8 +24,8 @@ namespace HlidacStatu.ExportData
             {
                 this.Columns.Add(new Column()
                 {
-                     Name = col.Key,
-                     ValueType = col.Value == null ? null : col.Value.GetType()
+                    Name = col.Key,
+                    ValueType = col.Value == null ? null : col.Value.GetType()
                 });
             }
             this.Rows = new List<Row>();
@@ -34,7 +34,7 @@ namespace HlidacStatu.ExportData
                 Dictionary<string, object> vals = Values(row);
                 if (this.Columns.Any(m => m.ValueType == null))
                 {
-                    foreach (var col in this.Columns.Where(m=>m.ValueType == null))
+                    foreach (var col in this.Columns.Where(m => m.ValueType == null))
                     {
                         if (vals.ContainsKey(col.Name) && vals[col.Name] != null)
                             col.ValueType = vals[col.Name].GetType();

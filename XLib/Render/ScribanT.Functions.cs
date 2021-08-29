@@ -1,14 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.Datasets;
+﻿using HlidacStatu.Datasets;
 using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories;
+
 using Newtonsoft.Json.Linq;
+
 using Scriban.Runtime;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.XLib.Render
 {
@@ -170,7 +173,7 @@ namespace HlidacStatu.XLib.Render
                             + $"<a href=\"{o.GetUrl(false)}\">{o.Jmeno}</a></span>";
                     }
                     else
-                        return $"<span>{(string.IsNullOrEmpty(missingCompanyName)? ico : missingCompanyName)}</span>";
+                        return $"<span>{(string.IsNullOrEmpty(missingCompanyName) ? ico : missingCompanyName)}</span>";
                 }
                 return string.Empty;
             }
@@ -184,7 +187,7 @@ namespace HlidacStatu.XLib.Render
                     {
                         var stat = firma.StatistikaRegistruSmluv();
                         var pocet = stat.Sum(stat.YearsAfter2016(), s => s.PocetSmluv);
-                        var celkem = stat.Sum(stat.YearsAfter2016(), s => s.CelkovaHodnotaSmluv); 
+                        var celkem = stat.Sum(stat.YearsAfter2016(), s => s.CelkovaHodnotaSmluv);
 
                         string niceString = $"<a href='/hledatSmlouvy?q=ico:{firma.ICO}'>" +
                             Devmasters.Lang.CS.Plural.Get(pocet, "{0} smlouva;{0} smlouvy;{0} smluv") +
@@ -198,8 +201,8 @@ namespace HlidacStatu.XLib.Render
                 }
                 return string.Empty;
             }
-            public static string fn_RenderCompanyInformations(string ico, int numberOfInfos = 3, string prefix = "", string postfix = "", 
-                string delimiterBetweenInfos="")
+            public static string fn_RenderCompanyInformations(string ico, int numberOfInfos = 3, string prefix = "", string postfix = "",
+                string delimiterBetweenInfos = "")
             {
                 if (!string.IsNullOrEmpty(ico))
                 {

@@ -14,7 +14,7 @@
         public RuleBase(string replaceWith, bool stopFurtherProcessing = false, string addLastCondition = "")
         {
             ReplaceWith = replaceWith;
-            NextStep = stopFurtherProcessing 
+            NextStep = stopFurtherProcessing
                 ? NextStepEnum.StopFurtherProcessing : NextStepEnum.Process;
             AddLastCondition = addLastCondition;
         }
@@ -30,7 +30,7 @@
         {
             var res = processQueryPart(queryPart);
 
-            if (res != null && res.LastConditionAdded == false &&  !string.IsNullOrEmpty(AddLastCondition))
+            if (res != null && res.LastConditionAdded == false && !string.IsNullOrEmpty(AddLastCondition))
             {
                 string rq = AddLastCondition;
                 if (AddLastCondition.Contains("${q}"))

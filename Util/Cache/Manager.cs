@@ -32,7 +32,7 @@ namespace HlidacStatu.Util.Cache
         }
         public virtual T Get(Key key, TimeSpan expiration)
         {
-            return getTCacheInstance(key, expiration, o => contentFunc.Invoke(key)).Get();                
+            return getTCacheInstance(key, expiration, o => contentFunc.Invoke(key)).Get();
         }
 
         protected abstract TCache getTCacheInstance(Key key, TimeSpan expiration, Func<Key, T> contentFunc);
@@ -59,7 +59,7 @@ namespace HlidacStatu.Util.Cache
 
 
         protected static object instancesLock = new object();
-        protected static Dictionary<string, Manager<T, Key,TCache>> instances = new Dictionary<string, Manager<T, Key, TCache>>();
+        protected static Dictionary<string, Manager<T, Key, TCache>> instances = new Dictionary<string, Manager<T, Key, TCache>>();
 
 
 

@@ -3,15 +3,15 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.57")]
-			public static void Init_1_0_0_57(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.57")]
+            public static void Init_1_0_0_57(IDatabaseUpgrader du)
+            {
                 string sql = @"
 
 /****** Object:  Table [dbo].[ItemToOcrQueue]    Script Date: 24/03/2019 11:17:48 ******/
@@ -59,5 +59,5 @@ GO
 
         }
 
-	}
+    }
 }

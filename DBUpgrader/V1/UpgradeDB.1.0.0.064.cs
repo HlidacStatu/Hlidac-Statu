@@ -4,17 +4,17 @@
 namespace HlidacStatu.DBUpgrades
 {
     public static partial class DBUpgrader
-	{
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.64")]
-			public static void Init_1_0_0_64(IDatabaseUpgrader du)
-			{
-				du.AddColumnToTable("status", "int", "firma", true);
+            [DatabaseUpgradeMethod("1.0.0.64")]
+            public static void Init_1_0_0_64(IDatabaseUpgrader du)
+            {
+                du.AddColumnToTable("status", "int", "firma", true);
 
-				string sql = @"
+                string sql = @"
 /****** Object:  StoredProcedure [dbo].[Firma_Save]    Script Date: 1/2/2020 3:32:44 PM ******/
 SET ANSI_NULLS ON
 GO
@@ -72,9 +72,9 @@ ELSE
 END
 ' 
 END";
-				du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
-			}
-		}
-	}
+            }
+        }
+    }
 }

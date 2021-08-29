@@ -11,9 +11,9 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
         public DateTime MinDate { get; private set; } = DateTime.MinValue;
         public DateTime MaxDate { get; private set; } = DateTime.MaxValue;
 
-        public ZabDataPerStatus<TimeSpan> DurationTotal { get; private set; } = new ZabDataPerStatus<TimeSpan>(TimeSpan.Zero, TimeSpan.Zero,TimeSpan.Zero);
+        public ZabDataPerStatus<TimeSpan> DurationTotal { get; private set; } = new ZabDataPerStatus<TimeSpan>(TimeSpan.Zero, TimeSpan.Zero, TimeSpan.Zero);
         public ZabDataPerStatus<TimeSpan> LongestDuration { get; private set; } = new ZabDataPerStatus<TimeSpan>(TimeSpan.Zero, TimeSpan.Zero, TimeSpan.Zero);
-        public ZabDataPerStatus<decimal> PercentOfTime { get; private set; } = new ZabDataPerStatus<decimal>(0,0,0);
+        public ZabDataPerStatus<decimal> PercentOfTime { get; private set; } = new ZabDataPerStatus<decimal>(0, 0, 0);
 
 
         IEnumerable<ZabAvailability> data;

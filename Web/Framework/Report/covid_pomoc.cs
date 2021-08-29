@@ -1,7 +1,8 @@
-﻿using System;
+﻿using HlidacStatu.Datasets;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Datasets;
 
 namespace HlidacStatu.Web.Framework.Report
 {
@@ -23,7 +24,7 @@ namespace HlidacStatu.Web.Framework.Report
             return dataCache.Get();
         }
 
-        static Devmasters.Cache.LocalMemory.LocalMemoryCache<List<covid_pomoc>> dataCache = 
+        static Devmasters.Cache.LocalMemory.LocalMemoryCache<List<covid_pomoc>> dataCache =
             new(TimeSpan.FromMinutes(10), "covid_pomoc",
             (o) =>
             {
@@ -31,5 +32,5 @@ namespace HlidacStatu.Web.Framework.Report
                 return ds.GetAllData<covid_pomoc>().ToList();
             });
 
-        }
+    }
 }

@@ -102,10 +102,11 @@ namespace HlidacStatu.Datastructures.Graphs
                 }
                 if (mergedInterval == false)
                     newInterval.Add(
-                        new Interval() { 
-                          Descr = e.Descr,
-                          RelFrom = e.RelFrom,
-                          RelTo = e.RelTo
+                        new Interval()
+                        {
+                            Descr = e.Descr,
+                            RelFrom = e.RelFrom,
+                            RelTo = e.RelTo
                         }
                         );
                 Intervals = newInterval;

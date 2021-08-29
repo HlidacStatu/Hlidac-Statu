@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using HlidacStatu.Util;
+
+using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Util;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -16,12 +17,12 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             else
                 return Devmasters.TextUtil.RemoveHTML(txt);
         }
-  
+
 
         private string Best(Annual data, int year, string ico, out KIndexParts? usedPart)
         {
             Statistics stat = Statistics.GetStatistics(year);
-            
+
             usedPart = data.OrderedValuesFromBestForInfofacts(ico).FirstOrDefault();
             if (usedPart != null)
             {

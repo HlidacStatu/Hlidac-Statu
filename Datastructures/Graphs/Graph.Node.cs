@@ -28,9 +28,9 @@ namespace HlidacStatu.Datastructures.Graphs
                     if (_uniqId == null)
                     {
                         if (Type == NodeType.Person)
-                            _uniqId= Prefix_NodeType_Person + Id;
+                            _uniqId = Prefix_NodeType_Person + Id;
                         else
-                            _uniqId= Prefix_NodeType_Company + Id;
+                            _uniqId = Prefix_NodeType_Company + Id;
                         UniqIdHashCode = _uniqId.GetHashCode();
                     }
                     return _uniqId;

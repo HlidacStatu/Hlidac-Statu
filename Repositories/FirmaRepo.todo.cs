@@ -1,11 +1,12 @@
+using Devmasters;
+
+using HlidacStatu.Entities;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Devmasters;
-using HlidacStatu.Entities;
-using HlidacStatu.Connectors.External;
 
 namespace HlidacStatu.Repositories
 {
@@ -183,8 +184,8 @@ namespace HlidacStatu.Repositories
                     f.Kod_PF = legal_form.id;
 
                     f.NACE = secondary_industries != null
-                        ? new string[] {industry.id}.Concat(secondary_industries.Select(m => m.id)).ToArray()
-                        : new string[] {industry.id};
+                        ? new string[] { industry.id }.Concat(secondary_industries.Select(m => m.id)).ToArray()
+                        : new string[] { industry.id };
 
                     //f.Popis = 
                     f.Source = link;
@@ -428,14 +429,14 @@ namespace HlidacStatu.Repositories
                         var f = new Firma();
                         f.ICO = Util.ParseTools.MerkIcoToICO(regno.ToString());
                         f.DIC = vatno;
-                        f.DatovaSchranka = new string[] {databox_id};
+                        f.DatovaSchranka = new string[] { databox_id };
                         f.Datum_Zapisu_OR = estab_date;
                         f.Jmeno = name;
                         f.Kod_PF = legal_form.id;
 
                         f.NACE = secondary_industries != null
-                            ? new string[] {industry.id}.Concat(secondary_industries.Select(m => m.id)).ToArray()
-                            : new string[] {industry.id};
+                            ? new string[] { industry.id }.Concat(secondary_industries.Select(m => m.id)).ToArray()
+                            : new string[] { industry.id };
 
                         //f.Popis = 
                         f.Source = link;
@@ -706,21 +707,21 @@ namespace HlidacStatu.Repositories
                 {
                     value = value.Replace(k,
                         k.Replace(' ',
-                            (char) 160)); //nahrad mezery char(160) - non breaking space, aby to tvorilo 1 slovo
+                            (char)160)); //nahrad mezery char(160) - non breaking space, aby to tvorilo 1 slovo
                 }
                 else if (k.EndsWith(".") && value.EndsWith(k.Substring(0, k.Length - 1)))
                 {
                     value = value.Replace(k.Substring(0, k.Length - 1),
                         k.Replace(' ',
-                            (char) 160)); //nahrad mezery char(160) - non breaking space, aby to tvorilo 1 slovo
+                            (char)160)); //nahrad mezery char(160) - non breaking space, aby to tvorilo 1 slovo
                 }
             }
 
             //find company name
-            string[] words = value.Split(new char[] {' ', ',', ';'}, StringSplitOptions.RemoveEmptyEntries);
+            string[] words = value.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries);
 
             //get back space instead of #160
-            words = words.Select(m => m.Replace((char) 160, ' ')).ToArray();
+            words = words.Select(m => m.Replace((char)160, ' ')).ToArray();
 
             for (int firstWord = 0; firstWord < words.Length; firstWord++)
             {

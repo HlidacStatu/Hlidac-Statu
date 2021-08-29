@@ -11,7 +11,7 @@ namespace HlidacStatu.Entities
         { }
 
         public UserOptions(ParameterType option, int? languageId = null)
-            :base(option,languageId)
+            : base(option, languageId)
         {
         }
 
@@ -24,7 +24,7 @@ namespace HlidacStatu.Entities
             if (uo == null)
                 Value = null;
             else
-            Value = uo.GetValue();
+                Value = uo.GetValue();
         }
 
         public new virtual T GetValue()

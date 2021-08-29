@@ -1,13 +1,15 @@
 ﻿using Devmasters;
+
+using EnumsNET;
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Reflection;
 using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using EnumsNET;
+using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace HlidacStatu.Entities
 {
@@ -47,7 +49,7 @@ namespace HlidacStatu.Entities
             {
                 var csv = new CsvHelper.CsvReader(r,
                     new CsvHelper.Configuration.CsvConfiguration(Util.Consts.csCulture)
-                        {HasHeaderRecord = true, Delimiter = "\t"});
+                    { HasHeaderRecord = true, Delimiter = "\t" });
                 csv.Read();
                 csv.ReadHeader();
                 csv.Read(); //skip second line
@@ -145,7 +147,7 @@ namespace HlidacStatu.Entities
             var titulPred = string.Empty;
             var titulPo = string.Empty;
             foreach (var w in normalizedText
-                .Split(new char[] {' ', ','}, StringSplitOptions.RemoveEmptyEntries)
+                .Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries)
             )
             {
                 var newW = w;
@@ -197,7 +199,7 @@ namespace HlidacStatu.Entities
             normalizedText = TextUtil
                 .ReplaceDuplicates(normalizedText, " ");
             string[] wordsFromNormalizedText =
-                normalizedText.Split(new char[] {' ', ','}, StringSplitOptions.RemoveEmptyEntries);
+                normalizedText.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
             string[] words = wordsFromNormalizedText.Select(m => TextUtil.RemoveDiacritics(m).ToLower()).ToArray();
 
 
@@ -216,7 +218,7 @@ namespace HlidacStatu.Entities
                     if (w0 == w1 && w0 != CompareResult.NotFound &&
                         currWords[0] == currWords[1]) //stejne jmeno a prijmeni MUDr. Tomáš Tomáš, PH.D.
                         return new Osoba()
-                            {Jmeno = origWords[0], Prijmeni = origWords[1], TitulPred = titulPred, TitulPo = titulPo};
+                        { Jmeno = origWords[0], Prijmeni = origWords[1], TitulPred = titulPred, TitulPo = titulPo };
 
                     if (
                         w0.HasAnyFlags(CompareResult.FoundInTopJmeno | CompareResult.FoundInJmeno)
@@ -228,7 +230,7 @@ namespace HlidacStatu.Entities
                         && w1 != CompareResult.NotFound
                     )
                         return new Osoba()
-                            {Jmeno = origWords[0], Prijmeni = origWords[1], TitulPred = titulPred, TitulPo = titulPo};
+                        { Jmeno = origWords[0], Prijmeni = origWords[1], TitulPred = titulPred, TitulPo = titulPo };
                     else if (
                         w1.HasAnyFlags(CompareResult.FoundInTopJmeno | CompareResult.FoundInJmeno)
                         && !w1.HasAnyFlags(CompareResult.FoundInTopPrijmeni)
@@ -239,7 +241,7 @@ namespace HlidacStatu.Entities
                         && w0 != CompareResult.NotFound
                     )
                         return new Osoba()
-                            {Jmeno = origWords[1], Prijmeni = origWords[0], TitulPred = titulPred, TitulPo = titulPo};
+                        { Jmeno = origWords[1], Prijmeni = origWords[0], TitulPred = titulPred, TitulPo = titulPo };
 
                     //situace ala
                     //w0 FoundInTopPrijmeni | FoundInTopJmeno    
@@ -250,14 +252,14 @@ namespace HlidacStatu.Entities
                         && w1 != CompareResult.NotFound
                     )
                         return new Osoba()
-                            {Jmeno = origWords[0], Prijmeni = origWords[1], TitulPred = titulPred, TitulPo = titulPo};
+                        { Jmeno = origWords[0], Prijmeni = origWords[1], TitulPred = titulPred, TitulPo = titulPo };
                     if (
                         w1.HasAnyFlags(CompareResult.FoundInTopJmeno | CompareResult.FoundInTopPrijmeni)
                         && !w0.HasAnyFlags(CompareResult.FoundInTopJmeno | CompareResult.FoundInJmeno)
                         && w0 != CompareResult.NotFound
                     )
                         return new Osoba()
-                            {Jmeno = origWords[1], Prijmeni = origWords[0], TitulPred = titulPred, TitulPo = titulPo};
+                        { Jmeno = origWords[1], Prijmeni = origWords[0], TitulPred = titulPred, TitulPo = titulPo };
 
 
                     if (preferAccurateResult)
@@ -525,8 +527,8 @@ namespace HlidacStatu.Entities
                         }
                         else if (valueA != null && valueB != null)
                         {
-                            collectionItems1 = ((IEnumerable) valueA).Cast<object>();
-                            collectionItems2 = ((IEnumerable) valueB).Cast<object>();
+                            collectionItems1 = ((IEnumerable)valueA).Cast<object>();
+                            collectionItems2 = ((IEnumerable)valueB).Cast<object>();
                             collectionItemsCount1 = collectionItems1.Count();
                             collectionItemsCount2 = collectionItems2.Count();
 

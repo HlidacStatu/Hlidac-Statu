@@ -1,13 +1,12 @@
 ﻿using HlidacStatu.Entities;
+using HlidacStatu.Repositories;
+using HlidacStatu.Repositories.ES;
 
 using Nest;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.ES;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -86,9 +85,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         }
         public KIndexLabelValues LastKIndexLabel(int? maxYear = null)
         {
-            return LastKIndexLabel(out int? tmp,maxYear);
+            return LastKIndexLabel(out int? tmp, maxYear);
         }
-        public KIndexLabelValues LastKIndexLabel(out int? rok,int? maxYear= null)
+        public KIndexLabelValues LastKIndexLabel(out int? rok, int? maxYear = null)
         {
 
             var val = LastKIndex(maxYear);

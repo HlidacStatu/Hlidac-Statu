@@ -1,16 +1,18 @@
-﻿using HlidacStatu.Entities;
+﻿using HlidacStatu.Datasets;
+using HlidacStatu.Entities;
+using HlidacStatu.Entities.Insolvence;
 using HlidacStatu.Entities.VZ;
+using HlidacStatu.Repositories;
+using HlidacStatu.Repositories.ES;
+using HlidacStatu.Web.Framework;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using HlidacStatu.Datasets;
-using HlidacStatu.Entities.Insolvence;
-using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.ES;
-using HlidacStatu.Web.Framework;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -77,7 +79,7 @@ namespace HlidacStatu.Web.Controllers
                 }
 
                 int numOfRecords = num ?? 1000;
-                if (string.IsNullOrEmpty(q) || (q?.Contains("*") == true && q?.Length<5))
+                if (string.IsNullOrEmpty(q) || (q?.Contains("*") == true && q?.Length < 5))
                     numOfRecords = 100;
                 if (User.IsInRole("Admin") || User.IsInRole("novinar"))
                 {

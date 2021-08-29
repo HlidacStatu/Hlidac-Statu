@@ -1,14 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using Devmasters;
+
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
 using HlidacStatu.Util;
+
 using Nest;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace HlidacStatu.Repositories
 {
@@ -29,7 +32,7 @@ namespace HlidacStatu.Repositories
 
             static string[] ignoredIcos = Config
                 .GetWebConfigValue("DontIndexFirmy")
-                .Split(new string[] {";", ","}, StringSplitOptions.RemoveEmptyEntries)
+                .Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => m.ToLower())
                 .ToArray();
 
@@ -39,7 +42,7 @@ namespace HlidacStatu.Repositories
 
                 string modifQ = SimpleQueryCreator
                     .GetSimpleQuery(query,
-                        new IRule[] {new Firmy_OVMKategorie()})
+                        new IRule[] { new Firmy_OVMKategorie() })
                     .FullQuery();
 
                 string[] specifiedIcosInQuery =
@@ -59,7 +62,7 @@ namespace HlidacStatu.Repositories
                     if (found.Count() > 0)
                         return new Search.GeneralResult<Firma>(query, specifiedIcosInQuery.Count(), found,
                                 size, true)
-                            {Page = page};
+                        { Page = page };
                 }
 
 
@@ -92,7 +95,7 @@ namespace HlidacStatu.Repositories
                         .Search<FirmaInElastic>(s => s
                             .Size(size)
                             .From(page * size)
-                            .TrackTotalHits(size == 0 ? true : (bool?) null)
+                            .TrackTotalHits(size == 0 ? true : (bool?)null)
                             .Query(q => qc)
                         );
 
@@ -105,12 +108,12 @@ namespace HlidacStatu.Repositories
                         }
 
                         return new Search.GeneralResult<Firma>(query, res.Total, found, size, true)
-                            {Page = page};
+                        { Page = page };
                     }
                     else
                     {
                         Manager.LogQueryError<FirmaInElastic>(res, query);
-                        return new Search.GeneralResult<Firma>(query, 0, found, size, false) {Page = page};
+                        return new Search.GeneralResult<Firma>(query, 0, found, size, false) { Page = page };
                     }
                 }
                 catch (Exception e)

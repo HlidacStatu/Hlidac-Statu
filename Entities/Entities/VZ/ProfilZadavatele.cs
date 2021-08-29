@@ -1,6 +1,6 @@
-﻿using System;
-using System.Linq;
-using Nest;
+﻿using Nest;
+
+using System;
 
 namespace HlidacStatu.Entities.VZ
 {
@@ -44,7 +44,7 @@ namespace HlidacStatu.Entities.VZ
         [Keyword]
         public string DataSet { get; set; }
 
-        
+
 
     }
 

@@ -43,7 +43,7 @@ namespace FullTextSearch
             //json to Sentence list
             tokenizer = tokenizer ?? Tokenizer.DefaultTokenizer();
             options = options ?? Options.DefaultOptions();
-            
+
             List<SerializableSentence<T>> deserializedSentences =
                 JsonSerializer.Deserialize<List<SerializableSentence<T>>>(json);
 
@@ -51,16 +51,16 @@ namespace FullTextSearch
                 throw new Exception("Deserialization failed");
 
             var tokenTree = new TokenTree<T>();
-            
+
             foreach (var deserializedSentence in deserializedSentences)
             {
                 var sentence = new Sentence<T>(deserializedSentence, tokenizer);
                 tokenTree.AddTokens(sentence.Tokens);
             }
-                
+
             return new Index<T>(tokenTree, tokenizer, options);
         }
-        
+
         public byte[] Serialize()
         {
             return SortedTokens.Serialize();
@@ -298,11 +298,11 @@ namespace FullTextSearch
 
             return overallScore;
         }
-        
+
         private bool CompareLists(Sentence<T> sentence, string[] tokenizedQuery, bool shortComparison = false)
         {
             int difference = shortComparison ? 1 : 0;
-            
+
             if (sentence.Tokens.Count != tokenizedQuery.Length + difference)
                 return false;
 

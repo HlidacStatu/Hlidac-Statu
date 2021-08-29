@@ -1,14 +1,17 @@
+using Devmasters;
+
+using HlidacStatu.Connectors;
+using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
+
+using Microsoft.EntityFrameworkCore;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using Devmasters;
-using HlidacStatu.Connectors;
-using HlidacStatu.Entities;
-using HlidacStatu.Extensions;
-using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories
 {
@@ -34,7 +37,7 @@ namespace HlidacStatu.Repositories
             if (narozeni.HasValue == false)
             {
                 p.Umrti = umrti;
-                p.Status = (int) status;
+                p.Status = (int)status;
                 Save(p);
                 AuditRepo.Add(Audit.Operations.Create, user, p, null);
                 return p;
@@ -46,7 +49,7 @@ namespace HlidacStatu.Repositories
             if (exiO == null)
             {
                 p.Umrti = umrti;
-                p.Status = (int) status;
+                p.Status = (int)status;
                 p.Narozeni = narozeni;
                 Save(p);
                 AuditRepo.Add(Audit.Operations.Create, user, p, null);
@@ -71,7 +74,7 @@ namespace HlidacStatu.Repositories
             basic = TextUtil.ReplaceDuplicates(basic, ' ').Trim();
             basic = basic.Replace(" ", "-");
 
-            if (osoba.Status == (int) Osoba.StatusOsobyEnum.Duplicita)
+            if (osoba.Status == (int)Osoba.StatusOsobyEnum.Duplicita)
                 basic += "-duplicita";
 
             Osoba exists = null;
@@ -194,7 +197,7 @@ namespace HlidacStatu.Repositories
 
         private static Osoba GetOriginal(this Osoba osoba)
         {
-            if (osoba.Status != (int) Osoba.StatusOsobyEnum.Duplicita)
+            if (osoba.Status != (int)Osoba.StatusOsobyEnum.Duplicita)
                 return osoba;
 
             using (DbEntities db = new DbEntities())
@@ -212,7 +215,7 @@ namespace HlidacStatu.Repositories
             using (DbEntities db = new DbEntities())
             {
                 var oei = db.OsobaExternalId.AsQueryable()
-                    .Where(m => m.ExternalId == exId && m.ExternalSource == (int) source).FirstOrDefault();
+                    .Where(m => m.ExternalId == exId && m.ExternalSource == (int)source).FirstOrDefault();
                 if (oei == null)
                     return null;
                 else
@@ -325,7 +328,7 @@ namespace HlidacStatu.Repositories
             }
 
             OsobaExternalId[] dEids = duplicated.ExternalIds()
-                .Where(m => m.ExternalSource != (int) OsobaExternalId.Source.HlidacSmluvGuid)
+                .Where(m => m.ExternalSource != (int)OsobaExternalId.Source.HlidacSmluvGuid)
                 .ToArray();
             List<OsobaExternalId> addExternalIds = new List<OsobaExternalId>();
             foreach (var dEid in dEids)
@@ -369,7 +372,7 @@ namespace HlidacStatu.Repositories
             if (!original.OnRadar && duplicated.OnRadar)
                 original.OnRadar = duplicated.OnRadar;
 
-            if (original.Status != (int) Osoba.StatusOsobyEnum.Politik
+            if (original.Status != (int)Osoba.StatusOsobyEnum.Politik
                 && original.Status < duplicated.Status)
                 original.Status = duplicated.Status;
 
@@ -395,7 +398,7 @@ namespace HlidacStatu.Repositories
             if (duplicated.InternalId != 0)
             {
                 duplicated.OriginalId = original.InternalId;
-                duplicated.Status = (int) Osoba.StatusOsobyEnum.Duplicita;
+                duplicated.Status = (int)Osoba.StatusOsobyEnum.Duplicita;
                 Save(duplicated);
             }
 
@@ -492,7 +495,7 @@ namespace HlidacStatu.Repositories
                 return osobySponzoring;
             }
         }
-        
+
         public static Osoba.JSON Export(this Osoba osoba, bool allData = false)
         {
             var t = osoba;

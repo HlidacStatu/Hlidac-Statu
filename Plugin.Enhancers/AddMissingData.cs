@@ -1,16 +1,10 @@
-﻿using Devmasters;
-using Devmasters.Collections;
-using HlidacStatu.Lib;
+﻿using Devmasters.Collections;
+
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Enhancers;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
+
+using System.Linq;
 
 namespace HlidacStatu.Plugin.Enhancers
 {
@@ -146,7 +140,7 @@ namespace HlidacStatu.Plugin.Enhancers
                         subj.datovaSchranka = f.DatovaSchranka.Length > 0 ? f.DatovaSchranka[0] : "";
                         _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněno IČO subjektu", "", path + ".ico", "", f.ICO, this));
                         if (f.DatovaSchranka.Length > 0)
-                            _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path +".datovaSchranka", "", f.DatovaSchranka[0], this));
+                            _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaSchranka", "", f.DatovaSchranka[0], this));
                         changed = true;
                     }
                     else
@@ -160,7 +154,7 @@ namespace HlidacStatu.Plugin.Enhancers
                         {
                             subj.ico = f.ICO;
                             subj.datovaSchranka = f.DatovaSchranka.Length > 0 ? f.DatovaSchranka[0] : "";
-                            _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněno IČO subjektu", "", path +".ico", "", f.ICO, this));
+                            _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněno IČO subjektu", "", path + ".ico", "", f.ICO, this));
                             if (f.DatovaSchranka.Length > 0)
                                 _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněna datová schránka subjektu", "", path + ".datovaSchranka", "", f.DatovaSchranka[0], this));
                             changed = true;

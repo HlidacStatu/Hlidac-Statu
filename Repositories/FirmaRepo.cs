@@ -1,15 +1,14 @@
+using Devmasters;
+
+using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
+using HlidacStatu.Lib.Data.External.DatoveSchranky;
+
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using Devmasters;
-using HlidacStatu.Connectors.External;
-using HlidacStatu.Entities;
-using HlidacStatu.Lib.Data.External.DatoveSchranky;
-using HlidacStatu.Extensions;
-
-using static HlidacStatu.Entities.Firma;
 
 namespace HlidacStatu.Repositories
 {
@@ -172,7 +171,7 @@ namespace HlidacStatu.Repositories
                 return Firma.NotFound;
             }
         }
-        
+
         public static void AddZahranicniFirma(string ico, string jmeno, string adresa)
         {
             using (PersistLib p = new PersistLib())
@@ -213,7 +212,7 @@ namespace HlidacStatu.Repositories
                 }
             }
         }
-        
+
         public static Firma FromName(string jmeno)
         {
             var res = AllFromName(jmeno);
@@ -222,7 +221,7 @@ namespace HlidacStatu.Repositories
             else
                 return res.First();
         }
-        
+
         public static IEnumerable<Firma> AllFromName(string jmeno)
         {
             using (PersistLib p = new PersistLib())
@@ -290,7 +289,7 @@ namespace HlidacStatu.Repositories
             }
 
         }
-        
+
         public static IEnumerable<string> AllIcoInRS()
         {
             using (PersistLib p = new PersistLib())
@@ -306,14 +305,14 @@ namespace HlidacStatu.Repositories
                         .Where(r => TextUtil.IsNumeric((string)r["ICO"]))
                         .Select(r => (string)r["ICO"])
                         .ToArray();
-                    
-                        return allIcos;
+
+                    return allIcos;
                 }
                 else
                     return new string[] { };
             }
         }
-        
+
         public static IEnumerable<Firma> AllFirmyInRS(bool skipDS_Nace = false)
         {
             using (PersistLib p = new PersistLib())
@@ -334,7 +333,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private static Firma FromDataRow(DataRow dr, bool skipDS_Nace=false)
+        private static Firma FromDataRow(DataRow dr, bool skipDS_Nace = false)
         {
             Firma f = new Firma();
             f.ICO = (string)dr["ico"];
@@ -398,7 +397,7 @@ namespace HlidacStatu.Repositories
 
             }
         }
-        
+
         public static void RefreshDS(this Firma firma)
         {
             firma.DatovaSchranka = Lib.Data.External.DatoveSchranky.ISDS.GetDatoveSchrankyForIco(firma.ICO);

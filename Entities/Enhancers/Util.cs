@@ -81,7 +81,7 @@ namespace HlidacStatu.Entities.Enhancers
                             //parser.SetInstanceData(StaticData.CiziStaty);
                         }
 
-                            HlidacStatu.Util.Consts.Logger.Info("Creating instance of enhancer plugin " + type.FullName);
+                        HlidacStatu.Util.Consts.Logger.Info("Creating instance of enhancer plugin " + type.FullName);
 
                     }
                     catch (Exception)
@@ -91,7 +91,7 @@ namespace HlidacStatu.Entities.Enhancers
                 }
                 enhancers = ps;
 
-                return enhancers.OrderByDescending(o=>o.Priority).ToList();
+                return enhancers.OrderByDescending(o => o.Priority).ToList();
             }
         }
     }

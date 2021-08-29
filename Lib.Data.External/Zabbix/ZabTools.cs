@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Devmasters.Enums;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Devmasters.Enums;
 
 namespace HlidacStatu.Lib.Data.External.Zabbix
 {
@@ -29,9 +30,9 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
                     catch (Exception e)
                     {
                         Util.Consts.Logger.Fatal("ZabTools webyList cache", e);
-						return new List<ZabHost>(); //null;
+                        return new List<ZabHost>(); //null;
 
-					}
+                    }
                 });
 
         static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<ZabHostAvailability>> webyData =
@@ -69,7 +70,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
                     List<ZabHostSslStatus> d = null;
                     using (var zr = new ZabbixReader())
                     {
-                        d = zr.GetSsl(24*20, WebySslItems())
+                        d = zr.GetSsl(24 * 20, WebySslItems())
                             ?.ToList();
                         Util.Consts.Logger.Info("Cache statniweby_ssl_data refreshnuta");
                         return d;
@@ -106,7 +107,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
         {
             return Weby(group)
                 .Select(m => m.itemIdSsl)
-                .Where (m=> !string.IsNullOrWhiteSpace(m));
+                .Where(m => !string.IsNullOrWhiteSpace(m));
         }
 
         public static IEnumerable<string> WebyItems()

@@ -1,9 +1,11 @@
-﻿using System;
+﻿using HlidacStatu.Entities;
+using HlidacStatu.Util.Cache;
+
+using Microsoft.EntityFrameworkCore;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities;
-using HlidacStatu.Util.Cache;
-using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories
 {
@@ -12,7 +14,7 @@ namespace HlidacStatu.Repositories
     {
         public static volatile MemoryCacheManager<IEnumerable<OsobaEvent>, int> CachedEvents
             = MemoryCacheManager<IEnumerable<OsobaEvent>, int>
-                .GetSafeInstance("osobyEvents", 
+                .GetSafeInstance("osobyEvents",
                 osobaInternalId =>
                 {
                     using (DbEntities db = new DbEntities())
@@ -41,20 +43,20 @@ namespace HlidacStatu.Repositories
                             .ToList();
 
                         var res1 = res.Select(m => new Sponzoring()
-                            {
-                                OsobaIdDarce = osobaInternalId,
-                                IcoDarce = m.IcoDarce,
-                                OsobaIdPrijemce = m.OsobaIdPrijemce,
-                                UpdatedBy = m.UpdatedBy,
-                                IcoPrijemce = m.IcoPrijemce,
-                                Hodnota = m.Hodnota,
-                                Created = m.Created,
-                                Edited = m.Edited,
-                                DarovanoDne = m.DarovanoDne,
-                                Typ = (int)Sponzoring.TypDaru.DarFirmy,
-                                Popis = m.Popis,
-                                Zdroj = m.Zdroj
-                            })
+                        {
+                            OsobaIdDarce = osobaInternalId,
+                            IcoDarce = m.IcoDarce,
+                            OsobaIdPrijemce = m.OsobaIdPrijemce,
+                            UpdatedBy = m.UpdatedBy,
+                            IcoPrijemce = m.IcoPrijemce,
+                            Hodnota = m.Hodnota,
+                            Created = m.Created,
+                            Edited = m.Edited,
+                            DarovanoDne = m.DarovanoDne,
+                            Typ = (int)Sponzoring.TypDaru.DarFirmy,
+                            Popis = m.Popis,
+                            Zdroj = m.Zdroj
+                        })
                         .ToArray();
                         return res1;
                     }
@@ -64,10 +66,10 @@ namespace HlidacStatu.Repositories
 
 
 
-        static Osoba nullObj = new Osoba() { NameId="____NOTHING____" };
+        static Osoba nullObj = new Osoba() { NameId = "____NOTHING____" };
         private class OsobyMCMById : CouchbaseCacheManager<Osoba, int>
         {
-            public OsobyMCMById() : base("PersonById",getById, TimeSpan.FromMinutes(10), 
+            public OsobyMCMById() : base("PersonById", getById, TimeSpan.FromMinutes(10),
                 Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                 Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                 Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
@@ -114,7 +116,7 @@ namespace HlidacStatu.Repositories
 
         private class OsobyMCMByNameId : CouchbaseCacheManager<Osoba, string>
         {
-            public OsobyMCMByNameId() : base("PersonByNameId", getByNameId, TimeSpan.FromMinutes(10), 
+            public OsobyMCMByNameId() : base("PersonByNameId", getByNameId, TimeSpan.FromMinutes(10),
                 Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                 Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                 Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),

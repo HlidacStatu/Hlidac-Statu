@@ -1,20 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Net.Mail;
-using System.Security.Claims;
-using Elasticsearch.Net;
+﻿using Elasticsearch.Net;
+
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Util;
 using HlidacStatu.Util.Cache;
+
 using Nest;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
+
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+using System.Net.Mail;
+using System.Security.Claims;
 
 namespace HlidacStatu.Datasets
 {
@@ -149,7 +153,7 @@ namespace HlidacStatu.Datasets
                 {
                     //migrace: je potřeba při vzniku záznamu naplnit SocialShareText v datasetu
                     texts.Add(t);
-                    
+
                 }
             }
 
@@ -208,7 +212,7 @@ namespace HlidacStatu.Datasets
                 var dataMapping = remote?.Mappings?.Properties;
                 if (dataMapping == null)
                     return new CorePropertyBase[] { };
-                _mapping = dataMapping.Select(m => (CorePropertyBase) m.Value);
+                _mapping = dataMapping.Select(m => (CorePropertyBase)m.Value);
             }
 
             return _mapping;
@@ -221,7 +225,7 @@ namespace HlidacStatu.Datasets
 
             if (user.IsInRole("Admin"))
                 return true;
-            
+
             return Registration()?.HasAdminAccess(user) ?? false;
         }
 
@@ -297,11 +301,11 @@ namespace HlidacStatu.Datasets
 
                 if (p.GetType() == typeof(ObjectProperty))
                 {
-                    ObjectProperty pObj = (ObjectProperty) p;
+                    ObjectProperty pObj = (ObjectProperty)p;
                     if (pObj.Properties != null)
                     {
                         _props.AddRange(getMappingType(prefix + p.Name.Name + ".", mappingType,
-                            pObj.Properties.Select(m => (CorePropertyBase) m.Value), specName, attrNameModif));
+                            pObj.Properties.Select(m => (CorePropertyBase)m.Value), specName, attrNameModif));
                     }
                 }
             }
@@ -320,12 +324,12 @@ namespace HlidacStatu.Datasets
             if (IsFlatStructure() == false)
                 return null;
 
-            IDictionary<String, Object> eo = (IDictionary<String, Object>) obj;
+            IDictionary<String, Object> eo = (IDictionary<String, Object>)obj;
             var props = GetPropertyNamesFromSchema();
             var toremove = eo.Keys.Where(m => props.Contains(m) == false).ToArray();
             for (int i = 0; i < toremove.Count(); i++)
             {
-                ((IDictionary<String, Object>) obj).Remove(toremove[i]);
+                ((IDictionary<String, Object>)obj).Remove(toremove[i]);
             }
 
             return obj;
@@ -343,7 +347,7 @@ namespace HlidacStatu.Datasets
         {
             Dictionary<string, Property> names = new Dictionary<string, Property>();
             var sch = Schema;
-            getPropertyNameTypeFromSchemaInternal(new JSchema[] {sch}, "", name, ref names);
+            getPropertyNameTypeFromSchemaInternal(new JSchema[] { sch }, "", name, ref names);
             return names.Keys.ToArray();
         }
 
@@ -383,7 +387,7 @@ namespace HlidacStatu.Datasets
         {
             Dictionary<string, Property> names = new Dictionary<string, Property>();
             var sch = Schema;
-            getPropertyNameTypeFromSchemaInternal(new JSchema[] {sch}, "", name, ref names);
+            getPropertyNameTypeFromSchemaInternal(new JSchema[] { sch }, "", name, ref names);
             return names;
         }
 
@@ -407,7 +411,7 @@ namespace HlidacStatu.Datasets
                     else if (prop.Value.Properties?.Count > 0)
                     {
                         getPropertyNameTypeFromSchemaInternal(
-                            new JSchema[] {prop.Value}
+                            new JSchema[] { prop.Value }
                             , prefix + prop.Key + ".", name, ref names);
                     }
                 }
@@ -617,7 +621,7 @@ namespace HlidacStatu.Datasets
                 objDyn.id == null)
                 throw new DataSetException(datasetId, ApiResponseStatus.DatasetItemNoSetID);
             else
-                id = objDyn.Id == null ? (string) objDyn.id : (string) objDyn.Id;
+                id = objDyn.Id == null ? (string)objDyn.id : (string)objDyn.Id;
 
             objDyn.DbCreated = DateTime.UtcNow;
             objDyn.DbCreatedBy = createdBy;
@@ -683,7 +687,7 @@ namespace HlidacStatu.Datasets
 
             foreach (var jtoken in jArray)
             {
-                var jobj = (JObject) jtoken;
+                var jobj = (JObject)jtoken;
                 CheckSchema(jobj);
 
                 jobj.Add("DbCreated", JToken.FromObject(DateTime.UtcNow));
@@ -744,7 +748,7 @@ namespace HlidacStatu.Datasets
             {
                 JObject jobj = jArray.Where(jt => (jt["id"]?.Value<string>() == item.Id)
                                                   || (jt["Id"]?.Value<string>() == item.Id))
-                    .Select(jt => (JObject) jt)
+                    .Select(jt => (JObject)jt)
                     .FirstOrDefault();
                 var jpaths = jobj
                     .SelectTokens("$..HsProcessType")
@@ -757,7 +761,7 @@ namespace HlidacStatu.Datasets
         }
 
 
-        public static string[] AUDIOCommands = new string[] {"audio", "audiosave"};
+        public static string[] AUDIOCommands = new string[] { "audio", "audiosave" };
 
         /// <summary>
         /// Register item to Audio Speech2Text queueu
@@ -792,7 +796,7 @@ namespace HlidacStatu.Datasets
         }
 
 
-        public static string[] OCRCommands = new string[] {"document", "documentsave"};
+        public static string[] OCRCommands = new string[] { "document", "documentsave" };
 
         /// <summary>
         /// Register item to OCR query
@@ -833,7 +837,7 @@ namespace HlidacStatu.Datasets
                 if (!obj.IsValid(schema, out errors))
                 {
                     if (errors == null || errors?.Count == 0)
-                        errors = new string[] {"", ""};
+                        errors = new string[] { "", "" };
 
                     throw DataSetException.GetExc(datasetId,
                         ApiResponseStatus.DatasetItemInvalidFormat.error.number,
@@ -846,7 +850,7 @@ namespace HlidacStatu.Datasets
             return true;
         }
 
-        public static string[] PERSONLookupCommands = new string[] {"person"};
+        public static string[] PERSONLookupCommands = new string[] { "person" };
 
 
         /// <summary>
@@ -982,7 +986,7 @@ namespace HlidacStatu.Datasets
         {
             var data = GetData(Id);
             if (string.IsNullOrEmpty(data))
-                return (dynamic) null;
+                return (dynamic)null;
             else
                 return JObject.Parse(data);
         }
@@ -1000,7 +1004,7 @@ namespace HlidacStatu.Datasets
             if (res.Found)
                 return res.Source;
             else
-                return (T) null;
+                return (T)null;
         }
 
         public IEnumerable<T> GetAllData<T>(string scrollTimeout = "2m", int scrollSize = 1000) where T : class
@@ -1059,7 +1063,7 @@ namespace HlidacStatu.Datasets
                 if (res.Found)
                     return JsonConvert.SerializeObject(res.Source);
                 else
-                    return (string) null;
+                    return (string)null;
             }
         }
 
@@ -1196,7 +1200,7 @@ namespace HlidacStatu.Datasets
 
                     DateTime dbCreated = Registration().created;
                     var first = SearchData("*", 1, 1, "DbCreated", exactNumOfResults: true);
-                    var total = (int) first.Total;
+                    var total = (int)first.Total;
                     var last = SearchData("*", 1, 1, "DbCreated desc");
                     if (total == 0)
                     {
@@ -1204,8 +1208,8 @@ namespace HlidacStatu.Datasets
                         return _infofacts;
                     }
 
-                    var itemFirstDate = (DateTime) first.Result.First().DbCreated;
-                    var itemLastDate = (DateTime) last.Result.First().DbCreated;
+                    var itemFirstDate = (DateTime)first.Result.First().DbCreated;
+                    var itemLastDate = (DateTime)last.Result.First().DbCreated;
 
                     dbCreated = new DateTime(Math.Min(dbCreated.Ticks, itemFirstDate.Ticks));
                     var sCreated =

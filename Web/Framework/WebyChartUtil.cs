@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using HlidacStatu.Lib.Data.External.Zabbix;
+
 using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.Rendering;
+
 using System.Linq;
 using System.Text;
-using HlidacStatu.Lib.Data.External.Zabbix;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -61,13 +60,13 @@ namespace HlidacStatu.Web.Framework
         <div class='col-xs-12 col-sm-6 '>
             <div class='list-group'>
 
-                <a href='/StatniWeby/Https' class='list-group-item {WebUtil.IfExists(active=="https","disabled")}'>
+                <a href='/StatniWeby/Https' class='list-group-item {WebUtil.IfExists(active == "https", "disabled")}'>
                     <span class='badge'>{ZabTools.SslStatuses()?.Count() ?? 0}</span>
                     Žebříček státních serverů podle HTTPS Labs hodnocení
                 </a>
 
 
-                <a href='/StatniWeby/Index' class='list-group-item {WebUtil.IfExists(active=="index","disabled")}'>
+                <a href='/StatniWeby/Index' class='list-group-item {WebUtil.IfExists(active == "index", "disabled")}'>
                     <span class='badge'>{ZabTools.WebyItems("0")?.Count() ?? 0}</span>
                     Nejdůležitější služby státní správy
                 </a>
@@ -92,7 +91,7 @@ namespace HlidacStatu.Web.Framework
                 //        <span class='badge'>Připravujeme</span>
                 //        Služby krajů ČR
                 //    </a>
-                + @$"<a href='/StatniWeby/opendata' class='list-group-item {WebUtil.IfExists(active=="opendata","disabled")}'>
+                + @$"<a href='/StatniWeby/opendata' class='list-group-item {WebUtil.IfExists(active == "opendata", "disabled")}'>
                     <span class='badge'>JSON</span>
                     Naměřené údaje jako open data
                 </a>
@@ -321,7 +320,7 @@ Highcharts.setOptions({
             sb.AppendLine("};");
             //Highcharts options
             sb.AppendLine(@"$('#container" + uniqueId + @"').html('<center><img src=""/content/img/loading.gif"" style=""width:127px;height:auto;""><b>Stahujeme data</b>');
-                        "+ $"$.getJSON('/StatniWeby/ChartData/{dataName}?h={hoursBack}&hh={hash}'" + @", function (data) {
+                        " + $"$.getJSON('/StatniWeby/ChartData/{dataName}?h={hoursBack}&hh={hash}'" + @", function (data) {
                     chartopt" + uniqueId + @".series[0].data = data.data;
                     chartopt" + uniqueId + @".yAxis[0].categories = data.categories;
                     cats" + uniqueId + @" = data.cats;

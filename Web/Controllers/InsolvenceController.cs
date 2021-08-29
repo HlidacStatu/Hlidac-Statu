@@ -1,9 +1,11 @@
-﻿using System.Linq;
-using System.Collections.Generic;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Models;
+
 using Microsoft.AspNetCore.Mvc;
+
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -64,7 +66,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
             if (IsLimitedView() && model.Rizeni.OnRadar == false)
-                return RedirectToAction("PristupOmezen", new {id = model.Rizeni.UrlId()});
+                return RedirectToAction("PristupOmezen", new { id = model.Rizeni.UrlId() });
 
             if (showHighliting)
             {
@@ -95,7 +97,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
             if (IsLimitedView() && data.Rizeni.OnRadar == false)
-                return RedirectToAction("PristupOmezen", new {id = data.Rizeni.UrlId()});
+                return RedirectToAction("PristupOmezen", new { id = data.Rizeni.UrlId() });
 
             IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlighting = null;
             if (showHighliting)
@@ -132,7 +134,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
             if (IsLimitedView() && dokument.Rizeni.OnRadar == false)
-                return RedirectToAction("PristupOmezen", new {id = dokument.Rizeni.UrlId()});
+                return RedirectToAction("PristupOmezen", new { id = dokument.Rizeni.UrlId() });
 
             return View(dokument);
         }

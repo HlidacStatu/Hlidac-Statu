@@ -1,8 +1,9 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+
+using System;
+using System.Collections.Generic;
 
 namespace HlidacStatu.Web.TagHelpers
 {
@@ -10,8 +11,8 @@ namespace HlidacStatu.Web.TagHelpers
     {
         private const string Key = "queued-scripts";
 
-        [HtmlAttributeNotBound] 
-        [ViewContext] 
+        [HtmlAttributeNotBound]
+        [ViewContext]
         public ViewContext ViewContext { get; set; }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -22,7 +23,7 @@ namespace HlidacStatu.Web.TagHelpers
                 return;
             }
 
-            var scriptQueue = (Queue<string>) scriptQueueObj;
+            var scriptQueue = (Queue<string>)scriptQueueObj;
 
             var scripts = string.Join("\n", scriptQueue);
             output.Content.SetHtmlContent(scripts);
@@ -41,7 +42,7 @@ namespace HlidacStatu.Web.TagHelpers
 
             if (viewContext.ViewData.TryGetValue(Key, out var scriptQueueObj))
             {
-                scriptQueue = (Queue<string>) scriptQueueObj;
+                scriptQueue = (Queue<string>)scriptQueueObj;
             }
             else
             {

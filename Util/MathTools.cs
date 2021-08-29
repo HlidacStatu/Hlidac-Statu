@@ -24,7 +24,7 @@ namespace HlidacStatu.Util
         /// </summary>
         /// <param name="valuesGroupedByCompany"></param>
         /// <returns></returns>
-        public static decimal Herfindahl_Hirschman_IndexNormalized(Dictionary<string,long> items)
+        public static decimal Herfindahl_Hirschman_IndexNormalized(Dictionary<string, long> items)
         {
             if (items == null)
                 return 0;
@@ -33,7 +33,7 @@ namespace HlidacStatu.Util
 
             if (items.Count() == 1)
                 return 1;
-            decimal H = Herfindahl_Hirschman_Index(items.Values.Select(m=> (decimal)m));
+            decimal H = Herfindahl_Hirschman_Index(items.Values.Select(m => (decimal)m));
 
             return Herfindahl_Hirschman_IndexNormalized_FromHHI(H, items.LongCount());
             //return hindexNorm;
@@ -93,7 +93,7 @@ namespace HlidacStatu.Util
             if (index + 1 < elements.Length)
                 return elements[index] * (1 - frac) + elements[index + 1] * frac;
             else
-                return elements[elements.Length-1];
+                return elements[elements.Length - 1];
         }
     }
 }

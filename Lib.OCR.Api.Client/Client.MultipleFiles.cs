@@ -21,7 +21,7 @@ namespace HlidacStatu.Lib.OCR.Api
             public TimeSpan MaxWaitingTimeOfOneFile { get; set; } = TimeSpan.FromHours(1);
             public TimeSpan? RestartTaskIn { get; set; } = null;
 
-            string Apikey=null;
+            string Apikey = null;
             decimal currProgress = 0;
             object objLock = new object();
 
@@ -36,7 +36,7 @@ namespace HlidacStatu.Lib.OCR.Api
             {
                 if (files == null)
                     throw new ArgumentNullException("files");
-                if (string.IsNullOrEmpty( apikey ))
+                if (string.IsNullOrEmpty(apikey))
                     throw new ArgumentNullException("apikey");
 
                 Apikey = apikey;
@@ -45,7 +45,7 @@ namespace HlidacStatu.Lib.OCR.Api
                 Intensity = intensity;
                 this.files = files;
 
-                if (this.files.Count()>0)
+                if (this.files.Count() > 0)
                     pi = new ProgressInterval(this.files.Count());
 
             }
@@ -53,7 +53,7 @@ namespace HlidacStatu.Lib.OCR.Api
             public async Task<Result[]> Go()
             {
                 List<Task<Result>> tas = new List<Task<Result>>();
-                
+
                 logger.Debug($"MultipleFiles starting for {files.Count()} files for parentTaskId:{ParentTaskId ?? ""}");
 
                 foreach (var fn in files)
@@ -99,7 +99,7 @@ namespace HlidacStatu.Lib.OCR.Api
                 catch (ApiException e)
                 {
                     logger.Error($"TextFromFileAsync error for {fn}  parentTaskId:{ParentTaskId ?? ""}", e);
-                    return new Result() { Id=res?.Id,  IsValid = Result.ResultStatus.Invalid, Error = e.ToString() };
+                    return new Result() { Id = res?.Id, IsValid = Result.ResultStatus.Invalid, Error = e.ToString() };
                 }
                 catch (Exception e)
                 {

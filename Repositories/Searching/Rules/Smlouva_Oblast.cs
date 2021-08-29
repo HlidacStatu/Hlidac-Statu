@@ -1,7 +1,8 @@
-﻿using System;
+﻿using HlidacStatu.Entities;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories.Searching.Rules
 {
@@ -23,14 +24,14 @@ namespace HlidacStatu.Repositories.Searching.Rules
         {
             get
             {
-                return new string[] { $"oblast{(place==1 ? "" : "2")}:" };
+                return new string[] { $"oblast{(place == 1 ? "" : "2")}:" };
             }
         }
 
         private static Dictionary<string, string> GetOblastiValues()
         {
             Dictionary<string, string> ret = new Dictionary<string, string>();
-            
+
 
 
             foreach (var v in Smlouva.SClassification.AllTypes)
@@ -38,7 +39,7 @@ namespace HlidacStatu.Repositories.Searching.Rules
                 if (v.MainType)
                 {
                     ret.Add(v.SearchShortcut, v.SearchExpression);
-                    ret.Add(v.SearchShortcut+"_obecne", v.SearchExpression);
+                    ret.Add(v.SearchShortcut + "_obecne", v.SearchExpression);
                 }
                 else
                     ret.Add(v.SearchShortcut, v.SearchExpression);

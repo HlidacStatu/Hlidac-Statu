@@ -1,5 +1,6 @@
-﻿using System;
-using Nest;
+﻿using Nest;
+
+using System;
 namespace HlidacStatu.Entities.Logs
 {
     public class ProfilZadavateleDownload : ILogs
@@ -24,7 +25,7 @@ namespace HlidacStatu.Entities.Logs
 
         [Keyword]
         public string RequestedUrl { get; set; }
-        
+
     }
 
 }

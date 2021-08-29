@@ -1,8 +1,10 @@
-﻿using System;
+﻿using HlidacStatu.Repositories.ES;
+
+using Nest;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Repositories.ES;
-using Nest;
 
 
 namespace HlidacStatu.Web.Models
@@ -75,7 +77,7 @@ namespace HlidacStatu.Web.Models
             public int Pacienti_tezky { get; set; } = 0;
             public int Pacienti_zemreli { get; set; } = 0;
 
-            public int PacientiCelkem() {  return Pacienti_bezpriznaku + Pacienti_lehky + Pacienti_stredni + Pacienti_tezky; }
+            public int PacientiCelkem() { return Pacienti_bezpriznaku + Pacienti_lehky + Pacienti_stredni + Pacienti_tezky; }
 
             public string regionFull()
             {
@@ -163,9 +165,9 @@ namespace HlidacStatu.Web.Models
 
             h.Pacienti_bezpriznaku = lh.Pacienti_bezpriznaku - fh.Pacienti_bezpriznaku;
             h.Pacienti_lehky = lh.Pacienti_lehky - fh.Pacienti_lehky;
-            h.Pacienti_stredni= lh.Pacienti_stredni - fh.Pacienti_stredni;
-            h.Pacienti_tezky= lh.Pacienti_tezky - fh.Pacienti_tezky;
-            h.Pacienti_zemreli= lh.Pacienti_zemreli - fh.Pacienti_zemreli;
+            h.Pacienti_stredni = lh.Pacienti_stredni - fh.Pacienti_stredni;
+            h.Pacienti_tezky = lh.Pacienti_tezky - fh.Pacienti_tezky;
+            h.Pacienti_zemreli = lh.Pacienti_zemreli - fh.Pacienti_zemreli;
 
             return h;
         }

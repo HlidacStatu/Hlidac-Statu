@@ -1,17 +1,18 @@
-﻿using HlidacStatu.Util;
-using HlidacStatu.Entities;
-using System.Linq;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using System;
-using HlidacStatu.Datasets;
+﻿using HlidacStatu.Datasets;
 using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
-using HlidacStatu.Entities.OsobyES;
 using HlidacStatu.Repositories;
+using HlidacStatu.Util;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Graph = HlidacStatu.Repositories.Graph;
+
+using Newtonsoft.Json;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -51,7 +52,7 @@ namespace HlidacStatu.Web.Controllers
                          where os.Status = 3";
 
                     var result = db.FindPersonView.FromSqlRaw(sql)
-                        .Select( r => new
+                        .Select(r => new
                         {
                             id = r.NameId,
                             name = r.Jmeno,
@@ -108,9 +109,9 @@ namespace HlidacStatu.Web.Controllers
                 if (o == null)
                 {
                     Response.StatusCode = 404;
-                    return Json(ApiResponseStatus.Error(404,"Politik not found"));
+                    return Json(ApiResponseStatus.Error(404, "Politik not found"));
                 }
-                if (o.StatusOsoby() != Osoba.StatusOsobyEnum.Politik )
+                if (o.StatusOsoby() != Osoba.StatusOsobyEnum.Politik)
                 {
                     Response.StatusCode = 404;
                     return Json(ApiResponseStatus.Error(404, "Person is not marked as politician"));
@@ -128,7 +129,7 @@ namespace HlidacStatu.Web.Controllers
                         description = v.Descr
 
                     }).ToList();
-                
+
 
                 var statDescription =
                     InfoFact.RenderInfoFacts(
@@ -148,12 +149,13 @@ namespace HlidacStatu.Web.Controllers
                     (int)OsobaEvent.Types.VerejnaSpravaJine,
                     (int)OsobaEvent.Types.VerejnaSpravaPracovni,
                 };
-                
 
-                var roleOsoba = o.Events(m => 
+
+                var roleOsoba = o.Events(m =>
                         types.Contains(m.Type)
                         && m.Status != (int)OsobaEvent.Statuses.NasiPoliticiSkryte)
-                    .Select(e => new { 
+                    .Select(e => new
+                    {
                         role = e.AddInfo,
                         dateFrom = e.DatumOd,
                         dateTo = e.DatumDo,
@@ -161,7 +163,7 @@ namespace HlidacStatu.Web.Controllers
                     })
                     .ToArray();
 
-                
+
                 string osobaInsQuery = $"{{0}}.osobaId:{o.NameId}";
                 //var oinsRes = Insolvence.SimpleSearch("osobaid:" + Model.NameId, 1, 5, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc, false, false);
                 //query: dluznici.osobaId:{o.NameId}
@@ -204,7 +206,7 @@ namespace HlidacStatu.Web.Controllers
                     debtorLink = $"https://www.hlidacstatu.cz/insolvence/hledat?Q=dluznici.osobaId:{o.NameId}"
                         + "&utm_source=nasipolitici&utm_medium=detail&utm_campaign=dluznikosoba",
                     creditorCount = oinsVeritel.Total,
-                    creditorLink = $"https://www.hlidacstatu.cz/insolvence/hledat?Q=veritele.osobaId:{o.NameId}" 
+                    creditorLink = $"https://www.hlidacstatu.cz/insolvence/hledat?Q=veritele.osobaId:{o.NameId}"
                         + "&utm_source=nasipolitici&utm_medium=detail&utm_campaign=veritelosoba",
                     bailiffCount = oinsSpravce.Total,
                     bailiffLink = $"https://www.hlidacstatu.cz/insolvence/hledat?Q=spravci.osobaId:{o.NameId}"
@@ -217,7 +219,7 @@ namespace HlidacStatu.Web.Controllers
                     debtorLink = $"https://www.hlidacstatu.cz/insolvence/hledat?Q=osobaiddluznik:{o.NameId}"
                                         + "&utm_source=nasipolitici&utm_medium=detail&utm_campaign=dluznikfirma",
                     creditorCount = insVeritel.Total,
-                    creditorLink = $"https://www.hlidacstatu.cz/insolvence/hledat?Q=osobaidveritel:{o.NameId}" 
+                    creditorLink = $"https://www.hlidacstatu.cz/insolvence/hledat?Q=osobaidveritel:{o.NameId}"
                         + "&utm_source=nasipolitici&utm_medium=detail&utm_campaign=veritelfirma",
 
                     bailiffCount = insSpravce.Total,
@@ -260,14 +262,14 @@ namespace HlidacStatu.Web.Controllers
                     connections = vazby,
                     wikiId = o.WikiId,
                     //sources
-                    sourceInsolvency = $"https://www.hlidacstatu.cz/insolvence/hledat?Q=osobaid:{o.NameId}" 
+                    sourceInsolvency = $"https://www.hlidacstatu.cz/insolvence/hledat?Q=osobaid:{o.NameId}"
                         + "&utm_source=nasipolitici&utm_medium=detail&utm_campaign=osoba",
                     sourceSponzor = $"https://www.hlidacstatu.cz/osoba/{o.NameId}"
                                             + "?utm_source=nasipolitici&utm_medium=detail&utm_campaign=osoba",
                     sourceRegisterStatements = "",
-                            //string.IsNullOrWhiteSpace(registrOznameni) 
-                            //? "https://www.hlidacstatu.cz" + "?utm_source=nasipolitici&utm_medium=detail&utm_campaign=osoba"
-                            //: $"https://www.hlidacstatu.cz/data/Detail/centralniregistroznameni/{registrOznameni}" + "?utm_source=nasipolitici&utm_medium=detail&utm_campaign=osoba",
+                    //string.IsNullOrWhiteSpace(registrOznameni) 
+                    //? "https://www.hlidacstatu.cz" + "?utm_source=nasipolitici&utm_medium=detail&utm_campaign=osoba"
+                    //: $"https://www.hlidacstatu.cz/data/Detail/centralniregistroznameni/{registrOznameni}" + "?utm_source=nasipolitici&utm_medium=detail&utm_campaign=osoba",
                     sourceRoles = $"https://www.hlidacstatu.cz/osoba/{o.NameId}" + "?utm_source=nasipolitici&utm_medium=detail&utm_campaign=osoba",
 
 

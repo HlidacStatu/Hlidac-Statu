@@ -1,5 +1,6 @@
-using System.Linq;
 using HlidacStatu.Entities;
+
+using System.Linq;
 
 namespace HlidacStatu.Extensions
 {
@@ -13,8 +14,8 @@ namespace HlidacStatu.Extensions
             }
         }
 
-        
-        
-        
+
+
+
     }
 }

@@ -1,13 +1,14 @@
 ﻿using HlidacStatu.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using HlidacStatu.Repositories;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
+using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Drawing.Imaging;
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -41,7 +42,7 @@ namespace HlidacStatu.Web.Controllers
 
         [Authorize(Roles = "canEditData")]
         [HttpGet]
-        public ActionResult ShowPrilohaTablesOnePage(string s, string p,int page)
+        public ActionResult ShowPrilohaTablesOnePage(string s, string p, int page)
         {
             Smlouva sml = SmlouvaRepo.Load(s);
             Smlouva.Priloha pr = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == p);
@@ -51,7 +52,7 @@ namespace HlidacStatu.Web.Controllers
             if (page < 1)
                 page = 1;
 
-            return View(new Tuple<string,string,int>(s,p,page));
+            return View(new Tuple<string, string, int>(s, p, page));
         }
 
         [Authorize(Roles = "canEditData")]
@@ -80,7 +81,7 @@ namespace HlidacStatu.Web.Controllers
 
             //  prepare codec parameters
 
-            using (var _img = PDFtoImage.Conversion.ToImage(pdfBin, page: page-1))
+            using (var _img = PDFtoImage.Conversion.ToImage(pdfBin, page: page - 1))
             {
                 using (var stream = new MemoryStream())
                 {

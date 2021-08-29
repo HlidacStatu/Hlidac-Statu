@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Devmasters.Enums;
-using Microsoft.EntityFrameworkCore;
+﻿using Devmasters.Enums;
+
+using System;
 
 namespace HlidacStatu.Entities
 {
@@ -31,7 +29,7 @@ namespace HlidacStatu.Entities
         {
             return (Sponzoring)MemberwiseClone();
         }
-        
+
         public string ToAuditJson()
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
@@ -47,9 +45,9 @@ namespace HlidacStatu.Entities
             return Id.ToString();
         }
 
-        
 
-        
+
+
     }
 }
 

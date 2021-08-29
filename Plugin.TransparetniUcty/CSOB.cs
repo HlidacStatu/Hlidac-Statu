@@ -1,16 +1,14 @@
-﻿using System;
+﻿using Polly;
+using Polly.Retry;
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
-using HlidacStatu.Util;
-using Polly.Retry;
-using Polly;
 
 namespace HlidacStatu.Plugin.TransparetniUcty
 {
@@ -76,7 +74,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
             httpClient.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br");
             httpClient.DefaultRequestHeaders.Add("Accept-Language", "cs,sk;q=0.8,en-US;q=0.5,en;q=0.3");
             httpClient.DefaultRequestHeaders.Connection.Add("keep-alive");
-            
+
 
             var page = 1;
             var chunk = 1000;
@@ -108,10 +106,10 @@ namespace HlidacStatu.Plugin.TransparetniUcty
             {
                 httpClient.DefaultRequestHeaders.Add("Cookie", setCookies);
             }
-            
+
             // ale protože ten ... web je nepošle najednou, tak je zapotřebí ještě jednou
             // druhé kolo načítání cookies
-            
+
             var cookieResponse2 = RetryPolicy.Execute(() =>
             {
                 var cookieRequest = new HttpRequestMessage(HttpMethod.Get, refererUrl);
@@ -137,8 +135,8 @@ namespace HlidacStatu.Plugin.TransparetniUcty
             {
                 httpClient.DefaultRequestHeaders.Add("Cookie", setCookies2);
             }
-            
-            
+
+
             httpClient.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
 
             string apiUrl =
@@ -191,7 +189,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                         try
                         {
                             datumPlatby = new DateTime(item.baseInfo.accountingDate.year,
-                                item.baseInfo.accountingDate.monthValue, 
+                                item.baseInfo.accountingDate.monthValue,
                                 item.baseInfo.accountingDate.dayOfMonth);
                         }
                         catch (Exception e)
@@ -199,7 +197,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                             TULogger.Info($"Nedokazu spravne rozparsovat datum u {item.baseInfo.bankReference}. Exception = {e.Message}");
                             continue;
                         }
-                        
+
                         polozky.Add(new SimpleBankovniPolozka
                         {
                             AddId = item?.baseInfo?.bankReference,
@@ -217,7 +215,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                                 + item?.transactionTypeChoice?.domesticPayment?.message?.message4,
                             ZdrojUrl = refererUrl,
                             CisloProtiuctu = item?.transactionTypeChoice?.domesticPayment?.partyAccount?.domesticAccount?.accountNumber +
-                                             "/" + 
+                                             "/" +
                                              item?.transactionTypeChoice?.domesticPayment?.partyAccount?.domesticAccount?.bankCode
                         });
                     }

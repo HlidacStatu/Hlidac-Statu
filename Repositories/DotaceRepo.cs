@@ -1,16 +1,18 @@
+using HlidacStatu.Entities.Dotace;
+using HlidacStatu.Repositories.ES;
+using HlidacStatu.Repositories.Searching;
+
+using Nest;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities.Dotace;
-using HlidacStatu.Repositories.ES;
-using Nest;
-using HlidacStatu.Repositories.Searching;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class DotaceRepo
     {
-        
+
         public static Dotace Get(string idDotace)
         {
             if (idDotace == null) throw new ArgumentNullException(nameof(idDotace));
@@ -21,13 +23,13 @@ namespace HlidacStatu.Repositories
                 ? response.Source
                 : null;
         }
-        
+
         public static IEnumerable<Dotace> GetAll(string scrollTimeout = "2m", int scrollSize = 300)
         {
             return YieldAll(null, scrollTimeout, scrollSize);
 
         }
-        
+
         public static void Save(Dotace dotace)
         {
             if (dotace == null) throw new ArgumentNullException(nameof(dotace));
@@ -42,8 +44,8 @@ namespace HlidacStatu.Repositories
                 throw new ApplicationException(res.ServerError?.ToString());
             }
         }
-        
-        
+
+
         /// <summary>
         /// Returns true if any error ocurred.
         /// </summary>
@@ -67,7 +69,7 @@ namespace HlidacStatu.Repositories
 
             return result.Errors;
         }
-        
+
         public static (decimal Sum, int Count) GetStatisticsForIco(string ico)
         {
             var dotaceAggs = new AggregationContainerDescriptor<Dotace>()
@@ -128,10 +130,10 @@ namespace HlidacStatu.Repositories
 
             return YieldAll(qc);
         }
-        
-        
-        private static IEnumerable<Dotace> YieldAll(QueryContainer query, 
-            string scrollTimeout = "2m", 
+
+
+        private static IEnumerable<Dotace> YieldAll(QueryContainer query,
+            string scrollTimeout = "2m",
             int scrollSize = 300)
         {
             ISearchResponse<Dotace> initialResponse = null;
@@ -179,6 +181,6 @@ namespace HlidacStatu.Repositories
 
             Manager.GetESClient_Dotace().ClearScroll(new ClearScrollRequest(scrollid));
         }
-        
+
     }
 }

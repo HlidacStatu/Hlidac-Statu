@@ -4,16 +4,16 @@
 namespace HlidacStatu.DBUpgrades
 {
     public static partial class DBUpgrader
-	{
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.69")]
-			public static void Init_1_0_0_69(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.69")]
+            public static void Init_1_0_0_69(IDatabaseUpgrader du)
+            {
 
-				string sql = @"
+                string sql = @"
 /****** Object:  Table [dbo].[TipUrl]    Script Date: 19.04.2020 16:18:04 ******/
 SET ANSI_NULLS ON
 GO
@@ -45,9 +45,9 @@ GO
 
 
 ";
-				du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
-			}
-		}
-	}
+            }
+        }
+    }
 }

@@ -5,9 +5,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
     public class Consts
     {
-        public static string[] KIndexExceptions = new string[] {  };
+        public static string[] KIndexExceptions = new string[] { };
 
-        public static int[] AvailableCalculationYears=null;
+        public static int[] AvailableCalculationYears = null;
         public static int[] ToCalculationYears = null;
 
         public const decimal IntervalOkolo = 0.11m;

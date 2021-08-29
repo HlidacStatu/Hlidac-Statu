@@ -1,6 +1,8 @@
 ﻿using EasyNetQ;
+
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,7 +37,7 @@ namespace HlidacStatu.Q
             {
                 throw;
             }
-            
+
             return Task.CompletedTask;
         }
 
@@ -44,6 +46,6 @@ namespace HlidacStatu.Q
             RabbitBus.Dispose();
             return Task.CompletedTask;
         }
-        
+
     }
 }

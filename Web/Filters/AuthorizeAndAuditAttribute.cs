@@ -1,11 +1,12 @@
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using HlidacStatu.Web.Framework;
-using HlidacStatu.Web.Framework.Api;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+
 using Newtonsoft.Json;
+
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Filters
 {
@@ -23,7 +24,7 @@ namespace HlidacStatu.Web.Filters
             var parameters = context.ActionArguments
                 .Select(ap => new ApiCall.CallParameter(ap.Key, JsonConvert.SerializeObject(ap.Value)))
                 .ToList();
-            
+
             var apiAuth = ApiAuth.IsApiAuth(context.HttpContext,
                 validRole: Roles,
                 parameters: parameters);

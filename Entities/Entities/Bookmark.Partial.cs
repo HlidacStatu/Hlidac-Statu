@@ -1,4 +1,5 @@
 ﻿using Devmasters.Enums;
+
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HlidacStatu.Entities
@@ -25,7 +26,7 @@ namespace HlidacStatu.Entities
             return item.ToAuditObjectTypeName() + IdDelimiter + item.ToAuditObjectId();
         }
 
-        
+
 
         [Nest.Object(Ignore = true)]
         [NotMapped]
@@ -35,6 +36,6 @@ namespace HlidacStatu.Entities
             set { ItemType = (int)value; }
         }
 
-        
+
     }
 }

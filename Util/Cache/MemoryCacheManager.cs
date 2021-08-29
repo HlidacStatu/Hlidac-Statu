@@ -1,18 +1,19 @@
-﻿using System;
-using Devmasters.Cache.LocalMemory;
+﻿using Devmasters.Cache.LocalMemory;
+
+using System;
 
 namespace HlidacStatu.Util.Cache
 {
 
     public class MemoryCacheManager<T, Key>
-        : Manager<T,Key, LocalMemoryCache<T>>
+        : Manager<T, Key, LocalMemoryCache<T>>
         where T : class
     {
 
         Func<Key, string> keyValueSelector = null;
 
         public MemoryCacheManager(string keyPrefix, Func<Key, T> func, TimeSpan expiration, Func<Key, string> keyValueSelector = null)
-            : base(keyPrefix, func,expiration)
+            : base(keyPrefix, func, expiration)
         {
             this.keyValueSelector = keyValueSelector ?? new Func<Key, string>(k => k.ToString());
         }
@@ -42,7 +43,7 @@ namespace HlidacStatu.Util.Cache
 
                 if (!instances.ContainsKey(instanceFullName))
                 {
-                    instances[instanceFullName] = new MemoryCacheManager<T, Key>(instanceName, func, expiration, 
+                    instances[instanceFullName] = new MemoryCacheManager<T, Key>(instanceName, func, expiration,
                         keyValueSelector: keyValueSelector);
                 }
                 return (MemoryCacheManager<T, Key>)instances[instanceFullName];

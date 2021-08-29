@@ -1,8 +1,10 @@
+using HlidacStatu.Entities;
+
+using Microsoft.EntityFrameworkCore;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories
 {
@@ -22,19 +24,19 @@ namespace HlidacStatu.Repositories
                         Created = DateTime.Now,
                         CreatedBy = username,
                         OriginalCat1 = oldClassification.GetClassif().Length > 0
-                            ? (int?) oldClassification.GetClassif()[0].TypeValue
+                            ? (int?)oldClassification.GetClassif()[0].TypeValue
                             : null,
                         OriginalCat2 = oldClassification.GetClassif().Length > 1
-                            ? (int?) oldClassification.GetClassif()[1].TypeValue
+                            ? (int?)oldClassification.GetClassif()[1].TypeValue
                             : null,
-                        CorrectCat1 = newClassification.Count > 0 ? (int?) newClassification[0].TypeValue : null,
-                        CorrectCat2 = newClassification.Count > 1 ? (int?) newClassification[1].TypeValue : null
+                        CorrectCat1 = newClassification.Count > 0 ? (int?)newClassification[0].TypeValue : null,
+                        CorrectCat2 = newClassification.Count > 1 ? (int?)newClassification[1].TypeValue : null
                     });
                 db.SaveChanges();
             }
         }
-        
-        public static bool TryGetOverridenClassification(string idSmlouvy, 
+
+        public static bool TryGetOverridenClassification(string idSmlouvy,
             out ClassificationOverride classification)
         {
             using (var db = new DbEntities())

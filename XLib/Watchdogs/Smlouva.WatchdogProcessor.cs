@@ -1,8 +1,9 @@
-﻿using System;
+﻿using HlidacStatu.Entities;
+using HlidacStatu.Repositories;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
@@ -41,9 +42,9 @@ namespace HlidacStatu.XLib.Watchdogs
             }
 
             var res = SmlouvaRepo.Searching.SimpleSearch(query, 0, maxItems.Value,
-                (SmlouvaRepo.Searching.OrderResult) Convert.ToInt32(order ?? "4")
+                (SmlouvaRepo.Searching.OrderResult)Convert.ToInt32(order ?? "4")
             );
-            return new Results(res.ElasticResults.Hits.Select(m => (dynamic) m.Source), res.Total,
+            return new Results(res.ElasticResults.Hits.Select(m => (dynamic)m.Source), res.Total,
                 query, fromDate, toDate, res.IsValid, typeof(Smlouva).Name);
         }
 

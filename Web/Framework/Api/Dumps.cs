@@ -1,6 +1,8 @@
-﻿using System;
+﻿using HlidacStatu.Repositories;
+
+using System;
 using System.Collections.Generic;
-using HlidacStatu.Repositories;
+
 using static HlidacStatu.Web.Models.ApiV1Models;
 
 namespace HlidacStatu.Web.Framework.Api
@@ -13,7 +15,7 @@ namespace HlidacStatu.Web.Framework.Api
         {
 
             List<DumpInfoModel> data = new List<DumpInfoModel>();
-            
+
             foreach (var fi in new System.IO.DirectoryInfo(StaticData.Dumps_Path).GetFiles("*.zip"))
             {
                 var fn = fi.Name;

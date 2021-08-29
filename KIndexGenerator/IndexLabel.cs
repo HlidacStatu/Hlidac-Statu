@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
@@ -31,7 +30,7 @@ namespace HlidacStatu.KIndexGenerator
 
         public Byte[] GenerateImageByteArray(string headingText, string fourLinerText, string label, string year)
         {
-            using ( MemoryStream ms = GenerateImage(headingText, fourLinerText, label, year))
+            using (MemoryStream ms = GenerateImage(headingText, fourLinerText, label, year))
             {
                 return ms.ToArray();
             }
@@ -95,7 +94,7 @@ namespace HlidacStatu.KIndexGenerator
                             // Vykreslení boxu
                             graphics.DrawString(fourLinerText,
                                 fourLinerFont,
-                                new SolidBrush(Color.FromArgb(60,60,60)),
+                                new SolidBrush(Color.FromArgb(60, 60, 60)),
                                 //Brushes.Black,
                                 this.FourlinerPosition,
                                 stringFormat);
@@ -104,7 +103,7 @@ namespace HlidacStatu.KIndexGenerator
 
                     // Rok - ten bych nechal vždy velikostí 36, tady neresizuju text
                     using (Font yearFont = new Font(fontFamily, this.YearFontSize, FontStyle.Regular))
-                    { 
+                    {
                         using (StringFormat stringFormat = new StringFormat())
                         {
                             stringFormat.LineAlignment = StringAlignment.Center;

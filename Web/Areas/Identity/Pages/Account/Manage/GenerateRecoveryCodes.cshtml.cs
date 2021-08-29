@@ -1,18 +1,19 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using HlidacStatu.Entities;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
+
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
 {
     public class GenerateRecoveryCodesModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        
+
         public GenerateRecoveryCodesModel(
             UserManager<ApplicationUser> userManager)
         {

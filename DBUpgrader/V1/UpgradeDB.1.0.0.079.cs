@@ -4,16 +4,16 @@
 namespace HlidacStatu.DBUpgrades
 {
     public static partial class DBUpgrader
-	{
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.79")]
-			public static void Init_1_0_0_79(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.79")]
+            public static void Init_1_0_0_79(IDatabaseUpgrader du)
+            {
 
-				string sql = @"
+                string sql = @"
 Create table Sponzoring(
     Id int identity(1,1) Primary key,
     OsobaIdDarce int,
@@ -30,9 +30,9 @@ Create table Sponzoring(
     UpdatedBy nvarchar(150)
 );
 ";
-				du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
-			}
-		}
-	}
+            }
+        }
+    }
 }

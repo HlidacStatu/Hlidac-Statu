@@ -1,5 +1,5 @@
-﻿using HlidacStatu.Entities.Entities;
-using HlidacStatu.Entities.Views;
+﻿using HlidacStatu.Entities.Views;
+
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,21 +11,21 @@ namespace HlidacStatu.Entities
             : base(GetConnectionString())
         {
         }
-        
+
         public DbEntities(DbContextOptions<DbEntities> options)
             : base(options)
         {
         }
-    
+
         private static DbContextOptions GetConnectionString()
         {
-            var connectionString = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection"); 
+            var connectionString = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection");
             return new DbContextOptionsBuilder()
                 .UseSqlServer(connectionString)
                 //.EnableSensitiveDataLogging(true)
                 .Options;
         }
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -148,7 +148,7 @@ namespace HlidacStatu.Entities
                 entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
             });
 
-           
+
             modelBuilder.Entity<WatchDog>(entity =>
             {
                 entity.Property(e => e.ToEmail).HasDefaultValueSql("((1))");
@@ -159,9 +159,9 @@ namespace HlidacStatu.Entities
                 entity.HasKey(e => e.Ico)
                     .HasName("PK__ZkratkaS__C497141E3346B980");
             });
-            
+
         }
-    
+
         public virtual DbSet<WatchDog> WatchDogs { get; set; }
         public virtual DbSet<AspNetUserApiToken> AspNetUserApiTokens { get; set; }
         public virtual DbSet<SmlouvyId> SmlouvyIds { get; set; }
@@ -183,7 +183,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<ZkratkaStrany> ZkratkaStrany { get; set; }
         public virtual DbSet<Sponzoring> Sponzoring { get; set; }
         public virtual DbSet<BannedIp> BannedIps { get; set; }
-        
+
         public virtual DbSet<InDocJobs> InDocJobs { get; set; }
         public virtual DbSet<InDocTables> InDocTables { get; set; }
 
@@ -191,7 +191,7 @@ namespace HlidacStatu.Entities
         public DbSet<FindPersonDTO> FindPersonView { get; set; }
         public DbSet<SponzoringOverview> SponzoringOverviewView { get; set; }
         public DbSet<SponzoringSummed> SponzoringSummedView { get; set; }
-    
-       
+
+
     }
 }

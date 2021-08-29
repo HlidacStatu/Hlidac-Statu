@@ -1,13 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.XSD;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Util;
+
 using Nest;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace HlidacStatu.Extensions
 {
@@ -34,7 +36,7 @@ namespace HlidacStatu.Extensions
             f.Add(new InfoFact(hlavni, InfoFact.ImportanceLevel.Summary));
 
             //sponzori
-            foreach (var subj in smlouva.Prijemce.Union(new Smlouva.Subjekt[] {smlouva.Platce}))
+            foreach (var subj in smlouva.Prijemce.Union(new Smlouva.Subjekt[] { smlouva.Platce }))
             {
                 var firma = Firmy.Get(subj.ico);
                 if (firma.Valid && firma.IsSponzor() && firma.JsemSoukromaFirma())
@@ -157,74 +159,74 @@ namespace HlidacStatu.Extensions
             return _infofacts;
         }
 
-        
+
 
         public static Smlouva[] OtherVersions(this Smlouva smlouva)
         {
             var result = new List<Smlouva>();
-            
-            
-                var res = SmlouvaRepo.Searching.SimpleSearch("identifikator.idSmlouvy:" + smlouva.identifikator.idSmlouvy,
-                    1, 50, SmlouvaRepo.Searching.OrderResult.DateAddedDesc, null
-                );
-                var resNeplatne = SmlouvaRepo.Searching.SimpleSearch("identifikator.idSmlouvy:" + smlouva.identifikator.idSmlouvy,
-                    1, 50, SmlouvaRepo.Searching.OrderResult.DateAddedDesc, null, platnyZaznam: false
-                );
 
-                if (res.IsValid == false)
-                    Manager.LogQueryError<Smlouva>(res.ElasticResults);
-                else
-                    result.AddRange(res.ElasticResults.Hits.Select(m => m.Source).Where(m => m.Id != smlouva.Id));
 
-                if (resNeplatne.IsValid == false)
-                    Manager.LogQueryError<Smlouva>(resNeplatne.ElasticResults);
-                else
-                    result.AddRange(resNeplatne.ElasticResults.Hits.Select(m => m.Source).Where(m => m.Id != smlouva.Id));
+            var res = SmlouvaRepo.Searching.SimpleSearch("identifikator.idSmlouvy:" + smlouva.identifikator.idSmlouvy,
+                1, 50, SmlouvaRepo.Searching.OrderResult.DateAddedDesc, null
+            );
+            var resNeplatne = SmlouvaRepo.Searching.SimpleSearch("identifikator.idSmlouvy:" + smlouva.identifikator.idSmlouvy,
+                1, 50, SmlouvaRepo.Searching.OrderResult.DateAddedDesc, null, platnyZaznam: false
+            );
 
-                var otherVersions = result.ToArray();
+            if (res.IsValid == false)
+                Manager.LogQueryError<Smlouva>(res.ElasticResults);
+            else
+                result.AddRange(res.ElasticResults.Hits.Select(m => m.Source).Where(m => m.Id != smlouva.Id));
 
-                List<QueryContainer> mustQs = new List<QueryContainer>(smlouva.sameContractSides());
-                mustQs.AddRange(new QueryContainer[]
-                {
+            if (resNeplatne.IsValid == false)
+                Manager.LogQueryError<Smlouva>(resNeplatne.ElasticResults);
+            else
+                result.AddRange(resNeplatne.ElasticResults.Hits.Select(m => m.Source).Where(m => m.Id != smlouva.Id));
+
+            var otherVersions = result.ToArray();
+
+            List<QueryContainer> mustQs = new List<QueryContainer>(smlouva.sameContractSides());
+            mustQs.AddRange(new QueryContainer[]
+            {
                     new QueryContainerDescriptor<Smlouva>().Match(qm => qm.Field(f => f.predmet).Query(smlouva.predmet)),
                     new QueryContainerDescriptor<Smlouva>().Term(
                         t => t.Field(f => f.datumUzavreni).Value(smlouva.datumUzavreni)),
                     new QueryContainerDescriptor<Smlouva>().Term(t =>
                         t.Field(f => f.CalculatedPriceWithVATinCZK).Value(smlouva.CalculatedPriceWithVATinCZK)),
-                });
-                List<QueryContainer> optionalQs = new List<QueryContainer>();
-                if (!string.IsNullOrEmpty(smlouva.cisloSmlouvy))
-                    optionalQs.Add(
-                        new QueryContainerDescriptor<Smlouva>().Term(t =>
-                            t.Field(f => f.cisloSmlouvy).Value(smlouva.cisloSmlouvy)));
+            });
+            List<QueryContainer> optionalQs = new List<QueryContainer>();
+            if (!string.IsNullOrEmpty(smlouva.cisloSmlouvy))
+                optionalQs.Add(
+                    new QueryContainerDescriptor<Smlouva>().Term(t =>
+                        t.Field(f => f.cisloSmlouvy).Value(smlouva.cisloSmlouvy)));
 
 
-                otherVersions = otherVersions
-                    .Union(SmlouvaRepo.GetPodobneSmlouvy(smlouva.Id, mustQs, optionalQs, otherVersions.Select(m => m.Id)))
-                    .ToArray();
-            
+            otherVersions = otherVersions
+                .Union(SmlouvaRepo.GetPodobneSmlouvy(smlouva.Id, mustQs, optionalQs, otherVersions.Select(m => m.Id)))
+                .ToArray();
+
             return otherVersions;
         }
 
         public static Smlouva[] PodobneSmlouvy(this Smlouva smlouva)
         {
-            
-                IEnumerable<QueryContainer> mustQs = smlouva.sameContractSides().Union(new QueryContainer[]
-                {
+
+            IEnumerable<QueryContainer> mustQs = smlouva.sameContractSides().Union(new QueryContainer[]
+            {
                     new QueryContainerDescriptor<Smlouva>().Match(qm => qm.Field(f => f.predmet).Query(smlouva.predmet)),
                     new QueryContainerDescriptor<Smlouva>().Match(qm => qm.Field(f => f.predmet).Query(smlouva.predmet)),
-                });
-                QueryContainer[] niceToHaveQs = new QueryContainer[]
-                {
+            });
+            QueryContainer[] niceToHaveQs = new QueryContainer[]
+            {
                     new QueryContainerDescriptor<Smlouva>().Term(
                         t => t.Field(f => f.datumUzavreni).Value(smlouva.datumUzavreni)),
                     new QueryContainerDescriptor<Smlouva>().Term(t =>
                         t.Field(f => f.CalculatedPriceWithVATinCZK).Value(smlouva.CalculatedPriceWithVATinCZK)),
-                };
+            };
 
-                var podobneSmlouvy = SmlouvaRepo.GetPodobneSmlouvy(smlouva.Id, smlouva.sameContractSides(), niceToHaveQs,
-                    smlouva.OtherVersions().Select(m => m.Id), 10);
-            
+            var podobneSmlouvy = SmlouvaRepo.GetPodobneSmlouvy(smlouva.Id, smlouva.sameContractSides(), niceToHaveQs,
+                smlouva.OtherVersions().Select(m => m.Id), 10);
+
             return podobneSmlouvy;
         }
 
@@ -335,6 +337,6 @@ namespace HlidacStatu.Extensions
         }
 
 
-        
+
     }
 }

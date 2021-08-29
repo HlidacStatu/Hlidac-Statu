@@ -1,12 +1,15 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using HlidacStatu.Datasets;
-using HlidacStatu.Extensions;
+﻿using HlidacStatu.Datasets;
 using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
+
 using Microsoft.AspNetCore.Mvc;
+
+using Newtonsoft.Json;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -207,7 +210,7 @@ namespace HlidacStatu.Web.Controllers
             return found ?? new Osoba[] { };
         }
 
-        
+
         [HttpGet]
         public ActionResult FindCompanyID(string companyName)
         {
@@ -301,7 +304,7 @@ namespace HlidacStatu.Web.Controllers
 
 
         [HttpPut, ActionName("Datasets")]
-        public ActionResult Datasets_Update(string _id, [FromBody]Registration data)
+        public ActionResult Datasets_Update(string _id, [FromBody] Registration data)
         {
             string id = _id;
 
@@ -320,13 +323,13 @@ namespace HlidacStatu.Web.Controllers
 
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             var errorsStringified = string.Join(";\n", errors);
-            Util.Consts.Logger.Error($"Dataset API:\n {errorsStringified}"); 
+            Util.Consts.Logger.Error($"Dataset API:\n {errorsStringified}");
             return Json(ApiResponseStatus.GeneralExceptionError(errorsStringified));
 
         }
 
         [HttpPut, ActionName("DatasetsPart")]
-        public ActionResult DatasetsPart_Update(string _id, string atribut, [FromBody]Registration data)
+        public ActionResult DatasetsPart_Update(string _id, string atribut, [FromBody] Registration data)
         {
             string id = _id;
 
@@ -356,10 +359,10 @@ namespace HlidacStatu.Web.Controllers
                     return Json(dse.APIResponse);
                 }
             }
-            
+
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             var errorsStringified = string.Join(";\n", errors);
-            Util.Consts.Logger.Error($"Dataset API:\n {errorsStringified}"); 
+            Util.Consts.Logger.Error($"Dataset API:\n {errorsStringified}");
             return Json(ApiResponseStatus.GeneralExceptionError(errorsStringified));
         }
 
@@ -510,7 +513,7 @@ namespace HlidacStatu.Web.Controllers
                     if (ds == null)
                         return Json(ApiResponseStatus.DatasetNotFound);
 
-                    
+
                     bool bDesc = (desc == "1" || desc?.ToLower() == "true");
                     var res = ds.SearchData(q, page.Value, 50, sort + (bDesc ? " desc" : ""));
                     res.Result = res.Result.Select(m => { m.DbCreatedBy = null; return m; });
@@ -522,7 +525,7 @@ namespace HlidacStatu.Web.Controllers
                     )
                     , "application/json");
 
-                    
+
 
                 }
                 catch (DataSetException dex)

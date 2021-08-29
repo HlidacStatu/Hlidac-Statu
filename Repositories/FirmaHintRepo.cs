@@ -1,7 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using HlidacStatu.Entities;
+
 using Microsoft.EntityFrameworkCore;
-using HlidacStatu.Entities;
+
+using System;
+using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
@@ -14,8 +16,8 @@ namespace HlidacStatu.Repositories
                 return db.FirmaHint
                     .AsNoTracking()
                     .Where(m => m.Ico == ico)
-                    .FirstOrDefault() ?? new FirmaHint() { Ico = ico };                    
-                    ;
+                    .FirstOrDefault() ?? new FirmaHint() { Ico = ico };
+                ;
             }
         }
 
@@ -36,7 +38,7 @@ namespace HlidacStatu.Repositories
             using (DbEntities db = new DbEntities())
             {
                 db.FirmaHint.Attach(firmaHint);
-                if (db.FirmaHint.Any(m=>m.Ico == firmaHint.Ico))
+                if (db.FirmaHint.Any(m => m.Ico == firmaHint.Ico))
                     db.Entry(firmaHint).State = EntityState.Modified;
                 else
                     db.Entry(firmaHint).State = EntityState.Added;

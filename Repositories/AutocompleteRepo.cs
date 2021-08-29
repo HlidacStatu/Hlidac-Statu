@@ -1,16 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
 using Devmasters.Enums;
 
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Util;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -292,7 +292,7 @@ namespace HlidacStatu.Repositories
 
             return results;
         }
-        
+
         private static List<Autocomplete> LoadSynonyms()
         {
             string sql = $@"select text, query, type, priority, imageElement, description from AutocompleteSynonyms where active=1;";
@@ -310,7 +310,7 @@ namespace HlidacStatu.Repositories
                 }).ToList();
             return results;
         }
-        
+
         //obce
         private static List<Autocomplete> LoadCities()
         {
@@ -350,11 +350,11 @@ namespace HlidacStatu.Repositories
                         RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
                     synonyms[1].Text = synonymText;
 
-                        lock (lockObj)
-                        {
-                            results.Add(synonyms[0]);
-                            results.Add(synonyms[1]);
-                        }
+                    lock (lockObj)
+                    {
+                        results.Add(synonyms[0]);
+                        results.Add(synonyms[1]);
+                    }
                     return new Devmasters.Batch.ActionOutputData();
                 }, null, progressWriter.Write, true, prefix: "LoadObce ");
 

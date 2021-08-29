@@ -1,13 +1,15 @@
-﻿using System;
+﻿using HlidacStatu.Util;
+
+using Polly;
+using Polly.Retry;
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
-using HlidacStatu.Util;
-using Polly;
-using Polly.Retry;
 
 namespace HlidacStatu.Plugin.TransparetniUcty
 {
@@ -42,11 +44,11 @@ namespace HlidacStatu.Plugin.TransparetniUcty
         {
             string apiUrl = "https://www.kb.cz/transparentsapi/transactions/"; //api base address
             int chunk = 10000; // how many items should be loaded
-            
+
             var polozky = new List<IBankovniPolozka>();
-            
+
             TULogger.Info($"Zpracovavam ucet {Ucet.CisloUctu} s url {Ucet.Url}");
-            string cisloUctuBezKoncovky = Ucet.CisloUctu.Split('/', 
+            string cisloUctuBezKoncovky = Ucet.CisloUctu.Split('/',
                 StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
                 .FirstOrDefault();
 
@@ -55,7 +57,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                 TULogger.Info($"Nedokazu oddelit cislo uctu od kodu banky. Cislo uctu [{Ucet.CisloUctu}]");
                 return polozky;
             }
-            
+
             var httpClient = new HttpClient();
             httpClient.BaseAddress = new Uri(apiUrl);
             httpClient.Timeout = TimeSpan.FromMinutes(3);
@@ -72,7 +74,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                     return httpClient.Send(request);
                 });
 
-            
+
                 if (response.IsSuccessStatusCode)
                 {
                     using var reader = new StreamReader(response.Content.ReadAsStream());
@@ -84,7 +86,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                         TULogger.Info($"Ucet neobsahuje zadne polozky.");
                         break;
                     }
-                        
+
                     foreach (var item in result.items)
                     {
                         DateTime datum = ParseDate(item.date);
@@ -92,7 +94,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                             continue;
                         if (toDate != null && datum > toDate)
                             continue;
-                        
+
                         var itemSymbols = item.symbols.Replace(" ", "").Split('/');
                         var notes = item.notes.Split("<br />");
                         string nazevProtiuctu = "";
@@ -109,7 +111,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                             popisTransakce = notes[0];
                             nazevProtiuctu = notes[1];
                         }
-                        
+
                         polozky.Add(new SimpleBankovniPolozka
                         {
                             AddId = item.id,
@@ -126,7 +128,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                             CisloProtiuctu = ""
                         });
                     }
-                    
+
                     containsNextPage = result?.loadMore ?? false;
                 }
                 else
@@ -134,17 +136,17 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                     TULogger.Info($"Chyba {response.StatusCode}");
                     break;
                 }
-                
+
                 page++;
             } while (containsNextPage);
 
 
-            
+
             return polozky;
 
         }
-        
-        
+
+
         public class Item
         {
             public string id { get; set; }
@@ -161,7 +163,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
 
         }
 
-        
+
 
         private bool IsAlreadyExist(List<IBankovniPolozka> polozky, IBankovniPolozka p)
         {
@@ -185,7 +187,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
 
         private DateTime ParseDate(string value)
         {
-            
+
             var dat = Devmasters.DT.Util.ToDateTime(value.Replace("&nbsp;", " "), "d. M. yyyy");
             if (dat.HasValue)
             {
@@ -196,7 +198,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
             throw new ApplicationException($"KB: chybejici datum pro ucet {Ucet.CisloUctu}");
         }
 
-        
+
         private string MakeRequest(int page, HttpClient httpClient)
         {
             var content = new FormUrlEncodedContent(new[]

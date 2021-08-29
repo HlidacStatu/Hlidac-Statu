@@ -1,21 +1,21 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using Devmasters;
 using Devmasters.Cache.LocalMemory;
+
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Util;
+
 using Microsoft.EntityFrameworkCore;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class OsobaRepo
     {
         private static string AppDataPath = null;
-        
+
         public static AutoUpdatedLocalMemoryCache<List<Osoba>> PolitickyAktivni = null;
         public static AutoUpdatedLocalMemoryCache<List<Osoba>> Politici = null;
 
@@ -27,7 +27,7 @@ namespace HlidacStatu.Repositories
                 throw new ArgumentNullException("App_Data_Path");
             }
 
-            
+
 
             Consts.Logger.Info("Static data - Politici");
             Politici = new AutoUpdatedLocalMemoryCache<List<Osoba>>(
@@ -39,7 +39,7 @@ namespace HlidacStatu.Repositories
                     {
                         osoby = db.Osoba
                             .AsNoTracking()
-                            .Where(m => m.Status == (int) Osoba.StatusOsobyEnum.Politik)
+                            .Where(m => m.Status == (int)Osoba.StatusOsobyEnum.Politik)
                             .ToArray()
                             .OrderBy(o =>
                             {
@@ -64,8 +64,8 @@ namespace HlidacStatu.Repositories
                         var osobyQ = db.Osoba.AsQueryable()
                             //migrace: SponzoringLimitsPredicate hodit do repositories
                             .Where(m => db.Sponzoring.Any(SponzoringRepo.SponzoringLimitsPredicate))
-                            .Where(m => m.Status == (int) Osoba.StatusOsobyEnum.VazbyNaPolitiky ||
-                                        m.Status == (int) Osoba.StatusOsobyEnum.Sponzor)
+                            .Where(m => m.Status == (int)Osoba.StatusOsobyEnum.VazbyNaPolitiky ||
+                                        m.Status == (int)Osoba.StatusOsobyEnum.Sponzor)
                             .AsNoTracking()
                             .ToArray()
                             .OrderBy(o =>
@@ -81,6 +81,6 @@ namespace HlidacStatu.Repositories
             );
         }
 
- 
+
     }
 }

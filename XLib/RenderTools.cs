@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using HlidacStatu.Datasets;
 
 namespace HlidacStatu.XLib
 {
@@ -188,7 +186,7 @@ namespace HlidacStatu.XLib
             }
             else
             {
-                txtDiff = Devmasters.Lang.CS.Plural.GetWithZero(dateDiff.Days,  "dnes","den","{0} dny","{0} dnů");
+                txtDiff = Devmasters.Lang.CS.Plural.GetWithZero(dateDiff.Days, "dnes", "den", "{0} dny", "{0} dnů");
             }
 
             if (after)

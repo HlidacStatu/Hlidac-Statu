@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Nest;
+
+using System.Collections.Generic;
 using System.Linq;
-using Nest;
 
 namespace HlidacStatu.Repositories.Searching
 {
@@ -8,7 +9,7 @@ namespace HlidacStatu.Repositories.Searching
     {
         public static SplittingQuery GetSimpleQuery(string query, Rules.IRule[] rules)
         {
-            var fixedQuery = Tools.FixInvalidQuery(query,rules) ?? "";
+            var fixedQuery = Tools.FixInvalidQuery(query, rules) ?? "";
             var sq = SplittingQuery.SplitQuery(fixedQuery);
             return GetSimpleQuery(sq, rules);
         }
@@ -47,7 +48,7 @@ namespace HlidacStatu.Repositories.Searching
 
                     qToProcess = qpResults
                         .SelectMany(m => m.Query.Parts)
-                        .Where(m=>m.ToQueryString.Length > 0)
+                        .Where(m => m.ToQueryString.Length > 0)
                         .ToArray();
 
                 } //rules

@@ -1,10 +1,10 @@
+using HlidacStatu.Entities.VZ;
+using HlidacStatu.Repositories;
+using HlidacStatu.Util;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Lib;
-using HlidacStatu.Repositories;
-using HlidacStatu.Entities.VZ;
-using HlidacStatu.Util;
 
 
 namespace HlidacStatu.Extensions
@@ -94,7 +94,7 @@ namespace HlidacStatu.Extensions
 
             //sponzori
             foreach (var subj in verejnaZakazka.Dodavatele.Union(
-                new VerejnaZakazka.Subject[] {verejnaZakazka.Zadavatel}))
+                new VerejnaZakazka.Subject[] { verejnaZakazka.Zadavatel }))
             {
                 if (subj != null)
                 {
@@ -222,7 +222,7 @@ namespace HlidacStatu.Extensions
 
             return null;
         }
-        
+
         public static VerejnaZakazka.ExportedVZ.SubjectExport SubjectExport(
             VerejnaZakazka.Subject s)
         {

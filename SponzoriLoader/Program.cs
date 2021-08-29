@@ -1,14 +1,16 @@
 ﻿using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
+using HlidacStatu.Repositories;
 using HlidacStatu.Util;
+
 using Newtonsoft.Json;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using HlidacStatu.Extensions;
-using HlidacStatu.Repositories;
 
 namespace SponzoriLoader
 {
@@ -32,8 +34,8 @@ namespace SponzoriLoader
 
         static async Task Main(string[] args)
         {
-            HlidacStatu.Connectors.InitializeConfigServices.Initialize(new []{"Petr"});
-            
+            HlidacStatu.Connectors.InitializeConfigServices.Initialize(new[] { "Petr" });
+
             _partyNames = LoadPartyNames();
             var peopleDonations = new Donations(new DonorEqualityComparer());
             var companyDonations = new Donations(new DonorEqualityComparer());
@@ -78,7 +80,7 @@ namespace SponzoriLoader
             return json;
         }
 
-        public static Dictionary<string,string> LoadPartyNames()
+        public static Dictionary<string, string> LoadPartyNames()
         {
             using (DbEntities db = new DbEntities())
             {
@@ -108,13 +110,13 @@ namespace SponzoriLoader
                 string lastName = record.lastName;
                 string titlesBefore = record.titleBefore;
                 string titlesAfter = record.titleAfter;
-                
+
                 var cleanedName = Validators.SeparateNameFromTitles(firstName);
                 var cleanedLastName = Validators.SeparateNameFromTitles(lastName);
 
                 titlesBefore = MergeTitles(titlesBefore, cleanedName.titulyPred, cleanedLastName.titulyPred);
                 titlesAfter = MergeTitles(titlesAfter, cleanedName.titulyPo, cleanedLastName.titulyPo);
-           
+
                 Donor donor = new Donor()
                 {
                     City = record.addrCity,
@@ -208,7 +210,7 @@ namespace SponzoriLoader
                 {
                     Console.WriteLine(ex.Message);
                 }
-                
+
                 if (firma is null)
                 {
                     Console.WriteLine($"Chybějící firma v db - ICO: {donor.CompanyId}, nazev: {donor.Name}");

@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using HlidacStatu.XLib.Render;
+
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using HlidacStatu.XLib.Render;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -297,11 +299,11 @@ pie: {
                 string xValueFormat = null, string yValueFormat = null, string tooltipFormatFull = null,
                 string loadEvents = null, string backgroundColor = null, string addStyle = null, bool stacking = false
             )
-            //where T : class
+        //where T : class
         {
             return SimpleBarChart(htmlHelper, columnType, timeData, height,
                 containerId, xAxisName, yAxisName,
-                new ReportDataSource<T>[] {rds},
+                new ReportDataSource<T>[] { rds },
                 tooltipValueSuffix, xValueFormat, yValueFormat, tooltipFormatFull,
                 backgroundColor, addStyle, stacking: stacking);
         }
@@ -473,7 +475,7 @@ pie: {
 
         public static IHtmlContent RenderReportTableT<T>(string title, ReportDataSource<T> item,
                 string JsDataTableOptions = null, string JsDataTableId = null)
-            //  where T : class
+        //  where T : class
         {
             return DataToHTMLTable(title, item, JsDataTableId, JsDataTableOptions);
         }
@@ -481,7 +483,7 @@ pie: {
 
         public static IHtmlContent DataToHTMLTable<T>(string title, ReportDataSource<T> rds,
                 string tableId = "", string dataTableOptions = "", string customTableHeader = null)
-            //   where T : class
+        //   where T : class
         {
             System.Text.StringBuilder sb = new(1024);
             string _tableId = tableId;
@@ -558,7 +560,7 @@ tbl_" + _tableId + @" = $('#" + _tableId + @"').DataTable(" + dataTableOptions +
 
         public static IHtmlContent RenderReportTable<T>(string title, ReportModel.QueueItem item,
                 string JsDataTableOptions, string JsDataTableId = null)
-            //where T : class
+        //where T : class
         {
             if (item.Type == ReportModel.QueueItem.types.table)
             {
@@ -596,11 +598,11 @@ tbl_" + _tableId + @" = $('#" + _tableId + @"').DataTable(" + dataTableOptions +
             else
             {
                 return RenderReport(
-                    new ReportModel.QueueItem() {Title = title, Type = type, Data = data},
+                    new ReportModel.QueueItem() { Title = title, Type = type, Data = data },
                     JsDataTableOptions, JsDataTableId);
             }
         }
-        
-        
+
+
     }
 }

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Devmasters.Collections;
+
+using System.Collections.Generic;
 using System.Linq;
-using Devmasters.Collections;
 
 namespace HlidacStatu.Util
 {

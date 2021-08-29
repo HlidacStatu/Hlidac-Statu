@@ -1,23 +1,25 @@
-﻿using HlidacStatu.Lib.Analysis.KorupcniRiziko;
-using HlidacStatu.Entities;
-using HlidacStatu.Util;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using HlidacStatu.Connectors;
+﻿using HlidacStatu.Connectors;
 using HlidacStatu.Datasets;
-using HlidacStatu.Extensions;
 using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
+using HlidacStatu.Extensions;
+using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories;
+using HlidacStatu.Util;
 using HlidacStatu.Web.Models;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -91,7 +93,7 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult ICO2Firmy([FromForm] string names)
         {
             List<Firma> res = null;
-            string jmena = names ;//Request.Form.Keys.Contains("names") ? Request.Form["names"] : "";
+            string jmena = names;//Request.Form.Keys.Contains("names") ? Request.Form["names"] : "";
             if (!string.IsNullOrWhiteSpace(jmena))
             {
                 string[] icos = jmena.Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
@@ -226,7 +228,7 @@ namespace HlidacStatu.Web.Controllers
 
         }
 
-        
+
         [Authorize(Roles = "canEditData")]
         public ActionResult WatchdogsAdminList()
         {
@@ -235,7 +237,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "canEditData")]
         public ActionResult EditSmlouva(string Id, string type)
         {
-            object item =  SmlouvaRepo.Load(Id);
+            object item = SmlouvaRepo.Load(Id);
             if (item != null)
             {
                 ViewBag.objectType = type;
@@ -451,13 +453,13 @@ namespace HlidacStatu.Web.Controllers
             user.SentWatchdogOneByOne = (form["allinone"] != "on");
             return Redirect("Watchdogs?rnd=" + Util.Consts.Rnd.Next(1, 10000));
         }
-        
+
         [HttpGet, ActionName("WatchdogsSett")]
         public ActionResult WatchdogsSett_get()
         {
             return Redirect("Watchdogs");
         }
-        
+
         public ActionResult Watchdogs(string id, string wid, string disable, string enable, string delete)
         {
             string currWDtype = null;
@@ -524,7 +526,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        
+
         [AllowAnonymous]
         public ActionResult ChangePhoto(string id)
         {
@@ -547,7 +549,7 @@ namespace HlidacStatu.Web.Controllers
             try
             {
                 if (string.IsNullOrEmpty(id))
-                    return RedirectToAction(nameof(OsobyController.Index),"Osoby");
+                    return RedirectToAction(nameof(OsobyController.Index), "Osoby");
 
                 var o = Osoby.GetByNameId.Get(id);
                 if (o == null)
@@ -694,13 +696,13 @@ namespace HlidacStatu.Web.Controllers
 
         }
 
-        
+
 
         #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";
 
-     
+
         private async Task<bool> HasPassword()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -710,7 +712,7 @@ namespace HlidacStatu.Web.Controllers
             }
             return false;
         }
- 
+
 
         public enum ManageMessageId
         {

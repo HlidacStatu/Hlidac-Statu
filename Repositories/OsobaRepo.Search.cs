@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using Devmasters;
 using Devmasters.Enums;
+
 using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
@@ -11,8 +8,15 @@ using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
 using HlidacStatu.Util;
+
 using Microsoft.EntityFrameworkCore;
+
 using Nest;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace HlidacStatu.Repositories
 {
@@ -28,11 +32,13 @@ namespace HlidacStatu.Repositories
             [Sortable(SortableAttribute.SortAlgorithm.BySortValue)]
             public enum OrderResult
             {
-                [SortValue(0)] [NiceDisplayName("podle relevance")]
+                [SortValue(0)]
+                [NiceDisplayName("podle relevance")]
                 Relevance = 0,
 
 
-                [SortValue(1)] [NiceDisplayName("podle abecedy")]
+                [SortValue(1)]
+                [NiceDisplayName("podle abecedy")]
                 NameAsc = 1,
 
 
@@ -80,7 +86,7 @@ namespace HlidacStatu.Repositories
 
             static string[] dontIndexOsoby = Config
                 .GetWebConfigValue("DontIndexOsoby")
-                .Split(new string[] {";", ","}, StringSplitOptions.RemoveEmptyEntries)
+                .Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => m.ToLower())
                 .ToArray();
 
@@ -183,7 +189,7 @@ namespace HlidacStatu.Repositories
                             .Sort(ss => GetSort(order))
                             .Aggregations(aggrFunc)
                             .Highlight(h => Tools.GetHighlight<Smlouva>(withHighlighting))
-                            .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?) null)
+                            .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null)
                         );
                     if (withHighlighting && res.Shards != null &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
@@ -198,7 +204,7 @@ namespace HlidacStatu.Repositories
                                 .Sort(ss => GetSort(order))
                                 .Aggregations(aggrFunc)
                                 .Highlight(h => Tools.GetHighlight<Smlouva>(false))
-                                .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?) null)
+                                .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null)
                             );
                     }
                 }
@@ -247,7 +253,7 @@ namespace HlidacStatu.Repositories
             {
                 var osoba = GetAllByName(jmeno, prijmeni, narozeni).FirstOrDefault();
 
-                if (osoba is null || osoba.Status != (int) Osoba.StatusOsobyEnum.Duplicita)
+                if (osoba is null || osoba.Status != (int)Osoba.StatusOsobyEnum.Duplicita)
                     return osoba;
 
                 return osoba.GetOriginal();
@@ -430,7 +436,7 @@ namespace HlidacStatu.Repositories
                 return res;
             }
 
-            public static List<int> PolitikImportanceOrder = new List<int>() {3, 4, 2, 1, 0};
+            public static List<int> PolitikImportanceOrder = new List<int>() { 3, 4, 2, 1, 0 };
 
             public static int[] PolitikImportanceEventTypes = new int[]
             {
@@ -502,6 +508,6 @@ namespace HlidacStatu.Repositories
             }
         }
 
- 
+
     }
 }

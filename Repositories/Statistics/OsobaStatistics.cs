@@ -1,10 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Repositories.Statistics
 {
@@ -14,7 +15,7 @@ namespace HlidacStatu.Repositories.Statistics
             _cache
                 = Util.Cache.CouchbaseCacheManager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
                     .GetSafeInstance("Osoba_SmlouvyStatistics_v1_",
-                        (obj) => Calculate(obj.os, (Relation.AktualnostType) obj.aktualnost, obj.obor),
+                        (obj) => Calculate(obj.os, (Relation.AktualnostType)obj.aktualnost, obj.obor),
                         TimeSpan.FromHours(12),
                         Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                         Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
@@ -26,7 +27,7 @@ namespace HlidacStatu.Repositories.Statistics
         public static Osoba.Statistics.RegistrSmluv CachedStatistics(Osoba os, Relation.AktualnostType aktualnost,
             int? obor)
         {
-            return _cache.Get((os, (int) aktualnost, obor));
+            return _cache.Get((os, (int)aktualnost, obor));
         }
 
 
@@ -35,7 +36,7 @@ namespace HlidacStatu.Repositories.Statistics
             Osoba.Statistics.RegistrSmluv res = new Osoba.Statistics.RegistrSmluv();
             res.OsobaNameId = o.NameId;
             res.Aktualnost = aktualnost;
-            res.Obor = (Smlouva.SClassification.ClassificationsTypes?) obor;
+            res.Obor = (Smlouva.SClassification.ClassificationsTypes?)obor;
 
             Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>> statni =
                 new Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
@@ -49,7 +50,7 @@ namespace HlidacStatu.Repositories.Statistics
                 .Distinct(new Datastructures.Graphs.Graph.NodeComparer())
                 .Select(f => Firmy.Get(f.Id))
                 .Where(f => f.Valid == true)
-                .Select(f => new {f = f, ss = f.StatistikaRegistruSmluv(obor)});
+                .Select(f => new { f = f, ss = f.StatistikaRegistruSmluv(obor) });
 
 
             foreach (var it in perIcoStat)

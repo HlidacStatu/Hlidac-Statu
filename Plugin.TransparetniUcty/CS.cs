@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Devmasters.Net.HttpClient;
+
+using Newtonsoft.Json;
+
+using System;
 using System.Collections.Generic;
 using System.Text;
-using Devmasters.Net.HttpClient;
-using Newtonsoft.Json;
 
 namespace HlidacStatu.Plugin.TransparetniUcty
 {

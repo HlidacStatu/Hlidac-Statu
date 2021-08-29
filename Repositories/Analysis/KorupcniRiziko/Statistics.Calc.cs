@@ -1,9 +1,9 @@
-﻿using HlidacStatu.Entities;
+﻿using HlidacStatu.Repositories;
+using HlidacStatu.Repositories.ES;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.ES;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -86,7 +86,8 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 //poradi
                 stat.SubjektOrderedListKIndexAsc = datayear
                     .Where(m => m.Value.KIndexReady)
-                    .Select(m => {
+                    .Select(m =>
+                    {
                         var company = Firmy.Get(m.Key);
                         return (m.Key, m.Value.KIndex, company.KrajId);
                     })
@@ -97,7 +98,8 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     stat.SubjektOrderedListPartsAsc.Add(part, datayear
                         .Where(m => m.Value.KIndexReady)
                         .Where(m => m.Value.KIndexVypocet.Radky.Any(r => r.VelicinaPart == part))
-                        .Select(m => {
+                        .Select(m =>
+                        {
                             var company = Firmy.Get(m.Key);
                             return (m.Key, m.Value.KIndexVypocet.Radky.First(r => r.VelicinaPart == part).Hodnota, company.KrajId);
                         })
@@ -116,7 +118,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     decimal val = datayear
                         .Select(m => m.Value.KIndexVypocet.Radky
                             .FirstOrDefault(r => r.Velicina == (int)part))
-                            .Where(a=>a!=null)
+                            .Where(a => a != null)
                             .Average(a => a.Hodnota);
 
                     KIndexData.VypocetDetail.Radek radek = new KIndexData.VypocetDetail.Radek(part, val, KIndexData.DetailInfo.DefaultKIndexPartKoeficient(part));
@@ -144,8 +146,8 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                         decimal val = HlidacStatu.Util.MathTools.PercentileCont(perc / 100m,
                                 datayear
                                 .Select(m => m.Value.KIndexVypocet.Radky.FirstOrDefault(r => r.Velicina == (int)part))
-                                .Where(m=>m != null)
-                                .Select(m=>m.Hodnota)
+                                .Where(m => m != null)
+                                .Select(m => m.Hodnota)
                             );
                         KIndexData.VypocetDetail.Radek radek = new KIndexData.VypocetDetail.Radek(part, val, KIndexData.DetailInfo.DefaultKIndexPartKoeficient(part));
                         radky.Add(radek);

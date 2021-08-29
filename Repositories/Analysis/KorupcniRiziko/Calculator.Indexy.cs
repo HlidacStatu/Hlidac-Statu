@@ -158,7 +158,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             if (finalHI > 1)
                 finalHI = Math.Sqrt(finalHI);
 
-            return (decimal)((decimal)finalHI/10m);
+            return (decimal)((decimal)finalHI / 10m);
         }
 
         /// <summary>

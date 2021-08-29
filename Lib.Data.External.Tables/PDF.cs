@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Data.External.Tables
@@ -45,7 +44,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 //    Status = m.Status,
                 //    Tables = m.Tables
                 //})
-                .Select(m=>(Result)m)
+                .Select(m => (Result)m)
                 .ToArray()
                 ;
         }

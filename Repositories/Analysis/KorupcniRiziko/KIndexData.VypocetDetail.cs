@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using Devmasters.Enums;
 
-using Devmasters.Enums;
+using System.Linq;
 
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko

@@ -3,15 +3,15 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.23")]
-			public static void Init_1_0_0_23(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.23")]
+            public static void Init_1_0_0_23(IDatabaseUpgrader du)
+            {
 
                 //fix of 1.0.0.14 script
 
@@ -62,15 +62,15 @@ values (2097081, 'Partner', '1994-01-01',4,'1461247')
 
 
 ";
-				du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
 
-			}
-
-	
+            }
 
 
-		}
 
-	}
+
+        }
+
+    }
 }

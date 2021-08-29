@@ -30,9 +30,9 @@ namespace HlidacStatu.Datasets
                 return (body ?? "").Contains("{{");
             }
 
-            
 
-            public string GetTemplateHeader(string datasetId,  string qs)
+
+            public string GetTemplateHeader(string datasetId, string qs)
             {
                 string template = "{{ \n" +
                     " qs = \"" + System.Net.WebUtility.UrlEncode(qs) + "\""
@@ -50,7 +50,7 @@ namespace HlidacStatu.Datasets
 
             public List<string> GetTemplateErrors()
             {
-                string template = GetTemplateHeader("any","") + body;
+                string template = GetTemplateHeader("any", "") + body;
                 var xTemp = Scriban.Template.Parse(template);
                 if (xTemp.HasErrors)
                 {
@@ -69,8 +69,8 @@ namespace HlidacStatu.Datasets
                 public string Q { get; set; }
                 public int Page { get; set; }
             }
-            
-            
+
+
         }
     }
 }

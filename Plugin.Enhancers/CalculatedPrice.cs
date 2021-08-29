@@ -1,12 +1,9 @@
 ﻿using Devmasters.Collections;
-using HlidacStatu.Lib;
-using HlidacStatu.Entities.Enhancers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Enhancers;
+
+using System;
 
 namespace HlidacStatu.Plugin.Enhancers
 {
@@ -68,7 +65,7 @@ namespace HlidacStatu.Plugin.Enhancers
                     {
                         item.CalculatedPriceWithVATinCZK = item.ciziMena.hodnota * exr;
                         item.CalcutatedPriceQuality = DataQualityEnum.Calculated;
-                        item.Enhancements = item.Enhancements.AddOrUpdate(new Enhancement("Dopočítána cena v CZK ze zahraniční měny", "","", "", "", this));
+                        item.Enhancements = item.Enhancements.AddOrUpdate(new Enhancement("Dopočítána cena v CZK ze zahraniční měny", "", "", "", "", this));
                         changed = true;
                     }
                     else
@@ -88,7 +85,7 @@ namespace HlidacStatu.Plugin.Enhancers
             string sdate = date.Date.ToString("dd.MM.yyyy");
             string url = "https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/denni_kurz.txt?date=" + sdate;
 
-// old URL "https://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt?date=" + sdate; 
+            // old URL "https://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/denni_kurz.txt?date=" + sdate; 
 
             try
             {
@@ -123,7 +120,7 @@ namespace HlidacStatu.Plugin.Enhancers
             }
             catch (Exception e)
             {
-                Base.Logger.Error("Date: " + date.ToShortDateString() + " " + currency + " is unknown",e);
+                Base.Logger.Error("Date: " + date.ToShortDateString() + " " + currency + " is unknown", e);
 
                 return 0;
             }

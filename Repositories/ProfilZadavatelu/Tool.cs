@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Devmasters.Batch;
+
+using HlidacStatu.Entities.VZ;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Devmasters.Batch;
-using HlidacStatu.Entities.VZ;
 
 namespace HlidacStatu.Repositories.ProfilZadavatelu
 {
@@ -58,7 +60,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                                 profily2.Add(pz);
                         }
                         return new ActionOutputData();
-                    }, null, 
+                    }, null,
                     outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter
                     , false);
 
@@ -80,5 +82,5 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
     }
 
 
-    
+
 }

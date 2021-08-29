@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
@@ -24,7 +21,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     tbl.TableInPage = crT.TableInPage;
 
                     var score = HlidacStatu.DetectJobs.InHtmlTables.TableWithWordsAndNumbers(
-                        tbl.ParsedContent(), 
+                        tbl.ParsedContent(),
                         HlidacStatu.DetectJobs.InHtmlTables.SpecificWords, out var foundJobs, out var cells);
                     if (foundJobs != null)
                         tbl.FoundJobs = foundJobs.ToArray();

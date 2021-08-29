@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using HlidacStatu.Repositories;
 
 namespace HlidacStatu.Repositories.Searching.Rules
 {

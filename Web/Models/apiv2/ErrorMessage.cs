@@ -1,6 +1,8 @@
-using System.Net.Http;
 using HlidacStatu.Datasets;
+
 using Newtonsoft.Json;
+
+using System.Net.Http;
 
 namespace HlidacStatu.Web.Models.Apiv2
 {
@@ -12,7 +14,7 @@ namespace HlidacStatu.Web.Models.Apiv2
     {
 
         private ErrorMessage() { }
-        public ErrorMessage(ApiResponseStatus apiresponse) 
+        public ErrorMessage(ApiResponseStatus apiresponse)
             : this(System.Net.HttpStatusCode.BadRequest, apiresponse.error?.ToString(), apiresponse.value)
         { }
 
@@ -23,7 +25,7 @@ namespace HlidacStatu.Web.Models.Apiv2
             if (detail != null)
                 this.Detail = detail;
 
-            this.Content =new StringContent(
+            this.Content = new StringContent(
                 Newtonsoft.Json.JsonConvert.SerializeObject(new { Error = this.Error, Detail = this.Detail })
                 );
         }
@@ -31,12 +33,12 @@ namespace HlidacStatu.Web.Models.Apiv2
         /// Gets or Sets error
         /// </summary>
         public string Error { get; private set; }
-        
+
         /// <summary>
         /// Object with more details about error.
         /// </summary>
         public dynamic Detail { get; private set; }
-       
+
 
         /// <summary>
         /// Returns error message

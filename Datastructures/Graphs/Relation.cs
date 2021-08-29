@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Devmasters.Enums;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Devmasters.Enums;
 
 namespace HlidacStatu.Datastructures.Graphs
 {
@@ -190,7 +191,7 @@ namespace HlidacStatu.Datastructures.Graphs
             Checkbox
         }
 
-        
+
         public static string ExportTabDataDebug(IEnumerable<Graph.Edge> data)
         {
             if (data == null)
@@ -206,9 +207,9 @@ namespace HlidacStatu.Datastructures.Graphs
             }
             return sb.ToString();
         }
-        
 
-        
+
+
 
         public static Graph.Edge[] AktualniVazby(IEnumerable<Graph.Edge> allRelations, AktualnostType minAktualnost)
         {

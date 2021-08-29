@@ -1,17 +1,19 @@
 ﻿using Devmasters;
 using Devmasters.Enums;
+
+using HlidacStatu.Connectors;
+using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
+using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Util.Cache;
+
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
-using HlidacStatu.Datastructures.Graphs;
-using HlidacStatu.Connectors;
-using HlidacStatu.Entities;
-using HlidacStatu.Extensions;
-using HlidacStatu.Lib.Analytics;
 
 
 namespace HlidacStatu.Repositories
@@ -135,7 +137,7 @@ namespace HlidacStatu.Repositories
                         if (!excludeOsobaId.Contains(ov.VazbakOsobaId.Value))
                         {
                             Osoba o = Osoby.GetById.Get(ov.VazbakOsobaId.Value);
-                            excludeOsobaId = excludeOsobaId.Union(new int[] {ov.VazbakOsobaId.Value});
+                            excludeOsobaId = excludeOsobaId.Union(new int[] { ov.VazbakOsobaId.Value });
                             var rel = vsechnyDcerineVazbyInternal(o, level + 1, true, parentRelFound,
                                 excludeOsobaId: excludeOsobaId, aktualnost: aktualnost);
                             relForConnectedPersons = Datastructures.Graphs.Graph.Edge.Merge(relForConnectedPersons, rel);
@@ -175,7 +177,7 @@ namespace HlidacStatu.Repositories
         {
             var vazby = vsechnyDcerineVazbyInternal(ico, 9, true, null, datumOd: datumOd, datumDo: datumDo);
             var parents = GetParentRelations(ico, vazby, 0, datumOd, datumDo);
-            var rootNode = new Datastructures.Graphs.Graph.Node() {Id = ico, Type = Datastructures.Graphs.Graph.Node.NodeType.Company};
+            var rootNode = new Datastructures.Graphs.Graph.Node() { Id = ico, Type = Datastructures.Graphs.Graph.Node.NodeType.Company };
             if (parents?.Count() > 0)
             {
                 if (vazby.Any(m => m.Root))
@@ -210,7 +212,7 @@ namespace HlidacStatu.Repositories
                     {
                         From = null,
                         Root = true,
-                        To = new Datastructures.Graphs.Graph.Node() {Id = nodeId, Type = nodeType},
+                        To = new Datastructures.Graphs.Graph.Node() { Id = nodeId, Type = nodeType },
                         RelFrom = datumOd,
                         RelTo = datumDo,
                         Distance = 0
@@ -232,12 +234,12 @@ namespace HlidacStatu.Repositories
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
                     AngazovanostData angaz = null;
-                    var ico = (string) dr["VazbakIco"];
+                    var ico = (string)dr["VazbakIco"];
                     if (string.IsNullOrEmpty(ico))
                     {
                         if (dr.Table.Columns.Contains("vazbakOsobaId"))
                         {
-                            var vazbakOsobaId = (int?) PersistLib.IsNull(dr["vazbakOsobaId"], null);
+                            var vazbakOsobaId = (int?)PersistLib.IsNull(dr["vazbakOsobaId"], null);
                             if (vazbakOsobaId != null)
                             {
                                 Osoba o = Osoby.GetById.Get(vazbakOsobaId.Value);
@@ -245,11 +247,11 @@ namespace HlidacStatu.Repositories
                                 {
                                     subjId = vazbakOsobaId.Value.ToString(),
                                     NodeType = Datastructures.Graphs.Graph.Node.NodeType.Person,
-                                    fromDate = (DateTime?) PersistLib.IsNull(dr["datumOd"], null),
-                                    toDate = (DateTime?) PersistLib.IsNull(dr["datumDo"], null),
+                                    fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
+                                    toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
                                     kod_ang = Convert.ToInt32(dr["typVazby"]),
-                                    descr = (string) PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
-                                    podil = (decimal?) PersistLib.IsNull(dr["podil"], null)
+                                    descr = (string)PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
+                                    podil = (decimal?)PersistLib.IsNull(dr["podil"], null)
                                 };
                             }
                         }
@@ -261,11 +263,11 @@ namespace HlidacStatu.Repositories
                             subjId = ico,
                             subjname = "",
                             NodeType = Datastructures.Graphs.Graph.Node.NodeType.Company,
-                            fromDate = (DateTime?) PersistLib.IsNull(dr["datumOd"], null),
-                            toDate = (DateTime?) PersistLib.IsNull(dr["datumDo"], null),
+                            fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
+                            toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
                             kod_ang = Convert.ToInt32(dr["typVazby"]),
-                            descr = (string) PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
-                            podil = (decimal?) PersistLib.IsNull(dr["podil"], null)
+                            descr = (string)PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
+                            podil = (decimal?)PersistLib.IsNull(dr["podil"], null)
                         };
                     }
 
@@ -317,8 +319,8 @@ namespace HlidacStatu.Repositories
                     }
 
                     var rel = AngazovanostDataToEdge(ang,
-                        new Datastructures.Graphs.Graph.Node() {Type = nodeType, Id = nodeId},
-                        new Datastructures.Graphs.Graph.Node() {Type = ang.NodeType, Id = ang.subjId},
+                        new Datastructures.Graphs.Graph.Node() { Type = nodeType, Id = nodeId },
+                        new Datastructures.Graphs.Graph.Node() { Type = ang.NodeType, Id = ang.subjId },
                         level + 1
                     );
 
@@ -388,11 +390,11 @@ namespace HlidacStatu.Repositories
             rel.To = toNode;
             rel.Distance = distance;
             rel.VazbaType = ang.kod_ang;
-            rel.RelFrom = (DateTime?) PersistLib.IsNull(ang.fromDate, null);
+            rel.RelFrom = (DateTime?)PersistLib.IsNull(ang.fromDate, null);
             if (rel.RelFrom < minDate)
                 rel.RelFrom = null;
 
-            rel.RelTo = (DateTime?) PersistLib.IsNull(ang.toDate, null);
+            rel.RelTo = (DateTime?)PersistLib.IsNull(ang.toDate, null);
             if (rel.RelTo < minDate)
                 rel.RelTo = null;
 
@@ -522,17 +524,17 @@ namespace HlidacStatu.Repositories
             if (ds.Tables[0].Rows.Count > 0)
             {
                 var parents = ds.Tables[0].AsEnumerable()
-                    .Where(m => (string) m["ico"] != ico)
+                    .Where(m => (string)m["ico"] != ico)
                     .Select(dr => new AngazovanostData()
                     {
-                        subjId = (string) dr["ico"],
+                        subjId = (string)dr["ico"],
                         subjname = "",
                         NodeType = Datastructures.Graphs.Graph.Node.NodeType.Company,
-                        fromDate = (DateTime?) PersistLib.IsNull(dr["datumOd"], null),
-                        toDate = (DateTime?) PersistLib.IsNull(dr["datumDo"], null),
+                        fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
+                        toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
                         kod_ang = Convert.ToInt32(dr["typVazby"]),
-                        descr = (string) PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
-                        podil = (decimal?) PersistLib.IsNull(dr["podil"], null)
+                        descr = (string)PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
+                        podil = (decimal?)PersistLib.IsNull(dr["podil"], null)
                     })
                     .ToArray();
                 var ret = new List<Datastructures.Graphs.Graph.Edge>();
@@ -540,8 +542,8 @@ namespace HlidacStatu.Repositories
                 {
                     AngazovanostData ang = parents[i];
                     var rel = AngazovanostDataToEdge(ang,
-                        new Datastructures.Graphs.Graph.Node() {Type = Datastructures.Graphs.Graph.Node.NodeType.Company, Id = ang.subjId},
-                        new Datastructures.Graphs.Graph.Node() {Type = Datastructures.Graphs.Graph.Node.NodeType.Company, Id = ico},
+                        new Datastructures.Graphs.Graph.Node() { Type = Datastructures.Graphs.Graph.Node.NodeType.Company, Id = ang.subjId },
+                        new Datastructures.Graphs.Graph.Node() { Type = Datastructures.Graphs.Graph.Node.NodeType.Company, Id = ico },
                         -1
                     );
                     ret.Add(rel);
@@ -579,14 +581,14 @@ namespace HlidacStatu.Repositories
                 var parents = ds.Tables[0].AsEnumerable()
                     .Select(dr => new AngazovanostData()
                     {
-                        subjId = ((int) dr["osobaId"]).ToString(),
+                        subjId = ((int)dr["osobaId"]).ToString(),
                         subjname = "",
                         NodeType = Datastructures.Graphs.Graph.Node.NodeType.Company,
-                        fromDate = (DateTime?) PersistLib.IsNull(dr["datumOd"], null),
-                        toDate = (DateTime?) PersistLib.IsNull(dr["datumDo"], null),
+                        fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
+                        toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
                         kod_ang = Convert.ToInt32(dr["typVazby"]),
-                        descr = (string) PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
-                        podil = (decimal?) PersistLib.IsNull(dr["podil"], null)
+                        descr = (string)PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
+                        podil = (decimal?)PersistLib.IsNull(dr["podil"], null)
                     })
                     .ToArray();
                 var ret = new List<Datastructures.Graphs.Graph.Edge>();
@@ -594,8 +596,8 @@ namespace HlidacStatu.Repositories
                 {
                     AngazovanostData ang = parents[i];
                     var rel = AngazovanostDataToEdge(ang,
-                        new Datastructures.Graphs.Graph.Node() {Type = Datastructures.Graphs.Graph.Node.NodeType.Person, Id = ang.subjId},
-                        new Datastructures.Graphs.Graph.Node() {Type = Datastructures.Graphs.Graph.Node.NodeType.Person, Id = ico},
+                        new Datastructures.Graphs.Graph.Node() { Type = Datastructures.Graphs.Graph.Node.NodeType.Person, Id = ang.subjId },
+                        new Datastructures.Graphs.Graph.Node() { Type = Datastructures.Graphs.Graph.Node.NodeType.Person, Id = ico },
                         -1
                     );
 
@@ -637,14 +639,14 @@ namespace HlidacStatu.Repositories
             if (ds.Tables[0].Rows.Count > 0)
             {
                 var parentIcos = ds.Tables[0].AsEnumerable()
-                    .Select(dr => (string) dr["ico"])
+                    .Select(dr => (string)dr["ico"])
                     .Where(m => m != ico);
 
 
                 foreach (var parentIco in parentIcos)
                 {
                     var parentRels = vsechnyDcerineVazbyInternal(parentIco, 0, true, null,
-                        new ExcludeDataCol() {items = relations?.Select(m => new ExcludeData(m)).ToList()}
+                        new ExcludeDataCol() { items = relations?.Select(m => new ExcludeData(m)).ToList() }
                         , datumOd: datumOd, datumDo: datumDo
                     );
                     //move
@@ -810,8 +812,8 @@ namespace HlidacStatu.Repositories
                     .Any(m => m.Mergable(ex));
             }
         }
-        
-        
+
+
         public static string TiskVazeb(string rootName, IEnumerable<Datastructures.Graphs.Graph.Edge> vazby, Relation.TiskEnum typ, bool withStats = true)
         {
             string htmlTemplate = "<ul id='nestedlist'><li>{0}</li>{1}</ul>";
@@ -844,8 +846,8 @@ namespace HlidacStatu.Repositories
                 return PrintFlatRelations(new Datastructures.Graphs.Graph.MergedEdge(parent), level, relations, typ,
                 renderedIds, withStats, highlightSubjId);
         }
-        
-        private static string PrintFlatRelations(Datastructures.Graphs.Graph.MergedEdge parent, int level, 
+
+        private static string PrintFlatRelations(Datastructures.Graphs.Graph.MergedEdge parent, int level,
             IEnumerable<Datastructures.Graphs.Graph.Edge> relations, Relation.TiskEnum typ,
        List<string> renderedIds, bool withStats = true, string highlightSubjId = null)
         {
@@ -857,7 +859,7 @@ namespace HlidacStatu.Repositories
             if (renderedIds == null)
                 renderedIds = new List<string>();
 
-            var rels = relations 
+            var rels = relations
                 .Where(m =>
                     (
                     (parent != null && m.From?.UniqId == parent.To?.UniqId)
@@ -936,10 +938,10 @@ namespace HlidacStatu.Repositories
                                 subjName,
                                 PrintFlatRelations(rel, level + 1, relations, typ, renderedIds, withStats),
                                 last ? "" : "connect",
-                                Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, Util.Consts.csCulture, "{0} smlouva","{0} smlouvy","{0} smluv"),
+                                Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, Util.Consts.csCulture, "{0} smlouva", "{0} smlouvy", "{0} smluv"),
                                 Smlouva.NicePrice(stat.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true),
                                 "aktualnost" + ((int)rel.Aktualnost).ToString(),
-                                (rel.Aktualnost < Relation.AktualnostType.Aktualni) ? rel.Doba(format:"/{0}/") : string.Empty
+                                (rel.Aktualnost < Relation.AktualnostType.Aktualni) ? rel.Doba(format: "/{0}/") : string.Empty
                             );
                         else
                             sb.AppendFormat("<li class='{3} {4}'><a href='/subjekt/{0}'><span class=''>{0}:{1}</span></a>{5}.  {2}</li>",
@@ -981,7 +983,7 @@ namespace HlidacStatu.Repositories
 
             return sb.ToString();
         }
-        
+
         public static string PrintName(this Datastructures.Graphs.Graph.Node node, bool html = false)
         {
             switch (node.Type)
@@ -993,7 +995,7 @@ namespace HlidacStatu.Repositories
                     return Firmy.GetJmeno(node.Id);
             }
         }
-        
+
         public static string ExportTabData(IEnumerable<Datastructures.Graphs.Graph.Edge> data)
         {
             if (data == null)
@@ -1009,7 +1011,7 @@ namespace HlidacStatu.Repositories
             }
             return sb.ToString();
         }
-        
+
         public static string ExportGraphJsonData(IEnumerable<Datastructures.Graphs.Graph.Edge> data)
         {
             if (data == null)

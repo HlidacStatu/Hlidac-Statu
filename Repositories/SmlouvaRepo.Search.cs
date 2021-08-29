@@ -1,18 +1,22 @@
-using System;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
 using Devmasters;
 using Devmasters.Crypto;
 using Devmasters.DT;
 using Devmasters.Enums;
+
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
 using HlidacStatu.Util.Cache;
+
 using Nest;
+
 using Newtonsoft.Json;
+
+using System;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace HlidacStatu.Repositories
 {
@@ -211,7 +215,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
         bool? platnyZaznam = null, bool includeNeplatne = false, bool logError = true, bool fixQuery = true,
         bool withHighlighting = false, bool exactNumOfResults = false)
             {
-            
+
                 var result = new SmlouvaSearchResult()
                 {
                     Page = page,
@@ -234,7 +238,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
 
                 if (fixQuery)
                 {
-                    query = Tools.FixInvalidQuery(query, Irules, Tools.DefaultQueryOperators );
+                    query = Tools.FixInvalidQuery(query, Irules, Tools.DefaultQueryOperators);
                     result.Q = query;
                 }
 
@@ -526,6 +530,6 @@ bool withHighlighting = false, bool exactNumOfResults = false)
 
         }
 
- 
+
     }
 }

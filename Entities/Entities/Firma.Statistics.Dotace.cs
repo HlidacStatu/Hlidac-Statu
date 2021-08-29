@@ -1,6 +1,4 @@
 ﻿using HlidacStatu.Lib.Analytics;
-using System;
-using System.Linq;
 
 namespace HlidacStatu.Entities
 {
@@ -15,7 +13,7 @@ namespace HlidacStatu.Entities
                 public int PocetCerpani { get; set; } = 0;
                 public decimal CelkemCerpano { get; set; } = 0;
 
-                
+
 
                 public Dotace Add(Dotace other)
                 {

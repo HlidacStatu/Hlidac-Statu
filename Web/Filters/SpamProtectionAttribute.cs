@@ -9,12 +9,12 @@ namespace HlidacStatu.Web.Filters
         public SpamProtectionAttribute(string name, string redirectToController, string redirectToAction) : base(typeof(SpamProtectionImpl))
         {
             // careful about correct ordering. It has to be the same as in the constructor below
-            Arguments = new object[] {name, redirectToAction, redirectToController};
+            Arguments = new object[] { name, redirectToAction, redirectToController };
         }
-        
+
         private class SpamProtectionImpl : IActionFilter
         {
-            
+
             private readonly string _name;
             private readonly IActionResult _redirect;
 
@@ -43,8 +43,8 @@ namespace HlidacStatu.Web.Filters
 
             private bool IsInFormData(HttpRequest request)
             {
-                return request.HasFormContentType 
-                       && request.Form.TryGetValue(_name, out var data) 
+                return request.HasFormContentType
+                       && request.Form.TryGetValue(_name, out var data)
                        && !string.IsNullOrEmpty(data.ToString());
             }
 
@@ -76,6 +76,6 @@ namespace HlidacStatu.Web.Filters
             // }
 
         }
-        
+
     }
 }

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.Datasets;
+﻿using HlidacStatu.Datasets;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.Searching;
 using HlidacStatu.XLib.Render;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
@@ -81,7 +81,7 @@ namespace HlidacStatu.XLib.Watchdogs
                 return DateTime.Now.Date.AddYears(-10);
             if (res.Total == 0)
                 return DateTime.Now;
-            return (DateTime) res.Result.First().DbCreated;
+            return (DateTime)res.Result.First().DbCreated;
         }
 
 
@@ -112,7 +112,7 @@ namespace HlidacStatu.XLib.Watchdogs
 
             IEnumerable<dynamic> dataToRender = null;
             if (data.Items.Count() > numOfListed)
-                dataToRender = data.Items.Take((int) numOfListed);
+                dataToRender = data.Items.Take((int)numOfListed);
             else
                 dataToRender = data.Items.ToArray();
 
@@ -144,8 +144,8 @@ namespace HlidacStatu.XLib.Watchdogs
             return ret;
         }
 
-//            static string HtmlTemplate = @"
-//";
-//            static string TextTemplate = @"";
+        //            static string HtmlTemplate = @"
+        //";
+        //            static string TextTemplate = @"";
     }
 }

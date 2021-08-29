@@ -1,4 +1,5 @@
 ﻿using HlidacStatu.Entities;
+
 using System;
 
 namespace HlidacStatu.Web.Models.Apiv2

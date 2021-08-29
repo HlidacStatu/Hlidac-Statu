@@ -1,9 +1,9 @@
-﻿using System;
+﻿using HlidacStatu.Entities;
+using HlidacStatu.Entities.Issues;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities;
-using HlidacStatu.Lib;
-using HlidacStatu.Entities.Issues;
 
 namespace HlidacStatu.Plugin.IssueAnalyzers
 {
@@ -42,13 +42,13 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
                 List<string> files = new List<string>();
                 foreach (var p in item.Prilohy)
                 {
-                    string fn = CheckAttachment(p,item);
+                    string fn = CheckAttachment(p, item);
                     if (!string.IsNullOrEmpty(fn))
                         files.Add(fn);
                 }
                 if (files.Count > 1)
                     issues.Add(
-                        new Issue(this, (int)IssueType.IssueTypes.NecitelnostSmlouvy,"Nečitelnost smlouvy",
+                        new Issue(this, (int)IssueType.IssueTypes.NecitelnostSmlouvy, "Nečitelnost smlouvy",
                         string.Format("Text příloh {0} není strojově čitelný, ze zákona být musí",
                         files.Aggregate((f, s) => f + ", " + s)
                         ))
@@ -76,7 +76,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
 
             if (
                 (!p.EnoughExtractedText || p.PlainTextContentQuality == DataQualityEnum.Estimated)
-                && (p.LastUpdate > historyDate )
+                && (p.LastUpdate > historyDate)
                 && item.datumUzavreni > datumUzavreni
                 && p.PlainTextContentQuality != DataQualityEnum.Unknown
                 )

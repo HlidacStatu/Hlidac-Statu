@@ -8,7 +8,7 @@ namespace HlidacStatu.Lib.Analytics
     // Nebo začne bůh topit koťátka, dokud ti to nesmažu! :-D
 
     public class StatisticsSubjectPerYear<T> : StatisticsPerYear<T>
-        where T : CoreStat, IAddable<T>,new()
+        where T : CoreStat, IAddable<T>, new()
     {
         public string ICO { get; set; }
 
@@ -18,7 +18,7 @@ namespace HlidacStatu.Lib.Analytics
         { }
 
         public StatisticsSubjectPerYear(string ico, StatisticsPerYear<T> baseObj)
-            :base(baseObj)
+            : base(baseObj)
         {
             ICO = ico;
         }
@@ -35,7 +35,7 @@ namespace HlidacStatu.Lib.Analytics
         /// <param name="ico">Subject Ico</param>
         /// <param name="data">Dictionary where key = Year, value = T</param>
         public StatisticsSubjectPerYear(string ico, Dictionary<int, T> data)
-            :base(data)
+            : base(data)
         {
             ICO = ico;
         }
@@ -49,7 +49,7 @@ namespace HlidacStatu.Lib.Analytics
             var aggregatedStatistics = new StatisticsSubjectPerYear<T>(
                 $"aggregated for {statistics.FirstOrDefault().ICO}",
                 AggregateStats(statistics));
-            
+
             return aggregatedStatistics;
         }
 

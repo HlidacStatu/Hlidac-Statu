@@ -1,13 +1,16 @@
 ﻿using Devmasters.Batch;
-using Nest;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.Datastructures.Graphs;
+
 using HlidacStatu.Connectors;
+using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
+
+using Nest;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 
 namespace HlidacStatu.Repositories
@@ -22,7 +25,7 @@ namespace HlidacStatu.Repositories
             static List<string> _vsechnyUrady = null;
             static object _vsechnyUradyLock = new object();
             public static List<string> VsechnyUrady(
-                Action<string> logOutputFunc = null, 
+                Action<string> logOutputFunc = null,
                 Action<ActionProgressData> progressOutputFunc = null,
                 int? threads = null)
             {
@@ -82,7 +85,7 @@ namespace HlidacStatu.Repositories
                             var f = Get(ico);
                             if (f.PatrimStatu())
                             {
-                                if (f.StatistikaRegistruSmluv().Any(m=>
+                                if (f.StatistikaRegistruSmluv().Any(m =>
                                         m.Value.PocetSmluv >= Lib.Analysis.KorupcniRiziko.Consts.MinSmluvPerYear)
                                    )
                                     icos.Add(ico);
@@ -175,8 +178,8 @@ namespace HlidacStatu.Repositories
                             TimeSpan.Zero, $"UradySmlouvyGlobal_{obor.Value}",
                             o =>
                             {
-                            //fill from Lib.Data.AnalysisCalculation.CalculateGlobalRankPerYear_UradySmlouvy && Tasks.UpdateWebCache
-                            return null;
+                                //fill from Lib.Data.AnalysisCalculation.CalculateGlobalRankPerYear_UradySmlouvy && Tasks.UpdateWebCache
+                                return null;
                             }, providerId: "HlidacStatu.Lib"
                             );
 
@@ -193,7 +196,7 @@ namespace HlidacStatu.Repositories
             public static void CalculateGlobalRangeCaches_UradySmlouvy(int? threads = null,
          Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
             {
-                UradySmlouvyGlobal(null,CalculateGlobalRankPerYear_UradySmlouvy(null,threads,logOutputFunc,progressOutputFunc));
+                UradySmlouvyGlobal(null, CalculateGlobalRankPerYear_UradySmlouvy(null, threads, logOutputFunc, progressOutputFunc));
                 foreach (var main in Devmasters.Enums.EnumTools
                     .EnumToEnumerable(typeof(Smlouva.SClassification.ClassificationsTypes))
                     .Select(m => new { value = Convert.ToInt32(m.Value), key = m.Key })
@@ -211,7 +214,7 @@ namespace HlidacStatu.Repositories
                  )
             {
                 obor = obor ?? 0;
-                var icos = VsechnyUrady(logOutputFunc,progressOutputFunc);
+                var icos = VsechnyUrady(logOutputFunc, progressOutputFunc);
                 object lockObj = new object();
                 List<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> data =
                     new List<StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();

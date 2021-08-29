@@ -12,7 +12,7 @@
         public string Jmeno { get; set; }
         [Nest.Number]
         public int? RokNarozeni { get; set; }
-        
+
         [Nest.Keyword]
         public string Obec { get; set; }
         [Nest.Keyword]

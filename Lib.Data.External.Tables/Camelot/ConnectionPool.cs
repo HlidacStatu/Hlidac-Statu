@@ -164,7 +164,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
         public void DeclareDeadEndpoint(string url)
         {
-            foreach (var kv in pool.Where(m=>m.Value.Url == url))
+            foreach (var kv in pool.Where(m => m.Value.Url == url))
             {
                 if (pool.TryGetValue(kv.Key, out var item))
                 {

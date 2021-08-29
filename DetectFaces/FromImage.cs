@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Devmasters.Imaging;
+
 using Emgu.CV;
-using Emgu.Util;
 using Emgu.CV.Structure;
-using Emgu.CV.CvEnum;
-using Devmasters.Imaging;
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -42,9 +42,9 @@ namespace HlidacStatu.DetectFaces
                 CascadeClassifier _cascadeClassifier;
                 _cascadeClassifier = new CascadeClassifier("haarcascade_frontalface_default.xml");
                 //Image<Bgr, byte> img = Image<Bgr, byte>.FromIplImagePtr(image.Image.GetHbitmap);  
-                
+
                 Image<Bgr, byte> img = image.Image.ToImage<Bgr, byte>();
-                
+
                 Image<Gray, byte> grayframe = img.Convert<Gray, byte>();
                 var faces = _cascadeClassifier.DetectMultiScale(grayframe, 1.1, 10, Size.Empty); //the actual face detection happens here
                 foreach (var face in faces)

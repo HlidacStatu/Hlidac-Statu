@@ -3,16 +3,16 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.12")]
-			public static void Init_1_0_0_12(IDatabaseUpgrader du)
-			{
-				string sql = @"
+            [DatabaseUpgradeMethod("1.0.0.12")]
+            public static void Init_1_0_0_12(IDatabaseUpgrader du)
+            {
+                string sql = @"
 
 ALTER TABLE dbo.AngazovanostFirma ADD
 	podil decimal(18,9) NULL
@@ -27,15 +27,15 @@ ALTER TABLE dbo.AngazovanostFirma ADD
 
 GO
 ";
-				du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
 
-			}
-
-	
+            }
 
 
-		}
 
-	}
+
+        }
+
+    }
 }

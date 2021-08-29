@@ -1,4 +1,5 @@
 ﻿using HlidacStatu.Web.Filters;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers
@@ -8,18 +9,18 @@ namespace HlidacStatu.Web.Controllers
 
         // GET: Ucty
 
-        [HlidacCache(60*60*6,"embed",false)]
+        [HlidacCache(60 * 60 * 6, "embed", false)]
         public ActionResult Index()
         {
             return RedirectPermanent($"/data/Index/transparentni-ucty");
         }
 
 
-        [HlidacCache(60*60*6,"embed",false)]
+        [HlidacCache(60 * 60 * 6, "embed", false)]
         public ActionResult Prezidenti()
         {
             return RedirectPermanent($"/data/Hledat/transparentni-ucty?Q=TypSubjektu%3A%22{System.Net.WebUtility.UrlEncode("Prezidentský kandidát")}%22");
-            
+
 
         }
 

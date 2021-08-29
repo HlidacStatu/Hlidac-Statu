@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Datasets
 {
@@ -56,7 +57,7 @@ namespace HlidacStatu.Datasets
             if (client == null)
             {
                 client = Manager.GetESClient(DataSourcesDbName, idxType: Manager.IndexType.DataSource);
-                var ret = client.Indices.Exists(client.ConnectionSettings.DefaultIndex); 
+                var ret = client.Indices.Exists(client.ConnectionSettings.DefaultIndex);
                 if (!ret.Exists)
                 {
                     Newtonsoft.Json.Schema.Generation.JSchemaGenerator jsonG = new Newtonsoft.Json.Schema.Generation.JSchemaGenerator();
@@ -88,7 +89,7 @@ namespace HlidacStatu.Datasets
         }
 
 
-        public virtual string AddData(Registration reg, string user,bool skipallowWriteAccess = false)
+        public virtual string AddData(Registration reg, string user, bool skipallowWriteAccess = false)
         {
             if (reg.jsonSchema == null)
                 throw new DataSetException(datasetId, ApiResponseStatus.DatasetJsonSchemaMissing);
@@ -100,7 +101,7 @@ namespace HlidacStatu.Datasets
             else
                 AuditRepo.Add<Registration>(Audit.Operations.Update, user, reg, oldReg);
 
-            var addDataResult = base.AddData(reg, reg.datasetId, reg.createdBy, validateSchema:false, skipallowWriteAccess: true);
+            var addDataResult = base.AddData(reg, reg.datasetId, reg.createdBy, validateSchema: false, skipallowWriteAccess: true);
             CachedDatasets.Delete(reg.datasetId);
 
             //check orderList

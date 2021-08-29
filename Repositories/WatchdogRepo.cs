@@ -1,7 +1,9 @@
+using HlidacStatu.Entities;
+
+using Microsoft.EntityFrameworkCore;
+
 using System.Linq;
 using System.Net.Mail;
-using HlidacStatu.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories
 {
@@ -13,7 +15,7 @@ namespace HlidacStatu.Repositories
             {
                 if (watchDog.Id == 0)
                     return;
-                
+
                 db.WatchDogs.Attach(watchDog);
                 db.Entry(watchDog).State = EntityState.Deleted;
                 db.SaveChanges();
@@ -101,7 +103,7 @@ namespace HlidacStatu.Repositories
                 }
             }
         }
-        
+
         public static ApplicationUser UnconfirmedUser(this WatchDog watchDog)
         {
             using (DbEntities db = new DbEntities())

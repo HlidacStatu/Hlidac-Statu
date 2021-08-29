@@ -1,9 +1,11 @@
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using HlidacStatu.Entities;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Areas.Identity.Pages.Account
 {
@@ -11,7 +13,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
-        
+
         public LogoutModel(SignInManager<ApplicationUser> signInManager)
         {
             _signInManager = signInManager;

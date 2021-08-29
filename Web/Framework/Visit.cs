@@ -1,7 +1,8 @@
+using HlidacStatu.Connectors;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -50,7 +51,7 @@ namespace HlidacStatu.Web.Framework
         {
             if (string.IsNullOrEmpty(page))
                 return;
-            DirectDB.NoResult("AddVisit", System.Data.CommandType.StoredProcedure, 
+            DirectDB.NoResult("AddVisit", System.Data.CommandType.StoredProcedure,
                 new System.Data.IDataParameter[] {
                     new System.Data.SqlClient.SqlParameter("@page", page.ToLower()),
                     new System.Data.SqlClient.SqlParameter("@date", DateTime.Now.Date),

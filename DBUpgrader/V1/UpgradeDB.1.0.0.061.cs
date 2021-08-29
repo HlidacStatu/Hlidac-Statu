@@ -3,15 +3,15 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.61")]
-			public static void Init_1_0_0_61(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.61")]
+            public static void Init_1_0_0_61(IDatabaseUpgrader du)
+            {
                 string sql = @"
 ALTER TABLE dbo.Firma ADD
 	KrajId nvarchar(5) NULL,
@@ -78,7 +78,7 @@ END
 END
 
 ";
-    du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
             }
 
@@ -87,5 +87,5 @@ END
 
         }
 
-	}
+    }
 }

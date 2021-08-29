@@ -19,7 +19,7 @@ namespace HlidacStatu.Entities
         public string JobGrouped { get; set; }
         public decimal? SalaryMD { get; set; }
         public decimal? SalaryMdVAT { get; set; }
-        
+
         [Column(TypeName = "datetime")]
         public DateTime? Created { get; set; }
         public string Tags { get; set; }

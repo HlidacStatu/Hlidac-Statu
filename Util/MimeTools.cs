@@ -10,13 +10,13 @@ namespace HlidacStatu.Util
             return MimeMapping.MimeUtility.GetMimeMapping(filename);
         }
 
-        
+
         public static string ExtensionFromMime(string mime)
         {
-            string ext = MimeMapping.MimeUtility.TypeMap 
+            string ext = MimeMapping.MimeUtility.TypeMap
                 .Where(m => m.Value == mime)
-                .Select(m=>m.Key)
-                .OrderBy(m=>m?.Length ?? 0)
+                .Select(m => m.Key)
+                .OrderBy(m => m?.Length ?? 0)
                 .FirstOrDefault();
             if (string.IsNullOrEmpty(ext))
                 return ".bin";

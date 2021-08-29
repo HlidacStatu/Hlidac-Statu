@@ -15,7 +15,7 @@ namespace HlidacStatu.Entities
             Dataset,
             VerejnaZakazka
         }
-       
+
         private static IQueryable<ItemToOcrQueue> CreateQuery(DbEntities db, ItemToOcrType? itemType, string itemSubType)
         {
             IQueryable<ItemToOcrQueue> sql = null;
@@ -85,7 +85,7 @@ namespace HlidacStatu.Entities
             using (DbEntities db = new DbEntities())
             {
                 IQueryable<ItemToOcrQueue> sql = CreateQuery(db, itemType, itemSubType);
-                sql = sql.Where(m => m.ItemId == itemId );
+                sql = sql.Where(m => m.ItemId == itemId);
                 var _sql = sql.ToQueryString();
                 if (sql.Any()) //already in the queue
                     return new Lib.OCR.Api.Result()

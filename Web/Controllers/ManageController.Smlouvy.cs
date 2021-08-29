@@ -1,8 +1,9 @@
-﻿using HlidacStatu.Entities;
-using System.Collections.Generic;
-using HlidacStatu.Repositories;
+﻿using HlidacStatu.Repositories;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using System.Collections.Generic;
 
 namespace HlidacStatu.Web.Controllers
 {

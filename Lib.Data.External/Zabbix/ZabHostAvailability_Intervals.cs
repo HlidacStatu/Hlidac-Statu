@@ -12,7 +12,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
             List<ZabAvailabilityInterval> interv = new List<ZabAvailabilityInterval>();
             DateTime debugt = new DateTime(2017, 12, 7, 17, 08, 00);
             var data = measures.OrderBy(m => m.clock).ToArray();
-            for (int i = 0; i < data.Length-1; i++)
+            for (int i = 0; i < data.Length - 1; i++)
             {
                 var m = data[i];
                 Statuses status = ZabAvailability.GetStatus(m.value);
@@ -25,9 +25,9 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
                 //hledej kdy tento status konci
                 var j = 1;
                 while (
-                    i+j<data.Length-1 
+                    i + j < data.Length - 1
                     && ZabAvailability.GetStatus(data[i + j].value) == status
-                    && (i>0 && (data[i +j].clock - data[i+j - 1].clock).TotalMinutes < 3)
+                    && (i > 0 && (data[i + j].clock - data[i + j - 1].clock).TotalMinutes < 3)
                     )
                 {
                     j++;

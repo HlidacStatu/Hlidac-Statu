@@ -2,7 +2,7 @@
 {
     public class FoundContractItem
     {
-        public string PlatceTxt {get;set;}
+        public string PlatceTxt { get; set; }
         public string PlatceHtml { get; set; }
         public string PrijemceTxt { get; set; }
         public string PrijemceHtml { get; set; }

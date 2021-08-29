@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.IO;
-using System.Xml.Serialization;
-using System.Net;
 using System.IO.Compression;
+using System.Linq;
+using System.Net;
+using System.Xml.Serialization;
 
 namespace HlidacStatu.Lib.Data.External.DatoveSchranky
 {

@@ -6,7 +6,7 @@ namespace HlidacStatu.Web.Filters
 {
     public class SpamProtectionRazor : IPageFilter
     {
-        
+
         public void OnPageHandlerSelected(PageHandlerSelectedContext context)
         {
         }
@@ -15,7 +15,7 @@ namespace HlidacStatu.Web.Filters
         {
             var req = context.HttpContext.Request;
 
-            if (IsInFormData(req) || IsInQueryData(req)) 
+            if (IsInFormData(req) || IsInQueryData(req))
             {
                 Util.Consts.Logger.Warning($"Detected bot from [{context.HttpContext.Connection.RemoteIpAddress}] filling in 'email2' field value.");
                 context.Result = new RedirectToActionResult("Bot", "Error", null);
@@ -25,11 +25,11 @@ namespace HlidacStatu.Web.Filters
         public void OnPageHandlerExecuted(PageHandlerExecutedContext context)
         {
         }
-        
+
         private bool IsInFormData(HttpRequest request)
         {
-            return request.HasFormContentType 
-                   && request.Form.TryGetValue(Framework.Constants.AntispamInputName, out var data) 
+            return request.HasFormContentType
+                   && request.Form.TryGetValue(Framework.Constants.AntispamInputName, out var data)
                    && !string.IsNullOrEmpty(data.ToString());
         }
 

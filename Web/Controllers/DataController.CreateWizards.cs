@@ -1,13 +1,15 @@
-﻿using HlidacStatu.Web.Models;
+﻿using HlidacStatu.Datasets;
+using HlidacStatu.Entities;
+using HlidacStatu.Web.Models;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using HlidacStatu.Datasets;
-using HlidacStatu.Entities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 
 namespace HlidacStatu.Web.Controllers
@@ -42,7 +44,7 @@ namespace HlidacStatu.Web.Controllers
                 return View(newReg);
             }
         }
-        
+
         [HttpGet]
         [Authorize]
         public ActionResult CreateFromBackup()
@@ -55,7 +57,7 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult CreateFromBackup(IFormCollection form, int step, IFormFile file)
         {
             var email = Request?.HttpContext?.User?.Identity?.Name;
-            
+
             string json = "";
 
             if (file != null && file.Length > 0)
@@ -115,7 +117,7 @@ namespace HlidacStatu.Web.Controllers
             else
             {
                 var path = uTmp.GetFullPath(fileId.ToString(), fileId.ToString() + ".csv");
-                using (var fileStream = new FileStream(path,FileMode.Create))
+                using (var fileStream = new FileStream(path, FileMode.Create))
                 {
                     file.CopyTo(fileStream);
                 }
@@ -460,7 +462,7 @@ namespace HlidacStatu.Web.Controllers
                 else
                 {
                     var path = uTmp.GetFullPath(fileId.ToString(), fileId.ToString() + ".csv");
-                    using (var fileStream = new FileStream(path,FileMode.Create))
+                    using (var fileStream = new FileStream(path, FileMode.Create))
                     {
                         file.CopyTo(fileStream);
                     }
@@ -479,7 +481,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize]
         public ActionResult ImportDataProcess(string id, CreateSimpleModel model, IFormCollection form)
         {
-            
+
             ViewBag.NumOfRows = 0;
 
             model.DatasetId = id;
@@ -511,7 +513,7 @@ namespace HlidacStatu.Web.Controllers
             if (!System.IO.File.Exists(path))
                 return RedirectToAction("ImportData", new { id = ds.DatasetId });
 
-            RuntimeClassBuilder rcb = new RuntimeClassBuilder(ds.GetPropertyNamesTypesFromSchema().ToDictionary(m=>m.Key,v=>v.Value.Type));
+            RuntimeClassBuilder rcb = new RuntimeClassBuilder(ds.GetPropertyNamesTypesFromSchema().ToDictionary(m => m.Key, v => v.Value.Type));
 
             string[] formsHeaders = form["sheaders"].ToString().Split('|');
             List<MappingCSV> mappingProps = new List<MappingCSV>();

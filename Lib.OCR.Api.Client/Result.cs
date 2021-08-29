@@ -21,11 +21,13 @@ namespace HlidacStatu.Lib.OCR.Api
             public string ContentType { get; set; }
 
             private string _filename = default(string);
-            public string Filename {
+            public string Filename
+            {
                 get { return _filename; }
-                set {
+                set
+                {
                     _filename = value ?? "neznamy.bin";
-                    ContentType = MimeMapping.MimeUtility.GetMimeMapping(_filename );
+                    ContentType = MimeMapping.MimeUtility.GetMimeMapping(_filename);
                 }
             }
 
@@ -77,7 +79,7 @@ namespace HlidacStatu.Lib.OCR.Api
         public string Server { get; set; } = Environment.MachineName;
         public DateTime Started { get; set; } = DateTime.Now;
         public DateTime Ends { get; set; }
- 
+
         public ResultStatus IsValid { get; set; } = ResultStatus.Unknown;
         public string Error { get; set; } = null;
 

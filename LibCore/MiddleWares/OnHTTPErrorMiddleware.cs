@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
+
+using System;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.LibCore.MiddleWares
 {
@@ -27,17 +24,17 @@ namespace HlidacStatu.LibCore.MiddleWares
             catch (Exception e)
             {
                 var str = Devmasters.Net.WebContextLogger.LogFatalWebError(e, httpContext, true, "");
-                
+
                 if (httpContext.Items.ContainsKey(ItemKeyName))
                 {
                     var prevStr = httpContext.Items[ItemKeyName] as string;
-                    httpContext.Items[ItemKeyName]=prevStr + "\n\n====== NextException ======="+str;
+                    httpContext.Items[ItemKeyName] = prevStr + "\n\n====== NextException =======" + str;
                 }
                 else
                     httpContext.Items.Add(ItemKeyName, str);
                 throw;
             }
-            
+
             if (httpContext.Response.StatusCode >= 500)
             {
                 try
@@ -47,7 +44,7 @@ namespace HlidacStatu.LibCore.MiddleWares
                     if (httpContext.Items.ContainsKey(ItemKeyName))
                     {
                         var prevStr = httpContext.Items[ItemKeyName] as string;
-                        httpContext.Items[ItemKeyName]=prevStr + "\n\n====== NextException ======="+str;
+                        httpContext.Items[ItemKeyName] = prevStr + "\n\n====== NextException =======" + str;
                     }
                     else
                         httpContext.Items.Add(ItemKeyName, str);

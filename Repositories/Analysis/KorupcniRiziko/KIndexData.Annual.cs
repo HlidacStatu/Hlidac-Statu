@@ -1,7 +1,8 @@
-﻿using System;
+﻿using HlidacStatu.Entities;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -119,7 +120,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             object _infoLock = new object();
             Dictionary<KIndexParts, DetailInfo> _info = new Dictionary<KIndexParts, DetailInfo>();
             public DetailInfo Info(KIndexParts part)
-            { 
+            {
                 if (_info.ContainsKey(part) == false)
                 {
                     lock (_infoLock)

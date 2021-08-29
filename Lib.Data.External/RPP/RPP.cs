@@ -58,7 +58,7 @@ Cookie: _ga=GA1.2.1208733850.1580933391; JSessionID=R3890696782
                 "PUT"
                 ).Result;
 
-            var res =Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<KategorieOVM>>(json);
+            var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<KategorieOVM>>(json);
 
             var prefSeznam = res.seznam.ToArray();
             for (int i = 0; i < prefSeznam.Count(); i++)

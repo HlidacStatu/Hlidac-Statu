@@ -1,10 +1,13 @@
-﻿using System.Linq;
-using HlidacStatu.Entities.VZ;
+﻿using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Swashbuckle.AspNetCore.Annotations;
+
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -22,7 +25,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>detail veřejné zakázky</returns>
         [AuthorizeAndAudit(Roles = "Admin,KomercniLicence")]
         [HttpGet("{id?}")]
-        public ActionResult<VerejnaZakazka> Detail([FromRoute]string id = null)
+        public ActionResult<VerejnaZakazka> Detail([FromRoute] string id = null)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -61,7 +64,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>nalezené veřejné zakázky</returns>
         [AuthorizeAndAudit(Roles = "Admin,KomercniLicence")]
         [HttpGet("hledat")]
-        public ActionResult<SearchResultDTO<VerejnaZakazka>> Hledat([FromQuery]string dotaz = null, [FromQuery]int? strana=null, [FromQuery]int? razeni=null)
+        public ActionResult<SearchResultDTO<VerejnaZakazka>> Hledat([FromQuery] string dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
         {
             strana = strana ?? 1;
             razeni = razeni ?? 0;

@@ -1,7 +1,9 @@
+using HlidacStatu.Repositories.ES;
+
+using Nest;
+
 using System;
 using System.ComponentModel;
-using HlidacStatu.Repositories.ES;
-using Nest;
 
 namespace HlidacStatu.Web.Models
 {

@@ -1,8 +1,9 @@
-﻿using System;
+﻿using HlidacStatu.Entities;
+using HlidacStatu.Repositories;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
 
 namespace HlidacStatu.XLib.Watchdogs
 {

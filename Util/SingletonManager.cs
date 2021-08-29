@@ -31,7 +31,7 @@ namespace HlidacStatu.Util
     }
 
     public class SingletonManagerWithSetup<T, Key>
-        : SingletonManager<T,Key>
+        : SingletonManager<T, Key>
         where T : SingletonManagerWithSetup<T, Key>.ISetupableClass, new()
     {
         public interface ISetupableClass

@@ -1,13 +1,14 @@
-using System;
-using System.Net;
 using HlidacStatu.Web.Framework;
+
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
+using System;
+
 namespace HlidacStatu.Web.TagHelpers
 {
-    public class ShareWidgetTagHelper: TagHelper
+    public class ShareWidgetTagHelper : TagHelper
     {
         [HtmlAttributeNotBound]
         [ViewContext]
@@ -15,7 +16,7 @@ namespace HlidacStatu.Web.TagHelpers
 
         public string Title { get; set; } = "Vložit do vlastní stránky";
         public int Width { get; set; } = 500;
-        
+
         public string Url { get; set; }
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
@@ -101,9 +102,9 @@ overflow: hidden;height: 75px;border: 1px solid #ccd6dd;resize: none;
             }});
         }});
     </script>";
-            
+
             output.TagName = null;
-            output.Content.SetHtmlContent(content);   
+            output.Content.SetHtmlContent(content);
         }
     }
 }

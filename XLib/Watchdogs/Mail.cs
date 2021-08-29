@@ -1,8 +1,9 @@
-﻿using System;
+﻿using HlidacStatu.Entities;
+using HlidacStatu.Repositories;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
@@ -28,18 +29,18 @@ namespace HlidacStatu.XLib.Watchdogs
             return SendWatchdogsInOneEmail(new WatchDog[] { watchdog },
             aspnetUser,
             force, specificContacts,
-            fromSpecificDate,toSpecificDate,
+            fromSpecificDate, toSpecificDate,
             openingText
             );
         }
 
 
-            internal static SendStatus SendWatchdogsInOneEmail(IEnumerable<WatchDog> watchdogs,
-                ApplicationUser aspnetUser,
-            bool force = false, string[] specificContacts = null,
-            DateTime? fromSpecificDate = null, DateTime? toSpecificDate = null,
-            string openingText = null
-            )
+        internal static SendStatus SendWatchdogsInOneEmail(IEnumerable<WatchDog> watchdogs,
+            ApplicationUser aspnetUser,
+        bool force = false, string[] specificContacts = null,
+        DateTime? fromSpecificDate = null, DateTime? toSpecificDate = null,
+        string openingText = null
+        )
         {
             bool saveWatchdogStatus =
                 force == false

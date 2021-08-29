@@ -1,11 +1,13 @@
+using HlidacStatu.Entities;
+using HlidacStatu.Util.Cache;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using HlidacStatu.Entities;
-using HlidacStatu.Util.Cache;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace HlidacStatu.Repositories
 {
@@ -47,7 +49,7 @@ namespace HlidacStatu.Repositories
         {
             if (s == null)
                 return null;
-            var key = new KeyAndId() {ValueForData = s.Id, CacheNameOnDisk = $"stem_smlouva_{s.Id}"};
+            var key = new KeyAndId() { ValueForData = s.Id, CacheNameOnDisk = $"stem_smlouva_{s.Id}" };
             if (rewriteStems)
             {
                 InvalidateStemCache(s.Id);
@@ -62,7 +64,7 @@ namespace HlidacStatu.Repositories
 
         public static void InvalidateStemCache(string smlouvaId)
         {
-            var key = new KeyAndId() {ValueForData = smlouvaId, CacheNameOnDisk = $"stem_smlouva_{smlouvaId}"};
+            var key = new KeyAndId() { ValueForData = smlouvaId, CacheNameOnDisk = $"stem_smlouva_{smlouvaId}" };
             Util.Consts.Logger.Debug("Deleting stems cache for " + smlouvaId);
 
             stemCacheManager.Delete(key);
@@ -201,7 +203,7 @@ namespace HlidacStatu.Repositories
             smlouva.Classification.LastUpdate = DateTime.Now;
             SmlouvaRepo.Save(smlouva);
         }
-        
+
         private static string CallEndpoint(string endpoint, string content, string id, int timeoutMs)
         {
             using (Devmasters.Net.HttpClient.URLContent request = new Devmasters.Net.HttpClient.URLContent(classificationBaseUrl() + $"/{endpoint}?doc_id={id}"))
@@ -228,7 +230,7 @@ namespace HlidacStatu.Repositories
                 }
             }
         }
-        
+
         private static string classificationBaseUrl()
         {
             string[] baseUrl = Devmasters.Config.GetWebConfigValue("Classification.Service.Url")
@@ -238,7 +240,7 @@ namespace HlidacStatu.Repositories
             return baseUrl[Util.Consts.Rnd.Next(baseUrl.Length)];
 
         }
-        
+
         public static bool SetClassification(this Smlouva smlouva, bool rewrite = false, bool rewriteStems = false) //true if changed
         {
             if (smlouva.Prilohy == null
@@ -248,7 +250,7 @@ namespace HlidacStatu.Repositories
             if (!rewrite && !rewriteStems && (smlouva.Classification?.LastUpdate) != null
                 && ((smlouva.Classification?.GetClassif()) == null || smlouva.Classification.GetClassif().Count() != 0))
                 return false;
- 
+
             var types = GetClassificationFromServer(smlouva, rewriteStems);
             if (types == null)
             {
@@ -258,10 +260,10 @@ namespace HlidacStatu.Repositories
             {
                 Smlouva.SClassification.Classification[] newClass = types
                     .Select(m => new Smlouva.SClassification.Classification()
-                        {
-                            TypeValue = (int)m.Key,
-                            ClassifProbability = m.Value
-                        }
+                    {
+                        TypeValue = (int)m.Key,
+                        ClassifProbability = m.Value
+                    }
                     ).ToArray();
 
                 var newClassRelevant = smlouva.relevantClassif(newClass);

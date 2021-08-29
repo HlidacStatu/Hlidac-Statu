@@ -1,6 +1,7 @@
-﻿using System;
+﻿using HlidacStatu.Datasets;
+
+using System;
 using System.Linq;
-using HlidacStatu.Datasets;
 
 namespace HlidacStatu.Web.Models
 {
@@ -99,9 +100,9 @@ namespace HlidacStatu.Web.Models
 
     public class MappingCSV
     {
-            public string sourceCSV { get; set; }
-            public string TargetJSON { get; set; }
-            public string Transform { get; set; }
-        
+        public string sourceCSV { get; set; }
+        public string TargetJSON { get; set; }
+        public string Transform { get; set; }
+
     }
 }

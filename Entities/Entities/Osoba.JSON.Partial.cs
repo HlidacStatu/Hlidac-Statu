@@ -6,7 +6,7 @@ namespace HlidacStatu.Entities
     public partial class Osoba
     {
 
-        
+
 
         public class JSON
         {
@@ -169,7 +169,7 @@ namespace HlidacStatu.Entities
             {
                 [JsonProperty("id", Required = Required.Default)]
                 public int Id { get; set; } = 0;
-                
+
                 [JsonProperty("hodnota", Required = Required.Default)]
                 public decimal? Hodnota { get; set; }
 

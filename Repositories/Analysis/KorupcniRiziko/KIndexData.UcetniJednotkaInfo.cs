@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using HlidacStatu.Entities;
+
+using System;
 using System.Collections.Generic;
-using HlidacStatu.Entities;
+using System.Linq;
 using System.Xml.Linq;
-using HlidacStatu.Entities;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {

@@ -17,7 +17,7 @@ namespace HlidacStatu.Util.Cache
         {
         }
 
-        
+
         protected override Devmasters.Cache.File.BinaryFileCache getTCacheInstance(KeyAndId key, TimeSpan expiration, Func<KeyAndId, byte[]> contentFunc)
         {
             return new Devmasters.Cache.File.BinaryFileCache(

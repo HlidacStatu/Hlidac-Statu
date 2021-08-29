@@ -1,13 +1,17 @@
 ﻿using Devmasters.Batch;
 using Devmasters.Enums;
+
+using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities.Analysis;
+using HlidacStatu.Extensions;
+
 using Nest;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Datastructures.Graphs;
-using HlidacStatu.Entities.Entities.Analysis;
-using HlidacStatu.Extensions;
-using HlidacStatu.Entities;
+
 using Manager = HlidacStatu.Repositories.ES.Manager;
 
 namespace HlidacStatu.Repositories
@@ -23,9 +27,9 @@ namespace HlidacStatu.Repositories
 
         public class VazbyFiremNaUradyStat
         {
-            public IEnumerable<BasicDataForSubject<List<BasicData<string>>>> SoukromeFirmy = 
+            public IEnumerable<BasicDataForSubject<List<BasicData<string>>>> SoukromeFirmy =
                 new List<BasicDataForSubject<List<BasicData<string>>>>();
-            public IEnumerable<BasicDataForSubject<List<BasicData<string>>>> StatniFirmy = 
+            public IEnumerable<BasicDataForSubject<List<BasicData<string>>>> StatniFirmy =
                 new List<BasicDataForSubject<List<BasicData<string>>>>();
         }
         public class IcoSmlouvaMinMax
@@ -73,7 +77,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-     
+
 
         private static List<Smlouva> SimpleSmlouvyForIco(string ico, DateTime? from, DateTime? to)
         {
@@ -83,9 +87,9 @@ namespace HlidacStatu.Repositories
                 if (from.HasValue)
                     sdate = $" AND podepsano:[{from?.ToString("yyyy-MM-dd") ?? "*"} TO {from?.ToString("yyyy-MM-dd") ?? DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")}]"; //podepsano:[2016-01-01 TO 2016-12-31]
 
-                
+
                 return Manager.GetESClient().Search<Smlouva>(a => a
-                            .TrackTotalHits(page*size == 0)
+                            .TrackTotalHits(page * size == 0)
                             .Size(size)
                             .From(page * size)
                             .Source(m => m.Excludes(e => e.Field(o => o.Prilohy)))
@@ -111,7 +115,7 @@ namespace HlidacStatu.Repositories
         {
             var nespolehliveFirmy = StaticData.NespolehlivyPlatciDPH.Get();
 
-            Dictionary<string, BasicDataForSubject<List<BasicData<string>>>> uradyData = new ();
+            Dictionary<string, BasicDataForSubject<List<BasicData<string>>>> uradyData = new();
 
             Dictionary<string, BasicDataForSubject<List<BasicData<string>>>> nespolehliveFirmyKontrakty = new();
 
@@ -136,13 +140,13 @@ namespace HlidacStatu.Repositories
                             {
                                 if (!uradyData.ContainsKey(urad.ICO))
                                 {
-                                    uradyData.Add(urad.ICO, new BasicDataForSubject<List<BasicData<string>>>() { Item  =urad.ICO });
+                                    uradyData.Add(urad.ICO, new BasicDataForSubject<List<BasicData<string>>>() { Item = urad.ICO });
 
                                 }
                                 uradyData[urad.ICO].Add(1, s.CalculatedPriceWithVATinCZK);
                                 if (!uradyData[urad.ICO].Detail.Any(m => m.Item == ico))
                                 {
-                                    uradyData[urad.ICO].Detail.Add(new BasicData<string>() { Item = ico, CelkemCena = s.CalculatedPriceWithVATinCZK, Pocet = 1  });
+                                    uradyData[urad.ICO].Detail.Add(new BasicData<string>() { Item = ico, CelkemCena = s.CalculatedPriceWithVATinCZK, Pocet = 1 });
                                 }
                                 else
                                 {
@@ -177,7 +181,7 @@ namespace HlidacStatu.Repositories
                 },
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
                 showProgress ? new ActionProgressWriter().Write : (Action<ActionProgressData>)null,
-                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism:5);
+                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 5);
 
             VazbyFiremNaUradyStat ret = new VazbyFiremNaUradyStat();
             ret.StatniFirmy = uradyData
@@ -208,7 +212,7 @@ namespace HlidacStatu.Repositories
             {
                 case Relation.AktualnostType.Aktualni:
                     vazbyNaPolitiky = StaticData.FirmySVazbamiNaPolitiky_aktualni_Cache.Get();
-                    qc = new QueryContainerDescriptor<Smlouva>().Term(t=>t.Field(f=>f.SVazbouNaPolitikyAktualni).Value(true));
+                    qc = new QueryContainerDescriptor<Smlouva>().Term(t => t.Field(f => f.SVazbouNaPolitikyAktualni).Value(true));
                     sponzorujiciFirmy = StaticData.SponzorujiciFirmy_Nedavne.Get();
                     break;
                 case Relation.AktualnostType.Nedavny:
@@ -224,7 +228,7 @@ namespace HlidacStatu.Repositories
                     break;
             }
 
-                
+
             Func<int, int, ISearchResponse<Smlouva>> searchFunc = null;
             searchFunc = (size, page) =>
             {
@@ -281,7 +285,7 @@ namespace HlidacStatu.Repositories
                                           else
                                           {
                                               var item = uradySoukr[objednatelIco].Detail.First(m => m.Item == ico);
-                                              item.Add(1,s.CalculatedPriceWithVATinCZK);
+                                              item.Add(1, s.CalculatedPriceWithVATinCZK);
 
                                           }
                                       }
@@ -301,7 +305,7 @@ namespace HlidacStatu.Repositories
                                           else
                                           {
                                               var item = uradyStatni[objednatelIco].Detail.First(m => m.Item == ico);
-                                              item.Add(1,s.CalculatedPriceWithVATinCZK);
+                                              item.Add(1, s.CalculatedPriceWithVATinCZK);
 
                                           }
                                       }
@@ -320,7 +324,7 @@ namespace HlidacStatu.Repositories
                   }, null,
                     showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
                     showProgress ? new ActionProgressWriter().Write : (Action<ActionProgressData>)null
-                    ,true
+                    , true
                     , prefix: "UradyObchodujiciSFirmami_s_vazbouNaPolitiky " + aktualnost.ToNiceDisplayName()
             );
 
@@ -553,12 +557,12 @@ namespace HlidacStatu.Repositories
                 .ToArray();
             //.Take(100)
 
-            Util.Consts.Logger.Debug($"GetFirmyCasovePodezreleZalozene - returning {badF.Count()} records." );
+            Util.Consts.Logger.Debug($"GetFirmyCasovePodezreleZalozene - returning {badF.Count()} records.");
 
             return badF;
         }
 
-        public static IEnumerable<(string idDotace, string ico, int ageInDays )> CompanyAgeDuringSubsidy()
+        public static IEnumerable<(string idDotace, string ico, int ageInDays)> CompanyAgeDuringSubsidy()
         {
             //var dotSer = new Dotace.DotaceService();
 

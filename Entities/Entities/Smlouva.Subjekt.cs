@@ -1,4 +1,5 @@
 ﻿using HlidacStatu.Entities.XSD;
+
 using Nest;
 
 namespace HlidacStatu.Entities

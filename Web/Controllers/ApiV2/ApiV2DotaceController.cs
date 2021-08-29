@@ -1,10 +1,13 @@
-﻿using System.Linq;
-using HlidacStatu.Entities.Dotace;
+﻿using HlidacStatu.Entities.Dotace;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Swashbuckle.AspNetCore.Annotations;
+
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -72,7 +75,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>detail dotace</returns>
         [HttpGet("{id?}")]
         [AuthorizeAndAudit]
-        public ActionResult<Dotace> Detail([FromRoute]string? id = null)
+        public ActionResult<Dotace> Detail([FromRoute] string? id = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -87,7 +90,7 @@ namespace HlidacStatu.Web.Controllers
             return dotace;
         }
 
-        
+
 
     }
 }

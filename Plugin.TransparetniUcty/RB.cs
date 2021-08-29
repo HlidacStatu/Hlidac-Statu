@@ -46,11 +46,11 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                     do
                     {
                         string url = string.Format(@"https://www.rb.cz/o-nas/povinne-uverejnovane-informace/transparentni-ucty?" +
-                                "p_p_id=Transparentaccountportlet_WAR_Transparentaccountportlet_INSTANCE_{0}&p_p_lifecycle=2&p_p_state=normal" 
+                                "p_p_id=Transparentaccountportlet_WAR_Transparentaccountportlet_INSTANCE_{0}&p_p_lifecycle=2&p_p_state=normal"
                                 + "&p_p_mode=view&p_p_resource_id=nextTransactions&p_p_cacheability=cacheLevelPage"
-                                + "&p_p_col_id=_DynamicNestedPortlet_INSTANCE_{1}__column-1-1&p_p_col_count=1" 
+                                + "&p_p_col_id=_DynamicNestedPortlet_INSTANCE_{1}__column-1-1&p_p_col_count=1"
                                 + "&idBankAccount={2}&fromIndex={3}&dateFrom={4}&dateTo={5}&q="
-                            , webReqInstance, dynamicInst, internalIdBankAccount, page * 20 +1, fromDate.Value.ToString("yyyy-M-d"), toDate.Value.ToString("yyyy-M-d"));
+                            , webReqInstance, dynamicInst, internalIdBankAccount, page * 20 + 1, fromDate.Value.ToString("yyyy-M-d"), toDate.Value.ToString("yyyy-M-d"));
 
                         using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent(url, html.Context))
                         {
@@ -66,19 +66,20 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                                     getSomeData = true;
                                     polozky.AddRange(
                                         data.transactions
-                                            .Select(m=>new SimpleBankovniPolozka() {
-                                                 Castka = Util.ParseTools.ToDecimal(m.amount) ?? 0,
-                                                 CisloProtiuctu = "",
-                                                 CisloUctu = Ucet.CisloUctu,
-                                                 Datum = Devmasters.DT.Util.ToDateTime(m.datumDate,"dd.MM.yyyy").Value,
-                                                 KS = m.constSymbol,
-                                                 NazevProtiuctu = m.accountName,
-                                                 PopisTransakce = m.type,
-                                                 SS = m.specSymbol,
-                                                 VS = m.varSymbol,
-                                                 ZdrojUrl = baseUrl.Url,
-                                                 ZpravaProPrijemce = m.info,
-                                                 
+                                            .Select(m => new SimpleBankovniPolozka()
+                                            {
+                                                Castka = Util.ParseTools.ToDecimal(m.amount) ?? 0,
+                                                CisloProtiuctu = "",
+                                                CisloUctu = Ucet.CisloUctu,
+                                                Datum = Devmasters.DT.Util.ToDateTime(m.datumDate, "dd.MM.yyyy").Value,
+                                                KS = m.constSymbol,
+                                                NazevProtiuctu = m.accountName,
+                                                PopisTransakce = m.type,
+                                                SS = m.specSymbol,
+                                                VS = m.varSymbol,
+                                                ZdrojUrl = baseUrl.Url,
+                                                ZpravaProPrijemce = m.info,
+
                                             })
                                         );
                                 }
@@ -87,7 +88,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                             }
                             catch (Exception e)
                             {
-                                TULogger.Error("RB parser JSON error",e);
+                                TULogger.Error("RB parser JSON error", e);
                                 return polozky;
                             }
 

@@ -1,5 +1,6 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+
+using System;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -9,7 +10,7 @@ namespace HlidacStatu.Web.Controllers
         {
             string id = _id;
 
-            return View(new Tuple<string,string>(id,modalId));
+            return View(new Tuple<string, string>(id, modalId));
         }
 
         public ActionResult ModalZneplatnenaSmlouva(string _id, string modalId)

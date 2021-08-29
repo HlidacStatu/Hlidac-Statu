@@ -82,7 +82,7 @@ namespace HlidacStatu.Q.Simple
         {
             channel.BasicReject(responseId, true);
         }
-        public void RejectMessageOnTheEnd(ulong responseId,T value)
+        public void RejectMessageOnTheEnd(ulong responseId, T value)
         {
             AckMessage(responseId);
             Send(value);

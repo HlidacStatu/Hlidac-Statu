@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Data.External.Tables.Camelot
@@ -76,7 +74,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         public async Task<ApiResult<CamelotResult>> GetSessionAsync()
         {
             if (string.IsNullOrEmpty(this.SessionId))
-                return new ApiResult<CamelotResult>(false) { ErrorCode =404, ErrorDescription ="sessionID is empty" };
+                return new ApiResult<CamelotResult>(false) { ErrorCode = 404, ErrorDescription = "sessionID is empty" };
 
             try
             {
@@ -85,7 +83,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
             catch (Exception e)
             {
-                return new ApiResult<CamelotResult>(false) { ErrorDescription=e.ToString(), ErrorCode = 500 };
+                return new ApiResult<CamelotResult>(false) { ErrorDescription = e.ToString(), ErrorCode = 500 };
             }
         }
 
@@ -109,7 +107,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             try
             {
                 return await cl.VersionAsync();
-                
+
 
             }
             catch (Exception e)

@@ -6,15 +6,15 @@ namespace HlidacStatu.Web.Models
     {
         public Type? Datatype { get; set; }
         public string Query { get; set; }
-        public string? ButtonText  { get; set; } 
-        public string? PreButtonText  { get; set; } 
-        public string? PostButtonText  { get; set; } 
-        public string PrefillWDname  { get; set; } 
-        public bool ShowWDList  { get; set; } 
-        public string? DatasetId  { get; set; } 
-        public bool ShowButtonIcon  { get; set; } 
-        public string? ButtonCss  { get; set; }
-        
+        public string? ButtonText { get; set; }
+        public string? PreButtonText { get; set; }
+        public string? PostButtonText { get; set; }
+        public string PrefillWDname { get; set; }
+        public bool ShowWDList { get; set; }
+        public string? DatasetId { get; set; }
+        public bool ShowButtonIcon { get; set; }
+        public string? ButtonCss { get; set; }
+
         public WatchdogViewModel(Type? datatype,
             string query,
             string? buttonText = null,

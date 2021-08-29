@@ -1,5 +1,6 @@
-﻿using System;
-using HlidacStatu.Entities.Issues;
+﻿using HlidacStatu.Entities.Issues;
+
+using System;
 
 namespace HlidacStatu.Repositories.Searching.Rules
 {
@@ -14,7 +15,7 @@ namespace HlidacStatu.Repositories.Searching.Rules
         {
             get
             {
-                return new string[] { "chyby:"};
+                return new string[] { "chyby:" };
             }
         }
 

@@ -1,5 +1,6 @@
-﻿using System;
-using HlidacStatu.Repositories.ES;
+﻿using HlidacStatu.Repositories.ES;
+
+using System;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -20,7 +21,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 return;
             CreateBackup(comment, kidx, useTempDb);
         }
-        public static void CreateBackup(string comment, KIndexData kidx, bool useTempDb )
+        public static void CreateBackup(string comment, KIndexData kidx, bool useTempDb)
         {
 
             if (kidx == null)

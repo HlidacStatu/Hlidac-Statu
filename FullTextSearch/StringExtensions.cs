@@ -41,6 +41,6 @@ namespace FullTextSearch
                 c => char.IsLetterOrDigit(c) || allowedCharacters.Contains(c)));
         }
 
-       
+
     }
 }

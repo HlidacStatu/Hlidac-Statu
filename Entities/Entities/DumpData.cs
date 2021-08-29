@@ -38,7 +38,7 @@ namespace HlidacStatu.Entities
                     //if (dump.casGenerovani < DateTime.Now.Date)
                     //    return ShouldDownloadStatus.WaitForData;
                     //else
-                        return ShouldDownloadStatus.Yes;
+                    return ShouldDownloadStatus.Yes;
                 }
 
                 return ShouldDownloadStatus.No;

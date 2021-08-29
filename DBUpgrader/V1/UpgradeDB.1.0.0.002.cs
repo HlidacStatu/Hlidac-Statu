@@ -12,7 +12,7 @@ namespace HlidacStatu.DBUpgrades
             [DatabaseUpgradeMethod("1.0.0.2")]
             public static void Init_1_0_0_2(IDatabaseUpgrader du)
             {
-                du.AddColumnToTable("Source", "nvarchar(100)", "Firma",true);
+                du.AddColumnToTable("Source", "nvarchar(100)", "Firma", true);
                 du.AddColumnToTable("Popis", "nvarchar(100)", "Firma", true);
 
                 string sql = @"
@@ -74,7 +74,7 @@ END
 
             }
 
-    
+
 
 
         }

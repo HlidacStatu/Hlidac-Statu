@@ -1,8 +1,9 @@
-﻿using System;
+﻿using HlidacStatu.Util;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using HlidacStatu.Util;
 
 namespace HlidacStatu.Plugin.TransparetniUcty
 {
@@ -108,7 +109,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
                         System.Net.WebUtility.HtmlDecode(doc.GetNodeHtml(xroot + "/td[9]"))
                         ?.Replace("<br>", " \n")
                         );
-                    
+
                     if (poznamka != p.ZpravaProPrijemce)
                         p.ZpravaProPrijemce += " " + poznamka;
 
@@ -167,7 +168,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
             public decimal OpeningBalance { get; set; }
             public decimal FinalBalance { get; set; }
         }
-    
+
         private class StatementTooLongException : Exception { }
     }
 }

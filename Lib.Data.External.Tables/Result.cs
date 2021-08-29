@@ -1,11 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace HlidacStatu.Lib.Data.External.Tables
 {
     public class Result
@@ -13,7 +7,8 @@ namespace HlidacStatu.Lib.Data.External.Tables
         public class Table
         {
             string _context = "";
-            public string Content {
+            public string Content
+            {
                 get { return _context; }
                 set { _parsedContent = null; _context = value; }
             }
@@ -64,7 +59,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
         public Table[] Tables { get; set; } = new Table[] { };
         public int FoundTables { get; set; }
         public string Format { get; set; }
-        public string Algorithm { get; set; }   
+        public string Algorithm { get; set; }
         public long ElapsedTimeInMs { get; set; }
 
     }

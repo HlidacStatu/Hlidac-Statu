@@ -1,19 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-
-using Devmasters;
-
 using HlidacStatu.Connectors;
-using HlidacStatu.Connectors.External;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
-using HlidacStatu.Lib.Data.External.DatoveSchranky;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Util;
 using HlidacStatu.Util.Cache;
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 
 
 namespace HlidacStatu.Repositories

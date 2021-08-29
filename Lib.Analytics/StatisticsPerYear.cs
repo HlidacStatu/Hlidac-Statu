@@ -18,7 +18,7 @@ namespace HlidacStatu.Lib.Analytics
         [JsonProperty("Years")]
         protected Dictionary<int, T> Years { get; set; } = new Dictionary<int, T>();
 
-         
+
 
         /// <summary>
         /// Tenhle měsíc určuje, za který rok se AKTUÁLNÍ data mají zobrazovat.
@@ -61,7 +61,7 @@ namespace HlidacStatu.Lib.Analytics
         {
             get
             {
-                return Years.TryGetValue(year, out var value) ? value : new T ();
+                return Years.TryGetValue(year, out var value) ? value : new T();
             }
             set
             {
@@ -69,9 +69,9 @@ namespace HlidacStatu.Lib.Analytics
             }
         }
 
-        public bool HasStatistics 
-        { 
-            get 
+        public bool HasStatistics
+        {
+            get
             {
                 return Years.Count != 0;
             }
@@ -261,13 +261,13 @@ namespace HlidacStatu.Lib.Analytics
             {
                 yield return (element.Key, element.Value);
             }
-            
+
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
 
-        
+
     }
 }

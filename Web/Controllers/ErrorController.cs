@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-using System;
-
 namespace HlidacStatu.Web.Controllers
 {
     [ApiExplorerSettings(IgnoreApi = true)]
@@ -17,21 +15,21 @@ namespace HlidacStatu.Web.Controllers
 
             string err = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyName] as string;
 
-            Util.Consts.Logger.Error($"500 - Server error on {exceptionHandlerPathFeature.Path}\n\n"+err);
-            
+            Util.Consts.Logger.Error($"500 - Server error on {exceptionHandlerPathFeature.Path}\n\n" + err);
+
             return View();
         }
-        
+
         [Route("404")]
         public IActionResult PageNotFound()
         {
             string err = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyName] as string;
 
-            Util.Consts.Logger.Warning($"404 - Page not found.\n\n" +  err);
-            
+            Util.Consts.Logger.Warning($"404 - Page not found.\n\n" + err);
+
             return View();
         }
-        
+
         [Route("{code:int}")]
         public IActionResult GeneralError(int code)
         {
@@ -43,7 +41,7 @@ namespace HlidacStatu.Web.Controllers
                 originalPath = HttpContext.Items["originalPath"] as string;
             }
             Util.Consts.Logger.Warning($"{code} error - [{originalPath}].\n\n" + err);
-            
+
             return View(code);
         }
 

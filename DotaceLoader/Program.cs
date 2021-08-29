@@ -1,10 +1,14 @@
 ﻿using Dapper;
-using Npgsql;
+
 using HlidacStatu.Entities.Dotace;
-using Newtonsoft.Json;
-using System.Configuration;
-using System.Collections.Generic;
 using HlidacStatu.Repositories;
+
+using Newtonsoft.Json;
+
+using Npgsql;
+
+using System.Collections.Generic;
+using System.Configuration;
 
 namespace DotaceLoader
 {
@@ -65,7 +69,7 @@ namespace DotaceLoader
             }
         }
 
-        
+
         public static string NormalizeIco(string ico)
         {
             if (ico == null)

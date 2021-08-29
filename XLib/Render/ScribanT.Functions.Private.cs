@@ -1,4 +1,5 @@
 ﻿using HlidacStatu.Entities;
+
 using Scriban.Runtime;
 
 namespace HlidacStatu.XLib.Render

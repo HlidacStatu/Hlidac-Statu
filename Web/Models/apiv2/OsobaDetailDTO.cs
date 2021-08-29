@@ -1,10 +1,13 @@
-﻿using HlidacStatu.Entities;
+﻿using Devmasters.Enums;
+
+using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
+
 using Newtonsoft.Json;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Devmasters.Enums;
-using HlidacStatu.Extensions;
 
 namespace HlidacStatu.Web.Models.Apiv2
 {
@@ -27,7 +30,7 @@ namespace HlidacStatu.Web.Models.Apiv2
                     DatumDo = ev.DarovanoDne,
                     Typ = "sponzor",
                     Organizace = ev.JmenoPrijemce()
-                }).ToList() ;
+                }).ToList();
 
             var unwantedEvents = new int[]
             {

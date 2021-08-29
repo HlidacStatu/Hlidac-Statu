@@ -1,10 +1,7 @@
-﻿using Couchbase;
-
+﻿
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -48,7 +45,7 @@ namespace HlidacStatu.Web.HealthChecks
                         {
                             bad = true;
                             result += $"{containerName}: doesnt exists\n";
-                            stat = new Docker.DotNet.Models.ContainerState() {  ExitCode = -1 };
+                            stat = new Docker.DotNet.Models.ContainerState() { ExitCode = -1 };
                         }
                         catch (System.AggregateException aex)
                         {

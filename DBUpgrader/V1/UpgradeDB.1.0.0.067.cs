@@ -4,16 +4,16 @@
 namespace HlidacStatu.DBUpgrades
 {
     public static partial class DBUpgrader
-	{
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.67")]
-			public static void Init_1_0_0_67(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.67")]
+            public static void Init_1_0_0_67(IDatabaseUpgrader du)
+            {
 
-				string sql = @"
+                string sql = @"
 
 /* To prevent any potential data loss issues, you should review this script in detail before running it outside the context of the database designer.*/
 BEGIN TRANSACTION
@@ -155,9 +155,9 @@ BEGIN
 END
 
 ";
-				du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
-			}
-		}
-	}
+            }
+        }
+    }
 }

@@ -6,7 +6,7 @@ namespace HlidacStatu.Repositories.Searching.Rules
     public class VZ_Form
         : RuleBase
     {
-        public VZ_Form( bool stopFurtherProcessing = false, string addLastCondition = "")
+        public VZ_Form(bool stopFurtherProcessing = false, string addLastCondition = "")
             : base("", stopFurtherProcessing, addLastCondition)
         { }
 

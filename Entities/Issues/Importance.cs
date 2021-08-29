@@ -23,7 +23,8 @@ namespace HlidacStatu.Entities.Issues
         Fatal = 100,
     }
 
-    public class Importance {
+    public class Importance
+    {
 
         public static string GetCssClass(ImportanceLevel imp, bool withpreDash)
         {
@@ -51,7 +52,7 @@ namespace HlidacStatu.Entities.Issues
         {
             string res = "<span class=\"text{0} glyphicon glyphicon-{3}\" style=\"font-size:{1}\" aria-hidden=\"true\" title=\"{2}\"></span>";
 
-            return string.Format(res,GetCssClass(imp, true), sizeInCss, imp.ToNiceDisplayName(), glyphiconSymbol );
+            return string.Format(res, GetCssClass(imp, true), sizeInCss, imp.ToNiceDisplayName(), glyphiconSymbol);
         }
 
     }

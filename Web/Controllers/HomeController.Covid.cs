@@ -1,8 +1,10 @@
-﻿using HlidacStatu.Web.Models;
+﻿using HlidacStatu.Datasets;
+using HlidacStatu.Web.Models;
+
+using Microsoft.AspNetCore.Mvc;
+
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Datasets;
-using Microsoft.AspNetCore.Mvc;
 
 
 namespace HlidacStatu.Web.Controllers
@@ -22,11 +24,11 @@ namespace HlidacStatu.Web.Controllers
                 .Select(m => m.Source)
                 .ToArray();
 
-            if (id=="last")
-                Content(Newtonsoft.Json.JsonConvert.SerializeObject(n.First()),"text/json");
-            return Content(Newtonsoft.Json.JsonConvert.SerializeObject(n),"text/json");
+            if (id == "last")
+                Content(Newtonsoft.Json.JsonConvert.SerializeObject(n.First()), "text/json");
+            return Content(Newtonsoft.Json.JsonConvert.SerializeObject(n), "text/json");
         }
-        
+
         public ActionResult KapacitaNemocnic()
         {
 
@@ -39,7 +41,7 @@ namespace HlidacStatu.Web.Controllers
             NemocniceData[] nAll = ds
                 .SearchDataRaw("*", 1, 1000).Result
                 .Select(s => Newtonsoft.Json.JsonConvert.DeserializeObject<NemocniceData>(s.Item2))
-                .OrderByDescending(m=>m.lastUpdated)
+                .OrderByDescending(m => m.lastUpdated)
                 .Take(120)
                 .Reverse()
                 .ToArray();

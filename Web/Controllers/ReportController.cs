@@ -1,7 +1,9 @@
-using System;
 using HlidacStatu.Web.Filters;
+
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+
+using System;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -9,7 +11,7 @@ namespace HlidacStatu.Web.Controllers
     [Route("Report")]
     public class ReportController : Controller
     {
-        
+
         [Route("2")]
         public IActionResult SmlouvySChybami()
         {
@@ -17,7 +19,7 @@ namespace HlidacStatu.Web.Controllers
             ViewBag.SubTitle = "Každou smlouvu analyzujeme a hledáme v ní chyby. Zde jsou ty nejhorší smlouvy.";
             return View("2_SmlouvySChybami");
         }
-        
+
         [Route("3")]
         public IActionResult DraheSmlouvySChybami()
         {
@@ -25,14 +27,14 @@ namespace HlidacStatu.Web.Controllers
             ViewBag.SubTitle = "Každou smlouvu analyzujeme a hledáme v ní chyby. Zde jsou ty nejhorší smlouvy na vyšší částky.";
             return View("3_DraheSmlouvySChybami");
         }
-        
+
         [Route("4")]
         public IActionResult NejdrazsiSmlouvy(int? id)
         {
             ViewBag.Title = "Smlouvy na nejvyšší částky";
             return View("4_NejDrazsiSmlouvy");
         }
-        
+
         [Route("27")]
         public IActionResult CovidPodpora(int? id)
         {
@@ -46,7 +48,7 @@ namespace HlidacStatu.Web.Controllers
                     + "<meta property=\"og:image:type\" content=\"image/png\" />";
             return View("27_COVIDPodpora");
         }
-        
+
         [Route("28")]
         public IActionResult Ministerstva(int? id)
         {
@@ -60,19 +62,19 @@ namespace HlidacStatu.Web.Controllers
                     + "<meta property=\"og:image:type\" content=\"image/png\" />";
             return View("28_Ministerstva");
         }
-        
+
         [Route("99")]
         public IActionResult CovidUmrti()
         {
             return View("99_COVID_Umrti");
         }
-    
+
         [Route("999")]
         public IActionResult CovidNakazeni(int? id)
         {
             return View("999_COVID_Nakazeni");
         }
-        
+
         [Route("25")]
         [HlidacCache(12 * 60 * 60, "id;obdobi", true)]
         public IActionResult Report25()
@@ -88,8 +90,8 @@ namespace HlidacStatu.Web.Controllers
                                     + "<meta property=\"og:image:type\" content=\"image/png\" />";
             return View("25_MinisterstvaStrany");
         }
-        
-        
+
+
         [Route("{id:int}")]
         [HlidacCache(12 * 60 * 60, "id", true)]
         public ActionResult OtherReports(int? id)

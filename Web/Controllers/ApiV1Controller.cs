@@ -1,22 +1,26 @@
 ﻿using FullTextSearch;
+
 using HlidacStatu.Entities;
-using Nest;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.ProfilZadavatelu;
 using HlidacStatu.Web.Models;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
+using Nest;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -106,7 +110,7 @@ namespace HlidacStatu.Web.Controllers
                     foreach (var user in users)
                     {
                         string code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        var callbackUrl = Url.Page("ConfirmEmail", "Account", new {userId = user.Id, code = code},
+                        var callbackUrl = Url.Page("ConfirmEmail", "Account", new { userId = user.Id, code = code },
                             protocol: Request.Scheme);
                         //create email
                         var email = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("ConfirmEmail");
@@ -165,15 +169,15 @@ namespace HlidacStatu.Web.Controllers
                 sb.AppendLine("Typ\tVe frontě\tZpracovavane\tHotovo za 24hod\tChyby pri zpracovani");
                 foreach (System.Data.DataRow dr in ds.Tables[0].Rows)
                 {
-                    sb.Append((string) dr[0]);
+                    sb.Append((string)dr[0]);
                     sb.Append("\t");
-                    sb.Append((int) dr[1]);
+                    sb.Append((int)dr[1]);
                     sb.Append("\t");
-                    sb.Append((int) dr[2]);
+                    sb.Append((int)dr[2]);
                     sb.Append("\t");
-                    sb.Append((int) dr[3]);
+                    sb.Append((int)dr[3]);
                     sb.Append("\t");
-                    sb.Append((int) dr[4]);
+                    sb.Append((int)dr[4]);
                     sb.AppendLine();
                 }
 
@@ -279,12 +283,12 @@ namespace HlidacStatu.Web.Controllers
 
                 if (res.IsValid)
                 {
-                    foreach (KeyedBucket<object> val in ((BucketAggregate) res.Aggregations["profiles"]).Items)
+                    foreach (KeyedBucket<object> val in ((BucketAggregate)res.Aggregations["profiles"]).Items)
                     {
                         var resProf = Manager.GetESClient_VZ()
-                            .Get<ProfilZadavatele>((string) val.Key);
+                            .Get<ProfilZadavatele>((string)val.Key);
                         list.Add(new VZProfilesListRes()
-                            {profileId = (string) val.Key, url = resProf?.Source?.Url, count = val.DocCount});
+                        { profileId = (string)val.Key, url = resProf?.Source?.Url, count = val.DocCount });
                     }
                 }
 
@@ -324,7 +328,7 @@ namespace HlidacStatu.Web.Controllers
                     ), "application/json");
                 }
 
-                return Content(Newtonsoft.Json.JsonConvert.SerializeObject(new {error = res.ServerError.ToString()}),
+                return Content(Newtonsoft.Json.JsonConvert.SerializeObject(new { error = res.ServerError.ToString() }),
                     "application/json");
             }
         }
@@ -400,12 +404,14 @@ namespace HlidacStatu.Web.Controllers
 
                 ErrorEnvelope ee = new()
                 {
-                    Data = errorsStringified, Error = "invalid data", UserId = authId.ApiCall.User,
+                    Data = errorsStringified,
+                    Error = "invalid data",
+                    UserId = authId.ApiCall.User,
                     apiCallJson = Newtonsoft.Json.JsonConvert.SerializeObject(authId) ?? null
                 };
                 ErrorEnvelopeRepo.Save(ee, idxConn);
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    new {error = "data is empty"}
+                    new { error = "data is empty" }
                 ), "application/json");
             }
 
@@ -414,20 +420,22 @@ namespace HlidacStatu.Web.Controllers
             {
                 VerejnaZakazkaRepo.Save(vz, idxConn);
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    new {result = "ok"}
+                    new { result = "ok" }
                 ), "application/json");
             }
             catch (Exception e)
             {
                 ErrorEnvelope ee = new()
                 {
-                    Data = content.ToString(), Error = e.ToString(), UserId = authId.ApiCall.User,
+                    Data = content.ToString(),
+                    Error = e.ToString(),
+                    UserId = authId.ApiCall.User,
                     apiCallJson = Newtonsoft.Json.JsonConvert.SerializeObject(authId) ?? null
                 };
                 ErrorEnvelopeRepo.Save(ee, idxConn);
 
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    new {error = "deserialization error", descr = e.ToString()}
+                    new { error = "deserialization error", descr = e.ToString() }
                 ), "application/json");
             }
         }
@@ -450,8 +458,8 @@ namespace HlidacStatu.Web.Controllers
                     .LowLevel.Cat.Nodes<Elasticsearch.Net.StringResponse>(
                         new Elasticsearch.Net.Specification.CatApi.CatNodesRequestParameters()
                         {
-                            Headers = new[] {"m", "name", "ip", "u"},
-                            SortByColumns = new[] {"name"},
+                            Headers = new[] { "m", "name", "ip", "u" },
+                            SortByColumns = new[] { "name" },
                             Verbose = true
                         }
                     ).Body
@@ -482,13 +490,13 @@ namespace HlidacStatu.Web.Controllers
 
 
             res = OsobaRepo.Searching.GetPolitikByNameFtx(q, 15)
-                .Select(m => new ApiV1Models.PolitikTypeAhead() {name = m.FullNameWithYear(), nameId = m.NameId})
+                .Select(m => new ApiV1Models.PolitikTypeAhead() { name = m.FullNameWithYear(), nameId = m.NameId })
                 .ToArray();
 
             if (!string.IsNullOrEmpty(Request.Headers["Origin"]))
             {
                 if (Request.Headers["Origin"].Contains(".hlidacstatu.cz")
-                    //|| Request.Headers["Origin"].Contains(".hlidacstatu.cz")
+                //|| Request.Headers["Origin"].Contains(".hlidacstatu.cz")
                 )
                     Response.Headers.Add("Access-Control-Allow-Origin", Request.Headers["Origin"]);
             }
@@ -512,7 +520,7 @@ namespace HlidacStatu.Web.Controllers
             if (!string.IsNullOrEmpty(Request.Headers["Origin"]))
             {
                 if (Request.Headers["Origin"].Contains(".hlidacstatu.cz")
-                    //|| Request.Headers["Origin"].Contains(".hlidacstatu.cz")
+                //|| Request.Headers["Origin"].Contains(".hlidacstatu.cz")
                 )
                     Response.Headers.Add("Access-Control-Allow-Origin", Request.Headers["Origin"]);
             }
@@ -536,7 +544,7 @@ namespace HlidacStatu.Web.Controllers
             if (!string.IsNullOrEmpty(Request.Headers["Origin"]))
             {
                 if (Request.Headers["Origin"].Contains(".hlidacstatu.cz")
-                    //|| Request.Headers["Origin"].Contains(".hlidacstatu.cz")
+                //|| Request.Headers["Origin"].Contains(".hlidacstatu.cz")
                 )
                     Response.Headers.Add("Access-Control-Allow-Origin", Request.Headers["Origin"]);
             }
@@ -607,14 +615,14 @@ namespace HlidacStatu.Web.Controllers
 
                 res = SmlouvaRepo.Searching.SimpleSearch(query, page.Value,
                     SmlouvaRepo.Searching.DefaultPageSize,
-                    (SmlouvaRepo.Searching.OrderResult) order.Value,
+                    (SmlouvaRepo.Searching.OrderResult)order.Value,
                     platnyZaznam: platnyzaznam);
 
 
                 if (res.IsValid == false)
                 {
                     Response.StatusCode = 500;
-                    return Json(new {error = "Bad query", reason = res.ElasticResults.ServerError});
+                    return Json(new { error = "Bad query", reason = res.ElasticResults.ServerError });
                 }
                 else
                 {
@@ -624,14 +632,14 @@ namespace HlidacStatu.Web.Controllers
                         .ToArray();
 
                     return Content(
-                        Newtonsoft.Json.JsonConvert.SerializeObject(new {total = res.Total, items = filtered},
+                        Newtonsoft.Json.JsonConvert.SerializeObject(new { total = res.Total, items = filtered },
                             Newtonsoft.Json.Formatting.None), "application/json");
                 }
             }
             else
             {
                 Response.StatusCode = 401;
-                return Json(new {error = "Unauthorized"});
+                return Json(new { error = "Unauthorized" });
             }
         }
 
@@ -640,7 +648,7 @@ namespace HlidacStatu.Web.Controllers
             string Id = _id;
 
             var apires = Framework.ApiAuth.IsApiAuth(HttpContext,
-                parameters: new Framework.ApiCall.CallParameter[] {new("Detail", Id)});
+                parameters: new Framework.ApiCall.CallParameter[] { new("Detail", Id) });
             if (apires.Authentificated)
             {
                 if (string.IsNullOrWhiteSpace(Id))
@@ -673,7 +681,7 @@ namespace HlidacStatu.Web.Controllers
             else
             {
                 Response.StatusCode = 401;
-                return Json(new {error = "Unauthorized"});
+                return Json(new { error = "Unauthorized" });
             }
         }
 
@@ -701,10 +709,10 @@ namespace HlidacStatu.Web.Controllers
 
                 var contracts = items.ElasticResults.Hits
                     .Select(m => new ApiV1Models.ClassificatioListItemModel.Contract()
-                        {
-                            contractId = m.Source.Id,
-                            url = string.Format(urlItemTemplate, m.Source.Id)
-                        }
+                    {
+                        contractId = m.Source.Id,
+                        url = string.Format(urlItemTemplate, m.Source.Id)
+                    }
                     )
                     .ToArray();
                 result.contracts = contracts;
@@ -714,7 +722,7 @@ namespace HlidacStatu.Web.Controllers
             else
             {
                 Response.StatusCode = 401;
-                return Json(new {error = "Unauthorized"});
+                return Json(new { error = "Unauthorized" });
             }
         }
 
@@ -790,7 +798,7 @@ namespace HlidacStatu.Web.Controllers
                 {
                     return Content(
                         Newtonsoft.Json.JsonConvert.SerializeObject(new
-                            {valid = false, error = "Invalid date format. Use yyyy-MM-dd format."}),
+                        { valid = false, error = "Invalid date format. Use yyyy-MM-dd format." }),
                         "application/json");
                 }
 
@@ -805,11 +813,11 @@ namespace HlidacStatu.Web.Controllers
                 }
 
                 var no = OsobaRepo.GetOrCreateNew(titulPred, jmeno, prijmeni, titulPo, nar,
-                    (Osoba.StatusOsobyEnum) typOsoby, auth.ApiCall.User);
+                    (Osoba.StatusOsobyEnum)typOsoby, auth.ApiCall.User);
                 no.Vazby(true);
 
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                        new {valid = true, nameId = no.NameId})
+                        new { valid = true, nameId = no.NameId })
                     , "application/json");
             }
             else
@@ -828,7 +836,7 @@ namespace HlidacStatu.Web.Controllers
                 if (oo != null)
                 {
                     return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                        new {osobaid = oo.NameId, jmeno = oo.Jmeno, prijmeni = oo.Prijmeni}
+                        new { osobaid = oo.NameId, jmeno = oo.Jmeno, prijmeni = oo.Prijmeni }
                     ), "application/json");
                 }
                 else
@@ -852,7 +860,7 @@ namespace HlidacStatu.Web.Controllers
                 {
                     return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
                         oo
-                            .Select(o => new {osobaid = o.NameId, jmeno = o.Jmeno, prijmeni = o.Prijmeni})
+                            .Select(o => new { osobaid = o.NameId, jmeno = o.Jmeno, prijmeni = o.Prijmeni })
                             .ToArray()
                     ), "application/json");
                 }
@@ -876,7 +884,7 @@ namespace HlidacStatu.Web.Controllers
                 if (dt.HasValue == false)
                 {
                     return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                        new {error = "invalid date format. Use yyyy-MM-dd format."}
+                        new { error = "invalid date format. Use yyyy-MM-dd format." }
                     ), "application/json");
                 }
 
@@ -885,7 +893,7 @@ namespace HlidacStatu.Web.Controllers
                     .ToArray();
 
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    new {Total = found.Count(), Result = found}
+                    new { Total = found.Count(), Result = found }
                 ), "application/json");
             }
             else

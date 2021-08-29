@@ -68,7 +68,7 @@ namespace HlidacStatu.Datasets
                 if (Type == typeof(Nullable<DateTime>)
                     || Type == typeof(DateTime)
                     )
-                {                     
+                {
                     samples.Add(("2020-04-23", "hodnota rovna 23. dubna 2020"));
                     samples.Add(("rok-mesic-den", "přesný den"));
                     samples.Add(("[2020-04-23 TO *]", "od 23. dubna 2020 včetně"));
@@ -79,7 +79,7 @@ namespace HlidacStatu.Datasets
                 if (Type == typeof(Nullable<Devmasters.DT.Date>)
                     || Type == typeof(Devmasters.DT.Date)
                     )
-                {                     
+                {
                     samples.Add(("2020-04-23", "hodnota rovna 23. dubna 2020"));
                     samples.Add(("rok-mesic-den", "přesný den"));
                     samples.Add(("[2020-04-23 TO *]", "od 23. dubna 2020 včetně"));
@@ -89,14 +89,14 @@ namespace HlidacStatu.Datasets
                 }
                 if (Type == typeof(string)
                     )
-                {                     
+                {
                     samples.Add(("podpora", "parametr obsahuje slovo podpora, všechny tvary slova"));
                     samples.Add(("\"premiér Babiš\"", "obsahuje sousloví 'premiér Babiš', všechny tvary jednotlivých slov, ale pevném pořadí"));
                 }
                 if (Type == typeof(Nullable<bool>)
                     || Type == typeof(bool)
                     )
-                {                     
+                {
                     samples.Add(("true", "logický parametr obsahuje hodnotu 'true'"));
                     samples.Add(("false", "logický parametr obsahuje hodnotu 'false'"));
                 }

@@ -34,6 +34,6 @@ namespace HlidacStatu.Entities
             JmenoBezKoncovkyAscii = Devmasters.TextUtil.RemoveDiacritics(JmenoBezKoncovky);
         }
 
- 
+
     }
 }

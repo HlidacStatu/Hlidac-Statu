@@ -1,9 +1,11 @@
+using HlidacStatu.Entities;
+
+using Microsoft.EntityFrameworkCore;
+
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
-using HlidacStatu.Entities;
-using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -26,7 +28,7 @@ namespace HlidacStatu.Repositories
                 .AsQueryable()
                 .Where(b => b.Ip == ipAddress)
                 .FirstOrDefaultAsync();
-            
+
             if (bannedIp == default)
             {
                 bannedIp = new BannedIp()
@@ -35,15 +37,15 @@ namespace HlidacStatu.Repositories
                 };
                 await dbContext.BannedIps.AddAsync(bannedIp);
             }
-            
+
             bannedIp.Expiration = expiration;
             bannedIp.Created = DateTime.Now;
             bannedIp.LastStatusCode = lastStatusCode;
             bannedIp.PathList = pathList;
-            
+
             await dbContext.SaveChangesAsync();
         }
-        
+
         public static async Task AllowIp(string ipAddress)
         {
             await using var dbContext = new DbEntities();
@@ -56,6 +58,6 @@ namespace HlidacStatu.Repositories
             dbContext.Remove(ip);
             await dbContext.SaveChangesAsync();
         }
-        
+
     }
 }

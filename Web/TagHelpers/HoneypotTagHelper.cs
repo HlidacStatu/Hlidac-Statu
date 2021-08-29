@@ -9,9 +9,9 @@ namespace HlidacStatu.Web.TagHelpers
         [HtmlAttributeNotBound]
         [ViewContext]
         public ViewContext ViewContext { get; set; }
-        
+
         public string Name { get; set; }
-        
+
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             if (string.IsNullOrWhiteSpace(Name))
@@ -20,8 +20,8 @@ namespace HlidacStatu.Web.TagHelpers
             output.TagName = null;
             output.Content.SetHtmlContent($@"<input type='text' name='{Name}' id='{Name}' value='' placeholder='Your Zip code' />");
 
-            
-            RenderScriptsTagHelper.QueueScript(ViewContext, 
+
+            RenderScriptsTagHelper.QueueScript(ViewContext,
                 @"<script>
                     $(function () {
                         $('#" + Name + @"').css({ ""font-size"": ""1pt"", ""color"": ""white"", ""width"": ""1px"", ""border"": ""none""});
@@ -35,7 +35,7 @@ namespace HlidacStatu.Web.TagHelpers
                     </style>
                 </noscript>
             ");
-            
+
         }
     }
 }

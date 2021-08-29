@@ -6,7 +6,7 @@ namespace FullTextSearch
     public interface ITokenizer
     {
         string[] Tokenize(string text);
-    } 
+    }
 
     public class Tokenizer : ITokenizer
     {

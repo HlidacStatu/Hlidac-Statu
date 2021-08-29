@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace HlidacStatu.Util
 {
@@ -32,7 +30,7 @@ namespace HlidacStatu.Util
                 root = root + @"\";
 
 
-            var tmp = System.IO.File.ReadLines(root+"staty.txt")
+            var tmp = System.IO.File.ReadLines(root + "staty.txt")
                 //.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => m.Split('\t'))
                 .Select(mm =>

@@ -35,7 +35,7 @@ namespace HlidacStatu.Repositories.Searching
             string[] prefixes = ("pan kolega poslanec předseda místopředseda prezident premiér "
                                  + "paní slečna kolegyně poslankyně předsedkyně místopředsedkyně prezidentka premiérka ")
                 .Split(' ');
-            string[] blacklist = {"poslanec celý"};
+            string[] blacklist = { "poslanec celý" };
             string[] whitelist = { };
 
             var politiciStems = new List<Tuple<string, string[]>>();
@@ -43,7 +43,7 @@ namespace HlidacStatu.Repositories.Searching
             var path = Connectors.Init.WebAppDataPath;
             if (string.IsNullOrWhiteSpace(path))
                 path = Devmasters.IO.IOTools.GetExecutingDirectoryName(true);
-                
+
             foreach (var s in System.IO.File.ReadAllLines(path + "Czech.3-2-5.dic"))
             {
                 slova.Add(s);
@@ -51,7 +51,7 @@ namespace HlidacStatu.Repositories.Searching
 
             foreach (var p in OsobaRepo.Politici.Get())
             {
-                var cols = new string[] {p.Jmeno.ToLower(), p.Prijmeni.ToLower()};
+                var cols = new string[] { p.Jmeno.ToLower(), p.Prijmeni.ToLower() };
                 var key = p.NameId;
                 List<string> variants = new List<string>();
 

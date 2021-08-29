@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using HlidacStatu.DetectJobs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
+
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.JobTableEditor.Data
 {
@@ -23,7 +23,7 @@ namespace HlidacStatu.JobTableEditor.Data
                 InHtmlTables.SpecificWords,
                 out var foundJobs,
                 out var cells);
-            
+
             await Task.Delay(200);
 
             var st = new SomeTable();
@@ -56,7 +56,7 @@ namespace HlidacStatu.JobTableEditor.Data
         public CellShell[][] Cells { get; set; }
         public TimeSpan ProcessingTime { get; set; }
         public string Author { get; set; }
-        
+
     }
 
     public class CellShell
@@ -66,7 +66,7 @@ namespace HlidacStatu.JobTableEditor.Data
         public string Id { get; init; }
         public int Row { get; init; }
         public int Column { get; init; }
-        
+
         public InHtmlTables.Cell.GuessedCellType CellType { get; set; }
         public string Value { get; set; }
 
@@ -102,7 +102,7 @@ namespace HlidacStatu.JobTableEditor.Data
         {
             Value = Cell.Text;
         }
-        
+
     }
-    
+
 }

@@ -1,5 +1,6 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+using System;
 
 namespace HlidacStatu.Entities.Migrations
 {
@@ -7,24 +8,24 @@ namespace HlidacStatu.Entities.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey("FK_dbo.AspNetUserRoles_dbo.AspNetRoles_RoleId","AspNetUserRoles");
-            migrationBuilder.DropForeignKey("FK_dbo.AspNetUserRoles_dbo.AspNetUsers_UserId","AspNetUserRoles");
-            migrationBuilder.DropForeignKey("FK_dbo.AspNetUserClaims_dbo.AspNetUsers_UserId","AspNetUserClaims");
-            migrationBuilder.DropForeignKey("FK_dbo.AspNetUserLogins_dbo.AspNetUsers_UserId","AspNetUserLogins");
-            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetRoles","AspNetRoles");
-            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUserRoles","AspNetUserRoles");
-            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUsers","AspNetUsers");
-            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUserClaims","AspNetUserClaims");
-            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUserLogins","AspNetUserLogins");
-            migrationBuilder.DropPrimaryKey("PK_AspNetUserTokens","AspNetUserTokens");
-            
+            migrationBuilder.DropForeignKey("FK_dbo.AspNetUserRoles_dbo.AspNetRoles_RoleId", "AspNetUserRoles");
+            migrationBuilder.DropForeignKey("FK_dbo.AspNetUserRoles_dbo.AspNetUsers_UserId", "AspNetUserRoles");
+            migrationBuilder.DropForeignKey("FK_dbo.AspNetUserClaims_dbo.AspNetUsers_UserId", "AspNetUserClaims");
+            migrationBuilder.DropForeignKey("FK_dbo.AspNetUserLogins_dbo.AspNetUsers_UserId", "AspNetUserLogins");
+            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetRoles", "AspNetRoles");
+            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUserRoles", "AspNetUserRoles");
+            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUsers", "AspNetUsers");
+            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUserClaims", "AspNetUserClaims");
+            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUserLogins", "AspNetUserLogins");
+            migrationBuilder.DropPrimaryKey("PK_AspNetUserTokens", "AspNetUserTokens");
+
             migrationBuilder.RenameTable("AspNetUserRoles", newName: "AspNetUserRoles_old");
             migrationBuilder.RenameTable("AspNetUserClaims", newName: "AspNetUserClaims_old");
             migrationBuilder.RenameTable("AspNetUserLogins", newName: "AspNetUserLogins_old");
             migrationBuilder.RenameTable("AspNetRoles", newName: "AspNetRoles_old");
-            migrationBuilder.RenameTable("AspNetUsers", newName: "AspNetUsers_old"); 
+            migrationBuilder.RenameTable("AspNetUsers", newName: "AspNetUsers_old");
             migrationBuilder.RenameTable("AspNetUserTokens", newName: "AspNetUserTokens_old");
-            
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -246,7 +247,7 @@ namespace HlidacStatu.Entities.Migrations
                 select UserId, ClaimType, ClaimValue
                 from AspNetUserClaims_old;"
             );
-            
+
             migrationBuilder.Sql(
                 @"insert into AspNetUserLogins
                 select LoginProvider, ProviderKey, LoginProvider, UserId
@@ -257,14 +258,14 @@ namespace HlidacStatu.Entities.Migrations
                 @"insert into AspNetUserRoles
                 select * from AspNetUserRoles_old;"
             );
-            
+
             migrationBuilder.Sql(
                 @"insert into AspNetUserApiTokens
                 select * from AspNetUserTokens_old;"
             );
-            
+
             //migrace: Přidat ještě volání uložené procedury (db.context.cs)
-            
+
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

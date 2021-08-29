@@ -1,4 +1,5 @@
 ﻿using Devmasters.Enums;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -411,18 +412,18 @@ namespace HlidacStatu.Entities
 
             public Classification[] GetClassif()
             {
-                    List<Classification> types = new List<Classification>();
-                    if (Class1 != null)
-                        types.Add(Class1);
-                    if (Class2 != null)
-                        types.Add(Class2);
-                    if (Class3 != null)
-                        types.Add(Class3);
-                    return types.ToArray();
+                List<Classification> types = new List<Classification>();
+                if (Class1 != null)
+                    types.Add(Class1);
+                if (Class2 != null)
+                    types.Add(Class2);
+                if (Class3 != null)
+                    types.Add(Class3);
+                return types.ToArray();
 
-                
+
             }
-            
+
 
             public Classification Class1 { get; set; } = null;
             public Classification Class2 { get; set; } = null;
@@ -468,18 +469,18 @@ namespace HlidacStatu.Entities
 
 
 
-            
 
-            
 
-            
 
-            
+
+
+
+
 
         }
 
-        
 
-        
+
+
     }
 }

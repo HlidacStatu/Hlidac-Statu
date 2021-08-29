@@ -8,10 +8,10 @@ namespace HlidacStatu.Web.Models
         public string LoadingText { get; set; }
         public string Style { get; set; }
 
-        public DynamicModalViewModel(string dynamicContentRelUrl, 
-            string nazevOdkazu = "Opravit", 
-            string cssClass = "btn btn-link", 
-            string loadingText = "Nahrávám formulář", 
+        public DynamicModalViewModel(string dynamicContentRelUrl,
+            string nazevOdkazu = "Opravit",
+            string cssClass = "btn btn-link",
+            string loadingText = "Nahrávám formulář",
             string style = "")
         {
             DynamicContentRelUrl = dynamicContentRelUrl;
@@ -19,7 +19,7 @@ namespace HlidacStatu.Web.Models
             CssClass = cssClass;
             LoadingText = loadingText;
             Style = style;
-            
+
             if (!DynamicContentRelUrl.EndsWith("&"))
             {
                 if (DynamicContentRelUrl.Contains("?"))
@@ -31,7 +31,7 @@ namespace HlidacStatu.Web.Models
                     DynamicContentRelUrl += "?";
                 }
             }
-            
+
         }
     }
 }

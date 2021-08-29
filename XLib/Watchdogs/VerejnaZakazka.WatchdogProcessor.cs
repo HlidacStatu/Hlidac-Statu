@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
@@ -21,7 +22,7 @@ namespace HlidacStatu.XLib.Watchdogs
             var query = "posledniZmena:" +
                         string.Format("[* TO {0}]", Repositories.Searching.Tools.ToElasticDate(toDate));
             var res = VerejnaZakazkaRepo.Searching.SimpleSearch(query, null, 0, 1,
-                ((int) Repositories.Searching.VerejnaZakazkaSearchData.VZOrderResult.LastUpdate).ToString());
+                ((int)Repositories.Searching.VerejnaZakazkaSearchData.VZOrderResult.LastUpdate).ToString());
 
             if (res.IsValid == false)
                 return DateTime.Now.Date.AddYears(-10);
@@ -46,11 +47,11 @@ namespace HlidacStatu.XLib.Watchdogs
 
             var res = VerejnaZakazkaRepo.Searching.SimpleSearch(query, null, 0, 50,
                 order == null
-                    ? ((int) Repositories.Searching.VerejnaZakazkaSearchData.VZOrderResult.DateAddedDesc).ToString()
+                    ? ((int)Repositories.Searching.VerejnaZakazkaSearchData.VZOrderResult.DateAddedDesc).ToString()
                     : order,
                 OrigWD.FocusId == 1);
 
-            return new Results(res.ElasticResults.Hits.Select(m => (dynamic) m.Source), res.Total,
+            return new Results(res.ElasticResults.Hits.Select(m => (dynamic)m.Source), res.Total,
                 query, fromDate, toDate, res.IsValid, nameof(VerejnaZakazka));
         }
 

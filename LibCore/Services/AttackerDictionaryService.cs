@@ -1,7 +1,7 @@
 using System;
-using System.Linq;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 
 namespace HlidacStatu.LibCore.Services
@@ -10,7 +10,7 @@ namespace HlidacStatu.LibCore.Services
     {
         private class Attacker
         {
-            public int Num { get; set; } 
+            public int Num { get; set; }
             public DateTime Last { get; set; }
 
             public List<string?> Paths { get; set; } = new List<string?>();
@@ -21,10 +21,10 @@ namespace HlidacStatu.LibCore.Services
                 Num = num;
             }
         }
-        
+
         private ConcurrentDictionary<string, Attacker> Attackers { get; } = new();
 
-        const int SaveTimeBetweentAttacksInSec = 15*60; //inSec
+        const int SaveTimeBetweentAttacksInSec = 15 * 60; //inSec
         const int PenaltyLimit = 1500; //inSec
         public static string[] whitelistedIps = new string[] { "77.93.208.131", "217.31.202.16", "89.22.68.163" };
 
@@ -34,9 +34,9 @@ namespace HlidacStatu.LibCore.Services
                 return false;
 
             var ipString = IpToString(ipAddress);
-            if (ipString.StartsWith("10.10") || whitelistedIps.Contains(ipString ) )
+            if (ipString.StartsWith("10.10") || whitelistedIps.Contains(ipString))
                 return false;
-            
+
             var currentTime = DateTime.Now;
             Attackers.TryAdd(ipString, new Attacker(currentTime, 0));
 
@@ -44,7 +44,7 @@ namespace HlidacStatu.LibCore.Services
             {
                 return false;
             }
-            
+
             var diff = (currentTime - attacker.Last).TotalSeconds;
 
             //calculatePenalty
@@ -62,14 +62,14 @@ namespace HlidacStatu.LibCore.Services
                 penalty = 10; // not found, forbidden, ...
             else
                 penalty = 0;
-            
+
 
             if (diff >= SaveTimeBetweentAttacksInSec && penalty > 0)
             {
                 attacker.Num = penalty;
                 attacker.Paths.Clear();
             }
-            else if (penalty > 0)   
+            else if (penalty > 0)
             {
                 attacker.Num += penalty;
             }
@@ -93,8 +93,8 @@ namespace HlidacStatu.LibCore.Services
         {
             return ipAddress?.ToString() ?? "_empty";
         }
-        
-        
+
+
     }
 
 }

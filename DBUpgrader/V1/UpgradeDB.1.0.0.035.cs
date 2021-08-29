@@ -3,15 +3,15 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.35")]
-			public static void Init_1_0_0_35(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.35")]
+            public static void Init_1_0_0_35(IDatabaseUpgrader du)
+            {
 
                 string sql = @"
 insert into AspNetRoles(id,Name) values('4503d2bd-6f6d-4c7a-9ad7-96a45bd8929e','novinar')
@@ -30,18 +30,18 @@ end
 
 
 ";
-				du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
                 //add new bank account
 
-                
-
-			}
-
-	
 
 
-		}
+            }
 
-	}
+
+
+
+        }
+
+    }
 }

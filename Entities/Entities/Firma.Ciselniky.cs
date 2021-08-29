@@ -1,4 +1,5 @@
 ﻿using Devmasters.Enums;
+
 using System.Collections.Generic;
 
 namespace HlidacStatu.Entities

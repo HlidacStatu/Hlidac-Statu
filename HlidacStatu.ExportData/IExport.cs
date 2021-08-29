@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HlidacStatu.ExportData
+﻿namespace HlidacStatu.ExportData
 {
     public interface IExport
     {

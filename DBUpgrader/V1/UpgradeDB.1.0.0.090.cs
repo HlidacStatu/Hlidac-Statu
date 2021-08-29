@@ -4,13 +4,13 @@
 namespace HlidacStatu.DBUpgrades
 {
     public static partial class DBUpgrader
-	{
-		private partial class UpgradeDB
-		{
-			[DatabaseUpgradeMethod("1.0.0.90")]
-			public static void Init_1_0_0_90(IDatabaseUpgrader du)
-			{
-				string sql = @"
+    {
+        private partial class UpgradeDB
+        {
+            [DatabaseUpgradeMethod("1.0.0.90")]
+            public static void Init_1_0_0_90(IDatabaseUpgrader du)
+            {
+                string sql = @"
 
 /****** Object:  Table [dbo].[InDocJobs]    Script Date: 26.08.2021 21:51:32 ******/
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[InDocJobs]') AND type in (N'U'))
@@ -97,8 +97,8 @@ GO
 
 
 ";
-				du.RunDDLCommands(sql);
-			}
-		}
-	}
+                du.RunDDLCommands(sql);
+            }
+        }
+    }
 }

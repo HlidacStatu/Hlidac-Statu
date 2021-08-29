@@ -1,8 +1,9 @@
-﻿using System.IO;
+﻿using Microsoft.AspNetCore.Mvc;
+
+using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Text;
-using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers
 {

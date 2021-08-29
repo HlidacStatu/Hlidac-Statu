@@ -2,7 +2,7 @@
 
 namespace HlidacStatu.Lib.Data.External.Zabbix
 {
-    
+
     public class ZabDataPerStatus<T>
     {
         public ZabDataPerStatus() { }

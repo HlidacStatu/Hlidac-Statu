@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Devmasters;
+
+using System;
 using System.Collections.Generic;
-using Devmasters;
 
 namespace HlidacStatu.Datasets.TransparentniUcty
 {
@@ -67,7 +68,7 @@ namespace HlidacStatu.Datasets.TransparentniUcty
          * 2 Volební účet
         */
         public string TypUctu { get; set; }
-        
+
         public void Save(string user)
         {
             _client.AddData(this, Id, user);
@@ -86,7 +87,7 @@ namespace HlidacStatu.Datasets.TransparentniUcty
 
         public static IEnumerable<BankovniUcet> GetAll()
         {
-            var items =  _client.GetAllData<BankovniUcet>();
+            var items = _client.GetAllData<BankovniUcet>();
 
             //var data = items
             //    .Select(m => Newtonsoft.Json.JsonConvert.SerializeObject(m))

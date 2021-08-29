@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.Entities.Entities.Analysis;
+﻿using HlidacStatu.Entities.Entities.Analysis;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Util.Cache;
 
 using Nest;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -33,7 +34,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
            );
         private static Tuple<int?, KIndexData.KIndexLabelValues> getDirectLabel((string ico, bool useTemp) param)
         {
-            if (Consts.KIndexExceptions.Contains(param.ico) && param.useTemp ==false)
+            if (Consts.KIndexExceptions.Contains(param.ico) && param.useTemp == false)
                 return new Tuple<int?, KIndexData.KIndexLabelValues>(null, KIndexData.KIndexLabelValues.None);
 
             var kidx = Get(param.ico, param.useTemp);
@@ -47,7 +48,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         }
 
 
-        public static KIndexData Get(string ico, bool useTemp=false)
+        public static KIndexData Get(string ico, bool useTemp = false)
         {
             if (string.IsNullOrEmpty(ico))
                 return null;
@@ -65,8 +66,8 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         public static string PlannedKIndexHash(string ico, int rok)
         {
-            string salt = string.Format(Devmasters.Config.GetWebConfigValue("KIndexSaltTemplate"),ico,rok);
-            string hash=Devmasters.Crypto.Hash.ComputeHashToHex(salt);
+            string salt = string.Format(Devmasters.Config.GetWebConfigValue("KIndexSaltTemplate"), ico, rok);
+            string hash = Devmasters.Crypto.Hash.ComputeHashToHex(salt);
             return Devmasters.Core.Right(hash, 15);
         }
 
@@ -120,7 +121,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         public static bool HasKIndexValue(string ico, bool useTemp)
         {
-            var kidx = Get(ico,useTemp);
+            var kidx = Get(ico, useTemp);
             if (kidx == null)
                 return false;
             else
@@ -131,7 +132,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         public static Tuple<int?, KIndexData.KIndexLabelValues> GetLastLabel(string ico, bool useTemp)
         {
-            return instanceLabelByIco.Get((ico,useTemp));
+            return instanceLabelByIco.Get((ico, useTemp));
         }
 
 

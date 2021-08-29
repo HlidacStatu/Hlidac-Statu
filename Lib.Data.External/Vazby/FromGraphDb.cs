@@ -1,4 +1,5 @@
 ﻿using Neo4j.Driver.V1;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +15,8 @@ namespace HlidacStatu.Lib.Data.External.Vazby
             from = from ?? new DateTime(1900, 1, 1);
             string sFrom = from.Value.ToString("yyyyMMdd");
 
-            using (var db = GraphDatabase.Driver(Devmasters.Config.GetWebConfigValue("Neo4jUrl"), 
-                                    AuthTokens.Basic(Devmasters.Config.GetWebConfigValue("Neo4jUser"), 
+            using (var db = GraphDatabase.Driver(Devmasters.Config.GetWebConfigValue("Neo4jUrl"),
+                                    AuthTokens.Basic(Devmasters.Config.GetWebConfigValue("Neo4jUser"),
                                                     Devmasters.Config.GetWebConfigValue("Neo4jPassword"))
                                     )
                     )

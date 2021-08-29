@@ -1,9 +1,11 @@
 ﻿using HlidacStatu.Entities;
-using System.Collections.Generic;
-using System.Linq;
 using HlidacStatu.Repositories;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -34,7 +36,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "canEditData")]
         public ActionResult CompanyDetail(string ico, string columOrdering, int? descending)
         {
-            if (string.IsNullOrWhiteSpace(ico)) 
+            if (string.IsNullOrWhiteSpace(ico))
                 return NotFound();
 
             Firma firma = FirmaRepo.FromIco(ico);
@@ -62,13 +64,14 @@ namespace HlidacStatu.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var person = OsobaRepo.GetOrCreateNew(osoba.TitulPred, osoba.Jmeno, osoba.Prijmeni, 
-                    osoba.TitulPo, osoba.Narozeni, (Osoba.StatusOsobyEnum)osoba.Status, 
+                var person = OsobaRepo.GetOrCreateNew(osoba.TitulPred, osoba.Jmeno, osoba.Prijmeni,
+                    osoba.TitulPo, osoba.Narozeni, (Osoba.StatusOsobyEnum)osoba.Status,
                     this.User.Identity.Name, osoba.Umrti);
 
-                return RedirectToAction(nameof(FindPerson), 
-                    new {
-                        jmeno = $"{osoba.Jmeno} {osoba.Prijmeni}" ,
+                return RedirectToAction(nameof(FindPerson),
+                    new
+                    {
+                        jmeno = $"{osoba.Jmeno} {osoba.Prijmeni}",
                         narozeni = osoba.Narozeni?.ToString("dd.MM.yyyy")
                     });
             }
@@ -119,14 +122,14 @@ namespace HlidacStatu.Web.Controllers
         [HttpPost]
         public JsonResult UpdateEvent(OsobaEvent osobaEvent)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var result = OsobaEventRepo.CreateOrUpdate(osobaEvent, this.User.Identity.Name);
                 return Json(new { Success = true });
             }
 
             var errorModel = GetModelErrorsJSON();
-     
+
             Response.StatusCode = 400;
             return new JsonResult(new { Data = errorModel });
         }
@@ -135,10 +138,10 @@ namespace HlidacStatu.Web.Controllers
         [HttpPost]
         public JsonResult DeleteEvent(int? id)
         {
-            if ( (id ?? 0) == 0)
+            if ((id ?? 0) == 0)
             {
                 Response.StatusCode = 400;
-                return new JsonResult(new { Data = "chybí id" }) ;
+                return new JsonResult(new { Data = "chybí id" });
             }
             OsobaEvent osobaEvent = OsobaEventRepo.GetById(id ?? 0);
             if (osobaEvent is null)

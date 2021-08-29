@@ -1,9 +1,10 @@
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
 using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.XLib.Render;
+
+using System;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace HlidacStatu.Web.Models
 {
@@ -90,12 +91,12 @@ namespace HlidacStatu.Web.Models
     {
         [Phone(ErrorMessage = "Uveďte platný telefon"), Display(Name = "Telefon", Prompt = "Telefonni čislo")]
         public string Phone { get; set; }
-        [EmailAddress(ErrorMessage ="Uveďte platný eamil"), Required(ErrorMessage = "Uveďte platný email"), Display(Name ="Email", Prompt = "Platný email")]
+        [EmailAddress(ErrorMessage = "Uveďte platný eamil"), Required(ErrorMessage = "Uveďte platný email"), Display(Name = "Email", Prompt = "Platný email")]
         public string Email { get; set; }
         [DisplayName("Jméno")]
         public string Jmeno { get; set; }
 
-        [Display(Name ="Příjmení")]
+        [Display(Name = "Příjmení")]
         public string Prijmeni { get; set; }
 
         [DisplayName("V jakých oblastech se chcete zapojit?")]

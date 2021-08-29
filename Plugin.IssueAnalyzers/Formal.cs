@@ -1,11 +1,11 @@
-﻿using HlidacStatu.Lib;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Entities.Issues;
+using HlidacStatu.Extensions;
+using HlidacStatu.Repositories;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities;
-using HlidacStatu.Extensions;
-using HlidacStatu.Repositories;
 
 namespace HlidacStatu.Plugin.IssueAnalyzers
 {
@@ -89,12 +89,12 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
             {
                 if (
                     (item.hodnotaBezDph > 0 && item.hodnotaBezDph <= 50000)
-                    || (item.hodnotaVcetneDph> 0 && item.hodnotaVcetneDph <= (50000m * 1.21m))
-                    || (item.CalculatedPriceWithVATinCZK > 0 && item.CalculatedPriceWithVATinCZK <= (50000m * 1.21m) )
+                    || (item.hodnotaVcetneDph > 0 && item.hodnotaVcetneDph <= (50000m * 1.21m))
+                    || (item.CalculatedPriceWithVATinCZK > 0 && item.CalculatedPriceWithVATinCZK <= (50000m * 1.21m))
                  )
                 {
                     issues.Add(
-                    new Issue(this, (int)IssueType.IssueTypes.SmlouvaZverejnenaPozde_NemuselaBytZverejnena, 
+                    new Issue(this, (int)IssueType.IssueTypes.SmlouvaZverejnenaPozde_NemuselaBytZverejnena,
                     "Smlouva nebyla zveřejněna do 3 měsíců od podpisu",
                     "Pozdní zveřejnění ale nemá vliv na platnost smlouvy, protože smlouva byla zveřejněna v registru smluv dobrovolně.")
                     );

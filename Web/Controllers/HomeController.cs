@@ -1,20 +1,17 @@
 ﻿using Devmasters;
 using Devmasters.Enums;
-using HlidacStatu.Entities;
-using HlidacStatu.Entities.VZ;
-using HlidacStatu.Web.Framework;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+
 using HlidacStatu.Connectors;
 using HlidacStatu.Datasets;
 using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.Entities;
+using HlidacStatu.Entities.VZ;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Web.Filters;
+using HlidacStatu.Web.Framework;
+
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -22,6 +19,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+
 using Visit = HlidacStatu.Web.Framework.Visit;
 
 
@@ -42,7 +46,7 @@ namespace HlidacStatu.Web.Controllers
         public async Task<ActionResult> Kod(string? id)
         {
 
-            if (id != null && id?.ToLower()?.RemoveAccents()?.Equals("lizatko")==true)
+            if (id != null && id?.ToLower()?.RemoveAccents()?.Equals("lizatko") == true)
             {
                 var user = await _userManager.GetUserAsync(HttpContext.User);
                 await _userManager.AddToRoleAsync(user, "TK-KIndex-2021");
@@ -57,9 +61,9 @@ namespace HlidacStatu.Web.Controllers
 
         public ActionResult Analyza(string id, string p, string q, string title, string description, string moreUrl)
         {
-            ViewData.Add(Constants.CacheKeyName, 
-                WebUtil.GenerateCacheKey(new object[]{id,p,q,title,description,moreUrl}));
-            
+            ViewData.Add(Constants.CacheKeyName,
+                WebUtil.GenerateCacheKey(new object[] { id, p, q, title, description, moreUrl }));
+
             var model = new Lib.Analysis.TemplatedQuery() { Query = q, Text = title, Description = description };
 
             if (string.IsNullOrEmpty(id))
@@ -82,7 +86,7 @@ namespace HlidacStatu.Web.Controllers
                 id = "platcu";
 
             model.NameOfView = "Analyza" + id;
-            
+
             return View(model);
         }
 
@@ -112,7 +116,7 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
-       
+
         public ActionResult Reporty()
         {
             return View();
@@ -123,64 +127,64 @@ namespace HlidacStatu.Web.Controllers
             return RedirectPermanent("/texty/provoznipodminky");
         }
 
-//migrace: šílená konstrukce provázání views... 
-// #if (!DEBUG)
-//         [OutputCache(VaryByParam = "*", Duration = 60 * 60 * 1)]
-// #endif
-//         public ActionResult PorovnatSubjekty(string id, string ico, string ds, string title, int? width, string specialtype, string specialvalue, string part)
-//         {
-//             if (id == "special")
-//             {
-//                 if (specialtype != null)
-//                 {
-//                     var specval = specialvalue;
-//                     if (!string.IsNullOrEmpty(specval) && StaticData.MestaPodleKraju.ContainsKey(specval))
-//                     {
-//                         ds = StaticData.MestaPodleKraju[specval].Aggregate((f, s) => f + "," + s);
-//                     }
-//                 }
-//             }
-//
-//
-//             if (!string.IsNullOrEmpty(ico) || !string.IsNullOrEmpty(ds))
-//             {
-//                 List<string> icos = new();
-//
-//                 if (!string.IsNullOrEmpty(ico))
-//                 {
-//                     foreach (var i in ico.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
-//                     {
-//                         var f = Firmy.Get(i);
-//                         if (f.Valid)
-//                             icos.Add(f.ICO);
-//                     }
-//                 }
-//                 if (!string.IsNullOrEmpty(ds))
-//                 {
-//                     foreach (var i in ds.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
-//                     {
-//                         var f = Firmy.GetByDS(i);
-//                         if (f.Valid)
-//                             icos.Add(f.ICO);
-//                     }
-//                 }
-//                 return View(icos.Distinct().ToArray());
-//             }
-//             else
-//                 return Content("<h3>Neplatné parametry stránky</h3>");
-//         }
-//
-//         public ActionResult Porovnat(string id, string ico, string ds, string title, int? width, string specialtype, string specialvalue)
-//         {
-//             if (id == "special" || id == "subjekty")
-//             {
-//                 ViewBag.NameOfView = "PorovnatSubjekty";
-//                 return View("Porovnat_child");
-//             }
-//
-//
-//             return View("Porovnat");
-//         }
+        //migrace: šílená konstrukce provázání views... 
+        // #if (!DEBUG)
+        //         [OutputCache(VaryByParam = "*", Duration = 60 * 60 * 1)]
+        // #endif
+        //         public ActionResult PorovnatSubjekty(string id, string ico, string ds, string title, int? width, string specialtype, string specialvalue, string part)
+        //         {
+        //             if (id == "special")
+        //             {
+        //                 if (specialtype != null)
+        //                 {
+        //                     var specval = specialvalue;
+        //                     if (!string.IsNullOrEmpty(specval) && StaticData.MestaPodleKraju.ContainsKey(specval))
+        //                     {
+        //                         ds = StaticData.MestaPodleKraju[specval].Aggregate((f, s) => f + "," + s);
+        //                     }
+        //                 }
+        //             }
+        //
+        //
+        //             if (!string.IsNullOrEmpty(ico) || !string.IsNullOrEmpty(ds))
+        //             {
+        //                 List<string> icos = new();
+        //
+        //                 if (!string.IsNullOrEmpty(ico))
+        //                 {
+        //                     foreach (var i in ico.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
+        //                     {
+        //                         var f = Firmy.Get(i);
+        //                         if (f.Valid)
+        //                             icos.Add(f.ICO);
+        //                     }
+        //                 }
+        //                 if (!string.IsNullOrEmpty(ds))
+        //                 {
+        //                     foreach (var i in ds.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
+        //                     {
+        //                         var f = Firmy.GetByDS(i);
+        //                         if (f.Valid)
+        //                             icos.Add(f.ICO);
+        //                     }
+        //                 }
+        //                 return View(icos.Distinct().ToArray());
+        //             }
+        //             else
+        //                 return Content("<h3>Neplatné parametry stránky</h3>");
+        //         }
+        //
+        //         public ActionResult Porovnat(string id, string ico, string ds, string title, int? width, string specialtype, string specialvalue)
+        //         {
+        //             if (id == "special" || id == "subjekty")
+        //             {
+        //                 ViewBag.NameOfView = "PorovnatSubjekty";
+        //                 return View("Porovnat_child");
+        //             }
+        //
+        //
+        //             return View("Porovnat");
+        //         }
 
 
         public ActionResult Index()
@@ -194,7 +198,7 @@ namespace HlidacStatu.Web.Controllers
             return RedirectPermanent("/kindex");
         }
 
-        
+
         public ActionResult PridatSe()
         {
             return RedirectPermanent("https://www.hlidacstatu.cz/texty/pridejte-se/");
@@ -645,7 +649,7 @@ text zpravy: {txt}
             {
                 query += " holding:" + qs["holding"];
             }
-            
+
             if (!string.IsNullOrWhiteSpace(qs["obory"]))
             {
                 foreach (var obor in qs["obory"])
@@ -653,7 +657,7 @@ text zpravy: {txt}
                     query += " oblast:" + obor;
                 }
             }
-            
+
             query = query.Trim();
 
             if (!string.IsNullOrWhiteSpace(query))
@@ -684,12 +688,12 @@ text zpravy: {txt}
 
         public ActionResult Politik(string Id, Relation.AktualnostType? aktualnost)
         {
-            return RedirectPermanent(Url.Action("Index","Osoba" , new { Id = Id, aktualnost = aktualnost }));
+            return RedirectPermanent(Url.Action("Index", "Osoba", new { Id = Id, aktualnost = aktualnost }));
         }
 
         public ActionResult PolitikVazby(string Id, Relation.AktualnostType? aktualnost)
         {
-            return RedirectPermanent(Url.Action("Vazby","Osoba", new { Id = Id, aktualnost = aktualnost }));
+            return RedirectPermanent(Url.Action("Vazby", "Osoba", new { Id = Id, aktualnost = aktualnost }));
         }
 
         public ActionResult Detail(string Id)
@@ -697,7 +701,7 @@ text zpravy: {txt}
             if (string.IsNullOrWhiteSpace(Id))
                 return NotFound();
 
-            var model =  SmlouvaRepo.Load(Id);
+            var model = SmlouvaRepo.Load(Id);
             if (model == null)
             {
                 return NotFound();
@@ -715,7 +719,7 @@ text zpravy: {txt}
 
         public ActionResult HledatFirmy(string q, int? page = 1)
         {
-            var model = FirmaRepo.Searching.SimpleSearch(q,page.Value,50);
+            var model = FirmaRepo.Searching.SimpleSearch(q, page.Value, 50);
             return View(model);
         }
 
@@ -768,7 +772,7 @@ text zpravy: {txt}
                 Util.Consts.Logger.Info($"Search times: {q}\n" + res.SearchTimesReport());
 
                 var data = res.SearchTimes();
-                
+
                 TelemetryClient tm = new TelemetryClient();
 
                 // Set up some properties:
@@ -786,7 +790,7 @@ text zpravy: {txt}
             string viewName = "Hledat";
             return View(viewName, res);
         }
-        
+
         public ActionResult Novinky()
         {
             return RedirectPermanent("https://www.hlidacstatu.cz/texty");
@@ -817,7 +821,7 @@ text zpravy: {txt}
 
 
         public enum ErrorPages
-        { 
+        {
             Ok = 0,
             NotFound = 404,
             Error = 500,
@@ -849,7 +853,7 @@ text zpravy: {txt}
 
         public ActionResult Widget(string id, string width)
         {
-            string path = Path.Combine(_hostingEnvironment.WebRootPath, "Scripts\\widget.js");  
+            string path = Path.Combine(_hostingEnvironment.WebRootPath, "Scripts\\widget.js");
 
             string widgetjs = System.IO.File.ReadAllText(path)
                 .Replace("#RND#", id ?? Devmasters.TextUtil.GenRandomString(4))
@@ -860,7 +864,7 @@ text zpravy: {txt}
             return Content(widgetjs, "text/javascript");
         }
 
-        [HlidacCache(60*60,"id",false)]
+        [HlidacCache(60 * 60, "id", false)]
         public ActionResult Export(string id)
         {
             System.Text.StringBuilder sb = new(2048);
@@ -1055,7 +1059,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "smlouva")
             {
-                Smlouva s =  SmlouvaRepo.Load(v);
+                Smlouva s = SmlouvaRepo.Load(v);
                 if (s != null)
                 {
                     if (!s.NotInterestingToShow())
@@ -1129,7 +1133,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "kindex")
             {
-                data = RemoteUrlFromWebCache.GetBinary(mainUrl+"/kindex/banner/"+v,"kindex-banner-"+v, HttpContext.Request.Query["refresh"] == "1");
+                data = RemoteUrlFromWebCache.GetBinary(mainUrl + "/kindex/banner/" + v, "kindex-banner-" + v, HttpContext.Request.Query["refresh"] == "1");
             }
             else if (id?.ToLower() == "page")
             {
@@ -1197,7 +1201,7 @@ text zpravy: {txt}
                 return File(data, "image/png");
 
         }
-        
+
         private string GetSocialBannerUrl(ImageBannerCoreData si, bool ratio1x1 = false, bool localUrl = true)
         {
             string url = "";
@@ -1212,7 +1216,7 @@ text zpravy: {txt}
                       + "&img=" + System.Net.WebUtility.UrlEncode(si.img)
                       + "&ratio=" + (ratio1x1 ? "1x1" : "16x9")
                       + "&color=" + si.color;
-            
+
 
             return url;
         }

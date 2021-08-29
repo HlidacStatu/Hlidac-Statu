@@ -1,13 +1,16 @@
 ﻿using HlidacStatu.Entities;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using System.Linq.Expressions;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Swashbuckle.AspNetCore.Annotations;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -25,7 +28,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns></returns>
         [AuthorizeAndAudit]
         [HttpGet("{osobaId}")]
-        public ActionResult<OsobaDetailDTO> Detail([FromRoute]string osobaId)
+        public ActionResult<OsobaDetailDTO> Detail([FromRoute] string osobaId)
         {
             if (string.IsNullOrEmpty(osobaId))
             {
@@ -43,7 +46,7 @@ namespace HlidacStatu.Web.Controllers
 
             return OsobaDetail;
         }
-        
+
         [AuthorizeAndAudit]
         [HttpGet, Route("hledatFtx")]
         public ActionResult<List<OsobaDTO>> OsobySearchFtx([FromQuery] string ftxDotaz = null, [FromQuery] int? strana = null)
@@ -83,7 +86,7 @@ namespace HlidacStatu.Web.Controllers
                 var result = osoby.Select(o => new OsobaDTO(o)).ToList();
                 return result;
             }
-            
+
             return BadRequest("Datum narozeni musi mit format yyyy-MM-dd.");
         }
 

@@ -1,11 +1,13 @@
 ﻿using Devmasters;
+
+using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.Datastructures.Graphs2;
+
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.RegularExpressions;
-using HlidacStatu.Datastructures.Graphs;
-using HlidacStatu.Datastructures.Graphs2;
 
 namespace HlidacStatu.Entities
 {

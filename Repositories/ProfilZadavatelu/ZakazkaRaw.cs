@@ -1,11 +1,13 @@
-﻿using System;
-using System.ComponentModel;
-using System.Linq;
-using HlidacStatu.Connectors.External.ProfilZadavatelu;
+﻿using HlidacStatu.Connectors.External.ProfilZadavatelu;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories.ES;
+
 using Nest;
+
+using System;
+using System.ComponentModel;
+using System.Linq;
 
 namespace HlidacStatu.Repositories.ProfilZadavatelu
 {

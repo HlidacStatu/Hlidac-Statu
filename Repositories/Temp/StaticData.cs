@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Xml;
-using System.Xml.Serialization;
-using HlidacStatu.Datastructures.Graphs;
+﻿using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.OrgStrukturyStatu;
 using HlidacStatu.Extensions;
+
 using Microsoft.EntityFrameworkCore; //using HlidacStatu.Extensions;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace HlidacStatu.Repositories
 {
@@ -29,12 +30,12 @@ namespace HlidacStatu.Repositories
 
         public static string Dumps_Path = null;
         public static string[] Mestske_Firmy = new string[] { };
-        
-        
+
+
         public static Devmasters.Cache.File.FileCache<Dictionary<string, List<JednotkaOrganizacni>>> OrganizacniStrukturyUradu = null;
 
 
-        
+
 
         public static Devmasters.Cache.File.FileCache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>> FirmyCasovePodezreleZalozene = null;
         public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_aktualni_Cache = null;
@@ -54,13 +55,13 @@ namespace HlidacStatu.Repositories
 
         public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSNespolehlivymiPlatciDPH_Cache = null;
         public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat> NespolehlivyPlatciDPH_obchodySurady_Cache = null;
-        
+
         public static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<Sponzoring>> SponzorujiciFirmy_Vsechny = null;
         public static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<Sponzoring>> SponzorujiciFirmy_Nedavne = null;
 
         public static Devmasters.Cache.LocalMemory.LocalMemoryCache<List<double>> BasicStatisticData = null;
 
-        
+
         public static Dictionary<string, Lib.Analysis.TemplatedQuery> Afery = new Dictionary<string, Lib.Analysis.TemplatedQuery>();
 
         public static Devmasters.Cache.LocalMemory.LocalMemoryCache<Dictionary<string, NespolehlivyPlatceDPH>> NespolehlivyPlatciDPH = null;
@@ -173,7 +174,7 @@ namespace HlidacStatu.Repositories
                 if (!Dumps_Path.EndsWith(@"\"))
                     Dumps_Path = Dumps_Path + @"\";
                 Directory.CreateDirectory(Dumps_Path);
-                
+
 
                 Util.Consts.Logger.Info("Static data - NespolehlivyPlatciDPH ");
                 NespolehlivyPlatciDPH = new Devmasters.Cache.LocalMemory.LocalMemoryCache<Dictionary<string, NespolehlivyPlatceDPH>>
@@ -239,7 +240,7 @@ namespace HlidacStatu.Repositories
                                                      }
                                                  }
                                              }
-                                         addList:
+                                             addList:
                                              if (addToList)
                                                  insolvenceIntoList.Add(i);
                                          }
@@ -283,7 +284,7 @@ namespace HlidacStatu.Repositories
                                     {
                                         dary = db.Sponzoring
                                             .AsNoTracking()
-                                            .Where(s => s.IcoDarce != null 
+                                            .Where(s => s.IcoDarce != null
                                                 && s.DarovanoDne > limit10let
                                                 && s.IcoPrijemce != null) //pro zachování funkčnosti
                                             .ToList();
@@ -388,9 +389,9 @@ namespace HlidacStatu.Repositories
                     );
 
 
-                
 
-                
+
+
 
 
                 Util.Consts.Logger.Info("Static data - FirmySVazbamiNaPolitiky_*");

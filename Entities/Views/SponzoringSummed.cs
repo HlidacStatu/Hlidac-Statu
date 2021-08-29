@@ -1,12 +1,13 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HlidacStatu.Entities.Views
 {
     [Keyless]
     public class SponzoringSummed
     {
-        
+
         public string Id { get; set; }
         public string Jmeno { get; set; }
         public int Rok { get; set; }

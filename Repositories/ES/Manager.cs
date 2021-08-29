@@ -1,18 +1,20 @@
-﻿using System;
+﻿using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+using HlidacStatu.Lib.Data.External.RPP;
+using HlidacStatu.Repositories.ProfilZadavatelu;
+
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Primitives;
+
+using Nest;
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using HlidacStatu.Connectors.External.ProfilZadavatelu;
-using HlidacStatu.Lib.Analysis.KorupcniRiziko;
-using HlidacStatu.Lib.Data.External.RPP;
-using HlidacStatu.Repositories.ProfilZadavatelu;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Primitives;
-using Nest;
 
 namespace HlidacStatu.Repositories.ES
 {
@@ -27,7 +29,7 @@ namespace HlidacStatu.Repositories.ES
         {
             Smlouvy,
             Firmy,
-            KIndex,KIndexBackup,KindexFeedback,
+            KIndex, KIndexBackup, KindexFeedback,
             KIndexTemp, KIndexBackupTemp,
             VerejneZakazky,
             ProfilZadavatele,
@@ -359,7 +361,7 @@ namespace HlidacStatu.Repositories.ES
                         goto compareValues;
                 }
 
-            compareValues:
+                compareValues:
                 object defValue = GetDefault(propertyInfo.PropertyType);
                 if (oldPropVal == defValue && newPropVal != defValue)
                 {
@@ -695,7 +697,7 @@ namespace HlidacStatu.Repositories.ES
         {
             StringValues browser = new StringValues();
             httpContext?.Request?.Headers?.TryGetValue("User-Agent", out browser);
-            
+
             Elasticsearch.Net.ServerError serverErr = esReq.ServerError;
             ESLogger.Error(new Devmasters.Logging.LogMessage()
                     .SetMessage("ES query error: " + text
@@ -707,7 +709,7 @@ namespace HlidacStatu.Repositories.ES
                     .SetCustomKeyValue("URL", httpContext?.Request?.GetDisplayUrl())
                     .SetCustomKeyValue("Stack-trace", Environment.StackTrace)
                     .SetCustomKeyValue("Referer", httpContext?.Request?.GetTypedHeaders()?.Referer.ToString())
-                    .SetCustomKeyValue("User-agent",  browser.ToString() )
+                    .SetCustomKeyValue("User-agent", browser.ToString())
                     //následující řádek byl zkrácen pokud je hostname chtěný, je potřeba volat ještě něco takového: System.Net.Dns.GetHostEntry("127.0.0.1").HostName 
                     .SetCustomKeyValue("IP", httpContext?.Connection?.RemoteIpAddress) //+ " " + System.Web.HttpContext.Current?.Request?.UserHostName  
                     );

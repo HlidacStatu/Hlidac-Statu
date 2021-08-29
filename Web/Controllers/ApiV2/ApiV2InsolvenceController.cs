@@ -1,11 +1,14 @@
-﻿using System.Linq;
-using System.Web;
-using HlidacStatu.Entities.Insolvence;
+﻿using HlidacStatu.Entities.Insolvence;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Swashbuckle.AspNetCore.Annotations;
+
+using System.Linq;
+using System.Web;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -32,7 +35,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns></returns>
         [HttpGet("hledat")]
         [AuthorizeAndAudit]
-        [SwaggerOperation(Tags = new[] {"Insolvence"})]
+        [SwaggerOperation(Tags = new[] { "Insolvence" })]
         public ActionResult<SearchResultDTO<Rizeni>> Hledat([FromQuery] string dotaz = null,
             [FromQuery] int? strana = null,
             [FromQuery] int? razeni = null)
@@ -89,7 +92,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>detail smlouvy</returns>
         [HttpGet("{id?}")]
         [AuthorizeAndAudit]
-        public ActionResult<Rizeni> Detail([FromRoute]string id = null)
+        public ActionResult<Rizeni> Detail([FromRoute] string id = null)
         {
             id = HttpUtility.UrlDecode(id);
             if (string.IsNullOrWhiteSpace(id))

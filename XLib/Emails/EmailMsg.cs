@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Html; // For extension methods.
+
+using RazorEngine.Templating;
+
+using System;
 using System.Linq;
 using System.Net.Mail;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Html; // For extension methods.
-using RazorEngine.Templating;
 
 namespace HlidacStatu.XLib.Emails
 {

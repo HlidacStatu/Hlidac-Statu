@@ -22,7 +22,7 @@
                     if (hits.Relation == Nest.TotalHitsRelation.EqualTo)
                         return PocetVysledku(hits.Value);
                     else
-                        return Capitalize("více než " + PocetVysledku(hits.Value),style);
+                        return Capitalize("více než " + PocetVysledku(hits.Value), style);
                 }
             }
             public static string NalezenoPocetVysledku(Nest.TotalHits hits, CapitalizationStyle style = CapitalizationStyle.NoChange)
@@ -59,7 +59,7 @@
                 if (hits.Relation == Nest.TotalHitsRelation.EqualTo)
                     return PocetSmluv(hits.Value);
                 else
-                    return Capitalize(Devmasters.Lang.CS.Plural.GetWithZero((int)hits.Value, "0 smluv", "jedna smlouva", "{0:### ### ##0} smlouvy", "více než {0:### ### ##0} smluv"),style);
+                    return Capitalize(Devmasters.Lang.CS.Plural.GetWithZero((int)hits.Value, "0 smluv", "jedna smlouva", "{0:### ### ##0} smlouvy", "více než {0:### ### ##0} smluv"), style);
             }
 
             public static string PocetVysledku(long pocet, CapitalizationStyle style = CapitalizationStyle.NoChange)

@@ -3,15 +3,15 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.28")]
-			public static void Init_1_0_0_28(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.28")]
+            public static void Init_1_0_0_28(IDatabaseUpgrader du)
+            {
 
                 string sql = @"
 /****** Object:  UserDefinedFunction [dbo].[RemoveAccent]    Script Date: 28.05.2017 14:23:19 ******/
@@ -184,18 +184,18 @@ where oe.type = 3 and o.Status != 2)
 GO
 
 ";
-				du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
                 //add new bank account
 
-                
-
-			}
-
-	
 
 
-		}
+            }
 
-	}
+
+
+
+        }
+
+    }
 }

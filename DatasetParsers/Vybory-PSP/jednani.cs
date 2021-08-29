@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Vybory_PSP
 {
@@ -121,8 +119,8 @@ namespace Vybory_PSP
                             docs.Add(a);
                             changed = true;
                         }
-                        }
-                        prim.dokumenty = docs.ToArray();
+                    }
+                    prim.dokumenty = docs.ToArray();
                 }
             }
 

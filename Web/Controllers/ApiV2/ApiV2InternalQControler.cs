@@ -1,13 +1,11 @@
-﻿using System;
-using System.Net;
-
-using HlidacStatu.Q.Simple.Tasks;
+﻿using HlidacStatu.Q.Simple.Tasks;
 using HlidacStatu.Web.Filters;
-using HlidacStatu.Web.Models.Apiv2;
 
 using Microsoft.AspNetCore.Mvc;
 
 using Swashbuckle.AspNetCore.Annotations;
+
+using System;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -31,14 +29,14 @@ namespace HlidacStatu.Web.Controllers
             try
             {
 
-            using (HlidacStatu.Q.Simple.Queue<Voice2Text> sq = new Q.Simple.Queue<Voice2Text>(
-                Voice2Text.QName_priority(priority),
-                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString"))
-                )
-            {
-                sq.Send(new Voice2Text() { dataset = datasetId, itemid = itemId });
-                return $"OK";
-            }
+                using (HlidacStatu.Q.Simple.Queue<Voice2Text> sq = new Q.Simple.Queue<Voice2Text>(
+                    Voice2Text.QName_priority(priority),
+                    Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString"))
+                    )
+                {
+                    sq.Send(new Voice2Text() { dataset = datasetId, itemid = itemId });
+                    return $"OK";
+                }
             }
             catch (Exception e)
             {

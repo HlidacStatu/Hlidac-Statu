@@ -8,9 +8,9 @@ namespace HlidacStatu.Repositories.Searching
         {
             return $"{property}:{exactDate:yyyy-MM-dd}";
         }
-        public static string Formatted(string property, DateTime fromDate, DateTime toDate, bool includefromDate=true, bool includeToDate=true)
+        public static string Formatted(string property, DateTime fromDate, DateTime toDate, bool includefromDate = true, bool includeToDate = true)
         {
-            return $"{property}:{(includefromDate ? "[" : "{")}{fromDate:yyyy-MM-dd} TO {toDate:yyyy-MM-dd}{(includeToDate? "]" : "}")}";
+            return $"{property}:{(includefromDate ? "[" : "{")}{fromDate:yyyy-MM-dd} TO {toDate:yyyy-MM-dd}{(includeToDate ? "]" : "}")}";
         }
 
         public static string ModifyQueryAND(string origQuery, string anotherCondition)

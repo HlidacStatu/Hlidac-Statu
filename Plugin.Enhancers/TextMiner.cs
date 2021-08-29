@@ -1,14 +1,12 @@
 ﻿using Devmasters.Collections;
 
-using HlidacStatu.Lib;
+using HlidacStatu.Entities;
 using HlidacStatu.Entities.Enhancers;
+using HlidacStatu.Repositories;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
 
 namespace HlidacStatu.Plugin.Enhancers
 {
@@ -181,7 +179,7 @@ namespace HlidacStatu.Plugin.Enhancers
                                         if (att1.EnoughExtractedText)
                                         {
                                             if (att1.PlainTextContentQuality == DataQualityEnum.Estimated)
-                                                item.Enhancements = item.Enhancements.AddOrUpdate(new Enhancement("Text přílohy extrahován z OCR dokumentu ", "", "item.Prilohy[" + (item.Prilohy.Count()+ii).ToString() + "].PlainTextContent", "", "", this));
+                                                item.Enhancements = item.Enhancements.AddOrUpdate(new Enhancement("Text přílohy extrahován z OCR dokumentu ", "", "item.Prilohy[" + (item.Prilohy.Count() + ii).ToString() + "].PlainTextContent", "", "", this));
                                             else
                                                 item.Enhancements = item.Enhancements.AddOrUpdate(new Enhancement("Text přílohy extrahován z obsahu dokumentu ", "", "item.Prilohy[" + (item.Prilohy.Count() + ii).ToString() + "].PlainTextContent", "", "", this));
 

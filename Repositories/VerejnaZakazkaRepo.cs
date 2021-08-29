@@ -1,8 +1,10 @@
-using System;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Util;
+
 using Nest;
+
+using System;
 
 namespace HlidacStatu.Repositories
 {
@@ -73,8 +75,8 @@ namespace HlidacStatu.Repositories
             var res = es.DocumentExists<VerejnaZakazka>(id);
             return res.Exists;
         }
-        
-        
-        
+
+
+
     }
 }

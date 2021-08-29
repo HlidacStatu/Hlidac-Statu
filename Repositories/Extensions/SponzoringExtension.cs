@@ -40,20 +40,20 @@ namespace HlidacStatu.Extensions
                 : "v neznámém datu";
 
             var hodnotaDaruKc = Util.RenderData.NicePrice(sponzoring.Hodnota ?? 0, html: true);
-            var dar = (sponzoring.Typ == (int) Sponzoring.TypDaru.FinancniDar)
+            var dar = (sponzoring.Typ == (int)Sponzoring.TypDaru.FinancniDar)
                 ? $"částkou {hodnotaDaruKc}"
                 : $"nepeněžním darem ({sponzoring.Popis}) v hodnotě {hodnotaDaruKc}";
             var zdroj = string.IsNullOrWhiteSpace(sponzoring.Zdroj)
                 ? ""
                 : $"(<a target=\"_blank\" href=\"{sponzoring.Zdroj}\"><span class=\"glyphicon glyphicon-link\" aria-hidden=\"true\"></span>zdroj</a>)";
 
-            if (sponzoring.Typ == (int) Sponzoring.TypDaru.DarFirmy)
+            if (sponzoring.Typ == (int)Sponzoring.TypDaru.DarFirmy)
                 return string.Format(itemTemplate,
                     $"Člen statut. orgánu ve firmě {Firmy.GetJmeno(sponzoring.IcoDarce)} sponzorující {kohoSponzoroval} {kdySponzoroval}, hodnota daru {hodnotaDaruKc}");
 
             return string.Format(itemTemplate, $"Sponzor {kohoSponzoroval} {kdySponzoroval} {dar} {zdroj}");
         }
 
-        
+
     }
 }

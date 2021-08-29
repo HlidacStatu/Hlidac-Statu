@@ -1,14 +1,15 @@
+using HlidacStatu.LibCore.Services;
+using HlidacStatu.Repositories;
+
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
+
 using System;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using HlidacStatu.Entities;
-using HlidacStatu.LibCore.Services;
-using HlidacStatu.Repositories;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 
 namespace HlidacStatu.LibCore.MiddleWares
 {
@@ -21,7 +22,7 @@ namespace HlidacStatu.LibCore.MiddleWares
             _next = next;
         }
 
-        
+
         // IMyScopedService is injected into Invoke
         public async Task Invoke(HttpContext httpContext, AttackerDictionaryService attackerDictionary)
         {
@@ -31,15 +32,15 @@ namespace HlidacStatu.LibCore.MiddleWares
             {
                 Util.Consts.Logger.Info($"Remote IP [{remoteIp}] is banned.");
                 httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-                httpContext.Response.Headers.Append("content-type","text/html; charset=utf-8");
+                httpContext.Response.Headers.Append("content-type", "text/html; charset=utf-8");
                 await httpContext.Response.WriteAsync(BannedResponse(remoteIp.ToString()), Encoding.UTF8);
                 return;
             }
 
             string? lastPath = httpContext.Request.GetEncodedPathAndQuery();
-        
+
             await _next(httpContext);
-            
+
             // add new ip to blocked ones in case it is attacker
             int statusCode = httpContext.Response.StatusCode;
             if (attackerDictionary.IsAttacker(remoteIp, statusCode, lastPath))
@@ -50,14 +51,14 @@ namespace HlidacStatu.LibCore.MiddleWares
             }
 
         }
-        
-        
+
+
         private bool IsBanned(IPAddress? ipAddress)
         {
-            var ipString = ipAddress?.ToString() ?? "_empty"; 
+            var ipString = ipAddress?.ToString() ?? "_empty";
 
             var bannedIps = BannedIpRepoCached.GetBannedIps();
-            
+
             return bannedIps.Exists(b => b.Ip.Contains(ipString));
         }
 
@@ -77,7 +78,7 @@ namespace HlidacStatu.LibCore.MiddleWares
 
             await BannedIpRepoCached.AllowIp(ipString);
         }
-        
+
         private string BannedResponse(string ipAddress)
         {
             return $@"<!DOCTYPE html PUBLIC ""-//W3C//DTD XHTML 1.0 Transitional//EN"" ""http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"">
@@ -129,7 +130,7 @@ namespace HlidacStatu.LibCore.MiddleWares
 </html>";
         }
     }
-    
+
 
     public static class BannedIpsMiddlewareExtension
     {

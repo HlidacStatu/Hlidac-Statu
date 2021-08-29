@@ -78,7 +78,8 @@ namespace HlidacStatu.Entities.Issues
                 {
                     types = AppDomain.CurrentDomain.GetAssemblies()
                         .Union(dlls)
-                        .SelectMany(s => {
+                        .SelectMany(s =>
+                        {
                             Type[] tt = null;
                             try
                             {

@@ -1,7 +1,9 @@
+using HlidacStatu.Util;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Util;
+
 using Rizeni = HlidacStatu.Entities.Insolvence.Rizeni;
 
 namespace HlidacStatu.Extensions

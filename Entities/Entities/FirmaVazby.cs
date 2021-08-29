@@ -1,8 +1,8 @@
-﻿using System;
+﻿using HlidacStatu.Datastructures.Graphs;
+
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using HlidacStatu.Datastructures.Graphs;
-using Microsoft.EntityFrameworkCore;
 
 #nullable disable
 
@@ -42,7 +42,7 @@ namespace HlidacStatu.Entities
         public int? RucniZapis { get; set; }
         [StringLength(500)]
         public string Poznamka { get; set; }
-        
+
         [NotMapped]
         public Relation.RelationEnum Vazba
         {

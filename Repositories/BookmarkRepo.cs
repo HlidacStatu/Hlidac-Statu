@@ -1,9 +1,11 @@
+using Devmasters;
+
+using HlidacStatu.Entities;
+
+using Microsoft.EntityFrameworkCore;
+
 using System;
 using System.Linq;
-using Devmasters;
-using HlidacStatu.Entities;
-using Microsoft.EntityFrameworkCore;
-using Nest;
 
 namespace HlidacStatu.Repositories
 {
@@ -21,7 +23,7 @@ namespace HlidacStatu.Repositories
 
             using (DbEntities db = new DbEntities())
             {
-                return db.Bookmarks.Any(m => m.ItemType == (int) type && m.ItemId == itemId && m.UserId == userId);
+                return db.Bookmarks.Any(m => m.ItemType == (int)type && m.ItemId == itemId && m.UserId == userId);
             }
         }
 
@@ -48,7 +50,7 @@ namespace HlidacStatu.Repositories
             using (DbEntities db = new DbEntities())
             {
                 var b = db.Bookmarks.FirstOrDefault(m =>
-                    m.ItemType == (int) type && m.ItemId == itemId && m.UserId == userId);
+                    m.ItemType == (int)type && m.ItemId == itemId && m.UserId == userId);
                 if (b != null)
                 {
                     db.Bookmarks.Remove(b);

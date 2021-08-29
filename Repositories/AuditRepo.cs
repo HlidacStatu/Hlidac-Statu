@@ -1,12 +1,13 @@
-using System;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
+
+using System;
 
 namespace HlidacStatu.Repositories
 {
     public static class AuditRepo
     {
-        
+
         public static Audit Add<T>(Audit.Operations operation, string user, T newObj, T prevObj)
             where T : IAuditable
         {

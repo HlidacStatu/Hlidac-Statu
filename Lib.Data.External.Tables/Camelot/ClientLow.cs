@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Data.External.Tables.Camelot
@@ -26,7 +24,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         private readonly string apiKey;
 
         public ClientLow(IApiConnection cnn)
-         :  this(cnn.GetEndpointUrl(),cnn.GetApiKey()) {}
+         : this(cnn.GetEndpointUrl(), cnn.GetApiKey()) { }
 
         public ClientLow(string apiEndpoint, string apiKey)
         {
@@ -38,20 +36,20 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         {
             try
             {
-                    using (System.Net.WebClient wc = new System.Net.WebClient())
-                    {
-                        wc.Headers.Add("Authorization", apiKey);
-                        string baseUrl = ApiEndpoint;
-                        string url = baseUrl + "/Camelot/StartSessionWithUrl?url=" + System.Net.WebUtility.UrlEncode(pdfUrl);
-                        url += "&command=" + command.ToString().ToLower();
-                        url += "&format=" + format.ToString().ToLower();
-                        url += "&pages=" + pages;
+                using (System.Net.WebClient wc = new System.Net.WebClient())
+                {
+                    wc.Headers.Add("Authorization", apiKey);
+                    string baseUrl = ApiEndpoint;
+                    string url = baseUrl + "/Camelot/StartSessionWithUrl?url=" + System.Net.WebUtility.UrlEncode(pdfUrl);
+                    url += "&command=" + command.ToString().ToLower();
+                    url += "&format=" + format.ToString().ToLower();
+                    url += "&pages=" + pages;
 
-                        var json = await wc.DownloadStringTaskAsync(new Uri(url));
-                        var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<string>>(json);
+                    var json = await wc.DownloadStringTaskAsync(new Uri(url));
+                    var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<string>>(json);
 
-                        return res;
-                    }
+                    return res;
+                }
 
             }
             catch (Exception e)

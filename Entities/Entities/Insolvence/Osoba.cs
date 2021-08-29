@@ -1,21 +1,22 @@
 ﻿using Devmasters;
+
 using System;
 
 namespace HlidacStatu.Entities.Insolvence
 {
-	public class Osoba
-	{
-		[Nest.Keyword]
-		public string IdPuvodce { get; set; }
-		[Nest.Keyword]
-		public string IdOsoby { get; set; }
-		[Nest.Text]
-		public string PlneJmeno { get; set; }
+    public class Osoba
+    {
+        [Nest.Keyword]
+        public string IdPuvodce { get; set; }
+        [Nest.Keyword]
+        public string IdOsoby { get; set; }
+        [Nest.Text]
+        public string PlneJmeno { get; set; }
 
         [Nest.Keyword]
-		public string Role { get; set; }
-		[Nest.Keyword]
-		public string Typ { get; set; }
+        public string Role { get; set; }
+        [Nest.Keyword]
+        public string Typ { get; set; }
         /*
          "F","doc_count": 188652
          "PODNIKATEL","doc_count": 62398
@@ -55,9 +56,9 @@ namespace HlidacStatu.Entities.Insolvence
 
 
         [Nest.Keyword]
-		public string ICO { get; set; }
-		[Nest.Keyword]
-		public string Rc { get; set; }
+        public string ICO { get; set; }
+        [Nest.Keyword]
+        public string Rc { get; set; }
 
         [Nest.Date]
         public DateTime? Zalozen { get; set; }
@@ -66,15 +67,15 @@ namespace HlidacStatu.Entities.Insolvence
 
 
         [Nest.Date]
-		public DateTime? DatumNarozeni { get; set; }
-		[Nest.Keyword]
-		public string Mesto { get; set; }
-		[Nest.Keyword]
-		public string Okres { get; set; }
-		[Nest.Keyword]
-		public string Zeme { get; set; }
-		[Nest.Keyword]
-		public string Psc { get; set; }
+        public DateTime? DatumNarozeni { get; set; }
+        [Nest.Keyword]
+        public string Mesto { get; set; }
+        [Nest.Keyword]
+        public string Okres { get; set; }
+        [Nest.Keyword]
+        public string Zeme { get; set; }
+        [Nest.Keyword]
+        public string Psc { get; set; }
 
         [Nest.Keyword]
         public string OsobaId { get; set; }
@@ -93,20 +94,20 @@ namespace HlidacStatu.Entities.Insolvence
             return $"{PlneJmeno}{dn}";
         }
 
-        
 
-		public DateTime? GetDatumNarozeni()
-		{
-			if (DatumNarozeni.HasValue)
-			{
-				return DatumNarozeni;
-			}
-			else if (!string.IsNullOrEmpty(Rc))
-			{
+
+        public DateTime? GetDatumNarozeni()
+        {
+            if (DatumNarozeni.HasValue)
+            {
+                return DatumNarozeni;
+            }
+            else if (!string.IsNullOrEmpty(Rc))
+            {
                 return Devmasters.DT.Util.RodneCisloToDate(Rc);
             }
             return null;
-		}
+        }
 
         public string FullNameWithYear()
         {

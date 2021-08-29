@@ -15,7 +15,7 @@ namespace HlidacStatu.Entities.Issues
             AnalyzerType = analyzer != null ? analyzer.GetType().FullName : "Manual";
             Title = title;
             TextDescription = description;
-            Importance = (importance.HasValue ? importance.Value :  IssueType.IssueImportance(issueTypeId));
+            Importance = (importance.HasValue ? importance.Value : IssueType.IssueImportance(issueTypeId));
             Public = publicVisible;
             Permanent = permanent;
             if (affectedParams != null)
@@ -23,7 +23,7 @@ namespace HlidacStatu.Entities.Issues
                 AffectedParams = ((object)affectedParams).GetType()
                         .GetProperties()
                         .ToDictionary(p => p.Name, p => p.GetValue(affectedParams, null))
-                        .Select(m => new KeyValue() { Key= m.Key, Value= m.Value.ToString() })
+                        .Select(m => new KeyValue() { Key = m.Key, Value = m.Value.ToString() })
                         .ToArray();
             }
         }

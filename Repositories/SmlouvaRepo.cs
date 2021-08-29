@@ -1,3 +1,19 @@
+using Devmasters;
+using Devmasters.Batch;
+using Devmasters.Net.HttpClient;
+
+using HlidacStatu.Connectors;
+using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.Entities;
+using HlidacStatu.Entities.Issues;
+using HlidacStatu.Entities.XSD;
+using HlidacStatu.Extensions;
+using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+using HlidacStatu.Lib.OCR;
+using HlidacStatu.Repositories.Searching;
+
+using Nest;
+
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -6,20 +22,8 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using Devmasters;
-using Devmasters.Batch;
-using Devmasters.Net.HttpClient;
-using HlidacStatu.Datastructures.Graphs;
-using HlidacStatu.Connectors;
-using HlidacStatu.Entities;
-using HlidacStatu.Entities.Issues;
-using HlidacStatu.Entities.XSD;
-using HlidacStatu.Extensions;
-using HlidacStatu.Lib.Analysis.KorupcniRiziko;
-using HlidacStatu.Repositories.Searching;
-using Nest;
+
 using Manager = HlidacStatu.Repositories.ES.Manager;
-using HlidacStatu.Lib.OCR;
 
 
 namespace HlidacStatu.Repositories
@@ -133,7 +137,7 @@ namespace HlidacStatu.Repositories
             smlouva.Hint.Updated = DateTime.Now;
 
             smlouva.Hint.SkrytaCena = smlouva.Issues?
-                .Any(m => m.IssueTypeId == (int) IssueType.IssueTypes.Nulova_hodnota_smlouvy) == true
+                .Any(m => m.IssueTypeId == (int)IssueType.IssueTypes.Nulova_hodnota_smlouvy) == true
                 ? 1
                 : 0;
 
@@ -145,53 +149,53 @@ namespace HlidacStatu.Repositories
                 .ToArray();
 
             List<Firma> firmy = fPrijemci
-                .Concat(new Firma[] {fPlatce})
+                .Concat(new Firma[] { fPlatce })
                 .Where(f => f.Valid)
                 .ToList();
 
-            smlouva.Hint.DenUzavreni = (int) Devmasters.DT.Util.TypeOfDay(smlouva.datumUzavreni);
+            smlouva.Hint.DenUzavreni = (int)Devmasters.DT.Util.TypeOfDay(smlouva.datumUzavreni);
 
             if (firmy.Count() == 0)
                 smlouva.Hint.PocetDniOdZalozeniFirmy = 9999;
             else
-                smlouva.Hint.PocetDniOdZalozeniFirmy = (int) firmy
+                smlouva.Hint.PocetDniOdZalozeniFirmy = (int)firmy
                     .Select(f => (smlouva.datumUzavreni - (f.Datum_Zapisu_OR ?? new DateTime(1990, 1, 1))).TotalDays)
                     .Min();
 
-            smlouva.Hint.SmlouvaSPolitickyAngazovanymSubjektem = (int) HintSmlouva.PolitickaAngazovanostTyp.Neni;
+            smlouva.Hint.SmlouvaSPolitickyAngazovanymSubjektem = (int)HintSmlouva.PolitickaAngazovanostTyp.Neni;
             if (firmy.Any(f => f.IsSponzorBefore(smlouva.datumUzavreni)))
                 smlouva.Hint.SmlouvaSPolitickyAngazovanymSubjektem =
-                    (int) HintSmlouva.PolitickaAngazovanostTyp.PrimoSubjekt;
+                    (int)HintSmlouva.PolitickaAngazovanostTyp.PrimoSubjekt;
             else if (firmy.Any(f => f.MaVazbyNaPolitikyPred(smlouva.datumUzavreni)))
                 smlouva.Hint.SmlouvaSPolitickyAngazovanymSubjektem =
-                    (int) HintSmlouva.PolitickaAngazovanostTyp.AngazovanyMajitel;
+                    (int)HintSmlouva.PolitickaAngazovanostTyp.AngazovanyMajitel;
 
             if (fPlatce.Valid && fPlatce.PatrimStatu())
             {
                 if (fPrijemci.All(f => f.PatrimStatu()))
                     smlouva.Hint.VztahSeSoukromymSubjektem =
-                        (int) HintSmlouva.VztahSeSoukromymSubjektemTyp.PouzeStatStat;
+                        (int)HintSmlouva.VztahSeSoukromymSubjektemTyp.PouzeStatStat;
                 else if (fPrijemci.All(f => f.PatrimStatu() == false))
                     smlouva.Hint.VztahSeSoukromymSubjektem =
-                        (int) HintSmlouva.VztahSeSoukromymSubjektemTyp.PouzeStatSoukr;
+                        (int)HintSmlouva.VztahSeSoukromymSubjektemTyp.PouzeStatSoukr;
                 else
-                    smlouva.Hint.VztahSeSoukromymSubjektem = (int) HintSmlouva.VztahSeSoukromymSubjektemTyp.Kombinovane;
+                    smlouva.Hint.VztahSeSoukromymSubjektem = (int)HintSmlouva.VztahSeSoukromymSubjektemTyp.Kombinovane;
             }
 
             if (fPlatce.Valid && fPlatce.PatrimStatu() == false)
             {
                 if (fPrijemci.All(f => f.PatrimStatu()))
                     smlouva.Hint.VztahSeSoukromymSubjektem =
-                        (int) HintSmlouva.VztahSeSoukromymSubjektemTyp.PouzeStatSoukr;
+                        (int)HintSmlouva.VztahSeSoukromymSubjektemTyp.PouzeStatSoukr;
                 else if (fPrijemci.All(f => f.PatrimStatu() == false))
                     smlouva.Hint.VztahSeSoukromymSubjektem =
-                        (int) HintSmlouva.VztahSeSoukromymSubjektemTyp.PouzeSoukrSoukr;
+                        (int)HintSmlouva.VztahSeSoukromymSubjektemTyp.PouzeSoukrSoukr;
                 else
-                    smlouva.Hint.VztahSeSoukromymSubjektem = (int) HintSmlouva.VztahSeSoukromymSubjektemTyp.Kombinovane;
+                    smlouva.Hint.VztahSeSoukromymSubjektem = (int)HintSmlouva.VztahSeSoukromymSubjektemTyp.Kombinovane;
             }
 
             //U limitu
-            smlouva.Hint.SmlouvaULimitu = (int) HintSmlouva.ULimituTyp.OK;
+            smlouva.Hint.SmlouvaULimitu = (int)HintSmlouva.ULimituTyp.OK;
             //vyjimky
             //smlouvy s bankama o repo a vkladech
             bool vyjimkaNaLimit = false;
@@ -217,7 +221,7 @@ namespace HlidacStatu.Repositories
                         && smlouva.CalculatedPriceWithVATinCZK <= Consts.Limit1bezDPH_To * 1.21m
                     )
                 )
-                    smlouva.Hint.SmlouvaULimitu = (int) HintSmlouva.ULimituTyp.Limit2M;
+                    smlouva.Hint.SmlouvaULimitu = (int)HintSmlouva.ULimituTyp.Limit2M;
 
                 if (
                     (
@@ -230,7 +234,7 @@ namespace HlidacStatu.Repositories
                         && smlouva.CalculatedPriceWithVATinCZK <= Consts.Limit2bezDPH_To * 1.21m
                     )
                 )
-                    smlouva.Hint.SmlouvaULimitu = (int) HintSmlouva.ULimituTyp.Limit6M;
+                    smlouva.Hint.SmlouvaULimitu = (int)HintSmlouva.ULimituTyp.Limit6M;
             }
 
             if (smlouva.Prilohy != null)
@@ -349,7 +353,7 @@ namespace HlidacStatu.Repositories
                         new SqlParameter("created", smlouva.casZverejneni),
                         new SqlParameter("updated", smlouva.LastUpdate),
                         new SqlParameter("active",
-                            smlouva.znepristupnenaSmlouva() ? (int) 0 : (int) 1)
+                            smlouva.znepristupnenaSmlouva() ? (int)0 : (int)1)
                     );
                 }
                 catch (Exception e)
@@ -496,7 +500,7 @@ namespace HlidacStatu.Repositories
                 searchFunc, (hit, param) =>
                 {
                     ids.Add(hit.Id);
-                    return new ActionOutputData() {CancelRunning = false, Log = null};
+                    return new ActionOutputData() { CancelRunning = false, Log = null };
                 }, null, outputWriter, progressWriter, false, blockSize: 100);
 
             return ids;
@@ -616,7 +620,7 @@ namespace HlidacStatu.Repositories
                     );
 
                     Console.Write(c++);
-                    return new ActionOutputData() {CancelRunning = false, Log = null};
+                    return new ActionOutputData() { CancelRunning = false, Log = null };
                 }, null, null, null, false);
 
 

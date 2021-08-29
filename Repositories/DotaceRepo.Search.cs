@@ -1,13 +1,16 @@
-using System;
-using System.Linq;
 using Devmasters;
 using Devmasters.DT;
+
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Dotace;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
+
 using Nest;
+
+using System;
+using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
@@ -15,7 +18,7 @@ namespace HlidacStatu.Repositories
     {
         public static class Searching
         {
-            public static readonly string[] QueryOperators = new string[] {"AND", "OR"};
+            public static readonly string[] QueryOperators = new string[] { "AND", "OR" };
 
 
             public static readonly IRule[] Irules = new IRule[]
@@ -43,7 +46,7 @@ namespace HlidacStatu.Repositories
 
             public static QueryContainer GetSimpleQuery(string query)
             {
-                return GetSimpleQuery(new DotaceSearchResult() {Q = query, Page = 1});
+                return GetSimpleQuery(new DotaceSearchResult() { Q = query, Page = 1 });
             }
 
             public static QueryContainer GetSimpleQuery(DotaceSearchResult searchdata)
@@ -60,7 +63,7 @@ namespace HlidacStatu.Repositories
                 bool withHighlighting = false,
                 AggregationContainerDescriptor<Dotace> anyAggregation = null, bool exactNumOfResults = false)
             {
-                return SimpleSearch(query, page, pagesize, ((int) order).ToString(),
+                return SimpleSearch(query, page, pagesize, ((int)order).ToString(),
                     withHighlighting,
                     anyAggregation, exactNumOfResults);
             }
@@ -105,7 +108,7 @@ namespace HlidacStatu.Repositories
                             .Aggregations(aggr => anyAggregation)
                             .TrackTotalHits((search.ExactNumOfResults || page * search.PageSize == 0)
                                 ? true
-                                : (bool?) null)
+                                : (bool?)null)
                         );
                     if (res.IsValid && withHighlighting &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
@@ -121,7 +124,7 @@ namespace HlidacStatu.Repositories
                                 .Aggregations(aggr => anyAggregation)
                                 .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                     ? true
-                                    : (bool?) null)
+                                    : (bool?)null)
                             );
                     }
                 }

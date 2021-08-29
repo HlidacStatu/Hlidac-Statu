@@ -1,10 +1,11 @@
-﻿    using System;
-    using System.Security.Claims;
-    using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 
-    namespace HlidacStatu.Datasets
+using System;
+using System.Security.Claims;
+
+namespace HlidacStatu.Datasets
 {
-    
+
     public partial class Registration : IAuditable
     {
         public string id { get { return datasetId; } }
@@ -42,22 +43,24 @@
         public string defaultOrderBy { get; set; } = null;
 
         public const string DbCreatedLabel = "Datumu importu do db";
-        
+
         string[,] _orderList = new string[,] { { DbCreatedLabel, "DbCreated" } };
-        public string[,] orderList { 
+        public string[,] orderList
+        {
             get { return _orderList; }
-            set {
+            set
+            {
                 string[,] tmp = value;
                 for (int i = 0; i < tmp.GetLength(0); i++)
                 {
-                    tmp[i, 0] = tmp[i,0].Replace("\r", "").Replace("\n", "").Replace("\t", "").Trim();
-                    tmp[i, 1] = tmp[i,1].Replace("\r", "").Replace("\n", "").Replace("\t", "").Trim();
+                    tmp[i, 0] = tmp[i, 0].Replace("\r", "").Replace("\n", "").Replace("\t", "").Trim();
+                    tmp[i, 1] = tmp[i, 1].Replace("\r", "").Replace("\n", "").Replace("\t", "").Trim();
                 }
                 _orderList = tmp;
             }
         }
         //.Replace("\r","").Replace("\n","").Replace("\t", "").Trim()    
-            
+
 
         public void NormalizeShortName()
         {
@@ -107,8 +110,8 @@
         public string ToAuditObjectId()
         {
             return datasetId;
-        }   
-        
+        }
+
         public bool HasAdminAccess(ClaimsPrincipal user)
         {
             if (user is null)
@@ -116,9 +119,9 @@
 
             if (user.IsInRole("Admin"))
                 return true;
-            
+
             string email = user.Identity?.Name;
-            
+
             if (string.IsNullOrEmpty(email))
                 return false;
 

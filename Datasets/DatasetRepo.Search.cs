@@ -1,12 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
+
 using Nest;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Datasets
 {
@@ -108,7 +110,7 @@ namespace HlidacStatu.Datasets
                         Result = res.Hits
                             .Select(m => Newtonsoft.Json.JsonConvert.SerializeObject(m.Source))
                             .Select(s =>
-                                (dynamic) Newtonsoft.Json.JsonConvert.DeserializeObject<System.Dynamic.ExpandoObject>(s,
+                                (dynamic)Newtonsoft.Json.JsonConvert.DeserializeObject<System.Dynamic.ExpandoObject>(s,
                                     expConverter)),
 
                         Page = page,
@@ -197,7 +199,7 @@ namespace HlidacStatu.Datasets
                             .Trim();
                         if (sort.EndsWith(".keyword", StringComparison.OrdinalIgnoreCase))
                             sort = sort.Replace(".keywork", "", StringComparison.OrdinalIgnoreCase).Trim();
-                        if (allProps.Any(k=>string.Equals(k,sort, StringComparison.OrdinalIgnoreCase)))
+                        if (allProps.Any(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase)))
                         {
                             var found = txtProps.FirstOrDefault(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase));
                             if (found != null)
@@ -250,7 +252,7 @@ namespace HlidacStatu.Datasets
                         .Query(q => qc)
                         .Sort(ss => sortD)
                         .Highlight(h => Repositories.Searching.Tools.GetHighlight<Object>(withHighlighting))
-                        .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?) null)
+                        .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null)
                     );
 
                 //fix Highlighting for large texts
@@ -266,7 +268,7 @@ namespace HlidacStatu.Datasets
                             .Query(q => qc)
                             .Sort(ss => sortD)
                             .Highlight(h => Repositories.Searching.Tools.GetHighlight<Object>(false))
-                            .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?) null)
+                            .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null)
                         );
                 }
 

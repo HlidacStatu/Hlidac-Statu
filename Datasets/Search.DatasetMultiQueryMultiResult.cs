@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using HlidacStatu.Repositories.Searching;
+
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Repositories.Searching;
 
 namespace HlidacStatu.Datasets
 {
@@ -27,7 +28,7 @@ namespace HlidacStatu.Datasets
             {
                 return new()
                 {
-                    Q = Query ,
+                    Q = Query,
                     Page = page,
                 };
             }
@@ -54,10 +55,11 @@ namespace HlidacStatu.Datasets
 
             static object objGeneralSearchLock = new object();
 
-           
+
             public static DatasetMultiQueryMultiResult GeneralSearch(Dictionary<DataSet, string> datasetsWithQuery, int page, int pageSize)
             {
-                DatasetMultiQueryMultiResult res = new DatasetMultiQueryMultiResult() {
+                DatasetMultiQueryMultiResult res = new DatasetMultiQueryMultiResult()
+                {
                     DataSource = "DatasetMultiQueryMultiResult.GeneralSearch"
                 };
 
@@ -67,7 +69,7 @@ namespace HlidacStatu.Datasets
                 if (!Repositories.Searching.Tools.ValidateQuery(datasetsWithQuery.First().Value))
                 {
                     res.Exceptions.Add(new System.Exception($"Invalid Query: {datasetsWithQuery.First().Value}"));
-                    return res;                   
+                    return res;
                 }
 
                 ParallelOptions po = new ParallelOptions();

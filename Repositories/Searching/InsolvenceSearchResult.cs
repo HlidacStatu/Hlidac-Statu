@@ -1,18 +1,19 @@
-﻿using System;
+﻿using HlidacStatu.Entities.Insolvence;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities.Insolvence;
 
 namespace HlidacStatu.Repositories.Searching
 {
-	public class InsolvenceSearchResult : SearchDataResult<Rizeni>
-	{
+    public class InsolvenceSearchResult : SearchDataResult<Rizeni>
+    {
         public InsolvenceSearchResult()
             : base(getVZOrderList)
         {
         }
 
-       public IEnumerable<Rizeni> Results
+        public IEnumerable<Rizeni> Results
         {
             get
             {
@@ -26,15 +27,15 @@ namespace HlidacStatu.Repositories.Searching
         public bool LimitedView { get; set; } = true;
 
         public new object ToRouteValues(int page)
-		{
-			return new
-			{
-				Q = string.IsNullOrEmpty(Q) ? OrigQuery : Q,
-				Page = page,
-			};
-		}
+        {
+            return new
+            {
+                Q = string.IsNullOrEmpty(Q) ? OrigQuery : Q,
+                Page = page,
+            };
+        }
 
-		public bool ShowWatchdog { get; set; } = true;
+        public bool ShowWatchdog { get; set; } = true;
 
 
         protected static Func<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> getVZOrderList = () =>
@@ -73,7 +74,7 @@ namespace HlidacStatu.Repositories.Searching
 
             [Devmasters.Enums.SortValue(4)]
             [Devmasters.Enums.NiceDisplayName("naposled změněné poslední")]
-            LatestUpdateAsc =43,
+            LatestUpdateAsc = 43,
 
 
             [Devmasters.Enums.Disabled]

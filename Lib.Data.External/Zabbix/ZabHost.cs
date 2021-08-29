@@ -1,7 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Devmasters.Enums;
+
 using Newtonsoft.Json;
-using Devmasters.Enums;
+
+using System;
+using System.Collections.Generic;
 
 namespace HlidacStatu.Lib.Data.External.Zabbix
 {
@@ -47,8 +49,8 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
             this.host = host;
             this.url = url;
             urad = Devmasters.TextUtil.NormalizeToBlockText(Devmasters.RegexUtil.GetRegexGroupValue(description, @"Urad:\s?(?<txt>[^\x0a\x0d]*)", "txt"));
-            popis = Devmasters.TextUtil.ShortenHTML(Devmasters.RegexUtil.GetRegexGroupValue(description, @"Popis:\s?(?<txt>[^\x0a\x0d]*)", "txt"), 10000, new string[] {"a","b"} );
-            publicname = Devmasters.TextUtil.NormalizeToBlockText(Devmasters.RegexUtil.GetRegexGroupValue(description, @"Nazev:\s?(?<txt>[^\x0a\x0d]*)", "txt"));            
+            popis = Devmasters.TextUtil.ShortenHTML(Devmasters.RegexUtil.GetRegexGroupValue(description, @"Popis:\s?(?<txt>[^\x0a\x0d]*)", "txt"), 10000, new string[] { "a", "b" });
+            publicname = Devmasters.TextUtil.NormalizeToBlockText(Devmasters.RegexUtil.GetRegexGroupValue(description, @"Nazev:\s?(?<txt>[^\x0a\x0d]*)", "txt"));
             string sgroup = Devmasters.TextUtil.NormalizeToBlockText(Devmasters.RegexUtil.GetRegexGroupValue(description, @"Poznamka:\s?(?<txt>[^\x0a\x0d]*)", "txt"));
 
             customUrl = Devmasters.TextUtil.NormalizeToBlockText(Devmasters.RegexUtil.GetRegexGroupValue(description, @"URL:\s?(?<txt>[^\x0a\x0d]*)", "txt"));
@@ -70,7 +72,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
         public string host { get; set; }
         public string url { get; set; }
 
-        public string opendataUrl { get { return "https://www.hlidacstatu.cz/api/v2/Weby/" + hostid ; } }
+        public string opendataUrl { get { return "https://www.hlidacstatu.cz/api/v2/Weby/" + hostid; } }
         public string pageUrl { get { return "https://www.hlidacstatu.cz/StatniWeby/Info/" + hostid + "?h=" + hash; } }
 
         [JsonIgnore()]

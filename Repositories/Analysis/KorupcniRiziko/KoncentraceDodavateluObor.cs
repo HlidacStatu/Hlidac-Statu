@@ -23,14 +23,15 @@
         }
 
         public decimal PodilSmluvBezCeny
-        { 
-            get  {
+        {
+            get
+            {
                 if (Koncentrace.PocetSmluvProVypocet == 0)
                     return 0m;
 
                 return (decimal)Koncentrace.PocetSmluvBezCenyProVypocet / (decimal)Koncentrace.PocetSmluvProVypocet;
             }
         }
-    } 
+    }
 
 }

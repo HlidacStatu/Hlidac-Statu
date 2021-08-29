@@ -1,16 +1,19 @@
-﻿using System;
-using System.Linq;
-using System.Data;
-using System.Net.Http;
-using System.Collections.Generic;
+﻿using HlidacStatu.Datasets;
 using HlidacStatu.Entities;
-using System.Linq.Expressions;
-using HlidacStatu.Datasets;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Swashbuckle.AspNetCore.Annotations;
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Net.Http;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -28,7 +31,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>Ico, jméno a datová schránka</returns>
         [AuthorizeAndAudit]
         [HttpGet("ico/{ico}")]
-        public ActionResult<FirmaDTO> CompanyPerIco([FromRoute]string ico)
+        public ActionResult<FirmaDTO> CompanyPerIco([FromRoute] string ico)
         {
             try
             {
@@ -64,7 +67,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>Ico, jméno a datová schránka</returns>
         [AuthorizeAndAudit]
         [HttpGet("{jmenoFirmy}")]
-        public ActionResult<FirmaDTO> CompanyID([FromRoute]string jmenoFirmy)
+        public ActionResult<FirmaDTO> CompanyID([FromRoute] string jmenoFirmy)
         {
             try
             {

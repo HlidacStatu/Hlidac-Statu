@@ -39,7 +39,7 @@ namespace HlidacStatu.Entities
         public int SmlouvaSPolitickyAngazovanymSubjektem { get; set; } = 0;
 
         [Nest.Number]
-        public int PocetDniOdZalozeniFirmy{ get; set; } = 999999;
+        public int PocetDniOdZalozeniFirmy { get; set; } = 999999;
 
         [Nest.Number]
         public int VztahSeSoukromymSubjektem { get; set; } = -2;

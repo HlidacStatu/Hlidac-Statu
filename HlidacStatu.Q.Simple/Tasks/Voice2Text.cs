@@ -15,7 +15,7 @@
             else if (priority > 2)
                 priority = 2;
 
-            return priority == 0 ? QName : QName+"_" + priority.ToString();
+            return priority == 0 ? QName : QName + "_" + priority.ToString();
         }
 
         public string dataset { get; set; }

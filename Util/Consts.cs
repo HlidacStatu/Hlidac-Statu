@@ -20,8 +20,8 @@ namespace HlidacStatu.Util
                 new Devmasters.Batch.ActionProgressWriter(10, new Devmasters.Batch.LoggerWriter(Logger).ProgressWriter).Write
             );
 
-        public static RegexOptions DefaultRegexQueryOption = RegexOptions.IgnoreCase 
-                                                            | RegexOptions.IgnorePatternWhitespace 
+        public static RegexOptions DefaultRegexQueryOption = RegexOptions.IgnoreCase
+                                                            | RegexOptions.IgnorePatternWhitespace
                                                             | RegexOptions.Multiline;
 
         public static System.Globalization.CultureInfo enCulture = System.Globalization.CultureInfo.InvariantCulture; //new System.Globalization.CultureInfo("en-US");

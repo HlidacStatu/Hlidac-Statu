@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Entities
 {
 
     public partial class UserOptions
     {
-//migrace: rozdělit ještě na repozitory část, kde se pracuje s DB
+        //migrace: rozdělit ještě na repozitory část, kde se pracuje s DB
         public enum ParameterType
         {
             DatLabLastUpdate = 1,
@@ -44,7 +45,7 @@ namespace HlidacStatu.Entities
                     .FromSqlInterpolated($@"EXEC UserOption_Get @optionId = {(int)option}, @userid = {null}, @languageid = {languageId}")
                     .AsEnumerable()
                     .FirstOrDefault();
-                
+
                 Created = r?.Created ?? DateTime.Now;
                 Value = r?.Value;
             }
@@ -92,7 +93,7 @@ namespace HlidacStatu.Entities
             {
                 var r = db.UserOptions
                     .FromSqlInterpolated(
-                        $@"EXEC UserOption_Get @optionId = {(int) option}, @userid = {userId}, @languageid = {languageid}")
+                        $@"EXEC UserOption_Get @optionId = {(int)option}, @userid = {userId}, @languageid = {languageid}")
                     .AsEnumerable()
                     .FirstOrDefault();
                 return r;
@@ -107,7 +108,7 @@ namespace HlidacStatu.Entities
         {
             if (res == null)
                 return null;
-            var uo= new UserOptions()
+            var uo = new UserOptions()
             {
                 Pk = res.pk,
                 Created = res.Created,

@@ -1,10 +1,12 @@
 ﻿using EasyNetQ;
-using System.Threading;
-using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Q.Subscriber
 {
@@ -62,7 +64,8 @@ namespace HlidacStatu.Q.Subscriber
         {
             _logger.LogInformation("Subscribing to Queue.");
             _logger.LogInformation(_options.ToString());
-            _rabbitBus.PubSub.SubscribeAsync<T>(_options.SubscriberName, _messageHandler.HandleAsync, configure => {
+            _rabbitBus.PubSub.SubscribeAsync<T>(_options.SubscriberName, _messageHandler.HandleAsync, configure =>
+            {
                 configure.WithPrefetchCount(_options.PrefetchCount);
             });
         }

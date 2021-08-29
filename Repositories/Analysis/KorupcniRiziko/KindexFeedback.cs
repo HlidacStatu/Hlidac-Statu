@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.Entities;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
+
 using Nest;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -29,11 +30,11 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         public void Save()
         {
-            if(string.IsNullOrWhiteSpace(Id))
+            if (string.IsNullOrWhiteSpace(Id))
             {
                 Id = Guid.NewGuid().ToString();
             }
-            if(string.IsNullOrWhiteSpace(Company))
+            if (string.IsNullOrWhiteSpace(Company))
             {
                 var firma = FirmaRepo.FromIco(Ico);
                 Company = firma.Jmeno;
@@ -47,7 +48,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         public static IEnumerable<KindexFeedback> GetKindexFeedbacks(string ico, int year)
         {
-            
+
             ElasticClient _esClient = Manager.GetESClient_KindexFeedback();
 
             ISearchResponse<KindexFeedback> searchResults = null;
@@ -59,10 +60,10 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                             && q.Term(f => f.Year, year)
                             )
                         );
-                
+
                 if (searchResults.IsValid && searchResults.Hits.Count > 0)
                 {
-                    var hits = searchResults.Hits.Select(h => h.Source).OrderByDescending(s=>s.SignDate);
+                    var hits = searchResults.Hits.Select(h => h.Source).OrderByDescending(s => s.SignDate);
                     return hits;
                 }
             }
@@ -72,7 +73,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 AuditRepo.Add(Audit.Operations.Search, "", "", "KindexFeedback", "error", origQuery, null);
                 if (searchResults != null && searchResults.ServerError != null)
                 {
-                    Manager.LogQueryError<KindexFeedback>(searchResults, 
+                    Manager.LogQueryError<KindexFeedback>(searchResults,
                         $"Exception for {origQuery}",
                         ex: e);
                 }

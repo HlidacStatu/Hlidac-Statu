@@ -12,7 +12,7 @@ namespace HlidacStatu.DBUpgrades
                 typeof(UpgradeDB),
                 MsSqlDatabaseObjectTypeForDatabaseVersion.ExtendedProperty
             );
-            
+
             core.Upgrade();
 
 

@@ -1,13 +1,10 @@
 ﻿using Devmasters.Collections;
-using HlidacStatu.Lib;
+
+using HlidacStatu.Entities;
 using HlidacStatu.Entities.Enhancers;
-using Newtonsoft.Json;
-using System;
+
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using HlidacStatu.Entities;
 
 namespace HlidacStatu.Plugin.Enhancers
 {
@@ -43,7 +40,7 @@ namespace HlidacStatu.Plugin.Enhancers
             return false;
         }
 
-        public bool UpdateSmluvniStrany(ref Smlouva item, Smlouva.Subjekt platce, Smlouva.Subjekt[] prijemce )
+        public bool UpdateSmluvniStrany(ref Smlouva item, Smlouva.Subjekt platce, Smlouva.Subjekt[] prijemce)
         {
             item.Enhancements = item.Enhancements.AddOrUpdate(
                 new Enhancement(NastaveniSmluvnichStran, "Ručně nastaven plátce", "item.Platce", Ser(item.Platce), Ser(platce), this)
@@ -63,7 +60,7 @@ namespace HlidacStatu.Plugin.Enhancers
         {
             if (subj == null)
                 return null;
-            return  Newtonsoft.Json.JsonConvert.SerializeObject(new { ico = subj.ico, nazev = subj.nazev });
+            return Newtonsoft.Json.JsonConvert.SerializeObject(new { ico = subj.ico, nazev = subj.nazev });
         }
         private string Ser(IEnumerable<Smlouva.Subjekt> subj)
         {
@@ -71,7 +68,7 @@ namespace HlidacStatu.Plugin.Enhancers
                 return null;
             return Newtonsoft.Json.JsonConvert.SerializeObject(
                     subj
-                    .Select(m=>Ser(m))
+                    .Select(m => Ser(m))
                     .ToArray()
                 );
         }

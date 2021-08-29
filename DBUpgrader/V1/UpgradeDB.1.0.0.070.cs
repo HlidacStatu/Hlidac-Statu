@@ -4,16 +4,16 @@
 namespace HlidacStatu.DBUpgrades
 {
     public static partial class DBUpgrader
-	{
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.70")]
-			public static void Init_1_0_0_70(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.70")]
+            public static void Init_1_0_0_70(IDatabaseUpgrader du)
+            {
 
-				string sql = @"
+                string sql = @"
 SET ANSI_NULLS ON
 GO
 
@@ -36,9 +36,9 @@ END
 GO
 
 ";
-				du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
-			}
-		}
-	}
+            }
+        }
+    }
 }

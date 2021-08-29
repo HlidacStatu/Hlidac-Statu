@@ -1,7 +1,8 @@
+using HlidacStatu.Datasets;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Datasets;
 
 namespace HlidacStatu.XLib.Render
 {
@@ -13,7 +14,7 @@ namespace HlidacStatu.XLib.Render
             dynamic model = Newtonsoft.Json.Linq.JObject.Parse(sModel);
             return Render(registrationTemplate, ds, model, qs, highlightingData);
         }
-        
+
         public static string Render(this Registration.Template registrationTemplate, DataSet ds, dynamic dmodel, string qs = "",
             IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlightingData = null)
         {
@@ -25,9 +26,9 @@ namespace HlidacStatu.XLib.Render
             var res = xtemp.Render(dmodel);
             return res;
         }
-        
+
         private static string _renderResultsInHtml<T>(this DataSearchResultBase<T> dataSearchResultBase, string query,
-            Func<T, dynamic> itemToDynamicFunc, int maxToRender = int.MaxValue) where T: class
+            Func<T, dynamic> itemToDynamicFunc, int maxToRender = int.MaxValue) where T : class
         {
             var actualNumToRender = Math.Min(maxToRender, dataSearchResultBase.Result?.Count() ?? 0);
             var content = "";
@@ -60,7 +61,7 @@ namespace HlidacStatu.XLib.Render
                 }
                 if (dataSearchResultBase.Total > actualNumToRender)
                 {
-                    content = $"<h4>Zobrazujeme {Devmasters.Lang.CS.Plural.Get(actualNumToRender, "první výsledek","první {0} výsledky","prvních {0} výsledků")}</h4>" 
+                    content = $"<h4>Zobrazujeme {Devmasters.Lang.CS.Plural.Get(actualNumToRender, "první výsledek", "první {0} výsledky", "prvních {0} výsledků")}</h4>"
                         + content
                         + $"<div class=\"text-center\"><a class=\"btn btn-default btn-default-new\" href=\"{dataSearchResultBase.DataSet.DatasetSearchUrl(query)}\">zobrazit všechny nalezené záznamy</a></div>";
                 }
@@ -72,7 +73,7 @@ namespace HlidacStatu.XLib.Render
                     $"<div class=\"text-center\"><a class=\"btn btn-default btn-default-new\" href=\"{dataSearchResultBase.DataSet.DatasetSearchUrl(query)}\">zobrazit všechny nalezené záznamy zde</a></div>";
             }
         }
-        
+
         public static string RenderResultsInHtml(this DataSearchResult dataSearchResult, string query, int maxToRender = int.MaxValue)
         {
             return dataSearchResult._renderResultsInHtml(query, (d) => d, maxToRender);

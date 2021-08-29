@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-
 using Devmasters;
 
 using HlidacStatu.Datastructures.Graphs;
@@ -15,6 +9,12 @@ using HlidacStatu.Repositories.Statistics;
 using HlidacStatu.Util;
 
 using Microsoft.EntityFrameworkCore;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
 
 namespace HlidacStatu.Extensions
 {
@@ -278,8 +278,8 @@ namespace HlidacStatu.Extensions
                 return rppReq.Source.angazovaneOsoby ?? new HlidacStatu.Lib.Data.External.RPP.OVMFull.Osoba[] { };
 
             }
-            return new HlidacStatu.Lib.Data.External.RPP.OVMFull.Osoba[]{ };
-            
+            return new HlidacStatu.Lib.Data.External.RPP.OVMFull.Osoba[] { };
+
         }
 
 

@@ -3,15 +3,15 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.32")]
-			public static void Init_1_0_0_32(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.32")]
+            public static void Init_1_0_0_32(IDatabaseUpgrader du)
+            {
 
                 string sql = @"
 
@@ -107,18 +107,18 @@ GO
 COMMIT
 
 ";
-				du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
                 //add new bank account
 
-                
-
-			}
-
-	
 
 
-		}
+            }
 
-	}
+
+
+
+        }
+
+    }
 }

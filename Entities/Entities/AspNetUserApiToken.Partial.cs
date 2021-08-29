@@ -1,7 +1,7 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.AspNetCore.Identity;
+
+using System;
 using System.Linq;
-using Microsoft.AspNetCore.Identity;
 
 namespace HlidacStatu.Entities
 {

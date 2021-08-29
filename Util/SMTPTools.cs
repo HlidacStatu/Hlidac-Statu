@@ -8,7 +8,7 @@ namespace HlidacStatu.Util
     {
 
 
-        public static bool SendEmail(string subject, 
+        public static bool SendEmail(string subject,
             string htmlContent, string textContent,
             string toEmail,
             string fromEmail = "podpora@hlidacstatu.cz", bool bccToAdmin = false)
@@ -40,7 +40,7 @@ namespace HlidacStatu.Util
                     {
                         smtp.Host = Devmasters.Config.GetWebConfigValue("SmtpHost");
                         Consts.Logger.Info("Sending email to " + msg.To);
-                        if (bccToAdmin) 
+                        if (bccToAdmin)
                             msg.Bcc.Add("michal@michalblaha.cz");
                         smtp.Send(msg);
                         return true;
@@ -57,7 +57,7 @@ namespace HlidacStatu.Util
 
         }
 
-        public static void SendSimpleMailToPodpora(string subject, string body, string replyTo )
+        public static void SendSimpleMailToPodpora(string subject, string body, string replyTo)
         {
             string from = "podpora@hlidacstatu.cz";
             string to = "podpora@hlidacstatu.cz";

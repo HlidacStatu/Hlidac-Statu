@@ -1,9 +1,9 @@
-﻿using System;
+﻿using CsvHelper;
+
+using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
-
-using CsvHelper;
 
 namespace HlidacStatu.ExportData
 {
@@ -99,7 +99,7 @@ namespace HlidacStatu.ExportData
                                         }
                                         else
                                         {
-                                            csv.WriteField( data.Rows[r].Values[c].ToString());
+                                            csv.WriteField(data.Rows[r].Values[c].ToString());
                                         }
                                     } //types
 

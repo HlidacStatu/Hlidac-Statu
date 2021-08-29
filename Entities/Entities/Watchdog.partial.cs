@@ -1,4 +1,5 @@
 ﻿using Devmasters.Enums;
+
 using System.ComponentModel.DataAnnotations.Schema;
 
 
@@ -52,8 +53,8 @@ namespace HlidacStatu.Entities
             get { return (PeriodTime)PeriodId; }
             set { PeriodId = (int)value; }
         }
-        
-        
+
+
 
         public enum DisabledBySystemReasons
         {
@@ -62,8 +63,8 @@ namespace HlidacStatu.Entities
             InvalidQuery
         }
 
-        
-        
+
+
 
     }
 }

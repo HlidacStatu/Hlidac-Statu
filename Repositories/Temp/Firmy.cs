@@ -1,7 +1,7 @@
-﻿using HlidacStatu.Util.Cache;
+﻿using HlidacStatu.Entities;
+using HlidacStatu.Util.Cache;
+
 using System;
-using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
 
 namespace HlidacStatu.Repositories
 {
@@ -10,7 +10,7 @@ namespace HlidacStatu.Repositories
 
         static Firma nullObj = new Firma();
 
-        
+
         private static string getNameByIco(string key)
         {
             var o = FirmaRepo.FromIco(key);
@@ -69,7 +69,7 @@ namespace HlidacStatu.Repositories
         {
             if (string.IsNullOrEmpty(ICO))
                 return Firma.LoadError;
-            var f =  instanceByIco.Get(Util.ParseTools.NormalizeIco( ICO));
+            var f = instanceByIco.Get(Util.ParseTools.NormalizeIco(ICO));
             if (f == null)
                 return Firma.LoadError;
             else
@@ -81,7 +81,7 @@ namespace HlidacStatu.Repositories
             if (ds == null)
                 ds = string.Empty;
 
-            var f =  instanceByDS.Get(ds);
+            var f = instanceByDS.Get(ds);
             if (f == null)
                 return Firma.LoadError;
             else

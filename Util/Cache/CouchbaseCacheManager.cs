@@ -4,7 +4,7 @@ namespace HlidacStatu.Util.Cache
 {
 
     public class CouchbaseCacheManager<T, Key>
-        : Manager<T,Key, Devmasters.Cache.Couchbase.CouchbaseCache<T>>
+        : Manager<T, Key, Devmasters.Cache.Couchbase.CouchbaseCache<T>>
         where T : class
     {
         private string bucketName = "";
@@ -15,13 +15,13 @@ namespace HlidacStatu.Util.Cache
         public CouchbaseCacheManager(string keyPrefix, Func<Key, T> func, TimeSpan expiration
             , string[] serversUrl, string couchbaseBucketName, string username, string password
             , Func<Key, string> keyValueSelector = null)
-            : base(keyPrefix, func,expiration)
+            : base(keyPrefix, func, expiration)
         {
             bucketName = couchbaseBucketName;
             this.serversUrl = serversUrl;
             this.username = username;
             this.password = password;
-            this.keyValueSelector = keyValueSelector ??  new Func<Key, string>(k=>k.ToString());
+            this.keyValueSelector = keyValueSelector ?? new Func<Key, string>(k => k.ToString());
         }
         protected override Devmasters.Cache.Couchbase.CouchbaseCache<T> getTCacheInstance(Key key, TimeSpan expiration, Func<Key, T> contentFunc)
         {
@@ -31,7 +31,7 @@ namespace HlidacStatu.Util.Cache
 
         public static CouchbaseCacheManager<T, Key> GetSafeInstance(string instanceName, Func<Key, T> func, TimeSpan expiration,
             string[] serversUrl, string couchbaseBucketName, string username, string password,
-            Func<Key,string> keyValueSelector = null)
+            Func<Key, string> keyValueSelector = null)
         {
             lock (instancesLock)
             {

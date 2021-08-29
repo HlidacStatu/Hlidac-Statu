@@ -54,10 +54,10 @@ namespace HlidacStatu.Datastructures.Graphs
                 {
                     calls++;
                     List<Edge> edges = new List<Edge>();
-                    var nodes =  ShortestPath(start, node);
+                    var nodes = ShortestPath(start, node);
                     if (nodes == null)
                         return edges;
-                     
+
                     //convert to edges
                     var prev = start;
                     foreach (var n in nodes)
@@ -66,8 +66,8 @@ namespace HlidacStatu.Datastructures.Graphs
                         var foundE = this.edges
                             .Where(m => m.From?.UniqId == prev?.UniqId && m.To?.UniqId == n.UniqId)
                             //.Where(m=> Devmasters.DT.Util.IsOverlappingIntervals(overlapDateFrom,overlapDateTo,m.RelFrom, m.RelTo))
-                            .OrderBy(e=>e.NumberOfDaysFromToday())
-                            .ThenByDescending(e=>e.LengthOfEdgeInDays())
+                            .OrderBy(e => e.NumberOfDaysFromToday())
+                            .ThenByDescending(e => e.LengthOfEdgeInDays())
                             .FirstOrDefault(); //TODO zmena na vsechna obdobi
                         if (foundE != null)
                         {

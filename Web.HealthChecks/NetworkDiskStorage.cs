@@ -2,11 +2,9 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 
 namespace HlidacStatu.Web.HealthChecks
 {
@@ -68,7 +66,7 @@ namespace HlidacStatu.Web.HealthChecks
             }
             catch (Exception e)
             {
-                return Task.FromResult(HealthCheckResult.Degraded("Unknown status, cannot read data from network disk",e));
+                return Task.FromResult(HealthCheckResult.Degraded("Unknown status, cannot read data from network disk", e));
             }
 
 

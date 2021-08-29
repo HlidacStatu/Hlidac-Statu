@@ -44,7 +44,7 @@
                 {
                     ContentHtml = string.Format(headerTemplateHtml, data.ContentTitle, stotal, FixTable(data).ContentHtml),
                     ContentText = string.Format(headerTemplateText, data.ContentTitle, stotal, new string('=', data.ContentText.Length + 3), data.ContentText)
-                    
+
                 };
             }
 
@@ -64,7 +64,7 @@
             {
                 return Paragraph(htmltext, Devmasters.TextUtil.RemoveHTML(htmltext));
             }
-                public static RenderedContent Paragraph(string htmltext, string plaintext)
+            public static RenderedContent Paragraph(string htmltext, string plaintext)
             {
                 return new RenderedContent()
                 {
@@ -79,7 +79,7 @@
                             </tr>
                         </table>
                         ", htmltext),
-                    ContentText = string.Format("\n{0}\n\n",plaintext)
+                    ContentText = string.Format("\n{0}\n\n", plaintext)
                 };
             }
 
@@ -92,9 +92,10 @@
 
             public static RenderedContent MailFooter()
             {
-                return new RenderedContent() { 
-                ContentHtml = DefaultEmailFooterHtml,
-                ContentText = DefaultEmailFooterText
+                return new RenderedContent()
+                {
+                    ContentHtml = DefaultEmailFooterHtml,
+                    ContentText = DefaultEmailFooterText
                 };
             }
 
@@ -113,7 +114,7 @@
 
 
 
-        public static string DefaultEmailFooterText = @"
+            public static string DefaultEmailFooterText = @"
 
 PODPOŘTE PROVOZ HLÍDAČE
 

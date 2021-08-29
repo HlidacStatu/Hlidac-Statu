@@ -1,16 +1,18 @@
-﻿using System;
+﻿using Devmasters.Enums;
+
+using Microsoft.AspNetCore.Html;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Devmasters.Enums;
-using Microsoft.AspNetCore.Html;
 
 namespace HlidacStatu.Util
 {
     public static partial class RenderData
     {
         public enum CapitalizationStyle
-        { 
+        {
             AllUpperCap,
             EveryWordUpperCap,
             FirstLetterUpperCap,
@@ -67,7 +69,7 @@ namespace HlidacStatu.Util
                 case CapitalizationStyle.AllUpperCap:
                     return s.ToUpperInvariant();
                 case CapitalizationStyle.EveryWordUpperCap:
-                    return System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(s.ToLower());                    
+                    return System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(s.ToLower());
                 case CapitalizationStyle.FirstLetterUpperCap:
                     return s.First().ToString().ToUpper() + s.Substring(1);
                 case CapitalizationStyle.AllLowerCap:
@@ -78,7 +80,7 @@ namespace HlidacStatu.Util
             }
         }
 
-        
+
 
         public static string RenderCharWithCH(char c)
         {
@@ -113,7 +115,7 @@ namespace HlidacStatu.Util
 
         }
 
-        
+
 
         public static string NicePrice(decimal number, string valueIfZero = "0 {0}", string mena = "Kč", bool html = false, bool shortFormat = false, ShowDecimalVal showDecimal = ShowDecimalVal.Hide)
         {
@@ -126,7 +128,7 @@ namespace HlidacStatu.Util
             else
                 return ShortNicePrice(number, valueIfZero, mena, html, showDecimal, MaxScale.Jeden);
         }
-        
+
         public static IHtmlContent NicePriceHtml(decimal number, string valueIfZero = "0 {0}", string mena = "Kč", bool shortFormat = false, ShowDecimalVal showDecimal = ShowDecimalVal.Hide)
         {
             var result = shortFormat
@@ -136,9 +138,9 @@ namespace HlidacStatu.Util
             return new HtmlString(result);
 
         }
-        
+
         static string tableOrderValueFormat = "000000000000000#";
-        public static string OrderValueFormat(string n) { return n ; }
+        public static string OrderValueFormat(string n) { return n; }
         public static string OrderValueFormat(double? n) { return ((n ?? 0) * 1000000).ToString(tableOrderValueFormat); }
         public static string OrderValueFormat(decimal? n) { return OrderValueFormat((double?)n); }
         public static string OrderValueFormat(byte? n) { return OrderValueFormat((double?)n); }
@@ -311,8 +313,8 @@ namespace HlidacStatu.Util
 
             if (html)
             {
-                return String.Format("<span title=\"{2:### ### ### ### ### ##0} {1}\">{0}</span>", 
-                    Devmasters.TextUtil.ReplaceDuplicates(ret,' ').Replace(" ", "&nbsp;"), mena, number);
+                return String.Format("<span title=\"{2:### ### ### ### ### ##0} {1}\">{0}</span>",
+                    Devmasters.TextUtil.ReplaceDuplicates(ret, ' ').Replace(" ", "&nbsp;"), mena, number);
 
             }
             return ret;
@@ -331,7 +333,7 @@ namespace HlidacStatu.Util
             if (number.HasValue == false)
                 return noValue;
 
-            var s = number.Value.ToString("P"+decimalPlaces);
+            var s = number.Value.ToString("P" + decimalPlaces);
 
             if (html)
             {
@@ -416,9 +418,9 @@ namespace HlidacStatu.Util
                 data.Select(m => new string[] { m })
                 , format, itemsDelimiter, lastItemDelimiter, ending);
         }
-            public static string RenderList(IEnumerable<string[]> data, string format = "{0}",
-            string itemsDelimiter = ", ", string lastItemDelimiter = " a ", string ending = "."
-            )
+        public static string RenderList(IEnumerable<string[]> data, string format = "{0}",
+        string itemsDelimiter = ", ", string lastItemDelimiter = " a ", string ending = "."
+        )
         {
             if (data == null)
                 return string.Empty;
@@ -429,11 +431,11 @@ namespace HlidacStatu.Util
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             sb.Append(
                 string.Join(itemsDelimiter, aData
-                                .Take(aData.Length-1)
+                                .Take(aData.Length - 1)
                                 .Select(m => string.Format(format, m))
                                 )
                 );
-            if (aData.Length>1)            
+            if (aData.Length > 1)
                 sb.Append(lastItemDelimiter);
             sb.Append(string.Format(format, aData.Last()));
             sb.Append(ending);
@@ -448,20 +450,20 @@ namespace HlidacStatu.Util
             return LimitedList(maxItems, data.Select(m => new string[] { m }), format, itemsDelimiter, lastItemDelimiter, moreTextPrefix, morePluralForm, moreNumberFormat);
         }
         public static string LimitedList(int maxItems, IEnumerable<string[]> data, string format = "{0}",
-           string itemsDelimiter = "\n", string lastItemDelimiter = "\n", 
+           string itemsDelimiter = "\n", string lastItemDelimiter = "\n",
            string moreTextPrefix = null, Devmasters.Lang.CS.PluralDef morePluralForm = null,
            bool moreNumberFormat = true
            )
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             string more = "";
-            if (data.Count() == maxItems+1)
+            if (data.Count() == maxItems + 1)
             {
-                sb.Append(RenderList(data.Take(maxItems+1),format,itemsDelimiter, lastItemDelimiter,""));
+                sb.Append(RenderList(data.Take(maxItems + 1), format, itemsDelimiter, lastItemDelimiter, ""));
                 maxItems = data.Count();
             }
             else
-                sb.Append(RenderList(data.Take(maxItems), format, itemsDelimiter, lastItemDelimiter,""));
+                sb.Append(RenderList(data.Take(maxItems), format, itemsDelimiter, lastItemDelimiter, ""));
 
             if (data.Count() > maxItems)
             {
@@ -478,7 +480,7 @@ namespace HlidacStatu.Util
                         more = moreTextPrefix;
                 }
                 if (morePluralForm != null)
-                    more = more + Devmasters.Lang.CS.Plural.Get(diff,morePluralForm);
+                    more = more + Devmasters.Lang.CS.Plural.Get(diff, morePluralForm);
 
             }
             sb.Append(more);

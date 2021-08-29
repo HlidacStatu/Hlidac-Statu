@@ -1,17 +1,17 @@
-﻿using System;
+﻿using HlidacStatu.Entities;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
 
 namespace HlidacStatu.Repositories.Searching
 {
-	public class OsobaSearchResult : SearchDataResult<Osoba>
-	{
+    public class OsobaSearchResult : SearchDataResult<Osoba>
+    {
         public OsobaSearchResult()
             : base(getVZOrderList)
-                {
-                }
+        {
+        }
 
         public IEnumerable<Osoba> Results { get; set; }
 
@@ -21,15 +21,15 @@ namespace HlidacStatu.Repositories.Searching
         }
 
         public new object ToRouteValues(int page)
-		{
-			return new
-			{
-				Q = Query,
-				Page = page,
-			};
-		}
+        {
+            return new
+            {
+                Q = Query,
+                Page = page,
+            };
+        }
 
-       
+
         protected static Func<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> getVZOrderList = () =>
         {
             return

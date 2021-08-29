@@ -42,7 +42,7 @@ namespace HlidacStatu.Repositories.Searching
 
 
             static char[] reservedAll = new char[] { '+', '-', '=', '!', '(', ')', '{', '}', '[', ']', '^', '\'', '~', '*', '?', ':', '\\', '/' };
-            static char[] skipIfPrefix = new char[] { '-', '*', '?'};
+            static char[] skipIfPrefix = new char[] { '-', '*', '?' };
 
             static char[] formulaStart = new char[] { '>', '<', '(', '{', '[' };
             static char[] formulaEnd = new char[] { ')', '}', ']', '*' };
@@ -69,7 +69,7 @@ namespace HlidacStatu.Repositories.Searching
 
                 //allow ~ or ~5 on the end of word
                 //replace ~ with chr(254)
-                val = System.Text.RegularExpressions.Regex.Replace(val, @"(?<w>\w*) ~ (?<n>\d{0,2})", "${w}"+Devmasters.Core.Chr(254)+"${n}", Util.Consts.DefaultRegexQueryOption);
+                val = System.Text.RegularExpressions.Regex.Replace(val, @"(?<w>\w*) ~ (?<n>\d{0,2})", "${w}" + Devmasters.Core.Chr(254) + "${n}", Util.Consts.DefaultRegexQueryOption);
 
 
                 for (int i = 0; i < val.Length; i++)
@@ -86,7 +86,7 @@ namespace HlidacStatu.Repositories.Searching
                         continue;
                     }
                     if (string.IsNullOrWhiteSpace(Prefix) == false
-                        && i == 0 && val.Length > 1 
+                        && i == 0 && val.Length > 1
                         && formulaStart.Contains(val[i]) && val[i + 1] == '=')
                     {
                         sout.Add(val[i]);
@@ -101,7 +101,7 @@ namespace HlidacStatu.Repositories.Searching
                         continue;
                     }
 
-                    if (( i>0 ) && ignored.Contains(val[i]))
+                    if ((i > 0) && ignored.Contains(val[i]))
                         continue;
 
                     if ((i > 0 || i < val.Length - 1) && reservedAll.Contains(val[i]))
@@ -113,7 +113,8 @@ namespace HlidacStatu.Repositories.Searching
                         sout.Add(val[i]);
                 }
 
-                var ret = String.Join("", sout.Select(c=> {
+                var ret = String.Join("", sout.Select(c =>
+                {
                     switch (c)
                     {
                         case (char)254: return '~';
@@ -293,7 +294,7 @@ namespace HlidacStatu.Repositories.Searching
                             Value = tmpParts.Skip(pi).Take(tmpParts.Count - pi + 1).Select(m => m.Value).Aggregate((f, s) => f + " " + s)
                         });
                         pi = tmpParts.Count;
-                    NextPart:
+                        NextPart:
                         continue;
                     }
                     else

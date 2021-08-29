@@ -1,11 +1,10 @@
-﻿using System;
+﻿using HlidacStatu.Api.Dataset.Connector;
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using HlidacStatu.Api.Dataset.Connector;
 
 namespace Vybory_PSP
 {
@@ -133,7 +132,7 @@ namespace Vybory_PSP
                             }
                             return new Devmasters.Batch.ActionOutputData();
 
-                        }, null,null, !System.Diagnostics.Debugger.IsAttached, prefix:$"Jednani {cisloJednani} OCR:");
+                        }, null, null, !System.Diagnostics.Debugger.IsAttached, prefix: $"Jednani {cisloJednani} OCR:");
 
 
                     string jedn = "zápis";
@@ -151,7 +150,7 @@ namespace Vybory_PSP
                     Console.WriteLine($"Saved vybor {jednani.vybor} jednani {jednani.Id} id {id}");
                     return new Devmasters.Batch.ActionOutputData();
 
-                }, null, null, !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism:5, prefix: "cisloJednani: ");
+                }, null, null, !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 5, prefix: "cisloJednani: ");
             }
 
         }
@@ -252,9 +251,9 @@ namespace Vybory_PSP
                                     mp3s.Add(jmp3);
                                     MP3 mp3 = new MP3(Program.mp3path, Program.apikey);
                                     string smp3id = mp3s.Count == 1 ? "" : "_" + mp3s.Count;
-                                    var blocks = mp3.CheckDownloadAndStartV2TOrGet(Parse.datasetname,j.Id+ smp3id, rootUrl + fUrl);
+                                    var blocks = mp3.CheckDownloadAndStartV2TOrGet(Parse.datasetname, j.Id + smp3id, rootUrl + fUrl);
                                     if (blocks != null)
-                                    { 
+                                    {
                                         jmp3.DocumentPlainText = Devmasters.SpeechToText.VoiceToTextFormatter.TextWithTimestampsToText(blocks);
                                         jmp3.prepisAudia = blocks
                                             .Select(t => new jednani.mp3.blok() { sekundOdZacatku = (long)t.Start.TotalSeconds, text = t.Text })
@@ -368,7 +367,7 @@ namespace Vybory_PSP
                 {
                     net.IgnoreHttpErrors = false;
                     //Console.WriteLine($"Downloading {url} ");
-                    net.Timeout = 60000; 
+                    net.Timeout = 60000;
                     net.Tries = 5;
                     html = net.GetContent().Text;
                 }
@@ -424,14 +423,14 @@ namespace Vybory_PSP
             return Devmasters.TextUtil.RemoveDiacritics(sanitisedNamePart);
         }
 
-//        static string regexRokFromTxt = @"č\. \s* (?<cislo>\d*)
-//\s*
-//(
-//	(ze \s* dne \s* ) (\d* \. \d* \. (?<rok>\d{4})) 
-//|
-//	(z \s* roku \s* ) ( (?<rok>\d{4})) 
+        //        static string regexRokFromTxt = @"č\. \s* (?<cislo>\d*)
+        //\s*
+        //(
+        //	(ze \s* dne \s* ) (\d* \. \d* \. (?<rok>\d{4})) 
+        //|
+        //	(z \s* roku \s* ) ( (?<rok>\d{4})) 
 
-//)";
+        //)";
 
 
         private static string NormalizeUrl(string url, string prefix = "https://apps.odok.cz")

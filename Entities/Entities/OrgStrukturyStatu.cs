@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace HlidacStatu.Entities.OrgStrukturyStatu
@@ -102,7 +101,7 @@ namespace HlidacStatu.Entities.OrgStrukturyStatu
             {
                 manages = $"podřízených p: {ridiPracovnich}; s: {ridiSluzebnich}";
             }
-            
+
             var current = new D3GraphHierarchy()
             {
                 name = oznaceni,
@@ -168,7 +167,7 @@ namespace HlidacStatu.Entities.OrgStrukturyStatu
         }
         public int Jine { get; set; }
         public int Sekce { get; set; }
-        public int Urady { get; set; } 
+        public int Urady { get; set; }
         public int Odbory { get; set; }
         public int Oddeleni { get; set; }
         public int OrganizacniJednotky { get { return Jine + Sekce + Odbory + Oddeleni; } }
@@ -183,7 +182,7 @@ namespace HlidacStatu.Entities.OrgStrukturyStatu
                 + $"{Devmasters.Lang.CS.Plural.GetWithZero(SluzebniMista, "nezaměstnává žádné úředníky na služebních místech", "zaměstnává jednoho úředníka na služebních místech", "zaměstnává {0} úředníky na služebních místech", "zaměstnává {0} úředníků na služebních místech")} "
                 + $"a {Devmasters.Lang.CS.Plural.GetWithZero(PracovniPozice, "žádné další zaměstnance", "jednoho zaměstnance", "{0} další zaměstnance", "{0} dalších zaměstnanců")}."
                 ;
-                return ret;
+            return ret;
 
 
         }
@@ -194,9 +193,9 @@ namespace HlidacStatu.Entities.OrgStrukturyStatu
                 + $"<li><a href='/subjekt/OrganizacniStruktura/{ico}'>{Devmasters.Lang.CS.Plural.Get(OrganizacniJednotky, "<b>jednou</b> organizační části", "<b>{0}</b> organizačními částmi", "<b>{0}</b> organizačními částmi")}</a></li>"
                 + $"<li>{Devmasters.Lang.CS.Plural.GetWithZero(SluzebniMista, "nezaměstnává žádné úředníky na služebních místech", "zaměstnává <b>jednoho úředníka</b> na služebních místech", "zaměstnává <b>{0} úředníky</b> na služebních místech", "zaměstnává <b>{0} úředníků</b> na služebních místech")}</li>"
                 + $"<li>{Devmasters.Lang.CS.Plural.GetWithZero(PracovniPozice, "žádné další zaměstnance", "<b>jednoho</b> zaměstnance", "<b>{0}</b> další zaměstnance", "<b>{0}</b> dalších zaměstnanců")}</li>"
-                +"</ul>"
+                + "</ul>"
                 ;
-                return ret;
+            return ret;
 
 
         }

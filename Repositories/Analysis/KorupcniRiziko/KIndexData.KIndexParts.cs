@@ -6,7 +6,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
     public partial class KIndexData
     {
         [Groupable]
-        [Sortable( SortableAttribute.SortAlgorithm.BySortValue)]
+        [Sortable(SortableAttribute.SortAlgorithm.BySortValue)]
         [ShowNiceDisplayName()]
         public enum KIndexParts
         {

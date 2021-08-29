@@ -3,7 +3,6 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -69,7 +68,7 @@ namespace HlidacStatu.Web.HealthChecks
                     var info = cluster.CreateManager().ListBuckets().Value.FirstOrDefault(m => m.Name == "hlidac");
                     if (info != null)
                     {
-                        report += $"Nodes\n{string.Join("", info.Nodes.Select((n,i)=>$"Node{i}: {n.Status}\n"))}";
+                        report += $"Nodes\n{string.Join("", info.Nodes.Select((n, i) => $"Node{i}: {n.Status}\n"))}";
                         report += $"Stats\n{info?.BasicStats?.ItemCount} záznamů\n"
                             + $"{info?.BasicStats?.MemUsed / (1024 * 1024):N0} MB RAM\n"
                             + $"{info?.BasicStats?.OpsPerSec:N2} op/s\n"

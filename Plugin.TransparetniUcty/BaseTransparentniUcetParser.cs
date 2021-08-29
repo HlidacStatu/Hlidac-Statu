@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Devmasters.Logging;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Devmasters.Logging;
 
 namespace HlidacStatu.Plugin.TransparetniUcty
 {
@@ -25,7 +26,7 @@ namespace HlidacStatu.Plugin.TransparetniUcty
 
         public abstract string Name { get; }
 
-        public IEnumerable<IBankovniPolozka> GetPolozky(DateTime? fromDate=null, DateTime? toDate = null)
+        public IEnumerable<IBankovniPolozka> GetPolozky(DateTime? fromDate = null, DateTime? toDate = null)
         {
             TULogger.Info($"Zahajeni zpracovani uctu {Ucet.CisloUctu} ({fromDate?.ToString() ?? "null"} - {toDate?.ToString() ?? "null"})");
             var accountItems = DoParse(fromDate, toDate).ToArray();
@@ -34,6 +35,6 @@ namespace HlidacStatu.Plugin.TransparetniUcty
         }
 
         protected abstract IEnumerable<IBankovniPolozka> DoParse(DateTime? fromDate = null, DateTime? toDate = null);
-        
+
     }
 }

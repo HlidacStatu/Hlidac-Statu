@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;
+
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.XLib
 {
@@ -21,7 +22,7 @@ namespace HlidacStatu.XLib
             public bool OsobaFtx = false;
             public Repositories.Searching.Search.GeneralResult<Firma> Firmy { get; set; } = null;
             public Datasets.Search.DatasetMultiResult Datasets { get; set; }
-			public InsolvenceSearchResult Insolvence { get; set; } = null;
+            public InsolvenceSearchResult Insolvence { get; set; } = null;
             public DotaceSearchResult Dotace { get; set; } = null;
 
             public bool HasSmlouvy { get { return (Smlouvy != null && Smlouvy.HasResult); } }
@@ -29,7 +30,7 @@ namespace HlidacStatu.XLib
             public bool HasOsoby { get { return (Osoby != null && Osoby.HasResult); } }
             public bool HasFirmy { get { return (Firmy != null && Firmy.HasResult); } }
             public bool HasDatasets { get { return (Datasets != null && Datasets.HasResult); } }
-			public bool HasInsolvence { get { return Insolvence != null && Insolvence.HasResult; } }
+            public bool HasInsolvence { get { return Insolvence != null && Insolvence.HasResult; } }
             public bool HasDotace { get { return Dotace != null && Dotace.HasResult; } }
 
             public Dictionary<string, System.TimeSpan> SearchTimes()
@@ -45,15 +46,15 @@ namespace HlidacStatu.XLib
                     times.Add("Firmy", Firmy.ElapsedTime);
                 if (Firmy != null)
                     times.Add("Dataset.Total", Datasets.ElapsedTime);
-				if (Datasets != null)
+                if (Datasets != null)
                 {
                     foreach (var ds in Datasets.Results)
                     {
                         times.Add("Dataset." + ds.DataSet.DatasetId, ds.ElapsedTime);
                     }
                 }
-				if (Insolvence != null)
-					times.Add("Insolvence", Insolvence.ElapsedTime);
+                if (Insolvence != null)
+                    times.Add("Insolvence", Insolvence.ElapsedTime);
                 if (Dotace != null)
                     times.Add("Dotace", Dotace.ElapsedTime);
                 if (AddOsobyTime.Ticks > 0)
@@ -61,7 +62,7 @@ namespace HlidacStatu.XLib
 
                 if (TotalSearchTime.Ticks > 0)
                     times.Add("Total", TotalSearchTime);
-				return times;
+                return times;
             }
 
             public string SearchTimesReport(string delimiter = "\n")
@@ -84,7 +85,7 @@ namespace HlidacStatu.XLib
                         && (Osoby?.IsValid ?? false)
                         && (Firmy?.IsValid ?? false)
                         && (Datasets?.IsValid ?? false)
-						&& (Insolvence?.IsValid ?? false)
+                        && (Insolvence?.IsValid ?? false)
                         && (Dotace?.IsValid ?? false)
                         ;
                 }
@@ -113,8 +114,8 @@ namespace HlidacStatu.XLib
                         t += Firmy.Total;
                     if (HasDatasets)
                         t += Datasets.Total;
-					if (HasInsolvence)
-						t += Insolvence.Total;
+                    if (HasInsolvence)
+                        t += Insolvence.Total;
                     if (HasDotace)
                         t += Dotace.Total;
 
@@ -127,7 +128,7 @@ namespace HlidacStatu.XLib
 
 
         static object objGeneralSearchLock = new object();
-        public static MultiResult GeneralSearch(string query, int page = 1, int pageSize = 10, bool showBeta = false, string order = null)  
+        public static MultiResult GeneralSearch(string query, int page = 1, int pageSize = 10, bool showBeta = false, string order = null)
         {
             MultiResult res = new MultiResult() { Query = query };
 
@@ -139,7 +140,7 @@ namespace HlidacStatu.XLib
                 res.Smlouvy = new SmlouvaSearchResult();
                 res.Smlouvy.Q = query;
                 res.Smlouvy.IsValid = false;
-                
+
                 return res;
             }
 
@@ -150,7 +151,7 @@ namespace HlidacStatu.XLib
             //po.MaxDegreeOfParallelism = 20;
             po.MaxDegreeOfParallelism = System.Diagnostics.Debugger.IsAttached ? 1 : po.MaxDegreeOfParallelism;
 
-            Parallel.Invoke(po,               
+            Parallel.Invoke(po,
                 () =>
                 {
                     try
@@ -163,7 +164,7 @@ namespace HlidacStatu.XLib
                     {
                         Util.Consts.Logger.Error("MultiResult GeneralSearch for Smlouvy query" + query, e);
                     }
-                    
+
 
                 },
                 () =>
@@ -187,7 +188,7 @@ namespace HlidacStatu.XLib
                 {
                     try
                     {
-                        res.VZ =  VerejnaZakazkaRepo.Searching.SimpleSearch(query, null, 1, pageSize, order);
+                        res.VZ = VerejnaZakazkaRepo.Searching.SimpleSearch(query, null, 1, pageSize, order);
                     }
                     catch (System.Exception e)
                     {
@@ -214,10 +215,10 @@ namespace HlidacStatu.XLib
 
 
                 },
-				() =>
-				{
-					try
-					{
+                () =>
+                {
+                    try
+                    {
                         var iqu = new InsolvenceSearchResult { Q = query, PageSize = pageSize, Order = order };
                         res.Insolvence = iqu;
                         //if (showBeta)
@@ -225,11 +226,11 @@ namespace HlidacStatu.XLib
 
                     }
                     catch (System.Exception e)
-					{
-						Util.Consts.Logger.Error("MultiResult GeneralSearch for insolvence query" + query, e);
-					}
+                    {
+                        Util.Consts.Logger.Error("MultiResult GeneralSearch for insolvence query" + query, e);
+                    }
 
-				},
+                },
                 () =>
                 {
                     try
@@ -250,12 +251,12 @@ namespace HlidacStatu.XLib
                  {
                      try
                      {
-                             res.Datasets = Datasets.Search.DatasetMultiResult.GeneralSearch(query, null, 1, 5);
-                             if (res.Datasets.Exceptions.Count > 0)
-                             {
-                                 Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetMulti query " + query,
-                                     res.Datasets.GetExceptions());
-                             }
+                         res.Datasets = Datasets.Search.DatasetMultiResult.GeneralSearch(query, null, 1, 5);
+                         if (res.Datasets.Exceptions.Count > 0)
+                         {
+                             Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetMulti query " + query,
+                                 res.Datasets.GetExceptions());
+                         }
                      }
                      catch (System.Exception e)
                      {

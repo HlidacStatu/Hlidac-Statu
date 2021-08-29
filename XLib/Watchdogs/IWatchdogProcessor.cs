@@ -1,12 +1,13 @@
-﻿using System;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
+
+using System;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
     public interface IWatchdogProcessor
         : IEmailFormatter
     {
-        WatchDog OrigWD { get;  }
+        WatchDog OrigWD { get; }
         Results GetResults(DateTime? fromDate = null, DateTime? toDate = null, int? maxItems = null, string order = null);
         DateTime GetLatestRec(DateTime toDate);
 

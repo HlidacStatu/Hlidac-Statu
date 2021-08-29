@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Net;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
 using System.Text;
@@ -13,7 +13,7 @@ namespace HlidacStatu.Lib.Data.External.eAgri
 {
     public static class DeMinimisCalls
     {
-        
+
 
         //dn=""cn=PDS_RDM_All,cn=PDS,cn=Users,o=mze,c=cz"" certificateSN=""#NEDEF"" addressAD=""default"" certificateOwner=""#NEDEF""
         static string icoSubReq = @"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:v02=""http://www.pds.eu/vOKO/v0200"" xmlns:rdm=""http://www.pds.eu/RDM_PUB01B"" xmlns:ns=""http://www.mze.cz/ESBServer/1.0"">
@@ -37,21 +37,21 @@ namespace HlidacStatu.Lib.Data.External.eAgri
         {
 
             string url = "https://eagri.cz/ssl/nosso-app/EPO/WS/v2Online/vOKOsrv.ashx";
-            string req = icoSubReq.Replace("#ICO#",ico);
+            string req = icoSubReq.Replace("#ICO#", ico);
 
             Soap net = new Soap();
             string resp = net.UploadString(url, req);
 
             XElement xdoc = XElement.Parse(resp);
             var res = xdoc.DescendantNodes()
-                .Select(m=>m as XElement)
-                .Where(m=>m!=null && m.HasAttributes)
+                .Select(m => m as XElement)
+                .Where(m => m != null && m.HasAttributes)
                 .Where(m => m.Attributes()
                         .Any(a => a.Name == "xmlns" && a.Value == "http://www.pds.eu/RDM_PUB01B") == true
                     )
                     .ToArray();
-                    var serializer = new XmlSerializer(typeof(DeMinimis.Response),"http://www.pds.eu/RDM_PUB01B");
-        var xxx=  (DeMinimis.Response)serializer.Deserialize(res.First().CreateReader());
+            var serializer = new XmlSerializer(typeof(DeMinimis.Response), "http://www.pds.eu/RDM_PUB01B");
+            var xxx = (DeMinimis.Response)serializer.Deserialize(res.First().CreateReader());
 
         }
 

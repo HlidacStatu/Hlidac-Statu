@@ -3,7 +3,6 @@
 using Nest;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,11 +43,11 @@ namespace HlidacStatu.Web.HealthChecks
                     .SniffLifeSpan(null)
                     ;
 
-                if (_client==null)
+                if (_client == null)
                     _client = new ElasticClient(settings);
 
                 var res = await _client.Cluster.HealthAsync();
-                    
+
                 var numberOfNodes = res?.NumberOfNodes ?? 0;
 
                 string report = $"Num. of nodes:{numberOfNodes}";
@@ -59,7 +58,7 @@ namespace HlidacStatu.Web.HealthChecks
 
                 switch (res?.Status)
                 {
-                    case Elasticsearch.Net.Health.Red: 
+                    case Elasticsearch.Net.Health.Red:
                         return HealthCheckResult.Unhealthy(report + $" Cluster status RED! {res.UnassignedShards} unassigned shards. {res.InitializingShards} initializing shards.");
                     case Elasticsearch.Net.Health.Yellow:
                         return HealthCheckResult.Degraded(report + $" Cluster status YELLOW! {res.UnassignedShards} unassigned shards. {res.InitializingShards} initializing shards.");

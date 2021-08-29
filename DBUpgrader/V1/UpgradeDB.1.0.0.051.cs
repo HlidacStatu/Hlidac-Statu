@@ -3,15 +3,15 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.51")]
-			public static void Init_1_0_0_51(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.51")]
+            public static void Init_1_0_0_51(IDatabaseUpgrader du)
+            {
 
                 string sql = @"
 CREATE NONCLUSTERED INDEX [idx_audit_date] ON [dbo].[Audit]
@@ -48,5 +48,5 @@ GO
 
         }
 
-	}
+    }
 }

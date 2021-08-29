@@ -1,25 +1,27 @@
-using System;
-using System.IO;
 using HlidacStatu.Entities;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Framework;
+
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.OpenApi.Models;
+
+using System;
+using System.IO;
 
 namespace HlidacStatu.Web
 {
     public class Startup
     {
         private bool _shouldRunHealthcheckFeature = false;
-        
+
         public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
         {
             Configuration = configuration;
@@ -44,7 +46,7 @@ namespace HlidacStatu.Web
             string healthcheckFeatureOption = Devmasters.Config.GetWebConfigValue("RunHealthcheckFeature");
             _shouldRunHealthcheckFeature = !string.IsNullOrWhiteSpace(healthcheckFeatureOption) &&
                                            healthcheckFeatureOption == "true";
-            
+
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             // for scoped services (mainly for identity)
             services.AddDbContext<DbEntities>(options =>
@@ -112,9 +114,9 @@ namespace HlidacStatu.Web
                 c.IncludeXmlComments(xmlPath);
             });
 
-            
-            
-            if(_shouldRunHealthcheckFeature)
+
+
+            if (_shouldRunHealthcheckFeature)
                 AddAllHealtChecks(services);
 
             //services.AddHealthChecksUI(set =>
@@ -208,7 +210,7 @@ namespace HlidacStatu.Web
                 //    }
                 //);
             }
-            
+
 
             app.UseEndpoints(endpoints =>
             {
@@ -335,8 +337,8 @@ namespace HlidacStatu.Web
         {
             services
                 .AddHealthChecks()
-                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000, 
-                    name: "Web server využitá pamět", 
+                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000,
+                    name: "Web server využitá pamět",
                     tags: new[] { "Web server", "process", "memory" })
                 .AddHealthCheckWithResponseTime(
                     new global::HealthChecks.SqlServer.SqlServerHealthCheck(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 username from AspNetUsers"),
@@ -347,15 +349,15 @@ namespace HlidacStatu.Web
                     {
                         ExpectedNumberOfNodes = 16,
                         ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';')
-                    }, 
+                    },
                     "Elastic cluster", tags: new[] { "DB", "elastic" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.ElasticSearchNodesFreeDisk, Web.HealthChecks.ElasticSearchNodesFreeDisk.Options>(
                     new Web.HealthChecks.ElasticSearchNodesFreeDisk.Options()
                     {
                         ExpectedNumberOfNodes = 16,
                         ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-                        MinimumFreeSpaceInMegabytes= 5000
-                    }, 
+                        MinimumFreeSpaceInMegabytes = 5000
+                    },
                     "Elastic nodes disk space", tags: new[] { "DB", "elastic" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.NetworkDiskStorage, Web.HealthChecks.NetworkDiskStorage.Options>(
                     new Web.HealthChecks.NetworkDiskStorage.Options()
@@ -363,7 +365,7 @@ namespace HlidacStatu.Web
                         UNCPath = "c:\\",
                         DegradedMinimumFreeMegabytes = 10 * 1024, //10G 
                         UnHealthtMinimumFreeMegabytes = 1 * 1024 //1GB
-                    }, 
+                    },
                     "System disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
                 )
 
@@ -373,7 +375,7 @@ namespace HlidacStatu.Web
                         UNCPath = Devmasters.Config.GetWebConfigValue("FileCachePath"),
                         DegradedMinimumFreeMegabytes = 10 * 1024, //10G 
                         UnHealthtMinimumFreeMegabytes = 1 * 1024 //1GB
-                    }, 
+                    },
                     "Cache disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
                 )
                 .AddHealthCheckWithOptions<Web.HealthChecks.Couchbase, Web.HealthChecks.Couchbase.Options>(
@@ -384,7 +386,7 @@ namespace HlidacStatu.Web
                         Username = Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
                         Password = Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
                         Service = Web.HealthChecks.Couchbase.Service.KeyValue
-                    }, 
+                    },
                     "Couchbase", tags: new[] { "Cache" })
                 .AddHealthCheckWithResponseTime(
                     new global::HealthChecks.Network.SmtpHealthCheck(new global::HealthChecks.Network.SmtpHealthCheckOptions()
@@ -458,7 +460,7 @@ namespace HlidacStatu.Web
                     }, "Docker .204", HealthStatus.Unhealthy, tags: new[] { "Docker" })
 
                 .AddHealthCheckWithOptions<Web.HealthChecks.CamelotApis, Web.HealthChecks.CamelotApis.Options>(
-                    new Web.HealthChecks.CamelotApis.Options() { CamelotAPIUris = Devmasters.Config.GetWebConfigValue("Camelot.Service.Api").Split(';')}, 
+                    new Web.HealthChecks.CamelotApis.Options() { CamelotAPIUris = Devmasters.Config.GetWebConfigValue("Camelot.Service.Api").Split(';') },
                     "Camelot APIs", HealthStatus.Unhealthy, tags: new[] { "Docker" })
                 ;
         }

@@ -1,15 +1,16 @@
-﻿using System;
+﻿using HlidacStatu.Connectors;
+using HlidacStatu.Entities;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Connectors;
-using HlidacStatu.Entities;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
     public partial class Statistics
     {
 
-        static int[] Percentiles = new int[] { 1, 5, 10, 25,33, 50, 66, 75, 90, 95, 99 };
+        static int[] Percentiles = new int[] { 1, 5, 10, 25, 33, 50, 66, 75, 90, 95, 99 };
 
         public static Devmasters.Cache.File.FileCache<Analysis.KorupcniRiziko.Statistics[]> KIndexStatTotal = new Devmasters.Cache.File.FileCache<Analysis.KorupcniRiziko.Statistics[]>(
                 Init.WebAppDataPath, TimeSpan.Zero, "KIndexStat",
@@ -51,7 +52,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         {
             if (year < Consts.AvailableCalculationYears.Min() + 1)
                 year = Consts.AvailableCalculationYears.Min() + 1;
-            if (year > Consts.AvailableCalculationYears.Max() )
+            if (year > Consts.AvailableCalculationYears.Max())
                 year = Consts.AvailableCalculationYears.Max();
 
             var statChosenYear = KIndexStatTotal.Get().FirstOrDefault(m => m.Rok == year).SubjektOrderedListKIndexAsc;
@@ -60,7 +61,8 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             IEnumerable<SubjectWithKIndexTrend> result = statChosenYear.Join(statYearBefore,
                 cy => cy.ico,
                 yb => yb.ico,
-                (cy, yb) => {
+                (cy, yb) =>
+                {
                     SubjectNameCache.GetCompanies().TryGetValue(cy.ico, out SubjectNameCache comp);
                     var r = new SubjectWithKIndexTrend()
                     {
@@ -72,7 +74,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     };
                     return r;
                 })
-                .Where(m=>(m.Roky.First().Value - m.Roky.Last().Value )!= 0)
+                .Where(m => (m.Roky.First().Value - m.Roky.Last().Value) != 0)
                 .OrderByDescending(c => c.KIndex);
 
             if (statChosenYear == null || statYearBefore == null)
@@ -119,10 +121,10 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                         Ico = m.ico,
                         Jmeno = SubjectNameCache.CachedCompanies.Get()[m.ico].Name,
                         KrajId = m.krajId,
-                        Group="",
+                        Group = "",
                         KIndex = m.kindex
                     }
-                    ) ;
+                    );
             }
             if (showNone)
             {
@@ -131,16 +133,16 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     var missing_ico = filterIco.Select(m => m.Ico).Except(data.Select(m => m.Ico));
 
                     IEnumerable<SubjectWithKIndex> missing_data = missing_ico
-                        .Join(filterIco,mi=>mi, fi=>fi.Ico, (mi,fi)=> 
-                            new SubjectWithKIndex()
-                            {
-                                Ico = fi.Ico,
-                                KIndex = Consts.MinSmluvPerYearKIndexValue,
-                                Jmeno = fi.Jmeno,
-                                Group = fi.Group,
-                                KrajId = fi.KrajId,
-                                Kraj = fi.Kraj
-                            });
+                        .Join(filterIco, mi => mi, fi => fi.Ico, (mi, fi) =>
+                                 new SubjectWithKIndex()
+                                 {
+                                     Ico = fi.Ico,
+                                     KIndex = Consts.MinSmluvPerYearKIndexValue,
+                                     Jmeno = fi.Jmeno,
+                                     Group = fi.Group,
+                                     KrajId = fi.KrajId,
+                                     Kraj = fi.Kraj
+                                 });
                     data = data.Concat(missing_data);
                 }
             }
@@ -149,13 +151,13 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         public IEnumerable<SubjectWithKIndex> SubjektOrderedListKIndexCompanyAsc(IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
         {
-            return Filter(SubjektOrderedListKIndexAsc,filterIco, showNone)
+            return Filter(SubjektOrderedListKIndexAsc, filterIco, showNone)
                 .OrderBy(m => m.KIndex);
         }
 
         public IEnumerable<SubjectWithKIndex> SubjektOrderedListPartsCompanyAsc(KIndexData.KIndexParts part, IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
         {
-            return Filter(SubjektOrderedListPartsAsc[part],filterIco,showNone)
+            return Filter(SubjektOrderedListPartsAsc[part], filterIco, showNone)
                 .OrderBy(m => m.KIndex);
         }
 

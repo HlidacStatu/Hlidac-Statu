@@ -1,10 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Devmasters;
+﻿using Devmasters;
+
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Issues;
 using HlidacStatu.Repositories;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Plugin.IssueAnalyzers
 {
@@ -75,14 +77,14 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
             if (item.hodnotaBezDph.HasValue && (item.hodnotaBezDph.HasValue == false || item.hodnotaBezDph == 0))
             {
                 issues.Add(
-                    new Issue(this, (int)IssueType.IssueTypes.Cena_bez_DPH_nulova, "Cena bez DPH nulová", "Smlouva uvádí nulovou cenu bez DPH.",null, new { hodnotaBezDph = item.hodnotaBezDph })
+                    new Issue(this, (int)IssueType.IssueTypes.Cena_bez_DPH_nulova, "Cena bez DPH nulová", "Smlouva uvádí nulovou cenu bez DPH.", null, new { hodnotaBezDph = item.hodnotaBezDph })
                     );
             }
 
-            if (item.hodnotaVcetneDph.HasValue && (item.hodnotaVcetneDph.HasValue == false || item.hodnotaVcetneDph== 0))
+            if (item.hodnotaVcetneDph.HasValue && (item.hodnotaVcetneDph.HasValue == false || item.hodnotaVcetneDph == 0))
             {
                 issues.Add(
-                    new Issue(this, (int)IssueType.IssueTypes.Cena_s_DPH_nulova, "Cena s DPH nulová", "Smlouva uvádí nulovou cenu s DPH.",null, new { hodnotaVcetneDph = item.hodnotaVcetneDph })
+                    new Issue(this, (int)IssueType.IssueTypes.Cena_s_DPH_nulova, "Cena s DPH nulová", "Smlouva uvádí nulovou cenu s DPH.", null, new { hodnotaVcetneDph = item.hodnotaVcetneDph })
                     );
             }
 
@@ -105,7 +107,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
                 decimal bezDPH = item.hodnotaBezDph.Value;
                 decimal sDPH = item.hodnotaVcetneDph.Value;
 
-                if (bezDPH > sDPH && (bezDPH>0 && sDPH>0))
+                if (bezDPH > sDPH && (bezDPH > 0 && sDPH > 0))
                 {
                     issues.Add(
                         new Issue(this, (int)IssueType.IssueTypes.Neplatna_cena, "Neplatná cena", "Cena bez DPH je větší než cena s DPH.", null, new { hodnotaVcetneDph = item.hodnotaVcetneDph, hodnotaBezDph = item.hodnotaBezDph })
@@ -137,7 +139,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
                             );
 
                     }
-                }                
+                }
             }
 
             return issues;

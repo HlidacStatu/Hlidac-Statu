@@ -1,7 +1,8 @@
-﻿using System;
-using System.Linq;
-using HlidacStatu.Datastructures.Graphs;
+﻿using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
+
+using System;
+using System.Linq;
 
 namespace HlidacStatu.Repositories.Searching.Rules
 {
@@ -15,12 +16,14 @@ namespace HlidacStatu.Repositories.Searching.Rules
             _specificPrefix = specificPrefix;
         }
 
-        public override string[] Prefixes { 
-            get {
+        public override string[] Prefixes
+        {
+            get
+            {
                 if (!string.IsNullOrEmpty(_specificPrefix))
                     return new string[] { _specificPrefix };
                 else
-                    return new string[] { "holding:", 
+                    return new string[] { "holding:",
                         "holdingprijemce:", "holdingplatce:",
                         "holdingdluznik:", "holdingveritel:", "holdingspravce:",
                         "holdingdodavatel:", "holdingzadavatel:"};

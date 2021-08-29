@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities.Analysis;
 using HlidacStatu.Lib.Analytics;
+
+using System;
+using System.Collections.Generic;
 
 namespace HlidacStatu.Repositories.Statistics
 {
@@ -80,25 +81,25 @@ namespace HlidacStatu.Repositories.Statistics
             foreach (var year in Consts.RegistrSmluvYearsList)
             {
                 data.Add(year, new Smlouva.Statistics.Data()
-                    {
-                        PocetSmluv = _calc_smlouvy[year].Pocet,
-                        CelkovaHodnotaSmluv = _calc_smlouvy[year].CelkemCena,
-                        PocetSmluvBezCeny = _calc_bezCeny[year].Pocet,
-                        PocetSmluvBezSmluvniStrany = _calc_bezSmlStran[year].Pocet,
-                        SumKcSmluvBezSmluvniStrany = _calc_bezSmlStran[year].CelkemCena,
-                        PocetSmluvSeSoukromymSubj = _calc_soukrome[year].Pocet,
-                        CelkovaHodnotaSmluvSeSoukrSubj = _calc_soukrome[year].CelkemCena,
-                        PocetSmluvBezCenySeSoukrSubj = _calc_soukromeBezCeny[year].Pocet,
+                {
+                    PocetSmluv = _calc_smlouvy[year].Pocet,
+                    CelkovaHodnotaSmluv = _calc_smlouvy[year].CelkemCena,
+                    PocetSmluvBezCeny = _calc_bezCeny[year].Pocet,
+                    PocetSmluvBezSmluvniStrany = _calc_bezSmlStran[year].Pocet,
+                    SumKcSmluvBezSmluvniStrany = _calc_bezSmlStran[year].CelkemCena,
+                    PocetSmluvSeSoukromymSubj = _calc_soukrome[year].Pocet,
+                    CelkovaHodnotaSmluvSeSoukrSubj = _calc_soukrome[year].CelkemCena,
+                    PocetSmluvBezCenySeSoukrSubj = _calc_soukromeBezCeny[year].Pocet,
 
-                        PocetSmluvSponzorujiciFirmy = _calc_sVazbouNaPolitikyNedavne[year].Pocet,
-                        PocetSmluvBezCenySponzorujiciFirmy = _calc_sVazbouNaPolitikyBezCenyNedavne[year].Pocet,
-                        SumKcSmluvSponzorujiciFirmy = _calc_sVazbouNaPolitikyNedavne[year].CelkemCena,
-                        PocetSmluvULimitu = _calc_ULimitu[year].Pocet,
-                        PocetSmluvOVikendu = _calc_UzavrenoOVikendu[year].Pocet,
-                        PocetSmluvSeZasadnimNedostatkem = _calc_SeZasadnimNedostatkem[year].Pocet,
-                        PocetSmluvNovaFirma = _calc_NovaFirmaDodavatel[year].Pocet,
-                        PoOblastech = _calc_poOblastech[year]
-                    }
+                    PocetSmluvSponzorujiciFirmy = _calc_sVazbouNaPolitikyNedavne[year].Pocet,
+                    PocetSmluvBezCenySponzorujiciFirmy = _calc_sVazbouNaPolitikyBezCenyNedavne[year].Pocet,
+                    SumKcSmluvSponzorujiciFirmy = _calc_sVazbouNaPolitikyNedavne[year].CelkemCena,
+                    PocetSmluvULimitu = _calc_ULimitu[year].Pocet,
+                    PocetSmluvOVikendu = _calc_UzavrenoOVikendu[year].Pocet,
+                    PocetSmluvSeZasadnimNedostatkem = _calc_SeZasadnimNedostatkem[year].Pocet,
+                    PocetSmluvNovaFirma = _calc_NovaFirmaDodavatel[year].Pocet,
+                    PoOblastech = _calc_poOblastech[year]
+                }
                 );
             }
 

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Html;
+
+using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Html;
 
 namespace HlidacStatu.XLib.Render
 {
@@ -25,7 +26,7 @@ namespace HlidacStatu.XLib.Render
             queue.Add(new QueueItem() { Key = key, Title = title, Data = report, Type = QueueItem.types.table });
         }
         public void Add<T>(string key, string title, ReportDataSource<T> report)
-            //where T : class
+        //where T : class
         {
             queue.Add(new QueueItem() { Key = key, Title = title, Data = report, Type = QueueItem.types.table });
         }

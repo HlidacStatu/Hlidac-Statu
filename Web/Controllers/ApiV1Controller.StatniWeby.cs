@@ -1,9 +1,12 @@
 ﻿using Devmasters.Enums;
+
+using HlidacStatu.Datasets;
 using HlidacStatu.Lib.Data.External.Zabbix;
+
+using Microsoft.AspNetCore.Mvc;
+
 using System;
 using System.Linq;
-using HlidacStatu.Datasets;
-using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers
 {

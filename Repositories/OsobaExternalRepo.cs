@@ -1,5 +1,6 @@
-using System.Linq;
 using HlidacStatu.Entities;
+
+using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
@@ -20,7 +21,7 @@ namespace HlidacStatu.Repositories
                     .FirstOrDefault(m => m.OsobaId == osobaId && m.ExternalId == externalId && m.ExternalSource == (int)externalsource);
                 if (exist == null)
                 {
-                    OsobaExternalId oei = new OsobaExternalId(osobaId, externalId, externalsource );
+                    OsobaExternalId oei = new OsobaExternalId(osobaId, externalId, externalsource);
                     db.OsobaExternalId.Add(oei);
                     db.SaveChanges();
                 }

@@ -1,4 +1,5 @@
 ﻿using Nest;
+
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -21,7 +22,7 @@ namespace HlidacStatu.Entities.Dotace
         public string NazevProjektu { get; set; }
         [Object]
         public Zdroj Zdroj { get; set; }
-        
+
         [Object]
         public Prijemce Prijemce { get; set; }
 
@@ -77,7 +78,7 @@ namespace HlidacStatu.Entities.Dotace
                 return url;
         }
 
-       
+
         public string ToAuditJson() => Newtonsoft.Json.JsonConvert.SerializeObject(this);
 
         public string ToAuditObjectId() => IdDotace;
@@ -99,7 +100,7 @@ namespace HlidacStatu.Entities.Dotace
                 DotaceCelkem = Rozhodnuti.Sum(r => r.CerpanoCelkem ?? 0);
                 PujckaCelkem = Rozhodnuti.Where(r => r.JePujcka.HasValue && r.JePujcka.Value).Sum(r => r.CerpanoCelkem ?? 0);
             }
-         
+
         }
 
         public void CalculateCerpaniYears()

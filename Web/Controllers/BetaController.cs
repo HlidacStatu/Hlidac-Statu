@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.Repositories;
+﻿using HlidacStatu.Repositories;
+
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -29,7 +30,7 @@ namespace HlidacStatu.Web.Controllers
             return Json(searchResult.Select(r => r.Original));
         }
 
-     
+
         public JsonResult Autocomplete2(string q)
         {
             var searchCache = StaticData.FulltextSearchForAutocomplete.Get();
@@ -89,7 +90,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 result = 10 / i;
             }
-            
+
             return Ok($"V pořádku {result}");
         }
     }

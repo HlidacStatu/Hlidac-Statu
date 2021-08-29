@@ -29,7 +29,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
 
         public IEnumerable<DateTimeRange> Split(Interval interval, double number, bool overlapEndAndNextStart)
         {
-            TimeSpan ts;            
+            TimeSpan ts;
             switch (interval)
             {
                 case Interval.Minutes:

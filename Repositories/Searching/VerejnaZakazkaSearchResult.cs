@@ -1,7 +1,8 @@
-﻿using System;
+﻿using HlidacStatu.Entities.VZ;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities.VZ;
 
 
 namespace HlidacStatu.Repositories.Searching
@@ -96,7 +97,7 @@ namespace HlidacStatu.Repositories.Searching
             [Devmasters.Enums.NiceDisplayName("podle odběratele")]
             [Devmasters.Enums.SortValue(98)]
             CustomerAsc = 8,
-    
+
             [Devmasters.Enums.NiceDisplayName("podle dodavatele")]
             [Devmasters.Enums.SortValue(99)]
             ContractorAsc = 9,
@@ -112,7 +113,7 @@ namespace HlidacStatu.Repositories.Searching
         }
 
         public List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> OblastiList { get; set; } = null;
-        
+
         private string _oblast = "";
         public string Oblast
         {
@@ -123,7 +124,7 @@ namespace HlidacStatu.Repositories.Searching
 
             set
             {
-                _oblast= value;
+                _oblast = value;
                 if (OblastiList != null && OblastiList.Count > 0)
                 {
                     foreach (var item in OrderList)
@@ -144,7 +145,7 @@ namespace HlidacStatu.Repositories.Searching
 
         public bool ShowWatchdog { get; set; } = true;
 
-       public IEnumerable<VerejnaZakazka> Results
+        public IEnumerable<VerejnaZakazka> Results
         {
             get
             {
@@ -158,7 +159,7 @@ namespace HlidacStatu.Repositories.Searching
         protected static Func<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> getVZOrderList = () =>
         {
             return
-                new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem[] { new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem() { Value="", Text = "---" } }
+                new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem[] { new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem() { Value = "", Text = "---" } }
                 .Union(
                     Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(VZOrderResult))
                     .Select(
@@ -187,7 +188,7 @@ namespace HlidacStatu.Repositories.Searching
 
             string ret = string.Format("{0}{1}",
                 pageUrl,
-               GetSearchUrlQueryString(Q, order, page, Zahajeny,oblast));
+               GetSearchUrlQueryString(Q, order, page, Zahajeny, oblast));
 
             return ret;
         }
@@ -203,7 +204,7 @@ namespace HlidacStatu.Repositories.Searching
             string ret = string.Format("?Q={0}",
                System.Web.HttpUtility.UrlEncode(Q));
             if (Zahajeny)
-                ret = ret + "&Zahajeny=true" ;
+                ret = ret + "&Zahajeny=true";
 
             if (eorder.HasValue)
                 ret = ret + "&order=" + ((int)eorder.Value).ToString();

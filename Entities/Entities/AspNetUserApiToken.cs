@@ -13,9 +13,9 @@ namespace HlidacStatu.Entities
         public AspNetUserApiToken()
         {
         }
-        
+
         public AspNetUserApiToken(ApplicationUser user) : this(user.Id) { }
-        
+
         public AspNetUserApiToken(string userId)
         {
             Id = userId;

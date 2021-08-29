@@ -9,8 +9,8 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class GenericHealthCheckBuilderExtensions
     {
         public static IHealthChecksBuilder AddHealthCheckWithOptions<T, TOptions>(
-            this IHealthChecksBuilder builder, 
-            TOptions options, 
+            this IHealthChecksBuilder builder,
+            TOptions options,
             string name = default, HealthStatus? failureStatus = default, IEnumerable<string> tags = default, TimeSpan? timeout = default)
         where T : IHealthCheck
         {
@@ -43,6 +43,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 timeout));
         }
 
-        
+
     }
 }

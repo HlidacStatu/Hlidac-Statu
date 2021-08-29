@@ -1,9 +1,9 @@
 ﻿using NPOI.XWPF.UserModel;
 
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace HlidacStatu.Lib.Data.External.Tables
 {
@@ -49,12 +49,12 @@ namespace HlidacStatu.Lib.Data.External.Tables
             try
             {
 
-            if (File.Exists(fn) == false)
-                return null;
-            if (fn.EndsWith(".docx"))
-                return GetTablesFromWordDOCX(fn);
-            if (fn.EndsWith(".doc"))
-                return GetTablesFromWordDOC(fn);
+                if (File.Exists(fn) == false)
+                    return null;
+                if (fn.EndsWith(".docx"))
+                    return GetTablesFromWordDOCX(fn);
+                if (fn.EndsWith(".doc"))
+                    return GetTablesFromWordDOC(fn);
             }
             catch (Exception e)
             {

@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Devmasters.Enums;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
-using Devmasters.Enums;
 
 namespace HlidacStatu.Lib.Data.External.DatoveSchranky
 {

@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using Devmasters.Collections;
+﻿using Devmasters.Collections;
 
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {

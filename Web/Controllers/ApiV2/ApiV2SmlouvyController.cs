@@ -1,11 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Swashbuckle.AspNetCore.Annotations;
+
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -78,7 +81,7 @@ namespace HlidacStatu.Web.Controllers
             else
             {
                 var filtered = result.ElasticResults.Hits
-                    .Select(m => 
+                    .Select(m =>
                         Smlouva.Export(m.Source,
                             this.ApiAuth.ApiCall.UserRoles.Contains("Admin") || this.ApiAuth.ApiCall.UserRoles.Contains("KomercniLicence"),
                             this.ApiAuth.ApiCall.UserRoles.Contains("Admin") || this.ApiAuth.ApiCall.UserRoles.Contains("KomercniLicence")
@@ -97,7 +100,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>detail smlouvy</returns>
         [HttpGet("{id?}")]
         [AuthorizeAndAudit]
-        public ActionResult<Smlouva> Detail([FromRoute]string id = null)
+        public ActionResult<Smlouva> Detail([FromRoute] string id = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -114,7 +117,7 @@ namespace HlidacStatu.Web.Controllers
             return s;
         }
 
-        
+
         /// <summary>
         /// všechna ID platných verzí smluv. (API pouze pro komerční licence)
         /// </summary>
@@ -130,7 +133,7 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpGet("text/{id?}")]
         [AuthorizeAndAudit]
-        public ActionResult<IEnumerable<string>> Text([FromRoute]string id = null)
+        public ActionResult<IEnumerable<string>> Text([FromRoute] string id = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {

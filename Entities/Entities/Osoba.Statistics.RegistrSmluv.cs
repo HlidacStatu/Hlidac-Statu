@@ -1,6 +1,7 @@
-﻿using HlidacStatu.Lib.Analytics;
+﻿using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.Lib.Analytics;
+
 using System.Collections.Generic;
-using HlidacStatu.Datastructures.Graphs;
 
 namespace HlidacStatu.Entities
 {
@@ -23,10 +24,10 @@ namespace HlidacStatu.Entities
                 public StatisticsPerYear<Smlouva.Statistics.Data> _soukromeFirmySummary = null;
                 public StatisticsPerYear<Smlouva.Statistics.Data> _statniFirmySummary = null;
                 public StatisticsPerYear<Smlouva.Statistics.Data> _neziskovkySummary = null;
-                
+
 
             }
-            
+
 
         }
     }

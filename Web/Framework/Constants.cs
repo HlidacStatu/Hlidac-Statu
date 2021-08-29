@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using Microsoft.Extensions.Hosting;
 
-using Microsoft.Extensions.Hosting;
+using System;
+using System.Linq;
 
 namespace HlidacStatu.Web.Framework
 {

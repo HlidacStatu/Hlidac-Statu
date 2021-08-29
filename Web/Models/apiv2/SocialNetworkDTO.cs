@@ -1,4 +1,5 @@
 ﻿using HlidacStatu.Entities;
+
 using System;
 
 namespace HlidacStatu.Web.Models.Apiv2
@@ -17,7 +18,7 @@ namespace HlidacStatu.Web.Models.Apiv2
         {
             get
             {
-                if(Enum.TryParse<OsobaEvent.SocialNetwork>(Type, out var socialNetwork))
+                if (Enum.TryParse<OsobaEvent.SocialNetwork>(Type, out var socialNetwork))
                 {
                     switch (socialNetwork)
                     {

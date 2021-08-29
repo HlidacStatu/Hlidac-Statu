@@ -1,6 +1,7 @@
-using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
+
+using System.Linq;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -26,8 +27,8 @@ namespace HlidacStatu.Web.Framework
 
         public static bool IsAuthenticatedOrSearchCrawler(HttpRequest req)
         {
-            return req.HttpContext.User.Identity?.IsAuthenticated == true 
-                   || allCrawl.Any(cr=>cr.IsItCrawler(req.HttpContext.Connection.RemoteIpAddress?.ToString(), req.Headers[HeaderNames.UserAgent]));
+            return req.HttpContext.User.Identity?.IsAuthenticated == true
+                   || allCrawl.Any(cr => cr.IsItCrawler(req.HttpContext.Connection.RemoteIpAddress?.ToString(), req.Headers[HeaderNames.UserAgent]));
             //return req.IsAuthenticated || MajorCrawler.Crawlers.Any(cr=>cr.Detected(req.UserHostAddress, req.UserAgent));
         }
 

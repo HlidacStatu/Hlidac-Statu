@@ -3,15 +3,15 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.54")]
-			public static void Init_1_0_0_54(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.54")]
+            public static void Init_1_0_0_54(IDatabaseUpgrader du)
+            {
 
                 string sql = @"
 /****** Object:  StoredProcedure [dbo].[SmlouvaId_Save]    Script Date: 04/01/2019 16:21:26 ******/
@@ -66,5 +66,5 @@ END
 
         }
 
-	}
+    }
 }

@@ -7,10 +7,10 @@ namespace SponzoriLoader
     {
         private string _companyId;
 
-        public string CompanyId 
-        { 
-            get => _companyId; 
-            set => _companyId = value?.PadLeft(8, '0'); 
+        public string CompanyId
+        {
+            get => _companyId;
+            set => _companyId = value?.PadLeft(8, '0');
         }
         public string Name { get; set; }
         public string Surname { get; set; }

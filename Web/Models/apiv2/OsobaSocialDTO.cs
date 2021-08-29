@@ -1,9 +1,10 @@
 ﻿using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using HlidacStatu.Extensions;
 
 namespace HlidacStatu.Web.Models.Apiv2
 {

@@ -4,7 +4,7 @@ namespace SponzoriLoader
 {
     public class Donations
     {
-        private Dictionary<Donor,List<Gift>> AllDonations { get; set; }
+        private Dictionary<Donor, List<Gift>> AllDonations { get; set; }
 
         public Donations(IEqualityComparer<Donor> equalityComparer)
         {

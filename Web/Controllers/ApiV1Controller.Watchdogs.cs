@@ -1,11 +1,13 @@
-﻿using HlidacStatu.Entities;
-using System;
-using System.Linq;
-using HlidacStatu.Datasets;
+﻿using HlidacStatu.Datasets;
+using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
+using System;
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -114,7 +116,7 @@ namespace HlidacStatu.Web.Controllers
                             if (id == "delete")
                             {
                                 wd1.Delete();
-                                return Json(new {Ok = true});
+                                return Json(new { Ok = true });
                             }
 
                             if (id == "disable")
@@ -125,7 +127,8 @@ namespace HlidacStatu.Web.Controllers
                                 return Content(
                                     Newtonsoft.Json.JsonConvert.SerializeObject(new
                                     {
-                                        id = wd1.Name.Replace("APIID:", ""), expiration = wd1.Expires,
+                                        id = wd1.Name.Replace("APIID:", ""),
+                                        expiration = wd1.Expires,
                                         query = wd1.SearchTerm
                                     }), "text/json");
 
@@ -136,7 +139,7 @@ namespace HlidacStatu.Web.Controllers
                     }
                 }
 
-                return Json(new {Ok = true});
+                return Json(new { Ok = true });
             }
         }
     }

@@ -1,7 +1,9 @@
-using System;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
+
 using Nest;
+
+using System;
 
 namespace HlidacStatu.Repositories
 {

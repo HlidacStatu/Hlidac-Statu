@@ -1,8 +1,9 @@
-﻿using System;
+﻿using HlidacStatu.Repositories.Searching;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Repositories.Searching;
 
 namespace HlidacStatu.Datasets
 {
@@ -12,7 +13,7 @@ namespace HlidacStatu.Datasets
         {
             public DataSet Dataset { get; set; }
             public DatasetSumGeneralResult(string query, long total, IEnumerable<string> results, int pageSize, DataSet dataset, TimeSpan searchElapsedTime)
-                : base(query, total, results,pageSize, true)
+                : base(query, total, results, pageSize, true)
             {
                 Dataset = dataset;
                 DataSource = "Dataset." + Dataset.DatasetId;
@@ -76,7 +77,7 @@ namespace HlidacStatu.Datasets
                     return res;
 
                 if (!Repositories.Searching.Tools.ValidateQuery(query))
-                {                    
+                {
                     res.Exceptions.Add(new Exception($"Invalid Query: {query}"));
                     return res;
                 }

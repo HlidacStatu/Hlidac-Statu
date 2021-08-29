@@ -3,15 +3,15 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.62")]
-			public static void Init_1_0_0_62(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.62")]
+            public static void Init_1_0_0_62(IDatabaseUpgrader du)
+            {
                 string sql = @"
 /****** Object:  StoredProcedure [dbo].[DELETE_ASPNETUser]    Script Date: 14. 9. 2019 12:13:56 ******/
 SET ANSI_NULLS ON
@@ -57,7 +57,7 @@ END'
 END
 
 ";
-    du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
             }
 
@@ -66,5 +66,5 @@ END
 
         }
 
-	}
+    }
 }

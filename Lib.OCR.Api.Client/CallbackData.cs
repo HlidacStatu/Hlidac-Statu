@@ -21,7 +21,7 @@ namespace HlidacStatu.Lib.OCR.Api
         public string Url { get; set; }
         public string CallbackDataBody { get; set; }
 
-        
+
         public static string PrepareElasticCallbackDataForOCRReq(string itemPathText, bool addMore = false)
         {
             var ss = @"{

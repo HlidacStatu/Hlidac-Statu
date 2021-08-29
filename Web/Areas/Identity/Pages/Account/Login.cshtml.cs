@@ -1,13 +1,15 @@
+using HlidacStatu.Entities;
+
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using HlidacStatu.Entities;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HlidacStatu.Web.Areas.Identity.Pages.Account
 {
@@ -16,8 +18,8 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        
-        public LoginModel(SignInManager<ApplicationUser> signInManager, 
+
+        public LoginModel(SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
@@ -70,7 +72,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             returnUrl ??= Url.Content("~/");
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-        
+
             if (ModelState.IsValid)
             {
                 // This doesn't count login failures towards account lockout

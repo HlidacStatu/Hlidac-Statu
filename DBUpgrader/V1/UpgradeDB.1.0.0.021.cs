@@ -3,15 +3,15 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.21")]
-			public static void Init_1_0_0_21(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.21")]
+            public static void Init_1_0_0_21(IDatabaseUpgrader du)
+            {
 
                 //fix of 1.0.0.14 script
 
@@ -21,15 +21,15 @@ ALTER TABLE dbo.OsobaEvent ADD
 
 
 ";
-				du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
 
-			}
-
-	
+            }
 
 
-		}
 
-	}
+
+        }
+
+    }
 }

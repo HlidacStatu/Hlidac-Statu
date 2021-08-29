@@ -19,8 +19,8 @@ namespace HlidacStatu.Lib.Analytics
 
         static Func<T, bool> alwaysTrue = c => true;
 
-        public GlobalStatisticsPerYear(int[] calculatedYears, IEnumerable<StatisticsSubjectPerYear<T>> dataForAllIcos, 
-            Func<T,bool> allowedItems = null)
+        public GlobalStatisticsPerYear(int[] calculatedYears, IEnumerable<StatisticsSubjectPerYear<T>> dataForAllIcos,
+            Func<T, bool> allowedItems = null)
         {
             CalculatedYears = calculatedYears;
             allowedItems = allowedItems ?? alwaysTrue;
@@ -37,10 +37,11 @@ namespace HlidacStatu.Lib.Analytics
             foreach (var year in CalculatedYears)
             {
                 Devmasters.Batch.Manager.DoActionForAll<PropertyInfo>(numericProperties,
-                    property => {
+                    property =>
+                    {
                         Util.Consts.Logger.Debug($"Starting property {property} for {year}");
                         IEnumerable<decimal> globalData = dataForAllIcos
-                            .Select(d=> d[year])
+                            .Select(d => d[year])
                             .Where(allowedItems)
                             .Select(d =>
                                 GetDecimalValueOfNumericProperty(property, d))

@@ -1,13 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -16,18 +18,18 @@ namespace HlidacStatu.Web.Controllers
     {
         private readonly DbEntities _context = new();
         private readonly UserManager<Entities.ApplicationUser> _userManager;
-        
+
         public RolesController(UserManager<Entities.ApplicationUser> userManager)
         {
             _userManager = userManager;
         }
-        
 
-        [Authorize(Roles ="Admin")]
+
+        [Authorize(Roles = "Admin")]
         public ActionResult Index()
         {
             // Populate Dropdown Lists
-            
+
             var rolelist = _context.Roles.AsNoTracking().OrderBy(r => r.Name).ToList().Select(rr =>
             new SelectListItem { Value = rr.Name.ToString(), Text = rr.Name }).ToList();
             ViewBag.Roles = rolelist;
@@ -180,8 +182,8 @@ new SelectListItem { Value = uu.UserName.ToString(), Text = uu.UserName }).ToLis
         public async Task<ActionResult> DeleteRoleForUser(string UserName, string RoleName)
         {
             var user = await _userManager.FindByEmailAsync(UserName);
-            
-            
+
+
             if (await _userManager.IsInRoleAsync(user, RoleName))
             {
                 await _userManager.RemoveFromRoleAsync(user, RoleName);

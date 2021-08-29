@@ -1,14 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
 using HlidacStatu.Util.Cache;
+
 using Nest;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace HlidacStatu.Repositories
 {
@@ -174,7 +176,7 @@ namespace HlidacStatu.Repositories
             {
                 var key = skupina.ToString().ToLower();
                 if (cpvSearchGroups.ContainsKey(key))
-                    return cpvSearchGroups[key].Split(new char[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                    return cpvSearchGroups[key].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 else
                     throw new ArgumentOutOfRangeException("CPVSkupinaToCPV failed for " + skupina);
             }
@@ -189,7 +191,7 @@ namespace HlidacStatu.Repositories
                     {
                         try
                         {
-                            return CPVOblastToCPV((CPVSkupiny) iSkup);
+                            return CPVOblastToCPV((CPVSkupiny)iSkup);
                         }
                         catch (Exception)
                         {
@@ -200,7 +202,7 @@ namespace HlidacStatu.Repositories
 
                 var key = skupinaJmeno.ToLower();
                 if (cpvSearchGroups.ContainsKey(key))
-                    return cpvSearchGroups[key].Split(new char[] {','}, StringSplitOptions.RemoveEmptyEntries);
+                    return cpvSearchGroups[key].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 else
                     return null;
             }
@@ -216,7 +218,7 @@ namespace HlidacStatu.Repositories
                     {
                         try
                         {
-                            var skupina = (CPVSkupiny) iSkup;
+                            var skupina = (CPVSkupiny)iSkup;
                             return skupina.ToString();
                         }
                         catch (Exception)
@@ -358,7 +360,7 @@ namespace HlidacStatu.Repositories
                             .Highlight(h => Tools.GetHighlight<VerejnaZakazka>(withHighlighting))
                             .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                 ? true
-                                : (bool?) null)
+                                : (bool?)null)
                         );
                     if (withHighlighting && res.Shards != null &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
@@ -374,7 +376,7 @@ namespace HlidacStatu.Repositories
                                 .Highlight(h => Tools.GetHighlight<VerejnaZakazka>(false))
                                 .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                     ? true
-                                    : (bool?) null)
+                                    : (bool?)null)
                             );
                     }
                 }
@@ -450,7 +452,7 @@ namespace HlidacStatu.Repositories
                         //.Source(m => m.Excludes(e => e.Field(o => o.Prilohy)))
                         .Sort(ss => GetSort(order))
                         .Aggregations(aggrFunc)
-                        .TrackTotalHits(page * pageSize == 0 ? true : (bool?) null)
+                        .TrackTotalHits(page * pageSize == 0 ? true : (bool?)null)
                     );
                 if (res.IsValid == false)
                     Manager.LogQueryError<VerejnaZakazka>(res);
@@ -507,7 +509,7 @@ namespace HlidacStatu.Repositories
                             )
                             .Sort(ss => GetSort(search.Order))
                             .Aggregations(aggrFunc)
-                            .TrackTotalHits(page * search.PageSize == 0 ? true : (bool?) null)
+                            .TrackTotalHits(page * search.PageSize == 0 ? true : (bool?)null)
                         );
                 }
                 catch (Exception e)

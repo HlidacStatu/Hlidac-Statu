@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
+﻿using HlidacStatu.Entities;
+
 using Microsoft.AspNetCore.Http;
+
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Repositories.Searching
 {

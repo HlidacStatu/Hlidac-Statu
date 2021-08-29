@@ -1,7 +1,8 @@
-using System;
-using System.Linq;
 using HlidacStatu.Connectors;
 using HlidacStatu.Util.Cache;
+
+using System;
+using System.Linq;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -50,7 +51,7 @@ namespace HlidacStatu.Web.Framework
                 ?.ToArray();
 
             if (webShotServiceUrls == null || webShotServiceUrls?.Length == null || webShotServiceUrls?.Length == 0)
-                webShotServiceUrls = new[] {"http://127.0.0.1:9090"};
+                webShotServiceUrls = new[] { "http://127.0.0.1:9090" };
 
             var webShotServiceUrl = webShotServiceUrls[Util.Consts.Rnd.Next(webShotServiceUrls.Length)];
 

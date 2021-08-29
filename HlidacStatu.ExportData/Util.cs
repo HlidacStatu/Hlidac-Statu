@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace HlidacStatu.ExportData
 {
@@ -71,11 +69,11 @@ namespace HlidacStatu.ExportData
         }
         public static bool TryConvert<T>(this object obj, out object result)
         {
-            result=default(T);
+            result = default(T);
 
             if (typeof(T) == typeof(string))
             {
-                result= obj.ToString();
+                result = obj.ToString();
                 return true;
             }
             else if (typeof(T) == typeof(int) || typeof(T) == typeof(long)
@@ -158,7 +156,7 @@ namespace HlidacStatu.ExportData
             }
             else if (typeof(T) == typeof(DateTime))
             {
-                
+
                 if (obj.TryCast<DateTime>(out DateTime xvar0))
                 {
                     result = xvar0;

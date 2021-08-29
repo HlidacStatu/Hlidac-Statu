@@ -36,7 +36,7 @@ namespace HlidacStatu.Lib.OCR.Api
                 return request;
             }
         }
-        
+
 
     }
 }

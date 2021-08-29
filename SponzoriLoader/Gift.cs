@@ -1,5 +1,6 @@
-﻿using System;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
+
+using System;
 
 namespace SponzoriLoader
 {

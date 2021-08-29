@@ -1,15 +1,13 @@
 ﻿using HtmlAgilityPack;
-using System;
+
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Vybory_PSP
 {
     public partial class XPath
     {
-        
+
         public static class Tools
         {
             public static HtmlDocument HtmlDocumentFromHtml(string html)

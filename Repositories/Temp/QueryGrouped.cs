@@ -1,10 +1,11 @@
-﻿using System;
+﻿using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities.Analysis;
+
+using Nest;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities.Analysis;
-using HlidacStatu.Lib.Analysis;
-using Nest;
 
 namespace HlidacStatu.Repositories.ES
 {
@@ -60,7 +61,7 @@ namespace HlidacStatu.Repositories.ES
                             }
                         ).ToArray();
 
-                        result[val.Date.Year] = oblasti.ToDictionary(k=>k.oblast, v=>v.data);
+                        result[val.Date.Year] = oblasti.ToDictionary(k => k.oblast, v => v.data);
                     }
                 }
             }
@@ -87,7 +88,7 @@ namespace HlidacStatu.Repositories.ES
                     }
                 }
 
-        }
+            }
 
             return result;
         }

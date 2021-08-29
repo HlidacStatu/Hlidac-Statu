@@ -3,15 +3,15 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.43")]
-			public static void Init_1_0_0_43(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.43")]
+            public static void Init_1_0_0_43(IDatabaseUpgrader du)
+            {
 
                 string sql = @"
 /****** Object:  Table [dbo].[Visit]    Script Date: 13/04/2018 19:57:50 ******/
@@ -157,5 +157,5 @@ GO
 
         }
 
-	}
+    }
 }

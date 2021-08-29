@@ -1,9 +1,11 @@
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 using HlidacStatu.Entities;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
 {
@@ -11,7 +13,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        
+
         public ChangePasswordModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager)

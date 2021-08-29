@@ -1,17 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.XSD;
 using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.ES;
-using HlidacStatu.Util;
 using HlidacStatu.Util.Cache;
 
-using Nest;
+using System;
+using System.Linq;
+using System.Text;
 
 namespace HlidacStatu.Extensions
 {
@@ -55,11 +48,11 @@ namespace HlidacStatu.Extensions
                 }
             }
             else
-            { 
-            
+            {
+
             }
-                
-                return null;
+
+            return null;
 
 
         }

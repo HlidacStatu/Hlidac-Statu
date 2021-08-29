@@ -4,14 +4,14 @@
 namespace HlidacStatu.DBUpgrades
 {
     public static partial class DBUpgrader
-	{
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.63")]
-			public static void Init_1_0_0_63(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.63")]
+            public static void Init_1_0_0_63(IDatabaseUpgrader du)
+            {
                 string sql = @"
 CREATE TABLE EventType(
    Id int,
@@ -38,9 +38,9 @@ alter table OsobaEvent
 EXEC sp_RENAME 'OsobaEvent.Description' , 'Note', 'COLUMN'
 
 ";
-    du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
             }
         }
-	}
+    }
 }

@@ -1,7 +1,9 @@
 ﻿using FullTextSearch;
+
+using HlidacStatu.Connectors;
+
 using System;
 using System.Collections.Generic;
-using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -13,7 +15,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             Ico = ico;
         }
 
-        public static Devmasters.Cache.File.FileCache<Dictionary<string,SubjectNameCache>> CachedCompanies = 
+        public static Devmasters.Cache.File.FileCache<Dictionary<string, SubjectNameCache>> CachedCompanies =
             new Devmasters.Cache.File.FileCache<Dictionary<string, SubjectNameCache>>(
                 Init.WebAppDataPath, TimeSpan.Zero, "KIndexCompanies",
                     (o) =>
@@ -21,10 +23,10 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                         return ListCompanies();
                     });
 
-        private static Dictionary<string,SubjectNameCache> ListCompanies()
+        private static Dictionary<string, SubjectNameCache> ListCompanies()
         {
             Dictionary<string, SubjectNameCache> companies = new Dictionary<string, SubjectNameCache>();
-            foreach(var kindexRecord in KIndex.YieldExistingKindexes())
+            foreach (var kindexRecord in KIndex.YieldExistingKindexes())
             {
                 companies.Add(kindexRecord.Ico, new SubjectNameCache(kindexRecord.Jmeno, kindexRecord.Ico));
             }
@@ -54,7 +56,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((SubjectNameCache) obj);
+            return Equals((SubjectNameCache)obj);
         }
 
         public override int GetHashCode()

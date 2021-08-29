@@ -1,7 +1,8 @@
-﻿using System;
+﻿using HlidacStatu.Entities.OsobyES;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities.OsobyES;
 
 namespace HlidacStatu.Repositories.Searching
 {
@@ -12,7 +13,7 @@ namespace HlidacStatu.Repositories.Searching
         {
         }
 
-       public IEnumerable<OsobaES> Results
+        public IEnumerable<OsobaES> Results
         {
             get
             {

@@ -1,8 +1,4 @@
-﻿using HlidacStatu.Util;
-using System;
-using System.Linq;
-using Devmasters.Enums;
-using HlidacStatu.Util.Cache;
+﻿using Devmasters.Enums;
 
 namespace HlidacStatu.Entities
 {
@@ -20,7 +16,7 @@ namespace HlidacStatu.Entities
             }
 
 
-            
+
 
             [Groupable]
             [ShowNiceDisplayName()]
@@ -227,7 +223,7 @@ namespace HlidacStatu.Entities
 
              */
 
-            
+
 
 
         }

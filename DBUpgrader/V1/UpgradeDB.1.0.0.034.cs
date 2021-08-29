@@ -3,15 +3,15 @@
 
 namespace HlidacStatu.DBUpgrades
 {
-	public static partial class DBUpgrader
-	{
+    public static partial class DBUpgrader
+    {
 
-		private partial class UpgradeDB
-		{
+        private partial class UpgradeDB
+        {
 
-			[DatabaseUpgradeMethod("1.0.0.34")]
-			public static void Init_1_0_0_34(IDatabaseUpgrader du)
-			{
+            [DatabaseUpgradeMethod("1.0.0.34")]
+            public static void Init_1_0_0_34(IDatabaseUpgrader du)
+            {
 
                 string sql = @"
     IF  EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[dbo].[DF_Media_Server_Created]') AND type = 'D')
@@ -166,18 +166,18 @@ GO
 
 
 ";
-				du.RunDDLCommands(sql);
+                du.RunDDLCommands(sql);
 
                 //add new bank account
 
-                
-
-			}
-
-	
 
 
-		}
+            }
 
-	}
+
+
+
+        }
+
+    }
 }

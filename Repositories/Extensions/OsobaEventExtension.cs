@@ -1,7 +1,8 @@
-using System;
-using System.Text;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
+
+using System;
+using System.Text;
 
 namespace HlidacStatu.Extensions
 {
@@ -50,17 +51,17 @@ namespace HlidacStatu.Extensions
                         return sb.ToString();
                     }
                     if (!string.IsNullOrEmpty(osobaEvent.Title) && !string.IsNullOrEmpty(osobaEvent.Note))
-                        return osobaEvent.Title + delimeter + osobaEvent.Note ;
+                        return osobaEvent.Title + delimeter + osobaEvent.Note;
                     else if (!string.IsNullOrEmpty(osobaEvent.Title))
-                        return osobaEvent.Title ;
+                        return osobaEvent.Title;
                     else if (!string.IsNullOrEmpty(osobaEvent.Note))
-                        return osobaEvent.Note ;
+                        return osobaEvent.Note;
                     else
                         return string.Empty;
             }
         }
 
-        public static string RenderHtml(this OsobaEvent osobaEvent,string delimeter = ", ")
+        public static string RenderHtml(this OsobaEvent osobaEvent, string delimeter = ", ")
         {
             string zdroj = "";
             if (!string.IsNullOrEmpty(osobaEvent.Zdroj))
@@ -90,7 +91,7 @@ namespace HlidacStatu.Extensions
                         Osoba o = Osoby.GetById.Get(Convert.ToInt32(osobaEvent.AddInfo));
                         if (o != null)
                             return osobaEvent.Title + " s " + string.Format("<a href=\"{0}\">{1}</a>", o.GetUrl(), o.FullName());
-                    }                    
+                    }
                     if (!string.IsNullOrEmpty(osobaEvent.AddInfo + osobaEvent.Organizace))
                     {
                         sb.Append($"{osobaEvent.AddInfo} {osobaEvent.RenderDatum(txtOd: "od", txtDo: " do ", template: "({0})")} ");
@@ -99,7 +100,7 @@ namespace HlidacStatu.Extensions
                         return sb.ToString();
                     }
                     else
-                        return (osobaEvent.Title + " " + osobaEvent.Note).Trim() ;
+                        return (osobaEvent.Title + " " + osobaEvent.Note).Trim();
 
                 case OsobaEvent.Types.Specialni:
                 default:
@@ -120,8 +121,8 @@ namespace HlidacStatu.Extensions
                         return string.Empty;
             }
         }
-        
-        
+
+
         private static string RenderDatum(this OsobaEvent oEvent, string txtOd = "", string txtDo = " - ", string dateFormat = "yyyy", string template = "{0}")
         {
             return RenderDatum(oEvent.DatumOd, oEvent.DatumDo, txtOd, txtDo, dateFormat, template);
@@ -138,7 +139,7 @@ namespace HlidacStatu.Extensions
                     return string.Format(template, DatumOd.Value.Year.ToString());
                 else
                 {
-                    return string.Format(template, 
+                    return string.Format(template,
                         string.Format("{0} {1}{2}{3}",
                            txtOd,
                            DatumOd.Value.ToString(dateFormat),
@@ -150,7 +151,7 @@ namespace HlidacStatu.Extensions
             }
             else if (DatumOd.HasValue)
             {
-                return string.Format(template, 
+                return string.Format(template,
                         string.Format("{0} {1}",
                             txtOd,
                             DatumOd.Value.ToString(dateFormat)
@@ -159,7 +160,7 @@ namespace HlidacStatu.Extensions
             }
             else if (DatumDo.HasValue)
             {
-                return string.Format(template, 
+                return string.Format(template,
                         string.Format("{0} {1}",
                         txtDo,
                         DatumDo.Value.ToString(dateFormat)

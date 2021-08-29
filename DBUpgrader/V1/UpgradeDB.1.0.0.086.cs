@@ -4,13 +4,13 @@
 namespace HlidacStatu.DBUpgrades
 {
     public static partial class DBUpgrader
-	{
-		private partial class UpgradeDB
-		{
-			[DatabaseUpgradeMethod("1.0.0.86")]
-			public static void Init_1_0_0_86(IDatabaseUpgrader du)
-			{
-				string sql = @"
+    {
+        private partial class UpgradeDB
+        {
+            [DatabaseUpgradeMethod("1.0.0.86")]
+            public static void Init_1_0_0_86(IDatabaseUpgrader du)
+            {
+                string sql = @"
 
 /****** Object:  Table [dbo].[NACE]    Script Date: 15.07.2021 18:51:17 ******/
 IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[NACE]') AND type in (N'U'))
@@ -1734,8 +1734,8 @@ insert into NACE values('9900','Činnosti exteritoriálních organizací a orgá
 insert into NACE values('99000','Činnosti exteritoriálních organizací a orgánů')
 
 ";
-				du.RunDDLCommands(sql);
-			}
-		}
-	}
+                du.RunDDLCommands(sql);
+            }
+        }
+    }
 }

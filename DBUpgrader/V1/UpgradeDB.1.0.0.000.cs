@@ -20,7 +20,7 @@ namespace HlidacStatu.DBUpgrades
 
             }
 
-    
+
 
 
         }

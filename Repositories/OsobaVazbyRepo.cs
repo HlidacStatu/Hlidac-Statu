@@ -1,9 +1,10 @@
-using System;
-using System.Linq;
 using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Datastructures.Graphs2;
 using HlidacStatu.Entities;
 using HlidacStatu.Util.Cache;
+
+using System;
+using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
@@ -149,7 +150,7 @@ namespace HlidacStatu.Repositories
                 if (shortestPath == null)
                     return Array.Empty<Datastructures.Graphs.Graph.Edge>();
 
-                var result = shortestPath.Select(x => ((Edge<Datastructures.Graphs.Graph.Edge>) x).BindingPayload).ToArray();
+                var result = shortestPath.Select(x => ((Edge<Datastructures.Graphs.Graph.Edge>)x).BindingPayload).ToArray();
                 return result; // shortestGraph.ShortestTo(ico).ToArray();
             }
             catch (Exception e)

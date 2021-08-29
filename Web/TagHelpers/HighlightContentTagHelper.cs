@@ -1,5 +1,6 @@
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+
+using System.Collections.Generic;
 
 namespace HlidacStatu.Web.TagHelpers
 {

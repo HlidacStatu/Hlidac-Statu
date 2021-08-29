@@ -1,12 +1,16 @@
 ﻿using Devmasters.Enums;
-using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+
+using FullTextSearch;
+
 using HlidacStatu.Entities;
+using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+using HlidacStatu.Repositories;
+
+using Microsoft.AspNetCore.Mvc;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FullTextSearch;
-using HlidacStatu.Repositories;
-using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -33,7 +37,7 @@ namespace HlidacStatu.Web.Controllers
                 (string id, int? rok, string priv) model = (id, rok, priv);
                 return View(model);
             }
- 
+
             return View("Index");
         }
 
@@ -72,7 +76,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrWhiteSpace(id))
                 return View(results);
 
-            
+
             foreach (var i in id.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 var f = Firmy.Get(Util.ParseTools.NormalizeIco(i));
@@ -130,9 +134,9 @@ namespace HlidacStatu.Web.Controllers
 
                 case "celkovy":
                     return View("NoAvail");
-                    //ViewBag.LadderTopic = "Kompletní žebříček úřadů a organizací";
-                    //ViewBag.LadderTitle = "Kompletní žebříček úřadů a organizací podle K–Indexu";
-                    //break;
+                //ViewBag.LadderTopic = "Kompletní žebříček úřadů a organizací";
+                //ViewBag.LadderTitle = "Kompletní žebříček úřadů a organizací podle K–Indexu";
+                //break;
 
                 case "skokani":
                     ViewBag.LadderTitle = "Úřady a organizace, kterým se hodnocení K-Indexu meziročně nejvíce změnilo";
@@ -142,8 +146,8 @@ namespace HlidacStatu.Web.Controllers
             }
 
 
-            (string id, int rok, string group, string kraj) model = ((string)ViewBag.SelectedLadder, rok!.Value, 
-                group,kraj );
+            (string id, int rok, string group, string kraj) model = ((string)ViewBag.SelectedLadder, rok!.Value,
+                group, kraj);
             return View(model);
         }
 
@@ -171,7 +175,7 @@ namespace HlidacStatu.Web.Controllers
                         //};
 
                         //Q.Publisher.QuickPublisher.Publish(message, connectionString);
-                        
+
                         string body = $@"
 Žádost o rekalkulaci K-Indexu z hlidacstatu.cz.
 
@@ -182,7 +186,7 @@ ke stránce:{url}
 text zpravy: {txt}";
                         Util.SMTPTools.SendSimpleMailToPodpora("Žádost o rekalkulaci K-indexu", body, email);
 
-                       
+
 
                     }
                     catch (Exception ex)
@@ -259,7 +263,7 @@ text zpravy: {txt}";
 
             if (feedback is null)
                 return NotFound();
-            
+
             return View(feedback);
         }
 
@@ -335,7 +339,7 @@ text zpravy: {txt}";
                 }
                 else
                 {
-                    var val = kidx?.ForYear(rok.Value)?.KIndex ??  0;
+                    var val = kidx?.ForYear(rok.Value)?.KIndex ?? 0;
 
                     return Content(
                         new KIndexGenerator.PercentileBanner(
@@ -392,7 +396,7 @@ text zpravy: {txt}";
                     label.ToString(),
                     year.ToString());
             }
-            
+
             return File(data, "image/png");
         }
 

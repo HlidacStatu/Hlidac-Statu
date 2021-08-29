@@ -101,7 +101,7 @@ namespace HlidacStatu.Datasets.TransparentniUcty
 
         public string GetUrl(bool local, string foundWithQuery)
         {
-            return GetUrl(local, false,"");
+            return GetUrl(local, false, "");
         }
         public string GetUrl(bool local = true, bool onList = false, string foundWithQuery = "")
         {
@@ -152,7 +152,7 @@ namespace HlidacStatu.Datasets.TransparentniUcty
                 && x.ZpravaProPrijemce == y.ZpravaProPrijemce
                 );
         }
-        
+
         public int GetHashCode(BankovniPolozka obj)
         {
             //http://stackoverflow.com/a/4630550

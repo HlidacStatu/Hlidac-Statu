@@ -1,12 +1,16 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using HlidacStatu.Datasets;
+﻿using HlidacStatu.Datasets;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
+
 using Microsoft.AspNetCore.Mvc;
+
+using Newtonsoft.Json;
+
 using Swashbuckle.AspNetCore.Annotations;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {

@@ -44,7 +44,7 @@ namespace HlidacStatu.Lib.OCR.Api
                             }
                         }
                     }
-                    catch (Exception){}
+                    catch (Exception) { }
                 } while (true);
             }
 

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Devmasters.Enums;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Text;
-using Devmasters.Enums;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace HlidacStatu.Entities
 {
@@ -88,7 +89,7 @@ namespace HlidacStatu.Entities
             //HlidacSkryte = 2
         }
 
- 
+
         public void SetYearInterval(int year)
         {
             DatumOd = new DateTime(year, 1, 1);
@@ -122,10 +123,10 @@ namespace HlidacStatu.Entities
             return (OsobaEvent)MemberwiseClone();
         }
 
-        
 
 
-        
+
+
         public string ToAuditJson()
         {
             return JsonConvert.SerializeObject(this);
@@ -154,7 +155,7 @@ namespace HlidacStatu.Entities
                 && a.Type == b.Type;
         }
 
-        
+
 
     }
 }

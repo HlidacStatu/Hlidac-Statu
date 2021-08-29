@@ -1,7 +1,8 @@
-using System;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
+
+using System;
 
 namespace HlidacStatu.Extensions
 {
@@ -11,7 +12,7 @@ namespace HlidacStatu.Extensions
         {
             review.ReviewedBy = user;
             review.Reviewed = DateTime.Now;
-            review.ReviewResult = (int) Review.ReviewAction.Accepted;
+            review.ReviewResult = (int)Review.ReviewAction.Accepted;
 
             switch (review.ItemType)
             {
@@ -58,7 +59,7 @@ namespace HlidacStatu.Extensions
         {
             review.ReviewedBy = user;
             review.Reviewed = DateTime.Now;
-            review.ReviewResult = (int) Review.ReviewAction.Denied;
+            review.ReviewResult = (int)Review.ReviewAction.Denied;
             review.Comment = reason;
             if (Devmasters.TextUtil.IsValidEmail(review.CreatedBy))
             {
@@ -96,7 +97,7 @@ namespace HlidacStatu.Extensions
 
             ReviewRepo.Save(review);
         }
-        
+
         public static string RenderNewValueToHtml(this Review review)
         {
             return review.RenderValueToHtml(false);
@@ -120,7 +121,7 @@ namespace HlidacStatu.Extensions
                         {
                             var fn = Init.OsobaFotky.GetFullPath(o, "small.uploaded.jpg");
                             if (System.IO.File.Exists(fn))
-                                return "<img style='width:150px;height:auto; border:solid #d0d0d0 1px; margin:5px;' src='data:image/jpeg;base64," 
+                                return "<img style='width:150px;height:auto; border:solid #d0d0d0 1px; margin:5px;' src='data:image/jpeg;base64,"
                                     + Convert.ToBase64String(System.IO.File.ReadAllBytes(fn), Base64FormattingOptions.None) + "' />" + o.FullNameWithNarozeni();
                             else
                                 return "Žádná fotka" + o.FullNameWithNarozeni();
@@ -142,7 +143,7 @@ namespace HlidacStatu.Extensions
                                 return $"<a href='{o1.GetUrl()}'>{o1.FullNameWithNarozeni()}</a>";
                             }
                         }
-                        return  "(neznama osoba)";
+                        return "(neznama osoba)";
                     }
                     else
                         return review.NewValue;

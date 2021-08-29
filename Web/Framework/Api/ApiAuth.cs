@@ -1,10 +1,12 @@
 ﻿using HlidacStatu.Entities;
+using HlidacStatu.Repositories;
+
+using Microsoft.AspNetCore.Http;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using HlidacStatu.Repositories;
-using Microsoft.AspNetCore.Http;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -111,7 +113,7 @@ namespace HlidacStatu.Web.Framework
             {
                 ApplicationUser user = ApplicationUser.GetByEmail(login);
                 if (user == null)
-                    return Result.Invalid(new ApiCall() { IP = httpContext.GetRemoteIp(), UserId=null, User = null, Id = method, Method = method, Parameters = parameters });
+                    return Result.Invalid(new ApiCall() { IP = httpContext.GetRemoteIp(), UserId = null, User = null, Id = method, Method = method, Parameters = parameters });
                 else
                 {
                     var userroles = user.GetRoles();
@@ -154,13 +156,13 @@ namespace HlidacStatu.Web.Framework
                 }
             }
             else
-                return Result.Invalid(new ApiCall() { IP = httpContext.GetRemoteIp(), UserId=null, User = null, Id = method, Method = method, Parameters = parameters });
+                return Result.Invalid(new ApiCall() { IP = httpContext.GetRemoteIp(), UserId = null, User = null, Id = method, Method = method, Parameters = parameters });
         }
 
         private static bool IsApiAuthHeader(string authToken, out string login)
         {
             login = "";
-            
+
             if (string.IsNullOrEmpty(authToken))
                 return false;
             authToken = authToken.Replace("Token ", "").Trim();
@@ -178,6 +180,6 @@ namespace HlidacStatu.Web.Framework
             else
                 return false;
         }
-    
+
     }
 }

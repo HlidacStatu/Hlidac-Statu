@@ -1,9 +1,11 @@
 ﻿using Devmasters.Enums;
+
+using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.Datastructures.Graphs2;
+
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using HlidacStatu.Datastructures.Graphs;
-using HlidacStatu.Datastructures.Graphs2;
 
 namespace HlidacStatu.Entities
 {
@@ -61,7 +63,7 @@ namespace HlidacStatu.Entities
             //return base.ToString();
             return FullNameWithNarozeni();
         }
-        
+
         public string FullNameToQuery(bool exact = true)
         {
             if (exact)
@@ -134,7 +136,7 @@ namespace HlidacStatu.Entities
             }
         }
 
-        
+
 
         public static int[] VerejnopravniUdalosti = new int[] {
             (int)OsobaEvent.Types.VolenaFunkce,
@@ -145,8 +147,8 @@ namespace HlidacStatu.Entities
             (int)OsobaEvent.Types.Osobni,
             (int)OsobaEvent.Types.Jine
         };
-        
-        
+
+
         //migrace: ugly hack - tohle je hezké místo, co by šlo vylepšit
         public UnweightedGraph _graph = null;
         public Vertex<string> _startingVertex = null; //not for other use except as a search starting point
@@ -180,8 +182,8 @@ namespace HlidacStatu.Entities
             return result;
         }
 
-        
-        
+
+
 
 
         public Osoba ShallowCopy()
@@ -291,8 +293,8 @@ namespace HlidacStatu.Entities
         }
 
 
-        
 
-        
+
+
     }
 }

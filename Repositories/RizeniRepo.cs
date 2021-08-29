@@ -1,10 +1,11 @@
-using System;
-using System.Linq;
 using HlidacStatu.Entities;
-using HlidacStatu.Lib;
 using HlidacStatu.Entities.Insolvence;
 using HlidacStatu.Repositories.ES;
+
 using Nest;
+
+using System;
+using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
@@ -128,7 +129,7 @@ namespace HlidacStatu.Repositories
 
             if (client == null)
                 client = Manager.GetESClient_Insolvence();
-            
+
             PrepareForSave(rizeni);
             if (forceOnRadarValue.HasValue)
                 rizeni.OnRadar = forceOnRadarValue.Value;

@@ -1,6 +1,7 @@
 ﻿using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers
@@ -17,7 +18,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
             return result;
-            
+
         }
 
         public ActionResult Dotace(string id)
@@ -101,7 +102,7 @@ namespace HlidacStatu.Web.Controllers
         {
             if (TryGetOsoba(id, out var osoba, out var result))
             {
-                (Osoba osoba, string viewName, string title) model = (osoba, "InsolvencniRejstrik", $"{osoba.FullName()} - Insolvenční rejstřík" );
+                (Osoba osoba, string viewName, string title) model = (osoba, "InsolvencniRejstrik", $"{osoba.FullName()} - Insolvenční rejstřík");
                 return View("_osobaLayout", model);
                 //return View((Firma: firma, Data: new List<int>()));
             }
@@ -113,13 +114,13 @@ namespace HlidacStatu.Web.Controllers
         private bool TryGetOsoba(string id, out Osoba osoba, out ActionResult actionResult)
         {
             osoba = null;
-            
+
             if (string.IsNullOrWhiteSpace(id))
             {
                 actionResult = RedirectToAction("Index", "Osoby");
                 return false;
             }
-                
+
 
             osoba = Osoby.GetByNameId.Get(id);
 
@@ -130,7 +131,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
 
-            actionResult = View("Index",osoba);
+            actionResult = View("Index", osoba);
             return true;
         }
 

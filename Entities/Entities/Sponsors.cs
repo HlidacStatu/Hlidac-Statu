@@ -1,15 +1,12 @@
-﻿using Devmasters.Collections;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 
 namespace HlidacStatu.Entities
 {
     public class Sponsors
     {
-        
 
-        
+
+
 
         public class Sponzorstvi<T>
             where T : class, IBookmarkable //T Osoba nebo Firma
@@ -27,7 +24,7 @@ namespace HlidacStatu.Entities
                     Strana = d.Strana,
                     CastkaCelkem = d.CastkaCelkem,
                     Rok = d.Rok,
-                    Sponzor = (IBookmarkable) d.Sponzor
+                    Sponzor = (IBookmarkable)d.Sponzor
                 };
             }
         }
@@ -55,7 +52,7 @@ namespace HlidacStatu.Entities
 
         public static string GetStranaSponzoringUrl(string strana, int rok, SponzoringDataType typ, bool local = true)
         {
-            string url = $"/Sponzori/seznam?id={System.Net.WebUtility.UrlEncode(strana)}&rok={rok}&typ={(int) typ}";
+            string url = $"/Sponzori/seznam?id={System.Net.WebUtility.UrlEncode(strana)}&rok={rok}&typ={(int)typ}";
             if (local == false)
                 return "http://www.hlidacstatu.cz" + url;
             else

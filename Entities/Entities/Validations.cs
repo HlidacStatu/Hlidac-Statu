@@ -69,7 +69,7 @@ namespace HlidacStatu.Entities
         public string Zdroj { get; set; }
 
 
-        
+
 
     }
 }

@@ -1,16 +1,19 @@
-﻿using System;
+﻿using Devmasters;
+using Devmasters.Batch;
+
+using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.Entities;
 using HlidacStatu.Util;
+
+using Nest;
+
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Nest;
-using Devmasters.Batch;
 using System.Threading;
-using Devmasters;
-using HlidacStatu.Datastructures.Graphs;
-using HlidacStatu.Repositories;
+using System.Threading.Tasks;
+
 using Manager = HlidacStatu.Repositories.ES.Manager;
-using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories.Searching
 {
@@ -461,7 +464,7 @@ namespace HlidacStatu.Repositories.Searching
             return modifiedQ;
         }
 
-        
+
 
 
 

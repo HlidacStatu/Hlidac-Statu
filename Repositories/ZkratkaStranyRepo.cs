@@ -1,13 +1,14 @@
+using HlidacStatu.Entities;
+
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories
 {
     public static class ZkratkaStranyRepo
     {
-        
+
         /// <returns> Dictionary; Key=Ico, Value=Zkratka </returns>
         public static Dictionary<string, string> ZkratkyVsechStran()
         {
@@ -16,7 +17,7 @@ namespace HlidacStatu.Repositories
                 return db.ZkratkaStrany.ToDictionary(z => z.Ico, e => e.KratkyNazev);
             }
         }
-        
+
         public static string IcoStrany(string zkratka)
         {
             using (DbEntities db = new DbEntities())
@@ -28,7 +29,7 @@ namespace HlidacStatu.Repositories
                     .FirstOrDefault();
             }
         }
-        
+
         public static string[,] NazvyStranŹkratky = {
             {"strana zelených","SZ"},
             {"česká pirátská strana","Piráti" },
@@ -39,7 +40,7 @@ namespace HlidacStatu.Repositories
             {"věci veřejné","VV" },
             {"starostové a nezávislí","STAN" },
         };
-        
+
         public static string StranaZkratka(string strana, int maxlength = 20)
         {
             if (string.IsNullOrEmpty(strana))

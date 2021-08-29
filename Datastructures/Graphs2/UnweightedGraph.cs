@@ -13,7 +13,7 @@ namespace HlidacStatu.Datastructures.Graphs2
 
         public HashSet<IVertex> Vertices { get; }
         public IEnumerable<IEdge> Edges { get => Vertices.SelectMany(v => v.OutgoingEdges); }
-        
+
         /// <summary>
         /// Add new directed unweighted edge to graph. If Vertices (from, to) doesn't exist. It adds them too.
         /// </summary>
@@ -23,9 +23,9 @@ namespace HlidacStatu.Datastructures.Graphs2
         {
             IVertex vertex1 = GetOrAddVertex(from);
             IVertex vertex2 = GetOrAddVertex(to);
-            
+
             //dont like this, but can't think better solution right now
-            var edge = new Edge<T>(vertex1, vertex2, bindingPayload); 
+            var edge = new Edge<T>(vertex1, vertex2, bindingPayload);
 
             // There can be only one direct outgoing edge from A to B
             // Other outgoing edges from A to B are skipped in graph
@@ -38,7 +38,7 @@ namespace HlidacStatu.Datastructures.Graphs2
             {
                 return actual;
             }
-            
+
             Vertices.Add(vertex);
             return (vertex);
         }
@@ -69,12 +69,12 @@ namespace HlidacStatu.Datastructures.Graphs2
             {
                 var currentVertex = queuedVertices.Dequeue();
                 visitedVertices.Add(currentVertex);
-                
+
                 foreach (var edge in currentVertex.OutgoingEdges)
                 {
                     if (visitedVertices.Contains(edge.To))
                         continue;
-                    
+
                     visitHistory.Add(edge);
                     queuedVertices.Enqueue(edge.To);
 
@@ -103,10 +103,10 @@ namespace HlidacStatu.Datastructures.Graphs2
                 previousVertex = edge.From;
 
             } while (!previousVertex.Equals(from));
-            
+
             return results.Reverse<IEdge>();
         }
-        
+
 
         /// <summary>
         /// Projde (do šířky) všechny vrcholy od konkrétního bodu a postupně je vypíše.
@@ -116,7 +116,7 @@ namespace HlidacStatu.Datastructures.Graphs2
         public IEnumerable<IVertex> BreathFirstIterator(IVertex from)
         {
             var visitedVertices = new HashSet<IVertex>();
-            
+
             Queue<IVertex> queuedVertices = new Queue<IVertex>();
             queuedVertices.Enqueue(from);
 
@@ -125,10 +125,10 @@ namespace HlidacStatu.Datastructures.Graphs2
                 var currentVertex = queuedVertices.Dequeue();
                 visitedVertices.Add(currentVertex);
                 yield return currentVertex;
-                
+
                 foreach (var edge in currentVertex.OutgoingEdges)
                 {
-                    if(!visitedVertices.Contains(edge.To))
+                    if (!visitedVertices.Contains(edge.To))
                     {
                         queuedVertices.Enqueue(edge.To);
                     }

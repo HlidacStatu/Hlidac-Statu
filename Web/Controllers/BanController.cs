@@ -1,10 +1,12 @@
+using HlidacStatu.Repositories;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
 using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Repositories;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -33,7 +35,7 @@ namespace HlidacStatu.Web.Controllers
 
             return View();
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AllowIp(string ipAddress)

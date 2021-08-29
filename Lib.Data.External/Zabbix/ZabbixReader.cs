@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Devmasters.Collections;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Devmasters.Collections;
 
 namespace HlidacStatu.Lib.Data.External.Zabbix
 {
@@ -9,7 +10,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
         : IDisposable
     {
 
-        static string zabbixServer = Devmasters.Config.GetWebConfigValue("ZabbixServerUrl"); 
+        static string zabbixServer = Devmasters.Config.GetWebConfigValue("ZabbixServerUrl");
 
         ZabbixApi.Zabbix zabbix = new ZabbixApi.Zabbix(Devmasters.Config.GetWebConfigValue("ZabbixAPIUser"), Devmasters.Config.GetWebConfigValue("ZabbisAPIPassword"), zabbixServer + "/api_jsonrpc.php");
 
@@ -355,7 +356,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
                     var h = new ZabHistoryItem()
                     {
                         itemId = r.itemid,
-                        clock = Devmasters.DT.Util.FromEpochTimeToUTC(Convert.ToInt64(r.clock)).ToLocalTime() ,
+                        clock = Devmasters.DT.Util.FromEpochTimeToUTC(Convert.ToInt64(r.clock)).ToLocalTime(),
                         value = Util.ParseTools.ToDecimal(r.value)
                     };
                     history.Add(h);
@@ -425,7 +426,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
             DateTime now = DateTime.Now;
             foreach (var host in dataResponseTime.Select(m => m.itemId).Distinct().Select(m => ZabTools.Weby().First(h => h.itemIdResponseTime == m)))
             {
-                var hint = dataResponseTime.Where(h => h.itemId == host.itemIdResponseTime).OrderBy(m=>m.clock).ToArray();
+                var hint = dataResponseTime.Where(h => h.itemId == host.itemIdResponseTime).OrderBy(m => m.clock).ToArray();
                 ret.Add(new ZabHostAvailability(host, hint, fillMissingWithNull));
             }
 
@@ -450,7 +451,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
                             int httpstatus = (int)status.value;
                             foundHistoryItem.HttpStatusCode = httpstatus;
                             if (httpstatus > 399)
-                                foundHistoryItem.Response = ZabAvailability.BadHttpCode;                                
+                                foundHistoryItem.Response = ZabAvailability.BadHttpCode;
 
                         }
 

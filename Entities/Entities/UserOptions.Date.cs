@@ -11,12 +11,12 @@ namespace HlidacStatu.Entities
         {
         }
 
-        public DateUserOption(ParameterType option, int? languageId = null) 
+        public DateUserOption(ParameterType option, int? languageId = null)
             : base(option, languageId)
         {
         }
 
-        public DateUserOption(ApplicationUser user, ParameterType option, int? languageId = null) 
+        public DateUserOption(ApplicationUser user, ParameterType option, int? languageId = null)
             : base(user, option, languageId)
         {
         }

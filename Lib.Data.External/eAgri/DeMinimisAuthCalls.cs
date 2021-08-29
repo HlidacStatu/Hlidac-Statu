@@ -8,7 +8,7 @@ using System.Xml;
 
 namespace HlidacStatu.Lib.Data.External.eAgri
 {
-  public static class DeMinimisAuthCalls
+    public static class DeMinimisAuthCalls
     {
         static string enveloReq = @"<SOAP:Envelope xmlns:SOAP=""http://schemas.xmlsoap.org/soap/envelope/"">
   <SOAP:Header>

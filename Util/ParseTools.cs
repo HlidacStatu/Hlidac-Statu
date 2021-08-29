@@ -13,11 +13,11 @@ namespace HlidacStatu.Util
         public static bool EnoughExtractedTextCheck(long words, long lengthChars, long uniqueWordsCount, decimal wordsVariance)
         {
 
-            return !(lengthChars <= 20 || words <= 10 ||                
+            return !(lengthChars <= 20 || words <= 10 ||
                 (
-                    uniqueWordsCount<7 || (uniqueWordsCount >=7 && wordsVariance > 0.7m  )
+                    uniqueWordsCount < 7 || (uniqueWordsCount >= 7 && wordsVariance > 0.7m)
                 )
-                
+
             );
         }
 
@@ -89,7 +89,7 @@ namespace HlidacStatu.Util
 
         public static string NormalizeIco(string ico)
         {
-            if (ico == null) 
+            if (ico == null)
                 return string.Empty;
 
             ico = ico.Trim();
@@ -266,7 +266,7 @@ namespace HlidacStatu.Util
             //    | System.Globalization.NumberStyles.AllowThousands
             //    | System.Globalization.NumberStyles.AllowCurrencySymbol
             //    ;
-            if (decimal.TryParse(value, System.Globalization.NumberStyles.Any, Consts.czCulture, out decimal tmp) 
+            if (decimal.TryParse(value, System.Globalization.NumberStyles.Any, Consts.czCulture, out decimal tmp)
                 || decimal.TryParse(value, System.Globalization.NumberStyles.Any, Consts.enCulture, out tmp))
                 return tmp;
             else

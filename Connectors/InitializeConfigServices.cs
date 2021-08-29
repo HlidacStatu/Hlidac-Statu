@@ -1,6 +1,7 @@
-using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
+using System.IO;
 
 namespace HlidacStatu.Connectors
 {
@@ -23,7 +24,7 @@ namespace HlidacStatu.Connectors
                     configuration = configuration.AddJsonFile($"appsettings.{variant}.json", true);
                 }
             }
-            
+
             // create service collection
             var services = new ServiceCollection();
             services.AddOptions();

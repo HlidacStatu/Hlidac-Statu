@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Entities.Insolvence;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
@@ -30,7 +31,7 @@ namespace HlidacStatu.XLib.Watchdogs
             var query = "posledniZmena:" +
                         string.Format("[* TO {0}]", Repositories.Searching.Tools.ToElasticDate(toDate));
             var res = InsolvenceRepo.Searching.SimpleSearch(query, 0, 1,
-                (int) Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc,
+                (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc,
                 false, isLimited);
 
             if (res.IsValid == false)
@@ -56,11 +57,11 @@ namespace HlidacStatu.XLib.Watchdogs
 
             var res = InsolvenceRepo.Searching.SimpleSearch(query, 0, 50,
                 order == null
-                    ? (int) Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc
+                    ? (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc
                     : Convert.ToInt32(order),
                 false, isLimited);
 
-            return new Results(res.ElasticResults.Hits.Select(m => (dynamic) m.Source), res.Total,
+            return new Results(res.ElasticResults.Hits.Select(m => (dynamic)m.Source), res.Total,
                 query, fromDate, toDate, res.IsValid, nameof(Rizeni));
         }
 

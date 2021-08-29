@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
@@ -10,17 +6,21 @@ using HlidacStatu.XLib.Render;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace HlidacStatu.Web.Framework
 {
     public static class HtmlExtensions
     {
         public static bool IsDebug(this IHtmlHelper htmlHelper)
         {
-            #if DEBUG
-                        return true;
-            #else
+#if DEBUG
+            return true;
+#else
                   return false;
-            #endif
+#endif
         }
 
         public static IHtmlContent KIndexIcon(this IHtmlHelper htmlHelper, string ico, int heightInPx = 15, string hPadding = "3px", string vPadding = "0", bool showNone = false, bool useTemp = false)
@@ -71,7 +71,7 @@ namespace HlidacStatu.Web.Framework
             var kidx = Lib.Analysis.KorupcniRiziko.KIndex.Get(ico);
             if (kidx == null)
                 kidx = Lib.Analysis.KorupcniRiziko.KIndexData.Empty(ico);
-            var ann = kidx.ForYear(MaxKIndexYearToShow(user,rok));
+            var ann = kidx.ForYear(MaxKIndexYearToShow(user, rok));
 
             if (ann == null)
                 return htmlHelper.Raw("");
@@ -142,7 +142,7 @@ namespace HlidacStatu.Web.Framework
         }
         public static int MaxKIndexYearToShow(System.Security.Principal.IPrincipal user)
         {
-            int lastY = Devmasters.ParseText.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYearToShow")) 
+            int lastY = Devmasters.ParseText.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYearToShow"))
                 ?? HlidacStatu.Lib.Analysis.KorupcniRiziko.Consts.AvailableCalculationYears.Max();
             if (
                 IfInRoles(user, "TK-KIndex-2021")

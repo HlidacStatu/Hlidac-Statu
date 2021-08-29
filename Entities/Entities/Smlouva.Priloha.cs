@@ -1,6 +1,8 @@
-﻿using Nest;
+﻿using HlidacStatu.Util;
+
+using Nest;
+
 using System;
-using HlidacStatu.Util;
 
 namespace HlidacStatu.Entities
 {
@@ -16,7 +18,7 @@ namespace HlidacStatu.Entities
                 public string Value { get; set; }
             }
 
- 
+
             public KeyVal[] FileMetadata = new KeyVal[] { };
 
 
@@ -65,7 +67,7 @@ namespace HlidacStatu.Entities
             {
                 get
                 {
-                    return ParseTools.EnoughExtractedTextCheck(WordCount,Lenght, UniqueWordsCount, WordsVariance );
+                    return ParseTools.EnoughExtractedTextCheck(WordCount, Lenght, UniqueWordsCount, WordsVariance);
                 }
             }
 

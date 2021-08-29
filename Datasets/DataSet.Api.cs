@@ -1,9 +1,10 @@
-﻿using System;
+﻿using HlidacStatu.Entities;
+
+using Newtonsoft.Json.Schema;
+
+using System;
 using System.Linq;
 using System.Net.Mail;
-using System.Security.Claims;
-using HlidacStatu.Entities;
-using Newtonsoft.Json.Schema;
 
 namespace HlidacStatu.Datasets
 {
@@ -78,7 +79,7 @@ namespace HlidacStatu.Datasets
                     {
                         return ApiResponseStatus.DatasetNoPermision;
                     }
-                    
+
                     if (updatedBy != oldReg?.createdBy?.ToLower())
                     {
                         if (!user.IsInRole("Admin"))
@@ -167,8 +168,8 @@ namespace HlidacStatu.Datasets
 
                     //HlidacStatu.Web.Framework.TemplateVirtualFileCacheManager.InvalidateTemplateCache(reg.datasetId);
 
-                    return new ApiResponseStatus() { valid = true, value= newreg };
-                    
+                    return new ApiResponseStatus() { valid = true, value = newreg };
+
 
                 }
                 catch (Newtonsoft.Json.JsonSerializationException jex)
@@ -206,7 +207,7 @@ namespace HlidacStatu.Datasets
                 {
                     var apires = ApiResponseStatus.DatasetJsonSchemaError;
                     apires.error.errorDetail = e.ToString();
-                    throw new DataSetException("",apires);
+                    throw new DataSetException("", apires);
                 }
             }
         }

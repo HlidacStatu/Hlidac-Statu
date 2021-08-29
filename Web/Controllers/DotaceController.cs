@@ -1,6 +1,7 @@
 ﻿using HlidacStatu.Entities;
 using HlidacStatu.Entities.Dotace;
 using HlidacStatu.Repositories;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers
@@ -22,11 +23,11 @@ namespace HlidacStatu.Web.Controllers
             var aggs = new Nest.AggregationContainerDescriptor<Dotace>()
                 .Sum("souhrn", s => s
                     .Field(f => f.DotaceCelkem)
-                
+
                 );
 
 
-            var res = DotaceRepo.Searching.SimpleSearch(model, anyAggregation:aggs);
+            var res = DotaceRepo.Searching.SimpleSearch(model, anyAggregation: aggs);
 
             AuditRepo.Add(
                 Audit.Operations.UserSearch
@@ -47,7 +48,7 @@ namespace HlidacStatu.Web.Controllers
                 return Redirect("/dotace");
             }
             var dotace = DotaceRepo.Get(id);
-            if(dotace is null)
+            if (dotace is null)
             {
                 return NotFound();
             }

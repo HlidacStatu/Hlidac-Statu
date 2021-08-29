@@ -1,14 +1,16 @@
+using Devmasters.Cache;
+using Devmasters.Cache.LocalMemory;
+
+using HlidacStatu.Connectors;
+using HlidacStatu.Entities;
+using HlidacStatu.Util;
+
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Devmasters.Cache;
-using Devmasters.Cache.LocalMemory;
-using HlidacStatu.Connectors;
-using HlidacStatu.Entities;
-using HlidacStatu.Util;
 
 namespace HlidacStatu.Repositories
 {
@@ -174,7 +176,7 @@ namespace HlidacStatu.Repositories
                 .GroupBy(k =>
                         k.Element(DatoveSchrankyNS + "AdresaUradu")?.Element(DatoveSchrankyNS + "KrajNazev")?.Value ??
                         "Královéhradecký" //chybejici u Dvora kraloveho
-                    //, v => new { DS = v.Element(DatoveSchrankyNS + "IdDS").Value, Nazev = v.Element(DatoveSchrankyNS + "Nazev").Value }
+                                          //, v => new { DS = v.Element(DatoveSchrankyNS + "IdDS").Value, Nazev = v.Element(DatoveSchrankyNS + "Nazev").Value }
                     , v => v.Element(DatoveSchrankyNS + "IdDS").Value
                 )
                 .ToDictionary(k => k.Key, v => v.ToArray());
@@ -204,7 +206,7 @@ namespace HlidacStatu.Repositories
             PrahaManualCache = new LocalMemoryCache<IEnumerable<Firma>>(TimeSpan.FromHours(6), "StatData.PrahaManual",
                 (o) =>
                 {
-                    var ds = new string[] {"48ia97h", "ktdeucu"};
+                    var ds = new string[] { "48ia97h", "ktdeucu" };
                     return ds
                         .Select(d => Firmy.GetByDS(d))
                         .OrderBy(or => or.Jmeno);
@@ -252,11 +254,11 @@ namespace HlidacStatu.Repositories
                                     var jmenoa = Devmasters.TextUtil.RemoveDiacritics(Firma.JmenoBezKoncovky(name))
                                         .Trim().ToLower();
                                     if (!res.ContainsKey(jmenoa))
-                                        res[jmenoa] = new string[] {ico};
+                                        res[jmenoa] = new string[] { ico };
                                     else if (!res[jmenoa].Contains(ico))
                                     {
                                         var v = res[jmenoa];
-                                        res[jmenoa] = v.Union(new string[] {ico}).ToArray();
+                                        res[jmenoa] = v.Union(new string[] { ico }).ToArray();
                                     }
                                 }
                             }

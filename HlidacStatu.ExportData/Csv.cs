@@ -1,10 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-
-using CsvHelper;
-
-namespace HlidacStatu.ExportData
+﻿namespace HlidacStatu.ExportData
 {
     public class Csv : FlatFile
     {

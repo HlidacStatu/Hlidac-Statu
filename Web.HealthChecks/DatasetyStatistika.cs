@@ -1,12 +1,13 @@
 ﻿
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Devmasters.Enums;
+
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 
 namespace HlidacStatu.Web.HealthChecks
 {
@@ -125,8 +126,8 @@ namespace HlidacStatu.Web.HealthChecks
                 sb.Append($"<thead><tr><td>dataset</td><td>celkem zaznamu</td><td>za {options.Interval.ToNiceDisplayName()}</td><td>posl.změna</td></tr></thead>");
                 sb.Append("<tbody>");
                 foreach (var ds in data
-                    .Where(ds=>options.Exclude.Contains(ds.Dataset.DatasetId)==false)
-                    .OrderByDescending(o=>o.PosledniZmena)
+                    .Where(ds => options.Exclude.Contains(ds.Dataset.DatasetId) == false)
+                    .OrderByDescending(o => o.PosledniZmena)
                     )
                 {
                     sb.Append("<tr>");

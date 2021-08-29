@@ -1,9 +1,11 @@
+using HlidacStatu.Entities;
+using HlidacStatu.Lib.Data.External.NespolehlivyPlatceDPH;
+
+using Microsoft.EntityFrameworkCore;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities;
-using HlidacStatu.Lib.Data.External.NespolehlivyPlatceDPH;
-using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories
 {
@@ -30,7 +32,7 @@ namespace HlidacStatu.Repositories
                             Ico = f.dic.Trim(),
                             FromDate = f.datumZverejneniNespolehlivostiSpecified
                                 ? f.datumZverejneniNespolehlivosti
-                                : (DateTime?) null
+                                : (DateTime?)null
                         })
                     .ToDictionary(k => k.Ico, v => v);
             }

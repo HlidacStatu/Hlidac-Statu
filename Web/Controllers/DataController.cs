@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.Datasets;
+﻿using HlidacStatu.Datasets;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.Searching;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -21,7 +22,7 @@ namespace HlidacStatu.Web.Controllers
                     var datasets = DataSetDB.Instance.SearchDataRaw("*", 1, 200)
                         .Result
                         .Select(s => Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(s.Item2))
-                        .Where(m=>m.id != null);
+                        .Where(m => m.id != null);
 
                     foreach (var ds in datasets)
                     {

@@ -1,9 +1,10 @@
-using System;
-using System.Linq;
-using System.Security.Policy;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories.ES;
+
 using Nest;
+
+using System;
+using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
@@ -21,7 +22,7 @@ namespace HlidacStatu.Repositories
                     .IndexDocument<ProfilZadavatele>(profilZadavatele);
             }
         }
-        
+
         public static ProfilZadavatele GetByUrl(string url, ElasticClient client = null)
         {
             var f = (client ?? Manager.GetESClient_ProfilZadavatele())

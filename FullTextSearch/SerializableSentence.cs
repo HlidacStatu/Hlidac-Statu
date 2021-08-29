@@ -13,7 +13,7 @@ namespace FullTextSearch
         public SerializableSentence()
         {
         }
-        
+
         public SerializableSentence(Sentence<T> sentence)
         {
             Original = sentence.Original;

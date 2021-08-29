@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using Devmasters.Enums;
+﻿using Devmasters.Enums;
+
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities.Analysis;
-using HlidacStatu.Entities.Views;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Util;
 using HlidacStatu.XLib.Render;
+
+using System;
+using System.Collections.Generic;
+using System.Net;
+
 using Consts = HlidacStatu.Util.Consts;
 
 namespace HlidacStatu.XLib
@@ -57,7 +58,7 @@ namespace HlidacStatu.XLib
                         HtmlRender = (s) => RenderData.ShortNicePrice(s.Value[year].CelkovaHodnotaSmluv, mena: "", html: true, showDecimal: RenderData.ShowDecimalVal.Show, exactScale: scale, hideSuffix: true),
                         OrderValueRender = (s) => RenderData.OrderValueFormat(s.Value[year].CelkovaHodnotaSmluv),
                         TextRender = (s) => RenderData.ShortNicePrice(s.Value[year].CelkovaHodnotaSmluv, mena: "", html: false, showDecimal: RenderData.ShowDecimalVal.Show, exactScale: scale, hideSuffix: true),
-                        ValueRender = (s) => s.Value[year].CelkovaHodnotaSmluv.ToString("F0",HlidacStatu.Util.Consts.enCulture),
+                        ValueRender = (s) => s.Value[year].CelkovaHodnotaSmluv.ToString("F0", HlidacStatu.Util.Consts.enCulture),
                         CssClass = "number"
                     }
                     );
@@ -102,7 +103,7 @@ namespace HlidacStatu.XLib
                             Name = $"Hodnota smluv s politiky za {year}",
                             HtmlRender = (s) => HlidacStatu.Util.RenderData.NicePrice(s.Value[year].SumKcSmluvSponzorujiciFirmy),
                             OrderValueRender = (s) => RenderData.OrderValueFormat(s.Value[year].SumKcSmluvSponzorujiciFirmy),
-                            ValueRender = (s) => (s.Value[year].SumKcSmluvSponzorujiciFirmy).ToString("F0",Consts.enCulture),
+                            ValueRender = (s) => (s.Value[year].SumKcSmluvSponzorujiciFirmy).ToString("F0", Consts.enCulture),
                             TextRender = (s) => s.Value[year].SumKcSmluvSponzorujiciFirmy.ToString("F0", HlidacStatu.Util.Consts.enCulture),
                             CssClass = "number"
                         });
@@ -114,8 +115,8 @@ namespace HlidacStatu.XLib
                             {
                                 Id = "CenaChangePercent_Y_" + year,
                                 Name = $"Změna hodnoty smlouvy {year - 1}-{year}",
-                                HtmlRender = (s) => s.Value.ChangeBetweenYears(year, m => m.CelkovaHodnotaSmluv).percentage.HasValue?
-                                    RenderData.ChangeValueSymbol(s.Value.ChangeBetweenYears(year,m=>m.CelkovaHodnotaSmluv).percentage.Value, true) :
+                                HtmlRender = (s) => s.Value.ChangeBetweenYears(year, m => m.CelkovaHodnotaSmluv).percentage.HasValue ?
+                                    RenderData.ChangeValueSymbol(s.Value.ChangeBetweenYears(year, m => m.CelkovaHodnotaSmluv).percentage.Value, true) :
                                     "",
                                 OrderValueRender = (s) => RenderData.OrderValueFormat(s.Value.ChangeBetweenYears(year, m => m.CelkovaHodnotaSmluv).percentage ?? 0),
                                 ValueRender = (s) => s.Value.ChangeBetweenYears(year, m => m.CelkovaHodnotaSmluv).percentage.HasValue ?
@@ -134,8 +135,8 @@ namespace HlidacStatu.XLib
                 {
                     Id = "CenaCelkem",
                     Name = $"Smlouvy 2016-{DateTime.Now.Year} v {scale.ToNiceDisplayName()} Kč",
-                    HtmlRender = (s) => RenderData.ShortNicePrice(s.Value.Sum(m=>m.CelkovaHodnotaSmluv), mena: "", html: true, showDecimal: RenderData.ShowDecimalVal.Show, exactScale: scale, hideSuffix: true),
-                    ValueRender = (s) => (s.Value.Sum(m=>m.CelkovaHodnotaSmluv)).ToString("F0", Consts.enCulture),
+                    HtmlRender = (s) => RenderData.ShortNicePrice(s.Value.Sum(m => m.CelkovaHodnotaSmluv), mena: "", html: true, showDecimal: RenderData.ShowDecimalVal.Show, exactScale: scale, hideSuffix: true),
+                    ValueRender = (s) => (s.Value.Sum(m => m.CelkovaHodnotaSmluv)).ToString("F0", Consts.enCulture),
                     OrderValueRender = (s) => RenderData.OrderValueFormat(s.Value.Sum(m => m.CelkovaHodnotaSmluv)),
                     CssClass = "number"
                 });

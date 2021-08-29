@@ -1,8 +1,9 @@
-﻿using System;
+﻿using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.Entities;
+
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using HlidacStatu.Datastructures.Graphs;
-using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories.Searching.Rules
 {
@@ -25,7 +26,7 @@ namespace HlidacStatu.Repositories.Searching.Rules
                 else
                     return new string[] { "osobaid:",
                         "osobaidprijemce:", "osobaidplatce:",
-                        "osobaiddluznik:", "osobaidveritel:", 
+                        "osobaiddluznik:", "osobaidveritel:",
                         "osobaidspravce:", "osobaiddodavatel:", "osobaidzadavatel:"};
             }
         }
@@ -57,7 +58,7 @@ namespace HlidacStatu.Repositories.Searching.Rules
                 )
             )
             && (Regex.IsMatch(part.Value, @"(?<q>((\w{1,} [-]{1} \w{1,})([-]{1} \d{1,3})?))", Util.Consts.DefaultRegexQueryOption))
-             
+
             )
             {
                 if (!string.IsNullOrWhiteSpace(ReplaceWith))
@@ -112,7 +113,7 @@ namespace HlidacStatu.Repositories.Searching.Rules
                     if (AddLastCondition.Contains("${q}"))
                     {
                         var q = AddLastCondition.Replace("${q}", part.Value);
-                        return new RuleResult(SplittingQuery.SplitQuery(q), NextStep,true);
+                        return new RuleResult(SplittingQuery.SplitQuery(q), NextStep, true);
                     }
                     else
                     {

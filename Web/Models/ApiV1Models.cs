@@ -28,7 +28,7 @@ namespace HlidacStatu.Web.Models
 
         public class PolitikTypeAhead : IEqualityComparer<PolitikTypeAhead>
         {
-            public  string name; public string nameId;
+            public string name; public string nameId;
 
             public bool Equals(PolitikTypeAhead x, PolitikTypeAhead y)
             {

@@ -1,6 +1,7 @@
-﻿using System;
+﻿using HlidacStatu.XLib.Text;
+
+using System;
 using System.Net;
-using HlidacStatu.XLib.Text;
 
 namespace HlidacStatu.XLib
 {

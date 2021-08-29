@@ -1,5 +1,6 @@
 ﻿using HlidacStatu.Entities;
 using HlidacStatu.Web.Framework;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
@@ -30,6 +31,6 @@ namespace HlidacStatu.Web.Controllers
         }
 
         public ApiAuth.Result ApiAuth { get; set; }
-        
+
     }
 }

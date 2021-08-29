@@ -10,11 +10,11 @@ namespace HlidacStatu.Entities
     public partial class OsobaExternalId
     {
         public int OsobaId { get; set; }
-        
+
         [StringLength(50)]
         public string ExternalId { get; set; }
         public int ExternalSource { get; set; }
-        
+
         public enum Source
         {
             Merk = 1,

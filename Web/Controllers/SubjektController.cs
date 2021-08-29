@@ -1,10 +1,12 @@
-﻿using System.Linq;
-using HlidacStatu.Datastructures.Graphs;
+﻿using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
-using HlidacStatu.Extensions;
 using HlidacStatu.Entities.OrgStrukturyStatu;
+using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
+
 using Microsoft.AspNetCore.Mvc;
+
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -20,9 +22,9 @@ namespace HlidacStatu.Web.Controllers
             }
 
             return result;
-            
+
         }
-        
+
         public ActionResult Dotace(string id)
         {
             if (TryGetCompany(id, out var firma, out var result))
@@ -131,7 +133,7 @@ namespace HlidacStatu.Web.Controllers
 
             return result;
         }
-        
+
         public ActionResult Dodavatele(string id)
         {
             if (TryGetCompany(id, out var firma, out var result))
@@ -181,7 +183,7 @@ namespace HlidacStatu.Web.Controllers
         {
             if (TryGetCompany(id, out var firma, out var result))
             {
-                (Firma firma, string viewName, string title) model = (firma, "InsolvencniRejstrik", $"{firma.Jmeno} - Insolvenční rejstřík" );
+                (Firma firma, string viewName, string title) model = (firma, "InsolvencniRejstrik", $"{firma.Jmeno} - Insolvenční rejstřík");
                 return View("_subjektLayout", model);
                 //return View((Firma: firma, Data: new List<int>()));
             }
@@ -193,13 +195,13 @@ namespace HlidacStatu.Web.Controllers
         private bool TryGetCompany(string id, out Firma firma, out ActionResult actionResult)
         {
             firma = null;
-            
+
             if (string.IsNullOrWhiteSpace(id))
             {
                 actionResult = RedirectToAction("Index", "Home");
                 return false;
             }
-                
+
             string ico = Util.ParseTools.NormalizeIco(id);
 
             firma = Firmy.Get(ico);
@@ -223,7 +225,7 @@ namespace HlidacStatu.Web.Controllers
                 return false;
             }
 
-            actionResult = View("Index",firma);
+            actionResult = View("Index", firma);
             return true;
         }
 

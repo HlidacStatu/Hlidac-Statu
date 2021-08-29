@@ -81,7 +81,7 @@ namespace HlidacStatu.Datasets
             {
                 var propType = CreateType().GetProperty(propName)?.PropertyType;
                 if (propType != null)
-                   CreateType().GetProperty(propName)?.SetValue(instance, HlidacStatu.Util.ParseTools.ChangeType(value, propType));
+                    CreateType().GetProperty(propName)?.SetValue(instance, HlidacStatu.Util.ParseTools.ChangeType(value, propType));
             }
         }
 
@@ -136,7 +136,7 @@ namespace HlidacStatu.Datasets
                             if (sProp.Key.StartsWith(prefix)
                                 && sProp.Key.IndexOf('.', prefix.Length) == -1 //no subObjects properties
                                 )
-                                subProps.Add(sProp.Key.Replace(prefix,""), sProp.Value);
+                                subProps.Add(sProp.Key.Replace(prefix, ""), sProp.Value);
                         }
 
                         var subRcb = new RuntimeClassBuilder(subProps);

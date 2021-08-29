@@ -1,7 +1,8 @@
-﻿using System;
+﻿using HlidacStatu.Entities.Dotace;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Entities.Dotace;
 
 namespace HlidacStatu.Repositories.Searching
 {
@@ -12,7 +13,7 @@ namespace HlidacStatu.Repositories.Searching
         {
         }
 
-       public IEnumerable<Dotace> Results
+        public IEnumerable<Dotace> Results
         {
             get
             {

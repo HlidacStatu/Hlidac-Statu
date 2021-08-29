@@ -20,12 +20,12 @@ namespace FullTextSearch
         {
             if (this == merged) return; //fuse to not merge myself with myself
 
-            foreach(var sentence in merged.Sentences)
+            foreach (var sentence in merged.Sentences)
             {
                 Sentences.Add(sentence);
-                for(int i = 0; i < sentence.Tokens.Count; i++)
+                for (int i = 0; i < sentence.Tokens.Count; i++)
                 {
-                    if(sentence.Tokens[i].Equals(merged))
+                    if (sentence.Tokens[i].Equals(merged))
                     {
                         sentence.Tokens[i] = this;
                     }

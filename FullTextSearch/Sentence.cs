@@ -52,7 +52,7 @@ namespace FullTextSearch
                     .Where(p => p.CustomAttributes.Any(ca => ca.AttributeType == typeof(SearchAttribute)))
                     .Select(p => p.GetValue(Original)?.ToString());
 
-            
+
             var words = objectValues.SelectMany(x => _tokenizer.Tokenize(x)); //.Distinct();
 
             CreateTokens(words);

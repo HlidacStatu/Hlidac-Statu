@@ -1,9 +1,11 @@
-﻿using System;
+﻿using HlidacStatu.Lib.Data.External.Zabbix;
+using HlidacStatu.Web.Filters;
+
+using Microsoft.AspNetCore.Mvc;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Lib.Data.External.Zabbix;
-using HlidacStatu.Web.Filters;
-using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -147,7 +149,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        [HlidacCache(10*60,"id;h;embed",false)]
+        [HlidacCache(10 * 60, "id;h;embed", false)]
         public ActionResult Info(int id, string h)
         {
             ZabHost host = ZabTools.Weby().Where(w => w.hostid == id.ToString() & w.itemIdResponseTime != null).FirstOrDefault();

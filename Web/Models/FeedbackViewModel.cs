@@ -2,7 +2,7 @@ namespace HlidacStatu.Web.Models
 {
     public class FeedbackViewModel
     {
-        public string ButtonText { get; set; } 
+        public string ButtonText { get; set; }
         public string SelectOption { get; set; }
         public string Style { get; set; }
         public string? IdPrefix { get; set; }

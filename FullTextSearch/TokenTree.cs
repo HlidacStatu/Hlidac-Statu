@@ -11,16 +11,16 @@ namespace FullTextSearch
             new Dictionary<char, Dictionary<string, Token<T>>>();
 
         private const char NullChar = '_';
-        
+
         public void AddTokens(List<Token<T>> tokens)
         {
-            for(int i = 0; i < tokens.Count(); i++)
+            for (int i = 0; i < tokens.Count(); i++)
             {
-                string word = tokens[i].Word; 
-                
+                string word = tokens[i].Word;
+
                 var subdictionary = GetSubdictionary(word);
-                
-                if(subdictionary.TryGetValue(tokens[i].Word, out Token<T> olderToken))
+
+                if (subdictionary.TryGetValue(tokens[i].Word, out Token<T> olderToken))
                 {
                     olderToken.MergeWith(tokens[i]);
                 }
@@ -34,7 +34,7 @@ namespace FullTextSearch
         public IEnumerable<Token<T>> FindTokens(string word)
         {
             var subdictionary = GetSubdictionary(word);
-            
+
             return subdictionary
                 .Where(t => t.Key.StartsWith(word, StringComparison.Ordinal))
                 .Select(x => x.Value);
@@ -51,7 +51,7 @@ namespace FullTextSearch
 
             var emptyDictionary = new Dictionary<string, Token<T>>(StringComparer.Ordinal);
             _innerStructure.Add(key, emptyDictionary);
-            
+
             return emptyDictionary;
         }
 
@@ -59,8 +59,8 @@ namespace FullTextSearch
         {
             return string.IsNullOrEmpty(word) ? NullChar : word.FirstOrDefault();
         }
-        
-        
+
+
         public byte[] Serialize()
         {
             var structure = _innerStructure
@@ -68,7 +68,7 @@ namespace FullTextSearch
                 .Distinct()
                 .Select(v => new SerializableSentence<T>(v))
                 .ToList();
-            
+
             return JsonSerializer.SerializeToUtf8Bytes(structure);
             //return jsonUtf8Bytes;
 
@@ -79,10 +79,10 @@ namespace FullTextSearch
             //
             //return JsonSerializer.Serialize(structure);
 
-            
+
         }
-        
-        
+
+
     }
-        
+
 }

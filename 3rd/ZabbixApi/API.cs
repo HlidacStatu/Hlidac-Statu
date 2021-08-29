@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System.Net;
-using System.IO;
+
 using System.Dynamic;
+using System.IO;
+using System.Net;
 
 namespace ZabbixApi
 {
@@ -83,7 +84,7 @@ namespace ZabbixApi
         private string sendRequest(string jsonParams)
         {
             WebRequest request = WebRequest.Create(zabbixURL);
-            
+
             if (basicAuth != null) request.Headers.Add("Authorization", "Basic " + basicAuth);
             request.ContentType = "application/json-rpc";
             request.Method = "POST";

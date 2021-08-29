@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.Entities.OsobyES;
-using Devmasters.Collections;
+﻿using Devmasters.Collections;
+
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.OsobyES;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
+
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PeopleLoader
 {
@@ -32,7 +34,7 @@ namespace PeopleLoader
                 //first fix people where is missing osoba.nameid
                 foreach (var osoba in osoby.Where(o => o.NameId == null || o.NameId.Length < 1))
                 {
-                   OsobaRepo.Save(osoba);
+                    OsobaRepo.Save(osoba);
                 }
 
                 System.Console.WriteLine("Converting all records");

@@ -1,10 +1,12 @@
-using System;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Insolvence;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
+
 using Nest;
+
+using System;
 
 namespace HlidacStatu.Repositories
 {
@@ -45,12 +47,12 @@ namespace HlidacStatu.Repositories
                 "id:"
             };
 
-            static string[] queryOperators = new string[] {"AND", "OR"};
+            static string[] queryOperators = new string[] { "AND", "OR" };
 
 
             public static QueryContainer GetSimpleQuery(string query)
             {
-                return GetSimpleQuery(new InsolvenceSearchResult() {Q = query, Page = 1});
+                return GetSimpleQuery(new InsolvenceSearchResult() { Q = query, Page = 1 });
             }
 
             public static QueryContainer GetSimpleQuery(InsolvenceSearchResult searchdata)
@@ -193,7 +195,7 @@ namespace HlidacStatu.Repositories
                             .Aggregations(aggr => anyAggregation)
                             .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                 ? true
-                                : (bool?) null)
+                                : (bool?)null)
                         );
                     if (withHighlighting && res.Shards != null &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
@@ -211,7 +213,7 @@ namespace HlidacStatu.Repositories
                                 .Aggregations(aggr => anyAggregation)
                                 .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                     ? true
-                                    : (bool?) null)
+                                    : (bool?)null)
                             );
                     }
                 }

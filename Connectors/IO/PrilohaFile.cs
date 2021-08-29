@@ -25,7 +25,7 @@ namespace HlidacStatu.Connectors.IO
         {
             if (string.IsNullOrEmpty(prilohaUrl) || obj == null)
                 return string.Empty;
-            return GetFullDir(obj)  + Encode(prilohaUrl);
+            return GetFullDir(obj) + Encode(prilohaUrl);
         }
 
         public override string GetRelativeDir(Smlouva obj)

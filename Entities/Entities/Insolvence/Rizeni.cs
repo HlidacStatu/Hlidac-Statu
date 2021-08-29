@@ -1,7 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using Nest;
+
+using System;
 using System.Collections.Generic;
-using Nest;
+using System.Linq;
 
 namespace HlidacStatu.Entities.Insolvence
 {
@@ -65,7 +66,7 @@ namespace HlidacStatu.Entities.Insolvence
 
         public string UrlId() => SpisovaZnacka.Replace(" ", "_").Replace("/", "-");
 
-        
+
 
         public string GetUrl(bool local = true)
         {
@@ -104,7 +105,7 @@ namespace HlidacStatu.Entities.Insolvence
             }
 
         }
-        
+
         public class ProgressItem
         {
             public enum ProgressStatus
@@ -498,7 +499,7 @@ namespace HlidacStatu.Entities.Insolvence
 
         }
 
-        
+
 
         public string StavRizeni()
         {

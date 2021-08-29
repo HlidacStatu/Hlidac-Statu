@@ -1,11 +1,13 @@
-﻿using HlidacStatu.Entities.XSD;
+﻿using HlidacStatu.Entities.Issues;
+using HlidacStatu.Entities.XSD;
 using HlidacStatu.Util;
+
 using Nest;
+
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using HlidacStatu.Entities.Issues;
 
 namespace HlidacStatu.Entities
 {
@@ -16,7 +18,7 @@ namespace HlidacStatu.Entities
 
         public tIdentifikator identifikator;
         InfoFact[] _infofacts = null;
-        
+
         Smlouva[] _podobneSmlouvy = null;
         object enhLock = new object();
         private Issues.Issue[] issues = new Issues.Issue[] { };
@@ -331,7 +333,7 @@ namespace HlidacStatu.Entities
             return ImportanceLevel.Ok;
         }
 
-        
+
 
         public SClassification.Classification[] GetRelevantClassification()
         {
@@ -357,7 +359,7 @@ namespace HlidacStatu.Entities
                 return url;
         }
 
-        
+
 
         public bool IsPartOfRegistrSmluv()
         {
@@ -376,8 +378,8 @@ namespace HlidacStatu.Entities
                 return NicePrice(CalculatedPriceWithVATinCZK, html: html);
         }
 
-        
-        
+
+
 
         public bool NotInterestingToShow() { return false; }
 
@@ -404,9 +406,9 @@ namespace HlidacStatu.Entities
             return (b || platnyZaznam == false);
         }
 
-        
 
-        
+
+
 
         public SClassification.Classification[] relevantClassif(SClassification.Classification[] types)
         {
@@ -503,7 +505,7 @@ namespace HlidacStatu.Entities
         }
 
         //migrace: tohle nahradit pomocí devmasters tools pro nice price.
-        
+
         public static string NicePrice(decimal? number, string mena = "Kč", bool html = false, bool shortFormat = false)
         {
             if (number.HasValue)
@@ -548,7 +550,7 @@ namespace HlidacStatu.Entities
             }
             return v;
         }
-        
+
         static DateTime pravniRamce01072017 = new DateTime(2017, 7, 1);
 
     }

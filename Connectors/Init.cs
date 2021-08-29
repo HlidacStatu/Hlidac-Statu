@@ -36,11 +36,11 @@ namespace HlidacStatu.Connectors
 
                 if (!string.IsNullOrEmpty(Devmasters.Config.GetWebConfigValue("WebAppRoot")))
                 {
-                    WebAppRoot= Devmasters.Config.GetWebConfigValue("WebAppRoot");
+                    WebAppRoot = Devmasters.Config.GetWebConfigValue("WebAppRoot");
                 }
                 else throw new System.IO.DirectoryNotFoundException("cannot find WebAppRoot");
 
-                WebAppRoot = Path.Combine(new System.IO.DirectoryInfo(WebAppRoot).FullName,"wwwroot");
+                WebAppRoot = Path.Combine(new System.IO.DirectoryInfo(WebAppRoot).FullName, "wwwroot");
 
                 if (!WebAppRoot.EndsWith("\\"))
                     WebAppRoot = WebAppRoot + "\\";
@@ -66,6 +66,6 @@ namespace HlidacStatu.Connectors
         }
 
 
-        
+
     }
 }

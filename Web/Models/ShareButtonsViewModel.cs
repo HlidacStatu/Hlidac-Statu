@@ -7,7 +7,7 @@ namespace HlidacStatu.Web.Models
         public string PrefixHtml { get; set; }
         public string BetweenButtonsHtml { get; set; }
         public string PostfixHtml { get; set; }
-        
+
         public ShareButtonsViewModel(string url, string text, string prefixHtml = "", string betweenButtonsHtml = "", string postfixHtml = "")
         {
             Url = url;

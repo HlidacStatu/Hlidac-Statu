@@ -1,9 +1,6 @@
 ﻿using HtmlAgilityPack;
-using System;
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Vybory_PSP
 {
@@ -14,7 +11,7 @@ namespace Vybory_PSP
         public XPath(string html)
         {
             doc = new HtmlDocument();
-            doc.LoadHtml(html??"");
+            doc.LoadHtml(html ?? "");
         }
 
         public HtmlDocument Document { get { return doc; } }

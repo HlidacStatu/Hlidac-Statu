@@ -3,8 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 
-using Microsoft.EntityFrameworkCore;
-
 #nullable disable
 
 namespace HlidacStatu.Entities
@@ -15,7 +13,7 @@ namespace HlidacStatu.Entities
     {
         [Key]
         public int Id { get; set; }
-        
+
         [Required]
         [Column("ico")]
         [StringLength(20)]

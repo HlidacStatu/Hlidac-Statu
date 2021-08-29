@@ -50,7 +50,7 @@ namespace HlidacStatu.Repositories.Searching.Rules
                     }
                     else if (cpvs.Length > 1)
                         q_cpv = " ( " + cpvs.Select(s => "cPV:" + s + "*").Aggregate((f, s) => f + " OR " + s) + " ) ";
-                    
+
                     return new RuleResult(SplittingQuery.SplitQuery($" {q_cpv} "), NextStep);
                 }
             }

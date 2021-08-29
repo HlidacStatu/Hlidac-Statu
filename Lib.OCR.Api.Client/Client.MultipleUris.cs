@@ -40,20 +40,20 @@ namespace HlidacStatu.Lib.OCR.Api
                 if (string.IsNullOrEmpty(apikey))
                     throw new ArgumentNullException("apikey");
 
-                this.apikey = apikey;                
+                this.apikey = apikey;
                 Client = client;
                 Priority = priority;
                 Intensity = intensity;
                 this.uris = uris;
 
-                if (this.uris.Count()>0)
+                if (this.uris.Count() > 0)
                     pi = new ProgressInterval(this.uris.Count());
 
             }
 
-            public async Task<Dictionary<Uri,Result>> Go()
+            public async Task<Dictionary<Uri, Result>> Go()
             {
-                List<Task<Tuple<Uri, Result>>> tas = new List<Task<Tuple<Uri,Result>>>();
+                List<Task<Tuple<Uri, Result>>> tas = new List<Task<Tuple<Uri, Result>>>();
 
                 foreach (var url in uris)
                 {
@@ -61,7 +61,7 @@ namespace HlidacStatu.Lib.OCR.Api
                 }
 
                 var res = await Task.WhenAll(tas);
-                return res.ToDictionary(k=>k.Item1,v=>v.Item2);
+                return res.ToDictionary(k => k.Item1, v => v.Item2);
             }
 
             private void AddProgress(decimal progress, string name)
@@ -73,7 +73,7 @@ namespace HlidacStatu.Lib.OCR.Api
                 MiningProgress.SetProgress(currProgress, name);
             }
 
-            private async Task<Tuple<Uri,Result>> OneCall(string apikey, Uri url)
+            private async Task<Tuple<Uri, Result>> OneCall(string apikey, Uri url)
             {
                 Result res = null;
                 try
@@ -91,13 +91,13 @@ namespace HlidacStatu.Lib.OCR.Api
                     AddProgress(
                         pi.SetProgressInPercent(100).Progress
                         , url.ToString());
-                    return new Tuple<Uri,Result>(url,res);
+                    return new Tuple<Uri, Result>(url, res);
 
                 }
                 catch (ApiException e)
                 {
                     logger.Error($"TextFromURLAsync {url.AbsoluteUri} API error", e);
-                    return new Tuple<Uri, Result>(url,new Result() { Id=res?.Id,  IsValid = Result.ResultStatus.Invalid, Error = e.ToString() });
+                    return new Tuple<Uri, Result>(url, new Result() { Id = res?.Id, IsValid = Result.ResultStatus.Invalid, Error = e.ToString() });
                 }
                 catch (Exception e)
                 {

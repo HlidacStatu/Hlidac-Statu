@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Devmasters;
+
+using HlidacStatu.Connectors.External.ProfilZadavatelu;
+using HlidacStatu.Entities.VZ;
+
+using System;
 using System.Net;
 using System.Threading;
 using System.Xml.Serialization;
-using Devmasters;
-using HlidacStatu.Connectors.External.ProfilZadavatelu;
-using HlidacStatu.Entities.VZ;
 
 namespace HlidacStatu.Repositories.ProfilZadavatelu
 {
@@ -43,7 +45,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
         {
             ProcessProfileZadavatelu(profil, from, DateTime.Now);
         }
-        public  void ProcessProfileZadavatelu(ProfilZadavatele profil, DateTime from, DateTime to)
+        public void ProcessProfileZadavatelu(ProfilZadavatele profil, DateTime from, DateTime to)
         {
 
             var di = new DateTimeInterval(from, to);
@@ -67,13 +69,13 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
         {
             string xmlUrlTemp = profil.Url;
             if (profil.Url?.EndsWith("/") == true)
-                xmlUrlTemp = xmlUrlTemp+ "XMLdataVZ?od={0:ddMMyyy}&do={1:ddMMyyyy}";
+                xmlUrlTemp = xmlUrlTemp + "XMLdataVZ?od={0:ddMMyyy}&do={1:ddMMyyyy}";
             else
                 xmlUrlTemp = xmlUrlTemp + "/XMLdataVZ?od={0:ddMMyyy}&do={1:ddMMyyyy}";
 
 
             var xml = "";
-            Devmasters.DT.StopWatchEx sw = new  Devmasters.DT.StopWatchEx();
+            Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
             sw.Start();
             var surl = string.Format(xmlUrlTemp, from, to);
             var ReqLog = new Entities.Logs.ProfilZadavateleDownload() { Date = DateTime.Now, ProfileId = profil.Id, RequestedUrl = surl };
@@ -181,7 +183,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
 
         }
 
-        private  ProfilStructure ParserXml(string xml)
+        private ProfilStructure ParserXml(string xml)
         {
             using (var xmlReader = new System.IO.StringReader(xml))
             {

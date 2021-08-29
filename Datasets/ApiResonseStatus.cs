@@ -33,7 +33,7 @@ namespace HlidacStatu.Datasets
 
         public static ApiResponseStatus StatniWebNotFound = Error(-91, "Web not found.");
 
-        public static ApiResponseStatus Valid(object value = null) { return new ApiResponseStatus() { valid = true, value=value }; }
+        public static ApiResponseStatus Valid(object value = null) { return new ApiResponseStatus() { valid = true, value = value }; }
         public static ApiResponseStatus Error(int number, string description, string errorDetail = null)
         {
             return Error(new ErrorInfo()

@@ -1,5 +1,6 @@
-﻿using System;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
+
+using System;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
@@ -24,7 +25,7 @@ namespace HlidacStatu.XLib.Watchdogs
 
         }
 
-        public static bool ReadyToRun(WatchDog.PeriodTime period, DateTime? lastRun, DateTime? newRun )
+        public static bool ReadyToRun(WatchDog.PeriodTime period, DateTime? lastRun, DateTime? newRun)
         {
             newRun = newRun ?? DateTime.Now;
             if (lastRun.HasValue == false)

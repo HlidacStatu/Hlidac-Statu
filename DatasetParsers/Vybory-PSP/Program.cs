@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using HlidacStatu.Api.Dataset.Connector;
+
+using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Api.Dataset.Connector;
 
 namespace Vybory_PSP
 {
@@ -13,7 +14,7 @@ namespace Vybory_PSP
         public static string mp3path = System.Configuration.ConfigurationManager.AppSettings["mp3path"];
         static void Main(string[] arguments)
         {
-            dsc = new HlidacStatu.Api.Dataset.Connector.DatasetConnector(apikey);            
+            dsc = new HlidacStatu.Api.Dataset.Connector.DatasetConnector(apikey);
 
             //dsc.SetDeveleperUrl("http://local.hlidacstatu.cz/api/v1/");
             args = arguments
@@ -33,7 +34,7 @@ namespace Vybory_PSP
                 "https://github.com/HlidacStatu/Datasety/tree/master/Vybory-PSP",
                 true, true,
                 new string[,] { { "Datum jednání", "datum" }, { "Výboru", "vybor" } },
-                new Template() { Body= @"
+                new Template() { Body = @"
 
 <!-- scriban {{ date.now }} --> 
 <table class='table table-hover'>

@@ -40,12 +40,14 @@ namespace HlidacStatu.Datasets
             DatasetId = datasetId;
             APIResponse = apiResp;
         }
-        public override string Message {
-            get {
+        public override string Message
+        {
+            get
+            {
                 return $"Dataset:{DatasetId}\nApiResponse:{APIResponse.ToString()}\n{base.Message}";
-                }
+            }
         }
-    
-        
+
+
     }
 }

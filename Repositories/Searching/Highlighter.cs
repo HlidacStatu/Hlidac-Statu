@@ -12,7 +12,7 @@ namespace HlidacStatu.Repositories.Searching
             highlights = highlights ?? new Dictionary<string, IReadOnlyCollection<string>>();
             foreach (var hlk in highlights.Where(k => k.Key == path))
             {
-                foreach (var txt in hlk.Value) 
+                foreach (var txt in hlk.Value)
                 {
                     string stxt = txt.Replace("<highl>", "").Replace("</highl>", "");
                     if (content?.Contains(stxt) == true)

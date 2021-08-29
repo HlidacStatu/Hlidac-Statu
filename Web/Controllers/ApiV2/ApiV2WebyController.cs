@@ -1,15 +1,18 @@
-﻿using System;
-using System.Linq;
+﻿using Devmasters.Enums;
+
 using HlidacStatu.Lib.Data.External.Zabbix;
-using Devmasters.Enums;
 using HlidacStatu.Web.Filters;
-using HlidacStatu.Web.Models.Apiv2;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Swashbuckle.AspNetCore.Annotations;
+
+using System;
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
-    
+
     [SwaggerTag("Weby")]
     [Route("api/v2/Weby")]
     public class ApiV2WebyController : ApiV2AuthController
@@ -35,7 +38,7 @@ namespace HlidacStatu.Web.Controllers
         //[GZipOrDeflate()]
         [AuthorizeAndAudit]
         [HttpGet("{id?}")]
-        public ActionResult<WebStatusExport> Status([FromRoute]string id = null)
+        public ActionResult<WebStatusExport> Status([FromRoute] string id = null)
         {
             if (string.IsNullOrEmpty(id))
                 return BadRequest($"Web nenalezen");

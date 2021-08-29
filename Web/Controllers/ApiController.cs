@@ -1,22 +1,10 @@
-﻿using FullTextSearch;
-using HlidacStatu.Entities;
-using Nest;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using HlidacStatu.Entities.VZ;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.ES;
-using HlidacStatu.Repositories.ProfilZadavatelu;
-using HlidacStatu.Web.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Connections;
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {

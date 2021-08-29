@@ -1,5 +1,6 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
+
 using Nest;
 
 namespace HlidacStatu.Repositories
@@ -11,6 +12,6 @@ namespace HlidacStatu.Repositories
             ElasticClient c = Manager.GetESClient_Firmy();
             var res = c.Index<FirmaInElastic>(firmaInElastic, m => m.Id(firmaInElastic.Ico));
         }
-        
+
     }
 }

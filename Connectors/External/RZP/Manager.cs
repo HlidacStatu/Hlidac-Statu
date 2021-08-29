@@ -1,8 +1,9 @@
-﻿using System;
+﻿using HlidacStatu.Lib.Data.External;
+
+using System;
 using System.IO;
 using System.Net;
 using System.Text;
-using HlidacStatu.Lib.Data.External;
 
 namespace HlidacStatu.Connectors.External
 {

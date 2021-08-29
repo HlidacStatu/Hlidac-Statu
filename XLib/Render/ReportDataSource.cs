@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Nest;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Nest;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace HlidacStatu.XLib.Render
 {
@@ -139,7 +141,7 @@ namespace HlidacStatu.XLib.Render
             Data.Clear();
         }
 
-        
+
 
         public virtual void AddRows(IEnumerable<T> values)
         {
@@ -249,7 +251,7 @@ namespace HlidacStatu.XLib.Render
 
         }
 
-        public static ReportDataSource SimpleReportDataForDateChart(string xAxisName, string yAxisName, Dictionary<DateTime,decimal> data)
+        public static ReportDataSource SimpleReportDataForDateChart(string xAxisName, string yAxisName, Dictionary<DateTime, decimal> data)
         {
             ReportDataSource rds = new ReportDataSource(new Column[]
             {
@@ -275,12 +277,14 @@ namespace HlidacStatu.XLib.Render
         }
     }
 
-    public class ReportDataTimeValue {
+    public class ReportDataTimeValue
+    {
         public DateTime Date { get; set; }
         public decimal Value { get; set; }
     }
 
-    public class Series : Series<SeriesData> {
+    public class Series : Series<SeriesData>
+    {
         [JsonProperty("color")]
         public string Color { get; set; }
 
@@ -323,9 +327,10 @@ namespace HlidacStatu.XLib.Render
         public SeriesTooltip SeriesTooltip { get; set; }
 
     }
-    public class SeriesTextValue : Series<SeriesDataTextValue> {
+    public class SeriesTextValue : Series<SeriesDataTextValue>
+    {
         [JsonProperty("colorByPoint")]
-        public bool ColorByPoint { get; set; } 
+        public bool ColorByPoint { get; set; }
 
 
     }

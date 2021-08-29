@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace HlidacStatu.Entities
 {
@@ -11,7 +10,7 @@ namespace HlidacStatu.Entities
             {
                 public static VZ NullObj = new VZ() { ICO = "--------" };
 
-                
+
 
                 public VZ() : base() { }
 
@@ -20,7 +19,7 @@ namespace HlidacStatu.Entities
                 {
 
                 }
-                
+
             }
         }
     }

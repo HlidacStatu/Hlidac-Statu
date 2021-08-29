@@ -36,7 +36,7 @@ namespace HlidacStatu.Repositories.Searching.Rules
             if (//this.ReplaceWith.Contains("${q}") &&
                 part.Prefix.Equals(_prefix, StringComparison.InvariantCultureIgnoreCase)
                 && (
-                    string.IsNullOrWhiteSpace(_valueConstrain) 
+                    string.IsNullOrWhiteSpace(_valueConstrain)
                     || Regex.IsMatch(part.Value, _valueConstrain, Util.Consts.DefaultRegexQueryOption)
                     )
                 )

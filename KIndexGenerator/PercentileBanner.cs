@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Svg;
+
+using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-
-using Svg;
 
 
 namespace HlidacStatu.KIndexGenerator
@@ -55,7 +54,7 @@ namespace HlidacStatu.KIndexGenerator
         { }
 
 
-        public PercentileBanner(decimal currValue,Dictionary<int, decimal> percentilesValues, string dataFolder)
+        public PercentileBanner(decimal currValue, Dictionary<int, decimal> percentilesValues, string dataFolder)
         {
             this.CurrValue = currValue;
 
@@ -155,7 +154,7 @@ namespace HlidacStatu.KIndexGenerator
 
 
 
-            
+
             //this.BitMap().Save(@"\!!\!sample1.png");
             //System.IO.File.WriteAllText(@"\!!\!sample1.svg", Svg());
             //sdoc.Draw(Svg.SvgRenderer)
@@ -167,12 +166,12 @@ namespace HlidacStatu.KIndexGenerator
             using (System.IO.MemoryStream mem = new MemoryStream())
             {
                 sdoc.Write(mem, true);
-                ret= Encoding.UTF8.GetString(mem.ToArray());
+                ret = Encoding.UTF8.GetString(mem.ToArray());
             }
             return ret
                 .Replace("xmlns:xml=\"http://www.w3.org/XML/1998/namespace\"", "")
                 .Replace(" d1p1:space=\"preserve\"", "")
-                .Replace("xmlns:d1p1=\"http://www.w3.org/XML/1998/namespace\"","")
+                .Replace("xmlns:d1p1=\"http://www.w3.org/XML/1998/namespace\"", "")
                 ; // error on line 3 at column 352: xml namespace URI mapped to wrong prefix fix
 
         }
@@ -193,7 +192,7 @@ namespace HlidacStatu.KIndexGenerator
             //el.RenderElement(SvgRenderer.FromImage(bitmap));
 
             //return bitmap;
-            
+
         }
 
         public MemoryStream PngStream()

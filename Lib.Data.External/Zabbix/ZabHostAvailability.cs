@@ -39,7 +39,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
                     {
                         foreach (var sd in sdata.Split('|'))
                         {
-                            var parts = sd.Split(new char[] { '~' }, StringSplitOptions.None).Select(m=>m.Trim()).ToArray();
+                            var parts = sd.Split(new char[] { '~' }, StringSplitOptions.None).Select(m => m.Trim()).ToArray();
                             string hostid = parts[0].Trim();
                             var from = Devmasters.DT.Util.ToDateTime(parts[1], "yyyy-MM-ddTHH:mm:ss");
                             var to = Devmasters.DT.Util.ToDateTime(parts[2], "yyyy-MM-ddTHH:mm:ss");
@@ -69,7 +69,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
             }
         }
 
-        public static bool SkipThisTime(string hostid,  DateTime time)
+        public static bool SkipThisTime(string hostid, DateTime time)
         {
             foreach (var ign in ignoreIt)
             {
@@ -109,7 +109,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
                         {
                             DateTime prevTime = prev.Time.AddMinutes(j);
 
-                            if (SkipThisTime(Host.hostid,prevTime) == false)
+                            if (SkipThisTime(Host.hostid, prevTime) == false)
                                 avail.Add(new ZabAvailability() { Time = prevTime, Response = ZabAvailability.TimeOuted });
                         }
                     }
