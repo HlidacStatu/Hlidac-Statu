@@ -180,7 +180,7 @@ namespace HlidacStatu.Repositories
                     return new ActionOutputData();
                 },
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
-                showProgress ? new ActionProgressWriter().Write : (Action<ActionProgressData>)null,
+                showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null,
                 !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 5);
 
             VazbyFiremNaUradyStat ret = new VazbyFiremNaUradyStat();
@@ -323,7 +323,7 @@ namespace HlidacStatu.Repositories
                       return new ActionOutputData() { CancelRunning = false, Log = null };
                   }, null,
                     showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
-                    showProgress ? new ActionProgressWriter().Write : (Action<ActionProgressData>)null
+                    showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null
                     , true
                     , prefix: "UradyObchodujiciSFirmami_s_vazbouNaPolitiky " + aktualnost.ToNiceDisplayName()
             );
@@ -408,7 +408,7 @@ namespace HlidacStatu.Repositories
                 return new ActionOutputData() { CancelRunning = false, Log = null };
             },
             showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
-            showProgress ? new ActionProgressWriter().Write : (Action<ActionProgressData>)null,
+            showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null,
             false
             , prefix: "LoadFirmySVazbamiNaPolitiky " + aktualnostVztahu.ToNiceDisplayName()
             );
@@ -464,7 +464,7 @@ namespace HlidacStatu.Repositories
                       return new ActionOutputData() { CancelRunning = false, Log = null };
                   }, null,
                     showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
-                    showProgress ? new ActionProgressWriter().Write : (Action<ActionProgressData>)null
+                    showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null
                 , false
                 , prefix: "SmlouvyIdSPolitiky "
             );
@@ -541,7 +541,7 @@ namespace HlidacStatu.Repositories
             },
             null,
             logOutputFunc ?? Devmasters.Batch.Manager.DefaultOutputWriter,
-            progressOutputFunc ?? new ActionProgressWriter(0.1f).Write,
+            progressOutputFunc ?? new ActionProgressWriter(0.1f).Writer,
             true
             );
 

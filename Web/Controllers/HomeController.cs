@@ -35,8 +35,8 @@ namespace HlidacStatu.Web.Controllers
     {
 
         private readonly UserManager<ApplicationUser> _userManager;
-        protected readonly IHostingEnvironment _hostingEnvironment;
-        public HomeController(IHostingEnvironment hostingEnvironment, UserManager<ApplicationUser> userManager)
+        protected readonly IWebHostEnvironment _hostingEnvironment;
+        public HomeController(IWebHostEnvironment hostingEnvironment, UserManager<ApplicationUser> userManager)
         {
             _hostingEnvironment = hostingEnvironment;
             _userManager = userManager;

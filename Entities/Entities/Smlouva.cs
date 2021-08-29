@@ -17,9 +17,7 @@ namespace HlidacStatu.Entities
     {
 
         public tIdentifikator identifikator;
-        InfoFact[] _infofacts = null;
 
-        Smlouva[] _podobneSmlouvy = null;
         object enhLock = new object();
         private Issues.Issue[] issues = new Issues.Issue[] { };
         object lockInfoObj = new object();

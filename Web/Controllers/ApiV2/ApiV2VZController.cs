@@ -25,7 +25,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>detail veřejné zakázky</returns>
         [AuthorizeAndAudit(Roles = "Admin,KomercniLicence")]
         [HttpGet("{id?}")]
-        public ActionResult<VerejnaZakazka> Detail([FromRoute] string id = null)
+        public ActionResult<VerejnaZakazka> Detail([FromRoute] string? id = null)
         {
             if (string.IsNullOrEmpty(id))
             {

@@ -111,4 +111,9 @@
       <Folder Include="Framework\HealthChecks\" />
     </ItemGroup>
 
+
+    <ItemGroup>
+      <None Include="..\.editorconfig" Link=".editorconfig" />
+    </ItemGroup>
+
 </Project>

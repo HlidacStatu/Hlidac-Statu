@@ -78,7 +78,7 @@ namespace HlidacStatu.XLib.Emails
             {
                 Util.Consts.Logger.Error("Send email", e);
 #if DEBUG
-                throw e;
+                throw;
 #endif
             }
         }
@@ -91,7 +91,7 @@ namespace HlidacStatu.XLib.Emails
             catch (Exception e)
             {
                 Util.Consts.Logger.Error("Render text version", e);
-                throw e;
+                throw;
             }
         }
 
@@ -104,7 +104,7 @@ namespace HlidacStatu.XLib.Emails
             catch (Exception e)
             {
                 Util.Consts.Logger.Error("Render html version", e);
-                throw e;
+                throw;
             }
         }
 

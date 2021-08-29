@@ -121,7 +121,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{ACC852
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.JobTableEditor", "HlidacStatu.JobTableEditor\HlidacStatu.JobTableEditor.csproj", "{EF59CD86-CAF1-439C-A76D-2FECC4897B7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.Data.External.Tables", "Lib.Data.External.Tables\Lib.Data.External.Tables.csproj", "{956497F7-9609-442E-8AB1-5F0AEEBF8081}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Data.External.Tables", "Lib.Data.External.Tables\Lib.Data.External.Tables.csproj", "{956497F7-9609-442E-8AB1-5F0AEEBF8081}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{964DE48E-8813-408B-894D-072689E7005B}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

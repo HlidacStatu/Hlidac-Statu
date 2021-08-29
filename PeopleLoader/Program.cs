@@ -60,7 +60,7 @@ namespace PeopleLoader
                     osobyES.Add(o);
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, progressWriter.Write, true, maxDegreeOfParallelism: 10);
+                }, null, progressWriter.Writer, true, maxDegreeOfParallelism: 10);
 
                 System.Console.WriteLine("Deleting all records");
                 OsobyEsRepo.DeleteAll();

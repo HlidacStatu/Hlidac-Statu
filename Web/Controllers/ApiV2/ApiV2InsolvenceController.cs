@@ -92,7 +92,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>detail smlouvy</returns>
         [HttpGet("{id?}")]
         [AuthorizeAndAudit]
-        public ActionResult<Rizeni> Detail([FromRoute] string id = null)
+        public ActionResult<Rizeni> Detail([FromRoute] string? id = null)
         {
             id = HttpUtility.UrlDecode(id);
             if (string.IsNullOrWhiteSpace(id))

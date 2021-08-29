@@ -14,7 +14,7 @@ namespace HlidacStatu.Web.HealthChecks
         {
             try
             {
-                string json = "";
+
 
                 var ocrQueueSQL = @"select distinct t.itemtype as 'type',
 		            (select count(*) from ItemToOcrQueue with (nolock) where started is null and itemtype = t.itemtype) as waiting,

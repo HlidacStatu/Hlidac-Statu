@@ -100,7 +100,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>detail smlouvy</returns>
         [HttpGet("{id?}")]
         [AuthorizeAndAudit]
-        public ActionResult<Smlouva> Detail([FromRoute] string id = null)
+        public ActionResult<Smlouva> Detail([FromRoute] string? id = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -133,7 +133,7 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpGet("text/{id?}")]
         [AuthorizeAndAudit]
-        public ActionResult<IEnumerable<string>> Text([FromRoute] string id = null)
+        public ActionResult<IEnumerable<string>> Text([FromRoute] string? id = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {

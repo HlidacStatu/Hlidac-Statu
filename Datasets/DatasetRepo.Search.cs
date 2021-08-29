@@ -279,7 +279,6 @@ namespace HlidacStatu.Datasets
             }
 
 
-            static string simpleQueryOsobaPrefix = "___";
 
             //static RegexOptions regexQueryOption = RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline;
             public static QueryContainer GetSimpleQuery(DataSet ds, string query)

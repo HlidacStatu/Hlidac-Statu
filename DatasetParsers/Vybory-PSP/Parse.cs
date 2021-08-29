@@ -377,7 +377,7 @@ namespace Vybory_PSP
             catch (Exception ex)
             {
                 Console.WriteLine($"{url} - {ex.Message}");
-                throw ex;
+                throw;
             }
 
         }

@@ -215,7 +215,7 @@ namespace HlidacStatu.Repositories
                             results.Add(res);
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, progressWriter.Write, true, prefix: "LoadSoukrFirmy ");
+                }, null, progressWriter.Writer, true, prefix: "LoadSoukrFirmy ");
 
             return results;
         }
@@ -288,7 +288,7 @@ namespace HlidacStatu.Repositories
                             results.Add(res);
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, progressWriter.Write, true, prefix: "LoadUrady ");
+                }, null, progressWriter.Writer, true, prefix: "LoadUrady ");
 
             return results;
         }
@@ -321,7 +321,7 @@ namespace HlidacStatu.Repositories
             Devmasters.Batch.Manager.DoActionForAll<Firma.Zatrideni.Item>(obce,
                 (f) =>
                 {
-                    Autocomplete res = null;
+
                     string img = "<i class='fas fa-city'></i>";
 
                     var fi = Firmy.Get(f.Ico);
@@ -356,7 +356,7 @@ namespace HlidacStatu.Repositories
                         results.Add(synonyms[1]);
                     }
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, progressWriter.Write, true, prefix: "LoadObce ");
+                }, null, progressWriter.Writer, true, prefix: "LoadObce ");
 
             return results;
         }
@@ -400,7 +400,7 @@ namespace HlidacStatu.Repositories
 
                                return new Devmasters.Batch.ActionOutputData();
                            }
-                           , null, progressWriter.Write, true, prefix: "LoadPeople ");
+                           , null, progressWriter.Writer, true, prefix: "LoadPeople ");
 
             }
             return results;

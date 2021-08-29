@@ -6,7 +6,6 @@ namespace HlidacStatu.Plugin.TransparetniUcty
 {
     public class CSOB2021 : BaseTransparentniUcetParser
     {
-        private readonly StringComparison SC = StringComparison.Ordinal;
 
         string jsonUrl = "https://www.csob.cz/portal/firmy/bezne-ucty/transparentni-ucty/ucet?p_p_id=etnpwltadetail_WAR_etnpwlta&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage&p_p_col_id=column-main&p_p_col_count=1&_etnpwltadetail_WAR_etnpwlta_ta={0}&p_p_resource_id=transactionList";
         string baseUrl = "https://www.csob.cz/portal/firmy/bezne-ucty/transparentni-ucty/ucet/-/ta/{0}";

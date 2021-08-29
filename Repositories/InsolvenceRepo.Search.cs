@@ -59,45 +59,6 @@ namespace HlidacStatu.Repositories
             {
                 var query = searchdata.Q;
 
-
-                //fix field prefixes
-                //ds: -> 
-                Rule[] rules = new Rule[]
-                {
-                    new Rule(@"osobaid:(?<q>((\w{1,} [-]{1} \w{1,})([-]{1} \d{1,3})?)) ", "ico"),
-                    new Rule(@"osobaiddluznik:(?<q>((\w{1,} [-]{1} \w{1,})([-]{1} \d{1,3})?)) ", "icodluznik"),
-                    new Rule(@"osobaidveritel:(?<q>((\w{1,} [-]{1} \w{1,})([-]{1} \d{1,3})?)) ", "icoveritel"),
-                    new Rule(@"osobaidspravce:(?<q>((\w{1,} [-]{1} \w{1,})([-]{1} \d{1,3})?)) ", "icospravce"),
-
-                    new Rule(@"holding:(?<q>(\d{1,8})) (\s|$){1,}", "ico"),
-                    new Rule(@"holdindluznik:(?<q>(\d{1,8})) (\s|$){1,}", "icodluznik"),
-                    new Rule(@"holdingveritel:(?<q>(\d{1,8})) (\s|$){1,}", "icoveritel"),
-                    new Rule(@"holdingspravce:(?<q>(\d{1,8})) (\s|$){1,}", "icospravce"),
-
-                    new Rule("ico:", "(dluznici.iCO:${q} OR veritele.iCO:${q} OR spravci.iCO:${q}) "),
-                    new Rule("icodluznik:", "dluznici.iCO:"),
-                    new Rule("icoveritel:", "veritele.iCO:"),
-                    new Rule("icospravce:", "spravci.iCO:"),
-                    new Rule("jmeno:",
-                        "(dluznici.plneJmeno:${q} OR veritele.plneJmeno:${q} OR spravci.plneJmeno:${q})"),
-                    new Rule("jmenodluznik:", "dluznici.plneJmeno:"),
-                    new Rule("jmenoveritel:", "veritele.plneJmeno:"),
-                    new Rule("jmenospravce:", "spravci.plneJmeno:"),
-                    new Rule("spisovaznacka:", "spisovaZnacka:"),
-                    new Rule("id:", "spisovaZnacka:"),
-                    new Rule("zmeneno:\\[", "posledniZmena:["),
-                    new Rule("zmeneno:(?=[<>])", "posledniZmena:${q}"),
-                    new Rule("zmeneno:(?=\\d)", "posledniZmena:[${q} TO ${q}||+1d}"),
-                    new Rule("zahajeno:\\[", "datumZalozeni:["),
-                    new Rule("zahajeno:(?=[<>])", "datumZalozeni:${q}"),
-                    new Rule("zahajeno:(?=\\d)", "datumZalozeni:[${q} TO ${q}||+1d}"),
-                    new Rule("stav:", "stav:"),
-                    new Rule("text:", "dokumenty.plainText:"),
-                    new Rule("texttypdokumentu:", "dokumenty.popis:"),
-                    new Rule("typdokumentu:", "dokumenty.typUdalosti:"),
-                    new Rule("oddil:", "dokumenty.oddil:"),
-                };
-
                 IRule[] irules = new IRule[]
                 {
                     new OsobaId("osobaid:", "ico:"),

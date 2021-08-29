@@ -100,7 +100,7 @@ namespace HlidacStatu.XLib.Emails
             {
                 Util.Consts.Logger.Error("Send email", e);
 #if DEBUG
-                throw e;
+                throw;
 #endif
             }
         }
@@ -114,7 +114,7 @@ namespace HlidacStatu.XLib.Emails
             catch (Exception e)
             {
                 Util.Consts.Logger.Error("Send email", e);
-                throw e;
+                throw;
             }
         }
 

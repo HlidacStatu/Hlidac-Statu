@@ -49,7 +49,7 @@ namespace HlidacStatu.Web.Controllers
 
         [AuthorizeAndAudit]
         [HttpGet, Route("hledatFtx")]
-        public ActionResult<List<OsobaDTO>> OsobySearchFtx([FromQuery] string ftxDotaz = null, [FromQuery] int? strana = null)
+        public ActionResult<List<OsobaDTO>> OsobySearchFtx([FromQuery] string? ftxDotaz = null, [FromQuery] int? strana = null)
         {
             if (string.IsNullOrEmpty(ftxDotaz))
             {

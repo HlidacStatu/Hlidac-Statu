@@ -69,7 +69,7 @@ namespace HlidacStatu.Entities
                         catch (Exception e)
                         {
                             dbTran.Rollback();
-                            throw e;
+                            throw;
                         }
                     }
                 }

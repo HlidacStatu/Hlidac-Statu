@@ -14,7 +14,7 @@ namespace HlidacStatu.Web.Controllers
     public partial class ApiV1Controller : Controller
     {
         public ActionResult Watchdog(string _id, string _dataid, string dataType = "VerejnaZakazka",
-            string query = null, string expiration = null)
+            string? query = null, string? expiration = null)
         {
             string id = _id;
             string dataid = _dataid;
