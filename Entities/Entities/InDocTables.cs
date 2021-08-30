@@ -1,3 +1,5 @@
+using Newtonsoft.Json.Linq;
+
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -24,7 +26,37 @@ namespace HlidacStatu.Entities
         [Required]
         public string Json { get; set; }
 
-        [Required]
+        private string[][] _parsedContent = null;
+        public string[][] ParsedContent()
+        {
+            if (_parsedContent == null)
+            {
+                string[][] cells = new string[0][];
+
+                var json = Newtonsoft.Json.Linq.JArray.Parse(this.Json);
+                var numRows = json.Count;
+                var numCells = 0;
+                if (numRows > 0)
+                {
+                    cells = new string[numRows][];
+                    for (int r = 0; r < numRows; r++)
+                    {
+                        var row = (Newtonsoft.Json.Linq.JObject)json[r];
+                        cells[r] = new string[row.Count];
+                        for (int c = 0; c < row.Count; c++)
+                        {
+                            cells[r][c] = row.GetValue(c.ToString()).Value<string>();
+                        }
+
+                    }
+                }
+                _parsedContent = cells;
+            }
+            return _parsedContent;
+        }
+    
+
+    [Required]
         public int Page { get; set; }
         [Required]
         public int TableOnPage { get; set; }
