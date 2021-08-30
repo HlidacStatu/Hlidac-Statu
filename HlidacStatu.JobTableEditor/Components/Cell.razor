@@ -3,9 +3,9 @@
 @using HlidacStatu.DetectJobs
 
 <td class="@cellStyle">
-    <button @onclick="ColorChange">⚙</button>
-    <button @onclick="CellShell.SetOriginalValue">O</button>
-    <button @onclick="CellShell.SetMergedValue">M</button>
+    <button @onclick="ColorChange"><i class="fad fa-exchange"></i></button>
+    <button @onclick="CellShell.SetOriginalValue"><i class="fad fa-exchange"></i></button>
+    <button @onclick="CellShell.SetMergedValue"><i class="far fa-code-merge"></i></button>
     <input type="text" class="form-control" @bind="@CellShell.Value" />
     <p>@CellShell.Error</p>
 </td>
