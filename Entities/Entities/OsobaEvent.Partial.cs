@@ -70,13 +70,13 @@ namespace HlidacStatu.Entities
         [JsonConverter(typeof(StringEnumConverter))]
         public enum SocialNetwork
         {
-            Twitter,
-            Facebook_page,
-            Facebook_profile,
-            Instagram,
-            WWW,
-            Youtube,
-            Zaznam_zastupitelstva
+            Twitter = 0,
+            Facebook_page = 1,
+            Facebook_profile = 2,
+            Instagram = 3,
+            WWW =4,
+            Youtube = 5,
+            Zaznam_zastupitelstva = 6
         }
 
         [Flags]

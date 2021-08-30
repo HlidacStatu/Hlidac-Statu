@@ -91,6 +91,19 @@ namespace HlidacStatu.Web.Controllers
         }
 
         // /api/v2/osoby/social?typ=instagram&typ=twitter
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="typ">
+        ///    Twitter = 0,
+        ///    Facebook_page = 1,
+        ///    Facebook_profile = 2,
+        ///    Instagram = 3,
+        ///    WWW =4,
+        ///    Youtube = 5,
+        ///    Zaznam_zastupitelstva = 6
+        /// </param>
+        /// <returns></returns>
         [AuthorizeAndAudit]
         [HttpGet("social")]
         public ActionResult<List<OsobaSocialDTO>> OsobySocial([FromQuery] OsobaEvent.SocialNetwork[] typ)
