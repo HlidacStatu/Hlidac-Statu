@@ -1,8 +1,11 @@
-﻿using HlidacStatu.Entities;
+﻿using System;
+using HlidacStatu.Entities;
 
 using Microsoft.EntityFrameworkCore;
 
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 
 namespace HlidacStatu.Repositories
@@ -23,32 +26,44 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static InDocTables GetNextForCheck(string requestedBy)
+        public static async Task<InDocTables> GetNextForCheck(string requestedBy, CancellationToken cancellationToken)
         {
-            using (DbEntities db = new DbEntities())
+            await using (DbEntities db = new DbEntities())
             {
-                var tbl = db.InDocTables
-                    .AsNoTracking()
-                    .FirstOrDefault(m => m.Status == (int)InDocTables.CheckStatuses.WaitingInQueue);
+
+                var tbl = await db.InDocTables
+                    .AsQueryable()
+                    .Where(m => m.Status == (int)InDocTables.CheckStatuses.WaitingInQueue)
+                    .OrderByDescending(m => m.PrecalculatedScore)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                tbl.CheckStatus = InDocTables.CheckStatuses.InProgress;
+                tbl.CheckedBy = requestedBy;
+                tbl.CheckedDate = DateTime.Now;
+
+                await db.SaveChangesAsync(cancellationToken);
+                
                 return tbl;
             }
         }
 
-        public static void ChangeStatus(long tblPK, InDocTables.CheckStatuses status, string checkedBy, long checkElapsedTimeInMS)
+        // public static void ChangeStatus(long tblPK, InDocTables.CheckStatuses status, string checkedBy, long checkElapsedTimeInMS)
+        // {
+        //     using (DbEntities db = new DbEntities())
+        //     {
+        //         var tbl = db.InDocTables
+        //             .AsNoTracking()
+        //             .FirstOrDefault(m => m.Pk == tblPK);
+        //
+        //         if (tbl != null)
+        //             ChangeStatus(tbl, status, checkedBy, checkElapsedTimeInMS);
+        //     }
+        // }
+        
+        public static async Task ChangeStatus(InDocTables tbl, InDocTables.CheckStatuses status, string checkedBy,
+            long checkElapsedTimeInMS)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                var tbl = db.InDocTables
-                    .AsNoTracking()
-                    .FirstOrDefault(m => m.Pk == tblPK);
-
-                if (tbl != null)
-                    ChangeStatus(tbl, status, checkedBy, checkElapsedTimeInMS);
-            }
-        }
-        public static void ChangeStatus(InDocTables tbl, InDocTables.CheckStatuses status, string checkedBy, long checkElapsedTimeInMS)
-        {
-            using (DbEntities db = new DbEntities())
+            await using (DbEntities db = new DbEntities())
             {
                 db.InDocTables.Attach(tbl);
                 if (tbl.Pk == 0)
@@ -61,7 +76,7 @@ namespace HlidacStatu.Repositories
                 tbl.CheckedDate = System.DateTime.Now;
                 tbl.CheckElapsedInMs = (int)checkElapsedTimeInMS;
 
-                db.SaveChanges();
+                await db.SaveChangesAsync();
 
             }
         }

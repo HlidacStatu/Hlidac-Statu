@@ -2,8 +2,13 @@
 
 @using HlidacStatu.JobTableEditor.Data
 @using HlidacStatu.JobTableEditor.Components
+@using HlidacStatu.Entities
+@using System.Threading
 
 @inject JobService JobService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@attribute [Authorize(Roles = "Admin")]
 
 <h1>Job editor</h1>
 
@@ -15,6 +20,7 @@
 }
 else
 {
+    <a target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(table.InDocTable.SmlouvaID)&p=@(table.InDocTable.PrilohaHash)&page=@table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
     <table class="table">
         <tbody>
         @foreach (var row in table.Cells)
@@ -32,39 +38,79 @@ else
     <button @onclick="SaveTable">Save changes</button>
     <button @onclick="SuperviseTable">Send to supervisor</button>
     <button @onclick="NonsenseTable">This table is full of 💩</button>
+    <p>@errorMessage</p>
 }
 
 @code {
     private SomeTable table;
     private DateTime tableOpenedAt;
-
-
+    private string errorMessage;
+    
     protected override async Task OnInitializedAsync()
     {
-    //forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        //forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
     }
 
     private async Task LoadNewTable()
     {
-        table = await JobService.GetNewTable();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userName = authState?.User?.Identity?.Name;
+        
+        table = await JobService.GetNewTable(userName, CancellationToken.None);
         tableOpenedAt = DateTime.Now;
     }
 
     private async Task SaveTable()
     {
-        var elapsedTime = tableOpenedAt - DateTime.Now;
+        var isSaved = await TrySave(InDocTables.CheckStatuses.Done);
+        if (isSaved)
+        {
+            table = null;
+            errorMessage = "";
+        }
+    }
+
+    private async Task SuperviseTable()
+    {
+        var isSaved = await TrySave(InDocTables.CheckStatuses.ForNextReview);
+        if (isSaved)
+        {
+            table = null;
+            errorMessage = "";
+        }
+    }
+
+    private async Task NonsenseTable()
+    {
+        var isSaved = await TrySave(InDocTables.CheckStatuses.Done);
+        if (isSaved)
+        {
+            table = null;
+            errorMessage = "";
+        }
+    }
+
+    private async Task<bool> TrySave(InDocTables.CheckStatuses operation)
+    {
+        var elapsedTime = DateTime.Now - tableOpenedAt;
         table.ProcessingTime = elapsedTime;
-        await JobService.SaveChanges(table);
-    }
+        
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userName = authState?.User?.Identity?.Name;
+        table.Author = userName;
 
-    private void SuperviseTable()
-    {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            await JobService.SaveChanges(table, operation);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            errorMessage = e.Message;
+            return false;
+        }
 
-    private void NonsenseTable()
-    {
-        throw new NotImplementedException();
+        return true;
     }
 
 }

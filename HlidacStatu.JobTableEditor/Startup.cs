@@ -1,3 +1,5 @@
+using System;
+using HlidacStatu.Entities;
 using HlidacStatu.JobTableEditor.Areas.Identity;
 using HlidacStatu.JobTableEditor.Data;
 
@@ -30,14 +32,17 @@ namespace HlidacStatu.JobTableEditor
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            
+            string connectionString = Configuration.GetConnectionString("DefaultConnection");
+            // for scoped services (mainly for identity)
+            services.AddDbContext<DbEntities>(options =>
+                options.UseSqlServer(connectionString));
+            
+            AddIdentity(services);
+            
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+            services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
 
 
@@ -74,5 +79,34 @@ namespace HlidacStatu.JobTableEditor
                 endpoints.MapFallbackToPage("/_Host");
             });
         }
+        
+        private void AddIdentity(IServiceCollection services)
+        {
+            services.AddDefaultIdentity<ApplicationUser>(options =>
+                {
+                    options.SignIn.RequireConfirmedAccount = true;
+
+                    options.User.RequireUniqueEmail = true;
+
+                    options.Password.RequiredLength = 6;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireDigit = false;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequireUppercase = false;
+
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                    options.Lockout.MaxFailedAccessAttempts = 5;
+
+                })
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<DbEntities>();
+
+            // this is needed because passwords are stored with old hashes
+            services.Configure<PasswordHasherOptions>(options =>
+                    options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
+                );
+        }
+        
+        
     }
 }
