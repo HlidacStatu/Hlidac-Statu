@@ -12,6 +12,14 @@
 
 <h1>Job editor</h1>
 
+<table class="table table-sm">
+    <tr>
+        <td class="bg-primary bg-opacity-25">Pozice</td>
+        <td class="bg-success bg-opacity-25">Cena bez DPH</td>
+        <td class="bg-warning bg-opacity-25">Cena s DPH</td>
+    </tr>
+</table>
+
 @if (table == null)
 {
     <p>
@@ -23,15 +31,15 @@ else
     <a target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(table.InDocTable.SmlouvaID)&p=@(table.InDocTable.PrilohaHash)&page=@table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
     <table class="table">
         <tbody>
-        @foreach (var row in table.Cells)
-        {
-            <tr>
-                @foreach (var cell in row)
-                {
-                    <Cell CellShell="@cell"></Cell>
-                }
-            </tr>
-        }
+            @foreach (var row in table.Cells)
+            {
+                <tr>
+                    @foreach (var cell in row)
+                    {
+                        <Cell CellShell="@cell"></Cell>
+                    }
+                </tr>
+            }
         </tbody>
     </table>
 
@@ -45,7 +53,7 @@ else
     private SomeTable table;
     private DateTime tableOpenedAt;
     private string errorMessage;
-    
+
     protected override async Task OnInitializedAsync()
     {
         //forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
@@ -55,7 +63,7 @@ else
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var userName = authState?.User?.Identity?.Name;
-        
+
         table = await JobService.GetNewTable(userName, CancellationToken.None);
         tableOpenedAt = DateTime.Now;
     }
@@ -94,7 +102,7 @@ else
     {
         var elapsedTime = DateTime.Now - tableOpenedAt;
         table.ProcessingTime = elapsedTime;
-        
+
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var userName = authState?.User?.Identity?.Name;
         table.Author = userName;

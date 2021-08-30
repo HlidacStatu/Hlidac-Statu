@@ -3,9 +3,10 @@
 @using HlidacStatu.DetectJobs
 
 <td class="@cellStyle">
-    <button @onclick="ColorChange"><i class="fad fa-exchange"></i></button>
-    <button @onclick="CellShell.SetOriginalValue"><i class="fad fa-exchange"></i></button>
-    <button @onclick="CellShell.SetMergedValue"><i class="far fa-code-merge"></i></button>
+    <button style="font-size:11px;padding:0px 5px;" @onclick="ColorChange"><i class="fad fa-exchange"></i></button>
+    <span style="width:1px">&nbsp;</span>
+    <button style="font-size:9px;padding:0px 4px;" @onclick="CellShell.SetOriginalValue"><i class="far fa-undo"></i></button>
+    <button style="font-size:9px;padding:0px 4px;" @onclick="CellShell.SetMergedValue"><i class="far fa-code-merge"></i></button>
     <input type="text" class="form-control" @bind="@CellShell.Value" />
     <p>@CellShell.Error</p>
 </td>
@@ -34,9 +35,9 @@
         cellStyle = cellType switch 
         {
             InHtmlTables.Cell.GuessedCellType.Unknown => "",
-            InHtmlTables.Cell.GuessedCellType.Position => "bg-primary",
-            InHtmlTables.Cell.GuessedCellType.Price => "bg-success",
-            InHtmlTables.Cell.GuessedCellType.PriceWithVAT => "bg-warning",
+            InHtmlTables.Cell.GuessedCellType.Position => "bg-primary bg-opacity-25",
+            InHtmlTables.Cell.GuessedCellType.Price => "bg-success bg-opacity-25",
+            InHtmlTables.Cell.GuessedCellType.PriceWithVAT => "bg-warning bg-opacity-25",
             _ => ""
             };
     }
