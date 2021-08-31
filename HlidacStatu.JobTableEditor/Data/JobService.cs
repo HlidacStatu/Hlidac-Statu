@@ -2,7 +2,6 @@ using HlidacStatu.DetectJobs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +30,7 @@ namespace HlidacStatu.JobTableEditor.Data
                 InHtmlTables.SpecificWords,
                 out var foundJobs,
                 out var cells);
-            
+
             var st = new SomeTable
             {
                 Author = user,
@@ -60,7 +59,9 @@ namespace HlidacStatu.JobTableEditor.Data
         public async Task SaveChanges(SomeTable table, InDocTables.CheckStatuses operation)
         {
             // push changes to server
-            if (operation != InDocTables.CheckStatuses.WrongTable)
+            if (operation != InDocTables.CheckStatuses.WrongTable
+                && operation != InDocTables.CheckStatuses.ForNextReview
+            )
             {
                 try
                 {
@@ -73,15 +74,14 @@ namespace HlidacStatu.JobTableEditor.Data
                     throw;
                 }
             }
-            
+
             await InDocTablesRepo.ChangeStatus(table.InDocTable,
                 operation,
                 table.Author,
-                (long) table.ProcessingTime.TotalMilliseconds);
+                (long)table.ProcessingTime.TotalMilliseconds);
         }
-        
     }
-    
+
 
     // assembled object from loaded data and some meta data which are going to be pushed on server
     public class SomeTable
@@ -104,7 +104,7 @@ namespace HlidacStatu.JobTableEditor.Data
                         case InHtmlTables.Cell.GuessedCellType.Position:
                             if (foundJob != null)
                                 jobsList.Add(foundJob);
-                            
+
                             foundJob = new InDocJobs
                             {
                                 JobRaw = cell.Value,
@@ -121,6 +121,7 @@ namespace HlidacStatu.JobTableEditor.Data
                             {
                                 foundJob.SalaryMD = Devmasters.ParseText.ToDecimal(cell.Value);
                             }
+
                             break;
                         case InHtmlTables.Cell.GuessedCellType.PriceWithVAT:
                             if (foundJob == null)
@@ -132,18 +133,19 @@ namespace HlidacStatu.JobTableEditor.Data
                             {
                                 foundJob.SalaryMdVAT = Devmasters.ParseText.ToDecimal(cell.Value);
                             }
+
                             break;
                         default:
                             break;
                     }
                 }
             }
+
             if (foundJob != null)
                 jobsList.Add(foundJob);
 
             return jobsList;
         }
-
     }
 
     public class CellShell
@@ -156,7 +158,7 @@ namespace HlidacStatu.JobTableEditor.Data
 
         public InHtmlTables.Cell.GuessedCellType CellType { get; set; }
         public string Value { get; set; }
-        
+
         public string Error { get; set; }
 
         public CellShell(InHtmlTables.Cell cell, int row, int column)
@@ -191,7 +193,5 @@ namespace HlidacStatu.JobTableEditor.Data
         {
             Value = Cell.Text;
         }
-
     }
-
 }
