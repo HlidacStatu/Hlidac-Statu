@@ -3,12 +3,15 @@
 @using HlidacStatu.DetectJobs
 
 <td class="@cellStyle">
-    <button style="font-size:11px;padding:0px 5px;" @onclick="ColorChange"><i class="fad fa-exchange"></i></button>
+    <button style="font-size:11px;padding:0 5px;" @onclick="ColorChange" title="Změň typ"><i class="fad fa-exchange"></i></button>
     <span style="width:1px">&nbsp;</span>
-    <button style="font-size:9px;padding:0px 4px;" @onclick="CellShell.SetOriginalValue"><i class="far fa-undo"></i></button>
-    <button style="font-size:9px;padding:0px 4px;" @onclick="CellShell.SetMergedValue"><i class="far fa-code-merge"></i></button>
-    <input type="text" class="form-control" @bind="@CellShell.Value" />
-    <p>@CellShell.Error</p>
+    <button style="font-size:9px;padding:0 4px;" @onclick="CellShell.SetOriginalValue" title="Nastav původní hodnotu"><i class="far fa-undo"></i></button>
+    <button style="font-size:9px;padding:0 4px;" @onclick="CellShell.SetMergedValue" title="Nastav předpočítanou hodnotu"><i class="far fa-code-merge"></i></button>
+    <input type="text" class="form-control" style="margin: 0; padding: 0;" @bind="@CellShell.Value" />
+    @if (!string.IsNullOrWhiteSpace(CellShell.Error))
+    {
+        <p class="text-danger">@CellShell.Error</p>
+    }
 </td>
 
 

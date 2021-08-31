@@ -30,6 +30,15 @@ namespace HlidacStatu.Repositories
         {
             await using (DbEntities db = new DbEntities())
             {
+                //pokud zůstal rozpracovaný úkol, lízne si nejprve ten
+                var inProgress = await db.InDocTables
+                    .AsQueryable()
+                    .Where(m => m.Status == (int)InDocTables.CheckStatuses.InProgress)
+                    .Where(m => m.CheckedBy == requestedBy)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (inProgress != null)
+                    return inProgress;
 
                 var tbl = await db.InDocTables
                     .AsQueryable()
@@ -40,7 +49,7 @@ namespace HlidacStatu.Repositories
                 tbl.CheckStatus = InDocTables.CheckStatuses.InProgress;
                 tbl.CheckedBy = requestedBy;
                 tbl.CheckedDate = DateTime.Now;
-
+                
                 await db.SaveChangesAsync(cancellationToken);
                 
                 return tbl;

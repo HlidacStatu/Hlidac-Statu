@@ -4,6 +4,7 @@
 @using HlidacStatu.JobTableEditor.Components
 @using HlidacStatu.Entities
 @using System.Threading
+@using HlidacStatu.DetectJobs
 
 @inject JobService JobService
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -13,55 +14,59 @@
 <h1>Job editor</h1>
 
 <div class="container">
-  <div class="row">
-    <div class="col-2 bg-primary bg-opacity-25">
-      Pozice
+    <div class="row">
+        <div class="col-2 bg-primary bg-opacity-25">
+            Pozice
+        </div>
+        <div class="col-2 bg-success bg-opacity-25">
+            Cena za MD bez DPH
+        </div>
+        <div class="col-2 bg-warning bg-opacity-25">
+            Cena za MD s DPH
+        </div>
     </div>
-    <div class="col-2 bg-success bg-opacity-25">
-      Cena za MD bez DPH
-    </div>
-    <div class="col-2 bg-warning bg-opacity-25">
-      Cena za MD s DPH
-    </div>
-  </div>
 </div>
-<hr style="margin-bottom: 20px;" />
+<hr style="margin-bottom: 20px;"/>
 
 @if (table == null)
 {
     <p>
-        <button @onclick="LoadNewTable">Load New Table</button>
+        <button @onclick="LoadNewTable">Načti tabulku</button>
     </p>
 }
 else
 {
+    <h4 class="text-danger">@errorMessage</h4>
+    <button class="btn btn-secondary btn-sm" @onclick="MultiplyPrices">Vynásob ceny 8</button>
+    <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(table.InDocTable.SmlouvaID)&p=@(table.InDocTable.PrilohaHash)&page=@table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
+    <br>
     <button class="btn btn-outline-success" @onclick="SaveTable">Save changes</button>
     <button class="btn btn-outline-warning" @onclick="SuperviseTable">Send to supervisor</button>
     <button class="btn btn-outline-danger" @onclick="NonsenseTable">This table is full of 💩</button>
-    <a class="btn btn-outline-secondary" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(table.InDocTable.SmlouvaID)&p=@(table.InDocTable.PrilohaHash)&page=@table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
-   <hr style="margin-bottom:20px;" />
- <table class="table">
+    <hr style="margin-bottom:20px;"/>
+    <table class="table">
         <tbody>
-            @foreach (var row in table.Cells)
-            {
-                <tr>
-                    @foreach (var cell in row)
-                    {
-                        <Cell CellShell="@cell"></Cell>
-                    }
-                </tr>
-            }
+        @foreach (var row in table.Cells)
+        {
+            <tr>
+                @foreach (var cell in row)
+                {
+                    <Cell CellShell="@cell"></Cell>
+                }
+            </tr>
+        }
         </tbody>
     </table>
-<hr style="margin-top:20px;" />
-
+    <hr style="margin-top:20px;"/>
+    <button class="btn btn-secondary" @onclick="MultiplyPrices">Vynásob ceny 8</button>
+    <a class="btn btn-outline-secondary" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(table.InDocTable.SmlouvaID)&p=@(table.InDocTable.PrilohaHash)&page=@table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
+    <br>
     <button class="btn btn-outline-success" @onclick="SaveTable">Save changes</button>
     <button class="btn btn-outline-warning" @onclick="SuperviseTable">Send to supervisor</button>
     <button class="btn btn-outline-danger" @onclick="NonsenseTable">This table is full of 💩</button>
-    <a class="btn btn-outline-secondary" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(table.InDocTable.SmlouvaID)&p=@(table.InDocTable.PrilohaHash)&page=@table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
 
-    <hr />
-    <p>@errorMessage</p>
+    <hr/>
+    
 }
 
 @code {
@@ -71,7 +76,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        //forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    //forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
     }
 
     private async Task LoadNewTable()
@@ -105,14 +110,14 @@ else
 
     private async Task NonsenseTable()
     {
-        var isSaved = await TrySave(InDocTables.CheckStatuses.Done);
+        var isSaved = await TrySave(InDocTables.CheckStatuses.WrongTable);
         if (isSaved)
         {
             table = null;
             errorMessage = "";
         }
     }
-
+    
     private async Task<bool> TrySave(InDocTables.CheckStatuses operation)
     {
         var elapsedTime = DateTime.Now - tableOpenedAt;
@@ -135,5 +140,22 @@ else
 
         return true;
     }
+    
+    private void MultiplyPrices()
+    {
+        foreach (var row in table.Cells)
+        {
+            foreach (var cell in row)
+            {
+                if (cell.CellType == InHtmlTables.Cell.GuessedCellType.Price
+                    || cell.CellType == InHtmlTables.Cell.GuessedCellType.PriceWithVAT)
+                {
+                    var newPrice = (Devmasters.ParseText.ToDecimal(cell.Value) * 8);
+                    cell.Value = newPrice.HasValue ? newPrice.Value.ToString("N2") : "";
+                }
+            }
+        }
+    }
 
 }
+

@@ -60,16 +60,18 @@ namespace HlidacStatu.JobTableEditor.Data
         public async Task SaveChanges(SomeTable table, InDocTables.CheckStatuses operation)
         {
             // push changes to server
-            try
+            if (operation != InDocTables.CheckStatuses.WrongTable)
             {
-                var parsedJobs = table.ParseJobs();
-                await InDocJobsRepo.Save(parsedJobs);
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
+                try
+                {
+                    var parsedJobs = table.ParseJobs();
+                    await InDocJobsRepo.Save(parsedJobs);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
             }
             
             await InDocTablesRepo.ChangeStatus(table.InDocTable,

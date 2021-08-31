@@ -89,6 +89,7 @@ namespace HlidacStatu.Entities
             InProgress = 1,
             Done = 2,
             ForNextReview = 3,
+            WrongTable = 4,
         }
 
         [NotMapped()]
