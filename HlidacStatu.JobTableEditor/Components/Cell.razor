@@ -3,11 +3,13 @@
 @using HlidacStatu.DetectJobs
 
 <td class="@cellStyle">
-    <button style="font-size:11px;padding:0 5px;" @onclick="ColorChange" title="Změň typ"><i class="fad fa-exchange"></i></button>
+    <button @onclick="ColorChange" title="Změň typ" style="float: left"><i class="fad fa-exchange"></i></button>
     <span style="width:1px">&nbsp;</span>
-    <button style="font-size:9px;padding:0 4px;" @onclick="CellShell.SetOriginalValue" title="Nastav původní hodnotu"><i class="far fa-undo"></i></button>
-    <button style="font-size:9px;padding:0 4px;" @onclick="CellShell.SetMergedValue" title="Nastav předpočítanou hodnotu"><i class="far fa-code-merge"></i></button>
-    <input type="text" class="form-control" style="margin: 0; padding: 0;" @bind="@CellShell.Value" />
+    <button @onclick="CellShell.SetOriginalValue" title="Nastav původní hodnotu"><i class="far fa-undo"></i></button>
+    <button @onclick="CellShell.SetMergedValue" title="Nastav předpočítanou hodnotu"><i class="far fa-brain"></i></button>
+    
+    <button @onclick="@(() => Swapper.Swap(this))" title="Prohoď hodnotu" style="float: right"><i class="@swapButtonStyle"></i></button>
+    <input type="text" class="form-control" @bind="@CellShell.Value" />
     @if (!string.IsNullOrWhiteSpace(CellShell.Error))
     {
         <p class="text-danger">@CellShell.Error</p>
@@ -20,22 +22,26 @@
     [Parameter]
     public CellShell CellShell { get; set; }
     
-    private string cellStyle;
+    [Parameter]
+    public CellSwapper Swapper { get; set; }
     
-    protected override async Task OnInitializedAsync()
+    private string cellStyle;
+    private string swapButtonStyle = "fas fa-retweet";
+
+    protected override void OnInitialized()
     {
-        SetCellStyle(CellShell.CellType);
+        SetCellStyle();
     }
     
     private void ColorChange()
     {
         CellShell.RotateType();
-        SetCellStyle(CellShell.CellType);
+        SetCellStyle();
     }
 
-    private void SetCellStyle(InHtmlTables.Cell.GuessedCellType cellType)
+    public void SetCellStyle()
     {
-        cellStyle = cellType switch 
+        cellStyle = CellShell.CellType switch 
         {
             InHtmlTables.Cell.GuessedCellType.Unknown => "",
             InHtmlTables.Cell.GuessedCellType.Position => "bg-primary bg-opacity-25",
@@ -45,9 +51,12 @@
             };
     }
     
-    // input type by se mohl měnit podle toho, jestli pracuji s pozicí, nebo cenou
-    // mohla by se taky udělat validace na správně zadanou cenu
-    
     //+ validace pokud se při načtení tabulky liší (merged value vs original value)?
+
+    public void Redraw(bool isMarked)
+    {
+        swapButtonStyle = isMarked ? "fas fa-retweet text-danger" : "fas fa-retweet";
+        StateHasChanged();
+    }
 
 }

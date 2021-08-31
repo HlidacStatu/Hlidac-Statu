@@ -51,7 +51,7 @@ else
             <tr>
                 @foreach (var cell in row)
                 {
-                    <Cell CellShell="@cell"></Cell>
+                    <Cell CellShell="@cell" Swapper="@Swapper"></Cell>
                 }
             </tr>
         }
@@ -73,6 +73,7 @@ else
     private SomeTable table;
     private DateTime tableOpenedAt;
     private string errorMessage;
+    public CellSwapper Swapper { get; } = new CellSwapper();
 
     protected override async Task OnInitializedAsync()
     {
