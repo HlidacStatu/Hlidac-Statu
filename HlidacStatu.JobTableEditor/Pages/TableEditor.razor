@@ -31,7 +31,7 @@
 @if (table == null)
 {
     <p>
-        <button @onclick="LoadNewTable">Načti tabulku</button>
+        <button class="btn btn-primary" @onclick="LoadNewTable">Načti tabulku</button>
     </p>
 }
 else
@@ -45,6 +45,20 @@ else
     <button class="btn btn-outline-danger" @onclick="NonsenseTable">This table is full of 💩</button>
     <hr style="margin-bottom:20px;"/>
     <table class="table">
+        <thead>
+        <tr>
+            @for (int col = 0; col < table.Cells[0].Length; col++)
+            {
+                int column = col;
+                <th>
+                    <button class="btn btn-sm btn-primary bg-opacity-25" @onclick="@(() => SetColumn(column, InHtmlTables.Cell.GuessedCellType.Position) )">Job</button>
+                    <button class="btn btn-sm btn-success bg-opacity-25" @onclick="@(() => SetColumn(column, InHtmlTables.Cell.GuessedCellType.Price) )"><i class="far fa-money-bill-alt"></i></button>
+                    <button class="btn btn-sm btn-warning bg-opacity-25" @onclick="@(() => SetColumn(column, InHtmlTables.Cell.GuessedCellType.PriceWithVAT) )"><i class="far fa-money-bill-alt"></i> s DPH</button>
+                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => SetColumn(column, InHtmlTables.Cell.GuessedCellType.Unknown) )">Nic</button>
+                </th>
+            }
+        </tr>
+        </thead>
         <tbody>
         @foreach (var row in table.Cells)
         {
@@ -73,11 +87,16 @@ else
     private SomeTable table;
     private DateTime tableOpenedAt;
     private string errorMessage;
-    public CellSwapper Swapper { get; } = new CellSwapper();
-
-    protected override async Task OnInitializedAsync()
+    private CellSwapper Swapper { get; } = new CellSwapper();
+    
+    private void SetColumn(int column, InHtmlTables.Cell.GuessedCellType cellType)
     {
-    //forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        foreach (var row in table.Cells)
+        {
+            row[column].CellType = cellType;
+        }
+        
+    //StateHasChanged();
     }
 
     private async Task LoadNewTable()

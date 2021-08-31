@@ -1,14 +1,17 @@
 @using HlidacStatu.JobTableEditor.Data
 @using Microsoft.AspNetCore.Components
 @using HlidacStatu.DetectJobs
+@using System.ComponentModel
+
+@implements IDisposable
 
 <td class="@cellStyle">
-    <button @onclick="ColorChange" title="Změň typ" style="float: left"><i class="fad fa-exchange"></i></button>
+    <button class="btn btn-outline-primary" @onclick="ColorChange" title="Změň typ" style="float: left"><i class="fad fa-exchange"></i></button>
     <span style="width:1px">&nbsp;</span>
-    <button @onclick="CellShell.SetOriginalValue" title="Nastav původní hodnotu"><i class="far fa-undo"></i></button>
-    <button @onclick="CellShell.SetMergedValue" title="Nastav předpočítanou hodnotu"><i class="far fa-brain"></i></button>
+    <button class="btn btn-outline-secondary" @onclick="CellShell.SetOriginalValue" title="Nastav původní hodnotu"><i class="far fa-undo"></i></button>
+    <button class="btn btn-outline-secondary" @onclick="CellShell.SetMergedValue" title="Nastav předpočítanou hodnotu"><i class="far fa-brain"></i></button>
     
-    <button @onclick="@(() => Swapper.Swap(this))" title="Prohoď hodnotu" style="float: right"><i class="@swapButtonStyle"></i></button>
+    <button class="btn btn-outline-primary" @onclick="@(() => Swapper.Swap(this))" title="Prohoď hodnotu" style="float: right"><i class="@swapButtonStyle"></i></button>
     <input type="text" class="form-control" @bind="@CellShell.Value" />
     @if (!string.IsNullOrWhiteSpace(CellShell.Error))
     {
@@ -28,11 +31,17 @@
     private string cellStyle;
     private string swapButtonStyle = "fas fa-retweet";
 
-    protected override void OnInitialized()
+    private void HandleDataChange(object? sender, PropertyChangedEventArgs propertyChangedEventArgs)
     {
         SetCellStyle();
     }
-    
+
+    protected override void OnInitialized()
+    {
+        SetCellStyle();
+        CellShell.PropertyChanged += HandleDataChange;
+    }
+
     private void ColorChange()
     {
         CellShell.RotateType();
@@ -49,6 +58,7 @@
             InHtmlTables.Cell.GuessedCellType.PriceWithVAT => "bg-warning bg-opacity-25",
             _ => ""
             };
+        
     }
     
     //+ validace pokud se při načtení tabulky liší (merged value vs original value)?
@@ -57,6 +67,11 @@
     {
         swapButtonStyle = isMarked ? "fas fa-retweet text-danger" : "fas fa-retweet";
         StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        CellShell.PropertyChanged -= HandleDataChange;
     }
 
 }

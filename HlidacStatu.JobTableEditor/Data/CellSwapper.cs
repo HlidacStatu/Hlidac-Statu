@@ -5,12 +5,6 @@ namespace HlidacStatu.JobTableEditor.Data
 {
     public class CellSwapper
     {
-        public enum SwapResult
-        {
-            Marked,
-            Done
-        }
-        
         private Cell CellToSwap;
         
         public void Swap(Cell cell)
