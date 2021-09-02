@@ -72,7 +72,7 @@ namespace HlidacStatu.JobTableEditor.Data
         {
             Value = CellType switch
             {
-                InHtmlTables.Cell.GuessedCellType.Position => string.Join(' ', Cell.FoundKeywords.Keys),
+                InHtmlTables.Cell.GuessedCellType.Position => Cell.Text,
                 InHtmlTables.Cell.GuessedCellType.Price or
                     InHtmlTables.Cell.GuessedCellType.PriceWithVAT => Cell.FoundNumbers.FirstOrDefault().ToString("N2"),
                 _ => Cell.Text
