@@ -38,8 +38,9 @@ else
 {
     <h4 class="text-danger">@errorMessage</h4>
     <button class="btn btn-secondary btn-sm" @onclick="MultiplyPrices">Vynásob ceny 8</button>
+    <button class="btn btn-secondary btn-sm" @onclick="AddColumn">Přidej sloupec</button>
     <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(table.InDocTable.SmlouvaID)&p=@(table.InDocTable.PrilohaHash)&page=@table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
-    <br>
+    <span>&nbsp;&nbsp;| &nbsp;</span>
     <button class="btn btn-outline-success" @onclick="SaveTable">Save changes</button>
     <button class="btn btn-outline-warning" @onclick="SuperviseTable">Send to supervisor</button>
     <button class="btn btn-outline-danger" @onclick="NonsenseTable">This table is full of 💩</button>
@@ -74,7 +75,7 @@ else
     <hr style="margin-top:20px;"/>
     <button class="btn btn-secondary" @onclick="MultiplyPrices">Vynásob ceny 8</button>
     <a class="btn btn-outline-secondary" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(table.InDocTable.SmlouvaID)&p=@(table.InDocTable.PrilohaHash)&page=@table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
-    <br>
+    <span>&nbsp;&nbsp;| &nbsp;</span>
     <button class="btn btn-outline-success" @onclick="SaveTable">Save changes</button>
     <button class="btn btn-outline-warning" @onclick="SuperviseTable">Send to supervisor</button>
     <button class="btn btn-outline-danger" @onclick="NonsenseTable">This table is full of 💩</button>
@@ -175,6 +176,17 @@ else
                 }
             }
         }
+    }
+
+    private void AddColumn()
+    {
+        for (int i = 0; i < table.Cells.Length; i++)
+        {
+            int currentLength = table.Cells[i].Length;
+            Array.Resize(ref table.Cells[i], currentLength + 1);
+            table.Cells[i][currentLength] = new CellShell(new InHtmlTables.Cell(), i, currentLength);
+        }
+        
     }
 
 }
