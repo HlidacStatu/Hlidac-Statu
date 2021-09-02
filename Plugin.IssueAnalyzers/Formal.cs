@@ -78,8 +78,22 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
                  (item.datumUzavreni.AddMonths(3).AddDays(1) > prvniZverejneni)
                 )
             {
-                issues.Add(
-                    new Issue(this, (int)IssueType.IssueTypes.SmlouvaZverejnenaPozde, "Smlouva nebyla zveřejněna do 30 dnů od podpisu", "Smlouva nebyla uveřejněna do 30 dnů od uzavření smlouvy (dle § 5 odst. 2), její účinnost je až odedne uveřejnění")
+                if (
+                    (item.hodnotaBezDph > 0 && item.hodnotaBezDph <= 50000)
+                    || (item.hodnotaVcetneDph > 0 && item.hodnotaVcetneDph <= (50000m * 1.21m))
+                    || (item.CalculatedPriceWithVATinCZK > 0 && item.CalculatedPriceWithVATinCZK <= (50000m * 1.21m))
+                 )
+                {
+                    issues.Add(
+                    new Issue(this, (int)IssueType.IssueTypes.SmlouvaZverejnenaPozde30dni_NemuselaBytZverejnena,
+                    "Smlouva nebyla zveřejněna do 30 dní od podpisu",
+                    "Pozdní zveřejnění ale nemá vliv na platnost smlouvy ani není porušením zákona, protože smlouva byla zveřejněna v registru smluv dobrovolně nad rámec zákona.")
+                    );
+
+                }
+                else
+                    issues.Add(
+                    new Issue(this, (int)IssueType.IssueTypes.SmlouvaZverejnenaPozde30dni, "Smlouva nebyla zveřejněna do 30 dnů od podpisu", "Smlouva nebyla uveřejněna do 30 dnů od uzavření smlouvy (dle § 5 odst. 2), její účinnost je až odedne uveřejnění")
                     );
             }
 
@@ -94,7 +108,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
                  )
                 {
                     issues.Add(
-                    new Issue(this, (int)IssueType.IssueTypes.SmlouvaZverejnenaPozde_NemuselaBytZverejnena,
+                    new Issue(this, (int)IssueType.IssueTypes.SmlouvaZverejnenaPozde3Mesice_NemuselaBytZverejnena,
                     "Smlouva nebyla zveřejněna do 3 měsíců od podpisu",
                     "Pozdní zveřejnění ale nemá vliv na platnost smlouvy, protože smlouva byla zveřejněna v registru smluv dobrovolně.")
                     );
@@ -102,7 +116,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
                 }
                 else
                     issues.Add(
-                    new Issue(this, (int)IssueType.IssueTypes.SmlouvaZverejnenaPozdeNezacalaPlatit, "Smlouva nebyla zveřejněna do 3 měsíců od podpisu a nikdy nezačala platit", "Smlouva nebyla uveřejněna do 3 měsíců od uzavření smlouvy (dle § 7 odst. 1) a je tak automaticky zrušena od počátku, nikdy nezačala platit.")
+                    new Issue(this, (int)IssueType.IssueTypes.SmlouvaZverejnenaPozde3Mesice_NezacalaPlatit, "Smlouva nebyla zveřejněna do 3 měsíců od podpisu a nikdy nezačala platit", "Smlouva nebyla uveřejněna do 3 měsíců od uzavření smlouvy (dle § 7 odst. 1) a je tak automaticky zrušena od počátku, nikdy nezačala platit.")
                     );
             }
 

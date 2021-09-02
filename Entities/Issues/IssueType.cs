@@ -26,11 +26,12 @@ namespace HlidacStatu.Entities.Issues
             Firma_vznikla_az_po = 14,
             Firma_vznikla_kratce_pred = 15,
             SmlouvaUzavrena_s_NespolehlivymPlatcemDPH = 19,
-            SmlouvaZverejnenaPozde = 20,
-            SmlouvaZverejnenaPozdeNezacalaPlatit = 21,
+            SmlouvaZverejnenaPozde30dni = 20,
+            SmlouvaZverejnenaPozde3Mesice_NezacalaPlatit = 21,
             Zcela_Chybi_identifikace_smluvni_strany = 22,
             SmlouvaZverejnenaPozde_DodatekVynutilPublikaci = 23,
-            SmlouvaZverejnenaPozde_NemuselaBytZverejnena = 24,
+            SmlouvaZverejnenaPozde3Mesice_NemuselaBytZverejnena = 24,
+            SmlouvaZverejnenaPozde30dni_NemuselaBytZverejnena = 25,
 
             Nulova_hodnota_smlouvy = 100,
             Cena_bez_DPH_nulova = 101,
@@ -59,7 +60,7 @@ namespace HlidacStatu.Entities.Issues
                 switch (issuetype)
                 {
                     case IssueTypes.Neuveden_dodavatel:
-                    case IssueTypes.SmlouvaZverejnenaPozdeNezacalaPlatit:
+                    case IssueTypes.SmlouvaZverejnenaPozde3Mesice_NezacalaPlatit:
                     case IssueTypes.Neplatny_datum_uzavreni_smlouvy:
                     case IssueTypes.Chybi_predmet_smlouvy:
                     case IssueTypes.Zcela_Chybi_identifikace_smluvni_strany:
@@ -69,7 +70,7 @@ namespace HlidacStatu.Entities.Issues
                     case IssueTypes.Stejne_strany_smlouvy:
                     case IssueTypes.Chybne_strany_smlouvy:
                     case IssueTypes.Firma_vznikla_az_po:
-                    case IssueTypes.SmlouvaZverejnenaPozde:
+                    case IssueTypes.SmlouvaZverejnenaPozde30dni:
                     case IssueTypes.Neplatna_cena:
                         return ImportanceLevel.Major;
 
@@ -89,7 +90,8 @@ namespace HlidacStatu.Entities.Issues
                     case IssueTypes.Nulova_hodnota_smlouvy_u_dodatku:
                     case IssueTypes.Nulova_hodnota_smlouvy_ostatni:
                     case IssueTypes.SmlouvaZverejnenaPozde_DodatekVynutilPublikaci:
-                    case IssueTypes.SmlouvaZverejnenaPozde_NemuselaBytZverejnena:
+                    case IssueTypes.SmlouvaZverejnenaPozde30dni_NemuselaBytZverejnena:
+                    case IssueTypes.SmlouvaZverejnenaPozde3Mesice_NemuselaBytZverejnena:
                         return ImportanceLevel.Formal;
 
                     case IssueTypes.Chybi_ICO:
