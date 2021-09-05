@@ -12,9 +12,10 @@ namespace HlidacStatu.Web.HealthChecks
 
         private Options options;
 
-        public class Options
+        public class Options : IHCConfig
         {
-            public string DockerAPIUri { get; set; }
+            public string DefaultSectionName => "Docker.Containers";
+            public string ServerUri { get; set; }
             public string[] ContainerNames { get; set; }
         }
 
@@ -27,7 +28,7 @@ namespace HlidacStatu.Web.HealthChecks
             try
             {
                 using (Docker.DotNet.DockerClient cli = new Docker.DotNet.DockerClientConfiguration(
-                    new Uri(options.DockerAPIUri), null, TimeSpan.FromSeconds(3)
+                    new Uri(options.ServerUri), null, TimeSpan.FromSeconds(3)
                     )
                     .CreateClient())
                 {

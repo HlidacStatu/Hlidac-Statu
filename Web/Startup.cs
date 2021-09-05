@@ -335,6 +335,8 @@ namespace HlidacStatu.Web
 
         private void AddAllHealtChecks(IServiceCollection services)
         {
+            var conf = Configuration.GetSection("HealthChecks");
+
             services
                 .AddHealthChecks()
                 .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000,
@@ -429,38 +431,23 @@ namespace HlidacStatu.Web
                         Interval = HealthChecks.DatasetyStatistika.IntervalEnum.Month
                     }, "Statistiky malých databází", HealthStatus.Unhealthy, tags: new[] { "Data" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
-                    new Web.HealthChecks.DockerContainer.Options()
-                    {
-                        DockerAPIUri = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.100.145").Split(';')[0],
-                        ContainerNames = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.100.145").Split(';')[1].Split(','),
-                    }, "Docker .145", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+                    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.100.145").ConfigData,
+                    "Docker .145", HealthStatus.Unhealthy, tags: new[] { "Docker" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
-                    new Web.HealthChecks.DockerContainer.Options()
-                    {
-                        DockerAPIUri = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.100.146").Split(';')[0],
-                        ContainerNames = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.100.146").Split(';')[1].Split(','),
-                    }, "Docker .146", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+                    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.100.146").ConfigData,
+                    "Docker .146", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+                .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(                    
+                    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.200").ConfigData,
+                    "Docker .200", HealthStatus.Unhealthy, tags: new[] { "Docker" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
-                    new Web.HealthChecks.DockerContainer.Options()
-                    {
-                        DockerAPIUri = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.150.200").Split(';')[0],
-                        ContainerNames = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.150.200").Split(';')[1].Split(','),
-                    }, "Docker .200", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+                    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.201").ConfigData,
+                    "Docker .201", HealthStatus.Unhealthy, tags: new[] { "Docker" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
-                    new Web.HealthChecks.DockerContainer.Options()
-                    {
-                        DockerAPIUri = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.150.201").Split(';')[0],
-                        ContainerNames = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.150.201").Split(';')[1].Split(','),
-                    }, "Docker .201", HealthStatus.Unhealthy, tags: new[] { "Docker" })
-                .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
-                    new Web.HealthChecks.DockerContainer.Options()
-                    {
-                        DockerAPIUri = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.150.204").Split(';')[0],
-                        ContainerNames = Devmasters.Config.GetWebConfigValue("Docker.HealthCheck.150.204").Split(';')[1].Split(','),
-                    }, "Docker .204", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+                    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.204").ConfigData,
+                    "Docker .204", HealthStatus.Unhealthy, tags: new[] { "Docker" })
 
                 .AddHealthCheckWithOptions<Web.HealthChecks.CamelotApis, Web.HealthChecks.CamelotApis.Options>(
-                    new Web.HealthChecks.CamelotApis.Options() { CamelotAPIUris = Devmasters.Config.GetWebConfigValue("Camelot.Service.Api").Split(';') },
+                    new HealthChecks.HCConfig<HealthChecks.CamelotApis.Options>(conf).ConfigData,
                     "Camelot APIs", HealthStatus.Unhealthy, tags: new[] { "Docker" })
                 ;
         }

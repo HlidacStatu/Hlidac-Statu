@@ -14,11 +14,19 @@ namespace HlidacStatu.Web.HealthChecks
     public class CamelotApis : IHealthCheck
     {
 
+
+
         private Options options;
 
-        public class Options
+        public class Options : IHCConfig
         {
-            public string[] CamelotAPIUris { get; set; }
+            public string DefaultSectionName => "Camelot.Services";
+            public class Endpoint { 
+                public string Uri { get; set; }
+                public string ApiKey { get; set; }
+            }
+            public Endpoint[] Uris { get; set; }
+
         }
 
         public CamelotApis(Options options)
@@ -30,13 +38,13 @@ namespace HlidacStatu.Web.HealthChecks
             System.Text.StringBuilder sb = new System.Text.StringBuilder(1024);
             try
             {
-                foreach (var url in options.CamelotAPIUris.Distinct())
+                foreach (var endp in options.Uris)
                 {
-                    if (Uri.TryCreate(url, UriKind.Absolute, out var xxx))
+                    if (Uri.TryCreate(endp.Uri, UriKind.Absolute, out var xxx))
                     {
-                        using (ClientLow cl = new ClientLow(url, Devmasters.Config.GetWebConfigValue("Camelot.Service.Api.Key")))
+                        using (ClientLow cl = new ClientLow(endp.Uri, endp.ApiKey))
                         {
-                            Uri uri = new Uri(url);
+                            Uri uri = new Uri(endp.Uri);
                             string anonUrl = string.Join("", uri.Host.TakeLast(7)) + ":" + uri.Port;
                             var ver = cl.VersionAsync().Result;
                             if (ver.Success)
