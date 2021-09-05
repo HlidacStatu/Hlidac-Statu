@@ -154,8 +154,8 @@ namespace HlidacStatu.Web.Controllers
                 case 20:
                     return RedirectPermanent("/Porovnat");
                 case 21:
-                    ViewBag.Title = "České vlády od 2014";
-                    ViewBag.SubTitle = "Stav k 15.4.2018";
+                    ViewBag.Title = "Aktuální složení vlády";
+                    ViewBag.SubTitle = "";
                     return View("21_VladyCR");
                 case 22:
                     ViewBag.Title = "";

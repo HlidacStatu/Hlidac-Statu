@@ -9,9 +9,8 @@ namespace HlidacStatu.JobTableEditor.Data
 {
     public class CellShell : INotifyPropertyChanged
     {
-        private string value;
-        private InHtmlTables.Cell.GuessedCellType cellType;
-        private string error;
+        private string _value;
+        private InHtmlTables.Cell.GuessedCellType _cellType;
         
         public InHtmlTables.Cell Cell { get; private set; }
         public string Id { get; init; }
@@ -20,37 +19,28 @@ namespace HlidacStatu.JobTableEditor.Data
 
         public InHtmlTables.Cell.GuessedCellType CellType
         {
-            get => cellType;
+            get => _cellType;
             set
             {
-                if (value == cellType) return;
-                cellType = value;
+                if (value == _cellType) return;
+                _cellType = value;
                 OnPropertyChanged(nameof(CellType));
             }
         }
 
         public string Value
         {
-            get => value;
+            get => _value;
             set
             {
-                if (value == this.value) return;
-                this.value = value;
+                if (value == _value) return;
+                _value = value;
                 OnPropertyChanged(nameof(Value));
             }
         }
 
-        public string Error
-        {
-            get => error;
-            set
-            {
-                if (value == error) return;
-                error = value;
-                OnPropertyChanged(nameof(Error));
-            }
-        }
-
+        public string Error { get; set; }
+        
         public CellShell(InHtmlTables.Cell cell, int row, int column)
         {
             Row = row;
@@ -75,13 +65,13 @@ namespace HlidacStatu.JobTableEditor.Data
                 InHtmlTables.Cell.GuessedCellType.Position => Cell.Text,
                 InHtmlTables.Cell.GuessedCellType.Price or
                     InHtmlTables.Cell.GuessedCellType.PriceWithVAT => Cell.FoundNumbers.FirstOrDefault().ToString("N2"),
-                _ => Cell.Text
+                _ => Cell.OriginalCellText
             };
         }
 
         public void SetOriginalValue()
         {
-            Value = Cell.Text;
+            Value = Cell.OriginalCellText;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -89,7 +79,79 @@ namespace HlidacStatu.JobTableEditor.Data
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
+            RunErrorChecks();
+            
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public void RunErrorChecks()
+        {
+            Error = "";
+            CheckAllowedValue(1000, 20000);
+            CheckJobIsNotEmpty();
+
+        }
+
+        private void CheckJobIsNotEmpty()
+        {
+            if (CellType == InHtmlTables.Cell.GuessedCellType.Position)
+            {
+                if (string.IsNullOrWhiteSpace(Value))
+                {
+                    Error += "Není vyplněn název pozice.";
+                }
+            }
+        }
+
+        private void CheckAllowedValue(decimal from, decimal to)
+        {
+            decimal vat = 1.21m;
+            decimal? value = Devmasters.ParseText.ToDecimal(Value);
+
+            
+            if (CellType == InHtmlTables.Cell.GuessedCellType.Price)
+            {
+                if (!value.HasValue)
+                {
+                    Error += "Chybí vyplněná hodnota.";
+                    return;
+                }
+                
+                if (value < from)
+                {
+                    Error += $"Zkontroluj hodnotu, zdá se nám nízká [{value:N1}].";
+                    return;
+                }
+                
+                if (value > to)
+                {
+                    Error += $"Zkontroluj hodnotu, zdá se nám vysoká [{value:N1}].";
+                    return;
+                }
+            }
+            
+            if (CellType == InHtmlTables.Cell.GuessedCellType.PriceWithVAT)
+            {
+                if (!value.HasValue)
+                {
+                    Error += "Chybí vyplněná hodnota.";
+                    return;
+                }
+                
+                if (value < (from * vat))
+                {
+                    Error += $"Zkontroluj hodnotu, zdá se nám nízká [{value:N1}].";
+                    return;
+                }
+                
+                if (value > (to * vat))
+                {
+                    Error += $"Zkontroluj hodnotu, zdá se nám vysoká [{value:N1}].";
+                    return;
+                }
+            }
+            
+        }
+        
     }
 }

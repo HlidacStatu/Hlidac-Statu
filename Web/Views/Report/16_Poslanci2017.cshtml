@@ -9,11 +9,7 @@
 @{
         Layout = "_ReportLayout";
 
-    var showList = OsobaRepo.GetByEvent(e =>
-            e.Type == (int)OsobaEvent.Types.VolenaFunkce
-            && (e.AddInfo.ToLower().StartsWith("poslanec") || e.AddInfo.ToLower().StartsWith("poslankyně"))
-            && e.Organizace.ToLower().StartsWith("poslanecká sněmovna pčr")
-            && (e.DatumDo == null || e.DatumDo >= DateTime.Now))
+    var showList = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.Poslanec, DateTime.Now)
         .OrderBy(o => o.Prijmeni)
         .ThenBy(o => o.Jmeno)
         .ToList();

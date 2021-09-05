@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using Devmasters.Enums;
 
 namespace HlidacStatu.Repositories
 {
@@ -563,6 +564,83 @@ namespace HlidacStatu.Repositories
                 .ToArray();
 
             return r;
+        }
+
+        public enum Zatrideni
+        {
+            [NiceDisplayName("Politik")]
+            Politik,
+            [NiceDisplayName("Člen vlády")]
+            Ministr,
+            [NiceDisplayName("Hejtman")]
+            Hejtman,
+            [NiceDisplayName("Poslanec")]
+            Poslanec,
+            [NiceDisplayName("Vedoucí úřadu")]
+            SefUradu,
+            
+        }
+        
+        public static List<Osoba> GetByZatrideni(Zatrideni zatrideni, DateTime? toDate)
+        {
+            if (!toDate.HasValue)
+                toDate = DateTime.Now;
+            
+            switch (zatrideni)
+            {
+                case Zatrideni.Politik:
+                    var politickeEventy = new HashSet<int>()
+                    {
+                        (int)OsobaEvent.Types.Politicka,
+                        (int)OsobaEvent.Types.PolitickaPracovni,
+                        // Patří sem i volená?
+                    };
+                    
+                    return GetByEvent(e => 
+                            politickeEventy.Any(pe => pe == e.Type)
+                            && (e.DatumDo == null || e.DatumDo >= toDate)
+                            && (e.DatumOd == null || e.DatumOd <= toDate))
+                        .ToList();
+
+                case Zatrideni.Ministr:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.PolitickaPracovni
+                            && e.AddInfo.ToLower().StartsWith("ministr")
+                            && e.Organizace.ToLower().StartsWith("ministerstvo")
+                            && (e.DatumDo == null || e.DatumDo >= toDate)
+                            && (e.DatumOd == null || e.DatumOd <= toDate))
+                        .ToList();
+
+                case Zatrideni.Hejtman:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.PolitickaPracovni
+                            && e.AddInfo.ToLower().StartsWith("hejtman")
+                            && (e.DatumDo == null || e.DatumDo >= toDate)
+                            && (e.DatumOd == null || e.DatumOd <= toDate))
+                        .ToList();
+                
+                case Zatrideni.Poslanec:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.VolenaFunkce
+                            && (e.AddInfo.ToLower().StartsWith("poslanec") ||
+                                e.AddInfo.ToLower().StartsWith("poslankyně"))
+                            && e.Organizace.ToLower().StartsWith("poslanecká sněmovna pčr")
+                            && (e.DatumDo == null || e.DatumDo >= toDate)
+                            && (e.DatumOd == null || e.DatumOd <= toDate))
+                        .ToList();
+                
+                case Zatrideni.SefUradu:
+                    return GetByEvent(e =>
+                            e.Ceo == 1
+                            && (e.DatumDo == null || e.DatumDo >= toDate)
+                            && (e.DatumOd == null || e.DatumOd <= toDate))
+                        .ToList();
+                
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(zatrideni), zatrideni, null);
+            }
+
+            return null;
         }
     }
 }

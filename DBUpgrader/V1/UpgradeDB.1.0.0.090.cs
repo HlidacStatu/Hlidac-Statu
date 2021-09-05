@@ -11,10 +11,7 @@ namespace HlidacStatu.DBUpgrades
             public static void Init_1_0_0_90(IDatabaseUpgrader du)
             {
                 string sql = @"
-
-/****** Object:  Table [dbo].[InDocJobs]    Script Date: 26.08.2021 21:51:32 ******/
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[InDocJobs]') AND type in (N'U'))
-DROP TABLE [dbo].[InDocJobs]
+USE [Firmy]
 GO
 
 /****** Object:  Table [dbo].[InDocJobs]    Script Date: 26.08.2021 21:51:32 ******/
@@ -41,20 +38,6 @@ CREATE TABLE [dbo].[InDocJobs](
 GO
 
 
-USE [Firmy]
-GO
-
-ALTER TABLE [dbo].[InDocTables] DROP CONSTRAINT [DF_InDocTables_status]
-GO
-
-ALTER TABLE [dbo].[InDocTables] DROP CONSTRAINT [DF_InDocTables_precalculatedScore]
-GO
-
-/****** Object:  Table [dbo].[InDocTables]    Script Date: 27.08.2021 5:56:41 ******/
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[InDocTables]') AND type in (N'U'))
-DROP TABLE [dbo].[InDocTables]
-GO
-
 /****** Object:  Table [dbo].[InDocTables]    Script Date: 27.08.2021 5:56:41 ******/
 SET ANSI_NULLS ON
 GO
@@ -68,7 +51,7 @@ CREATE TABLE [dbo].[InDocTables](
 	[smlouvaID] [nvarchar](20) NOT NULL,
 	[prilohaHash] [nvarchar](90) NOT NULL,
 	[page] [int] NOT NULL,
-	[json] [nvarchar(MAX)] NOT NULL,
+	[json] [nvarchar](MAX) NOT NULL,
 	[tableOnPage] [int] NOT NULL,
 	[algorithm] [nvarchar](50) NOT NULL,
 	[precalculatedScore] [money] NOT NULL,

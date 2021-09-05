@@ -128,77 +128,68 @@
         </div>
         <hr />
     }
-    @if (statistics.SoukromeFirmy.Count > 0)
+    @if (statistics.SoukromeFirmy.Count > 0 || statistics.StatniFirmy.Count > 0)
     {
         <div>
             <h4>
-                Angažovanost v soukromých firmách
+                Angažovanost
             </h4>
             <p class="text-muted sub-header-info">
-                Firmy, které tato osoba přímo či prostřednictvím jiných společností vlastnila či spoluvlastnila
+                Firmy a organizace, které tato osoba přímo či prostřednictvím jiných společností vlastnila či spoluvlastnila
                 nebo byla ve statutárních orgánech, a to <b>@(aktualnost.ToNiceDisplayName().ToLower())</b>.
             </p>
-            <p>
-                @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné firmě", "{0} firmách", "{0} firmách")
-                @if (statistics.NeziskovkyCount() > 0)
-                {
-                    <span>(z toho v @Devmasters.Lang.CS.Plural.Get(statistics.NeziskovkyCount(), "jedné neziskovce", "{0} neziskovkách", "{0} neziskovkách"))</span>
-                }
-                :
-                <ul>
-                    @foreach (var stat in statistics.SoukromeFirmy
-                        .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)
-                        .Take(statistics.SoukromeFirmy.Count <= listingNum + 1 ? listingNum + 1 : listingNum)
-                        )
+            @if (statistics.SoukromeFirmy.Count > 0)
+            {
+                <p>
+                    @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
+                    @if (statistics.NeziskovkyCount() > 0)
                     {
-                        <li>
-                            <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                                @Firmy.GetJmeno(stat.Key)
-                            </a> (@stat.Value.CurrentSeasonStatistics().ToNiceString(null, false) v @stat.Value.CurrentSeasonYear())
-                        </li>
+                        <span>(z toho v @Devmasters.Lang.CS.Plural.Get(statistics.NeziskovkyCount(), "jedné neziskovce", "{0} neziskovkách", "{0} neziskovkách"))</span>
                     }
-                </ul>
-            </p>
+                    :
+                    <ul>
+                        @foreach (var stat in statistics.SoukromeFirmy
+                            .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)
+                            .Take(statistics.SoukromeFirmy.Count <= listingNum + 1 ? listingNum + 1 : listingNum)
+                            )
+                        {
+                            <li>
+                                <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
+                                    @Firmy.GetJmeno(stat.Key)
+                                </a> (@stat.Value.CurrentSeasonStatistics().ToNiceString(null, false) v @stat.Value.CurrentSeasonYear())
+                            </li>
+                        }
+                    </ul>
+                </p>
+            }
+            
+            @if (statistics.StatniFirmy.Count > 0)
+            {
+                <p>
+                    @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
+                    <ul>
+                        @foreach (var stat in statistics.StatniFirmy
+                            .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)
+                            .Take(statistics.SoukromeFirmy.Count <= listingNum + 1 ? listingNum + 1 : listingNum)
+                            )
+                        {
+                            <li>
+                                <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
+                                    @Firmy.GetJmeno(stat.Key)
+                                </a> (@stat.Value.CurrentSeasonStatistics().ToNiceString(null, false) v @stat.Value.CurrentSeasonYear())
+                            </li>
+                        }
+                    </ul>
+                </p>
+            }
+            
             <a asp-action="Vazby" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
                 <strong>Zobrazit podrobnosti</strong>
             </a>
         </div>
         <hr />
     }
-    @if (statistics.StatniFirmy.Count > 0)
-    {
-        <div>
-            <h4>
-                Angažovanost ve státních organizacích a firmách
-            </h4>
-            <p class="text-muted sub-header-info">
-                Organizace a firmy vlastněné státem či samosprávou, které tato osoba přímo či prostřednictvím jiných společností spoluvlastnila
-                nebo byla ve statutárních orgánech, a to <b>@(aktualnost.ToNiceDisplayName().ToLower())</b>.
-            </p>
-            <p>
-                @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
-                <ul>
-                    @foreach (var stat in statistics.StatniFirmy
-                        .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)
-                        .Take(statistics.SoukromeFirmy.Count <= listingNum + 1 ? listingNum + 1 : listingNum)
-                        )
-                    {
-                        <li>
-                            <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
-                                @Firmy.GetJmeno(stat.Key)
-                            </a> (@stat.Value.CurrentSeasonStatistics().ToNiceString(null, false) v @stat.Value.CurrentSeasonYear())
-                        </li>
-                    }
-                </ul>
-            </p>
-            <a asp-action="Vazby" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
-                <strong>Zobrazit podrobnosti</strong>
-            </a>
-        </div>
-        <hr />
-    }
-
-
+    
     @*dotace*@
 
     @{
