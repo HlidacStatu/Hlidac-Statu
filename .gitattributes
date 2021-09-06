@@ -53,6 +53,10 @@
 *.zip   binary
 *.pdf   binary
 
+###### Others
+*.woff
+*.woff2
+
 ###############################################################################
 # diff behavior for common document formats
 # 
