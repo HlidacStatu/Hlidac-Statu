@@ -32,8 +32,7 @@
 
 @*@Html.Action("CachedAction_Child_48H", new { model = Model, NameOfView = "Index.Content.Charts" })*@
 
-
-@Html.Partial("_SearchForm", new HlidacStatu.Repositories.Searching.InsolvenceSearchResult())
+<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.InsolvenceSearchResult())"/>
 
 @*@Html.Action("CachedAction_Child_48H", new { model = Model, NameOfView = "Index.Content.Politici" })*@
 

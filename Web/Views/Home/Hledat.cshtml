@@ -936,8 +936,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
         Model.Smlouvy.ShowWatchdog = false;
         <div id="smlouvy" class="row">
             <div class="col-xs-12">
-
-                @Html.Partial("_SearchResult", Model.Smlouvy)
+                <partial name="_SearchResult" model="@Model.Smlouvy"/>
             </div>
         </div>
     }

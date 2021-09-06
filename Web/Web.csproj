@@ -12,7 +12,7 @@
         <Nullable>enable</Nullable>
 <!--    Generuje XML dokumentaci (komentáře metod) pro swagger -->
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-
+        <NoWarn>8601;8602;8600;8618;8603;8629;8604</NoWarn>
     </PropertyGroup>
 
 <!--    Některé soubory (automaticky kopírované) je potřeba nejprve odstranit ze seznamu, 

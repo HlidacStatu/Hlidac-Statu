@@ -13,8 +13,7 @@
         <li class="active">Hlídač Veřejných zakázek</li>
     </ol>
 }
-@Html.Partial("_SearchForm", new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData())
-
+<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData())" />
 
 <hr />
 <h2>Veřejné zakázky v jednotlivých oblastech</h2>

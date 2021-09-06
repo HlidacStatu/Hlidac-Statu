@@ -20,8 +20,7 @@
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.css" />
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
 
-@Html.Partial("_SearchForm", new HlidacStatu.Repositories.Searching.InsolvenceSearchResult())
-
+<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.InsolvenceSearchResult())"/>
 
 <h2>
 	Dokumenty k řízení @Model.SpisovaZnacka
@@ -48,17 +47,18 @@
 else
 {
 	<h3>Oddíl A - Řízení do úpadku</h3>
-	@Html.Partial("_OddilDokumenty", new DokumentListViewModel { Oddil = "A", Dokumenty = Model.Dokumenty.Where(d => d.Oddil != null && d.Oddil.StartsWith("A")).ToArray(), HighlightingData= Model.HighlightingData })
+	<partial name="_OddilDokumenty" model="@(new DokumentListViewModel { Oddil = "A", Dokumenty = Model.Dokumenty.Where(d => d.Oddil != null && d.Oddil.StartsWith("A")).ToArray(), HighlightingData= Model.HighlightingData })"/>
 
 	<h3>Oddíl B - Řízení po úpadku	</h3>
-	@Html.Partial("_OddilDokumenty", new DokumentListViewModel { Oddil = "B", Dokumenty = Model.Dokumenty.Where(d => d.Oddil != null && d.Oddil.StartsWith("B")).ToArray(), HighlightingData = Model.HighlightingData })
+	<partial name="_OddilDokumenty" model="@(new DokumentListViewModel { Oddil = "B", Dokumenty = Model.Dokumenty.Where(d => d.Oddil != null && d.Oddil.StartsWith("B")).ToArray(), HighlightingData = Model.HighlightingData })"/>
 
 	<h3>Oddíl C - Incidenční spory</h3>
-	@Html.Partial("_OddilDokumenty", new DokumentListViewModel { Oddil = "C", Dokumenty = Model.Dokumenty.Where(d => d.Oddil != null && d.Oddil.StartsWith("C")).ToArray(), HighlightingData = Model.HighlightingData })
+	<partial name="_OddilDokumenty" model="@(new DokumentListViewModel { Oddil = "C", Dokumenty = Model.Dokumenty.Where(d => d.Oddil != null && d.Oddil.StartsWith("C")).ToArray(), HighlightingData = Model.HighlightingData })"/>
 
 	<h3>Oddíl D - Ostatní</h3>
-	@Html.Partial("_OddilDokumenty", new DokumentListViewModel { Oddil = "D", Dokumenty = Model.Dokumenty.Where(d => d.Oddil == null || d.Oddil != null && d.Oddil.StartsWith("D")).ToArray(), HighlightingData = Model.HighlightingData })
+	<partial name="_OddilDokumenty" model="@(new DokumentListViewModel { Oddil = "D", Dokumenty = Model.Dokumenty.Where(d => d.Oddil == null || d.Oddil != null && d.Oddil.StartsWith("D")).ToArray(), HighlightingData = Model.HighlightingData })"/>
 
 	<h3>Oddíl P - Přihlášky</h3>
-	@Html.Partial("_OddilDokumenty", new DokumentListViewModel { Oddil = "P", Dokumenty = Model.Dokumenty.Where(d => d.Oddil != null && d.Oddil.StartsWith("P")).ToArray(), HighlightingData = Model.HighlightingData })
+	<partial name="_OddilDokumenty" model="@(new DokumentListViewModel { Oddil = "P", Dokumenty = Model.Dokumenty.Where(d => d.Oddil != null && d.Oddil.StartsWith("P")).ToArray(), HighlightingData = Model.HighlightingData })"/>
+	
 }

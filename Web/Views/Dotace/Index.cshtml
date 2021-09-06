@@ -20,7 +20,7 @@
     </ol>
 }
 
-@Html.Partial("_SearchForm", new HlidacStatu.Repositories.Searching.DotaceSearchResult())
+<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.DotaceSearchResult())" />
 
 <h2>Informace k dotacím</h2>
 <div>

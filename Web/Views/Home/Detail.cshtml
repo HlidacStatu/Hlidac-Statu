@@ -473,8 +473,7 @@
 </table>
 <partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("Poslat opravu či připomínku"))"/>
 
-
-@Html.Partial("_Symbols", Model)
+<partial name="_Symbols" model="@Model"/>
 
 @*@Html.Action("Detail_child", new { Id = Model.Id, model = Model, NameOfView = "Detail_Child" })*@
 

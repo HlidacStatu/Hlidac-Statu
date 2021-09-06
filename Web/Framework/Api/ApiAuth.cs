@@ -78,7 +78,7 @@ namespace HlidacStatu.Web.Framework
             }
             public static Result Invalid(ApiCall apiCall)
             {
-                if (!string.IsNullOrEmpty(apiCall?.User))
+                if (!string.IsNullOrEmpty(apiCall.User))
                 {
                     AuditRepo.Add(Audit.Operations.InvalidAccess, apiCall.User, apiCall.IP, apiCall, null);
                 }

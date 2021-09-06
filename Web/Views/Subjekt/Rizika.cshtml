@@ -14,9 +14,8 @@
     @foreach (var rok in roky.OrderByDescending(m=>m))
     {
 
-    <h4 style="padding-bottom:15px;">Sledovaná rizika pro rok @rok</h4>
-    @Html.Partial("_rizikoPart", (firma:Model, rok:rok))
-
+        <h4 style="padding-bottom:15px;">Sledovaná rizika pro rok @rok</h4>
+        <partial name="_rizikoPart" model="@((firma:Model, rok:rok))"/>
         <hr/>
 
     }

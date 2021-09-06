@@ -27,9 +27,6 @@
         <li>@ViewBag.SubTitle</li>
     </ol>
 }
-@Html.Partial("_SearchForm", Model)
+<partial name="_SearchForm" model="@Model" />
 
-
-@Html.Partial("_SearchResult", Model)
-
-
+<partial name="_SearchResult" model="@Model" />
