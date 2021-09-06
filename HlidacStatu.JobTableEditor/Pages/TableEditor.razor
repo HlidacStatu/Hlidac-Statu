@@ -9,7 +9,7 @@
 @inject JobService JobService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-@attribute [Authorize(Roles = "Admin")]
+@attribute [Authorize(Roles = "Admin,TableEditor")]
 
 <h1>Job editor</h1>
 
