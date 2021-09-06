@@ -32,6 +32,11 @@ namespace HlidacStatu.Web.Framework
             return viewContext.HttpContext.Request.GetDisplayUrl();
         }
 
+        public static string GetBaseUrl(this ViewContext viewContext)
+        {
+            return $"{viewContext.HttpContext.Request.Scheme}://{viewContext.HttpContext.Request.Host}";
+        }
+
 
     }
 }

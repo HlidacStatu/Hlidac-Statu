@@ -69,9 +69,12 @@
     <div>
         <span class="text-muted">Chci sdílet s ostatními</span>
         <div>
-            <share-facebook></share-facebook>
-            <share-twitter text="@($"{Model.FullName()} na @HlidacStatu - {Model.InfoFacts().First().Render(false)}")"></share-twitter>
-            <share-widget></share-widget>
+            @{
+                var linkUrl = $"{ViewContext.GetBaseUrl()}/osoba/{Model.NameId}"; 
+            }
+            <share-facebook url="@linkUrl"></share-facebook>
+            <share-twitter url="@linkUrl" text="@($"{Model.FullName()} na @HlidacStatu - {Model.InfoFacts().First().Render(false)}")"></share-twitter>
+            <share-widget url="@linkUrl"></share-widget>
         </div>
     </div>
 </div>
