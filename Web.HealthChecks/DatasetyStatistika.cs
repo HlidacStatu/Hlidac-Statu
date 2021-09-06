@@ -122,7 +122,7 @@ namespace HlidacStatu.Web.HealthChecks
             {
                 var data = statistiky.Get();
                 System.Text.StringBuilder sb = new System.Text.StringBuilder(1024);
-                sb.Append("<table class='table table-new table-dotted'>");
+                sb.Append("<table class='table table-new table-dotted table-responsive'>");
                 sb.Append($"<thead><tr><td>dataset</td><td>celkem zaznamu</td><td>za {options.Interval.ToNiceDisplayName()}</td><td>posl.změna</td></tr></thead>");
                 sb.Append("<tbody>");
                 foreach (var ds in data
