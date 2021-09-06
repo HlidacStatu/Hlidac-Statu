@@ -911,7 +911,7 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
         </div>
     }
 
-    private void RenderSmlouvy(int numOfSmluv)
+    private async Task RenderSmlouvy(int numOfSmluv)
     {
         if (numOfSmluv == 0)
         {
