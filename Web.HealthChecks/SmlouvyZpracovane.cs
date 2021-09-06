@@ -28,7 +28,7 @@ namespace HlidacStatu.Web.HealthChecks
                     result += $"{date:yyyy-MM-dd}: {res.Total} smluv \n";
                     if (svatek && res.Total < 10)
                         bad = true;
-                    else if (res.Total < 1000)
+                    else if (svatek == false && res.Total < 1000)
                         bad = true;
 
                 }
