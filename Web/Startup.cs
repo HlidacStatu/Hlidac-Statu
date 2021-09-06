@@ -468,9 +468,9 @@ namespace HlidacStatu.Web
                 .AddHealthCheckWithOptions<Web.HealthChecks.ProxmoxVMs, Web.HealthChecks.ProxmoxVMs.Options>(
                     new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.pve-nic-168").ConfigData,
                     "Proxmox pve-nic-168 (02.168)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
-                .AddHealthCheckWithOptions<Web.HealthChecks.ProxmoxVMs, Web.HealthChecks.ProxmoxVMs.Options>(
-                    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.hs-h-01").ConfigData,
-                    "Proxmox hs-h-01 (02.160)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
+                //.AddHealthCheckWithOptions<Web.HealthChecks.ProxmoxVMs, Web.HealthChecks.ProxmoxVMs.Options>(
+                //    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.hs-h-01").ConfigData,
+                //    "Proxmox hs-h-01 (02.160)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
                 ;
         }
 

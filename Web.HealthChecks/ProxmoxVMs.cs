@@ -62,7 +62,7 @@ namespace HlidacStatu.Web.HealthChecks
                 client.ApiToken = this.options.ApiToken;
 
                 var resp = client.Nodes[this.options.NodeName].Qemu.Vmlist();
-                if (resp.ResponseInError == false || resp.IsSuccessStatusCode)
+                if (resp.ResponseInError == false && resp.IsSuccessStatusCode)
                 {
                     VM[] allVMs = JsonConvert.DeserializeObject<VM[]>(JsonConvert.SerializeObject(resp.Response.data));
                     foreach (var vm in this.options.ExpectedRunningVMs)
@@ -93,9 +93,12 @@ namespace HlidacStatu.Web.HealthChecks
 
                     }
 
-                    var nonListedVM = allVMs.Select(m => m.name).Except(this.options.ExpectedRunningVMs, System.StringComparer.InvariantCultureIgnoreCase);
+                    var nonListedVM = allVMs
+                        .Where(m=>m.status=="running")
+                        .Select(m => m.name)
+                        .Except(this.options.ExpectedRunningVMs, System.StringComparer.InvariantCultureIgnoreCase);
                     if (nonListedVM.Count()>0)
-                        result.AppendLine($"Others running VMs: {string.Join(',', nonListedVM)}");
+                        result.AppendLine($"Other running VMs: {string.Join(',', nonListedVM)}");
 
                     if (bad)
                         return Task.FromResult(HealthCheckResult.Degraded(result.ToString()));
