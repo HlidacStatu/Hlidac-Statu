@@ -25,7 +25,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
 
                     var json = Newtonsoft.Json.Linq.JArray.Parse(this.Content);
                     var numRows = json.Count;
-                    var numCells = 0;
+
                     if (numRows > 0)
                     {
                         cells = new string[numRows][];

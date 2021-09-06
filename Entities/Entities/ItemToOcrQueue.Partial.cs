@@ -66,7 +66,7 @@ namespace HlidacStatu.Entities
                             dbTran.Commit();
                             return res;
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             dbTran.Rollback();
                             throw;

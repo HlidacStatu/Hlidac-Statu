@@ -23,7 +23,9 @@
         Informace o chybovosti je proto pouze orientační.
     </p>
     <a href="/Novinky">Podrobněji analýzu popisujeme zde</a>.
-    <div class="pull-right">@Html.Partial("~/Views/Home/_Symbols.cshtml")</div>
+    <div class="pull-right">
+        <partial name="~/Views/Home/_Symbols.cshtml"/>
+    </div>
 </div>
 
 <partial name="~/Views/Home/_SearchResult.cshtml" model="model"/>

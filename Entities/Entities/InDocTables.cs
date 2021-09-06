@@ -33,15 +33,15 @@ namespace HlidacStatu.Entities
             {
                 string[][] cells = new string[0][];
 
-                var json = Newtonsoft.Json.Linq.JArray.Parse(this.Json);
+                var json = JArray.Parse(Json);
                 var numRows = json.Count;
-                var numCells = 0;
+                
                 if (numRows > 0)
                 {
                     cells = new string[numRows][];
                     for (int r = 0; r < numRows; r++)
                     {
-                        var row = (Newtonsoft.Json.Linq.JObject)json[r];
+                        var row = (JObject)json[r];
                         cells[r] = new string[row.Count];
                         for (int c = 0; c < row.Count; c++)
                         {
@@ -95,8 +95,8 @@ namespace HlidacStatu.Entities
         [NotMapped()]
         public CheckStatuses CheckStatus
         {
-            get { return (CheckStatuses)this.Status; }
-            set { this.Status = (int)value; }
+            get { return (CheckStatuses)Status; }
+            set { Status = (int)value; }
         }
 
     }

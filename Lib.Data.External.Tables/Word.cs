@@ -25,21 +25,21 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 string ext = "." + filename;
                 try
                 {
-                    tmpFn = System.IO.Path.GetTempFileName() + ext;
+                    tmpFn = Path.GetTempFileName() + ext;
                     wc.DownloadFile(url, tmpFn);
                     return GetTablesFromWord(tmpFn);
                 }
                 catch (Exception e)
                 {
                     logger.Error($"GetTablesFromWord {url.ToString()}", e);
-                    throw e;
+                    throw;
                 }
                 finally
                 {
                     if (!string.IsNullOrEmpty(tmpFn))
                     {
-                        System.IO.File.Delete(tmpFn);
-                        System.IO.File.Delete(tmpFn + ext);
+                        File.Delete(tmpFn);
+                        File.Delete(tmpFn + ext);
                     }
                 }
             }

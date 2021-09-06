@@ -85,9 +85,6 @@ namespace HlidacStatu.Lib.OCR.Api
             MiningIntensity intensity, string origFilename = null, TimeSpan? maxWaitingTime = null,
             TimeSpan? restartTaskAfterTime = null /*, Api.CallbackData callBackData = null*/)
         {
-            string fullUrl = null;
-            string taskId = null;
-
             var tmpFile = TempIO.GetTemporaryFilename();
             try
             {
@@ -248,9 +245,6 @@ namespace HlidacStatu.Lib.OCR.Api
            MiningIntensity intensity, string origFilename = null, TimeSpan? maxWaitingTime = null,
            TimeSpan? restartTaskAfterTime = null /*, Api.CallbackData callBackData = null*/)
         {
-            string fullUrl = null;
-            string taskId = null;
-
             var tmpFile = TempIO.GetTemporaryFilename();
             try
             {

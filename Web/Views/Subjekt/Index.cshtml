@@ -80,7 +80,7 @@
             Přehled rizik, která u jednotlivých subjektů sledujeme za <b>rok @rok</b>
         </p>
 
-        @Html.Partial("_rizikoPart", (firma: Model, rok: rok))
+        <partial name="_rizikoPart" model="@((firma: Model, rok: rok))"/>
 
         <a href="/subjekt/Rizika/@Model.ICO" class="moreinfolink text-uppercase"><strong>Zobrazit další rizika i v předchozích letech</strong></a>
 

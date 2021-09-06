@@ -30,13 +30,13 @@ namespace HlidacStatu.Web.Models
         {
             public string name; public string nameId;
 
-            public bool Equals(PolitikTypeAhead x, PolitikTypeAhead y)
+            public bool Equals(PolitikTypeAhead? x, PolitikTypeAhead? y)
             {
                 if (x == null && y == null)
                     return true;
                 if ((x == null && y != null) || (x != null && y == null))
                     return false;
-                return (x.nameId == y.nameId && x.name == y.name);
+                return (x?.nameId == y?.nameId && x?.name == y?.name);
             }
 
             public int GetHashCode(PolitikTypeAhead obj)

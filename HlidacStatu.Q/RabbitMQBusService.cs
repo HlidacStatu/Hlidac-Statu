@@ -29,14 +29,7 @@ namespace HlidacStatu.Q
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            try
-            {
-                RabbitBus = RabbitHutch.CreateBus(_options.ConnectionString);
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            RabbitBus = RabbitHutch.CreateBus(_options.ConnectionString);
 
             return Task.CompletedTask;
         }

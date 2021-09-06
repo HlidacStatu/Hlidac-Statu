@@ -34,7 +34,7 @@
         <li class="active">Dostupnost nejdůležitějších webů</li>
     </ol>
 }
-@Html.Partial("~/Views/StatniWeby/_Info.cshtml", this.ViewData)
+<partial name="~/Views/StatniWeby/_Info.cshtml" model="@ViewData"/>
 
 <h2>Dostupnost nejdůležitějších služeb <small>za posledních 24 hodin</small></h2>
 <div class="row">

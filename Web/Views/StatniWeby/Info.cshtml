@@ -68,9 +68,8 @@ else
             <li><a href="@Url.Action("Index", "StatniWeby")">Hlídač Webů</a></li>
             <li class="active">@ViewBag.SubTitle</li>
         </ol>
-    }
-    @Html.Partial("~/Views/StatniWeby/_Info.cshtml", this.ViewData)
-
+}
+    <partial name="~/Views/StatniWeby/_Info.cshtml" model="@ViewData"/>
 
     <h2>
         @(web.Host.publicname)

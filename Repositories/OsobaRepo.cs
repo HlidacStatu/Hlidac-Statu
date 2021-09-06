@@ -639,8 +639,6 @@ namespace HlidacStatu.Repositories
                 default:
                     throw new ArgumentOutOfRangeException(nameof(zatrideni), zatrideni, null);
             }
-
-            return null;
         }
     }
 }

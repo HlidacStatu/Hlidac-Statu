@@ -56,12 +56,10 @@ namespace HlidacStatu.LibCore.Services
                 penalty = 0;
             else if (statusCode >= 500)
                 penalty = 20; // server errors
-            else if (statusCode >= 400 && path.StartsWith("/api"))
+            else if (statusCode >= 400 && path != null && path.StartsWith("/api"))
                 penalty = 1; // not found, forbidden, ... in API
-            else if (statusCode >= 400)
-                penalty = 10; // not found, forbidden, ...
             else
-                penalty = 0;
+                penalty = 10; // not found, forbidden, ...
 
 
             if (diff >= SaveTimeBetweentAttacksInSec && penalty > 0)

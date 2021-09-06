@@ -52,7 +52,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new ApiResult<string>(false);
             }
@@ -74,7 +74,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new ApiResult<CamelotResult>(false);
             }
@@ -96,7 +96,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new ApiResult<CamelotResult>(false);
             }
@@ -116,7 +116,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new ApiResult<CamelotVersionData>(false);
             }
@@ -137,7 +137,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return new ApiResult<CamelotStatistics>(false);
             }

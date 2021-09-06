@@ -512,7 +512,7 @@ namespace HlidacStatu.Datasets
                 {
                     Consts.Logger.Error("Send email", e);
 #if DEBUG
-                    throw e;
+                    throw;
 #endif
                 }
             }

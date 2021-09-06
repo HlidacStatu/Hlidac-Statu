@@ -31,10 +31,7 @@
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.css" />
 <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
 
-
-
-@Html.Partial("_SearchForm", new HlidacStatu.Repositories.Searching.InsolvenceSearchResult())
-
+<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.InsolvenceSearchResult())"/>
 
 <h2>
     @*@WebUtil.AddBookmark(this.User, Model)*@
@@ -68,10 +65,10 @@ else
     // else 
     if (!Model.Rizeni.OnRadar)
     {
-        @Html.Partial("_OnRadarInfo")
+        <partial name="_OnRadarInfo"/>
     }
 
-    @Html.Partial("_Status", Model)
+    <partial name="_Status" model="@Model"/>
 }
 
 
