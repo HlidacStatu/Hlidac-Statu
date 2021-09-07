@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace HlidacStatu.Repositories.ES
 {
-    public class QueryGrouped
+    public partial class QueryGrouped
     {
         public static Dictionary<int, Dictionary<int, BasicData>> OblastiPerYear(string query, int[] interestedInYearsOnly)
         {

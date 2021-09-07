@@ -1,0 +1,110 @@
+﻿using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities.Analysis;
+using HlidacStatu.Extensions;
+using HlidacStatu.Lib.Analytics;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace HlidacStatu.Repositories.Statistics
+{
+    public static partial class FirmaStatistics
+    {
+         static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma> 
+            _dotaceCache = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
+                .GetSafeInstance("Firma_DotaceStatistics",
+                    (firma) => CalculateDotaceStat(firma),
+                    TimeSpan.FromHours(12),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                    Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                    f => f.ICO);
+
+
+         static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)> 
+            _holdingDotaceCache = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)>
+                .GetSafeInstance("Holding_DotaceStatistics",
+                    (obj) => CalculateHoldingDotaceStat(obj.firma, obj.aktualnost),
+                    TimeSpan.FromHours(12),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                    Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                    Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                    obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
+
+        public static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CachedHoldingStatisticsDotace(
+    Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost,
+    bool forceUpdateCache = false)
+        {
+            if (forceUpdateCache)
+                _holdingDotaceCache.Delete((firma, aktualnost));
+
+            return _holdingDotaceCache.Get((firma, aktualnost));
+        }
+
+        public static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CachedStatisticsDotace(
+            Firma firma,
+            bool forceUpdateCache = false)
+        {
+            if (forceUpdateCache)
+                _dotaceCache.Delete(firma);
+
+            return _dotaceCache.Get(firma);
+        }
+
+        private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateHoldingDotaceStat(Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)
+        {
+            var firmy = firma.Holding(aktualnost).ToArray();
+
+            var statistiky = firmy.Select(f => f.StatistikaDotaci()).Append(firma.StatistikaDotaci()).ToArray();
+
+            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistiky);
+
+            return aggregate;
+
+        }
+
+        private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateDotaceStat(Firma f)
+        {
+            var dotaceFirmy = DotaceRepo.GetDotaceForIco(f.ICO);
+
+            // doplnit počty dotací
+            var statistiky = dotaceFirmy.GroupBy(d => d.DatumPodpisu?.Year)
+                .ToDictionary(g => g.Key ?? 0,
+                    g => new Firma.Statistics.Dotace()
+                    {
+                        PocetDotaci = g.Count()
+                    }
+                );
+
+            var cerpani = dotaceFirmy
+                .SelectMany(d => d.Rozhodnuti)
+                .SelectMany(r => r.Cerpani);
+
+            var dataYearly = cerpani
+                .GroupBy(c => c.GuessedYear)
+                .ToDictionary(g => g.Key ?? 0,
+                    g => (CelkemCerpano: g.Sum(c => c.CastkaSpotrebovana ?? 0),
+                        PocetCerpani: g.Count(c => c.CastkaSpotrebovana.HasValue))
+                );
+
+            foreach (var dy in dataYearly)
+            {
+                if (!statistiky.TryGetValue(dy.Key, out var yearstat))
+                {
+                    yearstat = new Firma.Statistics.Dotace();
+                    statistiky.Add(dy.Key, yearstat);
+                }
+
+                yearstat.CelkemCerpano = dy.Value.CelkemCerpano;
+                yearstat.PocetCerpani = dy.Value.PocetCerpani;
+            }
+
+
+            return new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(f.ICO, statistiky);
+        }
+
+    }
+}

@@ -28,7 +28,17 @@ namespace HlidacStatu.Lib.Analysis
         public string Text { get; set; }
         public string Description { get; set; }
         public string NameOfView { get; set; }
-        public Analytics.StatisticsPerYear<Smlouva.Statistics.Data> Data { get { return Repositories.Statistics.SmlouvaStatistics.CachedStatisticsForQuery(Query); } }
+        public int? Year { get; set; }
+        public Analytics.StatisticsPerYear<Smlouva.Statistics.Data> Data
+        {
+            get
+            {
+                if (Year.HasValue)
+                    return Repositories.Statistics.SmlouvaStatistics.CachedStatisticsForQuery(Query);
+                else
+                    return Repositories.Statistics.SmlouvaStatistics.CachedStatisticsForQuery(Query);
+            }
+        }
 
     }
 

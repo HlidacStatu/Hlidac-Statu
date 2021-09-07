@@ -59,10 +59,10 @@ namespace HlidacStatu.Web.Controllers
 
         }
 
-        public ActionResult Analyza(string id, string p, string q, string title, string description, string moreUrl)
+        public ActionResult Analyza(string id, string p, string q, string title, string description, string moreUrl, int? y)
         {
             ViewData.Add(Constants.CacheKeyName,
-                WebUtil.GenerateCacheKey(new object[] { id, p, q, title, description, moreUrl }));
+                WebUtil.GenerateCacheKey(new object[] { id, p, q, title, description, moreUrl, y }));
 
             var model = new Lib.Analysis.TemplatedQuery() { Query = q, Text = title, Description = description };
 

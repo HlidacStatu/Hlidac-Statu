@@ -134,15 +134,25 @@ namespace HlidacStatu.Extensions
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(this Firma firma)
         {
-            return FirmaStatistics.DotaceCache().Get(firma);
+            return FirmaStatistics.CachedStatisticsDotace(firma);
         }
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> HoldingStatistikaDotaci(
-    this Firma firma,
-    Relation.AktualnostType aktualnost)
+            this Firma firma,
+            Relation.AktualnostType aktualnost)
         {
-            return FirmaStatistics.HoldingDotaceCache().Get((firma, aktualnost));
+            return FirmaStatistics.CachedHoldingStatisticsDotace(firma, aktualnost);
         }
 
+        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> StatistikaVerejneZakazky(this Firma firma)
+        {
+            return FirmaStatistics.CachedStatisticsVZ(firma);
+        }
+        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> HoldingStatistikaVerejneZakazky(
+            this Firma firma,
+            Relation.AktualnostType aktualnost)
+        {
+            return FirmaStatistics.CachedHoldingStatisticsVZ(firma, aktualnost);
+        }
 
         public static Lib.Analysis.KorupcniRiziko.KIndexData Kindex(this Firma firma, bool useTemp = false)
         {
@@ -336,7 +346,7 @@ namespace HlidacStatu.Extensions
             this Firma firma,
             Relation.AktualnostType aktualnost, int? obor = null)
         {
-            return FirmaStatistics.HoldingCachedStatistics(firma, aktualnost, obor);
+            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor);
         }
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>
@@ -345,7 +355,7 @@ namespace HlidacStatu.Extensions
                 Relation.AktualnostType aktualnost,
                 Smlouva.SClassification.ClassificationsTypes classification)
         {
-            return FirmaStatistics.HoldingCachedStatistics(firma, aktualnost, (int)classification);
+            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, (int)classification);
         }
 
         public static bool PatrimStatuAlespon25procent(this Firma firma) => (firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu25perc);
