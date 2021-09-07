@@ -5,6 +5,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
+@using Nest
 
 @{
     ViewBag.Title = Devmasters.TextUtil.ShortenText(Model.predmet ?? "", 70);
@@ -46,7 +47,7 @@
 
 
 
-@if (User.IsInRole("BetaTester") && Model?.Classification?.Types?.Count() > 0)
+@if (User.IsInRole("BetaTester") && Model?.Classification?.HasClassification() != null)
 {
     <table class="table table-new table-new--dotted table-hover" id="invalidItemWarn">
         <tbody>
@@ -56,10 +57,19 @@
                 <br/><b>BETA</b>
             </td>
             <td>
-                @foreach (var cl in Model.Classification.Types)
+                @if (Model.Classification.Class1 != null)
                 {
-                    <div>@(cl.ClassifTypeName()) - @(cl.ClassifProbability)</div>
+                    <div>@(Model.Classification.Class1.ClassifTypeName()) - @(Model.Classification.Class1.ClassifProbability)</div>
                 }
+                @if (Model.Classification.Class2 != null)
+                {
+                    <div>@(Model.Classification.Class2.ClassifTypeName()) - @(Model.Classification.Class2.ClassifProbability)</div>
+                }
+                @if (Model.Classification.Class3 != null)
+                {
+                    <div>@(Model.Classification.Class3.ClassifTypeName()) - @(Model.Classification.Class3.ClassifProbability)</div>
+                }
+                
             </td>
         </tr>
         </tbody>

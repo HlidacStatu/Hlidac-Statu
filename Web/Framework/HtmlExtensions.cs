@@ -132,6 +132,7 @@ namespace HlidacStatu.Web.Framework
         /// 
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="rok"></param>
         /// <returns></returns>
         public static int MaxKIndexYearToShow(System.Security.Principal.IPrincipal user, int? rok = null)
         {

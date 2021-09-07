@@ -398,6 +398,18 @@ namespace HlidacStatu.Entities
             }
 
 
+            
+            // následující půjde smazat až nebude existovat žádná smlouva ve verzi 1 
+            // get hlidacsmluv/_search
+            // {
+            //     "query": {
+            //         "match": {
+            //             "classification.version": 1
+            //         }
+            //     }
+            // }
+            [Obsolete("Nahrazeno")]
+            public Classification[] Types { get; set; } = null;
 
 
             [Nest.Date]
@@ -405,10 +417,6 @@ namespace HlidacStatu.Entities
 
             [Nest.Number]
             public int Version { get; set; } = 2;
-
-
-            [Obsolete()]
-            public Classification[] Types { get; set; } = null;
 
             public Classification[] GetClassif()
             {
@@ -424,10 +432,11 @@ namespace HlidacStatu.Entities
 
             }
 
-
             public Classification Class1 { get; set; } = null;
             public Classification Class2 { get; set; } = null;
             public Classification Class3 { get; set; } = null;
+
+            public bool HasClassification() => Class1 != null || Class2 != null || Class3 != null;
 
             public void ConvertToV2()
             {
