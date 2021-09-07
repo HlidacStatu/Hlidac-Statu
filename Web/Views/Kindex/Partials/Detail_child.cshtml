@@ -590,7 +590,7 @@ else
                                                 await KoncentraceDetail(currYear, radek.VelicinaPart, statistics);
                                                 break;
                                             case KIndexData.KIndexParts.PercSmlouvyPod50kBonus:
-                                                await ParametrDescr(currYear, radek.VelicinaPart, false, "well");
+                                                <parametr-description data="@currYear" part="@radek.VelicinaPart" autohide="false" custom-class="well" />
                                                 break;
                                             default:
                                                 break;
@@ -775,7 +775,7 @@ else
         <div class="row">
             <div class="col-xs-12">
                 <h3>Co tento parametr znamená?</h3>
-                @{ await ParametrDescr(currYear, vradek.VelicinaPart, false, "well"); }
+                <parametr-description data="@currYear" part="@vradek.VelicinaPart" autohide="false" custom-class="well" />
             </div>
         </div>
 
@@ -813,7 +813,7 @@ else
         <div class="row">
             <div class="col-xs-12">
                 <h3>Co tento parametr znamená?</h3>
-                @{ await ParametrDescr(currYear, vradek.VelicinaPart, false, "well"); }
+                <parametr-description data="@currYear" part="@vradek.VelicinaPart" autohide="false" custom-class="well" />
 
                 @if (koncentrace?.Dodavatele?.Count() > 0)
                 {
@@ -900,7 +900,7 @@ else
         <div class="row">
             <div class="col-xs-12 col-sm-6">
                 <h3>Co tento parametr znamená?</h3>
-                @{ await ParametrDescr(currYear, vradek.VelicinaPart, false, "well"); }
+                <parametr-description data="@currYear" part="@vradek.VelicinaPart" autohide="false" custom-class="well" />
             </div>
             <div class="col-xs-12 col-sm-6">
                 <h3>Jaké jsou obvyklé hodnoty tohoto parametru?</h3>
@@ -1018,23 +1018,6 @@ else
                     </div>
                 </div>
             }
-        }
-    }
-
-
-    private async Task ParametrDescr(KIndexData.Annual data, KIndexData.KIndexParts part, bool autohide = true, string _class = "bs-callout bs-callout-info small", string style = "")
-    {
-        string descr = "";
-        descr = data.Info(part).Description;
-
-        if (!string.IsNullOrEmpty(descr))
-        {
-            string classProp = autohide ? "collapse helpKidx" : "";
-            <div class="@classProp" aria-expanded="true">
-                <div class="@_class" style="@style">
-                    @Html.Raw(descr)
-                </div>
-            </div>
         }
     }
 

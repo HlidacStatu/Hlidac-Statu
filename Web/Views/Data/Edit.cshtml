@@ -180,9 +180,7 @@
 
 @functions
 {
-    static RegexOptions regexQueryOption = RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline;
-    static string regexval = "(<[^>]*>)|(\\s{1,}{{[^}]*}})";
-    public string FormatHtml(string html)
+    private string FormatHtml(string html)
     {
         return html;
 
