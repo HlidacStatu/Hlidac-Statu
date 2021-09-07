@@ -216,7 +216,7 @@ pie: {
         type: 'pie',
         name: '" + valueName + @"',
         innerSize: '40%',
-        data: [" + sdata + @")]
+        data: [" + sdata + @"]
     }]
 });</script>
 ";

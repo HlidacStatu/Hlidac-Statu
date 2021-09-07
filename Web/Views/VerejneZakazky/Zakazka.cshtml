@@ -38,9 +38,7 @@
         <li class="active">@ViewBag.SubTitle</li>
     </ol>
 }
-
-@Html.Partial("_SearchForm", new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData())
-
+<partial name="_SearchForm" model="@(new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData())"/>
 
 <h2>
     <add-bookmark item="Model"></add-bookmark>
