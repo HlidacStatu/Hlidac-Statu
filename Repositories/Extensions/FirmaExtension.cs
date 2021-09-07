@@ -121,15 +121,15 @@ namespace HlidacStatu.Extensions
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> StatistikaRegistruSmluv(
             this Firma firma,
-            Smlouva.SClassification.ClassificationsTypes classif)
+            Smlouva.SClassification.ClassificationsTypes classif, bool forceUpdateCache = false)
         {
-            return firma.StatistikaRegistruSmluv((int)classif);
+            return firma.StatistikaRegistruSmluv((int)classif,forceUpdateCache);
         }
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> StatistikaRegistruSmluv(
-            this Firma firma, int? iclassif = null)
+            this Firma firma, int? iclassif = null, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedStatistics(firma, iclassif);
+            return FirmaStatistics.CachedStatistics(firma, iclassif, forceUpdateCache);
         }
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(this Firma firma, bool forceUpdateCache = false)
@@ -143,15 +143,15 @@ namespace HlidacStatu.Extensions
             return FirmaStatistics.CachedHoldingStatisticsDotace(firma, aktualnost,forceUpdateCache);
         }
 
-        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> StatistikaVerejneZakazky(this Firma firma)
+        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> StatistikaVerejneZakazky(this Firma firma, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedStatisticsVZ(firma);
+            return FirmaStatistics.CachedStatisticsVZ(firma, forceUpdateCache);
         }
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> HoldingStatistikaVerejneZakazky(
             this Firma firma,
-            Relation.AktualnostType aktualnost)
+            Relation.AktualnostType aktualnost, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedHoldingStatisticsVZ(firma, aktualnost);
+            return FirmaStatistics.CachedHoldingStatisticsVZ(firma, aktualnost, forceUpdateCache);
         }
 
         public static Lib.Analysis.KorupcniRiziko.KIndexData Kindex(this Firma firma, bool useTemp = false)
