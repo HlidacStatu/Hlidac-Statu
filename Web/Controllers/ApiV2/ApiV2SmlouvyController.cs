@@ -121,7 +121,6 @@ namespace HlidacStatu.Web.Controllers
         /// <summary>
         /// všechna ID platných verzí smluv. (API pouze pro komerční licence)
         /// </summary>
-        /// <param name="id">id smlouvy</param>
         /// <returns>detail smlouvy</returns>
         [HttpGet("vsechnaID")]
         [AuthorizeAndAudit(Roles = "Admin,KomercniLicence")]

@@ -50,7 +50,6 @@
         <h4>Města a kraje</h4>
         <div class="row">
             @{
-                bool first = true;
                 var oMesta = new Dictionary<Firma, StatsAggregate>();
                 oMesta = mesta
                     .Select(m => new { o = Firmy.Get(m.Key), s = m.Value })
