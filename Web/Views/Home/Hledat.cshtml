@@ -389,7 +389,7 @@ else if (Model.HasResults == false)
                 {
                     Devmasters.DT.StopWatchEx sw = new();
                     sw.Start();
-                    RenderSmlouvy(numOfSmluv);
+                    await RenderSmlouvy(numOfSmluv);
                     sw.Stop();
                     viewRenderTimes.Add("smlouvy", sw.Elapsed);
                 }
@@ -422,7 +422,7 @@ else if (Model.HasResults == false)
                 {
                     Devmasters.DT.StopWatchEx sw = new();
                     sw.Start();
-                    RenderInsolvence(numOfInsolvenci);
+                    await RenderInsolvence(numOfInsolvenci);
                     sw.Stop();
                     viewRenderTimes.Add("Insolvence", sw.Elapsed);
                 }
@@ -433,7 +433,7 @@ else if (Model.HasResults == false)
                 {
                     Devmasters.DT.StopWatchEx sw = new();
                     sw.Start();
-                    RenderOsoby(numOfOsob);
+                    await RenderOsoby(numOfOsob);
                     sw.Stop();
                     viewRenderTimes.Add("Osoby", sw.Elapsed);
                 }
@@ -444,7 +444,7 @@ else if (Model.HasResults == false)
                 {
                     Devmasters.DT.StopWatchEx sw = new();
                     sw.Start();
-                    RenderFirmy(numOfFirem);
+                    await RenderFirmy(numOfFirem);
                     sw.Stop();
                     viewRenderTimes.Add("Firmy", sw.Elapsed);
                 }
@@ -455,7 +455,7 @@ else if (Model.HasResults == false)
                 {
                     Devmasters.DT.StopWatchEx sw = new();
                     sw.Start();
-                    RenderDatasets(1);
+                    await RenderDatasets(1);
                     sw.Stop();
                     viewRenderTimes.Add("Datasets", sw.Elapsed);
                 }
@@ -672,9 +672,6 @@ viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key
 
     private async Task RenderOsoby(int numOfOsob)
     {
-        string osobaStatDescription = "";
-
-
         <div class="row" id="osoby">
             <div class="col-xs-12">
                 <div class="searching__watcher">

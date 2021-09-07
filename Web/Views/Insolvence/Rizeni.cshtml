@@ -262,7 +262,7 @@ else
     <table class="table table-condensed table-striped">
         <tbody>
             @{
-                Dictionary<Dokument, string> docs = new Dictionary<Dokument, string>();
+                Dictionary<Dokument, string?> docs = new();
                 for (int i = 0; i < dokumentu; i++)
                 {
                     var doc = Model.Rizeni.Dokumenty[i];

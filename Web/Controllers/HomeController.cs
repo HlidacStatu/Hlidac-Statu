@@ -36,10 +36,13 @@ namespace HlidacStatu.Web.Controllers
 
         private readonly UserManager<ApplicationUser> _userManager;
         protected readonly IWebHostEnvironment _hostingEnvironment;
-        public HomeController(IWebHostEnvironment hostingEnvironment, UserManager<ApplicationUser> userManager)
+        private readonly TelemetryClient _telemetryClient;
+        
+        public HomeController(IWebHostEnvironment hostingEnvironment, UserManager<ApplicationUser> userManager, TelemetryClient telemetryClient)
         {
             _hostingEnvironment = hostingEnvironment;
             _userManager = userManager;
+            _telemetryClient = telemetryClient;
         }
 
         [Authorize]
@@ -773,8 +776,7 @@ text zpravy: {txt}
 
                 var data = res.SearchTimes();
 
-                TelemetryClient tm = new TelemetryClient();
-
+                
                 // Set up some properties:
 
                 foreach (var kv in data)
@@ -782,8 +784,8 @@ text zpravy: {txt}
                     var metrics = new Dictionary<string, double> { { "web-search-" + kv.Key, kv.Value.TotalMilliseconds } };
                     var props = new Dictionary<string, string> { { "query", q }, { "database", kv.Key } };
 
-                    Metric elaps = tm.GetMetric("web-GlobalSearch_Elapsed", "Database");
-                    tm.TrackEvent("web-GlobalSearch_Elapsed", props, metrics);
+                    Metric elaps = _telemetryClient.GetMetric("web-GlobalSearch_Elapsed", "Database");
+                    _telemetryClient.TrackEvent("web-GlobalSearch_Elapsed", props, metrics);
                     var ok = elaps.TrackValue(kv.Value.TotalMilliseconds, kv.Key);
                 }
             }

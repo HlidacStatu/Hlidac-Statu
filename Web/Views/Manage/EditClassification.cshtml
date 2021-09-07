@@ -1,15 +1,9 @@
 ﻿@model HlidacStatu.Entities.Smlouva
-@using HlidacStatu.Lib.Data
 @using Devmasters.Enums;
 @using HlidacStatu.Entities
 
 @{
     ViewBag.Title = "SmlouvaClassification";
-
-    string GetNiceClassificationName(string enumNumber)
-    {
-        return ((Smlouva.SClassification.ClassificationsTypes) (int.Parse(enumNumber) - int.Parse(enumNumber) % 100)).ToNiceDisplayName();
-    }
 
     List<SelectListItem> CreateClassificationList(int? classification)
     {
