@@ -132,15 +132,15 @@ namespace HlidacStatu.Extensions
             return FirmaStatistics.CachedStatistics(firma, iclassif);
         }
 
-        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(this Firma firma)
+        public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(this Firma firma, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedStatisticsDotace(firma);
+            return FirmaStatistics.CachedStatisticsDotace(firma,forceUpdateCache);
         }
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> HoldingStatistikaDotaci(
             this Firma firma,
-            Relation.AktualnostType aktualnost)
+            Relation.AktualnostType aktualnost, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedHoldingStatisticsDotace(firma, aktualnost);
+            return FirmaStatistics.CachedHoldingStatisticsDotace(firma, aktualnost,forceUpdateCache);
         }
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.VZ> StatistikaVerejneZakazky(this Firma firma)

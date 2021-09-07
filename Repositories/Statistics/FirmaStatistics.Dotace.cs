@@ -35,8 +35,8 @@ namespace HlidacStatu.Repositories.Statistics
                     obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
 
         public static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CachedHoldingStatisticsDotace(
-    Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost,
-    bool forceUpdateCache = false)
+            Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost,
+            bool forceUpdateCache = false)
         {
             if (forceUpdateCache)
                 _holdingDotaceCache.Delete((firma, aktualnost));
