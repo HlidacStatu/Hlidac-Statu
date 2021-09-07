@@ -577,13 +577,13 @@ StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
     }
 
     @{
-        var topDodavateleFull = HlidacStatu.Repositories.ES.QueryGrouped.TopDodavatelePerYear("ico:" + Model.ICO, HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList);
+        var topDodavateleFull = HlidacStatu.Repositories.ES.QueryGrouped.TopDodavatelePerYear("icoPlatce:" + Model.ICO, HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList);
         var topDodavatele = topDodavateleFull[currentSeasonYear].topPodleKc.Take(5)
                     .Union(topDodavateleFull[currentSeasonYear].topPodlePoctu.Take(5))
                     .Select(m => m.ico)
                     .Where(m => m != Model.ICO)
                     .Distinct();
-        var topOdberateleFull = HlidacStatu.Repositories.ES.QueryGrouped.TopOdberatelePerYear("ico:" + Model.ICO, HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList);
+        var topOdberateleFull = HlidacStatu.Repositories.ES.QueryGrouped.TopOdberatelePerYear("icoPrijemce:" + Model.ICO, HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList);
         var topOdberatele = topOdberateleFull[currentSeasonYear].topPodleKc.Take(5)
                     .Union(topOdberateleFull[currentSeasonYear].topPodlePoctu.Take(5))
                     .Select(m => m.ico)

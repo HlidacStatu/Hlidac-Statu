@@ -15,7 +15,7 @@ namespace HlidacStatu.Repositories.Statistics
             _dotaceCache = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
                 .GetSafeInstance("Firma_DotaceStatistics",
                     (firma) => CalculateDotaceStat(firma),
-                    TimeSpan.FromHours(12),
+                    TimeSpan.FromDays(7),
                     Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                     Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                     Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
@@ -27,7 +27,7 @@ namespace HlidacStatu.Repositories.Statistics
             _holdingDotaceCache = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)>
                 .GetSafeInstance("Holding_DotaceStatistics",
                     (obj) => CalculateHoldingDotaceStat(obj.firma, obj.aktualnost),
-                    TimeSpan.FromHours(12),
+                    TimeSpan.FromDays(7),
                     Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                     Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                     Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),

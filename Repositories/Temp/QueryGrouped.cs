@@ -151,7 +151,7 @@ namespace HlidacStatu.Repositories.ES
             int maxList = 50
             )
         {
-            return _topSmluvniStranyPerYear("prijemce.ico", query, interestedInYearsOnly, maxList);
+            return _topSmluvniStranyPerYear("platce.ico", query, interestedInYearsOnly, maxList);
         }
 
 
@@ -162,7 +162,7 @@ namespace HlidacStatu.Repositories.ES
             int maxList = 50
             )
         {
-            return _topSmluvniStranyPerYear("platce.ico", query, interestedInYearsOnly, maxList);
+            return _topSmluvniStranyPerYear("prijemce.ico", query, interestedInYearsOnly, maxList);
         }
 
         private static Dictionary<int, (List<(string ico, BasicData stat)> topPodlePoctu, List<(string ico, BasicData stat)> topPodleKc)>
@@ -232,11 +232,31 @@ namespace HlidacStatu.Repositories.ES
                     result[val.Date.Year] =
                         (topPodlePoctu: ((BucketAggregate)val["perIco"]).Items
                             .Select(m => ((KeyedBucket<object>)m))
-                            .Select(m => (m.Key.ToString(), new BasicData() { Pocet = m.DocCount ?? 0 }))
+                            .Select(m => new {
+                                ico = m.Key.ToString(),
+                                p = m.DocCount ?? 0,
+                                cc = ((Nest.ValueAggregate)m.Values.FirstOrDefault())?.Value ?? 0
+                            })
+                            .OrderByDescending(m => m.p)
+                            .Select(m => (m.ico, new BasicData()
+                            {
+                                Pocet = m.p,
+                                CelkemCena = (decimal) m.cc
+                            }))
                             .ToList(),
                         topPodleKc: ((BucketAggregate)val["perPrice"]).Items
                             .Select(m => ((KeyedBucket<object>)m))
-                            .Select(m => (m.Key.ToString(), new BasicData() { Pocet = m.DocCount ?? 0 }))
+                            .Select(m=> new { 
+                                ico = m.Key.ToString(), 
+                                p = m.DocCount ?? 0,
+                                cc = ((Nest.ValueAggregate)m.Values.FirstOrDefault())?.Value ?? 0
+                            })
+                            .OrderByDescending(m=>m.cc)
+                            .Select(m => (m.ico, new BasicData()
+                            {
+                                Pocet = m.p,
+                                CelkemCena = (decimal)m.cc
+                            }))
                             .ToList()
                            );
 

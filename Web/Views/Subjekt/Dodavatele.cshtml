@@ -34,11 +34,11 @@
         AggregationContainerDescriptor<Smlouva> aggs = new();
         aggs
             .Terms("perIco", m => m
-                .Field("platce.ico")
+                .Field("prijemce.ico")
                 .Size(size)
             ).Terms("perPrice", m => m
                 .Order(o => o.Descending("sumincome"))
-                .Field("platce.ico")
+                .Field("prijemce.ico")
                 .Size(size)
                 .Aggregations(agg => agg
                    .Sum("sumincome", s => s
@@ -47,7 +47,7 @@
                 )
             );
 
-        var res = SmlouvaRepo.Searching.SimpleSearch("icoPrijemce:" + ico, 1, 0,
+        var res = SmlouvaRepo.Searching.SimpleSearch("icoPlatce:" + ico, 1, 0,
             SmlouvaRepo.Searching.OrderResult.FastestForScroll,
             anyAggregation: aggs, platnyZaznam: true);
 
@@ -58,7 +58,7 @@
                     Tuple<string,string> data = (Tuple<string,string>)s;
                     return string.Format(@"{1} <a href='/subjekt/{0}'>detail o subj</a>
                        <br/>{3}", data.Item2, data.Item1, Model.ICO,
-                       WebUtil.AddSearchBtn("/hledatSmlouvy","icoPlatce:" + data.Item2 + " AND icoPrijemce:" + Model.ICO,"smlouvy mezi subjekty"));
+                       WebUtil.AddSearchBtn("/hledatSmlouvy","icoPrijemce:" + data.Item2 + " AND icoPlatce:" + Model.ICO,"smlouvy mezi subjekty"));
                 },
                 ValueRender = (s) => { return "\"" + ((Tuple<string,string>)s).Item1.ToString().Replace("\"", "\\\"") + "\""; },
                 TextRender = (s) => { return ((Tuple<string,string>)s).Item1.ToString().Replace("\"", "\\\""); }
@@ -77,7 +77,7 @@
                     return string.Format(@"{1} <a href='/subjekt/{0}'>detail o subj</a>
                        <br/>{3}"
                         , data.Item2, data.Item1, Model.ICO
-                        ,WebUtil.AddSearchBtn("/hledatSmlouvy","icoPlatce:" + data.Item2 + " AND icoPrijemce:" + Model.ICO,"smlouvy mezi subjekty"));
+                        ,WebUtil.AddSearchBtn("/hledatSmlouvy","icoPrijemce:" + data.Item2 + " AND icoPlatce:" + Model.ICO,"smlouvy mezi subjekty"));
                 },
                 ValueRender = (s) => { return "\"" + ((Tuple<string,string>)s).Item1.ToString().Replace("\"", "\\\"") + "\""; },
                 TextRender = (s) => { return ((Tuple<string,string>)s).Item1.ToString().Replace("\"", "\\\""); }
@@ -108,13 +108,13 @@
                 );
         }
 
-        rdsPerIco.Title = "Nejčastější objednatelé (plátci) podle počtu smluv";
-        rdsPerPrice.Title = "Nejčastější objednatelé (plátci) podle celkové hodnoty smluv";
+        rdsPerIco.Title = "Nejčastější dodavatelé (příjemci peněz) podle počtu smluv";
+        rdsPerPrice.Title = "Nejčastější dodavatelé (příjemci peněz) podle celkové hodnoty smluv";
     }
 
     @if (rdsPerIco.Data.Count > 0 || rdsPerPrice.Data.Count > 0)
     {
-        <h3 id="_odberatele" style="padding-bottom:20px;">@Model.Jmeno jako dodavatel  (příjemce peněz)</h3>
+        <h3 id="_odberatele" style="padding-bottom:20px;">@Model.Jmeno jako odběratel (plátce peněz)</h3>
 
         <div class="row">
             <div class="col-xs-12">

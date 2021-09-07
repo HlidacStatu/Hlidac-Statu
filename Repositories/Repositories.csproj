@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Compile Remove="Temp\QueryGrouped.VZ.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
       <ProjectReference Include="..\Connectors\Connectors.csproj" />
       <ProjectReference Include="..\Entities\Entities.csproj" />
