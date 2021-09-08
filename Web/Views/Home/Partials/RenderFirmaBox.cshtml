@@ -1,0 +1,89 @@
+@model Firma
+
+@using HlidacStatu.Entities
+@using HlidacStatu.Extensions
+@using HlidacStatu.Repositories
+@using HlidacStatu.Datastructures.Graphs
+
+
+@if (Model == null)
+{
+    return;
+}
+else
+{
+    var ceo = Model.Ceo();
+
+        var alldata = Model.AktualniVazby(Relation.AktualnostType.Nedavny);
+
+        var data = Model.AktualniVazby(Relation.AktualnostType.Nedavny)
+            .Where(v => !string.IsNullOrEmpty(v.To.Id))
+            .GroupBy(f => f.To.Id, v => v, (ico, v) => new
+            {
+                ICO = ico,
+                stat = Firmy.Get(ico).StatistikaRegistruSmluv()
+            })
+            .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv).ThenBy(m => m.ICO)
+            .ToArray();
+
+        string box1Css = "col-sm-4 col-md-3";
+
+        <div class="@box1Css" style="border-right: #eee solid 1px; height: 120px !important; overflow: auto hidden; margin-top: 25px">
+            <div class="person-profile-thumb">
+                <a href="@Model.GetUrl(true)">
+                    @if (ceo.Osoba != null && ceo.Osoba.IsValid())
+                    {
+                    <div class="profile-picture" style="background-image: url('@ceo.Osoba.GetPhotoUrl(local: true)')"></div>
+                    }
+                    else
+                    {
+                    <div class="profile-picture" style="background-image: url('/photo/unknown')"></div>
+                    }
+                </a>
+                <div>
+                <a class="section-title link--blue" href="@Model.GetUrl(true)">@Model.Jmeno</a>
+                    <div class="new-p new-p--gray new-p--small">
+                            @if (Model.JsemOVM())
+                            {
+                                <span>Úřad - orgán veřejné moci.</span>
+                            }
+                            else if (Model.JsemStatniFirma())
+                            {
+                                <span>Firma (spolu)vlastněná státem či samosprávou.</span>
+                            }
+                            else
+                            {
+                                <span>Soukromá firma.</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Model.StatusFull()))
+                            {
+                                <span class="text-muted">@Model.StatusFull().</span>
+                            }
+
+                    </div>
+                    <div class="new-p new-p--gray new-p--small">
+                            @if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Any())
+                                {
+                                    if (Model.PatrimStatu())
+                                    {
+                                        <span>
+                                            Řídí <a href="/subjekt/Vazby/@Model.ICO">@(Devmasters.Lang.CS.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací")).</a>
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            Řídí <a href="/subjekt/Vazby/@Model.ICO">@(Devmasters.Lang.CS.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů")).</a>
+                                        </span>
+                                    }
+                                }
+
+                    </div>
+                    <div class="new-p new-p--gray new-p--small">
+                        @Html.Raw(HlidacStatu.Util.InfoFact.RenderInfoFacts(Model.InfoFacts(), 1, true, true, ", "))
+                    </div>
+                </div>
+            </div>
+        </div>
+}
+        

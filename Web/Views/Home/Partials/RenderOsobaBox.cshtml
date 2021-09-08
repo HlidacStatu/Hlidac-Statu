@@ -1,0 +1,86 @@
+@model RenderOsobaBoxViewModel
+
+@using HlidacStatu.Entities
+@using HlidacStatu.Extensions
+@using HlidacStatu.Repositories
+@using Devmasters.Enums
+@using HlidacStatu.Datastructures.Graphs
+
+@if (Model.Osoba == null)
+{
+    return;
+}
+else
+{
+    var alldata = Model.Osoba.AktualniVazby(Relation.AktualnostType.Nedavny);
+
+    var data = Model.Osoba.AktualniVazby(Relation.AktualnostType.Nedavny)
+        .Where(v => !string.IsNullOrEmpty(v.To.Id))
+        .GroupBy(f => f.To.Id, v => v, (ico, v) => new
+        {
+            ICO = ico,
+            stat = Firmy.Get(ico).StatistikaRegistruSmluv()
+        })
+        .OrderByDescending(m => m.stat.Summary().CelkovaHodnotaSmluv).ThenBy(m => m.ICO)
+        .ToArray();
+
+    var osobaStatDescTotalKc = Smlouva.NicePrice(data.Sum(d => d.stat.Summary().CelkovaHodnotaSmluv), html: true, shortFormat: true);
+    string osobaStatDescription = string.Format("{0}{1}",
+        Devmasters.Lang.CS.Plural.GetWithZero((int)alldata.Count(), "Žádná vazba na firmy", "Celkem vazba na <b>{0} firmu</b>", "Celkem vazba na <b>{0} firmy</b>", "Celkem vazba na <b>{0} firem</b>"),
+        Devmasters.Lang.CS.Plural.GetWithZero((int)data.Sum(d => d.stat.Summary().PocetSmluv), "."
+            , ", <b>{0} smlouva</b> v registru smluv za <b>" + osobaStatDescTotalKc + "</b>"
+            , ";, <b>{0} smlouvy</b> v registru smluv za <b>" + osobaStatDescTotalKc + "</b>"
+            , ";, <b>{0} smluv</b> v registru smluv za <b>" + osobaStatDescTotalKc) + "</b>"
+        );
+    var funkceOsoba = Model.Osoba.Description(true, e => true, numOfRecords: 2);
+    string box1Css = "col-sm-4 col-md-3";
+    string box2Css = "col-sm-4 col-md-3";
+
+    <div class="@box1Css" style="border-right: #eee solid 1px; height: 120px !important; overflow: auto hidden;margin-top:25px">
+        <div class="person-profile-thumb">
+            <a href="@Model.Osoba.GetUrl(true)">
+                <div class="profile-picture" style="background-image: url('@Model.Osoba.GetPhotoUrl(true)')">
+                </div>
+            </a>
+            <div>
+                <a class="section-title link--blue" href="@Model.Osoba.GetUrl(true)">
+                    @Model.Osoba.FullName()
+                </a>
+                <div class="new-p new-p--gray new-p--small">
+                    @Model.Osoba.NarozeniYear()
+                </div>
+                <div class="new-p new-p--gray new-p--small">
+                    @Model.Osoba.StatusOsoby().ToNiceDisplayName()
+                    @if (Model.Smaller)
+                    {
+                        @Html.Raw(", " +Devmasters.TextUtil.ShortenText(funkceOsoba,80))
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    @if (Model.Smaller == false)
+    {
+        <div class="@box2Css" style="border-right: #eee solid 1px; height: 120px !important; overflow: auto hidden;margin-top:25px">
+
+            @if (!string.IsNullOrWhiteSpace(funkceOsoba))
+            {
+                <div class="search-result-label">
+                    Funkce
+                </div>
+                <div class="new-p">
+                    @Html.Raw(funkceOsoba)
+                </div>
+            }
+            
+            <div class="search-result-label">
+                Angažovanost
+            </div>
+            <div class="new-p">
+                @Html.Raw(osobaStatDescription)
+            </div>
+
+        </div>
+    }
+}
+    
