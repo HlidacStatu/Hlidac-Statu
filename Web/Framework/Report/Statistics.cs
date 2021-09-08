@@ -41,7 +41,7 @@ namespace HlidacStatu.Web.Framework.Report
             AggregationContainerDescriptor<Smlouva> aggs = new AggregationContainerDescriptor<Smlouva>()
                 .DateHistogram("x-agg", h => h
                     .Field(f => f.datumUzavreni)
-                    .Interval(interval)
+                    .CalendarInterval(interval)
                 );
 
             //var res = Smlouva.Search.RawSearch(
@@ -89,7 +89,7 @@ namespace HlidacStatu.Web.Framework.Report
             AggregationContainerDescriptor<Smlouva> aggs = new AggregationContainerDescriptor<Smlouva>()
                 .DateHistogram("x-agg", h => h
                     .Field(f => f.datumUzavreni)
-                    .Interval(interval)
+                    .CalendarInterval(interval)
                     .Format("yyyy-MM-dd")
                     .Aggregations(agg => agg
                         .Sum("sumincome", s => s
