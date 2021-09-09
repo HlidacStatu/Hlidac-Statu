@@ -1,0 +1,110 @@
+@model KindexDetailsViewModel
+
+@using Devmasters.Enums
+@using HlidacStatu.Entities
+@using HlidacStatu.Lib.Analysis.KorupcniRiziko
+@using HlidacStatu.Repositories
+
+
+@{
+    KIndexData.VypocetDetail.Radek vradek = Model.CurrYear.KIndexVypocet.Radky.Where(m => m.VelicinaPart == Model.Part).First();
+    KoncentraceDodavateluIndexy koncentrace = null;
+    bool showHodnota = true;
+    switch (Model.Part)
+    {
+        case KIndexData.KIndexParts.CelkovaKoncentraceDodavatelu:
+            koncentrace = Model.CurrYear.CelkovaKoncentraceDodavatelu;
+            break;
+        case KIndexData.KIndexParts.KoncentraceDodavateluBezUvedeneCeny:
+            koncentrace = Model.CurrYear.KoncentraceDodavateluBezUvedeneCeny;
+            showHodnota = false;
+            break;
+        case KIndexData.KIndexParts.KoncentraceDodavateluCenyULimitu:
+            koncentrace = Model.CurrYear.KoncentraceDodavateluCenyULimitu;
+            break;
+        default:
+            break;
+    }
+
+}
+
+<div class="row">
+    <div class="col-xs-12">
+        <h3>Co tento parametr znamená?</h3>
+        <parametr-description data="@Model.CurrYear" part="@vradek.VelicinaPart" autohide="false" custom-class="well"/>
+
+        @if (koncentrace?.Dodavatele?.Count() > 0)
+        {
+            <a class="btn btn-default" href="/hledatsmlouvy?q=@System.Net.WebUtility.UrlEncode(Model.CurrYear.Info(Model.Part).Query())"><i class="far fa-file-search"></i> Vyhledat odpovídající smlouvy</a>
+        }
+    </div>
+</div>
+
+
+@if (koncentrace?.Dodavatele?.Count() > 0)
+{
+    List<Tuple<string, decimal>> data = koncentrace.TopDodavatele(3)
+        .OrderByDescending(m => m.HodnotaSmluv)
+        .Select(m => new Tuple<string, decimal>(Firmy.GetJmeno(m.Ico), m.HodnotaSmluv))
+        .Take(12)
+        .ToList();
+    if (koncentrace.HodnotaSmluvProVypocet - data.Sum(m => m.Item2) > 0)
+    {
+        data.Add(new Tuple<string, decimal>("ostatní", koncentrace.HodnotaSmluvProVypocet - data.Sum(m => m.Item2)));
+    }
+    <div class="row">
+        <div class="col-xs-12 col-sm-6">
+            @ChartUtil.SemiCircleDonut(data, "Koncentrace dodavatelů", "Podíl", 240)
+
+            <h3>Jaké jsou obvyklé hodnoty tohoto parametru?</h3>
+            <div class="well well-sm">
+                <img src="/kindex/PercentileBanner/@Model.Ico?part=@((int)vradek.VelicinaPart)" style="margin-left:-15%;width:115%;max-width:900px;height:auto"/>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-6">
+
+            <low-box width="500">
+                <table class="table table-new table-new--dotted table-hover">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th>Dodavatel</th>
+                        <th>Počet smluv</th>
+                        @if (showHodnota)
+                        {
+                            <th>Kalkulovaná částka* v Kč</th>
+                        }
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var souh in koncentrace.Dodavatele.OrderByDescending(m => m.HodnotaSmluv).Take(100))
+                    {
+                        var q = $"icoplatce:{Model.CurrYear.Ico} AND datumUzavreni:[{Model.CurrYear.Rok}-01-01 TO {Model.CurrYear.Rok + 1}-01-01}} AND icoPrijemce:{souh.Ico}";
+                        <tr>
+                            <td>
+                                <a href="/HledatSmlouvy?Q=@System.Net.WebUtility.UrlEncode(q)">
+                                    <i class="far fa-file-search"></i>
+                                </a>
+                            </td>
+                            <td>@Firmy.GetJmeno(souh.Ico)</td>
+                            <td class="number">@HlidacStatu.Util.RenderData.NiceNumber(souh.PocetSmluv)</td>
+                            @if (showHodnota)
+                            {
+                                <td class="number text-nowrap">@HlidacStatu.Util.RenderData.NicePrice(souh.HodnotaSmluv)</td>
+                            }
+                        </tr>
+                    }
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="@(showHodnota ? 4 : 3)">
+                            *) Kalkulováná částka je suma smluv s hodnotou a smluv bez uvedené ceny, kde jsme použili průměrnou hodnotu smluv
+                            @(Model.Jmeno) v @(Model.CurrYear.Rok) ve výši @HlidacStatu.Util.RenderData.NicePrice(koncentrace.PrumernaHodnotaSmluvProVypocet)
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </low-box>
+        </div>
+    </div>
+}

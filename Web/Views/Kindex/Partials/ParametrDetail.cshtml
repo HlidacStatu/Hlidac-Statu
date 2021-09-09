@@ -1,0 +1,67 @@
+@model KindexDetailsViewModel
+
+@using Devmasters.Enums
+@using HlidacStatu.Entities
+@using HlidacStatu.Lib.Analysis.KorupcniRiziko
+@using HlidacStatu.Repositories
+
+@{
+    KIndexData.VypocetDetail.Radek vradek = Model.CurrYear.KIndexVypocet.Radky.Where(m => m.VelicinaPart == Model.Part).First();
+    long pocetSmluv = 0;
+    switch (Model.Part)
+    {
+        case KIndexData.KIndexParts.PercentBezCeny:
+            pocetSmluv = Model.CurrYear.Statistika.PocetSmluvBezCenySeSoukrSubj;
+            break;
+        case KIndexData.KIndexParts.PercSeZasadnimNedostatkem:
+            pocetSmluv = Model.CurrYear.Statistika.PocetSmluvSeZasadnimNedostatkem;
+            break;
+        case KIndexData.KIndexParts.PercSmlouvySPolitickyAngazovanouFirmou:
+            pocetSmluv = Model.CurrYear.Statistika.PocetSmluvPolitiky;
+            break;
+        case KIndexData.KIndexParts.PercSmluvUlimitu:
+            pocetSmluv = Model.CurrYear.Statistika.PocetSmluvULimitu;
+            break;
+        case KIndexData.KIndexParts.PercNovaFirmaDodavatel:
+            pocetSmluv = Model.CurrYear.Statistika.PocetSmluvNovaFirma;
+            break;
+        case KIndexData.KIndexParts.PercUzavrenoOVikendu:
+            pocetSmluv = Model.CurrYear.Statistika.PocetSmluvOVikendu;
+            break;
+        default:
+            break;
+    }
+
+}
+
+<div class="row">
+    <div class="col-xs-12">
+        @if (Model.PercentValue)
+        {
+            <div class="well">
+                Parametr <b>@(vradek.VelicinaLongName.ToLower())</b> přesně odpovídá procentuálnímu zastoupení v rámci všech smluv organizace za rok @Model.CurrYear.Rok.
+                Tzn. že hodnota parametru @(vradek.Hodnota.ToString("F4")) odpovídá @(vradek.Hodnota.ToString("P2")) podílu těchto smluv v rámci všech smluv.
+            </div>
+        }
+        @if (pocetSmluv > 0)
+        {
+            <a class="btn btn-default" href="/hledatsmlouvy?q=@System.Net.WebUtility.UrlEncode(Model.CurrYear.Info(Model.Part).Query())">
+                <i class="far fa-file-search"></i> Vyhledat odpovídající smlouvy
+            </a>
+        }
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        <h3>Co tento parametr znamená?</h3>
+        <parametr-description data="@Model.CurrYear" part="@vradek.VelicinaPart" autohide="false" custom-class="well"/>
+    </div>
+</div>
+
+@if (Model.Part != KIndexData.KIndexParts.PercNovaFirmaDodavatel)
+{
+    <h3>Jaké jsou obvyklé hodnoty parametru @vradek.VelicinaLongName?</h3>
+    <div class="well well-sm">
+        <img src="/kindex/PercentileBanner/@Model.Ico?part=@((int)vradek.VelicinaPart)" style="width:80%;max-width:800px;height:auto"/>
+    </div>
+}
