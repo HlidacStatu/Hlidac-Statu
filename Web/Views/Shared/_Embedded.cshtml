@@ -1,9 +1,9 @@
 @using Microsoft.AspNetCore.Http.Extensions
-
-<html>
+<!doctype html>
+<html lang="cs">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     @{
         ViewBag.ThisIsEmbeded = true;
@@ -30,8 +30,11 @@
 
     @RenderSection("metatags", required: false)
 
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" >
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script src="~/bundles/jquery"></script>
-    <script src="~/bundles/bootstrap"></script>
+    <script src="~/bundles/scriptbundle"></script>
     <link rel="stylesheet" href="~/content/bundled.css"/>
     <script src="~/bundles/modernizr"></script>
 
