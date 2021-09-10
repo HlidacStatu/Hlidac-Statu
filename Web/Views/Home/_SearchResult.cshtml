@@ -104,7 +104,7 @@
         {
             @Html.CheckBoxFor(m => m.Chyby, new { @onchange = "changeChyby(this);" }) @Html.LabelFor(m => m.Chyby, "Ukázat chyby")
         }
-        @Html.DropDownListFor(m => m.Order, Model.OrderList, new { @class = "form-control small pull-right", @style = "width:50%;max-width:300px", @id = "orderList", @onchange = "changeOrder(this);" })
+        @Html.DropDownListFor(m => m.Order, Model.OrderList, new { @class = "form-control small float-end", @style = "width:50%;max-width:300px", @id = "orderList", @onchange = "changeOrder(this);" })
     </div>
 </div>
 <div style="height:32px;"></div>

@@ -237,11 +237,11 @@ figure {
   content: ' x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x ';
 }
 
-.u-pull-left {
+.u-float-start {
   float: left;
 }
 
-.u-pull-right {
+.u-float-end {
   float: right;
 }
 

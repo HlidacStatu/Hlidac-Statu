@@ -48,7 +48,7 @@
                 <li class="list-group-item">
                     <form action="watchdogsSett" method="post" class="" role="form" style="padding-bottom: 11px;">
                         Posílat upozornění dohromady v jednom mailu (doporučujeme):
-                        <div class="material-switch pull-right">
+                        <div class="material-switch float-end">
                             @{
                                 var aspnetuser = ApplicationUser.GetByEmail(User.Identity?.Name);
                                 string allInOneWDcheck = aspnetuser.SentWatchdogOneByOne ? "" : "checked='checked'";
