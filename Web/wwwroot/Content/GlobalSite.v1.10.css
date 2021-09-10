@@ -895,7 +895,7 @@ textarea {
             color: #E4E4E4;
         }
 
-    .custom-search-input .glyphicon-search, #custom-search-input .glyphicon-question-sign {
+    .custom-search-input .fa-search, #custom-search-input {
         font-size: 23px;
     }
 
@@ -1451,7 +1451,10 @@ div.verticaltab-container {
                 box-shadow: inset -8px 0 7px -7px hsla(0,0%,0%,.25);
             }
 
-                div.verticaltab-container div.verticaltab-menu div.list-group > a .glyphicon,
+                div.verticaltab-container div.verticaltab-menu div.list-group > a .fas,
+                div.verticaltab-container div.verticaltab-menu div.list-group > a .far,
+                div.verticaltab-container div.verticaltab-menu div.list-group > a .fal,
+                div.verticaltab-container div.verticaltab-menu div.list-group > a .fad,
                 div.verticaltab-container div.verticaltab-menu div.list-group > a .fa {
                     color: #818C99;
                 }
@@ -1467,7 +1470,10 @@ div.verticaltab-container {
                 }
 
                 div.verticaltab-container div.verticaltab-menu div.list-group > a.active,
-                div.verticaltab-container div.verticaltab-menu div.list-group > a.active .glyphicon,
+                div.verticaltab-container div.verticaltab-menu div.list-group > a.fas,
+                div.verticaltab-container div.verticaltab-menu div.list-group > a.far,
+                div.verticaltab-container div.verticaltab-menu div.list-group > a.fal,
+                div.verticaltab-container div.verticaltab-menu div.list-group > a.fad,
                 div.verticaltab-container div.verticaltab-menu div.list-group > a.active .fa {
                     background-color: #fff;
                     border-color: #fff;
@@ -1579,13 +1585,13 @@ div.verticaltab-container {
     border-top-width: 0 !important;
 }
 
-.bookmark, .bookmark:active, .bookmark:visited, .bookmark:focus, .bookmark:hover { /* z glyphicon glyphicon-star */
+.bookmark, .bookmark:active, .bookmark:visited, .bookmark:focus, .bookmark:hover { /* z fad fa-star */
     position: relative;
     top: 1px;
     display: inline-block;
-    font-family: 'Glyphicons Halflings' !important;
+    font-family: 'Font Awesome 5 Brands' !important;
     font-style: normal;
-    font-weight: 600;
+    font-weight: 400;
     line-height: 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -1602,7 +1608,7 @@ div.verticaltab-container {
     }
 
         .bookmark.bookmarkOn:before {
-            content: "\e044";
+            content: "\f02e";
         }
 
     .bookmark.bookmarkOff {
@@ -1610,7 +1616,7 @@ div.verticaltab-container {
     }
 
         .bookmark.bookmarkOff:before {
-            content: "\e044";
+            content: "\f02e";
         }
 
 

@@ -242,15 +242,15 @@ Highcharts.setOptions({
                         useHTML: true,
                         formatter: function () {
                             var obj = cats" + uniqueId + @"[this.value];
-                            var status = '<span style=""font-size:15px;color:" + colors[0] + @""" class=""glyphicon glyphicon-ok-sign""></span> ';
+                            var status = '<span style=""font-size:15px;color:" + colors[0] + @""" class=""fas fa-check-circle""></span> ';
                             if (obj.lastResponse.Response > " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.OKLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @")
-                                status = '<span style=""font-size:15px;color:" + colors[1] + @""" class=""glyphicon glyphicon-ok-sign""></span> ';
+                                status = '<span style=""font-size:15px;color:" + colors[1] + @""" class=""fas fa-check-circle""></span> ';
                             if (obj.lastResponse.Response > " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @")
-                                status = '<span style=""font-size:15px;color:" + colors[2] + @""" class=""glyphicon glyphicon-ok-sign""></span> ';
+                                status = '<span style=""font-size:15px;color:" + colors[2] + @""" class=""fas fa-check-circle""></span> ';
                             if (obj.lastResponse.Response == " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture) + @")
-                                status = '<span style=""font-size:15px;color:" + colors[3] + @""" class=""glyphicon glyphicon-ok-sign""></span> ';
+                                status = '<span style=""font-size:15px;color:" + colors[3] + @""" class=""fas fa-check-circle""></span> ';
                             if (obj.lastResponse.Response == " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.BadHttpCode.ToString(HlidacStatu.Util.Consts.enCulture) + @")
-                                status = '<span style=""font-size:15px;color:" + colors[4] + @""" class=""glyphicon glyphicon-ok-sign""></span> ';
+                                status = '<span style=""font-size:15px;color:" + colors[4] + @""" class=""fas fa-check-circle""></span> ';
                             var status2 = '<span style=""color:' + getChartStatusColor(obj.lastResponse.Response) + '"">právě ' + getChartStatus(obj.lastResponse.Response, 1) + '</span> ';
                             ");
             sb.AppendLine(detail ?

@@ -316,7 +316,7 @@
                     @if (User.Identity?.IsAuthenticated ?? false)
                     {
                         <a onclick="ga('send', 'event', 'bookmarksBtn', 'click','@Context.Request.Path'); return true;" title="Všechny uložené záložky" alt="Všechny uložené záložky" href="/manage/zalozky"><span style="color:#c9302c;" class="bookmark bookmarkOn"></span>Záložky</a>
-                        <a onclick="ga('send', 'event', 'manageBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/manage/" title="Nastavení účtu" alt="Nastavení účtu"><span style="font-family: 'Glyphicons Halflings'" class="glyphicon glyphicon-user"></span>Účet</a>
+                        <a onclick="ga('send', 'event', 'manageBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/manage/" title="Nastavení účtu" alt="Nastavení účtu"><span class="fad fa-user"></span>Účet</a>
                         <a onclick="ga('send', 'event', 'logoffBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Logout?rnd=@Guid.NewGuid().ToString("N")">Odhlásit</a>
                     }
                     else
@@ -497,7 +497,7 @@
                         </div>
                         <div class="fund-zavri">
                             <a id="fund-info-btn" onclick="ga('send', 'event', 'darujAdFooter', 'viceinfo', '1');" target="_blank" href="https://www.hlidacstatu.cz/texty/zalozky-si-za-vas-zapamatuji-vse-co-potrebujete/">Více informací</a>
-                            <a id="fund-zavri-btn" onclick="ga('send', 'event', 'darujAdFooter', 'zavri', '1');" style="margin-left:30px;color:#ff5900" href="#"><span class="glyphicon glyphicon-remove"></span></a>
+                            <a id="fund-zavri-btn" onclick="ga('send', 'event', 'darujAdFooter', 'zavri', '1');" style="margin-left:30px;color:#ff5900" href="#"><span class="fas fa-times"></span></a>
                         </div>
                     </div>
 

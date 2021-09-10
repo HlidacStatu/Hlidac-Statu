@@ -93,7 +93,7 @@ Máme pro vás denné sledovat <b>nové {dataTypeName} odpovídající tomuto do
                    onclick="ga('send', 'event', 'btnWatchDog', 'AddNew', 'authenticated');" role="button" data-toggle="modal" data-target="#addWDform@(uid)">
                     @if (Model.ShowButtonIcon)
                     {
-                        <span class="glyphicon glyphicon-eye-open dark"></span>
+                        <span class="fas fa-eye dark"></span>
                     }
                     <span class="btn-emphasized">@Html.Raw(Model.ButtonText)</span>
                 </a>
@@ -104,7 +104,7 @@ Máme pro vás denné sledovat <b>nové {dataTypeName} odpovídající tomuto do
                     onclick="ga('send', 'event', 'btnWatchDog', 'OutOf', 'authenticated');" role="button">
                     @if (Model.ShowButtonIcon)
                     {
-                        <span class="glyphicon glyphicon-eye-open dark"></span>
+                        <span class="fas fa-eye dark"></span>
                     }
                     <span class="btn-emphasized">@Html.Raw(Model.ButtonText)</span>
                 </a>
@@ -118,7 +118,7 @@ Máme pro vás denné sledovat <b>nové {dataTypeName} odpovídající tomuto do
                    onclick="ga('send', 'event', 'btnWatchDog', 'List', 'authenticated');" role="button">
                     @if (Model.ShowButtonIcon)
                     {
-                        <span class="glyphicon glyphicon-eye-open dark"></span>@:&nbsp;<span class="glyphicon glyphicon-th-list"></span>
+                        <span class="fas fa-eye dark"></span>@:&nbsp;<span class="fas fa-list"></span>
                     }
                     else
                     {
@@ -209,7 +209,7 @@ Máme pro vás denné sledovat <b>nové {dataTypeName} odpovídající tomuto do
             <a href="#" onclick="ga('send', 'event', 'btnWatchDog', 'AddNew', 'anonym');" class="@Model.ButtonCss" role="button" data-toggle="modal" data-target="#addWDhelp@(uid)">
                 @if (Model.ShowButtonIcon)
                 {
-                    <span class="glyphicon glyphicon-eye-open dark"></span>
+                    <span class="fas fa-eye dark"></span>
                 }
                 <span class="btn-emphasized">@Html.Raw(Model.ButtonText)</span>
             </a>

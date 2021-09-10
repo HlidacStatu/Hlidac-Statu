@@ -102,8 +102,8 @@
             ValueRender = (s) => { return $"\"{Firmy.GetJmeno(s.Key)}\""; },
             HtmlRender = (s) =>
             {
-                return string.Format("<a class='small' style='white-space:nowrap;' href='/hledatSmlouvy?q={0}'><span class='glyphicon glyphicon-link'></span>smlouvy</a><br/>" +
-                                     "<a class='small' style='white-space:nowrap;' href='/verejnezakazky/hledat?q={0}'><span class='glyphicon glyphicon-link'></span>zakázky</a>",
+                return string.Format("<a class='small' style='white-space:nowrap;' href='/hledatSmlouvy?q={0}'><span class='fad fa-link'></span>smlouvy</a><br/>" +
+                                     "<a class='small' style='white-space:nowrap;' href='/verejnezakazky/hledat?q={0}'><span class='fad fa-link'></span>zakázky</a>",
                     $"(ico:{s.Key}) AND ({Model.Query})");
             }
         });
@@ -135,7 +135,7 @@
                 @foreach (var url in Model.Links)
                 {
                     <span>
-                        <span class="glyphicon glyphicon-link"></span>&nbsp;<a class="small" href="@url.Url">@url.Text</a><br/>
+                        <span class="fad fa-link"></span>&nbsp;<a class="small" href="@url.Url">@url.Text</a><br/>
                     </span>
                 }
             </p>
