@@ -444,7 +444,7 @@
         {
             <div class="row">
                 <div class="col-xs-12">
-                    <h1 class="new-title text-left">
+                    <h1 class="new-title text-start">
                         @if (Model as IBookmarkable == null) //ViewBag.ShowBookmarkUrl == true)
                         {
                             <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" url="@Context.Request.GetDisplayUrl()" style="font-size:0.7em;vertical-align:top;"></add-bookmark>
@@ -493,7 +493,7 @@
                             </p>
                         </div>
                         <div class="col-sm-2 col-xs-12">
-                            <a style="margin-top:15px;" class="fund-daruj-btn float-end text-right" onclick="ga('send', 'event', 'darujAdFooter', 'daruj-btn', '1'); return false;" id="fund-daruj-btn" target="_blank" href="#">Chápu, díky!</a>
+                            <a style="margin-top:15px;" class="fund-daruj-btn float-end text-end" onclick="ga('send', 'event', 'darujAdFooter', 'daruj-btn', '1'); return false;" id="fund-daruj-btn" target="_blank" href="#">Chápu, díky!</a>
                         </div>
                         <div class="fund-zavri">
                             <a id="fund-info-btn" onclick="ga('send', 'event', 'darujAdFooter', 'viceinfo', '1');" target="_blank" href="https://www.hlidacstatu.cz/texty/zalozky-si-za-vas-zapamatuji-vse-co-potrebujete/">Více informací</a>

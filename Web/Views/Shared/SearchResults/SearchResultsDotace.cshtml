@@ -44,7 +44,7 @@
             <td class="text-nowrap">
                 @(dotaceItem.DatumPodpisu?.Date.ToString("dd.MM.yyyy") ?? "Neznámé")
             </td>
-            <td class="text-right number text-nowrap">
+            <td class="text-end number text-nowrap">
                 @if (dotaceItem.DotaceCelkem == null || dotaceItem.DotaceCelkem == 0)
                 {
                     <code><i class="fas fa-exclamation-circle"></i> Hodnota neznámá</code>

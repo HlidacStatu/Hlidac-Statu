@@ -148,10 +148,10 @@
                         <td>
                             @rozhodnuti.Rok
                         </td>
-                        <td class="text-nowrap text-right">
+                        <td class="text-nowrap text-end">
                             @HlidacStatu.Util.RenderData.NicePrice(rozhodnuti.CastkaPozadovana ?? 0)
                         </td>
-                        <td class="text-nowrap text-right">
+                        <td class="text-nowrap text-end">
                             @HlidacStatu.Util.RenderData.NicePrice(rozhodnuti.CastkaRozhodnuta ?? 0)
                         </td>
                         <td>
@@ -163,7 +163,7 @@
                         <td>
                             @rozhodnuti.Poskytovatel
                         </td>
-                        <td class="text-nowrap text-right">
+                        <td class="text-nowrap text-end">
 
                             @if (Model.DotaceCelkem == null || Model.DotaceCelkem == 0)
                             {
@@ -191,7 +191,7 @@
                     {
                         <tr>
                             <td></td>
-                            <td style="vertical-align:top;" class="text-right">Jednotlivá čerpání</td>
+                            <td style="vertical-align:top;" class="text-end">Jednotlivá čerpání</td>
                             <td colspan="5">
                                 <ul>
                                     @foreach (var row in rozhodnuti.Cerpani.OrderBy(r => r.Rok))
