@@ -1589,13 +1589,10 @@ div.verticaltab-container {
     position: relative;
     top: 1px;
     display: inline-block;
-    font-family: 'Font Awesome 5 Brands' !important;
     font-style: normal;
-    font-weight: 400;
     line-height: 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-size: 120%;
     text-decoration: none;
 }
 
@@ -1607,18 +1604,9 @@ div.verticaltab-container {
         color: #c9302c;
     }
 
-        .bookmark.bookmarkOn:before {
-            content: "\f02e";
-        }
-
     .bookmark.bookmarkOff {
         color: #96C0E5;
     }
-
-        .bookmark.bookmarkOff:before {
-            content: "\f02e";
-        }
-
 
 .btn-emphasized {
 }

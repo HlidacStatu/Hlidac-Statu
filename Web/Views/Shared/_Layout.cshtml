@@ -280,7 +280,7 @@
                             <i style="color:black;" class="fas fa-eye"></i>
                         </a>
 
-                        <a style="display:block;color:#c9302c;" title="Všechny uložené záložky" alt="Všechny uložené záložky" href="/manage/zalozky" class="bookmark bookmarkOn"></a>
+                        <a style="display:block;color:#c9302c;" title="Všechny uložené záložky" alt="Všechny uložené záložky" href="/manage/zalozky" class="bookmark bookmarkOn"><i class="fad fa-bookmark"></i></a>
                         <a style="display:block;" href="/Identity/Account/manage/" title="Nastavení účtu" alt="Nastavení účtu"><i class="fas fa-user"></i></a>
                         <a href="/Identity/Account/Logout?rnd=@Guid.NewGuid().ToString("N")">Odhlásit</a>
                     }
@@ -315,7 +315,7 @@
                 <li class="level2">
                     @if (User.Identity?.IsAuthenticated ?? false)
                     {
-                        <a onclick="ga('send', 'event', 'bookmarksBtn', 'click','@Context.Request.Path'); return true;" title="Všechny uložené záložky" alt="Všechny uložené záložky" href="/manage/zalozky"><span style="color:#c9302c;" class="bookmark bookmarkOn"></span>Záložky</a>
+                        <a onclick="ga('send', 'event', 'bookmarksBtn', 'click','@Context.Request.Path'); return true;" title="Všechny uložené záložky" alt="Všechny uložené záložky" href="/manage/zalozky"><span style="color:#c9302c;" class="bookmark bookmarkOn"><i class="fad fa-bookmark"></i></span>Záložky</a>
                         <a onclick="ga('send', 'event', 'manageBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/manage/" title="Nastavení účtu" alt="Nastavení účtu"><span class="fad fa-user"></span>Účet</a>
                         <a onclick="ga('send', 'event', 'logoffBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Logout?rnd=@Guid.NewGuid().ToString("N")">Odhlásit</a>
                     }
@@ -447,7 +447,7 @@
                     <h1 class="new-title text-left">
                         @if (Model as IBookmarkable == null) //ViewBag.ShowBookmarkUrl == true)
                         {
-                            <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" url="@Context.Request.GetDisplayUrl()" style="font-size:24px;vertical-align:top;"></add-bookmark>
+                            <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" url="@Context.Request.GetDisplayUrl()" style="font-size:0.7em;vertical-align:top;"></add-bookmark>
                         }
                         else
                         {

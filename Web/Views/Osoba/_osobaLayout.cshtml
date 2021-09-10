@@ -124,7 +124,7 @@
 
 <div class="head">
     <h3>
-        <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" item="@Model.osoba" style="font-size:24px;vertical-align:top;"></add-bookmark>
+        <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" item="@Model.osoba" style="font-size:0.7em;vertical-align:top;"></add-bookmark>
         @Model.osoba.FullNameWithYear()
         @if (this.User?.IsInRole("canEditData") == true)
         {
