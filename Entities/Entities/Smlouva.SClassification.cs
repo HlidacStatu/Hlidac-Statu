@@ -395,6 +395,11 @@ namespace HlidacStatu.Entities
 
                 [NiceDisplayName("Dary a dotace")]
                 dary_obecne = 12000,
+                
+                [NiceDisplayName("Zvířata (služební psi, koně)")]
+                zvirata_obecne = 12100,
+                
+                
             }
 
 
