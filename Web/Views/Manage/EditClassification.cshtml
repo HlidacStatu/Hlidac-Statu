@@ -44,8 +44,8 @@
     }
 
     
-    var typeList1 = CreateClassificationList(Model.Classification?.Class1.TypeValue);
-    var typeList2 = CreateClassificationList(Model.Classification?.Class2.TypeValue);
+    var typeList1 = CreateClassificationList(Model.Classification?.Class1?.TypeValue);
+    var typeList2 = CreateClassificationList(Model.Classification?.Class2?.TypeValue);
 }
 
 @using (Html.BeginForm())
