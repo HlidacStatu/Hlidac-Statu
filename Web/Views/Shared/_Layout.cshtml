@@ -250,7 +250,7 @@
         }
     }
 
-    <div class="header__navbar hidden-print">
+    <div class="header__navbar d-print-none">
         <a href="/" class="logo">
             <svg width="46" height="46" viewBox="0 0 46 46">
                 <use xlink:href="/content/defs.svg#logo"></use>
@@ -331,13 +331,13 @@
 
     @if (IsSectionDefined("title"))
     {
-        <div class="hidden-print">
+        <div class="d-print-none">
             @RenderSection("title", required: false)
         </div>
     }
     else
     {
-        <div class="header__content header__content--compact  hidden-print">
+        <div class="header__content header__content--compact  d-print-none">
             <!-- desktop menu items only -->
             <div class="navbar__level2">
                 <ul>
