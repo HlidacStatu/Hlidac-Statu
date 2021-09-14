@@ -270,7 +270,7 @@
                     <a href="/StatniWeby">Weby státu<sup style="top:0;text-decoration:none;color:#777;">@(HlidacStatu.Lib.Data.External.Zabbix.ZabTools.Weby()?.Count().ToString() ?? "")</sup></a>
                 </li>
 
-                <li class="hidden-sm hidden-xs">
+                <li class="d-none d-md-flex">
                     @if (User.Identity?.IsAuthenticated ?? false)
                     {
                         <a href="/manage/Watchdogs"
