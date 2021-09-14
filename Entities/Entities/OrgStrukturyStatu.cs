@@ -178,10 +178,7 @@ namespace HlidacStatu.Entities.OrgStrukturyStatu
         {
             var ret = $"Organizace je tvořena "
                 + (Urady == 0 ? "" : $" {Devmasters.Lang.CS.Plural.Get(Urady, "jedním úřadem", "{0} úřady", "{0} úřady")}, dále ")
-                + $"{Devmasters.Lang.CS.Plural.Get(OrganizacniJednotky, "jednou organizační části", "{0} organizačními částmi", "{0} organizačními částmi")}, "
-                + $"{Devmasters.Lang.CS.Plural.GetWithZero(SluzebniMista, "nezaměstnává žádné úředníky na služebních místech", "zaměstnává jednoho úředníka na služebních místech", "zaměstnává {0} úředníky na služebních místech", "zaměstnává {0} úředníků na služebních místech")} "
-                + $"a {Devmasters.Lang.CS.Plural.GetWithZero(PracovniPozice, "žádné další zaměstnance", "jednoho zaměstnance", "{0} další zaměstnance", "{0} dalších zaměstnanců")}."
-                ;
+                + $"{Devmasters.Lang.CS.Plural.Get(OrganizacniJednotky, "jednou organizační části", "{0} organizačními částmi", "{0} organizačními částmi")}, ";
             return ret;
 
 
@@ -191,10 +188,7 @@ namespace HlidacStatu.Entities.OrgStrukturyStatu
             var ret = $"Organizace je tvořena<ul>"
                 + (Urady == 0 ? "" : $"<li><a href='/subjekt/DalsiInformace/{ico}'>{Devmasters.Lang.CS.Plural.Get(Urady, "jedním úřadem", "{0} úřady", "{0} úřady")}</a></li>")
                 + $"<li><a href='/subjekt/OrganizacniStruktura/{ico}'>{Devmasters.Lang.CS.Plural.Get(OrganizacniJednotky, "<b>jednou</b> organizační části", "<b>{0}</b> organizačními částmi", "<b>{0}</b> organizačními částmi")}</a></li>"
-                + $"<li>{Devmasters.Lang.CS.Plural.GetWithZero(SluzebniMista, "nezaměstnává žádné úředníky na služebních místech", "zaměstnává <b>jednoho úředníka</b> na služebních místech", "zaměstnává <b>{0} úředníky</b> na služebních místech", "zaměstnává <b>{0} úředníků</b> na služebních místech")}</li>"
-                + $"<li>{Devmasters.Lang.CS.Plural.GetWithZero(PracovniPozice, "žádné další zaměstnance", "<b>jednoho</b> zaměstnance", "<b>{0}</b> další zaměstnance", "<b>{0}</b> dalších zaměstnanců")}</li>"
-                + "</ul>"
-                ;
+                + "</ul>";
             return ret;
 
 
