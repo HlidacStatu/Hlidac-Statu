@@ -288,6 +288,7 @@ body.nav-open nav.level2 {
 
 a {
     color: #3e6deb;
+    text-decoration: none;
 }
 
     a:hover {
@@ -1766,4 +1767,13 @@ table.chart_tooltip-table td {
 
 div.small {
     line-height: 1.5em;
+}
+
+kbd {
+    padding: 0.1rem .3rem;
+}
+
+.input-group-btn:last-child>.btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
