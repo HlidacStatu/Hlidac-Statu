@@ -47,24 +47,26 @@
             </span>
         </div>
     </div>
-    <div class="col-xs-12 col-sm-6" style="padding-top:8px;">
-        <div class="form-group">
-            @Html.CheckBoxFor(m => m.Zahajeny) @*, new{@onchange = "changeZahajeny(this);"}*@
-            @Html.LabelFor(m => m.Zahajeny, "pouze neuzavřené tendry")
+    <div class="row">
+        <div class="col-xs-12 col-sm-6" style="padding-top:8px;">
+            <div class="form-group">
+                @Html.CheckBoxFor(m => m.Zahajeny) @*, new{@onchange = "changeZahajeny(this);"}*@
+                @Html.LabelFor(m => m.Zahajeny, "pouze neuzavřené tendry")
+            </div>
         </div>
-    </div>
-    <div class="col-xs-12 col-sm-6" style="padding-top:8px;">
-        <div class="form-group">
-            @Html.LabelFor(m => m.Oblast, "Omezit na ")
-            @*@Html.DropDownList("Oblast", oblasti, new { @class = "form-control", style = "width:150px" })*@
-            <select name="Oblast" class="form-control" id="Oblast" style="width:150px" value="1">
-                @Html.Raw(
-               oblasti
-                    .Select(m=>$"<option value='{m.Value}' " + (m.Selected ? "selected" : "" ) + $">{m.Text}</option>")
-                    .Aggregate((f,s)=> f + "\n" + s)
-               )
-                
-            </select>
+        <div class="col-xs-12 col-sm-6" style="padding-top:8px;">
+            <div class="form-group row">
+                <label for="Oblast" class="col-auto">Omezit na </label>
+                @*@Html.DropDownList("Oblast", oblasti, new { @class = "form-control", style = "width:150px" })*@
+                <select name="Oblast" class="form-control col-auto" id="Oblast" style="width:150px" value="1">
+                    @Html.Raw(
+                   oblasti
+                        .Select(m=>$"<option value='{m.Value}' " + (m.Selected ? "selected" : "" ) + $">{m.Text}</option>")
+                        .Aggregate((f,s)=> f + "\n" + s)
+                   )
+                    
+                </select>
+            </div>
         </div>
     </div>
 </form>
