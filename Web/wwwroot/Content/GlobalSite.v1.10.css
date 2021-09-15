@@ -168,6 +168,7 @@ body {
     font-family: 'Source Sans Pro', "Helvetica Neue", Helvetica, Arial, sans-serif;
     background-color: #fff;
     padding-top: 10px;
+    font-size: 14px;
 }
 
 
@@ -1761,4 +1762,8 @@ table.chart_tooltip-table td {
     font-family: Cabin;
     font-weight: bold;
     fill: #28313B;
+}
+
+div.small {
+    line-height: 1.5em;
 }
