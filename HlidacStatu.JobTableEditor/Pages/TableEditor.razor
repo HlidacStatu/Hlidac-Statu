@@ -46,6 +46,7 @@ else
     <h4 class="text-danger">@errorMessage</h4>
     <button class="btn btn-secondary btn-sm" @onclick="MultiplyPrices">Vynásob ceny 8</button>
     <button class="btn btn-secondary btn-sm" @onclick="AddColumn">Přidej sloupec</button>
+    <button class="btn btn-secondary btn-sm" @onclick="AddRow">Přidej řádek</button>
     <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(table.InDocTable.SmlouvaID)&p=@(table.InDocTable.PrilohaHash)&page=@table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
     <span>&nbsp;&nbsp;| &nbsp;</span>
     <button class="btn btn-outline-success" @onclick="SaveTable">Save changes</button>
@@ -234,6 +235,24 @@ else
             int currentLength = table.Cells[i].Length;
             Array.Resize(ref table.Cells[i], currentLength + 1);
             table.Cells[i][currentLength] = new CellShell(new InHtmlTables.Cell(), i, currentLength);
+        }
+        
+    }
+    
+    private void AddRow()
+    {
+        var oldArray = table.Cells;
+        table.Cells = new CellShell[oldArray.Length + 1][];
+        for (int row = 0; row < oldArray.Length; row++) {
+            table.Cells[row] = oldArray[row]; 
+        }
+
+        int columnCount = table.Cells[0].Length;
+        int lastRow = table.Cells.Length - 1;
+        table.Cells[lastRow] = new CellShell[columnCount];
+        for (int col = 0; col < columnCount; col++)
+        {
+            table.Cells[lastRow][col] = new CellShell(new InHtmlTables.Cell(), lastRow, col);
         }
         
     }
