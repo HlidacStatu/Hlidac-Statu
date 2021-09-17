@@ -1794,3 +1794,8 @@ blockquote {
     padding: 10px 20px;
     border-left: 5px solid #eee;
 }
+
+hr {
+    background-color: unset;
+    opacity: 1;
+}
