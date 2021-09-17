@@ -328,8 +328,8 @@ else if (Model.HasResults == false)
 }
 
 
-<div class="row">
-    <div class="col-xs-12 col-sm-12">
+<div class="col-xs-12 col-sm-12">
+
 
         @{
             //analyze query and show big boxes
@@ -700,7 +700,8 @@ else if (Model.HasResults == false)
             {
                 <hr style="margin-top:30px;" />
                 <h3><span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> jsme nalezli ještě v těchto databázích</h3>
-                foreach (var items in htmlLinks.Chunk((htmlLinks.Count / 3) + 1))
+                <div class="row">
+                @foreach (var items in htmlLinks.Chunk((htmlLinks.Count / 3) + 1))
                 {
                     <div class="col-xs-6 col-sm-3">
                         <ul>
@@ -713,10 +714,10 @@ else if (Model.HasResults == false)
                         </ul>
                     </div>
                 }
+                </div>
             }
         }
 
-    </div>
 </div>
 <script type='text/javascript'>
     $(document).ready(function () {
