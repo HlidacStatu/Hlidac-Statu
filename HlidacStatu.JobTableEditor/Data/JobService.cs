@@ -3,6 +3,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -77,6 +78,53 @@ namespace HlidacStatu.JobTableEditor.Data
                 operation,
                 table.Author,
                 (long)table.ProcessingTime.TotalMilliseconds);
+        }
+
+        public async Task<string> GetRandomStatistic(string user, CancellationToken cancellationToken)
+        {
+            var globalStatistic = InDocTablesRepo.GlobalStatistic(cancellationToken);
+            var userStatistic = InDocTablesRepo.UserStatistic(user, cancellationToken);
+            var currentSecond = DateTime.Now.Second;
+            var statistiky = new List<string>();
+            int number = 0;
+            await Task.WhenAll(globalStatistic, userStatistic);
+            
+            //global
+            if (globalStatistic.Result.TryGetValue(InDocTables.CheckStatuses.Done, out number))
+            {
+                statistiky.Add($"Víš, že už je zpracovaných celkem {number} tabulek?");
+            }
+            if (globalStatistic.Result.TryGetValue(InDocTables.CheckStatuses.WrongTable, out number))
+            {
+                statistiky.Add($"Víš, že už bylo označeno celkem {number} tabulek jako 💩?");
+            }
+            if (globalStatistic.Result.TryGetValue(InDocTables.CheckStatuses.ForNextReview, out number))
+            {
+                statistiky.Add($"Víš, že na review čeká Michala a Petra {number} kousků?");
+            }
+            if (globalStatistic.Result.TryGetValue(InDocTables.CheckStatuses.WaitingInQueue, out number))
+            {
+                statistiky.Add($"Víš, že aby bylo hotovo úplně všechno, musí se zpracovat ještě {number} tabulek?");
+            }
+            
+            //user
+            if (userStatistic.Result.TryGetValue(InDocTables.CheckStatuses.Done, out number))
+            {
+                statistiky.Add($"Že si nepočítáš, kolik jsi už jsi toho zvládla? Já jo a už jsi zpracovala {number} tabulek?");
+            }
+            if (userStatistic.Result.TryGetValue(InDocTables.CheckStatuses.WrongTable, out number))
+            {
+                statistiky.Add($"To jsi věděla, že celkem jsi označila {number} tabulek jako nepoužitelných?");
+            }
+            if (userStatistic.Result.TryGetValue(InDocTables.CheckStatuses.ForNextReview, out number))
+            {
+                statistiky.Add($"Na review už jsi poslala {number} divnotabulek. Petr s Michalem Ti mockrát \"děkují\".");
+            }
+
+
+            return statistiky[currentSecond % statistiky.Count];
+
+
         }
     }
 

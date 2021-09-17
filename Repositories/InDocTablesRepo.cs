@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using HlidacStatu.Entities;
 
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,41 @@ namespace HlidacStatu.Repositories
                 await db.SaveChangesAsync(cancellationToken);
                 
                 return tbl;
+            }
+        }
+        
+        public static async Task<Dictionary<InDocTables.CheckStatuses, int>> GlobalStatistic(CancellationToken cancellationToken)
+        {
+            await using (DbEntities db = new DbEntities())
+            {
+                var data = await db.InDocTables
+                    .AsNoTracking()
+                    .Select(t => new { t.Status, t.CheckedBy, t.CheckElapsedInMs })
+                    .ToListAsync(cancellationToken);
+                    
+                var stat = data.GroupBy(t => t.Status)
+                    .ToDictionary(g => (InDocTables.CheckStatuses)g.Key,
+                        g => g.Count());
+
+                return stat;
+            }
+        }
+        
+        public static async Task<Dictionary<InDocTables.CheckStatuses, int>> UserStatistic(string user, CancellationToken cancellationToken)
+        {
+            await using (DbEntities db = new DbEntities())
+            {
+                var data = await db.InDocTables
+                    .AsNoTracking()
+                    .Where(t => t.CheckedBy == user)
+                    .Select(t => new { t.Status, t.CheckedBy, t.CheckElapsedInMs })
+                    .ToListAsync(cancellationToken);
+                
+                var stat = data.GroupBy(t => t.Status)
+                    .ToDictionary(g => (InDocTables.CheckStatuses)g.Key,
+                        g => g.Count());
+
+                return stat;
             }
         }
 

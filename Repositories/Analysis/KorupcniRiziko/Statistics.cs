@@ -4,6 +4,7 @@ using HlidacStatu.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HlidacStatu.Repositories;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -116,15 +117,27 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             else
             {
                 data = source.
-                    Select(m => new SubjectWithKIndex()
+                    Select(m =>
                     {
-                        Ico = m.ico,
-                        Jmeno = SubjectNameCache.CachedCompanies.Get()[m.ico].Name,
-                        KrajId = m.krajId,
-                        Group = "",
-                        KIndex = m.kindex
-                    }
-                    );
+                        string subjectName = "";
+                        if (SubjectNameCache.CachedCompanies.Get().TryGetValue(m.ico, out var cache))
+                        {
+                            subjectName = cache.Name;
+                        }
+                        else
+                        {
+                            Util.Consts.Logger.Error($"Record with ico [{m.ico}] is missing in KIndexCompanies cache file. Please reset cache.");
+                            subjectName = FirmaRepo.NameFromIco(m.ico);
+                        }
+                        return new SubjectWithKIndex()
+                        {
+                            Ico = m.ico,
+                            Jmeno = subjectName,
+                            KrajId = m.krajId,
+                            Group = "",
+                            KIndex = m.kindex
+                        };
+                    });
             }
             if (showNone)
             {

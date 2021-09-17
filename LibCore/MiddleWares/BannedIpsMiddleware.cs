@@ -17,6 +17,11 @@ namespace HlidacStatu.LibCore.MiddleWares
     {
         private readonly RequestDelegate _next;
 
+        private readonly string[] _badWords = new[]
+        {
+            "wp-login.php"
+        };
+
         public BannedIpsMiddleware(RequestDelegate next)
         {
             _next = next;
@@ -27,6 +32,15 @@ namespace HlidacStatu.LibCore.MiddleWares
         public async Task Invoke(HttpContext httpContext, AttackerDictionaryService attackerDictionary)
         {
             var remoteIp = httpContext.Connection.RemoteIpAddress;
+            var requestedUrl = httpContext.Request.GetDisplayUrl();
+
+            // autoban for robots
+            if (_badWords.Any(b => requestedUrl.Contains(b)))
+            {
+                await BanIp(remoteIp, DateTime.Now.AddHours(6), 555, requestedUrl);
+            }
+            
+            
             // block banned ip
             if (IsBanned(remoteIp))
             {
@@ -45,7 +59,6 @@ namespace HlidacStatu.LibCore.MiddleWares
             int statusCode = httpContext.Response.StatusCode;
             if (attackerDictionary.IsAttacker(remoteIp, statusCode, lastPath))
             {
-                Util.Consts.Logger.Info($"Adding IP [{remoteIp}] to ban list.");
                 string pathList = attackerDictionary.PathsForIp(remoteIp);
                 await BanIp(remoteIp, DateTime.Now.AddHours(6), statusCode, pathList);
             }
@@ -65,6 +78,7 @@ namespace HlidacStatu.LibCore.MiddleWares
         private async Task BanIp(IPAddress? ipAddress, DateTime expiration, int lastStatusCode, string pathList)
         {
             var ipString = ipAddress?.ToString() ?? "_empty";
+            Util.Consts.Logger.Info($"Adding IP [{ipString}] to ban list.");
 
             if (AttackerDictionaryService.whitelistedIps.Contains(ipString))
                 return;
