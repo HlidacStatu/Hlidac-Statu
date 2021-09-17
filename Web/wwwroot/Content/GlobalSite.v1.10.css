@@ -16,7 +16,15 @@ h2 small, h2 .small {
     color: #6c757d!important;
 }
 
+h3 small, h3 .small {
+    font-size: calc(0.7rem + .6vw)!important;
+    font-weight: lighter!important;
+    color: #6c757d!important;
+}
 
+.h4, h4 {
+    font-size: 1.2rem;
+}
 
 .alert-orange {
     color: black;
@@ -1776,4 +1784,8 @@ kbd {
 .input-group-btn:last-child>.btn {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+}
+
+.bg-warning {
+    background-color: #fcf8e3 !important;
 }
