@@ -1799,3 +1799,7 @@ hr {
     background-color: unset;
     opacity: 1;
 }
+
+td {
+    padding-left: 10px;
+}
