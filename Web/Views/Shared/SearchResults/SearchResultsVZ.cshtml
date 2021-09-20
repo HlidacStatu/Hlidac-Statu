@@ -77,12 +77,12 @@
                 <b>
                     @if (item.KonecnaHodnotaBezDPH.HasValue)
                     {
-                        @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(item.KonecnaHodnotaBezDPH.Value, html: true, shortFormat: Model.SmallRender))
+                        @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(item.KonecnaHodnotaBezDPH.Value, shortFormat: Model.SmallRender))
                     }
                     else if (item.OdhadovanaHodnotaBezDPH.HasValue)
                     {
                         <span>odhad.cena </span>
-                        @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(item.OdhadovanaHodnotaBezDPH.Value, html: true, shortFormat: Model.SmallRender))
+                        @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(item.OdhadovanaHodnotaBezDPH.Value, shortFormat: Model.SmallRender))
                     }
                     else
                     {

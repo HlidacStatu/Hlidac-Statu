@@ -151,7 +151,7 @@
                 var dotaceSuma = Model.StatistikaDotaci().Sum(s => s.CelkemCerpano);
                 var dotacePocet = Model.StatistikaDotaci().Sum(v => v.PocetDotaci);
 
-                var sdotaceKc = $" v celkové hodnotě <b>{HlidacStatu.Util.RenderData.NicePriceHtml(dotaceSuma, html: true)}</b>.";
+                var sdotaceKc = $" v celkové hodnotě <b>{HlidacStatu.Util.RenderData.NicePriceHtml(dotaceSuma)}</b>.";
             }
 
             @if (Model.JsemOVM())
@@ -185,8 +185,8 @@
 
                 if (totalCountDotaceHolding - dotacePocet > 0)
                 {
-                    var sdotaceHDiffKc = " v hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(totalSumDotaceHolding - dotaceSuma, html: true) + "</b>.";
-                    var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(totalSumDotaceHolding, html: true) + "</b>.";
+                    var sdotaceHDiffKc = " v hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(totalSumDotaceHolding - dotaceSuma) + "</b>.";
+                    var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(totalSumDotaceHolding) + "</b>.";
                     string durlH = "/dotace/hledat?Q=holding%3A+" + Model.ICO;
                     if (Model.JsemOVM())
                     {

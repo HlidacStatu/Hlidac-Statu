@@ -41,7 +41,7 @@
         <div style="font-size:20px" class="center-block text-center">
             Do @(keDni.ToString("d. MMMM yyyy")) bylo vyplaceno celkem
             <div class="text-danger" style="font-size:130%">
-                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(vypl_prima + vypl_neprima + vypl_zaruka, mena: "mld. Kč", html: true))
+                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(vypl_prima + vypl_neprima + vypl_zaruka, mena: "mld. Kč"))
                 z peněz daňových poplatníků.
             </div>
             @*To je @HlidacStatu.Util.RenderData.NicePriceHtml(((vypl_prima + vypl_neprima + vypl_zaruka)*1000000000)/pocetDomacnosti) na jednu domácnost.*@
@@ -89,12 +89,12 @@
                     <tr>
                         <td>
                             <span style="font-size:25px;font-weight:bold">
-                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(odh_prima, mena: "mld. Kč", html: true))
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(odh_prima, mena: "mld. Kč"))
                             </span>
                         </td>
                         <td>
                             <span style="font-size:25px;font-weight:bold">
-                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(vypl_prima, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(vypl_prima, mena: "mld. Kč", showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
                             </span>
                         </td>
                         <td>Přímá nevratná podpora</td>
@@ -102,12 +102,12 @@
                     <tr>
                         <td>
                             <span style="font-size:25px;font-weight:bold">
-                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(odh_neprima, mena: "mld. Kč", html: true))
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(odh_neprima, mena: "mld. Kč"))
                             </span>
                         </td>
                         <td>
                             <span style="font-size:25px;font-weight:bold">
-                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(vypl_neprima, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(vypl_neprima, mena: "mld. Kč", showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
                             </span>
                         </td>
                         <td>Nepřímá podpora (snížení, odpuštění daní, liberační balíček)</td>
@@ -115,12 +115,12 @@
                     <tr>
                         <td>
                             <span style="font-size:25px;font-weight:bold">
-                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(odh_zaruka, mena: "mld. Kč", html: true))
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(odh_zaruka, mena: "mld. Kč"))
                             </span>
                         </td>
                         <td>
                             <span style="font-size:25px;font-weight:bold">
-                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(vypl_zaruka, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(vypl_zaruka, mena: "mld. Kč", showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
                             </span>
                         </td>
                         <td>Úvěr či záruka za úvěr</td>
@@ -172,7 +172,7 @@
                                 <td>
                                     @if (item.odhadovana_celkova_vyse_v_mld_kc > 0)
                                     {
-                                        <span>@Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(item.odhadovana_celkova_vyse_v_mld_kc, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</span>
+                                        <span>@Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(item.odhadovana_celkova_vyse_v_mld_kc, mena: "mld. Kč", showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</span>
                                     }
                                     else
                                     {
@@ -182,7 +182,7 @@
                                 <td>
                                     @if (item.vyplacena > 0)
                                     {
-                                        <span>@Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(item.vyplacena, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</span>
+                                        <span>@Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(item.vyplacena, mena: "mld. Kč", showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</span>
                                     }
                                 </td>
                                 <td>

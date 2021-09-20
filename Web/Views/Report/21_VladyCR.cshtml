@@ -71,7 +71,7 @@
                 if (sum == 0)
                     return "Ne";
                 else
-                    return "Celkem&nbsp;" + HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value, html: true) + string.Format("<br /><a href='{0}'>podrobnosti</a>", o.GetUrl());
+                    return "Celkem&nbsp;" + HlidacStatu.Util.RenderData.NicePriceHtml(sum.Value) + string.Format("<br /><a href='{0}'>podrobnosti</a>", o.GetUrl());
             },
             OrderValueRender = (s) =>
             {

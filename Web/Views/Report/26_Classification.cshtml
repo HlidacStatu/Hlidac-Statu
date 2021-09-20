@@ -83,8 +83,8 @@
                     CssClass="number",
                     HtmlRender = (s) => {
                         Tuple<decimal, decimal> v = (Tuple<decimal, decimal>)s;
-                        string price = HlidacStatu.Util.RenderData.NicePriceHtml(v.Item1, shortFormat:true);
-                        var t =  $"<span alt='{price}' title='{price}'>{HlidacStatu.Util.RenderData.NicePriceHtml(v.Item1, html:false, shortFormat:false)}";
+                        string price = HlidacStatu.Util.RenderData.NicePrice(v.Item1, shortFormat:true);
+                        var t =  $"<span alt='{price}' title='{price}'>{HlidacStatu.Util.RenderData.NicePrice(v.Item1, html:false, shortFormat:false)}";
                         return t;
                     },
                     ValueRender = (s) => {

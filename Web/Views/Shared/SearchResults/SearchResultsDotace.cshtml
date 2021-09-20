@@ -51,11 +51,11 @@
                 }
                 else
                 {
-                    @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml((decimal) dotaceItem.DotaceCelkem, html: true))
+                    @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml((decimal) dotaceItem.DotaceCelkem))
                     if (dotaceItem.PujckaCelkem != null && dotaceItem.PujckaCelkem > 0)
                     {
                         <br/>
-                        <p class="text-muted">z toho @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml((decimal) dotaceItem.PujckaCelkem, html: true)) je půjčka</p>
+                        <p class="text-muted">z toho @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml((decimal) dotaceItem.PujckaCelkem)) je půjčka</p>
                     }
                 }
 
