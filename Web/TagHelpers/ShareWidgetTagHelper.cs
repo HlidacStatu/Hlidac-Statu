@@ -47,7 +47,7 @@ namespace HlidacStatu.Web.TagHelpers
             string content = $@"
 <span class=""dontembed"">
     <a href="""" class=""ssk ssk-text ssk-amethyst ssk-xs"" data-toggle=""modal"" data-target=""#modal{modalid}"">
-        <span class=""far fa-cog""></span>{Title}
+        <div class=""far fa-cog"" style=""margin: -4px 6px -4px -4px;padding: 4px;background-color: rgba(0,0,0,.15);""></div>{Title}
     </a>
 </span> <!-- Modal -->
 <div class=""modal fade"" id=""modal{modalid}"" tabindex=""-1"" role=""dialog"" aria-labelledby=""modal{modalid}"">

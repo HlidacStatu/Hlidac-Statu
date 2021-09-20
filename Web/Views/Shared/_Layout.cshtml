@@ -370,45 +370,22 @@
                     }
                 </form>
 
-                @if (false) //newsearch
-                {
-                    <form id="new-search-input" class="new-search-input" action="/hledat" method="get" style="visibility:hidden">
-                        <div class="select2-wrapper">
-                            <div class="input-group input-group-lg">
-                                <select class="form-control input-lg select2-multiple" id="autocomsearch" multiple="multiple">
-                                    @if (!string.IsNullOrWhiteSpace(ViewBag.Query))
-                                    {
-                                        foreach (string option in ViewBag.Query.ToString().Split(' '))
-                                        {
-                                            <option value="@option" selected="selected">@option</option>
-                                        }
-                                    }
-                                </select>
-                                <span class="input-group-btn">
-                                    <button class="btn btn-primary" data-select2-open="autocomsearch" style="left:-7px"> hledat</button>
-                                </span>
-                                <input id="search-result-query-data" name="q" type="hidden" />
-                            </div>
+                
+                <form id="new-search-input" class="new-search-input " method="get" action="/hledat" style="visibility:hidden">
+                    <div class="new-search-wrapper">
+                        <div class="input-group">
+                            <input class="form-control nopadding " name="q" value="@(ViewBag.Query)" id="new-search-input-q" />
+                            <span class="input-group-btn">
+                                <button id="new-search-input-btn" class="btn btn-primary" style="left:-7px;top:-5px"> hledat</button>
+                            </span>
                         </div>
-                    </form>
-                }
-                else //newsearch2
-                {
-                    <form id="new-search-input" class="new-search-input " method="get" action="/hledat" style="visibility:hidden">
-                        <div class="new-search-wrapper">
-                            <div class="input-group">
-                                <input class="form-control nopadding " name="q" value="@(ViewBag.Query)" id="new-search-input-q" />
-                                <span class="input-group-btn">
-                                    <button id="new-search-input-btn" class="btn btn-primary" style="left:-7px;top:-5px"> hledat</button>
-                                </span>
-                            </div>
-                        </div>
-                    </form>
-                    <script>
-                        MakeAutocomplete('#new-search-input');
-                    </script>
+                    </div>
+                </form>
+                <script>
+                    MakeAutocomplete('#new-search-input');
+                </script>
 
-                }
+                
                 <div>
                     <button class="header__search__hint btn btn-link new-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
                         <i class="fas fa-blind"></i> Přepnout na původní hledání
