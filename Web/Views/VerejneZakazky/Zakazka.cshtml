@@ -142,14 +142,14 @@ else
     {
         <tr>
             <td>Odhadovaná&nbsp;hodnota&nbsp;zakázky</td>
-            <td>@HlidacStatu.Util.RenderData.NicePrice(Model.OdhadovanaHodnotaBezDPH.Value, mena: Model.OdhadovanaHodnotaMena ?? "Kč")</td>
+            <td>@HlidacStatu.Util.RenderData.NicePriceHtml(Model.OdhadovanaHodnotaBezDPH.Value, mena: Model.OdhadovanaHodnotaMena ?? "Kč")</td>
         </tr>
     }
     @if (Model.KonecnaHodnotaBezDPH.HasValue && Model.KonecnaHodnotaBezDPH != 0)
     {
         <tr>
             <td>Konečná hodnota zakázky</td>
-            <td>@HlidacStatu.Util.RenderData.NicePrice(Model.KonecnaHodnotaBezDPH.Value, mena: Model.KonecnaHodnotaMena ?? "Kč")</td>
+            <td>@HlidacStatu.Util.RenderData.NicePriceHtml(Model.KonecnaHodnotaBezDPH.Value, mena: Model.KonecnaHodnotaMena ?? "Kč")</td>
         </tr>
     }
     <tr>

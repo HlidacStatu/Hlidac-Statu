@@ -54,7 +54,7 @@
                             <ul>
                                 @foreach (var os in Model.PodobneSmlouvy())
                                 {
-                                    <li><a href="/Detail/@os.Id">Zveřejněna @os.casZverejneni.ToString("dd.MM.yyyy HH.mm"); částka @HlidacStatu.Util.RenderData.NicePrice(os.CalculatedPriceWithVATinCZK) s DPH; @(os.platnyZaznam ? "platná" : "zneplatněna")</a></li>
+                                    <li><a href="/Detail/@os.Id">Zveřejněna @os.casZverejneni.ToString("dd.MM.yyyy HH.mm"); částka @HlidacStatu.Util.RenderData.NicePriceHtml(os.CalculatedPriceWithVATinCZK) s DPH; @(os.platnyZaznam ? "platná" : "zneplatněna")</a></li>
                                 }
                             </ul>
                         </div>

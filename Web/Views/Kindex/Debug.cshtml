@@ -124,7 +124,7 @@
                     @for (int y = fromY; y <= toY; y++)
                     {
             <td>
-                @HlidacStatu.Util.RenderData.NicePrice(Model.ForYear(y).Statistika.CelkovaHodnotaSmluv, shortFormat: true)
+                @HlidacStatu.Util.RenderData.NicePriceHtml(Model.ForYear(y).Statistika.CelkovaHodnotaSmluv, shortFormat: true)
             </td>}
                 </tr>
 
@@ -354,7 +354,7 @@
                     @for (int y = fromY; y <= toY; y++)
                     {
             <td>
-                @HlidacStatu.Util.RenderData.NicePrice(Model.ForYear(y).FinancniUdaje.OvlivnitelneNakladyCinnosti ?? 0)
+                @HlidacStatu.Util.RenderData.NicePriceHtml(Model.ForYear(y).FinancniUdaje.OvlivnitelneNakladyCinnosti ?? 0)
             </td>}
                 </tr>
             </tbody>

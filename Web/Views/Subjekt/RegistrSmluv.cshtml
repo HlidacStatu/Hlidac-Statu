@@ -412,7 +412,7 @@
                                 Name = "Hodnota smluv",
                                 HtmlRender = (m) =>
                                 {
-                                    return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena);
+                                    return HlidacStatu.Util.RenderData.NicePriceHtml(m.Value.CelkemCena);
                                 },
                                 OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
                                 CssClass = "number"

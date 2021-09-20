@@ -309,7 +309,7 @@
             string durl = "/dotace/hledat?Q=ico%3A+" + Model.ICO;
             //var dotaceStat = dotaceSummary.PocetDotaci;
 
-            var sdotaceKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePrice(dotaceSummary.CelkemCerpano, html: true) + "</b>."; }
+            var sdotaceKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(dotaceSummary.CelkemCerpano, html: true) + "</b>."; }
 
         @if (Model.JsemOVM())
         {
@@ -344,8 +344,8 @@
 
             if (totalCountDotaceHolding - dotaceSummary.PocetDotaci > 0)
             {
-                var sdotaceHDiffKc = " v hodnotě <b>" + HlidacStatu.Util.RenderData.NicePrice(totalSumDotaceHolding - dotaceSummary.CelkemCerpano, html: true) + "</b>.";
-                var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePrice(totalSumDotaceHolding, html: true) + "</b>.";
+                var sdotaceHDiffKc = " v hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(totalSumDotaceHolding - dotaceSummary.CelkemCerpano, html: true) + "</b>.";
+                var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(totalSumDotaceHolding, html: true) + "</b>.";
                 string durlH = "/dotace/hledat?Q=holding%3A+" + Model.ICO;
                 if (Model.JsemOVM())
                 {
@@ -509,7 +509,7 @@
                 <p>
                     @Html.SubjektTypTrojice(Model, "Úřad sponzoroval", "Organizace sponzorovala", "Firma sponzorovala")
                     politické strany @HlidacStatu.Util.RenderData.RenderList(Model.Sponzoring().Select(m => m.JmenoPrijemce()).Distinct(), ending: "")
-                    v celkové výši @HlidacStatu.Util.RenderData.NicePrice(Model.Sponzoring().Sum(m => m.Hodnota) ?? 0).
+                    v celkové výši @HlidacStatu.Util.RenderData.NicePriceHtml(Model.Sponzoring().Sum(m => m.Hodnota) ?? 0).
                 </p>
             }
             @if (StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO))

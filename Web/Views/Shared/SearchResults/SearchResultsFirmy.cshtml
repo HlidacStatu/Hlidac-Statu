@@ -25,7 +25,7 @@
                 <td>@Html.KIndexLabelLink(item.ICO)<a href="@item.GetUrl(true)">@Devmasters.TextUtil.ShortenText(item.Jmeno, 40, "...")</a></td>
                 <td>@(item.Datum_Zapisu_OR?.ToString("d.M.yyyy"))</td>
                 <td>@HlidacStatu.Util.RenderData.NiceNumber(stat.Sum(stat.YearsAfter2016(), s => s.PocetSmluv))</td>
-                <td>@HlidacStatu.Util.RenderData.NicePrice(stat.Sum(stat.YearsAfter2016(), s => s.CelkovaHodnotaSmluv))</td>
+                <td>@HlidacStatu.Util.RenderData.NicePriceHtml(stat.Sum(stat.YearsAfter2016(), s => s.CelkovaHodnotaSmluv))</td>
             </tr>
         }
     }

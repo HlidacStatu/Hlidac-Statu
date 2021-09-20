@@ -90,7 +90,7 @@
                             <td class="number">@HlidacStatu.Util.RenderData.NiceNumber(souh.PocetSmluv)</td>
                             @if (showHodnota)
                             {
-                                <td class="number text-nowrap">@HlidacStatu.Util.RenderData.NicePrice(souh.HodnotaSmluv)</td>
+                                <td class="number text-nowrap">@HlidacStatu.Util.RenderData.NicePriceHtml(souh.HodnotaSmluv)</td>
                             }
                         </tr>
                     }
@@ -99,7 +99,7 @@
                     <tr>
                         <td colspan="@(showHodnota ? 4 : 3)">
                             *) Kalkulováná částka je suma smluv s hodnotou a smluv bez uvedené ceny, kde jsme použili průměrnou hodnotu smluv
-                            @(Model.Jmeno) v @(Model.CurrYear.Rok) ve výši @HlidacStatu.Util.RenderData.NicePrice(koncentrace.PrumernaHodnotaSmluvProVypocet)
+                            @(Model.Jmeno) v @(Model.CurrYear.Rok) ve výši @HlidacStatu.Util.RenderData.NicePriceHtml(koncentrace.PrumernaHodnotaSmluvProVypocet)
                         </td>
                     </tr>
                     </tfoot>

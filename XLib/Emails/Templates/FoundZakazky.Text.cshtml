@@ -22,12 +22,12 @@ V době @Model.Interval @Model.TotalTxt pro tento dotaz
         Datum uveřejnění: @(item.DatumUverejneni == null ? "" : item.DatumUverejneni.Value.ToShortDateString())
         Zakázka: @(item.NazevZakazky)
         @if (item.KonecnaHodnotaBezDPH.HasValue)
-        {<text>        Cena: @(HlidacStatu.Util.RenderData.NicePrice(item.KonecnaHodnotaBezDPH.Value))</text>
+        {<text>        Cena: @(HlidacStatu.Util.RenderData.NicePriceHtml(item.KonecnaHodnotaBezDPH.Value))</text>
     }
     else if (item.OdhadovanaHodnotaBezDPH.HasValue)
     {
             <text>        
-        Odhadovaná cena: @(HlidacStatu.Util.RenderData.NicePrice(item.OdhadovanaHodnotaBezDPH.Value))
+        Odhadovaná cena: @(HlidacStatu.Util.RenderData.NicePriceHtml(item.OdhadovanaHodnotaBezDPH.Value))
             </text>
 }
         Více: @(item.GetUrl(true))?utm_source=hlidac&utm_medium=emailtxt&utm_campaign=detail

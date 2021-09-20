@@ -173,7 +173,7 @@ else
                         val = ki.ForYear(rok).Statistika.CelkovaHodnotaSmluv;
         <td>
             <span style="color:black">
-                @HlidacStatu.Util.RenderData.NicePrice(val, shortFormat: true)
+                @HlidacStatu.Util.RenderData.NicePriceHtml(val, shortFormat: true)
             </span>
         </td>}
                 </tr>
@@ -416,7 +416,7 @@ else
                     @foreach (var ki in Model)
                     {
         <td>
-            @HlidacStatu.Util.RenderData.NicePrice(ki.ForYear(rok).FinancniUdaje.OvlivnitelneNakladyCinnosti ?? 0)
+            @HlidacStatu.Util.RenderData.NicePriceHtml(ki.ForYear(rok).FinancniUdaje.OvlivnitelneNakladyCinnosti ?? 0)
         </td>}
                 </tr>
             </tbody>

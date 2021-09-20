@@ -83,7 +83,7 @@
                     var sponz = o.Sponzoring();
                     <li>
                         <a href="@o.GetUrl()">@o.FullNameWithYear()</a> sponzoroval @HlidacStatu.Util.RenderData.RenderList(sponz.Select(m => m.JmenoPrijemce()).Distinct(), ending: "")
-                        v celkové výši <b>@HlidacStatu.Util.RenderData.NicePrice(sponz.Sum(m => m.Hodnota) ?? 0)</b>.
+                        v celkové výši <b>@HlidacStatu.Util.RenderData.NicePriceHtml(sponz.Sum(m => m.Hodnota) ?? 0)</b>.
                     </li>
                 }
             </ul>

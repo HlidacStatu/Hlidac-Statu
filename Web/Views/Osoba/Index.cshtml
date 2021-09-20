@@ -211,7 +211,7 @@
         {
             sumH += (decimal)item.Sum("sum").Value;
         }
-        var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePrice(sumH) + "</b>.";
+        var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(sumH) + "</b>.";
         string durlH = "/dotace/hledat?Q=osobaid%3A" + Model.NameId;
     }
     @if (dotaceSearchH.Total > 0)

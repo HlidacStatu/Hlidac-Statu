@@ -48,7 +48,7 @@ else
                 {
                     double? sum = ((Nest.ValueAggregate)Model?.ElasticResults?.Aggregations["souhrn"])?.Value;
                     <div>
-                        V celkové hodnotě @HlidacStatu.Util.RenderData.NicePrice((decimal)sum). <sup>*)</sup>
+                        V celkové hodnotě @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)sum). <sup>*)</sup>
                         <div class="alert alert-info" role="alert">
                             <b>*) Celková hodnota</b> je námi vypočítaná hodnota čerpaných dotací, kterou jsme získali z různých zdrojových databází. Takto získané údaje proto mohou být podle kvality vstupních dat zobrazeny v některých případech i duplicitně nebo neúplně. Veškeré údaje proto vždy doporučujeme ověřit.
                         </div>
