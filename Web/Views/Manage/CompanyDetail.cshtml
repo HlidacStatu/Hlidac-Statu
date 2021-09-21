@@ -33,8 +33,8 @@
         <hr />
         <button type="button"
                 class="btn btn-primary btn-sm"
-                data-toggle="modal"
-                data-target="#eventModal"
+                data-bs-toggle="modal"
+                data-bs-target="#eventModal"
                 data-personid="0"
                 data-eventid="0"
                 data-datumod=""
@@ -250,8 +250,8 @@
                         <td>
                             <button type="button"
                                     class="btn btn-primary btn-sm"
-                                    data-toggle="modal"
-                                    data-target="#eventModal"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#eventModal"
                                     data-personid="@udalost.OsobaId"
                                     data-eventid="@udalost.Pk"
                                     data-datumod="@(udalost.DatumOd?.ToString("dd.MM.yyyy"))"
@@ -270,8 +270,8 @@
                             </button>
                             <button type="button"
                                     class="btn btn-danger btn-sm"
-                                    data-toggle="modal"
-                                    data-target="#eventModal"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#eventModal"
                                     data-personid="@udalost.OsobaId"
                                     data-eventid="@udalost.Pk"
                                     data-datumod="@(udalost.DatumOd?.ToString("dd.MM.yyyy"))"
@@ -307,7 +307,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="eventModalLabel">Editovat událost</h4>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                     
                 </button>
             </div>
@@ -389,7 +389,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Zrušit</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
                 <button type="button" class="btn btn-primary" id="sendButton">Uložit</button>
             </div>
         </div>

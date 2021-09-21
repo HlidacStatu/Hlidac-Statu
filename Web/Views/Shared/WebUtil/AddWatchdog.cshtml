@@ -90,7 +90,7 @@ Máme pro vás denné sledovat <b>nové {dataTypeName} odpovídající tomuto do
             @if (availableWatchdogs > 0)
             {
                 <a href="#" class="@Model.ButtonCss"
-                   onclick="ga('send', 'event', 'btnWatchDog', 'AddNew', 'authenticated');" role="button" data-toggle="modal" data-target="#addWDform@(uid)">
+                   onclick="ga('send', 'event', 'btnWatchDog', 'AddNew', 'authenticated');" role="button" data-bs-toggle="modal" data-bs-target="#addWDform@(uid)">
                     @if (Model.ShowButtonIcon)
                     {
                         <span class="fas fa-eye dark"></span>
@@ -132,7 +132,7 @@ Máme pro vás denné sledovat <b>nové {dataTypeName} odpovídající tomuto do
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <button type="button" onclick="ga('send', 'event', 'btnWatchDog', 'CloseBtnIcon', 'authenticated');" class="btn-close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" onclick="ga('send', 'event', 'btnWatchDog', 'CloseBtnIcon', 'authenticated');" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                                 
                             </button>
                             <h4 class="modal-title">Přidání nového hlídače</h4>
@@ -194,7 +194,7 @@ Máme pro vás denné sledovat <b>nové {dataTypeName} odpovídající tomuto do
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Zavřít</button>
+                            <button type="button" class="btn btn-default" data-bs-dismiss="modal">Zavřít</button>
                             <a href="#" role="button" class="btn btn-success" onclick="javascript: ga('send', 'event', 'btnWatchDog', 'AddNew', 'authenticated');AddNewWD('@Model.Query.Replace("'", "\\'")','@datatypeApi',$('#wdname@(uid)').val(),$('#period@(uid)').val(), $('#focus@(uid)').val(), this);return false;">Přidat hlídače</a>
                         </div>
                     </div>
@@ -206,7 +206,7 @@ Máme pro vás denné sledovat <b>nové {dataTypeName} odpovídající tomuto do
     {
         <text>
             @Html.Raw(Model.PreButtonText)
-            <a href="#" onclick="ga('send', 'event', 'btnWatchDog', 'AddNew', 'anonym');" class="@Model.ButtonCss" role="button" data-toggle="modal" data-target="#addWDhelp@(uid)">
+            <a href="#" onclick="ga('send', 'event', 'btnWatchDog', 'AddNew', 'anonym');" class="@Model.ButtonCss" role="button" data-bs-toggle="modal" data-bs-target="#addWDhelp@(uid)">
                 @if (Model.ShowButtonIcon)
                 {
                     <span class="fas fa-eye dark"></span>
@@ -219,7 +219,7 @@ Máme pro vás denné sledovat <b>nové {dataTypeName} odpovídající tomuto do
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <button type="button" onclick="ga('send', 'event', 'btnWatchDog', 'CloseBtnIcon', 'authenticated');" class="btn-close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" onclick="ga('send', 'event', 'btnWatchDog', 'CloseBtnIcon', 'authenticated');" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                                 
                             </button>
                             <h4 class="modal-title">Musíte být přihlášeni</h4>
@@ -233,7 +233,7 @@ Máme pro vás denné sledovat <b>nové {dataTypeName} odpovídající tomuto do
                             </p>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" onclick="ga('send', 'event', 'btnWatchDog', 'CloseForm', 'anonym');" class="btn btn-default" data-dismiss="modal">Zavřít</button>
+                            <button type="button" onclick="ga('send', 'event', 'btnWatchDog', 'CloseForm', 'anonym');" class="btn btn-default" data-bs-dismiss="modal">Zavřít</button>
                             <a onclick="ga('send', 'event', 'registerBtn', 'click','/@this.Path'); return true;" href="/account/register?returnUrl=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))" onclick="ga('send', 'event', 'btnWatchDog', 'Register', 'anonym');" role="button" class="btn btn-primary">Zdarma zaregistrovat</a>
                             <a onclick="ga('send', 'event', 'registerBtn', 'click','/@this.Path'); return true;" href="/account/login?returnUrl=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))" onclick="ga('send', 'event', 'btnWatchDog', 'Login', 'anonym');" role="button" class="btn btn-success">Přihlásit se</a>
                         </div>

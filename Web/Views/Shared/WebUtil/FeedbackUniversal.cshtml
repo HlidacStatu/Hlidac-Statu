@@ -3,7 +3,7 @@
 
 @if (Model.MustAuth == false || (Model.MustAuth && User.Identity?.IsAuthenticated == true))
 {<!-- Button trigger modal -->
-    <button class="@Model.Style" data-toggle="modal" data-target="#@(Model.IdPrefix)fbForm">@Model.BtnText</button> <!-- Modal -->
+    <button class="@Model.Style" data-bs-toggle="modal" data-bs-target="#@(Model.IdPrefix)fbForm">@Model.BtnText</button> <!-- Modal -->
     <div class="modal fade" id="@(Model.IdPrefix)fbForm" tabindex="-1" role="dialog"
          aria-labelledby="@(Model.IdPrefix)fbTitle" aria-hidden="true">
         <div class="modal-dialog">
@@ -11,7 +11,7 @@
                 <!-- Modal Header -->
                 <div class="modal-header">
                     <button type="button" class="btn-close"
-                            data-dismiss="modal">
+                            data-bs-dismiss="modal">
                         
                         <span class="sr-only">Close</span>
                     </button>
@@ -50,10 +50,10 @@
 
                     <!-- Modal Footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">
                             Zrušit
                         </button>
-                        <button type="button" onclick="send@(Model.IdPrefix)();" class="btn btn-primary" data-dismiss="modal">
+                        <button type="button" onclick="send@(Model.IdPrefix)();" class="btn btn-primary" data-bs-dismiss="modal">
                             Odeslat
                         </button>
                         <br />
@@ -80,7 +80,7 @@
 else
 {
     <!-- Button trigger modal -->
-    <button class="@Model.Style" data-toggle="modal" data-target="#@(Model.IdPrefix)fbForm">@Model.BtnText</button>
+    <button class="@Model.Style" data-bs-toggle="modal" data-bs-target="#@(Model.IdPrefix)fbForm">@Model.BtnText</button>
     <!-- Modal -->
     <div class="modal fade" id="@(Model.IdPrefix)fbForm" tabindex="-1" role="dialog"
          aria-labelledby="@(Model.IdPrefix)fbTitle" aria-hidden="true">
@@ -89,7 +89,7 @@ else
                 <!-- Modal Header -->
                 <div class="modal-header">
                     <button type="button" class="btn-close"
-                            data-dismiss="modal">
+                            data-bs-dismiss="modal">
                         
                         <span class="sr-only">Close</span>
                     </button>
@@ -110,7 +110,7 @@ else
 
                     <!-- Modal Footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">
                             Zavřít
                         </button>
                     </div>

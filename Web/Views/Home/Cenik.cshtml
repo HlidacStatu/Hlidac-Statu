@@ -1,7 +1,7 @@
 ﻿@{
     ViewBag.Title = "Ceník nadstandardních služeb";
 
-    string tooltipattrs = @"data-toggle='tooltip'
+    string tooltipattrs = @"data-bs-toggle='tooltip'
 data-placement='top' data-html='true'
 title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-bottom:1px solid white;line-height:30px;"">Hlídač nových smluv</span></i><br/>sleduje nové smlouvy odpovídající libovolnému dotazu a každý den či týden vás na ně sám upozorní e-mailem'
 ";
@@ -224,7 +224,7 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
                         <div class="panel-footer">
                             @if (this.User?.Identity?.IsAuthenticated == true)
                             {
-                                <a class="btn btn-lg btn-block btn-success" href="#" onclick="return trackInLink(this,'Cenik');" data-toggle="modal" data-target="#cenik_fbForm">Napište nám</a>
+                                <a class="btn btn-lg btn-block btn-success" href="#" onclick="return trackInLink(this,'Cenik');" data-bs-toggle="modal" data-bs-target="#cenik_fbForm">Napište nám</a>
                             }
                             else
                             {
@@ -251,7 +251,7 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
 {
         <script>
         $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
+            $('[data-bs-toggle="tooltip"]').tooltip()
         })
 
         $(document).ready(function () {
@@ -271,7 +271,7 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
                 <!-- Modal Header -->
                 <div class="modal-header">
                     <button type="button" class="btn-close"
-                            data-dismiss="modal">
+                            data-bs-dismiss="modal">
                         
                         <span class="sr-only">Close</span>
                     </button>
@@ -318,10 +318,10 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
 
                     <!-- Modal Footer -->
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">
                             Zrušit
                         </button>
-                        <button type="button" onclick="sendcenik_();" class="btn btn-primary" data-dismiss="modal">
+                        <button type="button" onclick="sendcenik_();" class="btn btn-primary" data-bs-dismiss="modal">
                             Odeslat vzkaz
                         </button>
                     </div>

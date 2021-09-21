@@ -11,12 +11,12 @@
     
 }
 
-<a href="#" class="@Model.Style" onclick="ga('send', 'event', 'exportBtn', 'click','@Model.GaPageEventId'); return true;" role="button" data-toggle="modal" data-target="#modal@(modalid)"><span class="small">Exportovat výsledky do Excelu</span></a> <!-- Modal -->
+<a href="#" class="@Model.Style" onclick="ga('send', 'event', 'exportBtn', 'click','@Model.GaPageEventId'); return true;" role="button" data-bs-toggle="modal" data-bs-target="#modal@(modalid)"><span class="small">Exportovat výsledky do Excelu</span></a> <!-- Modal -->
 <div class="modal fade" id="modal@(modalid)" tabindex="-1" role="dialog" aria-labelledby="modal@(modalid)">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 <h4 class="modal-title">@Model.Title</h4>
             </div>
             <div class="modal-body">
@@ -58,7 +58,7 @@
                     </p>}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Zavřít</button>
+                <button type="button" class="btn btn-default" data-bs-dismiss="modal">Zavřít</button>
             </div>
         </div>
     </div>

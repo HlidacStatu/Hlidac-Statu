@@ -5,7 +5,7 @@
     string idPrefix = Guid.NewGuid().ToString("N");
 }
 <!-- Button trigger modal -->
-<button class="@Model.Style" data-toggle="modal" data-target="#@(idPrefix)fbForm">Zpřístupnit tuto přílohu</button> <!-- Modal -->
+<button class="@Model.Style" data-bs-toggle="modal" data-bs-target="#@(idPrefix)fbForm">Zpřístupnit tuto přílohu</button> <!-- Modal -->
 <div class="modal fade" id="@(idPrefix)fbForm" tabindex="-1" role="dialog"
      aria-labelledby="@(idPrefix)fbTitle" aria-hidden="true">
     <div class="modal-dialog">
@@ -13,7 +13,7 @@
             <!-- Modal Header -->
             <div class="modal-header">
                 <button type="button" class="btn-close"
-                        data-dismiss="modal">
+                        data-bs-dismiss="modal">
                     
                     <span class="sr-only">Close</span>
                 </button>
@@ -58,10 +58,10 @@
 
                 <!-- Modal Footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">
                         Zrušit
                     </button>
-                    <button type="button" onclick="send@(idPrefix)();" class="btn btn-primary" data-dismiss="modal">
+                    <button type="button" onclick="send@(idPrefix)();" class="btn btn-primary" data-bs-dismiss="modal">
                         Odeslat vzkaz
                     </button>
                 </div>
