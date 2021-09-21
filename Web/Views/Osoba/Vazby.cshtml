@@ -38,7 +38,7 @@
     <p style="padding-top:30px;">
         @Html.Raw(
             HlidacStatu.Repositories.Graph.TiskVazeb(
-                Model.Jmeno,
+                Model.FullName(),
                 Model.AktualniVazby(aktualnost),
                 Relation.TiskEnum.Html
             )
@@ -66,12 +66,14 @@
         @foreach (var vPerIco in data)
         {
             <div>
-                <h4>@vPerIco.FirmaName</h4>
+                <h4><a href="/subjekt/@(vPerIco.ICO)">@vPerIco.FirmaName</a></h4>
                 @Html.RenderVazby(vPerIco.VazbyPerIco)
 
 
             </div>
         }
     </p>
+<partial name="PolitikDisclaimer" view-data="ViewData"/>
+
 </div>
 

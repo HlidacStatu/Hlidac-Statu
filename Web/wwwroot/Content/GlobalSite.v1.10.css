@@ -938,6 +938,13 @@ textarea {
     border-left-width: 5px;
     border-radius: 3px;
 }
+    .bs-callout.small h4 {
+        font-size: 18px;
+    }
+    .bs-callout.small div, .bs-callout.small p {
+        font-size: 13px;
+        line-height:19px;
+    }
 
     .bs-callout.bs-callout-noborder {
         margin-left: 30px;

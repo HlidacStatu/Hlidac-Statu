@@ -5,6 +5,7 @@
 @using HlidacStatu.Entities
 @using System.Threading
 @using HlidacStatu.DetectJobs
+@using HlidacStatu.Repositories.Exceptions
 
 @inject JobService JobService
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -37,6 +38,8 @@
         </h4>
     }
     <p>
+        <label for="specificLoad">Načíst konkrétní tabulku</label>
+        <input id="specificLoad" type="number" @bind="tablePk"/>
         <button class="btn btn-primary" @onclick="LoadNewTable">Načti tabulku</button>
     </p>
 
@@ -101,6 +104,8 @@ else
     private MarkupString? hlaska;
     private int processedTables;
 
+    private int tablePk;
+
     private void SetColumn(int column, InHtmlTables.Cell.GuessedCellType cellType)
     {
         foreach (var row in table.Cells)
@@ -117,7 +122,27 @@ else
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var userName = authState?.User?.Identity?.Name;
 
-        table = await JobService.GetNewTable(userName, CancellationToken.None);
+        if (tablePk != 0)
+        {
+            table = await JobService.GetSpecificTable(tablePk, userName, CancellationToken.None);
+        }
+        else
+        {
+
+            try
+            {
+                table = await JobService.GetNewTable(userName, CancellationToken.None);
+            }
+            catch (NoDataFoundException ndfe)
+            {
+                hlaska = new MarkupString($"<div class=\"alert alert-warning\" role=\"alert\">Ve frontě už není žádná další tabulka ke zpracování.</div>");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
         tableOpenedAt = DateTime.Now;
     }
 

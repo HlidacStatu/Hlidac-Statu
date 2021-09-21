@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Repositories.Exceptions;
 
 
 namespace HlidacStatu.Repositories
@@ -47,12 +48,35 @@ namespace HlidacStatu.Repositories
                     .OrderByDescending(m => m.PrecalculatedScore)
                     .FirstOrDefaultAsync(cancellationToken);
 
+                if (tbl is null)
+                    throw new NoDataFoundException("Table InDocTables neobsahuje zadna data ke zpracovani.");
+                
                 tbl.CheckStatus = InDocTables.CheckStatuses.InProgress;
                 tbl.CheckedBy = requestedBy;
                 tbl.CheckedDate = DateTime.Now;
                 
                 await db.SaveChangesAsync(cancellationToken);
                 
+                return tbl;
+            }
+        }
+        
+        public static async Task<InDocTables> GetSpecific(int pk, string requestedBy, CancellationToken cancellationToken)
+        {
+            await using (DbEntities db = new DbEntities())
+            {
+                var tbl = await db.InDocTables
+                    .AsQueryable()
+                    .Where(m => m.Pk == pk)
+                    .FirstOrDefaultAsync(cancellationToken);
+                
+                if (tbl is null)
+                    throw new NoDataFoundException("Table InDocTables neobsahuje zadna data ke zpracovani.");
+                
+                tbl.CheckStatus = InDocTables.CheckStatuses.InProgress;
+                tbl.CheckedBy = requestedBy;
+                tbl.CheckedDate = DateTime.Now;
+
                 return tbl;
             }
         }
