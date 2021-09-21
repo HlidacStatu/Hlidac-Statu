@@ -3,7 +3,9 @@ using HlidacStatu.Entities;
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace HlidacStatu.Repositories
@@ -21,6 +23,14 @@ namespace HlidacStatu.Repositories
                 
                 db.InDocJobs.AddRange(jobs);
                 await db.SaveChangesAsync();
+            }
+        }
+        
+        public static async Task Remove(long tablePk)
+        {
+            await using (DbEntities db = new DbEntities())
+            {
+                await db.Database.ExecuteSqlInterpolatedAsync($"Delete from InDocJobs where tablepk = {tablePk}");
             }
         }
     }
