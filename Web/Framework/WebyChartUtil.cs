@@ -61,38 +61,38 @@ namespace HlidacStatu.Web.Framework
             <div class='list-group'>
 
                 <a href='/StatniWeby/Https' class='list-group-item {WebUtil.IfExists(active == "https", "disabled")}'>
-                    <span class='badge'>{ZabTools.SslStatuses()?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{ZabTools.SslStatuses()?.Count() ?? 0}</span>
                     Žebříček státních serverů podle HTTPS Labs hodnocení
                 </a>
 
 
                 <a href='/StatniWeby/Index' class='list-group-item {WebUtil.IfExists(active == "index", "disabled")}'>
-                    <span class='badge'>{ZabTools.WebyItems("0")?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{ZabTools.WebyItems("0")?.Count() ?? 0}</span>
                     Nejdůležitější služby státní správy
                 </a>
 
                 <a href='/StatniWeby/Dalsi/ustredni' class='list-group-item {WebUtil.IfExists(active == "ustredni", "disabled")}'>
-                    <span class='badge'>{ZabTools.WebyItems("ustredni")?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{ZabTools.WebyItems("ustredni")?.Count() ?? 0}</span>
                     Služby ústředních orgánů státní správy
                 </a>
                 <a href='/StatniWeby/Dalsi/3' class='list-group-item {WebUtil.IfExists(active == "3", "disabled")}'>
-                    <span class='badge'>{ZabTools.WebyItems("3")?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{ZabTools.WebyItems("3")?.Count() ?? 0}</span>
                     Open source/open data weby
                 </a>
                 <a href='/StatniWeby/Dalsi/1' class='list-group-item {WebUtil.IfExists(active == "1", "disabled")}'>
-                    <span class='badge'>{ZabTools.WebyItems("1")?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{ZabTools.WebyItems("1")?.Count() ?? 0}</span>
                     Další důležité služby
                 </a>
                 <a href='/StatniWeby/Dalsi/2' class='list-group-item {WebUtil.IfExists(active == "2", "disabled")}'>
-                    <span class='badge'>{ZabTools.WebyItems("2")?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{ZabTools.WebyItems("2")?.Count() ?? 0}</span>
                     Ostatní měřené služby
                 </a>"
                 //<a href='#' class='list-group-item disabled'>
-                //        <span class='badge'>Připravujeme</span>
+                //        <span class='badge float-end rounded-pill bg-secondary'>Připravujeme</span>
                 //        Služby krajů ČR
                 //    </a>
                 + @$"<a href='/StatniWeby/opendata' class='list-group-item {WebUtil.IfExists(active == "opendata", "disabled")}'>
-                    <span class='badge'>JSON</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>JSON</span>
                     Naměřené údaje jako open data
                 </a>
             </div>
