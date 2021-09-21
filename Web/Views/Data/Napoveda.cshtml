@@ -14,8 +14,8 @@
         <li><a href="/data">Další databáze</a></li>
         <li><a href="@Model.DatasetUrl()">@reg.name</a></li>
         <li class="active">Nápověda k hledání</li>
-        <li class="active float-end"><a href="/data/manage" class="btn btn-primary btn-sm" style="color:whitesmoke;text-decoration:none">Snadné přidání nového datasetu</a></li>
     </ol>
+    <div class="active float-end"><a href="/data/manage" class="btn btn-primary btn-sm" style="color:whitesmoke;text-decoration:none">Snadné přidání nového datasetu</a></div>
 }
 
 <partial name="Partials/_SearchForm" model="@(new DataSearchRawResult() { DataSet = Model, Q = Context.Request.Query["qs"] })"/>
