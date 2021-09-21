@@ -23,7 +23,7 @@
     }
     if (string.IsNullOrEmpty(Model.IdPrefix))
     {
-        Model.IdPrefix = Guid.NewGuid().ToString("N");
+        Model.IdPrefix = $"m{Guid.NewGuid():N}";
     }
 
 }

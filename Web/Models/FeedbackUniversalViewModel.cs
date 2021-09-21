@@ -23,7 +23,7 @@ namespace HlidacStatu.Web.Models
             string btnText, string url, bool mustAuth, string addData)
         {
             Style = "btn btn-primary btn-sm";
-            IdPrefix = System.Guid.NewGuid().ToString("N");
+            IdPrefix = $"m{System.Guid.NewGuid():N}";
             HeaderText = headerText;
             SubText = subText;
             NoteLabel = noteLabel;

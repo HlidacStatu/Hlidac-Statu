@@ -2,7 +2,7 @@
 @model FeedbackPrilohaViewModel
 
 @{
-    string idPrefix = Guid.NewGuid().ToString("N");
+    string idPrefix = $"m{Guid.NewGuid():N}";
 }
 <!-- Button trigger modal -->
 <button class="@Model.Style" data-bs-toggle="modal" data-bs-target="#@(idPrefix)fbForm">Zpřístupnit tuto přílohu</button> <!-- Modal -->
