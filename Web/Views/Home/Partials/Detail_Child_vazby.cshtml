@@ -124,11 +124,11 @@
                             var firma = Firmy.Get(subj.ico);
                             if (firma.Valid && firma.IsSponzor() && firma.JsemSoukromaFirma())
                             {
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <h3 class="panel-title">@firma.Jmeno</h3>
+                                <div class="card bg-default">
+                                    <div class="card-header">
+                                        <h3 class="card-title">@firma.Jmeno</h3>
                                     </div>
-                                    <div class="panel-body">
+                                    <div class="card-body">
                                         @*@Html.Raw(firma.Description(true, m => m.Type == (int)OsobaEvent.Types.Sponzor))*@
                                         @Html.Raw(firma.SponzoringToHtml())
                                     </div>

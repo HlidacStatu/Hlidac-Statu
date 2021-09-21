@@ -6,54 +6,54 @@
 </a>
 <div class="collapse" id="iconHelp">
     <div class="well">
-        <div class="panel panel@(HlidacStatu.Entities.Issues.Importance.GetCssClass(HlidacStatu.Entities.Issues.ImportanceLevel.Formal,true))">
-            <div class="panel-heading">
-                <h3 class="panel-title">
+        <div class="card bg@(HlidacStatu.Entities.Issues.Importance.GetCssClass(HlidacStatu.Entities.Issues.ImportanceLevel.Formal,true))">
+            <div class="card-header">
+                <h3 class="card-title">
                     @Html.Raw(HlidacStatu.Entities.Issues.Importance.GetIcon(HlidacStatu.Entities.Issues.ImportanceLevel.Formal))
                     @HlidacStatu.Entities.Issues.ImportanceLevel.Formal.ToNiceDisplayName()
                 </h3>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 Formální nedostatek či malá nepřenost.
             </div>
 
         </div>
 
-        <div class="panel panel@(HlidacStatu.Entities.Issues.Importance.GetCssClass(HlidacStatu.Entities.Issues.ImportanceLevel.Minor,true))">
-            <div class="panel-heading">
-                <h3 class="panel-title">
+        <div class="card bg@(HlidacStatu.Entities.Issues.Importance.GetCssClass(HlidacStatu.Entities.Issues.ImportanceLevel.Minor,true))">
+            <div class="card-header">
+                <h3 class="card-title">
                     @Html.Raw(HlidacStatu.Entities.Issues.Importance.GetIcon(HlidacStatu.Entities.Issues.ImportanceLevel.Minor))
                     @HlidacStatu.Entities.Issues.ImportanceLevel.Minor.ToNiceDisplayName()
                 </h3>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 Malý nedostatek bez podstatného vlivu na přesnost dat, malý chyba.
             </div>
 
         </div>
 
-        <div class="panel panel@(HlidacStatu.Entities.Issues.Importance.GetCssClass(HlidacStatu.Entities.Issues.ImportanceLevel.Major,true))">
-            <div class="panel-heading">
-                <h3 class="panel-title">
+        <div class="card bg@(HlidacStatu.Entities.Issues.Importance.GetCssClass(HlidacStatu.Entities.Issues.ImportanceLevel.Major,true))">
+            <div class="card-header">
+                <h3 class="card-title">
                     @Html.Raw(HlidacStatu.Entities.Issues.Importance.GetIcon(HlidacStatu.Entities.Issues.ImportanceLevel.Major))
                     @HlidacStatu.Entities.Issues.ImportanceLevel.Major.ToNiceDisplayName()
                 </h3>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 Závažná chyba v informacích o smlouvě anebo chybějící důležitý údaj.
             </div>
 
         </div>
 
 
-        <div class="panel panel@(HlidacStatu.Entities.Issues.Importance.GetCssClass(HlidacStatu.Entities.Issues.ImportanceLevel.Fatal,true))">
-            <div class="panel-heading">
-                <h3 class="panel-title">
+        <div class="card bg@(HlidacStatu.Entities.Issues.Importance.GetCssClass(HlidacStatu.Entities.Issues.ImportanceLevel.Fatal,true))">
+            <div class="card-header">
+                <h3 class="card-title">
                     @Html.Raw(HlidacStatu.Entities.Issues.Importance.GetIcon(HlidacStatu.Entities.Issues.ImportanceLevel.Fatal))
                     @HlidacStatu.Entities.Issues.ImportanceLevel.Fatal.ToNiceDisplayName()
                 </h3>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 Zásadní chyba či chybějící údaj v rozporu se zákonem anebo ohrožující platnost smlouvy.
             </div>
 

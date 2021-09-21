@@ -45,11 +45,11 @@
 
 @if (data == null)
 {
-    <div class="panel panel-danger">
-        <div class="panel-heading">
-            <h3 class="panel-title">Chyba!</h3>
+    <div class="card bg-danger">
+        <div class="card-header">
+            <h3 class="card-title">Chyba!</h3>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             Data nejsou v tuto chvíli k dispozici. Omlouváme se, zkuste to znovu za pár minut.
         </div>
     </div>
@@ -120,11 +120,11 @@ else
         }
     </div>
 
-    <div class="panel panel-primary" style="margin-top:50px;">
-        <div class="panel-heading">
-            <h3 class="panel-title">Systém hodnocení HTTPS</h3>
+    <div class="card bg-primary" style="margin-top:50px;">
+        <div class="card-header">
+            <h3 class="card-title">Systém hodnocení HTTPS</h3>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             <dl class="dl-horizontal">
                 <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.A)">Zelená známka A+, A nebo A-</dt>
                 <dd>@ZabTools.StatusDescription(SSLLabsGrades.A, true)</dd>
