@@ -32,23 +32,23 @@
         @if (isPreviousEnabled)
         {
             var routeValues = Model.Result.ToRouteValues(page - 1);
-            <li>
-                <a href="@Model.UriPath?q=@(routeValues.Q)&page=@(routeValues.Page)@otherQueryParams" >« Předchozí</a>
+            <li class="page-item">
+                <a class="page-link" href="@Model.UriPath?q=@(routeValues.Q)&page=@(routeValues.Page)@otherQueryParams" >« Předchozí</a>
             </li>
         }
         @if (isNextEnabled)
         {
             var routeValues = Model.Result.ToRouteValues(page + 1);
-            <li>
-                <a href="@Model.UriPath?q=@(routeValues.Q)&page=@(routeValues.Page)@otherQueryParams" >Následující »</a>
+            <li class="page-item">
+                <a class="page-link" href="@Model.UriPath?q=@(routeValues.Q)&page=@(routeValues.Page)@otherQueryParams" >Následující »</a>
             </li>
         }
 
         
         @if (Model.ExportType is not null)
         {
-            <li>
-                <partial name="WebUtil/ExportButton" model="@(new ExportButtonViewModel(Model.ExportType, Model.Result.Query, Model.Result.Order, moreParams: Model.ExportMoreParams))"/>
+            <li class="page-item">
+                <partial name="WebUtil/ExportButton" model="@(new ExportButtonViewModel(Model.ExportType, Model.Result.Query, Model.Result.Order, moreParams: Model.ExportMoreParams, style: "page-link"))"/>
             </li>
         }
     </ul>
