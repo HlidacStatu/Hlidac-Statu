@@ -40,6 +40,8 @@
         public DateTime Zacatek { get; set; } = DateTime.MaxValue;
         public DateTime Konec { get; set; } = DateTime.MinValue;
         public int Days { get { return (int)(this.Konec - this.Zacatek).TotalDays; } }
+        public int manualDays { get; set; }
+
     }
 
     public List<odpovednost> DelkyVladnuti(IEnumerable<ministr> data, string resort = null)
@@ -111,7 +113,7 @@
     var ds = DataSet.CachedDatasets.Get("ministri");
 
     Dictionary<int, Tuple<DateTime, string>> obdobi = new()
-{
+    {
         {1998, new Tuple<DateTime,string>(new DateTime(1998, 7, 22),"Zemanova vláda")},
         {2002, new Tuple<DateTime,string>(new DateTime(2002, 7, 15),"Špidlova vláda")},
         {2006, new Tuple<DateTime,string>(new DateTime(2006, 10, 4), "První Topolánkova vláda")},
@@ -170,6 +172,14 @@
     int count = 0;
 
     List<odpovednost> vladnutiAll = new(resorty.SelectMany(v => DelkyVladnuti(ministri, v)));
+    List<odpovednost> vladnutiPoResortechStranach = vladnutiAll
+        .GroupBy(m=>new {r=m.Resort, s = m.Strana }, (k,v)=> new odpovednost() { Resort=k.r, Strana=k.s, manualDays=v.Sum(ss=>ss.Days)})
+        .ToList();
+
+        List<odpovednost> vladnutiPoResortechStranachOdNecase = vladnutiAll
+        .Where(m=>m.Zacatek>=new DateTime(2010,7,13))
+        .GroupBy(m=>new {r=m.Resort, s = m.Strana }, (k,v)=> new odpovednost() { Resort=k.r, Strana=k.s, manualDays=v.Sum(ss=>ss.Days)})
+        .ToList();
 
 }
 <link title="timeline-styles" rel="stylesheet" href="https://cdn.knightlab.com/libs/timeline3/latest/css/timeline.css" />
@@ -181,6 +191,18 @@
 
 @if (string.IsNullOrEmpty(resort))
 {
+    string socialHtml ="<p><ul>" + vladnutiPoResortechStranachOdNecase
+        .Where(m=>m.Resort!="Legislativní rada vlády")
+        .Where(m=>ignore.Contains(m.Resort)==false)
+        .OrderByDescending(o=>o.manualDays)
+        .Select(m=> $"<li>{m.Strana} řídila <b>{m.Resort}</b> celkem <strong>{m.manualDays}</strong> dní</li>")
+        .Take(8)
+        .Aggregate((f,s)=>f + "" + s)
+        +"</ul></p>"
+        ;
+
+
+
 <div class="jumbotron">
     <h1 style="padding-bottom:40px;" class="text-center">Na jakém resortu je která strana nejdéle?</h1>
     <div>
@@ -241,10 +263,12 @@
     <p><a class="btn btn-success btn-sm" href="/report/25" role="button">Ukázat přehled za různá období</a></p>
 </div>
 
-    <meta property="og:hlidac_html" content="@Html.Encode("<h2 style='padding-top:0'>Jak zodpovídají jednotlivé politické strany za fungování státu a jednotlivé resorty?</h2>")" />
-    <meta property="og:hlidac_footer" content="podrobné analýzy najdete v článku" />
+    <meta property="og:hlidac_title" content="Nejdelší řízení resortů od Nečasovy vlády 2010" />
+    <meta property="og:hlidac_html" content="@Html.Encode(socialHtml)" />
+    <meta property="og:hlidac_footer" content="podrobné analýzy najdete na <b>hlidacstatu.cz/report/28</b>" />
     <meta property="og:hlidac_subfooter" content="vypočítáno ke dni @DateTime.Now.ToString("d. M. yyyy")" />
-
+    <meta property="og:hlidac_footerimg" content="https://www.hlidacstatu.cz/content/icons/largetile.png" />
+    
 
 
     <div class="bs-callout bs-callout-primary">
@@ -368,6 +392,8 @@
             </ol>
         </div>
 
+    
+
         <div class="col-xs-6">
             <h4>Nejdelší nepřetržité působení stran na @resort</h4>
             <ol>
@@ -380,6 +406,21 @@
                 }
             </ol>
         </div>
+        @{ 
+            string socialHtml1 = "<b>Nejdelší nepřetržité působení stran</b>";
+            socialHtml1 += "<ul>"
+                + string.Join("",vladnuti.OrderByDescending(m => m.Days).Take(5)
+                                .Select(vl=>$"<li><b>{vl.Strana}</b> ({vl.Zacatek.ToString("d.M.yyyy")}-{vl.Konec.ToString("d.M.yyyy")}) - nepřetržitě <b>{HlidacStatu.Util.RenderData.NiceNumber(vl.Days)} dní</b></li>")
+                                )
+                + "</ul>";
+        }
+    <meta property="og:hlidac_title" content="Nejdelší řízení @resort stranami:" />
+    <meta property="og:hlidac_html" content="@Html.Encode(socialHtml1)" />
+    <meta property="og:hlidac_footer" content="podrobné analýzy najdete na <b>hlidacstatu.cz/report/28</b>" />
+    <meta property="og:hlidac_subfooter" content="vypočítáno ke dni @DateTime.Now.ToString("d. M. yyyy")" />
+    <meta property="og:hlidac_footerimg" content="https://www.hlidacstatu.cz/content/icons/largetile.png" />
+
+
         <div class="col-xs-5" style="border-left: 1px #ddd solid;">
             <h4>Jednotliví ministři</h4>
             <ol>
