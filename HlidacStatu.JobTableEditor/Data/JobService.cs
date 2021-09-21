@@ -40,6 +40,24 @@ namespace HlidacStatu.JobTableEditor.Data
             return st;
         }
 
+        public async Task<SomeTable> GetSpecificTable(int pk, string user, CancellationToken cancellationToken)
+        {
+            var table = await InDocTablesRepo.GetSpecific(pk, user, cancellationToken);
+            InHtmlTables.TableWithWordsAndNumbers(table.ParsedContent(),
+                InHtmlTables.SpecificWords,
+                out var foundJobs,
+                out var cells);
+
+            var st = new SomeTable
+            {
+                Author = user,
+                Cells = WrapCells(cells),
+                InDocTable = table
+            };
+
+            return st;
+        }
+
         private static CellShell[][] WrapCells(InHtmlTables.Cell[][] cells)
         {
             CellShell[][] cellShells = new CellShell[cells.Length][];
@@ -57,6 +75,8 @@ namespace HlidacStatu.JobTableEditor.Data
 
         public async Task SaveChanges(SomeTable table, InDocTables.CheckStatuses operation)
         {
+            // remove old values
+            await InDocJobsRepo.Remove(table.InDocTable.Pk);
             // push changes to server
             if (operation != InDocTables.CheckStatuses.WrongTable
                 && operation != InDocTables.CheckStatuses.ForNextReview
