@@ -218,11 +218,13 @@
             }
 
         }
-        <p><a class="btn btn-success btn-sm" href="/report/25" role="button">Ukázat přehled za různá období</a></p>
+        <p><a class="btn btn-success btn-sm" href="/report/28" role="button">Ukázat přehled po ministerstvech</a></p>
     </div>
 
-    <meta property="og:hlidac_html" content="@Html.Encode("<h2 style='padding-top:0'>Jak zodpovídají jednotlivé politické strany za fungování státu a jednotlivé resorty?</h2>" + _texts.Take(4).Aggregate((f,s)=> f + "<br/><br/>" + s))" />
-    <meta property="og:hlidac_footer" content="podrobné analýzy najdete v článku" />
+    
+    <meta property="og:hlidac_title" content="<b>Jak zodpovídají jednotlivé politické strany za fungování státu a jednotlivé resorty?</b>" />
+    <meta property="og:hlidac_html" content="@Html.Encode($"<p><ul>{_texts.Select(t=>$"<li>{t}</li>").Take(4).Aggregate((f,s)=> f + "" + s)}</ul></p>")" />
+    <meta property="og:hlidac_footer" content="podrobné analýzy najdete v <b>hlidacstatu.cz/report/25</b>" />
     <meta property="og:hlidac_subfooter" content="vypočítáno ke dni @DateTime.Now.ToString("d. M. yyyy")" />
 
 
@@ -398,7 +400,8 @@
 
     @Html.Raw(ministrTopTxt.ToString());
 </p>
-<meta property="og:hlidac_html" content="@Html.Encode("<h2 style='padding-top:0'>Jak zodpovídají jednotlivé politické strany za fungování státu a jednotlivé resorty?</h2>" + topTxt + "<br /><br />" + Devmasters.TextUtil.ShortenText(ministrTopTxt.ToString(),170,"..."))" />
+<meta property="og:hlidac_title" content="<b>Jak zodpovídají jednotlivé politické strany za fungování státu a jednotlivé resorty?</b>" />
+<meta property="og:hlidac_html" content="@Html.Encode(topTxt + "<br /><br />" + Devmasters.TextUtil.ShortenText(ministrTopTxt.ToString(),270,"..."))" />
 <meta property="og:hlidac_footer" content="Analýza působení stran od @startDate.ToString("d. M. yyyy")" />
 <meta property="og:hlidac_subfooter" content="vypočítáno ke dni @DateTime.Now.ToString("d. M. yyyy")" />
 

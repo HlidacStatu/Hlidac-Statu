@@ -49,6 +49,23 @@ namespace HlidacStatu.Web.Controllers
             return View("27_COVIDPodpora");
         }
 
+
+        [Route("25")]
+        [HlidacCache(12 * 60 * 60, "id;obdobi", true)]
+        public IActionResult Report25()
+        {
+            ViewBag.ReportNum = 25;
+            ViewBag.Title = "Které politické strany mají největší podíl na řízení státu?";
+            ViewBag.SocialShareText = "Jak dlouho zodpovídají jednotlivé politické strany za fungování státu a jednotlivé resorty? Které strany jsou tradiční a které se jimi pomalu stávají?";
+            ViewBag.SubTitle = "";
+            ViewBag.SocialShareTitle = "Které politické strany mají největší podíl na řízení státu?";
+            ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/page?d={DateTime.Now.ToString("d.M.yy")}&v=" + System.Net.WebUtility.UrlEncode(HttpContext.Request.GetDisplayUrl());
+            ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"
+                                    + "<meta property=\"og:image:height\" content=\"1080\" />"
+                                    + "<meta property=\"og:image:type\" content=\"image/png\" />";
+            return View("25_MinisterstvaStrany");
+        }
+
         [Route("28")]
         public IActionResult Ministerstva(int? id)
         {
@@ -73,22 +90,6 @@ namespace HlidacStatu.Web.Controllers
         public IActionResult CovidNakazeni(int? id)
         {
             return View("999_COVID_Nakazeni");
-        }
-
-        [Route("25")]
-        [HlidacCache(12 * 60 * 60, "id;obdobi", true)]
-        public IActionResult Report25()
-        {
-            ViewBag.ReportNum = 25;
-            ViewBag.Title = "Které politické strany mají největší podíl na řízení státu?";
-            ViewBag.SocialShareText = "Jak dlouho zodpovídají jednotlivé politické strany za fungování státu a jednotlivé resorty? Které strany jsou tradiční a které se jimi pomalu stávají?";
-            ViewBag.SubTitle = "";
-            ViewBag.SocialShareTitle = "Které politické strany mají největší podíl na řízení státu?";
-            ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/page?d={DateTime.Now.ToString("d.M.yy")}&v=" + System.Net.WebUtility.UrlEncode(HttpContext.Request.GetDisplayUrl());
-            ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"
-                                    + "<meta property=\"og:image:height\" content=\"1080\" />"
-                                    + "<meta property=\"og:image:type\" content=\"image/png\" />";
-            return View("25_MinisterstvaStrany");
         }
 
 
