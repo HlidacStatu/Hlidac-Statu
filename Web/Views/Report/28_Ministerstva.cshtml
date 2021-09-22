@@ -407,7 +407,7 @@
             </ol>
         </div>
         @{ 
-            string socialHtml1 = "<b>Nejdelší nepřetržité působení stran</b>";
+            string socialHtml1 = "<strong>Nejdelší nepřetržité působení stran</strong>";
             socialHtml1 += "<ul>"
                 + string.Join("",vladnuti.OrderByDescending(m => m.Days).Take(5)
                                 .Select(vl=>$"<li><b>{vl.Strana}</b> ({vl.Zacatek.ToString("d.M.yyyy")}-{vl.Konec.ToString("d.M.yyyy")}) - nepřetržitě <b>{HlidacStatu.Util.RenderData.NiceNumber(vl.Days)} dní</b></li>")

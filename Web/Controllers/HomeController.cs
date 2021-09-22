@@ -1176,7 +1176,7 @@ text zpravy: {txt}
                     return File(@"content\icons\largetile.png", "image/png");
                 else
                     url = mainUrl + "/imagebannercore/quote"
-                        + "?title="
+                        + "?title=" + System.Net.WebUtility.UrlEncode(System.Net.WebUtility.HtmlDecode(socialTitle))
                         + "&subtitle=" + System.Net.WebUtility.UrlEncode(System.Net.WebUtility.HtmlDecode(socialSubFooter))
                         + "&body=" + System.Net.WebUtility.UrlEncode(System.Net.WebUtility.HtmlDecode(socialHtml))
                         + "&footer=" + System.Net.WebUtility.UrlEncode(System.Net.WebUtility.HtmlDecode(socialFooter))
