@@ -166,7 +166,7 @@ $(document).ready(function(){
 @if (Consts.KIndexExceptions.Contains(Model.id)
      && futureData == false)
 {
-    <div class="jumbotron">
+    <div class="p-5 mb-4 bg-jumbo rounded-3">
         <div class="container">
             <div class="row">
                 <h2 style="padding-top:0;margin-top:0;margin-bottom:30px"><a href="/subjekt/@f.ICO"><b>@f.Jmeno</b></a> za rok <b>@ViewBag.SelectedYear</b></h2>
@@ -236,19 +236,19 @@ else
         <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header">
+                <h4 class="modal-title" id="kindexDisclaimerPopupfbTitle">
+                    Upozornění!
+                </h4>
                 <button type="button" class="btn-close"
                         data-bs-dismiss="modal">
                     
                     <span class="sr-only">Zavřít</span>
                 </button>
-                <h4 class="modal-title" id="kindexDisclaimerPopupfbTitle">
-                    Upozornění!
-                </h4>
             </div>
 
             <!-- Modal Body -->
-            <form class="form-horizontal" role="form">
-                <div class="modal-body">
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
                     <p>
                         Toto je výstup <i>Automatické kontroly rizik</i> transparentnosti a hospodaření u uzavřených smluv prováděný Hlídačem státu.
                         <ol>
@@ -259,15 +259,15 @@ else
                         
                     </p>
 
-                </div>
+                </form>
+            </div>
 
-                <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">
-                        Zavřít
-                    </button>
-                </div>
-            </form>
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+                    Zavřít
+                </button>
+            </div>
         </div>
     </div>
 </div>                    
