@@ -10,21 +10,19 @@
             <div class="modal-content">
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <button type="button" class="btn-close"
-                            data-bs-dismiss="modal">
-                        
-                        <span class="sr-only">Close</span>
-                    </button>
                     <h4 class="modal-title" id="@(Model.IdPrefix)fbTitle">
                         @Model.HeaderText
                     </h4>
-                    @Html.Raw(Model.SubText)
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal">
+                        <span class="sr-only">Close</span>
+                    </button>
                 </div>
 
                 <!-- Modal Body -->
-                <form class="form-horizontal" role="form">
-                    <div class="modal-body">
-
+                <div class="modal-body">
+                    @Html.Raw(Model.SubText)
+                    <form class="form-horizontal" role="form">
                         <input type="hidden" name="@(Model.IdPrefix)fbUrl" id="@(Model.IdPrefix)fbUrl" value="@ViewContext.GetDisplayUrl()" />
 
                         @if (!string.IsNullOrWhiteSpace(Model.NoteLabel))
@@ -45,21 +43,20 @@
                                        id="@(Model.IdPrefix)fbInputEmail" placeholder="Email" value="@(User.Identity?.Name)" />
                             </div>
                         </div>
+                    </form>
+                </div>
 
-                    </div>
-
-                    <!-- Modal Footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">
-                            Zrušit
-                        </button>
-                        <button type="button" onclick="send@(Model.IdPrefix)();" class="btn btn-primary" data-bs-dismiss="modal">
-                            Odeslat
-                        </button>
-                        <br />
-                        <div><a class="btn btn-default btn-sm" href="/Kontakt">Další kontakty zde</a></div>
-                    </div>
-                </form>
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+                        Zrušit
+                    </button>
+                    <button type="button" onclick="send@(Model.IdPrefix)();" class="btn btn-primary" data-bs-dismiss="modal">
+                        Odeslat
+                    </button>
+                    <br />
+                    <div><a class="btn btn-default btn-sm" href="/Kontakt">Další kontakty zde</a></div>
+                </div>
             </div>
         </div>
     </div>
@@ -88,33 +85,33 @@ else
             <div class="modal-content">
                 <!-- Modal Header -->
                 <div class="modal-header">
+                    <h4 class="modal-title" id="@(Model.IdPrefix)fbTitle">
+                        Musíte být přihlášeni
+                    </h4>
                     <button type="button" class="btn-close"
                             data-bs-dismiss="modal">
                         
                         <span class="sr-only">Close</span>
                     </button>
-                    <h4 class="modal-title" id="@(Model.IdPrefix)fbTitle">
-                        Musíte být přihlášeni
-                    </h4>
                 </div>
 
                 <!-- Modal Body -->
-                <form class="form-horizontal" role="form">
-                    <div class="modal-body">
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form">
                         <p>Pro poslání vzkazu musíte být přihlášeni.</p>
                         <p>
                             <login-link></login-link>
                         </p>
 
-                    </div>
+                    </form>
+                </div>
 
-                    <!-- Modal Footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">
-                            Zavřít
-                        </button>
-                    </div>
-                </form>
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+                        Zavřít
+                    </button>
+                </div>
             </div>
         </div>
     </div>

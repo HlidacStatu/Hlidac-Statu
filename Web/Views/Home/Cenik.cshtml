@@ -270,26 +270,24 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
             <div class="modal-content">
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <button type="button" class="btn-close"
-                            data-bs-dismiss="modal">
-                        
-                        <span class="sr-only">Close</span>
-                    </button>
                     <h4 class="modal-title" id="cenik_fbTitle">
                         Zpřístupnění všech funkcí hlidacstatu.cz
                     </h4>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal">
+                        <span class="sr-only">Close</span>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form">
                     <p>
                         Pokud jste novinář, uveďte pracovní e-mail a telefon.
                     </p>
                     <p>
                         Napište nám info o vás či vaší organizaci pro kterou potřebujete data z hlidacstatu.cz
                     </p>
-                </div>
-
-                <!-- Modal Body -->
-                <form class="form-horizontal" role="form">
-                    <div class="modal-body">
-
                         <div class="form-group">
                             <label class="col-sm-2 control-label"
                                    for="cenik_fbInputTxt">Vzkaz, odůvodnění</label>
@@ -313,19 +311,19 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
                                        id="cenik_fbInputTel" placeholder="Telefonní číslo" />
                             </div>
                         </div>
+                    </form>
 
-                    </div>
+                </div>
 
-                    <!-- Modal Footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">
-                            Zrušit
-                        </button>
-                        <button type="button" onclick="sendcenik_();" class="btn btn-primary" data-bs-dismiss="modal">
-                            Odeslat vzkaz
-                        </button>
-                    </div>
-                </form>
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+                        Zrušit
+                    </button>
+                    <button type="button" onclick="sendcenik_();" class="btn btn-primary" data-bs-dismiss="modal">
+                        Odeslat vzkaz
+                    </button>
+                </div>
             </div>
         </div>
     </div>

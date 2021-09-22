@@ -12,25 +12,25 @@
         <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header">
+                <h4 class="modal-title" id="@(idPrefix)fbTitle">
+                    Zpřístupnění skryté přílohy
+                </h4>
                 <button type="button" class="btn-close"
                         data-bs-dismiss="modal">
                     
                     <span class="sr-only">Close</span>
                 </button>
-                <h4 class="modal-title" id="@(idPrefix)fbTitle">
-                    Zpřístupnění skryté přílohy
-                </h4>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
                 <p>
                     Přílohy zneplatněných smluv jsou z registru smluv smazané (obvykle z důvodu ochrany osobních údajů). My je však pro jistotu uchováváme, ale nezveřejňujeme.
                 </p>
                 <p>
                     Pokud existuje závažný veřejný zájem na dostupnosti této přílohy, pošlete nám podrobnosti/odůvodnění a my vám přílohu zpřístupníme.
                 </p>
-            </div>
-
-            <!-- Modal Body -->
-            <form class="form-horizontal" role="form">
-                <div class="modal-body">
+                <form class="form-horizontal" role="form">
 
                     <input type="hidden" name="@(idPrefix)fbUrl" id="@(idPrefix)fbUrl" value="@Context.Request.GetDisplayUrl()"/>
                     <input type="hidden" name="@(idPrefix)fbPriloha" id="@(idPrefix)fbUrl" value="@Model.PrilohaId"/>
@@ -53,19 +53,18 @@
                                    id="@(idPrefix)fbInputEmail" placeholder="Email"/>
                         </div>
                     </div>
+                </form>
+            </div>
 
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">
-                        Zrušit
-                    </button>
-                    <button type="button" onclick="send@(idPrefix)();" class="btn btn-primary" data-bs-dismiss="modal">
-                        Odeslat vzkaz
-                    </button>
-                </div>
-            </form>
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+                    Zrušit
+                </button>
+                <button type="button" onclick="send@(idPrefix)();" class="btn btn-primary" data-bs-dismiss="modal">
+                    Odeslat vzkaz
+                </button>
+            </div>
         </div>
     </div>
 </div>
