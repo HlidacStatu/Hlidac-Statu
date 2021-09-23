@@ -571,7 +571,9 @@
                     <div>
                         @if (!string.IsNullOrWhiteSpace(Model.Platce?.ico) && !string.IsNullOrWhiteSpace(subjekt.ico))
                         {
-                            @Html.Raw($"<a href='/HledatSmlouvy?Q=icoPlatce:{Model.Platce?.ico}%20AND%20icoPrijemce:{subjekt.ico}'>Další smlouvy mezi tímto dodavatelem a úřadem</a>")
+                            <a href='/HledatSmlouvy?Q=icoPlatce:@Model.Platce?.ico%20AND%20icoPrijemce:@subjekt.ico'>Další smlouvy mezi tímto dodavatelem a úřadem</a>
+                            <br/>
+                            <a href='/HledatSmlouvy?Q=ico:@Model.Platce?.ico%20AND%20ico:@subjekt.ico'>Všechny smlouvy mezi těmito subjekty</a>
                         }
                     </div>
                 </text>
