@@ -51,11 +51,11 @@ Content-Type: text/html; charset=utf-8
                     <b>
                         @if (item.KonecnaHodnotaBezDPH.HasValue)
                         {
-                            @(HlidacStatu.Util.RenderData.NicePrice(item.KonecnaHodnotaBezDPH.Value, "0 {0}", "Kč",true))
+                            @(HlidacStatu.Util.RenderData.NicePriceHtml(item.KonecnaHodnotaBezDPH.Value, "0 {0}", "Kč",true))
                         }
                         else if (item.OdhadovanaHodnotaBezDPH.HasValue)
                         {
-                            <span>odhad.cena </span> @(HlidacStatu.Util.RenderData.NicePrice(item.OdhadovanaHodnotaBezDPH.Value, "0 {0}", "Kč", true))
+                            <span>odhad.cena </span> @(HlidacStatu.Util.RenderData.NicePriceHtml(item.OdhadovanaHodnotaBezDPH.Value, "0 {0}", "Kč", true))
                         }
                         else
                         {

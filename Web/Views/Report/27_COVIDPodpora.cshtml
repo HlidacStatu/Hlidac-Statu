@@ -41,19 +41,19 @@
         <div style="font-size:20px" class="center-block text-center">
             Do @(keDni.ToString("d. MMMM yyyy")) bylo vyplaceno celkem
             <div class="text-danger" style="font-size:130%">
-                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(vypl_prima + vypl_neprima + vypl_zaruka, mena: "mld. Kč", html: true))
+                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(vypl_prima + vypl_neprima + vypl_zaruka, mena: "mld. Kč"))
                 z peněz daňových poplatníků.
             </div>
-            @*To je @HlidacStatu.Util.RenderData.NicePrice(((vypl_prima + vypl_neprima + vypl_zaruka)*1000000000)/pocetDomacnosti) na jednu domácnost.*@
+            @*To je @HlidacStatu.Util.RenderData.NicePriceHtml(((vypl_prima + vypl_neprima + vypl_zaruka)*1000000000)/pocetDomacnosti) na jednu domácnost.*@
         </div>
     </div>
     <div class="col-xs-12 col-sm-9">
         <blockquote class="blockquote-reverse">
             <p class="text-justify">
-                <img src="~/Content/Img/report27sm.png" style="width:200px;height:auto;padding-left:20px" class="img-rounded pull-right" />
+                <img src="~/Content/Img/report27sm.png" style="width:200px;height:auto;padding-left:20px" class="img-rounded float-end" />
 
                 <span style="font-size:0.9em;" class="text-muted">
-                    <i class="fas fa-quote-right fa-2x fa-pull-left"></i>Celková
+                    <i class="fas fa-quote-right fa-2x fa-float-start"></i>Celková
                     opatření na podporu ekonomiky v souvislosti s dopady šíření koronaviru činí
                     <b class="text-danger">1,19 bilionu korun</b>. Z toho přímá podpora je 216 miliard korun a záruky na úvěry 951,5 miliardy
                     korun.
@@ -65,7 +65,7 @@
         </blockquote>
         <h3>Pro podporu ekonomiky vláda plánuje zadlužení státu v roce 2020 ve výši  
             <span class="text-danger"><b>500 miliard Kč</b></span>. 
-        To je <b class="text-danger">dluh @HlidacStatu.Util.RenderData.NicePrice((500m * 1000000000m) / pocetDomacnosti)</b> 
+        To je <b class="text-danger">dluh @HlidacStatu.Util.RenderData.NicePriceHtml((500m * 1000000000m) / pocetDomacnosti)</b> 
         na pro každou českou domácnost.
         </h3>
     </div>
@@ -89,12 +89,12 @@
                     <tr>
                         <td>
                             <span style="font-size:25px;font-weight:bold">
-                                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(odh_prima, mena: "mld. Kč", html: true))
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(odh_prima, mena: "mld. Kč"))
                             </span>
                         </td>
                         <td>
                             <span style="font-size:25px;font-weight:bold">
-                                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(vypl_prima, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(vypl_prima, mena: "mld. Kč", showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
                             </span>
                         </td>
                         <td>Přímá nevratná podpora</td>
@@ -102,12 +102,12 @@
                     <tr>
                         <td>
                             <span style="font-size:25px;font-weight:bold">
-                                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(odh_neprima, mena: "mld. Kč", html: true))
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(odh_neprima, mena: "mld. Kč"))
                             </span>
                         </td>
                         <td>
                             <span style="font-size:25px;font-weight:bold">
-                                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(vypl_neprima, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(vypl_neprima, mena: "mld. Kč", showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
                             </span>
                         </td>
                         <td>Nepřímá podpora (snížení, odpuštění daní, liberační balíček)</td>
@@ -115,12 +115,12 @@
                     <tr>
                         <td>
                             <span style="font-size:25px;font-weight:bold">
-                                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(odh_zaruka, mena: "mld. Kč", html: true))
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(odh_zaruka, mena: "mld. Kč"))
                             </span>
                         </td>
                         <td>
                             <span style="font-size:25px;font-weight:bold">
-                                @Html.Raw(HlidacStatu.Util.RenderData.NicePrice(vypl_zaruka, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
+                                @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(vypl_zaruka, mena: "mld. Kč", showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))
                             </span>
                         </td>
                         <td>Úvěr či záruka za úvěr</td>
@@ -172,7 +172,7 @@
                                 <td>
                                     @if (item.odhadovana_celkova_vyse_v_mld_kc > 0)
                                     {
-                                        <span>@Html.Raw(HlidacStatu.Util.RenderData.NicePrice(item.odhadovana_celkova_vyse_v_mld_kc, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</span>
+                                        <span>@Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(item.odhadovana_celkova_vyse_v_mld_kc, mena: "mld. Kč", showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</span>
                                     }
                                     else
                                     {
@@ -182,7 +182,7 @@
                                 <td>
                                     @if (item.vyplacena > 0)
                                     {
-                                        <span>@Html.Raw(HlidacStatu.Util.RenderData.NicePrice(item.vyplacena, mena: "mld. Kč", html: true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</span>
+                                        <span>@Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml(item.vyplacena, mena: "mld. Kč", showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.Show))</span>
                                     }
                                 </td>
                                 <td>
@@ -215,10 +215,10 @@
     <div class="col-xs-12">
         <blockquote>
             <p class="text-justify">
-                <img src="~/Content/Img/report27smbabis.png" style="width:200px;height:auto;padding-right:20px" class="img-rounded pull-left" />
+                <img src="~/Content/Img/report27smbabis.png" style="width:200px;height:auto;padding-right:20px" class="img-rounded float-start" />
 
                 <span style="font-size:0.9em;" class="text-muted">
-                    <i class="fas fa-quote-right fa-2x fa-pull-left"></i>Naše vláda je připravena udělat maximum pro to, abychom pomohli všem živnostníkům, podnikatelům, malým a středním firmám, rodinným firmám, ale taky samoživitelkám a dalším. Zkrátka všem, kteří přišli kvůli koronaviru o příjem. Jsme na to připraveni v tuto chvíli uvolnit až
+                    <i class="fas fa-quote-right fa-2x fa-float-start"></i>Naše vláda je připravena udělat maximum pro to, abychom pomohli všem živnostníkům, podnikatelům, malým a středním firmám, rodinným firmám, ale taky samoživitelkám a dalším. Zkrátka všem, kteří přišli kvůli koronaviru o příjem. Jsme na to připraveni v tuto chvíli uvolnit až
                     <b class="text-danger">tisíc miliard korun</b>.
                 </span>
             </p>

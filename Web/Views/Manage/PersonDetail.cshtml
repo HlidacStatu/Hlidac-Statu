@@ -64,8 +64,8 @@
         <hr />
         <button type="button"
                 class="btn btn-primary btn-sm"
-                data-toggle="modal"
-                data-target="#eventModal"
+                data-bs-toggle="modal"
+                data-bs-target="#eventModal"
                 data-personid="@Model.InternalId"
                 data-eventid="0"
                 data-datumod=""
@@ -276,8 +276,8 @@
                             <td>
                                 <button type="button"
                                         class="btn btn-primary btn-sm"
-                                        data-toggle="modal"
-                                        data-target="#eventModal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#eventModal"
                                         data-personid="@Model.InternalId"
                                         data-eventid="@udalost.Pk"
                                         data-datumod="@(udalost.DatumOd?.ToString("dd.MM.yyyy"))"
@@ -296,8 +296,8 @@
                                 </button>
                                 <button type="button"
                                         class="btn btn-danger btn-sm"
-                                        data-toggle="modal"
-                                        data-target="#eventModal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#eventModal"
                                         data-personid="@Model.InternalId"
                                         data-eventid="@udalost.Pk"
                                         data-datumod="@(udalost.DatumOd?.ToString("dd.MM.yyyy"))"
@@ -334,8 +334,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="eventModalLabel">Editovat událost</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    
                 </button>
             </div>
             <div class="modal-body">
@@ -380,7 +380,7 @@
                             <div id="ico-autocomplete"></div>
                             <span class="field-validation-valid text-danger" data-valmsg-for="Ico" data-valmsg-replace="true"></span>
                             <div class="form-inline">
-                                <input type="checkbox" class="form-control" id="ceo">
+                                <input type="checkbox" class="form-check-input" id="ceo">
                                 <label for="ceo">Je CEO</label>
                             </div>
                         </div>
@@ -401,7 +401,7 @@
                             {
                                 <div class="form-inline">
                                     <input type="checkbox"
-                                           class="form-control statusbox"
+                                           class="form-check-input statusbox"
                                            value="@value.ToString("D")"
                                            name="@value.ToString("G")">
                                     <label for="@value.ToString("G")">@value.ToNiceDisplayName()</label>
@@ -417,14 +417,12 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Zrušit</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zrušit</button>
                 <button type="button" class="btn btn-primary" id="sendButton">Uložit</button>
             </div>
         </div>
     </div>
 </div>
-
-<a id="back-to-top" href="#" class="btn btn-primary btn-lg back-to-top" role="button" title="Click to return on the top page" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
 
 <script>
     // setup modal window

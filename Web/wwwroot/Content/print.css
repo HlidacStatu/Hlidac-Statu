@@ -237,11 +237,11 @@ figure {
   content: ' x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x ';
 }
 
-.u-pull-left {
+.u-float-start {
   float: left;
 }
 
-.u-pull-right {
+.u-float-end {
   float: right;
 }
 
@@ -262,11 +262,11 @@ figure {
   left: -5000px;
 }
 
-.u-text-left {
+.u-text-start {
   text-align: left;
 }
 
-.u-text-right {
+.u-text-end {
   text-align: right;
 }
 

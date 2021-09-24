@@ -124,7 +124,7 @@
 
 <div class="head">
     <h3>
-        <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" item="@Model.osoba" style="font-size:24px;vertical-align:top;"></add-bookmark>
+        <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" item="@Model.osoba" style="font-size:0.7em;vertical-align:top;"></add-bookmark>
         @Model.osoba.FullNameWithYear()
         @if (this.User?.IsInRole("canEditData") == true)
         {
@@ -144,7 +144,7 @@
     </cache>
 
     @* Prázdný sloupec *@
-    <div class="col-sm-1"></div>
+    <div class="col-sm-1 order-2"></div>
     <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
         <partial name="@Model.viewName" model="@Model.osoba" />
     </cache>

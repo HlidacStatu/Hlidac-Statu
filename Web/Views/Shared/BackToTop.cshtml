@@ -1,4 +1,4 @@
-<a id="back-to-top" href="#" class="btn btn-primary btn-lg back-to-top" role="button" title="Click to return on the top page" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
+<a id="back-to-top" href="#" class="btn btn-primary btn-lg back-to-top" role="button" title="Vrátit se na začátek stránky" data-bs-toggle="tooltip" data-placement="left"><i class="fas fa-chevron-up"></i></a>
 <div style="height: 32px"></div>
 
 <script>
@@ -6,7 +6,9 @@
         $(window).scroll(function () {
             if ($(this).scrollTop() > 800) {
                 $('#back-to-top').fadeIn();
+                //$('#back-to-top').tooltip('show');
             } else {
+                $('#back-to-top').tooltip('hide');
                 $('#back-to-top').fadeOut();
             }
         });
@@ -19,7 +21,6 @@
             return false;
         });
 
-        $('#back-to-top').tooltip('show');
 
     });
 </script>

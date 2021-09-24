@@ -74,7 +74,7 @@ else
 
 
 <h3 style="margin-top:50px">Informace o řízení</h3>
-<div class="hidden-xs">
+<div class="d-none d-sm-flex">
     <table class="table solid">
         <tbody>
             <tr>
@@ -151,7 +151,7 @@ else
     </table>
 
 </div>
-<div class="visible-xs-block">
+<div class="d-flex d-sm-none">
     <table class="table table-striped">
         <tbody>
             <tr>
@@ -225,18 +225,18 @@ else
 
 <div class="col-xs-12">
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active">
-            <a href="#@(id)1" onclick="ga('send', 'event', 'tabHorizontal', 'change_1','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)1" role="tab" data-toggle="tab">
+        <li role="presentation" class="nav-item">
+            <a href="#@(id)1" class="nav-link active" onclick="ga('send', 'event', 'tabHorizontal', 'change_1','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)1" role="tab" data-bs-toggle="tab">
                 @Html.Raw($"Dlužníci ({Model.Rizeni?.Dluznici?.Count ?? 0})")
             </a>
         </li>
-        <li role="presentation">
-            <a href="#@(id)2" onclick="ga('send', 'event', 'tabHorizontal', 'change_2','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)2" role="tab" data-toggle="tab">
+        <li role="presentation" class="nav-item">
+            <a href="#@(id)2" class="nav-link" onclick="ga('send', 'event', 'tabHorizontal', 'change_2','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)2" role="tab" data-bs-toggle="tab">
                 @Html.Raw($"Věřitelé ({Model.Rizeni?.Veritele?.Count ?? 0})")
             </a>
         </li>
-        <li role="presentation">
-            <a href="#@(id)3" onclick="ga('send', 'event', 'tabHorizontal', 'change_3','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)3" role="tab" data-toggle="tab">
+        <li role="presentation" class="nav-item">
+            <a href="#@(id)3" class="nav-link" onclick="ga('send', 'event', 'tabHorizontal', 'change_3','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)3" role="tab" data-bs-toggle="tab">
                 @Html.Raw($"Insolveční správci ({Model.Rizeni?.Spravci?.Count ?? 0})")
             </a>
         </li>
@@ -311,14 +311,14 @@ else
             }
         </tbody>
     </table>
-    <div class="text-right">
+    <div class="text-end">
         <a href="@Url.Action("Dokumenty", "Insolvence", new { id = Model.Rizeni.UrlId(), qs = Context.Request.Query["qs"] })">Všechny dokumenty (@Model.Rizeni.Dokumenty.Count())</a>
     </div>
 </div>
 
 <script>
     $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
+        $('[data-bs-toggle="tooltip"]').tooltip()
     })
 </script>
 

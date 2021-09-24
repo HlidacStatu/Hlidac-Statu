@@ -53,6 +53,7 @@ namespace HlidacStatu.Web.TagHelpers
             }
 
             output.TagName = "a";
+            output.Content.AppendHtml("<i class=\"fad fa-bookmark\"></i>");
             output.Attributes.Add("href", "#");
 
             //if user is not authenticated not authenticated 

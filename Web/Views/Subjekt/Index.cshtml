@@ -34,7 +34,7 @@
 }
 
 @* První sloupec *@
-<div class="col-sm-7 col-sm-pull-5 col-xs-12 col-xs-pull-0">
+<div class="col-sm-7 col-xs-12 order-1">
     @* ----- K-Index ----- *@
     @if (kindex != null && kindex.LastKIndexLabel() != KIndexData.KIndexLabelValues.None)
     {
@@ -85,7 +85,7 @@
         <a href="/subjekt/Rizika/@Model.ICO" class="moreinfolink text-uppercase"><strong>Zobrazit další rizika i v předchozích letech</strong></a>
 
         <div style="padding-top:15px;">
-            <i class="fas fa-info-circle fa-2x fa-pull-left"></i>
+            <i class="fas fa-info-circle fa-2x fa-float-start"></i>
             <span class="text-muted small">
                 Toto je výstup <i>Automatické kontroly rizik</i> transparentnosti a hospodaření u uzavřených smluv prováděný Hlídačem státu.
                 Závěry kontroly nedokazují pochybení či porušení zákona na žádné straně smluvních vztahů.
@@ -309,7 +309,7 @@
             string durl = "/dotace/hledat?Q=ico%3A+" + Model.ICO;
             //var dotaceStat = dotaceSummary.PocetDotaci;
 
-            var sdotaceKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePrice(dotaceSummary.CelkemCerpano, html: true) + "</b>."; }
+            var sdotaceKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(dotaceSummary.CelkemCerpano) + "</b>."; }
 
         @if (Model.JsemOVM())
         {
@@ -344,8 +344,8 @@
 
             if (totalCountDotaceHolding - dotaceSummary.PocetDotaci > 0)
             {
-                var sdotaceHDiffKc = " v hodnotě <b>" + HlidacStatu.Util.RenderData.NicePrice(totalSumDotaceHolding - dotaceSummary.CelkemCerpano, html: true) + "</b>.";
-                var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePrice(totalSumDotaceHolding, html: true) + "</b>.";
+                var sdotaceHDiffKc = " v hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(totalSumDotaceHolding - dotaceSummary.CelkemCerpano) + "</b>.";
+                var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(totalSumDotaceHolding) + "</b>.";
                 string durlH = "/dotace/hledat?Q=holding%3A+" + Model.ICO;
                 if (Model.JsemOVM())
                 {
@@ -509,7 +509,7 @@
                 <p>
                     @Html.SubjektTypTrojice(Model, "Úřad sponzoroval", "Organizace sponzorovala", "Firma sponzorovala")
                     politické strany @HlidacStatu.Util.RenderData.RenderList(Model.Sponzoring().Select(m => m.JmenoPrijemce()).Distinct(), ending: "")
-                    v celkové výši @HlidacStatu.Util.RenderData.NicePrice(Model.Sponzoring().Sum(m => m.Hodnota) ?? 0).
+                    v celkové výši @HlidacStatu.Util.RenderData.NicePriceHtml(Model.Sponzoring().Sum(m => m.Hodnota) ?? 0).
                 </p>
             }
             @if (StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO))

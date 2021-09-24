@@ -48,11 +48,11 @@ namespace HlidacStatu.Entities.Issues
             }
         }
 
-        public static string GetIcon(ImportanceLevel imp, string sizeInCss = "90%;", string glyphiconSymbol = "exclamation-sign")
+        public static string GetIcon(ImportanceLevel imp, string sizeInCss = "90%;", string glyphiconSymbol = "exclamation-circle")
         {
-            string res = "<span class=\"text{0} glyphicon glyphicon-{3}\" style=\"font-size:{1}\" aria-hidden=\"true\" title=\"{2}\"></span>";
+            
+            return $"<span class=\"text{GetCssClass(imp, true)} fas fa-{glyphiconSymbol}\" style=\"font-size:{sizeInCss}\" aria-hidden=\"true\" title=\"{imp.ToNiceDisplayName()}\"></span>";
 
-            return string.Format(res, GetCssClass(imp, true), sizeInCss, imp.ToNiceDisplayName(), glyphiconSymbol);
         }
 
     }

@@ -46,16 +46,16 @@ namespace HlidacStatu.Web.TagHelpers
 
             string content = $@"
 <span class=""dontembed"">
-    <a href="""" class=""ssk ssk-text ssk-amethyst ssk-xs"" data-toggle=""modal"" data-target=""#modal{modalid}"">
-        <span class=""glyphicon glyphicon-cog""></span>{Title}
+    <a href="""" class=""ssk ssk-text ssk-amethyst ssk-xs"" data-bs-toggle=""modal"" data-bs-target=""#modal{modalid}"">
+        <div class=""far fa-cog"" style=""margin: -4px 6px -4px -4px;padding: 4px;background-color: rgba(0,0,0,.15);""></div>{Title}
     </a>
 </span> <!-- Modal -->
 <div class=""modal fade"" id=""modal{modalid}"" tabindex=""-1"" role=""dialog"" aria-labelledby=""modal{modalid}"">
     <div class=""modal-dialog"" role=""document"">
         <div class=""modal-content"">
             <div class=""modal-header"">
-                <button type=""button"" class=""close"" data-dismiss=""modal"" aria-label=""Close""><span aria-hidden=""true"">&times;</span></button>
                 <h4 class=""modal-title"">{Title}</h4>
+                <button type=""button"" class=""close"" data-bs-dismiss=""modal"" aria-label=""Close""><span aria-hidden=""true"">&times;</span></button>
             </div>
             <div class=""modal-body"">
                 <p style=""font-size:14px;"">
@@ -77,7 +77,7 @@ overflow: hidden;height: 75px;border: 1px solid #ccd6dd;resize: none;
                 </div>
             </div>
             <div class=""modal-footer"">
-                <button type=""button"" class=""btn btn-default"" data-dismiss=""modal"">Zavřít</button>
+                <button type=""button"" class=""btn btn-default"" data-bs-dismiss=""modal"">Zavřít</button>
             </div>
         </div>
     </div>

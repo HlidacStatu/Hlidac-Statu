@@ -12,7 +12,7 @@
 
 
 @* První sloupec *@
-<div class="col-sm-7 col-sm-pull-5 col-xs-12 col-xs-pull-0">
+<div class="col-sm-7 col-xs-12 order-1">
 
                 <p class="text-muted sub-header-info">
                 Přehled finančních a nefinančních podpor politickým stranám. Podpory větší než 5000 Kč zobrazujeme po dobu 10 let, menší podpory po dobu 5 let.
@@ -83,7 +83,7 @@
                     var sponz = o.Sponzoring();
                     <li>
                         <a href="@o.GetUrl()">@o.FullNameWithYear()</a> sponzoroval @HlidacStatu.Util.RenderData.RenderList(sponz.Select(m => m.JmenoPrijemce()).Distinct(), ending: "")
-                        v celkové výši <b>@HlidacStatu.Util.RenderData.NicePrice(sponz.Sum(m => m.Hodnota) ?? 0)</b>.
+                        v celkové výši <b>@HlidacStatu.Util.RenderData.NicePriceHtml(sponz.Sum(m => m.Hodnota) ?? 0)</b>.
                     </li>
                 }
             </ul>

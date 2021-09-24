@@ -108,10 +108,10 @@
                 }
                 else
                 {
-                    <p>@HlidacStatu.Util.RenderData.NicePrice((decimal)Model.DotaceCelkem)</p>
+                    <p>@HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.DotaceCelkem)</p>
                     if (Model.PujckaCelkem != null && Model.PujckaCelkem > 0)
                     {
-                        <p class="text-muted">z toho @HlidacStatu.Util.RenderData.NicePrice((decimal)Model.PujckaCelkem) je půjčka.</p>
+                        <p class="text-muted">z toho @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)Model.PujckaCelkem) je půjčka.</p>
                     }
                 }
 
@@ -148,11 +148,11 @@
                         <td>
                             @rozhodnuti.Rok
                         </td>
-                        <td class="text-nowrap text-right">
-                            @HlidacStatu.Util.RenderData.NicePrice(rozhodnuti.CastkaPozadovana ?? 0)
+                        <td class="text-nowrap text-end">
+                            @HlidacStatu.Util.RenderData.NicePriceHtml(rozhodnuti.CastkaPozadovana ?? 0)
                         </td>
-                        <td class="text-nowrap text-right">
-                            @HlidacStatu.Util.RenderData.NicePrice(rozhodnuti.CastkaRozhodnuta ?? 0)
+                        <td class="text-nowrap text-end">
+                            @HlidacStatu.Util.RenderData.NicePriceHtml(rozhodnuti.CastkaRozhodnuta ?? 0)
                         </td>
                         <td>
                             @(rozhodnuti.JePujcka.HasValue && rozhodnuti.JePujcka.Value ? "ano" : "ne")
@@ -163,7 +163,7 @@
                         <td>
                             @rozhodnuti.Poskytovatel
                         </td>
-                        <td class="text-nowrap text-right">
+                        <td class="text-nowrap text-end">
 
                             @if (Model.DotaceCelkem == null || Model.DotaceCelkem == 0)
                             {
@@ -171,7 +171,7 @@
                             }
                             else
                             {
-                                @HlidacStatu.Util.RenderData.NicePrice(rozhodnuti.CerpanoCelkem ?? 0)
+                                @HlidacStatu.Util.RenderData.NicePriceHtml(rozhodnuti.CerpanoCelkem ?? 0)
 
                             }
 
@@ -191,13 +191,13 @@
                     {
                         <tr>
                             <td></td>
-                            <td style="vertical-align:top;" class="text-right">Jednotlivá čerpání</td>
+                            <td style="vertical-align:top;" class="text-end">Jednotlivá čerpání</td>
                             <td colspan="5">
                                 <ul>
                                     @foreach (var row in rozhodnuti.Cerpani.OrderBy(r => r.Rok))
                                     {
                                         <li>
-                                            @(HlidacStatu.Util.RenderData.NicePrice(row.CastkaSpotrebovana ?? 0)) (v roce @row.Rok)
+                                            @(HlidacStatu.Util.RenderData.NicePriceHtml(row.CastkaSpotrebovana ?? 0)) (v roce @row.Rok)
                                         </li>
 
                                     }

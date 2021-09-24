@@ -10,7 +10,7 @@
 }
 
     @* První sloupec *@
-    <div class="col-sm-7 col-sm-pull-5 col-xs-12 col-xs-pull-0">
+    <div class="col-sm-7 col-xs-12 order-1">
 
 @{
     var uradSVazbami = StaticData.UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache.Get()
@@ -102,7 +102,7 @@
                         if (uradSVazbami.Detail.Count > previewCount)
                         {
                             string rand = Guid.NewGuid().ToString("N");
-                            sb.Append("<a class='btn btn-link' role='button' data-toggle='collapse' href='#allData" + rand + "' aria-expanded='false' aria-controls='allData'>Ukázat všechny</a>");
+                            sb.Append("<a class='btn btn-link' role='button' data-bs-toggle='collapse' href='#allData" + rand + "' aria-expanded='false' aria-controls='allData'>Ukázat všechny</a>");
                             sb.Append("<ul class='collapse' id='allData" + rand + "'>");
                             foreach (var f in uradSVazbami.Detail.OrderByDescending(m => m.CelkemCena).Skip(previewCount))
                             {

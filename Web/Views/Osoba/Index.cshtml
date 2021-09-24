@@ -32,7 +32,7 @@
 }
 
 @* První sloupec *@
-<div class="col-sm-7 col-sm-pull-5 col-xs-12 col-xs-pull-0">
+<div class="col-sm-7 col-xs-12 order-1">
     @{
         intv = laps.AddAndStartLap("RegistrSmluv");
     }
@@ -144,9 +144,8 @@
                     @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
                     @if (statistics.NeziskovkyCount() > 0)
                     {
-                        <span>(z toho v @Devmasters.Lang.CS.Plural.Get(statistics.NeziskovkyCount(), "jedné neziskovce", "{0} neziskovkách", "{0} neziskovkách"))</span>
+                        <span>(z toho v @Devmasters.Lang.CS.Plural.Get(statistics.NeziskovkyCount(), "jedné neziskovce", "{0} neziskovkách", "{0} neziskovkách")):</span>
                     }
-                    :
                     <ul>
                         @foreach (var stat in statistics.SoukromeFirmy
                             .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)
@@ -212,7 +211,7 @@
         {
             sumH += (decimal)item.Sum("sum").Value;
         }
-        var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePrice(sumH) + "</b>.";
+        var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(sumH) + "</b>.";
         string durlH = "/dotace/hledat?Q=osobaid%3A" + Model.NameId;
     }
     @if (dotaceSearchH.Total > 0)

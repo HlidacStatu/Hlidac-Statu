@@ -26,7 +26,7 @@
 
 @if (Model == null)
 {
-<div class="jumbotron">
+<div class="p-5 mb-4 bg-jumbo rounded-3">
     <h1>K–Index</h1>
     <p>Index klíčových rizik nebyl pro tento subjekt dosud spočítán</p>
 </div>return;
@@ -34,7 +34,7 @@
 
 @if (Model.roky.Count(m => m != null) == 0)
 {
-<div class="jumbotron">
+<div class="p-5 mb-4 bg-jumbo rounded-3">
     <h1>K–Index</h1>
     <p>Tento subjekt uzavřel v každém roce méně než @(HlidacStatu.Lib.Analysis.KorupcniRiziko.Consts.MinSmluvPerYear) smluv.</p>
     <p>Pro spočítání K–Indexu je to příliš málo smluv.</p>
@@ -59,7 +59,7 @@
         ); }
 
 
-<div class="jumbotron">
+<div class="p-5 mb-4 bg-jumbo rounded-3">
     <h1>K–Index</h1>
     <p>Index klíčových rizik pro <b>@(Firmy.Get(Model.Ico)?.Jmeno) (@Model.Ico)</b> </p>
 </div>
@@ -124,7 +124,7 @@
                     @for (int y = fromY; y <= toY; y++)
                     {
             <td>
-                @HlidacStatu.Util.RenderData.NicePrice(Model.ForYear(y).Statistika.CelkovaHodnotaSmluv, shortFormat: true)
+                @HlidacStatu.Util.RenderData.NicePriceHtml(Model.ForYear(y).Statistika.CelkovaHodnotaSmluv, shortFormat: true)
             </td>}
                 </tr>
 
@@ -354,7 +354,7 @@
                     @for (int y = fromY; y <= toY; y++)
                     {
             <td>
-                @HlidacStatu.Util.RenderData.NicePrice(Model.ForYear(y).FinancniUdaje.OvlivnitelneNakladyCinnosti ?? 0)
+                @HlidacStatu.Util.RenderData.NicePriceHtml(Model.ForYear(y).FinancniUdaje.OvlivnitelneNakladyCinnosti ?? 0)
             </td>}
                 </tr>
             </tbody>

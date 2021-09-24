@@ -39,8 +39,8 @@
 
 <div class="row">
     <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
-        <div class="panel panel-default">
-            <div class="panel-heading">
+        <div class="card bg-default">
+            <div class="card-header">
                 <b>Nastavení zasílání upozornění</b>
             </div>
 
@@ -48,7 +48,7 @@
                 <li class="list-group-item">
                     <form action="watchdogsSett" method="post" class="" role="form" style="padding-bottom: 11px;">
                         Posílat upozornění dohromady v jednom mailu (doporučujeme):
-                        <div class="material-switch pull-right">
+                        <div class="material-switch float-end">
                             @{
                                 var aspnetuser = ApplicationUser.GetByEmail(User.Identity?.Name);
                                 string allInOneWDcheck = aspnetuser.SentWatchdogOneByOne ? "" : "checked='checked'";

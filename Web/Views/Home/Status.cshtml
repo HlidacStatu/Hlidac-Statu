@@ -12,7 +12,7 @@
 
 @if (Model.name == "NoData")
 {
-    <div class="jumbotron">
+    <div class="p-5 mb-4 bg-jumbo rounded-3">
         <h1>@Html.Raw(Model.htmlIcon) Data o dostupnosti služeb se nepodařilo načíst</h1>
         <p><a class="btn btn-primary btn-lg" href="/status?r=@(HlidacStatu.Util.Consts.Rnd.Next(0, 1000))" role="button">Načíst znovu</a></p>
     </div>
@@ -20,7 +20,7 @@
 }
 
 
-<div class="jumbotron small">
+<div class="p-5 mb-4 bg-jumbo rounded-3 small">
     <h1>@Html.Raw(Model.htmlIcon) @Model.czStatus</h1>
     <p>Stav k @(Model.lastExecuted.ToString("dd. MM. yyyy HH:mm:ss"))</p>
     <p><a class="btn btn-primary btn-lg" href="/status?r=@(HlidacStatu.Util.Consts.Rnd.Next(0, 1000))" role="button">Načíst znovu</a></p>

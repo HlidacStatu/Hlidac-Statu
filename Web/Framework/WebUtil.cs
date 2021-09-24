@@ -70,7 +70,7 @@ namespace HlidacStatu.Web.Framework
         {
             return new HtmlString(
                 $@"<a class=""{btnCss ?? "btn btn-default btn-xs"}"" href=""{GetSearchUrl(url, query)}"">
-                <span class=""glyphicon glyphicon-search dark"" aria-hidden=""true""></span>{btnText}</a>");
+                <span class=""fad fa-search dark"" aria-hidden=""true""></span>{btnText}</a>");
         }
 
         public static IHtmlContent SetAutofocusOnId(string id)

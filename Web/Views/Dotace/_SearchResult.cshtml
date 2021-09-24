@@ -48,7 +48,7 @@ else
                 {
                     double? sum = ((Nest.ValueAggregate)Model?.ElasticResults?.Aggregations["souhrn"])?.Value;
                     <div>
-                        V celkové hodnotě @HlidacStatu.Util.RenderData.NicePrice((decimal)sum). <sup>*)</sup>
+                        V celkové hodnotě @HlidacStatu.Util.RenderData.NicePriceHtml((decimal)sum). <sup>*)</sup>
                         <div class="alert alert-info" role="alert">
                             <b>*) Celková hodnota</b> je námi vypočítaná hodnota čerpaných dotací, kterou jsme získali z různých zdrojových databází. Takto získané údaje proto mohou být podle kvality vstupních dat zobrazeny v některých případech i duplicitně nebo neúplně. Veškeré údaje proto vždy doporučujeme ověřit.
                         </div>
@@ -57,7 +57,7 @@ else
             </div>
             <div class="col-xs-12 col-sm-6">
                 <br />
-                @Html.DropDownListFor(m => m.Order, Model.OrderList, new { @class = "form-control small pull-right", @id = "orderListVZ", @style = "width:60%;max-width:300px", @onchange = "changeOrder(this);" })
+                @Html.DropDownListFor(m => m.Order, Model.OrderList, new { @class = "form-control small float-end", @id = "orderListVZ", @style = "width:60%;max-width:300px", @onchange = "changeOrder(this);" })
             </div>
         </div>
         
