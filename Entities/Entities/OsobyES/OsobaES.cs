@@ -15,8 +15,8 @@ namespace HlidacStatu.Entities.OsobyES
         public int? BirthYear { get; set; }
         [Number]
         public int? DeathYear { get; set; }
-        [Text]
-        public string[] PoliticalFunctions { get; set; }
+        [Object]
+        public PoliticalFunction[] PoliticalFunctions { get; set; }
         [Text]
         public string PoliticalParty { get; set; }
         [Text]
@@ -25,5 +25,13 @@ namespace HlidacStatu.Entities.OsobyES
         public int Status { get; set; }
         [Keyword]
         public string PhotoUrl { get; set; }
+    }
+
+    public class PoliticalFunction
+    {
+        [Text]
+        public string Name { get; set; }
+        [Text]
+        public string Organisation { get; set; }
     }
 }
