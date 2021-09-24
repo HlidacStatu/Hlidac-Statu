@@ -38,6 +38,15 @@ namespace PeopleLoader
                 }
 
                 System.Console.WriteLine("Converting all records");
+
+                List<int> politicalTypes = new List<int>()
+                {
+                    (int)OsobaEvent.Types.VolenaFunkce,
+                    (int)OsobaEvent.Types.VerejnaSpravaPracovni,
+                    (int)OsobaEvent.Types.Politicka,
+                    (int)OsobaEvent.Types.PolitickaPracovni,
+                };
+                
                 List<OsobaES> osobyES = new List<OsobaES>();
                 Devmasters.Batch.Manager.DoActionForAll<Osoba>(osoby,
                 os =>
@@ -52,8 +61,9 @@ namespace PeopleLoader
                         PoliticalParty = os.CurrentPoliticalParty(),
                         StatusText = os.StatusOsoby().ToString("G"),
                         Status = os.Status,
-                        PoliticalFunctions = os.Events(ev => ev.Type == (int)OsobaEvent.Types.VolenaFunkce)
-                            .Select(ev => ev.AddInfo).ToArray(),
+                        PoliticalFunctions = os.Events(ev => politicalTypes.Any(pt => pt == ev.Type))
+                            .Select(ev => new PoliticalFunction() { Name = ev.AddInfo, Organisation = ev.Organizace})
+                            .ToArray(),
                         PhotoUrl = os.HasPhoto() ? os.GetPhotoUrl() : null
 
                     };
