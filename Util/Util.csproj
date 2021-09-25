@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="Devmasters.Batch" Version="2.4.2.3" />
     <PackageReference Include="Devmasters.Cache.Couchbase" Version="2.4.1" />
-    <PackageReference Include="Devmasters.Collections" Version="2.4.1.2" />
+    <PackageReference Include="Devmasters.Collections" Version="2.4.2.2" />
     <PackageReference Include="Devmasters.Core" Version="2.4.4" />
     <PackageReference Include="Devmasters.DT" Version="2.4.2" />
     <PackageReference Include="Devmasters.Enums" Version="2.4.5" />

@@ -11,6 +11,11 @@ namespace HlidacStatu.JobTableEditor.Data
 {
     public class JobService
     {
+        static HlidacStatu.DetectJobs.InTables it_inTables = new DetectJobs.InTables(
+    HlidacStatu.DetectJobs.IT.Keywords, HlidacStatu.DetectJobs.IT.OtherWords, HlidacStatu.DetectJobs.IT.BlacklistedWords
+    );
+
+
         public async Task<SomeTable> GetNewTable(string user, CancellationToken cancellationToken)
         {
             //Get Data from queue
@@ -25,8 +30,7 @@ namespace HlidacStatu.JobTableEditor.Data
             //     out var cells);
 
             var table = await InDocTablesRepo.GetNextForCheck(user, cancellationToken);
-            InHtmlTables.TableWithWordsAndNumbers(table.ParsedContent(),
-                InHtmlTables.SpecificWords,
+            it_inTables.TableWithWordsAndNumbers(table.ParsedContent(),
                 out var foundJobs,
                 out var cells);
 
@@ -43,8 +47,7 @@ namespace HlidacStatu.JobTableEditor.Data
         public async Task<SomeTable> GetSpecificTable(int pk, string user, CancellationToken cancellationToken)
         {
             var table = await InDocTablesRepo.GetSpecific(pk, user, cancellationToken);
-            InHtmlTables.TableWithWordsAndNumbers(table.ParsedContent(),
-                InHtmlTables.SpecificWords,
+            it_inTables.TableWithWordsAndNumbers(table.ParsedContent(),
                 out var foundJobs,
                 out var cells);
 
@@ -58,7 +61,7 @@ namespace HlidacStatu.JobTableEditor.Data
             return st;
         }
 
-        private static CellShell[][] WrapCells(InHtmlTables.Cell[][] cells)
+        private static CellShell[][] WrapCells(InTables.Cell[][] cells)
         {
             CellShell[][] cellShells = new CellShell[cells.Length][];
             for (int row = 0; row < cells.Length; row++)

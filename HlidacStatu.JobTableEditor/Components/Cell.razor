@@ -52,10 +52,10 @@
     {
         cellStyle = CellShell.CellType switch 
         {
-            InHtmlTables.Cell.GuessedCellType.Unknown => "",
-            InHtmlTables.Cell.GuessedCellType.Position => "bg-primary bg-opacity-25",
-            InHtmlTables.Cell.GuessedCellType.Price => "bg-success bg-opacity-25",
-            InHtmlTables.Cell.GuessedCellType.PriceWithVAT => "bg-warning bg-opacity-25",
+            InTables.Cell.GuessedCellType.Unknown => "",
+            InTables.Cell.GuessedCellType.Position => "bg-primary bg-opacity-25",
+            InTables.Cell.GuessedCellType.Price => "bg-success bg-opacity-25",
+            InTables.Cell.GuessedCellType.PriceWithVAT => "bg-warning bg-opacity-25",
             _ => ""
             };
         

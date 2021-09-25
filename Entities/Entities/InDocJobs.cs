@@ -23,5 +23,8 @@ namespace HlidacStatu.Entities
         [Column(TypeName = "datetime")]
         public DateTime? Created { get; set; }
         public string Tags { get; set; }
+
+        [StringLength(100)]
+        public string Subject { get; set; }
     }
 }
