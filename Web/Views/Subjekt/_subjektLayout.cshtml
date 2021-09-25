@@ -117,7 +117,7 @@
 
 <div class="head">
     <h3>
-        <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" item="@Model.firma" style="font-size:24px;vertical-align:top;"></add-bookmark>
+        <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" item="@Model.firma" style="font-size:0.7em;vertical-align:top;"></add-bookmark>
         @Html.KIndexLabelLink(Model.firma.ICO, 30, linkToKindex: true)@Model.title
         @if (this.User?.IsInRole("canEditData") == true)
         {
@@ -140,7 +140,7 @@
     </cache>
 
     @* Prázdný sloupec *@
-    <div class="col-sm-1"></div>
+    <div class="col-sm-1 order-2"></div>
     <cache  enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
         <partial name="@Model.viewName" model="@Model.firma" />
     </cache>

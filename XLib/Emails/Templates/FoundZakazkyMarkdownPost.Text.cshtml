@@ -14,10 +14,10 @@ Content-Type: text/html; charset=utf-8
 
 Zadavatel: **@(item.Zadavatel == null ? "neuveden" : item.Zadavatel.Jmeno)**
 @if (item.KonecnaHodnotaBezDPH.HasValue)
-{<text>Cena: **@(HlidacStatu.Util.RenderData.NicePrice(item.KonecnaHodnotaBezDPH.Value))**</text>
+{<text>Cena: **@(HlidacStatu.Util.RenderData.NicePriceHtml(item.KonecnaHodnotaBezDPH.Value))**</text>
 }
 else if (item.OdhadovanaHodnotaBezDPH.HasValue)
-{<text>Odhadovaná cena: **@(HlidacStatu.Util.RenderData.NicePrice(item.OdhadovanaHodnotaBezDPH.Value))**</text>
+{<text>Odhadovaná cena: **@(HlidacStatu.Util.RenderData.NicePriceHtml(item.OdhadovanaHodnotaBezDPH.Value))**</text>
 }
 </text>
 }

@@ -142,7 +142,7 @@
 
 
     @* První sloupec *@
-    <div class="col-sm-7 col-sm-pull-5 col-xs-12 col-xs-pull-0">
+    <div class="col-sm-7 col-xs-12 order-1">
         <div>
             <h4>Souhrn</h4>
             @{
@@ -151,7 +151,7 @@
                 var dotaceSuma = Model.StatistikaDotaci().Sum(s => s.CelkemCerpano);
                 var dotacePocet = Model.StatistikaDotaci().Sum(v => v.PocetDotaci);
 
-                var sdotaceKc = $" v celkové hodnotě <b>{HlidacStatu.Util.RenderData.NicePrice(dotaceSuma, html: true)}</b>.";
+                var sdotaceKc = $" v celkové hodnotě <b>{HlidacStatu.Util.RenderData.NicePriceHtml(dotaceSuma)}</b>.";
             }
 
             @if (Model.JsemOVM())
@@ -185,8 +185,8 @@
 
                 if (totalCountDotaceHolding - dotacePocet > 0)
                 {
-                    var sdotaceHDiffKc = " v hodnotě <b>" + HlidacStatu.Util.RenderData.NicePrice(totalSumDotaceHolding - dotaceSuma, html: true) + "</b>.";
-                    var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePrice(totalSumDotaceHolding, html: true) + "</b>.";
+                    var sdotaceHDiffKc = " v hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(totalSumDotaceHolding - dotaceSuma) + "</b>.";
+                    var sdotaceHKc = " v celkové hodnotě <b>" + HlidacStatu.Util.RenderData.NicePriceHtml(totalSumDotaceHolding) + "</b>.";
                     string durlH = "/dotace/hledat?Q=holding%3A+" + Model.ICO;
                     if (Model.JsemOVM())
                     {

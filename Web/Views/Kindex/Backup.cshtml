@@ -78,7 +78,7 @@
 
 <div class="row">
     <div class="col-xs-12">
-        <h1 class="new-title text-left">
+        <h1 class="new-title text-start">
             @ViewBag.Title ze dne @ViewBag.BackupCreated
             <small>
                 Důvod pro přepočítání K-Indexu: @ViewBag.BackupComment
@@ -89,7 +89,7 @@
 
 @if (currYear.KIndexReady == false)
 {
-    <div class="jumbotron">
+    <div class="p-5 mb-4 bg-jumbo rounded-3">
         <div class="container">
             <div class="row">
                 <h2 style="padding-top:0;margin-top:0;margin-bottom:30px">
@@ -142,7 +142,7 @@
 }
 else
 {
-    <div class="jumbotron">
+    <div class="p-5 mb-4 bg-jumbo rounded-3">
         <div class="container">
             <h2 style="padding-top:0;margin-top:0;margin-bottom:30px">
                 <a href="/subjekt/@Model.Ico">

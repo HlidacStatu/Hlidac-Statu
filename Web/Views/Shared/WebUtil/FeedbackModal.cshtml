@@ -23,14 +23,14 @@
     }
     if (string.IsNullOrEmpty(Model.IdPrefix))
     {
-        Model.IdPrefix = Guid.NewGuid().ToString("N");
+        Model.IdPrefix = $"m{Guid.NewGuid():N}";
     }
 
 }
 @if (Model.MustAuth == false || (Model.MustAuth && User.Identity?.IsAuthenticated == true))
 {
     <!-- Button trigger modal -->
-    <button class="@Model.Style" data-toggle="modal" data-target="#@(Model.IdPrefix)fbForm">@Model.ButtonText</button>
+    <button class="@Model.Style" data-bs-toggle="modal" data-bs-target="#@(Model.IdPrefix)fbForm">@Model.ButtonText</button>
     <!-- Modal -->
     <div class="modal fade" id="@(Model.IdPrefix)fbForm" tabindex="-1" role="dialog"
          aria-labelledby="@(Model.IdPrefix)fbTitle" aria-hidden="true">
@@ -38,30 +38,27 @@
             <div class="modal-content">
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <button type="button" class="close"
-                            data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
                     <h4 class="modal-title" id="@(Model.IdPrefix)fbTitle">
                         Upozornění na chybu Hlídače státu či poslání vzkazu
                     </h4>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal">
+                        <span class="sr-only">Close</span>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
                     @if (defaultForm)
                     {
                         <div class="alert alert-danger" role="alert">
-                            <blink>
                                 Opravy údajů u smlouvy je možné provádět pouze přes <a href="https://portal.gov.cz/registr-smluv/formulare" target="_blank">formuláře registru smluv</a>
-                            </blink>
                             <br/>
                             My pouze přebíráme údaje v registru smluv. Měnit je nemůžeme.
                         </div>
                     }
-                </div>
-
-                <!-- Modal Body -->
-                <form class="form-horizontal" role="form">
-                    <input type="hidden" id="@(Model.IdPrefix)fbdata" name="@(Model.IdPrefix)fbdata" value="@Model.AddData"/>
-                    <div class="modal-body">
+                    <form class="form-horizontal" role="form">
+                        <input type="hidden" id="@(Model.IdPrefix)fbdata" name="@(Model.IdPrefix)fbdata" value="@Model.AddData"/>
 
                         <input type="hidden" name="@(Model.IdPrefix)fbUrl" id="@(Model.IdPrefix)fbUrl" value="@Context.Request.GetDisplayUrl()"/>
                         <div class="form-group">
@@ -97,23 +94,23 @@
                                        id="@(Model.IdPrefix)fbInputEmail" placeholder="Email" value="@(User.Identity?.Name)"/>
                             </div>
                         </div>
+                    </form>
 
-                    </div>
+                </div>
 
-                    <!-- Modal Footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">
-                            Zrušit
-                        </button>
-                        <button type="button" onclick="send@(Model.IdPrefix)();" class="btn btn-primary" data-dismiss="modal">
-                            Odeslat vzkaz
-                        </button>
-                        <br/>
-                        <div>
-                            <a class="btn btn-default btn-sm" href="/Kontakt">Další kontakty zde</a>
-                        </div>
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+                        Zrušit
+                    </button>
+                    <button type="button" onclick="send@(Model.IdPrefix)();" class="btn btn-primary" data-bs-dismiss="modal">
+                        Odeslat vzkaz
+                    </button>
+                    <br/>
+                    <div>
+                        <a class="btn btn-default btn-sm" href="/Kontakt">Další kontakty zde</a>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -137,7 +134,7 @@ else
 {
     <text>
         <!-- Button trigger modal -->
-        <button class="@Model.Style" data-toggle="modal" data-target="#@(Model.IdPrefix)fbForm">@Model.ButtonText</button>
+        <button class="@Model.Style" data-bs-toggle="modal" data-bs-target="#@(Model.IdPrefix)fbForm">@Model.ButtonText</button>
 
         <!-- Modal -->
         <div class="modal fade" id="@(Model.IdPrefix)fbForm" tabindex="-1" role="dialog"
@@ -146,33 +143,32 @@ else
                 <div class="modal-content">
                     <!-- Modal Header -->
                     <div class="modal-header">
-                        <button type="button" class="close"
-                                data-dismiss="modal">
-                            <span aria-hidden="true">&times;</span>
-                            <span class="sr-only">Close</span>
-                        </button>
                         <h4 class="modal-title" id="@(Model.IdPrefix)fbTitle">
                             Musíte být přihlášeni
                         </h4>
+                        <button type="button" class="btn-close"
+                                data-bs-dismiss="modal">
+                            
+                            <span class="sr-only">Close</span>
+                        </button>
                     </div>
 
                     <!-- Modal Body -->
-                    <form class="form-horizontal" role="form">
-                        <div class="modal-body">
+                    <div class="modal-body">
+                        <form class="form-horizontal" role="form">
                             <p>Pro poslání vzkazu musíte být přihlášeni.</p>
                             <p>
                                 <login-link></login-link>
                             </p>
+                        </form>
+                    </div>
 
-                        </div>
-
-                        <!-- Modal Footer -->
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">
-                                Zavřít
-                            </button>
-                        </div>
-                    </form>
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+                            Zavřít
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

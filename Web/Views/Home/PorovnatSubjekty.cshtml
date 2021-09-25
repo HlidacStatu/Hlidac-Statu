@@ -175,11 +175,11 @@ tooltipFormatFull: "<center><small>{point.category}</small><br /><b>{point.y:,.0
 @if (stats.Count() == 0)
 {
     <h3>Nemáme zadané žádné subjekty k porovnání.</h3>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Návod, jak porovnat subjekty mezi sebou</h3>
+    <div class="card bg-default">
+        <div class="card-header">
+            <h3 class="card-title">Návod, jak porovnat subjekty mezi sebou</h3>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             <div><b>Podle IČ:</b> (pouze platná česká IČ)</div>
             <div><code>@Context.Request.Scheme://@Context.Request.Host@(Context.Request.Path)?title=název_stránky&amp;ico=seznam_ico_oddělený_čárkami</code></div>
             <div><b>Podle datových schránek:</b> (pouze platné ID českých datových schránek)</div>

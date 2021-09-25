@@ -57,10 +57,10 @@
 
 }
 <!DOCTYPE html>
-<html>
+<html lang="cs">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>@title</title>
     <link rel="canonical" href="https://www.hlidacstatu.cz@(Context.Request.GetEncodedPathAndQuery())" />
@@ -133,18 +133,19 @@
 
     @RenderSection("metatags", required: false)
 
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" >
+    <script src="~/js/bootstrap.bundle.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&amp;subset=latin-ext" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Cabin:400,400i,600,700&amp;subset=latin-ext" rel="stylesheet" />
 
     <script src="https://kit.fontawesome.com/a0fc082c81.js" crossorigin="anonymous"></script>
 
     <script src="~/bundles/jquery"></script>
-    <script src="~/bundles/bootstrap"></script>
+    <script src="~/bundles/scriptbundle"></script>
     <link rel="stylesheet" href="~/content/bundled.css" />
     <script src="~/bundles/modernizr"></script>
-    @* <script src="~/lib/jquery/dist/jquery.min.js"></script> *@
-    @* <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> *@
-    @* <script src="~/js/site.js" asp-append-version="true"></script> *@
+    
     <script>
         var _showFAD = true;
         (function (i, s, o, g, r, a, m) {
@@ -249,7 +250,7 @@
         }
     }
 
-    <div class="header__navbar hidden-print">
+    <div class="header__navbar d-print-none">
         <a href="/" class="logo">
             <svg width="46" height="46" viewBox="0 0 46 46">
                 <use xlink:href="/content/defs.svg#logo"></use>
@@ -269,7 +270,7 @@
                     <a href="/StatniWeby">Weby státu<sup style="top:0;text-decoration:none;color:#777;">@(HlidacStatu.Lib.Data.External.Zabbix.ZabTools.Weby()?.Count().ToString() ?? "")</sup></a>
                 </li>
 
-                <li class="hidden-sm hidden-xs">
+                <li class="d-none d-md-flex">
                     @if (User.Identity?.IsAuthenticated ?? false)
                     {
                         <a href="/manage/Watchdogs"
@@ -279,7 +280,7 @@
                             <i style="color:black;" class="fas fa-eye"></i>
                         </a>
 
-                        <a style="display:block;color:#c9302c;" title="Všechny uložené záložky" alt="Všechny uložené záložky" href="/manage/zalozky" class="bookmark bookmarkOn"></a>
+                        <a style="display:block;color:#c9302c;" title="Všechny uložené záložky" alt="Všechny uložené záložky" href="/manage/zalozky" class="bookmark bookmarkOn"><i class="fad fa-bookmark"></i></a>
                         <a style="display:block;" href="/Identity/Account/manage/" title="Nastavení účtu" alt="Nastavení účtu"><i class="fas fa-user"></i></a>
                         <a href="/Identity/Account/Logout?rnd=@Guid.NewGuid().ToString("N")">Odhlásit</a>
                     }
@@ -314,8 +315,8 @@
                 <li class="level2">
                     @if (User.Identity?.IsAuthenticated ?? false)
                     {
-                        <a onclick="ga('send', 'event', 'bookmarksBtn', 'click','@Context.Request.Path'); return true;" title="Všechny uložené záložky" alt="Všechny uložené záložky" href="/manage/zalozky"><span style="color:#c9302c;" class="bookmark bookmarkOn"></span>Záložky</a>
-                        <a onclick="ga('send', 'event', 'manageBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/manage/" title="Nastavení účtu" alt="Nastavení účtu"><span style="font-family: 'Glyphicons Halflings'" class="glyphicon glyphicon-user"></span>Účet</a>
+                        <a onclick="ga('send', 'event', 'bookmarksBtn', 'click','@Context.Request.Path'); return true;" title="Všechny uložené záložky" alt="Všechny uložené záložky" href="/manage/zalozky"><span style="color:#c9302c;" class="bookmark bookmarkOn"><i class="fad fa-bookmark"></i></span>Záložky</a>
+                        <a onclick="ga('send', 'event', 'manageBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/manage/" title="Nastavení účtu" alt="Nastavení účtu"><span class="fad fa-user"></span>Účet</a>
                         <a onclick="ga('send', 'event', 'logoffBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Logout?rnd=@Guid.NewGuid().ToString("N")">Odhlásit</a>
                     }
                     else
@@ -330,13 +331,13 @@
 
     @if (IsSectionDefined("title"))
     {
-        <div class="hidden-print">
+        <div class="d-print-none">
             @RenderSection("title", required: false)
         </div>
     }
     else
     {
-        <div class="header__content header__content--compact  hidden-print">
+        <div class="header__content header__content--compact  d-print-none">
             <!-- desktop menu items only -->
             <div class="navbar__level2">
                 <ul>
@@ -348,7 +349,6 @@
                 <ul>
                     <li>
                         <a href="/pridatse">Přidat se</a>
-                        @*<a href="https://github.com/HlidacStatu/Web/issues" target="_blank" style="color:orange"><span class="glyphicon glyphicon-alert"></span>&nbsp;Nahlásit chybu</a>*@
                         <a href="https://www.darujme.cz/projekt/1204683" target="_blank" onclick="return trackOutLink(this,'header');">Podpořte nás</a>
                     </li>
                 </ul>
@@ -370,45 +370,22 @@
                     }
                 </form>
 
-                @if (false) //newsearch
-                {
-                    <form id="new-search-input" class="new-search-input" action="/hledat" method="get" style="visibility:hidden">
-                        <div class="select2-wrapper">
-                            <div class="input-group input-group-lg">
-                                <select class="form-control input-lg select2-multiple" id="autocomsearch" multiple="multiple">
-                                    @if (!string.IsNullOrWhiteSpace(ViewBag.Query))
-                                    {
-                                        foreach (string option in ViewBag.Query.ToString().Split(' '))
-                                        {
-                                            <option value="@option" selected="selected">@option</option>
-                                        }
-                                    }
-                                </select>
-                                <span class="input-group-btn">
-                                    <button class="btn btn-primary" data-select2-open="autocomsearch" style="left:-7px"> hledat</button>
-                                </span>
-                                <input id="search-result-query-data" name="q" type="hidden" />
-                            </div>
+                
+                <form id="new-search-input" class="new-search-input " method="get" action="/hledat" style="visibility:hidden">
+                    <div class="new-search-wrapper">
+                        <div class="input-group">
+                            <input class="form-control nopadding " name="q" value="@(ViewBag.Query)" id="new-search-input-q" />
+                            <span class="input-group-btn">
+                                <button id="new-search-input-btn" class="btn btn-primary" style="left:-7px;top:-5px"> hledat</button>
+                            </span>
                         </div>
-                    </form>
-                }
-                else //newsearch2
-                {
-                    <form id="new-search-input" class="new-search-input " method="get" action="/hledat" style="visibility:hidden">
-                        <div class="new-search-wrapper">
-                            <div class="input-group">
-                                <input class="form-control nopadding " name="q" value="@(ViewBag.Query)" id="new-search-input-q" />
-                                <span class="input-group-btn">
-                                    <button id="new-search-input-btn" class="btn btn-primary" style="left:-7px;top:-5px"> hledat</button>
-                                </span>
-                            </div>
-                        </div>
-                    </form>
-                    <script>
-                        MakeAutocomplete('#new-search-input');
-                    </script>
+                    </div>
+                </form>
+                <script>
+                    MakeAutocomplete('#new-search-input');
+                </script>
 
-                }
+                
                 <div>
                     <button class="header__search__hint btn btn-link new-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
                         <i class="fas fa-blind"></i> Přepnout na původní hledání
@@ -419,7 +396,7 @@
                     <a class="header__search__hint" style="padding-top:2px;font-size:15px;text-decoration:none;padding-top:2px;font-size:15px;text-decoration:none;" href="/napoveda">
                         <i class="far fa-question-square" style=""></i> Nápověda jak vyhledávat
                     </a>
-                    <a class="header__search__hint pull-right" style="" href="/snadnehledani">
+                    <a class="header__search__hint float-end" style="" href="/snadnehledani">
                         Snadné hledání
                     </a>
                 </div>
@@ -444,10 +421,10 @@
         {
             <div class="row">
                 <div class="col-xs-12">
-                    <h1 class="new-title text-left">
+                    <h1 class="new-title text-start">
                         @if (Model as IBookmarkable == null) //ViewBag.ShowBookmarkUrl == true)
                         {
-                            <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" url="@Context.Request.GetDisplayUrl()" style="font-size:24px;vertical-align:top;"></add-bookmark>
+                            <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" url="@Context.Request.GetDisplayUrl()" style="font-size:0.7em;vertical-align:top;"></add-bookmark>
                         }
                         else
                         {
@@ -493,11 +470,11 @@
                             </p>
                         </div>
                         <div class="col-sm-2 col-xs-12">
-                            <a style="margin-top:15px;" class="fund-daruj-btn pull-right text-right" onclick="ga('send', 'event', 'darujAdFooter', 'daruj-btn', '1'); return false;" id="fund-daruj-btn" target="_blank" href="#">Chápu, díky!</a>
+                            <a style="margin-top:15px;" class="fund-daruj-btn float-end text-end" onclick="ga('send', 'event', 'darujAdFooter', 'daruj-btn', '1'); return false;" id="fund-daruj-btn" target="_blank" href="#">Chápu, díky!</a>
                         </div>
                         <div class="fund-zavri">
                             <a id="fund-info-btn" onclick="ga('send', 'event', 'darujAdFooter', 'viceinfo', '1');" target="_blank" href="https://www.hlidacstatu.cz/texty/zalozky-si-za-vas-zapamatuji-vse-co-potrebujete/">Více informací</a>
-                            <a id="fund-zavri-btn" onclick="ga('send', 'event', 'darujAdFooter', 'zavri', '1');" style="margin-left:30px;color:#ff5900" href="#"><span class="glyphicon glyphicon-remove"></span></a>
+                            <a id="fund-zavri-btn" onclick="ga('send', 'event', 'darujAdFooter', 'zavri', '1');" style="margin-left:30px;color:#ff5900" href="#"><span class="fas fa-times"></span></a>
                         </div>
                     </div>
 
@@ -520,7 +497,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         <h4 class="modal-title">Záložky</h4>
                     </div>
                     <div class="modal-body">
@@ -535,7 +512,7 @@
                         <p>Abychom ale vědeli, komu jaké záložky patří, <a href="/Identity/Account/login" class="btn btn-default">musíte se zalogovat</a>.</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Zavřít</button>
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Zavřít</button>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
@@ -554,7 +531,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         <h4 class="modal-title">@anontitle</h4>
                     </div>
                     <div class="modal-body">
@@ -564,7 +541,7 @@
                         <p>Pokud jste již zaregistrováni, <a id="VZInfoAnonLogin" href="/Identity/Account/login?returnUrl=" class="btn btn-default">zalogujte se</a>. </p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Zavřít</button>
+                        <button type="button" class="btn btn-default" data-bs-dismiss="modal">Zavřít</button>
                         <a id="VZInfoAnonRegister" onclick="ga('send', 'event', 'registerBtn', 'click','@Context.Request.Path#VZPristupOmezen'); return true;" href="/Identity/account/Register?returnUrl=" class="btn btn-primary">Zaregistrovat se</a>
                     </div>
                 </div><!-- /.modal-content -->
@@ -582,56 +559,3 @@
 
 </body>
 </html>
-
-
-
-@* <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="utf-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>@ViewData["Title"] - Web</title>
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-        <link rel="stylesheet" href="~/css/site.css"/>
-    </head>
-    <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Web</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial"/>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2021 - Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-    <render-scripts></render-scripts>
-    </body>
-    </html>*@

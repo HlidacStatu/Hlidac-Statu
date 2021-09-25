@@ -122,7 +122,7 @@
                     <td colspan="5" class="joined">
                         <h5>
                             Počet nedostatků: @(rec.Issues.Where(m => m.Public).Count())
-                            <button class="btn btn-info" type="button" data-toggle="collapse" data-target="#collapseRec_@(rec.Id)" aria-expanded="false" aria-controls="collapseRec_@(rec.Id)">
+                            <button class="btn btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRec_@(rec.Id)" aria-expanded="false" aria-controls="collapseRec_@(rec.Id)">
                                 Ukázat
                             </button>
                         </h5>
@@ -135,7 +135,7 @@
                                     if (iss.Public && iss.Importance != HlidacStatu.Entities.Issues.ImportanceLevel.NeedHumanReview)
                                     {
                                         <li title="@iss.Importance.ToNiceDisplayName()" class="list-group-item list-group-item@(HlidacStatu.Entities.Issues.Importance.GetCssClass(iss.Importance, true))">
-                                            <span class="glyphicon glyphicon-eye-open" style="font-size:75%;" aria-hidden="true"></span>&nbsp;@iss.Title : @iss.TextDescription
+                                            <span class="fas fa-eye" style="font-size:75%;" aria-hidden="true"></span>&nbsp;@iss.Title : @iss.TextDescription
                                         </li>
                                     }
                                 }

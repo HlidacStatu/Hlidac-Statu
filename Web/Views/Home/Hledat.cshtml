@@ -110,11 +110,11 @@ else if (Model.HasResults == false)
                 <div class="col-xs-1">
                 </div>
                 <div class="col-xs-11">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Tipy pro kontrolu dotazu</h3>
+                    <div class="card bg-default">
+                        <div class="card-header">
+                            <h3 class="card-title">Tipy pro kontrolu dotazu</h3>
                         </div>
-                        <div class="panel-body">
+                        <div class="card-body">
                             <ul>
                                 <li><b>Uvozovky</b> - Zkontrolujte si, zda jste nezapomněli uzavřít uvozovky na konci</li>
                                 <li><b>Závorky</b> - Zkontrolujte si, zda jste nezapomněli uzavřít závorky na konci výrazu</li>
@@ -305,8 +305,8 @@ else if (Model.HasResults == false)
 
 @if (htmlLinks.Count > 0)
 {
-    <div class="row">
-        <div class="col-xs-12 col-sm-12">
+    <div class="col-xs-12 col-sm-12">
+        <div class="row">
 
             <h4><span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> jsme nalezli ještě v těchto databázích</h4>
             @foreach (var items in htmlLinks.Chunk((htmlLinks.Count / 3) + 1))
@@ -328,8 +328,8 @@ else if (Model.HasResults == false)
 }
 
 
-<div class="row">
-    <div class="col-xs-12 col-sm-12">
+<div class="col-xs-12 col-sm-12">
+
 
         @{
             //analyze query and show big boxes
@@ -350,11 +350,11 @@ else if (Model.HasResults == false)
 
                         if (parts % 4 == 0)
                         {
-                            <div class="clearfix visible-sm-block"></div>
+                            <div class="clearfix d-none d-sm-block d-md-none"></div>
                         }
                         if (parts % 3 == 0)
                         {
-                            <div class="clearfix visible-md-block"></div>
+                            <div class="clearfix d-none d-md-block d-lg-none"></div>
                         }
                     }
                     @foreach (var fP in splQ.Parts.Where(m => m.Prefix == "ico:"))
@@ -365,11 +365,11 @@ else if (Model.HasResults == false)
 
                         if (parts % 4 == 0)
                         {
-                            <div class="clearfix visible-sm-block"></div>
+                            <div class="clearfix d-none d-sm-block d-md-none"></div>
                         }
                         if (parts % 3 == 0)
                         {
-                            <div class="clearfix visible-md-block"></div>
+                            <div class="clearfix d-none d-md-block d-lg-none"></div>
                         }
 
                     }
@@ -700,7 +700,8 @@ else if (Model.HasResults == false)
             {
                 <hr style="margin-top:30px;" />
                 <h3><span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> jsme nalezli ještě v těchto databázích</h3>
-                foreach (var items in htmlLinks.Chunk((htmlLinks.Count / 3) + 1))
+                <div class="row">
+                @foreach (var items in htmlLinks.Chunk((htmlLinks.Count / 3) + 1))
                 {
                     <div class="col-xs-6 col-sm-3">
                         <ul>
@@ -713,10 +714,10 @@ else if (Model.HasResults == false)
                         </ul>
                     </div>
                 }
+                </div>
             }
         }
 
-    </div>
 </div>
 <script type='text/javascript'>
     $(document).ready(function () {

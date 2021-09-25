@@ -263,7 +263,6 @@ namespace HlidacStatu.Web
             {
                 string[] cssPaths = new[]
                 {
-                    "wwwroot/Content/bootstrap.css",
                     "wwwroot/Content/GlobalSite.v1.10.css",
                     "wwwroot/Content/social-share-kit.css",
                     "wwwroot/Content/new.v1.10.css"
@@ -278,16 +277,14 @@ namespace HlidacStatu.Web
 
                 pipeline.AddJavaScriptBundle("/bundles/modernizr", "Scripts/modernizr-2.8.3.js");
 
-                string[] bootstrapPaths = new[]
+                string[] scriptBundle = new[]
                 {
-                    "Scripts/bootstrap.js",
                     "Scripts/respond.js",
                     "Scripts/hlidac.v1.11.js",
-                    //"Scripts/autocomplete.v1.1.js",
                     "Scripts/fuckadblock.min.js",
                     "Scripts/social-share-kit.min.js"
                 };
-                pipeline.AddJavaScriptBundle("/bundles/bootstrap", bootstrapPaths);
+                pipeline.AddJavaScriptBundle("/bundles/scriptbundle", scriptBundle);
 
                 pipeline.AddJavaScriptBundle("/bundles/highcharts",
                     "Scripts/Highcharts-6/js/highcharts.js",

@@ -44,18 +44,18 @@
             <td class="text-nowrap">
                 @(dotaceItem.DatumPodpisu?.Date.ToString("dd.MM.yyyy") ?? "Neznámé")
             </td>
-            <td class="text-right number text-nowrap">
+            <td class="text-end number text-nowrap">
                 @if (dotaceItem.DotaceCelkem == null || dotaceItem.DotaceCelkem == 0)
                 {
                     <code><i class="fas fa-exclamation-circle"></i> Hodnota neznámá</code>
                 }
                 else
                 {
-                    @Html.Raw(HlidacStatu.Util.RenderData.NicePrice((decimal) dotaceItem.DotaceCelkem, html: true))
+                    @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml((decimal) dotaceItem.DotaceCelkem))
                     if (dotaceItem.PujckaCelkem != null && dotaceItem.PujckaCelkem > 0)
                     {
                         <br/>
-                        <p class="text-muted">z toho @Html.Raw(HlidacStatu.Util.RenderData.NicePrice((decimal) dotaceItem.PujckaCelkem, html: true)) je půjčka</p>
+                        <p class="text-muted">z toho @Html.Raw(HlidacStatu.Util.RenderData.NicePriceHtml((decimal) dotaceItem.PujckaCelkem)) je půjčka</p>
                     }
                 }
 

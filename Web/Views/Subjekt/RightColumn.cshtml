@@ -16,7 +16,7 @@
 }
 
 @* Pravý sloupec *@
-<div class="col-sm-4 col-sm-push-8 col-xs-12 col-xs-push-0">
+<div class="col-sm-4 col-xs-12 order-md-3 order-sm-0">
     <div class="row">
 
         @if (ceo.Osoba != null && ceo.Osoba.IsValid())
@@ -251,7 +251,7 @@
         <span class="text-muted">Chci sdílet s ostatními</span>
         <div>
             @{
-                var linkUrl = $"{ViewContext.GetBaseUrl()}/osoba/{Model.ICO}"; 
+                var linkUrl = $"{ViewContext.GetBaseUrl()}/subjekt/{Model.ICO}"; 
             }
             <share-facebook url="@linkUrl"></share-facebook>
             <share-twitter url="@linkUrl" text="@($"{Model.Jmeno} na @HlidacStatu - {Model.InfoFacts().First().Render(false)}")"></share-twitter>

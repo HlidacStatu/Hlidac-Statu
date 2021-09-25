@@ -45,11 +45,11 @@
 
 @if (data == null)
 {
-    <div class="panel panel-danger">
-        <div class="panel-heading">
-            <h3 class="panel-title">Chyba!</h3>
+    <div class="card bg-danger">
+        <div class="card-header">
+            <h3 class="card-title">Chyba!</h3>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             Data nejsou v tuto chvíli k dispozici. Omlouváme se, zkuste to znovu za pár minut.
         </div>
     </div>
@@ -96,7 +96,7 @@ else
                                 <div style="margin-left:0.5em;">
                                     <div style="word-break:normal;">@(w.Host.publicname?.Replace(".", ". "))</div>
                                     <div class="text-muted small">
-                                        <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+                                        <span class="fad fa-calendar-alt" aria-hidden="true"></span>
 
                                         @w.Time.ToString("dd.MM.yyyy")
                                     </div>
@@ -109,22 +109,22 @@ else
             </div>
             if (gridCount % 6 == 0)
             {
-                <div class="clearfix visible-sm-block"></div>
-                <div class="clearfix visible-md-block"></div>
-                <div class="clearfix visible-lg-block"></div>
+                <div class="clearfix d-none d-sm-block d-md-none"></div>
+                <div class="clearfix d-none d-md-block d-lg-none"></div>
+                <div class="clearfix d-none d-lg-block d-xl-none"></div>
             }
             else if (gridCount % 4 == 0)
             {
-                <div class="clearfix visible-xs-block"></div>
+                <div class="clearfix d-flex .d-sm-none"></div>
             }
         }
     </div>
 
-    <div class="panel panel-primary" style="margin-top:50px;">
-        <div class="panel-heading">
-            <h3 class="panel-title">Systém hodnocení HTTPS</h3>
+    <div class="card bg-primary" style="margin-top:50px;">
+        <div class="card-header">
+            <h3 class="card-title">Systém hodnocení HTTPS</h3>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             <dl class="dl-horizontal">
                 <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.A)">Zelená známka A+, A nebo A-</dt>
                 <dd>@ZabTools.StatusDescription(SSLLabsGrades.A, true)</dd>

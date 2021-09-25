@@ -278,16 +278,12 @@ namespace HlidacStatu.Repositories
                     osobaToUpdate.Status = osoba.Status;
                     osobaToUpdate.Umrti = osoba.Umrti;
 
-                    osobaToUpdate.JmenoAscii = TextUtil.RemoveDiacritics(osoba.Jmeno);
-                    osobaToUpdate.PrijmeniAscii = TextUtil.RemoveDiacritics(osoba.Prijmeni);
-                    osobaToUpdate.PuvodniPrijmeniAscii = TextUtil.RemoveDiacritics(osoba.PuvodniPrijmeni);
-                    osobaToUpdate.LastUpdate = DateTime.Now;
-
                     string normalizedWikiId = osoba.WikiId?.Trim();
                     if (!string.IsNullOrWhiteSpace(normalizedWikiId))
                         osobaToUpdate.WikiId = normalizedWikiId;
 
-                    db.SaveChanges();
+                    Save(osobaToUpdate);
+                    
                     AuditRepo.Add(Audit.Operations.Update, user, osobaToUpdate, osobaOriginal);
 
                     return osobaToUpdate;

@@ -1,7 +1,7 @@
 ﻿@{
     ViewBag.Title = "Ceník nadstandardních služeb";
 
-    string tooltipattrs = @"data-toggle='tooltip'
+    string tooltipattrs = @"data-bs-toggle='tooltip'
 data-placement='top' data-html='true'
 title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-bottom:1px solid white;line-height:30px;"">Hlídač nových smluv</span></i><br/>sleduje nové smlouvy odpovídající libovolnému dotazu a každý den či týden vás na ně sám upozorní e-mailem'
 ";
@@ -20,11 +20,11 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
                 box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.2);
             }
 
-            .panel-pricing .panel-heading {
+            .panel-pricing .card-header {
                 padding: 20px 10px;
             }
 
-                .panel-pricing .panel-heading .fa {
+                .panel-pricing .card-header .fa {
                     margin-top: 10px;
                     font-size: 58px;
                 }
@@ -44,7 +44,7 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
                     border-top-left-radius: 0px;
                 }
 
-            .panel-pricing .panel-body {
+            .panel-pricing .card-body {
                 background-color: #f0f0f0;
                 font-size: 40px;
                 color: #777777;
@@ -116,11 +116,11 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
 
     <!-- Plans -->
     <div class="row">
-        <div class="panel panel-default">
-            <div class="panel-heading">
+        <div class="card bg-default">
+            <div class="card-header">
                 <h3>99% obsahu a funkcí hlidacstatu.cz je zdarma pro všechny</h3>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 <p>
                     Veškerá funkčnost a všechna data hlidacstatu.cz jsou zdarma dostupné pro všechny uživatele s těmito omezeními:
                     <ul>
@@ -144,9 +144,9 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
 
                 <!-- item -->
                 <div class="col-xs-12 col-sm-4 text-center">
-                    <div class="panel panel-danger panel-pricing">
+                    <div class="card bg-danger panel-pricing">
                         <div class="ribbon-wrapper-green"><div class="ribbon-green">Oblíbené</div></div>
-                        <div class="panel-heading">
+                        <div class="card-header">
                             <i class="fa fa-desktop"></i>
                             <h3>Kompletní</h3>
                             <p>
@@ -154,7 +154,7 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
                                 <br />pro firemní holdingy
                             </p>
                         </div>
-                        <div class="panel-body text-center">
+                        <div class="card-body text-center">
                             <p><strong>24.900Kč / rok</strong></p>
                         </div>
                         <ul class="list-group text-center">
@@ -176,13 +176,13 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
                 <!-- /item -->
                 <!-- item -->
                 <div class="col-xs-12 col-sm-4 text-center">
-                    <div class="panel panel-warning panel-pricing">
-                        <div class="panel-heading">
+                    <div class="card bg-warning panel-pricing">
+                        <div class="card-header">
                             <i class="fa fa-desktop"></i>
                             <h3>Základní</h3>
                             <p>pro malé úřady a státní firmy<br />pro firmy</p>
                         </div>
-                        <div class="panel-body text-center">
+                        <div class="card-body text-center">
                             <p><strong>14.900Kč / rok</strong></p>
                         </div>
                         <ul class="list-group text-center">
@@ -204,13 +204,13 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
                 <!-- /item -->
                 <!-- item -->
                 <div class="col-xs-12 col-sm-4 text-center">
-                    <div class="panel panel-success panel-pricing">
-                        <div class="panel-heading">
+                    <div class="card bg-success panel-pricing">
+                        <div class="card-header">
                             <i class="fa fa-desktop"></i>
                             <h3>Nevládní</h3>
                             <p>pro neziskové organizace, školy, pro novináře, angažované občany, velké podporovatele</p>
                         </div>
-                        <div class="panel-body text-center">
+                        <div class="card-body text-center">
                             <p>zdarma</p>
                         </div>
                         <ul class="list-group text-center">
@@ -224,7 +224,7 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
                         <div class="panel-footer">
                             @if (this.User?.Identity?.IsAuthenticated == true)
                             {
-                                <a class="btn btn-lg btn-block btn-success" href="#" onclick="return trackInLink(this,'Cenik');" data-toggle="modal" data-target="#cenik_fbForm">Napište nám</a>
+                                <a class="btn btn-lg btn-block btn-success" href="#" onclick="return trackInLink(this,'Cenik');" data-bs-toggle="modal" data-bs-target="#cenik_fbForm">Napište nám</a>
                             }
                             else
                             {
@@ -251,7 +251,7 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
 {
         <script>
         $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
+            $('[data-bs-toggle="tooltip"]').tooltip()
         })
 
         $(document).ready(function () {
@@ -270,26 +270,24 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
             <div class="modal-content">
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <button type="button" class="close"
-                            data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        <span class="sr-only">Close</span>
-                    </button>
                     <h4 class="modal-title" id="cenik_fbTitle">
                         Zpřístupnění všech funkcí hlidacstatu.cz
                     </h4>
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="modal">
+                        <span class="sr-only">Close</span>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form">
                     <p>
                         Pokud jste novinář, uveďte pracovní e-mail a telefon.
                     </p>
                     <p>
                         Napište nám info o vás či vaší organizaci pro kterou potřebujete data z hlidacstatu.cz
                     </p>
-                </div>
-
-                <!-- Modal Body -->
-                <form class="form-horizontal" role="form">
-                    <div class="modal-body">
-
                         <div class="form-group">
                             <label class="col-sm-2 control-label"
                                    for="cenik_fbInputTxt">Vzkaz, odůvodnění</label>
@@ -313,19 +311,19 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
                                        id="cenik_fbInputTel" placeholder="Telefonní číslo" />
                             </div>
                         </div>
+                    </form>
 
-                    </div>
+                </div>
 
-                    <!-- Modal Footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">
-                            Zrušit
-                        </button>
-                        <button type="button" onclick="sendcenik_();" class="btn btn-primary" data-dismiss="modal">
-                            Odeslat vzkaz
-                        </button>
-                    </div>
-                </form>
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-bs-dismiss="modal">
+                        Zrušit
+                    </button>
+                    <button type="button" onclick="sendcenik_();" class="btn btn-primary" data-bs-dismiss="modal">
+                        Odeslat vzkaz
+                    </button>
+                </div>
             </div>
         </div>
     </div>
