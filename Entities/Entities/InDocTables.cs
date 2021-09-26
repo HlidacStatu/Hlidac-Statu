@@ -11,6 +11,7 @@ namespace HlidacStatu.Entities
     [Table("InDocTables")]
     public partial class InDocTables
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public long Pk { get; set; }
         [Required]
@@ -35,7 +36,7 @@ namespace HlidacStatu.Entities
 
                 var json = JArray.Parse(Json);
                 var numRows = json.Count;
-                
+
                 if (numRows > 0)
                 {
                     cells = new string[numRows][];
@@ -54,9 +55,9 @@ namespace HlidacStatu.Entities
             }
             return _parsedContent;
         }
-    
 
-    [Required]
+
+        [Required]
         public int Page { get; set; }
         [Required]
         public int TableOnPage { get; set; }
@@ -81,6 +82,12 @@ namespace HlidacStatu.Entities
         public string Note { get; set; }
         public string Tags { get; set; }
         public int? CheckElapsedInMs { get; set; }
+
+        [StringLength(100)]
+        public string Subject { get; set; }
+
+        [Required]
+        public int Year { get; set; }
 
 
         public enum CheckStatuses : int

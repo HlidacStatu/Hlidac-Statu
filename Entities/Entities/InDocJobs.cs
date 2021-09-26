@@ -6,8 +6,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HlidacStatu.Entities
 {
-    public class InDocJobs
+    public partial class InDocJobs
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public long Pk { get; set; }
         [Required]
@@ -24,7 +25,5 @@ namespace HlidacStatu.Entities
         public DateTime? Created { get; set; }
         public string Tags { get; set; }
 
-        [StringLength(100)]
-        public string Subject { get; set; }
     }
 }

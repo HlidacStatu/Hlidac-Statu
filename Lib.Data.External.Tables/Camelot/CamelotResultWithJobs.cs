@@ -5,7 +5,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
     public class CamelotResultWithJobs : CamelotResult
     {
-        static HlidacStatu.DetectJobs.InTables it_inTables = new DetectJobs.InTables(
+        static HlidacStatu.DetectJobs.InTables it_inTables = new DetectJobs.InTables("IT",
             HlidacStatu.DetectJobs.IT.Keywords, HlidacStatu.DetectJobs.IT.OtherWords, HlidacStatu.DetectJobs.IT.BlacklistedWords
             );
 

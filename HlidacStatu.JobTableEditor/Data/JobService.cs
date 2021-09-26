@@ -11,7 +11,7 @@ namespace HlidacStatu.JobTableEditor.Data
 {
     public class JobService
     {
-        static HlidacStatu.DetectJobs.InTables it_inTables = new DetectJobs.InTables(
+        static HlidacStatu.DetectJobs.InTables it_inTables = new DetectJobs.InTables("IT",
     HlidacStatu.DetectJobs.IT.Keywords, HlidacStatu.DetectJobs.IT.OtherWords, HlidacStatu.DetectJobs.IT.BlacklistedWords
     );
 
@@ -88,7 +88,11 @@ namespace HlidacStatu.JobTableEditor.Data
                 try
                 {
                     var parsedJobs = table.ParseJobs();
-                    await InDocJobsRepo.Save(parsedJobs);
+                    //TODO fix harcoded subject
+                    foreach (var j in parsedJobs)
+                        j.Subject = "IT";
+
+                    await InDocJobsRepo.SaveAsync(parsedJobs);
                 }
                 catch (Exception e)
                 {
