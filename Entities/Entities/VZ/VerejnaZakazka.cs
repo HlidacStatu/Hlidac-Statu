@@ -443,11 +443,11 @@ namespace HlidacStatu.Entities.VZ
 
             [Description("Neuvádět")]
             [Date]
-            public DateTime LastUpdate { get; set; } = DateTime.MinValue;
+            public DateTime? LastUpdate { get; set; } = DateTime.MinValue;
 
             [Description("Neuvádět")]
             [Date]
-            public DateTime LastProcessed { get; set; } = DateTime.MinValue;
+            public DateTime? LastProcessed { get; set; } = DateTime.MinValue;
 
             [Description("Neuvádět")]
             [Keyword()]

@@ -88,9 +88,6 @@ namespace HlidacStatu.JobTableEditor.Data
                 try
                 {
                     var parsedJobs = table.ParseJobs();
-                    //TODO fix harcoded subject
-                    foreach (var j in parsedJobs)
-                        j.Subject = "IT";
 
                     await InDocJobsRepo.SaveAsync(parsedJobs);
                 }
