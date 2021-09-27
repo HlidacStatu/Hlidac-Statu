@@ -63,10 +63,10 @@ else
             {
                 int column = col;
                 <th>
-                    <button class="btn btn-sm btn-primary bg-opacity-25" @onclick="@(() => SetColumn(column, InHtmlTables.Cell.GuessedCellType.Position) )">Job</button>
-                    <button class="btn btn-sm btn-success bg-opacity-25" @onclick="@(() => SetColumn(column, InHtmlTables.Cell.GuessedCellType.Price) )"><i class="far fa-money-bill-alt"></i></button>
-                    <button class="btn btn-sm btn-warning bg-opacity-25" @onclick="@(() => SetColumn(column, InHtmlTables.Cell.GuessedCellType.PriceWithVAT) )"><i class="far fa-money-bill-alt"></i> s DPH</button>
-                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => SetColumn(column, InHtmlTables.Cell.GuessedCellType.Unknown) )">Nic</button>
+                    <button class="btn btn-sm btn-primary bg-opacity-25" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.Position) )">Job</button>
+                    <button class="btn btn-sm btn-success bg-opacity-25" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.Price) )"><i class="far fa-money-bill-alt"></i></button>
+                    <button class="btn btn-sm btn-warning bg-opacity-25" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.PriceWithVAT) )"><i class="far fa-money-bill-alt"></i> s DPH</button>
+                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.Unknown) )">Nic</button>
                 </th>
             }
         </tr>
@@ -106,7 +106,7 @@ else
 
     private int tablePk;
 
-    private void SetColumn(int column, InHtmlTables.Cell.GuessedCellType cellType)
+    private void SetColumn(int column, InTables.Cell.GuessedCellType cellType)
     {
         foreach (var row in table.Cells)
         {
@@ -252,8 +252,8 @@ else
         {
             foreach (var cell in row)
             {
-                if (cell.CellType == InHtmlTables.Cell.GuessedCellType.Price
-                    || cell.CellType == InHtmlTables.Cell.GuessedCellType.PriceWithVAT)
+                if (cell.CellType == InTables.Cell.GuessedCellType.Price
+                    || cell.CellType == InTables.Cell.GuessedCellType.PriceWithVAT)
                 {
                     var newPrice = (Devmasters.ParseText.ToDecimal(cell.Value) * 8);
                     cell.Value = newPrice.HasValue ? newPrice.Value.ToString("N2") : "";
@@ -268,7 +268,7 @@ else
         {
             int currentLength = table.Cells[i].Length;
             Array.Resize(ref table.Cells[i], currentLength + 1);
-            table.Cells[i][currentLength] = new CellShell(new InHtmlTables.Cell(), i, currentLength);
+            table.Cells[i][currentLength] = new CellShell(new InTables.Cell(), i, currentLength);
         }
         
     }
@@ -286,7 +286,7 @@ else
         table.Cells[lastRow] = new CellShell[columnCount];
         for (int col = 0; col < columnCount; col++)
         {
-            table.Cells[lastRow][col] = new CellShell(new InHtmlTables.Cell(), lastRow, col);
+            table.Cells[lastRow][col] = new CellShell(new InTables.Cell(), lastRow, col);
         }
         
     }
