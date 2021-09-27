@@ -23,16 +23,16 @@ namespace HlidacStatu.JobTableEditor.Data
                 {
                     switch (cell.CellType)
                     {
-                        case InHtmlTables.Cell.GuessedCellType.Position:
+                        case InTables.Cell.GuessedCellType.Position:
                             foundJob.JobRaw = cell.Value;
                             foundJob.TablePk = InDocTable.Pk;
                             foundSomething = true;
                             break;
-                        case InHtmlTables.Cell.GuessedCellType.Price:
+                        case InTables.Cell.GuessedCellType.Price:
                             foundJob.SalaryMD = Devmasters.ParseText.ToDecimal(cell.Value);
                             foundSomething = true;
                             break;
-                        case InHtmlTables.Cell.GuessedCellType.PriceWithVAT:
+                        case InTables.Cell.GuessedCellType.PriceWithVAT:
                             foundJob.SalaryMdVAT = Devmasters.ParseText.ToDecimal(cell.Value);
                             foundSomething = true;
                             break;

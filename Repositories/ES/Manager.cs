@@ -221,6 +221,9 @@ namespace HlidacStatu.Repositories.ES
                 }
                 string cnnset = string.Format("{0}|{1}|{2}", indexName, timeOut, connectionLimit);
                 ConnectionSettings sett = GetElasticSearchConnectionSettings(indexName, timeOut, connectionLimit);
+                if (System.Diagnostics.Debugger.IsAttached)
+                    sett.Proxy(new Uri("http://127.0.0.1:8888"),"","");
+
                 if (!_clients.ContainsKey(cnnset))
                 {
                     //if (idxType.HasValue == false)

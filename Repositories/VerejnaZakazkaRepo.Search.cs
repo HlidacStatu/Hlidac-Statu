@@ -349,6 +349,7 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<VerejnaZakazka> res = null;
                 try
                 {
+
                     res = client
                         .Search<VerejnaZakazka>(s => s
                             .Size(search.PageSize)

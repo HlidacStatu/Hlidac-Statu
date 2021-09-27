@@ -10,14 +10,14 @@ namespace HlidacStatu.JobTableEditor.Data
     public class CellShell : INotifyPropertyChanged
     {
         private string _value;
-        private InHtmlTables.Cell.GuessedCellType _cellType;
+        private InTables.Cell.GuessedCellType _cellType;
         
-        public InHtmlTables.Cell Cell { get; private set; }
+        public InTables.Cell Cell { get; private set; }
         public string Id { get; init; }
         public int Row { get; init; }
         public int Column { get; init; }
 
-        public InHtmlTables.Cell.GuessedCellType CellType
+        public InTables.Cell.GuessedCellType CellType
         {
             get => _cellType;
             set
@@ -41,7 +41,7 @@ namespace HlidacStatu.JobTableEditor.Data
 
         public string Error { get; set; }
         
-        public CellShell(InHtmlTables.Cell cell, int row, int column)
+        public CellShell(InTables.Cell cell, int row, int column)
         {
             Row = row;
             Column = column;
@@ -53,7 +53,7 @@ namespace HlidacStatu.JobTableEditor.Data
 
         public void RotateType()
         {
-            var allEnums = Enum.GetValues<InHtmlTables.Cell.GuessedCellType>();
+            var allEnums = Enum.GetValues<InTables.Cell.GuessedCellType>();
             int nextPosition = Array.IndexOf(allEnums, CellType) + 1;
             CellType = nextPosition == allEnums.Length ? allEnums[0] : allEnums[nextPosition];
         }
@@ -62,9 +62,9 @@ namespace HlidacStatu.JobTableEditor.Data
         {
             Value = CellType switch
             {
-                InHtmlTables.Cell.GuessedCellType.Position => Cell.Text,
-                InHtmlTables.Cell.GuessedCellType.Price or
-                    InHtmlTables.Cell.GuessedCellType.PriceWithVAT => Cell.FoundNumbers.FirstOrDefault().ToString("N2"),
+                InTables.Cell.GuessedCellType.Position => Cell.Text,
+                InTables.Cell.GuessedCellType.Price or
+                    InTables.Cell.GuessedCellType.PriceWithVAT => Cell.FoundNumbers.FirstOrDefault().ToString("N2"),
                 _ => Cell.OriginalCellText
             };
         }
@@ -94,7 +94,7 @@ namespace HlidacStatu.JobTableEditor.Data
 
         private void CheckJobIsNotEmpty()
         {
-            if (CellType == InHtmlTables.Cell.GuessedCellType.Position)
+            if (CellType == InTables.Cell.GuessedCellType.Position)
             {
                 if (string.IsNullOrWhiteSpace(Value))
                 {
@@ -109,7 +109,7 @@ namespace HlidacStatu.JobTableEditor.Data
             decimal? value = Devmasters.ParseText.ToDecimal(Value);
 
             
-            if (CellType == InHtmlTables.Cell.GuessedCellType.Price)
+            if (CellType == InTables.Cell.GuessedCellType.Price)
             {
                 if (!value.HasValue)
                 {
@@ -130,7 +130,7 @@ namespace HlidacStatu.JobTableEditor.Data
                 }
             }
             
-            if (CellType == InHtmlTables.Cell.GuessedCellType.PriceWithVAT)
+            if (CellType == InTables.Cell.GuessedCellType.PriceWithVAT)
             {
                 if (!value.HasValue)
                 {
