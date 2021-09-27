@@ -20,7 +20,7 @@
 
     <ItemGroup>
       <PackageReference Include="Devmasters.Cache.Elastic" Version="2.4.1" />
-      <PackageReference Include="NEST" Version="7.13.2" />
+      <PackageReference Include="NEST" Version="7.15.0" />
     </ItemGroup>
 
     <ItemGroup>
