@@ -1,4 +1,5 @@
-﻿using Devmasters.Collections;
+﻿using System;
+using Devmasters.Collections;
 
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.OsobyES;
@@ -6,7 +7,10 @@ using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PeopleLoader
 {
@@ -22,6 +26,16 @@ namespace PeopleLoader
             //OsobyEsService.Get("aaa");
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.czCulture;
+            
+            var services = new ServiceCollection();
+
+            // build config
+            IConfiguration configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", false)
+                .Build();
+            services.AddOptions();
+            Devmasters.Config.Init(configuration);
 
             using (DbEntities db = new DbEntities())
             {
@@ -51,6 +65,7 @@ namespace PeopleLoader
                 Devmasters.Batch.Manager.DoActionForAll<Osoba>(osoby,
                 os =>
                 {
+                    
                     var o = new OsobaES()
                     {
                         NameId = os.NameId,
