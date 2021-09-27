@@ -399,7 +399,7 @@ namespace HlidacStatu.Entities.VZ
 
 
         [Description("")]
-        public DateTime? LastUpdated { get; set; } = DateTime.MinValue;
+        public DateTime? LastUpdated { get; set; } = null;
 
         [Description("Odhadovaná hodnota zakázky bez DPH.")]
         [Number]
@@ -443,11 +443,11 @@ namespace HlidacStatu.Entities.VZ
 
             [Description("Neuvádět")]
             [Date]
-            public DateTime? LastUpdate { get; set; } = DateTime.MinValue;
+            public DateTime? LastUpdate { get; set; } = null;
 
             [Description("Neuvádět")]
             [Date]
-            public DateTime? LastProcessed { get; set; } = DateTime.MinValue;
+            public DateTime? LastProcessed { get; set; } =null;
 
             [Description("Neuvádět")]
             [Keyword()]
