@@ -1,4 +1,40 @@
 @page "/"
 
-<h1><a href="/tableEditor">Job Table editor</a></h1>
+@inject NavigationManager NavigationManager
 
+<h1>Aplikace na třídění oborů</h1>
+
+<AuthorizeView>
+    <Authorized>
+        <h1>
+            Vyberte si obor, který budete zpracovávat
+        </h1>
+        <h2>Obory</h2>
+        <a href="/tableEditor/it">Editovat IT</a>
+        
+        <h2>Admin nástroje</h2>
+        <label for="specificLoad">Načíst konkrétní tabulku</label>
+        <input id="specificLoad" type="number" @bind="_tablePk"/>
+        <label for="specificArea">Oblast tabulky</label>
+        <input id="specificArea" type="text" @bind="_tableArea"/>
+        <button class="btn btn-primary" @onclick="EditSpecificTable">Načti konkrétní tabulku</button>
+        
+    </Authorized>
+    <NotAuthorized>
+        <p>Pro práci je potřeba se nejprve <a href="Identity/Account/Login">zalogovat</a></p>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+@code
+{
+    private int _tablePk;
+    private string _tableArea;
+    
+    private void EditSpecificTable()
+    {
+        if( _tablePk > 0 && !string.IsNullOrWhiteSpace(_tableArea))
+            NavigationManager.NavigateTo($"/tableEditor/{_tableArea}/{_tablePk}");
+    }
+}

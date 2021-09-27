@@ -1,4 +1,4 @@
-﻿@page "/tableEditor"
+﻿@page "/tableEditor/{obor}/{SpecificTablePk:int?}"
 
 @using HlidacStatu.JobTableEditor.Data
 @using HlidacStatu.JobTableEditor.Components
@@ -9,6 +9,7 @@
 
 @inject JobService JobService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 
 @attribute [Authorize(Roles = "Admin,TableEditor")]
 
@@ -28,29 +29,25 @@
     </div>
 </div>
 <hr style="margin-bottom: 20px;"/>
-
-@if (table == null)
+@if (_hlaska is not null)
 {
-    if (hlaska is not null)
-    {
-        <h4>
-            @hlaska.Value
-        </h4>
-    }
-    <p>
-        <label for="specificLoad">Načíst konkrétní tabulku</label>
-        <input id="specificLoad" type="number" @bind="tablePk"/>
-        <button class="btn btn-primary" @onclick="LoadNewTable">Načti tabulku</button>
-    </p>
+    <h4>
+        @_hlaska.Value
+    </h4>
+    <hr style="margin-bottom: 20px;"/>
+}
 
+@if (_table == null)
+{
+    <p>Načítám tabulku&hellip;</p>
 }
 else
 {
-    <h4 class="text-danger">@errorMessage</h4>
+    <h4 class="text-danger">@_errorMessage</h4>
     <button class="btn btn-secondary btn-sm" @onclick="MultiplyPrices">Vynásob ceny 8</button>
     <button class="btn btn-secondary btn-sm" @onclick="AddColumn">Přidej sloupec</button>
     <button class="btn btn-secondary btn-sm" @onclick="AddRow">Přidej řádek</button>
-    <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(table.InDocTable.SmlouvaID)&p=@(table.InDocTable.PrilohaHash)&page=@table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
+    <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(_table.InDocTable.SmlouvaID)&p=@(_table.InDocTable.PrilohaHash)&page=@_table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
     <span>&nbsp;&nbsp;| &nbsp;</span>
     <button class="btn btn-outline-success" @onclick="SaveTable">Save changes</button>
     <button class="btn btn-outline-warning" @onclick="SuperviseTable">Send to supervisor</button>
@@ -59,7 +56,7 @@ else
     <table class="table">
         <thead>
         <tr>
-            @for (int col = 0; col < table.Cells[0].Length; col++)
+            @for (int col = 0; col < _table.Cells[0].Length; col++)
             {
                 int column = col;
                 <th>
@@ -72,7 +69,7 @@ else
         </tr>
         </thead>
         <tbody>
-        @foreach (var row in table.Cells)
+        @foreach (var row in _table.Cells)
         {
             <tr>
                 @foreach (var cell in row)
@@ -85,7 +82,7 @@ else
     </table>
     <hr style="margin-top:20px;"/>
     <button class="btn btn-secondary" @onclick="MultiplyPrices">Vynásob ceny 8</button>
-    <a class="btn btn-outline-secondary" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(table.InDocTable.SmlouvaID)&p=@(table.InDocTable.PrilohaHash)&page=@table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
+    <a class="btn btn-outline-secondary" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(_table.InDocTable.SmlouvaID)&p=@(_table.InDocTable.PrilohaHash)&page=@_table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
     <span>&nbsp;&nbsp;| &nbsp;</span>
     <button class="btn btn-outline-success" @onclick="SaveTable">Save changes</button>
     <button class="btn btn-outline-warning" @onclick="SuperviseTable">Send to supervisor</button>
@@ -96,46 +93,54 @@ else
 }
 
 @code {
-    private SomeTable table;
-    private DateTime tableOpenedAt;
-    private string errorMessage;
+    
+    [Parameter]
+    public string Obor { get; set; }
+    [Parameter]
+    public int? SpecificTablePk { get; set; }
+    
+    private SomeTable _table;
+    private DateTime _tableOpenedAt;
+    private string _errorMessage;
     private CellSwapper Swapper { get; } = new CellSwapper();
     
-    private MarkupString? hlaska;
-    private int processedTables;
+    private MarkupString? _hlaska;
+    private int _processedTables;
 
-    private int tablePk;
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadNewTable();
+    }
+
 
     private void SetColumn(int column, InTables.Cell.GuessedCellType cellType)
     {
-        foreach (var row in table.Cells)
+        foreach (var row in _table.Cells)
         {
             row[column].CellType = cellType;
         }
-        
-    //StateHasChanged();
     }
+    
 
     private async Task LoadNewTable()
     {
-        hlaska = null;
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var userName = authState?.User?.Identity?.Name;
 
-        if (tablePk != 0)
+        if (SpecificTablePk.HasValue && SpecificTablePk != 0) //todo: lock only for admins?
         {
-            table = await JobService.GetSpecificTable(tablePk, userName, CancellationToken.None);
+            _table = await JobService.GetSpecificTable(SpecificTablePk.Value, userName, CancellationToken.None);
         }
         else
         {
 
             try
             {
-                table = await JobService.GetNewTable(userName, CancellationToken.None);
+                _table = await JobService.GetNewTable(userName, CancellationToken.None);
             }
             catch (NoDataFoundException ndfe)
             {
-                hlaska = new MarkupString($"<div class=\"alert alert-warning\" role=\"alert\">Ve frontě už není žádná další tabulka ke zpracování.</div>");
+                _hlaska = new MarkupString($"<div class=\"alert alert-warning\" role=\"alert\">Ve frontě už není žádná další tabulka ke zpracování.</div>");
             }
             catch (Exception e)
             {
@@ -143,7 +148,7 @@ else
                 throw;
             }
         }
-        tableOpenedAt = DateTime.Now;
+        _tableOpenedAt = DateTime.Now;
     }
 
     private async Task SaveTable()
@@ -183,28 +188,28 @@ else
     };
     private async Task OnSaved()
     {
-        table = null;
-        errorMessage = "";
-        processedTables++;
+        _table = null;
+        _errorMessage = "";
+        _processedTables++;
 
         try
         {
-            switch (processedTables % 100)
+            switch (_processedTables % 100)
             {
                 case 20:
-                    hlaska = new MarkupString("Zasloužíš si <i class=\"fad fa-mug-hot\"></i>");
+                    _hlaska = new MarkupString("Zasloužíš si <i class=\"fad fa-mug-hot\"></i>");
                     return;
                 case 40:
-                    hlaska = new MarkupString("<i class=\"fal fa-smoking\"></i> Pauzu?");
+                    _hlaska = new MarkupString("<i class=\"fal fa-smoking\"></i> Pauzu?");
                     return;
                 case 60:
-                    hlaska = new MarkupString("Nemáš hlad <i class=\"fal fa-cookie\"></i>");
+                    _hlaska = new MarkupString("Nemáš hlad <i class=\"fal fa-cookie\"></i>");
                     return;
                 case 80:
-                    hlaska = new MarkupString("<i class=\"fad fa-running\"></i> Co se takhle trochu protáhnout?");
+                    _hlaska = new MarkupString("<i class=\"fad fa-running\"></i> Co se takhle trochu protáhnout?");
                     return;
                 case 99:
-                    hlaska = new MarkupString("Tvůj dnešní výkon je na <i class=\"fad fa-medal\"></i>");
+                    _hlaska = new MarkupString("Tvůj dnešní výkon je na <i class=\"fad fa-medal\"></i>");
                     return;
                 default:
                     break;
@@ -213,33 +218,42 @@ else
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var userName = authState?.User?.Identity?.Name;
             var randomStatistic = await JobService.GetRandomStatistic(userName, CancellationToken.None);
-            hlaska = new MarkupString($"{pochvaly[processedTables % (pochvaly.Length)]} <br/> {randomStatistic}");
+            _hlaska = new MarkupString($"{pochvaly[_processedTables % (pochvaly.Length)]} <br/> {randomStatistic}");
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
-            hlaska = new MarkupString($"Nepodařilo se mi vymyslet správnou hlášku. Omlouvám se... <br/> Chyba je v {e.Message}");
+            _hlaska = new MarkupString($"Nepodařilo se mi vymyslet správnou hlášku. Omlouvám se... <br/> Chyba je v {e.Message}");
+        }
+
+        if (SpecificTablePk.HasValue && SpecificTablePk != 0)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            await LoadNewTable();
         }
 
     }
     
     private async Task<bool> TrySave(InDocTables.CheckStatuses operation)
     {
-        var elapsedTime = DateTime.Now - tableOpenedAt;
-        table.ProcessingTime = elapsedTime;
+        var elapsedTime = DateTime.Now - _tableOpenedAt;
+        _table.ProcessingTime = elapsedTime;
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var userName = authState?.User?.Identity?.Name;
-        table.Author = userName;
+        _table.Author = userName;
 
         try
         {
-            await JobService.SaveChanges(table, operation);
+            await JobService.SaveChanges(_table, operation);
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
-            errorMessage = e.Message;
+            _errorMessage = e.Message;
             return false;
         }
 
@@ -248,7 +262,7 @@ else
     
     private void MultiplyPrices()
     {
-        foreach (var row in table.Cells)
+        foreach (var row in _table.Cells)
         {
             foreach (var cell in row)
             {
@@ -264,29 +278,29 @@ else
 
     private void AddColumn()
     {
-        for (int i = 0; i < table.Cells.Length; i++)
+        for (int i = 0; i < _table.Cells.Length; i++)
         {
-            int currentLength = table.Cells[i].Length;
-            Array.Resize(ref table.Cells[i], currentLength + 1);
-            table.Cells[i][currentLength] = new CellShell(new InTables.Cell(), i, currentLength);
+            int currentLength = _table.Cells[i].Length;
+            Array.Resize(ref _table.Cells[i], currentLength + 1);
+            _table.Cells[i][currentLength] = new CellShell(new InTables.Cell(), i, currentLength);
         }
         
     }
     
     private void AddRow()
     {
-        var oldArray = table.Cells;
-        table.Cells = new CellShell[oldArray.Length + 1][];
+        var oldArray = _table.Cells;
+        _table.Cells = new CellShell[oldArray.Length + 1][];
         for (int row = 0; row < oldArray.Length; row++) {
-            table.Cells[row] = oldArray[row]; 
+            _table.Cells[row] = oldArray[row]; 
         }
 
-        int columnCount = table.Cells[0].Length;
-        int lastRow = table.Cells.Length - 1;
-        table.Cells[lastRow] = new CellShell[columnCount];
+        int columnCount = _table.Cells[0].Length;
+        int lastRow = _table.Cells.Length - 1;
+        _table.Cells[lastRow] = new CellShell[columnCount];
         for (int col = 0; col < columnCount; col++)
         {
-            table.Cells[lastRow][col] = new CellShell(new InTables.Cell(), lastRow, col);
+            _table.Cells[lastRow][col] = new CellShell(new InTables.Cell(), lastRow, col);
         }
         
     }

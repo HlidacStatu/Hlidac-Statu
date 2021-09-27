@@ -11,24 +11,13 @@ namespace HlidacStatu.JobTableEditor.Data
 {
     public class JobService
     {
-        static HlidacStatu.DetectJobs.InTables it_inTables = new DetectJobs.InTables("IT",
-    HlidacStatu.DetectJobs.IT.Keywords, HlidacStatu.DetectJobs.IT.OtherWords, HlidacStatu.DetectJobs.IT.BlacklistedWords
-    );
+        static readonly InTables it_inTables = new("IT", IT.Keywords, IT.OtherWords, IT.BlacklistedWords);
 
 
         public async Task<SomeTable> GetNewTable(string user, CancellationToken cancellationToken)
         {
-            //Get Data from queue
-            // Smlouva item = SmlouvaRepo.Load("13894880", includePrilohy: false);
-            // Smlouva.Priloha pril = item.Prilohy.First(m => m.hash.Value == "6411d84d9c37b3691c7f8cdc6017989920f5e66d483cf335589b408e1c7a88cb");
-            // var tbls = SmlouvaPrilohaExtension.GetTablesFromPriloha(item, pril, false);
-            // //zajima te pouze Strana 7, 2 tabulka na stránce, algorithm stream
-            // var tbl = tbls.First(m => m.Algorithm == "stream").Tables.First(t => t.Page == 7 && t.TableInPage == 2);
-            // var score = InHtmlTables.TableWithWordsAndNumbers(tbl.ParsedContent(),
-            //     InHtmlTables.SpecificWords,
-            //     out var foundJobs,
-            //     out var cells);
-
+            //todo: až bude víc oborů, tak to tady rozšířit, aby se načítal konkrétní obor
+            // nejprve v tabulce a poté se použil správný parser
             var table = await InDocTablesRepo.GetNextForCheck(user, cancellationToken);
             it_inTables.TableWithWordsAndNumbers(table.ParsedContent(),
                 out var foundJobs,
