@@ -76,9 +76,9 @@ namespace HlidacStatu.Datastructures.Graphs
                     return this;
 
                 if (To?.UniqId != e.To?.UniqId)
-                    throw new ArgumentException("To and From properties should be same with merged Edge");
-                if (From?.UniqId != e.From?.UniqId)
-                    throw new ArgumentException("To and From properties should be same with merged Edge");
+                    throw new ArgumentException("To properties should be same with merged Edge");
+                // if (From?.UniqId != e.From?.UniqId)
+                //     throw new ArgumentException("To and From properties should be same with merged Edge");
 
                 List<Interval> newInterval = new List<Interval>();
                 bool mergedInterval = false;
