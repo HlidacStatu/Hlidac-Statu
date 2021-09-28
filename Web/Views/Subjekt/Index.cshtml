@@ -426,9 +426,8 @@
             var holdingFirmy = Model.Holding(Relation.AktualnostType.Nedavny).ToList();
             var holdingFirmyWithSubsidies = holdingFirmy.Where(c => c.StatistikaDotaci().HasStatistics).Append(Model);
 
-            var holdingStats = StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(
-                holdingFirmyWithSubsidies.Select(f => f.StatistikaDotaci())
-            );
+            var holdingStats = Model.HoldingStatistikaDotaci(Relation.AktualnostType.Nedavny);
+
             var holdingGraphData = new Series[]
             {
                 new()
