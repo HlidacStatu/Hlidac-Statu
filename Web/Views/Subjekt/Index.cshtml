@@ -80,7 +80,7 @@
             Přehled rizik, která u jednotlivých subjektů sledujeme za <b>rok @rok</b>
         </p>
 
-        <partial name="_rizikoPart" model="@((firma: Model, rok: rok))"/>
+        <partial name="_rizikoPart" model="@((firma: Model, rok: rok))" />
 
         <a href="/subjekt/Rizika/@Model.ICO" class="moreinfolink text-uppercase"><strong>Zobrazit další rizika i v předchozích letech</strong></a>
 
@@ -198,7 +198,7 @@
             <div class="row">
                 <div class="col-sm-12 col-xs-12">
                     <hr />
-                    @{ 
+                    @{
                         var statisticsAfter2016 = statistics
                             .Where(s => statistics.YearsAfter2016().Contains(s.Year))
                             .OrderBy(s => s.Year);
@@ -235,7 +235,7 @@
                                 Type = Series.SeriesType.line,
 
                             }
-                        };
+                };
                     }
                     @Html.ColumnGraph("Hodnota smluv po letech", hodnotaSmluvGraphData, yTitleRight: "Počet smluv")
                 </div>
@@ -336,8 +336,8 @@
 
         @if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count() > 0)
         {
-            var subjectsWithSubsidiesCount = Model.Holding(Relation.AktualnostType.Nedavny)
-                .Where(s => s.StatistikaDotaci().HasStatistics).Count();
+               var subjectsWithSubsidiesCount =  Model.Holding(Relation.AktualnostType.Nedavny)
+                    .Where(s => s.StatistikaDotaci().HasStatistics).Count();
 
             decimal totalSumDotaceHolding = dotaceHoldingSummary.CelkemCerpano;
             int totalCountDotaceHolding = dotaceHoldingSummary.PocetDotaci;
@@ -423,8 +423,6 @@
                 holdingSubsidiesTitle += (Model.IcosInHolding(Relation.AktualnostType.Nedavny).Count() > 0 ? "firmy" : "holdingu");
             }
 
-            var holdingFirmy = Model.Holding(Relation.AktualnostType.Nedavny).ToList();
-            var holdingFirmyWithSubsidies = holdingFirmy.Where(c => c.StatistikaDotaci().HasStatistics).Append(Model);
 
             var holdingStats = Model.HoldingStatistikaDotaci(Relation.AktualnostType.Nedavny);
 
@@ -444,7 +442,7 @@
                     }
                 },
 
-            };
+                };
             <div>
                 <hr />
                 @Html.ColumnGraph(holdingSubsidiesTitle, holdingGraphData, yTitleLeft: "Celkem čerpáno", yTitleRight: "")
