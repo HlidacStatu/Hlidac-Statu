@@ -2,7 +2,6 @@
 using HlidacStatu.Entities.Entities.Analysis;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +10,7 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static partial class FirmaStatistics
     {
-         static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma> 
+        static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
             _dotaceCache = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
                 .GetSafeInstance("Firma_DotaceStatistics",
                     (firma) => CalculateDotaceStat(firma),
@@ -23,8 +22,11 @@ namespace HlidacStatu.Repositories.Statistics
                     f => f.ICO);
 
 
-         static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)> 
-            _holdingDotaceCache = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)>
+        static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
+                Datastructures.Graphs.Relation.AktualnostType aktualnost)>
+            _holdingDotaceCache = Util.Cache
+                .CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
+                    Datastructures.Graphs.Relation.AktualnostType aktualnost)>
                 .GetSafeInstance("Holding_DotaceStatistics",
                     (obj) => CalculateHoldingDotaceStat(obj.firma, obj.aktualnost),
                     TimeSpan.FromDays(7),
@@ -54,16 +56,25 @@ namespace HlidacStatu.Repositories.Statistics
             return _dotaceCache.Get(firma);
         }
 
-        private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateHoldingDotaceStat(Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)
+        private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateHoldingDotaceStat(Firma firma,
+            Datastructures.Graphs.Relation.AktualnostType aktualnost)
         {
-            var firmy = firma.Holding(aktualnost).ToArray();
+            var statistiky = firma.Holding(aktualnost)
+                .Append(firma)
+                .Where(f => f.Valid)
+                .Select(f => new { f.ICO, dotaceStats = f.StatistikaDotaci() })
+                .ToDictionary(s => s.ICO, s => s.dotaceStats);
 
-            var statistiky = firmy.Select(f => f.StatistikaDotaci()).Append(firma.StatistikaDotaci()).ToArray();
+            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistiky.Values);
 
-            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistiky);
+            foreach (var year in aggregate)
+            {
+                year.Value.JednotliveFirmy = statistiky
+                    .Where(s => s.Value.StatisticsForYear(year.Year).CelkemCerpano != 0)
+                    .ToDictionary(s => s.Key, s => s.Value.StatisticsForYear(year.Year).CelkemCerpano);
+            }
 
             return aggregate;
-
         }
 
         private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateDotaceStat(Firma f)
@@ -105,6 +116,5 @@ namespace HlidacStatu.Repositories.Statistics
 
             return new StatisticsSubjectPerYear<Firma.Statistics.Dotace>(f.ICO, statistiky);
         }
-
     }
 }

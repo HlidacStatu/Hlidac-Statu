@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Lib.Analytics;
+﻿using System.Collections.Generic;
+using HlidacStatu.Lib.Analytics;
 
 namespace HlidacStatu.Entities
 {
@@ -9,10 +10,14 @@ namespace HlidacStatu.Entities
 
             public class Dotace : CoreStat, IAddable<Dotace>
             {
-                public int PocetDotaci { get; set; } = 0;
-                public int PocetCerpani { get; set; } = 0;
-                public decimal CelkemCerpano { get; set; } = 0;
-
+                public int PocetDotaci { get; set; }
+                public int PocetCerpani { get; set; }
+                public decimal CelkemCerpano { get; set; }
+                
+                /// <summary>
+                /// Vyplněno pouze pro dotace holdingu
+                /// </summary>
+                public Dictionary<string, decimal> JednotliveFirmy { get; set; }
 
 
                 public Dotace Add(Dotace other)

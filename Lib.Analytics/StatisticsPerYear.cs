@@ -41,11 +41,10 @@ namespace HlidacStatu.Lib.Analytics
         /// <summary>
         /// Creates new statistics
         /// </summary>
-        /// <param name="ico">Subject Ico</param>
         /// <param name="data">Dictionary where key = Year, value = T</param>
         public StatisticsPerYear(Dictionary<int, T> data)
         {
-            Years = data ?? throw new ArgumentNullException("data");
+            Years = data ?? throw new ArgumentNullException(nameof(data));
         }
 
         /// <summary>
