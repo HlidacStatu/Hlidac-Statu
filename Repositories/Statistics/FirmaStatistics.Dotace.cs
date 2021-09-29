@@ -27,7 +27,7 @@ namespace HlidacStatu.Repositories.Statistics
             _holdingDotaceCache = Util.Cache
                 .CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
                     Datastructures.Graphs.Relation.AktualnostType aktualnost)>
-                .GetSafeInstance("Holding_DotaceStatistics",
+                .GetSafeInstance("Holding_DotaceStatistics_v2",
                     (obj) => CalculateHoldingDotaceStat(obj.firma, obj.aktualnost),
                     TimeSpan.FromDays(7),
                     Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
@@ -59,17 +59,17 @@ namespace HlidacStatu.Repositories.Statistics
         private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateHoldingDotaceStat(Firma firma,
             Datastructures.Graphs.Relation.AktualnostType aktualnost)
         {
-            var statistiky = firma.Holding(aktualnost)
+            var statistikyPerIco = firma.Holding(aktualnost)
                 .Append(firma)
                 .Where(f => f.Valid)
                 .Select(f => new { f.ICO, dotaceStats = f.StatistikaDotaci() })
                 .ToDictionary(s => s.ICO, s => s.dotaceStats);
 
-            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistiky.Values);
+            var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistikyPerIco.Values);
 
             foreach (var year in aggregate)
             {
-                year.Value.JednotliveFirmy = statistiky
+                year.Value.JednotliveFirmy = statistikyPerIco
                     .Where(s => s.Value.StatisticsForYear(year.Year).CelkemCerpano != 0)
                     .ToDictionary(s => s.Key, s => s.Value.StatisticsForYear(year.Year).CelkemCerpano);
             }

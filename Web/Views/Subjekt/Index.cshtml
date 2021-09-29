@@ -235,7 +235,7 @@
                                 Type = Series.SeriesType.line,
 
                             }
-                };
+        };
                     }
                     @Html.ColumnGraph("Hodnota smluv po letech", hodnotaSmluvGraphData, yTitleRight: "Počet smluv")
                 </div>
@@ -336,8 +336,11 @@
 
         @if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count() > 0)
         {
-               var subjectsWithSubsidiesCount =  Model.Holding(Relation.AktualnostType.Nedavny)
-                    .Where(s => s.StatistikaDotaci().HasStatistics).Count();
+            var subjectsWithSubsidiesCount = dotaceHoldingStat
+                .Select(y => y.Value)
+                .SelectMany(v => v.JednotliveFirmy.Keys)
+                .Distinct()
+                .Count();
 
             decimal totalSumDotaceHolding = dotaceHoldingSummary.CelkemCerpano;
             int totalCountDotaceHolding = dotaceHoldingSummary.PocetDotaci;
@@ -442,7 +445,7 @@
                     }
                 },
 
-                };
+                    };
             <div>
                 <hr />
                 @Html.ColumnGraph(holdingSubsidiesTitle, holdingGraphData, yTitleLeft: "Celkem čerpáno", yTitleRight: "")
@@ -718,7 +721,7 @@ StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
 
     </div>
     @{
-        intv.Stop();
+    intv.Stop();
     }
 
 </div>

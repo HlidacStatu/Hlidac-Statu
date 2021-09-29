@@ -9,6 +9,8 @@ namespace HlidacStatu.LibCore.MiddleWares
 {
     public class TimeMeasureMiddleware
     {
+        public static Devmasters.Logging.Logger _logger = new Devmasters.Logging.Logger("HlidacStatu.PageTimes");
+
         private readonly RequestDelegate _next;
 
         public TimeMeasureMiddleware(RequestDelegate next)
@@ -23,10 +25,9 @@ namespace HlidacStatu.LibCore.MiddleWares
             sw.Start();
             await _next(httpContext);
             sw.Stop();
-
-            if (sw.ElapsedMilliseconds > 1000)
+            if (sw.ElapsedMilliseconds > 2000)
             {
-                Util.Consts.Logger.Warning($"Loading time of [{url}] was [{sw.ElapsedMilliseconds} ms]. Care to fix it?");
+                _logger.Warning($"Loading time of {url} was {sw.ElapsedMilliseconds} ms");
             }
         }
     }
