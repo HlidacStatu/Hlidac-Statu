@@ -14,7 +14,9 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 
 using System;
+using System.Diagnostics;
 using System.IO;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace HlidacStatu.Web
 {
@@ -136,6 +138,23 @@ namespace HlidacStatu.Web
         //!Záleží na pořadí
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
+            //request time measurement
+            app.Use(async (context, next) =>
+            {
+                var url = context.Request.GetDisplayUrl();
+                var sw = new Stopwatch();
+                sw.Start();
+                await next();
+                sw.Stop();
+
+                if (sw.ElapsedMilliseconds > 1000)
+                {
+                    Util.Consts.Logger.Warning($"Loading time of [{url}] was [{sw.ElapsedMilliseconds} ms]. Care to fix it?");
+                }
+
+            });
+                
 
             if (Constants.IsDevelopment(env))
             {
