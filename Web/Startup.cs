@@ -14,9 +14,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 
 using System;
-using System.Diagnostics;
 using System.IO;
-using Microsoft.AspNetCore.Http.Extensions;
 
 namespace HlidacStatu.Web
 {
@@ -140,20 +138,7 @@ namespace HlidacStatu.Web
         {
 
             //request time measurement
-            app.Use(async (context, next) =>
-            {
-                var url = context.Request.GetDisplayUrl();
-                var sw = new Stopwatch();
-                sw.Start();
-                await next();
-                sw.Stop();
-
-                if (sw.ElapsedMilliseconds > 1000)
-                {
-                    Util.Consts.Logger.Warning($"Loading time of [{url}] was [{sw.ElapsedMilliseconds} ms]. Care to fix it?");
-                }
-
-            });
+            app.UseTimeMeasureMiddleware();
                 
 
             if (Constants.IsDevelopment(env))
@@ -182,8 +167,7 @@ namespace HlidacStatu.Web
             app.UseStaticFiles();
 
             app.UseSwagger();
-            //app.UseSwaggerUI();
-            // app.UseSwagger(s => s.RouteTemplate = "api/{documentName}/swagger/swagger.json");
+            
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v2/swagger.json", "API V2");
