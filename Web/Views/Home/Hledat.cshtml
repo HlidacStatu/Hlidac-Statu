@@ -22,7 +22,9 @@
 
     bool hasPreview = Model.HasOsoby;
 
-    Dictionary<string, System.TimeSpan> viewRenderTimes = new();
+    Devmasters.DT.StopWatchLaps viewRenderTimes = new Devmasters.DT.StopWatchLaps();
+    Devmasters.DT.StopWatchLaps.Interval viewRenderTimesInt = null;
+    viewRenderTimesInt = viewRenderTimes.AddAndStartLap("content header");
 }
 
 @section breadcrumb
@@ -173,6 +175,7 @@ else if (Model.HasResults == false)
 <hr />
 
 @{
+    viewRenderTimesInt.Stop();
     //debug
     //Model.Smlouvy = null;
     //Model.VZ = null;
@@ -180,6 +183,8 @@ else if (Model.HasResults == false)
     //Model.Dotace = null;
 
     //main content based on number of results
+
+    viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Models into ordered collection");
 
     List<string> paorder = new();
     if (Model.HasSmlouvy)
@@ -240,12 +245,16 @@ else if (Model.HasResults == false)
     }
     paorder.Add(Model.Datasets.GetType().Name);
 
+    viewRenderTimesInt.Stop();
 
     List<Tuple<string, string>> htmlLinks = new();
 }
 
 
 @* BOXES *@
+@{ 
+    viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Boxes");
+}
 @for (int ipart = 1; ipart < paorder.Count; ipart++)
 {
     var part = paorder[ipart];
@@ -301,8 +310,14 @@ else if (Model.HasResults == false)
     {
     }
 }
-@*for*@
+@{ 
+    viewRenderTimesInt.Stop();
+}
+@*BOXES for*@
 
+@{ 
+    viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Html links");
+}
 @if (htmlLinks.Count > 0)
 {
     <div class="col-xs-12 col-sm-12">
@@ -326,7 +341,9 @@ else if (Model.HasResults == false)
     </div>
     <hr />
 }
-
+@{ 
+    viewRenderTimesInt.Stop();
+}
 
 <div class="col-xs-12 col-sm-12">
 
@@ -386,8 +403,7 @@ else if (Model.HasResults == false)
             {
                 if (Model.HasSmlouvy)
                 {
-                    Devmasters.DT.StopWatchEx sw = new();
-                    sw.Start();
+                    viewRenderTimesInt= viewRenderTimes.AddAndStartLap("Result smlouvy");
                     if (numOfSmluv == 0)
                     {
                         <hr />
@@ -412,16 +428,15 @@ else if (Model.HasResults == false)
                             </div>
                         </div>
                     }
-                    sw.Stop();
-                    viewRenderTimes.Add("smlouvy", sw.Elapsed);
+                    viewRenderTimesInt.Stop();
                 }
             }
             else if (part == Model.VZ.GetType().Name)
             {
                 if (Model.HasVZ)
                 {
-                    Devmasters.DT.StopWatchEx sw = new();
-                    sw.Start();
+                    viewRenderTimesInt= viewRenderTimes.AddAndStartLap("Result VZ");
+
                     if (numOfVZ == 0)
                     {
                         <hr />
@@ -460,16 +475,15 @@ else if (Model.HasResults == false)
                             </div>
                         </div>
                     }
-                    sw.Stop();
-                    viewRenderTimes.Add("VZ", sw.Elapsed);
+                    viewRenderTimesInt.Stop();
+
                 }
             }
             else if (part == Model.Dotace.GetType().Name)
             {
+                    viewRenderTimesInt= viewRenderTimes.AddAndStartLap("Result dotace");
                 if (Model.HasDotace)
                 {
-                    Devmasters.DT.StopWatchEx sw = new();
-                    sw.Start();
                     if (numOfDotaci == 0)
                     {
                         <hr />
@@ -494,16 +508,14 @@ else if (Model.HasResults == false)
                             </div>
                         </div>
                     }
-                    sw.Stop();
-                    viewRenderTimes.Add("Dotace", sw.Elapsed);
+                    viewRenderTimesInt.Stop();
                 }
             }
             else if (part == Model.Insolvence.GetType().Name)
             {
+                viewRenderTimesInt= viewRenderTimes.AddAndStartLap("Result insolvence");
                 if (Model.HasInsolvence)
                 {
-                    Devmasters.DT.StopWatchEx sw = new();
-                    sw.Start();
                     if (numOfInsolvenci == 0)
                     {
                         <hr />
@@ -529,16 +541,15 @@ else if (Model.HasResults == false)
                         </div>
             
                     }
-                    sw.Stop();
-                    viewRenderTimes.Add("Insolvence", sw.Elapsed);
+                    viewRenderTimesInt.Stop();
+
                 }
             }
             else if (part == Model.Osoby.GetType().Name)
             {
+                    viewRenderTimesInt= viewRenderTimes.AddAndStartLap("Result osoby");
                 if (Model.HasOsoby)
                 {
-                    Devmasters.DT.StopWatchEx sw = new();
-                    sw.Start();
                     <div class="row" id="osoby">
                         <div class="col-xs-12">
                             <div class="searching__watcher">
@@ -575,16 +586,14 @@ else if (Model.HasResults == false)
                             </div>
                         }
                     }
-                    sw.Stop();
-                    viewRenderTimes.Add("Osoby", sw.Elapsed);
+                    viewRenderTimesInt.Stop();
                 }
             }
             else if (part == Model.Firmy.GetType().Name)
             {
+                    viewRenderTimesInt= viewRenderTimes.AddAndStartLap("Result firmy");
                 if (Model.HasFirmy)
                 {
-                    Devmasters.DT.StopWatchEx sw = new();
-                    sw.Start();
                     if (numOfFirem == 0)
                     {
                         <hr />
@@ -621,12 +630,12 @@ else if (Model.HasResults == false)
                         </div>
                     }
 
-                    sw.Stop();
-                    viewRenderTimes.Add("Firmy", sw.Elapsed);
+                    viewRenderTimesInt.Stop();
                 }
             }
             else if (part == Model.Datasets.GetType().Name)
             {
+                    viewRenderTimesInt= viewRenderTimes.AddAndStartLap("Result smlouvy");
                 if (Model.HasDatasets)
                 {
                     Devmasters.DT.StopWatchEx sw = new();
@@ -687,9 +696,8 @@ else if (Model.HasResults == false)
                             <partial name="WebUtil/VerticalTabs" model="@(new VerticalTabsViewModel(tabs?.ToList(), results))" />
                         </div>
                     }
+                    viewRenderTimesInt.Stop();
                     
-                    sw.Stop();
-                    viewRenderTimes.Add("Datasets", sw.Elapsed);
                 }
             }
             else
@@ -697,7 +705,9 @@ else if (Model.HasResults == false)
             }
 
             if (htmlLinks.Count > 0)
-            {
+            {                    
+                                    viewRenderTimesInt= viewRenderTimes.AddAndStartLap("Html links");
+
                 <hr style="margin-top:30px;" />
                 <h3><span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> jsme nalezli ještě v těchto databázích</h3>
                 <div class="row">
@@ -715,6 +725,8 @@ else if (Model.HasResults == false)
                     </div>
                 }
                 </div>
+                viewRenderTimesInt.Stop();
+
             }
         }
 
@@ -729,5 +741,5 @@ else if (Model.HasResults == false)
 searchtimes: @Html.Raw(string.Join("\n", Model.SearchTimes().Select(kv => kv.Key + ": " + kv.Value.TotalMilliseconds + "ms")))
 -->
 <!--
-viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Select(kv => kv.Key + ": " + kv.Value.TotalMilliseconds + "ms")))
+viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Laps.Select(m => $"{m.Name} : {m.ExactElapsedMs:# ##0.00}ms")))
 -->
