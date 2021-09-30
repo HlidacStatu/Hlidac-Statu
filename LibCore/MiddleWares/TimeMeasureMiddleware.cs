@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using System.Diagnostics;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.LibCore.MiddleWares
@@ -20,16 +21,27 @@ namespace HlidacStatu.LibCore.MiddleWares
 
         public async Task Invoke(HttpContext httpContext, AttackerDictionaryService attackerDictionary)
         {
-            var url = httpContext.Request.GetDisplayUrl();
+            var url = httpContext.Request.Path;
+            var query = httpContext.Request.QueryString.ToString();
             var sw = new Stopwatch();
             sw.Start();
             await _next(httpContext);
             sw.Stop();
             if (sw.ElapsedMilliseconds > 2000)
             {
-                _logger.Warning($"Loading time of {url} was {sw.ElapsedMilliseconds} ms");
+                //_logger.Warning($"Loading time of {url} was {sw.ElapsedMilliseconds} ms");
+                var msg = new Devmasters.Logging.LogMessage();
+                //<conversionPattern value="%date|%property{page}|%property{params}|%property{user}|%property{elapsedtime}" />
+                msg.SetCustomKeyValue("web_page", url);
+                msg.SetCustomKeyValue("web_params", query);
+                msg.SetCustomKeyValue("web_elapsedtime", sw.ElapsedMilliseconds);
+
+                if (httpContext.User != null && httpContext.User.Identity != null && httpContext.User.Identity.Name != null)
+                    msg.SetCustomKeyValue("web_user", httpContext.User.Identity.Name);
+                _logger.Warning(msg);
             }
         }
+
     }
     
 
