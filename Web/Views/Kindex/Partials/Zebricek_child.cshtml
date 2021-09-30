@@ -15,16 +15,16 @@
     string partDesc = part.HasValue ? "pro " + part.Value.ToNiceDisplayName() : "";
 
 
-    var data = Model.ToArray().Where(m => true);
+    var data = Model.ToArray().Where(m => true).ToList();
 
     if (!string.IsNullOrEmpty(selectedGroup))
     {
-        data = data.Where(c => string.IsNullOrEmpty(selectedGroup) || selectedGroup == c.Group);
+        data = data.Where(c => string.IsNullOrEmpty(selectedGroup) || selectedGroup == c.Group).ToList();
     }
 
     if (!string.IsNullOrEmpty(selectedKraj))
     {
-        data = data.Where(c => string.IsNullOrEmpty(selectedKraj) || selectedKraj == c.Kraj);
+        data = data.Where(c => string.IsNullOrEmpty(selectedKraj) || selectedKraj == c.Kraj).ToList();
     }
 
 

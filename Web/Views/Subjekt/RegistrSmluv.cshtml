@@ -39,7 +39,7 @@
 
     var statisticsAfter2016 = statistics
         .Where(s => statistics.YearsAfter2016().Contains(s.Year))
-        .OrderBy(s => s.Year);
+        .OrderBy(s => s.Year).ToList();
 
     var summaryAfter2016 = statistics.Summary(statistics.YearsAfter2016());
     var statHoldingAktual = Model.HoldingStatisticsRegistrSmluv(Relation.AktualnostType.Aktualni);
@@ -376,8 +376,9 @@
                 if (statistics[y].PoOblastech?.Count > 0)
                 {
                     var sortedData = statistics[y].PoOblastech
-                                        .OrderByDescending(o => o.Value.CelkemCena)
-                                        .ThenByDescending(o => o.Value.Pocet);
+                        .OrderByDescending(o => o.Value.CelkemCena)
+                        .ThenByDescending(o => o.Value.Pocet)
+                        .ToList();
                     IEnumerable<Tuple<string, decimal>> pieData = sortedData
                                         .Take(9)
                                         .Select(m => new Tuple<string, decimal>(

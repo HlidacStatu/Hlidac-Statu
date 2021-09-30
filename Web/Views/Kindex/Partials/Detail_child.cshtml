@@ -244,7 +244,7 @@ else
 }
 
 @{
-    var feedbacks = KindexFeedback.GetKindexFeedbacks(Model.Ico, selectedYear);
+    var feedbacks = KindexFeedback.GetKindexFeedbacks(Model.Ico, selectedYear).ToList();
 }
 @if (feedbacks.Any())
 {
@@ -695,7 +695,7 @@ else
 </div>
 
 @{
-    var previousKindexes = Model.GetPreviousVersions();
+    var previousKindexes = Model.GetPreviousVersions().ToList();
 }
 
 @if (previousKindexes.Count() > 0)

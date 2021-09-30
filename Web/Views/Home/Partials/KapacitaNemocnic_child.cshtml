@@ -168,7 +168,7 @@
         {
             date = m.lastUpdated,
             data = m.regions.First(hh => hh.region == h.region)
-        });
+        }).ToList();
 
 
         <h2 id="@h.region">@h.regionFull()</h2>
