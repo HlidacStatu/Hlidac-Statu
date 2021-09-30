@@ -744,5 +744,5 @@ else if (Model.HasResults == false)
 searchtimes: @Html.Raw(string.Join("\n", Model.SearchTimes().Select(kv => kv.Key + ": " + kv.Value.TotalMilliseconds + "ms")))
 -->
 <!--
-viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.Laps.Select(m => $"{m.Name} : {m.ExactElapsedMs:# ##0.00}ms")))
+viewrendertimes: @Html.Raw(string.Join("\n", viewRenderTimes.ToString()))
 -->

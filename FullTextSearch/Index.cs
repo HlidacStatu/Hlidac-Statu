@@ -80,7 +80,7 @@ namespace FullTextSearch
             }
 
             intv.Stop();
-            Log.Logger.Info(string.Join("\n", swl.Laps.Select(m => $"{m.Name} : {m.ExactElapsedMs:# ##0.00}ms")));
+            Log.Logger.Info(swl.ToString());
         }
 
         /// <summary>
@@ -144,10 +144,7 @@ namespace FullTextSearch
 
             if (swl.Summary().ExactElapsedMs >= 500d)
             {
-                Log.Logger.Info(
-                    string.Join("\n", swl.Laps.Select(m => $"{m.Name} : {m.ExactElapsedMs:# ##0.00}ms"))
-                    + $"\nTOTAL : {swl.Summary().ExactElapsedMs:# ##0.00}ms"
-                );
+                Log.Logger.Info(swl.ToString());
             }
 
             return final
