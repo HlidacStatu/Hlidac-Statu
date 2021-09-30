@@ -9,7 +9,6 @@
   </logger>
 
   <logger name="HlidacStatu.Lib.ES">
-    <appender-ref ref="ES-RollingLogFileAppenderError" />
   </logger>
 
   <logger name="HlidacStatu">
@@ -50,7 +49,7 @@
 
   </logger>
 
-  <logger name="PageTimes">
+  <logger name="HlidacStatu.PageTimes">
     <level value="ALL" />
     <appender-ref ref="RollingLogFilePageTimes" />
   </logger>
