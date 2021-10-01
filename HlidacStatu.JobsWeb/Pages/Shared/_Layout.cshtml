@@ -1,0 +1,185 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] - HlidacStatu.JobsWeb</title>
+    
+    <link rel="stylesheet" href="~/css/bootstrap.min.css" >
+    
+    
+    <link rel="stylesheet" href="~/css/site.css"/>
+    <link rel="stylesheet" href="~/content/new.v1.10.css"/>
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&amp;subset=latin-ext" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css?family=Cabin:400,400i,600,700&amp;subset=latin-ext" rel="stylesheet"/>
+
+    <link rel="shortcut icon" href="/content/icons/favicon.ico" type="image/x-icon"/>
+    <link rel="apple-touch-icon" sizes="57x57" href="/content/icons/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/content/icons/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/content/icons/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/content/icons/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/content/icons/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/content/icons/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/content/icons/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/content/icons/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/content/icons/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="/content/icons/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/content/icons/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/content/icons/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/content/icons/android-chrome-192x192.png" sizes="192x192">
+    <meta name="msapplication-square70x70logo" content="/content/icons/smalltile.png"/>
+    <meta name="msapplication-square150x150logo" content="/content/icons/mediumtile.png"/>
+    <meta name="msapplication-wide310x150logo" content="/content/icons/widetile.png"/>
+    <meta name="msapplication-square310x310logo" content="/content/icons/largetile.png"/>
+
+    <script src="https://kit.fontawesome.com/a0fc082c81.js" crossorigin="anonymous"></script>
+
+</head>
+<body>
+<header>
+    <div class="header__navbar d-print-none">
+        <a href="/" class="logo">
+            <svg width="46" height="46" viewBox="0 0 46 46">
+                <use xlink:href="/content/img/defs.svg#logo"></use>
+            </svg>
+            Hlídač <strong>Státu</strong>
+        </a>
+        <nav class="navbar__level1">
+            <a href="#" class="hamburger"></a>
+
+            <ul>
+                <li class="navbar__watchers">
+                    <a href="/smlouvy">Smlouvy</a>
+                    <a href="/VerejneZakazky">Veřejné zakázky</a>
+                    <a href="/Dotace">Dotace</a>
+                    <a href="/Insolvence">Insolvence</a>
+                    <a href="/sponzori">Sponzoři</a>
+                    <a href="/StatniWeby">Weby státu<sup style="top:0;text-decoration:none;color:#777;">219</sup></a>
+                </li>
+
+                <li class="d-none d-md-flex">
+                    <a onclick="ga('send', 'event', 'loginBtn', 'click','/'); return true;" href="/Identity/Account/Login?returnUrl=/" id="loginLink">
+                        <img src="/Content/img/icon-user.svg" style="padding-right: 8px;">
+                        Přihlášení
+                    </a>
+                    <a onclick="ga('send', 'event', 'registerBtn', 'click','/'); return true;" href="/Identity/Account/Register?returnUrl=/" id="regLink">Registrace</a>
+                </li>
+
+                <!-- mobile menu items below -->
+                <li class="level2">
+                    <a href="/data">Další databáze<sup style="top:0;text-decoration:none;color:#777;">40</sup></a>
+                </li>
+                <li class="level2">
+                    <a href="/reporty">Analýzy a reporty<sup style="top:0;text-decoration:none;color:#777;">24</sup></a>
+                </li>
+                <li class="level2">
+                    <a onclick="ga('send', 'event', 'logoffBtn', 'click','/')" href="/texty">
+                        <b>Zjistili jsme</b>
+                    </a>
+                </li>
+                <li class="level2">
+                    <a href="https://www.hlidacstatu.cz/texty/series/tipy/" onclick="return trackOutLink(this,'headermobile');">Tipy „Jak používat Hlídače“</a>
+                </li>
+
+                <li class="level2">
+                    <a href="https://www.darujme.cz/projekt/1204683" onclick="return trackOutLink(this,'headermobile');">Podpořte nás</a>
+                    <a href="/PridatSe">Přidejte se k nám</a>
+                </li>
+
+
+                <li class="level2">
+                    <partial name="_LoginPartial"/>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="d-print-none">
+
+        <div class="header__content ">
+            <!-- desktop menu items only -->
+            <div class="header__title">
+                <h1>Hlídač státu</h1>
+                <span>Hlídáme je, protože si to zaslouží!</span>
+            </div>
+            <!-- desktop menu items only -->
+
+        </div>
+
+    </div>
+</header>
+<div class="container">
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+</div>
+
+<div class="box-cta" id="fundingAdFooter">
+    <div class="container">
+        <div class="box-cta__content">
+            <h2 class="box-cta__title">
+                Pomozte nám udržovat český stát transparentní
+            </h2>
+            <ul class="box-cta__list">
+                <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Kontrolujeme politiky a úředníky, zda s našimi penězi zacházejí správně.</li>
+                <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Stali jsme se důležitým zdrojem informací pro novináře.</li>
+                <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Zvyšujeme transparentnost českého státu.</li>
+                <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Pomáháme státu zavádět moderní e-government.</li>
+            </ul>
+
+            <p>
+                <a href="https://www.darujme.cz/projekt/1204683" class="btn btn-primary" target="_blank">
+                    Pomozte nám i vy
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="footer">
+        <div class="footer__content">
+            <div class="footer__content__col">
+                <a href="https://texty.hlidacstatu.cz/o-serveru">O nás</a>
+                <a href="https://texty.hlidacstatu.cz/vize">Naše vize</a>
+                <a href="https://texty.hlidacstatu.cz/kodex">Náš kodex</a>
+                <a href="https://texty.hlidacstatu.cz/kontakt">Kontakt</a>
+                <a href="https://texty.hlidacstatu.cz/pro-media">Pro média, loga</a>
+            </div>
+            <div class="footer__content__gap"></div>
+            <div class="footer__content__col">
+                <a href="https://texty.hlidacstatu.cz/team">Team</a>
+                <a href="https://texty.hlidacstatu.cz/pomohu-spravnemu-fungovani-cr/" style="color:#3c763d;font-weight:bold">Podpořte nás!<i class="fas fa-heart" style="color:red"></i></a>
+                <a href="/api">API a Open data pro vývojáře</a>
+                <a href="https://texty.hlidacstatu.cz/provoznipodminky/">Podmínky užívání a ochrana soukromí</a>
+                <a href="https://texty.hlidacstatu.cz/series/tipy/">Tipy, nápověda</a>
+            </div>
+            <div class="footer__content__gap"></div>
+            <div class="footer__content__col">
+                <div style="padding: 7px 5px">
+                    <a href="https://texty.hlidacstatu.cz/kontakt/" target="_blank" style="color:orange"><span style="color:orange" class="fas fa-exclamation-triangle"></span>&nbsp;Nahlásit chybu</a>/ <a href="/status">Běží nám servery?</a>
+                </div>
+                <div style="padding: 7px 5px"><a href="https://texty.hlidacstatu.cz/k-index/">K-index: Hlídáme stát s odvahou!</a>/<a href="https://texty.hlidacstatu.cz/k-index-watchdog-bravely-monitors-public-corruption/">EN</a></div>
+                <div style="padding: 7px 5px">
+                    <span>Sledujte nás</span>
+                    <a href="https://www.facebook.com/hlidacstatu">
+                        <i class="fab fa-facebook-square fa-2x"></i>
+                    </a>
+                    <a href="https://twitter.com/hlidacstatu">
+                        <i class="fab fa-twitter-square fa-2x"></i>
+                    </a>
+                    <a href="https://www.instagram.com/hlidacstatu/">
+                        <i class="fab fa-instagram-square fa-2x"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
