@@ -37,62 +37,32 @@
 </head>
 <body>
 <header>
-    <div class="header__navbar d-print-none">
-        <a href="/" class="logo">
-            <svg width="46" height="46" viewBox="0 0 46 46">
-                <use xlink:href="/content/img/defs.svg#logo"></use>
-            </svg>
-            Hlídač <strong>Státu</strong>
-        </a>
-        <nav class="navbar__level1">
-            <a href="#" class="hamburger"></a>
-
-            <ul>
-                <li class="navbar__watchers">
-                    <a href="/smlouvy">Smlouvy</a>
-                    <a href="/VerejneZakazky">Veřejné zakázky</a>
-                    <a href="/Dotace">Dotace</a>
-                    <a href="/Insolvence">Insolvence</a>
-                    <a href="/sponzori">Sponzoři</a>
-                    <a href="/StatniWeby">Weby státu<sup style="top:0;text-decoration:none;color:#777;">219</sup></a>
-                </li>
-
-                <li class="d-none d-md-flex">
-                    <a onclick="ga('send', 'event', 'loginBtn', 'click','/'); return true;" href="/Identity/Account/Login?returnUrl=/" id="loginLink">
-                        <img src="/Content/img/icon-user.svg" style="padding-right: 8px;">
-                        Přihlášení
-                    </a>
-                    <a onclick="ga('send', 'event', 'registerBtn', 'click','/'); return true;" href="/Identity/Account/Register?returnUrl=/" id="regLink">Registrace</a>
-                </li>
-
-                <!-- mobile menu items below -->
-                <li class="level2">
-                    <a href="/data">Další databáze<sup style="top:0;text-decoration:none;color:#777;">40</sup></a>
-                </li>
-                <li class="level2">
-                    <a href="/reporty">Analýzy a reporty<sup style="top:0;text-decoration:none;color:#777;">24</sup></a>
-                </li>
-                <li class="level2">
-                    <a onclick="ga('send', 'event', 'logoffBtn', 'click','/')" href="/texty">
-                        <b>Zjistili jsme</b>
-                    </a>
-                </li>
-                <li class="level2">
-                    <a href="https://www.hlidacstatu.cz/texty/series/tipy/" onclick="return trackOutLink(this,'headermobile');">Tipy „Jak používat Hlídače“</a>
-                </li>
-
-                <li class="level2">
-                    <a href="https://www.darujme.cz/projekt/1204683" onclick="return trackOutLink(this,'headermobile');">Podpořte nás</a>
-                    <a href="/PridatSe">Přidejte se k nám</a>
-                </li>
-
-
-                <li class="level2">
-                    <partial name="_LoginPartial"/>
-                </li>
-            </ul>
-        </nav>
-    </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <svg width="46" height="46" viewBox="0 0 46 46">
+                    <use xlink:href="/content/img/defs.svg#logo"></use>
+                </svg>
+                Hlídač <strong>Státu</strong>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav"> <!-- aligned left -->
+                    <a class="nav-link" href="https://www.hlidacstatu.cz/smlouvy">Smlouvy</a>
+                    <a class="nav-link" href="https://www.hlidacstatu.cz/VerejneZakazky">Veřejné zakázky</a>
+                    <a class="nav-link" href="https://www.hlidacstatu.cz/Dotace">Dotace</a>
+                    <a class="nav-link" href="https://www.hlidacstatu.cz/Insolvence">Insolvence</a>
+                    <a class="nav-link" href="https://www.hlidacstatu.cz/sponzori">Sponzoři</a>
+                    <a class="nav-link" href="https://www.hlidacstatu.cz/StatniWeby">Weby státu</a>
+                </div>
+                <partial name="_LoginPartial"/> <!-- aligned right -->
+            </div>
+        </div>
+    </nav>
+    
 
     <div class="d-print-none">
 
@@ -114,30 +84,31 @@
     </main>
 </div>
 
-<div class="box-cta" id="fundingAdFooter">
-    <div class="container">
-        <div class="box-cta__content">
-            <h2 class="box-cta__title">
-                Pomozte nám udržovat český stát transparentní
-            </h2>
-            <ul class="box-cta__list">
-                <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Kontrolujeme politiky a úředníky, zda s našimi penězi zacházejí správně.</li>
-                <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Stali jsme se důležitým zdrojem informací pro novináře.</li>
-                <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Zvyšujeme transparentnost českého státu.</li>
-                <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Pomáháme státu zavádět moderní e-government.</li>
-            </ul>
-
-            <p>
-                <a href="https://www.darujme.cz/projekt/1204683" class="btn btn-primary" target="_blank">
-                    Pomozte nám i vy
-                </a>
-            </p>
-        </div>
-    </div>
-</div>
 
 <footer>
-    <div class="footer">
+    <div class="box-cta" id="fundingAdFooter">
+        <div class="container">
+            <div class="box-cta__content">
+                <h2 class="box-cta__title">
+                    Pomozte nám udržovat český stát transparentní
+                </h2>
+                <ul class="box-cta__list">
+                    <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Kontrolujeme politiky a úředníky, zda s našimi penězi zacházejí správně.</li>
+                    <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Stali jsme se důležitým zdrojem informací pro novináře.</li>
+                    <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Zvyšujeme transparentnost českého státu.</li>
+                    <li class="box-cta__item"><i class="fas fa-check" style="color:#2975DC;padding-right:10px;"></i> Pomáháme státu zavádět moderní e-government.</li>
+                </ul>
+    
+                <p>
+                    <a href="https://www.darujme.cz/projekt/1204683" class="btn btn-primary" target="_blank">
+                        Pomozte nám i vy
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div style="background:#f2f5f7;">
         <div class="footer__content">
             <div class="footer__content__col">
                 <a href="https://texty.hlidacstatu.cz/o-serveru">O nás</a>
