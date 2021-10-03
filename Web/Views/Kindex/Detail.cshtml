@@ -148,7 +148,8 @@ $(document).ready(function(){
                     .OrderByDescending(o => o.Created)?
                     .Select(m => m?.KIndex?.ForYear(rok)?.KIndex)?
                     .Where(m => m != null)?
-                    .Select(m => m.Value.ToString("N2"));
+                    .Select(m => m.Value.ToString("N2"))
+                    .ToList();
                 <tr>
                     <td>@rok</td>
                     <td>@(kidxP?.KIndexReady)</td>

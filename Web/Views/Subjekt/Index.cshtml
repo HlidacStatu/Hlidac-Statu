@@ -201,7 +201,8 @@
                     @{
                         var statisticsAfter2016 = statistics
                             .Where(s => statistics.YearsAfter2016().Contains(s.Year))
-                            .OrderBy(s => s.Year);
+                            .OrderBy(s => s.Year)
+                            .ToList();
                         //Graf hodnota smluv
                         var hodnotaSmluvGraphData = new Series[]
                         {

@@ -71,7 +71,7 @@
     var holdingFirmy = Model.Holding(Relation.AktualnostType.Nedavny).ToList();
     //holdingFirmy.Add(Model);
 
-    var holdingFirmyWithSubsidies = holdingFirmy.Where(c => c.StatistikaDotaci().HasStatistics).Append(Model);
+    var holdingFirmyWithSubsidies = holdingFirmy.Where(c => c.StatistikaDotaci().HasStatistics).Append(Model).ToList();
     int subCompaniesWithSubsidiesCount = holdingFirmyWithSubsidies.Count() - 1;
 
     var holdingStats = Model.HoldingStatistikaDotaci(Relation.AktualnostType.Nedavny);   

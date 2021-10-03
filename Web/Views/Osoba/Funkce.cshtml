@@ -17,7 +17,7 @@
         (int)OsobaEvent.Types.Jine
     };
 
-    var osobaEvents = Model.Events(m => types.Contains(m.Type));
+    var osobaEvents = Model.Events(m => types.Contains(m.Type)).ToList();
     var funkceOsobaNum = osobaEvents.Count();
     var funkceOsoba = Model.Description(true,
            m => types.Contains(m.Type),

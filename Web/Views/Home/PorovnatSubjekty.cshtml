@@ -30,7 +30,7 @@
         currYear--;
     }
 
-    IEnumerable<int> years = Enumerable.Range(firstYear, currYear - firstYear + 1);
+    var years = Enumerable.Range(firstYear, currYear - firstYear + 1).ToList();
 
     var parts = new ReportModel();
 
@@ -51,10 +51,9 @@
     columnsPoctySmluv.Add(nameCol);
     columnsPoctySmluv.AddRange(
             years.SelectMany(y => new[] {
-tblDataSource.PocetSmluv(y),
-tblDataSource.SumSmluvKc(y)
-            }
-            )
+                tblDataSource.PocetSmluv(y),
+                tblDataSource.SumSmluvKc(y)
+            })
         );
 
 

@@ -34,9 +34,10 @@
                                                                         and d.Typ='F'";
 
                                     var politici = DirectDB
-                                                    .GetList<string, string, DateTime, DateTime, string>(sql)
-                                                    .GroupBy(k => k.Item5, v => new Tuple<string, string, DateTime, DateTime>
-                                                                   (v.Item1, v.Item2, v.Item3, v.Item4));
+                                        .GetList<string, string, DateTime, DateTime, string>(sql)
+                                        .GroupBy(k => k.Item5, v => new Tuple<string, string, DateTime, DateTime>
+                                                       (v.Item1, v.Item2, v.Item3, v.Item4))
+                                        .ToList();
                                     var sb = new System.Text.StringBuilder();
 
                                 }
@@ -73,9 +74,10 @@
                                                         .OrderByDescending(o=>o.Item1.SoukromeFirmy.Values.AggregateStats().Summary().CelkovaHodnotaSmluv);
 
                                     var firmyPolitikuVInsolvenci = StaticData.Insolvence_firem_politiku_Cache.Get()
-                                                        .Select(m => m.Item2.Select(d => d.VybraniDluznici))
-                                                        .SelectMany(m => m)
-                                                        .Distinct();
+                                        .Select(m => m.Item2.Select(d => d.VybraniDluznici))
+                                        .SelectMany(m => m)
+                                        .Distinct()
+                                        .ToList();
                                     sb.Clear();
                                 }
                                 <p class="box-stats__title">

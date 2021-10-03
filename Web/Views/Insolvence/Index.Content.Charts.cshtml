@@ -42,7 +42,8 @@
                                         {
                                             Date = m.Date,
                                             Value = m.DocCount ?? 0
-                                        });
+                                        })
+                                        .ToList();
                                 }
                                 <p class="box-stats__title">
                                     <strong>@HlidacStatu.Util.RenderData.NiceNumber(data.Sum(m => m.Value))</strong><br>
@@ -95,7 +96,8 @@
                                         {
                                             Date = m.Date,
                                             Value = m.DocCount ?? 0
-                                        });
+                                        })
+                                        .ToList();
                                 }
                                 <p class="box-stats__title">
                                     <strong>@HlidacStatu.Util.RenderData.NiceNumber(data.Sum(m => m.Value))</strong><br>

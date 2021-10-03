@@ -72,7 +72,8 @@
                                                 .Where(m => m.InternalId == pid)
                                                 .FirstOrDefault())
                                                 .Where(pol => pol != null)
-                                                .Select(pol => string.Format("<a href='{0}'>{1}</a>", pol.GetUrl(), pol.FullNameWithYear()));
+                                                .Select(pol => string.Format("<a href='{0}'>{1}</a>", pol.GetUrl(), pol.FullNameWithYear()))
+                                            .ToList();
 
                                 if (ip.Count() > 0)
                                 {

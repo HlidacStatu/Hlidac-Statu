@@ -453,19 +453,6 @@ else if (Model.HasResults == false)
                 }
                 else
                 {
-                    var zakazkyTop = Model.VZ.ElasticResults.Hits
-                        .Select(m => m.Source)
-                        .Where(m => !string.IsNullOrEmpty(m.NazevZakazky?.Trim())
-                                    && !string.IsNullOrEmpty(m.PopisZakazky?.Trim())
-                        )
-                        .Take(numOfVZ);
-                    if (zakazkyTop.Count() < numOfVZ)
-                    {
-                        zakazkyTop = zakazkyTop.Union(
-                            Model.VZ.ElasticResults.Hits.Select(m => m.Source)
-                            )
-                            .Take(numOfVZ);
-                    }
                     Model.VZ.SmallRender = true;
                     Model.VZ.ShowWatchdog = false;
 
