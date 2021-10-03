@@ -5,10 +5,10 @@
     <thead>
     <tr>
         <th>&nbsp;</th>
-        <th>Smlouva podepsána</th>
+        <th class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">Smlouva podepsána</th>
         @if (Model.SmallRender == false)
         {
-            <th>Smlouva zveřejněna</th>
+            <th class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">Smlouva zveřejněna</th>
         }
         <th title="Publikující smluvní strana">Plátce</th>
         <th title="Smluvní strana/y">Dodavatel/é</th>
@@ -35,14 +35,17 @@
                 <span style='white-space:nowrap'>
                     @Html.Raw(iconLevel)<add-bookmark item="rec"></add-bookmark>&nbsp;
                     <a href="@rec.GetUrl(true, Model.Q)">
-                        <b>@rec.Id</b>
+                        <span class="d-none d-sm-flex d-md-flex d-lg-flex d-lx-flex"><b>@rec.Id</b></span>
+                        <span style='white-space:nowrap' class="d-visible d-sm-none d-md-none d-lg-none d-lx-none">
+                            <i class="far fa-file-alt"></i>
+                        </span>
                     </a>
                 </span>
             </td>
-            <td>@rec.datumUzavreni.ToShortDateString()</td>
+            <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">@rec.datumUzavreni.ToShortDateString()</td>
             @if (Model.SmallRender == false)
             {
-                <td>
+                <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">
                     @if (rec.platnyZaznam)
                     {
                         @rec.casZverejneni.ToShortDateString()

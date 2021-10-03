@@ -6,7 +6,7 @@
         <th></th>
         <th>IČ</th>
         <th>Název</th>
-        <th>Vznik</th>
+        <th class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">Vznik</th>
         <th>Počet smluv v RS</th>
         <th>Hodnota smluv v RS</th>
     </tr>
@@ -23,7 +23,7 @@
                 </td>
                 <td><a href="@item.GetUrl(true)">@item.ICO</a></td>
                 <td>@Html.KIndexLabelLink(item.ICO)<a href="@item.GetUrl(true)">@Devmasters.TextUtil.ShortenText(item.Jmeno, 40, "...")</a></td>
-                <td>@(item.Datum_Zapisu_OR?.ToString("d.M.yyyy"))</td>
+                <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">@(item.Datum_Zapisu_OR?.ToString("d.M.yyyy"))</td>
                 <td>@HlidacStatu.Util.RenderData.NiceNumber(stat.Sum(stat.YearsAfter2016(), s => s.PocetSmluv))</td>
                 <td>@HlidacStatu.Util.RenderData.NicePriceHtml(stat.Sum(stat.YearsAfter2016(), s => s.CelkovaHodnotaSmluv))</td>
             </tr>

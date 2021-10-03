@@ -5,7 +5,7 @@
     <tr>
         <th></th>
         <th>Příjemce</th>
-        <th>IČO příjemce</th>
+        <th class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">IČO příjemce</th>
         <th>Název projektu</th>
         <th>Datum podpisu</th>
         <th>Čerpaná částka</th>
@@ -24,7 +24,13 @@
                 }
                 <add-bookmark item="dotaceItem"></add-bookmark>
 
-                <a href="@(dotaceItem.GetUrl(true, Model.Q))">Detail</a>
+                <a href="@(dotaceItem.GetUrl(true, Model.Q))"  class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">
+                    <span class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">Detail</span>
+                    <span class="d-visible d-sm-none d-md-none d-lg-none d-lx-none">
+                        <i class="far fa-file-alt"></i>
+                    </span>
+                </a>
+
             </td>
             <td>
                 @Html.KIndexLabelLink(dotaceItem.Prijemce.Ico)@Devmasters.TextUtil.ShortenText((string.IsNullOrWhiteSpace(dotaceItem.Prijemce.HlidacJmeno) ?
@@ -32,7 +38,7 @@
                                                                   dotaceItem.Prijemce.HlidacJmeno)
                                                                   , 40)
             </td>
-            <td>
+            <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">
                 @if (dotaceItem.Prijemce.Ico != "00000000")
                 {
                     <a href="/subjekt/@dotaceItem.Prijemce.Ico" title="Informace o subjektu">@dotaceItem.Prijemce.Ico</a>

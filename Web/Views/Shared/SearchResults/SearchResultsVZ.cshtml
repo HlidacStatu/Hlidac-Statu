@@ -5,10 +5,10 @@
     <thead>
     <tr>
         <th>Zakázka</th>
-        <th>Poslední změna</th>
-        <th>Lhůta pro nabídky</th>
+        <th class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">Poslední změna</th>
+        <th class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">Lhůta pro nabídky</th>
         <th>Zadavatel</th>
-        <th>Dodavatelé</th>
+        <th class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">Dodavatelé</th>
         <th>Název</th>
         <th>Cena</th>
     </tr>
@@ -22,20 +22,28 @@
                     <add-bookmark item="item"></add-bookmark>&nbsp;
                     @if (LimitedAccess.IsAuthenticatedOrSearchCrawler(Context.Request))
                     {
-                        <a href="@item.GetUrl(true, Model.Q)">
-                            @item.EvidencniCisloZakazky
+                        <a href="@item.GetUrl(true, Model.Q)">                            
+                            <span class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">@item.EvidencniCisloZakazky</span>
+                            <span class="d-visible d-sm-none d-md-none d-lg-none d-lx-none">
+                                <i class="far fa-file-alt"></i>
+                            </span>
+
                         </a>
                     }
                     else
                     {
-                        <a href='#' data-bs-toggle='modal' data-bs-target='#VZInfoAnon' data-url='@item.GetUrl(true, Model.Q)'>@item.EvidencniCisloZakazky</a>
+                        <a href='#' data-bs-toggle='modal' data-bs-target='#VZInfoAnon' data-url='@item.GetUrl(true, Model.Q)'>                          
+                            <span class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">@item.EvidencniCisloZakazky</span>
+                            <span class="d-visible d-sm-none d-md-none d-lg-none d-lx-none">
+                                <i class="far fa-file-alt"></i>
+                            </span>                        </a>
                     }
                 </span>
             </td>
-            <td>
+            <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">
                 @(item.PosledniZmena?.ToShortDateString())
             </td>
-            <td>
+            <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">
                 @(item.LhutaDoruceni?.ToShortDateString() ?? "neuvedena")
             </td>
             <td>
@@ -51,7 +59,7 @@
                     }
                 }
             </td>
-            <td>
+            <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">
                 @if (item.Dodavatele != null && item.Dodavatele.Count() > 0)
                 {
                     foreach (var d in item.Dodavatele.Take(2))
@@ -93,7 +101,7 @@
         </tr>
         if (Model.SmallRender == false)
         {
-            <tr class="last">
+            <tr class="last d-none d-sm-table-row d-md-table-row d-lg-table-row d-xl-table-row d-xxl-table-row">
                 <td></td>
                 <td colspan="2">
                     <span class="small">@(item.LastestFormular()?.DruhFormulare().ToNiceDisplayName())</span>
