@@ -59,11 +59,17 @@ namespace HlidacStatu.Repositories.Statistics
         private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateHoldingDotaceStat(Firma firma,
             Datastructures.Graphs.Relation.AktualnostType aktualnost)
         {
-            var statistikyPerIco = firma.Holding(aktualnost)
+            var statistiky = firma.Holding(aktualnost)
                 .Append(firma)
                 .Where(f => f.Valid)
-                .Select(f => new { f.ICO, dotaceStats = f.StatistikaDotaci() })
-                .ToDictionary(s => s.ICO, s => s.dotaceStats);
+                .Select(f => new { f.ICO, dotaceStats = f.StatistikaDotaci() });
+
+            var statistikyPerIco = new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
+            foreach (var ico in statistiky.Select(m=>m.ICO).Distinct())
+            {
+                statistikyPerIco[ico] = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
+                statistikyPerIco[ico] = StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistikyPerIco.Where(w => w.Key == ico).Select(m=>m.Value));
+            }
 
             var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistikyPerIco.Values);
 
