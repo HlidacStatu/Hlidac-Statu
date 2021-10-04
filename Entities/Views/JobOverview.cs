@@ -10,9 +10,11 @@ namespace HlidacStatu.Entities.Views
         public string IcoDodavatele { get; set; }
         
         public int Year { get; set; }
+        
+        public int JobPk { get; set; }
         public string JobGrouped { get; set; }
-        public decimal SalaryMd { get; set; }
-        public decimal SalaryMdVat { get; set; }
+        public decimal? SalaryMd { get; set; }
+        public decimal? SalaryMdVat { get; set; }
         public string Subject { get; set; }
         
     }
