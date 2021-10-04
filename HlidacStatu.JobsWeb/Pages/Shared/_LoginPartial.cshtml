@@ -1,0 +1,19 @@
+@using HlidacStatu.Entities
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<div class="navbar-nav ms-auto">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Nastavení účtu"><i class="fas fa-user"></i></a>
+        <form class="container-fluid justify-content-end" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+            <button type="submit" class="nav-link btn btn-link text-dark">Odhlásit</button>
+        </form>
+    
+    }
+    else
+    {
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login"><img src="/Content/img/icon-user.svg" style="padding-right: 8px;">Přihlášení</a>
+        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Registrace</a>
+    }
+</div>
