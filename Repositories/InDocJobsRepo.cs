@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Entities.Views;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -33,6 +34,20 @@ namespace HlidacStatu.Repositories
                         JobRaw = NormalizeTextNoDiacriticsLower(m.JobRaw)
                     })
                     .ToList();
+            }
+        }
+
+        public static async Task<List<JobOverview>> GetAllJobsWithRelatedDataAsync()
+        {
+            using (var db = new DbEntities())
+            {
+                return await db.JobsOverviewView.FromSqlInterpolated(
+                        $@"SELECT t.smlouvaID, s.IcoOdberatele, d.Ico as IcoDodavatele, t.year, j.jobGrouped, j.salaryMD, j.salaryMDVat, t.subject
+                             FROM InDocTables t
+                             join InDocJobs j on t.pk = j.tablePK
+                             join SmlouvyIds s on s.Id = t.smlouvaID
+                             join SmlouvyDodavatele d on s.Id = d.SmlouvaId")
+                    .ToListAsync();
             }
         }
 
