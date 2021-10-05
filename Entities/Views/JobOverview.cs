@@ -16,6 +16,7 @@ namespace HlidacStatu.Entities.Views
         public decimal? SalaryMd { get; set; }
         public decimal? SalaryMdVat { get; set; }
         public string Subject { get; set; }
+        public string Tags { get; set; }
         
     }
 }

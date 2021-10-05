@@ -1,8 +1,48 @@
 @page
+@using HlidacStatu.JobsWeb.Services
 @model SouhrnModel
 
 @{
     ViewData["Title"] = "Souhrnné statistiky";
+
+    var statistics = JobService.GetStatitstics();
 }
 
 <h1>Souhrnné statistiky</h1>
+
+<table class="table-sm table-striped">
+    <caption>Přehled cen - souhrn</caption>
+    <thead>
+    <tr>
+        <th scope="col">Pozice</th>
+        <th scope="col">Dolní kvartil</th>
+        <th scope="col">Medián</th>
+        <th scope="col">Horní kvartil</th>
+        <th scope="col">Minimum</th>
+        <th scope="col">Průměr</th>
+        <th scope="col">Maximum</th>
+        <th scope="col">Počet smluv</th>
+        <th scope="col">Počet dodavatelů</th>
+        <th scope="col">Počet cen</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var row in statistics)
+    {
+        <tr>
+            <th scope="row">@row.Name</th>
+            <td>@row.DolniKvartil</td>
+            <td>@row.Median</td>
+            <td>@row.HorniKvartil</td>
+            <td>@row.Minimum</td>
+            <td>@row.Average</td>
+            <td>@row.Maximum</td>
+            <td>@row.Average</td>
+            <td>@row.ContractCount</td>
+            <td>@row.SupplierCount</td>
+
+        </tr>
+
+    }
+    </tbody>
+</table>

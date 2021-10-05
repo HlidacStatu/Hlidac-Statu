@@ -43,7 +43,7 @@ namespace HlidacStatu.Repositories
             {
                 return await db.JobsOverviewView.FromSqlInterpolated(
                         $@"SELECT t.smlouvaID, s.IcoOdberatele, d.Ico as IcoDodavatele, t.year, j.pk as JobPk, 
-                                  j.jobGrouped, j.salaryMD, j.salaryMDVat, t.subject
+                                  j.jobGrouped, j.salaryMD, j.salaryMDVat, t.subject, j.tags
                              FROM InDocTables t
                              join InDocJobs j on t.pk = j.tablePK
                              join SmlouvyIds s on s.Id = t.smlouvaID

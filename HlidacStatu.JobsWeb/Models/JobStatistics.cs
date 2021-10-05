@@ -2,7 +2,7 @@ namespace HlidacStatu.JobsWeb.Models
 {
     public class JobStatistics
     {
-        public string JobName { get; set; }
+        public string Name { get; set; }
         public decimal DolniKvartil { get; set; }
         public decimal HorniKvartil { get; set; }
         public decimal Minimum { get; set; }
@@ -26,6 +26,7 @@ namespace HlidacStatu.JobsWeb.Models
         public decimal SalaryMd { get; set; }
         public decimal SalaryMdVat { get; set; }
         public string Subject { get; set; }
+        public string[] Tags { get; set; }
         
         
     }
