@@ -348,13 +348,28 @@ namespace HlidacStatu.Repositories
             {
                 try
                 {
-                    DirectDB.NoResult("exec smlouvaId_save @id,@active, @created, @updated",
+                    DirectDB.NoResult("exec smlouvaId_save @id,@active, @created, @updated, @icoOdberatele",
                         new SqlParameter("id", smlouva.Id),
                         new SqlParameter("created", smlouva.casZverejneni),
                         new SqlParameter("updated", smlouva.LastUpdate),
-                        new SqlParameter("active",
-                            smlouva.znepristupnenaSmlouva() ? (int)0 : (int)1)
+                        new SqlParameter("active", smlouva.znepristupnenaSmlouva() ? (int)0 : (int)1),
+                        new SqlParameter("icoOdberatele", smlouva.Platce.ico)
                     );
+
+                    DirectDB.NoResult("delete from SmlouvyDodavatele where smlouvaId= @smlouvaId",
+                        new SqlParameter("smlouvaId", smlouva.Id)
+                    );
+                    if (smlouva.Prijemce != null)
+                    {
+                        foreach (var ico in smlouva.Prijemce.Select(m=>m.ico).Distinct())
+                        {
+                            DirectDB.NoResult("insert into SmlouvyDodavatele(smlouvaid,ico) values(@smlouvaid, @ico)",
+                                new SqlParameter("smlouvaId", smlouva.Id),
+                                new SqlParameter("ico", ico)
+                            );
+
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
