@@ -29,7 +29,7 @@
     @foreach (var row in statistics)
     {
         <tr>
-            <th scope="row">@row.Name</th>
+            <th scope="row"><a href="/Obor/@row.Name">@row.Name</a></th>
             <td class="text-end">@row.DolniKvartil.ToString("N0")</td>
             <td class="text-end">@row.Median.ToString("N0")</td>
             <td class="text-end">@row.HorniKvartil.ToString("N0")</td>

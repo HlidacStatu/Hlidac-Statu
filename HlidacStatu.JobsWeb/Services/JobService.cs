@@ -31,8 +31,12 @@ namespace HlidacStatu.JobsWeb.Services
         public static long RecalculationTimeMs { get; private set; }
         
         public static bool IsRecalculating { get; private set; }
-        public static string LastError { get; private set; } 
+        public static string LastError { get; private set; }
 
+        static JobService()
+        {
+            Recalculate().ConfigureAwait(false);
+        }
 
         public static async Task Recalculate()
         {
@@ -53,6 +57,9 @@ namespace HlidacStatu.JobsWeb.Services
                     .Select(g =>
                     {
                         var (net, vat) = FixSalaries(g.FirstOrDefault().SalaryMd, g.FirstOrDefault().SalaryMdVat);
+                        var tags = g.FirstOrDefault().Tags?.Split("|", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                        if (tags == null || tags.Length == 0)
+                            tags = new[] { "-" };
                         return new JobPrecalculated()
                         {
                             Subject = g.FirstOrDefault().Subject,
@@ -60,9 +67,7 @@ namespace HlidacStatu.JobsWeb.Services
                             IcoOdberatele = g.FirstOrDefault().IcoOdberatele,
                             JobGrouped = g.FirstOrDefault().JobGrouped,
                             SmlouvaId = g.FirstOrDefault().SmlouvaId,
-                            Tags = g.FirstOrDefault().Tags?
-                                       .Split("|", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries) 
-                                   ?? new []{"-"},
+                            Tags = tags,
                             JobPk = g.Key,
                             SalaryMd = net,
                             SalaryMdVat = vat,
@@ -107,7 +112,7 @@ namespace HlidacStatu.JobsWeb.Services
                         DolniKvartil = (decimal)salaryd.LowerQuartile(),
                         HorniKvartil = (decimal)salaryd.UpperQuartile(),
                         ContractCount = g.Count(),
-                        SupplierCount = g.Select(x => x.IcoOdberatele).Count()
+                        SupplierCount = g.Select(x => x.IcoOdberatele).Distinct().Count()
                     };
                 })
                 .ToList();
@@ -135,7 +140,7 @@ namespace HlidacStatu.JobsWeb.Services
                                 DolniKvartil = (decimal)salaryd.LowerQuartile(),
                                 HorniKvartil = (decimal)salaryd.UpperQuartile(),
                                 ContractCount = ig.Count(),
-                                SupplierCount = ig.Select(x => x.precalculated.IcoOdberatele).Count()
+                                SupplierCount = ig.Select(x => x.precalculated.IcoOdberatele).Distinct().Count()
                             };
                         })
                         .ToList()
@@ -163,7 +168,7 @@ namespace HlidacStatu.JobsWeb.Services
                                 DolniKvartil = (decimal)salaryd.LowerQuartile(),
                                 HorniKvartil = (decimal)salaryd.UpperQuartile(),
                                 ContractCount = ig.Count(),
-                                SupplierCount = ig.Select(x => x.IcoOdberatele).Count()
+                                SupplierCount = ig.Select(x => x.IcoOdberatele).Distinct().Count()
                             };
                         })
                         .ToList()
@@ -192,7 +197,7 @@ namespace HlidacStatu.JobsWeb.Services
                                 DolniKvartil = (decimal)salaryd.LowerQuartile(),
                                 HorniKvartil = (decimal)salaryd.UpperQuartile(),
                                 ContractCount = ig.Count(),
-                                SupplierCount = ig.Select(x => x.precalculated.IcoOdberatele).Count()
+                                SupplierCount = ig.Select(x => x.precalculated.IcoOdberatele).Distinct().Count()
                             };
                         })
                         .ToList()
