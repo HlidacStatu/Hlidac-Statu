@@ -1,8 +1,53 @@
-@page
+@page "{id?}"
+@using HlidacStatu.JobsWeb.Services
+@using HlidacStatu.JobsWeb.Models
 @model OborModel
 
 @{
     ViewData["Title"] = "Souhrnné statistiky podle oborů";
+
+    bool showStatistics = !string.IsNullOrWhiteSpace(Model.Obor); 
+    var statistics = new List<JobStatistics>();
+    if(showStatistics)
+        statistics = JobService.GetTagStatitstics(Model.Obor);
+    
 }
 
 <h1>Souhrnné statistiky podle oborů</h1>
+<h2>@Model.Obor</h2>
+
+@if (showStatistics)
+{
+    <table class="table-sm table-striped">
+        <caption>Přehled cen - souhrn</caption>
+        <thead>
+        <tr>
+            <th scope="col">Tag</th>
+            <th scope="col">Dolní kvartil</th>
+            <th scope="col">Medián</th>
+            <th scope="col">Horní kvartil</th>
+            <th scope="col">Minimum</th>
+            <th scope="col">Průměr</th>
+            <th scope="col">Maximum</th>
+            <th scope="col">Počet smluv</th>
+            <th scope="col">Počet dodavatelů</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var row in statistics)
+        {
+            <tr>
+                <th scope="row">@row.Name</th>
+                <td class="text-end">@row.DolniKvartil.ToString("N0")</td>
+                <td class="text-end">@row.Median.ToString("N0")</td>
+                <td class="text-end">@row.HorniKvartil.ToString("N0")</td>
+                <td class="text-end">@row.Minimum.ToString("N0")</td>
+                <td class="text-end">@row.Average.ToString("N0")</td>
+                <td class="text-end">@row.Maximum.ToString("N0")</td>
+                <td class="text-end">@row.ContractCount</td>
+                <td class="text-end">@row.SupplierCount</td>
+            </tr>
+        }
+        </tbody>
+    </table>    
+}

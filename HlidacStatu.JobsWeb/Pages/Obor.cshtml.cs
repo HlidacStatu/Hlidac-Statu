@@ -4,9 +4,12 @@ namespace HlidacStatu.JobsWeb.Pages
 {
     public class OborModel : PageModel
     {
-        public void OnGet()
+
+        public string Obor { get; set; }
+        
+        public void OnGet(string id)
         {
-            
+            Obor = id;
         }
     }
 }

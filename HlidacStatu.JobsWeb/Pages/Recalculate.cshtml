@@ -1,0 +1,33 @@
+@page
+@using HlidacStatu.JobsWeb.Services
+@model RecalculateModel
+@{
+    ViewData["Title"] = "Recalculate";
+}
+<h1>Admin section</h1>
+
+<p>Rekalulace statistik naposled spuštěna v @JobService.LastRecalculationStarted.ToString("u")</p>
+<p>Rekalkulace jobů skončena v @JobService.JobRecalculationEnd.ToString("u")</p>
+<p>Rekalkulace tagů skončena v @JobService.TagRecalculationEnd.ToString("u")</p>
+<p>Rekalkulace odběratelů skončena v @JobService.OdberateleRecalculationEnd.ToString("u")</p>
+<p>Rekalkulace dodavatelů skončena v @JobService.DodavateleRecalculationEnd.ToString("u")</p>
+<p>Poslední běh trval @JobService.RecalculationTimeMs ms</p>
+<hr>
+@if (!string.IsNullOrWhiteSpace(JobService.LastError))
+{
+    <p class="text-warning">Poslední běh skončil chybou!</p>
+    <p>@JobService.LastError</p>
+    <hr>
+}
+
+
+@if (JobService.IsRecalculating)
+{
+    <p class="text-danger">Pozor, probíhá rekalkulace!</p>
+}
+else
+{
+    <form method="post" class="form-horizontal">
+        <button type="submit" class="btn btn-primary">Přepočítej statistiky</button>
+    </form>
+}
