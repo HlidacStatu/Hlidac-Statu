@@ -372,3 +372,5 @@ SponzoriLoader/appsettings.Petr.json
 HlidacStatu.JobTableEditor/appsettings.json
 HlidacStatu.JobTableEditor/appsettings.Michal.json
 HlidacStatu.JobTableEditor/appsettings.Development.json
+
+HlidacStatu.JobsWeb/appsettings.json
