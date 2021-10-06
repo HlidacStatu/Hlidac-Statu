@@ -12,7 +12,7 @@ namespace HlidacStatu.JobsWeb.Pages
         public async Task OnPostAsync()
         {
             if(!JobService.IsRecalculating)
-                await JobService.Recalculate();
+                await JobService.RecalculateAsync();
         }
     }
 }

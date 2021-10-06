@@ -35,10 +35,10 @@ namespace HlidacStatu.JobsWeb.Services
 
         static JobService()
         {
-            Recalculate().ConfigureAwait(false);
+            RecalculateAsync().ConfigureAwait(false);
         }
 
-        public static async Task Recalculate()
+        public static async Task RecalculateAsync()
         {
             IsRecalculating = true;
             LastRecalculationStarted = DateTime.Now;
