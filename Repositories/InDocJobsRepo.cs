@@ -82,7 +82,7 @@ namespace HlidacStatu.Repositories
 
             return null;
         }
-        public static async Task SaveAsync(InDocJobs job)
+        public static async Task SaveAsync(InDocJobs job, bool dontChangeDates = false)
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -99,7 +99,8 @@ namespace HlidacStatu.Repositories
                     job.JobGrouped = null;
                     job.Tags = null;
                 }
-                job.Created = DateTime.Now;
+                if (dontChangeDates==false)
+                    job.Created = DateTime.Now;
 
 
 
@@ -115,11 +116,11 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task SaveAsync(IEnumerable<InDocJobs> jobs)
+        public static async Task SaveAsync(IEnumerable<InDocJobs> jobs, bool dontChangeDates = false)
         {
             foreach (var job in jobs)
             {
-                await SaveAsync(job);
+                await SaveAsync(job,dontChangeDates);
             }
 
         }
