@@ -21,7 +21,7 @@ namespace HlidacStatu.JobsWeb.Models
     
         public int Year { get; set; }
     
-        public int JobPk { get; set; }
+        public long JobPk { get; set; }
         public string JobGrouped { get; set; }
         public decimal SalaryMd { get; set; }
         public decimal SalaryMdVat { get; set; }

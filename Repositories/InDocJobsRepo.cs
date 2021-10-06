@@ -47,7 +47,8 @@ namespace HlidacStatu.Repositories
                              FROM InDocTables t
                              join InDocJobs j on t.pk = j.tablePK
                              join SmlouvyIds s on s.Id = t.smlouvaID
-                             join SmlouvyDodavatele d on s.Id = d.SmlouvaId")
+                             join SmlouvyDodavatele d on s.Id = d.SmlouvaId
+                            where j.jobGrouped is not null")
                     .ToListAsync();
             }
         }
