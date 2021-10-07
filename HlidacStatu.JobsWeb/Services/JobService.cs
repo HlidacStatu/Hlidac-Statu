@@ -97,41 +97,9 @@ namespace HlidacStatu.JobsWeb.Services
         {
             JobOverview = distinctJobs
                 .GroupBy(j => j.JobGrouped)
-                .Select(g =>
-                {
-                    var salaryd = g.Select(x => (double)x.SalaryMd).ToList();
-                    decimal dolniKvartil = (decimal)salaryd.LowerQuartile();
-                    decimal horniKvartil = (decimal)salaryd.UpperQuartile();
-                    decimal outlierRange = (horniKvartil - dolniKvartil) * 1.5m;
-                    decimal maximum = g.Max(x => x.SalaryMd);
-                    decimal minimum = g.Min(x => x.SalaryMd);
-                    decimal leftWhisk = dolniKvartil - outlierRange;
-                    if (leftWhisk < minimum)
-                        leftWhisk = minimum;
-                    decimal rightWhisk = horniKvartil + outlierRange;
-                    if (rightWhisk > maximum)
-                        rightWhisk = maximum;
-
-                    return new JobStatistics()
-                    {
-                        Name = g.Key,
-                        Average = g.Average(x => x.SalaryMd),
-                        Maximum = maximum,
-                        Minimum = minimum,
-                        Median = (decimal)salaryd.Median(),
-                        DolniKvartil = dolniKvartil,
-                        HorniKvartil = horniKvartil,
-                        LeftWhisk = leftWhisk,
-                        RightWhisk = rightWhisk,
-                        LowOutliers = g.Where(x => x.SalaryMd < leftWhisk).Select(x => x.SalaryMd)
-                            .OrderBy(x => x).ToArray(),
-                        HighOutliers = g.Where(x => x.SalaryMd > rightWhisk).Select(x => x.SalaryMd)
-                            .OrderBy(x => x).ToArray(),
-                        ContractCount = g.Count(),
-                        SupplierCount = g.Select(x => x.IcoOdberatele).Distinct().Count()
-                    };
-                })
+                .Select(g => new JobStatistics(g, g.Key))
                 .ToList();
+                
             JobRecalculationEnd = DateTime.Now;
         }
 
@@ -142,42 +110,7 @@ namespace HlidacStatu.JobsWeb.Services
                 .GroupBy(j => j.precalculated.JobGrouped)
                 .ToDictionary(g => g.Key, g =>
                     g.GroupBy(i => i.dodavatel)
-                        .Select(ig =>
-                        {
-                            var salaryd = ig.Select(x => (double)x.precalculated.SalaryMd).ToList();
-                            decimal dolniKvartil = (decimal)salaryd.LowerQuartile();
-                            decimal horniKvartil = (decimal)salaryd.UpperQuartile();
-                            decimal outlierRange = (horniKvartil - dolniKvartil) * 1.5m;
-                            decimal maximum = g.Max(x => x.precalculated.SalaryMd);
-                            decimal minimum = g.Min(x => x.precalculated.SalaryMd);
-                            decimal leftWhisk = dolniKvartil - outlierRange;
-                            if (leftWhisk < minimum)
-                                leftWhisk = minimum;
-                            decimal rightWhisk = horniKvartil + outlierRange;
-                            if (rightWhisk > maximum)
-                                rightWhisk = maximum;
-
-                            return new JobStatistics()
-                            {
-                                Name = ig.Key,
-                                Average = ig.Average(x => x.precalculated.SalaryMd),
-                                Maximum = maximum,
-                                Minimum = minimum,
-                                Median = (decimal)salaryd.Median(),
-                                DolniKvartil = (decimal)salaryd.LowerQuartile(),
-                                HorniKvartil = (decimal)salaryd.UpperQuartile(),
-                                LeftWhisk = leftWhisk,
-                                RightWhisk = rightWhisk,
-                                LowOutliers = g.Where(x => x.precalculated.SalaryMd < leftWhisk)
-                                    .Select(x => x.precalculated.SalaryMd)
-                                    .OrderBy(x => x).ToArray(),
-                                HighOutliers = g.Where(x => x.precalculated.SalaryMd > rightWhisk)
-                                    .Select(x => x.precalculated.SalaryMd)
-                                    .OrderBy(x => x).ToArray(),
-                                ContractCount = ig.Count(),
-                                SupplierCount = ig.Select(x => x.precalculated.IcoOdberatele).Distinct().Count()
-                            };
-                        })
+                        .Select(ig => new JobStatistics(ig.Select(x=> x.precalculated), ig.Key))
                         .ToList()
                 );
             TagRecalculationEnd = DateTime.Now;
@@ -189,40 +122,7 @@ namespace HlidacStatu.JobsWeb.Services
                 .GroupBy(j => j.IcoOdberatele)
                 .ToDictionary(g => g.Key, g =>
                     g.GroupBy(i => i.JobGrouped)
-                        .Select(ig =>
-                        {
-                            var salaryd = ig.Select(x => (double)x.SalaryMd).ToList();
-                            decimal dolniKvartil = (decimal)salaryd.LowerQuartile();
-                            decimal horniKvartil = (decimal)salaryd.UpperQuartile();
-                            decimal outlierRange = (horniKvartil - dolniKvartil) * 1.5m;
-                            decimal maximum = g.Max(x => x.SalaryMd);
-                            decimal minimum = g.Min(x => x.SalaryMd);
-                            decimal leftWhisk = dolniKvartil - outlierRange;
-                            if (leftWhisk < minimum)
-                                leftWhisk = minimum;
-                            decimal rightWhisk = horniKvartil + outlierRange;
-                            if (rightWhisk > maximum)
-                                rightWhisk = maximum;
-
-                            return new JobStatistics()
-                            {
-                                Name = ig.Key,
-                                Average = ig.Average(x => x.SalaryMd),
-                                Maximum = maximum,
-                                Minimum = minimum,
-                                Median = (decimal)salaryd.Median(),
-                                DolniKvartil = (decimal)salaryd.LowerQuartile(),
-                                HorniKvartil = (decimal)salaryd.UpperQuartile(),
-                                LeftWhisk = leftWhisk,
-                                RightWhisk = rightWhisk,
-                                LowOutliers = g.Where(x => x.SalaryMd < leftWhisk).Select(x => x.SalaryMd)
-                                    .OrderBy(x => x).ToArray(),
-                                HighOutliers = g.Where(x => x.SalaryMd > rightWhisk).Select(x => x.SalaryMd)
-                                    .OrderBy(x => x).ToArray(),
-                                ContractCount = ig.Count(),
-                                SupplierCount = ig.Select(x => x.IcoOdberatele).Distinct().Count()
-                            };
-                        })
+                        .Select(ig => new JobStatistics(ig, ig.Key))
                         .ToList()
                 );
             OdberateleRecalculationEnd = DateTime.Now;
@@ -235,42 +135,7 @@ namespace HlidacStatu.JobsWeb.Services
                 .GroupBy(j => j.dodavatel)
                 .ToDictionary(g => g.Key, g =>
                     g.GroupBy(i => i.precalculated.JobGrouped)
-                        .Select(ig =>
-                        {
-                            var salaryd = ig.Select(x => (double)x.precalculated.SalaryMd).ToList();
-                            decimal dolniKvartil = (decimal)salaryd.LowerQuartile();
-                            decimal horniKvartil = (decimal)salaryd.UpperQuartile();
-                            decimal outlierRange = (horniKvartil - dolniKvartil) * 1.5m;
-                            decimal maximum = g.Max(x => x.precalculated.SalaryMd);
-                            decimal minimum = g.Min(x => x.precalculated.SalaryMd);
-                            decimal leftWhisk = dolniKvartil - outlierRange;
-                            if (leftWhisk < minimum)
-                                leftWhisk = minimum;
-                            decimal rightWhisk = horniKvartil + outlierRange;
-                            if (rightWhisk > maximum)
-                                rightWhisk = maximum;
-
-                            return new JobStatistics()
-                            {
-                                Name = ig.Key,
-                                Average = ig.Average(x => x.precalculated.SalaryMd),
-                                Maximum = maximum,
-                                Minimum = minimum,
-                                Median = (decimal)salaryd.Median(),
-                                DolniKvartil = (decimal)salaryd.LowerQuartile(),
-                                HorniKvartil = (decimal)salaryd.UpperQuartile(),
-                                LeftWhisk = leftWhisk,
-                                RightWhisk = rightWhisk,
-                                LowOutliers = g.Where(x => x.precalculated.SalaryMd < leftWhisk)
-                                    .Select(x => x.precalculated.SalaryMd)
-                                    .OrderBy(x => x).ToArray(),
-                                HighOutliers = g.Where(x => x.precalculated.SalaryMd > rightWhisk)
-                                    .Select(x => x.precalculated.SalaryMd)
-                                    .OrderBy(x => x).ToArray(),
-                                ContractCount = ig.Count(),
-                                SupplierCount = ig.Select(x => x.precalculated.IcoOdberatele).Distinct().Count()
-                            };
-                        })
+                        .Select(ig => new JobStatistics(ig.Select(x=> x.precalculated), ig.Key))
                         .ToList()
                 );
             DodavateleRecalculationEnd = DateTime.Now;
