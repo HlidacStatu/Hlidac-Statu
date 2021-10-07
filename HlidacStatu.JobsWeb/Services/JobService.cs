@@ -172,9 +172,11 @@ namespace HlidacStatu.JobsWeb.Services
             return result;
         }
 
-        public static List<(string ico, string nazev)> GetOdberateleList()
+        public static List<(string ico, string nazev, int pocetSmluv)> GetOdberateleList()
         {
-            return OdberatelOverview.Keys.Select(k => (k, FirmaRepo.NameFromIco(k, true))).ToList();
+            return OdberatelOverview.Keys.Select(k =>
+                    (k, FirmaRepo.NameFromIco(k, true), OdberatelOverview[k].Sum(x => x.ContractCount)))
+                .ToList();
         }
         
         public static List<JobStatistics> GetOdberatelStatitstics(string ico)
@@ -187,9 +189,11 @@ namespace HlidacStatu.JobsWeb.Services
             return result;
         }
 
-        public static List<(string ico, string nazev)> GetDodavateleList()
+        public static List<(string ico, string nazev, int pocetSmluv)> GetDodavateleList()
         {
-            return DodavatelOverview.Keys.Select(k => (k, FirmaRepo.NameFromIco(k, true))).ToList();
+            return DodavatelOverview.Keys.Select(k =>
+                    (k, FirmaRepo.NameFromIco(k, true), DodavatelOverview[k].Sum(x => x.ContractCount)))
+                .ToList();
         }
         
         public static List<JobStatistics> GetDodavatelStatistics(string ico)
