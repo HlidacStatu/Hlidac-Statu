@@ -13,6 +13,11 @@
             outliers.Add($"[{i},{outlier:F0}]");
         }
     }
+
+
+    int tickInterval = 5000;
+    int pixelsPerTick = 100;
+    int tickCount = (int)Math.Ceiling(Model.Max(x => x.Maximum) / tickInterval);
 }
 
 
@@ -28,11 +33,11 @@ Highcharts.chart('chart-container', {
 
     chart: {
         type: 'boxplot',
-        height: 800,
+        height: @(tickCount * pixelsPerTick),
     },
 
     title: {
-        text: 'Přehled cen'
+        text: 'Přehled obvyklých cen'
     },
 
     legend: {
@@ -49,7 +54,7 @@ Highcharts.chart('chart-container', {
         title: {
             text: 'Cena za den práce'
         },
-        tickInterval: 5000,
+        tickInterval: @tickInterval,
         minorTickInterval: 1000,
         labels: {
             format: '{value:,.0f} Kč'    
