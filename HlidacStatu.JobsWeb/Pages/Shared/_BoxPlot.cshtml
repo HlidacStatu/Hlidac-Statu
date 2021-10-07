@@ -1,0 +1,86 @@
+@model List<HlidacStatu.JobsWeb.Models.JobStatistics>
+
+@{
+    var outliers = new List<string>();
+    for (int i = 0; i < Model.Count; i++)
+    {
+        foreach (var outlier in Model[i].LowOutliers)
+        {
+            outliers.Add($"[{i},{outlier:F0}]");
+        }
+        foreach (var outlier in Model[i].HighOutliers)
+        {
+            outliers.Add($"[{i},{outlier:F0}]");
+        }
+    }
+}
+
+
+<figure class="highcharts-figure">
+    <div id="chart-container"></div>
+    <p class="highcharts-description">
+        Nějaký popis grafu.
+    </p>
+</figure>
+
+<script>
+Highcharts.chart('chart-container', {
+
+    chart: {
+        type: 'boxplot',
+        height: 800,
+    },
+
+    title: {
+        text: 'Přehled cen'
+    },
+
+    legend: {
+        enabled: false
+    },
+
+    xAxis: {
+        categories: [
+            @Html.Raw(string.Join(",", Model.Select(j => $"'{j.Name}'")))
+        ]
+    },
+
+    yAxis: {
+        title: {
+            text: 'Cena za den práce'
+        },
+        tickInterval: 5000,
+        minorTickInterval: 1000,
+        labels: {
+            format: '{value:,.0f} Kč'    
+        }
+            
+    },
+
+    series: [{
+        name: 'Ceny za den práce',
+        data: [
+            @Html.Raw(string.Join(",",
+                Model.Select(j => $"[{j.LeftWhisk:F0},{j.DolniKvartil:F0},{j.Median:F0},{j.HorniKvartil:F0},{j.RightWhisk:F0}]")))
+        ],
+        tooltip: {
+            headerFormat: '<em>{point.key}</em><br/>'
+        }
+    }, {
+        name: 'Outliers',
+        color: Highcharts.getOptions().colors[0],
+        type: 'scatter',
+        data: [ @Html.Raw(string.Join(",", outliers)) ],
+        marker: {
+            fillColor: 'white',
+            lineWidth: 1,
+            lineColor: Highcharts.getOptions().colors[0]
+        },
+        tooltip: {
+            pointFormat: '{point.y} Kč'
+        }
+    }]
+
+});
+
+</script>
