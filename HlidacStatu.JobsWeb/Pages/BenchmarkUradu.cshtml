@@ -16,7 +16,7 @@
 <h1>Benchmark úřadů</h1>
 <h2>Seznam úřadů</h2>
 
-@foreach (var (ico, nazev, pocetSmluv) in JobService.GetOdberateleList().OrderBy(x => x.nazev))
+@foreach (var (ico, nazev, pocetSmluv) in JobService.GetOdberateleList().OrderByDescending(x => x.pocetSmluv))
 {
     <a href="/benchmarkUradu/@ico">@nazev (@pocetSmluv smluv)</a> 
     <br/>

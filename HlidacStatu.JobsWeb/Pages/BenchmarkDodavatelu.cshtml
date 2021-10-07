@@ -17,7 +17,7 @@
 
 <h2>Seznam dodavatelů</h2>
 
-@foreach (var (ico, nazev, pocetSmluv) in JobService.GetDodavateleList().OrderBy(x => x.nazev))
+@foreach (var (ico, nazev, pocetSmluv) in JobService.GetDodavateleList().OrderByDescending(x => x.pocetSmluv))
 {
     <a href="/benchmarkDodavatelu/@ico">@nazev (@pocetSmluv smluv)</a> 
     <br/>
