@@ -71,7 +71,7 @@ namespace HlidacStatu.JobsWeb.Services
                             JobPk = g.Key,
                             SalaryMd = net,
                             SalaryMdVat = vat,
-                            IcoDodavatele = g.Select(i => i.IcoOdberatele).ToArray(),
+                            IcoDodavatele = g.Select(i => i.IcoDodavatele).ToArray(),
                         };
                     }).ToList();
 
@@ -172,6 +172,11 @@ namespace HlidacStatu.JobsWeb.Services
             return result;
         }
 
+        public static List<(string ico, string nazev)> GetOdberateleList()
+        {
+            return OdberatelOverview.Keys.Select(k => (k, FirmaRepo.NameFromIco(k, true))).ToList();
+        }
+        
         public static List<JobStatistics> GetOdberatelStatitstics(string ico)
         {
             if (OdberatelOverview.TryGetValue(ico, out var result))
@@ -182,6 +187,11 @@ namespace HlidacStatu.JobsWeb.Services
             return result;
         }
 
+        public static List<(string ico, string nazev)> GetDodavateleList()
+        {
+            return DodavatelOverview.Keys.Select(k => (k, FirmaRepo.NameFromIco(k, true))).ToList();
+        }
+        
         public static List<JobStatistics> GetDodavatelStatistics(string ico)
         {
             if (DodavatelOverview.TryGetValue(ico, out var result))

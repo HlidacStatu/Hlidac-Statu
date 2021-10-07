@@ -14,6 +14,16 @@
 }
 
 <h1>Benchmark dodavatelů</h1>
+
+<h2>Seznam dodavatelů</h2>
+
+@foreach (var (ico, nazev) in JobService.GetDodavateleList().OrderBy(x => x.nazev))
+{
+    <a href="/benchmarkDodavatelu/@ico">@nazev</a> 
+    <br/>
+}
+
+
 <h2>@Model.Ico</h2>
 
 @if (showStatistics)

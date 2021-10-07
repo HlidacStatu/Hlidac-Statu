@@ -1,7 +1,8 @@
 @page "{id?}"
+@model BenchmarkUraduModel
+
 @using HlidacStatu.JobsWeb.Services
 @using HlidacStatu.JobsWeb.Models
-@model BenchmarkUraduModel
 
 @{
     ViewData["Title"] = "Benchmark úřadů";
@@ -10,10 +11,17 @@
     var statistics = new List<JobStatistics>();
     if(showStatistics)
         statistics = JobService.GetOdberatelStatitstics(Model.Ico);
-    
 }
 
 <h1>Benchmark úřadů</h1>
+<h2>Seznam úřadů</h2>
+
+@foreach (var (ico, nazev) in JobService.GetOdberateleList().OrderBy(x => x.nazev))
+{
+    <a href="/benchmarkUradu/@ico">@nazev</a> 
+    <br/>
+}
+
 <h2>@Model.Ico</h2>
 
 @if (showStatistics)
