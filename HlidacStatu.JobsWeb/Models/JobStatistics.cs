@@ -15,13 +15,13 @@ namespace HlidacStatu.JobsWeb.Models
             var salaryd = precalculatedJobs.Select(x => (double)x.SalaryMd).ToList();
             decimal dolniKvartil = (decimal)salaryd.LowerQuartile();
             decimal horniKvartil = (decimal)salaryd.UpperQuartile();
-            decimal outlierRange = (horniKvartil - dolniKvartil) * 1.5m;
+            //decimal outlierRange = (horniKvartil - dolniKvartil) * 1.5m;
             decimal maximum = precalculatedJobs.Max(x => x.SalaryMd);
             decimal minimum = precalculatedJobs.Min(x => x.SalaryMd);
-            decimal leftWhisk = dolniKvartil - outlierRange;
+            decimal leftWhisk = (decimal)salaryd.Percentile(10);
             if (leftWhisk < minimum)
                 leftWhisk = minimum;
-            decimal rightWhisk = horniKvartil + outlierRange;
+            decimal rightWhisk = (decimal)salaryd.Percentile(90);
             if (rightWhisk > maximum)
                 rightWhisk = maximum;
 

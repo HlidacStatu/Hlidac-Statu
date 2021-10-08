@@ -6,63 +6,80 @@
 @{
     ViewData["Title"] = "Benchmark dodavatelů";
 
-    bool showStatistics = !string.IsNullOrWhiteSpace(Model.Ico); 
+    bool showStatistics = !string.IsNullOrWhiteSpace(Model.Ico);
     var statistics = new List<JobStatistics>();
-    if(showStatistics)
+    if (showStatistics)
         statistics = JobService.GetDodavatelStatistics(Model.Ico);
-    
+
+}
+
+@section Scripts
+{
+    <script>
+    $(document).ready(function() {
+      $("#selectNavigace").change(function(){
+        if ($(this).val()!='') {
+          window.location.href= '/BenchmarkDodavatelu/' + $(this).val();
+        }
+      });
+    });
+    </script>
 }
 
 <h1>Benchmark dodavatelů</h1>
-
 <h2>Seznam dodavatelů</h2>
 
-@foreach (var (ico, nazev, pocetSmluv) in JobService.GetDodavateleList().OrderByDescending(x => x.pocetSmluv))
-{
-    <a href="/benchmarkDodavatelu/@ico">@nazev (@pocetSmluv smluv)</a> 
-    <br/>
-}
-
-<hr/>
-
-<h2>@Model.Ico</h2>
-
-@if (showStatistics)
-{
-    <table class="table table-sm table-striped mt-4">
-        <caption>Přehled cen - souhrn</caption>
-        <thead>
-        <tr>
-            <th scope="col">Tag</th>
-            <th scope="col" class="text-end">Dolní kvartil</th>
-            <th scope="col" class="text-end">Medián</th>
-            <th scope="col" class="text-end">Horní kvartil</th>
-            <th scope="col" class="text-end">Minimum</th>
-            <th scope="col" class="text-end">Průměr</th>
-            <th scope="col" class="text-end">Maximum</th>
-            <th scope="col" class="text-end">Počet smluv</th>
-            <th scope="col" class="text-end">Počet dodavatelů</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var row in statistics)
+<div class="input-group mb-3">
+    <label class="input-group-text" for="selectNavigace">Vyberte dodavatele:</label>
+    <select class="form-select" id="selectNavigace">
+        <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte dodavatele...</option>
+        @foreach (var (ico, nazev, pocetSmluv) in JobService.GetDodavateleList().OrderByDescending(x => x.pocetSmluv))
         {
-            <tr>
-                <th scope="row">@row.Name</th>
-                <td class="text-end">@row.DolniKvartil.ToString("N0")</td>
-                <td class="text-end">@row.Median.ToString("N0")</td>
-                <td class="text-end">@row.HorniKvartil.ToString("N0")</td>
-                <td class="text-end">@row.Minimum.ToString("N0")</td>
-                <td class="text-end">@row.Average.ToString("N0")</td>
-                <td class="text-end">@row.Maximum.ToString("N0")</td>
-                <td class="text-end">@row.ContractCount</td>
-                <td class="text-end">@row.SupplierCount</td>
-
-            </tr>
-
+            <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetSmluv smluv)</option>
         }
-        </tbody>
-    </table>
-    
-    <partial name="Shared/_BoxPlot" model="statistics"/>
+    </select>
+</div>
+@if (!string.IsNullOrEmpty(Model.Ico))
+{
+    <hr/>
+
+    <h2>@Model.Nazev</h2>
+    if (showStatistics)
+    {
+        <table class="table table-sm table-striped mt-4">
+            <caption>Přehled cen - souhrn</caption>
+            <thead>
+            <tr>
+                <th scope="col">Tag</th>
+                <th scope="col" class="text-end">Dolní kvartil</th>
+                <th scope="col" class="text-end">Medián</th>
+                <th scope="col" class="text-end">Horní kvartil</th>
+                <th scope="col" class="text-end">Minimum</th>
+                <th scope="col" class="text-end">Průměr</th>
+                <th scope="col" class="text-end">Maximum</th>
+                <th scope="col" class="text-end">Počet smluv</th>
+                <th scope="col" class="text-end">Počet dodavatelů</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var row in statistics)
+            {
+                <tr>
+                    <th scope="row">@row.Name</th>
+                    <td class="text-end">@row.DolniKvartil.ToString("N0")</td>
+                    <td class="text-end">@row.Median.ToString("N0")</td>
+                    <td class="text-end">@row.HorniKvartil.ToString("N0")</td>
+                    <td class="text-end">@row.Minimum.ToString("N0")</td>
+                    <td class="text-end">@row.Average.ToString("N0")</td>
+                    <td class="text-end">@row.Maximum.ToString("N0")</td>
+                    <td class="text-end">@row.ContractCount</td>
+                    <td class="text-end">@row.SupplierCount</td>
+
+                </tr>
+            }
+            </tbody>
+        </table>
+
+        <partial name="Shared/_BoxPlot" model="statistics"/>
+    }
 }
