@@ -40,7 +40,7 @@ namespace HlidacStatu.JobsWeb.Models
             HighOutliers = precalculatedJobs.Where(x => x.SalaryMd > rightWhisk).Select(x => x.SalaryMd)
                 .OrderBy(x => x).ToArray();
             ContractCount = precalculatedJobs.Count();
-            SupplierCount = precalculatedJobs.Select(x => x.IcoOdberatele).Distinct().Count();
+            SupplierCount = precalculatedJobs.SelectMany(x => x.IcaDodavatelu).Distinct().Count();
             
         }
         

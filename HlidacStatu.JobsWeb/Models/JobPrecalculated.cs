@@ -4,7 +4,7 @@ namespace HlidacStatu.JobsWeb.Models
     {
         public string SmlouvaId { get; set; }
         public string IcoOdberatele { get; set; }
-        public string[] IcoDodavatele { get; set; }
+        public string[] IcaDodavatelu { get; set; }
     
         public int Year { get; set; }
     

@@ -72,7 +72,7 @@ namespace HlidacStatu.JobsWeb.Services
                             JobPk = g.Key,
                             SalaryMd = net,
                             SalaryMdVat = vat,
-                            IcoDodavatele = g.Select(i => i.IcoDodavatele).ToArray(),
+                            IcaDodavatelu = g.Select(i => i.IcoDodavatele).ToArray(),
                         };
                     }).ToList();
 
@@ -136,7 +136,7 @@ namespace HlidacStatu.JobsWeb.Services
         private static void CalculateDodavatele(List<JobPrecalculated> distinctJobs)
         {
             DodavatelOverview = distinctJobs
-                .SelectMany(j => j.IcoDodavatele, (precalculated, dodavatel) => new { precalculated, dodavatel })
+                .SelectMany(j => j.IcaDodavatelu, (precalculated, dodavatel) => new { precalculated, dodavatel })
                 .GroupBy(j => j.dodavatel)
                 .ToDictionary(g => g.Key, g =>
                     g.GroupBy(i => i.precalculated.JobGrouped)
