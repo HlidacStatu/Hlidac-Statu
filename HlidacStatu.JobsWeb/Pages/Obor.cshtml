@@ -10,7 +10,10 @@
     var statistics = new List<JobStatistics>();
     if(showStatistics)
         statistics = JobService.GetTagStatitstics(Model.Obor);
-    
+    var graphModel = new Boxplot()
+    {
+        BasicData = statistics
+    };
 }
 
 <h1>Souhrnné statistiky podle oborů</h1>
@@ -51,5 +54,5 @@
         </tbody>
     </table>    
     
-    <partial name="Shared/_BoxPlot" model="statistics"/>
+    <partial name="Shared/_BoxPlot" model="graphModel"/>
 }

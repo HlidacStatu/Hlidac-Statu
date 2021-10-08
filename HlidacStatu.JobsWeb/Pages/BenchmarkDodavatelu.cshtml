@@ -10,6 +10,12 @@
     var statistics = new List<JobStatistics>();
     if (showStatistics)
         statistics = JobService.GetDodavatelStatistics(Model.Ico);
+    
+    var graphModel = new Boxplot()
+    {
+        BasicData = statistics,
+        CompareWith = JobService.GetStatitstics()
+    };
 
 }
 
@@ -80,6 +86,6 @@
             </tbody>
         </table>
 
-        <partial name="Shared/_BoxPlot" model="statistics"/>
+        <partial name="Shared/_BoxPlot" model="graphModel"/>
     }
 }

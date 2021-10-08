@@ -1,11 +1,16 @@
 @page
 @using HlidacStatu.JobsWeb.Services
+@using HlidacStatu.JobsWeb.Models
 @model SouhrnModel
 
 @{
     ViewData["Title"] = "Souhrnné statistiky";
 
     var statistics = JobService.GetStatitstics();
+    var graphModel = new Boxplot()
+    {
+        BasicData = statistics
+    };
 }
 
 <h1>Souhrnné statistiky</h1>
@@ -45,4 +50,4 @@
     </tbody>
 </table>
 
-<partial name="Shared/_BoxPlot" model="statistics"/>
+<partial name="Shared/_BoxPlot" model="graphModel"/>

@@ -1,14 +1,26 @@
-@model List<HlidacStatu.JobsWeb.Models.JobStatistics>
+@model HlidacStatu.JobsWeb.Models.Boxplot
 
 @{
-    var outliers = new List<string>();
-    for (int i = 0; i < Model.Count; i++)
+    Model.BasicData = Model.BasicData.OrderBy(x => x.Name).ToList();
+    string compareData = "";
+    if (Model.CompareWith != null)
     {
-        foreach (var outlier in Model[i].LowOutliers)
+        Model.CompareWith = Model.CompareWith
+            .Where(x => Model.BasicData.Any(y => y.Name.Equals(x.Name, StringComparison.InvariantCultureIgnoreCase)))
+            .OrderBy(x => x.Name).ToList();
+        
+        compareData = string.Join(",", 
+            Model.CompareWith.Select(j => $"[{j.LeftWhisk:F0},{j.DolniKvartil:F0},{j.Median:F0},{j.HorniKvartil:F0},{j.RightWhisk:F0}]"));
+    }
+    
+    var outliers = new List<string>();
+    for (int i = 0; i < Model.BasicData.Count; i++)
+    {
+        foreach (var outlier in Model.BasicData[i].LowOutliers)
         {
             outliers.Add($"[{i},{outlier:F0}]");
         }
-        foreach (var outlier in Model[i].HighOutliers)
+        foreach (var outlier in Model.BasicData[i].HighOutliers)
         {
             outliers.Add($"[{i},{outlier:F0}]");
         }
@@ -17,7 +29,7 @@
 
     int tickInterval = 5000;
     int pixelsPerTick = 100;
-    int tickCount = (int)Math.Ceiling(Model.Max(x => x.Maximum) / tickInterval);
+    int tickCount = (int)Math.Ceiling(Model.BasicData.Max(x => x.Maximum) / tickInterval);
 }
 
 
@@ -46,7 +58,7 @@ Highcharts.chart('chart-container', {
 
     xAxis: {
         categories: [
-            @Html.Raw(string.Join(",", Model.Select(j => $"'{j.Name}'")))
+            @Html.Raw(string.Join(",", Model.BasicData.Select(j => $"'{j.Name}'")))
         ]
     },
 
@@ -66,12 +78,31 @@ Highcharts.chart('chart-container', {
         name: 'Ceny za den práce',
         data: [
             @Html.Raw(string.Join(",",
-                Model.Select(j => $"[{j.LeftWhisk:F0},{j.DolniKvartil:F0},{j.Median:F0},{j.HorniKvartil:F0},{j.RightWhisk:F0}]")))
+                Model.BasicData.Select(j => $"[{j.LeftWhisk:F0},{j.DolniKvartil:F0},{j.Median:F0},{j.HorniKvartil:F0},{j.RightWhisk:F0}]")))
         ],
         tooltip: {
             headerFormat: '<em>{point.key}</em><br/>'
         }
-    }, {
+    },
+    @if(Model.CompareWith != null)
+    {
+        @Html.Raw($@"{{
+        name: 'Obvyklé ceny',
+        data: [
+            {compareData}
+        ],
+        fillColor: '#8FDB90',
+        lineWidth: 1,
+        medianColor: '#000000',
+        stemColor: '#8FDB90',
+        stemWidth: 1,
+        whiskerWidth: 0,
+        pointWidth: 7,
+        tooltip: {{
+            headerFormat: '<em>{{point.key}}</em><br/>'
+        }} }},")
+    }
+    {
         name: 'Outliers',
         color: Highcharts.getOptions().colors[0],
         type: 'scatter',
