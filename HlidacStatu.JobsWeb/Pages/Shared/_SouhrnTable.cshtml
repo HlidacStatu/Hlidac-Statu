@@ -1,10 +1,10 @@
-@model List<HlidacStatu.JobsWeb.Models.JobStatistics>
+@model HlidacStatu.JobsWeb.Models.TableViewModel
 
 <table class="table table-sm table-striped mt-4">
-    <caption>Přehled cen - souhrn</caption>
+    <caption>@Model.Caption</caption>
     <thead>
     <tr>
-        <th scope="col">Pozice</th>
+        <th scope="col">@Model.FirstColumnName</th>
         <th scope="col" class="text-end">Dolní kvartil</th>
         <th scope="col" class="text-end">Medián</th>
         <th scope="col" class="text-end">Horní kvartil</th>
@@ -12,14 +12,24 @@
         <th scope="col" class="text-end">Průměr</th>
         <th scope="col" class="text-end">Maximum</th>
         <th scope="col" class="text-end">Počet smluv</th>
-        <th scope="col" class="text-end">Počet dodavatelů</th>
+        @if (!Model.HideDodavatelCount)
+        {
+            <th scope="col" class="text-end">Počet dodavatelů</th>
+        }
     </tr>
     </thead>
     <tbody>
-    @foreach (var row in Model)
+    @foreach (var row in Model.Statistics)
     {
         <tr>
-            <th scope="row"><a href="/Obor/@row.Name">@row.Name</a></th>
+            @if (string.IsNullOrEmpty(Model.LinkHref))
+            {
+                <th scope="row">@row.Name</th>
+            }
+            else
+            {
+                <th scope="row"><a href="@Model.LinkHref/@row.Name">@row.Name</a></th>
+            }
             <td class="text-end">@row.DolniKvartil.ToString("N0")</td>
             <td class="text-end">@row.Median.ToString("N0")</td>
             <td class="text-end">@row.HorniKvartil.ToString("N0")</td>
@@ -27,9 +37,11 @@
             <td class="text-end">@row.Average.ToString("N0")</td>
             <td class="text-end">@row.Maximum.ToString("N0")</td>
             <td class="text-end">@row.ContractCount</td>
-            <td class="text-end">@row.SupplierCount</td>
+            @if (!Model.HideDodavatelCount)
+            {
+                <td class="text-end">@row.SupplierCount</td>
+            }
         </tr>
-
     }
     </tbody>
 </table>

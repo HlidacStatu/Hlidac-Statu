@@ -11,10 +11,16 @@
     {
         BasicData = statistics
     };
+
+    var tableModel = new TableViewModel()
+    {
+        Statistics = statistics,
+        LinkHref = "/obor"
+    };
 }
 
 <h1>Souhrnné statistiky</h1>
 
 
-<partial name="Shared/_SouhrnTable" model="statistics"/>
+<partial name="Shared/_SouhrnTable" model="tableModel"/>
 <partial name="Shared/_BoxPlot" model="graphModel"/>

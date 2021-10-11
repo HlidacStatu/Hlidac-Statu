@@ -17,6 +17,11 @@
         BasicData = statistics,
         CompareWith = JobService.GetStatitstics()
     };
+    
+    var tableModel = new TableViewModel()
+    {
+        Statistics = statistics
+    };
 }
 
 @section Scripts
@@ -55,7 +60,7 @@
     if (showStatistics)
     {
         
-        <partial name="Shared/_BenchmarkUraduTable" model="statistics"/>
+        <partial name="Shared/_SouhrnTable" model="tableModel"/>
         <partial name="Shared/_BoxPlot" model="graphModel"/>
     }
 }

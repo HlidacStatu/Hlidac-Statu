@@ -16,6 +16,12 @@
         BasicData = statistics,
         CompareWith = JobService.GetStatitstics()
     };
+    
+    var tableModel = new TableViewModel()
+    {
+        Statistics = statistics,
+        HideDodavatelCount = true
+    };
 
 }
 
@@ -52,7 +58,7 @@
     <h2>@Model.Nazev</h2>
     if (showStatistics)
     {
-        <partial name="Shared/_BenchmarkDodavateluTable" model="statistics"/>
+        <partial name="Shared/_SouhrnTable" model="tableModel"/>
         <partial name="Shared/_BoxPlot" model="graphModel"/>
     }
 }
