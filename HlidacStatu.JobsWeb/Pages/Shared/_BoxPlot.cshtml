@@ -30,10 +30,17 @@
     int tickInterval = 5000;
     int pixelsPerTick = 100;
     int tickCount = (int)Math.Ceiling(Model.BasicData.Max(x => x.Maximum) / tickInterval);
+
+    int jobCount = Model.BasicData.Count;
+    int pixelsPerJob = 100;
+
+    string outliersData = string.Join(",", outliers);
+    
+    string popisSerie = "'<span style=\"color:{point.color}\">●</span> <b> {series.name}</b><br/>90% percentil: {point.high}<br/>Horní kvartil: {point.q3}<br/>Medián: {point.median}<br/>Dolní kvartil: {point.q1}<br/>10% percentil: {point.low}<br/>'";
 }
 
 
-<figure class="highcharts-figure">
+<figure class="highcharts-figure" style="max-width: @(100 + jobCount * pixelsPerJob)px">
     <div id="chart-container"></div>
     <p class="highcharts-description">
         Nějaký popis grafu.
@@ -45,7 +52,7 @@ Highcharts.chart('chart-container', {
 
     chart: {
         type: 'boxplot',
-        height: @(tickCount * pixelsPerTick),
+        height: @(tickCount * pixelsPerTick)
     },
 
     title: {
@@ -81,12 +88,13 @@ Highcharts.chart('chart-container', {
                 Model.BasicData.Select(j => $"[{j.LeftWhisk:F0},{j.DolniKvartil:F0},{j.Median:F0},{j.HorniKvartil:F0},{j.RightWhisk:F0}]")))
         ],
         tooltip: {
-            headerFormat: '<em>{point.key}</em><br/>'
+            headerFormat: '<em>{point.key}</em><br/>',
+            pointFormat: @Html.Raw(popisSerie)
         }
-    },
+    }
     @if(Model.CompareWith != null)
     {
-        @Html.Raw($@"{{
+        @Html.Raw($@",{{
         name: 'Obvyklé ceny',
         data: [
             {compareData}
@@ -96,26 +104,33 @@ Highcharts.chart('chart-container', {
         medianColor: '#000000',
         stemColor: '#8FDB90',
         stemWidth: 1,
-        whiskerWidth: 0,
+        whiskerColor: '#8FDB90',
+        whiskerWidth: 1,
         pointWidth: 7,
         tooltip: {{
-            headerFormat: '<em>{{point.key}}</em><br/>'
-        }} }},")
+            headerFormat: '<em>{{point.key}}</em><br/>',
+            pointFormat: {popisSerie}
+        }} }}")
     }
+    @if(Model.CompareWith == null)
     {
+        @Html.Raw($@",{{
         name: 'Outliers',
         color: Highcharts.getOptions().colors[0],
         type: 'scatter',
-        data: [ @Html.Raw(string.Join(",", outliers)) ],
-        marker: {
+        data: [
+            {outliersData}
+        ],
+        marker: {{
             fillColor: 'white',
             lineWidth: 1,
             lineColor: Highcharts.getOptions().colors[0]
-        },
-        tooltip: {
-            pointFormat: '{point.y} Kč'
-        }
-    }]
+        }},
+        tooltip: {{
+            pointFormat: '{{point.y}} Kč'
+            }} }}")
+    }
+    ]
 
 });
 
