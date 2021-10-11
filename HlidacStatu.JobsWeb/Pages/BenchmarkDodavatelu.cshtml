@@ -52,40 +52,7 @@
     <h2>@Model.Nazev</h2>
     if (showStatistics)
     {
-        <table class="table table-sm table-striped mt-4">
-            <caption>Přehled cen - souhrn</caption>
-            <thead>
-            <tr>
-                <th scope="col">Tag</th>
-                <th scope="col" class="text-end">Dolní kvartil</th>
-                <th scope="col" class="text-end">Medián</th>
-                <th scope="col" class="text-end">Horní kvartil</th>
-                <th scope="col" class="text-end">Minimum</th>
-                <th scope="col" class="text-end">Průměr</th>
-                <th scope="col" class="text-end">Maximum</th>
-                <th scope="col" class="text-end">Počet smluv</th>
-                <th scope="col" class="text-end">Počet dodavatelů</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var row in statistics)
-            {
-                <tr>
-                    <th scope="row">@row.Name</th>
-                    <td class="text-end">@row.DolniKvartil.ToString("N0")</td>
-                    <td class="text-end">@row.Median.ToString("N0")</td>
-                    <td class="text-end">@row.HorniKvartil.ToString("N0")</td>
-                    <td class="text-end">@row.Minimum.ToString("N0")</td>
-                    <td class="text-end">@row.Average.ToString("N0")</td>
-                    <td class="text-end">@row.Maximum.ToString("N0")</td>
-                    <td class="text-end">@row.ContractCount</td>
-                    <td class="text-end">@row.SupplierCount</td>
-
-                </tr>
-            }
-            </tbody>
-        </table>
-
+        <partial name="Shared/_BenchmarkDodavateluTable" model="statistics"/>
         <partial name="Shared/_BoxPlot" model="graphModel"/>
     }
 }
