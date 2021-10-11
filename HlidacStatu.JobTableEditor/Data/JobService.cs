@@ -36,7 +36,7 @@ namespace HlidacStatu.JobTableEditor.Data
         public async Task<SomeTable> GetSpecificTable(int pk, string user, CancellationToken cancellationToken)
         {
             var table = await InDocTablesRepo.GetSpecific(pk, user, cancellationToken);
-            it_inTables.TableWithWordsAndNumbers(table.ParsedContent(),
+            var score = it_inTables.TableWithWordsAndNumbers(table.ParsedContent(),
                 out var foundJobs,
                 out var cells);
 

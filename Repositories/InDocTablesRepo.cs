@@ -28,7 +28,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task<InDocTables> GetNextForCheck(string requestedBy, CancellationToken cancellationToken)
+        public static async Task<InDocTables> GetNextForCheck(string requestedBy, CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -61,7 +61,7 @@ namespace HlidacStatu.Repositories
             }
         }
         
-        public static async Task<InDocTables> GetSpecific(int pk, string requestedBy, CancellationToken cancellationToken)
+        public static async Task<InDocTables> GetSpecific(int pk, string requestedBy, CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
             {
