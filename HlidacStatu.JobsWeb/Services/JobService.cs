@@ -56,7 +56,7 @@ namespace HlidacStatu.JobsWeb.Services
                     .GroupBy(j => j.JobPk)
                     .Select(g =>
                     {
-                        var (net, vat) = FixSalaries(g.FirstOrDefault().SalaryMd, g.FirstOrDefault().SalaryMdVat);
+                        var (net, vat) = HlidacStatu.DetectJobs.InTables.FixSalaries(g.FirstOrDefault().SalaryMd, g.FirstOrDefault().SalaryMdVat);
                         var tags = g.FirstOrDefault().Tags?.Split("|",
                             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                         if (tags == null || tags.Length == 0)
@@ -148,21 +148,6 @@ namespace HlidacStatu.JobsWeb.Services
             DodavateleRecalculationEnd = DateTime.Now;
         }
 
-        private static (decimal net, decimal vat) FixSalaries(decimal? net, decimal? vat)
-        {
-            decimal finalNet = net ?? 0;
-            decimal finalVat = vat ?? 0;
-
-            if (finalNet == 0)
-                finalNet = finalVat / 1.21m;
-            if (finalVat == 0)
-                finalVat = finalNet * 1.21m;
-
-            if (finalNet > finalVat)
-                return (finalVat, finalNet);
-
-            return (finalNet, finalVat);
-        }
 
         public static List<JobStatistics> GetStatitstics()
         {

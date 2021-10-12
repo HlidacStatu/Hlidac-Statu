@@ -99,27 +99,37 @@ namespace HlidacStatu.Repositories
 
             return null;
         }
-        public static async Task SaveAsync(InDocJobs job, bool dontChangeDates = false)
+        public static async Task SaveAsync(InDocJobs job, bool dontChangeDates = false, bool rewriteAll = false)
         {
             await using (DbEntities db = new DbEntities())
             {
                 string jobSubject = db.InDocTables.AsQueryable().FirstOrDefault(m => m.Pk == job.TablePk)?.Subject;
                 //find jobGroup
-                var jobGroup = FindSimilar(jobSubject, job.JobRaw);
-                if (jobGroup != null)
+                if (string.IsNullOrEmpty(job.JobGrouped) || rewriteAll)
                 {
-                    job.JobGrouped = jobGroup.JobGrouped;
-                    job.Tags = jobGroup.Tags;
+                    var jobGroup = FindSimilar(jobSubject, job.JobRaw);
+                    if (jobGroup != null)
+                    {
+                        job.JobGrouped = jobGroup.JobGrouped;
+                        job.Tags = jobGroup.Tags;
+                    }
+                    else
+                    {
+                        job.JobGrouped = null;
+                        job.Tags = null;
+                    }
                 }
-                else
-                {
-                    job.JobGrouped = null;
-                    job.Tags = null;
-                }
-                if (dontChangeDates==false)
+                if (dontChangeDates == false)
                     job.Created = DateTime.Now;
 
-
+                if (job.SalaryMD.HasValue == false || job.SalaryMD == 0
+                    || job.SalaryMdVAT.HasValue == false || job.SalaryMdVAT == 0
+                    || rewriteAll)
+                {
+                    var (salnet, salvat) = HlidacStatu.DetectJobs.InTables.FixSalaries(job.SalaryMD, job.SalaryMdVAT);
+                    job.SalaryMD = salnet;
+                    job.SalaryMdVAT = salvat;
+                }
 
                 db.InDocJobs.Attach(job);
                 if (job.Pk == 0)
@@ -133,11 +143,11 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task SaveAsync(IEnumerable<InDocJobs> jobs, bool dontChangeDates = false)
+        public static async Task SaveAsync(IEnumerable<InDocJobs> jobs, bool dontChangeDates = false, bool rewriteAll = false)
         {
             foreach (var job in jobs)
             {
-                await SaveAsync(job,dontChangeDates);
+                await SaveAsync(job,dontChangeDates,rewriteAll);
             }
 
         }
