@@ -1,0 +1,51 @@
+﻿@page "/history"
+
+@using HlidacStatu.JobTableEditor.Data
+@using HlidacStatu.Entities
+@using System.Threading
+
+@inject JobService JobService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize(Roles = "Admin,TableEditor")]
+
+<h1>Historie posledních tabulek</h1>
+
+@if (TablesCompleted is null)
+{
+    <p>Loading</p>
+}
+else
+{
+    <ul>
+        @foreach (var table in TablesCompleted)
+        {
+            <li>
+                <a class="button" href="/tableEditor/@table.Subject/@table.Pk">
+                    @table.SmlouvaID - @table.CheckedDate?.ToString("yyyy-MM-dd HH:mm") - @(((InDocTables.CheckStatuses)table.Status).ToString("G"))
+                </a>
+            </li>
+        }
+        
+    </ul>
+}
+
+
+@code {
+    
+    private List<InDocTables> TablesCompleted { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userName = authState?.User?.Identity?.Name;
+
+        if (!string.IsNullOrWhiteSpace(userName))
+        {
+            TablesCompleted = await JobService.LoadHistory(userName, 20, CancellationToken.None);
+        }
+    }
+
+}
+

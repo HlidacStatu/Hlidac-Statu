@@ -81,6 +81,22 @@ namespace HlidacStatu.Repositories
             }
         }
         
+        public static async Task<List<InDocTables>> GetHistory(string requestedBy, int take,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            await using (DbEntities db = new DbEntities())
+            {
+                var tbl = await db.InDocTables
+                    .AsQueryable()
+                    .Where(m => m.CheckedBy == requestedBy)
+                    .OrderByDescending(m => m.CheckedDate)
+                    .Take(take)
+                    .ToListAsync(cancellationToken: cancellationToken);
+                
+                return tbl;
+            }
+        }
+        
         public static async Task<Dictionary<InDocTables.CheckStatuses, int>> GlobalStatistic(CancellationToken cancellationToken)
         {
             await using (DbEntities db = new DbEntities())

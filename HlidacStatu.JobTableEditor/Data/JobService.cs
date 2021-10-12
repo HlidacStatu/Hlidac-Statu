@@ -49,6 +49,13 @@ namespace HlidacStatu.JobTableEditor.Data
 
             return st;
         }
+        
+        public async Task<List<InDocTables>> LoadHistory(string user, int take, CancellationToken cancellationToken)
+        {
+            var tablesList = await InDocTablesRepo.GetHistory(user, take, cancellationToken);
+            
+            return tablesList;
+        }
 
         private static CellShell[][] WrapCells(InTables.Cell[][] cells)
         {
