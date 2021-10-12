@@ -12,6 +12,7 @@
         <th scope="col" class="text-end">Průměr</th>
         <th scope="col" class="text-end">Maximum</th>
         <th scope="col" class="text-end">Počet smluv</th>
+        <th scope="col" class="text-end">Počet cen</th>
         @if (!Model.HideDodavatelCount)
         {
             <th scope="col" class="text-end">Počet dodavatelů</th>
@@ -37,6 +38,7 @@
             <td class="text-end">@row.Average.ToString("N0")</td>
             <td class="text-end">@row.Maximum.ToString("N0")</td>
             <td class="text-end">@row.ContractCount</td>
+            <td class="text-end">@row.PriceCount</td>
             @if (!Model.HideDodavatelCount)
             {
                 <td class="text-end">@row.SupplierCount</td>

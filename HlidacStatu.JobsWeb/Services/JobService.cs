@@ -13,7 +13,7 @@ namespace HlidacStatu.JobsWeb.Services
     {
         // make it "in memory", load it asynchronously, recalculate once a day?
         //private static List<JobPrecalculated> DistinctJobs { get; set; }
-        private static readonly int _minimumContractCount = 5;
+        private static readonly int _minimumPriceCount = 5;
 
         private static List<JobStatistics> JobOverview { get; set; }
 
@@ -99,7 +99,7 @@ namespace HlidacStatu.JobsWeb.Services
             JobOverview = distinctJobs
                 .GroupBy(j => j.JobGrouped)
                 .Select(g => new JobStatistics(g, g.Key))
-                .Where(s => s.ContractCount >= _minimumContractCount)
+                .Where(s => s.PriceCount >= _minimumPriceCount)
                 .ToList();
                 
             JobRecalculationEnd = DateTime.Now;
@@ -113,7 +113,7 @@ namespace HlidacStatu.JobsWeb.Services
                 .ToDictionary(g => g.Key, g =>
                     g.GroupBy(i => i.dodavatel)
                         .Select(ig => new JobStatistics(ig.Select(x=> x.precalculated), ig.Key))
-                        .Where(s => s.ContractCount >= _minimumContractCount)
+                        .Where(s => s.PriceCount >= _minimumPriceCount)
                         .ToList()
                 );
             TagRecalculationEnd = DateTime.Now;
@@ -126,7 +126,7 @@ namespace HlidacStatu.JobsWeb.Services
                 .ToDictionary(g => g.Key, g =>
                     g.GroupBy(i => i.JobGrouped)
                         .Select(ig => new JobStatistics(ig, ig.Key))
-                        .Where(s => s.ContractCount >= _minimumContractCount)
+                        .Where(s => s.PriceCount >= _minimumPriceCount)
                         .ToList()
                 );
             OdberatelOverview = OdberatelOverview.Where(x => x.Value.Count > 0).ToDictionary(x => x.Key, x => x.Value);
@@ -141,7 +141,7 @@ namespace HlidacStatu.JobsWeb.Services
                 .ToDictionary(g => g.Key, g =>
                     g.GroupBy(i => i.precalculated.JobGrouped)
                         .Select(ig => new JobStatistics(ig.Select(x=> x.precalculated), ig.Key))
-                        .Where(s => s.ContractCount >= _minimumContractCount)
+                        .Where(s => s.PriceCount >= _minimumPriceCount)
                         .ToList()
                 );
             DodavatelOverview = DodavatelOverview.Where(x => x.Value.Count > 0).ToDictionary(x => x.Key, x => x.Value);
