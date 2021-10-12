@@ -103,10 +103,10 @@ namespace HlidacStatu.Repositories
         {
             await using (DbEntities db = new DbEntities())
             {
-                string jobSubject = db.InDocTables.AsQueryable().FirstOrDefault(m => m.Pk == job.TablePk)?.Subject;
                 //find jobGroup
                 if (string.IsNullOrEmpty(job.JobGrouped) || rewriteAll)
                 {
+                    string jobSubject = db.InDocTables.AsQueryable().FirstOrDefault(m => m.Pk == job.TablePk)?.Subject;
                     var jobGroup = FindSimilar(jobSubject, job.JobRaw);
                     if (jobGroup != null)
                     {
