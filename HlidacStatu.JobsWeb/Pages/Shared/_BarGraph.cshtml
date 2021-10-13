@@ -1,0 +1,71 @@
+@using HlidacStatu.JobsWeb.Services
+
+
+@{
+    var data = JobService.GetDistinctJobs();
+
+    var res = data.GroupBy(x => Math.Ceiling(x.SalaryMd / 2000))
+        .Select(g => new {Klic = g.Key, pocet = g.Count()})
+        .OrderBy(x => x.Klic);
+
+
+    int tickInterval = 5000;
+    int pixelsPerTick = 100;
+    //int tickCount = (int)Math.Ceiling(Model.BasicData.Max(x => x.Maximum) / tickInterval);
+
+    //int jobCount = Model.BasicData.Count;
+    int pixelsPerJob = 100;
+
+}
+
+
+<figure class="highcharts-figure" style="max-width: 400px">
+    <div id="columnChart-container"></div>
+    <p class="highcharts-description">
+        Nějaký popis grafu.
+    </p>
+</figure>
+
+<script>
+Highcharts.chart('columnChart-container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Monthly Average Rainfall'
+    },
+    subtitle: {
+        text: 'Source: WorldClimate.com'
+    },
+    xAxis:{
+        tickInterval: 2000
+    },
+    yAxis: {
+        min: 0,
+        title: {
+            text: 'Počet smluv'
+        }
+    },
+    tooltip: {
+        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
+        footerFormat: '</table>',
+        shared: true,
+        useHTML: true
+    },
+    plotOptions: {
+        column: {
+            pointPadding: 0,
+            borderWidth: 1,
+            groupPadding: 0
+        }
+    },
+    series: [{
+        name: 'Počet smluv',
+        data: [@Html.Raw(string.Join(",",res.Select(x => $"[{x.Klic * 2000},{x.pocet}]")))]
+
+    }]
+});
+
+</script>

@@ -14,6 +14,8 @@ namespace HlidacStatu.JobsWeb.Services
         // make it "in memory", load it asynchronously, recalculate once a day?
         //private static List<JobPrecalculated> DistinctJobs { get; set; }
         private static readonly int _minimumPriceCount = 5;
+        
+        private static List<JobPrecalculated> DistinctJobs { get; set; }
 
         private static List<JobStatistics> JobOverview { get; set; }
 
@@ -52,7 +54,7 @@ namespace HlidacStatu.JobsWeb.Services
                 var allJobs = await InDocJobsRepo.GetAllJobsWithRelatedDataAsync();
 
                 // important to filter duplicates here, can be extended in future
-                var distinctJobs = allJobs
+                DistinctJobs = allJobs
                     .GroupBy(j => j.JobPk)
                     .Select(g =>
                     {
@@ -76,13 +78,13 @@ namespace HlidacStatu.JobsWeb.Services
                         };
                     }).ToList();
 
-                CalculateJobs(distinctJobs);
+                CalculateJobs(DistinctJobs);
 
-                CalculateTags(distinctJobs);
+                CalculateTags(DistinctJobs);
 
-                CalculateOdberatele(distinctJobs);
+                CalculateOdberatele(DistinctJobs);
 
-                CalculateDodavatele(distinctJobs);
+                CalculateDodavatele(DistinctJobs);
             }
             catch (Exception e)
             {
@@ -196,6 +198,11 @@ namespace HlidacStatu.JobsWeb.Services
             }
 
             return result;
+        }
+
+        public static List<JobPrecalculated> GetDistinctJobs()
+        {
+            return DistinctJobs;
         }
     }
 }
