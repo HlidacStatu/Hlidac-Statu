@@ -12,15 +12,15 @@
         <th scope="col" class="text-end">Průměr</th>
         <th scope="col" class="text-end">Maximum</th>
         <th scope="col" class="text-end">Počet smluv</th>
-        <th scope="col" class="text-end">Počet cen</th>
         @if (!Model.HideDodavatelCount)
         {
             <th scope="col" class="text-end">Počet dodavatelů</th>
         }
+        <th scope="col" class="text-end">Počet cen</th>
     </tr>
     </thead>
     <tbody>
-    @foreach (var row in Model.Statistics)
+    @foreach (var row in Model.Statistics.OrderBy(x => x.Name))
     {
         <tr>
             @if (string.IsNullOrEmpty(Model.LinkHref))
@@ -38,11 +38,11 @@
             <td class="text-end">@row.Average.ToString("N0")</td>
             <td class="text-end">@row.Maximum.ToString("N0")</td>
             <td class="text-end">@row.ContractCount</td>
-            <td class="text-end">@row.PriceCount</td>
             @if (!Model.HideDodavatelCount)
             {
                 <td class="text-end">@row.SupplierCount</td>
             }
+            <td class="text-end">@row.PriceCount</td>
         </tr>
     }
     </tbody>

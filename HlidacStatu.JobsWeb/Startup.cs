@@ -1,5 +1,7 @@
 using System;
+using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.JobsWeb.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
@@ -27,6 +29,7 @@ namespace HlidacStatu.JobsWeb
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
 
+            Task.Run(async () => await JobService.RecalculateAsync() ).GetAwaiter().GetResult();
             
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             // for scoped services (mainly for identity)
