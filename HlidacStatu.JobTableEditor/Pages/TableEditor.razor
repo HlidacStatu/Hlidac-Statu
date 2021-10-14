@@ -15,19 +15,6 @@
 
 <h1>Job editor</h1>
 
-<div class="container">
-    <div class="row">
-        <div class="col-2 bg-primary bg-opacity-25">
-            Pozice
-        </div>
-        <div class="col-2 bg-success bg-opacity-25">
-            Cena za MD bez DPH
-        </div>
-        <div class="col-2 bg-warning bg-opacity-25">
-            Cena za MD s DPH
-        </div>
-    </div>
-</div>
 <hr style="margin-bottom: 20px;"/>
 @if (_hlaska.HasValue)
 {
@@ -43,24 +30,39 @@
 }
 else
 {
-    <div class="sticky-top pt-2">
-        <h4 class="text-danger">@_errorMessage</h4>
-        <button class="btn btn-secondary btn-sm" @onclick="AddColumn">Přidej sloupec</button>
-        <button class="btn btn-secondary btn-sm" @onclick="AddRow">Přidej řádek</button>
-        <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(_table.InDocTable.SmlouvaID)&p=@(_table.InDocTable.PrilohaHash)&page=@_table.InDocTable.Page"><i class="far fa-file-alt"></i>Ukázat stránku s tabulkou</a>
+    <div class="sticky-top pt-2 col-6 row">
+        <div class="col-8">
+            <button class="btn btn-secondary btn-sm" @onclick="AddColumn">Přidej sloupec</button>
+            <button class="btn btn-secondary btn-sm" @onclick="AddRow">Přidej řádek</button>
+            <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(_table.InDocTable.SmlouvaID)&p=@(_table.InDocTable.PrilohaHash)&page=@_table.InDocTable.Page"><i class="far fa-file-alt"></i> Ukázat dokument</a>
+        </div>
+
+        <div class="col-4 dwarf-font">
+            <div class="bg-primary bg-opacity-25">
+                Pozice
+            </div>
+            <div class="bg-success bg-opacity-25">
+                Cena za MD bez DPH
+            </div>
+            <div class="bg-warning bg-opacity-25">
+                Cena za MD s DPH
+            </div>
+        </div>
+        
     </div>
     <hr style="margin-bottom:20px;"/>
     <table class="table">
         <thead>
         <tr>
+            <th></th>
             @for (int col = 0; col < _table.Cells[0].Length; col++)
             {
                 int column = col;
                 <th>
-                    <button class="btn btn-sm btn-primary bg-opacity-25" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.Position) )">Job</button>
-                    <button class="btn btn-sm btn-success bg-opacity-25" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.Price) )"><i class="far fa-money-bill-alt"></i></button>
-                    <button class="btn btn-sm btn-warning bg-opacity-25" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.PriceWithVAT) )"><i class="far fa-money-bill-alt"></i> s DPH</button>
-                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.Unknown) )">Nic</button>
+                    <button class="btn btn-sm btn-primary bg-opacity-25" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.Position))">Job</button>
+                    <button class="btn btn-sm btn-success bg-opacity-25" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.Price))"><i class="far fa-money-bill-alt"></i></button>
+                    <button class="btn btn-sm btn-warning bg-opacity-25" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.PriceWithVAT))"><i class="far fa-money-bill-alt"></i> s DPH</button>
+                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.Unknown))">Nic</button>
                     <span>&nbsp;&nbsp;| &nbsp;</span>
                     <button class="btn btn-secondary btn-sm" @onclick="() => MultiplyPrices(column)"><i class="fas fa-times"></i> 8</button>
                 </th>
@@ -71,6 +73,9 @@ else
         @foreach (var row in _table.Cells)
         {
             <tr>
+                <th>
+                    <button class="btn btn-sm btn-outline-info" @onclick="@(() => SetRow(row, InTables.Cell.GuessedCellType.Unknown))">Nic</button>
+                </th>
                 @foreach (var cell in row)
                 {
                     <Cell CellShell="@cell" Swapper="@Swapper"></Cell>
@@ -83,6 +88,7 @@ else
     <hr/>
     <div style="height:10px;"></div>
     <div class="fixed-bottom bg-light p-2">
+        <h4 class="text-danger float-start">@_errorMessage</h4>
         <div class="float-end">
             <button class="btn btn-outline-success" @onclick="SaveTable">Save changes</button>
             <button class="btn btn-outline-warning" @onclick="SuperviseTable">Send to supervisor</button>
@@ -120,6 +126,14 @@ else
         foreach (var row in _table.Cells)
         {
             row[column].CellType = cellType;
+        }
+    }
+    
+    private void SetRow(CellShell[] row, InTables.Cell.GuessedCellType cellType)
+    {
+        foreach (var column in row)
+        {
+            column.CellType = cellType;
         }
     }
     

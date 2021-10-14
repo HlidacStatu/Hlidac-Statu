@@ -12,7 +12,7 @@
     <button class="btn btn-outline-secondary" @onclick="CellShell.SetMergedValue" title="Nastav předpočítanou hodnotu"><i class="far fa-brain"></i></button>
     
     <button class="btn btn-outline-primary" @onclick="@(() => Swapper.Swap(this))" title="Prohoď hodnotu" style="float: right"><i class="@swapButtonStyle"></i></button>
-    <input type="text" class="form-control" @bind="@CellShell.Value" />
+    <textarea rows="2" class="form-control" @bind="@CellShell.Value"></textarea>
     @if (!string.IsNullOrWhiteSpace(CellShell.Error))
     {
         <p class="text-danger">@CellShell.Error</p>
