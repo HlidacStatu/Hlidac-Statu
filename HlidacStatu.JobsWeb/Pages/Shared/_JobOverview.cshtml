@@ -1,0 +1,34 @@
+@using HlidacStatu.JobsWeb.Models
+@using HlidacStatu.JobsWeb.Services
+@model JobStatistics
+
+@{
+    bool showStatistics = !string.IsNullOrWhiteSpace(Model.Name); 
+    var statistics = new List<JobStatistics>();
+    if(showStatistics)
+        statistics = JobService.GetTagStatitstics(Model.Name);
+    
+    var histogram = new BarGraph()
+    {
+        Data = JobService.GetDistinctJobs()
+            .Where(j => j.JobGrouped == Model.Name)
+            .ToList(),
+        Title = Model.Name
+    };
+    
+    var tableModel = new TableViewModel()
+    {
+        Statistics = statistics,
+        FirstColumnName = "Tag"
+    };
+
+}
+
+
+<h2>@Model.Name</h2>
+
+<p>Obvyklá cena pro kategorii @Model.Name je @Model.Median.ToString("N0") a pohybuje se v rozpětí od @Model.DolniKvartil.ToString("N0") do @Model.HorniKvartil.ToString("N0") bez DPH.</p>
+
+<partial name="Shared/_SouhrnTable" model="tableModel"/>
+
+<partial name="Shared/_BarGraph" model="histogram"/>

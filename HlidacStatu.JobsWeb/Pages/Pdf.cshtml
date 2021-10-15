@@ -1,0 +1,12 @@
+@page 
+@using HlidacStatu.JobsWeb.Services
+@model PdfModel
+
+@{
+    var statistics = JobService.GetStatitstics();
+}
+
+@foreach (var statistic in statistics)
+{
+    <partial name="Shared/_JobOverview" model="statistic"/>
+}

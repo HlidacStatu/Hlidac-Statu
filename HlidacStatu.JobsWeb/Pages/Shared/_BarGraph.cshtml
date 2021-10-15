@@ -1,7 +1,10 @@
 @model HlidacStatu.JobsWeb.Models.BarGraph
 
 @{
-    var data = Model.Data; // JobService.GetDistinctJobs();
+    var guid = Guid.NewGuid();
+    string uniqueName = $"cc_{guid:N}";
+    
+    var data = Model.Data;
 
     var res = data.GroupBy(x => Math.Ceiling(x.SalaryMd / 2000))
         .Select(g => new {Klic = g.Key, pocet = g.Count()})
@@ -19,14 +22,14 @@
 
 
 <figure class="highcharts-figure" style="max-width: 400px">
-    <div id="columnChart-container"></div>
+    <div id="@uniqueName"></div>
     <p class="highcharts-description">
         Nějaký popis grafu.
     </p>
 </figure>
 
 <script>
-Highcharts.chart('columnChart-container', {
+Highcharts.chart('@uniqueName', {
     chart: {
         type: 'column'
     },
