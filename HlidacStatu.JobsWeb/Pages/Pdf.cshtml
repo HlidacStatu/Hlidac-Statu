@@ -1,5 +1,6 @@
 @page 
 @using HlidacStatu.JobsWeb.Services
+@using HlidacStatu.JobsWeb.Models
 @model PdfModel
 
 @{
@@ -8,5 +9,11 @@
 
 @foreach (var statistic in statistics)
 {
-    <partial name="Shared/_JobOverview" model="statistic"/>
+    var jobOverviewViewModel = new JobOverviewViewModel()
+    {
+        Statistics = statistic,
+        CustomText = "vlastní text"
+    };
+    
+    <partial name="Shared/_JobOverview" model="jobOverviewViewModel"/>
 }

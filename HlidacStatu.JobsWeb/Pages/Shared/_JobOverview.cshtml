@@ -1,19 +1,19 @@
 @using HlidacStatu.JobsWeb.Models
 @using HlidacStatu.JobsWeb.Services
-@model JobStatistics
+@model JobOverviewViewModel
 
 @{
-    bool showStatistics = !string.IsNullOrWhiteSpace(Model.Name); 
+    bool showStatistics = !string.IsNullOrWhiteSpace(Model.Statistics.Name); 
     var statistics = new List<JobStatistics>();
     if(showStatistics)
-        statistics = JobService.GetTagStatitstics(Model.Name);
+        statistics = JobService.GetTagStatitstics(Model.Statistics.Name);
     
     var histogram = new BarGraph()
     {
         Data = JobService.GetDistinctJobs()
-            .Where(j => j.JobGrouped == Model.Name)
+            .Where(j => j.JobGrouped == Model.Statistics.Name)
             .ToList(),
-        Title = Model.Name
+        Title = Model.Statistics.Name
     };
     
     var tableModel = new TableViewModel()
@@ -25,9 +25,11 @@
 }
 
 
-<h2>@Model.Name</h2>
+<h2>@Model.Statistics.Name</h2>
 
-<p>Obvyklá cena pro kategorii @Model.Name je @Model.Median.ToString("N0") a pohybuje se v rozpětí od @Model.DolniKvartil.ToString("N0") do @Model.HorniKvartil.ToString("N0") bez DPH.</p>
+<p>Obvyklá cena pro kategorii @Model.Statistics.Name je @Model.Statistics.Median.ToString("N0") a pohybuje se v rozpětí od @Model.Statistics.DolniKvartil.ToString("N0") do @Model.Statistics.HorniKvartil.ToString("N0") bez DPH.</p>
+<p>@Html.Raw(Model.CustomText)</p>
+
 
 <partial name="Shared/_SouhrnTable" model="tableModel"/>
 
