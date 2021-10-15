@@ -11,6 +11,12 @@
     {
         BasicData = statistics.Where(s => s.Name == "Programátor").ToList()
     };
+
+    var histogram = new BarGraph()
+    {
+        Data = JobService.GetDistinctJobs(),
+        Title = "Histogram všeho"
+    };
 }
 
 <h1>Souhrnné statistiky</h1>
@@ -52,4 +58,4 @@
 
 <partial name="Shared/_BoxPlot" model="graphModel"/>
 
-<partial name="Shared/_BarGraph"/>
+<partial name="Shared/_BarGraph" model="histogram"/>

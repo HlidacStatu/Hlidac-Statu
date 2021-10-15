@@ -1,8 +1,7 @@
-@using HlidacStatu.JobsWeb.Services
-
+@model HlidacStatu.JobsWeb.Models.BarGraph
 
 @{
-    var data = JobService.GetDistinctJobs();
+    var data = Model.Data; // JobService.GetDistinctJobs();
 
     var res = data.GroupBy(x => Math.Ceiling(x.SalaryMd / 2000))
         .Select(g => new {Klic = g.Key, pocet = g.Count()})
@@ -32,10 +31,7 @@ Highcharts.chart('columnChart-container', {
         type: 'column'
     },
     title: {
-        text: 'Monthly Average Rainfall'
-    },
-    subtitle: {
-        text: 'Source: WorldClimate.com'
+        text: '@Model.Title'
     },
     xAxis:{
         tickInterval: 2000
@@ -62,7 +58,7 @@ Highcharts.chart('columnChart-container', {
         }
     },
     series: [{
-        name: 'Počet smluv',
+        name: 'Cena',
         data: [@Html.Raw(string.Join(",",res.Select(x => $"[{x.Klic * 2000},{x.pocet}]")))]
 
     }]
