@@ -33,7 +33,7 @@ namespace HlidacStatu.Web.Framework
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("Manager Save", e);
+                Util.Consts.Logger.Error($"Manager Save error from URL {ki.ValueForData}", e);
             }
 
             if (data == null || data.Length == 0)
