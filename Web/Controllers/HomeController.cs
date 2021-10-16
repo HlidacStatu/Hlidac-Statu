@@ -1137,7 +1137,7 @@ text zpravy: {txt}
             {
                 data = RemoteUrlFromWebCache.GetBinary(mainUrl + "/kindex/banner/" + v, "kindex-banner-" + v, HttpContext.Request.Query["refresh"] == "1");
             }
-            else if (id?.ToLower() == "page")
+            else if (id?.ToLower() == "page" && string.IsNullOrEmpty(v)==false)
             {
                 var pageUrl = v;
                 string socialTitle = "";
