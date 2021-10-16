@@ -712,7 +712,7 @@ namespace HlidacStatu.Repositories.ES
                     .SetException(ex)
                     .SetCustomKeyValue("URL", httpContext?.Request?.GetDisplayUrl())
                     .SetCustomKeyValue("Stack-trace", Environment.StackTrace)
-                    .SetCustomKeyValue("Referer", httpContext?.Request?.GetTypedHeaders()?.Referer.ToString())
+                    .SetCustomKeyValue("Referer", httpContext?.Request?.GetTypedHeaders()?.Referer?.ToString())
                     .SetCustomKeyValue("User-agent", browser.ToString())
                     //následující řádek byl zkrácen pokud je hostname chtěný, je potřeba volat ještě něco takového: System.Net.Dns.GetHostEntry("127.0.0.1").HostName 
                     .SetCustomKeyValue("IP", httpContext?.Connection?.RemoteIpAddress) //+ " " + System.Web.HttpContext.Current?.Request?.UserHostName  
