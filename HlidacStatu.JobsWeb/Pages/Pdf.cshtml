@@ -1,4 +1,5 @@
-@page 
+@page
+
 @using HlidacStatu.JobsWeb.Services
 @using HlidacStatu.JobsWeb.Models
 @model PdfModel
@@ -6,9 +7,9 @@
 @{
     var statistics = JobService.GetStatistics();
     int rok = 2020;
-    int pocetSmluv = JobService.DistinctJobs.Select(m=>m.SmlouvaId).Distinct().Count();
-    int pocetZadavatelu = JobService.DistinctJobs.Select(m=>m.IcoOdberatele).Distinct().Count();
-    int pocetDodavatelu = JobService.DistinctJobs.SelectMany(m=>m.IcaDodavatelu).Distinct().Count();
+    int pocetSmluv = JobService.DistinctJobs.Select(m => m.SmlouvaId).Distinct().Count();
+    int pocetZadavatelu = JobService.DistinctJobs.Select(m => m.IcoOdberatele).Distinct().Count();
+    int pocetDodavatelu = JobService.DistinctJobs.SelectMany(m => m.IcaDodavatelu).Distinct().Count();
     int pocetCen = JobService.DistinctJobs.Count();
 }
 
@@ -16,28 +17,62 @@
 <h1>Přehled obvyklých cen IT prací ve státní správě za rok @rok</h1>
 
 <p>
-Tento materiál analyzuje přehled obvyklých cen ICT prací na základě skutečně sjednaných cen v smlouvách pro ICT služby, 
-    uveřejněných v registru smluv za rok @rok. 
-Zdrojem dat pro přehled jsou smlouvy zveřejněné v registru smluv http://smlouvy.gov.cz, analyzované a zpracované serverem Hlídač státu. 
-    
-    Cílem analýzy je představit skutečné ceny zadavatelů na trhu v oblasti ICT, jako podklad pro odhad očekávané ceny zakázky. 
-    </p>
+    Tento materiál analyzuje přehled obvyklých cen ICT prací na základě skutečně sjednaných cen v smlouvách pro ICT služby,
+    uveřejněných v registru smluv za rok @rok.
+    Zdrojem dat pro přehled jsou smlouvy zveřejněné v registru smluv http://smlouvy.gov.cz, analyzované a zpracované serverem Hlídač státu.
+
+    Cílem analýzy je představit skutečné ceny zadavatelů na trhu v oblasti ICT, jako podklad pro odhad očekávané ceny zakázky.
+</p>
 <p><b>Tento dokument nestanovuje doporučené ceny.</b></p>
-<p>Přehled se zaměřuje výhradně na ceny explicitně ve smlouvách uvedené jako ceny za člověkoden nebo člověkohodinu práce.
-Přehled je sestaven pro smlouvy uzavřené v roce @rok, s místem realizace Česká republika. 
+<p>
+    Přehled se zaměřuje výhradně na ceny explicitně ve smlouvách uvedené jako ceny za člověkoden nebo člověkohodinu práce.
+    Přehled je sestaven pro smlouvy uzavřené v roce @rok, s místem realizace Česká republika.
     Metody a procesy získání cen se průběžně vyvíjejí.
-Přehled obsahuje údaje z @pocetSmluv smluv od @pocetZadavatelu zadavatelů a @pocetDodavatelu dodavatelů a zahrnuje @pocetCen cen.
+    Přehled obsahuje údaje z @pocetSmluv smluv od @pocetZadavatelu zadavatelů a @pocetDodavatelu dodavatelů a zahrnuje @pocetCen cen.
+</p>
+
+<h1>Metodika analýzy</h1>
+<p>
+    Přehled vznikl automatizovanou extrakcí cen z plných textů smluv automaticky identifikovaných pomocí AI jako IT smlouvy, následnou ruční kontrolou a validací.
+    Do seznamu zpracovávaných smluv byly zařazeny i smlouvy neoznačené pomocí AI jako IT smlouvy, od dodavatelů, kteří během roku poskytovali IT služby.
+</p>
+<p>
+    Tyto vybrané smlouvy byly vybrány pro vyhledávání a v textech samotných smluv byly nalezeny a vyextrahovány údaje, ve kterých jsou uvedeny práce související s ICT a ceny za člověkoden nebo člověkohodinu.
+    Z takto nalezených údajů byly extrahovány cenové údaje a popis zasmluvněné činnosti.
+    Každá takto extrahovaná údaje, dostupné v kontextu smlouvy, byly zkontrolovány nejméně jedním expertem, který upřesnil typ práce, zkontrolovat cenu činnosti s DPH a bez DPH.
+    V případě nutnosti přepočítal cenu z člověkohodin do člověkodnů.
+    Všechny validní položky byly zahrnuty do statistického zpracování, ve kterém jsou seskupeny ceny podle typů prací a případně, pokud je dost dat, i podle upřesňujících štítků.
+    Zahrnuty byly i položky nalezené a extrahované ručně.
+    Součástí analýzy jsou i smlouvy, které nebyly strojově čitelné. Textový obsah z nich byl získán pomocí OCR a ručně zkontrolován.
+</p>
+<p>
+    Je pravděpodobné, že součástí analýzy nejsou všechny ceny ze všech smluv, protože malá část smluv v registru smluv není uvedena nebo má ceny anonymizovány.
+
+    Přehled tedy není úplný, naše kontrolní analýza ukazuje, že jsme zpracovali drtivou většinu smluv týkajících se ITC oboru v daném roce.
+
+</p>
+<p>
+    U každého cenového údaje jsou udržována zdrojová metadata i odkaz na přesný zdroj údajů, a tedy každá cena a případně každá chyba je zpětně dohledatelná.
 </p>
 
 
-
-
-
 <h1>Souhrnné statistiky</h1>
+@{
+    var graphModel = new Boxplot()
+    {
+        BasicData = statistics
+    };
 
+    var tableModel = new TableViewModel()
+    {
+        Statistics = statistics,
+        LinkHref = "/obor"
+    };
 
-<partial name="Shared/_SouhrnTable" model="tableModel"/>
-<partial name="Shared/_BoxPlot" model="graphModel"/>
+}
+
+<partial name="Shared/_SouhrnTable" model="tableModel" />
+<partial name="Shared/_BoxPlot" model="graphModel" />
 
 
 
@@ -48,6 +83,6 @@ Přehled obsahuje údaje z @pocetSmluv smluv od @pocetZadavatelu zadavatelů a @
         Statistics = statistic,
         CustomText = "vlastní text"
     };
-    
-    <partial name="Shared/_JobOverview" model="jobOverviewViewModel"/>
+
+    <partial name="Shared/_JobOverview" model="jobOverviewViewModel" />
 }
