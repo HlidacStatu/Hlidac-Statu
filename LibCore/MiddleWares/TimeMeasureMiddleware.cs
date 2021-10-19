@@ -19,7 +19,7 @@ namespace HlidacStatu.LibCore.MiddleWares
             _next = next;
         }
 
-        public async Task Invoke(HttpContext httpContext, AttackerDictionaryService attackerDictionary)
+        public async Task Invoke(HttpContext httpContext)
         {
             var url = httpContext.Request.Path;
             var query = httpContext.Request.QueryString.ToString();
