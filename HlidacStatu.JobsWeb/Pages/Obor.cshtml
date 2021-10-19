@@ -9,7 +9,7 @@
     bool showStatistics = !string.IsNullOrWhiteSpace(Model.Obor); 
     var statistics = new List<JobStatistics>();
     if(showStatistics)
-        statistics = JobService.GetTagStatitstics(Model.Obor);
+        statistics = JobService.GetTagStatistics(Model.Obor);
     var graphModel = new Boxplot()
     {
         BasicData = statistics

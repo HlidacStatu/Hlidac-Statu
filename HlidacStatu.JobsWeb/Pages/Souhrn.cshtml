@@ -6,7 +6,7 @@
 @{
     ViewData["Title"] = "Souhrnné statistiky";
 
-    var statistics = JobService.GetStatitstics();
+    var statistics = JobService.GetStatistics();
     var graphModel = new Boxplot()
     {
         BasicData = statistics

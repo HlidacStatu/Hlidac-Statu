@@ -15,7 +15,7 @@ namespace HlidacStatu.JobsWeb.Services
         //private static List<JobPrecalculated> DistinctJobs { get; set; }
         private static readonly int _minimumPriceCount = 5;
         
-        private static List<JobPrecalculated> DistinctJobs { get; set; }
+        public static List<JobPrecalculated> DistinctJobs { get; set; }
 
         private static List<JobStatistics> JobOverview { get; set; }
 
@@ -147,12 +147,12 @@ namespace HlidacStatu.JobsWeb.Services
         }
 
 
-        public static List<JobStatistics> GetStatitstics()
+        public static List<JobStatistics> GetStatistics()
         {
             return JobOverview;
         }
 
-        public static List<JobStatistics> GetTagStatitstics(string jobName)
+        public static List<JobStatistics> GetTagStatistics(string jobName)
         {
             if (TagOverview.TryGetValue(jobName, out var result))
             {

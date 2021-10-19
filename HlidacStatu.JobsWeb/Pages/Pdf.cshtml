@@ -4,8 +4,42 @@
 @model PdfModel
 
 @{
-    var statistics = JobService.GetStatitstics();
+    var statistics = JobService.GetStatistics();
+    int rok = 2020;
+    int pocetSmluv = JobService.DistinctJobs.Select(m=>m.SmlouvaId).Distinct().Count();
+    int pocetZadavatelu = JobService.DistinctJobs.Select(m=>m.IcoOdberatele).Distinct().Count();
+    int pocetDodavatelu = JobService.DistinctJobs.SelectMany(m=>m.IcaDodavatelu).Distinct().Count();
+    int pocetCen = JobService.DistinctJobs.Count();
 }
+
+
+<h1>Přehled obvyklých cen IT prací ve státní správě za rok @rok</h1>
+
+<p>
+Tento materiál analyzuje přehled obvyklých cen ICT prací na základě skutečně sjednaných cen v smlouvách pro ICT služby, 
+    uveřejněných v registru smluv za rok @rok. 
+Zdrojem dat pro přehled jsou smlouvy zveřejněné v registru smluv http://smlouvy.gov.cz, analyzované a zpracované serverem Hlídač státu. 
+    
+    Cílem analýzy je představit skutečné ceny zadavatelů na trhu v oblasti ICT, jako podklad pro odhad očekávané ceny zakázky. 
+    </p>
+<p><b>Tento dokument nestanovuje doporučené ceny.</b></p>
+<p>Přehled se zaměřuje výhradně na ceny explicitně ve smlouvách uvedené jako ceny za člověkoden nebo člověkohodinu práce.
+Přehled je sestaven pro smlouvy uzavřené v roce @rok, s místem realizace Česká republika. 
+    Metody a procesy získání cen se průběžně vyvíjejí.
+Přehled obsahuje údaje z @pocetSmluv smluv od @pocetZadavatelu zadavatelů a @pocetDodavatelu dodavatelů a zahrnuje @pocetCen cen.
+</p>
+
+
+
+
+
+<h1>Souhrnné statistiky</h1>
+
+
+<partial name="Shared/_SouhrnTable" model="tableModel"/>
+<partial name="Shared/_BoxPlot" model="graphModel"/>
+
+
 
 @foreach (var statistic in statistics)
 {

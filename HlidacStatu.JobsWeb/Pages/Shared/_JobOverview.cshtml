@@ -6,7 +6,7 @@
     bool showStatistics = !string.IsNullOrWhiteSpace(Model.Statistics.Name); 
     var statistics = new List<JobStatistics>();
     if(showStatistics)
-        statistics = JobService.GetTagStatitstics(Model.Statistics.Name);
+        statistics = JobService.GetTagStatistics(Model.Statistics.Name);
     
     var histogram = new BarGraph()
     {
