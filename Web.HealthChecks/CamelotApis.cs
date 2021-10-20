@@ -21,7 +21,8 @@ namespace HlidacStatu.Web.HealthChecks
         public class Options : IHCConfig
         {
             public string DefaultSectionName => "Camelot.Services";
-            public class Endpoint { 
+            public class Endpoint
+            {
                 public string Uri { get; set; }
                 public string ApiKey { get; set; }
             }
@@ -53,7 +54,10 @@ namespace HlidacStatu.Web.HealthChecks
                                 sb.AppendLine($"{anonUrl} ({ver.ErrorCode}:{ver.ErrorDescription})");
                             var st = cl.StatisticAsync().Result;
                             if (st.Success)
-                                sb.AppendLine($"stats: threads {st.Data?.CurrentThreads}/{st.Data?.MaxThreads}, {HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ParsedFilesTotal ?? 0)} parsed (1H:{HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ParsedFilesIn1H ?? 0)}/24H:{HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ParsedFilesIn24H ?? 0)}), {HlidacStatu.Util.RenderData.NiceNumber(st.Data?.CallsTotal ?? 0)} (1H:{HlidacStatu.Util.RenderData.NiceNumber(st.Data?.CallsIn1H ?? 0)}/24H:{HlidacStatu.Util.RenderData.NiceNumber(st.Data?.CallsIn24H ?? 0)}) api calls, {st.Data?.FilesOnDisk} files {((st.Data?.FilesOnDiskSize ?? 0) / (1024m * 1024m)):N3} MB");
+                                sb.AppendLine($"stats: threads {st.Data?.CurrentThreads}/{st.Data?.MaxThreads},"
+                                    + $" {HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ParsedFilesTotal ?? 0)} parsed (1H:{HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ParsedFiles1H ?? 0)}/24H:{HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ParsedFiles24H ?? 0)}),"
+                                    + $" {HlidacStatu.Util.RenderData.NiceNumber(st.Data?.CallsTotal ?? 0)} (1H:{HlidacStatu.Util.RenderData.NiceNumber(st.Data?.CallsIn1H ?? 0)}/24H:{HlidacStatu.Util.RenderData.NiceNumber(st.Data?.CallsIn24H ?? 0)}) api calls,"
+                                    + $" {st.Data?.FilesOnDisk} files {((st.Data?.FilesOnDiskSize ?? 0) / (1024m * 1024m)):N3} MB");
                             else
                                 sb.AppendLine($" ({st.ErrorCode}:{st.ErrorDescription})");
 
