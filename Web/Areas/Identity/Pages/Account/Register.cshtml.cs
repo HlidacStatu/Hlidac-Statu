@@ -95,6 +95,10 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
                     else
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
+                        if (returnUrl == "/cenypracehlidac")
+                        {
+                            return Redirect("cenyprace.hlidacstatu.cz");
+                        }
                         return LocalRedirect(returnUrl);
                     }
                 }
