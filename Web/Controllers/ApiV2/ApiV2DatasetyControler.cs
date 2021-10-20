@@ -81,6 +81,8 @@ namespace HlidacStatu.Web.Controllers
 
             try
             {
+                this.HttpContext.Items.Add("track_query", dotaz);
+                
                 var ds = DataSet.CachedDatasets.Get(datasetId?.ToLower());
                 if (ds == null)
                 {

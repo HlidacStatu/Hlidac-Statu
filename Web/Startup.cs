@@ -186,6 +186,13 @@ namespace HlidacStatu.Web
                     context.Response.Redirect("https://www.hlidacstatu.cz/Identity" + url + context.Request.QueryString.Value);
                     return;   // short circuit
                 }
+                
+                if (url?.ToLower()?.StartsWith("/cenypracehlidac") == true)
+                {
+                    context.Response.Redirect("https://cenyprace.hlidacstatu.cz/");
+                    return;   // short circuit
+                }
+                
 
                 await next();
             });
