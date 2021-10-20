@@ -58,7 +58,7 @@ namespace HlidacStatu.JobsWeb.Services
                         var tags = g.FirstOrDefault().Tags?.Split("|",
                             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                         if (tags == null || tags.Length == 0)
-                            tags = new[] { "-vöe-" };
+                            tags = new[] { "-v≈°e-" };
                         return new JobPrecalculated()
                         {
                             Subject = g.FirstOrDefault().Subject,
