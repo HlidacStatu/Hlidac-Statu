@@ -6,6 +6,7 @@ namespace HlidacStatu.JobsWeb.Models
     {
         public List<JobPrecalculated> Data { get; set; }
         public string Title { get; set; } = "Histogram";
-        
+        public string Description { get; set; }
+
     }
 }

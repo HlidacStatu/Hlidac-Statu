@@ -14,7 +14,7 @@
 }
 
 
-<h1>Přehled obvyklých cen IT prací ve státní správě za rok @rok</h1>
+<h2>Přehled obvyklých cen IT prací ve státní správě za rok @rok</h2>
 
 <p>
     Tento materiál analyzuje přehled obvyklých cen ICT prací na základě skutečně sjednaných cen v smlouvách pro ICT služby,
@@ -31,7 +31,7 @@
     Přehled obsahuje údaje z @pocetSmluv smluv od @pocetZadavatelu zadavatelů a @pocetDodavatelu dodavatelů a zahrnuje @pocetCen cen.
 </p>
 
-<h1>Metodika analýzy</h1>
+<h2>Metodika analýzy</h2>
 <p>
     Přehled vznikl automatizovanou extrakcí cen z plných textů smluv automaticky identifikovaných pomocí AI jako IT smlouvy, následnou ruční kontrolou a validací.
     Do seznamu zpracovávaných smluv byly zařazeny i smlouvy neoznačené pomocí AI jako IT smlouvy, od dodavatelů, kteří během roku poskytovali IT služby.
@@ -56,17 +56,19 @@
 </p>
 
 
-<h1>Souhrnné statistiky</h1>
+<h2>Souhrnné statistiky</h2>
 @{
     var graphModel = new Boxplot()
     {
-        BasicData = statistics
+        BasicData = statistics,
+        Height=500
     };
 
     var tableModel = new TableViewModel()
     {
         Statistics = statistics,
-        LinkHref = "/obor"
+        LinkHref = "/obor",
+        Caption="",
     };
 
 }
@@ -75,14 +77,28 @@
 <partial name="Shared/_BoxPlot" model="graphModel" />
 
 
+<h2>Obvyklé ceny pro jednotlivé pracovní pozice</h2>
+<p>
+Cenových analýzy pro jednotlivé pracovní pozice/typ práce. 
+    Metodika výpočtu je totožná jako pro souhrnné statistiky, pouze je aplikovaná na konkretní pracovní pozici.
+    Tabulka využívá pro popis dat charakteristiky
+definované v kapitole Statistické údaje a jejich interpretace. 
+    </p><p>
+    První řádek tabulky uvedený značkou <code>-vše-</code> je souhrem všech cenových údajů pro daný typ práce. Pod ním následují řádky představující podmnožinu
+cenových údajů, která je vyjářena sloupcem Štítek. Ten byl zvolen ručně analytiky dle jeho
+smysluplnosti vzhledem ke konkrétní práci a množstí validních dat v této podmnožině. Jeden cenový údaj
+může být spojený s více než jedním štítkem. Z toho důvodu mohou být stejné cenové údaje zahrnuty ve více
+řádcích - podmnožinách.
+</p><p>Za obvyklou cenu je považován medián v rozpětí charakterizovaném dolním a horním kvartilem.
+</p>
 
 @foreach (var statistic in statistics)
 {
     var jobOverviewViewModel = new JobOverviewViewModel()
     {
         Statistics = statistic,
-        CustomText = "vlastní text"
+        CustomText = ""
     };
-
+    <hr />
     <partial name="Shared/_JobOverview" model="jobOverviewViewModel" />
 }

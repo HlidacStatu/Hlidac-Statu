@@ -3072,3 +3072,22 @@ a.form-search__hint:active:focus {
         width: 50px;
         vertical-align: top;
     }
+
+.middle-line {
+    display: flex;
+    flex-direction: row;
+}
+
+    .middle-line.left:before {
+        content: "";
+        flex: 1 1;
+        border-bottom: 1px dashed #838C98;
+        margin: auto;
+    }
+
+    .middle-line.right:after {
+        content: "";
+        flex: 1 1;
+        border-bottom: 1px dashed #838C98;
+        margin: auto;
+    }

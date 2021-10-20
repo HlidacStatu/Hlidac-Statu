@@ -1,5 +1,8 @@
 @model HlidacStatu.JobsWeb.Models.TableViewModel
 
+<style>
+   
+</style>
 <table class="table table-sm table-striped mt-4">
     <caption>@Model.Caption</caption>
     <thead>
@@ -11,16 +14,23 @@
         <th scope="col" class="text-end">Minimum</th>
         <th scope="col" class="text-end">Průměr</th>
         <th scope="col" class="text-end">Maximum</th>
-        <th scope="col" class="text-end">Počet smluv</th>
+        <th scope="col" class="text-end">Počet<br/>smluv</th>
         @if (!Model.HideDodavatelCount)
         {
-            <th scope="col" class="text-end">Počet dodavatelů</th>
+            <th scope="col" class="text-end">Počet<br/>dodavatelů</th>
         }
-        <th scope="col" class="text-end">Počet cen</th>
+        <th scope="col" class="text-end">Počet<br/>cen</th>
     </tr>
+        <tr>
+            <th></th>
+            <th class=""><div class="middle-line right">{</div></th>
+            <th class="text-center"><div class="middle-line left right"> Rozsah obvyklých cen </div></th>
+            <th class=""><div class="middle-line left ">}</div></th>
+            <th colspan="@(Model.HideDodavatelCount ? 5: 6 )"></th>
+        </tr>
     </thead>
     <tbody>
-    @foreach (var row in Model.Statistics.OrderBy(x => x.Name))
+    @foreach (var row in Model.Statistics.Where(m=> !string.IsNullOrEmpty(m.Name)).OrderBy(x => x.Name))
     {
         <tr>
             @if (string.IsNullOrEmpty(Model.LinkHref))
@@ -31,18 +41,18 @@
             {
                 <th scope="row"><a href="@Model.LinkHref/@row.Name">@row.Name</a></th>
             }
-            <td class="text-end">@row.DolniKvartil.ToString("N0")</td>
-            <td class="text-end">@row.Median.ToString("N0")</td>
-            <td class="text-end">@row.HorniKvartil.ToString("N0")</td>
-            <td class="text-end">@row.Minimum.ToString("N0")</td>
-            <td class="text-end">@row.Average.ToString("N0")</td>
-            <td class="text-end">@row.Maximum.ToString("N0")</td>
-            <td class="text-end">@row.ContractCount</td>
+            <td class="text-end number">@row.DolniKvartil.ToString("N0")</td>
+            <td class="text-end number">@row.Median.ToString("N0")</td>
+            <td class="text-end number">@row.HorniKvartil.ToString("N0")</td>
+            <td class="text-end number">@row.Minimum.ToString("N0")</td>
+            <td class="text-end number">@row.Average.ToString("N0")</td>
+            <td class="text-end number">@row.Maximum.ToString("N0")</td>
+            <td class="text-end number">@row.ContractCount</td>
             @if (!Model.HideDodavatelCount)
             {
-                <td class="text-end">@row.SupplierCount</td>
+                <td class="text-end number">@row.SupplierCount</td>
             }
-            <td class="text-end">@row.PriceCount</td>
+            <td class="text-end number">@row.PriceCount</td>
         </tr>
     }
     </tbody>

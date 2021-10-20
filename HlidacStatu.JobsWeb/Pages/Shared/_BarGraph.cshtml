@@ -24,7 +24,7 @@
 <figure class="highcharts-figure" style="max-width: 400px">
     <div id="@uniqueName"></div>
     <p class="highcharts-description">
-        Nějaký popis grafu.
+        @Model.Description
     </p>
 </figure>
 
@@ -46,10 +46,13 @@ Highcharts.chart('@uniqueName', {
         }
     },
     tooltip: {
-        headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-        pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-            '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
-        footerFormat: '</table>',
+        formatter: function () {
+            return '<p>Cenové rozpětí <b>' + this.x +
+                '-'+ (this.x+2000) + '</b> Kč bez DPH</p><p>' + this.y + ' smluv obsahuje ceny za den práce v tomto rozpětí</p>';
+        },
+        //headerFormat: '<p>Cenové rozpětí {point.key}-{point.key}</p><p>',
+        //pointFormat: '{point.y:.0f} smluv obsahuje ceny v tomto rozpětí',
+        //footerFormat: '</p>',
         shared: true,
         useHTML: true
     },
@@ -61,7 +64,7 @@ Highcharts.chart('@uniqueName', {
         }
     },
     series: [{
-        name: 'Cena',
+        name: 'Sazba na den pr8ce',
         data: [@Html.Raw(string.Join(",",res.Select(x => $"[{x.Klic * 2000},{x.pocet}]")))]
 
     }]

@@ -1,6 +1,7 @@
 @model HlidacStatu.JobsWeb.Models.Boxplot
 
 @{
+    string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
     Model.BasicData = Model.BasicData.OrderBy(x => x.Name).ToList();
     string compareData = "";
     if (Model.CompareWith != null)
@@ -8,11 +9,11 @@
         Model.CompareWith = Model.CompareWith
             .Where(x => Model.BasicData.Any(y => y.Name.Equals(x.Name, StringComparison.InvariantCultureIgnoreCase)))
             .OrderBy(x => x.Name).ToList();
-        
-        compareData = string.Join(",", 
+
+        compareData = string.Join(",",
             Model.CompareWith.Select(j => $"[{j.LeftWhisk:F0},{j.DolniKvartil:F0},{j.Median:F0},{j.HorniKvartil:F0},{j.RightWhisk:F0}]"));
     }
-    
+
     var outliers = new List<string>();
     for (int i = 0; i < Model.BasicData.Count; i++)
     {
@@ -30,29 +31,56 @@
     int tickInterval = 5000;
     int pixelsPerTick = 100;
     int tickCount = (int)Math.Ceiling(Model.BasicData.Max(x => x.Maximum) / tickInterval);
+    int height = Model.Height ?? tickCount * pixelsPerTick;
+
 
     int jobCount = Model.BasicData.Count;
     int pixelsPerJob = 100;
 
     string outliersData = string.Join(",", outliers);
-    
+
     string popisSerie = "'<span style=\"color:{point.color}\">●</span> <b> {series.name}</b><br/>90% percentil: {point.high}<br/>Horní kvartil: {point.q3}<br/>Medián: {point.median}<br/>Dolní kvartil: {point.q1}<br/>10% percentil: {point.low}<br/>'";
 }
 
 
 <figure class="highcharts-figure" style="max-width: @(100 + jobCount * pixelsPerJob)px">
-    <div id="chart-container"></div>
+    <div id="chart-container-@chartId"></div>
     <p class="highcharts-description">
-        Nějaký popis grafu.
+        Statistické rozložení cen prací vedle sebe ve stejném měřítku.
+    </p>
+    <p>
+        <button class="btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#boxChartInfo-@chartId" aria-expanded="false" aria-controls="boxChartInfo">
+           <i class="fas fa-question-circle"></i> Jak číst graf 'boxplot'
+        </button>
+        <div class="collapse" id="boxChartInfo-@chartId">
+            <div class="card card-body">
+                <p class="small">
+                    Diagram zobrazuje statistické rozložení cen všech typů prací vedle sebe ve stejném měřítku.
+                    Na ose x jsou jednotlivé typy prací, na ose y je cena. Boxplot se skládá z obdélníku,
+                    svislých čar (vousů) a teček.
+                </p>
+                <p class="small">
+                    Obvyklou cenu nejlépe charakterizuje obdélník. Spodní hrana obdélníku
+                    ukazuje dolní kvartil, horní hrana obdélníku ukazuje horní kvartil.
+                    Vodorovná čára uvnitř obdélníku ukazuje
+                    prostřední hodnotu (medián).
+                </p>
+                <p class="small">
+                    Svislé čáry, vousy, popisují variabilitu cenových údajů pod dolním a nad
+                    horním kvartilem. Tečky pak popisují odlehlé hodnoty - výjimečně nízké nebo vysoké ceny. Ceny zobrazené
+                    pomocí vousů a teček nedoporučujeme považovat za obvyklé ceny.
+                </p>
+            </div>
+        </div>
     </p>
 </figure>
-
+<div style="margin-bottom:20px;"></div>
 <script>
-Highcharts.chart('chart-container', {
+Highcharts.chart('chart-container-@(chartId)', {
 
     chart: {
         type: 'boxplot',
-        height: @(tickCount * pixelsPerTick)
+        height: @(height)
     },
 
     title: {
@@ -76,9 +104,9 @@ Highcharts.chart('chart-container', {
         tickInterval: @tickInterval,
         minorTickInterval: 1000,
         labels: {
-            format: '{value:,.0f} Kč'    
+            format: '{value:,.0f} Kč'
         }
-            
+
     },
 
     series: [{
