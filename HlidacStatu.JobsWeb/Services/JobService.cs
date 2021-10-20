@@ -182,7 +182,12 @@ namespace HlidacStatu.JobsWeb.Services
         public static List<(string ico, string nazev, int pocetSmluv)> GetDodavateleList()
         {
             return DodavatelOverview.Keys.Select(k =>
-                    (k, FirmaRepo.NameFromIco(k, true), DodavatelOverview[k].Sum(x => x.ContractCount)))
+                    (
+                        k, 
+                        FirmaRepo.NameFromIco(k, true), 
+                        DistinctJobs.Where(x => x.IcaDodavatelu.Any(i => i == k))
+                            .Select(x => x.SmlouvaId).Distinct().Count() 
+                    ))
                 .ToList();
         }
         
