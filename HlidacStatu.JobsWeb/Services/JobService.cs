@@ -17,12 +17,8 @@ namespace HlidacStatu.JobsWeb.Services
         
         public static List<JobPrecalculated> DistinctJobs { get; set; }
 
-        private static List<JobStatistics> JobOverview { get; set; }
-
-        private static Dictionary<string, List<JobStatistics>> TagOverview { get; set; }
-
-        private static Dictionary<string, List<JobStatistics>> OdberatelOverview { get; set; }
-        private static Dictionary<string, List<JobStatistics>> DodavatelOverview { get; set; }
+        private static Dictionary<YearlyStatisticsGroup.Key, YearlyStatisticsGroup> GlobalStats { get; set; }
+        
 
         //Meta informations
         public static DateTime LastRecalculationStarted { get; private set; }
@@ -49,6 +45,8 @@ namespace HlidacStatu.JobsWeb.Services
                 LastError = "";
                 var allJobs = await InDocJobsRepo.GetAllJobsWithRelatedDataAsync();
 
+                // Připraví plochou strukturu a odstraní případné duplicity u jobů, kde může být více dodavatelů
+                // Také je možné rozšířit v tomto místě o odstranění duplicit
                 // important to filter duplicates here, can be extended in future
                 DistinctJobs = allJobs
                     .GroupBy(j => j.JobPk)
@@ -73,14 +71,28 @@ namespace HlidacStatu.JobsWeb.Services
                             IcaDodavatelu = g.Select(i => i.IcoDodavatele).ToArray(),
                         };
                     }).ToList();
+                
+                //pro každou kombinaci roku a subjektu
+                var uniqueYearSubjectCombinations = DistinctJobs.Select(x => new YearlyStatisticsGroup.Key()
+                {
+                    Obor = x.Subject,
+                    Rok = x.Year
+                }).Distinct().ToList();
 
-                CalculateJobs(DistinctJobs);
+                foreach (var key in uniqueYearSubjectCombinations)
+                {
+                    var yearlyStatisticsGroup = new YearlyStatisticsGroup()
+                    {
+                        KeyInfo = key,
+                        JobStatistics = CalculateJobs(DistinctJobs, key),
+                        TagStatistics = CalculateTags(DistinctJobs, key),
+                        OdberateleStatistics = CalculateOdberatele(DistinctJobs, key),
+                        DodavateleStatistics = CalculateDodavatele(DistinctJobs, key),
+                    };
 
-                CalculateTags(DistinctJobs);
+                    GlobalStats.TryAdd(key, yearlyStatisticsGroup);
+                }
 
-                CalculateOdberatele(DistinctJobs);
-
-                CalculateDodavatele(DistinctJobs);
             }
             catch (Exception e)
             {
@@ -92,20 +104,20 @@ namespace HlidacStatu.JobsWeb.Services
             IsRecalculating = false;
         }
 
-        private static void CalculateJobs(List<JobPrecalculated> distinctJobs)
+        private static List<JobStatistics> CalculateJobs(List<JobPrecalculated> distinctJobs, YearlyStatisticsGroup.Key key)
         {
-            JobOverview = distinctJobs
+            return distinctJobs
+                .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
                 .GroupBy(j => j.JobGrouped)
                 .Select(g => new JobStatistics(g, g.Key))
                 .Where(s => s.PriceCount >= _minimumPriceCount)
                 .ToList();
-                
-            JobRecalculationEnd = DateTime.Now;
         }
 
-        private static void CalculateTags(List<JobPrecalculated> distinctJobs)
+        private static Dictionary<string, List<JobStatistics>> CalculateTags(List<JobPrecalculated> distinctJobs, YearlyStatisticsGroup.Key key)
         {
-            TagOverview = distinctJobs
+            return distinctJobs
+                .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
                 .SelectMany(j => j.Tags, (precalculated, tag) => new { precalculated, dodavatel = tag })
                 .GroupBy(j => j.precalculated.JobGrouped)
                 .ToDictionary(g => g.Key, g =>
@@ -114,12 +126,13 @@ namespace HlidacStatu.JobsWeb.Services
                         .Where(s => s.PriceCount >= _minimumPriceCount)
                         .ToList()
                 );
-            TagRecalculationEnd = DateTime.Now;
+
         }
 
-        private static void CalculateOdberatele(List<JobPrecalculated> distinctJobs)
+        private static Dictionary<string, List<JobStatistics>> CalculateOdberatele(List<JobPrecalculated> distinctJobs, YearlyStatisticsGroup.Key key)
         {
-            OdberatelOverview = distinctJobs
+            var results = distinctJobs
+                .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
                 .GroupBy(j => j.IcoOdberatele)
                 .ToDictionary(g => g.Key, g =>
                     g.GroupBy(i => i.JobGrouped)
@@ -127,13 +140,16 @@ namespace HlidacStatu.JobsWeb.Services
                         .Where(s => s.PriceCount >= _minimumPriceCount)
                         .ToList()
                 );
-            OdberatelOverview = OdberatelOverview.Where(x => x.Value.Count > 0).ToDictionary(x => x.Key, x => x.Value);
-            OdberateleRecalculationEnd = DateTime.Now;
+            
+            // clear empty records 
+            return results.Where(x => x.Value.Count > 0).ToDictionary(x => x.Key, x => x.Value);
+
         }
 
-        private static void CalculateDodavatele(List<JobPrecalculated> distinctJobs)
+        private static Dictionary<string, List<JobStatistics>> CalculateDodavatele(List<JobPrecalculated> distinctJobs, YearlyStatisticsGroup.Key key)
         {
-            DodavatelOverview = distinctJobs
+            var results = distinctJobs
+                .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
                 .SelectMany(j => j.IcaDodavatelu, (precalculated, dodavatel) => new { precalculated, dodavatel })
                 .GroupBy(j => j.dodavatel)
                 .ToDictionary(g => g.Key, g =>
@@ -142,19 +158,19 @@ namespace HlidacStatu.JobsWeb.Services
                         .Where(s => s.PriceCount >= _minimumPriceCount)
                         .ToList()
                 );
-            DodavatelOverview = DodavatelOverview.Where(x => x.Value.Count > 0).ToDictionary(x => x.Key, x => x.Value);
-            DodavateleRecalculationEnd = DateTime.Now;
+            return results.Where(x => x.Value.Count > 0).ToDictionary(x => x.Key, x => x.Value);
+
         }
 
 
         public static List<JobStatistics> GetStatistics()
         {
-            return JobOverview;
+            return JobStatistics;
         }
 
         public static List<JobStatistics> GetTagStatistics(string jobName)
         {
-            if (TagOverview.TryGetValue(jobName, out var result))
+            if (TagStatistics.TryGetValue(jobName, out var result))
             {
                 return result;
             }
@@ -162,16 +178,19 @@ namespace HlidacStatu.JobsWeb.Services
             return result;
         }
 
+        // jak to udělat správně? protože je to po letech? Jak to bude na FE?
+        // a) zobrazovat roky a po vybrání roku obory a po vybrání oboru firmy?
+        // b) zobrazovat firmy a po vybrání firmy nabídnout roky?
         public static List<(string ico, string nazev, int pocetSmluv)> GetOdberateleList()
         {
-            return OdberatelOverview.Keys.Select(k =>
-                    (k, FirmaRepo.NameFromIco(k, true), OdberatelOverview[k].Sum(x => x.ContractCount)))
+            return OdberateleStatistics.Keys.Select(k =>
+                    (k, FirmaRepo.NameFromIco(k, true), OdberateleStatistics[k].Sum(x => x.ContractCount)))
                 .ToList();
         }
         
         public static List<JobStatistics> GetOdberatelStatitstics(string ico)
         {
-            if (OdberatelOverview.TryGetValue(ico, out var result))
+            if (OdberateleStatistics.TryGetValue(ico, out var result))
             {
                 return result;
             }
@@ -181,7 +200,7 @@ namespace HlidacStatu.JobsWeb.Services
 
         public static List<(string ico, string nazev, int pocetSmluv)> GetDodavateleList()
         {
-            return DodavatelOverview.Keys.Select(k =>
+            return DodavateleStatistics.Keys.Select(k =>
                     (
                         k, 
                         FirmaRepo.NameFromIco(k, true), 
@@ -193,7 +212,7 @@ namespace HlidacStatu.JobsWeb.Services
         
         public static List<JobStatistics> GetDodavatelStatistics(string ico)
         {
-            if (DodavatelOverview.TryGetValue(ico, out var result))
+            if (DodavateleStatistics.TryGetValue(ico, out var result))
             {
                 return result;
             }
