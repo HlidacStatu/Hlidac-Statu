@@ -8,8 +8,13 @@
 
     bool showStatistics = !string.IsNullOrWhiteSpace(Model.Obor); 
     var statistics = new List<JobStatistics>();
+    var key = new YearlyStatisticsGroup.Key()
+    {
+        Obor = "IT",
+        Rok = 2020
+    };
     if(showStatistics)
-        statistics = JobService.GetTagStatistics(Model.Obor);
+        statistics = JobService.GetTagStatistics(Model.Obor, key);
     var graphModel = new Boxplot()
     {
         BasicData = statistics

@@ -64,7 +64,7 @@ Highcharts.chart('@uniqueName', {
         }
     },
     series: [{
-        name: 'Sazba na den pr8ce',
+        name: 'Sazba na den práce',
         data: [@Html.Raw(string.Join(",",res.Select(x => $"[{x.Klic * 2000},{x.pocet}]")))]
 
     }]

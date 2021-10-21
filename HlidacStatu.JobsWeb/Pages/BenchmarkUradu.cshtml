@@ -9,13 +9,18 @@
 
     bool showStatistics = !string.IsNullOrWhiteSpace(Model.Ico);
     var statistics = new List<JobStatistics>();
+    var key = new YearlyStatisticsGroup.Key()
+    {
+        Obor = "IT",
+        Rok = 2020
+    };
     if (showStatistics)
-        statistics = JobService.GetOdberatelStatitstics(Model.Ico);
+        statistics = JobService.GetOdberatelStatitstics(Model.Ico, key);
     
     var graphModel = new Boxplot()
     {
         BasicData = statistics,
-        CompareWith = JobService.GetStatistics()
+        CompareWith = JobService.GetStatistics(key)
     };
     
     var tableModel = new TableViewModel()
@@ -44,7 +49,7 @@
     <label class="input-group-text" for="selectNavigace">Vyberte úřad:</label>
     <select class="form-select" id="selectNavigace">
         <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte úřad...</option>
-        @foreach (var (ico, nazev, pocetSmluv) in JobService.GetOdberateleList().OrderByDescending(x => x.pocetSmluv))
+        @foreach (var (ico, nazev, pocetSmluv) in JobService.GetOdberateleList(key).OrderByDescending(x => x.pocetSmluv))
         {
             <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetSmluv smluv)</option>
         }

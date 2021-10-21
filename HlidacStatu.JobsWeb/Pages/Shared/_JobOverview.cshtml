@@ -5,8 +5,13 @@
 @{
     bool showStatistics = !string.IsNullOrWhiteSpace(Model.Statistics.Name); 
     var statistics = new List<JobStatistics>();
+    var key = new YearlyStatisticsGroup.Key()
+    {
+        Obor = "IT",
+        Rok = 2020
+    };
     if(showStatistics)
-        statistics = JobService.GetTagStatistics(Model.Statistics.Name);
+        statistics = JobService.GetTagStatistics(Model.Statistics.Name, key);
     
     var histogram = new BarGraph()
     {
