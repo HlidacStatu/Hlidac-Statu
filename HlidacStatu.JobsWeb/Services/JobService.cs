@@ -17,7 +17,7 @@ namespace HlidacStatu.JobsWeb.Services
         
         public static List<JobPrecalculated> DistinctJobs { get; set; }
 
-        private static Dictionary<YearlyStatisticsGroup.Key, YearlyStatisticsGroup> GlobalStats { get; set; }
+        private static Dictionary<YearlyStatisticsGroup.Key, YearlyStatisticsGroup> GlobalStats { get; } = new();
         
 
         //Meta informations
@@ -163,14 +163,15 @@ namespace HlidacStatu.JobsWeb.Services
         }
 
 
-        public static List<JobStatistics> GetStatistics()
+        public static List<JobStatistics> GetStatistics(YearlyStatisticsGroup.Key key)
         {
-            return JobStatistics;
+            return GlobalStats[key].JobStatistics;
+            
         }
 
-        public static List<JobStatistics> GetTagStatistics(string jobName)
+        public static List<JobStatistics> GetTagStatistics(string jobName, YearlyStatisticsGroup.Key key)
         {
-            if (TagStatistics.TryGetValue(jobName, out var result))
+            if (GlobalStats[key].TagStatistics.TryGetValue(jobName, out var result))
             {
                 return result;
             }
@@ -181,16 +182,20 @@ namespace HlidacStatu.JobsWeb.Services
         // jak to udělat správně? protože je to po letech? Jak to bude na FE?
         // a) zobrazovat roky a po vybrání roku obory a po vybrání oboru firmy?
         // b) zobrazovat firmy a po vybrání firmy nabídnout roky?
-        public static List<(string ico, string nazev, int pocetSmluv)> GetOdberateleList()
+        public static List<(string ico, string nazev, int pocetSmluv)> GetOdberateleList(YearlyStatisticsGroup.Key key)
         {
-            return OdberateleStatistics.Keys.Select(k =>
-                    (k, FirmaRepo.NameFromIco(k, true), OdberateleStatistics[k].Sum(x => x.ContractCount)))
+            return GlobalStats[key].OdberateleStatistics.Keys.Select(k =>
+                    (
+                        k, 
+                        FirmaRepo.NameFromIco(k, true), 
+                        DistinctJobs.Where(x => x.IcoOdberatele == k)
+                            .Select(x => x.SmlouvaId).Distinct().Count()))
                 .ToList();
         }
         
-        public static List<JobStatistics> GetOdberatelStatitstics(string ico)
+        public static List<JobStatistics> GetOdberatelStatitstics(string ico, YearlyStatisticsGroup.Key key)
         {
-            if (OdberateleStatistics.TryGetValue(ico, out var result))
+            if (GlobalStats[key].OdberateleStatistics.TryGetValue(ico, out var result))
             {
                 return result;
             }
@@ -198,9 +203,9 @@ namespace HlidacStatu.JobsWeb.Services
             return result;
         }
 
-        public static List<(string ico, string nazev, int pocetSmluv)> GetDodavateleList()
+        public static List<(string ico, string nazev, int pocetSmluv)> GetDodavateleList(YearlyStatisticsGroup.Key key)
         {
-            return DodavateleStatistics.Keys.Select(k =>
+            return GlobalStats[key].DodavateleStatistics.Keys.Select(k =>
                     (
                         k, 
                         FirmaRepo.NameFromIco(k, true), 
@@ -210,9 +215,9 @@ namespace HlidacStatu.JobsWeb.Services
                 .ToList();
         }
         
-        public static List<JobStatistics> GetDodavatelStatistics(string ico)
+        public static List<JobStatistics> GetDodavatelStatistics(string ico, YearlyStatisticsGroup.Key key)
         {
-            if (DodavateleStatistics.TryGetValue(ico, out var result))
+            if (GlobalStats[key].DodavateleStatistics.TryGetValue(ico, out var result))
             {
                 return result;
             }

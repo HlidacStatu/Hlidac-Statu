@@ -5,7 +5,12 @@
 @model PdfModel
 
 @{
-    var statistics = JobService.GetStatistics();
+    var key = new YearlyStatisticsGroup.Key()
+    {
+        Obor = "IT",
+        Rok = 2020
+    };
+    var statistics = JobService.GetStatistics(key);
     int rok = 2020;
     int pocetSmluv = JobService.DistinctJobs.Select(m => m.SmlouvaId).Distinct().Count();
     int pocetZadavatelu = JobService.DistinctJobs.Select(m => m.IcoOdberatele).Distinct().Count();

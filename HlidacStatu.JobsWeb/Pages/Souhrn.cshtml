@@ -6,7 +6,12 @@
 @{
     ViewData["Title"] = "Souhrnné statistiky";
 
-    var statistics = JobService.GetStatistics();
+    var key = new YearlyStatisticsGroup.Key()
+    {
+        Obor = "IT",
+        Rok = 2020
+    };
+    var statistics = JobService.GetStatistics(key);
     var graphModel = new Boxplot()
     {
         BasicData = statistics
