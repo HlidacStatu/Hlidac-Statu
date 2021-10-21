@@ -1,5 +1,6 @@
 ﻿@using HlidacStatu.Datastructures.Graphs
 @using HlidacStatu.Extensions;
+@using HlidacStatu.Repositories
 @using HlidacStatu.Web.TagHelpers;
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.Extensions.Primitives
@@ -33,7 +34,71 @@
 }
 @section breadcrumb
 {
-    <ol class="breadcrumb">
+
+    @{
+        var items = new List<Schema.NET.IListItem>()
+{
+            new Schema.NET.ListItem()
+            {
+                Item = new Schema.NET.WebPage()
+                {
+                    Name="Hlídač státu",
+                    Url= new Uri( "https://www.hlidacstatu.cz"),
+                    Id=new Uri( "https://www.hlidacstatu.cz")
+                }
+            },
+            new Schema.NET.ListItem()
+            {
+                Item = new Schema.NET.WebPage()
+                {
+                    Name="Osoby",
+                    Id = new Uri("https://www.hlidacstatu.cz/osoby/")
+                }
+            }
+        };
+        if (Model.viewName.ToLower() != "index")
+        {
+            items.Add(new Schema.NET.ListItem()
+            {
+                Item = new Schema.NET.Person()
+                {
+                    Name = Model.osoba.FullNameWithYear(),
+                    Description = HlidacStatu.Util.InfoFact.RenderInfoFacts(Model.osoba.InfoFacts(), 4, true, true, ", "),
+                    FamilyName = Model.osoba.Prijmeni,
+                    GivenName = Model.osoba.Jmeno,
+                    Image = Model.osoba.HasPhoto() ? new Uri(Model.osoba.GetPhotoUrl(false)) : null,
+                    Brand = new Schema.NET.Brand(){
+                        Name= Model.osoba.CurrentPoliticalParty(),                       
+                    },
+                    Url = new Uri("https://www.hlidacstatu.cz/osoba/" + Model.osoba.NameId),
+                    Id = new Uri("https://www.hlidacstatu.cz/osoba/" + Model.osoba.NameId)
+                }
+            }) ;
+            items.Add(new Schema.NET.ListItem()
+            {
+                Item = new Schema.NET.WebPage()
+                {
+                    Name = ViewBag.Title
+                }
+            });
+        }
+        else
+        {
+            items.Add(new Schema.NET.ListItem()
+            {
+                Item = new Schema.NET.Person()
+                {
+                    Name = Model.osoba.FullNameWithYear(),
+                    Id = new Uri("https://www.hlidacstatu.cz/osoba/" + Model.osoba.NameId)
+                }
+            });
+        }
+
+        var breadCr = new Schema.NET.BreadcrumbList() { ItemListElement = items };
+    }
+
+    @Html.RenderBreadcrumb(breadCr)
+    @*<ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
         <li>Osoby</li>
         @if (Model.viewName.ToLower() != "index")
@@ -45,7 +110,7 @@
         {
             <li class="active">@Model.osoba.FullNameWithYear()</li>
         }
-    </ol>
+    </ol>*@
 }
 
 @section scripts

@@ -22,26 +22,83 @@
 {
 
     @if (Model.firma != null
-        && HlidacStatu.Web.Framework.Constants.DontIndexICOS.Contains(Model.firma.ICO.ToLower()))
+ && HlidacStatu.Web.Framework.Constants.DontIndexICOS.Contains(Model.firma.ICO.ToLower()))
     {
         <meta name="robots" content="noindex, noarchive">
     }
 }
 @section breadcrumb
 {
-    <ol class="breadcrumb">
-        <li><a href="/">Hlídač Státu</a></li>
-        <li><a href="/adresar">Úřady a firmy</a></li>
-        @if (Model.viewName.ToLower() != "index")
+    @{
+        var items = new List<Schema.NET.IListItem>()
+{
+            new Schema.NET.ListItem()
+            {
+                Item = new Schema.NET.WebPage()
+                {
+                    Name="Hlídač státu",
+                    Url= new Uri( "https://www.hlidacstatu.cz"),
+                    Id=new Uri( "https://www.hlidacstatu.cz")
+                }
+            },
+            new Schema.NET.ListItem()
+            {
+                Item = new Schema.NET.WebPage()
+                {
+                    Name="Úřady a firmy",
+                    Url= new Uri( "https://www.hlidacstatu.cz/Adresar/"),
+                    Id = new Uri( "https://www.hlidacstatu.cz/Adresar/")
+                }
+            }
+        };
+        if (Model.viewName.ToLower() != "index")
         {
-            <li><a href="/subjekt/@Model.firma.ICO">@Model.firma.Jmeno</a></li>
-            <li class="active">@ViewBag.Title</li>
+            items.Add(new Schema.NET.ListItem()
+            {
+                Item = new Schema.NET.WebPage()
+                {
+                    Name = Model.firma.Jmeno,
+                    Url = new Uri("https://www.hlidacstatu.cz/subjekt/" + Model.firma.ICO),
+                    Id = new Uri("https://www.hlidacstatu.cz/subjekt/" + Model.firma.ICO)
+                }
+            });
+            items.Add(new Schema.NET.ListItem()
+            {
+                Item = new Schema.NET.WebPage()
+                {
+                    Name = ViewBag.Title
+                }
+            });
         }
         else
         {
-            <li class="active">@Model.firma.Jmeno</li>
+            items.Add(new Schema.NET.ListItem()
+            {
+                Item = new Schema.NET.WebPage()
+                {
+                    Name = Model.firma.Jmeno
+                }
+            });
         }
-    </ol>
+
+        var breadCr = new Schema.NET.BreadcrumbList() { ItemListElement = items };
+    }
+
+    @Html.RenderBreadcrumb(breadCr)
+
+    @*<ol class="breadcrumb">
+            <li><a href="/">Hlídač Státu</a></li>
+            <li><a href="/adresar">Úřady a firmy</a></li>
+            @if (Model.viewName.ToLower() != "index")
+            {
+                <li><a href="/subjekt/@Model.firma.ICO">@Model.firma.Jmeno</a></li>
+                <li class="active">@ViewBag.Title</li>
+            }
+            else
+            {
+                <li class="active">@Model.firma.Jmeno</li>
+            }
+        </ol>*@
 }
 
 @section scripts
@@ -61,7 +118,7 @@
     @*@Html.Action("Osoba_child", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed" })*@
 
     <a href="@Model.firma.GetUrl(false)" target="_top">
-    <img src="@($"https://www.hlidacstatu.cz/socialbanner/subjekt?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.firma.ICO)" style="width:95%;height:auto;max-width:@(ViewBag.MaxWidth)px" />
+        <img src="@($"https://www.hlidacstatu.cz/socialbanner/subjekt?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.firma.ICO)" style="width:95%;height:auto;max-width:@(ViewBag.MaxWidth)px" />
     </a>
 }
 <style>
@@ -141,7 +198,7 @@
 
     @* Prázdný sloupec *@
     <div class="col-sm-1 order-2"></div>
-    <cache  enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
+    <cache enabled="@(!System.Diagnostics.Debugger.IsAttached)" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.firma.ICO}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
         <partial name="@Model.viewName" model="@Model.firma" />
     </cache>
 

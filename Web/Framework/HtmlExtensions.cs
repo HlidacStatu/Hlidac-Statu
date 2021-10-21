@@ -23,6 +23,39 @@ namespace HlidacStatu.Web.Framework
 #endif
         }
 
+        public static IHtmlContent RenderBreadcrumb(this IHtmlHelper htmlHelper, Schema.NET.BreadcrumbList data)
+        {
+            Uri baseUri = new Uri("https://www.hlidacstatu.cz");
+            if (data == null)
+                return htmlHelper.Raw(string.Empty);
+            if (data.ItemListElement.Count == 0)
+                return htmlHelper.Raw(string.Empty);
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            sb.AppendLine("<ol class=\"breadcrumb\">");
+            var loc = 1;
+            foreach (Schema.NET.IListItem item in data.ItemListElement)
+            {
+                item.Position = loc;
+
+                if (item.Item.HasOne && item.Item.First().Url.HasOne)
+                {
+                    sb.AppendLine($"<li><a href=\"/{baseUri.MakeRelativeUri(item.Item.First().Url.First()).ToString()}\">{htmlHelper.Encode(item.Item.First().Name)}</a></li>");
+                }
+                else
+                    sb.AppendLine($"<li>{htmlHelper.Encode(item.Item.First().Name)}</li>");
+                loc++;
+            }
+            sb.AppendLine("</ol>");
+            sb.AppendLine("<script type=\"application/ld+json\">");
+            sb.AppendLine(data.ToHtmlEscapedString());
+            sb.AppendLine("</script>");
+
+
+            return htmlHelper.Raw(sb.ToString());
+        }
+
+
         public static IHtmlContent KIndexIcon(this IHtmlHelper htmlHelper, string ico, int heightInPx = 15, string hPadding = "3px", string vPadding = "0", bool showNone = false, bool useTemp = false)
         {
             return htmlHelper.KIndexIcon(ico, $"padding:{vPadding} {hPadding};height:{heightInPx}px;width:auto", showNone, useTemp);
