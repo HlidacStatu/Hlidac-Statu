@@ -4,32 +4,37 @@
     var obory = JobService.DistinctJobs
         .GroupBy(x => x.Subject)
         .ToDictionary(k => k.Key, v => v.Select(x => x.Year).Distinct().ToList());
-
-    obory["IT"].Add(2021);
-    obory["IT"].Add(2022);
-
-
+    
+    var key = Context.TryFindKey();
 }
 
 <form>
-    <div class="row">
+    <div class="row container">
         <div class="col-auto">
             <label class="col-form-label">Vyberte obor a rok</label>
         </div>
         
         <div class="col-auto">
             <select class="form-select" name="obor" id="obor_selector">
-                <option disabled selected> -- vyberte obor -- </option>
+                <option disabled selected="@(!key.HasValue)"> -- vyberte obor -- </option>
                 @foreach (var obor in obory)
                 {
-                    <option value="@obor.Key" data-years="@string.Join(';', obor.Value)">@obor.Key</option>
+                    <option value="@obor.Key" selected="@(obor.Key == key?.Obor)" data-years="[@string.Join(',', obor.Value)]">@obor.Key</option>
                 }
             </select>
         </div>
 
         <div class="col-auto">
             <select class="form-select" name="rok" id="year_selecor">
-                <option disabled selected> -- vyberte rok -- </option>
+                <option disabled selected="@(!key.HasValue)"> -- vyberte rok -- </option>
+                @if (key.HasValue)
+                {
+                    foreach (var rok in obory[key?.Obor])
+                    {
+                        <option value="@rok" selected="@(rok == key?.Rok)">@rok</option>
+                    }
+                }
+                
             </select>
         </div>
 
@@ -45,7 +50,7 @@ $('#obor_selector').change(function() {
     $('#year_selecor').empty()
         .append('<option disabled selected> -- vyberte rok -- </option>');
     
-    years.split(';').forEach(y => {
+    years.forEach(y => {
         $('#year_selecor')
             .append('<option value="' + y + '">' + y + '</option>')
     });
