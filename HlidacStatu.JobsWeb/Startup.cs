@@ -1,14 +1,18 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.JobsWeb.Models;
 using HlidacStatu.JobsWeb.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Nest;
 
 namespace HlidacStatu.JobsWeb
 {
@@ -29,20 +33,18 @@ namespace HlidacStatu.JobsWeb
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
 
-            Task.Run(async () => await JobService.RecalculateAsync() ).GetAwaiter().GetResult();
-            
+            Task.Run(async () => await JobService.RecalculateAsync()).GetAwaiter().GetResult();
+
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             // for scoped services (mainly for identity)
             services.AddDbContext<DbEntities>(options =>
                 options.UseSqlServer(connectionString));
-            
+
             AddIdentity(services);
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddRazorPages()
                 .AddRazorRuntimeCompilation();
-            
-            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -68,9 +70,30 @@ namespace HlidacStatu.JobsWeb
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.Use(async (context, next) =>
+            {
+                var req = context.Request.Query;
+                var reqStr = context.Request.QueryString;
+
+                if (req.TryGetValue("obor", out var oborValues))
+                {
+                    if (req.TryGetValue("rok", out var rokValues) 
+                        && int.TryParse(rokValues.FirstOrDefault(), out int rok))
+                    {
+                        string obor = oborValues.FirstOrDefault();
+                        
+                        context.Items.Add("obor", obor);
+                        context.Items.Add("rok", rok);
+                        
+                    }
+                }
+
+                await next();
+            });
+
             app.UseEndpoints(endpoints => { endpoints.MapRazorPages(); });
         }
-        
+
         private void AddIdentity(IServiceCollection services)
         {
             services.AddDefaultIdentity<ApplicationUser>(options =>
@@ -87,7 +110,6 @@ namespace HlidacStatu.JobsWeb
 
                     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
                     options.Lockout.MaxFailedAccessAttempts = 5;
-
                 })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DbEntities>();

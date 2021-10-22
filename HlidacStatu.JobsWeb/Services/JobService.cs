@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.JobsWeb.Models;
 using HlidacStatu.Repositories;
-using MathNet.Numerics.Statistics;
+using Microsoft.AspNetCore.Http;
 
 namespace HlidacStatu.JobsWeb.Services
 {
@@ -14,11 +14,11 @@ namespace HlidacStatu.JobsWeb.Services
         // make it "in memory", load it asynchronously, recalculate once a day?
         //private static List<JobPrecalculated> DistinctJobs { get; set; }
         private static readonly int _minimumPriceCount = 5;
-        
+
         public static List<JobPrecalculated> DistinctJobs { get; set; }
 
         private static Dictionary<YearlyStatisticsGroup.Key, YearlyStatisticsGroup> GlobalStats { get; } = new();
-        
+
 
         //Meta informations
         public static DateTime LastRecalculationStarted { get; private set; }
@@ -52,7 +52,8 @@ namespace HlidacStatu.JobsWeb.Services
                     .GroupBy(j => j.JobPk)
                     .Select(g =>
                     {
-                        var (net, vat) = HlidacStatu.DetectJobs.InTables.FixSalaries(g.FirstOrDefault().SalaryMd, g.FirstOrDefault().SalaryMdVat);
+                        var (net, vat) = HlidacStatu.DetectJobs.InTables.FixSalaries(g.FirstOrDefault().SalaryMd,
+                            g.FirstOrDefault().SalaryMdVat);
                         var tags = g.FirstOrDefault().Tags?.Split("|",
                             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                         if (tags == null || tags.Length == 0)
@@ -71,7 +72,7 @@ namespace HlidacStatu.JobsWeb.Services
                             IcaDodavatelu = g.Select(i => i.IcoDodavatele).ToArray(),
                         };
                     }).ToList();
-                
+
                 //pro každou kombinaci roku a subjektu
                 var uniqueYearSubjectCombinations = DistinctJobs.Select(x => new YearlyStatisticsGroup.Key()
                 {
@@ -92,7 +93,6 @@ namespace HlidacStatu.JobsWeb.Services
 
                     GlobalStats.TryAdd(key, yearlyStatisticsGroup);
                 }
-
             }
             catch (Exception e)
             {
@@ -104,7 +104,8 @@ namespace HlidacStatu.JobsWeb.Services
             IsRecalculating = false;
         }
 
-        private static List<JobStatistics> CalculateJobs(List<JobPrecalculated> distinctJobs, YearlyStatisticsGroup.Key key)
+        private static List<JobStatistics> CalculateJobs(List<JobPrecalculated> distinctJobs,
+            YearlyStatisticsGroup.Key key)
         {
             return distinctJobs
                 .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
@@ -114,7 +115,8 @@ namespace HlidacStatu.JobsWeb.Services
                 .ToList();
         }
 
-        private static Dictionary<string, List<JobStatistics>> CalculateTags(List<JobPrecalculated> distinctJobs, YearlyStatisticsGroup.Key key)
+        private static Dictionary<string, List<JobStatistics>> CalculateTags(List<JobPrecalculated> distinctJobs,
+            YearlyStatisticsGroup.Key key)
         {
             return distinctJobs
                 .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
@@ -122,14 +124,14 @@ namespace HlidacStatu.JobsWeb.Services
                 .GroupBy(j => j.precalculated.JobGrouped)
                 .ToDictionary(g => g.Key, g =>
                     g.GroupBy(i => i.dodavatel)
-                        .Select(ig => new JobStatistics(ig.Select(x=> x.precalculated), ig.Key))
+                        .Select(ig => new JobStatistics(ig.Select(x => x.precalculated), ig.Key))
                         .Where(s => s.PriceCount >= _minimumPriceCount)
                         .ToList()
                 );
-
         }
 
-        private static Dictionary<string, List<JobStatistics>> CalculateOdberatele(List<JobPrecalculated> distinctJobs, YearlyStatisticsGroup.Key key)
+        private static Dictionary<string, List<JobStatistics>> CalculateOdberatele(List<JobPrecalculated> distinctJobs,
+            YearlyStatisticsGroup.Key key)
         {
             var results = distinctJobs
                 .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
@@ -140,13 +142,13 @@ namespace HlidacStatu.JobsWeb.Services
                         .Where(s => s.PriceCount >= _minimumPriceCount)
                         .ToList()
                 );
-            
+
             // clear empty records 
             return results.Where(x => x.Value.Count > 0).ToDictionary(x => x.Key, x => x.Value);
-
         }
 
-        private static Dictionary<string, List<JobStatistics>> CalculateDodavatele(List<JobPrecalculated> distinctJobs, YearlyStatisticsGroup.Key key)
+        private static Dictionary<string, List<JobStatistics>> CalculateDodavatele(List<JobPrecalculated> distinctJobs,
+            YearlyStatisticsGroup.Key key)
         {
             var results = distinctJobs
                 .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
@@ -154,19 +156,17 @@ namespace HlidacStatu.JobsWeb.Services
                 .GroupBy(j => j.dodavatel)
                 .ToDictionary(g => g.Key, g =>
                     g.GroupBy(i => i.precalculated.JobGrouped)
-                        .Select(ig => new JobStatistics(ig.Select(x=> x.precalculated), ig.Key))
+                        .Select(ig => new JobStatistics(ig.Select(x => x.precalculated), ig.Key))
                         .Where(s => s.PriceCount >= _minimumPriceCount)
                         .ToList()
                 );
             return results.Where(x => x.Value.Count > 0).ToDictionary(x => x.Key, x => x.Value);
-
         }
 
 
         public static List<JobStatistics> GetStatistics(YearlyStatisticsGroup.Key key)
         {
             return GlobalStats[key].JobStatistics;
-            
         }
 
         public static List<JobStatistics> GetTagStatistics(string jobName, YearlyStatisticsGroup.Key key)
@@ -185,14 +185,14 @@ namespace HlidacStatu.JobsWeb.Services
         public static List<(string ico, string nazev, int pocetSmluv)> GetOdberateleList(YearlyStatisticsGroup.Key key)
         {
             return GlobalStats[key].OdberateleStatistics.Keys.Select(k =>
-                    (
-                        k, 
-                        FirmaRepo.NameFromIco(k, true), 
-                        DistinctJobs.Where(x => x.IcoOdberatele == k)
-                            .Select(x => x.SmlouvaId).Distinct().Count()))
+                (
+                    k,
+                    FirmaRepo.NameFromIco(k, true),
+                    DistinctJobs.Where(x => x.IcoOdberatele == k)
+                        .Select(x => x.SmlouvaId).Distinct().Count()))
                 .ToList();
         }
-        
+
         public static List<JobStatistics> GetOdberatelStatitstics(string ico, YearlyStatisticsGroup.Key key)
         {
             if (GlobalStats[key].OdberateleStatistics.TryGetValue(ico, out var result))
@@ -206,15 +206,15 @@ namespace HlidacStatu.JobsWeb.Services
         public static List<(string ico, string nazev, int pocetSmluv)> GetDodavateleList(YearlyStatisticsGroup.Key key)
         {
             return GlobalStats[key].DodavateleStatistics.Keys.Select(k =>
-                    (
-                        k, 
-                        FirmaRepo.NameFromIco(k, true), 
-                        DistinctJobs.Where(x => x.IcaDodavatelu.Any(i => i == k))
-                            .Select(x => x.SmlouvaId).Distinct().Count() 
-                    ))
+                (
+                    k,
+                    FirmaRepo.NameFromIco(k, true),
+                    DistinctJobs.Where(x => x.IcaDodavatelu.Any(i => i == k))
+                        .Select(x => x.SmlouvaId).Distinct().Count()
+                ))
                 .ToList();
         }
-        
+
         public static List<JobStatistics> GetDodavatelStatistics(string ico, YearlyStatisticsGroup.Key key)
         {
             if (GlobalStats[key].DodavateleStatistics.TryGetValue(ico, out var result))
@@ -228,6 +228,30 @@ namespace HlidacStatu.JobsWeb.Services
         public static List<JobPrecalculated> GetDistinctJobs()
         {
             return DistinctJobs;
+        }
+
+
+        public static YearlyStatisticsGroup.Key? TryFindKey(this HttpContext context)
+        {
+            if (context.Items.TryGetValue("obor", out var oborObject))
+            {
+                if (context.Items.TryGetValue("rok", out var rokObject))
+                {
+                    string obor = oborObject as string;
+                    int rok = rokObject as int? ?? 0;
+                    if (!string.IsNullOrEmpty(obor) && rok > 0)
+                    {
+                        var key = new YearlyStatisticsGroup.Key()
+                        {
+                            Obor = obor,
+                            Rok = rok
+                        };
+                        return key;
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

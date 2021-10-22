@@ -6,26 +6,29 @@
 @{
     ViewData["Title"] = "Souhrnné statistiky";
 
-    var key = new YearlyStatisticsGroup.Key()
+    bool isKeyValid = false;
+    Boxplot graphModel = new Boxplot();
+    TableViewModel tableModel = new TableViewModel();
+    
+    if (Model.Key is not null)
     {
-        Obor = "IT",
-        Rok = 2020
-    };
-    var statistics = JobService.GetStatistics(key);
-    var graphModel = new Boxplot()
-    {
-        BasicData = statistics
-    };
+        var statistics = JobService.GetStatistics(Model.Key.Value);
+        graphModel.BasicData = statistics;
 
-    var tableModel = new TableViewModel()
-    {
-        Statistics = statistics,
-        LinkHref = "/obor"
-    };
+        tableModel.Statistics = statistics;
+        tableModel.LinkHref = "/obor";
+    
+        isKeyValid = true;
+    }
+    
 }
 
 <h1>Souhrnné statistiky</h1>
 
+@if (isKeyValid)
+{
+    <partial name="Shared/_SouhrnTable" model="tableModel"/>
+    <partial name="Shared/_BoxPlot" model="graphModel"/>
+    
+}
 
-<partial name="Shared/_SouhrnTable" model="tableModel"/>
-<partial name="Shared/_BoxPlot" model="graphModel"/>

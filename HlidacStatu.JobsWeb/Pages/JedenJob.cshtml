@@ -6,22 +6,18 @@
 @{
     ViewData["Title"] = "Souhrnné statistiky";
 
-    var key = new YearlyStatisticsGroup.Key()
+    Boxplot graphModel = new();
+    BarGraph histogram = new();
+    List<JobStatistics> statistics = new();
+    
+    if (Model.Key.HasValue)
     {
-        Obor = "IT",
-        Rok = 2020
-    };
-    var statistics = JobService.GetStatistics(key);
-    var graphModel = new Boxplot()
-    {
-        BasicData = statistics.Where(s => s.Name == "Programátor").ToList()
-    };
+        statistics = JobService.GetStatistics(Model.Key.Value);
+        graphModel.BasicData = statistics.Where(s => s.Name == "Programátor").ToList();
 
-    var histogram = new BarGraph()
-    {
-        Data = JobService.GetDistinctJobs(),
-        Title = "Histogram všeho"
-    };
+        histogram.Data = JobService.GetDistinctJobs();
+        histogram.Title = "Histogram všeho";
+    }
 }
 
 <h1>Souhrnné statistiky</h1>
