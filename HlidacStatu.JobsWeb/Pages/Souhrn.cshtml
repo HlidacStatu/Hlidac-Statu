@@ -6,11 +6,10 @@
 @{
     ViewData["Title"] = "Souhrnné statistiky";
 
-    bool isKeyValid = false;
     Boxplot graphModel = new Boxplot();
     TableViewModel tableModel = new TableViewModel();
     
-    if (Model.Key is not null)
+    if (Model.Key.HasValue)
     {
         var statistics = JobService.GetStatistics(Model.Key.Value);
         graphModel.BasicData = statistics;
@@ -18,14 +17,13 @@
         tableModel.Statistics = statistics;
         tableModel.LinkHref = "/obor";
     
-        isKeyValid = true;
     }
     
 }
 
 <h1>Souhrnné statistiky</h1>
 
-@if (isKeyValid)
+@if (Model.Key.HasValue)
 {
     <partial name="Shared/_SouhrnTable" model="tableModel"/>
     <partial name="Shared/_BoxPlot" model="graphModel"/>

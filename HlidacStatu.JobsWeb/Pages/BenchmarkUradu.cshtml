@@ -7,26 +7,22 @@
 @{
     ViewData["Title"] = "Benchmark úřadů";
 
+    Boxplot graphModel = new Boxplot();
+    TableViewModel tableModel = new TableViewModel();
+
     bool showStatistics = !string.IsNullOrWhiteSpace(Model.Ico);
     var statistics = new List<JobStatistics>();
-    var key = new YearlyStatisticsGroup.Key()
+
+    if (Model.Key.HasValue)
     {
-        Obor = "IT",
-        Rok = 2020
-    };
-    if (showStatistics)
-        statistics = JobService.GetOdberatelStatitstics(Model.Ico, key);
-    
-    var graphModel = new Boxplot()
-    {
-        BasicData = statistics,
-        CompareWith = JobService.GetStatistics(key)
-    };
-    
-    var tableModel = new TableViewModel()
-    {
-        Statistics = statistics
-    };
+        if (showStatistics)
+            statistics = JobService.GetOdberatelStatitstics(Model.Ico, Model.Key.Value);
+
+        graphModel.BasicData = statistics;
+        graphModel.CompareWith = JobService.GetStatistics(Model.Key.Value);
+
+        tableModel.Statistics = statistics;
+    }
 }
 
 @section Scripts
@@ -35,7 +31,7 @@
     $(document).ready(function() {
       $("#selectNavigace").change(function(){
         if ($(this).val()!='') {
-          window.location.href= '/BenchmarkUradu/' + $(this).val();
+          window.location.href= '/BenchmarkUradu/' + $(this).val() + window.location.search;
         }
       });
     });
@@ -43,29 +39,31 @@
 }
 
 <h1>Benchmark úřadů</h1>
-<h2>Seznam úřadů</h2>
-
-<div class="input-group mb-3">
-    <label class="input-group-text" for="selectNavigace">Vyberte úřad:</label>
-    <select class="form-select" id="selectNavigace">
-        <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte úřad...</option>
-        @foreach (var (ico, nazev, pocetSmluv) in JobService.GetOdberateleList(key).OrderByDescending(x => x.pocetSmluv))
-        {
-            <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetSmluv smluv)</option>
-        }
-    </select>
-</div>
-
-@if (!string.IsNullOrEmpty(Model.Ico))
+@if (Model.Key.HasValue)
 {
-    <hr/>
+    <h2>Seznam úřadů</h2>
 
-    <h2>@Model.Nazev</h2>
+    <div class="input-group mb-3">
+        <label class="input-group-text" for="selectNavigace">Vyberte úřad:</label>
+        <select class="form-select" id="selectNavigace">
+            <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte úřad...</option>
+            @foreach (var (ico, nazev, pocetSmluv) in JobService.GetOdberateleList(Model.Key.Value).OrderByDescending(x => x.pocetSmluv))
+            {
+                <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetSmluv smluv)</option>
+            }
+        </select>
+    </div>
 
-    if (showStatistics)
+    if (!string.IsNullOrEmpty(Model.Ico))
     {
-        
-        <partial name="Shared/_SouhrnTable" model="tableModel"/>
-        <partial name="Shared/_BoxPlot" model="graphModel"/>
+        <hr/>
+
+        <h2>@Model.Nazev</h2>
+
+        if (showStatistics)
+        {
+            <partial name="Shared/_SouhrnTable" model="tableModel"/>
+            <partial name="Shared/_BoxPlot" model="graphModel"/>
+        }
     }
 }
