@@ -205,7 +205,7 @@ namespace HlidacStatu.Repositories
                         Text = f.Item1,
                         Type = ("firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
                         Description = FixKraj(f.Item3),
-                        Priority = 0,
+                        Priority = (f.Item4 == 1 ) ? 0 : -1,
                         ImageElement = "<i class='fas fa-industry-alt'></i>",
                         Category = Autocomplete.CategoryEnum.Company
                     };
