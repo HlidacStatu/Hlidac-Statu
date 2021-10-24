@@ -10,12 +10,12 @@ namespace HlidacStatu.Extensions
 {
     public static class SmlouvaPrilohaExtension
     {
-        public static volatile FileCacheManager prilohaTblsCacheManager
-            = FileCacheManager.GetSafeInstance("SmlouvyPrilohyTblsFormat",
-                smlouvaKeyId => getTablesFromDocumentOld(smlouvaKeyId),
-                TimeSpan.FromDays(365 * 10)); //10 years
+        //private static volatile FileCacheManager prilohaTblsCacheManager
+        //    = FileCacheManager.GetSafeInstance("SmlouvyPrilohyTblsFormat",
+        //        smlouvaKeyId => getTablesFromDocumentOld(smlouvaKeyId),
+        //        TimeSpan.FromDays(365 * 10)); //10 years
 
-        public static volatile MinioCacheManager<Lib.Data.External.Tables.Result[],KeyAndId> prilohaTblsMinioCacheManager
+        private static volatile MinioCacheManager<Lib.Data.External.Tables.Result[],KeyAndId> prilohaTblsMinioCacheManager
         = MinioCacheManager<Lib.Data.External.Tables.Result[],KeyAndId>.GetSafeInstance(
             "SmlouvyPrilohyTbls",
             smlouvaKeyId => getTablesFromDocument(smlouvaKeyId),
@@ -86,7 +86,7 @@ namespace HlidacStatu.Extensions
             var key = new KeyAndId() { ValueForData = keyval, CacheNameOnDisk = $"prlh_tblsJSON_{keyval}" };
             if (forceUpdate)
             {
-                prilohaTblsCacheManager.Delete(key);
+                prilohaTblsMinioCacheManager.Delete(key);
             }
 
             var data = prilohaTblsMinioCacheManager.Get(key);
