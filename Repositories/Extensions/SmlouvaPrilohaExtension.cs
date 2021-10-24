@@ -93,7 +93,7 @@ namespace HlidacStatu.Extensions
             if (data == null)
                 return null;
 
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Lib.Data.External.Tables.Camelot.CamelotResult[]>(Encoding.UTF8.GetString(data));
+            return data;
         }
     }
 }
