@@ -3,7 +3,7 @@
     public class CamelotVersionData
     {
         public string CamelotVersion { get; set; }
-        public string DockerVersion { get; set; }
+        public string AppVersion { get; set; }
 
     }
 }

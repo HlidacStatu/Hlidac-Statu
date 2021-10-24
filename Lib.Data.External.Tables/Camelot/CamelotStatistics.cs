@@ -18,7 +18,13 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         public long FilesOnDisk { get; set; }
         public long FilesOnDiskSize { get; set; }
 
-        public string Version { get; set; }
+        public long ErrorsTotal { get; set; }
+        public DateTime LastErrorDate { get; set; }
+        public string LastErrorException { get; set; }
+
+
+        public string AppVersion { get; set; }
+        public string CamelotVersion { get; set; }
 
     }
 }

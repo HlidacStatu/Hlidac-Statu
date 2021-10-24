@@ -14,14 +14,14 @@
       <PackageReference Include="Devmasters.IO" Version="2.4.0" />
       <PackageReference Include="Devmasters.Lang" Version="2.4.8" />
       <PackageReference Include="Enums.NET" Version="4.0.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.10" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.10">
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.11" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.11">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.10" />
-      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.10" />
-      <PackageReference Include="NEST" Version="7.15.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.11" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.11" />
+      <PackageReference Include="NEST" Version="7.15.1" />
       <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
     </ItemGroup>
 

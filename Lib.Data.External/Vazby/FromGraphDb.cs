@@ -1,4 +1,4 @@
-﻿using Neo4j.Driver.V1;
+﻿using Neo4j.Driver;
 
 using System;
 using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace HlidacStatu.Lib.Data.External.Vazby
                                     )
                     )
             {
-                using (var session = db.Session())
+                using (var session = db.AsyncSession())
                 {
                     var query = @"MATCH (n:company {regno: """ + ico + @"""})-[rels1*0..50]->(prev:company)
 WHERE ALL(r in rels1 WHERE (NOT EXISTS(r.to_date)) OR r.to_date >= " + sFrom + @")

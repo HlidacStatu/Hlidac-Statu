@@ -37,6 +37,11 @@ namespace HlidacStatu.Util.Cache
 
         protected abstract TCache getTCacheInstance(Key key, TimeSpan expiration, Func<Key, T> contentFunc);
 
+        public bool Exists(Key key)
+        {
+            return getTCacheInstance(key, expiration, o => contentFunc.Invoke(key)).Exists();
+        }
+
         public void Delete(Key key)
         {
             Set(key, null, expiration);

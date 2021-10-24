@@ -90,7 +90,7 @@
     <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="Enums.NET" Version="4.0.0" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
-    <PackageReference Include="Neo4j.Driver" Version="1.7.2" />
+    <PackageReference Include="Neo4j.Driver" Version="4.3.2" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
     <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
     <PackageReference Include="NitoAsyncEx.Context.StrongName" Version="1.1.0" />
@@ -111,11 +111,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="StatniPokladna\MonitorService.cs" />
+    <Compile Remove="Vazby\FromGraphDb.cs" />
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.ServiceModel" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Vazby\" />
   </ItemGroup>
 </Project>
