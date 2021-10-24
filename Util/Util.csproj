@@ -17,6 +17,7 @@
 	      <PackageReference Include="Devmasters.Cache" Version="2.4.5" />
     <PackageReference Include="Devmasters.Cache.AWS_S3" Version="2.1.0.666" />
     <PackageReference Include="Devmasters.Cache.Couchbase" Version="2.4.1" />
+    <PackageReference Include="Devmasters.Cache.Elastic" Version="2.4.1" />
     <PackageReference Include="Devmasters.Collections" Version="2.4.2.2" />
     <PackageReference Include="Devmasters.Core" Version="2.4.4" />
     <PackageReference Include="Devmasters.DT" Version="2.4.3" />
