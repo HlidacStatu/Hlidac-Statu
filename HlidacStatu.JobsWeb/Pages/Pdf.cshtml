@@ -5,105 +5,120 @@
 @model PdfModel
 
 @{
-    var key = new YearlyStatisticsGroup.Key()
+    Boxplot graphModel = new Boxplot();
+    TableViewModel tableModel = new TableViewModel();
+    var statistics = new List<JobStatistics>();
+    int rok = 0;
+    int pocetCen = 0;
+    int pocetSmluv = 0;
+    int pocetDodavatelu = 0;
+    int pocetZadavatelu = 0;
+
+    if (Model.Key.HasValue)
     {
-        Obor = "IT",
-        Rok = 2020
-    };
-    var statistics = JobService.GetStatistics(key);
-    int rok = 2020;
-    int pocetSmluv = JobService.DistinctJobs.Select(m => m.SmlouvaId).Distinct().Count();
-    int pocetZadavatelu = JobService.DistinctJobs.Select(m => m.IcoOdberatele).Distinct().Count();
-    int pocetDodavatelu = JobService.DistinctJobs.SelectMany(m => m.IcaDodavatelu).Distinct().Count();
-    int pocetCen = JobService.DistinctJobs.Count();
+        statistics = JobService.GetStatistics(Model.Key.Value);
+        rok = Model.Key.Value.Rok;
+
+        var distinctJobsForYearAndSubject = JobService.DistinctJobs
+            .Where(x => x.Subject == Model.Key.Value.Obor && x.Year == Model.Key.Value.Rok)
+            .ToList();
+        
+        pocetSmluv = distinctJobsForYearAndSubject
+            .Select(m => m.SmlouvaId).Distinct().Count();
+        pocetZadavatelu = distinctJobsForYearAndSubject
+            .Select(m => m.IcoOdberatele).Distinct().Count();
+        pocetDodavatelu = distinctJobsForYearAndSubject
+            .SelectMany(m => m.IcaDodavatelu).Distinct().Count();
+        pocetCen = distinctJobsForYearAndSubject
+            .Count();
+
+        graphModel.BasicData = statistics;
+        graphModel.Height = 500;
+
+        tableModel.Statistics = statistics;
+        tableModel.LinkHref = "/obor";
+        tableModel.Caption = "";
+    }
 }
 
-
-<h2>Přehled obvyklých cen IT prací ve státní správě za rok @rok</h2>
-
-<p>
-    Tento materiál analyzuje přehled obvyklých cen ICT prací na základě skutečně sjednaných cen v smlouvách pro ICT služby,
-    uveřejněných v registru smluv za rok @rok.
-    Zdrojem dat pro přehled jsou smlouvy zveřejněné v registru smluv http://smlouvy.gov.cz, analyzované a zpracované serverem Hlídač státu.
-
-    Cílem analýzy je představit skutečné ceny zadavatelů na trhu v oblasti ICT, jako podklad pro odhad očekávané ceny zakázky.
-</p>
-<p><b>Tento dokument nestanovuje doporučené ceny.</b></p>
-<p>
-    Přehled se zaměřuje výhradně na ceny explicitně ve smlouvách uvedené jako ceny za člověkoden nebo člověkohodinu práce.
-    Přehled je sestaven pro smlouvy uzavřené v roce @rok, s místem realizace Česká republika.
-    Metody a procesy získání cen se průběžně vyvíjejí.
-    Přehled obsahuje údaje z @pocetSmluv smluv od @pocetZadavatelu zadavatelů a @pocetDodavatelu dodavatelů a zahrnuje @pocetCen cen.
-</p>
-
-<h2>Metodika analýzy</h2>
-<p>
-    Přehled vznikl automatizovanou extrakcí cen z plných textů smluv automaticky identifikovaných pomocí AI jako IT smlouvy, následnou ruční kontrolou a validací.
-    Do seznamu zpracovávaných smluv byly zařazeny i smlouvy neoznačené pomocí AI jako IT smlouvy, od dodavatelů, kteří během roku poskytovali IT služby.
-</p>
-<p>
-    Tyto vybrané smlouvy byly vybrány pro vyhledávání a v textech samotných smluv byly nalezeny a vyextrahovány údaje, ve kterých jsou uvedeny práce související s ICT a ceny za člověkoden nebo člověkohodinu.
-    Z takto nalezených údajů byly extrahovány cenové údaje a popis zasmluvněné činnosti.
-    Každá takto extrahovaná údaje, dostupné v kontextu smlouvy, byly zkontrolovány nejméně jedním expertem, který upřesnil typ práce, zkontrolovat cenu činnosti s DPH a bez DPH.
-    V případě nutnosti přepočítal cenu z člověkohodin do člověkodnů.
-    Všechny validní položky byly zahrnuty do statistického zpracování, ve kterém jsou seskupeny ceny podle typů prací a případně, pokud je dost dat, i podle upřesňujících štítků.
-    Zahrnuty byly i položky nalezené a extrahované ručně.
-    Součástí analýzy jsou i smlouvy, které nebyly strojově čitelné. Textový obsah z nich byl získán pomocí OCR a ručně zkontrolován.
-</p>
-<p>
-    Je pravděpodobné, že součástí analýzy nejsou všechny ceny ze všech smluv, protože malá část smluv v registru smluv není uvedena nebo má ceny anonymizovány.
-
-    Přehled tedy není úplný, naše kontrolní analýza ukazuje, že jsme zpracovali drtivou většinu smluv týkajících se ITC oboru v daném roce.
-
-</p>
-<p>
-    U každého cenového údaje jsou udržována zdrojová metadata i odkaz na přesný zdroj údajů, a tedy každá cena a případně každá chyba je zpětně dohledatelná.
-</p>
-
-
-<h2>Souhrnné statistiky</h2>
-@{
-    var graphModel = new Boxplot()
-    {
-        BasicData = statistics,
-        Height=500
-    };
-
-    var tableModel = new TableViewModel()
-    {
-        Statistics = statistics,
-        LinkHref = "/obor",
-        Caption="",
-    };
-
-}
-
-<partial name="Shared/_SouhrnTable" model="tableModel" />
-<partial name="Shared/_BoxPlot" model="graphModel" />
-
-
-<h2>Obvyklé ceny pro jednotlivé pracovní pozice</h2>
-<p>
-Cenových analýzy pro jednotlivé pracovní pozice/typ práce. 
-    Metodika výpočtu je totožná jako pro souhrnné statistiky, pouze je aplikovaná na konkretní pracovní pozici.
-    Tabulka využívá pro popis dat charakteristiky
-definované v kapitole Statistické údaje a jejich interpretace. 
-    </p><p>
-    První řádek tabulky uvedený značkou <code>-vše-</code> je souhrem všech cenových údajů pro daný typ práce. Pod ním následují řádky představující podmnožinu
-cenových údajů, která je vyjářena sloupcem Štítek. Ten byl zvolen ručně analytiky dle jeho
-smysluplnosti vzhledem ke konkrétní práci a množstí validních dat v této podmnožině. Jeden cenový údaj
-může být spojený s více než jedním štítkem. Z toho důvodu mohou být stejné cenové údaje zahrnuty ve více
-řádcích - podmnožinách.
-</p><p>Za obvyklou cenu je považován medián v rozpětí charakterizovaném dolním a horním kvartilem.
-</p>
-
-@foreach (var statistic in statistics)
+@if (Model.Key.HasValue)
 {
-    var jobOverviewViewModel = new JobOverviewViewModel()
+    <h2>Přehled obvyklých cen IT prací ve státní správě za rok @rok</h2>
+
+    <p>
+        Tento materiál analyzuje přehled obvyklých cen ICT prací na základě skutečně sjednaných cen v smlouvách pro ICT služby,
+        uveřejněných v registru smluv za rok @rok.
+        Zdrojem dat pro přehled jsou smlouvy zveřejněné v registru smluv http://smlouvy.gov.cz, analyzované a zpracované serverem Hlídač státu.
+
+        Cílem analýzy je představit skutečné ceny zadavatelů na trhu v oblasti ICT, jako podklad pro odhad očekávané ceny zakázky.
+    </p>
+    <p>
+        <b>Tento dokument nestanovuje doporučené ceny.</b>
+    </p>
+    <p>
+        Přehled se zaměřuje výhradně na ceny explicitně ve smlouvách uvedené jako ceny za člověkoden nebo člověkohodinu práce.
+        Přehled je sestaven pro smlouvy uzavřené v roce @rok, s místem realizace Česká republika.
+        Metody a procesy získání cen se průběžně vyvíjejí.
+        Přehled obsahuje údaje z @pocetSmluv smluv od @pocetZadavatelu zadavatelů a @pocetDodavatelu dodavatelů a zahrnuje @pocetCen cen.
+    </p>
+
+    <h2>Metodika analýzy</h2>
+    <p>
+        Přehled vznikl automatizovanou extrakcí cen z plných textů smluv automaticky identifikovaných pomocí AI jako IT smlouvy, následnou ruční kontrolou a validací.
+        Do seznamu zpracovávaných smluv byly zařazeny i smlouvy neoznačené pomocí AI jako IT smlouvy, od dodavatelů, kteří během roku poskytovali IT služby.
+    </p>
+    <p>
+        Tyto vybrané smlouvy byly vybrány pro vyhledávání a v textech samotných smluv byly nalezeny a vyextrahovány údaje, ve kterých jsou uvedeny práce související s ICT a ceny za člověkoden nebo člověkohodinu.
+        Z takto nalezených údajů byly extrahovány cenové údaje a popis zasmluvněné činnosti.
+        Každá takto extrahovaná údaje, dostupné v kontextu smlouvy, byly zkontrolovány nejméně jedním expertem, který upřesnil typ práce, zkontrolovat cenu činnosti s DPH a bez DPH.
+        V případě nutnosti přepočítal cenu z člověkohodin do člověkodnů.
+        Všechny validní položky byly zahrnuty do statistického zpracování, ve kterém jsou seskupeny ceny podle typů prací a případně, pokud je dost dat, i podle upřesňujících štítků.
+        Zahrnuty byly i položky nalezené a extrahované ručně.
+        Součástí analýzy jsou i smlouvy, které nebyly strojově čitelné. Textový obsah z nich byl získán pomocí OCR a ručně zkontrolován.
+    </p>
+    <p>
+        Je pravděpodobné, že součástí analýzy nejsou všechny ceny ze všech smluv, protože malá část smluv v registru smluv není uvedena nebo má ceny anonymizovány.
+
+        Přehled tedy není úplný, naše kontrolní analýza ukazuje, že jsme zpracovali drtivou většinu smluv týkajících se ITC oboru v daném roce.
+
+    </p>
+    <p>
+        U každého cenového údaje jsou udržována zdrojová metadata i odkaz na přesný zdroj údajů, a tedy každá cena a případně každá chyba je zpětně dohledatelná.
+    </p>
+
+
+    <h2>Souhrnné statistiky</h2>
+
+    <partial name="Shared/_SouhrnTable" model="tableModel"/>
+    <partial name="Shared/_BoxPlot" model="graphModel"/>
+
+
+    <h2>Obvyklé ceny pro jednotlivé pracovní pozice</h2>
+    <p>
+        Cenových analýzy pro jednotlivé pracovní pozice/typ práce.
+        Metodika výpočtu je totožná jako pro souhrnné statistiky, pouze je aplikovaná na konkretní pracovní pozici.
+        Tabulka využívá pro popis dat charakteristiky
+        definované v kapitole Statistické údaje a jejich interpretace.
+    </p>
+    <p>
+        První řádek tabulky uvedený značkou <code>-vše-</code> je souhrem všech cenových údajů pro daný typ práce. Pod ním následují řádky představující podmnožinu
+        cenových údajů, která je vyjářena sloupcem Štítek. Ten byl zvolen ručně analytiky dle jeho
+        smysluplnosti vzhledem ke konkrétní práci a množstí validních dat v této podmnožině. Jeden cenový údaj
+        může být spojený s více než jedním štítkem. Z toho důvodu mohou být stejné cenové údaje zahrnuty ve více
+        řádcích - podmnožinách.
+    </p>
+    <p>
+        Za obvyklou cenu je považován medián v rozpětí charakterizovaném dolním a horním kvartilem.
+    </p>
+
+    foreach (var statistic in statistics)
     {
-        Statistics = statistic,
-        CustomText = ""
-    };
-    <hr />
-    <partial name="Shared/_JobOverview" model="jobOverviewViewModel" />
+        var jobOverviewViewModel = new JobOverviewViewModel()
+        {
+            Statistics = statistic,
+            CustomText = ""
+        };
+        <hr/>
+        <partial name="Shared/_JobOverview" model="jobOverviewViewModel"/>
+    }
 }

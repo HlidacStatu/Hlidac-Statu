@@ -6,33 +6,33 @@
 @{
     ViewData["Title"] = "Souhrnné statistiky podle oborů";
 
-    bool showStatistics = !string.IsNullOrWhiteSpace(Model.Obor); 
+    Boxplot graphModel = new Boxplot();
+    TableViewModel tableModel = new TableViewModel();
+
+    bool showStatistics = !string.IsNullOrWhiteSpace(Model.Obor);
     var statistics = new List<JobStatistics>();
-    var key = new YearlyStatisticsGroup.Key()
+
+    if (Model.Key.HasValue)
     {
-        Obor = "IT",
-        Rok = 2020
-    };
-    if(showStatistics)
-        statistics = JobService.GetTagStatistics(Model.Obor, key);
-    var graphModel = new Boxplot()
-    {
-        BasicData = statistics
-    };
-    
-    var tableModel = new TableViewModel()
-    {
-        Statistics = statistics,
-        FirstColumnName = "Tag"
-    };
+        if (showStatistics)
+            statistics = JobService.GetTagStatistics(Model.Obor, Model.Key.Value);
+        graphModel.BasicData = statistics;
+
+        tableModel.Statistics = statistics;
+        tableModel.FirstColumnName = "Tag";
+    }
+
 }
 
 <h1>Souhrnné statistiky podle oborů</h1>
-<h2>@Model.Obor</h2>
-
-@if (showStatistics)
+@if (Model.Key.HasValue)
 {
-    <partial name="Shared/_SouhrnTable" model="tableModel"/>    
-    
-    <partial name="Shared/_BoxPlot" model="graphModel"/>
+    <h2>@Model.Obor</h2>
+
+    if (showStatistics)
+    {
+        <partial name="Shared/_SouhrnTable" model="tableModel"/>
+
+        <partial name="Shared/_BoxPlot" model="graphModel"/>
+    }
 }
