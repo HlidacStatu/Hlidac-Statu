@@ -19,7 +19,7 @@ namespace HlidacStatu.Repositories
 
                 public string Query { get; set; }
                 public Action<string> LogOutputFunc { get; set; } = null;
-                public Action<Devmasters.Batch.ActionProgressData> ProgressOutputFunc { get; set; } = null
+                public Action<Devmasters.Batch.ActionProgressData> ProgressOutputFunc { get; set; } = null;
 
             }
 
@@ -81,4 +81,4 @@ namespace HlidacStatu.Repositories
 
     }
 }
-}
+
