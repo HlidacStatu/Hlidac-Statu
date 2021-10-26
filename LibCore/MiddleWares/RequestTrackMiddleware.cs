@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Services;
+using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -29,16 +32,38 @@ namespace HlidacStatu.LibCore.MiddleWares
             await _next(context);
 
             string? userName = context.User.Identity?.Name;
+            // refactor následujícího a přidat sem zjištění usera
+            // if (ApiAuth.IsApiAuthHeader(httpContext.GetAuthToken(), out string login))
+            // {
+            //     ApplicationUser user = ApplicationUser.GetByEmail(login);
+            
             int statusCode = context.Response.StatusCode;
 
             string customData = "";
             if (context.Items.TryGetValue(TrackDataKey, out object? trackData))
             {
                 var dataList = (TrackDataList)trackData;
-                customData = dataList.Draw();
+                customData = dataList.ToJson();
             }
+            
+            //get request time...
 
             //assemble string here
+            var audit = new Audit()
+            {
+                date = DateTime.Now,
+                operation = Audit.Operations.Call.ToString(),
+                userId = userName,
+                IP = ip,
+                traceId = traceIdentifier,
+                method = method,
+                requestUrl = requestUrl,
+                statusCode = statusCode,
+                additionalData = customData,
+                
+            };
+            
+            AuditRepo.Add(audit);
         }
     }
 
@@ -76,9 +101,9 @@ namespace HlidacStatu.LibCore.MiddleWares
             Storage.Add(item);
         }
 
-        public string Draw()
+        public string ToJson()
         {
-            return string.Join('\n', Storage);
+            return Newtonsoft.Json.JsonConvert.SerializeObject(Storage);
         }
     }
     

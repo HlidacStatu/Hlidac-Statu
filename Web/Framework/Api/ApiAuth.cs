@@ -159,7 +159,7 @@ namespace HlidacStatu.Web.Framework
                 return Result.Invalid(new ApiCall() { IP = httpContext.GetRemoteIp(), UserId = null, User = null, Id = method, Method = method, Parameters = parameters });
         }
 
-        private static bool IsApiAuthHeader(string authToken, out string login)
+        public static bool IsApiAuthHeader(string authToken, out string login)
         {
             login = "";
 

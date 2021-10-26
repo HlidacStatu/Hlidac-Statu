@@ -2,6 +2,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
 
 using System;
+using Nest;
 
 namespace HlidacStatu.Repositories
 {
@@ -52,6 +53,29 @@ namespace HlidacStatu.Repositories
             {
                 return null;
             }
+
+        }
+        
+        public static Audit Add(Audit audit)
+        {
+            IndexResponse res; 
+            try
+            {
+                res = Manager.GetESClient_Audit()
+                    .Index<Audit>(audit, m => m.Id(audit.Id));
+            }
+            catch (Exception ex)
+            {
+                HlidacStatu.Util.Consts.Logger.Error("Chyba při logování do auditu.", ex);
+                return null;
+            }
+
+            if (!res.IsValid)
+            {
+                HlidacStatu.Util.Consts.Logger.Error($"Chyba audit logu. {res.DebugInformation}");
+            }
+
+            return audit;
 
         }
     }
