@@ -39,7 +39,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns></returns>
         [HttpGet("hledat")]
         [Authorize]
-        public ActionResult<SearchResultDTO<Smlouva>> Hledat([FromQuery] string dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
+        public ActionResult<SearchResultDTO<Smlouva>> Hledat([FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
         {
             if (strana is null || strana < 1)
                 strana = 1;

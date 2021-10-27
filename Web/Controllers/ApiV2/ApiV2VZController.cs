@@ -65,7 +65,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>nalezené veřejné zakázky</returns>
         [Authorize(Roles = "Admin,KomercniLicence")]
         [HttpGet("hledat")]
-        public ActionResult<SearchResultDTO<VerejnaZakazka>> Hledat([FromQuery] string dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
+        public ActionResult<SearchResultDTO<VerejnaZakazka>> Hledat([FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
         {
             strana = strana ?? 1;
             razeni = razeni ?? 0;

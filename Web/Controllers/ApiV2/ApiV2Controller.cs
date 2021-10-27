@@ -69,7 +69,7 @@ namespace HlidacStatu.Web.Controllers
         }
         [Authorize]
         [HttpGet("dump/{datatype}/{date?}")]
-        public ActionResult<HttpResponseMessage> Dump([FromRoute] string datatype, [FromRoute(Name = "date")][DefaultValue("")] string date = "null")
+        public ActionResult<HttpResponseMessage> Dump([FromRoute] string datatype, [FromRoute(Name = "date")][DefaultValue("")] string? date = "null")
         {
             if (datatype.Contains("..") || datatype.Contains("\\"))
             {

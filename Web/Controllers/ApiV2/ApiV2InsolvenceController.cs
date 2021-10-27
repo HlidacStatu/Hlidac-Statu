@@ -37,7 +37,7 @@ namespace HlidacStatu.Web.Controllers
         [HttpGet("hledat")]
         [Authorize]
         [SwaggerOperation(Tags = new[] { "Insolvence" })]
-        public ActionResult<SearchResultDTO<Rizeni>> Hledat([FromQuery] string dotaz = null,
+        public ActionResult<SearchResultDTO<Rizeni>> Hledat([FromQuery] string? dotaz = null,
             [FromQuery] int? strana = null,
             [FromQuery] int? razeni = null)
         {

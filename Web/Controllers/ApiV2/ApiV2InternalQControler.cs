@@ -25,13 +25,12 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>taskid</returns>
         [Authorize(Roles = "Admin,internalQ")]
         [HttpPost, Route("Voice2TextNewTask/{datasetId}/{itemId}")]
-        public ActionResult<string> Voice2TextNewTask([FromRoute] string datasetId, [FromRoute] string itemId, int priority = 0)
+        public ActionResult<string> Voice2TextNewTask([FromRoute] string datasetId, [FromRoute] string itemId, int? priority = 0)
         {
             try
             {
-
                 using (HlidacStatu.Q.Simple.Queue<Voice2Text> sq = new Q.Simple.Queue<Voice2Text>(
-                    Voice2Text.QName_priority(priority),
+                    Voice2Text.QName_priority(priority ?? 0),
                     Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString"))
                     )
                 {

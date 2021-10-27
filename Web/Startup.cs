@@ -141,7 +141,7 @@ namespace HlidacStatu.Web
         //!Záleží na pořadí
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
+            app.UseRequestTrackMiddleware();
             //request time measurement
             app.UseTimeMeasureMiddleware();
                 

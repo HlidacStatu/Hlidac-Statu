@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using HlidacStatu.LibCore.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +28,9 @@ namespace HlidacStatu.LibCore.MiddleWares
             sw.Start();
             await _next(httpContext);
             sw.Stop();
+
+            httpContext.Items.TryAdd("timeToProcessRequest", sw.ElapsedMilliseconds);
+            
             if (sw.ElapsedMilliseconds > 2000)
             {
                 //_logger.Warning($"Loading time of {url} was {sw.ElapsedMilliseconds} ms");

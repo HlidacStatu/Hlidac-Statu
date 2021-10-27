@@ -32,10 +32,6 @@ namespace HlidacStatu.LibCore.MiddleWares
             await _next(context);
 
             string? userName = context.User.Identity?.Name;
-            // refactor následujícího a přidat sem zjištění usera
-            // if (ApiAuth.IsApiAuthHeader(httpContext.GetAuthToken(), out string login))
-            // {
-            //     ApplicationUser user = ApplicationUser.GetByEmail(login);
             
             int statusCode = context.Response.StatusCode;
 
@@ -47,6 +43,17 @@ namespace HlidacStatu.LibCore.MiddleWares
             }
             
             //get request time...
+            long timeElapsed = 0;
+            if (context.Items.TryGetValue("timeToProcessRequest", out object? requestTime))
+            {
+                timeElapsed = (long)requestTime;
+            }
+            
+            string exceptionDetail = "";
+            if (context.Items.TryGetValue("errorPageCtx", out object? exception))
+            {
+                exceptionDetail = (string)exception;
+            }
 
             //assemble string here
             var audit = new Audit()
@@ -60,6 +67,8 @@ namespace HlidacStatu.LibCore.MiddleWares
                 requestUrl = requestUrl,
                 statusCode = statusCode,
                 additionalData = customData,
+                timeElapsed = timeElapsed,
+                exception = exceptionDetail,
                 
             };
             
@@ -71,7 +80,7 @@ namespace HlidacStatu.LibCore.MiddleWares
     {
         public static IApplicationBuilder UseRequestTrackMiddleware(this IApplicationBuilder builder)
         {
-            return builder.UseMiddleware<TimeMeasureMiddleware>();
+            return builder.UseMiddleware<RequestTrackMiddleware>();
         }
 
         public static void SetTrackData(this HttpContext context, string dataString)

@@ -4,6 +4,8 @@ namespace HlidacStatu.Entities
 {
     public partial class Audit
     {
+        
+
         [Nest.Keyword]
         public string Id { get; set; } = Guid.NewGuid().ToString("N");
         [Nest.Date]
@@ -37,7 +39,10 @@ namespace HlidacStatu.Entities
         public string additionalData { get; set; }
         [Nest.Keyword]
         public int statusCode { get; set; }
+        [Nest.LongRange]
+        public long timeElapsed { get; set; }
         
+        public string exception { get; set; }
 
         public enum Operations
         {

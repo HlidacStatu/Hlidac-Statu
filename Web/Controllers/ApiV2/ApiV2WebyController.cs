@@ -39,7 +39,7 @@ namespace HlidacStatu.Web.Controllers
         //[GZipOrDeflate()]
         [Authorize]
         [HttpGet("{id?}")]
-        public ActionResult<WebStatusExport> Status([FromRoute] string id = null)
+        public ActionResult<WebStatusExport> Status([FromRoute] string? id = null)
         {
             if (string.IsNullOrEmpty(id))
                 return BadRequest($"Web nenalezen");

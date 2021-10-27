@@ -71,7 +71,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet("{datasetId}/hledat")]
-        public ActionResult<SearchResultDTO<object>> DatasetSearch(string datasetId, [FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] string? sort = null, [FromQuery] string desc = "0")
+        public ActionResult<SearchResultDTO<object>> DatasetSearch(string datasetId, [FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] string? sort = null, [FromQuery] string? desc = "0")
         {
             strana ??= 1;
             if (strana < 1)
@@ -300,12 +300,12 @@ namespace HlidacStatu.Web.Controllers
         [HttpPost("{datasetId}/zaznamy/{itemId}")]
         public ActionResult<DSItemResponseDTO> DatasetItem_Update(string datasetId, string itemId,
             [FromBody] object data,
-            string mode = "")
+            string? mode = "")
         {
 
             if (!ModelState.IsValid)
             {
-                var message = string.Join(Environment.NewLine, ModelState.Values.SelectMany(x => x.Errors).Select(x => x.Exception.Message));
+                var message = string.Join(Environment.NewLine, ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage));
                 return BadRequest(message);
             }
 
