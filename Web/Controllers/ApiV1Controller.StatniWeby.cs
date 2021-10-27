@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -15,42 +16,23 @@ namespace HlidacStatu.Web.Controllers
     //migrace: komprese by měla být přenechána modulu na iis
     public partial class ApiV1Controller : Controller
     {
+        [Authorize]
         public ActionResult WebList()
         {
-            if (!Framework.ApiAuth.IsApiAuth(HttpContext,
-                parameters: new Framework.ApiCall.CallParameter[] {
-                })
-                .Authentificated)
-            {
-                return Json(ApiResponseStatus.ApiUnauthorizedAccess);
-            }
-            else
-            {
-                return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    HlidacStatu.Lib.Data.External.Zabbix.ZabTools.Weby()
-                    ), "text/json");
-            }
+            return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
+                HlidacStatu.Lib.Data.External.Zabbix.ZabTools.Weby()
+                ), "text/json");
         }
 
+        [Authorize]
         public ActionResult WebStatus(string _id, string h)
         {
             string id = _id;
 
-            if (!Framework.ApiAuth.IsApiAuth(HttpContext,
-                parameters: new Framework.ApiCall.CallParameter[] {
-                    new Framework.ApiCall.CallParameter("id", id)
-                })
-                .Authentificated)
-            {
-                return Json(ApiResponseStatus.ApiUnauthorizedAccess);
-            }
+            if (Devmasters.TextUtil.IsNumeric(id))
+                return _DataHost(Convert.ToInt32(id), h);
             else
-            {
-                if (Devmasters.TextUtil.IsNumeric(id))
-                    return _DataHost(Convert.ToInt32(id), h);
-                else
-                    return Json(ApiResponseStatus.StatniWebNotFound);
-            }
+                return Json(ApiResponseStatus.StatniWebNotFound);
         }
 
         private ActionResult _DataHost(int id, string h)
@@ -95,10 +77,6 @@ namespace HlidacStatu.Web.Controllers
             else
                 return Json(ApiResponseStatus.StatniWebNotFound);
         }
-
-
-
-
     }
 }
 

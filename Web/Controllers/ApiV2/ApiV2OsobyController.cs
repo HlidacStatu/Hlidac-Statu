@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -26,7 +27,7 @@ namespace HlidacStatu.Web.Controllers
         /// </summary>
         /// <param name="osobaId">Id osoby v Hlídači Státu</param>
         /// <returns></returns>
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("{osobaId}")]
         public ActionResult<OsobaDetailDTO> Detail([FromRoute] string osobaId)
         {
@@ -47,7 +48,7 @@ namespace HlidacStatu.Web.Controllers
             return OsobaDetail;
         }
 
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet, Route("hledatFtx")]
         public ActionResult<List<OsobaDTO>> OsobySearchFtx([FromQuery] string? ftxDotaz = null, [FromQuery] int? strana = null)
         {
@@ -65,7 +66,7 @@ namespace HlidacStatu.Web.Controllers
             return result;
         }
 
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet, Route("hledat")]
         public ActionResult<List<OsobaDTO>> OsobySearch([FromQuery] string jmeno, [FromQuery] string prijmeni, [FromQuery] string datumNarozeni, [FromQuery] bool? ignoreDiakritiku = false)
         {
@@ -104,7 +105,7 @@ namespace HlidacStatu.Web.Controllers
         ///    Zaznam_zastupitelstva = 6
         /// </param>
         /// <returns></returns>
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("social")]
         public ActionResult<List<OsobaSocialDTO>> OsobySocial([FromQuery] OsobaEvent.SocialNetwork[] typ)
         {

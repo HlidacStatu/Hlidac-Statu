@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -37,7 +38,7 @@ namespace HlidacStatu.Web.Controllers
         /// </param>
         /// <returns></returns>
         [HttpGet("hledat")]
-        [AuthorizeAndAudit]
+        [Authorize]
         public ActionResult<SearchResultDTO<Smlouva>> Hledat([FromQuery] string dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
         {
             if (strana is null || strana < 1)
@@ -99,7 +100,7 @@ namespace HlidacStatu.Web.Controllers
         /// <param name="id">id smlouvy</param>
         /// <returns>detail smlouvy</returns>
         [HttpGet("{id?}")]
-        [AuthorizeAndAudit]
+        [Authorize]
         public ActionResult<Smlouva> Detail([FromRoute] string? id = null)
         {
             if (string.IsNullOrWhiteSpace(id))
@@ -123,7 +124,7 @@ namespace HlidacStatu.Web.Controllers
         /// </summary>
         /// <returns>detail smlouvy</returns>
         [HttpGet("vsechnaID")]
-        [AuthorizeAndAudit(Roles = "Admin,KomercniLicence")]
+        [Authorize(Roles = "Admin,KomercniLicence")]
         public ActionResult<string[]> VsechnaID()
         {
             return SmlouvaRepo.AllIdsFromDB(false).ToArray();
@@ -131,7 +132,7 @@ namespace HlidacStatu.Web.Controllers
 
 
         [HttpGet("text/{id?}")]
-        [AuthorizeAndAudit]
+        [Authorize]
         public ActionResult<IEnumerable<string>> Text([FromRoute] string? id = null)
         {
             if (string.IsNullOrWhiteSpace(id))

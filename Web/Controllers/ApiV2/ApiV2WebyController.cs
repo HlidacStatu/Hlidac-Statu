@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -28,7 +29,7 @@ namespace HlidacStatu.Web.Controllers
 
         // /api/v2/{id}
         //[GZipOrDeflate()]
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet]
         public ActionResult<ZabHost[]> List()
         {
@@ -36,7 +37,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         //[GZipOrDeflate()]
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("{id?}")]
         public ActionResult<WebStatusExport> Status([FromRoute] string id = null)
         {

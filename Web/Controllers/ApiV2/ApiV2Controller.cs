@@ -9,6 +9,7 @@ using System;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -29,7 +30,7 @@ namespace HlidacStatu.Web.Controllers
 
 
         // /api/v2/{id}
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("ping/{text}")]
         public ActionResult<string> Ping([FromRoute] string text)
         {
@@ -37,7 +38,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("geterror/{id?}")]
         public ActionResult<string> GetError([FromRoute] int? id = 200)
         {
@@ -45,14 +46,14 @@ namespace HlidacStatu.Web.Controllers
         }
 
         //[ApiExplorerSettings(IgnoreApi = true)]
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("getmyip")]
         public ActionResult<string> GetIp()
         {
             return this.ApiAuth.ApiCall.IP;
         }
 
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("dumps")]
         public ActionResult<Models.ApiV1Models.DumpInfoModel[]> Dumps()
         {
@@ -60,13 +61,13 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("dump/{datatype}")]
         public ActionResult<HttpResponseMessage> Dump([FromRoute] string datatype)
         {
             return Dump(datatype, "");
         }
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("dump/{datatype}/{date?}")]
         public ActionResult<HttpResponseMessage> Dump([FromRoute] string datatype, [FromRoute(Name = "date")][DefaultValue("")] string date = "null")
         {

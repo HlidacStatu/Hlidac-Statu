@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -32,7 +33,7 @@ namespace HlidacStatu.Web.Controllers
         /// </param>
         /// <returns></returns>
         [HttpGet("hledat")]
-        [AuthorizeAndAudit]
+        [Authorize]
         public ActionResult<SearchResultDTO<Dotace>> Hledat([FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
         {
             if (strana is null || strana < 1)
@@ -74,7 +75,7 @@ namespace HlidacStatu.Web.Controllers
         /// <param name="id">id dotace</param>
         /// <returns>detail dotace</returns>
         [HttpGet("{id?}")]
-        [AuthorizeAndAudit]
+        [Authorize]
         public ActionResult<Dotace> Detail([FromRoute] string? id = null)
         {
             if (string.IsNullOrWhiteSpace(id))

@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 using System.Linq;
 using System.Web;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -34,7 +35,7 @@ namespace HlidacStatu.Web.Controllers
         /// </param>
         /// <returns></returns>
         [HttpGet("hledat")]
-        [AuthorizeAndAudit]
+        [Authorize]
         [SwaggerOperation(Tags = new[] { "Insolvence" })]
         public ActionResult<SearchResultDTO<Rizeni>> Hledat([FromQuery] string dotaz = null,
             [FromQuery] int? strana = null,
@@ -91,7 +92,7 @@ namespace HlidacStatu.Web.Controllers
         /// <param name="id">id smlouvy</param>
         /// <returns>detail smlouvy</returns>
         [HttpGet("{id?}")]
-        [AuthorizeAndAudit]
+        [Authorize]
         public ActionResult<Rizeni> Detail([FromRoute] string? id = null)
         {
             id = HttpUtility.UrlDecode(id);

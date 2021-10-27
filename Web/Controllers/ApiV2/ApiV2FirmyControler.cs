@@ -14,6 +14,7 @@ using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -29,7 +30,7 @@ namespace HlidacStatu.Web.Controllers
         /// </summary>
         /// <param name="ico">ico firmy</param>
         /// <returns>Ico, jméno a datová schránka</returns>
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("ico/{ico}")]
         public ActionResult<FirmaDTO> CompanyPerIco([FromRoute] string ico)
         {
@@ -65,7 +66,7 @@ namespace HlidacStatu.Web.Controllers
         /// </summary>
         /// <param name="jmenoFirmy">název firmy</param>
         /// <returns>Ico, jméno a datová schránka</returns>
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("{jmenoFirmy}")]
         public ActionResult<FirmaDTO> CompanyID([FromRoute] string jmenoFirmy)
         {
@@ -103,7 +104,7 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
-        [AuthorizeAndAudit(Roles = "KomercniLicence,PrivateApi,Admin")]
+        [Authorize(Roles = "KomercniLicence,PrivateApi,Admin")]
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("vsechny")]
         public ActionResult<HttpResponseMessage> Vsechny()
@@ -133,7 +134,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         // /api/v2/firmy/social?typ=WWW&typ=Youtube
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("social")]
         public ActionResult<List<FirmaSocialDTO>> Social([FromQuery] OsobaEvent.SocialNetwork[] typ)
         {

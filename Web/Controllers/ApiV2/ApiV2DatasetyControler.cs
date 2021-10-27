@@ -11,6 +11,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -22,7 +23,7 @@ namespace HlidacStatu.Web.Controllers
         /// Načte seznam datasetů
         /// </summary>
         /// <returns>Seznam datasetů</returns>
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet]
         public ActionResult<SearchResultDTO<Registration>> GetAll()
         {
@@ -40,7 +41,8 @@ namespace HlidacStatu.Web.Controllers
         /// </summary>
         /// <param name="datasetId">Id datasetu (můžeme ho získat ze seznamu datasetů)</param>
         /// <returns>Detail datasetu</returns>
-        [AuthorizeAndAudit]
+        //[Authorize]
+        [Authorize]
         [HttpGet("{datasetId}")]
         public ActionResult<Registration> Detail(string datasetId)
         {
@@ -67,7 +69,7 @@ namespace HlidacStatu.Web.Controllers
         /// <param name="sort">Název pole pro řazení</param>
         /// <param name="desc">Řazení: 0 - Vzestupně; 1 - Sestupně</param>
         /// <returns></returns>
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("{datasetId}/hledat")]
         public ActionResult<SearchResultDTO<object>> DatasetSearch(string datasetId, [FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] string? sort = null, [FromQuery] string desc = "0")
         {
@@ -118,7 +120,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns> vrací id vytvořeného datasetu </returns>
         /// <response code="200">Dataset vytvořen</response>
         /// <response code="400">Chyba v datech</response>
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpPost]
         public ActionResult<DSCreatedDTO> Create([FromBody] Registration data)
         {
@@ -162,7 +164,7 @@ namespace HlidacStatu.Web.Controllers
         /// </summary>
         /// <param name="datasetId">Id datasetu (můžeme ho získat ze seznamu datasetů)</param>
         /// <returns>True/False</returns>
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpDelete("{datasetId}")]
         public ActionResult<bool> Delete(string datasetId)
         {
@@ -215,7 +217,7 @@ namespace HlidacStatu.Web.Controllers
         /// 
         /// <param name="data">Objekt typu Registration</param>
         /// <returns></returns>
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpPut]
         public ActionResult<Registration> Update([FromBody] Registration data)
         {
@@ -252,7 +254,7 @@ namespace HlidacStatu.Web.Controllers
         /// <param name="datasetId">Id datasetu (můžeme ho získat ze seznamu datasetů)</param>
         /// <param name="itemId">Id položky v datasetu, kterou chceme načíst</param>
         /// <returns>Vrací detail položky</returns>
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("{datasetId}/zaznamy/{itemId}")]
         public ActionResult<object> DatasetItem_Get(string datasetId, string itemId)
         {
@@ -294,7 +296,7 @@ namespace HlidacStatu.Web.Controllers
         /// "rewrite" - pokud záznam existuje, je bez milosti přepsán
         /// </param>
         /// <returns></returns>
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpPost("{datasetId}/zaznamy/{itemId}")]
         public ActionResult<DSItemResponseDTO> DatasetItem_Update(string datasetId, string itemId,
             [FromBody] object data,
@@ -405,7 +407,7 @@ namespace HlidacStatu.Web.Controllers
         /// <param name="datasetId">Id datasetu, kam chceme záznamy nahrát</param>
         /// <param name="data">Pole JSON objektů</param>
         /// <returns>Id vložených záznamů</returns>
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpPost("{datasetId}/zaznamy/")]
         public ActionResult<List<DSItemResponseDTO>> DatasetItem_BulkInsert(string datasetId, [FromBody] object data)
         {
@@ -446,7 +448,7 @@ namespace HlidacStatu.Web.Controllers
         /// <param name="datasetId">Id datasetu</param>
         /// <param name="itemId">Id záznamu</param>
         /// <returns>true/false</returns>
-        [AuthorizeAndAudit]
+        [Authorize]
         [HttpGet("{datasetId}/zaznamy/{itemId}/existuje")]
         public ActionResult<bool> DatasetItem_Exists(string datasetId, string itemId)
         {

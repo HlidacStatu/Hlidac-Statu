@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -23,7 +24,7 @@ namespace HlidacStatu.Web.Controllers
         /// </remarks>
         /// <param name="id">Id veřejné zakázky</param>
         /// <returns>detail veřejné zakázky</returns>
-        [AuthorizeAndAudit(Roles = "Admin,KomercniLicence")]
+        [Authorize(Roles = "Admin,KomercniLicence")]
         [HttpGet("{id?}")]
         public ActionResult<VerejnaZakazka> Detail([FromRoute] string? id = null)
         {
@@ -62,7 +63,7 @@ namespace HlidacStatu.Web.Controllers
         /// 9: podle dodavatele<br />
         /// </param>
         /// <returns>nalezené veřejné zakázky</returns>
-        [AuthorizeAndAudit(Roles = "Admin,KomercniLicence")]
+        [Authorize(Roles = "Admin,KomercniLicence")]
         [HttpGet("hledat")]
         public ActionResult<SearchResultDTO<VerejnaZakazka>> Hledat([FromQuery] string dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
         {

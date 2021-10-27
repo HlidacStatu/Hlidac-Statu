@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -22,7 +23,7 @@ namespace HlidacStatu.Web.Controllers
         /// <param name="itemId">id zaznamu</param>
         /// <param name="priority">0=normal; 1=fast lane; 2=express lane</param>
         /// <returns>taskid</returns>
-        [AuthorizeAndAudit(Roles = "Admin,internalQ")]
+        [Authorize(Roles = "Admin,internalQ")]
         [HttpPost, Route("Voice2TextNewTask/{datasetId}/{itemId}")]
         public ActionResult<string> Voice2TextNewTask([FromRoute] string datasetId, [FromRoute] string itemId, int priority = 0)
         {
@@ -51,7 +52,7 @@ namespace HlidacStatu.Web.Controllers
         /// Vrátí taskID pro Voice2Text Docker image
         /// </summary>
         /// <returns>taskid</returns>
-        [AuthorizeAndAudit(Roles = "Admin,internalQ")]
+        [Authorize(Roles = "Admin,internalQ")]
         [HttpGet("Voice2TextGetTask")]
         public ActionResult<Voice2Text> Voice2TextGetTask()
         {
@@ -86,7 +87,7 @@ namespace HlidacStatu.Web.Controllers
         /// Potvrdí ukončení Voice2Text operace
         /// </summary>
         /// <returns>taskid</returns>
-        [AuthorizeAndAudit(Roles = "Admin,internalQ")]
+        [Authorize(Roles = "Admin,internalQ")]
         [HttpPost, Route("Voice2TextDone")]
         public ActionResult<string> Voice2TextDone([FromBody] Voice2Text task)
         {
@@ -121,7 +122,7 @@ namespace HlidacStatu.Web.Controllers
         /// Potvrdí ukončení Voice2Text operace
         /// </summary>
         /// <returns>taskid</returns>
-        [AuthorizeAndAudit(Roles = "Admin,internalQ")]
+        [Authorize(Roles = "Admin,internalQ")]
         [HttpPost, Route("Voice2TextFailed/{requeueAsTheLast}")]
         public ActionResult<string> Voice2TextFailed([FromRoute] bool requeueAsTheLast, [FromBody] Voice2Text task)
         {
