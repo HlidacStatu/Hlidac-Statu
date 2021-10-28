@@ -51,6 +51,7 @@
         <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.319" />
         <PackageReference Include="log4net" Version="2.0.12" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.18.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.11" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.11" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.11" />

@@ -7,4 +7,18 @@
 
 <h1>Chyba @Model</h1>
 
-<p>Něco se pokazilo.</p>
+@switch (Model)
+{
+    case 401:
+        <p>Nejste přihlášen.</p>
+        break;
+        
+    case 403:
+        <p>Nemáte oprávnění pro přístup k tomuto zdroji.</p>
+        break;
+    
+    default:
+        <p>Něco se pokazilo.</p>
+        break;
+}
+

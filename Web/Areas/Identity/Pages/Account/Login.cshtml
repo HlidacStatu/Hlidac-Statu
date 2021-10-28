@@ -7,19 +7,42 @@
 }
 
 <h1>@ViewData["Title"]</h1>
+
 <div class="row">
     <div class="col-sm-12">
+        <h2>Přihlášení do Hlídače státu.</h2>
+        @if (!StringValues.IsNullOrEmpty(Request.Query["ReturnUrl"]))
+        {
+            <div class="alert alert-warning">
+                Pro přístup na požadovanou stránku musíte být přihlášeni pod svým uživatelským účtem.
+            </div>
+        }
+    </div>
+    <div class="col-sm-12 d-none">
+        <h4>Přihlášení přes službu třetí strany</h4>
+        <section>
+            <form id="external" method="post" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
+                <div>
+                    @foreach (var provider in Model.ExternalLogins)
+                    {
+                        <button type="submit" class="btn btn-primary" style="width:auto"
+                                name="provider" value="@provider.Name"
+                                title="Přihlásit pomocí @provider.DisplayName účtu">
+                            @provider.DisplayName
+                        </button>
+                    }
+                </div>
+            </form>
+        </section>
+        <hr class="bg-dark"/>
+    </div>
+    
+    <div class="col-sm-12">
+        <h4>Přihlášení pomocí účtu na Hlídači státu</h4>
         <section>
             <form id="account" method="post" class="form-horizontal">
-                @if (!StringValues.IsNullOrEmpty(Request.Query["ReturnUrl"]))
-                {
-                    <div class="alert alert-warning">
-                        Pro přístup na požadovanou stránku musíte být přihlášeni pod svým uživatelským účtem.
-                    </div>
-                }
-                <h4>Přihlášení do Hlídače státu.</h4>
                 <p>Pokud účet ještě nemáte, <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">tady se snadno a zdarma zaregistrujete</a>.</p>
-                <hr />
+                <hr/>
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="Input.Email" class="col-md-2 control-label">E-mail</label>
@@ -31,7 +54,7 @@
                 <div class="form-group">
                     <label asp-for="Input.Password" class="col-md-2 control-label">Heslo</label>
                     <div class="col-sm-8">
-                        <input asp-for="Input.Password" class="form-control" />
+                        <input asp-for="Input.Password" class="form-control"/>
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
                 </div>

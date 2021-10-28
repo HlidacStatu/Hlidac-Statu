@@ -14,10 +14,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -259,7 +256,7 @@ namespace HlidacStatu.Web
             {
                 try
                 {
-                    using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent("https://www.hlidacstatu.cz/api/autocomplete/?q=flakan&term=flakan&_type=query&q=flakan"))
+                    using (var net = new Devmasters.Net.HttpClient.URLContent("https://www.hlidacstatu.cz/api/autocomplete/?q=flakan&term=flakan&_type=query&q=flakan"))
                     {
                         net.Timeout = 3 * 60000;
                         var s = net.GetContent();
@@ -354,6 +351,10 @@ namespace HlidacStatu.Web
                         {
                             ctx.Response.StatusCode = 401;
                         }
+                        else
+                        {
+                            ctx.Response.Redirect($"/Identity/Account/Login?returnUrl={ctx.Request.Path}{ctx.Request.QueryString.Value}");
+                        }
 
                         return Task.CompletedTask;
                     },
@@ -363,11 +364,22 @@ namespace HlidacStatu.Web
                         {
                             ctx.Response.StatusCode = 403;
                         }
-
+                    
+                        ctx.Response.StatusCode = 403;
+                    
                         return Task.CompletedTask;
                     }
                 };
             });
+            
+            //add third party authentication
+            services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    IConfigurationSection googleAuthSetting = Configuration.GetSection("Authentication:Google");
+                    options.ClientId = googleAuthSetting["Id"];
+                    options.ClientSecret = googleAuthSetting["Secret"];
+                });
 
             
         }

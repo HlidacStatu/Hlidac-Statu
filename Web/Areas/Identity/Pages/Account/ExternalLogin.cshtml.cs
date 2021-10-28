@@ -85,77 +85,54 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             }
             else
             {
-                // If the user does not have an account, then ask the user to create an account.
-                ReturnUrl = returnUrl;
-                ProviderDisplayName = info.ProviderDisplayName;
-                if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email); 
+                //if it has email - then create user
+                if (string.IsNullOrEmpty(email))
                 {
-                    Input = new InputModel
-                    {
-                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
-                    };
+                    ErrorMessage = "Error loading email value from external login.";
+                    return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
                 }
-                return Page();
+                
+                var user = await _userManager.FindByEmailAsync(email);
+
+                if (user == null) //we need to create a new user
+                {
+                    user = new ApplicationUser { UserName = email, Email = email };
+                    var userCreateResult = await _userManager.CreateAsync(user);
+                    if (!userCreateResult.Succeeded)
+                    {
+                        ErrorMessage = "User couldn't be created.";
+                        return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                    }
+                    
+                    // send confirmation email
+                    Util.Consts.Logger.Info($"User created an account using {info.LoginProvider} provider.");
+
+                    var userId = await _userManager.GetUserIdAsync(user);
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = Url.Page(
+                        "/Account/ConfirmEmail",
+                        pageHandler: null,
+                        values: new { area = "Identity", userId = userId, code = code },
+                        protocol: Request.Scheme);
+
+                    var emailTemplate = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
+                    emailTemplate.Model.CallbackUrl = callbackUrl;
+                    emailTemplate.To = user.Email;
+                    emailTemplate.SendMe();
+                }
+                
+                await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
+
+                return LocalRedirect(returnUrl);
             }
         }
 
         public async Task<IActionResult> OnPostConfirmationAsync(string? returnUrl = null)
         {
-            returnUrl = returnUrl ?? Url.Content("~/");
-            // Get the information about the user from the external login provider
-            var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
-            {
-                ErrorMessage = "Error loading external login information during confirmation.";
-                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
-            }
-
-            if (ModelState.IsValid)
-            {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
-
-                var result = await _userManager.CreateAsync(user);
-                if (result.Succeeded)
-                {
-                    result = await _userManager.AddLoginAsync(user, info);
-                    if (result.Succeeded)
-                    {
-                        Util.Consts.Logger.Info($"User created an account using {info.LoginProvider} provider.");
-
-                        var userId = await _userManager.GetUserIdAsync(user);
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                        var callbackUrl = Url.Page(
-                            "/Account/ConfirmEmail",
-                            pageHandler: null,
-                            values: new { area = "Identity", userId = userId, code = code },
-                            protocol: Request.Scheme);
-
-                        var email = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
-                        email.Model.CallbackUrl = callbackUrl;
-                        email.To = user.Email;
-                        email.SendMe();
-
-                        // If account confirmation is required, we need to show the link if we don't have a real email sender
-                        // if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                        // {
-                        //     return RedirectToPage("./RegisterConfirmation", new { Email = Input.Email });
-                        // }
-
-                        await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
-
-                        return LocalRedirect(returnUrl);
-                    }
-                }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
-            }
-
-            ProviderDisplayName = info.ProviderDisplayName;
-            ReturnUrl = returnUrl;
-            return Page();
+            //no confirmation needed
+            return NotFound("this action is disabled");
         }
     }
 }

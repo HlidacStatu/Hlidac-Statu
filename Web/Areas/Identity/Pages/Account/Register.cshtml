@@ -8,10 +8,31 @@
 
 <div class="row">
     <div class="col-sm-12">
+        <h2>Vytvořit účet na Hlídači státu.</h2>
+        <p>Bez účtu si nemůžete nechat kontrolovat smlouvy, ukládat dotazy a spoustu dalších věcí. Pokud už účet máte, <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">zalogujte se tady</a>.</p>
+        <hr/>
+    </div>
+    <div class="col-sm-12 d-none">
+        <h4>Vytvoření účtu přes službu třetí strany</h4>
+        <section>
+            <form id="external" method="post" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
+                <div>
+                    @foreach (var provider in Model.ExternalLogins)
+                    {
+                        <button type="submit" class="btn btn-primary" style="width:auto"
+                                name="provider" value="@provider.Name"
+                                title="Přihlásit pomocí @provider.DisplayName účtu">
+                            @provider.DisplayName
+                        </button>
+                    }
+                </div>
+            </form>
+        </section>
+        <hr class="bg-dark"/>
+    </div>
+    <div class="col-sm-12">
+        <h4>Vytvoření účtu přímo na Hlídači státu</h4>
         <form asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-            <h4>Vytvořit účet na Hlídači státu.</h4>
-            <p>Bez účtu si nemůžete nechat kontrolovat smlouvy, ukládat dotazy a spoustu dalších věcí. Pokud už účet máte, <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">zalogujte se tady</a>.</p>
-            <hr/>
             <div asp-validation-summary="All" class="text-danger"></div>
             <honeypot></honeypot>
             <div class="form-group">
