@@ -30,6 +30,9 @@ namespace HlidacStatu.LibCore.MiddleWares
             string requestUrl = context.Request.GetEncodedUrl();
 
             await _next(context);
+            
+            if(!context.Request.Path.StartsWithSegments("/api")) // do this tracking only for /API
+                return;
 
             string? userName = context.User.Identity?.Name;
             
