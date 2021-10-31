@@ -18,18 +18,24 @@
             </div>
         }
     </div>
+        <hr class="bg-dark"/>
     <div class="col-sm-12 d-none">
-        <h4>Přihlášení přes službu třetí strany</h4>
+        <h4>Přihlášení účtem jiné služby</h4>
+        <p>Nemusíte se bát, my se váš login a heslo k jiné službě nedozvíme. Jediné, co se dozvíme je váš email. Stejně jako při registraci níže.</p>
+        
         <section>
             <form id="external" method="post" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
                 <div>
                     @foreach (var provider in Model.ExternalLogins)
                     {
-                        <button type="submit" class="btn btn-primary" style="width:auto"
+                        if (provider.Name.ToLower() == "google")
+                        {
+                        <button type="submit" class="btn btn-link"
                                 name="provider" value="@provider.Name"
                                 title="Přihlásit pomocí @provider.DisplayName účtu">
-                            @provider.DisplayName
+                            <img src="/Content/Img/GoogleSignin.png" style="height:50px;width:auto" />
                         </button>
+                        }
                     }
                 </div>
             </form>
