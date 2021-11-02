@@ -317,7 +317,7 @@ namespace HlidacStatu.Repositories
 
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
-            var obce = HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty(Firma.Zatrideni.StatniOrganizaceObor.Obce);
+            var obce = HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty(Firma.Zatrideni.SubjektyObory.Obce);
             Devmasters.Batch.Manager.DoActionForAll<Firma.Zatrideni.Item>(obce,
                 (f) =>
                 {

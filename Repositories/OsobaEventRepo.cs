@@ -150,52 +150,52 @@ namespace HlidacStatu.Repositories
             }
 
 
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Verejne_vysoke_skoly))
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Verejne_vysoke_skoly))
             {
                 pozice = osoba.Pohlavi == "f" ? "Rektorka" : "Rektor";
                 type = OsobaEvent.Types.VerejnaSpravaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Kraje_Praha))
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Kraje_Praha))
             {
                 pozice = osoba.Pohlavi == "f" ? "Hejtmanka" : "Hejtman";
                 type = OsobaEvent.Types.PolitickaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Ministerstva))
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Ministerstva))
             {
                 pozice = osoba.Pohlavi == "f" ? "Ministryně" : "Ministr";
                 type = OsobaEvent.Types.PolitickaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Statutarni_mesta))
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Statutarni_mesta))
             {
                 pozice = osoba.Pohlavi == "f" ? "Primátorka" : "Primátor";
                 type = OsobaEvent.Types.PolitickaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Obce))
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Obce))
             {
                 pozice = osoba.Pohlavi == "f" ? "Starostka" : "Starosta";
                 type = OsobaEvent.Types.PolitickaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Zakladni_a_stredni_skoly))
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Zakladni_a_stredni_skoly))
             {
                 pozice = osoba.Pohlavi == "f" ? "Ředitelka" : "Ředitel";
                 type = OsobaEvent.Types.VerejnaSpravaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Vrchni_statni_zastupitelstvi))
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Vrchni_statni_zastupitelstvi))
             {
                 pozice = osoba.Pohlavi == "f" ? "Vrchní státní zástupkyně" : "Vrchní státní zástupce";
                 type = OsobaEvent.Types.VerejnaSpravaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Krajska_statni_zastupitelstvi))
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Krajska_statni_zastupitelstvi))
             {
                 pozice = osoba.Pohlavi == "f" ? "Krajská státní zástupkyně" : "Krajský státní zástupce";
                 type = OsobaEvent.Types.VerejnaSpravaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Krajske_soudy))
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Krajske_soudy))
             {
                 pozice = osoba.Pohlavi == "f" ? "Předsedkyně krajského soudu" : "Předseda krajského soudu";
                 type = OsobaEvent.Types.VerejnaSpravaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.StatniOrganizaceObor.Soudy))
+            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Soudy))
             {
                 pozice = osoba.Pohlavi == "f" ? "Předsedkyně soudu" : "Předseda soudu";
                 type = OsobaEvent.Types.VerejnaSpravaPracovni;

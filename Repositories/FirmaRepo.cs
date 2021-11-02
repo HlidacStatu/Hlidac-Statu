@@ -16,51 +16,45 @@ namespace HlidacStatu.Repositories
     {
         static string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
 
-
-        public static void Save(Firma firma)
+        private static void PrepareBeforeSave(Firma firma, bool updateLastUpdateValue = true)
         {
             firma.JmenoAscii = TextUtil.RemoveDiacritics(firma.Jmeno);
             firma.SetTyp();
 
-            string sql = @"exec Firma_Save @ICO,@DIC,@Datum_zapisu_OR,@Stav_subjektu,@Jmeno,@Jmenoascii,@Kod_PF,@Source, @Popis, @VersionUpdate, @krajId, @okresId, @status,@typ,@esa2010  ";
+        }
+
+        public static void Save(Firma firma)
+        {
+
             string sqlNACE = @"INSERT into firma_NACE(ico, nace) values(@ico,@nace)";
             string sqlDS = @"INSERT into firma_DS(ico, DatovaSchranka) values(@ico,@DatovaSchranka)";
 
             string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
             try
             {
-                using (PersistLib p = new PersistLib())
+                using (DbEntities db = new DbEntities())
                 {
-                    p.ExecuteNonQuery(cnnStr, CommandType.Text, sql, new IDataParameter[]
+
+                    db.firm.Attach(osoba);
+
+                    if (osoba.InternalId == 0)
                     {
-                        new SqlParameter("ico", firma.ICO),
-                        new SqlParameter("dic", firma.DIC),
-                        new SqlParameter("Datum_zapisu_OR", firma.Datum_Zapisu_OR),
-                        new SqlParameter("Stav_subjektu", firma.Stav_subjektu),
-                        new SqlParameter("Jmeno", firma.Jmeno),
-                        new SqlParameter("Jmenoascii", firma.JmenoAscii),
-                        new SqlParameter("Kod_PF", firma.Kod_PF),
-                        new SqlParameter("Source", firma.Source),
-                        new SqlParameter("Popis", firma.Popis),
-                        new SqlParameter("VersionUpdate", firma.VersionUpdate),
-                        new SqlParameter("KrajId", firma.KrajId),
-                        new SqlParameter("OkresId", firma.OkresId),
-                        new SqlParameter("Status", firma.Status),
-                        new SqlParameter("Typ", firma.Typ),
-                        new SqlParameter("@esa2010", firma.ESA2020)
-                    });
+                        db.Entry(osoba).State = EntityState.Added;
+                    }
+                    else
+                        db.Entry(osoba).State = EntityState.Modified;
 
 
                     if (firma.DatovaSchranka != null)
                     {
-                        p.ExecuteNonQuery(cnnStr, CommandType.Text, "delete from firma_DS where ico=@ico",
+                        HlidacStatu.Connectors.DirectDB.NoResult("delete from firma_DS where ico=@ico",
                             new IDataParameter[]
                             {
                                 new SqlParameter("ico", firma.ICO)
                             });
                         foreach (var ds in firma.DatovaSchranka.Distinct())
                         {
-                            p.ExecuteNonQuery(cnnStr, CommandType.Text, sqlDS, new IDataParameter[]
+                            HlidacStatu.Connectors.DirectDB.NoResult(sqlDS, new IDataParameter[]
                             {
                                 new SqlParameter("ico", firma.ICO),
                                 new SqlParameter("DatovaSchranka", ds),
@@ -70,14 +64,14 @@ namespace HlidacStatu.Repositories
 
                     if (firma.NACE != null)
                     {
-                        p.ExecuteNonQuery(cnnStr, CommandType.Text, "delete from firma_NACE where ico=@ico",
+                        HlidacStatu.Connectors.DirectDB.NoResult("delete from firma_NACE where ico=@ico",
                             new IDataParameter[]
                             {
                                 new SqlParameter("ico", firma.ICO)
                             });
                         foreach (var nace in firma.NACE.Distinct())
                         {
-                            p.ExecuteNonQuery(cnnStr, CommandType.Text, sqlNACE, new IDataParameter[]
+                            HlidacStatu.Connectors.DirectDB.NoResult(sqlNACE, new IDataParameter[]
                             {
                                 new SqlParameter("ico", firma.ICO),
                                 new SqlParameter("nace", nace),
@@ -350,6 +344,7 @@ namespace HlidacStatu.Repositories
             f.KrajId = (string)PersistLib.IsNull(dr["krajid"], string.Empty);
             f.OkresId = (string)PersistLib.IsNull(dr["okresid"], string.Empty);
             f.Typ = (int?)PersistLib.IsNull(dr["typ"], null);
+            f.ESA2010 = (string)PersistLib.IsNull(dr["Esa2010"], string.Empty);
 
             if (skipDS_Nace == false)
             {

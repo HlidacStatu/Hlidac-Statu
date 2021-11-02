@@ -258,6 +258,24 @@ namespace HlidacStatu.Repositories
             }
             else
             {
+                Smlouva.SClassification.ClassificationsTypes[] vyjimkyClassif =
+                    new Smlouva.SClassification.ClassificationsTypes[]
+                    {
+                    Smlouva.SClassification.ClassificationsTypes.finance_formality,
+                    Smlouva.SClassification.ClassificationsTypes.finance_repo,
+                    Smlouva.SClassification.ClassificationsTypes.finance_bankovni,
+                    };
+
+                var smluvniStrany = smlouva.Prijemce.Concat(new Smlouva.Subjekt[] { smlouva.Platce })
+                    .Select(m=>Firmy.Get(m.ico))
+                    .Where(m=>m.Valid==true);
+                if (types.Count(m => vyjimkyClassif.Contains(m.Key)) > 0
+                    && smluvniStrany.Any(m=>m.ESA2010.StartsWith("12")==0 )
+                {
+                    foreach (var vc in vyjimkyClassif)
+                        types.Remove(vc);
+                }
+
                 Smlouva.SClassification.Classification[] newClass = types
                     .Select(m => new Smlouva.SClassification.Classification()
                     {
@@ -265,6 +283,8 @@ namespace HlidacStatu.Repositories
                         ClassifProbability = m.Value
                     }
                     ).ToArray();
+
+                //
 
                 var newClassRelevant = smlouva.relevantClassif(newClass);
                 smlouva.Classification = new Smlouva.SClassification(newClassRelevant);

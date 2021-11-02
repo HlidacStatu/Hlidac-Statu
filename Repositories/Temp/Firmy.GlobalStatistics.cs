@@ -65,7 +65,7 @@ namespace HlidacStatu.Repositories
                         string velkamesta = "00064581,00081531,00266094,00254657,00262978,44992785,00845451,00274046,00075370,00262978,00299308,00244732,00283924";
                         icos.AddRange(velkamesta.Split(','));
 
-                        icos.AddRange(FirmaRepo.Zatrideni.Subjekty(Firma.Zatrideni.StatniOrganizaceObor.Vse).Select(m => m.Ico));
+                        icos.AddRange(FirmaRepo.Zatrideni.Subjekty(Firma.Zatrideni.SubjektyObory.Vse).Select(m => m.Ico));
 
                         //nejvice utajujici smluvni strany
                         Util.Consts.Logger.Info($"Loading ICOS utajujici smluvni strany");

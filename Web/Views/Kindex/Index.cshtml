@@ -72,7 +72,7 @@
                 </div>
             </div>
             @{ string[] groupFilter = new[] { "Justice", "Samospráva", "Školství","Státní úřady a organizace" }; }
-            @foreach (var g in Devmasters.Enums.EnumTools.Groups(typeof(Firma.Zatrideni.StatniOrganizaceObor))
+            @foreach (var g in Devmasters.Enums.EnumTools.Groups(typeof(Firma.Zatrideni.SubjektyObory))
             .Except(groupFilter))
             {
                 <div class="block-col block-part">
@@ -80,7 +80,7 @@
                         @g
                     </div>
                     <div class="block-tags">
-                        @foreach (var item in Devmasters.Enums.EnumTools.InGroup(typeof(Firma.Zatrideni.StatniOrganizaceObor), g))
+                        @foreach (var item in Devmasters.Enums.EnumTools.InGroup(typeof(Firma.Zatrideni.SubjektyObory), g))
                         {
                             <a href="/kindex/zebricek/@item.ToString()" class="tag">@(item.ToNiceDisplayName())</a>
                         }

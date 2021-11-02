@@ -111,7 +111,7 @@ namespace HlidacStatu.Web.Controllers
             ViewBag.SelectedKraj = kraj;
 
 
-            Firma.Zatrideni.StatniOrganizaceObor oborFromId;
+            Firma.Zatrideni.SubjektyObory oborFromId;
             if (Enum.TryParse(id, true, out oborFromId))
                 id = "obor";
 

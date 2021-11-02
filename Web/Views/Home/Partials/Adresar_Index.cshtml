@@ -23,7 +23,7 @@
             string[] skip = new string[] { "Obce" };
         }
         @foreach (var g in Devmasters.Enums.EnumTools
-        .Groups(typeof(Firma.Zatrideni.StatniOrganizaceObor))
+        .Groups(typeof(Firma.Zatrideni.SubjektyObory))
         .OrderByDescending(o => o == "Státní úřady a organizace")
         .ThenByDescending(o => o == "Samospráva")
         .ThenBy(o => o)
@@ -31,7 +31,7 @@
         {
             <h3>@g</h3>
             <div>
-                @foreach (Firma.Zatrideni.StatniOrganizaceObor item in Devmasters.Enums.EnumTools.InGroup(typeof(Firma.Zatrideni.StatniOrganizaceObor), g, true))
+                @foreach (Firma.Zatrideni.SubjektyObory item in Devmasters.Enums.EnumTools.InGroup(typeof(Firma.Zatrideni.SubjektyObory), g, true))
                 {
                     if (skip.Contains(item.ToString()) == false)
                     {

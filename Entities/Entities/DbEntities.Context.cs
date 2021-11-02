@@ -96,6 +96,19 @@ namespace HlidacStatu.Entities
                     .IsFixedLength(true);
             });
 
+            modelBuilder.Entity<Firma>(entity =>
+            {
+                entity.HasKey(e => e.ICO)
+                    .HasName("PK_Firma");
+
+                entity.Property(e => e.VersionUpdate).HasDefaultValue<int>(0);
+                entity.Property(e => e.p).HasDefaultValue<int>(0);
+
+                entity.Property(e => e.Pohlavi)
+                    .IsUnicode(false)
+                    .IsFixedLength(true);
+            });
+
             modelBuilder.Entity<OsobaEvent>(entity =>
             {
                 entity.HasKey(e => e.Pk)
@@ -161,6 +174,7 @@ namespace HlidacStatu.Entities
             });
 
         }
+        public virtual DbSet<Firma> Firma { get; set; }
 
         public virtual DbSet<WatchDog> WatchDogs { get; set; }
         public virtual DbSet<AspNetUserApiToken> AspNetUserApiTokens { get; set; }

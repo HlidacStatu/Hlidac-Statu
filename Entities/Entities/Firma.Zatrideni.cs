@@ -21,7 +21,7 @@ namespace HlidacStatu.Entities
             [Groupable]
             [ShowNiceDisplayName()]
             [Sortable(SortableAttribute.SortAlgorithm.BySortValueAndThenAlphabetically)]
-            public enum StatniOrganizaceObor
+            public enum SubjektyObory
             {
                 [Disabled]
                 Ostatni = 0,
@@ -209,6 +209,13 @@ namespace HlidacStatu.Entities
                 // regionalni rozvojove agentury, vinarstvi, ...
                 // domy deti a mladeze
 
+                [Disabled()]
+                Financni_VsechnyInstituce = 50000,
+                Financni_Banky = 50001,
+                Financni_Fondy = 50002,
+                Financni_Ostatni = 50003,
+                Financni_Pojistovny = 50004,
+                Financni_PenzijniFondy = 50005,
 
                 [Disabled]
                 OVM_pro_evidenci_skutecnych_majitelu = 3106,

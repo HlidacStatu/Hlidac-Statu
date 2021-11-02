@@ -33,11 +33,11 @@
         <h2>Připravili jsme pro vás několik žebříčků</h2>
         <div class="row">
             <div class="col-xs-12">
-                @foreach (var g in Devmasters.Enums.EnumTools.Groups(typeof(Firma.Zatrideni.StatniOrganizaceObor)))
+                @foreach (var g in Devmasters.Enums.EnumTools.Groups(typeof(Firma.Zatrideni.SubjektyObory)))
                 {
                     <h3>@g</h3>
                     <div>
-                        @foreach (var item in Devmasters.Enums.EnumTools.InGroup(typeof(Firma.Zatrideni.StatniOrganizaceObor), g))
+                        @foreach (var item in Devmasters.Enums.EnumTools.InGroup(typeof(Firma.Zatrideni.SubjektyObory), g))
                         {
                             <a href="/kindex/zebricek/@item.ToString()" class="btn btn-default"><span class="text-gray">Porovnat</span> @(item.ToNiceDisplayName())</a>
 

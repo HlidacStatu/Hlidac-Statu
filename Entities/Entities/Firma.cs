@@ -98,7 +98,22 @@ namespace HlidacStatu.Entities
         public int? Status { get; set; }
         public int? Typ { get; set; }
 
-        public string ESA2020 { get; set; }
+        public string ESA2010 { get; set; }
+
+        public string KrajId { get; set; }
+        public string OkresId { get; set; }
+
+        public short? IsInRS { get; set; }
+
+        public int? Kod_PF { get; set; }
+
+        // https://wwwinfo.mfcr.cz/ares/nace/ares_nace.html.cz
+        [NotMapped]
+        public string[] NACE { get; set; } = new string[] { };
+        public int VersionUpdate { get; set; }
+
+        public string Source { get; set; }
+        public string Popis { get; set; }
 
 
         [NotMapped]
@@ -149,11 +164,6 @@ namespace HlidacStatu.Entities
             }
         }
 
-        public string KrajId { get; set; }
-        public string OkresId { get; set; }
-
-        public short? IsInRS { get; set; }
-
         //migrace: ošklivej hack
         public FirmaHint _firmaHint = null;
 
@@ -190,15 +200,6 @@ namespace HlidacStatu.Entities
 
         // https://wwwinfo.mfcr.cz/ares/aresPrFor.html.cz
 
-        public int? Kod_PF { get; set; }
-
-        // https://wwwinfo.mfcr.cz/ares/nace/ares_nace.html.cz
-        [NotMapped]
-        public string[] NACE { get; set; } = new string[] { };
-        public int VersionUpdate { get; set; }
-
-        public string Source { get; set; }
-        public string Popis { get; set; }
 
 
         //External.RPP.KategorieOVM[] _kategorieOVM = null;
