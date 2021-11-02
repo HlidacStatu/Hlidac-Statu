@@ -146,7 +146,7 @@ namespace HlidacStatu.Repositories
                 }
                 catch (Exception e)
                 {
-                    Console.Write(e.ToString());
+                    HlidacStatu.Util.Consts.Logger.Error($"Saving osoba {osoba.NameId}", e);
                 }
 
                 if (externalIds != null)

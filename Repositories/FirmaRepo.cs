@@ -35,14 +35,25 @@ namespace HlidacStatu.Repositories
                 using (DbEntities db = new DbEntities())
                 {
 
-                    db.firm.Attach(osoba);
+                    bool existsInDb = db.Firma.AsQueryable().Where(m => m.ICO == firma.ICO).Select(m => m.ICO).FirstOrDefault() != null;
 
-                    if (osoba.InternalId == 0)
+
+                    db.Firma.Attach(firma);
+                    if (existsInDb)
                     {
-                        db.Entry(osoba).State = EntityState.Added;
+                        db.Entry(firma).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                     }
                     else
-                        db.Entry(osoba).State = EntityState.Modified;
+                        db.Entry(firma).State = Microsoft.EntityFrameworkCore.EntityState.Added;
+
+                    try
+                    {
+                        db.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        HlidacStatu.Util.Consts.Logger.Error($"Saving EntityFr firma {firma.ICO}", e);
+                    }
 
 
                     if (firma.DatovaSchranka != null)
@@ -82,7 +93,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                HlidacStatu.Util.Consts.Logger.Error($"Saving firma {firma.ICO}", e);
             }
         }
 
@@ -129,14 +140,14 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static Firma FromIco(int ico, bool getMissingFromExternal = false)
+        public static Firma FromIcoExt(int ico, bool getMissingFromExternal = false, bool loadAllData = true)
         {
-            return FromIco(ico.ToString().PadLeft(8, '0'), getMissingFromExternal);
+            return FromIcoExt(ico.ToString().PadLeft(8, '0'), getMissingFromExternal, loadAllData);
         }
 
-        public static Firma FromIco(string ico, bool getMissingFromExternal = false)
+        public static Firma FromIcoExt(string ico, bool getMissingFromExternal = false, bool loadAllData = true)
         {
-            Firma f = FromIco(ico);
+            Firma f = FromIco(ico, loadAllData);
 
             if (f.Valid)
                 return f;
@@ -186,102 +197,96 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static Firma FromIco(string ico)
+        public static Firma FromIco(string ico, bool loadAllData = true)
         {
             Firma f = new Firma();
-            using (PersistLib p = new PersistLib())
+            using (DbEntities db = new DbEntities())
             {
-                string sql = @"select * from Firma where ico = @ico";
 
-                var res = p.ExecuteDataset(cnnStr, CommandType.Text, sql, new IDataParameter[] {
-                        new SqlParameter("ico", ico)
-                        });
+                f = db.Firma.AsQueryable().FirstOrDefault(m => m.ICO == ico);
 
-                if (res.Tables[0].Rows.Count > 0)
+                if (f != null)
                 {
-                    return FromDataRow(res.Tables[0].Rows[0]);
+                    f.DatovaSchranka = Connectors.DirectDB.GetList<string>("select DatovaSchranka from firma_DS where ico=@ico", param: new IDataParameter[] {
+                        new SqlParameter("ico", f.ICO)
+                        })
+                        .ToArray();
+
+                    f.NACE = Connectors.DirectDB.GetList<string>("select NACE from firma_Nace where ico=@ico", param: new IDataParameter[] {
+                        new SqlParameter("ico", f.ICO)
+                        })
+                        .ToArray();
+
+                    return f;
                 }
                 else
-                {
                     return Firma.NotFound;
-                }
+
             }
         }
 
         public static Firma FromName(string jmeno)
         {
-            var res = AllFromName(jmeno);
+            var res = AllFromExactName(jmeno);
             if (res.Count() == 0)
                 return Firma.NotFound;
             else
                 return res.First();
         }
 
-        public static IEnumerable<Firma> AllFromName(string jmeno)
+        public static IEnumerable<Firma> AllFromExactName(string jmeno)
         {
-            using (PersistLib p = new PersistLib())
-            {
-                string sql = @"select * from Firma where jmeno = @jmeno";
+            string sql = @"select ico from Firma where jmeno = @jmeno";
 
-                var res = p.ExecuteDataset(cnnStr, CommandType.Text, sql, new IDataParameter[] {
+            var res = Connectors.DirectDB.GetList<string>(sql, param: new IDataParameter[] {
                         new SqlParameter("jmeno", jmeno)
                         });
 
-                if (res.Tables.Count > 0 && res.Tables[0].Rows.Count > 0)
-                {
-                    return res.Tables[0]
-                        .AsEnumerable()
-                        .Where(r => TextUtil.IsNumeric((string)r["ICO"]))
-                        .Select(m => FromDataRow(m));
-                }
-                else
-                    return new Firma[] { };
+            if (res?.Count() > 0)
+            {
+                return res.Select(m => FromIco(m)).Where(m => m.Valid);
             }
+            else
+                return new Firma[] { };
+
         }
 
         public static IEnumerable<Firma> AllFromNameWildcards(string jmeno)
         {
-            using (PersistLib p = new PersistLib())
-            {
-                var sql = @"select * from Firma where jmeno like @jmeno";
 
-                var res = p.ExecuteDataset(cnnStr, CommandType.Text, sql, new IDataParameter[] {
-                        new SqlParameter("jmeno", Firma.JmenoBezKoncovky(jmeno)+ "%")
+
+            var sql = @"select ico from Firma where jmeno like @jmeno";
+
+            var res = Connectors.DirectDB.GetList<string>(sql, param: new IDataParameter[] {
+                        new SqlParameter("jmeno", jmeno)
                         });
-                var found = new List<Firma>();
-                if (res.Tables.Count > 0 && res.Tables[0].Rows.Count > 0)
-                {
-                    found.AddRange(res.Tables[0]
-                        .AsEnumerable()
-                        .Select(m => FromDataRow(m))
-                        );
-                    return found;
-                }
-                else
-                    return new Firma[] { };
+
+            if (res?.Count() > 0)
+            {
+                return res.Select(m => FromIco(m)).Where(m => m.Valid);
             }
+            else
+                return new Firma[] { };
+
         }
 
         public static Firma FromDS(string ds)
         {
-            Firma f = new Firma();
-            using (PersistLib p = new PersistLib())
-            {
-                string sql = @"select firma.* from Firma_ds fds inner join firma on firma.ico = fds.ico where DatovaSchranka = @ds";
+            string sql = @"select firma.ico from Firma_ds fds inner join firma on firma.ico = fds.ico where DatovaSchranka = @ds";
 
-                var res = p.ExecuteDataset(cnnStr, CommandType.Text, sql, new IDataParameter[] {
+            var res = Connectors.DirectDB.GetList<string>(sql, param: new IDataParameter[] {
                         new SqlParameter("ds", ds)
                         });
 
-                if (res.Tables[0].Rows.Count > 0)
-                {
-                    return FromDataRow(res.Tables[0].Rows[0]);
-                }
-                else
-                {
-                    return Firma.NotFound;
-                }
+            if (res?.Count() > 0)
+            {
+                return FromIco(res.First());
             }
+            else
+            {
+                return Firma.NotFound;
+            }
+
 
         }
 
@@ -310,22 +315,10 @@ namespace HlidacStatu.Repositories
 
         public static IEnumerable<Firma> AllFirmyInRS(bool skipDS_Nace = false)
         {
-            using (PersistLib p = new PersistLib())
-            {
-                string sql = @"select * from Firma where IsInRS = 1";
+            return AllIcoInRS()
+                .Select(m => FromIco(m))
+                .Where(m => m.Valid);
 
-                var res = p.ExecuteDataset(cnnStr, CommandType.Text, sql, null);
-
-                if (res.Tables.Count > 0 && res.Tables[0].Rows.Count > 0)
-                {
-                    return res.Tables[0]
-                        .AsEnumerable()
-                        .Where(r => TextUtil.IsNumeric((string)r["ICO"]))
-                        .Select(r => FromDataRow(r, skipDS_Nace));
-                }
-                else
-                    return new Firma[] { };
-            }
         }
 
         private static Firma FromDataRow(DataRow dr, bool skipDS_Nace = false)
@@ -334,7 +327,7 @@ namespace HlidacStatu.Repositories
             f.ICO = (string)dr["ico"];
             f.DIC = (string)PersistLib.IsNull(dr["dic"], string.Empty);
             f.Datum_Zapisu_OR = (DateTime?)PersistLib.IsNull(dr["datum_zapisu_or"], null);
-            f.Stav_subjektu = Convert.ToInt32(PersistLib.IsNull(dr["Stav_subjektu"], 1));
+            f.Stav_subjektu = (byte) Convert.ToInt32(PersistLib.IsNull(dr["Stav_subjektu"], 1));
             f.Status = Convert.ToInt32(PersistLib.IsNull(dr["Status"], 1));
             f.Jmeno = (string)PersistLib.IsNull(dr["jmeno"], string.Empty);
             f.JmenoAscii = (string)PersistLib.IsNull(dr["jmenoascii"], string.Empty);

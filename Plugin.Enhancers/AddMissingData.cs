@@ -166,7 +166,7 @@ namespace HlidacStatu.Plugin.Enhancers
             if (string.IsNullOrEmpty(subj.nazev) && !string.IsNullOrEmpty(subj.ico))
             {
                 //dopln chybejici jmeno 
-                Firma f = FirmaRepo.FromIco(subj.ico, true);
+                Firma f = FirmaRepo.FromIcoExt(subj.ico, true);
                 if (Firma.IsValid(f))
                 {
                     subj.nazev = f.Jmeno;

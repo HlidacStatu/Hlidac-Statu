@@ -189,7 +189,7 @@ namespace HlidacStatu.Repositories
 
                     //f.Popis = 
                     f.Source = link;
-                    f.Stav_subjektu = is_active ? 1 : 0;
+                    f.Stav_subjektu = (byte?)(is_active ? 1 : 0);
                     //f.VersionUpdate;
                     return f;
                 }
@@ -440,7 +440,7 @@ namespace HlidacStatu.Repositories
 
                         //f.Popis = 
                         f.Source = link;
-                        f.Stav_subjektu = is_active ? 1 : 0;
+                        f.Stav_subjektu = (byte?)(is_active ? 1 : 0);
                         //f.VersionUpdate;
                         return f;
                     }

@@ -33,21 +33,21 @@ namespace HlidacStatu.Repositories
         }
 
         public static CouchbaseCacheManager<Firma, string> instanceByIco
-            = CouchbaseCacheManager<Firma, string>.GetSafeInstance("firmyByICO", getByIco, TimeSpan.FromHours(4),
+            = CouchbaseCacheManager<Firma, string>.GetSafeInstance("firmyByICO_v2_", getByIco, TimeSpan.FromHours(4),
                 Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                 Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                 Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
                 Devmasters.Config.GetWebConfigValue("CouchbasePassword"));
 
         public static CouchbaseCacheManager<Firma, string> instanceByDS
-            = CouchbaseCacheManager<Firma, string>.GetSafeInstance("firmyByDS", getByDS, TimeSpan.FromHours(4),
+            = CouchbaseCacheManager<Firma, string>.GetSafeInstance("firmyByDS_v2_", getByDS, TimeSpan.FromHours(4),
                 Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                 Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                 Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
                 Devmasters.Config.GetWebConfigValue("CouchbasePassword"));
 
         public static CouchbaseCacheManager<string, string> instanceNameOnlyByIco
-            = CouchbaseCacheManager<string, string>.GetSafeInstance("firmaNameOnlyByICO", getNameByIco, TimeSpan.FromHours(12),
+            = CouchbaseCacheManager<string, string>.GetSafeInstance("firmaNameOnlyByICO_v2_", getNameByIco, TimeSpan.FromHours(12),
                 Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                 Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                 Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),

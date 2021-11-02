@@ -94,7 +94,7 @@ namespace HlidacStatu.Entities
         [NotMapped]
         public string[] DatovaSchranka { get; set; } = new string[] { };
         public DateTime? Datum_Zapisu_OR { get; set; }
-        public int? Stav_subjektu { get; set; }
+        public byte? Stav_subjektu { get; set; }
         public int? Status { get; set; }
         public int? Typ { get; set; }
 
@@ -114,6 +114,32 @@ namespace HlidacStatu.Entities
 
         public string Source { get; set; }
         public string Popis { get; set; }
+        private string _jmeno = string.Empty;
+
+        public string Jmeno
+        {
+            get { return _jmeno; }
+            set
+            {
+                _jmeno = value;
+                JmenoAscii = TextUtil.RemoveDiacritics(value);
+            }
+        }
+
+        public string JmenoAscii { get; set; }
+
+        public int PocetZam { get; set; }
+        public string KodOkresu { get; set; }
+        public string ICZUJ { get; set; }
+        public string KODADM { get; set; }
+        public string Adresa { get; set; }
+        public string PSC { get; set; }
+        public string Obec { get; set; }
+        public string CastObce { get; set; }
+        public string Ulice { get; set; }
+        public string CisloDomu { get; set; }
+        public string CisloOrientacni { get; set; }
+
 
 
         [NotMapped]
@@ -167,19 +193,6 @@ namespace HlidacStatu.Entities
         //migrace: ošklivej hack
         public FirmaHint _firmaHint = null;
 
-        private string _jmeno = string.Empty;
-
-        public string Jmeno
-        {
-            get { return _jmeno; }
-            set
-            {
-                _jmeno = value;
-                JmenoAscii = TextUtil.RemoveDiacritics(value);
-            }
-        }
-
-        public string JmenoAscii { get; set; }
 
         public string JmenoOrderReady()
         {
@@ -216,6 +229,8 @@ namespace HlidacStatu.Entities
 
         bool? _valid = null;
 
+
+        [NotMapped]
         public bool Valid
         {
             get

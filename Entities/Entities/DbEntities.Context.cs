@@ -102,11 +102,8 @@ namespace HlidacStatu.Entities
                     .HasName("PK_Firma");
 
                 entity.Property(e => e.VersionUpdate).HasDefaultValue<int>(0);
-                entity.Property(e => e.p).HasDefaultValue<int>(0);
+                entity.Property(e => e.PocetZam).HasDefaultValue<int>(0);
 
-                entity.Property(e => e.Pohlavi)
-                    .IsUnicode(false)
-                    .IsFixedLength(true);
             });
 
             modelBuilder.Entity<OsobaEvent>(entity =>

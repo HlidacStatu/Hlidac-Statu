@@ -268,9 +268,11 @@ namespace HlidacStatu.Repositories
 
                 var smluvniStrany = smlouva.Prijemce.Concat(new Smlouva.Subjekt[] { smlouva.Platce })
                     .Select(m=>Firmy.Get(m.ico))
-                    .Where(m=>m.Valid==true);
+                    .Where(m=>m.Valid==true)
+                    .ToArray();
                 if (types.Count(m => vyjimkyClassif.Contains(m.Key)) > 0
-                    && smluvniStrany.Any(m=>m.ESA2010.StartsWith("12")==0 )
+                    && smluvniStrany.Any(m=>m.ESA2010?.StartsWith("12") == true)==false
+                    )
                 {
                     foreach (var vc in vyjimkyClassif)
                         types.Remove(vc);
