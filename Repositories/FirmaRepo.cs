@@ -22,7 +22,7 @@ namespace HlidacStatu.Repositories
             firma.JmenoAscii = TextUtil.RemoveDiacritics(firma.Jmeno);
             firma.SetTyp();
 
-            string sql = @"exec Firma_Save @ICO,@DIC,@Datum_zapisu_OR,@Stav_subjektu,@Jmeno,@Jmenoascii,@Kod_PF,@Source, @Popis, @VersionUpdate, @krajId, @okresId, @status,@typ  ";
+            string sql = @"exec Firma_Save @ICO,@DIC,@Datum_zapisu_OR,@Stav_subjektu,@Jmeno,@Jmenoascii,@Kod_PF,@Source, @Popis, @VersionUpdate, @krajId, @okresId, @status,@typ,@esa2010  ";
             string sqlNACE = @"INSERT into firma_NACE(ico, nace) values(@ico,@nace)";
             string sqlDS = @"INSERT into firma_DS(ico, DatovaSchranka) values(@ico,@DatovaSchranka)";
 
@@ -47,6 +47,7 @@ namespace HlidacStatu.Repositories
                         new SqlParameter("OkresId", firma.OkresId),
                         new SqlParameter("Status", firma.Status),
                         new SqlParameter("Typ", firma.Typ),
+                        new SqlParameter("@esa2010", firma.ESA2020)
                     });
 
 
@@ -345,7 +346,6 @@ namespace HlidacStatu.Repositories
             f.JmenoAscii = (string)PersistLib.IsNull(dr["jmenoascii"], string.Empty);
             f.Kod_PF = (int?)PersistLib.IsNull(dr["Kod_PF"], null);
             f.VersionUpdate = (int)dr["VersionUpdate"];
-            //f.VazbyRaw = (string)PersistLib.IsNull(dr["vazbyRaw"], (string)"[]");
             f.IsInRS = (short?)PersistLib.IsNull(dr["IsInRS"], null);
             f.KrajId = (string)PersistLib.IsNull(dr["krajid"], string.Empty);
             f.OkresId = (string)PersistLib.IsNull(dr["okresid"], string.Empty);

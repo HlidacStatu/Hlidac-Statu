@@ -1,6 +1,7 @@
 ﻿using Devmasters.Enums;
 
 using System.Collections.Generic;
+using System.Data;
 
 namespace HlidacStatu.Entities
 {
@@ -1799,7 +1800,6 @@ namespace HlidacStatu.Entities
 {941,"Evropské seskupení pro územní spolupráci"},
 {950,"Subjekt právním řádem výslovně neupravený"},
         };
-
 
 
         [ShowNiceDisplayName()]

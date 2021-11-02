@@ -98,6 +98,9 @@ namespace HlidacStatu.Entities
         public int? Status { get; set; }
         public int? Typ { get; set; }
 
+        public string ESA2020 { get; set; }
+
+
         [NotMapped]
         public TypSubjektuEnum TypSubjektu
         {
