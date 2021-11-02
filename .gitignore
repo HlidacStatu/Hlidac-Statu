@@ -374,3 +374,5 @@ HlidacStatu.JobTableEditor/appsettings.Michal.json
 HlidacStatu.JobTableEditor/appsettings.Development.json
 
 HlidacStatu.JobsWeb/appsettings.json
+
+AutocompleteApi/appsettings.Development.json
