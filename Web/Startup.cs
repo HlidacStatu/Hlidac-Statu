@@ -379,6 +379,31 @@ namespace HlidacStatu.Web
                     IConfigurationSection googleAuthSetting = Configuration.GetSection("Authentication:Google");
                     options.ClientId = googleAuthSetting["Id"];
                     options.ClientSecret = googleAuthSetting["Secret"];
+                })
+                .AddOpenIdConnect("apple", async options =>  // taken from https://github.com/scottbrady91/AspNetCore-SignInWithApple-Example/blob/main/ScottBrady91.SignInWithApple.Example/Startup.cs
+                {
+                    options.Authority = "https://appleid.apple.com"; // disco doc: https://appleid.apple.com/.well-known/openid-configuration
+
+                    options.ClientId = "com.scottbrady91.authdemo.service"; // Service ID
+                    options.CallbackPath = "/signin-apple"; // corresponding to your redirect URI
+
+                    options.ResponseType = "code id_token"; // hybrid flow due to lack of PKCE support
+                    options.ResponseMode = "form_post"; // form post due to prevent PII in the URL
+                    options.DisableTelemetry = true;
+
+                    options.Scope.Clear(); // apple does not support the profile scope
+                    options.Scope.Add("openid");
+                    options.Scope.Add("email");
+                    options.Scope.Add("name");
+
+                    // custom client secret generation - secret can be re-used for up to 6 months
+                    options.Events.OnAuthorizationCodeReceived = context =>
+                    {
+                        //context.TokenEndpointRequest.ClientSecret = TokenGenerator.CreateNewToken();
+                        return Task.CompletedTask;
+                    };
+
+                    options.UsePkce = false; // apple does not currently support PKCE (April 2021)
                 });
 
             

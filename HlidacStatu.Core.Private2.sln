@@ -134,6 +134,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.JobsWeb", "Hlid
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CamelotDockerAPI", "..\Hlidac-Statu-Private\Docker\CamelotDockerAPI\CamelotDockerAPI.csproj", "{FF971AF6-D7D0-4CFD-826E-4D784CDCEBEA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Endpoints", "Endpoints", "{5D366581-E0CE-4116-90BE-DAC0F6B4CA5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutocompleteApi", "AutocompleteApi\AutocompleteApi.csproj", "{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -324,6 +328,10 @@ Global
 		{FF971AF6-D7D0-4CFD-826E-4D784CDCEBEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF971AF6-D7D0-4CFD-826E-4D784CDCEBEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF971AF6-D7D0-4CFD-826E-4D784CDCEBEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -352,6 +360,7 @@ Global
 		{956497F7-9609-442E-8AB1-5F0AEEBF8081} = {40841C9C-4BC4-4E32-AC3E-657E4A5FA1A0}
 		{A89C8C53-5F83-4EC8-BB06-F5CBB8BE1C28} = {40841C9C-4BC4-4E32-AC3E-657E4A5FA1A0}
 		{FF971AF6-D7D0-4CFD-826E-4D784CDCEBEA} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
+		{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC} = {5D366581-E0CE-4116-90BE-DAC0F6B4CA5C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
