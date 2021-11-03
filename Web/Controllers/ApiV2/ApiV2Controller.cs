@@ -50,7 +50,7 @@ namespace HlidacStatu.Web.Controllers
         [HttpGet("getmyip")]
         public ActionResult<string> GetIp()
         {
-            return this.ApiAuth.ApiCall.IP;
+            return HttpContext.Connection?.RemoteIpAddress?.ToString();
         }
 
         [Authorize]

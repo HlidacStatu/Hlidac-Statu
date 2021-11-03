@@ -60,9 +60,9 @@ namespace HlidacStatu.Web.Controllers
             }
 
             bool isLimited = !(
-                this.ApiAuth.ApiCall.UserRoles.Contains("novinar")
-                || this.ApiAuth.ApiCall.UserRoles.Contains("Admin")
-                || this.ApiAuth.ApiCall.UserRoles.Contains("KomercniLicence")
+                HttpContext.User.IsInRole("novinar")
+                || HttpContext.User.IsInRole("Admin")
+                || HttpContext.User.IsInRole("KomercniLicence")
             );
 
             result = InsolvenceRepo.Searching.SimpleSearch(dotaz, strana.Value,
@@ -102,9 +102,9 @@ namespace HlidacStatu.Web.Controllers
             }
 
             bool isLimited = !(
-                this.ApiAuth.ApiCall.UserRoles.Contains("novinar")
-                || this.ApiAuth.ApiCall.UserRoles.Contains("Admin")
-                || this.ApiAuth.ApiCall.UserRoles.Contains("KomercniLicence")
+                HttpContext.User.IsInRole("novinar")
+                || HttpContext.User.IsInRole("Admin")
+                || HttpContext.User.IsInRole("KomercniLicence")
             );
 
             var ins = InsolvenceRepo.LoadFromES(id, true, isLimited);

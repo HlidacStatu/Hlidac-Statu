@@ -29,7 +29,7 @@ namespace HlidacStatu.Web.Controllers
         {
 
             DataSet[] result = null;
-            if (this.ApiAuth.ApiCall.UserRoles.Contains("Admin"))
+            if (HttpContext.User.IsInRole("Admin"))
                 result = DataSetDB.AllDataSets.Get();
             else
                 result = DataSetDB.ProductionDataSets.Get();
@@ -132,7 +132,7 @@ namespace HlidacStatu.Web.Controllers
 
             try
             {
-                var res = DataSet.Api.Create(data, this.ApiAuth.ApiCall.User);
+                var res = DataSet.Api.Create(data, HttpContext.User?.Identity?.Name);
 
                 if (res.valid)
                 {
@@ -182,12 +182,12 @@ namespace HlidacStatu.Web.Controllers
                     return NotFound($"Dataset nenalezen.");
                 }
 
-                if (r.createdBy != null && this.ApiAuth.ApiCall.User.ToLower() != r.createdBy?.ToLower())
+                if (r.createdBy != null && HttpContext.User?.Identity?.Name?.ToLower() != r.createdBy?.ToLower())
                 {
                     return Forbid($"Nejste oprávněn mazat tento dataset.");
                 }
 
-                var res = DataSetDB.Instance.DeleteRegistration(datasetId, this.ApiAuth.ApiCall.User);
+                var res = DataSetDB.Instance.DeleteRegistration(datasetId, HttpContext.User?.Identity?.Name);
                 return res;
 
             }
@@ -230,7 +230,7 @@ namespace HlidacStatu.Web.Controllers
             ApiResponseStatus res;
             try
             {
-                res = DataSet.Api.Update(data, AuthUser()); //blablablabla this.ApiAuth.ApiCall.User);
+                res = DataSet.Api.Update(data, AuthUser()); //blablablabla HttpContext.User?.Identity?.Name);
             }
             catch (Exception ex)
             {
@@ -328,7 +328,7 @@ namespace HlidacStatu.Web.Controllers
 
                 if (mode == "rewrite")
                 {
-                    newId = ds.AddData(data.ToString(), itemId, this.ApiAuth.ApiCall.User, true);
+                    newId = ds.AddData(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
                 }
                 else if (mode == "merge")
                 {
@@ -350,17 +350,17 @@ namespace HlidacStatu.Web.Controllers
                                     MergeNullValueHandling = Newtonsoft.Json.Linq.MergeNullValueHandling.Ignore
                                 });
 
-                            newId = ds.AddData(oldObj.ToString(), itemId, this.ApiAuth.ApiCall.User, true);
+                            newId = ds.AddData(oldObj.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
                         }
                     }
                     else
-                        newId = ds.AddData(data.ToString(), itemId, this.ApiAuth.ApiCall.User, true);
+                        newId = ds.AddData(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
 
                 }
                 else //skip 
                 {
                     if (!ds.ItemExists(itemId))
-                        newId = ds.AddData(data.ToString(), itemId, this.ApiAuth.ApiCall.User, true);
+                        newId = ds.AddData(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
                 }
                 return new DSItemResponseDTO() { id = newId };
             }

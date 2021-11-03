@@ -84,8 +84,8 @@ namespace HlidacStatu.Web.Controllers
                 var filtered = result.ElasticResults.Hits
                     .Select(m =>
                         Smlouva.Export(m.Source,
-                            this.ApiAuth.ApiCall.UserRoles.Contains("Admin") || this.ApiAuth.ApiCall.UserRoles.Contains("KomercniLicence"),
-                            this.ApiAuth.ApiCall.UserRoles.Contains("Admin") || this.ApiAuth.ApiCall.UserRoles.Contains("KomercniLicence")
+                            HttpContext.User.IsInRole("Admin") || HttpContext.User.IsInRole("KomercniLicence"),
+                            HttpContext.User.IsInRole("Admin") || HttpContext.User.IsInRole("KomercniLicence")
                             )
                         )
                     .ToArray();
@@ -113,7 +113,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 return NotFound($"Smlouva nenalezena");
             }
-            var s = Smlouva.Export(smlouva, this.ApiAuth.ApiCall.UserRoles.Contains("Admin") || this.ApiAuth.ApiCall.UserRoles.Contains("KomercniLicence"), this.ApiAuth.ApiCall.UserRoles.Contains("Admin") || this.ApiAuth.ApiCall.UserRoles.Contains("KomercniLicence"));
+            var s = Smlouva.Export(smlouva, HttpContext.User.IsInRole("Admin") || HttpContext.User.IsInRole("KomercniLicence"), HttpContext.User.IsInRole("Admin") || HttpContext.User.IsInRole("KomercniLicence"));
 
             return s;
         }

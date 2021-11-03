@@ -27,11 +27,11 @@ namespace HlidacStatu.Web.Controllers
         [NonAction]
         public ApplicationUser AuthUser()
         {
-            ApplicationUser user = ApplicationUser.GetByEmail(ApiAuth.ApiCall.User);
+            ApplicationUser user = ApplicationUser.GetByEmail(HttpContext.User?.Identity?.Name);
             return user;
         }
 
-        public ApiAuth.Result ApiAuth { get; set; }
+        //public ApiAuth.Result ApiAuth { get; set; }
 
     }
 }

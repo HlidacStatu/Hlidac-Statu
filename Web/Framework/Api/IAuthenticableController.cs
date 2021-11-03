@@ -11,7 +11,7 @@ namespace HlidacStatu.Web.Framework
         string AuthToken { get; }
 
         //used only in apiV2
-        ApiAuth.Result ApiAuth { get; set; }
+        //ApiAuth.Result ApiAuth { get; set; }
 
         ApplicationUser AuthUser();
     }
