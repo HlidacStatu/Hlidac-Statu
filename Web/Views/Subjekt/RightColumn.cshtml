@@ -74,7 +74,7 @@
         <table>
             <tr>
                 <td class="text-nowrap text-muted col-sm-5">Založeno</td>
-                <td class="col-sm-7">@(Model.Datum_Zapisu_OR.Value.ToString("dd.MM.yyyy"))</td>
+                <td class="col-sm-7">@(Model.Datum_Zapisu_OR?.ToString("dd.MM.yyyy"))</td>
             </tr>
             <tr>
                 <td class="text-nowrap text-muted col-sm-5">IČO</td>

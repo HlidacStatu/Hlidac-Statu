@@ -363,9 +363,10 @@ namespace HlidacStatu.Repositories
                     {
                         foreach (var ico in smlouva.Prijemce.Select(m=>m.ico).Distinct())
                         {
-                            DirectDB.NoResult("insert into SmlouvyDodavatele(smlouvaid,ico) values(@smlouvaid, @ico)",
-                                new SqlParameter("smlouvaId", smlouva.Id),
-                                new SqlParameter("ico", ico)
+                            if (!string.IsNullOrEmpty(ico))
+                                DirectDB.NoResult("insert into SmlouvyDodavatele(smlouvaid,ico) values(@smlouvaid, @ico)",
+                                    new SqlParameter("smlouvaId", smlouva.Id),
+                                    new SqlParameter("ico", ico)
                             );
 
                         }
