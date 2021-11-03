@@ -26,7 +26,7 @@ namespace HlidacStatu.AutocompleteApi.Controllers
         }
         
         [HttpGet]
-        public IEnumerable<Autocomplete> SampleComplete(string q)
+        public IEnumerable<Autocomplete> Test(string q)
         {
             var searchResult = _memoryStore.SmallSampleIndex.Search(q, 5, ac => ac.Priority);
 

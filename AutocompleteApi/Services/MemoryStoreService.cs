@@ -10,6 +10,7 @@ namespace HlidacStatu.AutocompleteApi.Services
 {
     public class MemoryStoreService
     {
+        // Search indexes
         public Index<Autocomplete> HlidacFulltextIndex { get; private set; }
 
         private readonly object _fullTextLock = new();
@@ -18,9 +19,15 @@ namespace HlidacStatu.AutocompleteApi.Services
 
         private readonly object _sampleLock = new();
 
+        // metadata
+        public DateTime RunningSince { get; }
+        public DateTime LastDataRenewalStarted { get; private set; }
+        public bool IsDataRenewalRunning { get; private set; }
+        public Exception LastException { get; private set; }
 
         public MemoryStoreService()
         {
+            RunningSince = DateTime.Now;
             //quick load from backups so app can restart fast
             HlidacFulltextIndex = LoadFromBackup<Autocomplete>(nameof(HlidacFulltextIndex));
             SmallSampleIndex = LoadFromBackup<Autocomplete>(nameof(SmallSampleIndex));
@@ -30,10 +37,29 @@ namespace HlidacStatu.AutocompleteApi.Services
 
         public async Task GenerateAll(CancellationToken cancellationToken = default)
         {
-            await Task.WhenAll(
-                GenerateHlidacFulltextIndex(cancellationToken),
-                GenerateSmallSampleIndex(cancellationToken)
-            );
+            // prevent running twice at the same time
+            if (IsDataRenewalRunning)
+                return;
+            
+            IsDataRenewalRunning = true;
+            LastDataRenewalStarted = DateTime.Now;
+            try
+            {
+                // add new tasks here
+                await Task.WhenAll(
+                    GenerateHlidacFulltextIndex(cancellationToken),
+                    GenerateSmallSampleIndex(cancellationToken)
+                );
+                LastException = null;
+            }
+            catch (Exception e)
+            {
+                LastException = e;
+            }
+            finally
+            {
+                IsDataRenewalRunning = false;
+            }
         }
 
 
@@ -50,47 +76,47 @@ namespace HlidacStatu.AutocompleteApi.Services
 
         public async Task GenerateSmallSampleIndex(CancellationToken cancellationToken = default)
         {
-            string _asdf = @"[
-              {
+            string _asdf = $@"[
+              {{
                 ""id"": ""ico:00006947"",
                 ""text"": ""Ministerstvo financí"",
                 ""imageElement"": ""fas fa-university"",
                 ""type"": ""úřad"",
                 ""description"": ""Hlavní město Praha"",
                 ""priority"": 2
-              },
-              {
+              }},
+              {{
                 ""id"": ""ico:28569113"",
                 ""text"": ""MINORR FINANCE a.s."",
                 ""imageElement"": ""fas fa-industry-alt"",
                 ""type"": ""firma"",
                 ""description"": ""Moravskoslezský kraj"",
                 ""priority"": 0
-              },
-              {
+              }},
+              {{
                 ""id"": ""ico:27415414"",
                 ""text"": ""MINT Financial Services, s.r.o., v likvidaci"",
                 ""imageElement"": ""fas fa-industry-alt"",
                 ""type"": ""firma"",
                 ""description"": ""Hlavní město Praha"",
                 ""priority"": 0
-              },
-              {
+              }},
+              {{
                 ""id"": ""ico:48137430"",
                 ""text"": ""Ministerstvo financí České republiky Generální ředitelství cel"",
                 ""imageElement"": ""fas fa-industry-alt"",
                 ""type"": ""firma"",
                 ""description"": """",
                 ""priority"": 0
-              },
-              {
+              }},
+              {{
                 ""id"": ""ico:00001376"",
                 ""text"": ""FEDERÁLNÍ MINISTERSTVO FINANCÍ"",
                 ""imageElement"": ""fas fa-industry-alt"",
                 ""type"": ""firma"",
-                ""description"": """",
+                ""description"": ""vygenerováno v {DateTime.Now}"",
                 ""priority"": 0
-              }
+              }}
             ]";
 
             lock (_sampleLock)

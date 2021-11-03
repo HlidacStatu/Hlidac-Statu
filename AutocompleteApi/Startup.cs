@@ -1,8 +1,6 @@
 using HlidacStatu.AutocompleteApi.Services;
-using HlidacStatu.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,14 +27,12 @@ namespace HlidacStatu.AutocompleteApi
 
             services.AddHealthChecks();
             
-            //string connectionString = Configuration.GetConnectionString("DefaultConnection");
-            // for scoped services (mainly for identity)
-            // services.AddDbContext<DbEntities>(options =>
-            //     options.UseSqlServer(connectionString));
-            
             //start initializing during startup, not after first request
             // after first request call looks like this: services.AddSingleton<MemoryStoreService>();
             services.AddSingleton<MemoryStoreService>(new MemoryStoreService());
+            
+            //add timer to refresh data once a day
+            services.AddHostedService<TimedHostedService>();
             
             services.AddControllers();
             services.AddSwaggerGen(c =>
