@@ -150,5 +150,23 @@ namespace HlidacStatu.Web.Controllers
 
             return prilohy;
         }
+        
+        [HttpGet("predmet/{id?}")]
+        [Authorize]
+        public ActionResult<string> Predmet([FromRoute] string? id = null)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest($"Hodnota id chybí.");
+            }
+
+            var smlouva = SmlouvaRepo.Load(id);
+            if (smlouva == null)
+            {
+                return NotFound($"Smlouva nenalezena");
+            }
+
+            return smlouva.predmet;
+        }
     }
 }

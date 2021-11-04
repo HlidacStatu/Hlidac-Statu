@@ -73,7 +73,7 @@ namespace HlidacStatu.Repositories
         public static Dictionary<Smlouva.SClassification.ClassificationsTypes, decimal> GetClassificationFromServer(Smlouva s,
             bool rewriteStems = false)
         {
-            Dictionary<Smlouva.SClassification.ClassificationsTypes, decimal> data = new Dictionary<Smlouva.SClassification.ClassificationsTypes, decimal>();
+            var data = new Dictionary<Smlouva.SClassification.ClassificationsTypes, decimal>();
             if (s.Prilohy.Any(m => m.EnoughExtractedText) == false)
                 return null;
 
