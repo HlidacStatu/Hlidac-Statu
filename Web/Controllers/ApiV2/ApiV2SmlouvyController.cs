@@ -133,7 +133,7 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpGet("text/{id?}")]
         [Authorize]
-        public ActionResult<IEnumerable<string>> Text([FromRoute] string? id = null)
+        public ActionResult<IEnumerable<string>> Text([FromRoute] string? id = null, [FromQuery] int? addPredmet = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -147,6 +147,11 @@ namespace HlidacStatu.Web.Controllers
             }
 
             var prilohy = smlouva.Prilohy.Select(p => p.PlainTextContent).ToList();
+
+            if (addPredmet is 1)
+            {
+                prilohy.Add(smlouva.predmet);
+            }
 
             return prilohy;
         }

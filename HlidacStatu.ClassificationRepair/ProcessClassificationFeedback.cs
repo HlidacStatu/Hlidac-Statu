@@ -36,12 +36,9 @@ namespace HlidacStatu.ClassificationRepair
             {
                 _logger.LogInformation($"New message with idSmlouvy={message.IdSmlouvy} accepted.");
 
-                var textySmlouvyTask = _hlidac.GetTextSmlouvy(message.IdSmlouvy);
-                var predmetSmlouvyTask = _hlidac.GetPredmetSmlouvy(message.IdSmlouvy);
-
-                await Task.WhenAll(textySmlouvyTask, predmetSmlouvyTask);
+                var textySmlouvy = await _hlidac.GetTextSmlouvy(message.IdSmlouvy);
                 
-                string textSmlouvy = predmetSmlouvyTask.Result + '\n' + string.Join('\n', textySmlouvyTask.Result);
+                string textSmlouvy = string.Join('\n', textySmlouvy);
 
                 var explainTask = _stemmer.ExplainCategories(textSmlouvy, cancellationToken);
                 var documentNgramTask = _stemmer.Stem(textSmlouvy, cancellationToken);

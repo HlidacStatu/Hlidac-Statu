@@ -8,7 +8,6 @@ namespace HlidacStatu.ClassificationRepair
     public interface IHlidacService
     {
         Task<IEnumerable<string>> GetTextSmlouvy(string id);
-        Task<string> GetPredmetSmlouvy(string id);
     }
 
     public class HlidacService : IHlidacService
@@ -24,16 +23,10 @@ namespace HlidacStatu.ClassificationRepair
         // protože použijeme celý string. Stemmer si s tím poradí
         public async Task<IEnumerable<string>> GetTextSmlouvy(string id)
         {
-            var uri = new Uri($"smlouvy/text/{id}", UriKind.Relative);
+            var uri = new Uri($"smlouvy/text/{id}?addpredmet=1", UriKind.Relative);
             var json = await _httpClient.GetStringAsync(uri).ConfigureAwait(false);
             return System.Text.Json.JsonSerializer.Deserialize<IEnumerable<string>>(json);
         }
-        
-        public async Task<string> GetPredmetSmlouvy(string id)
-        {
-            var uri = new Uri($"smlouvy/predmet/{id}", UriKind.Relative);
-            var json = await _httpClient.GetStringAsync(uri).ConfigureAwait(false);
-            return System.Text.Json.JsonSerializer.Deserialize<string>(json);
-        }
+
     }
 }
