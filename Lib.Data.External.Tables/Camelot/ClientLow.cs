@@ -52,8 +52,9 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 }
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                logger.Error("StartSessionWithUrl API call error", e);
                 return new ApiResult<string>(false);
             }
         }
@@ -74,8 +75,9 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 }
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                logger.Error("GetSession API call error", e);
                 return new ApiResult<CamelotResult>(false);
             }
         }
@@ -96,8 +98,9 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 }
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                logger.Error("EndSession API call error", e);
                 return new ApiResult<CamelotResult>(false);
             }
         }
@@ -116,8 +119,9 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 }
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                logger.Error("Version API call error", e);
                 return new ApiResult<CamelotVersionData>(false);
             }
         }
@@ -137,8 +141,9 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 }
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                logger.Error("Statistic API call error", e);
                 return new ApiResult<CamelotStatistics>(false);
             }
         }
