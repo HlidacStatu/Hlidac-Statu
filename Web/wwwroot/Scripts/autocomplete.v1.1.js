@@ -11,7 +11,7 @@
     // init Tagify script on the above inputs
     var tagify = new Tagify(input, {
         keepInvalidTags: true,
-        duplicates: false,
+        duplicates: true,
         tagTextProp: 'text',
         pasteAsTags: false,
         templates: {
@@ -51,10 +51,12 @@
 
     // ES2015 argument destructuring
     function onSuggestionsListUpdate({ detail: suggestionsElm }) {
-        console.log(suggestionsElm)
+        console.log('onSuggestionsListUpdate');
+        console.log(suggestionsElm);
     }
     // ES2015 argument destructuring
     function onSuggestionsListUpdateFull(e) {
+        console.log('onSuggestionsListUpdateFull');
         console.log(e);
     }
 
@@ -117,6 +119,8 @@
                     tagify.loading(false).dropdown.show(qvalue) // render the suggestions dropdown
                 })
         } catch (err) {
+            consol.log('onTagifyInput err');
+            consol.log(err);
 
         }
 
@@ -131,11 +135,16 @@
                         </div>
                     </tag>`
         }
-        catch (err) { }
+        catch (err) {
+            console.log('tagItemTemplate err');
+            console.log(tagItemTemplate);
+        }
     }
 
 
     function suggestionItemTemplate(tagData) {
+        try {
+
         return `
         <div class='tagify__dropdown__item ${tagData.class ? tagData.class : ""}' tabindex="0" role="option" ${this.getAttributes(tagData)}>
         <div class='clearfix'>
@@ -147,6 +156,11 @@
             </div>
         </div>
         </div>`
+        } catch (e) {
+            console.log('suggestionItemTemplate err');
+            console.log(e);
+
+        }
     }
 
     function onTagifyFixQuery(input) {

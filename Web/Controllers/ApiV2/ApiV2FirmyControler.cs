@@ -145,7 +145,7 @@ namespace HlidacStatu.Web.Controllers
 
             Expression<Func<OsobaEvent, bool>> socialNetworkFilter = e =>
                 e.Type == (int)OsobaEvent.Types.SocialniSite
-                && e.Ico.Length == 8
+                //&& e.Ico.Length == 8
                 && socials.Contains(e.Organizace);
 
             var events = OsobaEventRepo.GetByEvent(socialNetworkFilter)
