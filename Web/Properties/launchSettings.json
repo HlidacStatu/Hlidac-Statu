@@ -27,7 +27,7 @@
         "ASPNETCORE_ENVIRONMENT": "Petr"
       },
       "dotnetRunMessages": "true",
-      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+      "applicationUrl": "https://local.hlidacstatu.cz;http://local.hlidacstatu.cz"
     },
     "Michal": {
       "commandName": "IIS",

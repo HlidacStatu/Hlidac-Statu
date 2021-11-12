@@ -14,9 +14,13 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 
 namespace HlidacStatu.Web
 {
@@ -382,10 +386,11 @@ namespace HlidacStatu.Web
                 })
                 .AddOpenIdConnect("mojeid", options =>
                 {
-                    options.Authority = "https://mojeid.regtest.nic.cz/oidc/"; // issuer
+                    IConfigurationSection mojeidAuthSetting = Configuration.GetSection("Authentication:MojeId");
+                    options.ClientId = mojeidAuthSetting["Id"]; // id, které dostaneme po registraci
+                    options.ClientSecret = mojeidAuthSetting["Secret"]; // heslo, které dostaneme po registraci
                     
-                    options.ClientId = "ZFTr1FExAVpg"; // id, které dostaneme po registraci
-                    options.ClientSecret = "3b2d6337e43af92111e0eec97a104ca4628f7c16eee4d5444aa26afb"; // heslo, které dostaneme po registraci
+                    options.Authority = "https://mojeid.cz/oidc/"; // issuer
                     
                     options.CallbackPath = "/signin-mojeid"; //unikátní endpoint na hlídači - zatím nevím k čemu
                     
@@ -407,9 +412,15 @@ namespace HlidacStatu.Web
                 })
                 .AddOpenIdConnect("apple", async options =>  // taken from https://github.com/scottbrady91/AspNetCore-SignInWithApple-Example/blob/main/ScottBrady91.SignInWithApple.Example/Startup.cs
                 {
+                    IConfigurationSection appleAuthSetting = Configuration.GetSection("Authentication:Apple");
+                    string clientId = appleAuthSetting["Id"];
+                    string secret = appleAuthSetting["Secret"];
+                    string teamId = appleAuthSetting["TeamId"];
+                    
+                    options.ClientId = clientId; // Service ID
+                    
                     options.Authority = "https://appleid.apple.com"; // disco doc: https://appleid.apple.com/.well-known/openid-configuration
-
-                    options.ClientId = "com.scottbrady91.authdemo.service"; // Service ID
+ 
                     options.CallbackPath = "/signin-apple"; // corresponding to your redirect URI
 
                     options.ResponseType = "code id_token"; // hybrid flow due to lack of PKCE support
@@ -424,16 +435,38 @@ namespace HlidacStatu.Web
                     // custom client secret generation - secret can be re-used for up to 6 months
                     options.Events.OnAuthorizationCodeReceived = context =>
                     {
-                        //context.TokenEndpointRequest.ClientSecret = TokenGenerator.CreateNewToken();
+                        context.TokenEndpointRequest.ClientSecret = TokenGenerator.CreateNewToken(clientId, secret, teamId);
                         return Task.CompletedTask;
                     };
 
                     options.UsePkce = false; // apple does not currently support PKCE (April 2021)
                 });
             
+        }
+        
+        private static class TokenGenerator
+        {
+            public static string CreateNewToken(string clientId, string secret, string teamId)
+            {
+                const string aud = "https://appleid.apple.com";
+                
+                var now = DateTime.UtcNow;
             
+                var ecdsa = ECDsa.Create();
+                ecdsa?.ImportPkcs8PrivateKey(Convert.FromBase64String(secret), out _);
 
-            
+                var handler = new JsonWebTokenHandler();
+                return handler.CreateToken(new SecurityTokenDescriptor
+                {
+                    Issuer = teamId,
+                    Audience = aud,
+                    Claims = new Dictionary<string, object> {{"sub", clientId}},
+                    Expires = now.AddMinutes(5), // expiry can be a maximum of 6 months - generate one per request or re-use until expiration
+                    IssuedAt = now,
+                    NotBefore = now,
+                    SigningCredentials = new SigningCredentials(new ECDsaSecurityKey(ecdsa), SecurityAlgorithms.EcdsaSha256)
+                });
+            }
         }
         
         private void AddAllHealtChecks(IServiceCollection services)
