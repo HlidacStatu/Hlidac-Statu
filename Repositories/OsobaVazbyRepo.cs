@@ -188,7 +188,7 @@ namespace HlidacStatu.Repositories
 
         public static Datastructures.Graphs.Graph.Edge[] Vazby(this Osoba osoba, bool refresh = false)
         {
-            if (osoba._vazby == null)
+            if (refresh || osoba._vazby == null)
             {
                 osoba.updateVazby(refresh);
             }
@@ -196,19 +196,19 @@ namespace HlidacStatu.Repositories
             return osoba._vazby;
         }
 
-        public static Osoba Vazby(this Osoba osoba, Datastructures.Graphs.Graph.Edge[] vazby)
+        //public static Osoba Vazby(this Osoba osoba, Datastructures.Graphs.Graph.Edge[] vazby)
+        //{
+        //    if (vazby == null)
+        //        osoba._vazby = new Datastructures.Graphs.Graph.Edge[] { };
+
+        //    osoba._vazby = vazby;
+        //    return osoba;
+        //}
+
+
+        public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh=false)
         {
-            if (vazby == null)
-                osoba._vazby = new Datastructures.Graphs.Graph.Edge[] { };
-
-            osoba._vazby = vazby;
-            return osoba;
-        }
-
-
-        public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Osoba osoba, Relation.AktualnostType minAktualnost)
-        {
-            return Relation.AktualniVazby(osoba.Vazby(), minAktualnost);
+            return Relation.AktualniVazby(osoba.Vazby(refresh), minAktualnost);
         }
 
         private static void updateVazby(this Osoba osoba, bool refresh = false)
