@@ -28,14 +28,12 @@
                 <div>
                     @foreach (var provider in Model.ExternalLogins)
                     {
-                        if (provider.Name.ToLower() == "google")
-                        {
+                        string imgPath = $"/Content/Img/{provider.Name}Signin.png"; 
                         <button type="submit" class="btn btn-link"
                                 name="provider" value="@provider.Name"
                                 title="Přihlásit pomocí @provider.DisplayName účtu">
-                            <img src="/Content/Img/GoogleSignin.png" style="height:50px;width:auto" />
+                            <img src="@imgPath" style="height:50px;width:auto" />
                         </button>
-                        }
                     }
                 </div>
             </form>

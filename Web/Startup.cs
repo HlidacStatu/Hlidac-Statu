@@ -380,6 +380,31 @@ namespace HlidacStatu.Web
                     options.ClientId = googleAuthSetting["Id"];
                     options.ClientSecret = googleAuthSetting["Secret"];
                 })
+                .AddOpenIdConnect("mojeid", options =>
+                {
+                    options.Authority = "https://mojeid.regtest.nic.cz/oidc/"; // issuer
+                    
+                    options.ClientId = "ZFTr1FExAVpg"; // id, které dostaneme po registraci
+                    options.ClientSecret = "3b2d6337e43af92111e0eec97a104ca4628f7c16eee4d5444aa26afb"; // heslo, které dostaneme po registraci
+                    
+                    options.CallbackPath = "/signin-mojeid"; //unikátní endpoint na hlídači - zatím nevím k čemu
+                    
+                    options.ResponseType = "code"; // typ flow (https://www.scottbrady91.com/openid-connect/openid-connect-flows)
+                    options.ResponseMode = "form_post"; // form post due to prevent PII in the URL
+                    
+                    options.DisableTelemetry = true;
+
+                    options.SaveTokens = true; // ? upřímně nevím
+                    options.UsePkce = true; // ? upřímně nevím
+                    
+                    // claimy, které chceme získat z userinfoendpointu
+                    options.Scope.Add("openid");
+                    options.Scope.Add("email");
+                    options.Scope.Add("name");
+                    
+                    options.GetClaimsFromUserInfoEndpoint = true; // získá data o jménu, emailu - věcech ze scope
+                    
+                })
                 .AddOpenIdConnect("apple", async options =>  // taken from https://github.com/scottbrady91/AspNetCore-SignInWithApple-Example/blob/main/ScottBrady91.SignInWithApple.Example/Startup.cs
                 {
                     options.Authority = "https://appleid.apple.com"; // disco doc: https://appleid.apple.com/.well-known/openid-configuration
@@ -405,6 +430,8 @@ namespace HlidacStatu.Web
 
                     options.UsePkce = false; // apple does not currently support PKCE (April 2021)
                 });
+            
+            
 
             
         }

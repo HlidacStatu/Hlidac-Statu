@@ -85,7 +85,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             }
             else
             {
-                var email = info.Principal.FindFirstValue(ClaimTypes.Email); 
+                var email = FindEmailInClaims(info);
                 //if it has email - then create user
                 if (string.IsNullOrEmpty(email))
                 {
@@ -122,7 +122,8 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
                     emailTemplate.To = user.Email;
                     emailTemplate.SendMe();
                 }
-                
+
+                var loginres = await _signInManager.UserManager.AddLoginAsync(user, info); // store user token
                 await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
 
                 return LocalRedirect(returnUrl);
@@ -133,6 +134,16 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
         {
             //no confirmation needed
             return NotFound("this action is disabled");
+        }
+        
+        // diferent login providers can have different claim names
+        private string? FindEmailInClaims(ExternalLoginInfo info)
+        {
+            return info.LoginProvider switch
+            {
+                "mojeid" => info.Principal.FindFirstValue("email"),
+                _ => info.Principal.FindFirstValue(ClaimTypes.Email)
+            };
         }
     }
 }
