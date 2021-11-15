@@ -54,10 +54,8 @@ namespace HlidacStatu.Datastructures.Graphs2
         {
             bool fromExists = Vertices.TryGetValue(from, out from);
             bool toExists = Vertices.TryGetValue(to, out to);
-            if (!fromExists)
-                throw new Exception("From parameter not found in vertices");
-            if (!toExists)
-                throw new Exception("To parameter was not found in vertices");
+            if (!fromExists || !toExists)
+                return null;
 
             var visitHistory = new List<IEdge>();
             var visitedVertices = new HashSet<IVertex>();
