@@ -7,10 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="protobuf-net.Grpc.AspNetCore" Version="1.0.152" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\GrpcProtobufs\GrpcProtobufs.csproj" />
+      <ProjectReference Include="..\LibCore\LibCore.csproj" />
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
     </ItemGroup>
 

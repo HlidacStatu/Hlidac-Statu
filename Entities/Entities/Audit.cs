@@ -44,6 +44,10 @@ namespace HlidacStatu.Entities
         public long timeElapsed { get; set; }
         
         public string exception { get; set; }
+        [Nest.Keyword]
+        public string machineName { get; set; }
+        [Nest.Keyword]
+        public string applicationName { get; set; }
 
         public enum Operations
         {

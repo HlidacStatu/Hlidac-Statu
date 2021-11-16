@@ -32,7 +32,9 @@ namespace HlidacStatu.AutocompleteApi.Services
             HlidacFulltextIndex = LoadFromBackup<Autocomplete>(nameof(HlidacFulltextIndex));
             SmallSampleIndex = LoadFromBackup<Autocomplete>(nameof(SmallSampleIndex));
 
-            GenerateAll();
+            #pragma warning disable 4014
+            GenerateAll(); // fire and forget - generate data on background
+            #pragma warning restore 4014
         }
 
         public async Task GenerateAll(CancellationToken cancellationToken = default)
@@ -47,7 +49,7 @@ namespace HlidacStatu.AutocompleteApi.Services
             {
                 // add new tasks here
                 await Task.WhenAll(
-                    GenerateHlidacFulltextIndex(cancellationToken),
+                    //GenerateHlidacFulltextIndex(cancellationToken),
                     GenerateSmallSampleIndex(cancellationToken)
                 );
                 LastException = null;

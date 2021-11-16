@@ -8,11 +8,11 @@ namespace HlidacStatu.AutocompleteApi.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]
-    public class SearchController : ControllerBase
+    public class AutocompleteController : ControllerBase
     {
-        private MemoryStoreService _memoryStore;
+        private readonly MemoryStoreService _memoryStore;
 
-        public SearchController(MemoryStoreService memoryStore)
+        public AutocompleteController(MemoryStoreService memoryStore)
         {
             _memoryStore = memoryStore;
         }
@@ -24,14 +24,13 @@ namespace HlidacStatu.AutocompleteApi.Controllers
 
             return searchResult.Select(r => r.Original);
         }
-        
+
         [HttpGet]
-        public IEnumerable<Autocomplete> Test(string q)
+        public IEnumerable<Autocomplete> TestAutocomplete(string q)
         {
             var searchResult = _memoryStore.SmallSampleIndex.Search(q, 5, ac => ac.Priority);
 
             return searchResult.Select(r => r.Original);
         }
-    
     }
 }

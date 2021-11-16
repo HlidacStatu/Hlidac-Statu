@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Services;
@@ -16,11 +17,14 @@ namespace HlidacStatu.LibCore.MiddleWares
         public static string TrackDataKey { get; } = "HS_track_data";
 
         private readonly RequestDelegate _next;
+        private readonly Options _options;
 
-        public RequestTrackMiddleware(RequestDelegate next)
+        public RequestTrackMiddleware(RequestDelegate next, Options options)
         {
             _next = next;
+            _options = options;
         }
+        
 
         public async Task Invoke(HttpContext context)
         {
@@ -31,7 +35,9 @@ namespace HlidacStatu.LibCore.MiddleWares
 
             await _next(context);
             
-            if(!context.Request.Path.StartsWithSegments("/api")) // do this tracking only for /API
+            // do this tracking only for limited paths /API
+            if(_options.LimitToPaths.Count > 0
+                && !_options.LimitToPaths.Any(path => context.Request.Path.StartsWithSegments(path))) 
                 return;
 
             string? userName = context.User.Identity?.Name;
@@ -52,6 +58,9 @@ namespace HlidacStatu.LibCore.MiddleWares
                 timeElapsed = (long)requestTime;
             }
             
+            if(timeElapsed <= _options.MinimumRequestTimeToTrackMs)
+                return;
+            
             string exceptionDetail = "";
             if (context.Items.TryGetValue("errorPageCtx", out object? exception))
             {
@@ -61,6 +70,8 @@ namespace HlidacStatu.LibCore.MiddleWares
             //assemble string here
             var audit = new Audit()
             {
+                machineName = Environment.MachineName,
+                applicationName = _options.ApplicationName,
                 date = DateTime.Now,
                 operation = Audit.Operations.Call.ToString(),
                 userId = userName,
@@ -77,13 +88,21 @@ namespace HlidacStatu.LibCore.MiddleWares
             
             AuditRepo.Add(audit);
         }
+        
+        public class Options
+        {
+            public List<string> LimitToPaths { get; set; } = new List<string>();
+            public int MinimumRequestTimeToTrackMs { get; set; } = 0;
+            public string ApplicationName { get; set; }
+        }
     }
 
     public static class RequestTrackMiddlewareExtension
     {
-        public static IApplicationBuilder UseRequestTrackMiddleware(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseRequestTrackMiddleware(this IApplicationBuilder builder
+            , RequestTrackMiddleware.Options options)
         {
-            return builder.UseMiddleware<RequestTrackMiddleware>();
+            return builder.UseMiddleware<RequestTrackMiddleware>(options);
         }
 
         public static void SetTrackData(this HttpContext context, string dataString)
