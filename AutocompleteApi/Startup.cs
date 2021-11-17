@@ -45,7 +45,7 @@ namespace HlidacStatu.AutocompleteApi
             app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
             {
                 ApplicationName = "AutocompleteApi",
-                MinimumRequestTimeToTrackMs = 10
+                MinimumRequestTimeToTrackMs = 900
             });
             
             app.UseTimeMeasureMiddleware();

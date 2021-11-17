@@ -47,6 +47,7 @@
         <PackageReference Include="CouchbaseNetClient" Version="2.7.23" />
         <PackageReference Include="Devmasters.Core" Version="2.4.4" />
         <PackageReference Include="Devmasters.Lang" Version="2.4.8" />
+        <PackageReference Include="Grpc.Net.ClientFactory" Version="2.40.0" />
         <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.2.0" />
         <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.319" />
         <PackageReference Include="log4net" Version="2.0.12" />
@@ -68,6 +69,7 @@
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="5.0.11" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
         <PackageReference Include="PDFtoImage" Version="1.2.0" />
+        <PackageReference Include="protobuf-net.Grpc.ClientFactory" Version="1.0.152" />
         <PackageReference Include="Schema.NET" Version="10.1.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.2.3" />
@@ -79,6 +81,7 @@
       <ProjectReference Include="..\DBUpgrader\DBUpgrader.csproj" />
       <ProjectReference Include="..\DetectFaces\DetectFaces.csproj" />
       <ProjectReference Include="..\Entities\Entities.csproj" />
+      <ProjectReference Include="..\GrpcProtobufs\GrpcProtobufs.csproj" />
       <ProjectReference Include="..\HlidacStatu.ExportData\HlidacStatu.ExportData.csproj" />
       <ProjectReference Include="..\HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj" />
       <ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
@@ -118,6 +121,13 @@
 
     <ItemGroup>
       <None Include="..\.editorconfig" Link=".editorconfig" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <Reference Include="Grpc.Net.Client, Version=2.0.0.0, Culture=neutral, PublicKeyToken=d754f35622e28bad">
+        <HintPath>C:\Users\sucho\.nuget\packages\grpc.net.client\2.40.0\lib\net5.0\Grpc.Net.Client.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

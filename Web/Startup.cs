@@ -16,11 +16,15 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
+using GrpcProtobufs;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using ProtoBuf.Grpc.ClientFactory;
 
 namespace HlidacStatu.Web
 {
@@ -125,15 +129,20 @@ namespace HlidacStatu.Web
             if (_shouldRunHealthcheckFeature)
                 AddAllHealtChecks(services);
 
-            //services.AddHealthChecksUI(set =>
-            //       {
-            //           set.AddHealthCheckEndpoint("Hlidac státu", "/health");
-            //           set.SetHeaderText("Hlídač státu status page");
-            //           set.MaximumHistoryEntriesPerEndpoint(50);
-
-            //       }
-            //    )
-            //    .AddSqlServerStorage(Configuration["ConnectionStrings:HealthChecksConnection"]);
+            services.AddCodeFirstGrpcClient<IAutocompleteGrpc>(o => {
+                o.Address = new Uri(Configuration.GetValue<string>("AutocompleteEndpoint"));
+                
+                o.ChannelOptionsActions.Add(options =>
+                {
+                    options.HttpHandler = new SocketsHttpHandler()
+                    {
+                        PooledConnectionIdleTimeout = Timeout.InfiniteTimeSpan,
+                        KeepAlivePingDelay = TimeSpan.FromSeconds(60),
+                        KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
+                        EnableMultipleHttp2Connections = true
+                    };
+                });
+            });
 
 
         }

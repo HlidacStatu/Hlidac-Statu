@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
 using GrpcProtobufs;
@@ -10,6 +11,11 @@ namespace HlidacStatu.AutocompleteApi.Controllers
     public class AutocompleteGrpc : IAutocompleteGrpc
     {
         private readonly MemoryStoreService _memoryStore;
+        
+        private JsonSerializerOptions _jsonOptions = new()
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
 
         public AutocompleteGrpc(MemoryStoreService memoryStore)
         {
@@ -22,7 +28,7 @@ namespace HlidacStatu.AutocompleteApi.Controllers
 
             var autocomplete = searchResult.Select(r => r.Original).FirstOrDefault();
             
-            var jsonMessage = JsonSerializer.Serialize(autocomplete);
+            var jsonMessage = JsonSerializer.Serialize(autocomplete, _jsonOptions);
             
             return Task.FromResult(new AutocompleteResponse()
             {
@@ -37,7 +43,7 @@ namespace HlidacStatu.AutocompleteApi.Controllers
 
             var autocomplete = searchResult.Select(r => r.Original).FirstOrDefault();
             
-            var jsonMessage = JsonSerializer.Serialize(autocomplete);
+            var jsonMessage = JsonSerializer.Serialize(autocomplete, _jsonOptions);
             
             return Task.FromResult(new AutocompleteResponse()
             {

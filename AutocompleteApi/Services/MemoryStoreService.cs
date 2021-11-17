@@ -49,7 +49,7 @@ namespace HlidacStatu.AutocompleteApi.Services
             {
                 // add new tasks here
                 await Task.WhenAll(
-                    //GenerateHlidacFulltextIndex(cancellationToken),
+                    GenerateHlidacFulltextIndex(cancellationToken),
                     GenerateSmallSampleIndex(cancellationToken)
                 );
                 LastException = null;
