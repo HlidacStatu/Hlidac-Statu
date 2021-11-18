@@ -126,7 +126,7 @@ namespace HlidacStatu.Repositories
                     || job.SalaryMdVAT.HasValue == false || job.SalaryMdVAT == 0
                     || rewriteAll)
                 {
-                    var (salnet, salvat) = HlidacStatu.DetectJobs.InTables.FixSalaries(job.SalaryMD, job.SalaryMdVAT);
+                    var (salnet, salvat) = FixSalaries(job.SalaryMD, job.SalaryMdVAT);
                     job.SalaryMD = salnet;
                     job.SalaryMdVAT = salvat;
                 }
@@ -158,6 +158,22 @@ namespace HlidacStatu.Repositories
             {
                 await db.Database.ExecuteSqlInterpolatedAsync($"Delete from InDocJobs where tablepk = {tablePk}");
             }
+        }
+        
+        public static (decimal net, decimal vat) FixSalaries(decimal? net, decimal? vat)
+        {
+            decimal finalNet = net ?? 0;
+            decimal finalVat = vat ?? 0;
+
+            if (finalNet == 0)
+                finalNet = finalVat / 1.21m;
+            if (finalVat == 0)
+                finalVat = finalNet * 1.21m;
+
+            if (finalNet > finalVat)
+                return (finalVat, finalNet);
+
+            return (finalNet, finalVat);
         }
     }
 }

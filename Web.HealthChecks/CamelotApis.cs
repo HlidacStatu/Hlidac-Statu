@@ -1,10 +1,8 @@
-﻿
-using HlidacStatu.Lib.Data.External.Tables.Camelot;
+﻿using HlidacStatu.Lib.Data.External.Tables.Camelot;
 
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,8 +11,6 @@ namespace HlidacStatu.Web.HealthChecks
 {
     public class CamelotApis : IHealthCheck
     {
-
-
 
         private Options options;
 

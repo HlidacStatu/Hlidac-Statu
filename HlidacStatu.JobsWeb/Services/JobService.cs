@@ -52,7 +52,7 @@ namespace HlidacStatu.JobsWeb.Services
                     .GroupBy(j => j.JobPk)
                     .Select(g =>
                     {
-                        var (net, vat) = HlidacStatu.DetectJobs.InTables.FixSalaries(g.FirstOrDefault().SalaryMd,
+                        var (net, vat) = InDocJobsRepo.FixSalaries(g.FirstOrDefault().SalaryMd,
                             g.FirstOrDefault().SalaryMdVat);
                         var tags = g.FirstOrDefault().Tags?.Split("|",
                             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);

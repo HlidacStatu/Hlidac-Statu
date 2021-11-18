@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using HlidacStatu.Lib.Data.External.Tables;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -34,7 +35,7 @@ namespace HlidacStatu.Web.Controllers
             if (sml == null || pr == null)
                 return NotFound();
 
-            Lib.Data.External.Tables.Result[] res = Extensions.SmlouvaPrilohaExtension.GetTablesFromPriloha(sml, pr);
+            Lib.Data.External.Tables.Result[] res = SmlouvaPrilohaExtension.GetTablesFromPriloha(sml, pr);
 
             return View(res);
         }
