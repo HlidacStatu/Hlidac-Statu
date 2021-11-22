@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.DT" Version="2.4.3" />
+      <PackageReference Include="Devmasters.DT" Version="2.4.4" />
       <PackageReference Include="Devmasters.Enums" Version="2.4.5" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>

@@ -9,7 +9,7 @@
     <ItemGroup>
       <PackageReference Include="CsvHelper" Version="27.1.1" />
       <PackageReference Include="Devmasters.Core" Version="2.4.4" />
-      <PackageReference Include="Devmasters.DT" Version="2.4.3" />
+      <PackageReference Include="Devmasters.DT" Version="2.4.4" />
       <PackageReference Include="Devmasters.Enums" Version="2.4.5" />
       <PackageReference Include="Devmasters.IO" Version="2.4.0" />
       <PackageReference Include="Devmasters.Lang" Version="2.4.8" />

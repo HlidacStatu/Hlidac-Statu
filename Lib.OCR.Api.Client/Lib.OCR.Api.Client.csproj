@@ -9,7 +9,7 @@
   
   <ItemGroup>
     <PackageReference Include="Devmasters.Core" Version="2.4.4" />
-    <PackageReference Include="Devmasters.DT" Version="2.4.3" />
+    <PackageReference Include="Devmasters.DT" Version="2.4.4" />
     <PackageReference Include="Devmasters.Lang" Version="2.4.8" />
     <PackageReference Include="Devmasters.Net" Version="2.4.4" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.11" />
