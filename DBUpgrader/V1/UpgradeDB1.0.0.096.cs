@@ -14,7 +14,7 @@ namespace HlidacStatu.DBUpgrades
                 string sql = @"
                 CREATE TABLE dbo.FirmyVlastneneStatem
                 (
-                ICO nvarchar(30) Primary key,
+                Ico nvarchar(30) Primary key,
                 Podil int NULL,
                 )";
                 

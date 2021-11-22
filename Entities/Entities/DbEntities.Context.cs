@@ -198,6 +198,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<InDocJobNames> InDocJobNames { get; set; }
         public virtual DbSet<InDocJobs> InDocJobs { get; set; }
         public virtual DbSet<InDocTables> InDocTables { get; set; }
+        public virtual DbSet<FirmaVlastnenaStatem> FirmyVlastneneStatem { get; set; }
 
         //views
         public DbSet<FindPersonDTO> FindPersonView { get; set; }
