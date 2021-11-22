@@ -6,6 +6,21 @@ namespace HlidacStatu.JobsWeb.Models
 {
     public class JobStatistics
     {
+        static Dictionary<string, IEnumerable<Entities.InDocJobNameDescription>> jobDescriptions = 
+            new Dictionary<string, IEnumerable<Entities.InDocJobNameDescription>>();
+
+        static JobStatistics()
+        {
+            using (var db = new Entities.DbEntities())
+            {
+                var subjects = db.InDocJobNameDescription.AsEnumerable().Select(m => m.Subject.ToLower()).Distinct();
+                foreach (var subj in subjects.Where(m=>!string.IsNullOrEmpty(m)))
+                {
+                    jobDescriptions.Add(subj, db.InDocJobNameDescription.AsEnumerable().Where(m => m.Subject.ToLower() == subj).ToArray());
+                }
+            }
+        }
+
         public JobStatistics()
         {
         }
@@ -25,8 +40,19 @@ namespace HlidacStatu.JobsWeb.Models
             if (rightWhisk > maximum)
                 rightWhisk = maximum;
 
-            
+
+            precalculatedJobs
+                .Select(m=>m.Subject)
+                .Distinct();
             Name = name;
+
+            Description = "";
+            var subj = precalculatedJobs.FirstOrDefault(m => !string.IsNullOrEmpty(m.Subject))?.Subject?.ToLower();
+            if (subj != null && jobDescriptions.ContainsKey(subj))
+            {
+                Description = jobDescriptions[subj].FirstOrDefault(m => m.JobGrouped.ToLower() == name.ToLower())?.jobGroupedDescription ?? "";
+            }
+
             Average = precalculatedJobs.Average(x => x.SalaryMd);
             Maximum = maximum;
             Minimum = minimum;
@@ -46,6 +72,7 @@ namespace HlidacStatu.JobsWeb.Models
         }
         
         public string Name { get; set; }
+        public string Description { get; set; }
         public decimal DolniKvartil { get; set; }
         public decimal HorniKvartil { get; set; }
         public decimal Minimum { get; set; }

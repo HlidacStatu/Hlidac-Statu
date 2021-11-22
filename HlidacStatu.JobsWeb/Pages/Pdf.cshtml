@@ -86,13 +86,17 @@
         U každého cenového údaje jsou udržována zdrojová metadata i odkaz na přesný zdroj údajů, a tedy každá cena a případně každá chyba je zpětně dohledatelná.
     </p>
 
-
+    
+    <hr class="d-print-none" style="margin-top:35px;margin-bottom:35px;" />
+    <p style="page-break-after: always;"></p>
     <h2>Souhrnné statistiky</h2>
 
     <partial name="Shared/_SouhrnTable" model="tableModel"/>
     <partial name="Shared/_BoxPlot" model="graphModel"/>
 
-
+    <hr class="d-print-none" style="margin-top:35px;margin-bottom:35px;" />
+    <p style="page-break-after: always;"></p>
+    
     <h2>Obvyklé ceny pro jednotlivé pracovní pozice</h2>
     <p>
         Cenových analýzy pro jednotlivé pracovní pozice/typ práce.
@@ -118,7 +122,8 @@
             Statistics = statistic,
             CustomText = ""
         };
-        <hr/>
+        <hr class="d-print-none" style="margin-top:35px;margin-bottom:35px;" />
+        <p style="page-break-after: always;"></p>
         <partial name="Shared/_JobOverview" model="jobOverviewViewModel"/>
     }
 }

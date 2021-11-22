@@ -33,8 +33,11 @@
 <h3>@Model.Statistics.Name</h3>
 
 <p>Obvyklá cena pro kategorii @Model.Statistics.Name je @Model.Statistics.Median.ToString("N0") Kč bez DPH a pohybuje se v rozpětí od @Model.Statistics.DolniKvartil.ToString("N0") Kč do @Model.Statistics.HorniKvartil.ToString("N0") Kč bez DPH.</p>
-<p>@Html.Raw(Model.CustomText)</p>
-
+<p>@Model.Statistics.Description</p>
+@if (!string.IsNullOrEmpty(Model.CustomText))
+{
+    <p>@Html.Raw(Model.CustomText)</p>
+}
 
 <partial name="Shared/_SouhrnTable" model="tableModel"/>
 

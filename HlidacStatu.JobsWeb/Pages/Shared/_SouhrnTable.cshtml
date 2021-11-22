@@ -23,9 +23,9 @@
     </tr>
         <tr>
             <th></th>
-            <th class=""><div class="middle-line right">{</div></th>
-            <th class="text-center"><div class="middle-line left right"> Rozsah obvyklých cen </div></th>
-            <th class=""><div class="middle-line left ">}</div></th>
+            <th class="align-middle border-start"><div class="middle-line right"></div></th>
+            <th class="align-middle text-center"><div class="middle-line left right"><b style="color:black">Rozsah<br/>obvyklých cen</b></div></th>
+            <th class="align-middle border-end"><div class="middle-line left "></div></th>
             <th colspan="@(Model.HideDodavatelCount ? 5: 6 )"></th>
         </tr>
     </thead>
@@ -35,15 +35,15 @@
         <tr>
             @if (string.IsNullOrEmpty(Model.LinkHref))
             {
-                <th scope="row">@row.Name</th>
+                <td scope="row">@row.Name</td>
             }
             else
             {
-                <th scope="row"><a href="@Model.LinkHref/@row.Name">@row.Name</a></th>
+                <td scope="row"><a href="@Model.LinkHref/@row.Name">@row.Name</a></td>
             }
-            <td class="text-end number">@row.DolniKvartil.ToString("N0")</td>
-            <td class="text-end number">@row.Median.ToString("N0")</td>
-            <td class="text-end number">@row.HorniKvartil.ToString("N0")</td>
+            <td class="text-end number border-start"><b>@row.DolniKvartil.ToString("N0")</b></td>
+            <td class="text-end number"><b>@row.Median.ToString("N0")</b></td>
+            <td class="text-end number border-end"><b>@row.HorniKvartil.ToString("N0")</b></td>
             <td class="text-end number">@row.Minimum.ToString("N0")</td>
             <td class="text-end number">@row.Average.ToString("N0")</td>
             <td class="text-end number">@row.Maximum.ToString("N0")</td>
