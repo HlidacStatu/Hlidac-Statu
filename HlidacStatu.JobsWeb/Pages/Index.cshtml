@@ -1,11 +1,154 @@
 ﻿@page
-@model IndexModel
+@model HlidacStatu.JobsWeb.Areas.Identity.Pages.Account.LoginModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Cenové analýzy Hlídače státu";
+    ViewBag.HideYearSelector = true;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Titulni strana</h1>
-    
-    
+<div class="container col-xl-10 col-xxl-8 px-4 py-5">
+    <div class="row align-items-center g-lg-5 py-5">
+        <div class="col-lg-7 text-center text-lg-start">
+            <h1 class="display-4 fw-bold lh-1 mb-3">Cenové analýzy prací, produktů a služeb</h1>
+            <p class="col-lg-10 fs-4 text-muted">
+                Pomocí AI, machine learning technologií a pokročilého zpracování obsahu smluv jsme zanalyzovali smluvní podmínky a nasmlouvané ceny v různých oblastech.
+                Naše <b class="text-dark">nejrozsáhlejší cenové analýzy</b> na českém trhu pomohou <b class="text-dark">úřadům s orientací v obvyklých cenových relacích</b>, a <b class="text-dark">dodavatelům s kvalitní a konkureční nabídkou</b> do výběrových řízení.
+
+            </p>
+        </div>
+        <div class="col-md-10 mx-auto col-lg-5">
+            <form class="p-4 p-md-5 border rounded-3 bg-light" id="account" action="/Identity/Account/Login" method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" asp-for="Input.Email" >
+                    <label for="floatingInput" asp-for="Input.Email" >Email</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" asp-for="Input.Password" >
+                    <label asp-for="Input.Password" >Heslo</label>
+                </div>
+                <button class="w-100 btn btn-lg btn-primary" type="submit">Přihlásit se</button>
+                <hr class="my-4">
+                <small class="text-muted">Pokud jste registrováni na www.hlidacstatu.cz, zde funguje stejný login.</small>
+                <small><a id="forgot-password" href="https://www.hlidacstatu.cz/Identity/Account/ForgotPassword">Zapomenuté heslo?</a></small>
+                <p class="text-dark">Nemáte přístup k analýzám, <a href="https://www.hlidacstatu.cz/Identity/Account/Register">zaregistrujte se</a>.</p>
+            </form>
+        </div>
+    </div>
 </div>
+
+
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+    <h1 class="display-4 fw-normal">Ceník</h1>
+    <p class="fs-5 text-muted">
+        Analýzy jsou dostupné ve formě PDF a interaktivní webové analytické aplikace. PDF obsahuje základní a souhrnné údaje.
+        Webová aplikace obsahuje detailní informace a přístup až k jednotlivým analyzovaným smlouvám.
+    </p>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3">
+            <h4 class="my-0 fw-normal">Přehled cen IT prací</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">za rok 2020</h1>
+            <ul class="list-unstyled mt-3 mb-4">
+              <li>10 users included</li>
+              <li>2 GB of storage</li>
+              <li>Email support</li>
+              <li>Help center access</li>
+            </ul>
+            <button type="button" class="w-100 btn btn-lg btn-outline-primary">Sign up for free</button>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3">
+            <h4 class="my-0 fw-normal">Pro</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">$15<small class="text-muted fw-light">/mo</small></h1>
+            <ul class="list-unstyled mt-3 mb-4">
+              <li>20 users included</li>
+              <li>10 GB of storage</li>
+              <li>Priority email support</li>
+              <li>Help center access</li>
+            </ul>
+            <button type="button" class="w-100 btn btn-lg btn-primary">Get started</button>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm border-primary">
+          <div class="card-header py-3 text-white bg-primary border-primary">
+            <h4 class="my-0 fw-normal">Enterprise</h4>
+          </div>
+          <div class="card-body">
+            <h1 class="card-title pricing-card-title">$29<small class="text-muted fw-light">/mo</small></h1>
+            <ul class="list-unstyled mt-3 mb-4">
+              <li>30 users included</li>
+              <li>15 GB of storage</li>
+              <li>Phone and email support</li>
+              <li>Help center access</li>
+            </ul>
+            <button type="button" class="w-100 btn btn-lg btn-primary">Contact us</button>
+          </div>
+        </div>
+      </div>
+    </div>
+<h2 class="display-6 text-center mb-4">Compare plans</h2>
+<div class="table-responsive">
+      <table class="table text-center">
+        <thead>
+          <tr>
+            <th style="width: 34%;"></th>
+            <th style="width: 22%;">Free</th>
+            <th style="width: 22%;">Pro</th>
+            <th style="width: 22%;">Enterprise</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row" class="text-start">Public</th>
+            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+          </tr>
+          <tr>
+            <th scope="row" class="text-start">Private</th>
+            <td></td>
+            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+          </tr>
+        </tbody>
+
+        <tbody>
+          <tr>
+            <th scope="row" class="text-start">Permissions</th>
+            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+          </tr>
+          <tr>
+            <th scope="row" class="text-start">Sharing</th>
+            <td></td>
+            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+          </tr>
+          <tr>
+            <th scope="row" class="text-start">Unlimited members</th>
+            <td></td>
+            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+          </tr>
+          <tr>
+            <th scope="row" class="text-start">Extra security</th>
+            <td></td>
+            <td></td>
+            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
