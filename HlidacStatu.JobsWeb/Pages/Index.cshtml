@@ -16,7 +16,7 @@
             </p>
         </div>
         <div class="col-md-10 mx-auto col-lg-5">
-            <form class="p-4 p-md-5 border rounded-3 bg-light" id="account" action="/Identity/Account/Login" method="post">
+            <form  asp-antiforgery="true" class="p-4 p-md-5 border rounded-3 bg-light" id="account" action="/Identity/Account/Login" method="post">
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <div class="form-floating mb-3">
                     <input type="email" class="form-control" asp-for="Input.Email" >
