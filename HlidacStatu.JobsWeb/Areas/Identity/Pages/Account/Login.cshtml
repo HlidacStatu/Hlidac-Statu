@@ -1,0 +1,97 @@
+@page
+@using Microsoft.Extensions.Primitives
+@model HlidacStatu.JobsWeb.Areas.Identity.Pages.Account.LoginModel
+
+@{
+    ViewData["Title"] = "Přihlášení";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-sm-12">
+        <h2>Přihlášení do Hlídače státu.</h2>
+        @if (!StringValues.IsNullOrEmpty(Request.Query["ReturnUrl"]))
+        {
+            <div class="alert alert-warning">
+                Pro přístup na požadovanou stránku musíte být přihlášeni pod svým uživatelským účtem.
+            </div>
+        }
+    </div>
+        <hr class="bg-dark"/>
+    <div class="col-sm-12 d-none">
+        <h4>Přihlášení účtem jiné služby</h4>
+        <p>Nemusíte se bát, my se váš login a heslo k jiné službě nedozvíme. Jediné, co se dozvíme je váš email. Stejně jako při registraci níže.</p>
+        
+        <section>
+            <form id="external" method="post" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
+                <div>
+                    @foreach (var provider in Model.ExternalLogins)
+                    {
+                        string imgPath = $"/Content/Img/{provider.Name}Signin.png"; 
+                        <button type="submit" class="btn btn-link"
+                                name="provider" value="@provider.Name"
+                                title="Přihlásit pomocí @provider.DisplayName účtu">
+                            <img src="@imgPath" style="height:50px;width:auto" />
+                        </button>
+                    }
+                </div>
+            </form>
+        </section>
+        <hr class="bg-dark"/>
+    </div>
+    
+    <div class="col-sm-12">
+        <h4>Přihlášení pomocí účtu na Hlídači státu</h4>
+        <section>
+            <form id="account" method="post" class="form-horizontal">
+                <p>Pokud účet ještě nemáte, <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">tady se snadno a zdarma zaregistrujete</a>.</p>
+                <hr/>
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Input.Email" class="col-md-2 control-label">E-mail</label>
+                    <div class="col-sm-8">
+                        <input asp-for="Input.Email" class="form-control"/>
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Password" class="col-md-2 control-label">Heslo</label>
+                    <div class="col-sm-8">
+                        <input asp-for="Input.Password" class="form-control"/>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8">
+                        <div class="checkbox">
+                            <label asp-for="Input.RememberMe">
+                                <input asp-for="Input.RememberMe"/>
+                                Zapamatuj si mě
+                            </label>
+                            <div class="text-warning small">
+                                Nezaškrtávejte, pokud sdílíte počítač s více lidmi nebo jste u veřejného počítače.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8">
+                        <button type="submit" class="btn btn-primary">Přihlásit se do Hlídače státu</button>
+                        <p>
+                            <a id="forgot-password" asp-page="./ForgotPassword">Zapomenuté heslo?</a>
+                        </p>
+                        <p>
+                            <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Odeslat potvrzení e-mailem</a>
+                        </p>
+                        @*<honeypot></honeypot>*@
+                    </div>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
