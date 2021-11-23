@@ -1,3 +1,4 @@
+using System;
 using HlidacStatu.AutocompleteApi.Controllers;
 using HlidacStatu.AutocompleteApi.Services;
 using HlidacStatu.LibCore.MiddleWares;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Polly;
 using ProtoBuf.Grpc.Server;
 
 namespace HlidacStatu.AutocompleteApi
@@ -29,14 +31,19 @@ namespace HlidacStatu.AutocompleteApi
             
             //start initializing during startup, not after first request
             // after first request call looks like this: services.AddSingleton<MemoryStoreService>();
-            services.AddSingleton<MemoryStoreService>(new MemoryStoreService());
+            services.AddSingleton<IMemoryStoreService, MemoryStoreService>();
             
             //add timer to refresh data once a day
             services.AddHostedService<TimedHostedService>();
 
             services.AddCodeFirstGrpc();
             services.AddControllers();
-            
+
+            services.AddHttpClient(AppConstants.HttpClientName) 
+                .AddTransientHttpErrorPolicy(policyBuilder =>
+                    policyBuilder.WaitAndRetryAsync(
+                        3, retryNumber => TimeSpan.FromMilliseconds(5000)));;
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

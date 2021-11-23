@@ -6,10 +6,18 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using HlidacStatu.Entities;
 using Microsoft.AspNetCore.Authorization;
+using MimeMapping;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -101,5 +109,19 @@ namespace HlidacStatu.Web.Controllers
                 return NotFound($"Dump {datatype} for date:{date} nenalezen.");
             }
         }
+        
+        [Authorize(Roles = "Admin,HlidacService")]
+        [HttpGet("generateAutocompleteData")]
+        public async Task<ActionResult<byte[]>> GenerateAutocompleteData(CancellationToken cancel = default)
+        {
+            var autocompleteFile = StaticData.Autocomplete_Cache.Get();
+
+            await using var outputStream = new MemoryStream();
+            await using var compressStream = new BrotliStream(outputStream, CompressionLevel.Fastest);
+            await compressStream.WriteAsync(autocompleteFile, 0, autocompleteFile.Length, cancel);
+
+            return File(outputStream.ToArray(), KnownMimeTypes.Bin, "autocomplete.br", true);
+        }
+        
     }
 }

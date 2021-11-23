@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 using FullTextSearch;
@@ -8,8 +9,21 @@ using HlidacStatu.Repositories;
 
 namespace HlidacStatu.AutocompleteApi.Services
 {
-    public class MemoryStoreService
+    public interface IMemoryStoreService
     {
+        Index<Autocomplete> HlidacFulltextIndex { get; }
+        Index<Autocomplete> SmallSampleIndex { get; }
+        DateTime RunningSince { get; }
+        DateTime LastDataRenewalStarted { get; }
+        bool IsDataRenewalRunning { get; }
+        Exception LastException { get; }
+        Task GenerateAll(CancellationToken cancellationToken = default);
+    }
+
+    public class MemoryStoreService : IMemoryStoreService
+    {
+        private HlidacApiService _hlidacService;
+        
         // Search indexes
         public Index<Autocomplete> HlidacFulltextIndex { get; private set; }
 
@@ -25,8 +39,10 @@ namespace HlidacStatu.AutocompleteApi.Services
         public bool IsDataRenewalRunning { get; private set; }
         public Exception LastException { get; private set; }
 
-        public MemoryStoreService()
+        public MemoryStoreService(HlidacApiService hlidacService)
         {
+            _hlidacService = hlidacService;
+            
             RunningSince = DateTime.Now;
             //quick load from backups so app can restart fast
             HlidacFulltextIndex = LoadFromBackup<Autocomplete>(nameof(HlidacFulltextIndex));
@@ -65,18 +81,18 @@ namespace HlidacStatu.AutocompleteApi.Services
         }
 
 
-        public async Task GenerateHlidacFulltextIndex(CancellationToken cancellationToken = default)
+        private async Task GenerateHlidacFulltextIndex(CancellationToken cancellationToken = default)
         {
+            var autocompleteBinary = await _hlidacService.LoadFullAutocomplete();
             lock (_fullTextLock)
             {
-                var autocompleteData = AutocompleteRepo.GenerateAutocomplete();
-                HlidacFulltextIndex = new Index<Autocomplete>(autocompleteData);
+                HlidacFulltextIndex = Index<Autocomplete>.Deserialize(autocompleteBinary);
             }
 
             await CreateBackup(nameof(HlidacFulltextIndex), HlidacFulltextIndex, cancellationToken);
         }
 
-        public async Task GenerateSmallSampleIndex(CancellationToken cancellationToken = default)
+        private async Task GenerateSmallSampleIndex(CancellationToken cancellationToken = default)
         {
             string _asdf = $@"[
               {{
@@ -156,6 +172,8 @@ namespace HlidacStatu.AutocompleteApi.Services
         {
             return $"{indexName}.bak";
         }
+
+        
     }
 
 }
