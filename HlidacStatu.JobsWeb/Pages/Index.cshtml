@@ -1,5 +1,13 @@
 ﻿@page
 @model HlidacStatu.JobsWeb.Areas.Identity.Pages.Account.LoginModel
+@using HlidacStatu.JobsWeb.Services
+@using HlidacStatu.JobsWeb.Models
+@using HlidacStatu.Entities
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+
 @{
     ViewData["Title"] = "Cenové analýzy Hlídače státu";
     ViewBag.HideYearSelector = true;
@@ -16,22 +24,38 @@
             </p>
         </div>
         <div class="col-md-10 mx-auto col-lg-5">
-            <form  asp-antiforgery="true" class="p-4 p-md-5 border rounded-3 bg-light" id="account" action="/Identity/Account/Login" method="post">
-                <div asp-validation-summary="All" class="text-danger"></div>
-                <div class="form-floating mb-3">
-                    <input type="email" class="form-control" asp-for="Input.Email" >
-                    <label for="floatingInput" asp-for="Input.Email" >Email</label>
-                </div>
-                <div class="form-floating mb-3">
-                    <input type="password" class="form-control" asp-for="Input.Password" >
-                    <label asp-for="Input.Password" >Heslo</label>
-                </div>
-                <button class="w-100 btn btn-lg btn-primary" type="submit">Přihlásit se</button>
-                <hr class="my-4">
-                <small class="text-muted">Pokud jste registrováni na www.hlidacstatu.cz, zde funguje stejný login.</small>
-                <small><a id="forgot-password" href="https://www.hlidacstatu.cz/Identity/Account/ForgotPassword">Zapomenuté heslo?</a></small>
-                <p class="text-dark">Nemáte přístup k analýzám, <a href="https://www.hlidacstatu.cz/Identity/Account/Register">zaregistrujte se</a>.</p>
-            </form>
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <div class="p-4 p-md-5 border rounded-3 bg-light">
+                <h4>Jste přihlášeni</h4>
+                    <div class="mb-3">
+                        @(User.Identity.Name)
+                    </div>
+                    <div class="mb-3">
+                        <b>Máte zakoupeny tyto produkty:</b>
+                    </div>
+                </div>            }
+            else
+            {
+
+
+                <form asp-antiforgery="true" class="p-4 p-md-5 border rounded-3 bg-light" id="account" action="/Identity/Account/Login" method="post">
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" asp-for="Input.Email">
+                        <label for="floatingInput" asp-for="Input.Email">Email</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" asp-for="Input.Password">
+                        <label asp-for="Input.Password">Heslo</label>
+                    </div>
+                    <button class="w-100 btn btn-lg btn-primary" type="submit">Přihlásit se</button>
+                    <hr class="my-4">
+                    <small class="text-muted">Pokud jste registrováni na www.hlidacstatu.cz, zde funguje stejný login.</small>
+                    <small><a id="forgot-password" href="https://www.hlidacstatu.cz/Identity/Account/ForgotPassword">Zapomenuté heslo?</a></small>
+                    <p class="text-dark">Nemáte přístup k analýzám, <a href="https://www.hlidacstatu.cz/Identity/Account/Register">zaregistrujte se</a>.</p>
+                </form>
+            }
         </div>
     </div>
 </div>
@@ -46,109 +70,154 @@
 </div>
 
 <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
-      <div class="col">
+    <div class="col">
         <div class="card mb-4 rounded-3 shadow-sm">
-          <div class="card-header py-3">
-            <h4 class="my-0 fw-normal">Přehled cen IT prací</h4>
-          </div>
-          <div class="card-body">
-            <h1 class="card-title pricing-card-title">za rok 2020</h1>
-            <ul class="list-unstyled mt-3 mb-4">
-              <li>10 users included</li>
-              <li>2 GB of storage</li>
-              <li>Email support</li>
-              <li>Help center access</li>
-            </ul>
-            <button type="button" class="w-100 btn btn-lg btn-outline-primary">Sign up for free</button>
-          </div>
+            <div class="card-header py-3">
+                <h4 class="my-0 fw-normal">Přehled cen IT prací</h4>
+            </div>
+            <div class="card-body">
+                <h2 class="card-title pricing-card-title">za celý rok 2020</h2>
+                @{ 
+                    var key = new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 };
+                    var stat = JobService.GetStatistics(key);
+                    var distinctJobsForYearAndSubject = JobService.DistinctJobs
+                            .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
+                            .ToList();
+                    var pocetSmluv = distinctJobsForYearAndSubject
+                        .Select(m => m.SmlouvaId).Distinct().Count();
+                    var pocetZadavatelu = distinctJobsForYearAndSubject
+                        .Select(m => m.IcoOdberatele).Distinct().Count();
+                    var pocetDodavatelu = distinctJobsForYearAndSubject
+                        .SelectMany(m => m.IcaDodavatelu).Distinct().Count();
+                    var pocetCen = distinctJobsForYearAndSubject
+                        .Count();
+                }
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>obsahuje údaje z @pocetSmluv smluv</li>
+                    <li>od @pocetZadavatelu zadavatelů</li>
+                    <li>a @pocetDodavatelu dodavatelů</li>
+                    <li>zahrnuje @pocetCen cen</li>
+                    <li>+ detailní rozpad cen</li>
+                    <li>+ obvyklé ceny</li>
+                    <li>+ maximální a minimální ceny</li>
+                </ul>
+            </div>
         </div>
-      </div>
-      <div class="col">
-        <div class="card mb-4 rounded-3 shadow-sm">
-          <div class="card-header py-3">
-            <h4 class="my-0 fw-normal">Pro</h4>
-          </div>
-          <div class="card-body">
-            <h1 class="card-title pricing-card-title">$15<small class="text-muted fw-light">/mo</small></h1>
-            <ul class="list-unstyled mt-3 mb-4">
-              <li>20 users included</li>
-              <li>10 GB of storage</li>
-              <li>Priority email support</li>
-              <li>Help center access</li>
-            </ul>
-            <button type="button" class="w-100 btn btn-lg btn-primary">Get started</button>
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card mb-4 rounded-3 shadow-sm border-primary">
-          <div class="card-header py-3 text-white bg-primary border-primary">
-            <h4 class="my-0 fw-normal">Enterprise</h4>
-          </div>
-          <div class="card-body">
-            <h1 class="card-title pricing-card-title">$29<small class="text-muted fw-light">/mo</small></h1>
-            <ul class="list-unstyled mt-3 mb-4">
-              <li>30 users included</li>
-              <li>15 GB of storage</li>
-              <li>Phone and email support</li>
-              <li>Help center access</li>
-            </ul>
-            <button type="button" class="w-100 btn btn-lg btn-primary">Contact us</button>
-          </div>
-        </div>
-      </div>
     </div>
-<h2 class="display-6 text-center mb-4">Compare plans</h2>
+    <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+            <div class="card-header py-3 text-white bg-success border-success">
+                <h4 class="my-0 fw-normal">Pro</h4>
+            </div>
+            <div class="card-body">
+                <h2 class="card-title pricing-card-title">49 000<small class="text-muted fw-light"> Kč bez DPH</small></h2>
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>PDF</li>
+                    <li>Webová analytická aplikace</li>
+                    <li>Omezená licence (pouze interní použití)</li>
+                    <li>Sleva 20% na analýzu pro jiné roky</li>
+                </ul>
+                <a href="/contact" class="w-100 btn btn-lg btn-success">Kontaktujte nás</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm border-primary">
+            <div class="card-header py-3 text-white bg-primary border-primary">
+                <h4 class="my-0 fw-normal">Public</h4>
+            </div>
+            <div class="card-body">
+                <h2 class="card-title pricing-card-title">290 000<small class="text-muted fw-light"> Kč bez DPH</small></h2>
+                <ul class="list-unstyled mt-3 mb-4">
+                    <li>Vše jako Pro, navíc</li>
+                    <li>Neomezená licence (údaje z analýzy můžete zveřejňovat)</li>
+                    <li>Sleva 25% na analýzu pro jiné roky</li>
+                </ul>
+                <a href="/contact" class="w-100 btn btn-lg btn-primary">Kontaktujte nás</a>
+            </div>
+        </div>
+    </div>
+</div>
+<h2 class="display-6 text-center mb-4">Porovnání produktů</h2>
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="check" viewBox="0 0 16 16">
+    <title>Check</title>
+    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+  </symbol>
+</svg>
 <div class="table-responsive">
-      <table class="table text-center">
+    <table class="table text-center table-sm table-striped">
         <thead>
-          <tr>
-            <th style="width: 34%;"></th>
-            <th style="width: 22%;">Free</th>
-            <th style="width: 22%;">Pro</th>
-            <th style="width: 22%;">Enterprise</th>
-          </tr>
+            <tr>
+                <th style="width: 34%;"></th>
+                <th style="width: 33%;">Pro</th>
+                <th style="width: 33%;">Public</th>
+            </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row" class="text-start">Public</th>
-            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-          </tr>
-          <tr>
-            <th scope="row" class="text-start">Private</th>
-            <td></td>
-            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-          </tr>
+            <tr>
+                <th scope="row" class="text-start">PDF se souhrnou analýzou</th>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            </tr>
+            <tr>
+                <th scope="row" class="text-start">Analytický web s detailnímy údaji</th>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            </tr>
+            <tr>
+                <th scope="row" class="text-start">Neomezený přístup k analytickému webu</th>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            </tr>
+            <tr>
+                <th scope="row" class="text-start">Provázání cen až na konkrétní smlouvy</th>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            </tr>
+            <tr>
+                <th scope="row" class="text-start">Provázání cen až na konkrétní stránky smlouvy</th>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            </tr>
         </tbody>
 
         <tbody>
-          <tr>
-            <th scope="row" class="text-start">Permissions</th>
-            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-          </tr>
-          <tr>
-            <th scope="row" class="text-start">Sharing</th>
-            <td></td>
-            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-          </tr>
-          <tr>
-            <th scope="row" class="text-start">Unlimited members</th>
-            <td></td>
-            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-          </tr>
-          <tr>
-            <th scope="row" class="text-start">Extra security</th>
-            <td></td>
-            <td></td>
-            <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-          </tr>
+            <tr>
+                <th scope="row" class="text-start">Použití pro vnitřní potřebu</th>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            </tr>
+            <tr>
+                <th scope="row" class="text-start">Právo na zveřejnění částí analýzy</th>
+                <td></td>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            </tr>
+            <tr>
+                <th scope="row" class="text-start">Sleva na analýzu pro další roky</th>
+                <td>20 %</td>
+                <td>25 %</td>
+            </tr>
+            <tr>
+                <th scope="row" class="text-start">Podpora s reakcí do 3 pracovních dní</th>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th scope="row" class="text-start">Podpora s reakcí do 1 pracovního dne</th>
+                <td></td>
+                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
+            </tr>
+            <tr>
+                <th scope="row" class="text-start">API pro získání analytických dat</th>
+                <td></td>
+                <td>Připravujeme</td>
+            </tr>
+            <tr>
+                <th scope="row" class="text-start">Kompletní data ve formě JSON/XML</th>
+                <td></td>
+                <td>Připravujeme</td>
+            </tr>
         </tbody>
-      </table>
-    </div>
+    </table>
+</div>
