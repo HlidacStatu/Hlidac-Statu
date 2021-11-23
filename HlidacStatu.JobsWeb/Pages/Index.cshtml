@@ -27,14 +27,19 @@
             @if (SignInManager.IsSignedIn(User))
             {
                 <div class="p-4 p-md-5 border rounded-3 bg-light">
-                <h4>Jste přihlášeni</h4>
+                    <h4>Jste přihlášeni</h4>
                     <div class="mb-3">
                         @(User.Identity.Name)
                     </div>
                     <div class="mb-3">
                         <b>Máte zakoupeny tyto produkty:</b>
+                        <ul class="list-group">
+                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019</li>
+                            <li class="list-group-item"><a href="/Souhrn?obor=IT&rok=2020">Přehled obvyklých cen IT prací ve státní správě za rok 2020</a></li>
+                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021</li>
+                        </ul>
                     </div>
-                </div>            }
+                </div> }
             else
             {
 
@@ -77,7 +82,7 @@
             </div>
             <div class="card-body">
                 <h2 class="card-title pricing-card-title">za celý rok 2020</h2>
-                @{ 
+                @{
                     var key = new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 };
                     var stat = JobService.GetStatistics(key);
                     var distinctJobsForYearAndSubject = JobService.DistinctJobs
@@ -140,10 +145,10 @@
 </div>
 <h2 class="display-6 text-center mb-4">Porovnání produktů</h2>
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-  <symbol id="check" viewBox="0 0 16 16">
-    <title>Check</title>
-    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
-  </symbol>
+    <symbol id="check" viewBox="0 0 16 16">
+        <title>Check</title>
+        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
+    </symbol>
 </svg>
 <div class="table-responsive">
     <table class="table text-center table-sm table-striped">

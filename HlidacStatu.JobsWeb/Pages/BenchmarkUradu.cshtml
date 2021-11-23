@@ -38,18 +38,19 @@
     </script>
 }
 
-<h1>Benchmark úřadů</h1>
+<h2>Benchmark cen vybraného úřadu
+    <small class="text-muted">oproti souhrným obvyklým cenám</small>
+    </h2>
 @if (Model.Key.HasValue)
 {
-    <h2>Seznam úřadů</h2>
 
     <div class="input-group mb-3">
         <label class="input-group-text" for="selectNavigace">Vyberte úřad:</label>
         <select class="form-select" id="selectNavigace">
             <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte úřad...</option>
-            @foreach (var (ico, nazev, pocetSmluv) in JobService.GetOdberateleList(Model.Key.Value).OrderByDescending(x => x.pocetSmluv))
+            @foreach (var (ico, nazev, pocetCen) in JobService.GetOdberateleList(Model.Key.Value).OrderByDescending(x => x.pocetCen))
             {
-                <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetSmluv smluv)</option>
+                <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetCen cen)</option>
             }
         </select>
     </div>

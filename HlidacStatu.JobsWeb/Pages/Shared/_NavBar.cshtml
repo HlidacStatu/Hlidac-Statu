@@ -3,7 +3,8 @@
     Context.Items.TryGetValue("rok", out var rok);
 }
 
-<nav class="navbar navbar-expand-lg navbar-dark">
+<h2>Analýza <b>@obor</b> <small  class="text-muted">pro rok @rok</small></h2>
+<nav class="navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -11,11 +12,14 @@
             
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav level2">
-                <a class="nav-link" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">Souhrn</a>
-                <a class="nav-link" asp-page="/BenchmarkUradu" asp-route-obor="@obor" asp-route-rok="@rok">Benchmark úřadů</a>
-                <a class="nav-link" asp-page="/BenchmarkDodavatelu" asp-route-obor="@obor" asp-route-rok="@rok">Benchmark dodavatelů</a>
-                <a class="nav-link" asp-page="/Pdf" asp-route-obor="@obor" asp-route-rok="@rok">PDF</a>
-                <a class="nav-link" asp-page="/JedenJob" asp-route-obor="@obor" asp-route-rok="@rok">Experimentální zobrazení grafu</a>
+                <a class="nav-link" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">▸ Souhrn</a>
+                <a class="nav-link" asp-page="/BenchmarkUradu" asp-route-obor="@obor" asp-route-rok="@rok">▸ Benchmark úřadů</a>
+                <a class="nav-link" asp-page="/BenchmarkDodavatelu" asp-route-obor="@obor" asp-route-rok="@rok">▸ Benchmark dodavatelů</a>
+                <a class="nav-link" asp-page="/Pdf" asp-route-obor="@obor" asp-route-rok="@rok">▸ PDF</a>
+                @if (this.User.IsInRole("Admin"))
+                {
+                <a class="nav-link" asp-page="/JedenJob" asp-route-obor="@obor" asp-route-rok="@rok">▸ Experimentální zobrazení grafu</a>
+                }
             </div>
             
         </div>

@@ -19,9 +19,9 @@ a {
 }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+    color: #0a58ca;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
 }
 
 /* Sticky footer styles
@@ -91,7 +91,7 @@ body {
   vertical-align: bottom;
 }
 
-.navbar-dark .navbar-nav.level2 .nav-link  {
-  color: #fff;
-  padding: 2px 12px;
+.navbar-dark .navbar-nav.level2 .nav-link {
+    color: #0a58ca;
+    padding: 2px 12px;
 }

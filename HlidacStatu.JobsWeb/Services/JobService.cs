@@ -182,14 +182,14 @@ namespace HlidacStatu.JobsWeb.Services
         // jak to udělat správně? protože je to po letech? Jak to bude na FE?
         // a) zobrazovat roky a po vybrání roku obory a po vybrání oboru firmy?
         // b) zobrazovat firmy a po vybrání firmy nabídnout roky?
-        public static List<(string ico, string nazev, int pocetSmluv)> GetOdberateleList(YearlyStatisticsGroup.Key key)
+        public static List<(string ico, string nazev, int pocetCen)> GetOdberateleList(YearlyStatisticsGroup.Key key)
         {
             return GlobalStats[key].OdberateleStatistics.Keys.Select(k =>
                 (
                     k,
                     FirmaRepo.NameFromIco(k, true),
                     DistinctJobs.Where(x => x.IcoOdberatele == k)
-                        .Select(x => x.SmlouvaId).Distinct().Count()))
+                        .Select(x => x.JobPk).Distinct().Count()))
                 .ToList();
         }
 
@@ -203,14 +203,14 @@ namespace HlidacStatu.JobsWeb.Services
             return result;
         }
 
-        public static List<(string ico, string nazev, int pocetSmluv)> GetDodavateleList(YearlyStatisticsGroup.Key key)
+        public static List<(string ico, string nazev, int pocetCen)> GetDodavateleList(YearlyStatisticsGroup.Key key)
         {
             return GlobalStats[key].DodavateleStatistics.Keys.Select(k =>
                 (
                     k,
                     FirmaRepo.NameFromIco(k, true),
                     DistinctJobs.Where(x => x.IcaDodavatelu.Any(i => i == k))
-                        .Select(x => x.SmlouvaId).Distinct().Count()
+                        .Select(x => x.JobPk).Distinct().Count()
                 ))
                 .ToList();
         }
