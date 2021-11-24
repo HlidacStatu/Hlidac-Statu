@@ -42,22 +42,27 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 return null;
             if (string.IsNullOrEmpty(p.nazevSouboru))
             {
-                Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} doesn't have nazevSouboru");
+                Util.Consts.Logger.Warning($"smlouva {key[0]} soubor {p.UniqueHash()} doesn't have nazevSouboru");
                 return null;
             }
             if (p.nazevSouboru.ToLower().EndsWith("pdf"))
             {
+                Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+                sw.Start();
                 try
                 {
                     Lib.Data.External.Tables.Result[] myRes = HlidacStatu.Lib.Data.External.Tables.PDF.GetMaxTablesFromPDFAsync(
                         p.odkaz, HlidacStatu.Lib.Data.External.Tables.Camelot.CamelotResult.Formats.JSON).Result;
+                    sw.Stop();
+                    Util.Consts.Logger.Debug($"smlouva {key[0]} soubor {p.UniqueHash()} done in {sw.ElapsedMilliseconds}ms, found {myRes.Length} tables");
 
                     return myRes;
 
                 }
                 catch (Exception e)
                 {
-                    Util.Consts.Logger.Error($"Stemmer returned incomplete json for {smlouvaKeyId.ValueForData}", e);
+                    sw.Stop();
+                    Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} error in {sw.ElapsedMilliseconds}ms, {e.Message}",e);
                     throw;
                 }
             }

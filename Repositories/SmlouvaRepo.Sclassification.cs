@@ -206,7 +206,8 @@ namespace HlidacStatu.Repositories
 
         private static string CallEndpoint(string endpoint, string content, string id, int timeoutMs)
         {
-            using (Devmasters.Net.HttpClient.URLContent request = new Devmasters.Net.HttpClient.URLContent(classificationBaseUrl() + $"/{endpoint}?doc_id={id}"))
+            var url = classificationBaseUrl() + $"/{endpoint}?doc_id={id}";
+            using (Devmasters.Net.HttpClient.URLContent request = new Devmasters.Net.HttpClient.URLContent(url))
             {
                 request.Method = Devmasters.Net.HttpClient.MethodEnum.POST;
                 request.Tries = 3;
@@ -215,17 +216,20 @@ namespace HlidacStatu.Repositories
                 request.ContentType = "application/json; charset=utf-8";
                 request.RequestParams.RawContent = content;
                 Devmasters.Net.HttpClient.TextContentResult response = null;
+                Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                 try
                 {
-                    Util.Consts.Logger.Debug($"Calling classifier endpoint [{endpoint}] for {id} from " + request.Url);
-
+                    sw.Start();
                     response = request.GetContent();
+                    sw.Stop();
+                    Util.Consts.Logger.Debug($"Called classifier endpoint [{endpoint}] for {id} from {url} in {sw.ElapsedMilliseconds}ms.");
 
                     return response.Text;
                 }
                 catch (Exception e)
                 {
-                    Util.Consts.Logger.Error($"Classification {endpoint} API error for {id} " + request.Url, e);
+                    sw.Stop();
+                    Util.Consts.Logger.Error($"Error classifier endpoint [{endpoint}] for {id} from {url} in {sw.ElapsedMilliseconds}ms, error {e.Message}",e);
                     throw;
                 }
             }
