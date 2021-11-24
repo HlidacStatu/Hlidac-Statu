@@ -1,39 +1,46 @@
-using System.IO;
-using System.IO.Compression;
+using System;
 using System.Net.Http;
-using System.Threading;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace HlidacStatu.AutocompleteApi.Services
 {
     public class HlidacApiService
     {
         private readonly IHttpClientFactory _httpClientFactory;
-
-        public HlidacApiService(IHttpClientFactory httpClientFactory) =>
+        private readonly HlidacApiOptions _options; 
+        
+        public HlidacApiService(IHttpClientFactory httpClientFactory, IOptions<HlidacApiOptions> options)
+        {
             _httpClientFactory = httpClientFactory;
+            _options = options.Value;
+        }
 
 
         public async Task<byte[]> LoadFullAutocomplete()
         {
             var client = _httpClientFactory.CreateClient(AppConstants.HttpClientName);
-            var response = await client.GetByteArrayAsync("https://www.hlidacstatu.cz/api/v2/generateAutocompleteData");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", _options.Token );
 
-            var decompressed = await DecompressBytesAsync(response);
+            try
+            {
+                var response = await client.GetByteArrayAsync(_options.AutocompleteUri);
+                return response;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
 
-            return decompressed;
+            return null;
         }
+    }
 
-
-        private async Task<byte[]> DecompressBytesAsync(byte[] bytes, CancellationToken cancel = default)
-        {
-            await using var inputStream = new MemoryStream(bytes);
-            await using var outputStream = new MemoryStream();
-            await using var decompressStream = new BrotliStream(inputStream, CompressionMode.Decompress);
-
-            await decompressStream.CopyToAsync(outputStream, cancel);
-
-            return outputStream.ToArray();
-        }
+    public class HlidacApiOptions
+    {
+        public string Token { get; set; }
+        public string AutocompleteUri { get; set; }
     }
 }

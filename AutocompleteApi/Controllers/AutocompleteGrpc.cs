@@ -10,14 +10,14 @@ namespace HlidacStatu.AutocompleteApi.Controllers
 {
     public class AutocompleteGrpc : IAutocompleteGrpc
     {
-        private readonly MemoryStoreService _memoryStore;
+        private readonly IMemoryStoreService _memoryStore;
         
         private JsonSerializerOptions _jsonOptions = new()
         {
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         };
 
-        public AutocompleteGrpc(MemoryStoreService memoryStore)
+        public AutocompleteGrpc(IMemoryStoreService memoryStore)
         {
             _memoryStore = memoryStore;
         }

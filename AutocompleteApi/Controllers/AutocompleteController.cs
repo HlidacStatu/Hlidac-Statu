@@ -10,9 +10,9 @@ namespace HlidacStatu.AutocompleteApi.Controllers
     [Route("[controller]/[action]")]
     public class AutocompleteController : ControllerBase
     {
-        private readonly MemoryStoreService _memoryStore;
+        private readonly IMemoryStoreService _memoryStore;
 
-        public AutocompleteController(MemoryStoreService memoryStore)
+        public AutocompleteController(IMemoryStoreService memoryStore)
         {
             _memoryStore = memoryStore;
         }

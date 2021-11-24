@@ -1,11 +1,9 @@
 using System;
 using System.IO;
-using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 using FullTextSearch;
 using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
 
 namespace HlidacStatu.AutocompleteApi.Services
 {
@@ -22,7 +20,7 @@ namespace HlidacStatu.AutocompleteApi.Services
 
     public class MemoryStoreService : IMemoryStoreService
     {
-        private HlidacApiService _hlidacService;
+        private readonly HlidacApiService _hlidacService;
         
         // Search indexes
         public Index<Autocomplete> HlidacFulltextIndex { get; private set; }
@@ -150,25 +148,28 @@ namespace HlidacStatu.AutocompleteApi.Services
         private async Task CreateBackup<T>(string indexName, Index<T> index, CancellationToken cancellationToken)
             where T : IEquatable<T>
         {
-            string filename = CreateFileName(indexName);
-            using var filestream = File.Create(filename);
+            string filename = AssembleFileName(indexName);
+            await using var filestream = File.Create(filename);
             await filestream.WriteAsync(index.Serialize(), cancellationToken);
         }
         
         private Index<T> LoadFromBackup<T>(string indexName)
             where T : IEquatable<T>
         {
-            string filename = CreateFileName(indexName);
+            string filename = AssembleFileName(indexName);
             if (File.Exists(filename))
             {
                 var bytes = File.ReadAllBytes(filename);
-                return Index<T>.Deserialize(bytes);
+                if (bytes.Length > 0)
+                {
+                    return Index<T>.Deserialize(bytes);
+                }
             }
 
             return null;
         }
 
-        private string CreateFileName(string indexName)
+        private string AssembleFileName(string indexName)
         {
             return $"{indexName}.bak";
         }
