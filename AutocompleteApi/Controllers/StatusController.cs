@@ -25,7 +25,8 @@ namespace HlidacStatu.AutocompleteApi.Controllers
                 _memoryStore.IsDataRenewalRunning,
                 _memoryStore.RunningSince,
                 _memoryStore.LastDataRenewalStarted,
-                _memoryStore.LastException
+                _memoryStore.LastException?.Message,
+                _memoryStore.LastException?.StackTrace
             };
             
             return new JsonResult(result);
