@@ -7,11 +7,11 @@ namespace HlidacStatu.AutocompleteApi.Services
 {
     public class TimedHostedService : IHostedService, IDisposable
     {
-        private int executionCount = 0;
+        private int _executionCount = 0;
         private Timer _timer;
-        private MemoryStoreService _memoryStoreService;
+        private readonly IMemoryStoreService _memoryStoreService;
 
-        public TimedHostedService(MemoryStoreService memoryStoreService)
+        public TimedHostedService(IMemoryStoreService memoryStoreService)
         {
             _memoryStoreService = memoryStoreService;
         }

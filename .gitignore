@@ -376,3 +376,5 @@ HlidacStatu.JobTableEditor/appsettings.Development.json
 HlidacStatu.JobsWeb/appsettings.json
 
 AutocompleteApi/appsettings.Development.json
+
+*.bak

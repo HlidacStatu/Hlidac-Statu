@@ -40,12 +40,15 @@ namespace FullTextSearch
 
         public static Index<T> Deserialize(byte[] json, ITokenizer tokenizer = null, Options options = null)
         {
+            
             //json to Sentence list
             tokenizer = tokenizer ?? Tokenizer.DefaultTokenizer();
             options = options ?? Options.DefaultOptions();
 
+            var decompressedJson = BrotliCompression.Decompress(json);
+
             List<SerializableSentence<T>> deserializedSentences =
-                JsonSerializer.Deserialize<List<SerializableSentence<T>>>(json);
+                JsonSerializer.Deserialize<List<SerializableSentence<T>>>(decompressedJson);
 
             if (deserializedSentences is null)
                 throw new Exception("Deserialization failed");
@@ -63,7 +66,9 @@ namespace FullTextSearch
 
         public byte[] Serialize()
         {
-            return SortedTokens.Serialize();
+            var serialized = SortedTokens.Serialize();
+
+            return BrotliCompression.Compress(serialized);
         }
 
         private void BuildIndex(IEnumerable<T> inputObjects)

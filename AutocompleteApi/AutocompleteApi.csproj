@@ -17,7 +17,6 @@
     <ItemGroup>
       <ProjectReference Include="..\GrpcProtobufs\GrpcProtobufs.csproj" />
       <ProjectReference Include="..\LibCore\LibCore.csproj" />
-      <ProjectReference Include="..\Repositories\Repositories.csproj" />
     </ItemGroup>
 
 </Project>
