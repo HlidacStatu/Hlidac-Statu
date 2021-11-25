@@ -6,7 +6,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
     public class Client
     {
 
-
+        public static Devmasters.Logging.Logger Logger = new Devmasters.Logging.Logger("HlidacStatu.Camelot.Api");
         public static async Task<CamelotResult> GetTablesFromPDFAsync(string pdfUrl, ClientLow.Commands command, CamelotResult.Formats format = CamelotResult.Formats.JSON, string pages = "all", TimeSpan? executionTimeout = null)
         {
             executionTimeout = executionTimeout ?? TimeSpan.FromMinutes(15);
@@ -28,7 +28,8 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                             ElapsedTimeInMs = (long)executionTimeout.Value.TotalMilliseconds,
                             FoundTables = 0,
                             ScriptOutput = session.ErrorDescription,
-                            Format = format.ToString()
+                            Format = format.ToString(),
+                            CamelotServer = cl.cl.ApiEndpoint
                         };
                     }
                     do
@@ -38,7 +39,10 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                         if (res.Success)
                         {
                             if (res.Data.Status.ToLower() == "done")
+                            {
+                                res.Data.ElapsedTimeInMs = (long)(DateTime.Now - started).TotalMilliseconds;
                                 return res.Data;
+                            }
                         }
                         else
                         {
@@ -48,7 +52,8 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                                 ElapsedTimeInMs = (long)executionTimeout.Value.TotalMilliseconds,
                                 FoundTables = 0,
                                 ScriptOutput = "APIClient: Session disappeard",
-                                Format = format.ToString()
+                                Format = format.ToString(),
+                                CamelotServer = cl.cl.ApiEndpoint
                             };
                         }
                         if ((DateTime.Now - started) > executionTimeout)
@@ -59,7 +64,8 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                                 ElapsedTimeInMs = (long)executionTimeout.Value.TotalMilliseconds,
                                 FoundTables = 0,
                                 ScriptOutput = "APIClient: Timeout expired",
-                                Format = format.ToString()
+                                Format = format.ToString(),
+                                CamelotServer = cl.cl.ApiEndpoint
                             };
                         }
                     } while (true);

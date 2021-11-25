@@ -61,6 +61,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
         public async Task<ApiResult<CamelotResult>> GetSessionAsync(string sessionId)
         {
+
             try
             {
                 using (System.Net.WebClient wc = new System.Net.WebClient())
@@ -70,7 +71,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
                     var json = await wc.DownloadStringTaskAsync(new Uri(url));
                     var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotResult>>(json);
-
+                    res.Data.ElapsedTimeInMs
                     return res;
                 }
 

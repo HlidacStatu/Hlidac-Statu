@@ -17,7 +17,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         private bool disposedValue;
 
         private IApiConnection conn = null;
-        private ClientLow cl = null;
+        public ClientLow cl = null;
 
         private static Devmasters.Logging.Logger logger = new Devmasters.Logging.Logger("Camelot.ClientParse");
         public ClientParse(IApiConnection connection,
@@ -79,6 +79,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             try
             {
                 var res = await cl.GetSessionAsync(this.SessionId);
+                res.Data.CamelotServer = cl.ApiEndpoint;
                 return res;
             }
             catch (Exception e)

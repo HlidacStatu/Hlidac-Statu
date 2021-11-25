@@ -11,6 +11,8 @@
             SQLITE
         }
 
+        public string CamelotServer { get; set; }
+
         public string SessionId { get; set; }
         public string ScriptOutput { get; set; }
 

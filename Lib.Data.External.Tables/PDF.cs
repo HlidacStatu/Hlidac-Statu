@@ -24,6 +24,8 @@ namespace HlidacStatu.Lib.Data.External.Tables
                      resLatt = Client.GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.lattice, format, pages).Result;
                      if (resLatt.Status != CamelotResult.Statuses.Error.ToString())
                          res.Add(resLatt);
+                     Client.Logger.Debug($"PDF {pdfUrl} done in {sw.ElapsedMilliseconds}ms on {resLatt.CamelotServer}");
+)
                  },
                 () =>
                 {
