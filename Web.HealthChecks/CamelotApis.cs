@@ -21,6 +21,7 @@ namespace HlidacStatu.Web.HealthChecks
             {
                 public string Uri { get; set; }
                 public string ApiKey { get; set; }
+                public string Name { get; set; }
             }
             public Endpoint[] Uris { get; set; }
 
@@ -42,7 +43,10 @@ namespace HlidacStatu.Web.HealthChecks
                         using (ClientLow cl = new ClientLow(endp.Uri, endp.ApiKey))
                         {
                             Uri uri = new Uri(endp.Uri);
-                            string anonUrl = string.Join("", uri.Host.TakeLast(7)) + ":" + uri.Port;
+                            string anonUrl = endp.Name;
+                            if (string.IsNullOrEmpty(anonUrl))
+                                anonUrl = string.Join("", uri.Host.TakeLast(7)) + ":" + uri.Port;
+
                             var ver = cl.VersionAsync().Result;
                             if (ver.Success)
                                 sb.AppendLine($"{anonUrl} ({ver.Data?.AppVersion}/{ver.Data?.CamelotVersion})");
@@ -53,7 +57,7 @@ namespace HlidacStatu.Web.HealthChecks
                                 sb.AppendLine($"stats: threads {st.Data?.CurrentThreads}/{st.Data?.MaxThreads},"
                                     + $" {HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ParsedFilesTotal ?? 0)} parsed (1H:{HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ParsedFiles1H ?? 0)}/24H:{HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ParsedFiles24H ?? 0)}),"
                                     + $" {HlidacStatu.Util.RenderData.NiceNumber(st.Data?.CallsTotal ?? 0)} ({HlidacStatu.Util.RenderData.NiceNumber(st.Data?.CallsIn1H ?? 0)} / {HlidacStatu.Util.RenderData.NiceNumber(st.Data?.CallsIn24H ?? 0)}) api calls,"
-                                    + $" {HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ErrorsTotal ?? 0)} errors ({st.Data?.LastErrorException}),"
+                                    + $" {HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ErrorsTotal ?? 0)} errors ({Devmasters.TextUtil.ShortenText( st.Data?.LastErrorException ??"",50)}),"
                                     + $" {st.Data?.FilesOnDisk} files {((st.Data?.FilesOnDiskSize ?? 0) / (1024m * 1024m)):N3} MB");
                             else
                                 sb.AppendLine($" ({st.ErrorCode}:{st.ErrorDescription})");
