@@ -7,15 +7,19 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
     {
 
         public static Devmasters.Logging.Logger Logger = new Devmasters.Logging.Logger("HlidacStatu.Camelot.Api");
-        public static async Task<CamelotResult> GetTablesFromPDFAsync(string pdfUrl, ClientLow.Commands command, CamelotResult.Formats format = CamelotResult.Formats.JSON, string pages = "all", TimeSpan? executionTimeout = null)
+        public static async Task<CamelotResult> GetTablesFromPDFAsync(
+            string pdfUrl, ClientLow.Commands command, 
+            CamelotResult.Formats format = CamelotResult.Formats.JSON, 
+            string pages = "all", TimeSpan? executionTimeout = null,
+            IApiConnection conn = null)
         {
             executionTimeout = executionTimeout ?? TimeSpan.FromMinutes(15);
-
+            conn = conn ?? ConnectionPool.DefaultInstance();
             DateTime started = DateTime.Now;
             try
             {
 
-                using (var cl = new ClientParse(ConnectionPool.DefaultInstance(), pdfUrl, command, format, pages))
+                using (var cl = new ClientParse(conn, pdfUrl, command, format, pages))
                 {
                     ApiResult<CamelotResult> res = null;
                     var session = await cl.StartSessionAsync();
