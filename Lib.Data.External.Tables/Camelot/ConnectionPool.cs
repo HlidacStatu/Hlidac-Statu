@@ -50,7 +50,8 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     }
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, true, maxDegreeOfParallelism: pool.Keys.Count);
+                }, null,null,
+                true, maxDegreeOfParallelism: pool.Keys.Count);
             insideTimer = false;
         }
 
