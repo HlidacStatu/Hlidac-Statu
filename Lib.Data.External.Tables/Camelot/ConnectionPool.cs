@@ -14,10 +14,12 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             public DateTime Checked { get; set; } = DateTime.MinValue;
             public bool Ready { get; set; } = false;
             public DateTime Used { get; set; } = DateTime.MinValue;
+            public CamelotStatistics Stats = null;
         }
 
         System.Random rnd = new Random(666);
-        private System.Collections.Concurrent.ConcurrentDictionary<Guid, EndpointStatus> pool = new System.Collections.Concurrent.ConcurrentDictionary<Guid, EndpointStatus>();
+        private System.Collections.Concurrent.ConcurrentDictionary<Guid, EndpointStatus> pool = 
+            new System.Collections.Concurrent.ConcurrentDictionary<Guid, EndpointStatus>();
         private System.Timers.Timer timer = new System.Timers.Timer();
         bool insideTimer = false;
         private static object lockObj = new object();
@@ -46,7 +48,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                         || (now - status.Checked).TotalMinutes < 5
                         || (now - status.Used).TotalMinutes < 5
                         )
-                        CheckEndpoint(id, false);
+                        CheckEndpoint(id);
                 }
 
             }
@@ -98,7 +100,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             timer.Start();
         }
 
-        private bool CheckEndpoint(Guid id, bool useIt)
+        private bool CheckEndpoint(Guid id)
         {
             if (pool.TryGetValue(id, out var status))
             {
@@ -112,17 +114,19 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                         net.Tries = 1;
                         net.Timeout = 2000;
                         var stat = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotStatistics>>(net.GetContent().Text);
+                        status.Stats = stat.Data;
                         if (stat.Success && stat.Data.CurrentThreads <= stat.Data.MaxThreads)
-                            DeclareLiveEndpoint(id, useIt);
+                            DeclareLiveEndpoint(id);
                         else
-                            status.Ready = false;
+                            DeclareDeadEndpoint(url);
                         return true;
                     }
 
                 }
                 catch (Exception)
                 {
-                    status.Ready = false;
+
+                    DeclareDeadEndpoint(url);
                 }
             }
             return false;
@@ -131,15 +135,21 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
         public string GetEndpointUrl()
         {
-            var liveUris = pool.Values.Where(m => m.Ready).OrderBy(m => m.Used);
+            var liveUris = pool.Values
+                .Where(m => m.Ready)
+                .OrderBy(m=>m.Stats?.UsedThreadsPercent() ?? 0)
+                .ThenBy(m => m.Used);
             if (liveUris.Count() == 0)
             {
                 foreach (var id in pool.Keys)
                 {
                     if (pool.TryGetValue(id, out var status))
                     {
-                        if (CheckEndpoint(id, true))
+                        if (CheckEndpoint(id))
+                        {
+                            UseLiveEndpoint(id);
                             return status.Url;
+                        }
                     }
                 }
                 throw new ApplicationException("No working api enpoint. All are dead");
@@ -150,15 +160,21 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
             return choosen.Url;
         }
-        public void DeclareLiveEndpoint(Guid id, bool useIt)
+        public void UseLiveEndpoint(Guid id)
+        {
+            if (pool.TryGetValue(id, out var item))
+            {
+                logger.Info($"Url {item.Url} is live.");
+                item.Used = item.Checked;
+            }
+        }
+        public void DeclareLiveEndpoint(Guid id)
         {
             if (pool.TryGetValue(id, out var item))
             {
                 logger.Info($"Url {item.Url} is live.");
                 item.Ready = true;
                 item.Checked = DateTime.Now;
-                if (useIt)
-                    item.Used = item.Checked;
             }
         }
 

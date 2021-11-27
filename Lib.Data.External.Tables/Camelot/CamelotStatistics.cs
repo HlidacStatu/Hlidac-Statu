@@ -4,6 +4,13 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
     public class CamelotStatistics
     {
+        public decimal UsedThreadsPercent() {
+            if (MaxThreads == 0)
+                return 1;
+            else
+                return (decimal)CurrentThreads / (decimal)MaxThreads;
+        }
+
         public long MaxThreads { get; set; }
         public long CallsTotal { get; set; }
         public long CallsIn1H { get; set; }
