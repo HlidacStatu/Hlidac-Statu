@@ -18,7 +18,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         }
 
         System.Random rnd = new Random(666);
-        private System.Collections.Concurrent.ConcurrentDictionary<Guid, EndpointStatus> pool = 
+        private System.Collections.Concurrent.ConcurrentDictionary<Guid, EndpointStatus> pool =
             new System.Collections.Concurrent.ConcurrentDictionary<Guid, EndpointStatus>();
         private System.Timers.Timer timer = new System.Timers.Timer();
         bool insideTimer = false;
@@ -29,7 +29,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
         private ConnectionPool()
         {
-            timer.Interval = 1 * 60 * 1000; //1 min
+            timer.Interval = 20 * 1000; //20s
             timer.Elapsed += (s, e) => CheckAllUris();
         }
 
@@ -40,19 +40,17 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
             insideTimer = true;
             DateTime now = DateTime.Now;
-            foreach (var id in pool.Keys)
-            {
-                if (pool.TryGetValue(id, out var status))
+
+            Devmasters.Batch.Manager.DoActionForAll<Guid>(pool.Keys,
+                id =>
                 {
-                    if (status.Ready == false
-                        || (now - status.Checked).TotalMinutes < 5
-                        || (now - status.Used).TotalMinutes < 5
-                        )
+                    if (pool.TryGetValue(id, out var status))
+                    {
                         CheckEndpoint(id);
-                }
+                    }
 
-            }
-
+                    return new Devmasters.Batch.ActionOutputData();
+                }, true, maxDegreeOfParallelism: pool.Keys.Count);
             insideTimer = false;
         }
 
@@ -116,10 +114,16 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                         var stat = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotStatistics>>(net.GetContent().Text);
                         status.Stats = stat.Data;
                         if (stat.Success && stat.Data.CurrentThreads <= stat.Data.MaxThreads)
+                        {
                             DeclareLiveEndpoint(id);
+                            return true;
+
+                        }
                         else
+                        {
                             DeclareDeadEndpoint(url);
-                        return true;
+                            return true;
+                        }
                     }
 
                 }
@@ -137,8 +141,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         {
             var liveUris = pool.Values
                 .Where(m => m.Ready)
-                .OrderBy(m=>m.Stats?.UsedThreadsPercent() ?? 0)
-                .ThenBy(m => m.Used);
+                .OrderBy(m => m.Stats?.UsedThreadsPercent() ?? 0).ThenBy(m => m.Used);
             if (liveUris.Count() == 0)
             {
                 foreach (var id in pool.Keys)
