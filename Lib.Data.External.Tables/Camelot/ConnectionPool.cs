@@ -24,7 +24,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         bool insideTimer = false;
         private static object lockObj = new object();
         private static ConnectionPool instance = null;
-        private static Devmasters.Logging.Logger logger = new Devmasters.Logging.Logger("Camelot.ConnectionPool");
+        private static Devmasters.Logging.Logger logger = new Devmasters.Logging.Logger("HlidacStatu.Camelot.Api.ConnectionPool");
         public readonly string apiKey;
 
         private ConnectionPool()
@@ -156,7 +156,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
             var choosen = liveUris.First();
             choosen.Used = DateTime.Now;
-            logger.Debug($"Returns {choosen.Url} ");
+            logger.Debug($"Choosen {choosen.Url} ");
 
             return choosen.Url;
         }
@@ -164,8 +164,8 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         {
             if (pool.TryGetValue(id, out var item))
             {
-                logger.Info($"Url {item.Url} is live.");
-                item.Used = item.Checked;
+                logger.Info($"Url {item.Url} is used.");
+                item.Used = DateTime.Now;
             }
         }
         public void DeclareLiveEndpoint(Guid id)
