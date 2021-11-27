@@ -54,15 +54,31 @@ namespace HlidacStatu.Lib.Data.External.Tables
                     Lib.Data.External.Tables.Result[] myRes = HlidacStatu.Lib.Data.External.Tables.PDF.GetMaxTablesFromPDFAsync(
                         p.odkaz, HlidacStatu.Lib.Data.External.Tables.Camelot.CamelotResult.Formats.JSON).Result;
                     sw.Stop();
-                    Util.Consts.Logger.Debug($"smlouva {key[0]} soubor {p.UniqueHash()} done in {sw.ElapsedMilliseconds}ms, found {myRes?.Sum(m=>m.Tables?.Length ?? 0)} tables");
+                    Util.Consts.Logger.Debug($"smlouva {key[0]} soubor {p.UniqueHash()} done in {sw.ElapsedMilliseconds}ms, found {myRes?.Sum(m => m.Tables?.Length ?? 0)} tables");
 
                     return myRes;
+
+                }
+                catch (AggregateException age)
+                {
+                    sw.Stop();
+                    if (age.InnerExceptions?.Count >0)
+                    {
+                        foreach (var e in age.InnerExceptions)
+                        {
+                            Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms  {e.ToString()}", e);
+                        }
+                    }
+                    else
+                        Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms {age.ToString()}", age);
+
+                    throw;
 
                 }
                 catch (Exception e)
                 {
                     sw.Stop();
-                    Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} error GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms, {e.Message}",e);
+                    Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} error GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms, {e.ToString()}", e);
                     throw;
                 }
             }
