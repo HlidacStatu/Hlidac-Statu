@@ -29,14 +29,14 @@ namespace HlidacStatu.Lib.Data.External.Tables
                      resLatt = Client.GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.lattice, format, pages,executionTimeout,conn).Result;
                      if (resLatt.Status != CamelotResult.Statuses.Error.ToString())
                          res.Add(resLatt);
-                     Client.Logger.Debug($"PDF {pdfUrl} done Latt in {resLatt.ElapsedTimeInMs}ms on {resLatt.CamelotServer}, status {resLatt.Status}");
+                     Client.logger.Debug($"PDF {pdfUrl} done Latt in {resLatt.ElapsedTimeInMs}ms on {resLatt.CamelotServer}, status {resLatt.Status}");
                  },
                 () =>
                 {
                     resStre = Client.GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.stream, format, pages, executionTimeout, conn).Result;
                     if (resStre.Status != CamelotResult.Statuses.Error.ToString())
                         res.Add(resStre);
-                    Client.Logger.Debug($"PDF {pdfUrl} done Stream in {resStre?.ElapsedTimeInMs}ms on {resStre.CamelotServer}, status {resStre.Status}");
+                    Client.logger.Debug($"PDF {pdfUrl} done Stream in {resStre?.ElapsedTimeInMs}ms on {resStre.CamelotServer}, status {resStre.Status}");
                 });
             if (resLatt.ErrorOccured() && resStre.ErrorOccured())
                 return null;

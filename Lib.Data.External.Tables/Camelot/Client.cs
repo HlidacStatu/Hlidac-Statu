@@ -6,7 +6,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
     public class Client
     {
 
-        public static Devmasters.Logging.Logger Logger = new Devmasters.Logging.Logger("HlidacStatu.Camelot.Api");
+        public static Devmasters.Logging.Logger logger = new Devmasters.Logging.Logger("HlidacStatu.Camelot.Api");
         public static async Task<CamelotResult> GetTablesFromPDFAsync(
             string pdfUrl, ClientLow.Commands command, 
             CamelotResult.Formats format = CamelotResult.Formats.JSON, 
