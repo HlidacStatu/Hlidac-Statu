@@ -673,6 +673,26 @@ namespace HlidacStatu.Web.Controllers
 
                     }
                 }
+                
+                //smazat fotku
+                if (form["phase"] == "delete" 
+                    && (User.IsInRole("Admin") || User.IsInRole("Editor"))) 
+                {
+                    var path = Init.OsobaFotky.GetFullPath(o, "original.uploaded.jpg");
+                    var pathTxt = Init.OsobaFotky.GetFullPath(o, "source.txt");
+                    
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
+                    
+                    if (System.IO.File.Exists(pathTxt))
+                    {
+                        System.IO.File.Delete(pathTxt);
+                    }
+
+                    return RedirectToAction("Index", "Osoba", new { id = o.NameId });
+                } 
             }
             catch (Exception e)
             {
