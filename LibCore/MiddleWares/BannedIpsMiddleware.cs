@@ -33,7 +33,7 @@ namespace HlidacStatu.LibCore.MiddleWares
         {
             //if on Radware, use header X-Forwarded-For
 
-            IPAddress? remoteIp = RealIpAddress.GetIp(httpContext);
+            IPAddress? remoteIp = HlidacStatu.Util.RealIpAddress.GetIp(httpContext);
             IPAddress.TryParse(httpContext.Request.Headers["X-Forwarded-For"], out remoteIp);
             
             if (remoteIp ==null)
