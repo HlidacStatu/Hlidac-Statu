@@ -8,6 +8,26 @@ namespace HlidacStatu.LibCore.Services
 {
     public class AttackerDictionaryService
     {
+
+        private class RadwareNetwork : Devmasters.Net.Crawlers.CrawlerBase
+        {
+            public override string Name => "RadwareNetwork";
+
+            public override string[] IP => new string[] {
+                "141.226.101.0/24",
+                "66.22.0.0/17",
+                "159.122.76.110",
+                "141.226.97.0/24"
+            };
+
+            public override string[] HostName => null;
+
+            public override string[] UserAgent => null;
+        }
+
+        static Devmasters.Net.Crawlers.ICrawler radware = new RadwareNetwork();
+
+
         private class Attacker
         {
             public int Num { get; set; }
@@ -32,6 +52,11 @@ namespace HlidacStatu.LibCore.Services
         {
             if (statusCode < 400)
                 return false;
+
+            //whitelisted Radware Ips
+            if (radware.IsItCrawler(IpToString(ipAddress), ""))
+                return false;
+
 
             var ipString = IpToString(ipAddress);
             if (ipString.StartsWith("10.10") || whitelistedIps.Contains(ipString))

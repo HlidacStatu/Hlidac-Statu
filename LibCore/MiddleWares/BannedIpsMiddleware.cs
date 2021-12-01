@@ -15,6 +15,24 @@ namespace HlidacStatu.LibCore.MiddleWares
 {
     public class BannedIpsMiddleware
     {
+        private class RadwareNetwork : Devmasters.Net.Crawlers.CrawlerBase
+        {
+            public override string Name => "RadwareNetwork";
+
+            public override string[] IP => new string[] {
+                "141.226.101.0/24",
+                "66.22.0.0/17",
+                "159.122.76.110",
+                "141.226.97.0/24"
+            };
+
+            public override string[] HostName => null;
+
+            public override string[] UserAgent => null;
+        }
+
+        static Devmasters.Net.Crawlers.ICrawler radware = new RadwareNetwork();
+
         private readonly RequestDelegate _next;
 
         private readonly string[] _badWords = new[]
@@ -35,8 +53,8 @@ namespace HlidacStatu.LibCore.MiddleWares
 
             IPAddress? remoteIp = HlidacStatu.Util.RealIpAddress.GetIp(httpContext);
             IPAddress.TryParse(httpContext.Request.Headers["X-Forwarded-For"], out remoteIp);
-            
-            if (remoteIp ==null)
+
+            if (remoteIp == null)
                 remoteIp = HlidacStatu.Util.RealIpAddress.GetIp(httpContext);
 
 
@@ -47,8 +65,8 @@ namespace HlidacStatu.LibCore.MiddleWares
             {
                 await BanIp(remoteIp, DateTime.Now.AddHours(6), 555, requestedUrl);
             }
-            
-            
+
+
             // block banned ip
             if (IsBanned(remoteIp))
             {
