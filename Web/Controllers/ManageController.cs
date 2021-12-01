@@ -552,6 +552,7 @@ namespace HlidacStatu.Web.Controllers
                     return RedirectToAction(nameof(OsobyController.Index), "Osoby");
 
                 var o = Osoby.GetByNameId.Get(id);
+                
                 if (o == null)
                     return NotFound();
                 ViewBag.Osoba = o;
@@ -673,6 +674,20 @@ namespace HlidacStatu.Web.Controllers
 
                     }
                 }
+                
+                //smazat fotku
+                if (form["phase"] == "delete" 
+                    && (User.IsInRole("Admin") || User.IsInRole("Editor")))
+                {
+                    var path = o.GetPhotoPath();
+                    
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
+                    
+                    return RedirectToAction("Index", "Osoba", new { id = o.NameId });
+                } 
             }
             catch (Exception e)
             {
