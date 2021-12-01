@@ -294,7 +294,7 @@ namespace HlidacStatu.Web.Controllers
                 AuditRepo.Add(
                     Audit.Operations.UserSearch
                     , User?.Identity?.Name
-                    , HttpContext.Connection.RemoteIpAddress?.ToString()
+                    , HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString()
                     , "Dataset." + ds.DatasetId
                     , model.IsValid ? "valid" : "invalid"
                     , model.Q, model.OrigQuery);

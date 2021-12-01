@@ -28,7 +28,7 @@ namespace HlidacStatu.LibCore.MiddleWares
 
         public async Task Invoke(HttpContext context)
         {
-            string? ip = context.Connection.RemoteIpAddress?.ToString();
+            string? ip = HlidacStatu.Util.RealIpAddress.GetIp(context)?.ToString();
             string traceIdentifier = context.TraceIdentifier;
             string method = context.Request.Method;
             string requestUrl = context.Request.GetEncodedUrl();

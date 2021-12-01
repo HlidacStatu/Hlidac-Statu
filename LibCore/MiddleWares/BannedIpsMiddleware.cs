@@ -31,7 +31,15 @@ namespace HlidacStatu.LibCore.MiddleWares
         // IMyScopedService is injected into Invoke
         public async Task Invoke(HttpContext httpContext, AttackerDictionaryService attackerDictionary)
         {
-            var remoteIp = httpContext.Connection.RemoteIpAddress;
+            //if on Radware, use header X-Forwarded-For
+
+            IPAddress? remoteIp = RealIpAddress.GetIp(httpContext);
+            IPAddress.TryParse(httpContext.Request.Headers["X-Forwarded-For"], out remoteIp);
+            
+            if (remoteIp ==null)
+                remoteIp = HlidacStatu.Util.RealIpAddress.GetIp(httpContext);
+
+
             var requestedUrl = httpContext.Request.GetDisplayUrl();
 
             // autoban for robots

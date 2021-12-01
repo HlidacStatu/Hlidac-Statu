@@ -17,7 +17,7 @@ namespace HlidacStatu.Web.Filters
 
             if (IsInFormData(req) || IsInQueryData(req))
             {
-                Util.Consts.Logger.Warning($"Detected bot from [{context.HttpContext.Connection.RemoteIpAddress}] filling in 'email2' field value.");
+                Util.Consts.Logger.Warning($"Detected bot from [{HlidacStatu.Util.RealIpAddress.GetIp(context.HttpContext)}] filling in 'email2' field value.");
                 context.Result = new RedirectToActionResult("Bot", "Error", null);
             }
         }

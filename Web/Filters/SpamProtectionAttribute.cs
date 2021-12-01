@@ -32,7 +32,7 @@ namespace HlidacStatu.Web.Filters
                 if (IsInFormData(req) || IsInQueryData(req))// ||  await IsInBodyJson(req)) 
                 {
                     //context.HttpContext.Items.Add("honeypotTrapped", true);
-                    Util.Consts.Logger.Warning($"Detected bot from [{context.HttpContext.Connection.RemoteIpAddress}]");
+                    Util.Consts.Logger.Warning($"Detected bot from [{HlidacStatu.Util.RealIpAddress.GetIp(context.HttpContext)}]");
                     context.Result = _redirect;
                 }
             }

@@ -32,7 +32,7 @@ namespace HlidacStatu.Web.Controllers
             AuditRepo.Add(
                 Audit.Operations.UserSearch
                 , User?.Identity?.Name
-                , this.HttpContext.Connection.RemoteIpAddress.ToString()
+                , HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString()
                 , "Dotace"
                 , res.IsValid ? "valid" : "invalid"
                 , res.Q, res.OrigQuery);

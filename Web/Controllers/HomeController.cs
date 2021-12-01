@@ -743,7 +743,7 @@ text zpravy: {txt}
             AuditRepo.Add(
                     Audit.Operations.UserSearch
                     , User?.Identity?.Name
-                    , HttpContext.Connection.RemoteIpAddress?.ToString()
+                    , HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString()
                     , "Smlouva"
                     , sres.IsValid ? "valid" : "invalid"
                     , sres.Q, sres.OrigQuery);
@@ -764,7 +764,7 @@ text zpravy: {txt}
             AuditRepo.Add(
                 Audit.Operations.UserSearch
                 , User?.Identity?.Name
-                , HttpContext.Connection.RemoteIpAddress?.ToString()
+                , HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString()
                 , "General"
                 , res.IsValid ? "valid" : "invalid"
                 , q, null);

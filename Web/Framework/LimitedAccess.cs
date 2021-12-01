@@ -28,13 +28,13 @@ namespace HlidacStatu.Web.Framework
         public static bool IsAuthenticatedOrSearchCrawler(HttpRequest req)
         {
             return req.HttpContext.User.Identity?.IsAuthenticated == true
-                   || allCrawl.Any(cr => cr.IsItCrawler(req.HttpContext.Connection.RemoteIpAddress?.ToString(), req.Headers[HeaderNames.UserAgent]));
+                   || allCrawl.Any(cr => cr.IsItCrawler(HlidacStatu.Util.RealIpAddress.GetIp(req.HttpContext)?.ToString(), req.Headers[HeaderNames.UserAgent]));
             //return req.IsAuthenticated || MajorCrawler.Crawlers.Any(cr=>cr.Detected(req.UserHostAddress, req.UserAgent));
         }
 
         public static bool IsSearchCrawler(HttpRequest req)
         {
-            return allCrawl.Any(cr => cr.IsItCrawler(req.HttpContext.Connection.RemoteIpAddress?.ToString(), req.Headers[HeaderNames.UserAgent]));
+            return allCrawl.Any(cr => cr.IsItCrawler(HlidacStatu.Util.RealIpAddress.GetIp(req.HttpContext)?.ToString(), req.Headers[HeaderNames.UserAgent]));
             //return req.IsAuthenticated || MajorCrawler.Crawlers.Any(cr=>cr.Detected(req.UserHostAddress, req.UserAgent));
         }
     }

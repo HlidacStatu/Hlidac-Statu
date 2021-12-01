@@ -59,7 +59,7 @@ namespace HlidacStatu.Web.Controllers
         [HttpGet("getmyip")]
         public ActionResult<string> GetIp()
         {
-            return HttpContext.Connection?.RemoteIpAddress?.ToString();
+            return HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString();
         }
 
         [Authorize]

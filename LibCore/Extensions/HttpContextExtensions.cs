@@ -20,7 +20,7 @@ namespace HlidacStatu.LibCore.Extensions
         
         public static string GetRemoteIp(this HttpContext httpContext)
         {
-            return httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown IP";
+            return HlidacStatu.Util.RealIpAddress.GetIp(httpContext)?.ToString() ?? "unknown IP";
         }
     }
 }

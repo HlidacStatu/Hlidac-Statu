@@ -41,7 +41,7 @@ namespace HlidacStatu.Web.Controllers
             AuditRepo.Add(
                 Audit.Operations.UserSearch
                 , User?.Identity?.Name
-                , HttpContext.Connection.RemoteIpAddress?.ToString()
+                , HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString()
                 , "Insolvence"
                 , res.IsValid ? "valid" : "invalid"
                 , res.Q, res.OrigQuery);

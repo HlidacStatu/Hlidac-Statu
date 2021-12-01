@@ -715,7 +715,7 @@ namespace HlidacStatu.Repositories.ES
                     .SetCustomKeyValue("Referer", httpContext?.Request?.GetTypedHeaders()?.Referer?.ToString())
                     .SetCustomKeyValue("User-agent", browser.ToString())
                     //následující řádek byl zkrácen pokud je hostname chtěný, je potřeba volat ještě něco takového: System.Net.Dns.GetHostEntry("127.0.0.1").HostName 
-                    .SetCustomKeyValue("IP", httpContext?.Connection?.RemoteIpAddress) //+ " " + System.Web.HttpContext.Current?.Request?.UserHostName  
+                    .SetCustomKeyValue("IP", HlidacStatu.HlidacStatu.Util.RealIpAddress.GetIp(httpContext)?.ToString()) //+ " " + System.Web.HttpContext.Current?.Request?.UserHostName  
                     );
 
         }
