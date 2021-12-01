@@ -14,16 +14,7 @@
         .ThenBy(o => o.Jmeno)
         .ToList();
 
-    //var allNames = StaticData.Poslanci2017Vsichni;
-    var newNames = HlidacStatu.Repositories.StaticData.Poslanci2017Novacci;
-
-
-    //List<Osoba> showList = null;
-    //showList = OsobaRepo.PolitickyAktivni.Get()
-    //    .Where(p => allNames.Contains(p.NameId))
-    //    .OrderBy(m => m.Prijmeni)
-    //    .ThenBy(m => m.Jmeno)
-    //    .ToList();
+    var newNames = HlidacStatu.Repositories.StaticData.Poslanci2021Novacci;
 
     ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
     {
@@ -124,7 +115,7 @@
 <button id="btnNovacci" class="btn btn-default">Ukázat pouze poslance - nováčky</button>
 
 
-<h3 id="tblHead">Všichni poslanci zvolení ve volbách 2017</h3>
+<h3 id="tblHead">Aktuální složení PSP ČR</h3>
 @ChartUtil.RenderReport("",ReportModel.QueueItem.types.table, poslanciTable, @"{
                  'language': {
                     'url': '//cdn.datatables.net/plug-ins/1.10.19/i18n/Czech.json'
@@ -144,14 +135,14 @@
                 filtered = false;
                 showAll();
                 $("#btnNovacci").text("Ukázat pouze poslance - nováčky");
-                $("#tblHead").text("Všichni poslanci zvolení ve volbách 2017");
+                $("#tblHead").text("Všichni poslanci zvolení ve volbách 2021");
 
             }
             else {
                 filtered = true;
                 showFiltered();
                 $("#btnNovacci").text("Ukázat všechny pouze poslance");
-                $("#tblHead").text("Poslanci - nováčci zvolení ve volbách 2017");
+                $("#tblHead").text("Poslanci - nováčci zvolení ve volbách 2021");
             }
         });
     });

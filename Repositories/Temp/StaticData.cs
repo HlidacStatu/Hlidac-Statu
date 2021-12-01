@@ -145,6 +145,25 @@ namespace HlidacStatu.Repositories
 "tatana-mala-2","robert-plaga","klara-dostalova","miroslav-toman","antonin-stanek"
     }; //Pridat Jan Kněžínek	
 
+        
+        public static string[] Poslanci2021Novacci = new string[] {
+            "jana-bacikova","vladimir-balas","romana-belohlavkova","roman-belor","jan-berki","jana-berkovcova",
+            "josef-bernard","lubomir-broz-3","eva-decroix","tomas-dubsky-10","ales-dufek","martin-exner-1","petr-fifka",
+            "romana-fischerova-1","josef-flek6","karel-haas","jiri-hajek-62","martin-hajek-2","jana-hanzlikova",
+            "matej-ondrej-havel","jiri-havranek-25","tomas-helebrant-3","simon-heller","igor-hendrych-3","jan-hofmann",
+            "jiri-horak","marie-jilkova","pavel-kasnik","zdenek-kettner-3","pavel-klima-31","lenka-knechtova",
+            "klara-kocmanova","michael-kohajda","ondrej-kolar","vaclav-kral","jan-kuchar-13","martin-kukla-1",
+            "jan-lacina-1","hubert-lang","petr-letocha","martina-lisova","petr-liska","ondrej-lochman","ivana-madlova",
+            "martin-major","lubomir-metnar","tomas-muller-39","hana-naiclerova","jiri-navratil",
+            "zdenka-nemeckova-crkvenjas","milos-novy","hayato-okamura","eliska-olsakova","michaela-opltova",
+            "renata-oulehlova-1","berenika-pestova-1","tom-philipp","pavla-vankova-4","marie-posarova",
+            "lucie-potuckova","petra-quittova","michael-rataj","drahoslav-ryba","rudolf-salvetr","jan-sila-10",
+            "karel-sladecek-1","jiri-slavik-28","karel-smetana-16","robert-strzinek","pavel-svoboda-199",
+            "michaela-sebelova-1","david-simek-15","iveta-stefanova-1","robert-teleky-1","antonin-tesarik",
+            "libor-turek","barbora-urbanova-5","lukas-vlcek","milada-voborska","viktor-vojtko","vit-vomacka",
+            "lubomir-wenzl","milan-wenzl","renata-zajickova","miroslav-zborovsky-2","vladimir-zlinsky","michal-zuna"
+        };
+        
 
         static StaticData()
         {
