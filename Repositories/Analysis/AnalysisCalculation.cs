@@ -181,7 +181,7 @@ namespace HlidacStatu.Repositories
                 },
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
                 showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null,
-                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 5);
+                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 5, prefix: "UradyObchodujiciSFirmami_NespolehlivymiPlatciDPH ");
 
             VazbyFiremNaUradyStat ret = new VazbyFiremNaUradyStat();
             ret.StatniFirmy = uradyData
@@ -542,7 +542,7 @@ namespace HlidacStatu.Repositories
             null,
             logOutputFunc ?? Devmasters.Batch.Manager.DefaultOutputWriter,
             progressOutputFunc ?? new ActionProgressWriter(0.1f).Writer,
-            true
+            true, prefix: "GetFirmyCasovePodezreleZalozene "
             );
 
 

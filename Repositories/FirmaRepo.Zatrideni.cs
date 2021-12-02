@@ -218,7 +218,7 @@ namespace HlidacStatu.Repositories
                                 }
                             }
                             return new Devmasters.Batch.ActionOutputData();
-                        }, !System.Diagnostics.Debugger.IsAttached);
+                        },null,null, !System.Diagnostics.Debugger.IsAttached, prefix: "firmy zatrideni ");
 
                     return ret.ToArray();
                 }

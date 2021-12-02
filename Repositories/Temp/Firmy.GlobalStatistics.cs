@@ -146,7 +146,7 @@ namespace HlidacStatu.Repositories
                             },
                         logOutputFunc,
                         progressOutputFunc,
-                        true, maxDegreeOfParallelism: threads);
+                        true, maxDegreeOfParallelism: threads, prefix:"VsechnyUrady ");
 
 
                         icos = allIcos.ToList();

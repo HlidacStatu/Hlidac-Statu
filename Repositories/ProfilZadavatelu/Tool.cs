@@ -27,7 +27,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                         return new ActionOutputData();
                     }, null,
                     outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter,
-                    false, elasticClient: Repositories.ES.Manager.GetESClient_VZ());
+                    false, elasticClient: Repositories.ES.Manager.GetESClient_VZ(), prefix: "profil zadavatelu ");
 
                 Console.WriteLine("Let's go mining");
 
@@ -62,7 +62,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                         return new ActionOutputData();
                     }, null,
                     outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter
-                    , false);
+                    , false, prefix: "profil zadav 2 ");
 
 
             }
@@ -74,7 +74,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                 {
                     parser.ProcessProfileZadavatelu(p, from);
                     return new ActionOutputData();
-                }, outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter, true);
+                }, outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter, true, prefix: "profil zadav 3 ");
 
 
         }

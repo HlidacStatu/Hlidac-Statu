@@ -51,7 +51,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
                     return new Devmasters.Batch.ActionOutputData();
                 }, null,null,
-                true, maxDegreeOfParallelism: pool.Keys.Count);
+                true, maxDegreeOfParallelism: pool.Keys.Count, prefix: "camelot CheckAllUris ");
             insideTimer = false;
         }
 

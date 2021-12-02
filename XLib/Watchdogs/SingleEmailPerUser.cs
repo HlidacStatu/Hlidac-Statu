@@ -58,7 +58,8 @@ namespace HlidacStatu.XLib.Watchdogs
                     return new Devmasters.Batch.ActionOutputData();
                 },
                 logOutputFunc, progressOutputFunc,
-                true, maxDegreeOfParallelism: maxDegreeOfParallelism
+                true, maxDegreeOfParallelism: maxDegreeOfParallelism, prefix:"Send watchdogs "
+               
                 );
 
             Util.Consts.Logger.Info($"SingleEmailPerUser Done processing {watchdogs.Count()} watchdogs.");

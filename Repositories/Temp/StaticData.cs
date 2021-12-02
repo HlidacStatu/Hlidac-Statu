@@ -285,7 +285,7 @@ namespace HlidacStatu.Repositories
                              Util.Consts.outputWriter.OutputWriter,
                              Util.Consts.progressWriter.ProgressWriter,
                              true, //!System.Diagnostics.Debugger.IsAttached,
-                             maxDegreeOfParallelism: 6);
+                             maxDegreeOfParallelism: 6, prefix:"Insolvence politiku ");
 
                          return ret.ToArray();
                      }

@@ -215,7 +215,7 @@ namespace HlidacStatu.Repositories
                             results.Add(res);
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, progressWriter.Writer, true, prefix: "LoadSoukrFirmy ");
+                }, null, progressWriter.Writer, true, prefix: "LoadSoukrFirmy autocomplete ");
 
             return results;
         }
