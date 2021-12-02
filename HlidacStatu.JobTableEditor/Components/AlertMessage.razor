@@ -1,0 +1,43 @@
+@if (!string.IsNullOrWhiteSpace(Text))
+{
+    <div class="alert @alertClass alert-dismissible @displayClass" role="alert">@Text</div>
+}
+
+@code {
+    private string messageType;
+    private string alertClass = "alert-info";
+    private string displayClass;
+
+    [Parameter] public string Text { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Task.Delay(5000);
+        Text = "";
+        displayClass = "d-none";
+    }
+
+    [Parameter]
+    public string MessageType
+    {
+        get { return messageType; }
+        set
+        {
+            messageType = value;
+            switch (messageType)
+            {
+                case "Error":
+                    alertClass = "alert-danger";
+                    break;
+                case "Warning":
+                    alertClass = "alert-warming";
+                    break;
+                case "Success":
+                    alertClass = "alert-success";
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}

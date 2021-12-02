@@ -30,11 +30,15 @@
 }
 else
 {
+    <AlertMessage Text="Načetl jsem pro tebe novou tabulku."></AlertMessage>
     <div class="sticky-top pt-2 col-6 row">
         <div class="col-8">
             <button class="btn btn-secondary btn-sm" @onclick="AddColumn">Přidej sloupec</button>
             <button class="btn btn-secondary btn-sm" @onclick="AddRow">Přidej řádek</button>
-            <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(_table.InDocTable.SmlouvaID)&p=@(_table.InDocTable.PrilohaHash)&page=@_table.InDocTable.Page"><i class="far fa-file-alt"></i> Ukázat dokument</a>
+            <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(_table.InDocTable.SmlouvaID)&p=@(_table.InDocTable.PrilohaHash)&page=@_table.InDocTable.Page"><i class="far fa-file-alt"></i> Originál</a>
+            
+            <button class="btn btn-success btn-sm" @onclick="RefreshPage"><i class="fad fa-sync"></i></button>
+            <button class="btn btn-success btn-sm" @onclick="TotalRefresh"><i class="fad fa-sync"></i>HARD</button>
         </div>
 
         <div class="col-4 dwarf-font">
@@ -78,7 +82,7 @@ else
                 </th>
                 @foreach (var cell in row)
                 {
-                    <Cell CellShell="@cell" Swapper="@Swapper"></Cell>
+                    <Cell CellShell="@cell" Swapper="@Swapper" SyncSignaler="_syncIndicator"></Cell>
                 }
             </tr>
         }
@@ -114,6 +118,8 @@ else
     
     private MarkupString? _hlaska;
     private int _processedTables;
+
+    private int _syncIndicator = 0;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -241,6 +247,8 @@ else
             Console.WriteLine(e);
             _hlaska = new MarkupString($"Nepodařilo se mi vymyslet správnou hlášku. Omlouvám se... <br/> Chyba je v {e.Message}");
         }
+        
+        StateHasChanged();
 
         if (SpecificTablePk.HasValue && SpecificTablePk != 0)
         {
@@ -317,6 +325,23 @@ else
         {
             _table.Cells[lastRow][col] = new CellShell(new InTables.Cell(), lastRow, col);
         }
+        
+    }
+
+    private void RefreshPage()
+    {
+        StateHasChanged();
+    }
+    
+    private void TotalRefresh()
+    {
+        _syncIndicator++;
+        StateHasChanged();
+    }
+
+    private async Task DismissCountdown()
+    {
+        await Task.Delay(2000);
         
     }
 
