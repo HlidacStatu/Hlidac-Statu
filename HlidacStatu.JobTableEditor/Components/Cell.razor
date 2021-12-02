@@ -28,6 +28,9 @@
     [Parameter]
     public CellSwapper Swapper { get; set; }
     
+    [Parameter]
+    public int SyncSignaler { get; set; }
+    
     private string cellStyle;
     private string swapButtonStyle = "fas fa-retweet";
 
@@ -66,7 +69,17 @@
     public void Redraw(bool isMarked)
     {
         swapButtonStyle = isMarked ? "fas fa-retweet text-danger" : "fas fa-retweet";
+        SetCellStyle();
         StateHasChanged();
+    }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        SetCellStyle();
+        //await Task.Delay(300);
+        //Console.WriteLine("OnParametersSetAsyncCalled");
+        //output = $"This is Site: {Code}";
+        //StateHasChanged();
     }
 
     public void Dispose()
