@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="27.1.1" />
-    <PackageReference Include="Devmasters.Core" Version="2.4.5" />
+    <PackageReference Include="Devmasters.Core" Version="2.4.6" />
     <PackageReference Include="Devmasters.DT" Version="2.4.4" />
     <PackageReference Include="EPPlus" Version="5.8.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

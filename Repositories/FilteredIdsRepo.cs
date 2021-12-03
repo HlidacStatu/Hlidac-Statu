@@ -47,6 +47,8 @@ namespace HlidacStatu.Repositories
 
             private static string[] smlouvy(QueryBatch query)
             {
+                var stack = HlidacStatu.Util.StackReport.GetCallingMethod(true);
+
                 if (query == null)
                     return new string[] { };
 
@@ -72,8 +74,7 @@ namespace HlidacStatu.Repositories
                     {
                         ids2Process.Add(hit.Id);
                         return new Devmasters.Batch.ActionOutputData() { CancelRunning = false, Log = null };
-                    }, null, query.LogOutputFunc, query.ProgressOutputFunc, false,
-                    prefix: "getting ids ");
+                    }, null, query.LogOutputFunc, query.ProgressOutputFunc, false);
 
                 return ids2Process.ToArray();
             }

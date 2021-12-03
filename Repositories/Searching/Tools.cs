@@ -198,11 +198,13 @@ namespace HlidacStatu.Repositories.Searching
             bool IdOnly = false,
             ElasticClient elasticClient = null,
             string query = null,
-            Indices indexes = null, string prefix = ""
+            Indices indexes = null, string prefix = null
 
             )
             where T : class
         {
+            prefix = prefix ?? HlidacStatu.Util.StackReport.GetCallingMethod(false, skipFrames: 1);
+
             var client = elasticClient ?? Manager.GetESClient();
 
             Func<int, int, ISearchResponse<T>> searchFunc = null;
@@ -260,10 +262,12 @@ namespace HlidacStatu.Repositories.Searching
             Action<string> logOutputFunc,
             Action<ActionProgressData> progressOutputFunc,
             bool parallel,
-            int blockSize = 500, int? maxDegreeOfParallelism = null, string prefix = ""
+            int blockSize = 500, int? maxDegreeOfParallelism = null, string prefix = null
             )
             where T : class
         {
+            prefix = prefix ?? HlidacStatu.Util.StackReport.GetCallingMethod(false,skipFrames:1);
+
             DateTime started = DateTime.Now;
             long total = 0;
             int currIteration = 0;
