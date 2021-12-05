@@ -1,4 +1,4 @@
-﻿using DatabaseUpgrader;
+﻿using Devmasters.DatabaseUpgrader;
 
 namespace HlidacStatu.DBUpgrades
 {

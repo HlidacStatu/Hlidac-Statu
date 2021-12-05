@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using DatabaseUpgrader;
+using Devmasters.DatabaseUpgrader;
 
 
 namespace HlidacStatu.DBUpgrades
