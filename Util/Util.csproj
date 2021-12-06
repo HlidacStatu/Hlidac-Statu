@@ -20,11 +20,11 @@
     <PackageReference Include="Devmasters.Cache.Elastic" Version="2.5.0" />
     <PackageReference Include="Devmasters.Collections" Version="2.5.0" />
     <PackageReference Include="Devmasters.Core" Version="2.5.0" />
-    <PackageReference Include="Devmasters.DT" Version="2.4.4" />
-    <PackageReference Include="Devmasters.Enums" Version="2.4.5" />
-    <PackageReference Include="Devmasters.IO" Version="2.5.0" />
-    <PackageReference Include="Devmasters.Lang" Version="2.4.8" />
-    <PackageReference Include="Devmasters.Net" Version="2.4.5" />
+    <PackageReference Include="Devmasters.DT" Version="2.5.0" />
+    <PackageReference Include="Devmasters.Enums" Version="2.5.0" />
+    <PackageReference Include="Devmasters.IO" Version="2.5.1.1" />
+    <PackageReference Include="Devmasters.Lang" Version="2.5.0" />
+    <PackageReference Include="Devmasters.Net" Version="2.5.0" />
     <PackageReference Include="DnsClient" Version="1.5.0" />
     <PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.11" />

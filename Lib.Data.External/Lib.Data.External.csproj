@@ -86,7 +86,7 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="CsvHelper" Version="27.1.1" />
-    <PackageReference Include="Devmasters.Imaging" Version="2.4.0" />
+    <PackageReference Include="Devmasters.Imaging" Version="2.5.0" />
     <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="Enums.NET" Version="4.0.0" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
