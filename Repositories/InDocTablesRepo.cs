@@ -166,6 +166,13 @@ namespace HlidacStatu.Repositories
             }
         }
 
+        public static List<InDocTables> GetAll()
+        {
+            using DbEntities db = new DbEntities();
+            return db.InDocTables
+                .AsNoTracking()
+                .ToList();
+        }
 
 
     }
