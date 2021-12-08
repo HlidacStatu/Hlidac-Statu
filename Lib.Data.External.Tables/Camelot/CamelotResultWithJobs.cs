@@ -23,8 +23,8 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     tbl.Page = crT.Page;
                     tbl.TableInPage = crT.TableInPage;
 
-                    var score = it_inTables.TableWithWordsAndNumbers(
-                        tbl.ParsedContent(), out var foundJobs, out var cells);
+                    var cells = it_inTables.TableToCells(tbl.ParsedContent());
+                    var score = it_inTables.CellsWithWordsAndNumbers(cells, out var foundJobs);
 
                     if (foundJobs != null)
                         tbl.FoundJobs = foundJobs.ToArray();

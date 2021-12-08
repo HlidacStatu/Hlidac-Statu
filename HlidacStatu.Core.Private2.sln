@@ -104,13 +104,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{34192F9D-C05
 		..\PrivateDocumentation\Deploy\Web\appsettings.Production.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production.json
 		..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json
 		..\PrivateDocumentation\Deploy\Web\deployWeb.bat = ..\PrivateDocumentation\Deploy\Web\deployWeb.bat
+		..\PrivateDocumentation\Deploy\Web\Production.logger.serilog.json = ..\PrivateDocumentation\Deploy\Web\Production.logger.serilog.json
 		..\PrivateDocumentation\Deploy\Web\web.Production.config = ..\PrivateDocumentation\Deploy\Web\web.Production.config
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Downloader", "Downloader", "{256417D4-C1D7-4747-A227-D860BCC5A2B1}"
 	ProjectSection(SolutionItems) = preProject
 		..\PrivateDocumentation\Deploy\Downloader\appsettings.Production.json = ..\PrivateDocumentation\Deploy\Downloader\appsettings.Production.json
-		..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat = ..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat
+		..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat.inactive = ..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat.inactive
+		..\PrivateDocumentation\Deploy\Downloader\Production.logger.serilog.json = ..\PrivateDocumentation\Deploy\Downloader\Production.logger.serilog.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Tasks.OCR", "..\Hlidac-Statu-Private\Lib.Tasks.OCR\Lib.Tasks.OCR.csproj", "{08056481-688D-44A9-BC3A-3A5B0FE2BDFF}"
@@ -134,11 +136,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.JobsWeb", "Hlid
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CamelotDockerAPI", "..\Hlidac-Statu-Private\Docker\CamelotDockerAPI\CamelotDockerAPI.csproj", "{FF971AF6-D7D0-4CFD-826E-4D784CDCEBEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutocompleteApi", "AutocompleteApi\AutocompleteApi.csproj", "{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutocompleteApi", "AutocompleteApi\AutocompleteApi.csproj", "{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Queue", "Queue", "{24E81119-636A-4383-A22D-A371C119E789}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcProtobufs", "GrpcProtobufs\GrpcProtobufs.csproj", "{40BB9F3F-0C00-4741-B6E2-CA8CA62A4CB7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcProtobufs", "GrpcProtobufs\GrpcProtobufs.csproj", "{40BB9F3F-0C00-4741-B6E2-CA8CA62A4CB7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -344,10 +346,17 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C3E3826A-CCC3-4D59-867D-E5846A0D86B7} = {584BE7E5-1233-4848-8C24-0A8A1D82ECC6}
+		{722060B8-8A64-46E6-A914-02E9B8F8789F} = {24E81119-636A-4383-A22D-A371C119E789}
 		{B3F13956-BC92-4B49-A375-1882BDA8878C} = {584BE7E5-1233-4848-8C24-0A8A1D82ECC6}
+		{A684F864-7C53-4985-939A-B7D2E35F9FFB} = {24E81119-636A-4383-A22D-A371C119E789}
+		{0FD1747B-569B-4381-9262-07640F55FA24} = {24E81119-636A-4383-A22D-A371C119E789}
 		{0B3B079C-A1EC-4B27-BBF0-FD5F83977A28} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{BBC1B0D6-3095-414A-9A60-03A2614F2166} = {C1833D67-B269-41C4-9556-3F9D7511B378}
+		{D5324949-3560-49F2-AA95-60FA5FFAED1D} = {944AEC9D-9A67-477D-811D-66DC2142299A}
 		{3B9E1A42-44F8-438C-86DB-A9D0989C7A78} = {C1833D67-B269-41C4-9556-3F9D7511B378}
+		{6046918B-AEA8-4B3A-B4BC-1ECB948D3507} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
+		{C3C768FF-1FA0-4082-9264-5D01551CDEA9} = {944AEC9D-9A67-477D-811D-66DC2142299A}
+		{1A2966FE-E825-44DE-A74E-85EA9F79FCF1} = {944AEC9D-9A67-477D-811D-66DC2142299A}
 		{D6A32076-4918-42A0-88E0-8AF58A8C32A9} = {944AEC9D-9A67-477D-811D-66DC2142299A}
 		{2B7237F8-F4E5-455F-B9E1-FA9F2A548FD3} = {944AEC9D-9A67-477D-811D-66DC2142299A}
 		{ED3844A4-80B8-4AD1-88A5-FF4C294976F5} = {944AEC9D-9A67-477D-811D-66DC2142299A}
@@ -362,14 +371,7 @@ Global
 		{956497F7-9609-442E-8AB1-5F0AEEBF8081} = {40841C9C-4BC4-4E32-AC3E-657E4A5FA1A0}
 		{A89C8C53-5F83-4EC8-BB06-F5CBB8BE1C28} = {40841C9C-4BC4-4E32-AC3E-657E4A5FA1A0}
 		{FF971AF6-D7D0-4CFD-826E-4D784CDCEBEA} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
-		{0FD1747B-569B-4381-9262-07640F55FA24} = {24E81119-636A-4383-A22D-A371C119E789}
-		{A684F864-7C53-4985-939A-B7D2E35F9FFB} = {24E81119-636A-4383-A22D-A371C119E789}
-		{722060B8-8A64-46E6-A914-02E9B8F8789F} = {24E81119-636A-4383-A22D-A371C119E789}
-		{C3C768FF-1FA0-4082-9264-5D01551CDEA9} = {944AEC9D-9A67-477D-811D-66DC2142299A}
-		{1A2966FE-E825-44DE-A74E-85EA9F79FCF1} = {944AEC9D-9A67-477D-811D-66DC2142299A}
-		{D5324949-3560-49F2-AA95-60FA5FFAED1D} = {944AEC9D-9A67-477D-811D-66DC2142299A}
 		{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
-		{6046918B-AEA8-4B3A-B4BC-1ECB948D3507} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}

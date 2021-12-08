@@ -19,9 +19,8 @@ namespace HlidacStatu.JobTableEditor.Data
             //todo: až bude víc oborů, tak to tady rozšířit, aby se načítal konkrétní obor
             // nejprve v tabulce a poté se použil správný parser
             var table = await InDocTablesRepo.GetNextForCheck(user, cancellationToken);
-            it_inTables.TableWithWordsAndNumbers(table.ParsedContent(),
-                out var foundJobs,
-                out var cells);
+            var cells = it_inTables.TableToCells(table.ParsedContent());
+            var score = it_inTables.CellsWithWordsAndNumbers(cells, out var foundJobs);
 
             var st = new SomeTable
             {
@@ -36,9 +35,8 @@ namespace HlidacStatu.JobTableEditor.Data
         public async Task<SomeTable> GetSpecificTable(int pk, string user, CancellationToken cancellationToken)
         {
             var table = await InDocTablesRepo.GetSpecific(pk, user, cancellationToken);
-            var score = it_inTables.TableWithWordsAndNumbers(table.ParsedContent(),
-                out var foundJobs,
-                out var cells);
+            var cells = it_inTables.TableToCells(table.ParsedContent());
+            var score = it_inTables.CellsWithWordsAndNumbers(cells, out var foundJobs);
 
             var st = new SomeTable
             {
