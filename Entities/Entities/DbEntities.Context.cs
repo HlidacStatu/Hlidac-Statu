@@ -172,7 +172,8 @@ namespace HlidacStatu.Entities
 
         }
         public virtual DbSet<Firma> Firma { get; set; }
-
+        public virtual DbSet<InDocTablesCheck> InDocTablesChecks { get; set; }
+        
         public virtual DbSet<WatchDog> WatchDogs { get; set; }
         public virtual DbSet<AspNetUserApiToken> AspNetUserApiTokens { get; set; }
         public virtual DbSet<SmlouvyId> SmlouvyIds { get; set; }
