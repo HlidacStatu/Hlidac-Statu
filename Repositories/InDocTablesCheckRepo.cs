@@ -33,24 +33,25 @@ namespace HlidacStatu.Repositories
                 if (tbl.Pk > 0)
                     return db.InDocTablesChecks
                         .AsNoTracking()
-                        .Where(m=>m.Pk == tbl.Pk)
-                        .Select(m=>m.Pk)
-                        .FirstOrDefault();
+                        .Where(m => m.Pk == tbl.Pk)
+                        .FirstOrDefault()
+                        ?.Pk;
+
                 else
-                return 
-                        db.InDocTablesChecks
-                            .AsNoTracking()
-                            .Where(m => 
-                                m.SmlouvaID == tbl.SmlouvaID
-                                && m.PrilohaHash == tbl.PrilohaHash
-                                && m.Page == tbl.Page
-                                && m.TableOnPage == tbl.TableOnPage 
-                                && m.Algorithm == tbl.Algorithm
-                                && m.SubjectCheck == tbl.SubjectCheck
-                                && m.AlgorithmCheck == tbl.AlgorithmCheck                       
-                            )
-                            .Select(m=>m.Pk)
-                            .FirstOrDefault();
+                    return
+                            db.InDocTablesChecks
+                                .AsNoTracking()
+                                .Where(m =>
+                                    m.SmlouvaID == tbl.SmlouvaID
+                                    && m.PrilohaHash == tbl.PrilohaHash
+                                    && m.Page == tbl.Page
+                                    && m.TableOnPage == tbl.TableOnPage
+                                    && m.Algorithm == tbl.Algorithm
+                                    && m.SubjectCheck == tbl.SubjectCheck
+                                    && m.AlgorithmCheck == tbl.AlgorithmCheck
+                                )
+                                .FirstOrDefault()
+                                ?.Pk;
             }
         }
     }
