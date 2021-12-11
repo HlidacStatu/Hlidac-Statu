@@ -73,6 +73,7 @@
         <PackageReference Include="Schema.NET" Version="10.1.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.2.3" />
+        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -129,10 +130,5 @@
         <HintPath>C:\Users\sucho\.nuget\packages\grpc.net.client\2.40.0\lib\net5.0\Grpc.Net.Client.dll</HintPath>
       </Reference>
     </ItemGroup>
-
-
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="copy $(ProjectDir)\System.Security.Cryptography.Pkcs.* $(OutDir)" />
-    </Target>
 
 </Project>
