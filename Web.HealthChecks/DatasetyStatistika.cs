@@ -13,8 +13,8 @@ namespace HlidacStatu.Web.HealthChecks
 {
     public class DatasetyStatistika : IHealthCheck
     {
-        Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<DatasetStat>> statistiky =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<DatasetStat>>(
+        Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<DatasetStat>> statistiky =
+            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<DatasetStat>>(
               TimeSpan.FromMinutes(60), "DatasetStat_all",
               _ =>
               {

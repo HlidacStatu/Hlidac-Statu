@@ -88,7 +88,7 @@
                             </div>
                             <div class="box-stats__media">
                                 <div style="display:block">
-                                    @foreach (var p in insolvenceFiremPolitiku.Take(20).Shuffle())
+                                    @foreach (var p in insolvenceFiremPolitiku.Take(20).ShuffleMe())
                                         {
                                             var pd = new Devmasters.Lang.CS.PluralDef() { Values = new string[] { " a ještě jedna", "{0} další","{0} dalších" } };
                                             var o = Osoby.GetByNameId.Get(p.Item1.OsobaNameId);

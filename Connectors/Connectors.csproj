@@ -1,13 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <AssemblyName>HlidacStatu.DbManagers</AssemblyName>
         <RootNamespace>HlidacStatu.DbManagers</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Core" Version="2.5.0" />
+      <PackageReference Include="Devmasters.Core" Version="3.0.0" />
       <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
     </ItemGroup>
 

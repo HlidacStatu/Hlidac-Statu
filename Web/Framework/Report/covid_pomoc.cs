@@ -24,7 +24,7 @@ namespace HlidacStatu.Web.Framework.Report
             return dataCache.Get();
         }
 
-        static Devmasters.Cache.LocalMemory.LocalMemoryCache<List<covid_pomoc>> dataCache =
+        static Devmasters.Cache.LocalMemory.Cache<List<covid_pomoc>> dataCache =
             new(TimeSpan.FromMinutes(10), "covid_pomoc",
             (o) =>
             {

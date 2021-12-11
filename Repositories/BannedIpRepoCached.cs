@@ -11,11 +11,11 @@ namespace HlidacStatu.Repositories
     public class BannedIpRepoCached
     {
         private const string CacheKey = "BannedIps_service";
-        private static readonly AutoUpdatedLocalMemoryCache<List<BannedIp>> _cache;
+        private static readonly AutoUpdatedCache<List<BannedIp>> _cache;
 
         static BannedIpRepoCached()
         {
-            _cache = new AutoUpdatedLocalMemoryCache<List<BannedIp>>(
+            _cache = new AutoUpdatedCache<List<BannedIp>>(
                 TimeSpan.FromSeconds(30),
                 CacheKey,
                 (_) => BannedIpRepo.GetBannedIps()

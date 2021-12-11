@@ -500,7 +500,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "NasiPoliticiAdmin")]
         public ActionResult Companies(string q)
         {
-            Devmasters.Cache.LocalMemory.LocalMemoryCache<Index<Autocomplete>> FullTextSearchCache =
+            Devmasters.Cache.LocalMemory.Cache<Index<Autocomplete>> FullTextSearchCache =
                 new(TimeSpan.FromDays(30),
                     "nasipolitici_firmy_autocomplete",
                     o => { return BuildNPFirmySearchIndex(); });

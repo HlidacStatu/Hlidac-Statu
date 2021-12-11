@@ -7,8 +7,8 @@ namespace HlidacStatu.Web.Models
     public class HealthCheckStatusModel
     {
 
-        public static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<HealthCheckStatusModel> CurrentData =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<HealthCheckStatusModel>(TimeSpan.FromSeconds(5),
+        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<HealthCheckStatusModel> CurrentData =
+            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<HealthCheckStatusModel>(TimeSpan.FromSeconds(5),
                 "HealthCheckStatusModel.CurrentData",
                 _ =>
                 {

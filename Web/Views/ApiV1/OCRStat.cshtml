@@ -7,7 +7,7 @@
     ViewBag.SubTitle = "";
 
     var dataCache = new Devmasters.Cache
-    .LocalMemory.LocalMemoryCache<string>(TimeSpan.FromMinutes(2), "Ocrstat.data.json",
+    .LocalMemory.Cache<string>(TimeSpan.FromMinutes(2), "Ocrstat.data.json",
         (o) =>
         {
             return new WebClient().DownloadString("https://ocr.hlidacstatu.cz/stats.ashx");

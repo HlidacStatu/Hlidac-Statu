@@ -26,7 +26,7 @@ namespace HlidacStatu.Util.Cache
                 (o) => contentFunc.Invoke(key)
                 );
 
-            // return new Devmasters.Cache.LocalMemory.LocalMemoryCache<T>(expiration, this.keyPrefix + key.ToString(), (o) => contentFunc.Invoke(key));
+            // return new Devmasters.Cache.LocalMemory.Cache<T>(expiration, this.keyPrefix + key.ToString(), (o) => contentFunc.Invoke(key));
 
         }
 

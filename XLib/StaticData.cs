@@ -7,12 +7,12 @@ namespace HlidacStatu.XLib
 {
     public static class StaticData
     {
-        public static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<WpPost[]> LastBlogPosts = null;
+        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<WpPost[]> LastBlogPosts = null;
 
         static StaticData()
         {
             Util.Consts.Logger.Info("Static data - LastBlogPosts");
-            LastBlogPosts = new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<WpPost[]>(
+            LastBlogPosts = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<WpPost[]>(
                 TimeSpan.FromHours(3), (obj) =>
                 {
                     try

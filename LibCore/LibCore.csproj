@@ -1,24 +1,25 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <AssemblyName>HlidacStatu.LibCore</AssemblyName>
         <RootNamespace>HlidacStatu.LibCore</RootNamespace>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Cache" Version="2.5.0" />
-      <PackageReference Include="Devmasters.Core" Version="2.5.0" />
+      <PackageReference Include="Devmasters.Cache" Version="3.0.1" />
+      <PackageReference Include="Devmasters.Core" Version="3.0.0" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.11" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.11" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.11" />
-      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.11" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.11">
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="6.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="System.Security.Cryptography.Pkcs" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>

@@ -3,7 +3,7 @@
     <PropertyGroup>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
         <Version>1.0.0.0</Version>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <UserSecretsId>aspnet-Web-D6658176-CBA9-44EA-823F-F6C01A8F3EE9</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <AssemblyName>HlidacStatu.Web</AssemblyName>
@@ -37,38 +37,38 @@
         <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="5.0.1" />
         <PackageReference Include="AspNetCore.HealthChecks.Network" Version="5.0.4" />
         <PackageReference Include="AspNetCore.HealthChecks.Publisher.ApplicationInsights" Version="5.0.1" />
-        <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="5.0.1" />
+        <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="5.0.2" />
         <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="5.0.3" />
         <PackageReference Include="AspNetCore.HealthChecks.System" Version="5.0.1" />
         <PackageReference Include="AspNetCore.HealthChecks.UI" Version="5.0.1" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="5.0.1" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="5.0.1" />
-        <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="5.0.1" />
+        <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="6.0.1" />
         <PackageReference Include="CouchbaseNetClient" Version="2.7.23" />
-        <PackageReference Include="Devmasters.Core" Version="2.5.0" />
-        <PackageReference Include="Devmasters.Lang" Version="2.5.0" />
-        <PackageReference Include="Grpc.Net.ClientFactory" Version="2.40.0" />
+        <PackageReference Include="Devmasters.Core" Version="3.0.0" />
+        <PackageReference Include="Devmasters.Lang" Version="3.0.0" />
+        <PackageReference Include="Grpc.Net.ClientFactory" Version="2.41.0" />
         <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.2.0" />
-        <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.319" />
-        <PackageReference Include="log4net" Version="2.0.12" />
-        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.18.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.11" />
+        <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.335" />
+        <PackageReference Include="log4net" Version="2.0.13" />
+        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.19.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.11" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.11" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.11" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.11" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.11">
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="5.0.11" />
-        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
-        <PackageReference Include="PDFtoImage" Version="1.2.0" />
+        <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="6.0.0" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.0" />
+        <PackageReference Include="PDFtoImage" Version="1.2.1" />
         <PackageReference Include="protobuf-net.Grpc.ClientFactory" Version="1.0.152" />
         <PackageReference Include="Schema.NET" Version="10.1.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
@@ -129,5 +129,10 @@
         <HintPath>C:\Users\sucho\.nuget\packages\grpc.net.client\2.40.0\lib\net5.0\Grpc.Net.Client.dll</HintPath>
       </Reference>
     </ItemGroup>
+
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="copy $(ProjectDir)\System.Security.Cryptography.Pkcs.* $(OutDir)" />
+    </Target>
 
 </Project>
