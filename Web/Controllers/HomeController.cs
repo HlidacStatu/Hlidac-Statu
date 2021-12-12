@@ -12,7 +12,6 @@ using HlidacStatu.Repositories.ES;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Framework;
 
-using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -36,13 +35,15 @@ namespace HlidacStatu.Web.Controllers
 
         private readonly UserManager<ApplicationUser> _userManager;
         protected readonly IWebHostEnvironment _hostingEnvironment;
-        private readonly TelemetryClient _telemetryClient;
+        //private readonly TelemetryClient _telemetryClient;
         
-        public HomeController(IWebHostEnvironment hostingEnvironment, UserManager<ApplicationUser> userManager, TelemetryClient telemetryClient)
+        public HomeController(IWebHostEnvironment hostingEnvironment, UserManager<ApplicationUser> userManager, 
+            //TelemetryClient telemetryClient
+            )
         {
             _hostingEnvironment = hostingEnvironment;
             _userManager = userManager;
-            _telemetryClient = telemetryClient;
+            //_telemetryClient = telemetryClient;
         }
 
         [Authorize]
@@ -784,9 +785,9 @@ text zpravy: {txt}
                     var metrics = new Dictionary<string, double> { { "web-search-" + kv.Key, kv.Value.TotalMilliseconds } };
                     var props = new Dictionary<string, string> { { "query", q }, { "database", kv.Key } };
 
-                    Metric elaps = _telemetryClient.GetMetric("web-GlobalSearch_Elapsed", "Database");
-                    _telemetryClient.TrackEvent("web-GlobalSearch_Elapsed", props, metrics);
-                    var ok = elaps.TrackValue(kv.Value.TotalMilliseconds, kv.Key);
+                    //Metric elaps = _telemetryClient.GetMetric("web-GlobalSearch_Elapsed", "Database");
+                    //_telemetryClient.TrackEvent("web-GlobalSearch_Elapsed", props, metrics);
+                    //var ok = elaps.TrackValue(kv.Value.TotalMilliseconds, kv.Key);
                 }
             }
             string viewName = "Hledat";

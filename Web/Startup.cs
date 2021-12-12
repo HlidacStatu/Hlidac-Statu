@@ -84,7 +84,7 @@ namespace HlidacStatu.Web
 
             services.AddSingleton<AttackerDictionaryService>(); //migrace: Přejmenovat attackerDictionaryService
 
-            services.AddApplicationInsightsTelemetry();
+            //services.AddApplicationInsightsTelemetry();
 
             services.AddSwaggerGen(c =>
             {
