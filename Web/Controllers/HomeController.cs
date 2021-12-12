@@ -37,7 +37,7 @@ namespace HlidacStatu.Web.Controllers
         protected readonly IWebHostEnvironment _hostingEnvironment;
         //private readonly TelemetryClient _telemetryClient;
         
-        public HomeController(IWebHostEnvironment hostingEnvironment, UserManager<ApplicationUser> userManager, 
+        public HomeController(IWebHostEnvironment hostingEnvironment, UserManager<ApplicationUser> userManager 
             //TelemetryClient telemetryClient
             )
         {

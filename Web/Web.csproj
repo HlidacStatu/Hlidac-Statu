@@ -66,6 +66,7 @@
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="6.0.0" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.0" />
+        <PackageReference Include="NEST" Version="7.15.2" />
         <PackageReference Include="PDFtoImage" Version="1.2.1" />
         <PackageReference Include="protobuf-net.Grpc.ClientFactory" Version="1.0.152" />
         <PackageReference Include="Schema.NET" Version="10.1.0" />

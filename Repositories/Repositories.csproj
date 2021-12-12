@@ -20,6 +20,7 @@
     <ItemGroup>
       <PackageReference Include="Devmasters.Cache.AWS_S3" Version="3.0.3.2" />
       <PackageReference Include="Devmasters.Cache.Elastic" Version="3.0.2" />
+      <PackageReference Include="NEST" Version="7.15.2" />
     </ItemGroup>
 
     <ItemGroup>
