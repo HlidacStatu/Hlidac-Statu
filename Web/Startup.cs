@@ -151,14 +151,14 @@ namespace HlidacStatu.Web
         //!Záleží na pořadí
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
-            {
-                LimitToPaths = new List<string> {"/api"},
-                ApplicationName = "WEB"
-            });
+            //app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
+            //{
+            //    LimitToPaths = new List<string> {"/api"},
+            //    ApplicationName = "WEB"
+            //});
             
             //request time measurement
-            app.UseTimeMeasureMiddleware();
+            //app.UseTimeMeasureMiddleware();
                 
 
             if (Constants.IsDevelopment(env))
@@ -172,7 +172,7 @@ namespace HlidacStatu.Web
             }
             else
             {
-                app.UseBannedIpsMiddleware(); // tohle nechci při developmentu :) 
+                //app.UseBannedIpsMiddleware(); // tohle nechci při developmentu :) 
                 app.UseExceptionHandler("/Error/500");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
@@ -270,21 +270,21 @@ namespace HlidacStatu.Web
 
 
             //force init autocomplete cache
-            new System.Threading.Thread(() =>
-            {
-                try
-                {
-                    using (var net = new Devmasters.Net.HttpClient.URLContent("https://www.hlidacstatu.cz/api/autocomplete/?q=flakan&term=flakan&_type=query&q=flakan"))
-                    {
-                        net.Timeout = 3 * 60000;
-                        var s = net.GetContent();
-                    }
+            //new System.Threading.Thread(() =>
+            //{
+            //    try
+            //    {
+            //        using (var net = new Devmasters.Net.HttpClient.URLContent("https://www.hlidacstatu.cz/api/autocomplete/?q=flakan&term=flakan&_type=query&q=flakan"))
+            //        {
+            //            net.Timeout = 3 * 60000;
+            //            var s = net.GetContent();
+            //        }
 
-                }
-                catch (Exception)
-                {
-                }
-            }).Start();
+            //    }
+            //    catch (Exception)
+            //    {
+            //    }
+            //}).Start();
 
 
         }
