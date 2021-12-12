@@ -191,6 +191,28 @@
             <param name="bytesConsumed">The number of bytes used for decoding.</param>
             <returns><see langword="true" /> if the operation succeeded; <see langword="false" /> otherwise.</returns>
         </member>
+        <member name="T:System.Security.Cryptography.SafeHashHandle">
+            <summary>
+            SafeHandle representing HCRYPTHASH handle
+            </summary>
+        </member>
+        <member name="T:System.Security.Cryptography.SafeKeyHandle">
+            <summary>
+                Safe handle representing a HCRYPTKEY
+            </summary>
+            <summary>
+                Since we need to delete the key handle before the provider is released we need to actually hold a
+                pointer to a CRYPT_KEY_CTX unmanaged structure whose destructor decrements a refCount. Only when
+                the provider refCount is 0 it is deleted. This way, we loose a race in the critical finalization
+                of the key handle and provider handle. This also applies to hash handles, which point to a
+                CRYPT_HASH_CTX. Those structures are defined in COMCryptography.h
+            </summary>
+        </member>
+        <member name="T:System.Security.Cryptography.SafeProvHandle">
+            <summary>
+            Safehandle representing HCRYPTPROV
+            </summary>
+        </member>
         <member name="P:System.HexConverter.CharToHexLookup">
             <summary>Map from an ASCII char to its hex value, e.g. arr['b'] == 11. 0xFF means it's not a hex digit.</summary>
         </member>
@@ -559,6 +581,46 @@
         <member name="P:Internal.Cryptography.PkcsPal.Instance">
             <summary>
             Get the one instance of PkcsPal.
+            </summary>
+        </member>
+        <member name="M:Internal.Cryptography.Pal.Windows.HelpersWindows.GetContentInfo(Microsoft.Win32.SafeHandles.SafeCryptMsgHandle)">
+             <summary>
+             Returns the inner content of the CMS.
+            
+             Special case: If the CMS is an enveloped CMS that has been decrypted and the inner content type is Oids.Pkcs7Data, the returned
+             content bytes are the decoded octet bytes, rather than the encoding of those bytes. This is a documented convenience behavior of
+             CryptMsgGetParam(CMSG_CONTENT_PARAM) that apparently got baked into the behavior of the managed EnvelopedCms class.
+             </summary>
+        </member>
+        <member name="M:Internal.Cryptography.Pal.Windows.HelpersWindows.ToAlgId(System.String)">
+            <summary>
+            Returns (AlgId)(-1) if oid is unknown.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Win32.SafeHandles.SafeHandleCache`1">
+            <summary>Provides a cache for special instances of SafeHandles.</summary>
+            <typeparam name="T">Specifies the type of SafeHandle.</typeparam>
+        </member>
+        <member name="M:Microsoft.Win32.SafeHandles.SafeHandleCache`1.GetInvalidHandle(System.Func{`0})">
+            <summary>
+            Gets a cached, invalid handle.  As the instance is cached, it should either never be Disposed
+            or it should override <see cref="M:System.Runtime.InteropServices.SafeHandle.Dispose(System.Boolean)"/> to prevent disposal when the
+            instance represents an invalid handle: <see cref="P:System.Runtime.InteropServices.SafeHandle.IsInvalid"/> returns <see language="true"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Win32.SafeHandles.SafeHandleCache`1.IsCachedInvalidHandle(System.Runtime.InteropServices.SafeHandle)">
+            <summary>Gets whether the specified handle is invalid handle.</summary>
+            <param name="handle">The handle to compare.</param>
+            <returns>true if <paramref name="handle"/> is invalid handle; otherwise, false.</returns>
+        </member>
+        <member name="M:Interop.Kernel32.GetMessage(System.Int32)">
+            <summary>
+                Returns a string message for the specified Win32 error code.
+            </summary>
+        </member>
+        <member name="T:Interop.NCrypt.ErrorCode">
+            <summary>
+                Result codes from NCrypt APIs
             </summary>
         </member>
     </members>
