@@ -14,9 +14,9 @@
 	<ItemGroup>
 		<PackageReference Include="Devmasters.Batch" Version="3.0.0.1" />
 		<PackageReference Include="Devmasters.Cache" Version="3.0.1" />
-		<PackageReference Include="Devmasters.Cache.AWS_S3" Version="3.0.3" />
-		<PackageReference Include="Devmasters.Cache.Couchbase" Version="3.0.0" />
-		<PackageReference Include="Devmasters.Cache.Elastic" Version="3.0.0" />
+		<PackageReference Include="Devmasters.Cache.AWS_S3" Version="3.0.3.2" />
+		<PackageReference Include="Devmasters.Cache.Couchbase" Version="3.0.1" />
+		<PackageReference Include="Devmasters.Cache.Elastic" Version="3.0.1" />
 		<PackageReference Include="Devmasters.Collections" Version="3.0.1" />
 		<PackageReference Include="Devmasters.Core" Version="3.0.0" />
 		<PackageReference Include="Devmasters.DT" Version="3.0.0" />

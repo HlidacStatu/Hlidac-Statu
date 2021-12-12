@@ -4,7 +4,7 @@ namespace HlidacStatu.Util.Cache
 {
 
     public class ElasticCacheManager<T, Key>
-        : Manager<T, Key, Devmasters.Cache.Elastic.ElasticCache<T>>
+        : Manager<T, Key, Devmasters.Cache.Elastic.Cache<T>>
         where T : class
     {
         private string indicieName = "";
@@ -23,9 +23,9 @@ namespace HlidacStatu.Util.Cache
             this.secretKey = secretKey;
             this.keyValueSelector = keyValueSelector ?? new Func<Key, string>(k => k.ToString());
         }
-        protected override Devmasters.Cache.Elastic.ElasticCache<T> getTCacheInstance(Key key, TimeSpan expiration, Func<Key, T> contentFunc)
+        protected override Devmasters.Cache.Elastic.Cache<T> getTCacheInstance(Key key, TimeSpan expiration, Func<Key, T> contentFunc)
         {
-            return new Devmasters.Cache.Elastic.ElasticCache<T>(
+            return new Devmasters.Cache.Elastic.Cache<T>(
                 this.serversUrl, this.indicieName,
                 expiration, keyPrefix + keyValueSelector(key), (o) => contentFunc.Invoke(key)
             );

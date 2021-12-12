@@ -161,7 +161,7 @@ namespace HlidacStatu.Repositories
 
             private static
                 Dictionary<int,
-                Devmasters.Cache.Elastic.ElasticCache<GlobalStatisticsPerYear<Smlouva.Statistics.Data>>>
+                Devmasters.Cache.Elastic.Cache<GlobalStatisticsPerYear<Smlouva.Statistics.Data>>>
                 _uradySmlouvyGlobal =
                     new();
 
@@ -172,7 +172,7 @@ namespace HlidacStatu.Repositories
                 obor = obor ?? 0;
 
                 if (!_uradySmlouvyGlobal.ContainsKey(obor.Value))
-                    _uradySmlouvyGlobal[obor.Value] = new Devmasters.Cache.Elastic.ElasticCache<GlobalStatisticsPerYear<Smlouva.Statistics.Data>>(
+                    _uradySmlouvyGlobal[obor.Value] = new Devmasters.Cache.Elastic.Cache<GlobalStatisticsPerYear<Smlouva.Statistics.Data>>(
                             Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
                             "DevmastersCache",
                             TimeSpan.Zero, $"UradySmlouvyGlobal_{obor.Value}",
