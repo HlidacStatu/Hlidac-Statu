@@ -26,7 +26,7 @@ namespace HlidacStatu.Entities
 
 
         [Required]
-        public long Page { get; set; }
+        public int Page { get; set; }
         [Required]
         public int TableOnPage { get; set; }
         [Required]
