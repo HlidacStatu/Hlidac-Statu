@@ -24,9 +24,9 @@
                 <br style="margin-bottom:20px;" />
                 <b>Dostupné analýzy</b>
                 <ul class="list-group">
-                    <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019 (dostupné leden 2022)</li>
-                    <li class="list-group-item">Přehled obvyklých cen IT prací ve státní správě za rok 2020 (<b>analýza připravena</b>)</li>
-                    <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021 (dostupné duben 2022)</li>
+                    <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019 (bude dostupná v lednu 2022)</li>
+                    <li class="list-group-item">Přehled obvyklých cen IT prací ve státní správě za rok 2020 (<b>report je hotový</b>)</li>
+                    <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021 (bude dostupná v dubnu 2022)</li>
                 </ul>
 
             </p>
@@ -40,11 +40,28 @@
                         @(User.Identity.Name)
                     </div>
                     <div class="mb-3">
-                        <b>Máte zakoupeny tyto produkty:</b>
+                        <b>Máte zakoupeny tyto analýzy:</b>
                         <ul class="list-group-flush">
-                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019 (dostupné leden 2022)</li>
-                            <li class="list-group-item"><a href="/Souhrn?obor=IT&rok=2020">Přehled obvyklých cen IT prací ve státní správě za rok 2020 (<b>report připraven</b>)</a></li>
-                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021 (dostupné duben 2022)</li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="list-group-item"><a href="/Souhrn?obor=IT&rok=2020">Přehled obvyklých cen IT prací ve státní správě za rok 2020 (<b>report máte zakoupený</b>)</a></li>
+                            }
+                            else
+                            {
+                                <li>Žádný</li>
+                            }
+                        </ul>
+                        <b>Můžete si koupit:</b>
+                        <ul class="list-group-flush">
+                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019 (bude dostupná v lednu 2022)</li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                            }
+                            else
+                            {
+                                <li class="list-group-item">Přehled obvyklých cen IT prací ve státní správě za rok 2020 (<b>report je hotový</b>)</li>
+                            }
+                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021 (bude dostupná v dubnu 2022)</li>
                         </ul>
                     </div>
                 </div>
