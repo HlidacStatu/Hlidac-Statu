@@ -13,13 +13,21 @@
     ViewBag.HideYearSelector = true;
 }
 
-<div class="container col-xl-10 col-xxl-8 px-4 py-5">
-    <div class="row align-items-center g-lg-5 py-5">
+<div class="container col-xl-10 col-xxl-8 px-4 ">
+    <div class="row align-items-center g-lg-5 ">
         <div class="col-lg-7 text-center text-lg-start">
             <h1 class="display-4 fw-bold lh-1 mb-3">Cenové analýzy prací, produktů a služeb</h1>
             <p class="col-lg-10 fs-4 text-muted">
-                Pomocí AI, machine learning technologií a pokročilého zpracování obsahu smluv jsme zanalyzovali smluvní podmínky a nasmlouvané ceny v různých oblastech.
+                Pomocí AI, machine learning technologií a pokročilého zpracování obsahu smluv a důkladné osobní kontroly každého údaje, jsme zanalyzovali smluvní podmínky a nasmlouvané ceny v různých oblastech.
                 Naše <b class="text-dark">nejrozsáhlejší cenové analýzy</b> na českém trhu pomohou <b class="text-dark">úřadům s orientací v obvyklých cenových relacích</b>, a <b class="text-dark">dodavatelům s kvalitní a konkureční nabídkou</b> do výběrových řízení.
+                <br style="margin-bottom:20px;" />
+                <br style="margin-bottom:20px;" />
+                <b>Dostupné analýzy</b>
+                <ul class="list-group">
+                    <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019 (dostupné leden 2022)</li>
+                    <li class="list-group-item">Přehled obvyklých cen IT prací ve státní správě za rok 2020 (<b>analýza připravena</b>)</li>
+                    <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021 (dostupné duben 2022)</li>
+                </ul>
 
             </p>
         </div>
@@ -33,13 +41,14 @@
                     </div>
                     <div class="mb-3">
                         <b>Máte zakoupeny tyto produkty:</b>
-                        <ul class="list-group">
-                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019</li>
-                            <li class="list-group-item"><a href="/Souhrn?obor=IT&rok=2020">Přehled obvyklých cen IT prací ve státní správě za rok 2020</a></li>
-                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021</li>
+                        <ul class="list-group-flush">
+                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019 (dostupné leden 2022)</li>
+                            <li class="list-group-item"><a href="/Souhrn?obor=IT&rok=2020">Přehled obvyklých cen IT prací ve státní správě za rok 2020 (<b>report připraven</b>)</a></li>
+                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021 (dostupné duben 2022)</li>
                         </ul>
                     </div>
-                </div> }
+                </div>
+            }
             else
             {
 
@@ -86,16 +95,16 @@
                     var key = new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 };
                     var stat = JobService.GetStatistics(key);
                     var distinctJobsForYearAndSubject = JobService.DistinctJobs
-                            .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
-                            .ToList();
+                    .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
+                    .ToList();
                     var pocetSmluv = distinctJobsForYearAndSubject
-                        .Select(m => m.SmlouvaId).Distinct().Count();
+                    .Select(m => m.SmlouvaId).Distinct().Count();
                     var pocetZadavatelu = distinctJobsForYearAndSubject
-                        .Select(m => m.IcoOdberatele).Distinct().Count();
+                    .Select(m => m.IcoOdberatele).Distinct().Count();
                     var pocetDodavatelu = distinctJobsForYearAndSubject
-                        .SelectMany(m => m.IcaDodavatelu).Distinct().Count();
+                    .SelectMany(m => m.IcaDodavatelu).Distinct().Count();
                     var pocetCen = distinctJobsForYearAndSubject
-                        .Count();
+                    .Count();
                 }
                 <ul class="list-unstyled mt-3 mb-4">
                     <li>obsahuje údaje z @pocetSmluv smluv</li>
