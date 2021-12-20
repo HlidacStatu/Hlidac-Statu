@@ -23,7 +23,7 @@ else
         {
             <li>
                 <a class="button" href="/tableEditor/@table.Subject/@table.Pk">
-                    @table.SmlouvaID - @table.CheckedDate?.ToString("yyyy-MM-dd HH:mm") - @(((InDocTables.CheckStatuses)table.Status).ToString("G"))
+                    @table.SmlouvaID - @table.CheckedDate?.ToString("yyyy-MM-dd HH:mm") - @(((InDocTables.CheckState)table.Status).ToString("G"))
                 </a>
             </li>
         }

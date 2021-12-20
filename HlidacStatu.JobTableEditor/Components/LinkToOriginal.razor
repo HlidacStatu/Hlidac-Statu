@@ -1,0 +1,14 @@
+@using HlidacStatu.Entities
+@if (InDocTable != null)
+{
+    <a class="btn btn-outline-secondary btn-sm"
+       target="_blank"
+       href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(InDocTable.SmlouvaID)&p=@(InDocTable.PrilohaHash)&page=@InDocTable.Page">
+        <i class="far fa-file-alt"></i> Originál
+    </a>
+}
+
+@code {
+    [Parameter]
+    public InDocTables InDocTable { get; set; }
+}

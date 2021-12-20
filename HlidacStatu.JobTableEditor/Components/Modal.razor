@@ -1,0 +1,257 @@
+@using HlidacStatu.JobTableEditor.Data
+@using HlidacStatu.Entities
+@using HlidacStatu.DetectJobs
+@using Devmasters.Enums
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@using Nest
+
+@inject JobService JobService
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" @onclick="LoadJobs">
+    Save
+</button>
+
+<!-- Modal -->
+
+@if (showModal)
+{
+    <div class="bodal" id="exampleModal" tabindex="-1">
+        <div class="modal-dialog bodal-fullscreen">
+            <div class="modal-content bodal-content-fullscreen">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Rekapitulace a uložení</h5>
+                    <button type="button" class="btn-close" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <LinkToOriginal InDocTable="Table.InDocTable"></LinkToOriginal>
+                    <div class="recap">
+                        <table>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Job</th>
+                                    <th scope="col">Hodnota</th>
+                                    <th scope="col">Hodnota s DPH</th>
+                                    <th scope="col">
+                                        Jednotka
+                                        <select @onchange="ChangeUnit" class="form-select">
+                                            @foreach (var measureUnit in (InDocJobs.MeasureUnit[])Enum
+                                                .GetValues(typeof(InDocJobs.MeasureUnit)))
+                                            {
+                                                <option value="@measureUnit">@measureUnit.ToString("G")</option>
+                                            }
+                                        </select>
+                                    </th>
+                                    <th>Automatická kontrola</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var job in Table.FoundJobs)
+                                {
+                                    <tr>
+                                        <td>
+                                            <input type="text" @bind="@job.JobRaw" class="form-control" autocomplete="off"/>
+                                        </td>
+                                        <td>
+                                            <input type="number" @bind="@job.Price" class="form-control" autocomplete="off">
+                                        </td>
+                                        <td>
+                                            <input type="number" @bind="@job.PriceVAT" class="form-control" autocomplete="off"/>
+                                        </td>
+                                        <td>
+                                            <select @bind="@job.Unit" class="form-select" autocomplete="off">
+                                                @foreach (var measureUnit in (InDocJobs.MeasureUnit[])Enum
+                                                    .GetValues(typeof(InDocJobs.MeasureUnit)))
+                                                {
+                                                    <option value="@measureUnit">@measureUnit.ToString("G")</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            @if (!IsValidJob(job, out var chyby))
+                                            {
+                                                <p class="alert alert-danger" role="alert">
+                                                    @((MarkupString)string.Join("<br/>", chyby))
+                                                </p>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </table>
+                    </div>
+                    <div class="category col-4">
+                        <h4>Vyberte kategorii smlouvy</h4>
+                        <select class="form-select" @onchange="ChangeClassification">
+                            <option value="">--== Zvolte kategorii ==--</option>
+                            @foreach (var (name, niceName) in GetGeneralClassificationTypes())
+                            {
+                                <option Value="@name">@niceName</option>
+                            }
+                        </select>
+                        @if (!IsValidCategory(out var chyba))
+                        {
+                            <p class="alert alert-danger" role="alert">
+                                @chyba
+                            </p>
+                        }
+                    </div>
+                    <div class="quality col-4">
+                        <h4>Byla tabulka, kterou jste zpracovával/a v pořádku?</h4>
+                        <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+                            <input type="checkbox" class="btn-check" id="shitTable" @bind="@Table.InDocTable.HasTerribleFormat" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="shitTable">Ne, byla <s>rozmrdaná.</s> s chaoticky přeházenými řádky a sloupci.</label>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    @if(!IsEverythingValid())
+                    {
+                        <p class="alert alert-danger" role="alert">
+                            Ve formuláři jsou chyby.
+                        </p>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="Close">Zrušit změny</button>
+                    <button type="button" class="btn btn-primary" @onclick="Save">Uložit změny</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public SomeTable Table { get; set; }
+
+    private bool showModal = false;
+
+    private async Task Save()
+    {
+        bool isValid = IsEverythingValid();
+        if (!isValid)
+        {
+            return;
+        }
+
+    //parent save
+        showModal = false;
+        await Table.Save();
+    }
+
+    private bool IsEverythingValid()
+    {
+        
+    // do checks
+        if (Table.FoundJobs.Count == 0)
+        {
+            return false;
+        }
+        if (!IsValidCategory(out string categoryError))
+        {
+            return false;
+        }
+        foreach (var job in Table.FoundJobs)
+        {
+            if(!IsValidJob(job, out var error))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
+    private bool IsValidCategory(out string error)
+    {
+        error = null;
+        if (Table.InDocTable.Category is null)
+        {
+            error = "Kategorie není vybrána.";
+            return false;
+        }
+        return true;
+    }
+
+    private bool IsValidJob(InDocJobs job, out List<string> errorMessages)
+    {
+        errorMessages = new();
+        if (job.Unit is null)
+        {
+            errorMessages.Add($"Jednotka není vybrána.");
+        }
+        if (string.IsNullOrWhiteSpace(job.JobRaw))
+        {
+            errorMessages.Add($"Chybí název jobu.");
+        }
+        
+        return errorMessages.Count == 0;
+    }
+    
+    private void LoadJobs()
+    {
+        Table.ParseJobs();
+        showModal = true;
+    }
+    
+    private void ChangeUnit(ChangeEventArgs arg)
+    {
+        if (arg.Value is null)
+        {
+            return;
+        }
+        string unitName = (string)arg.Value;
+
+        var isDefined = Enum.IsDefined(typeof(InDocJobs.MeasureUnit), unitName);
+        if (isDefined)
+        {
+            var value = Enum.Parse<InDocJobs.MeasureUnit>(unitName, true);
+            foreach (var job in Table.FoundJobs)
+            {
+                job.Unit = value;
+            }
+        }
+    }
+
+    private void ChangeClassification(ChangeEventArgs arg)
+    {
+        if (arg.Value is null)
+        {
+            return;
+        }
+        string classification = (string)arg.Value;
+
+        var isDefined = Enum.IsDefined(typeof(Smlouva.SClassification.ClassificationsTypes), classification);
+        if (isDefined)
+        {
+            var value = Enum.Parse<Smlouva.SClassification.ClassificationsTypes>(classification, true);
+            Table.InDocTable.Category = value;
+        }
+    
+    }
+
+    private List<(string Name, string NiceName)> GetGeneralClassificationTypes()
+    {
+        var classifications = Enum.GetValues<Smlouva.SClassification.ClassificationsTypes>();
+
+        var filtered = classifications.Where(c => c.ToString("G").EndsWith("_obecne"));
+        
+        var result = filtered.Select(c => (Name: c.ToString("G"), NiceName: c.ToNiceDisplayName()))
+            .OrderBy(t => t.NiceName)
+            .ToList();
+
+
+        return result;
+    }
+
+    private void Close()
+    {
+        showModal = false;
+    }
+
+}
+

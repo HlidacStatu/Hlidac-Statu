@@ -24,6 +24,83 @@ namespace HlidacStatu.Entities
         [Column(TypeName = "datetime")]
         public DateTime? Created { get; set; }
         public string Tags { get; set; }
+        
+        public MeasureUnit? Unit { get; set; }
+        public decimal? Price { get; set; }
+        public decimal? PriceVAT { get; set; }
+        public decimal? PriceVATCalculated { get; set; }
+        public decimal? VAT { get; set; }
+        
+        public enum MeasureUnit
+        {
+            None = 0,
+            ManHour = 1,
+            ManDay = 2,
+            Piece = 3,
+            Meter = 4,
+            Kilometer = 5,
+            Milimeter = 6,
+            SquareMeter = 7,
+            SquareKilometer = 8,
+            Gram = 9,
+            Kilogram = 10,
+            Ton = 11,
+            
+        }
+
+        public void NormalizePrices()
+        {
+            FixMixedupVat();
+            
+            switch (Unit)
+            {
+                case MeasureUnit.ManHour:
+                    SalaryMD = Price * 8;
+                    SalaryMdVAT = PriceVAT * 8;
+                    break;
+                        
+                case MeasureUnit.ManDay:
+                    SalaryMD = Price;
+                    SalaryMdVAT = PriceVAT;
+                    break;
+            }
+
+            ComputeFinalVatPrice();
+
+        }
+
+        private void FixMixedupVat()
+        {
+            // swap if PriceVat < Price
+            if (Price > 0 && PriceVAT > 0 && Price > PriceVAT)
+            {
+                (Price, PriceVAT) = (PriceVAT, Price);
+            }
+            // swap if salaryMdVat < salaryMd
+            if (SalaryMD > 0 && SalaryMdVAT > 0 && SalaryMD > SalaryMdVAT)
+            {
+                (SalaryMD, SalaryMdVAT) = (SalaryMdVAT, SalaryMD);
+            }
+            
+        }
+        
+        private void ComputeFinalVatPrice()
+        {
+            decimal vatMultiplier = 1.21m;
+            
+            if (SalaryMdVAT > 0)
+            {
+                PriceVATCalculated = SalaryMdVAT;
+            } 
+            else if (PriceVAT > 0)
+            {
+                PriceVATCalculated = PriceVAT;
+            }
+            else if (SalaryMD > 0)
+            {
+                PriceVATCalculated = SalaryMD * vatMultiplier;
+            }
+        }
 
     }
 }

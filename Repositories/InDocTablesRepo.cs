@@ -35,7 +35,7 @@ namespace HlidacStatu.Repositories
                 //pokud zůstal rozpracovaný úkol, lízne si nejprve ten
                 var inProgress = await db.InDocTables
                     .AsQueryable()
-                    .Where(m => m.Status == (int)InDocTables.CheckStatuses.InProgress)
+                    .Where(m => m.Status == (int)InDocTables.CheckState.InProgress)
                     .Where(m => m.CheckedBy == requestedBy)
                     .FirstOrDefaultAsync(cancellationToken);
 
@@ -44,14 +44,14 @@ namespace HlidacStatu.Repositories
 
                 var tbl = await db.InDocTables
                     .AsQueryable()
-                    .Where(m => m.Status == (int)InDocTables.CheckStatuses.WaitingInQueue)
+                    .Where(m => m.Status == (int)InDocTables.CheckState.WaitingInQueue)
                     .OrderByDescending(m => m.PrecalculatedScore)
                     .FirstOrDefaultAsync(cancellationToken);
 
                 if (tbl is null)
                     throw new NoDataFoundException("Table InDocTables neobsahuje zadna data ke zpracovani.");
                 
-                tbl.CheckStatus = InDocTables.CheckStatuses.InProgress;
+                tbl.CheckStatus = InDocTables.CheckState.InProgress;
                 tbl.CheckedBy = requestedBy;
                 tbl.CheckedDate = DateTime.Now;
                 
@@ -73,7 +73,7 @@ namespace HlidacStatu.Repositories
                 if (tbl is null)
                     throw new NoDataFoundException("Table InDocTables neobsahuje zadna data ke zpracovani.");
                 
-                tbl.CheckStatus = InDocTables.CheckStatuses.InProgress;
+                tbl.CheckStatus = InDocTables.CheckState.InProgress;
                 tbl.CheckedBy = requestedBy;
                 tbl.CheckedDate = DateTime.Now;
 
@@ -97,7 +97,7 @@ namespace HlidacStatu.Repositories
             }
         }
         
-        public static async Task<Dictionary<InDocTables.CheckStatuses, int>> GlobalStatistic(CancellationToken cancellationToken)
+        public static async Task<Dictionary<InDocTables.CheckState, int>> GlobalStatistic(CancellationToken cancellationToken)
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -107,14 +107,14 @@ namespace HlidacStatu.Repositories
                     .ToListAsync(cancellationToken);
                     
                 var stat = data.GroupBy(t => t.Status)
-                    .ToDictionary(g => (InDocTables.CheckStatuses)g.Key,
+                    .ToDictionary(g => (InDocTables.CheckState)g.Key,
                         g => g.Count());
 
                 return stat;
             }
         }
         
-        public static async Task<Dictionary<InDocTables.CheckStatuses, int>> UserStatistic(string user, CancellationToken cancellationToken)
+        public static async Task<Dictionary<InDocTables.CheckState, int>> UserStatistic(string user, CancellationToken cancellationToken)
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -125,7 +125,7 @@ namespace HlidacStatu.Repositories
                     .ToListAsync(cancellationToken);
                 
                 var stat = data.GroupBy(t => t.Status)
-                    .ToDictionary(g => (InDocTables.CheckStatuses)g.Key,
+                    .ToDictionary(g => (InDocTables.CheckState)g.Key,
                         g => g.Count());
 
                 return stat;
@@ -145,7 +145,7 @@ namespace HlidacStatu.Repositories
         //     }
         // }
         
-        public static async Task ChangeStatus(InDocTables tbl, InDocTables.CheckStatuses status, string checkedBy,
+        public static async Task ChangeStatus(InDocTables tbl, InDocTables.CheckState status, string checkedBy,
             long checkElapsedTimeInMS)
         {
             await using (DbEntities db = new DbEntities())

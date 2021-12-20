@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace HlidacStatu.JobTableEditor.Data
 {
@@ -70,32 +71,47 @@ namespace HlidacStatu.JobTableEditor.Data
             return cellShells;
         }
 
-        public async Task SaveChanges(SomeTable table, InDocTables.CheckStatuses operation)
+        public async Task SaveChanges(SomeTable table, InDocTables.CheckState status)
         {
-            // remove old values
             await InDocJobsRepo.Remove(table.InDocTable.Pk);
-            // push changes to server
-            if (operation != InDocTables.CheckStatuses.WrongTable
-                && operation != InDocTables.CheckStatuses.ForNextReview
-            )
+
+            if (status == InDocTables.CheckState.Done)
             {
-                try
-                {
-                    var parsedJobs = table.ParseJobs();
-
-                    await InDocJobsRepo.SaveAsync(parsedJobs);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+                await SaveJobs(table.FoundJobs);
             }
-
+            
             await InDocTablesRepo.ChangeStatus(table.InDocTable,
-                operation,
+                status,
                 table.Author,
                 (long)table.ProcessingTime.TotalMilliseconds);
+
+            if (status == InDocTables.CheckState.Done)
+            {
+                var cells = new InDocTableCells()
+                {
+                    Algorithm = table.InDocTable.Algorithm,
+                    Page = table.InDocTable.Page,
+                    PrilohaHash = table.InDocTable.PrilohaHash,
+                    SmlouvaID = table.InDocTable.SmlouvaID,
+                    TableOnPage = table.InDocTable.TableOnPage,
+                    Date = DateTime.Now,
+                    Cells = JsonConvert.SerializeObject(table.Cells)
+                };
+                InDocTableCellsRepo.Add(cells);
+            }
+        }
+
+        private static async Task SaveJobs(List<InDocJobs> jobs)
+        {
+            try
+            {
+                await InDocJobsRepo.SaveAsync(jobs);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task<string> GetRandomStatistic(string user, CancellationToken cancellationToken)
@@ -108,33 +124,33 @@ namespace HlidacStatu.JobTableEditor.Data
             await Task.WhenAll(globalStatistic, userStatistic);
             
             //global
-            if (globalStatistic.Result.TryGetValue(InDocTables.CheckStatuses.Done, out number))
+            if (globalStatistic.Result.TryGetValue(InDocTables.CheckState.Done, out number))
             {
                 statistiky.Add($"Víš, že už je zpracovaných celkem {number} tabulek?");
             }
-            if (globalStatistic.Result.TryGetValue(InDocTables.CheckStatuses.WrongTable, out number))
+            if (globalStatistic.Result.TryGetValue(InDocTables.CheckState.WrongTable, out number))
             {
                 statistiky.Add($"Víš, že už bylo označeno celkem {number} tabulek jako 💩?");
             }
-            if (globalStatistic.Result.TryGetValue(InDocTables.CheckStatuses.ForNextReview, out number))
+            if (globalStatistic.Result.TryGetValue(InDocTables.CheckState.ForNextReview, out number))
             {
                 statistiky.Add($"Víš, že na review čeká Michala a Petra {number} kousků?");
             }
-            if (globalStatistic.Result.TryGetValue(InDocTables.CheckStatuses.WaitingInQueue, out number))
+            if (globalStatistic.Result.TryGetValue(InDocTables.CheckState.WaitingInQueue, out number))
             {
                 statistiky.Add($"Víš, že aby bylo hotovo úplně všechno, musí se zpracovat ještě {number} tabulek?");
             }
             
             //user
-            if (userStatistic.Result.TryGetValue(InDocTables.CheckStatuses.Done, out number))
+            if (userStatistic.Result.TryGetValue(InDocTables.CheckState.Done, out number))
             {
                 statistiky.Add($"Že si nepočítáš, kolik jsi už jsi toho zvládla? Já jo a už jsi zpracovala {number} tabulek?");
             }
-            if (userStatistic.Result.TryGetValue(InDocTables.CheckStatuses.WrongTable, out number))
+            if (userStatistic.Result.TryGetValue(InDocTables.CheckState.WrongTable, out number))
             {
                 statistiky.Add($"To jsi věděla, že celkem jsi označila {number} tabulek jako nepoužitelných?");
             }
-            if (userStatistic.Result.TryGetValue(InDocTables.CheckStatuses.ForNextReview, out number))
+            if (userStatistic.Result.TryGetValue(InDocTables.CheckState.ForNextReview, out number))
             {
                 statistiky.Add($"Na review už jsi poslala {number} divnotabulek. Petr s Michalem Ti mockrát \"děkují\".");
             }

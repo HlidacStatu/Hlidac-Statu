@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using HlidacStatu.DetectJobs;
 using HlidacStatu.Entities;
+using Microsoft.AspNetCore.Components;
 
 namespace HlidacStatu.JobTableEditor.Data
 {
@@ -9,10 +11,33 @@ namespace HlidacStatu.JobTableEditor.Data
     {
         public InDocTables InDocTable { get; set; }
         public CellShell[][] Cells { get; set; }
-        public TimeSpan ProcessingTime { get; set; }
+        public TimeSpan ProcessingTime { get; private set; }
         public string Author { get; set; }
 
-        public List<InDocJobs> ParseJobs()
+        public List<InDocJobs> FoundJobs { get; private set; }
+        
+        
+        private DateTime _tableOpenedAt;
+        
+        public Func<Task> OnSave { get; set; }
+        
+        public async Task Save()
+        {
+            if (OnSave != null)
+                await OnSave();
+        }
+        
+        public void StartWork()
+        {
+            _tableOpenedAt = DateTime.Now;
+        }
+        
+        public void EndWork()
+        {
+            ProcessingTime = DateTime.Now - _tableOpenedAt;
+        }
+        
+        public void ParseJobs()
         {
             var jobsList = new List<InDocJobs>();
             foreach (var row in Cells)
@@ -29,11 +54,11 @@ namespace HlidacStatu.JobTableEditor.Data
                             foundSomething = true;
                             break;
                         case InTables.Cell.GuessedCellType.Price:
-                            foundJob.SalaryMD = Devmasters.ParseText.ToDecimal(cell.Value);
+                            foundJob.Price = Devmasters.ParseText.ToDecimal(cell.Value);
                             foundSomething = true;
                             break;
                         case InTables.Cell.GuessedCellType.PriceWithVAT:
-                            foundJob.SalaryMdVAT = Devmasters.ParseText.ToDecimal(cell.Value);
+                            foundJob.PriceVAT = Devmasters.ParseText.ToDecimal(cell.Value);
                             foundSomething = true;
                             break;
                         default:
@@ -42,18 +67,18 @@ namespace HlidacStatu.JobTableEditor.Data
                 }
 
                 // existuje název jobu
-                // AND má vyplněnou alespoň jednu z cen
-                bool validJob = !string.IsNullOrWhiteSpace(foundJob.JobRaw)
-                                && (foundJob.SalaryMD.HasValue || foundJob.SalaryMdVAT.HasValue);
+                bool validJob = !string.IsNullOrWhiteSpace(foundJob.JobRaw);
                 if (validJob)
                     jobsList.Add(foundJob);
                 else if (foundSomething)
                 {
-                    throw new Exception($"Na radku [{Array.IndexOf(Cells, row) + 1 }] neni kompletni job (nazev + cena)!");
+                    throw new Exception($"Na radku [{Array.IndexOf(Cells, row) + 1 }] nebyl nalezen job!");
                 }
             }
 
-            return jobsList;
+            FoundJobs = jobsList;
         }
+        
+        
     }
 }

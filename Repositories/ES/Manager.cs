@@ -45,7 +45,8 @@ namespace HlidacStatu.Repositories.ES
             Audit,
             RPP_Kategorie,
             RPP_OVM,
-            RPP_ISVS
+            RPP_ISVS,
+            InDocTableCells
         }
 
         public static string defaultIndexName = "hlidacsmluv";
@@ -70,6 +71,7 @@ namespace HlidacStatu.Repositories.ES
         public static string defaultIndexName_Dotace = "dotace";
         public static string defaultIndexName_Osoby = "osoby";
         public static string defaultIndexName_Audit = "audit";
+        public static string defaultIndexName_InDocTableCells = "indoctablecells";
 
         public static string defaultIndexName_RPP_Kategorie = "rpp_kategorie";
         public static string defaultIndexName_RPP_OVM = "rpp_ovm";
@@ -149,6 +151,11 @@ namespace HlidacStatu.Repositories.ES
         {
             return GetESClient(defaultIndexName_Audit, timeOut, connectionLimit, IndexType.Audit
                 );
+        }
+        public static ElasticClient GetESClient_InDocTableCells(int timeOut = 1000, int connectionLimit = 80)
+        {
+            return GetESClient(defaultIndexName_InDocTableCells, timeOut, connectionLimit, IndexType.InDocTableCells
+            );
         }
         public static ElasticClient GetESClient_RPP_OVM(int timeOut = 60000, int connectionLimit = 80)
         {
@@ -646,6 +653,13 @@ namespace HlidacStatu.Repositories.ES
                            )
                            .Map<ISVS>(map => map.AutoMap(maxRecursion: 1))
                        );
+                    break;
+                case IndexType.InDocTableCells:
+                    res = client.Indices
+                        .Create(client.ConnectionSettings.DefaultIndex, i => i
+                            .InitializeUsing(idxSt)
+                            .Map<Entities.InDocTableCells>(map => map.AutoMap().DateDetection(false))
+                        );
                     break;
             }
 

@@ -122,14 +122,8 @@ namespace HlidacStatu.Repositories
                 if (dontChangeDates == false)
                     job.Created = DateTime.Now;
 
-                if (job.SalaryMD.HasValue == false || job.SalaryMD == 0
-                    || job.SalaryMdVAT.HasValue == false || job.SalaryMdVAT == 0
-                    || rewriteAll)
-                {
-                    var (salnet, salvat) = FixSalaries(job.SalaryMD, job.SalaryMdVAT);
-                    job.SalaryMD = salnet;
-                    job.SalaryMdVAT = salvat;
-                }
+                
+                job.NormalizePrices();
 
                 db.InDocJobs.Attach(job);
                 if (job.Pk == 0)
@@ -160,20 +154,6 @@ namespace HlidacStatu.Repositories
             }
         }
         
-        public static (decimal net, decimal vat) FixSalaries(decimal? net, decimal? vat)
-        {
-            decimal finalNet = net ?? 0;
-            decimal finalVat = vat ?? 0;
-
-            if (finalNet == 0)
-                finalNet = finalVat / 1.21m;
-            if (finalVat == 0)
-                finalVat = finalNet * 1.21m;
-
-            if (finalNet > finalVat)
-                return (finalVat, finalNet);
-
-            return (finalNet, finalVat);
-        }
+        
     }
 }

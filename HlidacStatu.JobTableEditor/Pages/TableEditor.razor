@@ -35,7 +35,7 @@ else
         <div class="col-8">
             <button class="btn btn-secondary btn-sm" @onclick="AddColumn">Přidej sloupec</button>
             <button class="btn btn-secondary btn-sm" @onclick="AddRow">Přidej řádek</button>
-            <a class="btn btn-outline-secondary btn-sm" target="_blank" href="https://www.hlidacstatu.cz/manage/ShowPrilohaTablesOnePage?s=@(_table.InDocTable.SmlouvaID)&p=@(_table.InDocTable.PrilohaHash)&page=@_table.InDocTable.Page"><i class="far fa-file-alt"></i> Originál</a>
+            <LinkToOriginal InDocTable="@_table.InDocTable"></LinkToOriginal>
             
             <button class="btn btn-success btn-sm" @onclick="RefreshPage"><i class="fad fa-sync"></i></button>
             <button class="btn btn-success btn-sm" @onclick="TotalRefresh"><i class="fad fa-sync"></i>HARD</button>
@@ -68,7 +68,6 @@ else
                     <button class="btn btn-sm btn-warning bg-opacity-25" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.PriceWithVAT))"><i class="far fa-money-bill-alt"></i> s DPH</button>
                     <button class="btn btn-sm btn-outline-info" @onclick="@(() => SetColumn(column, InTables.Cell.GuessedCellType.Unknown))">Nic</button>
                     <span>&nbsp;&nbsp;| &nbsp;</span>
-                    <button class="btn btn-secondary btn-sm" @onclick="() => MultiplyPrices(column)"><i class="fas fa-times"></i> 8</button>
                 </th>
             }
         </tr>
@@ -94,7 +93,8 @@ else
     <div class="fixed-bottom bg-light p-2">
         <h4 class="text-danger float-start">@_errorMessage</h4>
         <div class="float-end">
-            <button class="btn btn-outline-success" @onclick="SaveTable">Save changes</button>
+            @* <button class="btn btn-outline-success" @onclick="SaveTable">Save changes</button> *@
+            <Modal Table="_table"></Modal>
             <button class="btn btn-outline-warning" @onclick="SuperviseTable">Send to supervisor</button>
             <button class="btn btn-outline-danger" @onclick="NonsenseTable">This table is full of 💩</button>
         </div>
@@ -112,7 +112,7 @@ else
     public int? SpecificTablePk { get; set; }
     
     private SomeTable _table;
-    private DateTime _tableOpenedAt;
+    
     private string _errorMessage;
     private CellSwapper Swapper { get; } = new CellSwapper();
     
@@ -120,9 +120,13 @@ else
     private int _processedTables;
 
     private int _syncIndicator = 0;
+    
+    private string _userName;
 
     protected override async Task OnParametersSetAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _userName = authState?.User?.Identity?.Name;
         await LoadNewTable();
     }
 
@@ -146,19 +150,16 @@ else
 
     private async Task LoadNewTable()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var userName = authState?.User?.Identity?.Name;
-
         if (SpecificTablePk.HasValue && SpecificTablePk != 0) //todo: lock only for admins?
         {
-            _table = await JobService.GetSpecificTable(SpecificTablePk.Value, userName, CancellationToken.None);
+            _table = await JobService.GetSpecificTable(SpecificTablePk.Value, _userName, CancellationToken.None);
         }
         else
         {
 
             try
             {
-                _table = await JobService.GetNewTable(userName, CancellationToken.None);
+                _table = await JobService.GetNewTable(_userName, CancellationToken.None);
             }
             catch (NoDataFoundException ndfe)
             {
@@ -170,12 +171,16 @@ else
                 throw;
             }
         }
-        _tableOpenedAt = DateTime.Now;
+        
+        _table.Author = _userName;
+        _table.StartWork();
+        _table.OnSave += SaveTable;
+        StateHasChanged();
     }
 
     private async Task SaveTable()
     {
-        var isSaved = await TrySave(InDocTables.CheckStatuses.Done);
+        var isSaved = await TrySave(InDocTables.CheckState.Done);
         if (isSaved)
         {
             await OnSaved();
@@ -184,7 +189,7 @@ else
 
     private async Task SuperviseTable()
     {
-        var isSaved = await TrySave(InDocTables.CheckStatuses.ForNextReview);
+        var isSaved = await TrySave(InDocTables.CheckState.ForNextReview);
         if (isSaved)
         {
             await OnSaved();
@@ -193,7 +198,7 @@ else
 
     private async Task NonsenseTable()
     {
-        var isSaved = await TrySave(InDocTables.CheckStatuses.WrongTable);
+        var isSaved = await TrySave(InDocTables.CheckState.WrongTable);
         if (isSaved)
         {
             await OnSaved();
@@ -237,9 +242,7 @@ else
                     break;
             }
 
-            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            var userName = authState?.User?.Identity?.Name;
-            var randomStatistic = await JobService.GetRandomStatistic(userName, CancellationToken.None);
+            var randomStatistic = await JobService.GetRandomStatistic(_userName, CancellationToken.None);
             _hlaska = new MarkupString($"{pochvaly[_processedTables % (pochvaly.Length)]} <br/> {randomStatistic}");
         }
         catch (Exception e)
@@ -261,14 +264,9 @@ else
 
     }
     
-    private async Task<bool> TrySave(InDocTables.CheckStatuses operation)
+    private async Task<bool> TrySave(InDocTables.CheckState operation)
     {
-        var elapsedTime = DateTime.Now - _tableOpenedAt;
-        _table.ProcessingTime = elapsedTime;
-
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var userName = authState?.User?.Identity?.Name;
-        _table.Author = userName;
+        _table.EndWork();
 
         try
         {
@@ -284,20 +282,6 @@ else
         return true;
     }
     
-    private void MultiplyPrices(int colnum)
-    {
-        foreach (var row in _table.Cells)
-        {
-            var cell = row[colnum];
-            
-            if (cell.CellType == InTables.Cell.GuessedCellType.Price
-                || cell.CellType == InTables.Cell.GuessedCellType.PriceWithVAT)
-            {
-                var newPrice = (Devmasters.ParseText.ToDecimal(cell.Value) * 8);
-                cell.Value = newPrice.HasValue ? newPrice.Value.ToString("N2") : "";
-            }
-        }
-    }
 
     private void AddColumn()
     {

@@ -52,23 +52,22 @@ namespace HlidacStatu.JobsWeb.Services
                     .GroupBy(j => j.JobPk)
                     .Select(g =>
                     {
-                        var (net, vat) = InDocJobsRepo.FixSalaries(g.FirstOrDefault().SalaryMd,
-                            g.FirstOrDefault().SalaryMdVat);
-                        var tags = g.FirstOrDefault().Tags?.Split("|",
+                        var firstJobOverview = g.FirstOrDefault();
+                        var tags = firstJobOverview.Tags?.Split("|",
                             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                         if (tags == null || tags.Length == 0)
                             tags = new[] { "-vše-" };
                         return new JobPrecalculated()
                         {
-                            Subject = g.FirstOrDefault().Subject,
-                            Year = g.FirstOrDefault().Year,
-                            IcoOdberatele = g.FirstOrDefault().IcoOdberatele,
-                            JobGrouped = g.FirstOrDefault().JobGrouped,
-                            SmlouvaId = g.FirstOrDefault().SmlouvaId,
+                            Subject = firstJobOverview.Subject,
+                            Year = firstJobOverview.Year,
+                            IcoOdberatele = firstJobOverview.IcoOdberatele,
+                            JobGrouped = firstJobOverview.JobGrouped,
+                            SmlouvaId = firstJobOverview.SmlouvaId,
                             Tags = tags,
                             JobPk = g.Key,
-                            SalaryMd = net,
-                            SalaryMdVat = vat,
+                            SalaryMd = firstJobOverview.SalaryMd ?? 0,
+                            SalaryMdVat = firstJobOverview.SalaryMdVat ?? 0,
                             IcaDodavatelu = g.Select(i => i.IcoDodavatele).ToArray(),
                         };
                     }).ToList();

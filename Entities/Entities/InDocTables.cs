@@ -85,12 +85,16 @@ namespace HlidacStatu.Entities
 
         [StringLength(100)]
         public string Subject { get; set; }
+        
+        public Smlouva.SClassification.ClassificationsTypes? Category { get; set; }
+        
+        public bool? HasTerribleFormat { get; set; }
 
-        [Required]
+        [Required]  //todo: protože je required, tak by mělo v DB být nastaveno na not null
         public int Year { get; set; }
 
 
-        public enum CheckStatuses : int
+        public enum CheckState : int
         {
             WaitingInQueue = 0,
             InProgress = 1,
@@ -100,9 +104,9 @@ namespace HlidacStatu.Entities
         }
 
         [NotMapped()]
-        public CheckStatuses CheckStatus
+        public CheckState CheckStatus
         {
-            get { return (CheckStatuses)Status; }
+            get { return (CheckState)Status; }
             set { Status = (int)value; }
         }
 

@@ -170,6 +170,18 @@ namespace HlidacStatu.Entities
                     .HasName("PK__ZkratkaS__C497141E3346B980");
             });
 
+            // modelBuilder.Entity<InDocTables>(entity =>
+            // {
+            //     entity.Property(e => e.Category)
+            //         .HasConversion<int?>();
+            // });
+            //
+            // modelBuilder.Entity<InDocJobs>(entity =>
+            // {
+            //     entity.Property(e => e.Unit)
+            //         .HasConversion<int>();
+            // });
+
         }
         public virtual DbSet<Firma> Firma { get; set; }
         public virtual DbSet<InDocTablesCheck> InDocTablesChecks { get; set; }
