@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 
 namespace HlidacStatu.Connectors
 {
@@ -57,7 +58,12 @@ namespace HlidacStatu.Connectors
                 }
                 catch (Exception e)
                 {
-                    Util.Consts.Logger.Error("SQL error:" + sql, e);
+                    string paramStr = "";
+                    if (param != null)
+                    {
+                        paramStr = string.Join(";", param.Select(s => $"{s.ParameterName}={s.Value}"));
+                    }
+                    Util.Consts.Logger.Error($"SQL error: {sql} Params:{paramStr}", e);
                     throw;
                 }
             }
@@ -165,7 +171,12 @@ namespace HlidacStatu.Connectors
                 }
                 catch (Exception e)
                 {
-                    Util.Consts.Logger.Error("SQL error:" + sql, e);
+                    string paramStr = "";
+                    if (param != null)
+                    {
+                        paramStr = string.Join(";", param.Select(s => $"{s.ParameterName}={s.Value}"));
+                    }
+                    Util.Consts.Logger.Error($"SQL error: {sql} Params:{paramStr}", e);
                     throw;
                 }
             }
