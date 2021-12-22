@@ -378,3 +378,4 @@ HlidacStatu.JobsWeb/appsettings.json
 AutocompleteApi/appsettings.Development.json
 
 *.bak
+Web/Logger.serilog.json
