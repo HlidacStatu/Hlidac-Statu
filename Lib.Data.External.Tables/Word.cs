@@ -1,4 +1,6 @@
-﻿using NPOI.XWPF.UserModel;
+﻿using Devmasters.Log;
+
+using NPOI.XWPF.UserModel;
 
 using System;
 using System.Collections.Generic;
@@ -9,7 +11,16 @@ namespace HlidacStatu.Lib.Data.External.Tables
 {
     public static class Word
     {
-        private static Devmasters.Logging.Logger logger = new Devmasters.Logging.Logger("HlidacStatu.Lib.Data.External.Tables.Word");
+        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.Data.External.Tables.Word",
+                            Devmasters.Log.Logger.DefaultConfiguration()
+                                .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
+                                .AddFileLoggerFilePerLevel("c:/Data/Logs/HlidacStatu/Tbls.Word", "slog.txt",
+                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                                    rollingInterval: Serilog.RollingInterval.Day,
+                                    fileSizeLimitBytes: null,
+                                    retainedFileCountLimit: 9,
+                                    shared: true
+                                    ));
 
         public static Result[] GetTablesFromWord(Uri url, string filename)
         {

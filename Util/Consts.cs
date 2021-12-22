@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Devmasters.Log;
+
+using System;
 using System.Text.RegularExpressions;
 
 namespace HlidacStatu.Util
@@ -29,7 +31,16 @@ namespace HlidacStatu.Util
         public static System.Globalization.CultureInfo csCulture = System.Globalization.CultureInfo.GetCultureInfo("cs");
         public static Random Rnd = new Random();
 
-        public static Devmasters.Logging.Logger Logger = new Devmasters.Logging.Logger("HlidacStatu");
+        public static Devmasters.Log.Logger Logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu",
+                            Devmasters.Log.Logger.DefaultConfiguration()
+                                .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
+                                .AddFileLoggerFilePerLevel("c:/Data/Logs/HlidacStatu/Web", "slog.txt",
+                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                                    rollingInterval: Serilog.RollingInterval.Day,
+                                    fileSizeLimitBytes: null,
+                                    retainedFileCountLimit: 9,
+                                    shared: true
+                                    ));
 
     }
 }

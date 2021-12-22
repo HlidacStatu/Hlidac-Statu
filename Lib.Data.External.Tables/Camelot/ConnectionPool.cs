@@ -24,7 +24,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         bool insideTimer = false;
         private static object lockObj = new object();
         private static ConnectionPool instance = null;
-        //private static Devmasters.Logging.Logger logger = new Devmasters.Logging.Logger("HlidacStatu.Camelot.Api.ConnectionPool");
+        //private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Camelot.Api.ConnectionPool");
         public readonly string apiKey;
 
         private ConnectionPool()

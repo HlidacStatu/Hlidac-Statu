@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Devmasters.Log;
+
+using System;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Data.External.Tables.Camelot
@@ -19,7 +21,16 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         private IApiConnection conn = null;
         public ClientLow cl = null;
 
-        private static Devmasters.Logging.Logger logger = new Devmasters.Logging.Logger("Camelot.ClientParse");
+        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("Camelot.ClientParse",
+                            Devmasters.Log.Logger.DefaultConfiguration()
+                                .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
+                                .AddFileLoggerFilePerLevel("c:/Data/Logs/HlidacStatu/Camelot.ClientParse", "slog.txt",
+                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                                    rollingInterval: Serilog.RollingInterval.Day,
+                                    fileSizeLimitBytes: null,
+                                    retainedFileCountLimit: 9,
+                                    shared: true
+                                    ));
         public ClientParse(IApiConnection connection,
             string pdfUrl, ClientLow.Commands command, CamelotResult.Formats format = CamelotResult.Formats.HTML, string pages = "all")
         {

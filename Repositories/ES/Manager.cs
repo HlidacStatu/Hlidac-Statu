@@ -21,8 +21,11 @@ namespace HlidacStatu.Repositories.ES
     public class Manager
     {
 
-        public static Devmasters.Logging.Logger ESTraceLogger = new Devmasters.Logging.Logger("HlidacStatu.Lib.ES.Trace");
-        public static Devmasters.Logging.Logger ESLogger = new Devmasters.Logging.Logger("HlidacStatu.Lib.ES");
+        public static Devmasters.Log.Logger ESTraceLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.ES.Trace");
+        public static Devmasters.Log.Logger ESLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.ES",
+                            Devmasters.Log.Logger.DefaultConfiguration()
+                                .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
+                            );
         public static bool ESTraceLoggerExists = log4net.LogManager.Exists("HlidacStatu.Lib.ES.Trace")?.Logger?.IsEnabledFor(log4net.Core.Level.Debug) == true;
 
         public enum IndexType
@@ -717,7 +720,7 @@ namespace HlidacStatu.Repositories.ES
             httpContext?.Request?.Headers?.TryGetValue("User-Agent", out browser);
 
             Elasticsearch.Net.ServerError serverErr = esReq.ServerError;
-            ESLogger.Error(new Devmasters.Logging.LogMessage()
+            ESLogger.Error(new Devmasters.Log.LogMessage()
                     .SetMessage("ES query error: " + text
                         + "\n\nCause:" + serverErr?.Error?.ToString()
                         + "\n\nDetail:" + esReq.DebugInformation

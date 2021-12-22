@@ -41,9 +41,9 @@ namespace Vybory_PSP
                                 $"--no-progress --extract-audio --audio-format mp3 --postprocessor-args \" -ac 1 -ar 16000\" -o \"{fnFile}.%(ext)s\" " + videourl
                                 );
                 Devmasters.ProcessExecutor pev = new Devmasters.ProcessExecutor(piv, 60 * 6 * 24);
-                pev.StandardOutputDataReceived += (o, e) => { Devmasters.Logging.Logger.Root.Debug(e.Data); };
+                pev.StandardOutputDataReceived += (o, e) => { Devmasters.Log.Logger.Root.Debug(e.Data); };
 
-                Devmasters.Logging.Logger.Root.Info($"Starting Youtube-dl for {videourl} ");
+                Devmasters.Log.Logger.Root.Info($"Starting Youtube-dl for {videourl} ");
                 pev.Start();
             }
             bool exists_S2T = System.IO.File.Exists(newtonFn) || System.IO.File.Exists(dockerFn);

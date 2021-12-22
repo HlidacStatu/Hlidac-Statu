@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Devmasters.Log;
+
+using System;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Data.External.Tables.Camelot
@@ -20,7 +22,16 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
         public string ApiEndpoint { get; private set; } = null;
 
-        private static Devmasters.Logging.Logger logger = new Devmasters.Logging.Logger("Camelot.ClientLow");
+        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("Camelot.ClientLow",
+                            Devmasters.Log.Logger.DefaultConfiguration()
+                                .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
+                                .AddFileLoggerFilePerLevel("c:/Data/Logs/HlidacStatu/Camelot.ClientLow", "slog.txt",
+                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                                    rollingInterval: Serilog.RollingInterval.Day,
+                                    fileSizeLimitBytes: null,
+                                    retainedFileCountLimit: 9,
+                                    shared: true
+                                    ));
         private readonly string apiKey;
 
         public ClientLow(IApiConnection cnn)

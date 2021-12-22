@@ -3,11 +3,20 @@ using HlidacStatu.Repositories.ES;
 
 using System;
 using Nest;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static class AuditRepo
     {
+
+        private static Devmasters.Log.Logger auditLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.AuditLogger",
+            new LoggerConfiguration().MinimumLevel.Debug()
+                .WriteTo.Http("http://10.10.150.203:5001",
+                                textFormatter:new Elastic.CommonSchema.Serilog.EcsTextFormatter(),
+                                batchFormatter:new Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter()
+                )
+            );
 
         public static Audit Add<T>(Audit.Operations operation, string user, T newObj, T prevObj)
             where T : IAuditable
@@ -44,8 +53,29 @@ namespace HlidacStatu.Repositories
                     return a;
                 }
 
-                var res = Manager.GetESClient_Audit()
-                    .Index<Audit>(a, m => m.Id(a.Id));
+                switch (operation)
+                {
+                    case Audit.Operations.Read:
+                    case Audit.Operations.Update:
+                    case Audit.Operations.Delete:
+                    case Audit.Operations.Create:
+                    case Audit.Operations.Other:
+                    case Audit.Operations.Search:
+                    case Audit.Operations.UserSearch:
+                        auditLogger.Debug("{@audit}", a);
+
+                        break;
+                    case Audit.Operations.Call:
+                        auditLogger.Info("{@audit}", a);
+                        break;
+                    case Audit.Operations.InvalidAccess:
+                        auditLogger.Warning("{@audit}", a);
+                        break;
+                    default:
+                        break;
+                }
+                //var res = Manager.GetESClient_Audit()
+                //    .Index<Audit>(a, m => m.Id(a.Id));
 
                 return a;
             }
@@ -58,21 +88,37 @@ namespace HlidacStatu.Repositories
         
         public static Audit Add(Audit audit)
         {
-            IndexResponse res; 
-            try
+            if (Enum.TryParse<Audit.Operations>(audit.operation, out var operation))
             {
-                res = Manager.GetESClient_Audit()
-                    .Index<Audit>(audit, m => m.Id(audit.Id));
-            }
-            catch (Exception ex)
-            {
-                HlidacStatu.Util.Consts.Logger.Error("Chyba při logování do auditu.", ex);
-                return null;
-            }
+                try
+                {
+                    switch (operation)
+                    {
+                        case Audit.Operations.Read:
+                        case Audit.Operations.Update:
+                        case Audit.Operations.Delete:
+                        case Audit.Operations.Create:
+                        case Audit.Operations.Other:
+                        case Audit.Operations.Search:
+                        case Audit.Operations.UserSearch:
+                            auditLogger.Debug("{@audit}", audit);
 
-            if (!res.IsValid)
-            {
-                HlidacStatu.Util.Consts.Logger.Error($"Chyba audit logu. {res.DebugInformation}");
+                            break;
+                        case Audit.Operations.Call:
+                            auditLogger.Info("{@audit}", audit);
+                            break;
+                        case Audit.Operations.InvalidAccess:
+                            auditLogger.Warning("{@audit}", audit);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    HlidacStatu.Util.Consts.Logger.Error("Chyba při logování do auditu.", ex);
+                    return null;
+                }
             }
 
             return audit;

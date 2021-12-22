@@ -6,12 +6,22 @@ using Microsoft.AspNetCore.Http.Extensions;
 using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
+using Devmasters.Log;
 
 namespace HlidacStatu.LibCore.MiddleWares
 {
     public class TimeMeasureMiddleware
     {
-        public static Devmasters.Logging.Logger _logger = new Devmasters.Logging.Logger("HlidacStatu.PageTimes");
+        public static Devmasters.Log.Logger _logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.PageTimes",
+                            Devmasters.Log.Logger.DefaultConfiguration()
+                                .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
+                                .AddFileLoggerFilePerLevel("c:/Data/Logs/HlidacStatu/Web.PageTimes", "slog.txt",
+                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                                    rollingInterval: Serilog.RollingInterval.Day,
+                                    fileSizeLimitBytes: null,
+                                    retainedFileCountLimit: 9,
+                                    shared: true
+                                    ));
 
         private readonly RequestDelegate _next;
 
@@ -34,7 +44,7 @@ namespace HlidacStatu.LibCore.MiddleWares
             if (sw.ElapsedMilliseconds > 2000)
             {
                 //_logger.Warning($"Loading time of {url} was {sw.ElapsedMilliseconds} ms");
-                var msg = new Devmasters.Logging.LogMessage();
+                var msg = new Devmasters.Log.LogMessage();
                 //<conversionPattern value="%date|%property{page}|%property{params}|%property{user}|%property{elapsedtime}" />
                 msg.SetCustomKeyValue("web_page", url);
                 msg.SetCustomKeyValue("web_params", query);

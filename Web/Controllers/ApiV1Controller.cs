@@ -170,7 +170,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize]
         public ActionResult Dump(string date, string datatype = "smlouvy")
         {
-            Util.Consts.Logger.Info(new Devmasters.Logging.LogMessage()
+            Util.Consts.Logger.Info(new Devmasters.Log.LogMessage()
                 .SetMessage("Downloading smlouvy.dump.zip")
                 .SetCustomKeyValue("UserId", User.Identity.Name)
             );

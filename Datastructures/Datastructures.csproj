@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.DT" Version="2.5.0" />
-      <PackageReference Include="Devmasters.Enums" Version="2.5.0" />
+      <PackageReference Include="Devmasters.DT" Version="3.1.0" />
+      <PackageReference Include="Devmasters.Enums" Version="3.1.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 

@@ -6,7 +6,7 @@ namespace HlidacStatu.Connectors
     //migrace: tohle by mohlo jít do XLibu a vše co je na tom závislý taky, protože to jsou až věci pro web
     public class Init
     {
-        //public static Devmasters.Logging.Logger Logger = new Devmasters.Logging.Logger("HlidacSmluv");
+        //public static Devmasters.Log.Logger Logger = Devmasters.Log.Logger.CreateLogger("HlidacSmluv");
         //public static System.Globalization.CultureInfo enCulture = System.Globalization.CultureInfo.InvariantCulture; //new System.Globalization.CultureInfo("en-US");
         //public static System.Globalization.CultureInfo czCulture = new System.Globalization.CultureInfo("cs-CZ");
         //public static Random Rnd = new Random();

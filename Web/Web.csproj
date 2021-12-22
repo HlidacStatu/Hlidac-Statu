@@ -32,6 +32,9 @@
       <EmbeddedResource Remove="publish\**" />
       <None Remove="publish\**" />
     </ItemGroup>
+    <ItemGroup>
+      <Content Remove="Logger.serilog.json" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="5.0.1" />
@@ -44,13 +47,13 @@
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="5.0.1" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="5.0.1" />
         <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="5.0.1" />
-        <PackageReference Include="CouchbaseNetClient" Version="2.7.23" />
-        <PackageReference Include="Devmasters.Core" Version="2.5.0" />
-        <PackageReference Include="Devmasters.Lang" Version="2.5.0" />
+        <PackageReference Include="CouchbaseNetClient" Version="2.7.26" />
+        <PackageReference Include="Devmasters.Core" Version="3.1.0" />
+        <PackageReference Include="Devmasters.Lang" Version="3.1.0" />
         <PackageReference Include="Grpc.Net.ClientFactory" Version="2.40.0" />
         <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.2.0" />
         <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.319" />
-        <PackageReference Include="log4net" Version="2.0.12" />
+        <PackageReference Include="log4net" Version="2.0.13" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.18.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.11" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="5.0.11" />
@@ -121,6 +124,7 @@
 
     <ItemGroup>
       <None Include="..\.editorconfig" Link=".editorconfig" />
+      <None Include="Logger.serilog.json" />
     </ItemGroup>
 
 
