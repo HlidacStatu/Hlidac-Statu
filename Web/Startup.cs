@@ -496,7 +496,10 @@ namespace HlidacStatu.Web
                     new global::HealthChecks.SqlServer.SqlServerHealthCheck(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 username from AspNetUsers"),
                     "SQL server", HealthStatus.Unhealthy, tags: new[] { "DB", "db" }
                 )
-                .AddHealthCheckWithOptions<Web.HealthChecks.ProcessOpenPorts>("Open network ports", tags: new[] {"process","Web server" })
+                .AddHealthCheckWithOptions<Web.HealthChecks.ProcessOpenPorts>(
+                    "Open network ports", 
+                    tags: new[] {"Web server" }
+                    )
                 .AddHealthCheckWithOptions<Web.HealthChecks.ElasticSearchClusterStatus, Web.HealthChecks.ElasticSearchClusterStatus.Options>(
                     new Web.HealthChecks.ElasticSearchClusterStatus.Options()
                     {
