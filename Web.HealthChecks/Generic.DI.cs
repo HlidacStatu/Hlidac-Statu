@@ -8,6 +8,22 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class GenericHealthCheckBuilderExtensions
     {
+        public static IHealthChecksBuilder AddHealthCheckWithOptions<T>(
+            this IHealthChecksBuilder builder,
+            string name = default, HealthStatus? failureStatus = default, IEnumerable<string> tags = default, TimeSpan? timeout = default)
+        where T : IHealthCheck
+        {
+            name = name ?? typeof(T).Name;
+            T instance = (T)Activator.CreateInstance(typeof(T));
+
+            return builder.Add(new HealthCheckRegistration(
+                name,
+                instance,
+                failureStatus,
+                tags,
+                timeout));
+        }
+
         public static IHealthChecksBuilder AddHealthCheckWithOptions<T, TOptions>(
             this IHealthChecksBuilder builder,
             TOptions options,
