@@ -26,9 +26,9 @@ namespace HlidacStatu.Web.HealthChecks
 
                     bool svatek = Devmasters.DT.Util.NepracovniDny[date.Year].Contains(date);
                     result += $"{date:yyyy-MM-dd}: {res.Total} zakázek \n";
-                    if (svatek && res.Total < 10)
+                    if (svatek && res.Total < 5)
                         bad = true;
-                    else if (res.Total < 100)
+                    else if (res.Total < 30)
                         bad = true;
 
                 }

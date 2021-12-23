@@ -15,6 +15,8 @@ namespace HlidacStatu.Web.HealthChecks
 {
     public class ProcessOpenPorts : IHealthCheck
     {
+
+
         static IPNetwork[] radWareIPs = new string[] {
             "141.226.101.0/24",
             "66.22.0.0/17",
@@ -23,6 +25,9 @@ namespace HlidacStatu.Web.HealthChecks
             }
             .Select(i => IPNetwork.Parse(i))
             .ToArray();
+
+        int warningThreshold = 4000;
+        int errorThreshold = 8000;
 
         public ProcessOpenPorts()
         {
@@ -63,21 +68,18 @@ namespace HlidacStatu.Web.HealthChecks
                     }
 
                 }
-                //if (freeMBytesAvailable < options.UnHealthtMinimumFreeMegabytes)
-                //    return Task.FromResult(HealthCheckResult.Unhealthy(description: report));
-
-                //else if (freeMBytesAvailable < options.DegradedMinimumFreeMegabytes)
-                //    return Task.FromResult(HealthCheckResult.Degraded(description: report));
-
-                //else
-                //    return Task.FromResult(HealthCheckResult.Healthy(description: report));
                 
-                return Task.FromResult(HealthCheckResult.Healthy(description: 
-                    $"Internal Established:{numInternalEstablished}<br/>\n"
+                string report = $"Internal Established:{numInternalEstablished}<br/>\n"
                     + $"Internal Time_Wait:{numInternalTimeWait}<br/>\n"
                     + $"External Established:{numOtherEstablished}<br/>\n"
                     + $"External Time_Wait:{numOtherTimeWait}<br/>\n"
-                    ));
+
+                if (numInternalEstablished+numInternalTimeWait+numOtherEstablished+numOtherTimeWait > errorThreshold)
+                    return Task.FromResult(HealthCheckResult.Unhealthy(description: report));
+                if (numInternalEstablished + numInternalTimeWait + numOtherEstablished + numOtherTimeWait > warningThreshold)
+                    return Task.FromResult(HealthCheckResult.Degraded(description: report));
+                else
+                    return Task.FromResult(HealthCheckResult.Healthy(description: report));
             }
             catch (Exception e)
             {

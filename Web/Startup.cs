@@ -497,7 +497,7 @@ namespace HlidacStatu.Web
                     "SQL server", HealthStatus.Unhealthy, tags: new[] { "DB", "db" }
                 )
                 .AddHealthCheckWithOptions<Web.HealthChecks.ProcessOpenPorts>(
-                    "Open network ports", 
+                    "Open TCP ports", 
                     tags: new[] {"Web server" }
                     )
                 .AddHealthCheckWithOptions<Web.HealthChecks.ElasticSearchClusterStatus, Web.HealthChecks.ElasticSearchClusterStatus.Options>(
