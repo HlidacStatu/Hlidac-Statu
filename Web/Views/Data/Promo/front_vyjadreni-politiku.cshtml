@@ -18,7 +18,7 @@
         .Size(0)
         .Aggregations(a => a
             .Terms("osoby", m => m
-                .Size(100)
+                .Size(1000)
                 .Field("osobaid.keyword")
                 .Aggregations(aa => aa
                     .Stats("stat", ss => ss.
@@ -34,7 +34,7 @@
         .Size(0)
         .Aggregations(a => a
             .Terms("servery", m => m
-                .Size(100)
+                .Size(1000)
                 .Field("server.keyword")
                 .Aggregations(aa => aa
                     .Stats("stat", ss => ss.

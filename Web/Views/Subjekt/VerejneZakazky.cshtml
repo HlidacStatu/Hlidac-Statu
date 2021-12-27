@@ -1,10 +1,16 @@
-﻿@model HlidacStatu.Entities.Firma 
+﻿@model HlidacStatu.Entities.Firma
 @using System.Linq;
 @using HlidacStatu.Repositories
 
-@{ 
+@{
     Layout = null;
     var Data = VerejnaZakazkaRepo.Searching.GetVZForHolding(Model.ICO);
+
+    var profilyZadavatele = ProfilZadavateleRepo.GetByIco(Model.ICO)
+        .GroupBy(k=>k.Url?.Trim(),m=>m, (k,m)=> new { k=k, pz = m.First()})
+        .Where(k=> k.k!=null)
+        .Select(m=>m.pz);
+
 }
 
 
@@ -26,14 +32,33 @@
                 <p>
                     @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
                     @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)kv.Value, $" jsme ve veřejných zakázkach jako {text[2]} nenašli",
-                                            $" se vyskytuje v <a href='{surl}'><b>jedné</b> veřejné zakázce</a> jako {text[1]}", $" se vyskytuje v <a href='{surl}'><b>{{0}}</b> veřejných zakázkách</a> jako {text[1]}", $" se vyskytuje v <a href='{surl}'><b>{{0}}</b> veřejných zakázkach</a> jako {text[1]}")).
+            $" se vyskytuje v <a href='{surl}'><b>jedné</b> veřejné zakázce</a> jako {text[1]}", $" se vyskytuje v <a href='{surl}'><b>{{0}}</b> veřejných zakázkách</a> jako {text[1]}", $" se vyskytuje v <a href='{surl}'><b>{{0}}</b> veřejných zakázkach</a> jako {text[1]}")).
                 </p>
             }
+
+
+            if (profilyZadavatele?.Count() > 0)
+            {
+                <p>
+                    U subjektu registrujeme @Html.Raw(Devmasters.Lang.CS.Plural.Get(profilyZadavatele.Count(),
+            "jeden profil zadavatele","{0} profily zadavatele","{0} profilů zadavatele"
+            )).
+                </p>
+                <p>
+                    <ul>
+                        @foreach (var pz in profilyZadavatele)
+                        {
+                            <li><a target="_blank" href="@pz.Url">@(pz.Url.Length >=40 ? pz.Url.Substring(0,40)+"..." : pz.Url)</a> (uveřejněn @(pz.DatumUverejneni?.ToString("dd. MM. yyyy")))</li>
+                        }
+                    </ul>
+                </p>
+            }
+
         }
 
         @* TODO
             <hr />
-        <h4>Data</h4>*@
+            <h4>Data</h4>*@
 
     </div>
 
