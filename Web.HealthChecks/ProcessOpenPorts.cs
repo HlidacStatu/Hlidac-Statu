@@ -68,11 +68,11 @@ namespace HlidacStatu.Web.HealthChecks
                     }
 
                 }
-                
+
                 string report = $"Internal Established:{numInternalEstablished}<br/>\n"
                     + $"Internal Time_Wait:{numInternalTimeWait}<br/>\n"
                     + $"External Established:{numOtherEstablished}<br/>\n"
-                    + $"External Time_Wait:{numOtherTimeWait}<br/>\n"
+                    + $"External Time_Wait:{numOtherTimeWait}<br/>\n";
 
                 if (numInternalEstablished+numInternalTimeWait+numOtherEstablished+numOtherTimeWait > errorThreshold)
                     return Task.FromResult(HealthCheckResult.Unhealthy(description: report));
