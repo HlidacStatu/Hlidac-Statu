@@ -23,7 +23,7 @@ namespace HlidacStatu.Util.Cache
         {
             contentFunc = func;
             this.expiration = expiration;
-            keyPrefix = keyprefix + "#";
+            keyPrefix = keyprefix;
         }
 
         public virtual T Get(Key key)

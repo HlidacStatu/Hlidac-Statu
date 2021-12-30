@@ -13,7 +13,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
         
         private static volatile MinioCacheManager<Lib.Data.External.Tables.Result[],KeyAndId> prilohaTblsMinioCacheManager
         = MinioCacheManager<Lib.Data.External.Tables.Result[],KeyAndId>.GetSafeInstance(
-            "SmlouvyPrilohyTbls",
+            "SmlouvyPrilohyTbls/",
             smlouvaKeyId => getTablesFromDocument(smlouvaKeyId),
             TimeSpan.Zero,
             new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
@@ -31,7 +31,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
         }
         private static Lib.Data.External.Tables.Result[] getTablesFromDocument(KeyAndId smlouvaKeyId)
         {
-            var key = smlouvaKeyId.ValueForData.Split("|");
+            var key = smlouvaKeyId.ValueForData.Split("/");
 
 
             Smlouva s = SmlouvaRepo.Load(key[0]);
@@ -99,8 +99,8 @@ namespace HlidacStatu.Lib.Data.External.Tables
 
 
             string hash = p.UniqueHash();
-            var keyval = s.Id + "|" + hash;
-            var key = new KeyAndId() { ValueForData = keyval, CacheNameOnDisk = $"prlh_tblsJSON_{keyval}" };
+            var keyval = s.Id + "/" + hash;
+            var key = new KeyAndId() { ValueForData = keyval, CacheNameOnDisk = $"{keyval}" };
             if (forceUpdate)
             {
                 prilohaTblsMinioCacheManager.Delete(key);
