@@ -132,7 +132,7 @@ namespace HlidacStatu.Web.Framework
 
             var sb = new StringBuilder($"<div class=\"low-box\" style=\"max-height:{width}px\">");
             sb.Append(
-                $"<div class=\"low-box-line\" style=\"top:{width - 55}px\"><a href=\"#\" onclick=\"ga('send', 'event', 'btnLowBoxMore', 'showMore','{gaPageEventId}'); return true;\" class=\"more\"></a></div>");
+                $"<div class=\"low-box-line\" style=\"top:{width - 55}px\"><a href=\"#\"  class=\"more\"></a></div>");
             sb.Append("<div class=\"low-box-content\">");
             sb.Append(content);
             sb.Append("</div></div>");

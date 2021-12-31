@@ -63,9 +63,11 @@
 {
     <script type="text/javascript">
         $(document).ready(function () {
-            ga('send', 'event', 'pageload', 'OutOfWatchDogs', '@User.Identity?.Name', {
+        if (_showTrackJS) {
+                ga('send', 'event', 'pageload', 'OutOfWatchDogs', '@User.Identity?.Name', {
                 nonInteraction: true
             });
+        }
         });
     </script>
 }

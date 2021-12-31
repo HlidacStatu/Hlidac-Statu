@@ -455,14 +455,14 @@ namespace HlidacStatu.Extensions
                     string ss = "";
 
                     if (soukrStat[rok].CelkovaHodnotaSmluv == 0)
-                        ss = Plural.Get(stat.SoukromeFirmy.Count(m => m.Value[rok].PocetSmluv > 0),
+                        ss = Plural.Get(stat.SoukromeFirmy.Count(m => m.Value != null && m.Value[rok]?.PocetSmluv > 0),
                                  $"Jeden subjekt, ve kterém se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřel",
                                  $"{{0}} subjekty, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely",
                                  $"{{0}} subjektů, ve kterých se angažuval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely"
                              )
                              + $" smlouvy v neznámé výši, protože <b>hodnota všech smluv byla utajena</b>. ";
                     else
-                        ss = Plural.Get(stat.SoukromeFirmy.Count(m => m.Value[rok].PocetSmluv > 0),
+                        ss = Plural.Get(stat.SoukromeFirmy.Count(m => m.Value!=null && m.Value[rok]?.PocetSmluv > 0),
                                  $"Jeden subjekt, ve které se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřel",
                                  $"{{0}} subjekty, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely",
                                  $"{{0}} subjektů, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely"
@@ -479,14 +479,14 @@ namespace HlidacStatu.Extensions
                     string ss = "";
                     if (soukrStat[rok].CelkovaHodnotaSmluv == 0)
                         ss = $"Je angažován{(osoba.Muz() ? "" : "a")} v&nbsp;" +
-                             Plural.Get(stat.SoukromeFirmy.Count(m => m.Value[rok].PocetSmluv > 0),
+                             Plural.Get(stat.SoukromeFirmy.Count(m => m.Value != null && m.Value[rok]?.PocetSmluv > 0),
                                  $"jednom subjektu, která v&nbsp;roce {rok - 1} uzavřela",
                                  $"{{0}} subjektech, které v&nbsp;roce {rok} uzavřely",
                                  $"{{0}} subjektech, které v&nbsp;roce {rok - 1} uzavřely"
                              )
                              + $" smlouvy v neznámé výši, protože <b>hodnota všech smluv byla utajena</b>. ";
                     else
-                        ss = Plural.Get(stat.SoukromeFirmy.Count(m => m.Value[rok - 1].PocetSmluv > 0),
+                        ss = Plural.Get(stat.SoukromeFirmy.Count(m => m.Value != null && m.Value[rok - 1]?.PocetSmluv > 0),
                                  $"Jeden subjekt, ve které se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřel",
                                  $"{{0}} subjekty, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely",
                                  $"{{0}} subjektů, ve kterých se angažoval{(osoba.Muz() ? "" : "a")}, v&nbsp;roce {rok} uzavřely"

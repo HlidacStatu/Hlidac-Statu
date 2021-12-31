@@ -199,7 +199,7 @@ namespace HlidacStatu.Lib.Analytics
             if (statistics is null)
                 return aggregatedStatistics;
 
-            var years = statistics.SelectMany(x => x.Years.Keys.Select(k => k)).Distinct();
+            var years = statistics.Where(x=>x!=null).SelectMany(x => x.Years.Keys.Select(k => k)).Distinct();
             if (onlyYears != null && onlyYears.Count() > 0)
                 years = years.Where(y => onlyYears.Contains(y));
             foreach (var year in years)

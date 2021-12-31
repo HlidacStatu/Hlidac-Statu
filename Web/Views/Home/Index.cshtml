@@ -36,6 +36,7 @@
 {
     <script>
         _showFAD = false;
+        _showTrackJS = false;
     </script>
 
     <!-- tagify -->
@@ -44,12 +45,15 @@
     <link href="@Html.Raw("/scripts/tagify/tagify.4.8.1.css")" rel="stylesheet" type="text/css" />
     <script src="/scripts/autocomplete.v1.2.js"></script>
     <script type="text/javascript">
+        if (_showTrackJS)
+        {
         window.smartlook || (function (d) {
             var o = smartlook = function () { o.api.push(arguments) }, h = d.getElementsByTagName('head')[0];
             var c = d.createElement('script'); o.api = new Array(); c.async = true; c.type = 'text/javascript';
             c.charset = 'utf-8'; c.src = 'https://rec.smartlook.com/recorder.js'; h.appendChild(c);
         })(document);
         smartlook('init', '344e291cbee0b3c87748a78b80faf81d6e8628b1');
+        }
     </script>
 
     @WebUtil.SetAutofocusOnId("Q")

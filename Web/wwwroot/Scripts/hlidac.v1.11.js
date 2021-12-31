@@ -15,6 +15,10 @@ if (location.search.indexOf(param + '=') !== -1) {
     history.replaceState(null, '', replace);
 }
 
+function ga(p1, p2, p3, p4, p5, p6, p7) {
+    console.log("fake ga " + p1 + ' ' + p2 + ' ' + p3 + ' ' + p4 + ' ' + p5 + ' ' + p6  )
+}
+
 function getRandom(min, max) {
     return Math.random() * (max - min) + min;
 }
