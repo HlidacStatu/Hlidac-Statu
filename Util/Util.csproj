@@ -12,7 +12,7 @@
 		<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Devmasters.Batch" Version="3.1.0.1" />
+		<PackageReference Include="Devmasters.Batch" Version="3.1.1" />
 		<PackageReference Include="Devmasters.Cache" Version="3.1.0" />
 		<PackageReference Include="Devmasters.Cache.AWS_S3" Version="3.1.4" />
 		<PackageReference Include="Devmasters.Cache.Couchbase" Version="3.1.0" />
