@@ -411,7 +411,7 @@ text zpravy: {txt}
                 return NotFound();
             }
 
-            var priloha = model.Prilohy?.FirstOrDefault(m => m.hash.Value == hash);
+            var priloha = model.Prilohy?.FirstOrDefault(m => m.UniqueHash() == hash);
             if (priloha == null)
             {
                 return NotFound();
@@ -419,7 +419,7 @@ text zpravy: {txt}
 
             if (model.znepristupnenaSmlouva())
             {
-                if (User.IsInRole("Admin") == false)
+                if (User.IsInRole("Admin") == false && secret != Devmasters.Config.GetWebConfigValue("LocalPrilohaUniversalSecret"))
                 {
                     if (string.IsNullOrEmpty(secret)) //pokus jak se dostat k znepristupnene priloze
                         return Redirect(model.GetUrl(true)); //jdi na detail smlouvy

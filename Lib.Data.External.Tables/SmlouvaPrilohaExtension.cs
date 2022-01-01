@@ -25,10 +25,6 @@ namespace HlidacStatu.Lib.Data.External.Tables
 
         //Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(
 
-        private static byte[] getTablesFromDocumentOld(KeyAndId smlouvaKeyId)
-        {
-            return Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(getTablesFromDocument(smlouvaKeyId)));
-        }
         private static Lib.Data.External.Tables.Result[] getTablesFromDocument(KeyAndId smlouvaKeyId)
         {
             var key = smlouvaKeyId.ValueForData.Split("/");
@@ -53,6 +49,11 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 {
                     Lib.Data.External.Tables.Result[] myRes = HlidacStatu.Lib.Data.External.Tables.PDF.GetMaxTablesFromPDFAsync(
                         p.odkaz, HlidacStatu.Lib.Data.External.Tables.Camelot.CamelotResult.Formats.JSON).Result;
+                    if (myRes==null)
+                        myRes = HlidacStatu.Lib.Data.External.Tables.PDF.GetMaxTablesFromPDFAsync(
+                            p.LocalCopyUrl(s.Id,secret: Devmasters.Config.GetWebConfigValue("LocalPrilohaUniversalSecret")), 
+                            Camelot.CamelotResult.Formats.JSON).Result;
+
                     sw.Stop();
                     Util.Consts.Logger.Debug($"smlouva {key[0]} soubor {p.UniqueHash()} done in {sw.ElapsedMilliseconds}ms, found {myRes?.Sum(m => m.Tables?.Length ?? 0)} tables");
 

@@ -87,6 +87,17 @@ namespace HlidacStatu.Entities
                 //}
             }
 
+            public string LocalCopyUrl(string smlouvaId, string identityName = null, string secret = null)
+            {
+                var url = $"/KopiePrilohy/{smlouvaId}?hash={this.UniqueHash()}";
+                if (identityName != null)
+                    url = url + $"&secret={LimitedAccessSecret(identityName)}";
+                else if (secret != null)
+                    url = url + $"&secret={secret}";
+
+                return url;
+            }
+
             public string LimitedAccessSecret(string forEmail)
             {
                 if (string.IsNullOrEmpty(forEmail))
