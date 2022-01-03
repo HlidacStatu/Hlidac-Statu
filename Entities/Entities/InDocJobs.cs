@@ -47,6 +47,7 @@ namespace HlidacStatu.Entities
             Tuna = 11,
             Hektar = 12,
             KompletniDodavka = 13,
+            Mesic = 14,
             
         }
 
