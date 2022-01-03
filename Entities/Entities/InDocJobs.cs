@@ -46,6 +46,7 @@ namespace HlidacStatu.Entities
             Kilogram = 10,
             Tuna = 11,
             Hektar = 12,
+            KompletniDodavka = 13,
             
         }
 
