@@ -417,7 +417,6 @@ textarea.code {
     font-size: 14px;
     font-weight: 300;
     line-height: 18px;
-    height: 32px;
     padding: 5px 8px;
     width: 95%;
     max-width: 95%;
@@ -3071,23 +3070,4 @@ a.form-search__hint:active:focus {
     .tagify__dropdown__item__avatar img {
         width: 50px;
         vertical-align: top;
-    }
-
-.middle-line {
-    display: flex;
-    flex-direction: row;
-}
-
-    .middle-line.left:before {
-        content: "";
-        flex: 1 1;
-        border-bottom: 1px dashed #838C98;
-        margin: auto;
-    }
-
-    .middle-line.right:after {
-        content: "";
-        flex: 1 1;
-        border-bottom: 1px dashed #838C98;
-        margin: auto;
     }
