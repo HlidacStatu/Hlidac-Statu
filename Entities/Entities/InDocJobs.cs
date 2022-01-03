@@ -36,15 +36,16 @@ namespace HlidacStatu.Entities
             None = 0,
             ManHour = 1,
             ManDay = 2,
-            Piece = 3,
-            Meter = 4,
-            Kilometer = 5,
-            Milimeter = 6,
-            SquareMeter = 7,
-            SquareKilometer = 8,
+            Kus = 3,
+            Metr = 4,
+            Kilometr = 5,
+            Milimetr = 6,
+            MetrCtverecny = 7,
+            KilometrCtverecny = 8,
             Gram = 9,
             Kilogram = 10,
-            Ton = 11,
+            Tuna = 11,
+            Hektar = 12,
             
         }
 
