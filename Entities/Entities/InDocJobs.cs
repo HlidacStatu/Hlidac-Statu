@@ -48,6 +48,7 @@ namespace HlidacStatu.Entities
             Hektar = 12,
             KompletniDodavka = 13,
             Mesic = 14,
+            MetrKrychlovy = 15,
             
         }
 
