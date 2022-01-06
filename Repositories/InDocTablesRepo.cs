@@ -27,6 +27,24 @@ namespace HlidacStatu.Repositories
                 db.SaveChanges();
             }
         }
+        
+        public static async Task SaveIfNotExistsAsync(InDocTables tbl, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            await using var db = new DbEntities();
+                    
+            bool exists = db.InDocTables.Any(m =>
+                m.Algorithm == tbl.Algorithm
+                && m.Page == tbl.Page
+                && m.PrilohaHash == tbl.PrilohaHash
+                && m.TableOnPage == tbl.TableOnPage
+                && m.SmlouvaID == tbl.SmlouvaID
+            );
+            if (!exists)
+            {
+                db.Add(tbl);
+                await db.SaveChangesAsync(cancellationToken);
+            }
+        }
 
         public static async Task<InDocTables> GetNextForCheck(string requestedBy, CancellationToken cancellationToken = default(CancellationToken))
         {

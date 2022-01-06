@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using HlidacStatu.DetectJobs;
 
 namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
@@ -23,7 +24,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     tbl.Page = crT.Page;
                     tbl.TableInPage = crT.TableInPage;
 
-                    var cells = it_inTables.TableToCells(tbl.ParsedContent());
+                    var cells = InTables.TableToCells(tbl.ParsedContent());
                     var score = it_inTables.CellsWithWordsAndNumbers(cells, out var foundJobs);
 
                     if (foundJobs != null)
