@@ -124,10 +124,14 @@
         Newtonsoft.Json.Linq.JObject obj = Newtonsoft.Json.Linq.JObject.Parse(skutMajitRes.First().Item2);
         if (obj["skutecni_majitele"]?.Count() > 0)
         {
+            bool first = true;
             <h4>@(obj["skutecni_majitele"].Count() >1 ? "Skuteční majitelé" : "Skutečný majitel")</h4>
             <table>
                 @foreach (Newtonsoft.Json.Linq.JObject skm in obj["skutecni_majitele"])
                 {
+                    DateTime? zapis = skm["datum_zapis"]?.Value<DateTime?>();
+                    DateTime? vymaz = skm["datum_vymaz"]?.Value<DateTime?>();
+
                     <tr style="border-top:4px solid rgba(0,0,0,0)">
                         <td colspan="2" class="col-sm-12">
                             @if (!string.IsNullOrEmpty(skm["osobaId"].Value<string>()))
@@ -137,6 +141,24 @@
                             else
                             {
                                 <span>@(skm["osoba_jmeno"]?.Value<string>()) @(skm["osoba_prijmeni"]?.Value<string>())</span>
+                            }
+                            @if (vymaz.HasValue && (DateTime.Now.Date - vymaz.Value) < Relation.NedavnyVztahDelka)
+                            {
+                                @if (first)
+                                {
+                                    first = false;
+                                    <span class="text-muted">(zapsán @(HlidacStatu.Util.RenderData.ToDate(zapis,"dd.MM.yyyy"))</span>
+                                    if (vymaz.HasValue)
+                                    {
+                                        <span class="text-muted"> - vymazán @(HlidacStatu.Util.RenderData.ToDate(vymaz,"dd.MM.yyyy"))</span>
+                                    }
+                                    @Html.Raw(")")
+                                    ;
+                                }
+                                else
+                                {
+                                    <span class="text-muted">(@(HlidacStatu.Util.RenderData.ToDate(zapis,"dd.MM.yyyy")) - @(HlidacStatu.Util.RenderData.ToDate(vymaz,"dd.MM.yyyy")) )</span>
+                                }
                             }
                         </td>
                     </tr>

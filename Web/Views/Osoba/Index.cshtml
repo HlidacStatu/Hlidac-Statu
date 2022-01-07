@@ -138,7 +138,7 @@
                 Firmy a organizace, které tato osoba přímo či prostřednictvím jiných společností vlastnila či spoluvlastnila
                 nebo byla ve statutárních orgánech, a to <b>@(aktualnost.ToNiceDisplayName().ToLower())</b>.
             </p>
-            @if (statistics.SoukromeFirmy.Count > 0)
+            @if (statistics.SoukromeFirmy.Count > 0 && statistics.SoukromeFirmySummary().Summary().PocetSmluv>0)
             {
                 <p>
                     @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
@@ -161,7 +161,14 @@
                     </ul>
                 </p>
             }
-            
+            else if (statistics.SoukromeFirmy.Count > 0 && statistics.SoukromeFirmySummary().Summary().PocetSmluv==0)
+            {
+               
+                <p>
+                    @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
+                </p>
+            }
+
             @if (statistics.StatniFirmy.Count > 0)
             {
                 <p>

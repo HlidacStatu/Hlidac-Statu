@@ -173,7 +173,7 @@ namespace HlidacStatu.Datastructures.Graphs
 
             [NiceDisplayName("Aktuálně podle obch.rejstříku")]
             Aktualni = 2,
-            [NiceDisplayName("Aktuálně podle obch.rejstříku či posledních 4 letech")]
+            [NiceDisplayName("Aktuálně podle obch.rejstříku či posledních 5 letech")]
             Nedavny = 1,
             [NiceDisplayName("Aktuálně podle obch.rejstříku či kdykoliv v minulosti")]
             Neaktualni = 0,

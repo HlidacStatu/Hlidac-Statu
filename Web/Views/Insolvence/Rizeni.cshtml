@@ -220,7 +220,7 @@ else
 <h3>Účastníci řízení</h3>
 
 @{
-    var id = Guid.NewGuid().ToString("N") + "_";
+    var id =  Guid.NewGuid().ToString("N").Substring(0,10) + "_";
 }
 
 <div class="col-xs-12">

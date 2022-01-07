@@ -1,5 +1,4 @@
 ﻿using HlidacStatu.Entities;
-
 using Newtonsoft.Json.Schema;
 
 using System;

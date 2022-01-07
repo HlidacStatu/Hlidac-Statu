@@ -190,7 +190,15 @@
 <div class="head">
     <h3>
         <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" item="@Model.osoba" style="font-size:0.7em;vertical-align:top;"></add-bookmark>
-        @Model.osoba.FullNameWithYear()
+        @if (Model.osoba.NotInterestingToShow())
+        {
+            <span>@Model.osoba.FullName()</span>
+        }
+        else
+        {
+            <span>@Model.osoba.FullNameWithYear()</span>
+            
+        }
         @if (this.User?.IsInRole("canEditData") == true)
         {
             <a href="/manage/PersonDetail/@Model.osoba.InternalId" style="font-size:0.8em">

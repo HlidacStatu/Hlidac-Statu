@@ -140,6 +140,8 @@ namespace HlidacStatu.Extensions
                           && osoba.IsSponzor() == false
                 );
 
+            res = res || osoba.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmySummary().Summary().PocetSmluv ==0;
+
             if (osoba.NameId == "radek-jonke")
                 return true;
 
