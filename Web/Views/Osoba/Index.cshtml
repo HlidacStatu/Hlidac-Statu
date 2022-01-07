@@ -165,7 +165,7 @@
             {
                
                 <p>
-                    @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
+                    @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchoduje se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
                 </p>
             }
 
@@ -188,10 +188,12 @@
                     </ul>
                 </p>
             }
-            
-            <a asp-action="Vazby" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
-                <strong>Zobrazit podrobnosti</strong>
-            </a>
+            @if (Model.NotInterestingToShow() == false)
+            {
+                <a asp-action="Vazby" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
+                    <strong>Zobrazit podrobnosti</strong>
+                </a>
+            }
         </div>
         <hr />
     }
@@ -372,9 +374,15 @@
     }
 
     @{
-
+        var datasetsToSearch = DataSetDB.ProductionDataSets.Get();
+        if (Model.NotInterestingToShow())
+        {
+            datasetsToSearch = datasetsToSearch.Where(m => m.DatasetId != "skutecni-majitele").ToArray();
+        }
         var dsQuery = $"( OsobaId:{Model.NameId} ) ";
-        var dsSearch = HlidacStatu.Datasets.Search.DatasetMultiResult.GeneralSearch(dsQuery, pageSize: 5);
+        var dsSearch = HlidacStatu.Datasets.Search.DatasetMultiResult.GeneralSearch(dsQuery,
+            datasets:datasetsToSearch, 
+            pageSize: 5);
 
     }
     @if (dsSearch.IsValid && dsSearch.Total > 0)

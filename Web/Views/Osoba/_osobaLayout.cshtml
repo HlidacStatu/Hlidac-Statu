@@ -126,8 +126,6 @@
 }
 @section onlyembed
 {
-    @*@Html.Action("CachedAction_Child_12H", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed", key = Model.NameId, param1 = aktualnost.ToString() })*@
-    @*@Html.Action("Osoba_child", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed" })*@
 
     <a href="@Model.osoba.GetUrl(false)" target="_top">
     <img src="@($"https://www.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId)" style="width:95%;height:auto;max-width:@(ViewBag.MaxWidth)px" />
