@@ -95,7 +95,8 @@ else
         <div class="float-end">
             @* <button class="btn btn-outline-success" @onclick="SaveTable">Save changes</button> *@
             <Modal Table="_table"></Modal>
-            <button class="btn btn-outline-warning" @onclick="SuperviseTable">Send to supervisor</button>
+            <button class="btn btn-outline-warning" @onclick="SuperviseTable">Nevím co s tím šéfe (supervisor)</button>
+            <button class="btn btn-outline-warning" @onclick="BrokenTable">Obsahuje data, ale moc rozházená (⚰)</button>
             <button class="btn btn-outline-danger" @onclick="NonsenseTable">This table is full of 💩</button>
         </div>
     </div>
@@ -190,6 +191,15 @@ else
     private async Task SuperviseTable()
     {
         var isSaved = await TrySave(InDocTables.CheckState.ForNextReview);
+        if (isSaved)
+        {
+            await OnSaved();
+        }
+    }
+    
+    private async Task BrokenTable()
+    {
+        var isSaved = await TrySave(InDocTables.CheckState.BrokenFormat);
         if (isSaved)
         {
             await OnSaved();

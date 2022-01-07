@@ -14,7 +14,6 @@ namespace HlidacStatu.JobTableEditor.Data
     {
         static readonly InTables it_inTables = new("IT", IT.Keywords, IT.OtherWords, IT.BlacklistedWords);
 
-
         public async Task<SomeTable> GetNewTable(string user, CancellationToken cancellationToken)
         {
             //todo: až bude víc oborů, tak to tady rozšířit, aby se načítal konkrétní obor

@@ -9,7 +9,7 @@
 
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-primary" @onclick="LoadJobs">
-    Save
+    Save ✔
 </button>
 
 <!-- Modal -->
@@ -31,6 +31,9 @@
                                 <thead>
                                 <tr>
                                     <th scope="col">Job</th>
+                                    <th scope="col">DPH
+                                        <input type="number" @onchange="ChangeVAT" class="form-control" autocomplete="off"/>
+                                    </th>
                                     <th scope="col">Hodnota</th>
                                     <th scope="col">Hodnota s DPH</th>
                                     <th scope="col">
@@ -43,6 +46,9 @@
                                             }
                                         </select>
                                     </th>
+                                    <th scope="col">Počet jednotek
+                                        <input type="number" @onchange="ChangeUnitCount" class="form-control" autocomplete="off"/>
+                                    </th>
                                     <th>Automatická kontrola</th>
                                 </tr>
                                 </thead>
@@ -52,6 +58,9 @@
                                     <tr>
                                         <td>
                                             <input type="text" @bind="@job.JobRaw" class="form-control" autocomplete="off"/>
+                                        </td>
+                                        <td>
+                                            <input type="text" @bind="@job.VAT" class="form-control" autocomplete="off"/>
                                         </td>
                                         <td>
                                             <input type="number" @bind="@job.Price" class="form-control" autocomplete="off">
@@ -67,6 +76,9 @@
                                                     <option value="@measureUnit">@measureUnit.ToString("G")</option>
                                                 }
                                             </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" @bind="@job.UnitCount" class="form-control" autocomplete="off"/>
                                         </td>
                                         <td>
                                             @if (!IsValidJob(job, out var chyby))
@@ -98,16 +110,9 @@
                             </p>
                         }
                     </div>
-                    <div class="quality col-4">
-                        <h4>Byla tabulka, kterou jste zpracovával/a v pořádku?</h4>
-                        <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-                            <input type="checkbox" class="btn-check" id="shitTable" @bind="@Table.InDocTable.HasTerribleFormat" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="shitTable">Ne, byla <s>rozmrdaná.</s> s chaoticky přeházenými řádky a sloupci.</label>
-                        </div>
-                    </div>
                 </div>
                 <div>
-                    @if(!IsEverythingValid())
+                    @if (!IsEverythingValid())
                     {
                         <p class="alert alert-danger" role="alert">
                             Ve formuláři jsou chyby.
@@ -145,7 +150,6 @@
 
     private bool IsEverythingValid()
     {
-        
     // do checks
         if (Table.FoundJobs.Count == 0)
         {
@@ -157,7 +161,7 @@
         }
         foreach (var job in Table.FoundJobs)
         {
-            if(!IsValidJob(job, out var error))
+            if (!IsValidJob(job, out var error))
             {
                 return false;
             }
@@ -165,7 +169,7 @@
 
         return true;
     }
-    
+
     private bool IsValidCategory(out string error)
     {
         error = null;
@@ -188,16 +192,17 @@
         {
             errorMessages.Add($"Chybí název jobu.");
         }
-        
+
         return errorMessages.Count == 0;
     }
-    
+
     private void LoadJobs()
     {
         Table.ParseJobs();
+        //todo Table.PrefillValues();
         showModal = true;
     }
-    
+
     private void ChangeUnit(ChangeEventArgs arg)
     {
         if (arg.Value is null)
@@ -216,6 +221,38 @@
             }
         }
     }
+    
+    private void ChangeUnitCount(ChangeEventArgs arg)
+    {
+        try
+        {
+            int? setUnitCount = (int?) arg.Value; 
+            foreach (var job in Table.FoundJobs)
+            {
+                job.UnitCount = setUnitCount;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+    
+    private void ChangeVAT(ChangeEventArgs arg)
+    {
+        try
+        {
+            int? setVAT = (int?) arg.Value; 
+            foreach (var job in Table.FoundJobs)
+            {
+                job.VAT = setVAT;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
 
     private void ChangeClassification(ChangeEventArgs arg)
     {
@@ -231,7 +268,6 @@
             var value = Enum.Parse<Smlouva.SClassification.ClassificationsTypes>(classification, true);
             Table.InDocTable.Category = value;
         }
-    
     }
 
     private List<(string Name, string NiceName)> GetGeneralClassificationTypes()
@@ -239,7 +275,7 @@
         var classifications = Enum.GetValues<Smlouva.SClassification.ClassificationsTypes>();
 
         var filtered = classifications.Where(c => c.ToString("G").EndsWith("_obecne"));
-        
+
         var result = filtered.Select(c => (Name: c.ToString("G"), NiceName: c.ToNiceDisplayName()))
             .OrderBy(t => t.NiceName)
             .ToList();
@@ -254,4 +290,3 @@
     }
 
 }
-

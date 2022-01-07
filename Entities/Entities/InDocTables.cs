@@ -101,6 +101,7 @@ namespace HlidacStatu.Entities
             Done = 2,
             ForNextReview = 3,
             WrongTable = 4,
+            BrokenFormat = 5,
         }
 
         [NotMapped()]

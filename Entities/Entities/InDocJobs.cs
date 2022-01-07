@@ -30,7 +30,8 @@ namespace HlidacStatu.Entities
         public decimal? PriceVAT { get; set; }
         public decimal? PriceVATCalculated { get; set; }
         public decimal? VAT { get; set; }
-        
+        public decimal? UnitCount { get; set; }
+
         public enum MeasureUnit
         {
             None = 0,
@@ -56,20 +57,23 @@ namespace HlidacStatu.Entities
         {
             FixMixedupVat();
             
+            var unitPrice = Price / UnitCount;
+            var unitPriceVAT = PriceVAT / UnitCount;
+            
             switch (Unit)
             {
                 case MeasureUnit.ManHour:
-                    SalaryMD = Price * 8;
-                    SalaryMdVAT = PriceVAT * 8;
+                    SalaryMD = unitPrice * 8;
+                    SalaryMdVAT = unitPriceVAT * 8;
                     break;
                         
                 case MeasureUnit.ManDay:
-                    SalaryMD = Price;
-                    SalaryMdVAT = PriceVAT;
+                    SalaryMD = unitPrice;
+                    SalaryMdVAT = unitPriceVAT;
                     break;
             }
 
-            ComputeFinalVatPrice();
+            ComputeFinalVatPrice(unitPriceVAT);
 
         }
 
@@ -88,7 +92,7 @@ namespace HlidacStatu.Entities
             
         }
         
-        private void ComputeFinalVatPrice()
+        private void ComputeFinalVatPrice(decimal? unitPriceVAT)
         {
             decimal vatMultiplier = 1.21m;
             
@@ -98,7 +102,7 @@ namespace HlidacStatu.Entities
             } 
             else if (PriceVAT > 0)
             {
-                PriceVATCalculated = PriceVAT;
+                PriceVATCalculated = unitPriceVAT;
             }
             else if (SalaryMD > 0)
             {
