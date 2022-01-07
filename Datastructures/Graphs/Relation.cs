@@ -1,5 +1,6 @@
 ﻿using Devmasters.Enums;
 
+using Force.DeepCloner;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -216,12 +217,62 @@ namespace HlidacStatu.Datastructures.Graphs
             if (allRelations == null)
                 return new Graph.Edge[] { };
 
-            return allRelations
+            if (minAktualnost <= AktualnostType.Neaktualni)
+                return allRelations.ToArray();
+
+            //filter per distance
+            var filteredRels = _childrenVazby(allRelations.First(m => m.Root == true), 
+                allRelations.Where(m=>!m.Root).DeepClone(), 
+                new Graph.Edge[] { },
+                minAktualnost);
+
+            return filteredRels
                 .Where(m => m.Aktualnost >= minAktualnost)
                 .ToArray();
         }
 
+        private static Graph.Edge[] _childrenVazby(Graph.Edge parent, IEnumerable<Graph.Edge> vazby, 
+            IEnumerable<Graph.Edge> exclude, AktualnostType minAktualnost)
+        {
+            //AktualnostType akt = parent.Aktualnost;
+            //if (minAktualnost >= parent.Aktualnost)
 
+
+            List<Graph.Edge> items = new List<Graph.Edge>();
+            var fVazby = vazby
+                    .Where(m =>
+                            parent.To.UniqId == m.From.UniqId
+                            //&& m.Distance == parent.Distance + 1
+                            && m.Aktualnost >= parent.Aktualnost
+                            && m.Aktualnost >= minAktualnost
+                        )
+                    .ToArray();
+            //var fVazby2 = vazby
+            //        .Where(m =>
+            //                parent.To.UniqId == m.From.UniqId
+            //                //&& m.Distance == parent.Distance + 1
+            //                && m.Aktualnost >= parent.Aktualnost
+            //                && m.Aktualnost >= minAktualnost
+            //            )
+            //        .ToArray();
+
+
+            foreach (var ch in fVazby)
+            {
+                if (exclude.Any(m => m.CompareTo(ch) == 0))
+                    continue;
+
+                if (ch.Aktualnost > minAktualnost)
+                    ch.Aktualnost = minAktualnost;
+                items.Add(ch);
+                var chVazby = vazby;//.Where(m => ch.To.UniqId == m.From.UniqId && m.Distance == ch.Distance + 1).ToArray();
+                items.AddRange(
+                    _childrenVazby(ch, vazby, items, minAktualnost)
+                    );
+            }
+            return items.ToArray();
+
+        }
 
 
         /*

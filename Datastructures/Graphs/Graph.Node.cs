@@ -45,7 +45,7 @@ namespace HlidacStatu.Datastructures.Graphs
 
             public override int GetHashCode()
             {
-                return _uniqId.GetHashCode();
+                return _uniqId==null ? 0 : _uniqId.GetHashCode();
             }
         }
 
