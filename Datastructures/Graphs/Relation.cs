@@ -237,7 +237,7 @@ namespace HlidacStatu.Datastructures.Graphs
             var filteredRels = _childrenVazby(allRelations.First(m => m.Root == true), 
                 allRelations.Where(m=>!m.Root).DeepClone(), 
                 new Graph.Edge[] { },
-                minAktualnost,0);
+                minAktualnost,0, allRelations.FirstOrDefault(m=>m.Root));
 
             return filteredRels
                 .Where(m => m.Aktualnost >= minAktualnost)
@@ -245,7 +245,7 @@ namespace HlidacStatu.Datastructures.Graphs
         }
 
         private static Graph.Edge[] _childrenVazby(Graph.Edge parent, IEnumerable<Graph.Edge> vazby, 
-            IEnumerable<Graph.Edge> exclude, AktualnostType minAktualnost, int callDeep)
+            IEnumerable<Graph.Edge> exclude, AktualnostType minAktualnost, int callDeep, Graph.Edge originalRoot)
         {
             //AktualnostType akt = parent.Aktualnost;
             //if (minAktualnost >= parent.Aktualnost)
@@ -256,7 +256,7 @@ namespace HlidacStatu.Datastructures.Graphs
             if (callDeep > 100)
             {
                 //primitive stackoverflow protection
-                HlidacStatu.Util.Consts.Logger.Error("_childrenVazby stackoverflow protection {@parent} {@root}", parent, vazby.FirstOrDefault(m => m.Root));
+                HlidacStatu.Util.Consts.Logger.Error("_childrenVazby stackoverflow protection {@parent(From,To)} {@originalRoot(From,To)}", parent, originalRoot);
                 return items.ToArray();
             }
 
@@ -290,7 +290,7 @@ namespace HlidacStatu.Datastructures.Graphs
                 items.Add(ch);
                 var chVazby = vazby;//.Where(m => ch.To.UniqId == m.From.UniqId && m.Distance == ch.Distance + 1).ToArray();
                 items.AddRange(
-                    _childrenVazby(ch, vazby, items, minAktualnost, callDeep+1)
+                    _childrenVazby(ch, vazby, items, minAktualnost, callDeep+1, originalRoot)
                     );
             }
             return items.ToArray();
