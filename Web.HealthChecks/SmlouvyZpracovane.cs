@@ -40,7 +40,7 @@ namespace HlidacStatu.Web.HealthChecks
             }
             catch (Exception e)
             {
-                return Task.FromResult(HealthCheckResult.Unhealthy("Unknown status, cannot read data from network disk", e));
+                return Task.FromResult(HealthCheckResult.Unhealthy("Unknown status, cannot read data", e));
             }
 
 
