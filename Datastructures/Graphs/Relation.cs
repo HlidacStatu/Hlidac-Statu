@@ -212,7 +212,7 @@ namespace HlidacStatu.Datastructures.Graphs
 
 
 
-        public static Graph.Edge[] AktualniVazby(IEnumerable<Graph.Edge> allRelations, AktualnostType minAktualnost)
+        public static Graph.Edge[] AktualniVazby_old(IEnumerable<Graph.Edge> allRelations, AktualnostType minAktualnost)
         {
             if (allRelations == null)
                 return new Graph.Edge[] { };
@@ -225,7 +225,7 @@ namespace HlidacStatu.Datastructures.Graphs
                 .ToArray();
         }
 
-        public static Graph.Edge[] AktualniVazby2(IEnumerable<Graph.Edge> allRelations, AktualnostType minAktualnost)
+        public static Graph.Edge[] AktualniVazby(IEnumerable<Graph.Edge> allRelations, AktualnostType minAktualnost)
         {
             if (allRelations == null)
                 return new Graph.Edge[] { };
@@ -237,7 +237,7 @@ namespace HlidacStatu.Datastructures.Graphs
             var filteredRels = _childrenVazby(allRelations.First(m => m.Root == true), 
                 allRelations.Where(m=>!m.Root).DeepClone(), 
                 new Graph.Edge[] { },
-                minAktualnost);
+                minAktualnost,0);
 
             return filteredRels
                 .Where(m => m.Aktualnost >= minAktualnost)
@@ -245,7 +245,7 @@ namespace HlidacStatu.Datastructures.Graphs
         }
 
         private static Graph.Edge[] _childrenVazby(Graph.Edge parent, IEnumerable<Graph.Edge> vazby, 
-            IEnumerable<Graph.Edge> exclude, AktualnostType minAktualnost)
+            IEnumerable<Graph.Edge> exclude, AktualnostType minAktualnost, int callDeep)
         {
             //AktualnostType akt = parent.Aktualnost;
             //if (minAktualnost >= parent.Aktualnost)
@@ -272,7 +272,9 @@ namespace HlidacStatu.Datastructures.Graphs
 
             foreach (var ch in fVazby)
             {
-                if (exclude.Any(m => m.CompareTo(ch) == 0))
+                if (exclude.Any(m => m.HasSameEdges(ch) ))
+                    continue;
+                if (parent.HasSameEdges(ch) )
                     continue;
 
                 if (ch.Aktualnost > minAktualnost)
@@ -280,7 +282,7 @@ namespace HlidacStatu.Datastructures.Graphs
                 items.Add(ch);
                 var chVazby = vazby;//.Where(m => ch.To.UniqId == m.From.UniqId && m.Distance == ch.Distance + 1).ToArray();
                 items.AddRange(
-                    _childrenVazby(ch, vazby, items, minAktualnost)
+                    _childrenVazby(ch, vazby, items, minAktualnost, callDeep+1)
                     );
             }
             return items.ToArray();

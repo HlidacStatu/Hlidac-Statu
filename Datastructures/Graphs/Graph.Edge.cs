@@ -368,6 +368,14 @@ namespace HlidacStatu.Datastructures.Graphs
                 else
                     return -1;
             }
+            public bool HasSameEdges(Edge other)
+            {
+                if (other == null)
+                    return false;
+                var same = this.From?.UniqId == other.From?.UniqId;
+                same = same && this.To?.UniqId == other.To?.UniqId;
+                return same;
+            }
 
             public override int GetHashCode()
             {
