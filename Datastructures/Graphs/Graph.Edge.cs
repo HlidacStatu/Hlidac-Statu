@@ -371,17 +371,18 @@ namespace HlidacStatu.Datastructures.Graphs
 
             public override int GetHashCode()
             {
-                unchecked
-                {
-                    int hash = 17;
-                    hash = hash * 23 + (From == null ? 0 : From.GetHashCode() );
-                    hash = hash * 23 + (To == null ? 0 : To.GetHashCode());
-                    hash = hash * 23 + (RelFrom==null ? 0 : RelFrom.Value.ToShortDateString().GetHashCode()) ;
-                    hash = hash * 23 + (RelTo == null ? 0 : RelTo.Value.ToShortDateString().GetHashCode());
-                    hash = hash * 23 + Root.GetHashCode();
-                    return hash;
+                return HashCode.Combine(From, To, RelFrom, RelTo, Root);
+                //unchecked
+                //{
+                //    int hash = 17;
+                //    hash = hash * 23 + (From == null ? 0 : From.GetHashCode() );
+                //    hash = hash * 23 + (To == null ? 0 : To.GetHashCode());
+                //    hash = hash * 23 + (RelFrom==null ? 0 : RelFrom.Value.ToShortDateString().GetHashCode()) ;
+                //    hash = hash * 23 + (RelTo == null ? 0 : RelTo.Value.ToShortDateString().GetHashCode());
+                //    hash = hash * 23 + Root.GetHashCode();
+                //    return hash;
 
-                }
+                //}
             }
         }
 

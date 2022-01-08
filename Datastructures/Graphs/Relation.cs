@@ -220,6 +220,19 @@ namespace HlidacStatu.Datastructures.Graphs
             if (minAktualnost <= AktualnostType.Neaktualni)
                 return allRelations.ToArray();
 
+            return allRelations
+                .Where(m => m.Aktualnost >= minAktualnost)
+                .ToArray();
+        }
+
+        public static Graph.Edge[] AktualniVazby2(IEnumerable<Graph.Edge> allRelations, AktualnostType minAktualnost)
+        {
+            if (allRelations == null)
+                return new Graph.Edge[] { };
+
+            if (minAktualnost <= AktualnostType.Neaktualni)
+                return allRelations.ToArray();
+
             //filter per distance
             var filteredRels = _childrenVazby(allRelations.First(m => m.Root == true), 
                 allRelations.Where(m=>!m.Root).DeepClone(), 

@@ -36,6 +36,7 @@ namespace HlidacStatu.Datastructures.Graphs
                     return _uniqId;
                 }
             }
+
             public enum NodeType { Company, Person }
             public string Id { get; set; }
             public NodeType Type { get; set; }
@@ -45,7 +46,8 @@ namespace HlidacStatu.Datastructures.Graphs
 
             public override int GetHashCode()
             {
-                return _uniqId==null ? 0 : _uniqId.GetHashCode();
+                return HashCode.Combine(UniqId);
+                //return _uniqId==null ? 0 : _uniqId.GetHashCode();
             }
         }
 
