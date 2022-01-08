@@ -256,7 +256,7 @@ namespace HlidacStatu.Datastructures.Graphs
             if (callDeep > 100)
             {
                 //primitive stackoverflow protection
-                HlidacStatu.Util.Consts.Logger.Error("_childrenVazby stackoverflow protection {parent} {root}", parent, vazby.FirstOrDefault(m => m.Root));
+                HlidacStatu.Util.Consts.Logger.Error("_childrenVazby stackoverflow protection {@parent} {@root}", parent, vazby.FirstOrDefault(m => m.Root));
                 return items.ToArray();
             }
 
