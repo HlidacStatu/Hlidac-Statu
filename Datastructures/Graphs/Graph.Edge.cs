@@ -372,8 +372,10 @@ namespace HlidacStatu.Datastructures.Graphs
             {
                 if (other == null)
                     return false;
-                var same = this.From?.UniqId == other.From?.UniqId;
-                same = same && this.To?.UniqId == other.To?.UniqId;
+                var same = (this.From?.UniqId == other.From?.UniqId
+                               && this.To?.UniqId == other.To?.UniqId)
+                        || (this.From?.UniqId == other.To?.UniqId
+                               && this.To?.UniqId == other.From?.UniqId);
                 return same;
             }
 

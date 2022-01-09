@@ -173,6 +173,21 @@ namespace HlidacStatu.Repositories
             return data.Select(m => m.Firma).ToArray();
         }
 
+        public static Datastructures.Graphs.Graph.Edge VazbyRootEdge(this Firma firma)
+        {
+            return new Datastructures.Graphs.Graph.Edge()
+            {
+                From = null,
+                Root = true,
+                To = new Datastructures.Graphs.Graph.Node() { Id = firma.ICO, Type = Datastructures.Graphs.Graph.Node.NodeType.Company },
+                RelFrom = null,
+                RelTo = null,
+                Distance = 0,
+                Aktualnost = Relation.AktualnostType.Aktualni
+            };
+
+        }
+
         public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
         {
             //firma.UpdateVazbyFromDB(); //nemelo by tu byt.

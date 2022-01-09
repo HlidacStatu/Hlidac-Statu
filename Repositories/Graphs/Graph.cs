@@ -215,7 +215,8 @@ namespace HlidacStatu.Repositories
                         To = new Datastructures.Graphs.Graph.Node() { Id = nodeId, Type = nodeType },
                         RelFrom = datumOd,
                         RelTo = datumDo,
-                        Distance = 0
+                        Distance = 0,
+                        Aktualnost= Relation.AktualnostType.Aktualni
                     }
                 );
             }
@@ -814,7 +815,7 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static string TiskVazeb(string rootName, IEnumerable<Datastructures.Graphs.Graph.Edge> vazby, Relation.TiskEnum typ, bool withStats = true)
+        public static string TiskVazeb(string rootName, Datastructures.Graphs.Graph.Edge origRoot, IEnumerable<Datastructures.Graphs.Graph.Edge> vazby, Relation.TiskEnum typ, bool withStats = true)
         {
             string htmlTemplate = "<ul id='nestedlist'><li>{0}</li>{1}</ul>";
             string textTemplate = "{0}\n|\n{1}";
@@ -823,31 +824,31 @@ namespace HlidacStatu.Repositories
             switch (typ)
             {
                 case Relation.TiskEnum.Text:
-                    return string.Format(textTemplate, rootName, PrintFlatRelations((Datastructures.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(textTemplate, rootName, PrintFlatRelations(origRoot, (Datastructures.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
                 case Relation.TiskEnum.Html:
-                    return string.Format(htmlTemplate, rootName, PrintFlatRelations((Datastructures.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(htmlTemplate, rootName, PrintFlatRelations(origRoot, (Datastructures.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
                 case Relation.TiskEnum.Json:
-                    return string.Format(jsonTemplate, rootName, PrintFlatRelations((Datastructures.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(jsonTemplate, rootName, PrintFlatRelations(origRoot, (Datastructures.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
                 case Relation.TiskEnum.Checkbox:
-                    return string.Format(checkboxTemplate, rootName, PrintFlatRelations((Datastructures.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(checkboxTemplate, rootName, PrintFlatRelations(origRoot, (Datastructures.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
                 default:
                     return string.Empty;
             }
 
         }
 
-        private static string PrintFlatRelations(Datastructures.Graphs.Graph.Edge parent, int level, IEnumerable<Datastructures.Graphs.Graph.Edge> relations, Relation.TiskEnum typ,
+        private static string PrintFlatRelations(Datastructures.Graphs.Graph.Edge origRoot, Datastructures.Graphs.Graph.Edge parent, int level, IEnumerable<Datastructures.Graphs.Graph.Edge> relations, Relation.TiskEnum typ,
            List<string> renderedIds, bool withStats = true, string highlightSubjId = null)
         {
             if (parent == null)
-                return PrintFlatRelations((Datastructures.Graphs.Graph.MergedEdge)null, level, relations, typ,
+                return PrintFlatRelations(origRoot, (Datastructures.Graphs.Graph.MergedEdge)null, level, relations, typ,
                     renderedIds, withStats, highlightSubjId);
             else
-                return PrintFlatRelations(new Datastructures.Graphs.Graph.MergedEdge(parent), level, relations, typ,
+                return PrintFlatRelations(origRoot, new Datastructures.Graphs.Graph.MergedEdge(parent), level, relations, typ,
                 renderedIds, withStats, highlightSubjId);
         }
 
-        private static string PrintFlatRelations(Datastructures.Graphs.Graph.MergedEdge parent, int level,
+        private static string PrintFlatRelations(Datastructures.Graphs.Graph.Edge origRoot, Datastructures.Graphs.Graph.MergedEdge parent, int level,
             IEnumerable<Datastructures.Graphs.Graph.Edge> relations, Relation.TiskEnum typ,
        List<string> renderedIds, bool withStats = true, string highlightSubjId = null)
         {
@@ -859,14 +860,16 @@ namespace HlidacStatu.Repositories
             if (renderedIds == null)
                 renderedIds = new List<string>();
 
-            var rels = relations
-                .Where(m =>
-                    (
-                    (parent != null && m.From?.UniqId == parent.To?.UniqId)
-                    ||
-                    (parent == null && !relations.Any(r => r.To?.UniqId == m.From?.UniqId)) //do root urovne pridej vazby, ktere jsou sirotci bez parenta
-                    )
-                )
+            IEnumerable<Datastructures.Graphs.Graph.Edge> firstBatch = null;
+            if (parent == null)
+                firstBatch = relations.Where(m => 
+                    !relations.Any(r => r.To?.UniqId == m.From?.UniqId)
+                    || m.From?.UniqId == origRoot.To?.UniqId                
+                );
+            else
+                firstBatch = relations.Where(m => m.From?.UniqId == parent.To?.UniqId);
+
+            var rels = firstBatch
                 .Distinct()
                 .GroupBy(k => new { id = k.To.UniqId, type = k.To.Type }, (k, v) =>
                 {
@@ -929,14 +932,14 @@ namespace HlidacStatu.Repositories
                                 subjName,
                                 rel.Doba()
                                 );
-                        sb.Append(PrintFlatRelations(rel, level + 1, relations, typ, renderedIds, withStats));
+                        sb.Append(PrintFlatRelations(origRoot, rel, level + 1, relations, typ, renderedIds, withStats));
                         break;
                     case Relation.TiskEnum.Html:
                         if (withStats && stat != null)
                             sb.AppendFormat("<li class='{3} {6}'><a href='/subjekt/{0}'>{0}:{1}</a>{7}; {4}, celkem {5}. {2}</li>",
                                 subjId,
                                 subjName,
-                                PrintFlatRelations(rel, level + 1, relations, typ, renderedIds, withStats),
+                                PrintFlatRelations(origRoot, rel, level + 1, relations, typ, renderedIds, withStats),
                                 last ? "" : "connect",
                                 Devmasters.Lang.CS.Plural.Get(stat.Summary().PocetSmluv, Util.Consts.csCulture, "{0} smlouva", "{0} smlouvy", "{0} smluv"),
                                 Smlouva.NicePrice(stat.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true),
@@ -947,7 +950,7 @@ namespace HlidacStatu.Repositories
                             sb.AppendFormat("<li class='{3} {4}'><a href='/subjekt/{0}'><span class=''>{0}:{1}</span></a>{5}.  {2}</li>",
                                 subjId,
                                 subjName,
-                                PrintFlatRelations(rel, level + 1, relations, typ, renderedIds, withStats),
+                                PrintFlatRelations(origRoot, rel, level + 1, relations, typ, renderedIds, withStats),
                                 last ? "" : "connect",
                                 "aktualnost" + ((int)rel.Aktualnost).ToString(),
                                 (rel.Aktualnost < Relation.AktualnostType.Aktualni) ? rel.Doba(format: "/{0}/") : string.Empty,
@@ -960,7 +963,7 @@ namespace HlidacStatu.Repositories
                         , (last ? "" : "connect"),
                         ("aktualnost" + ((int)rel.Aktualnost).ToString()),
                         subjId, subjName,
-                        PrintFlatRelations(rel, level + 1, relations, typ, renderedIds, withStats)
+                        PrintFlatRelations(origRoot, rel, level + 1, relations, typ, renderedIds, withStats)
                         );
 
                         break;

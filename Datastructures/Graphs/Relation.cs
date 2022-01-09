@@ -233,11 +233,18 @@ namespace HlidacStatu.Datastructures.Graphs
             if (minAktualnost <= AktualnostType.Neaktualni)
                 return allRelations.ToArray();
 
-            //filter per distance
-            var filteredRels = _childrenVazby(allRelations.First(m => m.Root == true), 
+            //create root for tree
+            var root = allRelations.First(m => m.Root == true).DeepClone();
+            root.Aktualnost = minAktualnost;
+
+            //filter per distanceallRelations.First(m => m.Root == true)
+            var filteredRels = _childrenVazby(root, 
                 allRelations.Where(m=>!m.Root).DeepClone(), 
                 new Graph.Edge[] { },
                 minAktualnost,0, allRelations.FirstOrDefault(m=>m.Root));
+
+            //add root
+            //var res = filteredRels.Prepend(root);
 
             return filteredRels
                 .Where(m => m.Aktualnost >= minAktualnost)
@@ -291,7 +298,7 @@ namespace HlidacStatu.Datastructures.Graphs
                 items.Add(ch);
                 var chVazby = vazby;//.Where(m => ch.To.UniqId == m.From.UniqId && m.Distance == ch.Distance + 1).ToArray();
                 items.AddRange(
-                    _childrenVazby(ch, vazby, items, minAktualnost, callDeep+1, originalRoot)
+                    _childrenVazby(ch, vazby, exclude.Concat(items), minAktualnost, callDeep+1, originalRoot)
                     );
             }
             return items.ToArray();

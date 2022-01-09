@@ -130,7 +130,20 @@ namespace HlidacStatu.Repositories
             }
         }
 
+        public static Datastructures.Graphs.Graph.Edge VazbyRootEdge(this Osoba osoba)
+        {
+            return new Datastructures.Graphs.Graph.Edge()
+            {
+                From = null,
+                Root = true,
+                To = new Datastructures.Graphs.Graph.Node() { Id = osoba.InternalId.ToString(), Type = Datastructures.Graphs.Graph.Node.NodeType.Person },
+                RelFrom = null,
+                RelTo = null,
+                Distance = 0,
+                Aktualnost = Relation.AktualnostType.Aktualni
+            };
 
+        }
         public static Datastructures.Graphs.Graph.Edge[] VazbyProICO(this Osoba osoba, string ico)
         {
             return _vazbyProIcoCache.Get((osoba, ico));
