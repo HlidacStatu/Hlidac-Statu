@@ -38,7 +38,7 @@
     <p style="padding-top:30px;">
         @Html.Raw(
             HlidacStatu.Repositories.Graph.TiskVazeb(
-                Model.FullName(),
+                Model.FullName(),Model.VazbyRootEdge(),
                 Model.AktualniVazby(aktualnost),
                 Relation.TiskEnum.Html
             )
