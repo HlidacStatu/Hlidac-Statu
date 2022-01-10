@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Devmasters.Enums;
 
 #nullable disable
 
@@ -32,24 +33,46 @@ namespace HlidacStatu.Entities
         public decimal? VAT { get; set; }
         public decimal? UnitCount { get; set; }
 
+        [ShowNiceDisplayName()]
         public enum MeasureUnit
         {
+            [NiceDisplayName("-nic-")]
             None = 0,
-            ManHour = 1,
-            ManDay = 2,
+            [NiceDisplayName("h")]
+            Hour = 1,
+            [NiceDisplayName("den")]
+            Day = 2,
+            [NiceDisplayName("ks")]
             Kus = 3,
+            [NiceDisplayName("m")]
             Metr = 4,
+            [NiceDisplayName("km")]
             Kilometr = 5,
+            [NiceDisplayName("mm")]
             Milimetr = 6,
+            [NiceDisplayName("m2")]
             MetrCtverecny = 7,
+            [NiceDisplayName("km2")]
             KilometrCtverecny = 8,
+            [NiceDisplayName("g")]
             Gram = 9,
+            [NiceDisplayName("kg")]
             Kilogram = 10,
+            [NiceDisplayName("t")]
             Tuna = 11,
+            [NiceDisplayName("ha")]
             Hektar = 12,
+            [NiceDisplayName("kompletní dodávka (kpl)")]
             KompletniDodavka = 13,
+            [NiceDisplayName("měsíc")]
             Mesic = 14,
+            [NiceDisplayName("m3")]
             MetrKrychlovy = 15,
+            [NiceDisplayName("l")]
+            Litr = 16,
+            [NiceDisplayName("ml")]
+            Mililitr = 17,
+            
             
         }
 
@@ -62,12 +85,12 @@ namespace HlidacStatu.Entities
             
             switch (Unit)
             {
-                case MeasureUnit.ManHour:
+                case MeasureUnit.Hour:
                     SalaryMD = unitPrice * 8;
                     SalaryMdVAT = unitPriceVAT * 8;
                     break;
                         
-                case MeasureUnit.ManDay:
+                case MeasureUnit.Day:
                     SalaryMD = unitPrice;
                     SalaryMdVAT = unitPriceVAT;
                     break;

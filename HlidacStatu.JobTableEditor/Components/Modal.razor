@@ -42,7 +42,7 @@
                                             @foreach (var measureUnit in (InDocJobs.MeasureUnit[])Enum
                                                 .GetValues(typeof(InDocJobs.MeasureUnit)))
                                             {
-                                                <option value="@measureUnit">@measureUnit.ToString("G")</option>
+                                                <option value="@measureUnit">@measureUnit.ToNiceDisplayName()</option>
                                             }
                                         </select>
                                     </th>
@@ -73,7 +73,7 @@
                                                 @foreach (var measureUnit in (InDocJobs.MeasureUnit[])Enum
                                                     .GetValues(typeof(InDocJobs.MeasureUnit)))
                                                 {
-                                                    <option value="@measureUnit">@measureUnit.ToString("G")</option>
+                                                    <option value="@measureUnit">@measureUnit.ToNiceDisplayName()</option>
                                                 }
                                             </select>
                                         </td>

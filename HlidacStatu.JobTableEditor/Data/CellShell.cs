@@ -11,11 +11,23 @@ namespace HlidacStatu.JobTableEditor.Data
     {
         private string _value;
         private InTables.Cell.GuessedCellType _cellType;
-        
+        private bool _isImportant;
+
         public InTables.Cell Cell { get; private set; }
         public string Id { get; init; }
         public int Row { get; init; }
         public int Column { get; init; }
+
+        public bool IsImportant
+        {
+            get => _isImportant;
+            set
+            {
+                if (value == _isImportant) return;
+                _isImportant = value;
+                OnPropertyChanged(nameof(IsImportant));
+            }
+        }
 
         public InTables.Cell.GuessedCellType CellType
         {
@@ -51,11 +63,9 @@ namespace HlidacStatu.JobTableEditor.Data
             SetMergedValue(); //pre-set Value to be displayed
         }
 
-        public void RotateType()
+        public void SwitchType()
         {
-            var allEnums = Enum.GetValues<InTables.Cell.GuessedCellType>();
-            int nextPosition = Array.IndexOf(allEnums, CellType) + 1;
-            CellType = nextPosition == allEnums.Length ? allEnums[0] : allEnums[nextPosition];
+            IsImportant = !IsImportant;
         }
 
         public void SetMergedValue()

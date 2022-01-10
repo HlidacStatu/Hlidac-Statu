@@ -47,21 +47,13 @@
 
     private void ColorChange()
     {
-        CellShell.RotateType();
+        CellShell.SwitchType();
         SetCellStyle();
     }
 
     public void SetCellStyle()
     {
-        cellStyle = CellShell.CellType switch 
-        {
-            InTables.Cell.GuessedCellType.Unknown => "",
-            InTables.Cell.GuessedCellType.Position => "bg-primary bg-opacity-25",
-            InTables.Cell.GuessedCellType.Price => "bg-success bg-opacity-25",
-            InTables.Cell.GuessedCellType.PriceWithVAT => "bg-warning bg-opacity-25",
-            _ => ""
-            };
-        
+        cellStyle = CellShell.IsImportant ? "bg-primary bg-opacity-25" : ""; 
     }
     
     //+ validace pokud se při načtení tabulky liší (merged value vs original value)?
@@ -76,10 +68,6 @@
     protected override async Task OnParametersSetAsync()
     {
         SetCellStyle();
-        //await Task.Delay(300);
-        //Console.WriteLine("OnParametersSetAsyncCalled");
-        //output = $"This is Site: {Code}";
-        //StateHasChanged();
     }
 
     public void Dispose()
