@@ -154,7 +154,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
             catch (Exception e)
             {
-                logger.Error("Statistic API call error {apiEndpoint}", ex: e, propertyValues: ApiEndpoint);
+                logger.Error("Statistic API call error {apiEndpoint}", ex: e, propertyValues: new object[] { ApiEndpoint });
                 return new ApiResult<CamelotStatistics>(false);
             }
         }
