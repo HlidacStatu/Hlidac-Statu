@@ -78,29 +78,12 @@ namespace HlidacStatu.Entities
 
         public void NormalizePrices()
         {
-            FixMixedupVat();
-            
-            var unitPrice = Price / UnitCount;
-            var unitPriceVAT = PriceVAT / UnitCount;
-            
-            switch (Unit)
-            {
-                case MeasureUnit.Hour:
-                    SalaryMD = unitPrice * 8;
-                    SalaryMdVAT = unitPriceVAT * 8;
-                    break;
-                        
-                case MeasureUnit.Day:
-                    SalaryMD = unitPrice;
-                    SalaryMdVAT = unitPriceVAT;
-                    break;
-            }
+            FixWhenPriceIsHigherThanPriceWithVat();
 
-            ComputeFinalVatPrice(unitPriceVAT);
-
+            CalculateFinalVatPrice();
         }
 
-        private void FixMixedupVat()
+        private void FixWhenPriceIsHigherThanPriceWithVat()
         {
             // swap if PriceVat < Price
             if (Price > 0 && PriceVAT > 0 && Price > PriceVAT)
@@ -115,23 +98,20 @@ namespace HlidacStatu.Entities
             
         }
         
-        private void ComputeFinalVatPrice(decimal? unitPriceVAT)
+        private void CalculateFinalVatPrice()
         {
-            decimal vatMultiplier = 1.21m;
+            if (UnitCount is null || UnitCount == 0)
+                return;
             
-            if (SalaryMdVAT > 0)
-            {
-                PriceVATCalculated = SalaryMdVAT;
-            } 
-            else if (PriceVAT > 0)
-            {
-                PriceVATCalculated = unitPriceVAT;
-            }
-            else if (SalaryMD > 0)
-            {
-                PriceVATCalculated = SalaryMD * vatMultiplier;
-            }
+            var unitPrice = Price / UnitCount;
+            var unitPriceVat = PriceVAT / UnitCount;
+            
+            // use unitPriceVAT if it is not null or zero
+            PriceVATCalculated = unitPriceVat ?? unitPrice * ((100 + VAT) / 100);
+            
+            
         }
+        
 
     }
 }

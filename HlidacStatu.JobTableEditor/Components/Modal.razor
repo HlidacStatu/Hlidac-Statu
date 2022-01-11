@@ -31,8 +31,14 @@
                                 <thead>
                                 <tr>
                                     <th scope="col">Job</th>
-                                    <th scope="col">DPH
-                                        <input type="number" @onchange="ChangeVAT" class="form-control" autocomplete="off"/>
+                                    <th scope="col">
+                                        DPH
+                                        <select @onchange="ChangeVAT" class="form-select">
+                                            <option value="">- dph -</option>
+                                            <option value="10">10 %</option>
+                                            <option value="15">15 %</option>
+                                            <option value="21">21 %</option>
+                                        </select>
                                     </th>
                                     <th scope="col">Hodnota</th>
                                     <th scope="col">Hodnota s DPH</th>
@@ -46,7 +52,8 @@
                                             }
                                         </select>
                                     </th>
-                                    <th scope="col">Počet jednotek
+                                    <th scope="col">
+                                        Počet jednotek
                                         <input type="number" @onchange="ChangeUnitCount" class="form-control" autocomplete="off"/>
                                     </th>
                                     <th>Automatická kontrola</th>
@@ -60,7 +67,12 @@
                                             <input type="text" @bind="@job.JobRaw" class="form-control" autocomplete="off"/>
                                         </td>
                                         <td>
-                                            <input type="text" @bind="@job.VAT" class="form-control" autocomplete="off"/>
+                                            <select @bind="@job.VAT" class="form-select">
+                                                <option value="">- dph -</option>
+                                                <option value="10">10 %</option>
+                                                <option value="15">15 %</option>
+                                                <option value="21">21 %</option>
+                                            </select>
                                         </td>
                                         <td>
                                             <input type="number" @bind="@job.Price" class="form-control" autocomplete="off">
@@ -199,7 +211,7 @@
     private void LoadJobs()
     {
         Table.ParseJobs();
-        //todo Table.PrefillValues();
+    //todo Table.PrefillValues();
         showModal = true;
     }
 
@@ -221,12 +233,18 @@
             }
         }
     }
-    
+
     private void ChangeUnitCount(ChangeEventArgs arg)
     {
         try
         {
-            int? setUnitCount = (int?) arg.Value; 
+            var value = (string)arg.Value;
+            decimal? setUnitCount = null;
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                setUnitCount = decimal.Parse(value);
+            }
+            
             foreach (var job in Table.FoundJobs)
             {
                 job.UnitCount = setUnitCount;
@@ -237,12 +255,18 @@
             Console.WriteLine(e);
         }
     }
-    
+
     private void ChangeVAT(ChangeEventArgs arg)
     {
         try
         {
-            int? setVAT = (int?) arg.Value; 
+            var value = (string)arg.Value;
+            decimal? setVAT = null;
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                setVAT = decimal.Parse(value);
+            }
+            
             foreach (var job in Table.FoundJobs)
             {
                 job.VAT = setVAT;

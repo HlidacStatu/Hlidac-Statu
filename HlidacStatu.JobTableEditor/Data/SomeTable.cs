@@ -43,14 +43,7 @@ namespace HlidacStatu.JobTableEditor.Data
         //todo: refactor this and underlaying code
         public void ParseJobs()
         {
-            //todo:
-            // - lépe označovat (detekovat) ceny
-            // - detekce jednotky
-            //
-            // + Nice enum strings
-            // - sazba dph => Zlepšit výpočet final price with VAT!!!
-            //
-            // + jedna barva?
+            //todo: detekce jednotky
             
             var jobsList = new List<InDocJobs>();
             List<int> priceCols = new List<int>();
@@ -130,6 +123,8 @@ namespace HlidacStatu.JobTableEditor.Data
                         job.Price = firstCell.DecimalValue;
                     }
                 }
+
+                job.UnitCount = 1; // default value for unit count (zatím nevím, jak bych tohle číslo parsoval)
                 
                 jobsList.Add(job);
 
