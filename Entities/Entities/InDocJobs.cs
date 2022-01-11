@@ -81,6 +81,32 @@ namespace HlidacStatu.Entities
             FixWhenPriceIsHigherThanPriceWithVat();
 
             CalculateFinalVatPrice();
+
+            CalculateSalaryBackwardCompatibility();
+        }
+
+        private void CalculateSalaryBackwardCompatibility()
+        {
+
+            if(Unit != MeasureUnit.Day || Unit != MeasureUnit.Hour)
+                return;
+
+            var recalculatedMdSalary = Price;
+            var recalculatedMdSalaryVat = PriceVATCalculated;
+            if (Unit == MeasureUnit.Hour)
+            {
+                recalculatedMdSalary *= 8;
+                recalculatedMdSalaryVat *= 8;
+            }
+            
+            if (recalculatedMdSalaryVat is null || recalculatedMdSalaryVat == 0)
+            {
+                recalculatedMdSalaryVat = recalculatedMdSalary * 1.21m;
+            }
+
+            SalaryMD = recalculatedMdSalary;
+            SalaryMdVAT = recalculatedMdSalaryVat;
+
         }
 
         private void FixWhenPriceIsHigherThanPriceWithVat()
