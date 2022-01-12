@@ -177,6 +177,10 @@
             {
                 return false;
             }
+            if (!IsValidPrice(job, out var vatError))
+            {
+                return false;
+            }
         }
 
         return true;
@@ -206,6 +210,21 @@
         }
 
         return errorMessages.Count == 0;
+    }
+    
+    private bool IsValidPrice(InDocJobs job, out List<string> errorMessages)
+    {
+        errorMessages = new();
+        if (job.Price > 0)
+        {
+            if (job.VAT is null || job.VAT <= 0)
+            {
+                errorMessages.Add($"Chybí vyplněná výše DPH.");
+                return false;
+            }
+        }
+
+        return true; 
     }
 
     private void LoadJobs()
