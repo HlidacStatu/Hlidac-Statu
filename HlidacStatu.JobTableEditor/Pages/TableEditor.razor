@@ -142,7 +142,7 @@ else
 
             try
             {
-                _table = await JobService.GetNewTable(_userName, CancellationToken.None);
+                _table = await JobService.GetNewTable(Obor, _userName, CancellationToken.None);
             }
             catch (NoDataFoundException ndfe)
             {

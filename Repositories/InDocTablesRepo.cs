@@ -46,7 +46,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task<InDocTables> GetNextForCheck(string requestedBy, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<InDocTables> GetNextForCheck(string obor, string requestedBy, CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -62,7 +62,8 @@ namespace HlidacStatu.Repositories
 
                 var tbl = await db.InDocTables
                     .AsQueryable()
-                    .Where(m => m.Status == (int)InDocTables.CheckState.WaitingInQueue)
+                    .Where(m => m.Status == (int)InDocTables.CheckState.WaitingInQueue
+                        && m.Subject.StartsWith(obor))
                     .OrderByDescending(m => m.PrecalculatedScore)
                     .FirstOrDefaultAsync(cancellationToken);
 
