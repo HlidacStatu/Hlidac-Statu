@@ -20,7 +20,7 @@
         rok = Model.Key.Value.Rok;
 
         var distinctJobsForYearAndSubject = JobService.DistinctJobs
-            .Where(x => x.Subject == Model.Key.Value.Obor && x.Year == Model.Key.Value.Rok)
+            .Where(x => x.AnalyzaName == Model.Key.Value.Obor && x.Year == Model.Key.Value.Rok)
             .ToList();
         
         pocetSmluv = distinctJobsForYearAndSubject

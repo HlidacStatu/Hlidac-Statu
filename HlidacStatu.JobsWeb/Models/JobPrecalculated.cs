@@ -9,10 +9,10 @@ namespace HlidacStatu.JobsWeb.Models
         public int Year { get; set; }
     
         public long JobPk { get; set; }
-        public string JobGrouped { get; set; }
-        public decimal SalaryMd { get; set; }
-        public decimal SalaryMdVat { get; set; }
-        public string Subject { get; set; }
+        public string Polozka { get; set; }
+        public decimal PricePerUnit { get; set; }
+        public decimal PricePerUnitVat { get; set; }
+        public string AnalyzaName { get; set; }
         public string[] Tags { get; set; }
         
         

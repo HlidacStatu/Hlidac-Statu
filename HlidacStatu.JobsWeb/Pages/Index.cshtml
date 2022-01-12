@@ -112,7 +112,7 @@
                     var key = new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 };
                     var stat = JobService.GetStatistics(key);
                     var distinctJobsForYearAndSubject = JobService.DistinctJobs
-                    .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
+                    .Where(x => x.AnalyzaName == key.Obor && x.Year == key.Rok)
                     .ToList();
                     var pocetSmluv = distinctJobsForYearAndSubject
                     .Select(m => m.SmlouvaId).Distinct().Count();

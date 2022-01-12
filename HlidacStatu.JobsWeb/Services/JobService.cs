@@ -43,7 +43,7 @@ namespace HlidacStatu.JobsWeb.Services
             try
             {
                 LastError = "";
-                var allJobs = await InDocJobsRepo.GetAllJobsWithRelatedDataAsync();
+                var allJobs = await CenyRepo.GetAllCenyAsync();
 
                 // Připraví plochou strukturu a odstraní případné duplicity u jobů, kde může být více dodavatelů
                 // Také je možné rozšířit v tomto místě o odstranění duplicit
@@ -52,22 +52,22 @@ namespace HlidacStatu.JobsWeb.Services
                     .GroupBy(j => j.JobPk)
                     .Select(g =>
                     {
-                        var firstJobOverview = g.FirstOrDefault();
-                        var tags = firstJobOverview.Tags?.Split("|",
+                        Entities.Ceny firstJobOverview = g.FirstOrDefault();
+                        string[] tags = firstJobOverview.Tags?.Split("|",
                             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                         if (tags == null || tags.Length == 0)
                             tags = new[] { "-vše-" };
                         return new JobPrecalculated()
                         {
-                            Subject = firstJobOverview.Subject,
+                            AnalyzaName = firstJobOverview.AnalyzaName,
                             Year = firstJobOverview.Year,
                             IcoOdberatele = firstJobOverview.IcoOdberatele,
-                            JobGrouped = firstJobOverview.JobGrouped,
+                            Polozka = firstJobOverview.Polozka,
                             SmlouvaId = firstJobOverview.SmlouvaId,
                             Tags = tags,
                             JobPk = g.Key,
-                            SalaryMd = firstJobOverview.SalaryMd ?? 0,
-                            SalaryMdVat = firstJobOverview.SalaryMdVat ?? 0,
+                            PricePerUnit = firstJobOverview.PricePerUnit ?? 0,
+                            PricePerUnitVat = firstJobOverview.PricePerUnitVat,
                             IcaDodavatelu = g.Select(i => i.IcoDodavatele).ToArray(),
                         };
                     }).ToList();
@@ -75,7 +75,7 @@ namespace HlidacStatu.JobsWeb.Services
                 //pro každou kombinaci roku a subjektu
                 var uniqueYearSubjectCombinations = DistinctJobs.Select(x => new YearlyStatisticsGroup.Key()
                 {
-                    Obor = x.Subject,
+                    Obor = x.AnalyzaName,
                     Rok = x.Year
                 }).Distinct().ToList();
 
@@ -107,8 +107,8 @@ namespace HlidacStatu.JobsWeb.Services
             YearlyStatisticsGroup.Key key)
         {
             return distinctJobs
-                .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
-                .GroupBy(j => j.JobGrouped)
+                .Where(x => x.AnalyzaName == key.Obor && x.Year == key.Rok)
+                .GroupBy(j => j.Polozka)
                 .Select(g => new JobStatistics(g, g.Key))
                 .Where(s => s.PriceCount >= _minimumPriceCount)
                 .ToList();
@@ -118,9 +118,9 @@ namespace HlidacStatu.JobsWeb.Services
             YearlyStatisticsGroup.Key key)
         {
             return distinctJobs
-                .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
+                .Where(x => x.AnalyzaName == key.Obor && x.Year == key.Rok)
                 .SelectMany(j => j.Tags, (precalculated, tag) => new { precalculated, dodavatel = tag })
-                .GroupBy(j => j.precalculated.JobGrouped)
+                .GroupBy(j => j.precalculated.Polozka)
                 .ToDictionary(g => g.Key, g =>
                     g.GroupBy(i => i.dodavatel)
                         .Select(ig => new JobStatistics(ig.Select(x => x.precalculated), ig.Key))
@@ -133,10 +133,10 @@ namespace HlidacStatu.JobsWeb.Services
             YearlyStatisticsGroup.Key key)
         {
             var results = distinctJobs
-                .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
+                .Where(x => x.AnalyzaName == key.Obor && x.Year == key.Rok)
                 .GroupBy(j => j.IcoOdberatele)
                 .ToDictionary(g => g.Key, g =>
-                    g.GroupBy(i => i.JobGrouped)
+                    g.GroupBy(i => i.Polozka)
                         .Select(ig => new JobStatistics(ig, ig.Key))
                         .Where(s => s.PriceCount >= _minimumPriceCount)
                         .ToList()
@@ -150,11 +150,11 @@ namespace HlidacStatu.JobsWeb.Services
             YearlyStatisticsGroup.Key key)
         {
             var results = distinctJobs
-                .Where(x => x.Subject == key.Obor && x.Year == key.Rok)
+                .Where(x => x.AnalyzaName == key.Obor && x.Year == key.Rok)
                 .SelectMany(j => j.IcaDodavatelu, (precalculated, dodavatel) => new { precalculated, dodavatel })
                 .GroupBy(j => j.dodavatel)
                 .ToDictionary(g => g.Key, g =>
-                    g.GroupBy(i => i.precalculated.JobGrouped)
+                    g.GroupBy(i => i.precalculated.Polozka)
                         .Select(ig => new JobStatistics(ig.Select(x => x.precalculated), ig.Key))
                         .Where(s => s.PriceCount >= _minimumPriceCount)
                         .ToList()

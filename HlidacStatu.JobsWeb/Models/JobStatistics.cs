@@ -27,12 +27,12 @@ namespace HlidacStatu.JobsWeb.Models
         
         public JobStatistics(IEnumerable<JobPrecalculated> precalculatedJobs, string name)
         {
-            var salaryd = precalculatedJobs.Select(x => (double)x.SalaryMd).ToList();
+            var salaryd = precalculatedJobs.Select(x => (double)x.PricePerUnit).ToList();
             decimal dolniKvartil = (decimal)salaryd.LowerQuartile();
             decimal horniKvartil = (decimal)salaryd.UpperQuartile();
             //decimal outlierRange = (horniKvartil - dolniKvartil) * 1.5m;
-            decimal maximum = precalculatedJobs.Max(x => x.SalaryMd);
-            decimal minimum = precalculatedJobs.Min(x => x.SalaryMd);
+            decimal maximum = precalculatedJobs.Max(x => x.PricePerUnit);
+            decimal minimum = precalculatedJobs.Min(x => x.PricePerUnit);
             decimal leftWhisk = (decimal)salaryd.Percentile(10);
             if (leftWhisk < minimum)
                 leftWhisk = minimum;
@@ -42,18 +42,18 @@ namespace HlidacStatu.JobsWeb.Models
 
 
             precalculatedJobs
-                .Select(m=>m.Subject)
+                .Select(m=>m.AnalyzaName)
                 .Distinct();
             Name = name;
 
             Description = "";
-            var subj = precalculatedJobs.FirstOrDefault(m => !string.IsNullOrEmpty(m.Subject))?.Subject?.ToLower();
+            var subj = precalculatedJobs.FirstOrDefault(m => !string.IsNullOrEmpty(m.AnalyzaName))?.AnalyzaName?.ToLower();
             if (subj != null && jobDescriptions.ContainsKey(subj))
             {
                 Description = jobDescriptions[subj].FirstOrDefault(m => m.JobGrouped.ToLower() == name.ToLower())?.jobGroupedDescription ?? "";
             }
 
-            Average = precalculatedJobs.Average(x => x.SalaryMd);
+            Average = precalculatedJobs.Average(x => x.PricePerUnit);
             Maximum = maximum;
             Minimum = minimum;
             Median = (decimal)salaryd.Median();
@@ -61,9 +61,9 @@ namespace HlidacStatu.JobsWeb.Models
             HorniKvartil = horniKvartil;
             LeftWhisk = leftWhisk;
             RightWhisk = rightWhisk;
-            LowOutliers = precalculatedJobs.Where(x => x.SalaryMd < leftWhisk).Select(x => x.SalaryMd)
+            LowOutliers = precalculatedJobs.Where(x => x.PricePerUnit < leftWhisk).Select(x => x.PricePerUnit)
                 .OrderBy(x => x).ToArray();
-            HighOutliers = precalculatedJobs.Where(x => x.SalaryMd > rightWhisk).Select(x => x.SalaryMd)
+            HighOutliers = precalculatedJobs.Where(x => x.PricePerUnit > rightWhisk).Select(x => x.PricePerUnit)
                 .OrderBy(x => x).ToArray();
             PriceCount = precalculatedJobs.Count();
             SupplierCount = precalculatedJobs.SelectMany(x => x.IcaDodavatelu).Distinct().Count();

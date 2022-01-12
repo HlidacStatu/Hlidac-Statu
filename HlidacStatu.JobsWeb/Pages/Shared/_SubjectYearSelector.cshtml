@@ -2,7 +2,7 @@
 
 @{
     var obory = JobService.DistinctJobs
-        .GroupBy(x => x.Subject)
+        .GroupBy(x => x.AnalyzaName)
         .ToDictionary(k => k.Key, v => v.Select(x => x.Year).Distinct().ToList());
     
     var key = Context.TryFindKey();
