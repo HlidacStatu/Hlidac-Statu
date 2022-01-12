@@ -7,7 +7,8 @@ using Devmasters.Enums;
 
 namespace HlidacStatu.Entities
 {
-    public partial class Ceny
+    [Table("Ceny")]
+    public partial class Cena
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
@@ -18,8 +19,10 @@ namespace HlidacStatu.Entities
         [Required]
         public string SmlouvaId { get; set; }
 
+        [Required]
         [StringLength(50)]
         public string IcoOdberatele { get; set; }
+        [Required]
         [StringLength(50)]
         public string IcoDodavatele { get; set; }
 

@@ -52,7 +52,7 @@ namespace HlidacStatu.JobsWeb.Services
                     .GroupBy(j => j.JobPk)
                     .Select(g =>
                     {
-                        Entities.Ceny firstJobOverview = g.FirstOrDefault();
+                        Entities.Cena firstJobOverview = g.FirstOrDefault();
                         string[] tags = firstJobOverview.Tags?.Split("|",
                             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                         if (tags == null || tags.Length == 0)

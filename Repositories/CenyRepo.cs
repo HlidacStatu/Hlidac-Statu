@@ -14,7 +14,7 @@ namespace HlidacStatu.Repositories
     public partial class CenyRepo
     {
 
-        public static async Task<List<Ceny>> GetAllCenyAsync()
+        public static async Task<List<Cena>> GetAllCenyAsync()
         {
             using (var db = new DbEntities())
             {

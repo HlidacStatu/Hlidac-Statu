@@ -184,7 +184,7 @@ namespace HlidacStatu.Entities
 
         }
 
-        public virtual DbSet<Ceny> Ceny { get; set; }
+        public virtual DbSet<Cena> Ceny { get; set; }
 
         public virtual DbSet<Firma> Firma { get; set; }
         public virtual DbSet<InDocTablesCheck> InDocTablesChecks { get; set; }
