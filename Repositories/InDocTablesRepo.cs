@@ -150,19 +150,6 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        // public static void ChangeStatus(long tblPK, InDocTables.CheckStatuses status, string checkedBy, long checkElapsedTimeInMS)
-        // {
-        //     using (DbEntities db = new DbEntities())
-        //     {
-        //         var tbl = db.InDocTables
-        //             .AsNoTracking()
-        //             .FirstOrDefault(m => m.Pk == tblPK);
-        //
-        //         if (tbl != null)
-        //             ChangeStatus(tbl, status, checkedBy, checkElapsedTimeInMS);
-        //     }
-        // }
-        
         public static async Task ChangeStatus(InDocTables tbl, InDocTables.CheckState status, string checkedBy,
             long checkElapsedTimeInMS)
         {
@@ -184,6 +171,23 @@ namespace HlidacStatu.Repositories
             }
         }
 
+        public static async Task ChangeCategoryAsync(InDocTables tbl, string category)
+        {
+            await using (DbEntities db = new DbEntities())
+            {
+                db.InDocTables.Attach(tbl);
+                if (tbl.Pk == 0)
+                    db.Entry(tbl).State = EntityState.Added;
+                else
+                    db.Entry(tbl).State = EntityState.Modified;
+
+                tbl.Subject = category;
+                
+                await db.SaveChangesAsync();
+
+            }
+        }
+        
         public static List<InDocTables> GetAll()
         {
             using DbEntities db = new DbEntities();
