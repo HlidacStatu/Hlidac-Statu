@@ -346,65 +346,71 @@ namespace HlidacStatu.Repositories
 
             if (res.IsValid)
             {
-                try
-                {
-                    DirectDB.NoResult("exec smlouvaId_save @id,@active, @created, @updated, @icoOdberatele",
-                        new SqlParameter("id", smlouva.Id),
-                        new SqlParameter("created", smlouva.casZverejneni),
-                        new SqlParameter("updated", smlouva.LastUpdate),
-                        new SqlParameter("active", smlouva.znepristupnenaSmlouva() ? (int)0 : (int)1),
-                        new SqlParameter("icoOdberatele", smlouva.Platce.ico)
-                    );
-
-                    DirectDB.NoResult("delete from SmlouvyDodavatele where smlouvaId= @smlouvaId",
-                        new SqlParameter("smlouvaId", smlouva.Id)
-                    );
-                    if (smlouva.Prijemce != null)
-                    {
-                        foreach (var ico in smlouva.Prijemce.Select(m=>m.ico).Distinct())
-                        {
-                            if (!string.IsNullOrEmpty(ico))
-                                DirectDB.NoResult("insert into SmlouvyDodavatele(smlouvaid,ico) values(@smlouvaid, @ico)",
-                                    new SqlParameter("smlouvaId", smlouva.Id),
-                                    new SqlParameter("ico", ico)
-                            );
-
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Manager.ESLogger.Error("Manager Save", e);
-                }
-
-
-                if (!string.IsNullOrEmpty(smlouva.Platce?.ico))
-                {
-                    DirectDB.NoResult("exec Firma_IsInRS_Save @ico",
-                        new SqlParameter("ico", smlouva.Platce?.ico)
-                    );
-                }
-
-                if (!string.IsNullOrEmpty(smlouva.VkladatelDoRejstriku?.ico))
-                {
-                    DirectDB.NoResult("exec Firma_IsInRS_Save @ico",
-                        new SqlParameter("ico", smlouva.VkladatelDoRejstriku?.ico)
-                    );
-                }
-
-                foreach (var s in smlouva.Prijemce ?? new Smlouva.Subjekt[] { })
-                {
-                    if (!string.IsNullOrEmpty(s.ico))
-                    {
-                        DirectDB.NoResult("exec Firma_IsInRS_Save @ico",
-                            new SqlParameter("ico", s.ico)
-                        );
-                    }
-                }
+                SaveSmlouvaDataIntoDB(smlouva);
             }
 
             return res.IsValid;
         }
+
+        public static void SaveSmlouvaDataIntoDB(Smlouva smlouva)
+        {
+            try
+            {
+                DirectDB.NoResult("exec smlouvaId_save @id,@active, @created, @updated, @icoOdberatele",
+                    new SqlParameter("id", smlouva.Id),
+                    new SqlParameter("created", smlouva.casZverejneni),
+                    new SqlParameter("updated", smlouva.LastUpdate),
+                    new SqlParameter("active", smlouva.znepristupnenaSmlouva() ? (int)0 : (int)1),
+                    new SqlParameter("icoOdberatele", smlouva.Platce.ico)
+                );
+
+                DirectDB.NoResult("delete from SmlouvyDodavatele where smlouvaId= @smlouvaId",
+                    new SqlParameter("smlouvaId", smlouva.Id)
+                );
+                if (smlouva.Prijemce != null)
+                {
+                    foreach (var ico in smlouva.Prijemce.Select(m => m.ico).Distinct())
+                    {
+                        if (!string.IsNullOrEmpty(ico))
+                            DirectDB.NoResult("insert into SmlouvyDodavatele(smlouvaid,ico) values(@smlouvaid, @ico)",
+                                new SqlParameter("smlouvaId", smlouva.Id),
+                                new SqlParameter("ico", ico)
+                        );
+
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Manager.ESLogger.Error("Manager Save", e);
+            }
+
+
+            if (!string.IsNullOrEmpty(smlouva.Platce?.ico))
+            {
+                DirectDB.NoResult("exec Firma_IsInRS_Save @ico",
+                    new SqlParameter("ico", smlouva.Platce?.ico)
+                );
+            }
+
+            if (!string.IsNullOrEmpty(smlouva.VkladatelDoRejstriku?.ico))
+            {
+                DirectDB.NoResult("exec Firma_IsInRS_Save @ico",
+                    new SqlParameter("ico", smlouva.VkladatelDoRejstriku?.ico)
+                );
+            }
+
+            foreach (var s in smlouva.Prijemce ?? new Smlouva.Subjekt[] { })
+            {
+                if (!string.IsNullOrEmpty(s.ico))
+                {
+                    DirectDB.NoResult("exec Firma_IsInRS_Save @ico",
+                        new SqlParameter("ico", s.ico)
+                    );
+                }
+            }
+        }
+
 
         public static void SaveAttachmentsToDisk(Smlouva smlouva, bool rewriteExisting = false)
         {
