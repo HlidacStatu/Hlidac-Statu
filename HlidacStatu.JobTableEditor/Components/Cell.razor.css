@@ -7,3 +7,13 @@ input {
     margin: 0; 
     padding: 0;
 }
+
+td {
+    padding-top: 25px;
+    padding-left: 2px;
+    padding-right: 2px;
+}
+
+.can-drop {
+    border: 2px dashed green;
+}

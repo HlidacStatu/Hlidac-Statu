@@ -45,8 +45,8 @@
                                     <th scope="col">
                                         Jednotka
                                         <select @onchange="ChangeUnit" class="form-select">
-                                            @foreach (var measureUnit in (InDocJobs.MeasureUnit[])Enum
-                                                .GetValues(typeof(InDocJobs.MeasureUnit)))
+                                            @foreach (var measureUnit in InDocJobs.GetSortedMeasureUnits())
+
                                             {
                                                 <option value="@measureUnit">@measureUnit.ToNiceDisplayName()</option>
                                             }
@@ -82,8 +82,7 @@
                                         </td>
                                         <td>
                                             <select @bind="@job.Unit" class="form-select" autocomplete="off">
-                                                @foreach (var measureUnit in (InDocJobs.MeasureUnit[])Enum
-                                                    .GetValues(typeof(InDocJobs.MeasureUnit)))
+                                                @foreach (var measureUnit in InDocJobs.GetSortedMeasureUnits())
                                                 {
                                                     <option value="@measureUnit">@measureUnit.ToNiceDisplayName()</option>
                                                 }
@@ -146,7 +145,7 @@
     public SomeTable Table { get; set; }
 
     private bool showModal = false;
-
+    
     private async Task Save()
     {
         bool isValid = IsEverythingValid();
@@ -177,10 +176,6 @@
             {
                 return false;
             }
-            if (!IsValidPrice(job, out var vatError))
-            {
-                return false;
-            }
         }
 
         return true;
@@ -208,13 +203,6 @@
         {
             errorMessages.Add($"Chybí název jobu.");
         }
-
-        return errorMessages.Count == 0;
-    }
-    
-    private bool IsValidPrice(InDocJobs job, out List<string> errorMessages)
-    {
-        errorMessages = new();
         if (job.Price > 0)
         {
             if (job.VAT is null || job.VAT <= 0)
@@ -224,8 +212,10 @@
             }
         }
 
-        return true; 
+        return errorMessages.Count == 0;
     }
+    
+    
 
     private void LoadJobs()
     {

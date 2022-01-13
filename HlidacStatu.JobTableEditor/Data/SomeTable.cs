@@ -59,6 +59,7 @@ namespace HlidacStatu.JobTableEditor.Data
                     var cell = Cells[rowNum][colNum];
                     if (cell.IsImportant)
                     {
+                        //prepare for next processing
                         foundValues.Add(
                             new Identifier.CellIdentifier(cell,
                                 priceCols.Contains(colNum),
@@ -67,6 +68,7 @@ namespace HlidacStatu.JobTableEditor.Data
                     }
                     else
                     {
+                        //check if column contains key words
                         string reducedString = cell.Value.ReduceText();
                         if (Identifier.WithDphRegex.IsMatch(reducedString))
                         {
@@ -144,6 +146,8 @@ namespace HlidacStatu.JobTableEditor.Data
 
         public static string ReduceText(this string input)
         {
+            if (string.IsNullOrWhiteSpace(input))
+                return "";
             return input.ToAlphaNumeric().Trim().RemoveAccents().ToLowerInvariant();
         }
         
