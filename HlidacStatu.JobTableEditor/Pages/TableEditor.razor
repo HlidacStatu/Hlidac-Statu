@@ -16,17 +16,20 @@
 <h1>Job editor</h1>
 
 <hr style="margin-bottom: 20px;"/>
-@if (_hlaska.HasValue)
+@if (_exceptionMessage.HasValue)
 {
     <h4>
-        @_hlaska.Value
+        @_exceptionMessage.Value
     </h4>
     <hr style="margin-bottom: 20px;"/>
 }
 
 @if (_table == null)
 {
-    <p>Načítám tabulku&hellip;</p>
+    if (!_exceptionMessage.HasValue)
+    {
+        <p>Načítám tabulku&hellip;</p>
+    }
 }
 else
 {
@@ -100,6 +103,8 @@ else
     private CellSwapper Swapper { get; } = new CellSwapper();
     
     private MarkupString? _hlaska;
+    private MarkupString? _exceptionMessage;
+    
     private int _processedTables;
 
     private int _syncIndicator = 0;
@@ -143,10 +148,13 @@ else
             try
             {
                 _table = await JobService.GetNewTable(Obor, _userName, CancellationToken.None);
+                _table.Author = _userName;
+                _table.StartWork();
+                _table.OnSave += SaveTable;
             }
             catch (NoDataFoundException ndfe)
             {
-                _hlaska = new MarkupString($"<div class=\"alert alert-warning\" role=\"alert\">Ve frontě už není žádná další tabulka ke zpracování.</div>");
+                _exceptionMessage = new MarkupString($"<div class=\"alert alert-warning\" role=\"alert\">Ve frontě už není žádná další tabulka ke zpracování.</div>");
             }
             catch (Exception e)
             {
@@ -155,9 +163,6 @@ else
             }
         }
         
-        _table.Author = _userName;
-        _table.StartWork();
-        _table.OnSave += SaveTable;
         StateHasChanged();
     }
 
