@@ -45,8 +45,8 @@
                                     <th scope="col">
                                         Jednotka
                                         <select @onchange="ChangeUnit" class="form-select">
-                                            @foreach (var measureUnit in (InDocJobs.MeasureUnit[])Enum
-                                                .GetValues(typeof(InDocJobs.MeasureUnit)))
+                                            @foreach (var measureUnit in InDocJobs.GetSortedMeasureUnits())
+
                                             {
                                                 <option value="@measureUnit">@measureUnit.ToNiceDisplayName()</option>
                                             }
@@ -82,8 +82,7 @@
                                         </td>
                                         <td>
                                             <select @bind="@job.Unit" class="form-select" autocomplete="off">
-                                                @foreach (var measureUnit in (InDocJobs.MeasureUnit[])Enum
-                                                    .GetValues(typeof(InDocJobs.MeasureUnit)))
+                                                @foreach (var measureUnit in InDocJobs.GetSortedMeasureUnits())
                                                 {
                                                     <option value="@measureUnit">@measureUnit.ToNiceDisplayName()</option>
                                                 }
@@ -146,7 +145,7 @@
     public SomeTable Table { get; set; }
 
     private bool showModal = false;
-
+    
     private async Task Save()
     {
         bool isValid = IsEverythingValid();

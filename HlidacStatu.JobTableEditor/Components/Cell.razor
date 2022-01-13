@@ -5,14 +5,19 @@
 
 @implements IDisposable
 
-<td class="@cellStyle">
-    <button class="btn btn-outline-primary" @onclick="ColorChange" title="Změň typ" style="float: left"><i class="fad fa-exchange"></i></button>
-    <span style="width:1px">&nbsp;</span>
-    <button class="btn btn-outline-secondary" @onclick="CellShell.SetOriginalValue" title="Nastav původní hodnotu"><i class="far fa-undo"></i></button>
-    <button class="btn btn-outline-secondary" @onclick="CellShell.SetMergedValue" title="Nastav předpočítanou hodnotu"><i class="far fa-brain"></i></button>
+<td class="@dropClass @cellStyle" @onclick="ColorChange"
+    draggable="true"
+    ondragover="event.preventDefault();"
+    @ondragstart="@(() => Swapper.Swap(this))"
+    @ondrop="HandleDrop"
+    @ondragenter="HandleDragEnter"
+    @ondragleave="HandleDragLeave">
     
-    <button class="btn btn-outline-primary" @onclick="@(() => Swapper.Swap(this))" title="Prohoď hodnotu" style="float: right"><i class="@swapButtonStyle"></i></button>
-    <textarea rows="2" class="form-control" @bind="@CellShell.Value"></textarea>
+    <textarea @onclick:stopPropagation="true" 
+        @onclick:preventDefault="true" 
+        @ondragover="HandleDragEnter"
+        @ondragenter="HandleDragEnter"
+        rows="2" class="form-control" @bind="@CellShell.Value"></textarea>
     @if (!string.IsNullOrWhiteSpace(CellShell.Error))
     {
         <p class="text-danger">@CellShell.Error</p>
@@ -31,6 +36,7 @@
     [Parameter]
     public int SyncSignaler { get; set; }
     
+    private string dropClass = "";
     private string cellStyle;
     private string swapButtonStyle = "fas fa-retweet";
 
@@ -38,6 +44,7 @@
     {
         SetCellStyle();
     }
+
 
     protected override void OnInitialized()
     {
@@ -73,6 +80,23 @@
     public void Dispose()
     {
         CellShell.PropertyChanged -= HandleDataChange;
+    }
+    
+    private void HandleDragEnter()
+    {
+        dropClass = "can-drop";
+    }
+
+    private void HandleDragLeave()
+    {
+        dropClass = "";
+    }
+
+    private async Task HandleDrop()
+    {
+        dropClass = "";
+
+        Swapper.Swap(this);
     }
 
 }
