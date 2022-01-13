@@ -312,7 +312,7 @@ namespace HlidacStatu.Web
                 string[] scriptBundle = new[]
                 {
                     "Scripts/respond.js",
-                    "Scripts/hlidac.v1.11.js",
+                    "Scripts/hlidac.v1.12.js",
                     "Scripts/fuckadblock.min.js",
                     "Scripts/social-share-kit.min.js"
                 };

@@ -67,7 +67,18 @@
                 m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
         })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
-        ga('create', 'UA-154075-22', 'auto');
+        //cookie-less tracker from https://helgeklein.com/blog/google-analytics-cookieless-tracking-without-gdpr-consent/
+        let clientIP = "@(HlidacStatu.LibCore.Extensions.HttpContextExtensions.GetRemoteIp(this.Context))";
+        let validityInterval = Math.round (new Date() / 1000 / 3600 / 24 / 4);
+        let clientIDSource = clientIP + ";" + window.location.host + ";" + navigator.userAgent + ";" + navigator.language + ";" + validityInterval;
+        let clientIDHashed = cyrb53(clientIDSource).toString(16);
+
+        ga('set', 'anonymizeIp', true);
+        ga('create', 'UA-154075-22', {
+            'storage': 'none',
+            'clientId': clientIDHashed
+
+        });
         ga('send', 'pageview',
             {
                 'dimension1': '@(Context.Request.Query.TryGetValue("calledfrom", out var value) ? value : "1")'
