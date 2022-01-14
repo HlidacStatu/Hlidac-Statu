@@ -203,7 +203,8 @@
         {
             errorMessages.Add($"Chybí název jobu.");
         }
-        if (job.Price > 0)
+        if (job.Price > 0 
+            && (job.PriceVAT is null || job.PriceVAT == 0))
         {
             if (job.VAT is null || job.VAT <= 0)
             {
