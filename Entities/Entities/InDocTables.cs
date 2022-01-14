@@ -102,6 +102,7 @@ namespace HlidacStatu.Entities
             ForNextReview = 3,
             WrongTable = 4,
             BrokenFormat = 5,
+            MissingPrices = 6,
         }
 
         [NotMapped()]
