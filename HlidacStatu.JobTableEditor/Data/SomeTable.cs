@@ -143,6 +143,7 @@ namespace HlidacStatu.JobTableEditor.Data
         public static Regex WithDphRegex = new Regex(@"(s|vc|vcetne)[\. ]{0,2}(dph)", RegexOptions.Compiled);
         public static Regex WithoutDphRegex = new Regex(@"(bez)[\. ]{0,2}(dph)", RegexOptions.Compiled);
         public static Regex CurrencyRegex = new Regex(@"(kc|eur|korun|czk)", RegexOptions.Compiled);
+        public static Regex UnitRegex = new Regex(@"(/|za| |\b)+(mili|micro|kilo|centi|m|k|c)?(metr|minut|hodin|gram|mesic|litr|min|hod|den|kus|kpl|ks|ha|m|h|g|t|l)(a|u|y)?", RegexOptions.Compiled);
 
         public static string ReduceText(this string input)
         {
@@ -181,6 +182,7 @@ namespace HlidacStatu.JobTableEditor.Data
             text = WithDphRegex.Replace(text, "");
             text = WithoutDphRegex.Replace(text, "");
             text = CurrencyRegex.Replace(text, "");
+            text = UnitRegex.Replace(text, "");
             return text;
         }
         

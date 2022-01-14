@@ -43,10 +43,10 @@ namespace HlidacStatu.Entities
             [SortValue(0)]
             None = 0,
             [NiceDisplayName("h")]
-            [SortValue(1)]
+            [SortValue(2)]
             Hour = 1,
             [NiceDisplayName("den")]
-            [SortValue(2)]
+            [SortValue(3)]
             Day = 2,
             [NiceDisplayName("ks")]
             [SortValue(50)]
@@ -93,7 +93,9 @@ namespace HlidacStatu.Entities
             [NiceDisplayName("ml")]
             [SortValue(40)]
             Mililitr = 17,
-            
+            [NiceDisplayName("min")]
+            [SortValue(1)]
+            Minuta = 18,
             
         }
 
