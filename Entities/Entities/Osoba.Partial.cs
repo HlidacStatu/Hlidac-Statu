@@ -47,8 +47,10 @@ namespace HlidacStatu.Entities
             VazbyNaPolitiky = 2,
             [NiceDisplayName("Politik")]
             Politik = 3,
-            [NiceDisplayName("Sponzor polit.strany")]
+            [NiceDisplayName("Sponzor polit. strany")]
             Sponzor = 4,
+            [NiceDisplayName("Vysoký státní úředník")]
+            VysokyUrednik = 5,
             [NiceDisplayName("Duplicita")]
             Duplicita = 22,
         }
