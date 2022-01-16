@@ -5,20 +5,36 @@
     Layout = "_Layout";
 }
 
-<h1>Chyba @Model</h1>
 
 @switch (Model)
 {
     case 401:
-        <p>Nejste přihlášen.</p>
+        <h1>
+            Nejste přihlášen
+            <br /><small class="text-warning">Chyba @Model</small>
+        </h1>
+        <p><a href="https://www.hlidacstatu.cz/Identity/Account/Login?returnUrl=/"><i class="fas fa-chevron-circle-right"></i> Přihlásit se</a></p>
+        <p><a href="https://www.hlidacstatu.cz/Identity/Account/Register?returnUrl=/Identity/Account/Login?returnUrl=/"><i class="fas fa-chevron-circle-right"></i> Vytvořit účet</a></p>
+
         break;
-        
+
     case 403:
-        <p>Nemáte oprávnění pro přístup k tomuto zdroji.</p>
+        <h1>
+            Nemáte oprávnění pro přístup k tomuto zdroji.
+            <br /><small class="text-warning">Chyba @Model</small>
+        </h1>
+
         break;
-    
+
     default:
-        <p>Něco se pokazilo.</p>
+        <h1>
+            Nastala nečekaná chyba.
+            <br /><small class="text-warning">Chyba @Model</small>
+        </h1>
+        <p>
+            Chybu jsme zaznamenali a budeme se ji věnovat.
+        </p>
+
         break;
 }
 
