@@ -107,7 +107,7 @@ namespace HlidacStatu.Web.Controllers
         {
             if (TryGetCompany(id, out var firma, out var result))
             {
-                var popis = "Dceřinné společnosti";
+                var popis = "Dceřiné společnosti";
                 if (firma.JsemOVM())
                     popis = "Podřízené organizace";
 

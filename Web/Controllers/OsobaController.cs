@@ -80,7 +80,7 @@ namespace HlidacStatu.Web.Controllers
         {
             if (TryGetOsoba(id, out var osoba, out var result))
             {
-                var popis = "Dceřinné společnosti";
+                var popis = "Dceřiné společnosti";
                 //if (firma.JsemOVM())
                 //    popis = "Podřízené organizace";
 
