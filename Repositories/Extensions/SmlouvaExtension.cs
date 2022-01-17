@@ -113,8 +113,8 @@ namespace HlidacStatu.Extensions
             //politici
             foreach (var ss in smlouva.Prijemce)
             {
-                if (!string.IsNullOrEmpty(ss.ico) && StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
-                    .SoukromeFirmy.ContainsKey(ss.ico))
+                if (!string.IsNullOrEmpty(ss.ico) && StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()?
+                    .SoukromeFirmy?.ContainsKey(ss.ico)==true)
                 {
                     var politici = StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy[ss.ico];
                     if (politici.Count > 0)

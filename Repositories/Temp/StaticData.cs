@@ -425,7 +425,8 @@ namespace HlidacStatu.Repositories
                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "FirmySVazbamiNaPolitiky_Nedavne",
                    (o) =>
                    {
-                       return AnalysisCalculation.LoadFirmySVazbamiNaPolitiky(Relation.AktualnostType.Nedavny, true);
+                       return new AnalysisCalculation.VazbyFiremNaPolitiky();
+                       
                    });
 
                 FirmySVazbamiNaPolitiky_vsechny_Cache = new Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaPolitiky>

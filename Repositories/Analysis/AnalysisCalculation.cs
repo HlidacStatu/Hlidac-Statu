@@ -319,7 +319,7 @@ namespace HlidacStatu.Repositories
                           Util.Consts.Logger.Error("ERROR UradyObchodujiciSFirmami_s_vazbouNaPolitiky", e);
                       }
 
-                      end:
+                        end:
                       return new ActionOutputData() { CancelRunning = false, Log = null };
                   }, null,
                     showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
@@ -338,8 +338,9 @@ namespace HlidacStatu.Repositories
             return ret;
         }
 
-        public static VazbyFiremNaPolitiky LoadFirmySVazbamiNaPolitiky(Relation.AktualnostType aktualnostVztahu, bool showProgress = false)
+        public static VazbyFiremNaPolitiky LoadFirmySVazbamiNaPolitiky(Relation.AktualnostType aktualnostVztahu, bool showProgress = false, Devmasters.Log.Logger logger = null)
         {
+            logger = logger ?? HlidacStatu.Util.Consts.Logger;
 
             Dictionary<string, List<int>> pol_SVazbami = new Dictionary<string, List<int>>();
             Dictionary<string, List<int>> pol_SVazbami_StatniFirmy = new Dictionary<string, List<int>>();
@@ -347,55 +348,59 @@ namespace HlidacStatu.Repositories
             Devmasters.Batch.Manager.DoActionForAll<Osoba>(OsobaRepo.PolitickyAktivni.Get(),
             (p) =>
             {
-
-                var vazby = p.AktualniVazby(aktualnostVztahu);
-                if (vazby != null && vazby.Count() > 0)
+                try
                 {
 
-                    foreach (var v in vazby)
+                    var vazby = p.AktualniVazby(aktualnostVztahu);
+                    if (vazby != null && vazby.Count() > 0)
                     {
-                        if (!string.IsNullOrEmpty(v.To.Id))
+
+                        foreach (var v in vazby)
                         {
-                            //check if it's GovType company
-                            Firma f = Firmy.Get(v.To.Id);
-                            //if (f == null)
-                            //{
-                            //    f = External.GovData.FromIco(v.To.Id);
-                            //    if (f == null)
-                            //        continue; //unknown company, skip
-                            //}
-                            if (!Firma.IsValid(f))
-                                continue; //unknown company, skip
-                            if (f.PatrimStatu())
+                            if (!string.IsNullOrEmpty(v.To.Id))
                             {
-                                //Gov Company
-                                if (pol_SVazbami_StatniFirmy.ContainsKey(v.To.Id))
+                                //check if it's GovType company
+                                Firma f = Firmy.Get(v.To.Id);
+                                //if (f == null)
+                                //{
+                                //    f = External.GovData.FromIco(v.To.Id);
+                                //    if (f == null)
+                                //        continue; //unknown company, skip
+                                //}
+                                if (!Firma.IsValid(f))
+                                    continue; //unknown company, skip
+                                if (f.PatrimStatu())
                                 {
-                                    var pol = pol_SVazbami_StatniFirmy[v.To.Id];
-                                    if (!pol.Any(m => m == p.InternalId))
-                                        pol.Add(p.InternalId);
+                                    //Gov Company
+                                    if (pol_SVazbami_StatniFirmy.ContainsKey(v.To.Id))
+                                    {
+                                        var pol = pol_SVazbami_StatniFirmy[v.To.Id];
+                                        if (!pol.Any(m => m == p.InternalId))
+                                            pol.Add(p.InternalId);
+                                    }
+                                    else
+                                    {
+                                        pol_SVazbami_StatniFirmy.Add(v.To.Id, new List<int>());
+                                        pol_SVazbami_StatniFirmy[v.To.Id].Add(p.InternalId);
+                                    }
+
+
                                 }
                                 else
                                 {
-                                    pol_SVazbami_StatniFirmy.Add(v.To.Id, new List<int>());
-                                    pol_SVazbami_StatniFirmy[v.To.Id].Add(p.InternalId);
-                                }
+                                    //private company
+                                    if (pol_SVazbami.ContainsKey(v.To.Id))
+                                    {
+                                        var pol = pol_SVazbami[v.To.Id];
+                                        if (!pol.Any(m => m == p.InternalId))
+                                            pol.Add(p.InternalId);
+                                    }
+                                    else
+                                    {
+                                        pol_SVazbami.Add(v.To.Id, new List<int>());
+                                        pol_SVazbami[v.To.Id].Add(p.InternalId);
+                                    }
 
-
-                            }
-                            else
-                            {
-                                //private company
-                                if (pol_SVazbami.ContainsKey(v.To.Id))
-                                {
-                                    var pol = pol_SVazbami[v.To.Id];
-                                    if (!pol.Any(m => m == p.InternalId))
-                                        pol.Add(p.InternalId);
-                                }
-                                else
-                                {
-                                    pol_SVazbami.Add(v.To.Id, new List<int>());
-                                    pol_SVazbami[v.To.Id].Add(p.InternalId);
                                 }
 
                             }
@@ -403,8 +408,13 @@ namespace HlidacStatu.Repositories
                         }
 
                     }
-
                 }
+                catch (Exception e)
+                {
+                    logger.Error("LoadFirmySVazbamiNaPolitiky error for {osoba}", ex: e, p?.NameId);
+                    
+                }
+
                 return new ActionOutputData() { CancelRunning = false, Log = null };
             },
             showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
