@@ -221,7 +221,7 @@ namespace HlidacStatu.Repositories
 
         public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh=false)
         {
-            return Relation.AktualniVazby(osoba.Vazby(refresh), minAktualnost);
+            return Relation.AktualniVazby(osoba.Vazby(refresh), minAktualnost, osoba.VazbyRootEdge());
         }
 
         private static void updateVazby(this Osoba osoba, bool refresh = false)

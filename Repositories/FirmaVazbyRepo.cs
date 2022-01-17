@@ -115,7 +115,7 @@ namespace HlidacStatu.Repositories
             currList = currList ?? new List<Firma>();
 
             var _parentVazbaFirma = Relation
-                .AktualniVazby(Graph.GetDirectParentRelationsFirmy(ico).ToArray(), minAktualnost)
+                .AktualniVazby(Graph.GetDirectParentRelationsFirmy(ico).ToArray(), minAktualnost, firma.VazbyRootEdge())
                 .Select(m => Firmy.Get(m.From.Id))
                 .Where(m => m != null)
                 .ToArray();
@@ -147,7 +147,7 @@ namespace HlidacStatu.Repositories
         {
             if (firma._parentVazbyFirmy == null)
                 firma._parentVazbyFirmy = Graph.GetDirectParentRelationsFirmy(firma.ICO).ToArray();
-            return Relation.AktualniVazby(firma._parentVazbyFirmy, minAktualnost);
+            return Relation.AktualniVazby(firma._parentVazbyFirmy, minAktualnost, firma.VazbyRootEdge());
         }
 
 
@@ -156,7 +156,7 @@ namespace HlidacStatu.Repositories
         {
             if (firma._parentVazbyOsoby == null)
                 firma._parentVazbyOsoby = Graph.GetDirectParentRelationsOsoby(firma.ICO).ToArray();
-            return Relation.AktualniVazby(firma._parentVazbyOsoby, minAktualnost);
+            return Relation.AktualniVazby(firma._parentVazbyOsoby, minAktualnost, firma.VazbyRootEdge());
         }
 
         private static Firma[] _vsechnyDcerinnePodrizene(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
@@ -191,7 +191,7 @@ namespace HlidacStatu.Repositories
         public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
         {
             //firma.UpdateVazbyFromDB(); //nemelo by tu byt.
-            return Relation.AktualniVazby(firma.Vazby(refresh), minAktualnost);
+            return Relation.AktualniVazby(firma.Vazby(refresh), minAktualnost, firma.VazbyRootEdge());
         }
 
 

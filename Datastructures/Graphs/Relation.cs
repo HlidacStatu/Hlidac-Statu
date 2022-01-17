@@ -225,7 +225,7 @@ namespace HlidacStatu.Datastructures.Graphs
                 .ToArray();
         }
 
-        public static Graph.Edge[] AktualniVazby(IEnumerable<Graph.Edge> allRelations, AktualnostType minAktualnost)
+        public static Graph.Edge[] AktualniVazby(IEnumerable<Graph.Edge> allRelations, AktualnostType minAktualnost, Graph.Edge root)
         {
             if (allRelations == null)
                 return new Graph.Edge[] { };
@@ -233,8 +233,6 @@ namespace HlidacStatu.Datastructures.Graphs
             if (minAktualnost <= AktualnostType.Neaktualni)
                 return allRelations.ToArray();
 
-            //create root for tree
-            var root = allRelations.First(m => m.Root == true).DeepClone();
             root.Aktualnost = minAktualnost;
 
             //filter per distanceallRelations.First(m => m.Root == true)
