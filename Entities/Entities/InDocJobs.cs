@@ -123,7 +123,7 @@ namespace HlidacStatu.Entities
         private void CalculateSalaryBackwardCompatibility()
         {
 
-            if(Unit != MeasureUnit.Day || Unit != MeasureUnit.Hour)
+            if(Unit != MeasureUnit.Day && Unit != MeasureUnit.Hour)
                 return;
 
             var recalculatedMdSalary = Price;
