@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using HlidacStatu.JobsWeb.Services
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -105,6 +108,18 @@
     </div>
     <div class="container mt-2">
         <main role="main" class="pb-3">
+            @{
+                var analyza = this.Context.TryFindKey();
+            }
+            @if (analyza.HasValue)
+            {
+                JobService.SubjectYearDescription descr = JobService.PerSubjectQuery(analyza.Value.Obor, analyza.Value.Rok);
+                if (descr != null)
+                {
+                    <h2>Analýza "@(descr.NiceName)"</h2>
+                }
+            }
+
             @RenderBody()
         </main>
     </div>

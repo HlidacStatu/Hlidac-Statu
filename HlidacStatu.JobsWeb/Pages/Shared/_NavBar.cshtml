@@ -1,6 +1,12 @@
 @{
     Context.Items.TryGetValue("obor", out var obor);
     Context.Items.TryGetValue("rok", out var rok);
+
+    bool choosenAnal = false;
+    if (string.IsNullOrEmpty(obor?.ToString())==false && string.IsNullOrEmpty(rok?.ToString())==false)
+    {
+        choosenAnal = true;
+    }
 }
 
 @*<h2>Analýza <b>@obor</b> <small  class="text-muted">pro rok @rok</small></h2>*@
@@ -12,16 +18,21 @@
             
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav level2">
-                <a class="nav-link" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">▸ Souhrn</a>
-                <a class="nav-link" asp-page="/BenchmarkUradu" asp-route-obor="@obor" asp-route-rok="@rok">▸ Benchmark úřadů</a>
-                <a class="nav-link" asp-page="/BenchmarkDodavatelu" asp-route-obor="@obor" asp-route-rok="@rok">▸ Benchmark dodavatelů</a>
-                <a class="nav-link" asp-page="/Pdf" asp-route-obor="@obor" asp-route-rok="@rok">▸ PDF</a>
-                @if (this.User.IsInRole("Admin"))
+                <a style="font-size:1.4em;color:#0074e4;" class="nav-link" href="/">Titulka</a>
+                @if (choosenAnal)
                 {
-                <a class="nav-link" asp-page="/JedenJob" asp-route-obor="@obor" asp-route-rok="@rok">▸ Experimentální zobrazení grafu</a>
+                    <a style="font-size:1.4em;color:#0074e4;" class="nav-link" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">▸ Souhrn</a>
+                    <a style="font-size:1.4em;color:#0074e4;" class="nav-link" asp-page="/BenchmarkUradu" asp-route-obor="@obor" asp-route-rok="@rok">▸ Benchmark úřadů</a>
+                    <a style="font-size:1.4em;color:#0074e4;" class="nav-link" asp-page="/BenchmarkDodavatelu" asp-route-obor="@obor" asp-route-rok="@rok">▸ Benchmark dodavatelů</a>
+                    <a style="font-size:1.4em;color:#0074e4;" class="nav-link" asp-page="/Pdf" asp-route-obor="@obor" asp-route-rok="@rok">▸ Celá zpráva</a>
+                    @if (this.User.IsInRole("Admin"))
+                    {
+                        <a style="color:#0074e4;" class="nav-link" asp-page="/JedenJob" asp-route-obor="@obor" asp-route-rok="@rok">▸ Experiment</a>
+                    }
                 }
             </div>
             
         </div>
     </div>
 </nav>
+    <hr />

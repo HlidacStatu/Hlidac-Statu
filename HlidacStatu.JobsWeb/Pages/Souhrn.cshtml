@@ -8,15 +8,15 @@
 
     Boxplot graphModel = new Boxplot();
     TableViewModel tableModel = new TableViewModel();
-    
+
     if (Model.Key.HasValue)
     {
-        var statistics = JobService.GetStatistics(Model.Key.Value);
+        List<JobStatistics> statistics = JobService.GetStatistics(Model.Key.Value);
         graphModel.BasicData = statistics;
 
         tableModel.Statistics = statistics;
         tableModel.LinkHref = "/obor";
-    
+        tableModel.Key = Model.Key;
     }
     
 }

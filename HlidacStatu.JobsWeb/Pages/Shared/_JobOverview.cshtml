@@ -3,29 +3,29 @@
 @model JobOverviewViewModel
 
 @{
-    bool showStatistics = !string.IsNullOrWhiteSpace(Model.Statistics.Name); 
+    bool showStatistics = !string.IsNullOrWhiteSpace(Model.Statistics.Name);
     var statistics = new List<JobStatistics>();
-    var key = new YearlyStatisticsGroup.Key()
+    if (Model.Key.HasValue == false)
     {
-        Obor = "IT",
-        Rok = 2020
-    };
-    if(showStatistics)
+        return;
+    }
+    var key = Model.Key.Value;
+    if (showStatistics)
         statistics = JobService.GetTagStatistics(Model.Statistics.Name, key);
-    
+
     var histogram = new BarGraph()
-    {
-        Data = JobService.GetDistinctJobs()
-            .Where(j => j.Polozka == Model.Statistics.Name)
-            .ToList(),
-        Title = Model.Statistics.Name
-    };
-    
+            {
+                Data = JobService.GetDistinctJobs()
+                    .Where(j => j.Polozka == Model.Statistics.Name)
+                    .ToList(),
+                Title = Model.Statistics.Name
+            };
+
     var tableModel = new TableViewModel()
-    {
-        Statistics = statistics,
-        FirstColumnName = "Tag"
-    };
+            {
+                Statistics = statistics,
+                FirstColumnName = "Tag"
+            };
 
 }
 
@@ -39,6 +39,6 @@
     <p>@Html.Raw(Model.CustomText)</p>
 }
 
-<partial name="Shared/_SouhrnTable" model="tableModel"/>
+<partial name="Shared/_SouhrnTable" model="tableModel" />
 
-<partial name="Shared/_BarGraph" model="histogram"/>
+<partial name="Shared/_BarGraph" model="histogram" />

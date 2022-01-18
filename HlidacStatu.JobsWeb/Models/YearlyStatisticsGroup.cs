@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
 
 namespace HlidacStatu.JobsWeb.Models
 {
@@ -11,6 +10,14 @@ namespace HlidacStatu.JobsWeb.Models
             public string Obor { get; set; }
             public int Rok { get; set; }
 
+            public string UrlDecodedParams
+            {
+                get => $"rok={this.Rok}&obor={System.Net.WebUtility.UrlEncode(this.Obor)}";
+            }
+            public Services.JobService.SubjectYearDescription PerSubjectDesc
+            {
+                get => HlidacStatu.JobsWeb.Services.JobService.PerSubjectQuery(this.Obor,this.Rok);
+            }
 
             public bool Equals(Key other)
             {

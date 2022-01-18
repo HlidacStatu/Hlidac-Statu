@@ -1,6 +1,7 @@
 using HlidacStatu.JobsWeb.Models;
 using HlidacStatu.JobsWeb.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HlidacStatu.JobsWeb.Pages
@@ -11,11 +12,15 @@ namespace HlidacStatu.JobsWeb.Pages
 
         public YearlyStatisticsGroup.Key? Key { get; set; }
         public string Obor { get; set; }
-        
-        public void OnGet(string id)
+
+        public IActionResult OnGet(string id )
         {
+            if (HttpContext.HasAccess() == false)
+                return Redirect("/");
+
             Obor = id;
             Key = HttpContext.TryFindKey();
+            return Page();
         }
         
     }

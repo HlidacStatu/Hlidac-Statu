@@ -4,7 +4,7 @@
    
 </style>
 <table class="table table-sm table-striped mt-4">
-    <caption>@Model.Caption</caption>
+@*    <caption>@Model.Caption</caption> *@
     <thead>
     <tr>
         <th scope="col">@Model.FirstColumnName</th>
@@ -26,7 +26,7 @@
             <th class="align-middle border-start"><div class="middle-line right"></div></th>
             <th class="align-middle text-center"><div class="middle-line left right"><b style="color:black">Rozsah<br/>obvyklých cen</b></div></th>
             <th class="align-middle border-end"><div class="middle-line left "></div></th>
-            <th colspan="@(Model.HideDodavatelCount ? 5: 6 )"></th>
+            <th class="align-middle text-center" colspan="@(Model.HideDodavatelCount ? 5: 6 )"><div class="middle-line left right"><span style="color:black"> Rozsah cen <span style="font-weight:bold">@(Model.SubjectName) </span></span></div></th>
         </tr>
     </thead>
     <tbody>
@@ -39,7 +39,7 @@
             }
             else
             {
-                <td scope="row"><a href="@Model.LinkHref/@row.Name">@row.Name</a></td>
+                <td scope="row"><a href="@Model.LinkHref/@row.Name?@(Model.Key?.UrlDecodedParams)">@row.Name</a></td>
             }
             <td class="text-end number border-start"><b>@row.DolniKvartil.ToString("N0")</b></td>
             <td class="text-end number"><b>@row.Median.ToString("N0")</b></td>

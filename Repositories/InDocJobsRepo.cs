@@ -54,7 +54,7 @@ namespace HlidacStatu.Repositories
         }
 
 
-        static string NormalizeTextNoDiacriticsLower(string text)
+        public static string NormalizeTextNoDiacriticsLower(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
                 return "";
@@ -99,7 +99,18 @@ namespace HlidacStatu.Repositories
 
             return null;
         }
-        public static async Task SaveAsync(InDocJobs job, bool dontChangeDates = false, bool rewriteAll = false)
+
+        public static async Task<InDocJobs> Load(long jobPk)
+        {
+            await using (DbEntities db = new DbEntities())
+            {
+                var found = await db.InDocJobs.AsAsyncEnumerable().FirstOrDefaultAsync(m => m.Pk == jobPk);
+                return found;
+            }
+        }
+
+
+        public static async Task SaveAsync(InDocJobs job, bool dontChangeDates = false, bool rewriteAll = false, string forceSubject = null)
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -107,7 +118,10 @@ namespace HlidacStatu.Repositories
                 if (string.IsNullOrEmpty(job.JobGrouped) || rewriteAll)
                 {
                     string jobSubject = db.InDocTables.AsQueryable().FirstOrDefault(m => m.Pk == job.TablePk)?.Subject;
-                    var jobGroup = FindSimilar(jobSubject, job.JobRaw);
+                    if (forceSubject != null)
+                        jobSubject = forceSubject;
+
+                    var jobGroup = FindSimilar(jobSubject.ToUpper(), job.JobRaw);
                     if (jobGroup != null)
                     {
                         job.JobGrouped = jobGroup.JobGrouped;

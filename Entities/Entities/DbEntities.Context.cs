@@ -31,6 +31,13 @@ namespace HlidacStatu.Entities
             base.OnModelCreating(modelBuilder);
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
+            modelBuilder.Entity<CenyCustomer>().HasKey(u => new
+            {
+                u.Username,
+                u.Analyza,
+                u.Rok
+            });
+
             modelBuilder.Entity<Audit>(entity =>
             {
                 entity.Property(e => e.date).HasDefaultValueSql("(getdate())");
@@ -183,8 +190,9 @@ namespace HlidacStatu.Entities
             // });
 
         }
-
         public virtual DbSet<Cena> Ceny { get; set; }
+
+        public virtual DbSet<CenyCustomer> CenyCustomer { get; set; }
 
         public virtual DbSet<Firma> Firma { get; set; }
         public virtual DbSet<InDocTablesCheck> InDocTablesChecks { get; set; }

@@ -16,18 +16,19 @@
     if (Model.Key.HasValue)
     {
         if (showStatistics)
-            statistics = JobService.GetOdberatelStatitstics(Model.Ico, Model.Key.Value);
+            statistics = JobService.GetOdberatelStatistics(Model.Ico, Model.Key.Value);
 
         graphModel.BasicData = statistics;
         graphModel.CompareWith = JobService.GetStatistics(Model.Key.Value);
 
         tableModel.Statistics = statistics;
+        tableModel.SubjectName = HlidacStatu.Repositories.Firmy.GetJmeno(Model.Ico);
     }
 }
 
 @section Scripts
 {
-    <script>
+<script>
     $(document).ready(function() {
       $("#selectNavigace").change(function(){
         if ($(this).val()!='') {
@@ -35,12 +36,13 @@
         }
       });
     });
-    </script>
+</script>
 }
 
-<h2>Benchmark cen vybraného úřadu
+<h2>
+    Benchmark cen vybraného úřadu
     <small class="text-muted">oproti souhrným obvyklým cenám</small>
-    </h2>
+</h2>
 @if (Model.Key.HasValue)
 {
 
@@ -57,14 +59,32 @@
 
     if (!string.IsNullOrEmpty(Model.Ico))
     {
-        <hr/>
+        var RSstat = HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStat(
+            TimeSpan.FromDays(14), 
+            $"icoPlatce:{Model.Ico} AND " + Model.Key?.PerSubjectDesc?.Query, 
+            1, 0, Repositories.SmlouvaRepo.Searching.OrderResult.FastestForScroll);
+        double sumKc = ((Nest.ValueAggregate)RSstat.ElasticResults?.Aggregations["sumKc"])?.Value ?? 0;
+        var uniqSmluv = JobService.DistinctJobsForYearAndSubject(Model.Key.Value)
+                            .Where(m => m.IcoOdberatele == Model.Ico)
+                            .Select(m => m.SmlouvaId)
+                            .Distinct()
+                            .Count();
+        bool showPouze = uniqSmluv * 3 < RSstat.Total;
+        <hr />
 
         <h2>@Model.Nazev</h2>
-
+        <p>
+        @Model.Nazev má v registru smluv za analyzovanou oblast <b>@Model.Key?.PerSubjectDesc?.NiceName</b> a rok <b>@(Model.Key?.Rok)</b> 
+        celkem @(Devmasters.Lang.CS.Plural.Get(RSstat.Total,"jednu smlouvu","{0} smlouvy","{0} smluv")) 
+        za @(HlidacStatu.Util.RenderData.NicePrice((decimal)sumKc,shortFormat:true)), 
+        z nichž @(showPouze ? "pouze" : "") @(Devmasters.Lang.CS.Plural.Get(uniqSmluv,"jedna smlouva obsahovala","{0} smlouvy obsahovaly","{0} smluv obsahovalo")) jednotkové ceny.
+        </p>
         if (showStatistics)
         {
-            <partial name="Shared/_SouhrnTable" model="tableModel"/>
-            <partial name="Shared/_BoxPlot" model="graphModel"/>
+            <div style="padding-bottom:20px">
+                <partial name="Shared/_SouhrnTable" model="tableModel" />
+            </div>
+            <partial name="Shared/_BoxPlot" model="graphModel" />
         }
     }
 }

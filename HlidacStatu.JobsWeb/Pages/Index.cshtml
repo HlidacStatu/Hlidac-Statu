@@ -20,13 +20,38 @@
             <p class="col-lg-10 fs-4 text-muted">
                 Pomocí AI, machine learning technologií a pokročilého zpracování obsahu smluv a důkladné osobní kontroly každého údaje, jsme zanalyzovali smluvní podmínky a nasmlouvané ceny v různých oblastech.
                 Naše <b class="text-dark">nejrozsáhlejší cenové analýzy</b> na českém trhu pomohou <b class="text-dark">úřadům s orientací v obvyklých cenových relacích</b>, a <b class="text-dark">dodavatelům s kvalitní a konkureční nabídkou</b> do výběrových řízení.
-                <br style="margin-bottom:20px;" />
-                <br style="margin-bottom:20px;" />
-                <b>Dostupné analýzy</b>
+
+                <br style="margin-bottom:30px;" />
+                <h3>Dostupné analýzy</h3>
                 <ul class="list-group">
-                    <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019 (bude dostupná v lednu 2022)</li>
-                    <li class="list-group-item">Přehled obvyklých cen IT prací ve státní správě za rok 2020 (<b>report je hotový</b>)</li>
-                    <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021 (bude dostupná v dubnu 2022)</li>
+@*                    <li class="list-group-item list-group-item-success" ariaaria-disabled="true">
+                        Přehled obvyklých cen IT prací ve státní správě za rok Q1/2018 (volně přístupný jako ukázka).
+                        @if (HttpContext.User?.Identity?.IsAuthenticated == false)
+                        {
+                            <b>Pro přístup k reportu se musíte přihlásit.</b>
+                        }
+                        else
+                        {
+                            <b><a href="/Souhrn?obor=DEMO&rok=2018">Otevřít analýzu</a></b>
+                        }
+                    </li>
+*@
+                    <li class="list-group-item list-group-item-info">Přehled obvyklých cen IT prací ve státní správě za rok 2020 
+                        @if (HttpContext.User?.Identity?.IsAuthenticated == false)
+                        {
+                            <b>Pro přístup k reportu se musíte přihlásit.</b>
+                        }
+                        else if (HttpContext.HasAccess("IT",2020))
+                        {
+                            <b><a href="/Souhrn?obor=IT&rok=2020">Otevřít analýzu</a></b>
+                        }
+                        </li>
+                </ul>
+                <br style="margin-bottom:30px;" />
+                <h3>Připravované analýzy</h3>
+                <ul class="list-group">
+                    <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019 (bude dostupná v březnu 2022)</li>
+                    <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021 (bude dostupná v květnu 2022)</li>
                 </ul>
 
             </p>
@@ -42,7 +67,8 @@
                     <div class="mb-3">
                         <b>Máte zakoupeny tyto analýzy:</b>
                         <ul class="list-group-flush">
-                            @if (User.IsInRole("Admin"))
+@*                            <li class="list-group-item"><a href="/Souhrn?obor=DEMO&rok=2018">Přehled obvyklých cen IT prací ve státní správě za rok 2018 (<b>Demo analýza za Q1 2018</b>)</a></li>*@
+                            @if (HttpContext.HasAccess("IT",2020))
                             {
                                 <li class="list-group-item"><a href="/Souhrn?obor=IT&rok=2020">Přehled obvyklých cen IT prací ve státní správě za rok 2020 (<b>report máte zakoupený</b>)</a></li>
                             }
@@ -53,15 +79,15 @@
                         </ul>
                         <b>Můžete si koupit:</b>
                         <ul class="list-group-flush">
-                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019 (bude dostupná v lednu 2022)</li>
-                            @if (User.IsInRole("Admin"))
+                            @if (HttpContext.HasAccess("IT",2020))
                             {
                             }
                             else
                             {
                                 <li class="list-group-item">Přehled obvyklých cen IT prací ve státní správě za rok 2020 (<b>report je hotový</b>)</li>
                             }
-                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021 (bude dostupná v dubnu 2022)</li>
+                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019 (připravujeme)</li>
+                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021 (připravujeme)</li>
                         </ul>
                     </div>
                 </div>
@@ -111,9 +137,7 @@
                 @{
                     var key = new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 };
                     var stat = JobService.GetStatistics(key);
-                    var distinctJobsForYearAndSubject = JobService.DistinctJobs
-                    .Where(x => x.AnalyzaName == key.Obor && x.Year == key.Rok)
-                    .ToList();
+                    var distinctJobsForYearAndSubject = JobService.DistinctJobsForYearAndSubject(key);
                     var pocetSmluv = distinctJobsForYearAndSubject
                     .Select(m => m.SmlouvaId).Distinct().Count();
                     var pocetZadavatelu = distinctJobsForYearAndSubject

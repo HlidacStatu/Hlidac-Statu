@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+
 using HlidacStatu.JobsWeb.Models;
 using HlidacStatu.Repositories;
+
 using Microsoft.AspNetCore.Http;
 
 namespace HlidacStatu.JobsWeb.Services
 {
-    public static class JobService
+    public static partial class JobService
     {
         // make it "in memory", load it asynchronously, recalculate once a day?
         //private static List<JobPrecalculated> DistinctJobs { get; set; }
@@ -103,6 +105,29 @@ namespace HlidacStatu.JobsWeb.Services
             IsRecalculating = false;
         }
 
+        public static SubjectYearDescription PerSubjectQuery(string subject, int rok)
+        {
+            if (string.IsNullOrEmpty(subject))
+                return null;
+            switch (subject.ToUpper())
+            {
+                case "IT":
+                    return new SubjectYearDescription()
+                    {
+                        Query = $"oblast:IT AND podepsano:[{rok}-01-01 TO {rok + 1}-01-01]",
+                        NiceName = $"IT služby za rok {rok}"
+                    };
+                case "DEMO":
+                    return new SubjectYearDescription()
+                    {
+                        Query = $"oblast:IT AND podepsano:[2018-01-01 TO 2018-04-01]",
+                        NiceName = "IT služby Q1 2018 - DEMO "
+                    };
+                default:
+                    return null;
+            }
+        }
+
         private static List<JobStatistics> CalculateJobs(List<JobPrecalculated> distinctJobs,
             YearlyStatisticsGroup.Key key)
         {
@@ -162,7 +187,12 @@ namespace HlidacStatu.JobsWeb.Services
             return results.Where(x => x.Value.Count > 0).ToDictionary(x => x.Key, x => x.Value);
         }
 
-
+        public static IEnumerable<JobPrecalculated> DistinctJobsForYearAndSubject(YearlyStatisticsGroup.Key key)
+        {
+            var distinctJobsForYearAndSubject = JobService.DistinctJobs
+                .Where(x => x.AnalyzaName == key.Obor && x.Year == key.Rok);
+            return distinctJobsForYearAndSubject;
+        }
         public static List<JobStatistics> GetStatistics(YearlyStatisticsGroup.Key key)
         {
             return GlobalStats[key].JobStatistics;
@@ -187,12 +217,12 @@ namespace HlidacStatu.JobsWeb.Services
                 (
                     k,
                     FirmaRepo.NameFromIco(k, true),
-                    DistinctJobs.Where(x => x.IcoOdberatele == k)
+                    DistinctJobs.Where(x => x.IcoOdberatele == k && x.AnalyzaName == key.Obor && x.Year == key.Rok)
                         .Select(x => x.JobPk).Distinct().Count()))
                 .ToList();
         }
 
-        public static List<JobStatistics> GetOdberatelStatitstics(string ico, YearlyStatisticsGroup.Key key)
+        public static List<JobStatistics> GetOdberatelStatistics(string ico, YearlyStatisticsGroup.Key key)
         {
             if (GlobalStats[key].OdberateleStatistics.TryGetValue(ico, out var result))
             {
@@ -208,7 +238,7 @@ namespace HlidacStatu.JobsWeb.Services
                 (
                     k,
                     FirmaRepo.NameFromIco(k, true),
-                    DistinctJobs.Where(x => x.IcaDodavatelu.Any(i => i == k))
+                    DistinctJobs.Where(x => x.IcaDodavatelu.Any(i => i == k) && x.AnalyzaName == key.Obor && x.Year == key.Rok)
                         .Select(x => x.JobPk).Distinct().Count()
                 ))
                 .ToList();
@@ -229,8 +259,36 @@ namespace HlidacStatu.JobsWeb.Services
             return DistinctJobs;
         }
 
+        public static bool HasAccess(this HttpContext context)
+        {
+            if (context.User?.Identity?.IsAuthenticated == false)
+                return false;
+            var username = context.User?.Identity?.Name;
+            if (string.IsNullOrEmpty(username))
+                return false;
+            var key = TryFindKey(context);
+            if (key == null)
+                return false;
 
-        public static YearlyStatisticsGroup.Key? TryFindKey(this HttpContext context)
+            return HasAccess(username, key?.Obor, key.Value.Rok);
+        }
+        public static bool HasAccess(this HttpContext context, string obor, int rok)
+        {
+            if (context.User?.Identity?.IsAuthenticated == false)
+                return false;
+            var username = context.User?.Identity?.Name;
+            if (string.IsNullOrEmpty(username))
+                return false;
+
+            return HasAccess(username, obor, rok);
+        }
+        public static bool HasAccess(string username, string obor, int rok)
+        {
+
+            return CenyCustomerRepo.HasAccessAsync(username, obor, rok).Result;
+        }
+
+            public static YearlyStatisticsGroup.Key? TryFindKey(this HttpContext context)
         {
             if (context.Items.TryGetValue("obor", out var oborObject))
             {

@@ -480,13 +480,26 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                 return h == QueryHash(typ, q);
             }
 
-            public static MemoryCacheManager<SmlouvaSearchResult, string> cachedSearches = new MemoryCacheManager<SmlouvaSearchResult, string>("SMLOUVYsearch", funcSimpleSearch, TimeSpan.FromHours(24));
+            public static MemoryCacheManager<SmlouvaSearchResult, (string query, AggregationContainerDescriptor<Smlouva> aggr)> cachedSearches = 
+                new MemoryCacheManager<SmlouvaSearchResult, (string query, AggregationContainerDescriptor<Smlouva> aggr)>(
+                    "SMLOUVYsearch", funcSimpleSearch, TimeSpan.FromHours(24));
 
-
+            //
+            public static SmlouvaSearchResult CachedSimpleSearchWithStat(TimeSpan expiration,
+               string query, int page, int pageSize, OrderResult order,
+               bool? platnyZaznam = null, bool includeNeplatne = false,
+               bool logError = true, bool fixQuery = true
+               )
+            { 
+                return CachedSimpleSearch(expiration, query, page, pageSize, order, platnyZaznam, includeNeplatne, logError, fixQuery,
+                    new AggregationContainerDescriptor<Smlouva>().Sum("sumKc", m => m.Field(f => f.CalculatedPriceWithVATinCZK))
+                    );
+            }
             public static SmlouvaSearchResult CachedSimpleSearch(TimeSpan expiration,
                 string query, int page, int pageSize, OrderResult order,
                 bool? platnyZaznam = null, bool includeNeplatne = false,
-                bool logError = true, bool fixQuery = true
+                bool logError = true, bool fixQuery = true,
+                AggregationContainerDescriptor<Smlouva> aggregation = null
                 )
             {
                 FullSearchQuery q = new FullSearchQuery()
@@ -498,16 +511,18 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                     platnyZaznam = platnyZaznam,
                     includeNeplatne = includeNeplatne,
                     logError = logError,
-                    fixQuery = fixQuery
-
+                    fixQuery = fixQuery,
+                    exactNumOfResults = true,
+                    anyAggregation = aggregation
                 };
-                return cachedSearches.Get(JsonConvert.SerializeObject(q), expiration);
+                return cachedSearches.Get((JsonConvert.SerializeObject(q),q.anyAggregation), expiration);
             }
-            private static SmlouvaSearchResult funcSimpleSearch(string jsonFullSearchQuery)
+            private static SmlouvaSearchResult funcSimpleSearch((string query, AggregationContainerDescriptor<Smlouva> aggr) data)
             {
-                var q = JsonConvert.DeserializeObject<FullSearchQuery>(jsonFullSearchQuery);
+                var q = JsonConvert.DeserializeObject<FullSearchQuery>(data.query);
                 var ret = SimpleSearch(
-                    q.query, q.page, q.pageSize, q.order, q.anyAggregation, q.platnyZaznam, q.includeNeplatne, q.logError, q.fixQuery, exactNumOfResults: q.exactNumOfResults
+                    q.query, q.page, q.pageSize, q.order, data.aggr, q.platnyZaznam, q.includeNeplatne, 
+                    q.logError, q.fixQuery, exactNumOfResults: q.exactNumOfResults
                     );
                 //remove debug & more
                 return ret;
