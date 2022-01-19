@@ -316,6 +316,8 @@
             Table.InDocTable.Analyza = analyzaOption;
             
             var optionValue = Enum.Parse<InDocTables.AnalyzaOption>(analyzaOption, true);
+            //clear klasifikace manual first
+            Table.InDocTable.KlasifikaceManual = null;
             displayAnotherCategories = optionValue == InDocTables.AnalyzaOption.Jine;
         }
         
