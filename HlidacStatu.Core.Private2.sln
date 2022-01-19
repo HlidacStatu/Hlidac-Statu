@@ -148,6 +148,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitPriceDetector", "..\Hli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MlSharedEntities", "..\Hlidac-Statu-Private\MlSharedEntities\MlSharedEntities.csproj", "{BCD7FBB1-6590-4CDB-BFBB-3988A001FEBF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitPricePenetrationAnalyzer", "..\Hlidac-Statu-Private\UnitPricePenetrationAnalyzer\UnitPricePenetrationAnalyzer.csproj", "{19BA17F9-AC50-4932-ACDD-47312234C1CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -354,6 +356,10 @@ Global
 		{BCD7FBB1-6590-4CDB-BFBB-3988A001FEBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCD7FBB1-6590-4CDB-BFBB-3988A001FEBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCD7FBB1-6590-4CDB-BFBB-3988A001FEBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19BA17F9-AC50-4932-ACDD-47312234C1CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19BA17F9-AC50-4932-ACDD-47312234C1CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19BA17F9-AC50-4932-ACDD-47312234C1CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19BA17F9-AC50-4932-ACDD-47312234C1CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -388,6 +394,7 @@ Global
 		{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{A9F3D2BF-821E-43DB-BE01-29CF2F44325C} = {AF9C295F-FA98-4C4C-9A87-25F1792C9E3D}
 		{BCD7FBB1-6590-4CDB-BFBB-3988A001FEBF} = {AF9C295F-FA98-4C4C-9A87-25F1792C9E3D}
+		{19BA17F9-AC50-4932-ACDD-47312234C1CE} = {AF9C295F-FA98-4C4C-9A87-25F1792C9E3D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
