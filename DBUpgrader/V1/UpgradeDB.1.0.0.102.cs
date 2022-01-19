@@ -7,8 +7,8 @@ namespace HlidacStatu.DBUpgrades
     {
         private partial class UpgradeDB
         {
-            [DatabaseUpgradeMethod("1.0.0.101")]
-            public static void Init_1_0_0_101(IDatabaseUpgrader du)
+            [DatabaseUpgradeMethod("1.0.0.102")]
+            public static void Init_1_0_0_102(IDatabaseUpgrader du)
             {
                 string sql = @"
 alter table indoctables add
