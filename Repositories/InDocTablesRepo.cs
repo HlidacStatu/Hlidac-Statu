@@ -152,6 +152,9 @@ namespace HlidacStatu.Repositories
             }
         }
 
+        //todo: change this so it is more obvious it saves all the table
+        // it is important to save category here! (or somewhere else)
+        // but we cant forget about this
         public static async Task ChangeStatus(InDocTables tbl, InDocTables.CheckState status, string checkedBy,
             long checkElapsedTimeInMS)
         {
