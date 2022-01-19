@@ -107,9 +107,9 @@
                     </div>
                     <div class="category col-4">
                         <h4>Vyberte kategorii smlouvy</h4>
-                        <select class="form-select" @onchange="ChangeClassification">
+                        <select class="form-select" @onchange="SetAnalyzaOption">
                             <option value="">--== Zvolte kategorii ==--</option>
-                            @foreach (var (name, niceName) in GetGeneralClassificationTypes())
+                            @foreach (var (name, niceName) in GetAnalyzaTypes())
                             {
                                 <option Value="@name">@niceName</option>
                             }
@@ -119,6 +119,19 @@
                             <p class="alert alert-danger" role="alert">
                                 @chyba
                             </p>
+                        }
+                        
+                        @if (displayAnotherCategories)
+                        {
+                            <br/>
+                            <h4>Vybrali jste jinou kategorii, je potřeba doupřesnit</h4>
+                            <select class="form-select" @onchange="SetAnalyzaOption">
+                                <option value="">--== Zvolte kategorii ==--</option>
+                                @foreach (var (name, niceName) in GetGeneralClassificationTypes())
+                                {
+                                    <option Value="@name">@niceName</option>
+                                }
+                            </select>
                         }
                     </div>
                 </div>
@@ -145,6 +158,7 @@
     public SomeTable Table { get; set; }
 
     private bool showModal = false;
+    private bool displayAnotherCategories = false;
     
     private async Task Save()
     {
@@ -184,7 +198,7 @@
     private bool IsValidCategory(out string error)
     {
         error = null;
-        if (Table.InDocTable.Category is null)
+        if (string.IsNullOrWhiteSpace(Table.InDocTable.Analyza))
         {
             error = "Kategorie není vybrána.";
             return false;
@@ -288,20 +302,51 @@
         }
     }
 
-    private void ChangeClassification(ChangeEventArgs arg)
+    private void SetAnalyzaOption(ChangeEventArgs arg)
     {
         if (arg.Value is null)
         {
             return;
         }
-        string classification = (string)arg.Value;
+        string analyzaOption = (string)arg.Value;
 
-        var isDefined = Enum.IsDefined(typeof(Smlouva.SClassification.ClassificationsTypes), classification);
+        var isDefined = Enum.IsDefined(typeof(InDocTables.AnalyzaOption), analyzaOption);
         if (isDefined)
         {
-            var value = Enum.Parse<Smlouva.SClassification.ClassificationsTypes>(classification, true);
-            Table.InDocTable.Category = value;
+            Table.InDocTable.Analyza = analyzaOption;
+            
+            var optionValue = Enum.Parse<InDocTables.AnalyzaOption>(analyzaOption, true);
+            displayAnotherCategories = optionValue == InDocTables.AnalyzaOption.Jine;
         }
+        
+    }
+    
+    private void SetKlasifikaceManual(ChangeEventArgs arg)
+    {
+        if (arg.Value is null)
+        {
+            return;
+        }
+        string klasifikaceManual = (string)arg.Value;
+
+        var isDefined = Enum.IsDefined(typeof(Smlouva.SClassification.ClassificationsTypes), klasifikaceManual);
+        if (isDefined)
+        {
+            Table.InDocTable.KlasifikaceManual = klasifikaceManual;
+        }
+        
+    }
+    
+    private List<(string Name, string NiceName)> GetAnalyzaTypes()
+    {
+        var analyzaOptions = Enum.GetValues<InDocTables.AnalyzaOption>();
+
+        var result = analyzaOptions.Select(c => (Name: c.ToString("G"), NiceName: c.ToNiceDisplayName()))
+            .OrderBy(t => t.NiceName)
+            .ToList();
+
+
+        return result;
     }
 
     private List<(string Name, string NiceName)> GetGeneralClassificationTypes()

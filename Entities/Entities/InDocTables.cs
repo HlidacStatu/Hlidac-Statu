@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Devmasters.Enums;
 
 #nullable disable
 
@@ -84,12 +85,15 @@ namespace HlidacStatu.Entities
         public int? CheckElapsedInMs { get; set; }
 
         [StringLength(100)]
-        public string Subject { get; set; }
+        public string Klasifikace { get; set; }
         
-        public Smlouva.SClassification.ClassificationsTypes? Category { get; set; }
+        [StringLength(100)]
+        public string KlasifikaceManual { get; set; }
         
-        public bool? HasTerribleFormat { get; set; }
-
+        [StringLength(100)]
+        public string Analyza { get; set; }
+        
+        
         [Required]  //todo: protože je required, tak by mělo v DB být nastaveno na not null
         public int Year { get; set; }
 
@@ -110,6 +114,15 @@ namespace HlidacStatu.Entities
         {
             get { return (CheckState)Status; }
             set { Status = (int)value; }
+        }
+
+        
+        public enum AnalyzaOption
+        {
+            [NiceDisplayName("Jiné")]
+            Jine = 0,
+            [NiceDisplayName("IT")]
+            It = 1,
         }
 
     }

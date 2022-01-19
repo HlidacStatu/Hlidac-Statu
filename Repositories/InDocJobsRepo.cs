@@ -117,7 +117,7 @@ namespace HlidacStatu.Repositories
                 //find jobGroup
                 if (string.IsNullOrEmpty(job.JobGrouped) || rewriteAll)
                 {
-                    string jobSubject = db.InDocTables.AsQueryable().FirstOrDefault(m => m.Pk == job.TablePk)?.Subject;
+                    string jobSubject = db.InDocTables.AsQueryable().FirstOrDefault(m => m.Pk == job.TablePk)?.Klasifikace;
                     if (forceSubject != null)
                         jobSubject = forceSubject;
 

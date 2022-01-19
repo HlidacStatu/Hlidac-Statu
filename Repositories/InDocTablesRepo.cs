@@ -63,8 +63,8 @@ namespace HlidacStatu.Repositories
                 var tbl = await db.InDocTables
                     .AsQueryable()
                     .Where(m => m.Status == (int)InDocTables.CheckState.WaitingInQueue
-                        && m.Subject.StartsWith(obor))
-                    .Where(m => m.Year == 2018) // tohle pak smazat, až doděláme demodata
+                        && m.Klasifikace.StartsWith(obor))
+                    //.Where(m => m.Year == 2018) // tohle pak smazat, až doděláme demodata
                     .OrderByDescending(m => m.PrecalculatedScore)
                     .FirstOrDefaultAsync(cancellationToken);
 
@@ -186,7 +186,7 @@ namespace HlidacStatu.Repositories
                 else
                     db.Entry(tbl).State = EntityState.Modified;
 
-                tbl.Subject = category;
+                tbl.Klasifikace = category;
                 
                 await db.SaveChangesAsync();
 
