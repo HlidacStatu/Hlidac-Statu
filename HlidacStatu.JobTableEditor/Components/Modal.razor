@@ -125,7 +125,7 @@
                         {
                             <br/>
                             <h4>Vybrali jste jinou kategorii, je potřeba doupřesnit</h4>
-                            <select class="form-select" @onchange="SetAnalyzaOption">
+                            <select class="form-select" @onchange="SetKlasifikaceManual">
                                 <option value="">--== Zvolte kategorii ==--</option>
                                 @foreach (var (name, niceName) in GetGeneralClassificationTypes())
                                 {
