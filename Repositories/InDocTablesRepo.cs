@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using HlidacStatu.Entities;
-
 using Microsoft.EntityFrameworkCore;
-
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,20 +10,18 @@ using HlidacStatu.Repositories.Exceptions;
 
 namespace HlidacStatu.Repositories
 {
-    public partial class InDocTablesRepo
+    public class InDocTablesRepo
     {
-        public static void Save(InDocTables tbl)
+        public static async Task SaveAsync(InDocTables tbl, CancellationToken cancellationToken = default)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                db.InDocTables.Attach(tbl);
-                if (tbl.Pk == 0)
-                    db.Entry(tbl).State = EntityState.Added;
-                else
-                    db.Entry(tbl).State = EntityState.Modified;
+            await using DbEntities db = new DbEntities();
+            db.InDocTables.Attach(tbl);
+            if (tbl.Pk == 0)
+                db.Entry(tbl).State = EntityState.Added;
+            else
+                db.Entry(tbl).State = EntityState.Modified;
 
-                db.SaveChanges();
-            }
+            await db.SaveChangesAsync(cancellationToken);
         }
         
         public static async Task SaveIfNotExistsAsync(InDocTables tbl, CancellationToken cancellationToken = default(CancellationToken))
@@ -151,47 +147,6 @@ namespace HlidacStatu.Repositories
                 return stat;
             }
         }
-
-        //todo: change this so it is more obvious it saves all the table
-        // it is important to save category here! (or somewhere else)
-        // but we cant forget about this
-        public static async Task ChangeStatus(InDocTables tbl, InDocTables.CheckState status, string checkedBy,
-            long checkElapsedTimeInMS)
-        {
-            await using (DbEntities db = new DbEntities())
-            {
-                db.InDocTables.Attach(tbl);
-                if (tbl.Pk == 0)
-                    db.Entry(tbl).State = EntityState.Added;
-                else
-                    db.Entry(tbl).State = EntityState.Modified;
-
-                tbl.CheckStatus = status;
-                tbl.CheckedBy = checkedBy;
-                tbl.CheckedDate = System.DateTime.Now;
-                tbl.CheckElapsedInMs = (int)checkElapsedTimeInMS;
-
-                await db.SaveChangesAsync();
-
-            }
-        }
-
-        public static async Task ChangeCategoryAsync(InDocTables tbl, string category)
-        {
-            await using (DbEntities db = new DbEntities())
-            {
-                db.InDocTables.Attach(tbl);
-                if (tbl.Pk == 0)
-                    db.Entry(tbl).State = EntityState.Added;
-                else
-                    db.Entry(tbl).State = EntityState.Modified;
-
-                tbl.Klasifikace = category;
-                
-                await db.SaveChangesAsync();
-
-            }
-        }
         
         public static List<InDocTables> GetAll()
         {
@@ -200,7 +155,5 @@ namespace HlidacStatu.Repositories
                 .AsNoTracking()
                 .ToList();
         }
-
-
     }
 }

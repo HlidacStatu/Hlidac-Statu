@@ -79,11 +79,14 @@ namespace HlidacStatu.JobTableEditor.Data
                 await SaveJobs(table.FoundJobs);
             }
             
-            await InDocTablesRepo.ChangeStatus(table.InDocTable,
-                status,
-                table.Author,
-                (long)table.ProcessingTime.TotalMilliseconds);
-
+            var idt = table.InDocTable;
+            idt.CheckStatus = status;
+            idt.CheckedBy = table.Author;
+            idt.CheckedDate = DateTime.Now;
+            idt.CheckElapsedInMs = (int)table.ProcessingTime.TotalMilliseconds;
+            
+            await InDocTablesRepo.SaveAsync(idt);
+            
             if (status == InDocTables.CheckState.Done)
             {
                 var cells = new InDocTableCells()
