@@ -8,15 +8,17 @@
 <td class="@dropClass @cellStyle" @onclick="ColorChange"
     draggable="true"
     ondragover="event.preventDefault();"
-    @ondragstart="@(() => Swapper.Swap(this))"
+    @ondragstart="@(() => Swapper.StartSwap(this))"
     @ondrop="HandleDrop"
     @ondragenter="HandleDragEnter"
     @ondragleave="HandleDragLeave">
     
     <textarea @onclick:stopPropagation="true" 
-        @onclick:preventDefault="true" 
+        @onclick:preventDefault="true"
         @ondragover="HandleDragEnter"
         @ondragenter="HandleDragEnter"
+        draggable="true"
+        ondragstart="event.preventDefault(); event.stopPropagation();"
         rows="2" class="form-control" @bind="@CellShell.Value"></textarea>
     @if (!string.IsNullOrWhiteSpace(CellShell.Error))
     {
@@ -38,7 +40,7 @@
     
     private string dropClass = "";
     private string cellStyle;
-    private string swapButtonStyle = "fas fa-retweet";
+    
 
     private void HandleDataChange(object? sender, PropertyChangedEventArgs propertyChangedEventArgs)
     {
@@ -67,7 +69,6 @@
 
     public void Redraw(bool isMarked)
     {
-        swapButtonStyle = isMarked ? "fas fa-retweet text-danger" : "fas fa-retweet";
         SetCellStyle();
         StateHasChanged();
     }
@@ -96,7 +97,7 @@
     {
         dropClass = "";
 
-        Swapper.Swap(this);
+        Swapper.EndSwap(this);
     }
 
 }
