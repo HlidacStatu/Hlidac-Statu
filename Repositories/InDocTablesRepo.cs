@@ -155,5 +155,17 @@ namespace HlidacStatu.Repositories
                 .AsNoTracking()
                 .ToList();
         }
+
+        public static async Task<int> WaitingInQueue(string obor, CancellationToken cancellationToken)
+        {
+            await using var db = new DbEntities();
+            var count = await db.InDocTables
+                .AsNoTracking()
+                .Where(m => m.Status == (int)InDocTables.CheckState.WaitingInQueue)
+                .Where(t => t.Klasifikace.StartsWith(obor))
+                .CountAsync(cancellationToken);
+            
+            return count;
+        }
     }
 }

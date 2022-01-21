@@ -6,18 +6,19 @@
 @using System.Threading
 @using HlidacStatu.DetectJobs
 @using HlidacStatu.Repositories.Exceptions
+@using Microsoft.Extensions.Logging
+@using System.Diagnostics
 
 @inject JobService JobService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+@inject ILogger<TableEditor> Logger
 
 @attribute [Authorize(Roles = "Admin,TableEditor")]
 
-<h1>Job editor</h1>
-
-<hr style="margin-bottom: 20px;"/>
 @if (_exceptionMessage.HasValue)
 {
+    //todo: use toasts https://getbootstrap.com/docs/5.0/components/toasts/
     <h4>
         @_exceptionMessage.Value
     </h4>
@@ -39,6 +40,16 @@ else
             <button class="btn btn-secondary btn-sm" @onclick="AddColumn">Přidej sloupec</button>
             <button class="btn btn-secondary btn-sm" @onclick="AddRow">Přidej řádek</button>
             <LinkToOriginal InDocTable="@_table.InDocTable"></LinkToOriginal>
+        </div>
+        <div class="col-4">
+            <span class="badge rounded-pill bg-success">
+                Hotovo: @_processedTables.ToString("#,#")
+                <span class="visually-hidden">tabulek</span>
+            </span>
+            <span class="badge rounded-pill bg-danger">
+                Zbývá: @_queuedTables.ToString("#,#")
+                <span class="visually-hidden">tabulek</span>
+            </span>
         </div>
     </div>
     <hr style="margin-bottom:20px;"/>
@@ -107,10 +118,12 @@ else
     private MarkupString? _exceptionMessage;
     
     private int _processedTables;
+    private int _queuedTables = 0;
 
     private int _syncIndicator = 0;
     
     private string _userName;
+
 
     protected override async Task OnParametersSetAsync()
     {
@@ -139,13 +152,15 @@ else
 
     private async Task LoadNewTable()
     {
+        var queueTask = JobService.WaitingInQueue(Obor, CancellationToken.None);
+        var sw = Stopwatch.StartNew();
+        sw.Start();
         if (SpecificTablePk.HasValue && SpecificTablePk != 0) //todo: lock only for admins?
         {
             _table = await JobService.GetSpecificTable(SpecificTablePk.Value, _userName, CancellationToken.None);
         }
         else
         {
-
             try
             {
                 _table = await JobService.GetNewTable(Obor, _userName, CancellationToken.None);
@@ -159,12 +174,26 @@ else
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Logger.LogDebug(e, "Load new table problem");
                 throw;
             }
         }
+
+        try
+        {
+            _queuedTables = await queueTask;
+        }
+        catch (Exception e)
+        {
+            Logger.LogDebug(e, "Queue task problem");
+            
+        }
+        
         
         StateHasChanged();
+        
+        sw.Stop();
+        Logger.LogDebug($"Total load time: {sw.ElapsedMilliseconds}ms");
     }
 
     private async Task SaveTable()
@@ -254,7 +283,7 @@ else
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Logger.LogDebug(e, "Hlaska problem");
             _hlaska = new MarkupString($"Nepodařilo se mi vymyslet správnou hlášku. Omlouvám se... <br/> Chyba je v {e.Message}");
         }
         
@@ -281,7 +310,7 @@ else
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Logger.LogDebug(e, "SaveChanges problem");
             _errorMessage = e.Message;
             return false;
         }

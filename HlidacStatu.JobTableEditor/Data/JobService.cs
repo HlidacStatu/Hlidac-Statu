@@ -4,8 +4,10 @@ using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace HlidacStatu.JobTableEditor.Data
@@ -13,22 +15,48 @@ namespace HlidacStatu.JobTableEditor.Data
     public class JobService
     {
         static readonly InTables it_inTables = new("IT", IT.Keywords, IT.OtherWords, IT.BlacklistedWords);
+        
+        ILogger<JobService> _logger;
 
+        public JobService(ILogger<JobService> logger)
+        {
+            _logger = logger;
+        }
+        
         public async Task<SomeTable> GetNewTable(string obor, string user, CancellationToken cancellationToken)
         {
             //todo: až bude víc oborů, tak to tady rozšířit, aby se načítal konkrétní obor
             // nejprve v tabulce a poté se použil správný parser
+            
+            //stopwatch
+            var sw = new Stopwatch(); 
+            sw.Start();
             var table = await InDocTablesRepo.GetNextForCheck(obor, user, cancellationToken);
+            sw.Stop();
+            var getNextForCheckTime = sw.ElapsedMilliseconds;
+            
+            sw.Restart();
             var cells = InTables.TableToCells(table.ParsedContent());
+            sw.Stop();
+            var tableToCellsTime = sw.ElapsedMilliseconds;
+            
+            sw.Restart();
             var score = it_inTables.CellsWithWordsAndNumbers(cells, out var foundJobs);
-
+            sw.Stop();
+            var cellsWithWordsAndNumbersTime = sw.ElapsedMilliseconds;
+            
+            sw.Restart();
             var st = new SomeTable
             {
                 Author = user,
                 Cells = WrapCells(cells),
                 InDocTable = table
             };
-
+            sw.Stop();
+            
+            var wrapCellsTime = sw.ElapsedMilliseconds;
+            int width = cells.Length > 0 ? cells[0].Length : 0;
+            _logger.LogDebug($"GetNewTable loading times - W:{width}, H:{cells.Length} - \nnfc: {getNextForCheckTime}ms \nttc: {tableToCellsTime}ms \ncwwn: {cellsWithWordsAndNumbersTime}ms \nwc: {wrapCellsTime}ms");
             return st;
         }
 
@@ -46,6 +74,11 @@ namespace HlidacStatu.JobTableEditor.Data
             };
 
             return st;
+        }
+        
+        public async Task<int> WaitingInQueue(string obor, CancellationToken cancellationToken)
+        {
+            return await InDocTablesRepo.WaitingInQueue(obor, cancellationToken);
         }
         
         public async Task<List<InDocTables>> LoadHistory(string user, int take, CancellationToken cancellationToken)
@@ -103,7 +136,7 @@ namespace HlidacStatu.JobTableEditor.Data
             }
         }
 
-        private static async Task SaveJobs(List<InDocJobs> jobs)
+        private async Task SaveJobs(List<InDocJobs> jobs)
         {
             try
             {
@@ -111,6 +144,7 @@ namespace HlidacStatu.JobTableEditor.Data
             }
             catch (Exception e)
             {
+                _logger.LogDebug(e, $"Save jobs failed");
                 Console.WriteLine(e);
                 throw;
             }
