@@ -1,0 +1,46 @@
+@if (ToastMessage is not null && !ToastMessage.IsDismissed)
+{
+    <div class="toast @_toastClass show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">@ToastMessage.Title</strong>
+            <small class="text-muted">@ToastMessage.Created.ToString("T")</small>
+            <button type="button" class="btn-close" aria-label="Close" @onclick="ToastMessage.Dismiss"></button>
+        </div>
+        <div class="toast-body">
+            @ToastMessage.Message
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public ToastService.ToastMessage ToastMessage { get; set; }
+    
+    private string _toastClass = "";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (ToastMessage is not null)
+        {
+            _toastClass = ToastMessage.ToastLevel switch
+            {
+                ToastService.ToastLevel.Success => "bg-success",
+                ToastService.ToastLevel.Info => "bg-info",
+                ToastService.ToastLevel.Warning => "bg-warning",
+                ToastService.ToastLevel.Error => "bg-danger",
+                _ => ""
+            };
+        }
+
+        await DismissInFiveSeconds();
+    }
+
+    private async Task DismissInFiveSeconds()
+    {
+        await Task.Delay(5000);
+        ToastMessage.Dismiss();
+    }
+
+
+}

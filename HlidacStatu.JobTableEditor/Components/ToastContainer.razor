@@ -1,0 +1,30 @@
+<div class="toast-container position-fixed bottom-0 end-0 pb-5 pe-3" style="z-index: 9999">
+    
+    @if (_messages is not null && _messages.Count > 0)
+    {
+        foreach (var toastMessage in _messages)
+        {
+            <Toast ToastMessage="toastMessage" />
+        }
+        
+    }
+    
+</div>
+
+@code {
+    [Inject] ToastService ToastService { get; set; }
+
+    private List<ToastService.ToastMessage> _messages;
+    
+    protected override void OnInitialized()
+    {
+        ToastService.OnChange += Refresh;
+    }
+    
+    private async Task Refresh(List<ToastService.ToastMessage> messages)
+    {
+        _messages = messages;
+        await InvokeAsync(StateHasChanged);
+    }
+
+}
