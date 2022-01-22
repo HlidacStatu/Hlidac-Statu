@@ -319,22 +319,5 @@ else
         
     }
 
-    private void RefreshPage()
-    {
-        StateHasChanged();
-    }
-    
-    private void TotalRefresh()
-    {
-        _syncIndicator++;
-        StateHasChanged();
-    }
-
-    private async Task DismissCountdown()
-    {
-        await Task.Delay(2000);
-        
-    }
-
 }
 

@@ -7,27 +7,23 @@ namespace HlidacStatu.JobTableEditor.Data
     {
         private Cell CellToSwap;
         
-        public void Swap(Cell cell)
+        public void EndSwap(Cell cell)
         {
             if (cell == null) throw new ArgumentNullException(nameof(cell));
 
             if (CellToSwap is null)
             {
-                CellToSwap = cell;
-                CellToSwap.Redraw(true);
                 return;
             }
 
             if (!ReferenceEquals(CellToSwap, cell))
             {
-                var value = CellToSwap.CellShell.Value;
-                var cellType = CellToSwap.CellShell.CellType;
-
-                CellToSwap.CellShell.Value = cell.CellShell.Value;
-                CellToSwap.CellShell.CellType = cell.CellShell.CellType;
-
-                cell.CellShell.Value = value;
-                cell.CellShell.CellType = cellType;
+                (CellToSwap.CellShell.Value, cell.CellShell.Value ) = 
+                    (cell.CellShell.Value, CellToSwap.CellShell.Value);
+                (CellToSwap.CellShell.CellType, cell.CellShell.CellType) = 
+                    (cell.CellShell.CellType, CellToSwap.CellShell.CellType);
+                (CellToSwap.CellShell.IsImportant, cell.CellShell.IsImportant) = 
+                    (cell.CellShell.IsImportant, CellToSwap.CellShell.IsImportant);
             }
             CellToSwap.SetCellStyle();
             cell.SetCellStyle();
@@ -36,6 +32,12 @@ namespace HlidacStatu.JobTableEditor.Data
             cell.Redraw(false);
 
             CellToSwap = null;
+        }
+
+        public void StartSwap(Cell cell)
+        {
+            CellToSwap = cell ?? throw new ArgumentNullException(nameof(cell));
+            CellToSwap.Redraw(true);
         }
     }
 }
