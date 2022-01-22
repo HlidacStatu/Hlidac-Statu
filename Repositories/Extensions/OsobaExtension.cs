@@ -133,19 +133,32 @@ namespace HlidacStatu.Extensions
 
         public static bool NotInterestingToShow(this Osoba osoba)
         {
-            var res = osoba.StatusOsoby() == Osoba.StatusOsobyEnum.NeniPolitik
-                      && osoba.MaVztahySeStatem() == false;
+            var showIt = osoba.StatusOsoby() == Osoba.StatusOsobyEnum.Politik 
+                || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.ByvalyPolitik
+                || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.Sponzor
+                || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VysokyUrednik
+                || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VazbyNaPolitiky
+                ;
+            if (showIt)
+                return !showIt;
 
-            res = res || (osoba.StatusOsoby() == Osoba.StatusOsobyEnum.Sponzor
-                          && osoba.IsSponzor() == false
-                );
+            showIt = showIt || osoba.MaVztahySeStatem();
+            if (showIt)
+                return !showIt;
 
-            res = res || osoba.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmySummary().Summary().PocetSmluv ==0;
+            showIt = showIt || osoba.IsSponzor();
+            if (showIt)
+                return !showIt;
+
+            showIt = showIt || osoba.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmySummary().Summary().PocetSmluv >0;
+            if (showIt)
+                return !showIt;
+
 
             if (osoba.NameId == "radek-jonke")
                 return true;
 
-            return res;
+            return !showIt;
         }
 
         public static bool IsSponzor(this Osoba osoba)
