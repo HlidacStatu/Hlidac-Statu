@@ -155,6 +155,41 @@ namespace HlidacStatu.Entities
                 && a.Type == b.Type;
         }
 
+        public bool IsOverlaping(OsobaEvent other, out OsobaEvent mergedEvent)
+        {
+            int tolerance = 5; //days
+            mergedEvent = default;
+
+            if (Type == other.Type
+                && string.Equals(AddInfo?.Trim() ?? "", other.AddInfo?.Trim() ?? "", StringComparison.InvariantCultureIgnoreCase)
+                && string.Equals(Organizace?.Trim() ?? "", other.Organizace?.Trim() ?? "", StringComparison.InvariantCultureIgnoreCase)
+                && string.Equals(AddInfo?.Trim() ?? "", other.AddInfo?.Trim() ?? "", StringComparison.InvariantCultureIgnoreCase)
+                && string.Equals(Ico?.Trim() ?? "", other.Ico?.Trim() ?? "", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var origDatumDo = DatumDo?.AddDays(tolerance) ?? DateTime.MaxValue;
+                var origDatumOd = DatumOd?.AddDays(-tolerance) ?? DateTime.MinValue;
+                var otherDatumDo = other.DatumDo?.AddDays(tolerance) ?? DateTime.MaxValue;
+                var otherDatumOd = other.DatumOd?.AddDays(-tolerance) ?? DateTime.MinValue;
+                
+                if (origDatumDo >= otherDatumOd && origDatumDo <= otherDatumDo)
+                {
+                    mergedEvent = this.ShallowCopy();
+                    mergedEvent.DatumDo = other.DatumDo;
+                    return true;
+                }
+
+                if (origDatumOd >= otherDatumOd && origDatumOd <= otherDatumDo)
+                {
+                    mergedEvent = this.ShallowCopy();
+                    mergedEvent.DatumOd = other.DatumOd;
+                    return true;
+                }
+
+            }
+
+            return false;
+        }
+
 
 
     }
