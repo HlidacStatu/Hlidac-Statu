@@ -1,8 +1,7 @@
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+using System.Web;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
 
 namespace HlidacStatu.JobTableEditor.Data
 {
@@ -10,7 +9,7 @@ namespace HlidacStatu.JobTableEditor.Data
     {
         public class ToastMessage
         {
-            public ToastMessage(string title, string message, ToastLevel toastLevel)
+            public ToastMessage(string title, MarkupString message, ToastLevel toastLevel)
             {
                 Title = title;
                 Message = message;
@@ -22,7 +21,7 @@ namespace HlidacStatu.JobTableEditor.Data
             public string Id { get; } = Guid.NewGuid().ToString();
             public DateTime Created { get; } = DateTime.Now;
             public string Title { get; init; }
-            public string Message { get; init; }
+            public MarkupString Message { get; init; }
             public ToastLevel ToastLevel { get; init; }
             public bool IsDismissed { get; private set; }
             
@@ -54,35 +53,25 @@ namespace HlidacStatu.JobTableEditor.Data
         
         public event Func<ToastMessage, Task> OnChange;
         
-        public async Task CreateInfoToast(string title, string message)
-        {
-            await CreateToast(ToastLevel.Info, title, message);
-        }
-        
-        public async Task CreateSuccessToast(string title, string message)
-        {
-            await CreateToast(ToastLevel.Success, title, message);
-        }
-        
-        public async Task CreateWarningToast(string title, string message)
-        {
-            await CreateToast(ToastLevel.Warning, title, message);
-        }
-        
-        public async Task CreateErrorToast(string title, string message)
-        {
-            await CreateToast(ToastLevel.Error, title, message);
-        }
+        public Task CreateInfoToast(string title, string message) => CreateToast(ToastLevel.Info, title, message);
+        public Task CreateInfoToast(string title, MarkupString message) => CreateToast(ToastLevel.Info, title, message);
+        public Task CreateSuccessToast(string title, string message) => CreateToast(ToastLevel.Success, title, message);
+        public Task CreateSuccessToast(string title, MarkupString message) => CreateToast(ToastLevel.Success, title, message);
+        public Task CreateWarningToast(string title, string message) => CreateToast(ToastLevel.Warning, title, message);
+        public Task CreateWarningToast(string title, MarkupString message) => CreateToast(ToastLevel.Warning, title, message);
+        public Task CreateErrorToast(string title, string message) => CreateToast(ToastLevel.Error, title, message);
+        public Task CreateErrorToast(string title, MarkupString message) => CreateToast(ToastLevel.Error, title, message);
 
-        private async Task CreateToast(ToastLevel toastLevel, string title, string message)
+        private Task CreateToast(ToastLevel toastLevel, string title, string message) =>
+            CreateToast(toastLevel, title, new MarkupString(HttpUtility.HtmlEncode(message)));
+
+        private async Task CreateToast(ToastLevel toastLevel, string title, MarkupString message)
         {
-            var toastMessage = new ToastMessage(title: title, message: message, toastLevel: toastLevel);
+            var toastMessage = new ToastMessage(title, message, toastLevel);
 
             await NotifyChange(toastMessage);
         }
-
         
-
         
 
         private async Task NotifyChange(ToastMessage toastMessage)

@@ -1,6 +1,5 @@
 ﻿@page "/tableEditor/{obor}/{SpecificTablePk:int?}"
 
-
 @using HlidacStatu.Entities
 @using System.Threading
 @using HlidacStatu.DetectJobs
@@ -16,31 +15,17 @@
 
 @attribute [Authorize(Roles = "Admin,TableEditor")]
 
-@if (_exceptionMessage.HasValue)
-{
-    //todo: use toasts https://getbootstrap.com/docs/5.0/components/toasts/
-    <h4>
-        @_exceptionMessage.Value
-    </h4>
-    <hr style="margin-bottom: 20px;"/>
-}
-
 @if (_table == null)
 {
-    if (!_exceptionMessage.HasValue)
-    {
-        <p>Načítám tabulku&hellip;</p>
-    }
+    <p>Načítám tabulku&hellip;</p>
 }
 else
 {
-    <AlertMessage Text="Načetl jsem pro tebe novou tabulku."></AlertMessage>
     <div class="sticky-top pt-2 col-6 row">
         <div class="col-8">
             <button class="btn btn-secondary btn-sm" @onclick="AddColumn">Přidej sloupec</button>
             <button class="btn btn-secondary btn-sm" @onclick="AddRow">Přidej řádek</button>
             <LinkToOriginal InDocTable="@_table.InDocTable"></LinkToOriginal>
-            <button class="btn btn-secondary btn-sm" @onclick="ToastIt">ToastIt</button>
         </div>
         <div class="col-4">
             <span class="badge rounded-pill bg-success">
@@ -115,16 +100,12 @@ else
     private string _errorMessage;
     private CellSwapper Swapper { get; } = new CellSwapper();
     
-    private MarkupString? _hlaska;
-    private MarkupString? _exceptionMessage;
-    
     private int _processedTables;
     private int _queuedTables = 0;
 
     private int _syncIndicator = 0;
     
     private string _userName;
-
 
     protected override async Task OnParametersSetAsync()
     {
@@ -171,11 +152,12 @@ else
             }
             catch (NoDataFoundException ndfe)
             {
-                _exceptionMessage = new MarkupString($"<div class=\"alert alert-warning\" role=\"alert\">Ve frontě už není žádná další tabulka ke zpracování.</div>");
+                await ToastService.CreateInfoToast("Fronta zpracována", "Podařilo se vám zpracovat všechny tabulky. Dobrá práce!");
             }
             catch (Exception e)
             {
                 Logger.LogDebug(e, "Load new table problem");
+                await ToastService.CreateErrorToast("Problém s načítáním", "Nepodařilo se načíst novou tabulku!");
                 throw;
             }
         }
@@ -189,7 +171,8 @@ else
             Logger.LogDebug(e, "Queue task problem");
             
         }
-        
+
+        await ToastService.CreateInfoToast("Nová tabulka", "Načtena nová tabulka.");
         
         StateHasChanged();
         
@@ -256,37 +239,38 @@ else
         _errorMessage = "";
         _processedTables++;
 
+        MarkupString hlaska;
         try
         {
             switch (_processedTables % 100)
             {
                 case 20:
-                    _hlaska = new MarkupString("Zasloužíš si <i class=\"fad fa-mug-hot\"></i>");
-                    return;
+                    hlaska = new MarkupString("Zasloužíš si <i class=\"fad fa-mug-hot\"></i>");
+                    break;
                 case 40:
-                    _hlaska = new MarkupString("<i class=\"fal fa-smoking\"></i> Pauzu?");
-                    return;
+                    hlaska = new MarkupString("<i class=\"fal fa-smoking\"></i> Pauzu?");
+                    break;
                 case 60:
-                    _hlaska = new MarkupString("Nemáš hlad <i class=\"fal fa-cookie\"></i>");
-                    return;
+                    hlaska = new MarkupString("Nemáš hlad <i class=\"fal fa-cookie\"></i>");
+                    break;
                 case 80:
-                    _hlaska = new MarkupString("<i class=\"fad fa-running\"></i> Co se takhle trochu protáhnout?");
-                    return;
+                    hlaska = new MarkupString("<i class=\"fad fa-running\"></i> Co se takhle trochu protáhnout?");
+                    break;
                 case 99:
-                    _hlaska = new MarkupString("Tvůj dnešní výkon je na <i class=\"fad fa-medal\"></i>");
-                    return;
+                    hlaska = new MarkupString("Tvůj dnešní výkon je na <i class=\"fad fa-medal\"></i>");
+                    break;
                 default:
+                    hlaska = new MarkupString($"{pochvaly[_processedTables % (pochvaly.Length)]}");
                     break;
             }
-
-            var randomStatistic = await JobService.GetRandomStatistic(_userName, CancellationToken.None);
-            _hlaska = new MarkupString($"{pochvaly[_processedTables % (pochvaly.Length)]} <br/> {randomStatistic}");
         }
         catch (Exception e)
         {
             Logger.LogDebug(e, "Hlaska problem");
-            _hlaska = new MarkupString($"Nepodařilo se mi vymyslet správnou hlášku. Omlouvám se... <br/> Chyba je v {e.Message}");
+            hlaska = new MarkupString($"Nepodařilo se mi vymyslet správnou hlášku. Omlouvám se... <br/> Chyba je v {e.Message}");
         }
+        
+        await ToastService.CreateSuccessToast("Tabulka uložena", hlaska);
         
         StateHasChanged();
 
@@ -313,6 +297,7 @@ else
         {
             Logger.LogDebug(e, "SaveChanges problem");
             _errorMessage = e.Message;
+            await ToastService.CreateErrorToast("Problém s ukládáním", "Nepodařilo se uložit data!");
             return false;
         }
 
@@ -347,14 +332,6 @@ else
             _table.Cells[lastRow][col] = new CellShell(new InTables.Cell(), lastRow, col);
         }
         
-    }
-
-    private async Task ToastIt()
-    {
-        await ToastService.CreateInfoToast("Tohle je infotoust"," S velmi důležitou zprávou! ");
-        await ToastService.CreateSuccessToast("Good my padawan","Uloženo");
-        await ToastService.CreateWarningToast("Bacha zatáčka","Nenarazit");
-        await ToastService.CreateErrorToast("Tohle je chyba"," Velká chyba! ");
     }
 
 }
