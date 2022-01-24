@@ -8,6 +8,7 @@
 
 @inject JobService JobService
 @inject ILogger<Modal> Logger
+@inject ToastService ToastService
 
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-primary" @onclick="LoadJobs">
@@ -260,7 +261,7 @@
         }
     }
 
-    private void ChangeUnitCount(ChangeEventArgs arg)
+    private async Task ChangeUnitCount(ChangeEventArgs arg)
     {
         try
         {
@@ -278,11 +279,12 @@
         }
         catch (Exception e)
         {
+            await ToastService.CreateErrorToast("Problém", "Neočekávaný problém - nepodařilo se změnit počet jednotek.");
             Logger.LogDebug(e, "ChangeUnitCount failed");
         }
     }
 
-    private void ChangeVAT(ChangeEventArgs arg)
+    private async Task ChangeVAT(ChangeEventArgs arg)
     {
         try
         {
@@ -300,6 +302,7 @@
         }
         catch (Exception e)
         {
+            await ToastService.CreateErrorToast("Problém", "Neočekávaný problém - nepodařilo se změnit hodnotu DPH.");
             Logger.LogDebug(e, "ChangeVAT failed");
         }
     }
