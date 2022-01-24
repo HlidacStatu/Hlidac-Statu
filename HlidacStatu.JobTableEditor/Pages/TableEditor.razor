@@ -1,7 +1,6 @@
 ﻿@page "/tableEditor/{obor}/{SpecificTablePk:int?}"
 
-@using HlidacStatu.JobTableEditor.Data
-@using HlidacStatu.JobTableEditor.Components
+
 @using HlidacStatu.Entities
 @using System.Threading
 @using HlidacStatu.DetectJobs
@@ -10,6 +9,7 @@
 @using System.Diagnostics
 
 @inject JobService JobService
+@inject ToastService ToastService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject ILogger<TableEditor> Logger
@@ -40,6 +40,7 @@ else
             <button class="btn btn-secondary btn-sm" @onclick="AddColumn">Přidej sloupec</button>
             <button class="btn btn-secondary btn-sm" @onclick="AddRow">Přidej řádek</button>
             <LinkToOriginal InDocTable="@_table.InDocTable"></LinkToOriginal>
+            <button class="btn btn-secondary btn-sm" @onclick="ToastIt">ToastIt</button>
         </div>
         <div class="col-4">
             <span class="badge rounded-pill bg-success">
@@ -346,6 +347,14 @@ else
             _table.Cells[lastRow][col] = new CellShell(new InTables.Cell(), lastRow, col);
         }
         
+    }
+
+    private async Task ToastIt()
+    {
+        await ToastService.CreateInfoToast("Tohle je infotoust"," S velmi důležitou zprávou! ");
+        await ToastService.CreateSuccessToast("Good my padawan","Uloženo");
+        await ToastService.CreateWarningToast("Bacha zatáčka","Nenarazit");
+        await ToastService.CreateErrorToast("Tohle je chyba"," Velká chyba! ");
     }
 
 }

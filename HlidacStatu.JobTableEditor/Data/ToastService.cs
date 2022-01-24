@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Timers;
 
 namespace HlidacStatu.JobTableEditor.Data
 {
@@ -11,6 +10,15 @@ namespace HlidacStatu.JobTableEditor.Data
     {
         public class ToastMessage
         {
+            public ToastMessage(string title, string message, ToastLevel toastLevel)
+            {
+                Title = title;
+                Message = message;
+                ToastLevel = toastLevel;
+
+                _ = Task.Run(async () => await DismissInFiveSeconds()).ConfigureAwait(false);
+            }
+
             public string Id { get; } = Guid.NewGuid().ToString();
             public DateTime Created { get; } = DateTime.Now;
             public string Title { get; init; }
@@ -18,9 +26,19 @@ namespace HlidacStatu.JobTableEditor.Data
             public ToastLevel ToastLevel { get; init; }
             public bool IsDismissed { get; private set; }
             
-            public void Dismiss()
+            public Func<Task> NotifyDismissed { get; set; }
+
+            public async Task Dismiss()
             {
                 IsDismissed = true;
+                if(NotifyDismissed != null)
+                    await NotifyDismissed();
+            }
+            
+            private async Task DismissInFiveSeconds()
+            {
+                await Task.Delay(5000).ConfigureAwait(false);
+                await Dismiss();
             }
         }
         
@@ -32,14 +50,9 @@ namespace HlidacStatu.JobTableEditor.Data
             Error
         }
         
-        private Timer _cleaningTimer = new Timer(60 * 1000) // once per minute
-        {
-            AutoReset = true,
-        }; 
         
-        private ConcurrentDictionary<string, ToastMessage> ToastMessages { get; } = new();
         
-        public event Func<List<ToastMessage>, Task> OnChange;
+        public event Func<ToastMessage, Task> OnChange;
         
         public async Task CreateInfoToast(string title, string message)
         {
@@ -63,40 +76,19 @@ namespace HlidacStatu.JobTableEditor.Data
 
         private async Task CreateToast(ToastLevel toastLevel, string title, string message)
         {
-            var toastMessage = new ToastMessage
-            {
-                Title = title,
-                Message = message,
-                ToastLevel = toastLevel,
-            };
-            
-            ToastMessages.TryAdd(toastMessage.Id, toastMessage);
+            var toastMessage = new ToastMessage(title: title, message: message, toastLevel: toastLevel);
 
-            await NotifyChange();
+            await NotifyChange(toastMessage);
         }
 
-        public ToastService()
-        {
-            _cleaningTimer.Elapsed += CleaningTimerTick;
-            _cleaningTimer.Start();
-        }
+        
 
-        private void CleaningTimerTick(object sender, ElapsedEventArgs e)
-        {
-            if (ToastMessages.Count == 0)
-                return;
-            
-            var toastIdsToRemove = ToastMessages.Values.Where(t => t.IsDismissed).Select(t => t.Id).ToList();
-            foreach (var toastIdToRemove in toastIdsToRemove)
-            {
-                ToastMessages.TryRemove(toastIdToRemove, out _);
-            }
-        }
+        
 
-        private async Task NotifyChange()
+        private async Task NotifyChange(ToastMessage toastMessage)
         {
             if (OnChange != null)
-                await OnChange(ToastMessages.Values.OrderByDescending(t => t.Created).ToList());
+                await OnChange(toastMessage);
         }
 
     }

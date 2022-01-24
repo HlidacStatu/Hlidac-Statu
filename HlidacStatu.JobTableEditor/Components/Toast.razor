@@ -1,3 +1,5 @@
+@implements IDisposable
+
 @if (ToastMessage is not null && !ToastMessage.IsDismissed)
 {
     <div class="toast @_toastClass show" role="alert" aria-live="assertive" aria-atomic="true">
@@ -19,7 +21,7 @@
     
     private string _toastClass = "";
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
         if (ToastMessage is not null)
         {
@@ -31,16 +33,22 @@
                 ToastService.ToastLevel.Error => "bg-danger",
                 _ => ""
             };
+            
+            ToastMessage.NotifyDismissed += Refresh;
         }
-
-        await DismissInFiveSeconds();
     }
 
-    private async Task DismissInFiveSeconds()
+    private async Task Refresh()
     {
-        await Task.Delay(5000);
-        ToastMessage.Dismiss();
+        await InvokeAsync(StateHasChanged);
     }
 
+    public void Dispose()
+    {
+        if (ToastMessage is not null)
+        {
+            ToastMessage.NotifyDismissed -= Refresh;
+        }
+    }
 
 }
