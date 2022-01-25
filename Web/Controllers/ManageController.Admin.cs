@@ -41,7 +41,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        [Authorize(Roles = "canEditData")]
+        [Authorize(Roles = "canEditData,TableEditor")]
         [HttpGet]
         public ActionResult ShowPrilohaTablesOnePage(string s, string p, int page)
         {
