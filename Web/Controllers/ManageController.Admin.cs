@@ -26,7 +26,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        [Authorize(Roles = "canEditData")]
+        [Authorize(Roles = "canEditData,TableEditor")]
         [HttpGet]
         public ActionResult ShowPrilohaTables(string s, string p)
         {
@@ -56,7 +56,7 @@ namespace HlidacStatu.Web.Controllers
             return View(new Tuple<string, string, int>(s, p, page));
         }
 
-        [Authorize(Roles = "canEditData")]
+        [Authorize(Roles = "canEditData,TableEditor")]
         [HttpGet]
         public ActionResult ShowPrilohaTablesOnePageImg(string s, string p, int page)
         {
