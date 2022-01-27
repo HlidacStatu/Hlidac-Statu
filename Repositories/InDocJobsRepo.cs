@@ -121,16 +121,25 @@ namespace HlidacStatu.Repositories
                     if (forceSubject != null)
                         jobSubject = forceSubject;
 
-                    var jobGroup = FindSimilar(jobSubject.ToUpper(), job.JobRaw);
-                    if (jobGroup != null)
+                    var classif = HlidacStatu.Connectors.External.TablePolozkaClassif.GetClassification(job.JobRaw);
+                    if (classif?.Count() > 0)
                     {
-                        job.JobGrouped = jobGroup.JobGrouped;
-                        job.Tags = jobGroup.Tags;
+                        job.JobGrouped = classif.First().Class;
+                        job.Tags = "";
                     }
                     else
                     {
-                        job.JobGrouped = null;
-                        job.Tags = null;
+                        var jobGroup = FindSimilar(jobSubject.ToUpper(), job.JobRaw);
+                        if (jobGroup != null)
+                        {
+                            job.JobGrouped = jobGroup.JobGrouped;
+                            job.Tags = jobGroup.Tags;
+                        }
+                        else
+                        {
+                            job.JobGrouped = null;
+                            job.Tags = null;
+                        }
                     }
                 }
                 if (dontChangeDates == false)

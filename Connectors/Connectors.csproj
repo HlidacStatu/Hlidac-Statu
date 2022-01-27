@@ -2,8 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <AssemblyName>HlidacStatu.DbManagers</AssemblyName>
-        <RootNamespace>HlidacStatu.DbManagers</RootNamespace>
+        <AssemblyName>HlidacStatu.Connectors</AssemblyName>
+        <RootNamespace>HlidacStatu.Connectors</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
