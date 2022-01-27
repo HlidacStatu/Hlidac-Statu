@@ -24,7 +24,7 @@
 		<PackageReference Include="Devmasters.IO" Version="3.1.1.1" />
 		<PackageReference Include="Devmasters.Lang" Version="3.1.0" />
 		<PackageReference Include="Devmasters.Logging" Version="3.1.2.2" />
-		<PackageReference Include="Devmasters.Net" Version="3.1.0" />
+		<PackageReference Include="Devmasters.Net" Version="3.1.1" />
 		<PackageReference Include="DnsClient" Version="1.5.0" />
 		<PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.11" />
