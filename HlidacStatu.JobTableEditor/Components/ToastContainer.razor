@@ -1,0 +1,52 @@
+@using System.Collections.Concurrent
+@implements IDisposable
+
+<div class="toast-container position-fixed bottom-0 end-0 pb-5 pe-3" style="z-index: 9999">
+    
+    @if (ToastMessages is not null && !ToastMessages.IsEmpty)
+    {
+        foreach (var toastMessage in ToastMessages.Values.OrderBy(t => t.Created))
+        {
+            <Toast ToastMessage="toastMessage" />
+        }
+        
+    }
+    
+</div>
+
+@code {
+    [Inject] ToastService ToastService { get; set; }
+
+    private ConcurrentDictionary<string, ToastService.ToastMessage> ToastMessages { get; } = new();
+    
+    protected override void OnInitialized()
+    {
+        ToastService.OnChange += AddMessage;
+    }
+    
+    private async Task AddMessage(ToastService.ToastMessage message)
+    {
+        CleanDismissedMessages();
+        
+        ToastMessages.TryAdd(message.Id, message);
+        
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void CleanDismissedMessages()
+    {
+        if (ToastMessages.Count == 0)
+            return;
+            
+        var toastIdsToRemove = ToastMessages.Values.Where(t => t.IsDismissed).Select(t => t.Id).ToList();
+        foreach (var toastIdToRemove in toastIdsToRemove)
+        {
+            ToastMessages.TryRemove(toastIdToRemove, out _);
+        }
+    }
+
+    public void Dispose()
+    {
+        ToastService.OnChange -= AddMessage;
+    }
+}

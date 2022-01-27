@@ -314,9 +314,28 @@ namespace HlidacStatu.Extensions
                 (int) OsobaEvent.Types.Jine
             };
 
-            var events = osoba.Events(predicate);
+            var events = osoba.Events(predicate).ToArray();
+            
+            //overlaping events
+            for (int currentIndex = 0; currentIndex < events.Length; currentIndex++)
+            {
+                for (int compareTo = currentIndex+1; compareTo < events.Length; compareTo++)
+                {
+                    // nebudeme porovnávat sám se sebou
+                    
+                    if (events[currentIndex].IsOverlaping(events[compareTo], out var mergedEvent))
+                    {
+                        events[compareTo] = mergedEvent;
+                        events[currentIndex] = null; // je potřeba zahodit zmergovaný
+                        break; // pokud někam uložíme, můžeme pokračovat dalším
+                    }
+                }
+            }
+            //odstranit prázdné
+            var mergedEvents = events.Where(e => e != null);
+            
 
-            List<string> evs = events
+            List<string> evs = mergedEvents
                 .OrderBy(o =>
                 {
                     var index = fixedOrder.IndexOf(o.Type);

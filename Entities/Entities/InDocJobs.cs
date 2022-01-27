@@ -96,6 +96,9 @@ namespace HlidacStatu.Entities
             [NiceDisplayName("min")]
             [SortValue(1)]
             Minuta = 18,
+            [NiceDisplayName("rok")]
+            [SortValue(4)]
+            Rok = 19,
             
         }
 

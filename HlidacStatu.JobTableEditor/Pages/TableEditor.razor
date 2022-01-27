@@ -1,44 +1,41 @@
 ﻿@page "/tableEditor/{obor}/{SpecificTablePk:int?}"
 
-@using HlidacStatu.JobTableEditor.Data
-@using HlidacStatu.JobTableEditor.Components
 @using HlidacStatu.Entities
 @using System.Threading
 @using HlidacStatu.DetectJobs
 @using HlidacStatu.Repositories.Exceptions
+@using Microsoft.Extensions.Logging
+@using System.Diagnostics
 
 @inject JobService JobService
+@inject ToastService ToastService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+@inject ILogger<TableEditor> Logger
 
 @attribute [Authorize(Roles = "Admin,TableEditor")]
 
-<h1>Job editor</h1>
-
-<hr style="margin-bottom: 20px;"/>
-@if (_exceptionMessage.HasValue)
-{
-    <h4>
-        @_exceptionMessage.Value
-    </h4>
-    <hr style="margin-bottom: 20px;"/>
-}
-
 @if (_table == null)
 {
-    if (!_exceptionMessage.HasValue)
-    {
-        <p>Načítám tabulku&hellip;</p>
-    }
+    <p>Načítám tabulku&hellip;</p>
 }
 else
 {
-    <AlertMessage Text="Načetl jsem pro tebe novou tabulku."></AlertMessage>
     <div class="sticky-top pt-2 col-6 row">
         <div class="col-8">
             <button class="btn btn-secondary btn-sm" @onclick="AddColumn">Přidej sloupec</button>
             <button class="btn btn-secondary btn-sm" @onclick="AddRow">Přidej řádek</button>
             <LinkToOriginal InDocTable="@_table.InDocTable"></LinkToOriginal>
+        </div>
+        <div class="col-4">
+            <span class="badge rounded-pill bg-success">
+                Hotovo: @_processedTables.ToString("#,#")
+                <span class="visually-hidden">tabulek</span>
+            </span>
+            <span class="badge rounded-pill bg-danger">
+                Zbývá: @_queuedTables.ToString("#,#")
+                <span class="visually-hidden">tabulek</span>
+            </span>
         </div>
     </div>
     <hr style="margin-bottom:20px;"/>
@@ -103,10 +100,8 @@ else
     private string _errorMessage;
     private CellSwapper Swapper { get; } = new CellSwapper();
     
-    private MarkupString? _hlaska;
-    private MarkupString? _exceptionMessage;
-    
     private int _processedTables;
+    private int _queuedTables = 0;
 
     private int _syncIndicator = 0;
     
@@ -139,13 +134,15 @@ else
 
     private async Task LoadNewTable()
     {
+        var queueTask = JobService.WaitingInQueue(Obor, CancellationToken.None);
+        var sw = Stopwatch.StartNew();
+        sw.Start();
         if (SpecificTablePk.HasValue && SpecificTablePk != 0) //todo: lock only for admins?
         {
             _table = await JobService.GetSpecificTable(SpecificTablePk.Value, _userName, CancellationToken.None);
         }
         else
         {
-
             try
             {
                 _table = await JobService.GetNewTable(Obor, _userName, CancellationToken.None);
@@ -155,16 +152,32 @@ else
             }
             catch (NoDataFoundException ndfe)
             {
-                _exceptionMessage = new MarkupString($"<div class=\"alert alert-warning\" role=\"alert\">Ve frontě už není žádná další tabulka ke zpracování.</div>");
+                await ToastService.CreateInfoToast("Fronta zpracována", "Podařilo se vám zpracovat všechny tabulky. Dobrá práce!");
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Logger.LogDebug(e, "Load new table problem");
+                await ToastService.CreateErrorToast("Problém s načítáním", "Nepodařilo se načíst novou tabulku!");
                 throw;
             }
         }
+
+        try
+        {
+            _queuedTables = await queueTask;
+        }
+        catch (Exception e)
+        {
+            Logger.LogDebug(e, "Queue task problem");
+            
+        }
+
+        await ToastService.CreateInfoToast("Nová tabulka", "Načtena nová tabulka.");
         
         StateHasChanged();
+        
+        sw.Stop();
+        Logger.LogDebug($"Total load time: {sw.ElapsedMilliseconds}ms");
     }
 
     private async Task SaveTable()
@@ -226,37 +239,38 @@ else
         _errorMessage = "";
         _processedTables++;
 
+        MarkupString hlaska;
         try
         {
             switch (_processedTables % 100)
             {
                 case 20:
-                    _hlaska = new MarkupString("Zasloužíš si <i class=\"fad fa-mug-hot\"></i>");
-                    return;
+                    hlaska = new MarkupString("Zasloužíš si <i class=\"fad fa-mug-hot\"></i>");
+                    break;
                 case 40:
-                    _hlaska = new MarkupString("<i class=\"fal fa-smoking\"></i> Pauzu?");
-                    return;
+                    hlaska = new MarkupString("<i class=\"fal fa-smoking\"></i> Pauzu?");
+                    break;
                 case 60:
-                    _hlaska = new MarkupString("Nemáš hlad <i class=\"fal fa-cookie\"></i>");
-                    return;
+                    hlaska = new MarkupString("Nemáš hlad <i class=\"fal fa-cookie\"></i>");
+                    break;
                 case 80:
-                    _hlaska = new MarkupString("<i class=\"fad fa-running\"></i> Co se takhle trochu protáhnout?");
-                    return;
+                    hlaska = new MarkupString("<i class=\"fad fa-running\"></i> Co se takhle trochu protáhnout?");
+                    break;
                 case 99:
-                    _hlaska = new MarkupString("Tvůj dnešní výkon je na <i class=\"fad fa-medal\"></i>");
-                    return;
+                    hlaska = new MarkupString("Tvůj dnešní výkon je na <i class=\"fad fa-medal\"></i>");
+                    break;
                 default:
+                    hlaska = new MarkupString($"{pochvaly[_processedTables % (pochvaly.Length)]}");
                     break;
             }
-
-            var randomStatistic = await JobService.GetRandomStatistic(_userName, CancellationToken.None);
-            _hlaska = new MarkupString($"{pochvaly[_processedTables % (pochvaly.Length)]} <br/> {randomStatistic}");
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            _hlaska = new MarkupString($"Nepodařilo se mi vymyslet správnou hlášku. Omlouvám se... <br/> Chyba je v {e.Message}");
+            Logger.LogDebug(e, "Hlaska problem");
+            hlaska = new MarkupString($"Nepodařilo se mi vymyslet správnou hlášku. Omlouvám se... <br/> Chyba je v {e.Message}");
         }
+        
+        await ToastService.CreateSuccessToast("Tabulka uložena", hlaska);
         
         StateHasChanged();
 
@@ -281,8 +295,9 @@ else
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Logger.LogDebug(e, "SaveChanges problem");
             _errorMessage = e.Message;
+            await ToastService.CreateErrorToast("Problém s ukládáním", "Nepodařilo se uložit data!");
             return false;
         }
 
