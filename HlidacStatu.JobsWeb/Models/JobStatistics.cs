@@ -1,12 +1,13 @@
+using MathNet.Numerics.Statistics;
+
 using System.Collections.Generic;
 using System.Linq;
-using MathNet.Numerics.Statistics;
 
 namespace HlidacStatu.JobsWeb.Models
 {
     public class JobStatistics
     {
-        static Dictionary<string, IEnumerable<Entities.InDocJobNameDescription>> jobDescriptions = 
+        static Dictionary<string, IEnumerable<Entities.InDocJobNameDescription>> jobDescriptions =
             new Dictionary<string, IEnumerable<Entities.InDocJobNameDescription>>();
 
         static JobStatistics()
@@ -14,7 +15,7 @@ namespace HlidacStatu.JobsWeb.Models
             using (var db = new Entities.DbEntities())
             {
                 var subjects = db.InDocJobNameDescription.AsEnumerable().Select(m => m.Subject.ToLower()).Distinct();
-                foreach (var subj in subjects.Where(m=>!string.IsNullOrEmpty(m)))
+                foreach (var subj in subjects.Where(m => !string.IsNullOrEmpty(m)))
                 {
                     jobDescriptions.Add(subj, db.InDocJobNameDescription.AsEnumerable().Where(m => m.Subject.ToLower() == subj).ToArray());
                 }
@@ -24,9 +25,11 @@ namespace HlidacStatu.JobsWeb.Models
         public JobStatistics()
         {
         }
-        
+
         public JobStatistics(IEnumerable<JobPrecalculated> precalculatedJobs, string name)
         {
+
+
             var salaryd = precalculatedJobs.Select(x => (double)x.PricePerUnit).ToList();
             decimal dolniKvartil = (decimal)salaryd.LowerQuartile();
             decimal horniKvartil = (decimal)salaryd.UpperQuartile();
@@ -42,7 +45,7 @@ namespace HlidacStatu.JobsWeb.Models
 
 
             precalculatedJobs
-                .Select(m=>m.AnalyzaName)
+                .Select(m => m.AnalyzaName)
                 .Distinct();
             Name = name;
 
@@ -69,8 +72,12 @@ namespace HlidacStatu.JobsWeb.Models
             SupplierCount = precalculatedJobs.SelectMany(x => x.IcaDodavatelu).Distinct().Count();
             ContractCount = precalculatedJobs.Select(x => x.SmlouvaId).Distinct().Count();
 
+            this.Dodavatele = precalculatedJobs.SelectMany(x => x.IcaDodavatelu).Distinct().ToArray();
+            this.Odberatele = precalculatedJobs.Select(x => x.IcoOdberatele).Distinct().ToArray();
+            this.Contracts = precalculatedJobs.Select(x => x.SmlouvaId).Distinct().ToArray();
+
         }
-        
+
         public string Name { get; set; }
         public string Description { get; set; }
         public decimal DolniKvartil { get; set; }
@@ -79,7 +86,7 @@ namespace HlidacStatu.JobsWeb.Models
         public decimal Maximum { get; set; }
         public decimal Average { get; set; }
         public decimal Median { get; set; }
-        
+
         public decimal LeftWhisk { get; set; }
         public decimal RightWhisk { get; set; }
         public decimal[] LowOutliers { get; set; }
@@ -87,5 +94,9 @@ namespace HlidacStatu.JobsWeb.Models
         public int ContractCount { get; set; }
         public int SupplierCount { get; set; }
         public int PriceCount { get; set; }
+
+        public string[] Contracts { get; set; }
+        public string[] Odberatele { get; set; }
+        public string[] Dodavatele { get; set; }
     }
 }

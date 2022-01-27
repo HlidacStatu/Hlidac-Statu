@@ -142,16 +142,18 @@ namespace HlidacStatu.JobsWeb.Services
         private static Dictionary<string, List<JobStatistics>> CalculateTags(List<JobPrecalculated> distinctJobs,
             YearlyStatisticsGroup.Key key)
         {
-            return distinctJobs
-                .Where(x => x.AnalyzaName == key.Obor && x.Year == key.Rok)
-                .SelectMany(j => j.Tags, (precalculated, tag) => new { precalculated, dodavatel = tag })
-                .GroupBy(j => j.precalculated.Polozka)
+            Dictionary<string, List<JobStatistics>>  ret = distinctJobs
+                .Where(x => x.AnalyzaName == key.Obor && x.Year == key.Rok) //filtruj analyzu
+                .SelectMany(j => j.Tags, (precalculated, tag) => new { precalculated, tag = tag }) // vem vsechny tagy
+                .GroupBy(j => j.precalculated.Polozka) //groupuj podle pracovni pozici
                 .ToDictionary(g => g.Key, g =>
-                    g.GroupBy(i => i.dodavatel)
+                    g.GroupBy(i => i.tag) //groupuj podle tabu u pracovni pozice
                         .Select(ig => new JobStatistics(ig.Select(x => x.precalculated), ig.Key))
                         .Where(s => s.PriceCount >= _minimumPriceCount)
                         .ToList()
                 );
+
+            return ret;
         }
 
         private static Dictionary<string, List<JobStatistics>> CalculateOdberatele(List<JobPrecalculated> distinctJobs,

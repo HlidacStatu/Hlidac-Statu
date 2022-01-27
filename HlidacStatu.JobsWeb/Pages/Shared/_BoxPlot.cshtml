@@ -32,7 +32,7 @@
     int pixelsPerTick = 100;
     int tickCount = (int)Math.Ceiling(Model.BasicData.Max(x => x.Maximum) / tickInterval);
     int height = Model.Height ?? tickCount * pixelsPerTick;
-    height = Math.Max(height, 500);
+    height = Math.Min(height, 700);
 
     int jobCount = Model.BasicData.Count;
     int pixelsPerJob = 100;

@@ -22,6 +22,21 @@
 }
 
 <h2>Souhrnné statistiky</h2>
+@{
+    var distinctJobsForYearAndSubject = JobService.DistinctJobsForYearAndSubject(Model.Key.Value);
+    var pocetSmluv = distinctJobsForYearAndSubject
+        .Select(m => m.SmlouvaId).Distinct().Count();
+    var pocetZadavatelu = distinctJobsForYearAndSubject
+        .Select(m => m.IcoOdberatele).Distinct().Count();
+    var pocetDodavatelu = distinctJobsForYearAndSubject
+        .SelectMany(m => m.IcaDodavatelu).Distinct().Count();
+    var pocetCen = distinctJobsForYearAndSubject
+        .Count();
+}
+<p>
+    Analýza obsahuje údaje z @pocetSmluv smluv, od @pocetZadavatelu zadavatelů, a @pocetDodavatelu dodavatelů. 
+    Analýzu zpracováváme z celkem @pocetCen nalezených cen.
+    </p>
 
 @if (Model.Key.HasValue)
 {
