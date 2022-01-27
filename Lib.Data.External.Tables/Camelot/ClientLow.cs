@@ -70,6 +70,31 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
         }
 
+        public async Task<ApiResult<CamelotResult>> ParseFromUrl(string pdfUrl, Commands command, CamelotResult.Formats format, string pages = "all")
+        {
+            try
+            {
+                string baseUrl = ApiEndpoint;
+                string url = baseUrl + "/Camelot/ParseFromUrl?url=" + System.Net.WebUtility.UrlEncode(pdfUrl);
+                url += "&command=" + command.ToString().ToLower();
+                url += "&format=" + format.ToString().ToLower();
+                url += "&pages=" + pages;
+
+                var httpreq = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, url);
+                httpreq.Headers.Add("Authorization", apiKey);
+                var res = await Devmasters.Net.HttpClient.Simple.SendAsync<ApiResult<CamelotResult>>(
+                    httpreq, timeout: TimeSpan.FromMinutes(5));
+
+                return res;
+
+            }
+            catch (Exception e)
+            {
+                logger.Error("StartSessionWithUrl API call error {apiEndpoint}", ex: e, propertyValues: ApiEndpoint);
+                return new ApiResult<CamelotResult>(false);
+            }
+        }
+
         public async Task<ApiResult<CamelotResult>> GetSessionAsync(string sessionId)
         {
 

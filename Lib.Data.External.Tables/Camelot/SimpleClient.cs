@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
 
-    public class ClientParse
+    public class SimpleClient
         : IDisposable
     {
         public string PdfUrl { get; }
@@ -21,17 +21,17 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         private IApiConnection conn = null;
         public ClientLow cl = null;
 
-        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("Camelot.ClientParse",
+        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("Camelot.Simple",
                             Devmasters.Log.Logger.DefaultConfiguration()
                                 .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
-                                .AddFileLoggerFilePerLevel("c:/Data/Logs/HlidacStatu/Camelot.ClientParse", "slog.txt",
+                                .AddFileLoggerFilePerLevel("c:/Data/Logs/HlidacStatu/Camelot.SimpleClient", "slog.txt",
                                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
                                     rollingInterval: Serilog.RollingInterval.Day,
                                     fileSizeLimitBytes: null,
                                     retainedFileCountLimit: 9,
                                     shared: true
                                     ));
-        public ClientParse(IApiConnection connection,
+        public SimpleClient(IApiConnection connection,
             string pdfUrl, ClientLow.Commands command, CamelotResult.Formats format = CamelotResult.Formats.JSON, string pages = "all")
         {
             PdfUrl = pdfUrl;
@@ -42,21 +42,19 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             cl = new ClientLow(conn.GetEndpointUrl(), connection.GetApiKey());
         }
 
-        public async Task<ApiResult<string>> StartSessionAsync(int numberOfTries = 10)
+        public async Task<ApiResult<CamelotResult>> ParseFromUrl(int numberOfTries = 10)
         {
             try
             {
                 for (int i = 0; i < numberOfTries; i++)
                 {
-                    var res = await cl.StartSessionAsync(this.PdfUrl, this.Command, this.Format, this.Pages);
+                    var res = await cl.ParseFromUrl(this.PdfUrl, this.Command, this.Format, this.Pages);
                     if (res.ErrorCode == 0)
                     {
-                        this.SessionId = res.Data;
                         return res;
                     }
                     else if (res.ErrorCode == 429)
                     {
-                        this.SessionId = null;
                         logger.Debug($"try {i} Error 429 waiting because of {cl.ApiEndpoint}");
                         cl.Dispose();
                         cl = new ClientLow(conn.GetEndpointUrl(), conn.GetApiKey());
@@ -64,7 +62,6 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     }
                     else
                     {
-                        this.SessionId = null;
                         logger.Debug($"unexspected API response {cl.ApiEndpoint} {res.ErrorCode}:{res.ErrorDescription} ");
 
                         return res;
@@ -73,47 +70,15 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 } //for
                 this.SessionId = null;
                 logger.Error($"no free resources");
-                return new ApiResult<string>(false);
+                return new ApiResult<CamelotResult>(false);
 
             }
             catch (Exception e)
             {
-                return new ApiResult<string>(false) { ErrorCode = 500, ErrorDescription = e.ToString() };
+                return new ApiResult<CamelotResult>(false) { ErrorCode = 500, ErrorDescription = e.ToString() };
             }
         }
 
-        public async Task<ApiResult<CamelotResult>> GetSessionAsync()
-        {
-            if (string.IsNullOrEmpty(this.SessionId))
-                return new ApiResult<CamelotResult>(false) { ErrorCode = 404, ErrorDescription = "sessionID is empty" };
-
-            try
-            {
-                var res = await cl.GetSessionAsync(this.SessionId);
-                res.Data.CamelotServer = cl.ApiEndpoint;
-                return res;
-            }
-            catch (Exception e)
-            {
-                return new ApiResult<CamelotResult>(false) { ErrorDescription = e.ToString(), ErrorCode = 500 };
-            }
-        }
-
-        public async Task<ApiResult> EndSessionAsync()
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(this.SessionId))
-                    return new ApiResult(false) { ErrorCode = 404, ErrorDescription = "sessionID is empty" };
-
-                return await cl.EndSessionAsync(this.SessionId);
-
-            }
-            catch (Exception)
-            {
-                return new ApiResult(false);
-            }
-        }
         public async Task<ApiResult<CamelotVersionData>> VersionAsync()
         {
             try
@@ -145,10 +110,6 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             {
                 if (disposing)
                 {
-                    if (!string.IsNullOrEmpty(this.SessionId))
-                    {
-                        var res = this.EndSessionAsync().Result;
-                    }
                     if (cl != null)
                         cl.Dispose();
 
@@ -177,7 +138,6 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
         public async ValueTask DisposeAsync()
         {
-            await this.EndSessionAsync();
             if (cl != null)
             {
                 await cl.DisposeAsync();
