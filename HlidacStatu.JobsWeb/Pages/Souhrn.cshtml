@@ -32,6 +32,7 @@
         .SelectMany(m => m.IcaDodavatelu).Distinct().Count();
     var pocetCen = distinctJobsForYearAndSubject
         .Count();
+    var tmp = distinctJobsForYearAndSubject.OrderByDescending(m => m.PricePerUnitVat).ToArray();
 }
 <p>
     Analýza obsahuje údaje z @pocetSmluv smluv, od @pocetZadavatelu zadavatelů, a @pocetDodavatelu dodavatelů. 

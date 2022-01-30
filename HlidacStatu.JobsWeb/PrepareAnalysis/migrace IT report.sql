@@ -25,13 +25,13 @@ SELECT
 	d.Ico as IcoDodavatele, 
 	j.tablePK,
 	j.jobGrouped as polozka, 
-	j.tags,
+	iif(j.tags='',null, j.tags) as tags,
 	2 as unit, --MD from enum MeasureUnit
 	'MD' as unitText,
-	j.salaryMD as pricePerUnit,
-	j.salaryMDVat as pricePerUnitVAT,
+	iif(j.UnitCount>1, j.salaryMD/j.unitcount,j.salaryMD) as pricePerUnit,
+	iif(j.UnitCount>1, j.salaryMDVat/j.unitcount,j.salaryMDVat)as pricePerUnitVAT,
 	t.year,
-    t.subject as AnalyzaName ,
+    Upper(t.analyza) as AnalyzaName ,
 	j.created
 
 FROM InDocTables t
@@ -39,7 +39,8 @@ FROM InDocTables t
     join SmlouvyIds s on s.Id = t.smlouvaID
     join SmlouvyDodavatele d on s.Id = d.SmlouvaId
 where j.jobGrouped is not null
-	and t.subject = 'IT'
-
+	and t.analyza = 'IT'
+	and t.year=2020
 	and j.salaryMDVat is not null
-
+	--and (j.pk not in (select jobpk from Ceny))
+order by salaryMDVat desc

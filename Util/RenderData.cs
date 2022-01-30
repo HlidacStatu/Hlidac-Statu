@@ -525,6 +525,41 @@ namespace HlidacStatu.Util
             else
                 return increaseTxt.Contains("{0") ? string.Format(increaseTxt, change) : increaseTxt;
         }
+
+        const string accentedCharacters = "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœčČšŠřŘžŽťŤňŇďĎĺĹěĚúÚůŮ";
+        static HashSet<string> stopWords = new Devmasters.Lang.CS.CzechStemmerAgressive().StopWords;
+        static HashSet<string> stopWordsAscii = new Devmasters.Lang.CS.CzechStemmerAgressive().StopWords
+            .Select(m=>Devmasters.TextUtil.RemoveDiacritics(m))
+            .Distinct()
+            .ToHashSet();
+
+        public static string NormalizedTextNoStopWords(string text, bool removeOneCharWords, bool removeAccent)
+        {
+            if (text == null)
+                return null;
+            if (string.IsNullOrWhiteSpace(text))
+                return string.Empty;
+
+            string normText = Regex.Replace(text, "[^a-zA-Z0-9" + accentedCharacters + "'-]{1}", " ");
+            if (removeOneCharWords)
+                normText = Regex.Replace(normText, @"\s[a-zA-Z0-9" + accentedCharacters + @"-]{1}\s", " ");
+            normText = Devmasters.TextUtil.ReplaceDuplicates(normText, " ");
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder(text.Length);
+            foreach (string w in normText.ToLower().Split(Devmasters.Lang.CS.Stemming.Separators, StringSplitOptions.RemoveEmptyEntries))
+            {
+                
+                if (!stopWords.Contains(w))
+                {
+                    if (!stopWordsAscii.Contains(Devmasters.TextUtil.RemoveAccents(w)))
+                        sb.Append(w + " ");
+                }
+            }
+            normText = sb.ToString().Trim();
+            if (removeAccent)
+                return Devmasters.TextUtil.RemoveDiacritics(normText);
+            return normText;
+        }
     }
 }
 

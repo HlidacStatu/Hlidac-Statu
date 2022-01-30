@@ -220,6 +220,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<BannedIp> BannedIps { get; set; }
         public virtual DbSet<InDocJobNameDescription> InDocJobNameDescription { get; set; }
 
+        public virtual DbSet<InDocTag> InDocTags { get; set; }
         public virtual DbSet<InDocJobNames> InDocJobNames { get; set; }
         public virtual DbSet<InDocJobs> InDocJobs { get; set; }
         public virtual DbSet<InDocTables> InDocTables { get; set; }

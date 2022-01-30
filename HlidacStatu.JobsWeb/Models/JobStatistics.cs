@@ -14,10 +14,10 @@ namespace HlidacStatu.JobsWeb.Models
         {
             using (var db = new Entities.DbEntities())
             {
-                var subjects = db.InDocJobNameDescription.AsEnumerable().Select(m => m.Subject.ToLower()).Distinct();
+                var subjects = db.InDocJobNameDescription.AsEnumerable().Select(m => m.Analyza.ToLower()).Distinct();
                 foreach (var subj in subjects.Where(m => !string.IsNullOrEmpty(m)))
                 {
-                    jobDescriptions.Add(subj, db.InDocJobNameDescription.AsEnumerable().Where(m => m.Subject.ToLower() == subj).ToArray());
+                    jobDescriptions.Add(subj, db.InDocJobNameDescription.AsEnumerable().Where(m => m.Analyza.ToLower() == subj).ToArray());
                 }
             }
         }
@@ -28,14 +28,15 @@ namespace HlidacStatu.JobsWeb.Models
 
         public JobStatistics(IEnumerable<JobPrecalculated> precalculatedJobs, string name)
         {
+            var salarydX = precalculatedJobs.Select(x =>new { p = (double)x.PricePerUnit, pk = x.JobPk }).ToList();
 
 
-            var salaryd = precalculatedJobs.Select(x => (double)x.PricePerUnit).ToList();
+            var salaryd = precalculatedJobs.Select(x => (double)x.PricePerUnitVat).ToList();
             decimal dolniKvartil = (decimal)salaryd.LowerQuartile();
             decimal horniKvartil = (decimal)salaryd.UpperQuartile();
             //decimal outlierRange = (horniKvartil - dolniKvartil) * 1.5m;
-            decimal maximum = precalculatedJobs.Max(x => x.PricePerUnit);
-            decimal minimum = precalculatedJobs.Min(x => x.PricePerUnit);
+            decimal maximum = (decimal)salaryd.Max(x => x);
+            decimal minimum = (decimal)salaryd.Min(x => x); ;
             decimal leftWhisk = (decimal)salaryd.Percentile(10);
             if (leftWhisk < minimum)
                 leftWhisk = minimum;

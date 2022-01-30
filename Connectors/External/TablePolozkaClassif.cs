@@ -1,4 +1,11 @@
-﻿using System;
+﻿using Devmasters;
+
+using HlidacStatu.Entities;
+
+using Microsoft.EntityFrameworkCore;
+
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HlidacStatu.Connectors.External
@@ -7,6 +14,21 @@ namespace HlidacStatu.Connectors.External
     {
         static string endpoint = "http://10.10.150.203:8001";
 
+        static Dictionary<string, InDocTag> tags = null;
+        static TablePolozkaClassif()
+        {
+            if (tags == null)
+                loadtags();
+        }
+        static void loadtags()
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                tags = db.InDocTags
+                    .AsNoTracking()
+                    .ToDictionary(k => k.Keyword.ToLower().RemoveAccents(), v => v);
+            }
+        }
 
         internal class ClassifResponse
         {
@@ -19,16 +41,39 @@ namespace HlidacStatu.Connectors.External
             }
 
         }
+        private static string[] findTagsFromText(string text, string analyza)
+        {
+            if (text == null)
+                return null;
+            if (string.IsNullOrWhiteSpace(text))
+                return null;
+            text = text.ToLower().RemoveAccents();
+            List<string> res = new List<string>();
+            foreach (string w in text.Split(Devmasters.Lang.CS.Stemming.Separators, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (tags.ContainsKey(w))
+                {
+                    if (tags[w].Analyza.ToLower() == analyza.ToLower())
+                        res.Add(tags[w].Tag);
+                }
+            }
+
+            return res.Distinct().ToArray();
+        }
+
         public class Classification
         {
-            internal Classification(ClassifResponse.Prediction data)
+            internal Classification(ClassifResponse.Prediction data, string analyza, string[] tags =null)
             {
                 if (data == null)
                     return;
-                this.Class = data.tag;
+                this.Class = ClassifNameToText(data.tag, analyza);
                 this.Prediction = data.prediction;
+                this.Tags = tags;
                 this.UsedWordsForClassif = data.words;
             }
+
+
             public Classification() { }
             public int Prediction { get; set; }
             public string Class { get; set; }
@@ -37,19 +82,48 @@ namespace HlidacStatu.Connectors.External
         }
 
 
+        static object lockclassif = new object();
+        static InDocJobNameDescription[] classif = null;
+        private static string ClassifNameToText(string classifItem, string analyza)
+        {
+            if (classif == null)
+            {
+                lock (lockclassif)
+                {
+                    if (classif == null)
+                    {
+                        using (DbEntities db = new DbEntities())
+                        {
+                            classif = db.InDocJobNameDescription
+                                .AsNoTracking()
+                                .ToArray()
+                                .Select(m => { m.Analyza = m.Analyza.ToLower(); m.Classification = m.Classification.ToLower(); return m; })
+                                .ToArray();
+
+                        }
+
+                    }
+                }
+            }
+            return classif
+                .FirstOrDefault(m => m.Analyza == analyza.ToLower() && m.Classification == classifItem.ToLower())?
+                .JobGrouped ?? classifItem;
+        }
+
         public static Classification[] GetClassification(string text, string analyza = "IT")
         {
             var url = endpoint + $"/explain_text_json?";
-            var response = callEndpoint(url, text);
+
+            string[] tags = findTagsFromText(text,analyza);
+
+            string normText = HlidacStatu.Util.RenderData.NormalizedTextNoStopWords(text, true, false);
+
+            var response = callEndpoint(url, normText);
             if (string.IsNullOrEmpty(response)
                 || response.Length < 5 //returns empty array []\n
                 )
             {
-
-                var accentedCharacters = "àèìòùÀÈÌÒÙáéíóúýÁÉÍÓÚÝâêîôûÂÊÎÔÛãñõÃÑÕäëïöüÿÄËÏÖÜŸçÇßØøÅåÆæœčČšŠřŘžŽťŤňŇďĎĺĹ";
-                string normText = System.Text.RegularExpressions.Regex.Replace(text, "[^a-zA-Z0-9" + accentedCharacters + "'-]{1}", " ");
-                normText = System.Text.RegularExpressions.Regex.Replace(normText, @"\s[a-zA-Z0-9" + accentedCharacters + @"-]{1}\s", " ");
-                normText = Devmasters.TextUtil.ReplaceDuplicates(normText, " ");
+                normText = HlidacStatu.Util.RenderData.NormalizedTextNoStopWords(text, true, true);
                 response = callEndpoint(url, normText);
             }
             if (string.IsNullOrEmpty(response)
@@ -64,7 +138,7 @@ namespace HlidacStatu.Connectors.External
                 return new Classification[] { };
 
             var res = resArr
-                .Select(m => new Classification(m))
+                .Select(m => new Classification(m, analyza, tags))
                 .OrderByDescending(m => m.Prediction)
                 .ThenByDescending(m => m.UsedWordsForClassif?.Length ?? 0)
                 .ThenByDescending(m => m.UsedWordsForClassif == null ? 0 : string.Concat(m.UsedWordsForClassif).Length)

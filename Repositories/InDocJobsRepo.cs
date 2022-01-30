@@ -104,7 +104,7 @@ namespace HlidacStatu.Repositories
         {
             await using (DbEntities db = new DbEntities())
             {
-                var found = await db.InDocJobs.AsAsyncEnumerable().FirstOrDefaultAsync(m => m.Pk == jobPk);
+                var found = await db.InDocJobs.AsNoTracking().AsAsyncEnumerable().FirstOrDefaultAsync(m => m.Pk == jobPk);
                 return found;
             }
         }
@@ -125,7 +125,9 @@ namespace HlidacStatu.Repositories
                     if (classif?.Count() > 0)
                     {
                         job.JobGrouped = classif.First().Class;
-                        job.Tags = "";
+                        job.Tags = null;
+                        if (classif.First().Tags?.Count()>0)
+                            job.Tags = String.Join('|', classif.First().Tags);
                     }
                     else
                     {

@@ -36,6 +36,7 @@ namespace HlidacStatu.Entities
         public decimal? VAT { get; set; }
         public decimal? UnitCount { get; set; }
 
+
         [ShowNiceDisplayName()]
         public enum MeasureUnit
         {
@@ -93,7 +94,7 @@ namespace HlidacStatu.Entities
             [NiceDisplayName("ml")]
             [SortValue(40)]
             Mililitr = 17,
-            [NiceDisplayName("min")]
+            [NiceDisplayName("minuta")]
             [SortValue(1)]
             Minuta = 18,
             [NiceDisplayName("rok")]

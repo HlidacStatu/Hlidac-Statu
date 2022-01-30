@@ -24,8 +24,8 @@ SELECT
 	j.tags,
 	2 as unit, --MD from enum MeasureUnit
 	'MD' as unitText,
-	j.salaryMD as pricePerUnit,
-	j.salaryMDVat as pricePerUnitVAT,
+	iif(j.UnitCount>1, j.salaryMD/j.unitcount,j.salaryMD) as pricePerUnit,
+	iif(j.UnitCount>1, j.salaryMDVat/j.unitcount,j.salaryMDVat)as pricePerUnitVAT,
 	t.year,
     'DEMO' as AnalyzaName ,
 	j.created
