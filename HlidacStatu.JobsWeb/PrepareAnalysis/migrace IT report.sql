@@ -42,5 +42,5 @@ where j.jobGrouped is not null
 	and t.analyza = 'IT'
 	and t.year=2020
 	and j.salaryMDVat is not null
-	--and (j.pk not in (select jobpk from Ceny))
-order by salaryMDVat desc
+	and (j.pk not in (select jobpk from Ceny))
+

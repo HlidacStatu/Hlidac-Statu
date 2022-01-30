@@ -47,13 +47,14 @@ namespace HlidacStatu.Connectors.External
                 return null;
             if (string.IsNullOrWhiteSpace(text))
                 return null;
+            analyza = analyza.ToLower();
             text = text.ToLower().RemoveAccents();
             List<string> res = new List<string>();
             foreach (string w in text.Split(Devmasters.Lang.CS.Stemming.Separators, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (tags.ContainsKey(w))
                 {
-                    if (tags[w].Analyza.ToLower() == analyza.ToLower())
+                    if (tags[w].Analyza.ToLower() == analyza)
                         res.Add(tags[w].Tag);
                 }
             }

@@ -21,8 +21,9 @@ namespace HlidacStatu.Entities
         {
             var connectionString = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection");
             return new DbContextOptionsBuilder()
-                .UseSqlServer(connectionString)
+                .UseSqlServer(connectionString, sql=> sql.CommandTimeout(120).EnableRetryOnFailure(2) )
                 //.EnableSensitiveDataLogging(true)
+
                 .Options;
         }
 

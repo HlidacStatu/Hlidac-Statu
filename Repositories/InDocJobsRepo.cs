@@ -157,8 +157,16 @@ namespace HlidacStatu.Repositories
                 }
                 else
                     db.Entry(job).State = EntityState.Modified;
+                try
+                {
+                    await db.SaveChangesAsync();
 
-                await db.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+
+                    throw;
+                }
             }
         }
 
