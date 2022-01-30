@@ -146,9 +146,7 @@ else
             try
             {
                 _table = await JobService.GetNewTable(Obor, _userName, CancellationToken.None);
-                _table.Author = _userName;
-                _table.StartWork();
-                _table.OnSave += SaveTable;
+                
             }
             catch (NoDataFoundException ndfe)
             {
@@ -161,6 +159,10 @@ else
                 throw;
             }
         }
+        
+        _table.Author = _userName;
+        _table.StartWork();
+        _table.OnSave += SaveTable;
 
         try
         {

@@ -130,7 +130,10 @@ namespace HlidacStatu.Entities
             if(Unit != MeasureUnit.Day && Unit != MeasureUnit.Hour)
                 return;
 
-            var recalculatedMdSalary = Price;
+            if (UnitCount is null || UnitCount == 0)
+                return;
+            
+            var recalculatedMdSalary = Price / UnitCount;
             var recalculatedMdSalaryVat = PriceVATCalculated;
             if (Unit == MeasureUnit.Hour)
             {
