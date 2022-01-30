@@ -46,6 +46,8 @@
 <figure class="highcharts-figure" style="max-width: @(100 + jobCount * pixelsPerJob)px">
     <div id="chart-container-@chartId"></div>
 
+        <div class="text-muted">Ceny s DPH</div>
+
     @if (Model.CompareWith != null)
     {
         <p class="highcharts-description">
@@ -64,7 +66,6 @@
 
 
     <p>
-
 
         <button class="btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#boxChartInfo-@chartId" aria-expanded="false" aria-controls="boxChartInfo">
             <i class="fas fa-question-circle"></i> Jak číst graf 'boxplot'
@@ -93,90 +94,90 @@
 </figure>
 <div style="margin-bottom:20px;"></div>
 <script>
-Highcharts.chart('chart-container-@(chartId)', {
+    Highcharts.chart('chart-container-@(chartId)', {
 
-    chart: {
-        type: 'boxplot',
-        height: @(height)
-    },
-
-    title: {
-        text: 'Přehled obvyklých cen'
-    },
-
-    legend: {
-    enabled: false
-    },
-
-    xAxis: {
-    categories: [
-        @Html.Raw(string.Join(",", Model.BasicData.Select(j => $"'{j.Name}'")))
-    ]
-    },
-
-    yAxis: {
-    title: {
-        text: 'Cena za den práce'
+        chart: {
+            type: 'boxplot',
+            height: @(height)
         },
-        tickInterval: @tickInterval,
-        minorTickInterval: 1000,
-        labels: {
-        format: '{value:,.0f} Kč'
-        }
 
-    },
+        title: {
+            text: 'Přehled obvyklých cen'
+        },
 
-    series: [{
-    name: 'Ceny za den práce',
-        data: [
-            @Html.Raw(string.Join(",",
-                Model.BasicData.Select(j => $"[{j.LeftWhisk:F0},{j.DolniKvartil:F0},{j.Median:F0},{j.HorniKvartil:F0},{j.RightWhisk:F0}]")))
-        ],
-        tooltip: {
-        headerFormat: '<em>{point.key}</em><br/>',
-            pointFormat: @Html.Raw(popisSerie)
+        legend: {
+        enabled: false
+        },
+
+        xAxis: {
+        categories: [
+    @Html.Raw(string.Join(",", Model.BasicData.Select(j => $"'{j.Name}'")))
+        ]
+        },
+
+        yAxis: {
+        title: {
+            text: 'Cena za den práce'
+            },
+            tickInterval: @tickInterval,
+            minorTickInterval: 1000,
+            labels: {
+            format: '{value:,.0f} Kč'
+            }
+
+        },
+
+        series: [{
+        name: 'Ceny za den práce',
+            data: [
+    @Html.Raw(string.Join(",",
+                    Model.BasicData.Select(j => $"[{j.LeftWhisk:F0},{j.DolniKvartil:F0},{j.Median:F0},{j.HorniKvartil:F0},{j.RightWhisk:F0}]")))
+            ],
+            tooltip: {
+            headerFormat: '<em>{point.key}</em><br/>',
+                pointFormat: @Html.Raw(popisSerie)
+            }
         }
-    }
-    @if(Model.CompareWith != null)
+    @if (Model.CompareWith != null)
     {
         @Html.Raw($@",{{
-        name: 'Obvyklé souhrnné ceny',
-        data: [
-            {compareData}
-        ],
-        fillColor: '#8FDB90',
-        lineWidth: 1,
-        medianColor: '#000000',
-        stemColor: '#8FDB90',
-        stemWidth: 1,
-        whiskerColor: '#8FDB90',
-        whiskerWidth: 1,
-        pointWidth: 7,
-        tooltip: {{
-            headerFormat: '<em>{{point.key}}</em><br/>',
-            pointFormat: {popisSerie}
-        }} }}")
-    }
-    @if(Model.CompareWith == null)
-    {
-        @Html.Raw($@",{{
-        name: 'Extrémy',
-        color: Highcharts.getOptions().colors[0],
-        type: 'scatter',
-        data: [
-            {outliersData}
-        ],
-        marker: {{
-            fillColor: 'white',
+            name: 'Obvyklé souhrnné ceny',
+            data: [
+                {compareData}
+            ],
+            fillColor: '#8FDB90',
             lineWidth: 1,
-            lineColor: Highcharts.getOptions().colors[0]
-        }},
-        tooltip: {{
-            pointFormat: '{{point.y}} Kč'
+            medianColor: '#000000',
+            stemColor: '#8FDB90',
+            stemWidth: 1,
+            whiskerColor: '#8FDB90',
+            whiskerWidth: 1,
+            pointWidth: 7,
+            tooltip: {{
+                headerFormat: '<em>{{point.key}}</em><br/>',
+                pointFormat: {popisSerie}
             }} }}")
     }
-    ]
+    @if (Model.CompareWith == null)
+    {
+        @Html.Raw($@",{{
+            name: 'Extrémy',
+            color: Highcharts.getOptions().colors[0],
+            type: 'scatter',
+            data: [
+                {outliersData}
+            ],
+            marker: {{
+                fillColor: 'white',
+                lineWidth: 1,
+                lineColor: Highcharts.getOptions().colors[0]
+            }},
+            tooltip: {{
+                pointFormat: '{{point.y}} Kč'
+                }} }}")
+    }
+        ]
 
-});
+    });
 
 </script>

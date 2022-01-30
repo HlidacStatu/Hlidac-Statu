@@ -24,6 +24,7 @@
 <figure class="highcharts-figure" style="max-width: 400px">
     <div id="@uniqueName"></div>
     <p class="highcharts-description">
+        <div class="text-muted">Ceny s DPH</div>
         @Model.Description
     </p>
 </figure>
@@ -64,7 +65,7 @@ Highcharts.chart('@uniqueName', {
         }
     },
     series: [{
-        name: 'Sazba na den práce',
+        name: 'Sazba na den práce s DPH',
         data: [@Html.Raw(string.Join(",",res.Select(x => $"[{x.Klic * 2000},{x.pocet}]")))]
 
     }]

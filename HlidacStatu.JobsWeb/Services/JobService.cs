@@ -68,7 +68,7 @@ namespace HlidacStatu.JobsWeb.Services
                             SmlouvaId = firstJobOverview.SmlouvaId,
                             Tags = tags,
                             JobPk = g.Key,
-                            PricePerUnit = firstJobOverview.PricePerUnit ?? 0,
+                            PricePerUnit = firstJobOverview.PricePerUnit ?? (firstJobOverview.PricePerUnitVat/1.21m),
                             PricePerUnitVat = firstJobOverview.PricePerUnitVat,
                             IcaDodavatelu = g.Select(i => i.IcoDodavatele).ToArray(),
                         };

@@ -28,7 +28,7 @@ namespace HlidacStatu.JobsWeb.Models
 
         public JobStatistics(IEnumerable<JobPrecalculated> precalculatedJobs, string name)
         {
-            var salarydX = precalculatedJobs.Select(x =>new { p = (double)x.PricePerUnit, pk = x.JobPk }).ToList();
+            var salarydX = precalculatedJobs.Select(x =>new { p = (double)x.PricePerUnitVat, pk = x.JobPk }).ToList();
 
 
             var salaryd = precalculatedJobs.Select(x => (double)x.PricePerUnitVat).ToList();
