@@ -13,9 +13,12 @@ namespace HlidacStatu.JobsWeb.Services
 {
     public static partial class JobService
     {
+        private const string VšeName = "-vše-";
+
         // make it "in memory", load it asynchronously, recalculate once a day?
         //private static List<JobPrecalculated> DistinctJobs { get; set; }
-        private static readonly int _minimumPriceCount = 5;
+        private static readonly int _minimumPriceCount = 0;// 5;
+        public static readonly int _minimumPriceCountInList = 5;
 
         public static List<JobPrecalculated> DistinctJobs { get; set; }
 
@@ -58,7 +61,7 @@ namespace HlidacStatu.JobsWeb.Services
                         string[] tags = firstJobOverview.Tags?.Split("|",
                             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                         if (tags == null || tags.Length == 0)
-                            tags = new[] { "-vše-" };
+                            tags = new[] { VšeName };
                         return new JobPrecalculated()
                         {
                             AnalyzaName = firstJobOverview.AnalyzaName,

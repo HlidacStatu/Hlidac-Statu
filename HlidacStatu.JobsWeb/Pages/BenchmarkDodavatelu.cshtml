@@ -6,9 +6,9 @@
 @{
     ViewData["Title"] = "Benchmark dodavatelů";
 
-    Boxplot graphModel = new Boxplot();
+    CompareDataModel graphModel = new CompareDataModel();
     TableViewModel tableModel = new TableViewModel();
-    
+
     bool showStatistics = !string.IsNullOrWhiteSpace(Model.Ico);
     var statistics = new List<JobStatistics>();
 
@@ -19,7 +19,8 @@
 
         graphModel.BasicData = statistics;
         graphModel.CompareWith = JobService.GetStatistics(Model.Key.Value);
-    
+        graphModel.SubjectName = Model.Nazev;
+
         tableModel.Statistics = statistics;
         tableModel.HideDodavatelCount = true;
         tableModel.SubjectName = HlidacStatu.Repositories.Firmy.GetJmeno(Model.Ico);
@@ -49,7 +50,11 @@
         <label class="input-group-text" for="selectNavigace">Vyberte dodavatele:</label>
         <select class="form-select" id="selectNavigace">
             <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte dodavatele...</option>
-            @foreach (var (ico, nazev, pocetCen) in JobService.GetDodavateleList(Model.Key.Value).OrderByDescending(x => x.pocetCen))
+            @foreach (var (ico, nazev, pocetCen) in 
+            JobService.GetDodavateleList(Model.Key.Value)
+                .Where(m=>m.pocetCen>JobService._minimumPriceCountInList)
+                .OrderByDescending(x => x.pocetCen)
+            )
             {
                 <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetCen cen)</option>
             }
@@ -87,6 +92,9 @@
         if (showStatistics)
         {
             <partial name="Shared/_SouhrnTable" model="tableModel"/>
+
+            <h2>Porovnání cenového rozpětí celku a @Model.Nazev</h2>
+            <partial name="Shared/_CompareTable" model="graphModel"/>
             <partial name="Shared/_BoxPlot" model="graphModel"/>
         }
     }

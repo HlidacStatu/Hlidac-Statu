@@ -1,0 +1,48 @@
+@model Models.CompareDataModel
+
+<style>
+
+</style>
+<table class="table table-sm table-striped mt-4">
+    <caption>ceny s DPH</caption>
+    <thead>
+        <tr>
+            <th scope="col">@Model.FirstColumnName</th>
+            <th scope="col" class="text-end">Dolní kvartil</th>
+            <th scope="col" class="text-end">Medián</th>
+            <th scope="col" class="text-end">Horní kvartil</th>
+            <th scope="col" class="text-end">Počet<br />smluv</th>
+            <th scope="col" class="text-end">Počet<br />cen</th>
+
+            <th scope="col" class="text-end">Dolní kvartil</th>
+            <th scope="col" class="text-end">Medián</th>
+            <th scope="col" class="text-end">Horní kvartil</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th class="align-middle border-start"><div class="middle-line right"></div></th>
+            <th colspan="3" class="align-middle text-center"><div class="middle-line left right"><b style="color:black">Obvyklé ceny<br />@Devmasters.TextUtil.ShortenText( Model.SubjectName,50)</b></div></th>
+            <th class="align-middle border-end"><div class="middle-line left "></div></th>
+            <th colspan="3" class="align-middle text-center"><div class="middle-line left right"><b style="color:black">Rozsah obvyklých<br />cen celkově</b></div></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var row in Model.BasicData.Where(m => !string.IsNullOrEmpty(m.Name)).OrderBy(x => x.Name))
+        {
+            var compRow = Model.CompareWith.FirstOrDefault(m => m.Name == row.Name);
+
+            <tr>
+                <td scope="row">@row.Name</td>
+                <td class="text-end number border-start"><b>@row.DolniKvartil.ToString("N0")</b></td>
+                <td class="text-end number"><b>@row.Median.ToString("N0")</b></td>
+                <td class="text-end number"><b>@row.HorniKvartil.ToString("N0")</b></td>
+                <td class="text-end number">@row.ContractCount</td>
+                <td class="text-end number border-end">@row.PriceCount</td>
+                <td class="text-end number border-start"><b>@compRow.DolniKvartil.ToString("N0")</b></td>
+                <td class="text-end number"><b>@compRow.Median.ToString("N0")</b></td>
+                <td class="text-end number border-end"><b>@compRow.HorniKvartil.ToString("N0")</b></td>
+
+            </tr>
+        }
+    </tbody>
+</table>

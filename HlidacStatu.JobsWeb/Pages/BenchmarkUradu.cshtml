@@ -7,7 +7,7 @@
 @{
     ViewData["Title"] = "Benchmark úřadů";
 
-    Boxplot graphModel = new Boxplot();
+    CompareDataModel graphModel = new CompareDataModel();
     TableViewModel tableModel = new TableViewModel();
 
     bool showStatistics = !string.IsNullOrWhiteSpace(Model.Ico);
@@ -50,7 +50,10 @@
         <label class="input-group-text" for="selectNavigace">Vyberte úřad:</label>
         <select class="form-select" id="selectNavigace">
             <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte úřad...</option>
-            @foreach (var (ico, nazev, pocetCen) in JobService.GetOdberateleList(Model.Key.Value).OrderByDescending(x => x.pocetCen))
+            @foreach (var (ico, nazev, pocetCen) in JobService.GetOdberateleList(Model.Key.Value)
+                .Where(m=>m.pocetCen>JobService._minimumPriceCountInList)
+                .OrderByDescending(x => x.pocetCen)
+            )
             {
                 <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetCen cen)</option>
             }

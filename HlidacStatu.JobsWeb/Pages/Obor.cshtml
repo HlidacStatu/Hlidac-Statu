@@ -6,7 +6,7 @@
 @{
     ViewData["Title"] = "Souhrnné statistiky podle oborů";
 
-    Boxplot graphModel = new Boxplot();
+    CompareDataModel graphModel = new CompareDataModel();
     TableViewModel tableModel = new TableViewModel();
 
     bool showStatistics = !string.IsNullOrWhiteSpace(Model.Obor);
@@ -31,8 +31,92 @@
 
     if (showStatistics)
     {
-        <partial name="Shared/_SouhrnTable" model="tableModel"/>
+        <partial name="Shared/_SouhrnTable" model="tableModel" />
 
-        <partial name="Shared/_BoxPlot" model="graphModel"/>
+        <partial name="Shared/_BoxPlot" model="graphModel" />
     }
+    <hr />
+    <p>
+        @{
+            var smlouvyIds = statistics.SelectMany(m => m.Contracts).Distinct();
+            if (smlouvyIds.Count() == 0)
+            {
+                return;
+            }
+
+            var smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
+
+            var firmyCount = JobService.GetDodavateleList(Model.Key.Value);
+            var firmy = statistics.SelectMany(m => m.Dodavatele).Distinct()
+            .Select(m => new
+            {
+                ico = m,
+                name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
+                count = firmyCount.Any(c => c.ico == m) ? firmyCount.First(c => c.ico == m).pocetCen : 0
+            })
+            .OrderBy(o => o.name);
+
+            var uradyCount = JobService.GetOdberateleList(Model.Key.Value);
+            var urady = statistics.SelectMany(m => m.Odberatele).Distinct()
+            .Select(m => new
+            {
+                ico = m,
+                name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
+                count = uradyCount.Any(c => c.ico == m) ? uradyCount.First(c => c.ico == m).pocetCen : 0
+            })
+            .OrderBy(o => o.name);
+            ;
+        }
+        Pro @Model.Obor jsme zanalyzovali celkem
+        @Devmasters.Lang.CS.Plural.Get(smlouvyIds.Count(),"jednu smlouvu","{0} smlouvy","{0} smluv")
+        (<a href="/hledatsmlouvy?q=@(System.Net.WebUtility.UrlEncode(smlouvyQuery))">najít tyto smlouvy</a>)
+        od @(Devmasters.Lang.CS.Plural.Get(firmy.Count(),"jednoho dodavatele","{0} dodavatelů","{0} dodavatelů"))
+        a od @(Devmasters.Lang.CS.Plural.Get(urady.Count(),"jednoho odběratele","{0} odběratelů","{0} odběratelů")).
+    </p>
+    <div class="row">
+        <div class="col-12 col-sm-6">
+            <h3>Dodavatelé z analýzy</h3>
+            <ul>
+                @foreach (var f in firmy)
+                {
+                    @if (f.count > 3)
+                    {
+                        <li>
+                            @f.name
+                            - <a href="/BenchmarkDodavatelu/@(f.ico)?@(Model.Key.Value.UrlDecodedParams)">@(Devmasters.Lang.CS.Plural.GetWithZero(f.count,"","jedna cena","{0} ceny","{0} cen"))</a>
+                        </li>
+                    }
+                    else if (f.count > 0)
+                    {
+                        <li>
+                            @f.name
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+
+        <div class="col-12 col-sm-6">
+            <h3>Odběratelé z analýzy</h3>
+            <ul>
+                @foreach (var f in urady)
+                {
+                    @if (f.count > 3)
+                    {
+                        <li>
+                            @f.name
+                            - <a href="/BenchmarkDodavatelu/@(f.ico)?@(Model.Key.Value.UrlDecodedParams)">@(Devmasters.Lang.CS.Plural.GetWithZero(f.count,"","jedna cena","{0} ceny","{0} cen"))</a>
+                        </li>
+                    }
+                    else if (f.count > 0)
+                    {
+                        <li>
+                            @f.name
+                        </li>
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+
 }
