@@ -118,6 +118,10 @@
                 {
                     <h2>Analýza "@(descr.NiceName)"</h2>
                 }
+                if (analyza?.Obor?.ToLower() == "demo")
+                {
+                    <p class="alert-warning">Toto je ukázková, volně dostupná analáza za období leden-březen 2018. Ostatní analýzy vždy pokrývají celý kalendářní rok.</p>
+                }
             }
 
             @RenderBody()
