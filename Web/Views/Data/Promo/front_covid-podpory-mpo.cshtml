@@ -1,0 +1,96 @@
+﻿@model object
+@using Nest;
+@using System.Linq;
+@using Devmasters.Collections;
+@using HlidacStatu.Datasets
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+
+@{
+    Layout = null;
+
+    DataSet ds =
+        DataSet.CachedDatasets.Get((string)Model);
+    var reg = ds.Registration();
+
+    var vyzvy = ds.ESClient.Search<object>(s => s
+    .MatchAll()
+    .Size(0)
+    .Aggregations(a => a
+        .MultiTerms("vyzvy", m => m
+            .Size(100)
+            .Terms(new Term() { Field = "nazev_programu_vyzvy.keyword" }, new Term() { Field = "kod_vyzvy.keyword" })
+            //t=>t.Field("kod_vyzvy.keyword","nazev_programu_vyzvy.keyword"),t=>t.Field("kod_vyzvy.keyword","kod_vyzvy.keyword"))
+            )
+
+        )
+    );
+    var vyzvyVds = ds.ESClient.Search<object>(s => s
+        .MatchAll()
+        .Size(0)
+        .Aggregations(a => a
+            .Terms("vyzvy", m => m
+                .Size(100)
+                .Field("kod_vyzvy.keyword")
+                .Aggregations(aa => aa
+                    .Stats("stat", ss => ss.
+                         Field("dotace")
+                    )
+                )
+            )
+
+        )
+    );
+
+
+    Dictionary<string, string> vyzvyNames = ((BucketAggregate)vyzvy.Aggregations["vyzvy"]).Items
+                    .Select(m => new
+                    {
+                        key = ((List<object>)((Nest.KeyedBucket<object>)m).Key)[1],
+                        name = ((List<object>)((Nest.KeyedBucket<object>)m).Key)[0]
+                    })
+                    .ToDictionary(k => k.key.ToString(), v => v.name.ToString());
+
+
+    Dictionary<string, Nest.StatsAggregate> vyzvyStats = ((BucketAggregate)vyzvyVds.Aggregations["vyzvy"]).Items
+                    .Select(m => new
+                    {
+                        key = ((Nest.KeyedBucket<object>)m).Key.ToString(),
+                        num = (Nest.StatsAggregate)(((Nest.KeyedBucket<object>)m).Values.First())
+                    })
+                    .ToDictionary(k => k.key, v => v.num);
+
+}
+<h2>
+    COVID výzvy vypsané MPO.
+</h2>
+<hr />
+<div class="row">
+    <div class="col-xs-12">
+
+        <table class="table table-hover table-sm table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>Výzva</th>
+                    <th>Vyplaceno</th>
+                    <th>Počet podpořených firem</th>
+                    <th></th>
+                </tr>
+            </thead>
+            @foreach (var vyzvaId in vyzvyNames.Keys
+            .OrderBy(m => vyzvyStats[m].Sum)
+            )
+            {
+                <tr>
+                    <td>@vyzvyNames[vyzvaId]</td>
+                    <td>@(HlidacStatu.Util.RenderData.NicePriceHtml((decimal)vyzvyStats[vyzvaId].Sum,shortFormat:true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.AsNeeded))</td>
+                    <td>@(vyzvyStats[vyzvaId].Count)</td>
+                    <td><a href="#vyzva_@(vyzvaId)">Detail</a></td>
+                </tr>
+            }
+        </table>
+    </div>
+
+    <hr />
+</div>
+
