@@ -25,7 +25,7 @@
 
         )
     );
-    var vyzvyVds = ds.ESClient.Search<object>(s => s
+    var vyzvyGroup = ds.ESClient.Search<object>(s => s
         .MatchAll()
         .Size(0)
         .Aggregations(a => a
@@ -42,6 +42,21 @@
         )
     );
 
+     var vyzvyTopPrijemci = ds.ESClient.Search<object>(s => s
+     .MatchAll()
+     .Size(0)
+     .Aggregations(a => a
+         .Terms("vyzvy", m => m
+             .Size(100)
+             .Field("ico.keyword")
+             .Aggregations(aa => aa
+                 .Stats("stat", ss => ss.
+                      Field("dotace")
+                     )
+                 )
+             )
+         )
+     );
 
     Dictionary<string, string> vyzvyNames = ((BucketAggregate)vyzvy.Aggregations["vyzvy"]).Items
                     .Select(m => new
@@ -52,7 +67,7 @@
                     .ToDictionary(k => k.key.ToString(), v => v.name.ToString());
 
 
-    Dictionary<string, Nest.StatsAggregate> vyzvyStats = ((BucketAggregate)vyzvyVds.Aggregations["vyzvy"]).Items
+    Dictionary<string, Nest.StatsAggregate> vyzvyStats = ((BucketAggregate)vyzvyGroup.Aggregations["vyzvy"]).Items
                     .Select(m => new
                     {
                         key = ((Nest.KeyedBucket<object>)m).Key.ToString(),
@@ -60,14 +75,48 @@
                     })
                     .ToDictionary(k => k.key, v => v.num);
 
+    Dictionary<string, Nest.StatsAggregate> topPrijemciStats = ((BucketAggregate)vyzvyTopPrijemci.Aggregations["vyzvy"]).Items
+                    .Select(m => new
+                    {
+                        key = ((Nest.KeyedBucket<object>)m).Key.ToString(),
+                        num = (Nest.StatsAggregate)(((Nest.KeyedBucket<object>)m).Values.First())
+                    })
+                    .Where(m=>m.key != "")
+                    .ToDictionary(k => k.key, v => v.num);
+
 }
 <h2>
     COVID výzvy vypsané MPO.
 </h2>
 <hr />
+
 <div class="row">
     <div class="col-xs-12">
+        <h2>Největší příjemci podpory celkem</h2>
+        <div class="row">
+        @foreach(var chunk in topPrijemciStats
+            .OrderByDescending(m => m.Value.Sum)
+            .Take(30)
+            .Chunk(10)
+        )
+        {
+            <div class="col-xs-12 col-sm-6 col-md-4">
+            @foreach (var kvv in chunk)
+            {
+                <div>
+                    <a href="/data/Hledat/covid-podpory-mpo?Q=ico.keyword%3A@(kvv.Key)">
+                    @(Firmy.GetJmeno(kvv.Key))
+                    </a> 
+                    <b>@(HlidacStatu.Util.RenderData.NicePriceHtml((decimal)kvv.Value.Sum,shortFormat:true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.AsNeeded))</b>
 
+                </div>
+            }
+            </div>
+        }
+        </div>
+        <div class="clearfix"></div>
+<hr />
+        <h2>Přehled výzev od MPO</h2>
         <table class="table table-hover table-sm table-striped mt-4">
             <thead>
                 <tr>
