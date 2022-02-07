@@ -18,7 +18,8 @@
     .Size(0)
     .Aggregations(a => a
         .MultiTerms("vyzvy", m => m
-            .Size(100)
+                .Size(10000)
+                
             .Terms(new Term() { Field = "nazev_programu_vyzvy.keyword" }, new Term() { Field = "kod_vyzvy.keyword" })
             //t=>t.Field("kod_vyzvy.keyword","nazev_programu_vyzvy.keyword"),t=>t.Field("kod_vyzvy.keyword","kod_vyzvy.keyword"))
             )
@@ -30,12 +31,15 @@
         .Size(0)
         .Aggregations(a => a
             .Terms("vyzvy", m => m
-                .Size(100)
+                .Size(10000)
+                
                 .Field("kod_vyzvy.keyword")
                 .Aggregations(aa => aa
                     .Stats("stat", ss => ss.
                          Field("dotace")
+                         
                     )
+                    
                 )
             )
 
@@ -47,7 +51,8 @@
      .Size(0)
      .Aggregations(a => a
          .Terms("vyzvy", m => m
-             .Size(10000)
+            .Size(10000)
+            
              .Field("ico.keyword")
              .Aggregations(aa => aa
                  .Stats("stat", ss => ss.
@@ -122,7 +127,7 @@
                 <tr>
                     <th>Výzva</th>
                     <th>Vyplaceno</th>
-                    <th>Počet podpořených firem</th>
+                    <th>Počet vyplacených podpor</th>
                     <th></th>
                 </tr>
             </thead>
