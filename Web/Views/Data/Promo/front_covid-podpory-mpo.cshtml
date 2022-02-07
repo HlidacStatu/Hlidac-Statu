@@ -47,7 +47,7 @@
      .Size(0)
      .Aggregations(a => a
          .Terms("vyzvy", m => m
-             .Size(100)
+             .Size(10000)
              .Field("ico.keyword")
              .Aggregations(aa => aa
                  .Stats("stat", ss => ss.
