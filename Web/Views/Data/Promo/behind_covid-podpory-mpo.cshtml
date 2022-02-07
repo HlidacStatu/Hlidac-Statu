@@ -107,7 +107,8 @@
                 })
                 .Where(m => m.key != "")
                 .ToDictionary(k => k.key, v => v.num);
-                    <tr>
+
+                    <tr id="vyzva_@vyzvaId">
                         <td>@vyzvyNames[vyzvaId]</td>
                         <td>
                             <a href="/data/Hledat/covid-podpory-mpo?Q=kod_vyzvy.keyword%3A@(vyzvaId)">
@@ -116,7 +117,7 @@
                             </td>
                         <td>
                             <ul>
-                                    @foreach (var kvv in statPerIco.OrderByDescending(o => o.Value.Sum).Take(10))
+                                    @foreach (var kvv in statPerIco.OrderByDescending(o => o.Value.Sum).ThenBy(m=> HlidacStatu.Util.Consts.Rnd.Next()).Take(10))
                                     {
                                     <li>
                                         <a href="/data/Hledat/covid-podpory-mpo?Q=ico.keyword%3A@(kvv.Key)">
