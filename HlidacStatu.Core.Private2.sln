@@ -152,6 +152,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitPricePenetrationAnalyze
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Http-Echo-Client", "Http-Echo-Client\Http-Echo-Client.csproj", "{4090F31C-9466-41F1-A892-1B3EA15D505B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uptimer", "..\Hlidac-Statu-Private\Docker\Uptimer\Uptimer.csproj", "{7FD7EEE4-00E5-4D91-BD16-8D1CDEE4DBF1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -366,6 +368,10 @@ Global
 		{4090F31C-9466-41F1-A892-1B3EA15D505B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4090F31C-9466-41F1-A892-1B3EA15D505B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4090F31C-9466-41F1-A892-1B3EA15D505B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FD7EEE4-00E5-4D91-BD16-8D1CDEE4DBF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FD7EEE4-00E5-4D91-BD16-8D1CDEE4DBF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FD7EEE4-00E5-4D91-BD16-8D1CDEE4DBF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FD7EEE4-00E5-4D91-BD16-8D1CDEE4DBF1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -402,6 +408,7 @@ Global
 		{BCD7FBB1-6590-4CDB-BFBB-3988A001FEBF} = {AF9C295F-FA98-4C4C-9A87-25F1792C9E3D}
 		{19BA17F9-AC50-4932-ACDD-47312234C1CE} = {AF9C295F-FA98-4C4C-9A87-25F1792C9E3D}
 		{4090F31C-9466-41F1-A892-1B3EA15D505B} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
+		{7FD7EEE4-00E5-4D91-BD16-8D1CDEE4DBF1} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
