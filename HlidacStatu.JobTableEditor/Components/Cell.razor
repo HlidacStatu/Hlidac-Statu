@@ -20,10 +20,6 @@
         draggable="true"
         ondragstart="event.preventDefault(); event.stopPropagation();"
         rows="2" class="form-control" @bind="@CellShell.Value"></textarea>
-    @if (!string.IsNullOrWhiteSpace(CellShell.Error))
-    {
-        <p class="text-danger">@CellShell.Error</p>
-    }
 </td>
 
 

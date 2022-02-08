@@ -51,7 +51,7 @@ namespace HlidacStatu.JobTableEditor.Data
             }
         }
 
-        public string Error { get; set; }
+        //public string Error { get; set; }
         
         public CellShell(InTables.Cell cell, int row, int column)
         {
@@ -89,79 +89,79 @@ namespace HlidacStatu.JobTableEditor.Data
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            RunErrorChecks();
+            //RunErrorChecks();
             
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void RunErrorChecks()
-        {
-            Error = "";
-            CheckAllowedValue(1000, 20000);
-            CheckJobIsNotEmpty();
-
-        }
-
-        private void CheckJobIsNotEmpty()
-        {
-            if (CellType == InTables.Cell.GuessedCellType.Position)
-            {
-                if (string.IsNullOrWhiteSpace(Value))
-                {
-                    Error += "Není vyplněn název pozice.";
-                }
-            }
-        }
-
-        private void CheckAllowedValue(decimal from, decimal to)
-        {
-            decimal vat = 1.21m;
-            decimal? value = Devmasters.ParseText.ToDecimal(Value);
-
-            
-            if (CellType == InTables.Cell.GuessedCellType.Price)
-            {
-                if (!value.HasValue)
-                {
-                    Error += "Chybí vyplněná hodnota.";
-                    return;
-                }
-                
-                if (value < from)
-                {
-                    Error += $"Zkontroluj hodnotu, zdá se nám nízká [{value:N1}].";
-                    return;
-                }
-                
-                if (value > to)
-                {
-                    Error += $"Zkontroluj hodnotu, zdá se nám vysoká [{value:N1}].";
-                    return;
-                }
-            }
-            
-            if (CellType == InTables.Cell.GuessedCellType.PriceWithVAT)
-            {
-                if (!value.HasValue)
-                {
-                    Error += "Chybí vyplněná hodnota.";
-                    return;
-                }
-                
-                if (value < (from * vat))
-                {
-                    Error += $"Zkontroluj hodnotu, zdá se nám nízká [{value:N1}].";
-                    return;
-                }
-                
-                if (value > (to * vat))
-                {
-                    Error += $"Zkontroluj hodnotu, zdá se nám vysoká [{value:N1}].";
-                    return;
-                }
-            }
-            
-        }
+        // public void RunErrorChecks()
+        // {
+        //     Error = "";
+        //     CheckAllowedValue(1000, 20000);
+        //     CheckJobIsNotEmpty();
+        //
+        // }
+        //
+        // private void CheckJobIsNotEmpty()
+        // {
+        //     if (CellType == InTables.Cell.GuessedCellType.Position)
+        //     {
+        //         if (string.IsNullOrWhiteSpace(Value))
+        //         {
+        //             Error += "Není vyplněn název pozice.";
+        //         }
+        //     }
+        // }
+        //
+        // private void CheckAllowedValue(decimal from, decimal to)
+        // {
+        //     decimal vat = 1.21m;
+        //     decimal? value = Devmasters.ParseText.ToDecimal(Value);
+        //
+        //     
+        //     if (CellType == InTables.Cell.GuessedCellType.Price)
+        //     {
+        //         if (!value.HasValue)
+        //         {
+        //             Error += "Chybí vyplněná hodnota.";
+        //             return;
+        //         }
+        //         
+        //         if (value < from)
+        //         {
+        //             Error += $"Zkontroluj hodnotu, zdá se nám nízká [{value:N1}].";
+        //             return;
+        //         }
+        //         
+        //         if (value > to)
+        //         {
+        //             Error += $"Zkontroluj hodnotu, zdá se nám vysoká [{value:N1}].";
+        //             return;
+        //         }
+        //     }
+        //     
+        //     if (CellType == InTables.Cell.GuessedCellType.PriceWithVAT)
+        //     {
+        //         if (!value.HasValue)
+        //         {
+        //             Error += "Chybí vyplněná hodnota.";
+        //             return;
+        //         }
+        //         
+        //         if (value < (from * vat))
+        //         {
+        //             Error += $"Zkontroluj hodnotu, zdá se nám nízká [{value:N1}].";
+        //             return;
+        //         }
+        //         
+        //         if (value > (to * vat))
+        //         {
+        //             Error += $"Zkontroluj hodnotu, zdá se nám vysoká [{value:N1}].";
+        //             return;
+        //         }
+        //     }
+        //     
+        // }
         
     }
 }

@@ -12,6 +12,7 @@ td {
     padding-top: 25px;
     padding-left: 2px;
     padding-right: 2px;
+    cursor: pointer;
 }
 
 .can-drop {
