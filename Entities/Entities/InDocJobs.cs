@@ -12,6 +12,8 @@ namespace HlidacStatu.Entities
 {
     public partial class InDocJobs
     {
+        private decimal? _vat;
+
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public long Pk { get; set; }
@@ -33,7 +35,23 @@ namespace HlidacStatu.Entities
         public decimal? Price { get; set; }
         public decimal? PriceVAT { get; set; }
         public decimal? PriceVATCalculated { get; set; }
-        public decimal? VAT { get; set; }
+
+        public decimal? VAT
+        {
+            get => _vat;
+            set
+            {
+                _vat = value;
+                if (_vat.HasValue)
+                {
+                    if (!PriceVAT.HasValue || PriceVAT.Value == 0) //if price is not set, then we can calculate it
+                    {
+                        PriceVAT = Price * (100 + _vat.Value) / 100;
+                    }
+                }
+            }
+        }
+
         public decimal? UnitCount { get; set; }
 
 

@@ -146,9 +146,9 @@
                         </p>
                     }
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer justify-content-start">
                     <button type="button" class="btn btn-secondary" @onclick="Close">Zrušit změny</button>
-                    <button type="button" class="btn btn-primary" @onclick="Save">Uložit změny</button>
+                    <button disabled="@(!isSaveEnabled)" type="button" class="btn btn-primary" @onclick="Save">Uložit změny</button>
                 </div>
             </div>
         </div>
@@ -162,6 +162,7 @@
 
     private bool showModal = false;
     private bool displayAnotherCategories = false;
+    private bool isSaveEnabled = true;
     
     private async Task Save()
     {
@@ -181,10 +182,12 @@
     // do checks
         if (Table.FoundJobs.Count == 0)
         {
+            isSaveEnabled = false;
             return false;
         }
         if (!IsValidCategory(out string categoryError))
         {
+            isSaveEnabled = false;
             return false;
         }
         foreach (var job in Table.FoundJobs)
@@ -195,6 +198,7 @@
             }
         }
 
+        isSaveEnabled = true;
         return true;
     }
 
@@ -214,10 +218,12 @@
         errorMessages = new();
         if (job.Unit is null)
         {
+            isSaveEnabled = false;
             errorMessages.Add($"Jednotka není vybrána.");
         }
         if (string.IsNullOrWhiteSpace(job.JobRaw))
         {
+            isSaveEnabled = false;
             errorMessages.Add($"Chybí název jobu.");
         }
         if (job.Price > 0 
@@ -225,6 +231,7 @@
         {
             if (job.VAT is null || job.VAT <= 0)
             {
+                isSaveEnabled = false;
                 errorMessages.Add($"Chybí vyplněná výše DPH.");
                 return false;
             }
