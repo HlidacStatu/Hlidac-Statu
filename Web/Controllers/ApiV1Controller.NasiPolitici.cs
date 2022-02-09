@@ -125,7 +125,7 @@ namespace HlidacStatu.Web.Controllers
             };
 
 
-            var roleOsoba = o.Events(m =>
+            var roleOsoba = o.MergedEvents(m =>
                     types.Contains(m.Type)
                     && m.Status != (int)OsobaEvent.Statuses.NasiPoliticiSkryte)
                 .Select(e => new
