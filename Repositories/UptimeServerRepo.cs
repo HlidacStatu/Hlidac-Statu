@@ -22,7 +22,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static List<UptimeServer> GetServersToCheck(int numOfServers=30)
+        public static List<UptimeServer> GetServersToCheck(int numOfServers = 30)
         {
             using (DbEntities db = new DbEntities())
             {
@@ -32,8 +32,9 @@ namespace HlidacStatu.Repositories
                     .Result;
 
                 return list;
+            }
+
+
         }
-
-
     }
 }
