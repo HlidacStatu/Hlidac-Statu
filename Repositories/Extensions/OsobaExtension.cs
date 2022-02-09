@@ -223,6 +223,30 @@ namespace HlidacStatu.Extensions
 
             return events;
         }
+        
+        public static IEnumerable<OsobaEvent> MergedEvents(this Osoba osoba, Expression<Func<OsobaEvent, bool>> predicate)
+        {
+            var events = osoba.NoFilteredEvents()
+                .Where(predicate)
+                .ToArray();
+            
+            for (int currentIndex = 0; currentIndex < events.Length; currentIndex++)
+            {
+                for (int compareTo = currentIndex+1; compareTo < events.Length; compareTo++)
+                {
+                    // nebudeme porovnávat sám se sebou
+                    
+                    if (events[currentIndex].IsOverlaping(events[compareTo], out var mergedEvent))
+                    {
+                        events[compareTo] = mergedEvent;
+                        events[currentIndex] = null; // je potřeba zahodit zmergovaný
+                        break; // pokud někam uložíme, můžeme pokračovat dalším
+                    }
+                }
+            }
+            //odstranit prázdné
+            return events.Where(e => e != null);
+        }
 
         public static IEnumerable<OsobaEvent> Events_VerejnopravniUdalosti(this Osoba osoba)
         {
@@ -314,28 +338,9 @@ namespace HlidacStatu.Extensions
                 (int) OsobaEvent.Types.Jine
             };
 
-            var events = osoba.Events(predicate).ToArray();
+            var events = osoba.MergedEvents(predicate).ToArray();
             
-            //overlaping events
-            for (int currentIndex = 0; currentIndex < events.Length; currentIndex++)
-            {
-                for (int compareTo = currentIndex+1; compareTo < events.Length; compareTo++)
-                {
-                    // nebudeme porovnávat sám se sebou
-                    
-                    if (events[currentIndex].IsOverlaping(events[compareTo], out var mergedEvent))
-                    {
-                        events[compareTo] = mergedEvent;
-                        events[currentIndex] = null; // je potřeba zahodit zmergovaný
-                        break; // pokud někam uložíme, můžeme pokračovat dalším
-                    }
-                }
-            }
-            //odstranit prázdné
-            var mergedEvents = events.Where(e => e != null);
-            
-
-            List<string> evs = mergedEvents
+            List<string> evs = events
                 .OrderBy(o =>
                 {
                     var index = fixedOrder.IndexOf(o.Type);
