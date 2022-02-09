@@ -191,6 +191,9 @@ namespace HlidacStatu.Entities
             // });
 
         }
+
+        public virtual DbSet<UptimeServer> UptimeServers { get; set; }
+
         public virtual DbSet<Cena> Ceny { get; set; }
 
         public virtual DbSet<CenyCustomer> CenyCustomer { get; set; }
