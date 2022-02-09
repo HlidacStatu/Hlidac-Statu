@@ -66,5 +66,8 @@ namespace HlidacStatu.Entities
         [StringLength(30)]
         public string SSLGrade { get; set; }
 
+        [Nest.Date]
+        public DateTime? TakenByUptimer { get; set; }
+
     }
 }
