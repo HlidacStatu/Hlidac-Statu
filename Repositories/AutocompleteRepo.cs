@@ -370,37 +370,44 @@ namespace HlidacStatu.Repositories
             {
 
                 Devmasters.Batch.Manager.DoActionForAll<Osoba>(db.Osoba.AsQueryable()
-                       .Where(o => o.Status == (int)Osoba.StatusOsobyEnum.Politik
-                           || o.Status == (int)Osoba.StatusOsobyEnum.Sponzor),
-
-                           o =>
-                           {
-                               var synonyms = new Autocomplete[2];
-                               synonyms[0] = new Autocomplete()
-                               {
-                                   Id = $"osobaid:{o.NameId}",
-                                   Text = $"{o.Prijmeni} {o.Jmeno}{AppendTitle(o.TitulPred, o.TitulPo)}",
-                                   Priority = o.Status == (int)Osoba.StatusOsobyEnum.Politik ? 2 : 0,
-                                   Type = o.StatusOsoby().ToNiceDisplayName(),
-                                   ImageElement = $"<img src='{o.GetPhotoUrl(false)}' />",
-                                   Description = InfoFact.RenderInfoFacts(
-                                       o.InfoFacts().Where(i => i.Level != InfoFact.ImportanceLevel.Stat).ToArray(),
-                                       2, true, false, "", "{0}", false),
-                                   Category = Autocomplete.CategoryEnum.Person
-                               };
-
-                               synonyms[1] = synonyms[0].Clone();
-                               synonyms[1].Text = $"{o.Jmeno} {o.Prijmeni}{AppendTitle(o.TitulPred, o.TitulPo)}";
-
-                               lock (_loadPlock)
-                               {
-                                   results.Add(synonyms[0]);
-                                   results.Add(synonyms[1]);
-                               }
-
-                               return new Devmasters.Batch.ActionOutputData();
-                           }
-                           , null, progressWriter.Writer, true, prefix: "LoadPeople ");
+                    .Where(o => o.Status == (int)Osoba.StatusOsobyEnum.Politik
+                        || o.Status == (int)Osoba.StatusOsobyEnum.VysokyUrednik
+                        || o.Status == (int)Osoba.StatusOsobyEnum.Sponzor),
+                    o =>
+                    {
+                        int priority = o.Status switch
+                        {
+                            (int)Osoba.StatusOsobyEnum.Politik => 2,
+                            (int)Osoba.StatusOsobyEnum.VysokyUrednik => 1,
+                            _ => 0
+                        };
+                        
+                        var synonyms = new Autocomplete[2];
+                        synonyms[0] = new Autocomplete()
+                        {
+                            Id = $"osobaid:{o.NameId}",
+                            Text = $"{o.Prijmeni} {o.Jmeno}{AppendTitle(o.TitulPred, o.TitulPo)}",
+                            Priority = priority,
+                            Type = o.StatusOsoby().ToNiceDisplayName(),
+                            ImageElement = $"<img src='{o.GetPhotoUrl(false)}' />",
+                            Description = InfoFact.RenderInfoFacts(
+                                o.InfoFacts().Where(i => i.Level != InfoFact.ImportanceLevel.Stat).ToArray(),
+                                2, true, false, "", "{0}", false),
+                            Category = Autocomplete.CategoryEnum.Person
+                        };
+ 
+                        synonyms[1] = synonyms[0].Clone();
+                        synonyms[1].Text = $"{o.Jmeno} {o.Prijmeni}{AppendTitle(o.TitulPred, o.TitulPo)}";
+ 
+                        lock (_loadPlock)
+                        {
+                            results.Add(synonyms[0]);
+                            results.Add(synonyms[1]);
+                        }
+ 
+                        return new Devmasters.Batch.ActionOutputData();
+                    }
+                    , null, progressWriter.Writer, true, prefix: "LoadPeople ");
 
             }
             return results;
