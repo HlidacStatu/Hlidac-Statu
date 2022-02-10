@@ -36,6 +36,21 @@ namespace HlidacStatu.Web.Controllers
             return ZabTools.Weby().ToArray();
         }
 
+        [HttpGet("domeny")]
+        public ActionResult<string> Domeny()
+        {
+            var webs = ZabTools.Weby()
+                .ToArray()
+                .Select(m=>m.url)
+                .Where(m=>Uri.IsWellFormedUriString(m, UriKind.Absolute))
+                .Select(m=>new Uri(m))
+                .Select(m=>m.Host.ToLower())
+                .Distinct()
+                ;
+            return string.Join("\n", webs);
+        }
+
+
         //[GZipOrDeflate()]
         [Authorize]
         [HttpGet("{id?}")]
