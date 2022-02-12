@@ -45,6 +45,7 @@ namespace HlidacStatu.Repositories.ES
             Insolvence,
             Dotace,
             UptimeItem,
+            ServerSSL,
             Osoby,
             Audit,
             RPP_Kategorie,
@@ -74,6 +75,8 @@ namespace HlidacStatu.Repositories.ES
         public static string defaultIndexName_Insolvence = "insolvencnirestrik";
         public static string defaultIndexName_Dotace = "dotace";
         public static string defaultIndexName_Uptime= "uptime";
+        public static string defaultIndexName_ServerSSL = "serverssl";
+        
         public static string defaultIndexName_Osoby = "osoby";
         public static string defaultIndexName_Audit = "audit";
         public static string defaultIndexName_InDocTableCells = "indoctablecells";
@@ -185,6 +188,10 @@ namespace HlidacStatu.Repositories.ES
         public static ElasticClient GetESClient_Uptime(int timeOut = 60000, int connectionLimit = 80)
         {
             return GetESClient(defaultIndexName_Uptime, timeOut, connectionLimit, IndexType.UptimeItem);
+        }
+        public static ElasticClient GetESClient_ServerSSL(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClient(defaultIndexName_ServerSSL, timeOut, connectionLimit, IndexType.ServerSSL);
         }
 
         public static ElasticClient GetESClient_Dotace(int timeOut = 60000, int connectionLimit = 80)
@@ -446,7 +453,7 @@ namespace HlidacStatu.Repositories.ES
             set.NumberOfReplicas = 2;
             if (idxTyp == IndexType.DataSource)
                 set.NumberOfShards = 4;
-            else if (idxTyp == IndexType.UptimeItem)
+            else if (idxTyp == IndexType.UptimeItem || idxTyp == IndexType.ServerSSL)
                 set.NumberOfShards = 3;
             else 
                 set.NumberOfShards = 8;
@@ -492,6 +499,13 @@ namespace HlidacStatu.Repositories.ES
                        .Create(client.ConnectionSettings.DefaultIndex, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Dotace.Dotace>(map => map.AutoMap().DateDetection(false))
+                       );
+                    break;
+                case IndexType.ServerSSL:
+                    res = client.Indices
+                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                           .InitializeUsing(idxSt)
+                           .Map<Entities.ServerSSL>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.UptimeItem:

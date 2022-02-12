@@ -127,7 +127,7 @@
                 <tr>
                     <th>Výzva</th>
                     <th>Vyplaceno</th>
-                    <th>Počet vyplacených podpor</th>
+                    <th>Počet vyplacených podpor<br/>Průměrná výše podpory</th>
                     <th></th>
                 </tr>
             </thead>
@@ -138,7 +138,7 @@
                 <tr>
                     <td>@vyzvyNames[vyzvaId]</td>
                     <td>@(HlidacStatu.Util.RenderData.NicePriceHtml((decimal)vyzvyStats[vyzvaId].Sum,shortFormat:true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.AsNeeded))</td>
-                    <td>@(vyzvyStats[vyzvaId].Count)</td>
+                    <td>@(vyzvyStats[vyzvaId].Count) / @(HlidacStatu.Util.RenderData.NicePriceHtml((decimal)vyzvyStats[vyzvaId].Sum/(decimal)vyzvyStats[vyzvaId].Count,shortFormat:true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.AsNeeded))</td>
                     <td><a href="#vyzva_@(vyzvaId)">Detail</a></td>
                 </tr>
             }
