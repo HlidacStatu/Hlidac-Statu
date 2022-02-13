@@ -35,6 +35,7 @@ namespace HlidacStatu.Entities
         [Nest.Keyword] 
         public string Groups { get; set; }
 
+
         [Required]
         [StringLength(300)]
         public string Name { get; set; }

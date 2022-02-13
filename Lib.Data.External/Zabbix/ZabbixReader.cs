@@ -370,7 +370,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
                 return null;
             }
         }
-
+        /*
         public List<ZabHostAvailability_Intervals> GetAvailability_Intervals(int hoursBack, IEnumerable<string> itemIds)
         {
             if (zabbix.loggedOn == false)
@@ -408,6 +408,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
             }
             return ret;
         }
+        */
 
         public List<ZabHostAvailability> GetAvailability_Raw(int hoursBack, IEnumerable<ZabHost> hosts, bool fillMissingWithNull = false)
         {

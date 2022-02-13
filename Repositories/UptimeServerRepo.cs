@@ -1,4 +1,5 @@
 using HlidacStatu.Entities;
+using HlidacStatu.Lib.Data.External.Zabbix;
 
 using InfluxDB.Client;
 using InfluxDB.Client.Api.Domain;
@@ -6,6 +7,7 @@ using InfluxDB.Client.Writes;
 
 using Microsoft.EntityFrameworkCore;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -128,5 +130,82 @@ namespace HlidacStatu.Repositories
 
 
         }
+
+
+        public static IEnumerable<ZabHostAvailability> Availability(string group, int hoursBack)
+        {
+            string[] serverIds = null;
+            UptimeServer[] servers = null;
+            using (Entities.DbEntities db = new HlidacStatu.Entities.DbEntities())
+            {
+                servers = db.UptimeServers
+                    .AsNoTracking()
+                    .ToArray();
+                if (Devmasters.TextUtil.IsNumeric(group))
+                    serverIds = servers
+                        .Where(m => m.Priorita == Convert.ToInt32(group))
+                        .Select(m => m.Id)
+                        .ToArray();
+                else
+                    serverIds = servers
+                        .Where(m => m.GroupArray().Contains(group) == true)
+                        .Select(m => m.Id)
+                        .ToArray();
+            }
+            string query = "";
+            List<InfluxDB.Client.Core.Flux.Domain.FluxTable> fluxTables = null;
+            if (serverIds?.Length == null)
+                return null;
+
+            query = "from(bucket:\"uptimer\")"
+                + $" |> range(start: -{hoursBack}h)"
+                + "  |> filter(fn: (r) => r[\"_measurement\"] == \"uptime\")"
+                + "  |> filter(fn: (r) => " + serverIds.Select(m => $"r[\"serverid\"] == \"{m}\"").Aggregate((f, s) => f + " or " + s) + " )"
+                + "  |> filter(fn: (r) => r[\"_field\"] == \"value\")"
+            ;
+
+            fluxTables = influxDbClient.GetQueryApi().QueryAsync(query, "hlidac").Result;
+            var allData = fluxTables.SelectMany(m => m.Records)
+                .Select(m => new
+                {
+                    serverId = m.Values["serverid"] as string,
+                    fieldname = m.Values["fieldname"] as string,
+                    value = Convert.ToInt64(m.Values["_value"]),
+                    time = ((NodaTime.Instant)m.Values["_time"]).ToDateTimeUtc().ToLocalTime()
+                })
+                .GroupBy(k => new { s = k.serverId, t = k.time }, v => v);
+
+            var items = allData
+                .Select(i => new
+                {
+                    ServerId = i.Key.s,
+                    Server = servers.First(m => m.Id == i.Key.s),
+                    CheckStart = i.Key.t,
+                    ResponseCode = i.Where(m => m.fieldname == "responseCode").FirstOrDefault()?.value ?? -1,
+                    ResponseSize = i.Where(m => m.fieldname == "responseSize").FirstOrDefault()?.value ?? -1,
+                    ResponseTimeInMs = i.Where(m => m.fieldname == "responseTime").FirstOrDefault()?.value ?? -1,
+                }
+                )
+                .ToArray();
+
+            var zabList = items
+                .GroupBy(k => k.ServerId, v => v)
+                .Select(g => new ZabHostAvailability(
+                    new ZabHost(g.Key, g.FirstOrDefault()?.Server.Host(), g.FirstOrDefault()?.Server.PublicUrl, g.FirstOrDefault()?.Server.Description, g.FirstOrDefault()?.Server.GroupArray())
+                                ,
+                                g.OrderBy(m => m.CheckStart)
+                                .Select(m => new ZabHistoryItem()
+                                {
+                                    clock = m.CheckStart,
+                                    itemId = g.Key,
+                                    value = m.ResponseCode >= 400 ? ZabAvailability.BadHttpCode : (m.ResponseTimeInMs > 15000 ? ZabAvailability.TimeOuted2 : ((decimal)m.ResponseTimeInMs)/1000m)
+                                }
+                                )
+                            ) //zabhost
+                    );
+
+            return zabList;
+        }
+
     }
 }

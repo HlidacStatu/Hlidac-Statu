@@ -11,6 +11,7 @@ namespace HlidacStatu.Lib.Data.External.Zabbix
         public static decimal OKLimit = 1.000m;
         public static decimal SlowLimit = 2.000m;
         public static decimal TimeOuted = 99m;
+        public static decimal TimeOuted2 = 99.2m;
         public static decimal BadHttpCode = 99.1m;
 
         public static Statuses GetStatus(decimal responseInMs)

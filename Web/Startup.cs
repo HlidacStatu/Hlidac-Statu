@@ -261,6 +261,11 @@ namespace HlidacStatu.Web
                     defaults: new { action = "Index" });
 
                 endpoints.MapControllerRoute(
+                    name: "weby redir",
+                    pattern: "uptime/{action}/{id?}",
+                    defaults: new { controller = "Uptime", action = "Index" });
+
+                endpoints.MapControllerRoute(
                     name: "DataController",
                     pattern: "Data/{action}/{id?}/{dataid?}",
                     defaults: new { controller = "Data", action = "Index" });
