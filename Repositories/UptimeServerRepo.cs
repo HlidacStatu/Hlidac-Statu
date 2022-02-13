@@ -1,5 +1,9 @@
 using HlidacStatu.Entities;
 
+using InfluxDB.Client;
+using InfluxDB.Client.Api.Domain;
+using InfluxDB.Client.Writes;
+
 using Microsoft.EntityFrameworkCore;
 
 using System.Collections.Generic;
@@ -9,6 +13,11 @@ namespace HlidacStatu.Repositories
 {
     public static class UptimeServerRepo
     {
+
+        static InfluxDBClient influxDbClient = InfluxDBClientFactory.Create(
+            Devmasters.Config.GetWebConfigValue("InfluxDb"),
+            Devmasters.Config.GetWebConfigValue("InfluxDbToken"));
+
         public static void SaveLastCheck(UptimeItem lastCheck, UptimeServer uptimeServerTrigger)
         {
             bool triggerScreenshot = false;
@@ -31,9 +40,46 @@ namespace HlidacStatu.Repositories
                 else
                     db.Entry(server).State = EntityState.Modified;
 
-                db.SaveChanges();
+                try
+                {
 
-                Repositories.ES.Manager.GetESClient_Uptime().Index<UptimeItem>(lastCheck, m=>m.Id(lastCheck.Id));
+                    db.SaveChanges();
+
+                    Repositories.ES.Manager.GetESClient_Uptime().Index<UptimeItem>(lastCheck, m => m.Id(lastCheck.Id));
+                    using (var writeApi = influxDbClient.GetWriteApi())
+                    {
+                        var point = PointData.Measurement("uptime")
+                            .Tag("uptimer", lastCheck.Uptimer)
+                            .Tag("serverid", lastCheck.ServerId)
+                            .Tag("fieldname", "responseTime")
+                            .Field("value", lastCheck.ResponseTimeInMs)
+                            .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S);
+                        writeApi.WritePoint("uptimer", "hlidac", point);
+
+                        point = PointData.Measurement("uptime")
+                            .Tag("uptimer", lastCheck.Uptimer)
+                            .Tag("serverid", lastCheck.ServerId)
+                            .Tag("fieldname", "responseSize")
+                            .Field("value", lastCheck.ResponseSize)
+                            .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S);
+                        writeApi.WritePoint("uptimer", "hlidac", point);
+
+                        point = PointData.Measurement("uptime")
+                            .Tag("uptimer", lastCheck.Uptimer)
+                            .Tag("serverid", lastCheck.ServerId)
+                            .Tag("fieldname", "responseCode")
+                            .Field("value", (long)lastCheck.ResponseCode)
+                            .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S);
+                        writeApi.WritePoint("uptimer", "hlidac", point);
+
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    HlidacStatu.Util.Consts.Logger.Error("UptimeServerRepo.SaveLastCheck error ", e);
+                    throw;
+                }
+
             }
         }
         public static UptimeServer Load(string serverId)
@@ -66,14 +112,14 @@ namespace HlidacStatu.Repositories
             try
             {
 
-            using (DbEntities db = new DbEntities())
-            {
-                var list = db.UptimeServers.FromSqlInterpolated($"exec GetUptimeServers {numOfServers}")
-                    .AsNoTracking()
-                    .ToList();
+                using (DbEntities db = new DbEntities())
+                {
+                    var list = db.UptimeServers.FromSqlInterpolated($"exec GetUptimeServers {numOfServers}")
+                        .AsNoTracking()
+                        .ToList();
 
-                return list;
-            }
+                    return list;
+                }
             }
             catch (System.Exception e)
             {
