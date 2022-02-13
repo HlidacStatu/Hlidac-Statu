@@ -129,7 +129,7 @@
             if (aktualniMajitele.Count()>0)
             {
                 <h4>@(aktualniMajitele.Count() >1 ? "Skuteční majitelé" : "Skutečný majitel")</h4>
-                RenderSkutecniMajitele(aktualniMajitele);
+                <partial name="_renderSkutecniMajitele" model="@aktualniMajitele" />
                 <div style="padding-bottom:10px;">&nbsp;</div>
             }
 
@@ -137,7 +137,7 @@
             if (vymazaniMajitele.Count()>0)
             {
                 <h4>@(vymazaniMajitele.Count() >1 ? "Vymazaní majitelé" : "Vymazaný majitel")</h4>
-                RenderSkutecniMajitele(vymazaniMajitele);
+                <partial name="_renderSkutecniMajitele" model="@vymazaniMajitele" />
             }
         }
     }
@@ -206,86 +206,3 @@
 </div>
 
 
-@{
-    void RenderSkutecniMajitele(IEnumerable<Newtonsoft.Json.Linq.JToken> majitele) 
-    {
-               <table>
-                    @foreach (Newtonsoft.Json.Linq.JObject skm in majitele)
-                    {
-                        DateTime? zapis = skm["datum_zapis"]?.Value<DateTime?>();
-                        DateTime? vymaz = skm["datum_vymaz"]?.Value<DateTime?>();
-                        <tr style="border-top:4px solid rgba(0,0,0,0)">
-                            <td colspan="2" class="col-sm-12">
-                                @if (!string.IsNullOrEmpty(skm["osobaId"].Value<string>()))
-                                {
-                                    <a href="/osoba/@(skm["osobaId"].Value<string>())">@(skm["osoba_jmeno"]?.Value<string>()) @(skm["osoba_prijmeni"]?.Value<string>())</a>
-                                }
-                                else
-                                {
-                                    <span>@(skm["osoba_jmeno"]?.Value<string>()) @(skm["osoba_prijmeni"]?.Value<string>())</span>
-                                }
-                                <span class="text-muted">(zapsán @(HlidacStatu.Util.RenderData.ToDate(zapis,"dd.MM.yyyy"))
-                                @if (vymaz.HasValue)
-                                {
-                                    @Html.Encode($" - {HlidacStatu.Util.RenderData.ToDate(vymaz,"dd.MM.yyyy")}")
-                                }
-                                )</span>
-                            </td>
-                        </tr>
-                        @if (skm["postaveni"] != null)
-                        {
-                            <tr>
-                                <td colspan="2" class="col-sm-12 text-muted small">@(skm["postaveni"].Value<string>())</td>
-                            </tr>
-                        }
-                        else if (skm["udaj_typ_nazev"] != null)
-                        {
-                            <tr>
-                                <td colspan="2" class="col-sm-12 text-muted small">@(skm["udaj_typ_nazev"].Value<string>())</td>
-                            </tr>
-                        }
-
-                        @if (skm["podil_na_prospechu_hodnota"] != null && skm["podil_na_prospechu_hodnota"].Value<string>() != null)
-                        {
-                            <tr>
-                                <td class="text-muted col-sm-5">Podíl na prospěchu ze společnosti</td>
-                                <td class="col-sm-7">
-                                    @(skm["podil_na_prospechu_hodnota"].Value<string>())
-                                    @if (skm["podil_na_prospechu_typ"].Value<string>() == "PROCENTA")
-                                    {
-                                        <text>
-                                            @Html.Raw(" %")
-                                        </text>
-                                    }
-                                    else
-                                    {
-                                        @Html.Raw($"({skm["podil_na_prospechu_typ"].Value<string>()})")
-                                    }
-                                </td>
-                            </tr>
-                        }
-
-                        @if (skm["podil_na_hlasovani_hodnota"] != null && skm["podil_na_hlasovani_hodnota"].Value<string>() != null)
-                        {
-                            <tr>
-                                <td class="text-muted col-sm-5">Podíl na hlasovacích právech</td>
-                                <td class="col-sm-7">
-                                    @(skm["podil_na_hlasovani_hodnota"].Value<string>())
-                                    @if (skm["podil_na_hlasovani_typ"].Value<string>() == "PROCENTA")
-                                    {
-                                        <text>
-                                            @Html.Raw(" %")
-                                        </text>
-                                    }
-                                    else
-                                    {
-                                        @Html.Raw($"({skm["podil_na_hlasovani_typ"].Value<string>()})")
-                                    }
-                                </td>
-                            </tr>
-                        }
-
-                    }
-                </table>
-     }
-}
