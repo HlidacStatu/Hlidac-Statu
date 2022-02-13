@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace HlidacStatu.Entities
 {
@@ -8,15 +9,17 @@ namespace HlidacStatu.Entities
         public string[] GroupArray()
         {
             if (string.IsNullOrEmpty(this.Groups))
-                return new string[] { };
+                return new string[] { this.Priorita.ToString() };
             else
-                return this.Groups.Split('|', StringSplitOptions.RemoveEmptyEntries);
+                return this.Groups.Split('|', StringSplitOptions.RemoveEmptyEntries)
+                    .Append(this.Priorita.ToString())
+                    .ToArray();
         }
 
 
         public string Hash()
         {
-            return Devmasters.Crypto.Hash.ComputeHashToHex(Host() + "xxttxx" + Host());
+            return Devmasters.Crypto.Hash.ComputeHashToHex(Id + "xxttxx" + Id);
 
         }
         public bool ValidHash(string h)

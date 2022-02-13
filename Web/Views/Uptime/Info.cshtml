@@ -13,7 +13,7 @@
     ZabHostSslStatus webssl = null;
     try
     {
-        web = ZabTools.GetHostAvailabilityLong(Model);
+        web = HlidacStatu.Repositories.UptimeServerRepo.AvailabilityById(Model.hostid,7*24).FirstOrDefault();
         webssl = ZabTools.SslStatusForHostId(web.Host.hostid);
     }
     catch (Exception)
@@ -172,7 +172,7 @@ else
         </h2>
         <div class="row">
             <div class="col-xs-12">
-                @WebyChartUtil.Chart("w" + web.Host.hostid, 7 * 24, 190, true, web.Host.hash)
+                @WebyChartUtil.Chart("w" + web.Host.hostid, 7 * 24, 190, true, web.Host.hash, path:"/uptime")
             </div>
         </div>
 

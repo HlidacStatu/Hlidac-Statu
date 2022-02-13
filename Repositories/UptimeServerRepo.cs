@@ -131,31 +131,82 @@ namespace HlidacStatu.Repositories
 
         }
 
-
-        public static IEnumerable<ZabHostAvailability> Availability(string group, int hoursBack)
+        public static IEnumerable<string> ServersIn(string group)
         {
             string[] serverIds = null;
-            UptimeServer[] servers = null;
             using (Entities.DbEntities db = new HlidacStatu.Entities.DbEntities())
             {
-                servers = db.UptimeServers
-                    .AsNoTracking()
-                    .ToArray();
+                var servers = AllServers(db);
                 if (Devmasters.TextUtil.IsNumeric(group))
                     serverIds = servers
                         .Where(m => m.Priorita == Convert.ToInt32(group))
                         .Select(m => m.Id)
                         .ToArray();
-                else
+                else if (!string.IsNullOrEmpty(group))
                     serverIds = servers
                         .Where(m => m.GroupArray().Contains(group) == true)
                         .Select(m => m.Id)
                         .ToArray();
+                else
+                    serverIds = servers
+                        .Select(m => m.Id)
+                        .ToArray();
             }
-            string query = "";
-            List<InfluxDB.Client.Core.Flux.Domain.FluxTable> fluxTables = null;
+            return serverIds;
+        }
+
+        public static ZabHost ToZabHost(this UptimeServer server)
+        {
+            if (server == null)
+                return null;
+
+            var zs = new ZabHost(server.Id,
+                                    server.Host(),
+                                    server.PublicUrl,
+                                    server.Description,
+                                    server.GroupArray()
+                                    )
+            {
+                urad = string.IsNullOrEmpty(server.ICO) ? "" : Firmy.GetJmeno(server.ICO),
+                popis = server.Description,
+                publicname = server.Name,
+
+            };
+
+            return zs;
+        }
+
+        public static UptimeServer[] AllServers(Entities.DbEntities existingConn = null)
+        {
+            if (existingConn != null)
+                return existingConn.UptimeServers.AsNoTracking().ToArray();
+
+
+            using (Entities.DbEntities db = new HlidacStatu.Entities.DbEntities())
+                return db.UptimeServers.AsNoTracking().ToArray();
+
+        }
+
+        public static IEnumerable<ZabHostAvailability> AvailabilityByGroup(string group, int hoursBack)
+        {
+            string[] serverIds = ServersIn(group).ToArray();
+            return AvailabilityByIds(serverIds, hoursBack);
+        }
+        public static IEnumerable<ZabHostAvailability> AvailabilityById(string serverId, int hoursBack)
+        {
+            return AvailabilityByIds(new string[] { serverId }, hoursBack);
+        }
+        public static IEnumerable<ZabHostAvailability> AvailabilityByIds(string[] serverIds, int hoursBack)
+        {
             if (serverIds?.Length == null)
                 return null;
+            if (serverIds.Length == 0)
+                return null;
+
+            UptimeServer[] allServers = AllServers();
+
+            string query = "";
+            List<InfluxDB.Client.Core.Flux.Domain.FluxTable> fluxTables = null;
 
             query = "from(bucket:\"uptimer\")"
                 + $" |> range(start: -{hoursBack}h)"
@@ -179,7 +230,7 @@ namespace HlidacStatu.Repositories
                 .Select(i => new
                 {
                     ServerId = i.Key.s,
-                    Server = servers.First(m => m.Id == i.Key.s),
+                    Server = allServers.First(m => m.Id == i.Key.s),
                     CheckStart = i.Key.t,
                     ResponseCode = i.Where(m => m.fieldname == "responseCode").FirstOrDefault()?.value ?? -1,
                     ResponseSize = i.Where(m => m.fieldname == "responseSize").FirstOrDefault()?.value ?? -1,
@@ -191,14 +242,14 @@ namespace HlidacStatu.Repositories
             var zabList = items
                 .GroupBy(k => k.ServerId, v => v)
                 .Select(g => new ZabHostAvailability(
-                    new ZabHost(g.Key, g.FirstOrDefault()?.Server.Host(), g.FirstOrDefault()?.Server.PublicUrl, g.FirstOrDefault()?.Server.Description, g.FirstOrDefault()?.Server.GroupArray())
+                                g.FirstOrDefault()?.Server?.ToZabHost()
                                 ,
                                 g.OrderBy(m => m.CheckStart)
                                 .Select(m => new ZabHistoryItem()
                                 {
                                     clock = m.CheckStart,
                                     itemId = g.Key,
-                                    value = m.ResponseCode >= 400 ? ZabAvailability.BadHttpCode : (m.ResponseTimeInMs > 15000 ? ZabAvailability.TimeOuted2 : ((decimal)m.ResponseTimeInMs)/1000m)
+                                    value = m.ResponseCode >= 400 ? ZabAvailability.BadHttpCode : (m.ResponseTimeInMs > 15000 ? ZabAvailability.TimeOuted2 : ((decimal)m.ResponseTimeInMs) / 1000m)
                                 }
                                 )
                             ) //zabhost

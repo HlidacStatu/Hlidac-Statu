@@ -1,4 +1,5 @@
 ﻿using HlidacStatu.Lib.Data.External.Zabbix;
+using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 
 using InfluxDB.Client;
@@ -32,11 +33,11 @@ namespace HlidacStatu.Web.Controllers
                     return RedirectToAction("Index", "StatniWeby");
 
                 ViewBag.SubTitle = "Další státní weby";
-                return View(ZabTools.WebyItems(iid.ToString()));
+                return View(Repositories.UptimeServerRepo.ServersIn(iid.ToString()));
             }
             else if (id?.ToLower() == "ustredni")
             {
-                var list = ZabTools.WebyItems(id);
+                var list = Repositories.UptimeServerRepo.ServersIn(id);
                 if (list == null)
                     return RedirectToAction("Index", "StatniWeby");
                 if (list.Count() == 0)
@@ -48,7 +49,7 @@ namespace HlidacStatu.Web.Controllers
             }
             else if (id?.ToLower() == "krajske" && false)
             {
-                var list = ZabTools.WebyItems(id);
+                var list = Repositories.UptimeServerRepo.ServersIn(id);
                 if (list == null)
                     return RedirectToAction("Index", "StatniWeby");
                 if (list.Count() == 0)
@@ -74,6 +75,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
+        [HlidacCache(60, "id;hh;f;t;h", false)]
         public ActionResult ChartData(string id, string hh, long? f, long? t, int? h = 24)
         {
             id = id?.ToLower() ?? "";
@@ -90,7 +92,7 @@ namespace HlidacStatu.Web.Controllers
             switch (id)
             {
                 case "index":
-                    data = Repositories.UptimeServerRepo.Availability("0",24)
+                    data = Repositories.UptimeServerRepo.AvailabilityByGroup("0",24)
                         ?.OrderBy(o => o.Host.publicname)
                         ?.Reverse()
                         ?.ToList();
@@ -99,13 +101,13 @@ namespace HlidacStatu.Web.Controllers
                 case "1":
                 case "2":
                 case "3":
-                    data = Repositories.UptimeServerRepo.Availability(id,24)
+                    data = Repositories.UptimeServerRepo.AvailabilityByGroup(id,24)
                         ?.OrderBy(o => o.Host.publicname)
                         ?.Reverse()
                         ?.ToList();
                     break;
                 case "ustredni":
-                    data = Repositories.UptimeServerRepo.Availability("ustredni",24)
+                    data = Repositories.UptimeServerRepo.AvailabilityByGroup("ustredni",24)
                         ?.OrderBy(o => o.Host.publicname)
                         ?.Reverse()
                         ?.ToList();
@@ -123,7 +125,7 @@ namespace HlidacStatu.Web.Controllers
                 {
                     if (host.ValidHash(hh))
                     {
-                        data = Repositories.UptimeServerRepo.Availability(host.Id, 24*7);
+                        data = Repositories.UptimeServerRepo.AvailabilityById(host.Id, 24*7);
                     }
                 }
             }
@@ -155,7 +157,10 @@ namespace HlidacStatu.Web.Controllers
         [HlidacCache(10 * 60, "id;h;embed", false)]
         public ActionResult Info(int id, string h)
         {
-            ZabHost host = ZabTools.Weby().Where(w => w.hostid == id.ToString() & w.itemIdResponseTime != null).FirstOrDefault();
+            ZabHost host = Repositories.UptimeServerRepo.AllServers()
+                .FirstOrDefault(w => w.Id == id.ToString())?
+                .ToZabHost()
+                ;
             if (host == null)
                 return RedirectToAction("Index", "StatniWeby");
 
