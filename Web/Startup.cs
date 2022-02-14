@@ -433,33 +433,33 @@ namespace HlidacStatu.Web
                     };
 
                     options.UsePkce = false; // apple does not currently support PKCE (April 2021)
+                })
+                .AddOpenIdConnect("mojeid", options =>
+                {
+                    IConfigurationSection mojeidAuthSetting = Configuration.GetSection("Authentication:MojeId");
+                    options.ClientId = mojeidAuthSetting["Id"]; // id, které dostaneme po registraci
+                    options.ClientSecret = mojeidAuthSetting["Secret"]; // heslo, které dostaneme po registraci
+                    
+                    options.Authority = "https://mojeid.cz/oidc/"; // issuer
+                    
+                    options.CallbackPath = "/signin-mojeid"; //unikátní endpoint na hlídači - zatím nevím k čemu
+                    
+                    options.ResponseType = "code"; // typ flow (https://www.scottbrady91.com/openid-connect/openid-connect-flows)
+                    options.ResponseMode = "form_post"; // form post due to prevent PII in the URL
+                    
+                    options.DisableTelemetry = true;
+                
+                    options.SaveTokens = true; // ? upřímně nevím
+                    options.UsePkce = true; // ? upřímně nevím
+                    
+                    // claimy, které chceme získat z userinfoendpointu
+                    options.Scope.Add("openid");
+                    options.Scope.Add("email");
+                    options.Scope.Add("name");
+                    
+                    options.GetClaimsFromUserInfoEndpoint = true; // získá data o jménu, emailu - věcech ze scope
+                    
                 });
-                // .AddOpenIdConnect("mojeid", options =>
-                // {
-                //     IConfigurationSection mojeidAuthSetting = Configuration.GetSection("Authentication:MojeId");
-                //     options.ClientId = mojeidAuthSetting["Id"]; // id, které dostaneme po registraci
-                //     options.ClientSecret = mojeidAuthSetting["Secret"]; // heslo, které dostaneme po registraci
-                //     
-                //     options.Authority = "https://mojeid.cz/oidc/"; // issuer
-                //     
-                //     options.CallbackPath = "/signin-mojeid"; //unikátní endpoint na hlídači - zatím nevím k čemu
-                //     
-                //     options.ResponseType = "code"; // typ flow (https://www.scottbrady91.com/openid-connect/openid-connect-flows)
-                //     options.ResponseMode = "form_post"; // form post due to prevent PII in the URL
-                //     
-                //     options.DisableTelemetry = true;
-                //
-                //     options.SaveTokens = true; // ? upřímně nevím
-                //     options.UsePkce = true; // ? upřímně nevím
-                //     
-                //     // claimy, které chceme získat z userinfoendpointu
-                //     options.Scope.Add("openid");
-                //     options.Scope.Add("email");
-                //     options.Scope.Add("name");
-                //     
-                //     options.GetClaimsFromUserInfoEndpoint = true; // získá data o jménu, emailu - věcech ze scope
-                //     
-                // });
             
         }
         
