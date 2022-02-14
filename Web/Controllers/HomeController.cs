@@ -207,11 +207,6 @@ namespace HlidacStatu.Web.Controllers
             return RedirectPermanent("https://www.hlidacstatu.cz/texty/pridejte-se/");
         }
 
-        [HttpPost]
-        public ActionResult PridatSe(Models.PridatSeModel model, IFormCollection form)
-        {
-            return RedirectPermanent("https://www.hlidacstatu.cz/texty/pridejte-se/");
-        }
 
         public ActionResult VerejneZakazky(string q)
         {
@@ -487,32 +482,6 @@ text zpravy: {txt}
             return View();
         }
 
-
-        public ActionResult PridatPolitika(Models.NewPersonModel model)
-        {
-            return View(model);
-        }
-        [HttpPost]
-        public ActionResult PridatPolitika(Models.NewPersonModel model, IFormCollection form)
-        {
-            if (ModelState.IsValid)
-            {
-                ViewBag.Thanks = true;
-                try
-                {
-                    if (User.IsInRole("Admin"))
-                    {
-                    }
-                }
-                catch (Exception)
-                {
-                    //HlidacStatu.Util.Consts.Logger.Fatal(string.Format("Pridat Politik : {0}", content), ex);
-                }
-
-                return View(new Models.NewPersonModel());
-            }
-            return View(model);
-        }
 
         public ActionResult HledatVice()
         {
