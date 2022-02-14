@@ -9,8 +9,6 @@ using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Statistics;
 using HlidacStatu.Util;
 
-using Microsoft.EntityFrameworkCore;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;

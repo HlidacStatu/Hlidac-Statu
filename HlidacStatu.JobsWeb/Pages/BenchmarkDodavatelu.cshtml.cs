@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using HlidacStatu.JobsWeb.Models;
 using HlidacStatu.JobsWeb.Services;
 using HlidacStatu.Repositories;
@@ -15,9 +16,9 @@ namespace HlidacStatu.JobsWeb.Pages
         public YearlyStatisticsGroup.Key? Key { get; set; }
         
 
-        public IActionResult OnGet(string id)
+        public async Task<IActionResult> OnGetAsync(string id)
         {
-            if (HttpContext.HasAccess() == false)
+            if (await HttpContext.HasAccess() == false)
                 return Redirect("/");
 
 

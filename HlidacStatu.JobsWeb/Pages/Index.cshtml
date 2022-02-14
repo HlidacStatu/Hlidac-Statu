@@ -41,7 +41,7 @@
                         {
                             <b>Pro přístup k reportu se musíte přihlásit.</b>
                         }
-                        else if (HttpContext.HasAccess("IT",2020))
+                        else if (await HttpContext.HasAccess("IT",2020))
                         {
                             <b><a href="/Souhrn?obor=IT&rok=2020">Otevřít analýzu</a></b>
                         }
@@ -67,7 +67,7 @@
                     <div class="mb-3">
                         <b>Máte zakoupeny tyto analýzy:</b>
                         <ul class="list-group-flush">
-                            @if (HttpContext.HasAccess("IT",2020))
+                            @if (await HttpContext.HasAccess("IT",2020))
                             {
                                 <li class="list-group-item"><a href="/Souhrn?obor=IT&rok=2020">Přehled obvyklých cen IT prací ve státní správě za rok 2020 (<b>report máte zakoupený</b>)</a></li>
                             }
@@ -78,7 +78,7 @@
                         </ul>
                         <b>Můžete si koupit:</b>
                         <ul class="list-group-flush">
-                            @if (HttpContext.HasAccess("IT",2020))
+                            @if (await HttpContext.HasAccess("IT",2020))
                             {
                             }
                             else

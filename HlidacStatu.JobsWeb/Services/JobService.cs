@@ -264,7 +264,7 @@ namespace HlidacStatu.JobsWeb.Services
             return DistinctJobs;
         }
 
-        public static bool HasAccess(this HttpContext context)
+        public static async Task<bool> HasAccess(this HttpContext context)
         {
             if (context.User?.Identity?.IsAuthenticated == false)
                 return false;
@@ -275,9 +275,9 @@ namespace HlidacStatu.JobsWeb.Services
             if (key == null)
                 return false;
 
-            return HasAccess(username, key?.Obor, key.Value.Rok);
+            return await HasAccess(username, key?.Obor, key.Value.Rok);
         }
-        public static bool HasAccess(this HttpContext context, string obor, int rok)
+        public static async Task<bool> HasAccess(this HttpContext context, string obor, int rok)
         {
             if (context.User?.Identity?.IsAuthenticated == false)
                 return false;
@@ -285,12 +285,12 @@ namespace HlidacStatu.JobsWeb.Services
             if (string.IsNullOrEmpty(username))
                 return false;
 
-            return HasAccess(username, obor, rok);
+            return await HasAccess(username, obor, rok);
         }
-        public static bool HasAccess(string username, string obor, int rok)
+        public static async Task<bool> HasAccess(string username, string obor, int rok)
         {
 
-            return CenyCustomerRepo.HasAccessAsync(username, obor, rok).Result;
+            return await CenyCustomerRepo.HasAccessAsync(username, obor, rok).ConfigureAwait(false);
         }
 
             public static YearlyStatisticsGroup.Key? TryFindKey(this HttpContext context)

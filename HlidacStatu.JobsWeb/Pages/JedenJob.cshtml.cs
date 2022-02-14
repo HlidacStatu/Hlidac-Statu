@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using HlidacStatu.JobsWeb.Models;
 using HlidacStatu.JobsWeb.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -11,9 +12,9 @@ namespace HlidacStatu.JobsWeb.Pages
     {
         public YearlyStatisticsGroup.Key? Key { get; set; }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
-            if (HttpContext.HasAccess() == false)
+            if (await HttpContext.HasAccess() == false)
                 return Redirect("/");
 
             Key = HttpContext.TryFindKey();

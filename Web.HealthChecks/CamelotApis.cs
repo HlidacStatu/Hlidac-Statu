@@ -31,7 +31,7 @@ namespace HlidacStatu.Web.HealthChecks
         {
             this.options = options;
         }
-        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder(1024);
             try
@@ -47,12 +47,12 @@ namespace HlidacStatu.Web.HealthChecks
                             if (string.IsNullOrEmpty(anonUrl))
                                 anonUrl = string.Join("", uri.Host.TakeLast(7)) + ":" + uri.Port;
 
-                            var ver = cl.VersionAsync().Result;
+                            var ver = await cl.VersionAsync();
                             if (ver.Success)
                                 sb.AppendLine($"{anonUrl} ({ver.Data?.AppVersion}/{ver.Data?.CamelotVersion})");
                             else
                                 sb.AppendLine($"{anonUrl} ({ver.ErrorCode}:{ver.ErrorDescription})");
-                            var st = cl.StatisticAsync().Result;
+                            var st = await cl.StatisticAsync();
                             if (st.Success)
                                 sb.AppendLine($"stats: threads {st.Data?.CurrentThreads}/{st.Data?.MaxThreads},"
                                     + $" {HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ParsedFilesTotal ?? 0)} parsed (1H:{HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ParsedFiles1H ?? 0)}/24H:{HlidacStatu.Util.RenderData.NiceNumber(st.Data?.ParsedFiles24H ?? 0)}),"
@@ -66,12 +66,12 @@ namespace HlidacStatu.Web.HealthChecks
                         }
                     }
                 }
-                return Task.FromResult(HealthCheckResult.Healthy(sb.ToString()));
+                return HealthCheckResult.Healthy(sb.ToString());
 
             }
             catch (Exception e)
             {
-                return Task.FromResult(HealthCheckResult.Unhealthy(exception: e));
+                return HealthCheckResult.Unhealthy(exception: e);
             }
 
         }
