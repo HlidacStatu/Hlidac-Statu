@@ -554,7 +554,7 @@ namespace HlidacStatu.Web
                 .AddHealthCheckWithResponseTime(
                     new global::HealthChecks.Network.SmtpHealthCheck(new global::HealthChecks.Network.SmtpHealthCheckOptions()
                     {
-                        Host = "10.10.100.147",
+                        Host = "10.10.100.103",
                         Port = 25,
                         ConnectionType = global::HealthChecks.Network.Core.SmtpConnectionType.PLAIN
                     }),
