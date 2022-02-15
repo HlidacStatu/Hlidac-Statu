@@ -1,8 +1,24 @@
 ﻿@using HlidacStatu.Entities.VZ
+@using System.Text
 @model HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData
 
 @{
 
+    var oblasti = Context.Request.Query["oblast"];
+
+    StringBuilder oblastQBuilder = new StringBuilder();
+    
+    if (oblasti.Count > 0)
+    {
+        foreach (var oblast in oblasti)
+        {
+            if(!string.IsNullOrEmpty(oblast))
+                oblastQBuilder.Append($" AND oblast:{oblast}");
+        }
+    }
+    
+    
+    string watchodgQ = $"{Model.Q}{oblastQBuilder.ToString()}";
 
 }
 
@@ -23,7 +39,7 @@ else
 {
     if (Model.ShowWatchdog && Model.Q != null)
     {
-        <partial name="WebUtil/AddWatchdog" model="@(new WatchdogViewModel(typeof(VerejnaZakazka), Model.Q ))"/>
+        <partial name="WebUtil/AddWatchdog" model="@(new WatchdogViewModel(typeof(VerejnaZakazka), watchodgQ ))"/>
     }
 
     if (Model.ElasticResults == null)
