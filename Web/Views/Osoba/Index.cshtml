@@ -22,11 +22,11 @@
     var intv = laps.AddAndStartLap("StatistikaRegistruSmluv");
     var statistics = Model.StatistikaRegistrSmluv(aktualnost);
 
-    var seasonStat = statistics.SoukromeFirmySummary().CurrentSeasonStatistics();
-    var currentSeasonYear = statistics.SoukromeFirmySummary().CurrentSeasonYear();
-    var zmenaObjemuSmluv = statistics.SoukromeFirmySummary().ChangeBetweenYears(currentSeasonYear - 1, currentSeasonYear, s => s.CelkovaHodnotaSmluv);
-
-    var pocetSoukrFiremVztah = statistics.SoukromeFirmy.Count + statistics.StatniFirmy.Count;
+    //unused stuff
+    //var seasonStat = statistics.SoukromeFirmySummary().CurrentSeasonStatistics();
+    //var currentSeasonYear = statistics.SoukromeFirmySummary().CurrentSeasonYear();
+    //var zmenaObjemuSmluv = statistics.SoukromeFirmySummary().ChangeBetweenYears(currentSeasonYear - 1, currentSeasonYear, s => s.CelkovaHodnotaSmluv);
+    //var pocetSoukrFiremVztah = statistics.SoukromeFirmy.Count + statistics.StatniFirmy.Count;
 
     intv.Stop();
 }
