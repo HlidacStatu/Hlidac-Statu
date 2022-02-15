@@ -120,7 +120,7 @@ namespace HlidacStatu.Web.Controllers
             if (id.StartsWith("w"))
             {
                 id = id.Replace("w", "");
-                var host = Repositories.UptimeServerRepo.Load("id");
+                var host = Repositories.UptimeServerRepo.Load(id);
                 if (host != null)
                 {
                     if (host.ValidHash(hh))
