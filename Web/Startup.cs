@@ -441,6 +441,7 @@ namespace HlidacStatu.Web
                     options.ClientSecret = mojeidAuthSetting["Secret"]; // heslo, které dostaneme po registraci
                     
                     options.Authority = "https://mojeid.cz/oidc/"; // issuer
+                    //options.Authority = "https://mojeid.regtest.nic.cz/oidc/"; // issuer
                     
                     options.CallbackPath = "/signin-mojeid"; //unikátní endpoint na hlídači - zatím nevím k čemu
                     
@@ -453,9 +454,10 @@ namespace HlidacStatu.Web
                     options.UsePkce = true; // ? upřímně nevím
                     
                     // claimy, které chceme získat z userinfoendpointu
+                    options.Scope.Clear();
                     options.Scope.Add("openid");
                     options.Scope.Add("email");
-                    options.Scope.Add("name");
+                    //options.Scope.Add("name");
                     
                     options.GetClaimsFromUserInfoEndpoint = true; // získá data o jménu, emailu - věcech ze scope
                     

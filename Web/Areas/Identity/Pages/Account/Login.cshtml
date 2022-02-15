@@ -31,8 +31,7 @@
                         string imgPath = $"/Content/Img/{provider.Name}Signin.png"; 
                         <button type="submit" class="btn btn-link"
                                 name="provider" value="@provider.Name"
-                                title="Přihlásit pomocí @provider.DisplayName účtu"
-                                style="@(provider.Name == "mojeid" ? "display:none" : "")">
+                                title="Přihlásit pomocí @provider.DisplayName účtu">
                             <img src="@imgPath" style="height:50px;width:auto" />
                         </button>
                     }
