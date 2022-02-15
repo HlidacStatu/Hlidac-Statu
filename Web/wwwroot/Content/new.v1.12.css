@@ -3071,3 +3071,13 @@ a.form-search__hint:active:focus {
         width: 50px;
         vertical-align: top;
     }
+
+    
+.blinking{
+    animation:blinkingText 0.7s infinite;
+}
+@keyframes blinkingText{
+    0% { opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1;    }
+}
