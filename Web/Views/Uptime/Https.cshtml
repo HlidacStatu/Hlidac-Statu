@@ -9,7 +9,7 @@
 
     var servers = HlidacStatu.Repositories.UptimeServerRepo.AllServers();
     var data = HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()
-            .OrderBy(m=>m.OverallScore)
+            .OrderByDescending(m=>m.SSLGrade())
             .ToArray();
 
 
@@ -49,6 +49,48 @@
 }
 else
 {
+
+    <h3>Časová platnost HTTPs certifikátů</h3>
+    <div class="row">
+        <div class="col-xs-12">
+            <table class="table table-dotted">
+                @foreach(var domain in data
+                                .Where(m=>m.CertExpiration()!=null)
+                                .Where(m=>(m.CertExpiration().Value - DateTime.Now).TotalDays<15)
+                                .OrderBy(o=>o.CertExpiration()) 
+                )
+                {
+                    TimeSpan interval = domain.CertExpiration().Value - DateTime.Now;
+                    var expiresIn = Devmasters.DT.Util.Ago(new TimeSpan(-1*interval.Ticks), HlidacStatu.Util.Consts.czCulture);
+                    string icon = "";
+                    var server = servers.FirstOrDefault(m => m.Host().ToLower() == domain.Domain.ToLower());
+
+                    if (interval.TotalDays < 0)
+                    {
+                        icon = "<i class='fa-solid fa-alarm-exclamation text-danger blinking'></i>";
+                        expiresIn = "Skončila " + expiresIn.ToLower();
+                    }
+                    else if (interval.TotalDays < 4)
+                    {
+                        icon = "<i class='fa-solid fa-circle-exclamation text-danger'></i>";
+                        expiresIn = "Skončí " + expiresIn.ToLower();
+                    }
+                    else 
+                    {
+                        icon = "<i class='fa-solid fa-circle-exclamation  text-warning'></i>";                        
+                        expiresIn = "Skončí " + expiresIn.ToLower();
+                    }
+
+                    <tr>
+                        <td>@Html.Raw(icon)</td>
+                        <td>@(expiresIn)</td>
+                        <td><a href="@server.pageUrl">@server.Name</a> (@(string.IsNullOrEmpty(server.ICO)?"" : HlidacStatu.Repositories.Firmy.GetJmeno( server.ICO)))</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+
     <div class="bs-callout bs-callout-primary">
         <h4>Rating HTTPS webů</h4>
         <p>
@@ -71,14 +113,14 @@ else
                 break;
 
             gridCount++;
-            var w = data[i];
+            var host = data[i];
             if (i == 0)
             {
                 //lastGrade = w.Status();
             }
-            if (w.SSLGrade() != lastGrade)
+            if (host.SSLGrade() != lastGrade)
             {
-                lastGrade = w.SSLGrade();
+                lastGrade = host.SSLGrade();
                 gridCount = 1;
                 <div class="clearfix"></div>
                 <h3 style="margin-top:50px">Rating @lastGrade.ToNiceDisplayName() <small>@UptimeSSL.StatusDescription(lastGrade.Value)</small></h3>
@@ -88,13 +130,13 @@ else
                 <a href="/statniweby/info/@(server.Id)?h=@(server.Hash())">
                     <table>
                         <tr>
-                            <td>@Html.Raw(UptimeSSL.StatusHtml(w.SSLGrade(), 30))</td>
+                            <td>@Html.Raw(UptimeSSL.StatusHtml(host.SSLGrade(), 30))</td>
                             <td>
                                 <div style="margin-left:0.5em;">
                                     <div style="word-break:normal;">@(server.PublicUrl?.Replace(".", ". "))</div>
                                     <div class="text-muted small">
                                         <span class="fad fa-calendar-alt" aria-hidden="true"></span>
-                                        @w.Created.ToString("dd.MM.yyyy")
+                                        @host.Created.ToString("dd.MM.yyyy")
                                     </div>
                                 </div>
                             </td>

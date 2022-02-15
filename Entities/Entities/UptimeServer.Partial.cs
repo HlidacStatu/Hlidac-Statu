@@ -41,5 +41,10 @@ namespace HlidacStatu.Entities
                 Uri.TryCreate(this.PublicUrl, UriKind.Absolute, out _uri);
             }
         }
+
+        public string opendataUrl { get { return "https://www.hlidacstatu.cz/api/v2/Weby/" + this.Id; } }
+        public string pageUrl { get { return "https://www.hlidacstatu.cz/StatniWeby/Info/" + this.Id + "?h=" + this.Hash(); } }
+
+
     }
 }
