@@ -6,6 +6,7 @@ using HlidacStatu.JobTableEditor.Data;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -48,6 +49,10 @@ namespace HlidacStatu.JobTableEditor
             // Add a DbContext to store your Database Keys
             services.AddDbContext<HlidacKeysContext>(options =>
                 options.UseSqlServer(connectionString));
+            
+            // using Microsoft.AspNetCore.DataProtection;
+            services.AddDataProtection()
+                .PersistKeysToDbContext<HlidacKeysContext>();
             
             AddIdentity(services);
             

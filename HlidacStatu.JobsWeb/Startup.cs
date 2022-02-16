@@ -49,6 +49,10 @@ namespace HlidacStatu.JobsWeb
             // Add a DbContext to store your Database Keys
             services.AddDbContext<HlidacKeysContext>(options =>
                 options.UseSqlServer(connectionString));
+            
+            // using Microsoft.AspNetCore.DataProtection;
+            services.AddDataProtection()
+                .PersistKeysToDbContext<HlidacKeysContext>();
 
             AddIdentity(services);
             services.AddDatabaseDeveloperPageExceptionFilter();
