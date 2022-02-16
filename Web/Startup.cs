@@ -366,6 +366,7 @@ namespace HlidacStatu.Web
             // 401 and 403 responses instead of redirects for api - for [Authorize] attribute
             services.ConfigureApplicationCookie(o =>
             {
+                o.Cookie.Domain = ".hlidacstatu.cz"; 
                 o.Events = new CookieAuthenticationEvents()
                 {
                     OnRedirectToLogin = (ctx) =>

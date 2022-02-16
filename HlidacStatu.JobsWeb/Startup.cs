@@ -115,6 +115,8 @@ namespace HlidacStatu.JobsWeb
             services.Configure<PasswordHasherOptions>(options =>
                 options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
             );
+            
+            services.ConfigureApplicationCookie(o => { o.Cookie.Domain = ".hlidacstatu.cz"; });
         }
     }
 }

@@ -45,7 +45,6 @@ namespace HlidacStatu.JobTableEditor
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-
             services.AddSingleton<JobService>();
             services.AddScoped<ToastService>();
         }
@@ -106,6 +105,8 @@ namespace HlidacStatu.JobTableEditor
             services.Configure<PasswordHasherOptions>(options =>
                     options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
                 );
+            
+            services.ConfigureApplicationCookie(o => { o.Cookie.Domain = ".hlidacstatu.cz"; });
         }
         
         
