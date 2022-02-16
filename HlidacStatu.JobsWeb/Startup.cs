@@ -121,8 +121,7 @@ namespace HlidacStatu.JobsWeb
             {
                 o.Cookie.Domain = ".hlidacstatu.cz"; 
                 o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
-                o.LoginPath = "www.hlidacstatu.cz/Identity/Account/Login"; // Path for the redirect to user login page    
-              
+                
                 o.Cookie.SameSite = SameSiteMode.Lax;
             });
         }
