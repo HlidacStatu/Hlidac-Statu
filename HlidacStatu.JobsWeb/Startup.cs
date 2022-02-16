@@ -1,9 +1,11 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.JobsWeb.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -116,6 +118,10 @@ namespace HlidacStatu.JobsWeb
             services.Configure<PasswordHasherOptions>(options =>
                 options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
             );
+            
+            services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(@"c:\Data\dpf"))
+                .SetApplicationName("HlidacStatu");
             
             services.ConfigureApplicationCookie(o =>
             {

@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GrpcProtobufs;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
@@ -363,6 +364,10 @@ namespace HlidacStatu.Web
             // this is needed because passwords are stored with old hashes
             services.Configure<PasswordHasherOptions>(options =>
                 options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2);
+            
+            services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(@"c:\Data\dpf"))
+                .SetApplicationName("HlidacStatu");
             
             // 401 and 403 responses instead of redirects for api - for [Authorize] attribute
             services.ConfigureApplicationCookie(o =>
