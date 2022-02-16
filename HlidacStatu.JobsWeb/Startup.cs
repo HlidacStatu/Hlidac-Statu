@@ -1,11 +1,15 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities;
 using HlidacStatu.JobsWeb.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +40,15 @@ namespace HlidacStatu.JobsWeb
             // for scoped services (mainly for identity)
             services.AddDbContext<DbEntities>(options =>
                 options.UseSqlServer(connectionString));
+            
+            // Add a DbContext to store your Database Keys
+            services.AddDbContext<HlidacKeysContext>(options =>
+                options.UseSqlServer(connectionString));
+            
+            // using Microsoft.AspNetCore.DataProtection;
+            services.AddDataProtection()
+                .PersistKeysToDbContext<HlidacKeysContext>()
+                .SetApplicationName("HlidacStatu");
 
             AddIdentity(services);
             services.AddDatabaseDeveloperPageExceptionFilter();
@@ -115,6 +128,14 @@ namespace HlidacStatu.JobsWeb
             services.Configure<PasswordHasherOptions>(options =>
                 options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
             );
+            
+            services.ConfigureApplicationCookie(o =>
+            {
+                o.Cookie.Domain = ".hlidacstatu.cz"; 
+                o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
+                
+                o.Cookie.SameSite = SameSiteMode.Lax;
+            });
         }
     }
 }

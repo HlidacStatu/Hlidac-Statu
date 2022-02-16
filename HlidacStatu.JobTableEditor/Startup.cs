@@ -1,11 +1,14 @@
 using System;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities;
 using HlidacStatu.JobTableEditor.Areas.Identity;
 using HlidacStatu.JobTableEditor.Data;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -38,13 +41,21 @@ namespace HlidacStatu.JobTableEditor
             services.AddDbContext<DbEntities>(options =>
                 options.UseSqlServer(connectionString));
             
+            // Add a DbContext to store your Database Keys
+            services.AddDbContext<HlidacKeysContext>(options =>
+                options.UseSqlServer(connectionString));
+            
+            // using Microsoft.AspNetCore.DataProtection;
+            services.AddDataProtection()
+                .PersistKeysToDbContext<HlidacKeysContext>()
+                .SetApplicationName("HlidacStatu");
+            
             AddIdentity(services);
             
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
-
 
             services.AddSingleton<JobService>();
             services.AddScoped<ToastService>();
@@ -106,6 +117,15 @@ namespace HlidacStatu.JobTableEditor
             services.Configure<PasswordHasherOptions>(options =>
                     options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
                 );
+            
+            // setup single sign on cookie
+            services.ConfigureApplicationCookie(o =>
+            {
+                o.Cookie.Domain = ".hlidacstatu.cz"; 
+                o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
+                
+                o.Cookie.SameSite = SameSiteMode.Lax;
+            });
         }
         
         
