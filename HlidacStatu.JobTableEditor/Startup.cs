@@ -1,11 +1,13 @@
 using System;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities;
 using HlidacStatu.JobTableEditor.Areas.Identity;
 using HlidacStatu.JobTableEditor.Data;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -36,6 +38,15 @@ namespace HlidacStatu.JobTableEditor
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             // for scoped services (mainly for identity)
             services.AddDbContext<DbEntities>(options =>
+                options.UseSqlServer(connectionString));
+            
+            // for scoped services (mainly for identity)
+            services.AddDbContext<DbEntities>(options =>
+                options.UseSqlServer(connectionString));
+            services.AddDatabaseDeveloperPageExceptionFilter();
+            
+            // Add a DbContext to store your Database Keys
+            services.AddDbContext<HlidacKeysContext>(options =>
                 options.UseSqlServer(connectionString));
             
             AddIdentity(services);
@@ -106,7 +117,14 @@ namespace HlidacStatu.JobTableEditor
                     options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
                 );
             
-            services.ConfigureApplicationCookie(o => { o.Cookie.Domain = ".hlidacstatu.cz"; });
+            // setup single sign on cookie
+            services.ConfigureApplicationCookie(o =>
+            {
+                o.Cookie.Domain = ".hlidacstatu.cz"; 
+                o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
+                
+                o.Cookie.SameSite = SameSiteMode.Lax;
+            });
         }
         
         

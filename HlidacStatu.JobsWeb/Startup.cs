@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities;
 using HlidacStatu.JobsWeb.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -38,6 +39,15 @@ namespace HlidacStatu.JobsWeb
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             // for scoped services (mainly for identity)
             services.AddDbContext<DbEntities>(options =>
+                options.UseSqlServer(connectionString));
+            
+            // for scoped services (mainly for identity)
+            services.AddDbContext<DbEntities>(options =>
+                options.UseSqlServer(connectionString));
+            services.AddDatabaseDeveloperPageExceptionFilter();
+            
+            // Add a DbContext to store your Database Keys
+            services.AddDbContext<HlidacKeysContext>(options =>
                 options.UseSqlServer(connectionString));
 
             AddIdentity(services);
@@ -118,10 +128,6 @@ namespace HlidacStatu.JobsWeb
             services.Configure<PasswordHasherOptions>(options =>
                 options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
             );
-            
-            services.AddDataProtection()
-                .PersistKeysToFileSystem(new DirectoryInfo(@"c:\Data\dpf"))
-                .SetApplicationName("HlidacStatu");
             
             services.ConfigureApplicationCookie(o =>
             {
