@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GrpcProtobufs;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using ProtoBuf.Grpc.ClientFactory;
@@ -367,6 +368,10 @@ namespace HlidacStatu.Web
             services.ConfigureApplicationCookie(o =>
             {
                 o.Cookie.Domain = ".hlidacstatu.cz"; 
+                o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
+                o.LoginPath = "/Identity/Account/Login"; // Path for the redirect to user login page    
+              
+                o.Cookie.SameSite = SameSiteMode.Lax;
                 o.Events = new CookieAuthenticationEvents()
                 {
                     OnRedirectToLogin = (ctx) =>

@@ -6,6 +6,7 @@ using HlidacStatu.JobsWeb.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -116,7 +117,14 @@ namespace HlidacStatu.JobsWeb
                 options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
             );
             
-            services.ConfigureApplicationCookie(o => { o.Cookie.Domain = ".hlidacstatu.cz"; });
+            services.ConfigureApplicationCookie(o =>
+            {
+                o.Cookie.Domain = ".hlidacstatu.cz"; 
+                o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
+                o.LoginPath = "www.hlidacstatu.cz/Identity/Account/Login"; // Path for the redirect to user login page    
+              
+                o.Cookie.SameSite = SameSiteMode.Lax;
+            });
         }
     }
 }
