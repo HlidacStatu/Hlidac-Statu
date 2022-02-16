@@ -41,11 +41,6 @@ namespace HlidacStatu.JobsWeb
             services.AddDbContext<DbEntities>(options =>
                 options.UseSqlServer(connectionString));
             
-            // for scoped services (mainly for identity)
-            services.AddDbContext<DbEntities>(options =>
-                options.UseSqlServer(connectionString));
-            services.AddDatabaseDeveloperPageExceptionFilter();
-            
             // Add a DbContext to store your Database Keys
             services.AddDbContext<HlidacKeysContext>(options =>
                 options.UseSqlServer(connectionString));
