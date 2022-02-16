@@ -72,7 +72,8 @@ namespace HlidacStatu.Web
 
             // using Microsoft.AspNetCore.DataProtection;
             services.AddDataProtection()
-                .PersistKeysToDbContext<HlidacKeysContext>();
+                .PersistKeysToDbContext<HlidacKeysContext>()
+                .SetApplicationName("HlidacStatu");
 
             AddIdentity(services);
             AddBundling(services);

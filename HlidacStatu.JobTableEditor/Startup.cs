@@ -47,7 +47,8 @@ namespace HlidacStatu.JobTableEditor
             
             // using Microsoft.AspNetCore.DataProtection;
             services.AddDataProtection()
-                .PersistKeysToDbContext<HlidacKeysContext>();
+                .PersistKeysToDbContext<HlidacKeysContext>()
+                .SetApplicationName("HlidacStatu");
             
             AddIdentity(services);
             
