@@ -23,14 +23,20 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
         {
             await _signInManager.SignOutAsync();
             Util.Consts.Logger.Info("User logged out.");
-            return RedirectToAction("Index", "Home");
+            if(string.IsNullOrEmpty(returnUrl))
+                return RedirectToAction("Index", "Home");
+            else
+                return LocalRedirect(returnUrl);
         }
 
         public async Task<IActionResult> OnPost(string? returnUrl = null)
         {
             await _signInManager.SignOutAsync();
             Util.Consts.Logger.Info("User logged out.");
-            return RedirectToAction("Index", "Home");
+            if(string.IsNullOrEmpty(returnUrl))
+                return RedirectToAction("Index", "Home");
+            else
+                return LocalRedirect(returnUrl);
         }
     }
 }
