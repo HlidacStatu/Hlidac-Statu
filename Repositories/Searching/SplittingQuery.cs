@@ -41,7 +41,7 @@ namespace HlidacStatu.Repositories.Searching
             }
 
 
-            static char[] reservedAll = new char[] { '+', '-', '=', '!', '(', ')', '{', '}', '[', ']', '^', '\'', '~', '*', '?', ':', '\\', '/' };
+            static char[] reservedAll = new char[] { '+', '=', '!', '(', ')', '{', '}', '[', ']', '^', '\'', '~', '*', '?', ':', '\\', '/' };
             static char[] skipIfPrefix = new char[] { '-', '*', '?' };
 
             static char[] formulaStart = new char[] { '>', '<', '(', '{', '[' };
