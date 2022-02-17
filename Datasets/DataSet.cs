@@ -1007,6 +1007,55 @@ namespace HlidacStatu.Datasets
                 return (T)null;
         }
 
+        public IEnumerable<dynamic> GetAllDataForQuery(string queryString, string scrollTimeout = "2m", int scrollSize = 1000)
+        {
+            var fixedQuery = Repositories.Searching.Tools.FixInvalidQuery(queryString,
+                DatasetRepo.Searching.QueryShorcuts,
+                DatasetRepo.Searching.QueryOperators);
+            
+            QueryContainer qc = DatasetRepo.Searching.GetSimpleQuery(this, fixedQuery);
+            
+            ISearchResponse<dynamic> initialResponse = client.Search<dynamic>
+            (scr => scr.From(0)
+                .Take(scrollSize)
+                .Query(q => qc)
+                .Scroll(scrollTimeout));
+
+            List<dynamic> results = new List<dynamic>();
+
+            if (!initialResponse.IsValid || string.IsNullOrEmpty(initialResponse.ScrollId))
+                throw new Exception(initialResponse.ServerError.Error.Reason);
+
+            if (initialResponse.Documents.Any())
+                results.AddRange(initialResponse.Documents);
+
+            string scrollid = initialResponse.ScrollId;
+            bool isScrollSetHasData = true;
+            while (isScrollSetHasData)
+            {
+                ISearchResponse<dynamic> loopingResponse = client.Scroll<dynamic>(scrollTimeout, scrollid);
+                if (loopingResponse.IsValid)
+                {
+                    results.AddRange(loopingResponse.Documents);
+                    scrollid = loopingResponse.ScrollId;
+                }
+
+                isScrollSetHasData = loopingResponse.Documents.Any();
+            }
+
+            client.ClearScroll(new ClearScrollRequest(scrollid));
+
+            var expConverter = new ExpandoObjectConverter();
+            
+            var data = results
+                .Select(m => JsonConvert.SerializeObject(m))
+                .Select(s => (dynamic)JsonConvert.DeserializeObject<ExpandoObject>(s, expConverter));
+            
+            return data;
+
+            //return results;
+        }
+        
         public IEnumerable<T> GetAllData<T>(string scrollTimeout = "2m", int scrollSize = 1000) where T : class
         {
             ISearchResponse<dynamic> initialResponse = client.Search<dynamic>

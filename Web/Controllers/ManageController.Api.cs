@@ -14,6 +14,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using HlidacStatu.LibCore.Extensions;
+using Schema.NET;
+using Review = HlidacStatu.Entities.Review;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -247,6 +249,82 @@ namespace HlidacStatu.Web.Controllers
             catch (Exception e)
             {
                 Util.Consts.Logger.Error($"Export error:  id={id}, q={q}, h={h}, o={o}, ct={ct}, num={num}, ds={ds}", e);
+                return Content("Nastala chyba. Zkuste to pozdeji znovu", "text/plain");
+            }
+
+        }
+        
+        public ActionResult FullExport(string q, string ds = null)
+        {
+            if(!User.IsInRole("Admin"))
+                return new UnauthorizedResult();
+            try
+            {
+
+                byte[] rawData = null;
+                string contentType = "";
+                string filename = "";
+                List<dynamic> data = new List<dynamic>();
+                
+                if (string.IsNullOrEmpty(ds))
+                {
+                    rawData = System.Text.Encoding.UTF8.GetBytes("žádná data nejsou k dispozici");
+                    contentType = "text/plain";
+                    filename = "chyba.txt";
+                    return File(rawData, contentType, filename);
+                }
+
+                DataSet datasource = DataSet.CachedDatasets.Get(ds);
+                if (datasource == null)
+                {
+                    rawData = System.Text.Encoding.UTF8.GetBytes("žádná data nejsou k dispozici");
+                    contentType = "text/plain";
+                    filename = "chyba.txt";
+                    return File(rawData, contentType, filename);
+                }
+                if (datasource.IsFlatStructure() == false)
+                {
+                    rawData = System.Text.Encoding.UTF8.GetBytes("Tato databáze nemá jednoduchou, plochou strukturu. Proto nemůže být exportována. Použijte API z hlidacstatu.cz/api");
+                    contentType = "text/plain";
+                    filename = "chyba.txt";
+                    return File(rawData, contentType, filename);
+                }
+
+                //var sres = datasource.SearchData(q, 1, 1000, (Util.ParseTools.ToInt(o) ?? 0).ToString());
+                var res = datasource.GetAllDataForQuery(q).ToList();
+
+                if (!res.Any())
+                {
+                    rawData = System.Text.Encoding.UTF8.GetBytes("chyba při přípravě dat. Omlouváme se a řešíme to");
+                    contentType = "text/plain";
+                    filename = "export.txt";
+                    return File(rawData, contentType, filename);
+                }
+                else
+                {
+                    foreach (var s in res)
+                    {
+                        data.Add(datasource.ExportFlatObject(s));
+                    }
+                }
+                
+                if (data.Count == 0)
+                {
+                    rawData = System.Text.Encoding.UTF8.GetBytes("žádná data nejsou k dispozici");
+                    contentType = "text/plain";
+                    filename = "chyba.txt";
+                }
+                else
+                {
+                    rawData = new HlidacStatu.ExportData.TabDelimited().ExportData(new ExportData.Data(data));
+                    contentType = "text/tab-separated-values";
+                    filename = "export.tsv";
+                }
+                return File(rawData, contentType, filename);
+            }
+            catch (Exception e)
+            {
+                Util.Consts.Logger.Error($"Full export error:  q={q}, ds={ds}", e);
                 return Content("Nastala chyba. Zkuste to pozdeji znovu", "text/plain");
             }
 

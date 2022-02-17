@@ -47,6 +47,13 @@
                            href="/manage/exportresult/@(Model.Typ)?q=@(System.Net.WebUtility.UrlEncode(Model.Query))&h=@(SmlouvaRepo.Searching.QueryHash(Model.Typ,Model.Query))&o=@(Model.Order)&ct=tab&@(Model.MoreParams)">
                             Do Tab delimited
                         </a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a role="button" class="btn btn-default btn-sm" target="_blank"
+                               href="/manage/FullExport/@(Model.Typ)?q=@(System.Net.WebUtility.UrlEncode(Model.Query))&@(Model.MoreParams)">
+                                Tab delimited full export
+                            </a>
+                        }
                     </p> }
                 else
                 {

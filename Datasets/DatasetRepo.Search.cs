@@ -46,12 +46,12 @@ namespace HlidacStatu.Datasets
                 return queries;
             }
 
-            static string[] queryOperators = new string[]
+            public static string[] QueryOperators = new string[]
             {
                 "AND", "OR"
             };
 
-            static string[] queryShorcuts = new string[]
+            public static string[] QueryShorcuts = new string[]
             {
                 "ico:",
                 "osobaid:",
@@ -81,7 +81,7 @@ namespace HlidacStatu.Datasets
                 Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
 
                 sw.Start();
-                var query = Repositories.Searching.Tools.FixInvalidQuery(queryString, queryShorcuts, queryOperators);
+                var query = Repositories.Searching.Tools.FixInvalidQuery(queryString, QueryShorcuts, QueryOperators);
 
                 var res = _searchData(ds, query, page, pageSize, sort, excludeBigProperties, withHighlighting,
                     exactNumOfResults);
@@ -138,7 +138,7 @@ namespace HlidacStatu.Datasets
                 string sort = null, bool excludeBigProperties = true, bool withHighlighting = false,
                 bool exactNumOfResults = false)
             {
-                var query = Repositories.Searching.Tools.FixInvalidQuery(queryString, queryShorcuts, queryOperators);
+                var query = Repositories.Searching.Tools.FixInvalidQuery(queryString, QueryShorcuts, QueryOperators);
                 var res = _searchData(ds, query, page, pageSize, sort, excludeBigProperties, withHighlighting,
                     exactNumOfResults);
                 if (!res.IsValid)
