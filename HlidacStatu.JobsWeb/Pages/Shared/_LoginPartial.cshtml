@@ -6,7 +6,7 @@
     @if (SignInManager.IsSignedIn(User))
     {
         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Nastavení účtu"><i class="fas fa-user"></i></a>
-        <a class="nav-link btn btn-link text-dark" href="https://www.hlidacstatu.cz/Identity/Account/Register?returnUrl=/cenypracehlidac" title="Odhlášení">Odhlásit</a>
+        <a class="nav-link btn btn-link text-dark" href="https://www.hlidacstatu.cz/Identity/Account/Logout?returnUrl=/cenypracehlidac" title="Odhlášení">Odhlásit</a>
     }
     else
     {
