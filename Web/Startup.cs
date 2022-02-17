@@ -221,7 +221,13 @@ namespace HlidacStatu.Web
                 
                 if (url?.ToLower()?.StartsWith("/cenypracehlidac") == true)
                 {
-                    context.Response.Redirect("https://cenyprace.hlidacstatu.cz/");
+                    context.Response.Redirect("https://www.ceny.analyzy.hlidacstatu.cz/");
+                    return;   // short circuit
+                }
+                
+                if (url?.ToLower()?.StartsWith("/jobtableeditor") == true)
+                {
+                    context.Response.Redirect("https://jobtableeditor.hlidacstatu.cz/");
                     return;   // short circuit
                 }
                 

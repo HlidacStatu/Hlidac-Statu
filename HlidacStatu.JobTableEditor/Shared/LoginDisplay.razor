@@ -1,11 +1,9 @@
 <AuthorizeView>
     <Authorized>
         <a href="Identity/Account/Manage">Hello, @context.User.Identity.Name!</a>
-        <form method="post" action="Identity/Account/LogOut">
-            <button type="submit" class="nav-link btn btn-link">Log out</button>
-        </form>
+        <a class="nav-link btn btn-link text-dark" href="https://www.hlidacstatu.cz/Identity/Account/Register?returnUrl=/jobtableeditor" title="Odhlášení">Odhlásit</a>
     </Authorized>
     <NotAuthorized>
-        <a href="Identity/Account/Login">Log in</a>
+        <a class="nav-link" href="https://www.hlidacstatu.cz/Identity/Account/Login?returnUrl=/jobtableeditor"><img src="/Content/img/icon-user.svg" style="padding-right: 8px;">Přihlášení</a>
     </NotAuthorized>
 </AuthorizeView>
