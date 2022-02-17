@@ -82,6 +82,35 @@
     </div>
 }
 
+@{
+    if (Model.Query.Contains("\"") == false && Model.Query.Contains(" ") && Model.Query.Length>5)
+    {
+        Osoba jmeno = Validators.JmenoInText(Model.Query, false);
+        string sjmeno = $"\"{jmeno.FullName()}\"";
+        if (jmeno != null)
+        {
+            <div class="row" style="margin-top:10px;margin-bottom:10px;">
+                <div class="col-xs-12">
+                    <div class="card bg-warning">
+                        <div class="card-header">
+                            <h3 class="card-title" style="font-size:1.2em;font-weight:bold" >
+                                <span class="text-warning fas fa-exclamation-circle" aria-hidden="true" title="Upozornění"></span>
+                                Upozornění!
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            V hledaném výrazu jsme našli nejméně jedno jméno. Vyhledávání hledá každou část jména samostatně a <b>vyhledané výsledky proto nemusí s osobou tohoto jména souviset</b>
+                            Pokud chcete hledat informace spojené s konkrétní osobou, dejte její jméno do uvozovek.
+                            Příklad hledání přesného jména: <code style="font-size:120%;font-weight:bold"><a href="hledat?q=@(System.Net.WebUtility.UrlEncode(sjmeno))">@(sjmeno)<i class="fa-solid fa-up-right-from-square"></i></a></code>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+
 <div class="row">
     <div class="col-xs-12 col-sm-6">
         <h3>
