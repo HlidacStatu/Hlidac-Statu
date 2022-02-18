@@ -141,7 +141,7 @@
             @if (statistics.SoukromeFirmy.Count > 0 && statistics.SoukromeFirmySummary().Summary().PocetSmluv>0)
             {
                 <p>
-                    @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
+                    @Model.FullName() se angažuje, nebo se v posledních 5 letech angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
                     @if (statistics.NeziskovkyCount() > 0)
                     {
                         <span>(z toho v @Devmasters.Lang.CS.Plural.Get(statistics.NeziskovkyCount(), "jedné neziskovce", "{0} neziskovkách", "{0} neziskovkách")):</span>
@@ -165,14 +165,14 @@
             {
                
                 <p>
-                    @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchoduje se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
+                    @Model.FullName() se angažuje, nebo se v posledních 5 letech angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchoduje se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
                 </p>
             }
 
             @if (statistics.StatniFirmy.Count > 0)
             {
                 <p>
-                    @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
+                    @Model.FullName() se angažuje, nebo se v posledních 5 letech angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
                     <ul>
                         @foreach (var stat in statistics.StatniFirmy
                             .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)

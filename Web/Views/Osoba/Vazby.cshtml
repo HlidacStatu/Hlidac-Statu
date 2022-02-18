@@ -26,7 +26,7 @@
         </a>
         <a href="@Url.Action("Vazby", new { id = Model.NameId, aktualnost = Relation.AktualnostType.Nedavny })"
            class="btn btn-@(aktualnost == Relation.AktualnostType.Nedavny ? "success" : "primary") btn-sm" role="button">
-            @(aktualnost == Relation.AktualnostType.Nedavny ? "Zobrazujeme" : "Ukázat") aktuální a nedávno skončené vazby
+            @(aktualnost == Relation.AktualnostType.Nedavny ? "Zobrazujeme" : "Ukázat") vazby za posledních 5 let včetně aktuálních
         </a>
         <a href="@Url.Action("Vazby", new { id = Model.NameId, aktualnost = Relation.AktualnostType.Libovolny })"
            class="btn btn-@(aktualnost == Relation.AktualnostType.Libovolny ? "success" : "primary") btn-sm" role="button">
