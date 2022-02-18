@@ -71,6 +71,8 @@ namespace SponzoriLoader
             UploadCompanyDonations(companyDonations);
 
             #endregion
+
+            await FixPeopleSponzors();
         }
 
         public static async Task<dynamic> LoadIndexAsync(string url)
@@ -242,6 +244,35 @@ namespace SponzoriLoader
                 return year;
             }
             return 0;
+        }
+
+        public static async Task FixPeopleSponzors()
+        {
+            var osoby = await OsobaRepo.PeopleWithAnySponzoringRecordAsync();
+
+            var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = 7 };
+            Parallel.ForEach(osoby, parallelOptions, osoba =>
+            {
+                bool isSponzor = osoba.IsSponzor();
+                var status = osoba.StatusOsoby();
+                bool shouldSetSponzor = isSponzor && status == Osoba.StatusOsobyEnum.NeniPolitik;
+                bool isNoLongerSponzor = status == Osoba.StatusOsobyEnum.Sponzor && !isSponzor;
+                
+                if (shouldSetSponzor)
+                {
+                    osoba.Status = (int)Osoba.StatusOsobyEnum.Sponzor;
+                    OsobaRepo.Update(osoba, "petr@hlidacstatu.cz");
+                }
+
+                if (isNoLongerSponzor)
+                {
+                    osoba.Status = (int)Osoba.StatusOsobyEnum.NeniPolitik;
+                    OsobaRepo.Update(osoba, "petr@hlidacstatu.cz");
+                }
+
+            });
+            
+            
         }
     }
 }

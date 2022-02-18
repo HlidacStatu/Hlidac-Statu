@@ -12,6 +12,8 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Devmasters.Enums;
 
 namespace HlidacStatu.Repositories
@@ -469,29 +471,19 @@ namespace HlidacStatu.Repositories
             }
         }
 
-
-        public static IEnumerable<Sponzoring> SponzoringsUnfiltered(this Osoba osoba,
-            Expression<Func<Sponzoring, bool>> predicate)
+        public static async Task<List<Osoba>> PeopleWithAnySponzoringRecordAsync(CancellationToken cancellationToken = default)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                var osobySponzoring = db.Sponzoring
-                    .AsNoTracking()
-                    .Where(s => s.OsobaIdDarce == osoba.InternalId)
-                    .Where(predicate)
-                    .ToList();
-
-                //sponzoring z navazanych firem kdyz byl statutar
-                var firmySponzoring = Osoby.CachedFirmySponzoring.Get(osoba.InternalId)
-                    .AsQueryable()
-                    .Where(predicate)
-                    .ToList();
-
-                osobySponzoring.AddRange(firmySponzoring);
-
-                return osobySponzoring;
-            }
+            await using var db  = new DbEntities();
+            var results = await db.Osoba.FromSqlInterpolated($@"
+                    Select * 
+                      from Osoba os
+                     where os.status in ({(int)Osoba.StatusOsobyEnum.NeniPolitik},{(int)Osoba.StatusOsobyEnum.Sponzor})
+                       and exists (select 1 from Sponzoring
+                                    where os.internalid = osobaiddarce)")
+                .ToListAsync(cancellationToken: cancellationToken);
+            return results;
         }
+        
 
         public static Osoba.JSON Export(this Osoba osoba, bool allData = false)
         {
@@ -636,5 +628,6 @@ namespace HlidacStatu.Repositories
                     throw new ArgumentOutOfRangeException(nameof(zatrideni), zatrideni, null);
             }
         }
+        
     }
 }
