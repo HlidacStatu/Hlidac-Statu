@@ -64,7 +64,7 @@ namespace HlidacStatu.Web.Controllers
 
             try
             {
-                UptimeServer.HostAvailability data = UptimeServerRepo.AvailabilityById(host.Id, 7*24);
+                UptimeServer.HostAvailability data = UptimeServerRepo.AvailabilityForWeekById(host.Id);
                 UptimeSSL webssl = UptimeSSLRepo.LoadLatest(host.Id);
                 var ssldata = new UptimeServer.WebStatusExport.SslData()
                 {

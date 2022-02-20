@@ -1,4 +1,5 @@
 using HlidacStatu.Entities;
+using HlidacStatu.Util.Cache;
 
 using InfluxDB.Client;
 using InfluxDB.Client.Api.Domain;
@@ -177,32 +178,37 @@ namespace HlidacStatu.Repositories
 
         }
 
-        public static IEnumerable<UptimeServer.HostAvailability> AvailabilityByGroup(string group, int hoursBack)
+        public static IEnumerable<UptimeServer.HostAvailability> AvailabilityForDayByGroup(string group)
         {
             string[] serverIds = ServersIn(group).ToArray();
-            return AvailabilityByIds(serverIds, hoursBack);
+            return AvailabilityForDayByIds(serverIds);
         }
-        public static UptimeServer.HostAvailability AvailabilityById(string serverId, int hoursBack)
+        public static UptimeServer.HostAvailability AvailabilityForDayById(string serverId)
         {
-            return AvailabilityByIds(new string[] { serverId }, hoursBack).FirstOrDefault();
+                return AvailabilityForDayByIds(new string[] { serverId }).FirstOrDefault();
+            
         }
-        public static IEnumerable<UptimeServer.HostAvailability> AvailabilityByIds(string[] serverIds, int hoursBack)
+        public static IEnumerable<UptimeServer.HostAvailability> AvailabilityForDayByIds(string[] serverIds)
         {
             if (serverIds?.Length == null)
                 return null;
             if (serverIds.Length == 0)
                 return null;
 
-            UptimeServer.HostAvailability[] allData = null;
-            if (hoursBack<=25)
-                allData = uptimeServersCache1Day.Get();
-            else
-                allData = uptimeServersCache7Day.Get();
+            UptimeServer.HostAvailability[] allData = uptimeServersCache1Day.Get();
+
             List<UptimeServer.HostAvailability> choosen = new List<UptimeServer.HostAvailability>();
             choosen = allData.Where(m => serverIds.Contains(m.Host.Id)).ToList();
             return choosen;
         }
 
+        public static UptimeServer.HostAvailability AvailabilityForWeekById(string serverId)
+        {
+            if (string.IsNullOrEmpty(serverId))
+                return null;
+
+            return uptimeServerCache7Day.Get(serverId);
+        }
 
 
         private static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]> uptimeServersCache1Day =
@@ -212,21 +218,25 @@ namespace HlidacStatu.Repositories
               var res = _availability(24);
               return res.ToArray();
           });
-        private static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]> uptimeServersCache7Day =
-      new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]>(TimeSpan.FromMinutes(30),
-          (obj) =>
-          {
-              var res = _availability(7*24);
-              return res.ToArray();
-          });
+
+        private static AutoUpdateMemoryCacheManager<UptimeServer.HostAvailability, string> uptimeServerCache7Day
+       = AutoUpdateMemoryCacheManager<UptimeServer.HostAvailability, string>.GetSafeInstance("uptimeServerCache7Day",
+          (id) => {
+              var res = _availability(new string[] { id }, 7 * 24);
+              return res.FirstOrDefault();
+          }
+           ,TimeSpan.FromMinutes(30));
 
 
         private static IEnumerable<UptimeServer.HostAvailability> _availability(int hoursBack)
         {
-            string[] serverIds = AllServers().Select(m=>m.Id).ToArray();
-
-
+            string[] serverIds = AllServers().Select(m => m.Id).ToArray();
+            return _availability(serverIds, hoursBack);
+        }
+        private static IEnumerable<UptimeServer.HostAvailability> _availability(string[] serverIds, int hoursBack)
+        {
             UptimeServer[] allServers = AllServers();
+
 
             string query = "";
             List<InfluxDB.Client.Core.Flux.Domain.FluxTable> fluxTables = null;
@@ -237,7 +247,7 @@ namespace HlidacStatu.Repositories
                 + "  |> filter(fn: (r) => " + serverIds.Select(m => $"r[\"serverid\"] == \"{m}\"").Aggregate((f, s) => f + " or " + s) + " )"
                 + "  |> filter(fn: (r) => r[\"_field\"] == \"value\")"
             ;
-            if (hoursBack > 25)
+            if (false && hoursBack > 25)
                 query = query + "\n"
                     + "|> aggregateWindow(every: 10m, fn: max, createEmpty: false)"
                   + "|> yield(name: \"max\")"

@@ -92,7 +92,7 @@ namespace HlidacStatu.Web.Controllers
             switch (id)
             {
                 case "index":
-                    data = Repositories.UptimeServerRepo.AvailabilityByGroup("0",24)
+                    data = Repositories.UptimeServerRepo.AvailabilityForDayByGroup("0")
                         ?.OrderBy(o => o.Host.Name)
                         ?.Reverse()
                         ?.ToList();
@@ -101,13 +101,13 @@ namespace HlidacStatu.Web.Controllers
                 case "1":
                 case "2":
                 case "3":
-                    data = Repositories.UptimeServerRepo.AvailabilityByGroup(id,24)
+                    data = Repositories.UptimeServerRepo.AvailabilityForDayByGroup(id)
                         ?.OrderBy(o => o.Host.Name)
                         ?.Reverse()
                         ?.ToList();
                     break;
                 case "ustredni":
-                    data = Repositories.UptimeServerRepo.AvailabilityByGroup("ustredni",24)
+                    data = Repositories.UptimeServerRepo.AvailabilityForDayByGroup("ustredni")
                         ?.OrderBy(o => o.Host.Name)
                         ?.Reverse()
                         ?.ToList();
@@ -125,7 +125,7 @@ namespace HlidacStatu.Web.Controllers
                 {
                     if (host.ValidHash(hh))
                     {
-                        data = new UptimeServer.HostAvailability[] { UptimeServerRepo.AvailabilityById(host.Id, 24 * 7) };
+                        data = new UptimeServer.HostAvailability[] { UptimeServerRepo.AvailabilityForWeekById(host.Id) };
                     }
                 }
             }
