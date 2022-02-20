@@ -37,10 +37,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FullTextSearch", "FullTextS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBUpgrader", "DBUpgrader\DBUpgrader.csproj", "{DDFB708E-0D58-4AFA-A160-18199F2231E7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZabbixSenderNet", "3rd\ZabbixSenderNet-master\ZabbixSenderNet\ZabbixSenderNet.csproj", "{9B5ABEFB-C5BD-41A1-BAE8-995C47AF35E6}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZabbixApi", "3rd\ZabbixApi\ZabbixApi.csproj", "{50EBBEF2-32D0-42AC-B5D0-2F1DD1BEB3E0}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.OCR.TextReadability", "..\Hlidac-Statu-Private\OCR\Lib.OCR.TextReadability\Lib.OCR.TextReadability.csproj", "{B3F13956-BC92-4B49-A375-1882BDA8878C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Q.Messages", "HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj", "{A684F864-7C53-4985-939A-B7D2E35F9FFB}"
@@ -158,7 +154,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GlobalTests", "..\Hlidac-Statu-Private\GlobalTests\GlobalTests.csproj", "{4ADFB805-8111-42F1-BA92-F847ED3A2F10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UptimerSSLCheck", "..\Hlidac-Statu-Private\Docker\UptimerSSLCheck\UptimerSSLCheck.csproj", "{69D089BC-461A-4A47-AB1B-9CB68EF37CE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UptimerSSLCheck", "..\Hlidac-Statu-Private\Docker\UptimerSSLCheck\UptimerSSLCheck.csproj", "{69D089BC-461A-4A47-AB1B-9CB68EF37CE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -214,14 +210,6 @@ Global
 		{DDFB708E-0D58-4AFA-A160-18199F2231E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDFB708E-0D58-4AFA-A160-18199F2231E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDFB708E-0D58-4AFA-A160-18199F2231E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9B5ABEFB-C5BD-41A1-BAE8-995C47AF35E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9B5ABEFB-C5BD-41A1-BAE8-995C47AF35E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9B5ABEFB-C5BD-41A1-BAE8-995C47AF35E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9B5ABEFB-C5BD-41A1-BAE8-995C47AF35E6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{50EBBEF2-32D0-42AC-B5D0-2F1DD1BEB3E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{50EBBEF2-32D0-42AC-B5D0-2F1DD1BEB3E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{50EBBEF2-32D0-42AC-B5D0-2F1DD1BEB3E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{50EBBEF2-32D0-42AC-B5D0-2F1DD1BEB3E0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B3F13956-BC92-4B49-A375-1882BDA8878C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B3F13956-BC92-4B49-A375-1882BDA8878C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3F13956-BC92-4B49-A375-1882BDA8878C}.Release|Any CPU.ActiveCfg = Release|Any CPU
