@@ -8,15 +8,6 @@ using System.Collections.Generic;
 namespace HlidacStatu.Lib.Data.External.Zabbix
 {
 
-    public enum Statuses
-    {
-        OK = 0,
-        Pomalé = 1,
-        Nedostupné = 2,
-        TimeOuted = 98,
-        BadHttpCode = 99,
-        Unknown = 1000,
-    }
 
     [ShowNiceDisplayName()]
     public enum SSLLabsGrades

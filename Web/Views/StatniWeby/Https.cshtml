@@ -1,26 +1,18 @@
 ﻿@using System.Linq;
-@using HlidacStatu.Lib.Data.External.Zabbix;
 @using Devmasters.Enums;
-
+@using HlidacStatu.Entities;
 @{
     ViewBag.Title = "Hlídač státních webů";
     ViewBag.SubTitle = "Žebříček HTTPS Labs hodnocení";
 
 
-    ZabHostSslStatus[] data = null;
-    try
-    {
-        data = ZabTools.SslStatuses()
-            ?.OrderByDescending(m => m.Status())
-            ?.ToArray()
-            ;
-    }
-    catch (Exception)
-    {
-        data = null;
-    }
+    var servers = HlidacStatu.Repositories.UptimeServerRepo.AllServers();
+    var data = HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()
+            .OrderByDescending(m=>m.SSLGrade())
+            .ToArray();
 
-    SSLLabsGrades? lastGrade = null;
+
+    UptimeSSL.SSLGrades? lastGrade = null;
     int gridCount = 0;
 }
 
@@ -56,6 +48,48 @@
 }
 else
 {
+
+    <h3>Časová platnost HTTPs certifikátů</h3>
+    <div class="row">
+        <div class="col-xs-12">
+            <table class="table table-dotted">
+                @foreach(var domain in data
+                                .Where(m=>m.CertExpiration()!=null)
+                                .Where(m=>(m.CertExpiration().Value - DateTime.Now).TotalDays<15)
+                                .OrderBy(o=>o.CertExpiration()) 
+                )
+                {
+                    TimeSpan interval = domain.CertExpiration().Value - DateTime.Now;
+                    var expiresIn = Devmasters.DT.Util.Ago(new TimeSpan(-1*interval.Ticks), HlidacStatu.Util.Consts.czCulture);
+                    string icon = "";
+                    var server = servers.FirstOrDefault(m => m.HostDomain().ToLower() == domain.Domain.ToLower());
+
+                    if (interval.TotalDays < 0)
+                    {
+                        icon = "<i class='fa-solid fa-alarm-exclamation text-danger blinking'></i>";
+                        expiresIn = "Skončila " + expiresIn.ToLower();
+                    }
+                    else if (interval.TotalDays < 4)
+                    {
+                        icon = "<i class='fa-solid fa-circle-exclamation text-danger'></i>";
+                        expiresIn = "Skončí " + expiresIn.ToLower();
+                    }
+                    else 
+                    {
+                        icon = "<i class='fa-solid fa-circle-exclamation  text-warning'></i>";                        
+                        expiresIn = "Skončí " + expiresIn.ToLower();
+                    }
+
+                    <tr>
+                        <td>@Html.Raw(icon)</td>
+                        <td>@(expiresIn)</td>
+                        <td><a href="@server.pageUrl">@server.Name</a> (@(string.IsNullOrEmpty(server.ICO)?"" : HlidacStatu.Repositories.Firmy.GetJmeno( server.ICO)))</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+
     <div class="bs-callout bs-callout-primary">
         <h4>Rating HTTPS webů</h4>
         <p>
@@ -73,32 +107,35 @@ else
 
         @for (int i = 0; i < data.Count(); i++)
         {
+            var server = servers.FirstOrDefault(m => m.HostDomain().ToLower() == data[i].Domain.ToLower());
+            if (server == null)
+                break;
+
             gridCount++;
-            var w = data[i];
+            var host = data[i];
             if (i == 0)
             {
                 //lastGrade = w.Status();
             }
-            if (w.Status() != lastGrade)
+            if (host.SSLGrade() != lastGrade)
             {
-                lastGrade = w.Status();
+                lastGrade = host.SSLGrade();
                 gridCount = 1;
                 <div class="clearfix"></div>
-                <h3 style="margin-top:50px">Rating @lastGrade.ToNiceDisplayName() <small>@ZabTools.StatusDescription(lastGrade.Value)</small></h3>
+                <h3 style="margin-top:50px">Rating @lastGrade.ToNiceDisplayName() <small>@UptimeSSL.StatusDescription(lastGrade.Value)</small></h3>
             }
             <div class="col-xs-6 col-sm-4"
                  style="border-top: 1px solid #ddd;padding-top:10px;margin-top:20px;">
-                <a href="/statniweby/info/@(w.Host.hostid)?h=@(w.Host.hash)">
+                <a href="/statniweby/info/@(server.Id)?h=@(server.Hash)">
                     <table>
                         <tr>
-                            <td>@Html.Raw(ZabTools.StatusHtml(w.Status(), 30))</td>
+                            <td>@Html.Raw(UptimeSSL.StatusHtml(host.SSLGrade(), 30))</td>
                             <td>
                                 <div style="margin-left:0.5em;">
-                                    <div style="word-break:normal;">@(w.Host.publicname?.Replace(".", ". "))</div>
+                                    <div style="word-break:normal;">@(server.PublicUrl?.Replace(".", ". "))</div>
                                     <div class="text-muted small">
                                         <span class="fad fa-calendar-alt" aria-hidden="true"></span>
-
-                                        @w.Time.ToString("dd.MM.yyyy")
+                                        @host.Created.ToString("dd.MM.yyyy")
                                     </div>
                                 </div>
                             </td>
@@ -120,28 +157,29 @@ else
         }
     </div>
 
-    <div class="card bg-primary" style="margin-top:50px;">
+    <div class="card" style="margin-top:50px;">
         <div class="card-header">
             <h3 class="card-title">Systém hodnocení HTTPS</h3>
         </div>
         <div class="card-body">
             <dl class="dl-horizontal">
-                <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.A)">Zelená známka A+, A nebo A-</dt>
-                <dd>@ZabTools.StatusDescription(SSLLabsGrades.A, true)</dd>
-                <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.B)">Žlutá známka B,C,D,E</dt>
-                <dd>@ZabTools.StatusDescription(SSLLabsGrades.B, true).</dd>
-                <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.F)">Červené F</dt>
-                <dd>@ZabTools.StatusDescription(SSLLabsGrades.F, true).</dd>
-                <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.M)">Červené M</dt>
-                <dd>@ZabTools.StatusDescription(SSLLabsGrades.M, true).</dd>
-                <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.T)">Červené T</dt>
-                <dd>@ZabTools.StatusDescription(SSLLabsGrades.T, true).</dd>
-                <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.X)">Červené X</dt>
-                <dd>@ZabTools.StatusDescription(SSLLabsGrades.X, true).</dd>
+                <dt style="color:@UptimeSSL.StatusOrigColor(UptimeSSL.SSLGrades.A)">Zelená známka A+, A nebo A-</dt>
+                <dd>@UptimeSSL.StatusDescription(UptimeSSL.SSLGrades.A, true)</dd>
+                <dt style="color:@UptimeSSL.StatusOrigColor(UptimeSSL.SSLGrades.B)">Žlutá známka B,C,D,E</dt>
+                <dd>@UptimeSSL.StatusDescription(UptimeSSL.SSLGrades.B, true).</dd>
+                <dt style="color:@UptimeSSL.StatusOrigColor(UptimeSSL.SSLGrades.F)">Červené F</dt>
+                <dd>@UptimeSSL.StatusDescription(UptimeSSL.SSLGrades.F, true).</dd>
+                <dt style="color:@UptimeSSL.StatusOrigColor(UptimeSSL.SSLGrades.M)">Červené M</dt>
+                <dd>@UptimeSSL.StatusDescription(UptimeSSL.SSLGrades.M, true).</dd>
+                <dt style="color:@UptimeSSL.StatusOrigColor(UptimeSSL.SSLGrades.T)">Červené T</dt>
+                <dd>@UptimeSSL.StatusDescription(UptimeSSL.SSLGrades.T, true).</dd>
+                <dt style="color:@UptimeSSL.StatusOrigColor(UptimeSSL.SSLGrades.X)">Červené X</dt>
+                <dd>@UptimeSSL.StatusDescription(UptimeSSL.SSLGrades.X, true).</dd>
             </dl>
         </div>
     </div>
 
+    <hr/>
 
     @WebyChartUtil.TableNextGroups("https")
 }

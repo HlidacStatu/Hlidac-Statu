@@ -113,8 +113,20 @@
   <ItemGroup>
     <Compile Remove="StatniPokladna\MonitorService.cs" />
     <Compile Remove="Vazby\FromGraphDb.cs" />
+    <Compile Remove="Zabbix\WebStatusExport.cs" />
+    <Compile Remove="Zabbix\ZabAvailability.cs" />
+    <Compile Remove="Zabbix\ZabAvailabilityInterval.cs" />
+    <Compile Remove="Zabbix\ZabAvailabilityStatistics.cs" />
+    <Compile Remove="Zabbix\ZabbixReader.cs" />
+    <Compile Remove="Zabbix\ZabConfig.cs" />
+    <Compile Remove="Zabbix\ZabDataPerStatus.cs" />
+    <Compile Remove="Zabbix\ZabHistoryItem.cs" />
+    <Compile Remove="Zabbix\ZabHost.cs" />
+    <Compile Remove="Zabbix\ZabHostAvailability.cs" />
     <Compile Remove="Zabbix\ZabHostAvailability_Intervals.cs" />
     <Compile Remove="Zabbix\ZabHostAvailability_PerMin.cs" />
+    <Compile Remove="Zabbix\ZabHostSslStatus.cs" />
+    <Compile Remove="Zabbix\ZabTools.cs" />
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -124,5 +136,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Vazby\" />
+    <Folder Include="Zabbix\" />
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Lib.Data.External.Zabbix;
+﻿
+using HlidacStatu.Repositories;
 
 using Microsoft.AspNetCore.Html;
 
@@ -18,31 +19,31 @@ namespace HlidacStatu.Web.Framework
         function getChartStatus(response, style)
         {{
             var s = """";
-            if (response == {ZabAvailability.BadHttpCode.ToString(HlidacStatu.Util.Consts.enCulture)})
+            if (response == { Entities.UptimeServer.Availability.BadHttpCode.ToString(HlidacStatu.Util.Consts.enCulture)})
                 if (style == 0) return ""odpověděla s chybou""; else return ""odpovídá<br/>s chybou"";
-            if (response == {ZabAvailability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture)})
+            if (response == {Entities.UptimeServer.Availability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture)})
                 if (style == 0) return ""vůbec neodpověděla""; else return ""vůbec<br/>neodpovídá"";
-            if (response <= {ZabAvailability.OKLimit.ToString(HlidacStatu.Util.Consts.enCulture)})
+            if (response <= {Entities.UptimeServer.Availability.OKLimit.ToString(HlidacStatu.Util.Consts.enCulture)})
                 if (style == 0) return ""byla rychlá""; else return ""reaguje<br/>rychle"";
-            if (response <= {ZabAvailability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture)})
+            if (response <= {Entities.UptimeServer.Availability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture)})
                 if (style == 0) return ""byla pomalá""; else return ""reaguje<br/>pomalu"";
-             if (response > {ZabAvailability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture)})
+             if (response > {Entities.UptimeServer.Availability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture)})
                 if (style == 0) return ""byla nedostupná""; else return ""reaguje<br/>velmi pomalu"";
           return s;
     }}
     function getChartStatusColor(response, style)
     {{
         var s = """";
-        if (response <= {ZabAvailability.OKLimit.ToString(HlidacStatu.Util.Consts.enCulture)})
-            return ""{ZabAvailability.GetStatusChartColor(Statuses.OK)}"";
-        if (response <= {ZabAvailability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture)})
-            return ""{ZabAvailability.GetStatusChartColor(Statuses.Pomalé) }"";
-        if (response > {ZabAvailability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture) })
-            return ""{ZabAvailability.GetStatusChartColor(Statuses.Nedostupné)} "";
-        if (response == {ZabAvailability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture) })
-            return ""{ZabAvailability.GetStatusChartColor(Statuses.TimeOuted)} "";
-        if (response == {ZabAvailability.BadHttpCode.ToString(HlidacStatu.Util.Consts.enCulture)})
-            return ""{ZabAvailability.GetStatusChartColor(Statuses.BadHttpCode)} "";
+        if (response <= {Entities.UptimeServer.Availability.OKLimit.ToString(HlidacStatu.Util.Consts.enCulture)})
+            return ""{Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.OK)}"";
+        if (response <= {Entities.UptimeServer.Availability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture)})
+            return ""{Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.Pomalé) }"";
+        if (response > {Entities.UptimeServer.Availability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture) })
+            return ""{Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.Nedostupné)} "";
+        if (response == {Entities.UptimeServer.Availability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture) })
+            return ""{Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.TimeOuted)} "";
+        if (response == {Entities.UptimeServer.Availability.BadHttpCode.ToString(HlidacStatu.Util.Consts.enCulture)})
+            return ""{Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.BadHttpCode)} "";
         return s;
     }}
     </script>
@@ -61,30 +62,30 @@ namespace HlidacStatu.Web.Framework
             <div class='list-group'>
 
                 <a href='/StatniWeby/Https' class='list-group-item {WebUtil.IfExists(active == "https", "disabled")}'>
-                    <span class='badge float-end rounded-pill bg-secondary'>{ZabTools.SslStatuses()?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()?.Count() ?? 0}</span>
                     Žebříček státních serverů podle HTTPS Labs hodnocení
                 </a>
 
 
                 <a href='/StatniWeby/Index' class='list-group-item {WebUtil.IfExists(active == "index", "disabled")}'>
-                    <span class='badge float-end rounded-pill bg-secondary'>{ZabTools.WebyItems("0")?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("0")?.Count() ?? 0}</span>
                     Nejdůležitější služby státní správy
                 </a>
 
                 <a href='/StatniWeby/Dalsi/ustredni' class='list-group-item {WebUtil.IfExists(active == "ustredni", "disabled")}'>
-                    <span class='badge float-end rounded-pill bg-secondary'>{ZabTools.WebyItems("ustredni")?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("ustredni")?.Count() ?? 0}</span>
                     Služby ústředních orgánů státní správy
                 </a>
                 <a href='/StatniWeby/Dalsi/3' class='list-group-item {WebUtil.IfExists(active == "3", "disabled")}'>
-                    <span class='badge float-end rounded-pill bg-secondary'>{ZabTools.WebyItems("3")?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("3")?.Count() ?? 0}</span>
                     Open source/open data weby
                 </a>
                 <a href='/StatniWeby/Dalsi/1' class='list-group-item {WebUtil.IfExists(active == "1", "disabled")}'>
-                    <span class='badge float-end rounded-pill bg-secondary'>{ZabTools.WebyItems("1")?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("1")?.Count() ?? 0}</span>
                     Další důležité služby
                 </a>
                 <a href='/StatniWeby/Dalsi/2' class='list-group-item {WebUtil.IfExists(active == "2", "disabled")}'>
-                    <span class='badge float-end rounded-pill bg-secondary'>{ZabTools.WebyItems("2")?.Count() ?? 0}</span>
+                    <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("2")?.Count() ?? 0}</span>
                     Ostatní měřené služby
                 </a>"
                 //<a href='#' class='list-group-item disabled'>
@@ -106,12 +107,12 @@ namespace HlidacStatu.Web.Framework
         {
             var uniqueId = "_chart_" + Devmasters.TextUtil.GenRandomString(8);
             var colsize = 0; //data.Select(d => d.ColSize(fromDate, toDate)).Max();
-            var colors = new string[] { ZabAvailability.GetStatusChartColor(Statuses.OK),
-        ZabAvailability.GetStatusChartColor(Statuses.Pomalé),
-        ZabAvailability.GetStatusChartColor(Statuses.Nedostupné),
-        ZabAvailability.GetStatusChartColor(Statuses.TimeOuted),
-        ZabAvailability.GetStatusChartColor(Statuses.BadHttpCode),
-        ZabAvailability.GetStatusChartColor(Statuses.Unknown)
+            var colors = new string[] { Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.OK),
+        Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.Pomalé),
+        Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.Nedostupné),
+        Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.TimeOuted),
+        Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.BadHttpCode),
+        Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.Unknown)
         };
 
             StringBuilder sb = new StringBuilder();
@@ -192,34 +193,34 @@ Highcharts.setOptions({
             sb.AppendLine(@"
                 colorAxis: {
                     dataClasses: [{
-                        to: " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.OKLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @",
-                        name: 'Služba ' + getChartStatus(" + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.OKLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @", 0),
+                        to: " + Entities.UptimeServer.Availability.OKLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @",
+                        name: 'Služba ' + getChartStatus(" + Entities.UptimeServer.Availability.OKLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @", 0),
                         color: '" + colors[0] + @"'
                     }, {
-                        from: " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.OKLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @",
-                        to: " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @",
+                        from: " + Entities.UptimeServer.Availability.OKLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @",
+                        to: " + Entities.UptimeServer.Availability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @",
                         color: '" + colors[1] + @"',
-                        name: 'Služba ' + getChartStatus(" + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @", 0)
+                        name: 'Služba ' + getChartStatus(" + Entities.UptimeServer.Availability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @", 0)
                     }, {
-                        from: " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @",
-                        to: " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture) + @",
+                        from: " + Entities.UptimeServer.Availability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @",
+                        to: " + Entities.UptimeServer.Availability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture) + @",
                         color: '" + colors[2] + @"',
-                        name: 'Služba ' + getChartStatus(" + (HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.SlowLimit + 1).ToString(HlidacStatu.Util.Consts.enCulture) + @", 0)
+                        name: 'Služba ' + getChartStatus(" + (Entities.UptimeServer.Availability.SlowLimit + 1).ToString(HlidacStatu.Util.Consts.enCulture) + @", 0)
                     },
                        {
-                        from: " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture) + @",
-                        to: " + (HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.BadHttpCode - 0.001m).ToString(HlidacStatu.Util.Consts.enCulture) + @",
+                        from: " + Entities.UptimeServer.Availability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture) + @",
+                        to: " + (Entities.UptimeServer.Availability.BadHttpCode - 0.001m).ToString(HlidacStatu.Util.Consts.enCulture) + @",
                         color: '" + colors[3] + @"',
                         name: 'Odezva nejde změřit'
                         },
                        {
-                        from: " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.BadHttpCode.ToString(HlidacStatu.Util.Consts.enCulture) + @",
-                        to: " + (HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.BadHttpCode + 0.001m).ToString(HlidacStatu.Util.Consts.enCulture) + @",
+                        from: " + Entities.UptimeServer.Availability.BadHttpCode.ToString(HlidacStatu.Util.Consts.enCulture) + @",
+                        to: " + (Entities.UptimeServer.Availability.BadHttpCode + 0.001m).ToString(HlidacStatu.Util.Consts.enCulture) + @",
                         color: '" + colors[4] + @"',
                         name: 'Chyba serveru'
                         },
                        {
-                        from: " + (HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.BadHttpCode + 0.001m).ToString(HlidacStatu.Util.Consts.enCulture) + @",
+                        from: " + (Entities.UptimeServer.Availability.BadHttpCode + 0.001m).ToString(HlidacStatu.Util.Consts.enCulture) + @",
                         color: '" + colors[5] + @"',
                         name: 'Odezva nezměřena'
                         }
@@ -243,19 +244,19 @@ Highcharts.setOptions({
                         formatter: function () {
                             var obj = cats" + uniqueId + @"[this.value];
                             var status = '<span style=""font-size:15px;color:" + colors[0] + @""" class=""fas fa-check-circle""></span> ';
-                            if (obj.lastResponse.Response > " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.OKLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @")
+                            if (obj.lastResponse.Response > " + Entities.UptimeServer.Availability.OKLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @")
                                 status = '<span style=""font-size:15px;color:" + colors[1] + @""" class=""fas fa-check-circle""></span> ';
-                            if (obj.lastResponse.Response > " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @")
+                            if (obj.lastResponse.Response > " + Entities.UptimeServer.Availability.SlowLimit.ToString(HlidacStatu.Util.Consts.enCulture) + @")
                                 status = '<span style=""font-size:15px;color:" + colors[2] + @""" class=""fas fa-check-circle""></span> ';
-                            if (obj.lastResponse.Response == " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture) + @")
+                            if (obj.lastResponse.Response == " + Entities.UptimeServer.Availability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture) + @")
                                 status = '<span style=""font-size:15px;color:" + colors[3] + @""" class=""fas fa-check-circle""></span> ';
-                            if (obj.lastResponse.Response == " + HlidacStatu.Lib.Data.External.Zabbix.ZabAvailability.BadHttpCode.ToString(HlidacStatu.Util.Consts.enCulture) + @")
+                            if (obj.lastResponse.Response == " + Entities.UptimeServer.Availability.BadHttpCode.ToString(HlidacStatu.Util.Consts.enCulture) + @")
                                 status = '<span style=""font-size:15px;color:" + colors[4] + @""" class=""fas fa-check-circle""></span> ';
-                            var status2 = '<span style=""color:' + getChartStatusColor(obj.lastResponse.Response) + '"">právě ' + getChartStatus(obj.lastResponse.Response, 1) + '</span> ';
+                            var status2 = '<span style=""color:' + getChartStatusColor(obj.lastResponse.Response) + '"">' + getChartStatus(obj.lastResponse.Response, 1) + '</span> ';
                             ");
             sb.AppendLine(detail ?
-                                    @"url = '<b>' + obj.host.publicname + '</b>'"
-                                    : @"var url = '<a href=""/statniweby/info/' + obj.host.hostid + '?h=' + obj.host.hash + '"">' + obj.host.publicname + '</a>';"
+                                    @"url = '<b>' + obj.host.Name + '</b>'"
+                                    : @"var url = '<a href=""/statniweby/info/' + obj.host.Id + '?h=' + obj.host.Hash + '"">' + obj.host.Name + '</a>';"
                             );
             sb.AppendLine(@"
                             var s = '<div style=""text-align:right;margin-top:9px;border-bottom:1px solid #ddd"">'
@@ -293,8 +294,8 @@ Highcharts.setOptions({
                         headerFormat: 'Rychlost odezvy<br/>',
                         //pointFormat: '{point.x:%a %H:%M:%S}  <b>{point.value:.2f}s</b>',
                         pointFormatter: function () {
-                            var timeout = " + ZabAvailability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture) + @";
-                            var badCode = " + ZabAvailability.BadHttpCode.ToString(HlidacStatu.Util.Consts.enCulture) + @";
+                            var timeout = " + Entities.UptimeServer.Availability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture) + @";
+                            var badCode = " + Entities.UptimeServer.Availability.BadHttpCode.ToString(HlidacStatu.Util.Consts.enCulture) + @";
                             var val = 'odezva ' + Highcharts.numberFormat(this.value, 2) + 's';
                             var s = '';
                             if (this.value == timeout) {

@@ -1,5 +1,8 @@
-﻿using HlidacStatu.Lib.Data.External.Zabbix;
+﻿using HlidacStatu.Entities;
+using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
+
+using InfluxDB.Client;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,11 +33,11 @@ namespace HlidacStatu.Web.Controllers
                     return RedirectToAction("Index", "StatniWeby");
 
                 ViewBag.SubTitle = "Další státní weby";
-                return View(ZabTools.WebyItems(iid.ToString()));
+                return View(Repositories.UptimeServerRepo.ServersIn(iid.ToString()));
             }
             else if (id?.ToLower() == "ustredni")
             {
-                var list = ZabTools.WebyItems(id);
+                var list = Repositories.UptimeServerRepo.ServersIn(id);
                 if (list == null)
                     return RedirectToAction("Index", "StatniWeby");
                 if (list.Count() == 0)
@@ -46,7 +49,7 @@ namespace HlidacStatu.Web.Controllers
             }
             else if (id?.ToLower() == "krajske" && false)
             {
-                var list = ZabTools.WebyItems(id);
+                var list = Repositories.UptimeServerRepo.ServersIn(id);
                 if (list == null)
                     return RedirectToAction("Index", "StatniWeby");
                 if (list.Count() == 0)
@@ -71,6 +74,8 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
+
+        [HlidacCache(60, "id;hh;f;t;h", false)]
         public ActionResult ChartData(string id, string hh, long? f, long? t, int? h = 24)
         {
             id = id?.ToLower() ?? "";
@@ -82,13 +87,13 @@ namespace HlidacStatu.Web.Controllers
             if (t.HasValue)
                 toDate = new DateTime(t.Value);
 
-            IEnumerable<ZabHostAvailability> data = null;
+            IEnumerable<Entities.UptimeServer.HostAvailability> data = null;
 
             switch (id)
             {
                 case "index":
-                    data = ZabTools.WebyData("0")
-                        ?.OrderBy(o => o.Host.publicname)
+                    data = Repositories.UptimeServerRepo.AvailabilityByGroup("0",24)
+                        ?.OrderBy(o => o.Host.Name)
                         ?.Reverse()
                         ?.ToList();
 
@@ -96,14 +101,14 @@ namespace HlidacStatu.Web.Controllers
                 case "1":
                 case "2":
                 case "3":
-                    data = ZabTools.WebyData(ZabTools.WebyItems(id))
-                        ?.OrderBy(o => o.Host.publicname)
+                    data = Repositories.UptimeServerRepo.AvailabilityByGroup(id,24)
+                        ?.OrderBy(o => o.Host.Name)
                         ?.Reverse()
                         ?.ToList();
                     break;
                 case "ustredni":
-                    data = ZabTools.WebyData(ZabTools.WebyItems("ustredni"))
-                        ?.OrderBy(o => o.Host.publicname)
+                    data = Repositories.UptimeServerRepo.AvailabilityByGroup("ustredni",24)
+                        ?.OrderBy(o => o.Host.Name)
                         ?.Reverse()
                         ?.ToList();
                     break;
@@ -115,23 +120,23 @@ namespace HlidacStatu.Web.Controllers
             if (id.StartsWith("w"))
             {
                 id = id.Replace("w", "");
-                ZabHost host = ZabTools.Weby().Where(w => w.hostid == id.ToString() & w.itemIdResponseTime != null).FirstOrDefault();
+                var host = Repositories.UptimeServerRepo.Load(id);
                 if (host != null)
                 {
                     if (host.ValidHash(hh))
                     {
-                        data = new ZabHostAvailability[] { ZabTools.GetHostAvailabilityLong(host) };
+                        data = new UptimeServer.HostAvailability[] { UptimeServerRepo.AvailabilityById(host.Id, 24 * 7) };
                     }
                 }
             }
 
 
-            if (data != null)
+            if (data?.Count() > 0)
             {
                 var dataArr = data.ToArray();
                 for (int i = 0; i < dataArr.Length; i++)
                 {
-                    dataArr[i].Host.publicname = Devmasters.TextUtil.ShortenText(dataArr[i].Host.publicname, 40);
+                    dataArr[i].Host.Name = Devmasters.TextUtil.ShortenText(dataArr[i].Host.Name, 40);
                 }
                 var dataready = new
                 {
@@ -139,8 +144,8 @@ namespace HlidacStatu.Web.Controllers
                       .Select((x, l) => x.DataForChart(fromDate, toDate, l))
                       .SelectMany(x => x)
                       .ToArray(),
-                    cats = data.ToDictionary(k => k.Host.hostid, d => new { host = d.Host, lastResponse = d.Data.Last() }),
-                    categories = data.Select(m => m.Host.hostid).ToArray(),
+                    cats = data.ToDictionary(k => k.Host.Id, d => new { host = d.Host, lastResponse = d.Data.Last() }),
+                    categories = data.Select(m => m.Host.Id).ToArray(),
                     colsize = data.Select(d => d.ColSize(fromDate, toDate)).Max(),
                 };
                 content = Newtonsoft.Json.JsonConvert.SerializeObject(dataready);
@@ -152,7 +157,9 @@ namespace HlidacStatu.Web.Controllers
         [HlidacCache(10 * 60, "id;h;embed", false)]
         public ActionResult Info(int id, string h)
         {
-            ZabHost host = ZabTools.Weby().Where(w => w.hostid == id.ToString() & w.itemIdResponseTime != null).FirstOrDefault();
+            UptimeServer host = Repositories.UptimeServerRepo.AllServers()
+                .FirstOrDefault(w => w.Id == id.ToString())
+                ;
             if (host == null)
                 return RedirectToAction("Index", "StatniWeby");
 

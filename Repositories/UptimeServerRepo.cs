@@ -1,5 +1,4 @@
 using HlidacStatu.Entities;
-using HlidacStatu.Lib.Data.External.Zabbix;
 
 using InfluxDB.Client;
 using InfluxDB.Client.Api.Domain;
@@ -16,9 +15,20 @@ namespace HlidacStatu.Repositories
     public static class UptimeServerRepo
     {
 
+
+
         static InfluxDBClient influxDbClient = InfluxDBClientFactory.Create(
             Devmasters.Config.GetWebConfigValue("InfluxDb"),
             Devmasters.Config.GetWebConfigValue("InfluxDbToken"));
+
+
+        public static string PatriPodUradJmeno(this UptimeServer server)
+        {
+            if (string.IsNullOrEmpty(server.ICO))
+                return string.Empty;
+            else
+                return Firmy.GetJmeno(server.ICO);
+        }
 
         public static void SaveLastCheck(UptimeItem lastCheck, UptimeServer uptimeServerTrigger)
         {
@@ -47,7 +57,7 @@ namespace HlidacStatu.Repositories
 
                     db.SaveChanges();
 
-                    Repositories.ES.Manager.GetESClient_Uptime().Index<UptimeItem>(lastCheck, m => m.Id(lastCheck.Id));
+                    //Repositories.ES.Manager.GetESClient_Uptime().Index<UptimeItem>(lastCheck, m => m.Id(lastCheck.Id));
                     using (var writeApi = influxDbClient.GetWriteApi())
                     {
                         var point = PointData.Measurement("uptime")
@@ -155,26 +165,6 @@ namespace HlidacStatu.Repositories
             return serverIds;
         }
 
-        public static ZabHost ToZabHost(this UptimeServer server)
-        {
-            if (server == null)
-                return null;
-
-            var zs = new ZabHost(server.Id,
-                                    server.Host(),
-                                    server.PublicUrl,
-                                    server.Description,
-                                    server.GroupArray()
-                                    )
-            {
-                urad = string.IsNullOrEmpty(server.ICO) ? "" : Firmy.GetJmeno(server.ICO),
-                popis = server.Description,
-                publicname = server.Name,
-
-            };
-
-            return zs;
-        }
 
         public static UptimeServer[] AllServers(Entities.DbEntities existingConn = null)
         {
@@ -187,21 +177,54 @@ namespace HlidacStatu.Repositories
 
         }
 
-        public static IEnumerable<ZabHostAvailability> AvailabilityByGroup(string group, int hoursBack)
+        public static IEnumerable<UptimeServer.HostAvailability> AvailabilityByGroup(string group, int hoursBack)
         {
             string[] serverIds = ServersIn(group).ToArray();
             return AvailabilityByIds(serverIds, hoursBack);
         }
-        public static IEnumerable<ZabHostAvailability> AvailabilityById(string serverId, int hoursBack)
+        public static UptimeServer.HostAvailability AvailabilityById(string serverId, int hoursBack)
         {
-            return AvailabilityByIds(new string[] { serverId }, hoursBack);
+            return AvailabilityByIds(new string[] { serverId }, hoursBack).FirstOrDefault();
         }
-        public static IEnumerable<ZabHostAvailability> AvailabilityByIds(string[] serverIds, int hoursBack)
+        public static IEnumerable<UptimeServer.HostAvailability> AvailabilityByIds(string[] serverIds, int hoursBack)
         {
             if (serverIds?.Length == null)
                 return null;
             if (serverIds.Length == 0)
                 return null;
+
+            UptimeServer.HostAvailability[] allData = null;
+            if (hoursBack<=25)
+                allData = uptimeServersCache1Day.Get();
+            else
+                allData = uptimeServersCache7Day.Get();
+            List<UptimeServer.HostAvailability> choosen = new List<UptimeServer.HostAvailability>();
+            choosen = allData.Where(m => serverIds.Contains(m.Host.Id)).ToList();
+            return choosen;
+        }
+
+
+
+        private static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]> uptimeServersCache1Day =
+      new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]>(TimeSpan.FromMinutes(1),
+          (obj) =>
+          {
+              var res = _availability(24);
+              return res.ToArray();
+          });
+        private static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]> uptimeServersCache7Day =
+      new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]>(TimeSpan.FromMinutes(30),
+          (obj) =>
+          {
+              var res = _availability(7*24);
+              return res.ToArray();
+          });
+
+
+        private static IEnumerable<UptimeServer.HostAvailability> _availability(int hoursBack)
+        {
+            string[] serverIds = AllServers().Select(m=>m.Id).ToArray();
+
 
             UptimeServer[] allServers = AllServers();
 
@@ -214,6 +237,11 @@ namespace HlidacStatu.Repositories
                 + "  |> filter(fn: (r) => " + serverIds.Select(m => $"r[\"serverid\"] == \"{m}\"").Aggregate((f, s) => f + " or " + s) + " )"
                 + "  |> filter(fn: (r) => r[\"_field\"] == \"value\")"
             ;
+            if (hoursBack > 25)
+                query = query + "\n"
+                    + "|> aggregateWindow(every: 10m, fn: max, createEmpty: false)"
+                  + "|> yield(name: \"max\")"
+                  + "|> duplicate(column: \"_stop\", as: \"_time\")";
 
             fluxTables = influxDbClient.GetQueryApi().QueryAsync(query, "hlidac").Result;
             var allData = fluxTables.SelectMany(m => m.Records)
@@ -241,15 +269,15 @@ namespace HlidacStatu.Repositories
 
             var zabList = items
                 .GroupBy(k => k.ServerId, v => v)
-                .Select(g => new ZabHostAvailability(
-                                g.FirstOrDefault()?.Server?.ToZabHost()
+                .Select(g => new UptimeServer.HostAvailability(
+                                g.FirstOrDefault()?.Server
                                 ,
                                 g.OrderBy(m => m.CheckStart)
-                                .Select(m => new ZabHistoryItem()
+                                .Select(m => new UptimeServer.UptimeMeasure()
                                 {
                                     clock = m.CheckStart,
                                     itemId = g.Key,
-                                    value = m.ResponseCode >= 400 ? ZabAvailability.BadHttpCode : (m.ResponseTimeInMs > 15000 ? ZabAvailability.TimeOuted2 : ((decimal)m.ResponseTimeInMs) / 1000m)
+                                    value = m.ResponseCode >= 400 ? UptimeServer.Availability.BadHttpCode : (m.ResponseTimeInMs > 15000 ? UptimeServer.Availability.TimeOuted2 : ((decimal)m.ResponseTimeInMs) / 1000m)
                                 }
                                 )
                             ) //zabhost
@@ -257,6 +285,5 @@ namespace HlidacStatu.Repositories
 
             return zabList;
         }
-
     }
 }

@@ -1,20 +1,21 @@
-﻿@model ZabHost
+﻿@model UptimeServer
 @using HlidacStatu.XLib
-@using HlidacStatu.Lib.Data.External.Zabbix;
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
 
 @{
-    ViewBag.Title = "Hlídač " + Model.publicname;
-    ViewBag.SubTitle = "Týdenní dostupnost pro " + Model.publicname;
+    ViewBag.Title = "Hlídač " + Model.Name;
+    ViewBag.SubTitle = "Týdenní dostupnost pro " + Model.Name;
 
     int hoursBack = 48;
     DateTime backHours = DateTime.Now.AddHours(-1 * hoursBack);
 
-    ZabHostAvailability web = null;
-    ZabHostSslStatus webssl = null;
+    UptimeServer.HostAvailability web = null;
+    UptimeSSL webssl = null;
     try
     {
-        web = ZabTools.GetHostAvailabilityLong(Model);
-        webssl = ZabTools.SslStatusForHostId(web.Host.hostid);
+        web = HlidacStatu.Repositories.UptimeServerRepo.AvailabilityById(Model.Id,7*24);
+        webssl = UptimeSSLRepo.LoadLatest(Model.HostDomain());
     }
     catch (Exception)
     {
@@ -34,13 +35,13 @@
 
     <style>
         .avail_OK {
-            color: @(ZabAvailability.GetStatusChartColor(Statuses.OK));
+            color: @(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.OK));
         }
         .avail_Pomale {
-            color: @(ZabAvailability.GetStatusChartColor(Statuses.Pomalé));
+            color: @(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Pomalé));
         }
         .avail_Nedostupne {
-            color: @(ZabAvailability.GetStatusChartColor(Statuses.Nedostupné));
+            color: @(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Nedostupné));
         }
     </style>
 
@@ -72,43 +73,40 @@ else
     <partial name="~/Views/StatniWeby/_Info.cshtml" model="@ViewData"/>
 
     <h2>
-        @(web.Host.publicname)
-        <br /><small><a href="@web.Host.url" target="_blank" onclick="return trackOutLink(this,'statniweby/info');">@web.Host.url</a></small>
+        @(web.Host.Name)
+        <br /><small><a href="@web.Host.PublicUrl" target="_blank" onclick="return trackOutLink(this,'statniweby/info');">@web.Host.PublicUrl</a></small>
     </h2>
     <p class="lead">
-        @web.Host.urad. @Html.Raw(web.Host.popis)
+        @UptimeServerRepo.PatriPodUradJmeno(web.Host) @Html.Raw(web.Host.Description)
     </p>
     <hr />
-    if (webssl != null && webssl.Status().HasValue)
+    if (webssl != null )
     {
 
         <h3>Zabezpečení komunikace</h3>
         <div class="row">
             <div class="col-xs-3 col-sm-2 text-center">
-                @Html.Raw(ZabTools.StatusHtml(webssl.Status(), 80))
+                @Html.Raw(UptimeSSL.StatusHtml(webssl.SSLGrade(), 80))
                 <div class="text-muted small text-center">
-                    @webssl.Time.ToString("dd.MM.yyyy")
+                    @webssl.Created.ToString("dd.MM.yyyy")
                 </div>
                 <div class="text-muted small text-center">
                     <a href="https://www.ssllabs.com" onclick="return trackOutLink(this,'statniweby/info');">&copy; Qualys, Inc</a>
                 </div>
             </div>
             <div class="col-xs-9 col-sm-10">
-                <div class="bs-callout bs-callout-@(ZabTools.StatusStyleColor(webssl.Status()))" style="margin:0;">
-                    <h4>Výsledek analýzy HTTPS na @web.Host.UriHost()</h4>
-                    @if (webssl.Status() == SSLLabsGrades.X)
+                <div class="bs-callout bs-callout-@(UptimeSSL.StatusStyleColor(webssl.SSLGrade()))" style="margin:0;">
+                    <h4>Výsledek analýzy HTTPS na @web.Host.HostDomain()</h4>
+                    @if (webssl.SSLGrade() == UptimeSSL.SSLGrades.X)
                     {
                         <p>
                             Tato služba zabezpečenou komunikaci nepodporuje.
                         </p>
                     }
-                    else if (webssl.Status().HasValue)
+                    else 
                     {
                         <p>
-                            @ZabTools.StatusDescription(webssl.Status().Value, true)
-                        </p>
-                        <p>
-                            <a target="_blank" href="https://www.ssllabs.com/ssltest/analyze.html?d=@(webssl.Host.UriHost())" onclick="return trackOutLink(this,'statniweby/info');">Podrobná zpráva o ratingu zabezpečení</a> (anglicky) z SSL Labs (&copy; Qualys, Inc)
+                            @UptimeSSL.StatusDescription(webssl.SSLGrade(), true)
                         </p>
                     }
                 </div>
@@ -172,14 +170,14 @@ else
         </h2>
         <div class="row">
             <div class="col-xs-12">
-                @WebyChartUtil.Chart("w" + web.Host.hostid, 7 * 24, 190, true, web.Host.hash)
+                @WebyChartUtil.Chart("w" + web.Host.Id, 7 * 24, 190, true, web.Host.Hash)
             </div>
         </div>
 
         <div class="row">
             <div class="col-xs-12">
                 <div class="text-end">
-                    <a asp-controller="ApiV2Weby" asp-action="Status" asp-route-id="@Model.hostid">Stahnout dostupnost v JSON (Open Data)</a>
+                    <a asp-controller="ApiV2Weby" asp-action="Status" asp-route-id="@Model.Id">Stahnout dostupnost v JSON (Open Data)</a>
                 </div>
             </div>
 
@@ -195,9 +193,9 @@ else
             <h4>Hlídání dostupnosti státní webů. Co to vlastně děláme?</h4>
             <p>
                 Měříme každou minutu, zda důležité weby státu vůbec běží, a pokud ano, tak jak rychle odpovídají. A tomu odpovídají i zobrazené barvy.
-                Pokud služba odpovídá rychle, dáváme <b style="color:@(ZabAvailability.GetStatusChartColor(Statuses.OK))">zelenou - v pořádku</b>.
-                Pokud odpovídá déle, dáváme <b style="color:@(ZabAvailability.GetStatusChartColor(Statuses.Pomalé))">oranžovou - pomalá odpověď.</b>.
-                Pokud neodpoví nebo odpoví za dlouhou dobu, použijeme <b style="color:@(ZabAvailability.GetStatusChartColor(Statuses.Nedostupné))">červenou za nedostupnost</b>.
+                Pokud služba odpovídá rychle, dáváme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.OK))">zelenou - v pořádku</b>.
+                Pokud odpovídá déle, dáváme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Pomalé))">oranžovou - pomalá odpověď.</b>.
+                Pokud neodpoví nebo odpoví za dlouhou dobu, použijeme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Nedostupné))">červenou za nedostupnost</b>.
             </p>
             <p>
                 Systém hodnocení HTTPS je jednoduchý: A+ je nejlepší známka, F nejhorší, M znamená špatné jméno serveru v certifikátu, T znamená špatný certifikát, X že zabezpečený přenos není vůbec podporován.

@@ -1,6 +1,5 @@
 ﻿using Devmasters.Enums;
 
-using HlidacStatu.Lib.Data.External.Zabbix;
 using HlidacStatu.Web.Filters;
 
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +9,8 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using HlidacStatu.Entities;
+using HlidacStatu.Repositories;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -31,20 +32,18 @@ namespace HlidacStatu.Web.Controllers
         //[GZipOrDeflate()]
         [Authorize]
         [HttpGet]
-        public ActionResult<ZabHost[]> List()
+        public ActionResult<UptimeServer[]> List()
         {
-            return ZabTools.Weby().ToArray();
+            return UptimeServerRepo.AllServers();
         }
 
         [HttpGet("domeny")]
         public ActionResult<string> Domeny()
         {
-            var webs = ZabTools.Weby()
+            var webs = UptimeServerRepo.AllServers()
                 .ToArray()
-                .Select(m=>m.url)
+                .Select(m=>m.HostDomain())
                 .Where(m=>Uri.IsWellFormedUriString(m, UriKind.Absolute))
-                .Select(m=>new Uri(m))
-                .Select(m=>m.Host.ToLower())
                 .Distinct()
                 ;
             return string.Join("\n", webs);
@@ -54,32 +53,31 @@ namespace HlidacStatu.Web.Controllers
         //[GZipOrDeflate()]
         [Authorize]
         [HttpGet("{id?}")]
-        public ActionResult<WebStatusExport> Status([FromRoute] string? id = null)
+        public ActionResult<UptimeServer.WebStatusExport> Status([FromRoute] string? id = null)
         {
             if (string.IsNullOrEmpty(id))
                 return BadRequest($"Web nenalezen");
 
-            ZabHost host = ZabTools.Weby().Where(w => w.hostid == id.ToString() & w.itemIdResponseTime != null).FirstOrDefault();
+            UptimeServer host = UptimeServerRepo.Load(id);
             if (host == null)
                 return BadRequest($"Web nenalezen");
 
             try
             {
-                ZabHostAvailability data = ZabTools.GetHostAvailabilityLong(host);
-                ZabHostSslStatus webssl = ZabTools.SslStatusForHostId(host.hostid);
-                var ssldata = new WebStatusExport.SslData()
+                UptimeServer.HostAvailability data = UptimeServerRepo.AvailabilityById(host.Id, 7*24);
+                UptimeSSL webssl = UptimeSSLRepo.LoadLatest(host.Id);
+                var ssldata = new UptimeServer.WebStatusExport.SslData()
                 {
-                    Grade = webssl?.Status().ToNiceDisplayName(),
-                    LatestCheck = webssl?.Time,
-                    Copyright = "(c) © Qualys, Inc. https://www.ssllabs.com/",
-                    FullReport = "https://www.ssllabs.com/ssltest/analyze.html?d=" + webssl?.Host?.UriHost()
+                    Grade = webssl == null ? null : webssl.SSLGrade().ToNiceDisplayName(),
+                    LatestCheck = webssl?.Created,
+                    SSLExpiresAt = webssl?.CertExpiration()
                 };
                 if (webssl == null)
                 {
                     ssldata = null;
                 }
                 return
-                    new WebStatusExport()
+                    new UptimeServer.WebStatusExport()
                     {
                         Availability = data,
                         SSL = ssldata

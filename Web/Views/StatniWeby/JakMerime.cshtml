@@ -1,4 +1,5 @@
-﻿@using HlidacStatu.Lib.Data.External.Zabbix;
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
 
 @{
     ViewBag.Title = "Hlídač státních webů";
@@ -21,9 +22,9 @@
         <h2>Jak měříme dostupnost státních webů</h2>
         <p>
             Měříme každou minutu, zda důležité weby státu vůbec běží, a pokud ano, tak jak rychle odpovídají. A tomu odpovídají i zobrazené barvy.
-            Pokud služba odpovídá rychle, dáváme <b style="color:@(ZabAvailability.GetStatusChartColor(Statuses.OK))">zelenou - v pořádku</b>.
-            Pokud odpovídá déle, dáváme <b style="color:@(ZabAvailability.GetStatusChartColor(Statuses.Pomalé))">oranžovou - pomalá odpověď.</b>.
-            Pokud neodpoví nebo odpoví za dlouhou dobu, použijeme <b style="color:@(ZabAvailability.GetStatusChartColor(Statuses.Nedostupné))">červenou za nedostupnost</b>.
+            Pokud služba odpovídá rychle, dáváme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.OK))">zelenou - v pořádku</b>.
+            Pokud odpovídá déle, dáváme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Pomalé))">oranžovou - pomalá odpověď.</b>.
+            Pokud neodpoví nebo odpoví za dlouhou dobu, použijeme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Nedostupné))">červenou za nedostupnost</b>.
         </p>
         <p>
             Rychlost odpovědi je snadno a přesně měřitelná a současně je z hlediska uživatele velmi důležitá.
@@ -38,9 +39,12 @@
         <div class="alert alert-info" role="alert">
             My hodnotíme dostupnost služeb státu mírně:
             <ul>
-                <li>Pokud služba <b style="color:@(ZabAvailability.GetStatusChartColor(Statuses.OK))">odpoví do 1s</b>, považujeme to za dostatečně dobrý výsledek a dáváme hodnocení <b style="color:@(ZabAvailability.GetStatusChartColor(Statuses.OK))">v pořádku</b>.</li>
-                <li>Pokud služba <b style="color:@(ZabAvailability.GetStatusChartColor(Statuses.Pomalé))">odpoví do 2s</b>, považujeme službu <b style="color:@(ZabAvailability.GetStatusChartColor(Statuses.Pomalé))">za pomalou</b>.</li>
-                <li>Pokud služba <b style="color:@(ZabAvailability.GetStatusChartColor(Statuses.Nedostupné))">odpoví později než za 2s</b> či neodpoví vůbec, považujeme službu <b style="color:@(ZabAvailability.GetStatusChartColor(Statuses.Nedostupné))">za nedostupnou</b>.</li>
+                <li>Pokud služba <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.OK))">odpoví do 1s</b>, považujeme to za dostatečně dobrý výsledek 
+                    a dáváme hodnocení <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.OK))">v pořádku</b>.</li>
+                <li>Pokud služba <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Pomalé))">odpoví do 2s</b>, 
+                    považujeme službu <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Pomalé))">za pomalou</b>.</li>
+                <li>Pokud služba <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Nedostupné))">odpoví později než za 2s</b> či neodpoví vůbec, 
+                    považujeme službu <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Nedostupné))">za nedostupnou</b>.</li>
             </ul>
 
         </div>
@@ -75,22 +79,22 @@
             Proto je nezbytností nejenom na webech, kde se zadávají citlivé údaje, ale i na webech, které publikují jakékoliv veřejné informace, které mají být důvěryhodné.
         </p>
         <p>
-            Pro hodnocení používáme světovou autoritu v této oblasti, <a href="https://www.ssllabs.com/ssltest/" onclick="return trackOutLink(this,'statniweby/jakmerime');">SSL Server Test</a> od Qualys SSL Labs.
+            Pro hodnocení používáme metodiku světové autority v této oblasti, <a href="https://github.com/ssllabs/research/wiki/SSL-Server-Rating-Guide" onclick="return trackOutLink(this,'statniweby/jakmerime');"> Qualys SSL Labs</a>, pro samotné měření používáme tento skript..
             <br />
             Systém hodnocení HTTPS je jednoduchý:
             <dl class="dl-horizontal">
-                <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.A)">Zelená známka A+, A nebo A-</dt>
-                <dd>@ZabTools.StatusDescription(SSLLabsGrades.A, true)</dd>
-                <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.B)">Žlutá známka B,C,D,E</dt>
-                <dd>@ZabTools.StatusDescription(SSLLabsGrades.B, true).</dd>
-                <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.F)">Červené F</dt>
-                <dd>@ZabTools.StatusDescription(SSLLabsGrades.F, true).</dd>
-                <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.M)">Červené M</dt>
-                <dd>@ZabTools.StatusDescription(SSLLabsGrades.M, true).</dd>
-                <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.T)">Červené T</dt>
-                <dd>@ZabTools.StatusDescription(SSLLabsGrades.T, true).</dd>
-                <dt style="color:@ZabTools.StatusOrigColor(SSLLabsGrades.X)">Červené X</dt>
-                <dd>@ZabTools.StatusDescription(SSLLabsGrades.X, true).</dd>
+                <dt style="color:@UptimeSSL.StatusOrigColor(UptimeSSL.SSLGrades.A)">Zelená známka A+, A nebo A-</dt>
+                <dd>@UptimeSSL.StatusDescription(UptimeSSL.SSLGrades.A, true)</dd>
+                <dt style="color:@UptimeSSL.StatusOrigColor(UptimeSSL.SSLGrades.B)">Žlutá známka B,C,D,E</dt>
+                <dd>@UptimeSSL.StatusDescription(UptimeSSL.SSLGrades.B, true).</dd>
+                <dt style="color:@UptimeSSL.StatusOrigColor(UptimeSSL.SSLGrades.F)">Červené F</dt>
+                <dd>@UptimeSSL.StatusDescription(UptimeSSL.SSLGrades.F, true).</dd>
+                <dt style="color:@UptimeSSL.StatusOrigColor(UptimeSSL.SSLGrades.M)">Červené M</dt>
+                <dd>@UptimeSSL.StatusDescription(UptimeSSL.SSLGrades.M, true).</dd>
+                <dt style="color:@UptimeSSL.StatusOrigColor(UptimeSSL.SSLGrades.T)">Červené T</dt>
+                <dd>@UptimeSSL.StatusDescription(UptimeSSL.SSLGrades.T, true).</dd>
+                <dt style="color:@UptimeSSL.StatusOrigColor(UptimeSSL.SSLGrades.X)">Červené X</dt>
+                <dd>@UptimeSSL.StatusDescription(UptimeSSL.SSLGrades.X, true).</dd>
             </dl>
 
         </p>

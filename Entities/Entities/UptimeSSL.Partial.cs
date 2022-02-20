@@ -43,6 +43,8 @@ namespace HlidacStatu.Entities
                     return SSLGrades.X;
             }
         }
+
+
         public enum Statuses
         {
             OK = 0,

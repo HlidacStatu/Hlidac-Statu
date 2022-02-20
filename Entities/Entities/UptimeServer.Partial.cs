@@ -17,18 +17,20 @@ namespace HlidacStatu.Entities
         }
 
 
-        public string Hash()
+        public string Hash
         {
-            return Devmasters.Crypto.Hash.ComputeHashToHex(Id + "xxttxx" + Id);
-
+            get
+            {
+                return Devmasters.Crypto.Hash.ComputeHashToHex(Id + "xxttxx" + Id);
+            }
         }
         public bool ValidHash(string h)
         {
-            return h == Hash();
+            return h == Hash;
         }
 
         Uri _uri = null;
-        public string Host()
+        public string HostDomain()
         {
             InitUri();
             return _uri?.Host;
@@ -43,7 +45,7 @@ namespace HlidacStatu.Entities
         }
 
         public string opendataUrl { get { return "https://www.hlidacstatu.cz/api/v2/Weby/" + this.Id; } }
-        public string pageUrl { get { return "https://www.hlidacstatu.cz/StatniWeby/Info/" + this.Id + "?h=" + this.Hash(); } }
+        public string pageUrl { get { return "https://www.hlidacstatu.cz/StatniWeby/Info/" + this.Id + "?h=" + this.Hash; } }
 
 
     }

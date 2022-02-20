@@ -1,13 +1,14 @@
 ﻿using Devmasters.Enums;
 
 using HlidacStatu.Datasets;
-using HlidacStatu.Lib.Data.External.Zabbix;
 
 using Microsoft.AspNetCore.Mvc;
 
 using System;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
+using HlidacStatu.Entities;
+using HlidacStatu.Repositories;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -20,7 +21,7 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult WebList()
         {
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                HlidacStatu.Lib.Data.External.Zabbix.ZabTools.Weby()
+                HlidacStatu.Repositories.UptimeServerRepo.AllServers()
                 ), "text/json");
         }
 
@@ -37,7 +38,7 @@ namespace HlidacStatu.Web.Controllers
 
         private ActionResult _DataHost(int id, string h)
         {
-            ZabHost host = ZabTools.Weby().Where(w => w.hostid == id.ToString() & w.itemIdResponseTime != null).FirstOrDefault();
+            UptimeServer host = UptimeServerRepo.AllServers().Where(w => w.Id == id.ToString()).FirstOrDefault();
             if (host == null)
                 return Json(ApiResponseStatus.StatniWebNotFound);
 
@@ -45,14 +46,13 @@ namespace HlidacStatu.Web.Controllers
             {
                 try
                 {
-                    var data = ZabTools.GetHostAvailabilityLong(host);
-                    var webssl = ZabTools.SslStatusForHostId(host.hostid);
+                    UptimeServer.HostAvailability? data = UptimeServerRepo.AvailabilityById(host.Id,24);
+                    UptimeSSL? webssl = UptimeSSLRepo.LoadLatest(host.Id);
                     var ssldata = new
                     {
-                        grade = webssl?.Status().ToNiceDisplayName(),
-                        time = webssl?.Time,
-                        copyright = "(c) © Qualys, Inc. https://www.ssllabs.com/",
-                        fullreport = "https://www.ssllabs.com/ssltest/analyze.html?d=" + webssl?.Host?.UriHost()
+                        grade = webssl==null ? null : webssl.SSLGrade().ToNiceDisplayName(),
+                        time = webssl?.Created,
+                        expiresAt = webssl?.CertExpiration()
                     };
                     if (webssl == null)
                     {

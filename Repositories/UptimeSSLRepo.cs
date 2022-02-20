@@ -1,5 +1,4 @@
 using HlidacStatu.Entities;
-using HlidacStatu.Lib.Data.External.Zabbix;
 
 using Microsoft.EntityFrameworkCore;
 
