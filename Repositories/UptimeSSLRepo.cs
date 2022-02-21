@@ -12,7 +12,7 @@ namespace HlidacStatu.Repositories
     {
 
         private static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeSSL[]> uptimeSSlCache =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeSSL[]>(TimeSpan.FromHours(12),
+            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeSSL[]>(TimeSpan.FromHours(2),
                 (obj) =>
                 {
                     UptimeSSL[] res = new UptimeSSL[] { };

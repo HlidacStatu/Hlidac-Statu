@@ -43,7 +43,7 @@ namespace HlidacStatu.Web.Controllers
             var webs = UptimeServerRepo.AllServers()
                 .ToArray()
                 .Select(m=>m.HostDomain())
-                .Where(m=>Uri.IsWellFormedUriString(m, UriKind.Absolute))
+                .Where(m=>string.IsNullOrEmpty(m)==false)
                 .Distinct()
                 ;
             return string.Join("\n", webs);

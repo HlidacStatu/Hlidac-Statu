@@ -185,10 +185,10 @@ namespace HlidacStatu.Repositories.ES
         {
             return GetESClient(defaultIndexName_Insolvence, timeOut, connectionLimit, IndexType.Insolvence);
         }
-        public static ElasticClient GetESClient_Uptime(int timeOut = 60000, int connectionLimit = 80)
-        {
-            return GetESClient(defaultIndexName_Uptime, timeOut, connectionLimit, IndexType.UptimeItem);
-        }
+        //public static ElasticClient GetESClient_Uptime(int timeOut = 60000, int connectionLimit = 80)
+        //{
+        //    return GetESClient(defaultIndexName_Uptime, timeOut, connectionLimit, IndexType.UptimeItem);
+        //}
         public static ElasticClient GetESClient_UptimeSSL(int timeOut = 60000, int connectionLimit = 80)
         {
             return GetESClient(defaultIndexName_UptimeSSL, timeOut, connectionLimit, IndexType.UptimeSSL);

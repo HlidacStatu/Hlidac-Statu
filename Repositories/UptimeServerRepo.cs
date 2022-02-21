@@ -58,7 +58,6 @@ namespace HlidacStatu.Repositories
 
                     db.SaveChanges();
 
-                    //Repositories.ES.Manager.GetESClient_Uptime().Index<UptimeItem>(lastCheck, m => m.Id(lastCheck.Id));
                     using (var writeApi = influxDbClient.GetWriteApi())
                     {
                         var point = PointData.Measurement("uptime")
