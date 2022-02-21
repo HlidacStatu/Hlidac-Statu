@@ -86,9 +86,9 @@
     if (Model.Query.Contains("\"") == false && Model.Query.Contains(" ") && Model.Query.Length>5)
     {
         Osoba jmeno = Validators.JmenoInText(Model.Query, false);
-        string sjmeno = $"\"{jmeno.FullName()}\"";
         if (jmeno != null)
         {
+            string sjmeno = $"\"{jmeno.FullName()}\"";
             <div class="row" style="margin-top:10px;margin-bottom:10px;">
                 <div class="col-xs-12">
                     <div class="card bg-warning">
