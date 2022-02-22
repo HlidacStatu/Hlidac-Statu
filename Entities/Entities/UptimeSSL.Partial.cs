@@ -7,6 +7,33 @@ namespace HlidacStatu.Entities
 {
     public partial class UptimeSSL
     {
+
+        //scanProblem
+        string _scanProblem = null;
+        public string ScanProblem()
+        {
+            if (_scanProblem == null)
+            {
+                //2022-03-18 03:38
+                _scanProblem = this.Steps.FirstOrDefault(m => m.id == "scanProblem")?.finding ?? "";
+            }
+
+            return _scanProblem;
+        }
+
+        DateTime? _certExpires = DateTime.MinValue;
+        public DateTime? CertExpiration()
+        {
+            if (_certExpires == DateTime.MinValue)
+            {
+                //2022-03-18 03:38
+                _certExpires = Devmasters.DT.Util.ToDateTime(this.Steps.FirstOrDefault(m => m.id == "cert_notAfter")?.finding, "yyyy-MM-dd HH:ss");
+            }
+
+            return _certExpires;
+        }
+
+
         public SSLGrades SSLGrade()
         {
             return ToSSLGrades(this.OverallGrade);
@@ -39,6 +66,9 @@ namespace HlidacStatu.Entities
                     return SSLGrades.T;
                 case "M":
                     return SSLGrades.M;
+                case "U":
+                case "UNKNOWN":
+                    return SSLGrades.Unknown;
                 default:
                     return SSLGrades.X;
             }
@@ -73,7 +103,9 @@ namespace HlidacStatu.Entities
             [NiceDisplayName("M")]
             M = 50,
             [NiceDisplayName("X")]
-            X = 100
+            X = 100,
+            [NiceDisplayName("?")]
+            Unknown = 999
 
         }
 
@@ -101,10 +133,13 @@ namespace HlidacStatu.Entities
                     case SSLGrades.X:
                         color = "danger";
                         break;
+                    case SSLGrades.Unknown:
+                        color = "muted";
+                        break;
                 }
             }
-            else
-                color = "muted";
+            else 
+            color = "muted";
 
             return color;
         }
@@ -148,6 +183,9 @@ namespace HlidacStatu.Entities
                     case SSLGrades.X:
                         txt = "Služba HTTPS nepodporuje vůbec.";
                         break;
+                    case SSLGrades.Unknown:
+                        txt = "Test SSL neproběhl úspěšně.";
+                        break;
                 }
             }
             else
@@ -180,6 +218,9 @@ namespace HlidacStatu.Entities
                     case SSLGrades.X:
                         color = "#ef251e";
                         break;
+                    case SSLGrades.Unknown:
+                        color = "#777777";
+                        break;
                 }
             }
             else
@@ -204,7 +245,7 @@ namespace HlidacStatu.Entities
 
             UptimeSSL uptimeSSL = new UptimeSSL();
             uptimeSSL.Steps = steps;
-            uptimeSSL.OverallGrade = steps.FirstOrDefault(m => m.id == "overall_grade")?.finding ?? "X";
+            uptimeSSL.OverallGrade = steps.FirstOrDefault(m => m.id == "overall_grade")?.finding ?? "U";
             uptimeSSL.OverallScore = Devmasters.ParseText.ToDecimal(steps.FirstOrDefault(m => m.id == "final_score")?.finding) ?? 0m;
             uptimeSSL.Created = DateTime.Now;
             if (filename != null)

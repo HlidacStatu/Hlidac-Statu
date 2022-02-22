@@ -91,8 +91,6 @@ else
     </div>
 
 
-    @if (false)
-    {
     <div class="bs-callout bs-callout-primary">
         <h4>Rating HTTPS webů</h4>
         <p>
@@ -112,7 +110,7 @@ else
         {
             var server = servers.FirstOrDefault(m => m.HostDomain().ToLower() == data[i].Domain.ToLower());
             if (server == null)
-                break;
+                continue;
 
             gridCount++;
             var host = data[i];
@@ -143,6 +141,13 @@ else
                                 </div>
                             </td>
                         </tr>
+                        @if (host.SSLGrade() == UptimeSSL.SSLGrades.Unknown)
+                        {<tr>
+                            <td colspan="2" class="text-muted small">
+                                @host.ScanProblem()
+                            </td>
+                        </tr>                            
+                        }
                     </table>
 
                 </a>
@@ -183,7 +188,7 @@ else
     </div>
 
     <hr/>
-    }
+    
     @WebyChartUtil.TableNextGroups("https")
 }
 

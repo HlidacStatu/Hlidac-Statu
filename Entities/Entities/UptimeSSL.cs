@@ -65,17 +65,6 @@ namespace HlidacStatu.Entities
             public string cve { get; set; }
         }
 
-        DateTime? _certExpires = DateTime.MinValue;
-        public DateTime? CertExpiration()
-        {
-            if (_certExpires == DateTime.MinValue)
-            {
-                //2022-03-18 03:38
-                _certExpires = Devmasters.DT.Util.ToDateTime(this.Steps.FirstOrDefault(m => m.id == "cert_notAfter")?.finding,"yyyy-MM-dd HH:ss");
-            }
-
-            return _certExpires;
-        }
 
     }
 }
