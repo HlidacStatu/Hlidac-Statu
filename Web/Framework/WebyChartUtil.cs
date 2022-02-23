@@ -55,7 +55,7 @@ namespace HlidacStatu.Web.Framework
         public static IHtmlContent TableNextGroups(string active)
         {
             var s = $@"
-    <h2>Další služby</h2>
+    <h2 style='margin-top:40px'>Další služby</h2>
 
     <div class='row'>
         <div class='col-xs-12 col-sm-6 '>

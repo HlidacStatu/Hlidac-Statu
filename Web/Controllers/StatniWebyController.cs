@@ -15,6 +15,8 @@ namespace HlidacStatu.Web.Controllers
     public class StatniWebyController : Controller
     {
 
+        [HlidacCache(1 * 60, "id;h;embed", false)]
+
         public ActionResult Index()
         {
             return View();
@@ -154,7 +156,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        [HlidacCache(10 * 60, "id;h;embed", false)]
+        [HlidacCache(2 * 60, "id;h;embed", false)]
         public ActionResult Info(int id, string h)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllServers()
@@ -169,7 +171,7 @@ namespace HlidacStatu.Web.Controllers
                 return RedirectToAction("Index", "StatniWeby");
         }
 
-        [HlidacCache(10 * 60, "id;h;embed", false)]
+        [HlidacCache(2 * 60, "id;h;embed", false)]
         public ActionResult InfoHttps(int id, string h)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllServers()
