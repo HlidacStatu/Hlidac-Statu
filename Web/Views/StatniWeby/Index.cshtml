@@ -102,15 +102,13 @@
                                     if (interval.TotalDays < 4)
                                     {
                                         icon = "<i class='fa-solid fa-circle-exclamation text-danger'></i>";
-                                        expiresIn = "Skončí " + expiresIn.ToLower();
                                     }
                                     else
                                     {
                                         icon = "<i class='fa-solid fa-circle-exclamation  text-warning'></i>";
-                                        expiresIn = "Skončí " + expiresIn.ToLower();
                                     }
 
-                                    <li class="list-inline-item">@Html.Raw(icon) <a href="@server.pageUrl">@server.Name</a>.</li>
+                                    <li class="list-inline-item">@Html.Raw(icon) <a href="@server.pageUrl">@server.Name</a> (@expiresIn).</li>
                                 }
                             </ul>
                         </p>
