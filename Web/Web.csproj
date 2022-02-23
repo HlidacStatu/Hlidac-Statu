@@ -80,6 +80,7 @@
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="5.0.11" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
         <PackageReference Include="PDFtoImage" Version="1.2.0" />
+        <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
         <PackageReference Include="protobuf-net.Grpc.ClientFactory" Version="1.0.152" />
         <PackageReference Include="Schema.NET" Version="10.1.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />

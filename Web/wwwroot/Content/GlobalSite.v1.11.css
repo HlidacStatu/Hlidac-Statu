@@ -1754,6 +1754,19 @@ pre {
     border-radius: 4px;
 }
 
+pre.noborder {
+    display: block;
+    padding: 0;
+    margin: 0 ;
+    line-height: 1.1;
+    color: #333;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: none;
+    border: none;
+    border-radius: unset;
+}
+
 pre.formatted {
     white-space: pre-wrap !important;
     background: none;

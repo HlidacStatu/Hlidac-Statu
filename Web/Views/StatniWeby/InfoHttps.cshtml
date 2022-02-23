@@ -1,0 +1,189 @@
+﻿@model UptimeServer
+@using HlidacStatu.XLib
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@using Org.BouncyCastle.X509;
+
+@{
+    ViewBag.Title = "Hlídač " + Model.Name;
+    ViewBag.SubTitle = "Detailní analýza HTTPs pro " + Model.Name;
+
+    UptimeSSL webssl = null;
+    try
+    {
+        webssl = UptimeSSLRepo.LoadLatest(Model.HostDomain());
+    }
+    catch (Exception)
+    {
+    }
+
+
+
+}
+@section scripts
+{
+<script src="/scripts/highcharts-6/highcharts.js"></script>
+<script src="/scripts/highcharts-6/modules/heatmap.js"></script>
+<script src="/scripts/highcharts-6/modules/data.js"></script>
+<script src="/scripts/highcharts-6/modules/boost-canvas.js"></script>
+<script src="/scripts/highcharts-6/modules/boost.js"></script>
+    @WebyChartUtil.OnPageSharedJavascript()
+
+<style>
+    .avail_OK {
+        color: @(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.OK));
+    }
+
+    .avail_Pomale {
+        color: @(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Pomalé));
+    }
+
+    .avail_Nedostupne {
+        color: @(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Nedostupné));
+    }
+</style>
+
+}
+
+
+
+@if (webssl == null)
+{
+    <div class="card bg-danger">
+        <div class="card-header">
+            <h3 class="card-title">Chyba!</h3>
+        </div>
+        <div class="card-body bigger">
+            Detailní analýza HTTPs není v tuto chvíli dostupná. Omlouváme se. <a href="/statniweby/info/@(Model.pageUrlIdParams)">Pokračujte zde</a>.
+        </div>
+    </div>
+
+    return;
+}
+@section breadcrumb
+{
+<ol class="breadcrumb">
+    <li><a href="/">Hlídač Státu</a></li>
+    <li><a href="@Url.Action("Index", "StatniWeby")">Hlídač Webů</a></li>
+    <li class="active">@ViewBag.SubTitle</li>
+</ol>
+}
+<partial name="~/Views/StatniWeby/_Info.cshtml" model="@ViewData" />
+
+<h2>
+    @(Model.Name)
+    <br /><small><a href="@Model.PublicUrl" target="_blank" onclick="return trackOutLink(this,'statniweby/info');">@Model.PublicUrl</a></small>
+</h2>
+<p class="lead">
+    @UptimeServerRepo.PatriPodUradJmeno(Model) @Html.Raw(Model.Description)
+</p>
+<hr />
+
+<h3>Zabezpečení komunikace</h3>
+<div class="row">
+    <div class="col-xs-3 col-sm-2 text-center">
+        @Html.Raw(UptimeSSL.StatusHtml(webssl.SSLGrade(), 80))
+        <div class="text-muted small text-center">
+            @webssl.Created.ToString("dd.MM.yyyy")
+        </div>
+        <div class="text-muted small text-center">
+            <a href="https://www.ssllabs.com" onclick="return trackOutLink(this,'statniweby/info');">&copy; Qualys, Inc</a>
+        </div>
+    </div>
+    <div class="col-xs-9 col-sm-10">
+        <div class="bs-callout bs-callout-@(UptimeSSL.StatusStyleColor(webssl.SSLGrade()))" style="margin:0;">
+            <h4>Výsledek analýzy HTTPS na @Model.HostDomain()</h4>
+            @if (webssl.SSLGrade() == UptimeSSL.SSLGrades.X)
+            {
+                <p>
+                    Tato služba zabezpečenou komunikaci nepodporuje.
+                </p>
+            }
+            else
+            {
+                <p>
+                    @UptimeSSL.StatusDescription(webssl.SSLGrade(), true)
+                </p>
+            }
+        </div>
+    </div>
+</div>
+<hr />
+
+
+<h3>Detailní analýza</h3>
+<p>Detailní report z HTTPs analýzy pomocí nástroje <a href="https://testssl.sh">testssl.sh</a></p>
+
+<table class="table table-condensed table-striped">
+
+    @foreach (var step in webssl.Steps)
+    {
+        <tr>
+            @if (step.id == "service")
+            {
+                <td>server</td>
+                <td><b>@step.ip</b></td>
+            }
+            else
+            {
+                <td>
+                    @step.id
+                    @if (!string.IsNullOrEmpty(step.cve) || !string.IsNullOrEmpty(step.cwe))
+                    {
+                        <div class="text-muted small">
+                            zranitelnosti:
+
+                            @if (!string.IsNullOrEmpty(step.cve))
+                            {
+                                var cveid = step.cve.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                                @foreach (var item in cveid)
+                                {
+                                    <a target="_blank" class="text-muted small" href="https://www.cve.org/CVERecord?id=@(System.Net.WebUtility.UrlDecode(item))">@(item)<i class="fa-solid fa-up-right-from-square"></i></a>
+                                }
+                            }
+                            @if (!string.IsNullOrEmpty(step.cwe))
+                            {
+                                var cweid = Devmasters.RegexUtil.GetRegexGroupValues(step.cwe, @"cwe-(?<id>\d{1,5})", "id");
+                                <a target="_blank" class="text-muted small" href="https://cwe.mitre.org/data/definitions/@(cweid).html">@(step.cwe)<i class="fa-solid fa-up-right-from-square"></i></a>
+                            }
+
+
+                        </div>
+                    }
+
+
+                </td>
+                <td class="col-sm-9 @step.htmlTextStyleColor">
+                    @step.severity
+
+                    @if (step.finding.Contains("BEGIN CERTIFICATE"))
+                    {
+                        try
+                        {
+                            var rawData = step.finding;
+                            var certificateBase64 = System.Text.RegularExpressions.Regex.Replace(rawData, @"\s*(-)*(BEGIN|END) \s* CERTIFICATE(-)*\s*", "", HlidacStatu.Util.Consts.DefaultRegexQueryOption);
+                            var certData = Convert.FromBase64String(certificateBase64);
+                            var parser = new X509CertificateParser();
+                            var cert = parser.ReadCertificate(certData);
+                               <pre class="formatted noborder @step.htmlTextStyleColor">@(cert.ToString())</pre>
+                        }
+                        catch
+                        {
+                            <pre class="formatted noborder @step.htmlTextStyleColor">@(step.finding)</pre>
+
+                        }
+
+                    }
+                    else
+                    {
+                        <pre class="formatted noborder @step.htmlTextStyleColor">@(step.finding)</pre>
+                    }
+                </td>
+
+            }
+        </tr>
+    }
+</table>
+@section footerscripts{
+}
+

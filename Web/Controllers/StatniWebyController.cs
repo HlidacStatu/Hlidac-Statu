@@ -169,6 +169,20 @@ namespace HlidacStatu.Web.Controllers
                 return RedirectToAction("Index", "StatniWeby");
         }
 
+        [HlidacCache(10 * 60, "id;h;embed", false)]
+        public ActionResult InfoHttps(int id, string h)
+        {
+            UptimeServer host = Repositories.UptimeServerRepo.AllServers()
+                .FirstOrDefault(w => w.Id == id.ToString())
+                ;
+            if (host == null)
+                return RedirectToAction("Index", "StatniWeby");
+
+            if (host.ValidHash(h))
+                return View(host);
+            else
+                return RedirectToAction("Index", "StatniWeby");
+        }
         //[GZipOrDeflate()]
         public ActionResult Data(int? id, string h)
         {

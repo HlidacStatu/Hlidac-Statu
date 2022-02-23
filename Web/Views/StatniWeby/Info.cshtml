@@ -87,28 +87,31 @@ else
         <div class="row">
             <div class="col-xs-3 col-sm-2 text-center">
                 @Html.Raw(UptimeSSL.StatusHtml(webssl.SSLGrade(), 80))
-                <div class="text-muted small text-center">
-                    @webssl.Created.ToString("dd.MM.yyyy")
-                </div>
-                <div class="text-muted small text-center">
-                    <a href="https://www.ssllabs.com" onclick="return trackOutLink(this,'statniweby/info');">&copy; Qualys, Inc</a>
-                </div>
             </div>
             <div class="col-xs-9 col-sm-10">
                 <div class="bs-callout bs-callout-@(UptimeSSL.StatusStyleColor(webssl.SSLGrade()))" style="margin:0;">
-                    <h4>Výsledek analýzy HTTPS na @web.Host.HostDomain()</h4>
+                    <h4>Výsledek analýzy HTTPS na @web.Host.HostDomain()<small class="text-muted">ze dne @webssl.Created.ToString("dd.MM.yyyy")</small></h4>
+                    @if (webssl.SSLGrade() == UptimeSSL.SSLGrades.Unknown)
+                    {
+                        <p>
+                            Kontrola pro tento server neproběhla úspěšně.
+                        </p>
+                    }
                     @if (webssl.SSLGrade() == UptimeSSL.SSLGrades.X)
                     {
                         <p>
                             Tato služba zabezpečenou komunikaci nepodporuje.
-                        </p>
+                        </p>                        
                     }
-                    else 
+                    else
                     {
                         <p>
                             @UptimeSSL.StatusDescription(webssl.SSLGrade(), true)
                         </p>
                     }
+                            <div class="text-muted text-center">
+                    <a href="/statniweby/infoHttps/@(Model.pageUrlIdParams)" onclick="return trackOutLink(this,'statniweby/infoHttps');">detailní analýza HTTPs</a>
+                </div>
                 </div>
             </div>
         </div>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace HlidacStatu.Entities
 {
@@ -63,6 +62,30 @@ namespace HlidacStatu.Entities
             public string cwe { get; set; }
             [Nest.Keyword]
             public string cve { get; set; }
+
+            [Nest.Object(Enabled = false)]
+            public string htmlTextStyleColor
+            {
+                get
+                {
+                    string color = "text-body";
+                    if (severity == "CRITICAL")
+                        color = "text-danger";
+                    else if (severity =="HIGH")
+                        color = "text-danger";
+                    else if (severity=="MEDIUM")
+                        color = "text-primary";
+                    else if (severity == "WARN")
+                        color = "text-warning";
+                    else if (severity == "LOW")
+                        color = "text-muted";
+                    else if (severity == "FATAL")
+                        color = "text-warning bg-dark";
+
+                    return color;
+                }
+
+            }
         }
 
 
