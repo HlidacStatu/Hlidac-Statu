@@ -146,7 +146,7 @@ namespace HlidacStatu.Repositories
             string[] serverIds = null;
             using (Entities.DbEntities db = new HlidacStatu.Entities.DbEntities())
             {
-                var servers = AllServers(db);
+                var servers = AllActiveServers(db);
                 if (Devmasters.TextUtil.IsNumeric(group))
                     serverIds = servers
                         .Where(m => m.Priorita == Convert.ToInt32(group))
@@ -166,14 +166,17 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static UptimeServer[] AllServers(Entities.DbEntities existingConn = null)
+        public static UptimeServer[] AllActiveServers(Entities.DbEntities existingConn = null)
         {
             if (existingConn != null)
                 return existingConn.UptimeServers.AsNoTracking().ToArray();
 
 
             using (Entities.DbEntities db = new HlidacStatu.Entities.DbEntities())
-                return db.UptimeServers.AsNoTracking().ToArray();
+                return db.UptimeServers
+                    .AsNoTracking()
+                    .Where(m=> m.Active == 1)
+                    .ToArray();
 
         }
 
@@ -229,12 +232,12 @@ namespace HlidacStatu.Repositories
 
         private static IEnumerable<UptimeServer.HostAvailability> _availability(int hoursBack)
         {
-            string[] serverIds = AllServers().Select(m => m.Id).ToArray();
+            string[] serverIds = AllActiveServers().Select(m => m.Id).ToArray();
             return _availability(serverIds, hoursBack);
         }
         private static IEnumerable<UptimeServer.HostAvailability> _availability(string[] serverIds, int hoursBack)
         {
-            UptimeServer[] allServers = AllServers();
+            UptimeServer[] allServers = AllActiveServers();
 
 
             string query = "";

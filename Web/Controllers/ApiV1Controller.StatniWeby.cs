@@ -21,7 +21,7 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult WebList()
         {
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                HlidacStatu.Repositories.UptimeServerRepo.AllServers()
+                HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers()
                 ), "text/json");
         }
 
@@ -38,7 +38,7 @@ namespace HlidacStatu.Web.Controllers
 
         private ActionResult _DataHost(int id, string h)
         {
-            UptimeServer host = UptimeServerRepo.AllServers().Where(w => w.Id == id.ToString()).FirstOrDefault();
+            UptimeServer host = UptimeServerRepo.AllActiveServers().Where(w => w.Id == id.ToString()).FirstOrDefault();
             if (host == null)
                 return Json(ApiResponseStatus.StatniWebNotFound);
 

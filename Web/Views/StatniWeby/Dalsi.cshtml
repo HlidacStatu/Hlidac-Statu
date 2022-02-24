@@ -1,11 +1,11 @@
-﻿@model IEnumerable<string>
+﻿@model (IEnumerable<string> list, string id)
 @using System.Linq;
 @using HlidacStatu.Entities
 
 @{
     ViewBag.Title = "Hlídač státních webů";
 
-    int numOfWebs = Model.Count();
+    int numOfWebs = Model.list.Count();
 
 }
 @section scripts
@@ -38,7 +38,7 @@
         <li class="active">@ViewBag.SubTitle</li>
     </ol>
 }
-<partial name="~/Views/StatniWeby/_Info.cshtml" model="@ViewData"/>
+<partial name="~/Views/StatniWeby/_Info.cshtml" Model.list="@ViewData"/>
 
 <h2>Dostupnost důležitých služeb <small>za posledních 24 hodin</small></h2>
 <div class="row">
@@ -49,7 +49,7 @@
 
 
 <div class="clearfix"></div>
-@WebyChartUtil.TableNextGroups(Context.Request.Query["id"])
+@WebyChartUtil.TableNextGroups(Model.id)
 
 <div class="bs-callout bs-callout-primary">
     <h4>Hlídání dostupnosti státní webů. Co to vlastně děláme?</h4>

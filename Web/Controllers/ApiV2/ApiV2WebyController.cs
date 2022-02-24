@@ -34,13 +34,13 @@ namespace HlidacStatu.Web.Controllers
         [HttpGet]
         public ActionResult<UptimeServer[]> List()
         {
-            return UptimeServerRepo.AllServers();
+            return UptimeServerRepo.AllActiveServers();
         }
 
         [HttpGet("domeny")]
         public ActionResult<string> Domeny()
         {
-            var webs = UptimeServerRepo.AllServers()
+            var webs = UptimeServerRepo.AllActiveServers()
                 .ToArray()
                 .Select(m=>m.HostDomain())
                 .Where(m=>string.IsNullOrEmpty(m)==false)

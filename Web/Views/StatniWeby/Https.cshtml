@@ -6,7 +6,7 @@
     ViewBag.SubTitle = "Žebříček HTTPS Labs hodnocení";
 
 
-    var servers = HlidacStatu.Repositories.UptimeServerRepo.AllServers();
+    var servers = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers();
     var data = HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()
             .OrderByDescending(m=>m.SSLGrade())
             .ToArray();

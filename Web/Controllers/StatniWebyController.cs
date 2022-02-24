@@ -35,7 +35,7 @@ namespace HlidacStatu.Web.Controllers
                     return RedirectToAction("Index", "StatniWeby");
 
                 ViewBag.SubTitle = "Další státní weby";
-                return View(Repositories.UptimeServerRepo.ServersIn(iid.ToString()));
+                return View((list: Repositories.UptimeServerRepo.ServersIn(iid.ToString()), id: id) );
             }
             else if (id?.ToLower() == "ustredni")
             {
@@ -46,7 +46,7 @@ namespace HlidacStatu.Web.Controllers
                     return RedirectToAction("Index", "StatniWeby");
 
                 ViewBag.SubTitle = "Weby ústředních orgánů státní správy";
-                return View(list);
+                return View((list: list, id: id));
 
             }
             else if (id?.ToLower() == "krajske" && false)
@@ -58,7 +58,7 @@ namespace HlidacStatu.Web.Controllers
                     return RedirectToAction("Index", "StatniWeby");
 
                 ViewBag.SubTitle = "Weby a služby krajských úřadů";
-                return View(list);
+                return View( (list: list, id: id) );
 
             }
             else
@@ -159,7 +159,7 @@ namespace HlidacStatu.Web.Controllers
         [HlidacCache(2 * 60, "id;h;embed", false)]
         public ActionResult Info(int id, string h)
         {
-            UptimeServer host = Repositories.UptimeServerRepo.AllServers()
+            UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
                 .FirstOrDefault(w => w.Id == id.ToString())
                 ;
             if (host == null)
@@ -174,7 +174,7 @@ namespace HlidacStatu.Web.Controllers
         [HlidacCache(2 * 60, "id;h;embed", false)]
         public ActionResult InfoHttps(int id, string h)
         {
-            UptimeServer host = Repositories.UptimeServerRepo.AllServers()
+            UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
                 .FirstOrDefault(w => w.Id == id.ToString())
                 ;
             if (host == null)

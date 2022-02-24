@@ -13,6 +13,10 @@ namespace HlidacStatu.Entities
         [StringLength(65)]
         [Nest.Keyword]
         public string Id { get; set; }
+
+        [Nest.Number]
+        public int Active { get; set; }
+
         [Nest.Date]
         [Required]
         public DateTime Created { get; set; }

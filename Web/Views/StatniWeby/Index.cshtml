@@ -51,7 +51,7 @@
 }
 @if (data != null)
 {
-    var servers = HlidacStatu.Repositories.UptimeServerRepo.AllServers();
+    var servers = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers();
     var expired = data.Where(m => m.CertExpiration() != null).Where(m => (m.CertExpiration().Value - DateTime.Now).TotalDays < 0);
     var closeToExpiration = data
         .Where(m => m.CertExpiration() != null)

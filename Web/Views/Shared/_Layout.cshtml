@@ -270,7 +270,7 @@
                     <a href="/Dotace">Dotace</a>
                     <a href="/Insolvence">Insolvence</a>
                     <a href="/sponzori">Sponzoři</a>
-                    <a href="/StatniWeby">Weby státu<sup style="top:0;text-decoration:none;color:#777;">@(HlidacStatu.Repositories.UptimeServerRepo.AllServers()?.Count().ToString() ?? "")</sup></a>
+                    <a href="/StatniWeby">Weby státu<sup style="top:0;text-decoration:none;color:#777;">@(HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers()?.Count().ToString() ?? "")</sup></a>
                 </li>
 
                 <li class="d-none d-md-flex">

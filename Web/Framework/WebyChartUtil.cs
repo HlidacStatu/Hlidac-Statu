@@ -61,30 +61,30 @@ namespace HlidacStatu.Web.Framework
         <div class='col-xs-12 col-sm-6 '>
             <div class='list-group'>
 
-                <a href='/StatniWeby/Https' class='list-group-item {WebUtil.IfExists(active == "https", "disabled")}'>
+                <a href='/StatniWeby/Https' class='list-group-item {WebUtil.IfExists(active == "https", "active disabled")}'>
                     <span class='badge float-end rounded-pill bg-secondary'>{HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()?.Count() ?? 0}</span>
                     Žebříček státních serverů podle HTTPS Labs hodnocení
                 </a>
 
 
-                <a href='/StatniWeby/Index' class='list-group-item {WebUtil.IfExists(active == "index", "disabled")}'>
+                <a href='/StatniWeby/Index' class='list-group-item {WebUtil.IfExists(active == "index", "active disabled")}'>
                     <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("0")?.Count() ?? 0}</span>
                     Nejdůležitější služby státní správy
                 </a>
 
-                <a href='/StatniWeby/Dalsi/ustredni' class='list-group-item {WebUtil.IfExists(active == "ustredni", "disabled")}'>
+                <a href='/StatniWeby/Dalsi/ustredni' class='list-group-item {WebUtil.IfExists(active == "ustredni", "active disabled")}'>
                     <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("ustredni")?.Count() ?? 0}</span>
                     Služby ústředních orgánů státní správy
                 </a>
-                <a href='/StatniWeby/Dalsi/3' class='list-group-item {WebUtil.IfExists(active == "3", "disabled")}'>
+                <a href='/StatniWeby/Dalsi/3' class='list-group-item {WebUtil.IfExists(active == "3", "active disabled")}'>
                     <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("3")?.Count() ?? 0}</span>
                     Open source/open data weby
                 </a>
-                <a href='/StatniWeby/Dalsi/1' class='list-group-item {WebUtil.IfExists(active == "1", "disabled")}'>
+                <a href='/StatniWeby/Dalsi/1' class='list-group-item {WebUtil.IfExists(active == "1", "active disabled")}'>
                     <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("1")?.Count() ?? 0}</span>
                     Další důležité služby
                 </a>
-                <a href='/StatniWeby/Dalsi/2' class='list-group-item {WebUtil.IfExists(active == "2", "disabled")}'>
+                <a href='/StatniWeby/Dalsi/2' class='list-group-item {WebUtil.IfExists(active == "2", "active disabled")}'>
                     <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("2")?.Count() ?? 0}</span>
                     Ostatní měřené služby
                 </a>"
@@ -92,7 +92,7 @@ namespace HlidacStatu.Web.Framework
                 //        <span class='badge float-end rounded-pill bg-secondary'>Připravujeme</span>
                 //        Služby krajů ČR
                 //    </a>
-                + @$"<a href='/StatniWeby/opendata' class='list-group-item {WebUtil.IfExists(active == "opendata", "disabled")}'>
+                + @$"<a href='/StatniWeby/opendata' class='list-group-item {WebUtil.IfExists(active == "opendata", "active disabled")}'>
                     <span class='badge float-end rounded-pill bg-secondary'>JSON</span>
                     Naměřené údaje jako open data
                 </a>
