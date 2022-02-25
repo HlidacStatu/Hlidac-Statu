@@ -122,7 +122,7 @@ namespace HlidacStatu.Web.Controllers
             if (id.StartsWith("w"))
             {
                 id = id.Replace("w", "");
-                var host = Repositories.UptimeServerRepo.Load(id);
+                var host = Repositories.UptimeServerRepo.Load(Convert.ToInt32( id));
                 if (host != null)
                 {
                     if (host.ValidHash(hh))
@@ -160,7 +160,7 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult Info(int id, string h)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
-                .FirstOrDefault(w => w.Id == id.ToString())
+                .FirstOrDefault(w => w.Id == id)
                 ;
             if (host == null)
                 return RedirectToAction("Index", "StatniWeby");
@@ -175,7 +175,7 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult InfoHttps(int id, string h)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
-                .FirstOrDefault(w => w.Id == id.ToString())
+                .FirstOrDefault(w => w.Id == id)
                 ;
             if (host == null)
                 return RedirectToAction("Index", "StatniWeby");

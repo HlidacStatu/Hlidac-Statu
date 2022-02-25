@@ -53,19 +53,19 @@ namespace HlidacStatu.Web.Controllers
         //[GZipOrDeflate()]
         [Authorize]
         [HttpGet("{id?}")]
-        public ActionResult<UptimeServer.WebStatusExport> Status([FromRoute] string? id = null)
+        public ActionResult<UptimeServer.WebStatusExport> Status([FromRoute] int? id = null)
         {
-            if (string.IsNullOrEmpty(id))
+            if (id == null)
                 return BadRequest($"Web nenalezen");
 
-            UptimeServer host = UptimeServerRepo.Load(id);
+            UptimeServer host = UptimeServerRepo.Load(id.Value);
             if (host == null)
                 return BadRequest($"Web nenalezen");
 
             try
             {
                 UptimeServer.HostAvailability data = UptimeServerRepo.AvailabilityForWeekById(host.Id);
-                UptimeSSL webssl = UptimeSSLRepo.LoadLatest(host.Id);
+                UptimeSSL webssl = UptimeSSLRepo.LoadLatest(host.HostDomain());
                 var ssldata = new UptimeServer.WebStatusExport.SslData()
                 {
                     Grade = webssl == null ? null : webssl.SSLGrade().ToNiceDisplayName(),

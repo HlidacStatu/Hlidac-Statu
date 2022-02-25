@@ -38,7 +38,7 @@ namespace HlidacStatu.Web.Controllers
 
         private ActionResult _DataHost(int id, string h)
         {
-            UptimeServer host = UptimeServerRepo.AllActiveServers().Where(w => w.Id == id.ToString()).FirstOrDefault();
+            UptimeServer host = UptimeServerRepo.AllActiveServers().Where(w => w.Id == id).FirstOrDefault();
             if (host == null)
                 return Json(ApiResponseStatus.StatniWebNotFound);
 
@@ -47,7 +47,7 @@ namespace HlidacStatu.Web.Controllers
                 try
                 {
                     UptimeServer.HostAvailability? data = UptimeServerRepo.AvailabilityForDayById(host.Id);
-                    UptimeSSL? webssl = UptimeSSLRepo.LoadLatest(host.Id);
+                    UptimeSSL? webssl = UptimeSSLRepo.LoadLatest(host.HostDomain());
                     var ssldata = new
                     {
                         grade = webssl==null ? null : webssl.SSLGrade().ToNiceDisplayName(),

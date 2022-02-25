@@ -12,7 +12,7 @@ namespace HlidacStatu.Entities
         {
             private class IgnoreMissingData
             {
-                public string hostid { get; set; } = null;
+                public int hostid { get; set; } = 0;
                 public DateTime from { get; set; }
                 public DateTime to { get; set; }
                 public string info { get; set; }
@@ -52,7 +52,7 @@ namespace HlidacStatu.Entities
                                     {
                                         from = from.Value,
                                         to = to.Value,
-                                        hostid = hostid,
+                                        hostid = Convert.ToInt32(hostid),
                                         info = descr
                                     }
                                         );
@@ -71,12 +71,12 @@ namespace HlidacStatu.Entities
                 }
             }
 
-            public static bool SkipThisTime(string hostid, DateTime time)
+            public static bool SkipThisTime(int hostid, DateTime time)
             {
                 foreach (var ign in ignoreIt)
                 {
                     if (
-                        (ign.hostid == hostid || string.IsNullOrEmpty(ign.hostid))
+                        (ign.hostid == hostid || ign.hostid==0)
                         && (ign.from < time && time < ign.to)
                         )
 

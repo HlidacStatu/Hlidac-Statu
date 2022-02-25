@@ -11,7 +11,7 @@ namespace HlidacStatu.Entities
         public string Id { get; set; } = Guid.NewGuid().ToString("N");
 
         [Nest.Keyword]
-        public string ServerId { get; set; }
+        public int ServerId { get; set; }
 
         [Nest.Keyword]
         public string Url { get; set; }

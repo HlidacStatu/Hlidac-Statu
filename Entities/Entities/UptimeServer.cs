@@ -10,9 +10,8 @@ namespace HlidacStatu.Entities
         
         [Key]
         [Required]
-        [StringLength(65)]
         [Nest.Keyword]
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         [Nest.Number]
         public int Active { get; set; }
