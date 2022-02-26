@@ -87,12 +87,12 @@ namespace HlidacStatu.Web.Framework
                 <a href='/StatniWeby/Dalsi/2' class='list-group-item {WebUtil.IfExists(active == "2", "active disabled")}'>
                     <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("2")?.Count() ?? 0}</span>
                     Ostatní měřené služby
-                </a>"
-                //<a href='#' class='list-group-item disabled'>
-                //        <span class='badge float-end rounded-pill bg-secondary'>Připravujeme</span>
-                //        Služby krajů ČR
-                //    </a>
-                + @$"<a href='/StatniWeby/opendata' class='list-group-item {WebUtil.IfExists(active == "opendata", "active disabled")}'>
+                </a>
+                <a href='/StatniWeby/Dalsi/samosprava' class='list-group-item  {WebUtil.IfExists(active == "2", "active disabled")}'>
+                    <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("samosprava")?.Count() ?? 0}</span>
+                        Weby krajů a velkých měst
+                    </a>
+                <a href='/StatniWeby/opendata' class='list-group-item {WebUtil.IfExists(active == "opendata", "active disabled")}'>
                     <span class='badge float-end rounded-pill bg-secondary'>JSON</span>
                     Naměřené údaje jako open data
                 </a>

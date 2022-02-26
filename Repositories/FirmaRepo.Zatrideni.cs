@@ -18,7 +18,8 @@ namespace HlidacStatu.Repositories
         public static class Zatrideni
         {
             private static CouchbaseCacheManager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory> instanceByZatrideni
-                = CouchbaseCacheManager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory>.GetSafeInstance("oboryByObor", GetSubjektyDirect,
+                = CouchbaseCacheManager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory>.GetSafeInstance("oboryByObor", 
+                    GetSubjektyDirect,
                     TimeSpan.FromDays(2),
                     Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                     Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),

@@ -49,7 +49,7 @@ namespace HlidacStatu.Web.Controllers
                 return View((list: list, id: id));
 
             }
-            else if (id?.ToLower() == "krajske" && false)
+            else if (id?.ToLower() == "samosprava")
             {
                 var list = Repositories.UptimeServerRepo.ServersIn(id);
                 if (list == null)
@@ -57,7 +57,7 @@ namespace HlidacStatu.Web.Controllers
                 if (list.Count() == 0)
                     return RedirectToAction("Index", "StatniWeby");
 
-                ViewBag.SubTitle = "Weby a služby krajských úřadů";
+                ViewBag.SubTitle = "Weby a služby velkých měst a krajských úřadů";
                 return View( (list: list, id: id) );
 
             }
@@ -109,12 +109,11 @@ namespace HlidacStatu.Web.Controllers
                         ?.ToList();
                     break;
                 case "ustredni":
-                    data = Repositories.UptimeServerRepo.AvailabilityForDayByGroup("ustredni")
+                case "samosprava":
+                    data = Repositories.UptimeServerRepo.AvailabilityForDayByGroup(id)
                         ?.OrderBy(o => o.Host.Name)
                         ?.Reverse()
                         ?.ToList();
-                    break;
-                case "krajske":
                     break;
                 default:
                     break;

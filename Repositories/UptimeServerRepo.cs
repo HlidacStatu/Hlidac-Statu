@@ -104,6 +104,42 @@ namespace HlidacStatu.Repositories
             }
         }
 
+        public static UptimeServer Load(Uri uri)
+        {
+            var url = uri.ToString();
+
+            using (DbEntities db = new DbEntities())
+            {
+                var found = db.UptimeServers
+                    .AsNoTracking()
+                    .FirstOrDefault(m => m.PublicUrl == url );
+                if (found == null)
+                { 
+                    if (url.EndsWith("/")) 
+                        url = url.Substring(0, url.Length - 1);
+                    else if (string.IsNullOrEmpty(uri.Query))
+                        url = url+"/";
+
+                    found = db.UptimeServers
+                    .AsNoTracking()
+                    .FirstOrDefault(m => m.PublicUrl == url);
+                }
+                if (found == null)
+                {
+                    if (uri.Scheme == "http")
+                        url = url.Replace("http://", "https://");
+                    else
+                        url = url.Replace("https://", "http://");
+
+                    found = db.UptimeServers
+                    .AsNoTracking()
+                    .FirstOrDefault(m => m.PublicUrl == url);
+                }
+
+                return found;
+            }
+        }
+
 
         public static void Save(UptimeServer uptimeServer)
         {
