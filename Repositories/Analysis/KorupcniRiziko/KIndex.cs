@@ -13,24 +13,36 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
     public static class KIndex
     {
 
-        private static MemoryCacheManager<KIndexData, (string ico, bool useTemp)> instanceByIco
-       = MemoryCacheManager<KIndexData, (string ico, bool useTemp)>.GetSafeInstance("kindexByICOv2", KIndexData.GetDirect,
+        private static AutoUpdateCouchbaseCacheManager<KIndexData, (string ico, bool useTemp)> instanceByIco
+       = AutoUpdateCouchbaseCacheManager<KIndexData, (string ico, bool useTemp)>.GetSafeInstance("kindexByICOv2", KIndexData.GetDirect,
 #if (!DEBUG)
-                TimeSpan.FromHours(1)
+                TimeSpan.FromDays(1)
 #else
-                TimeSpan.FromSeconds(10)
+                TimeSpan.FromSeconds(120)
 #endif
+                ,
+                Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                key => $"{key.ico}{(key.useTemp ? "_useTemp" : "")}"
            );
         static KIndexData notFoundKIdx = new KIndexData() { Ico = "-" };
 
 
-        private static MemoryCacheManager<Tuple<int?, KIndexData.KIndexLabelValues>, (string ico, bool useTemp)> instanceLabelByIco
-       = MemoryCacheManager<Tuple<int?, KIndexData.KIndexLabelValues>, (string ico, bool useTemp)>.GetSafeInstance("kindexLabelByICO", getDirectLabel,
+        private static AutoUpdateCouchbaseCacheManager<Tuple<int?, KIndexData.KIndexLabelValues>, (string ico, bool useTemp)> instanceLabelByIco
+       = AutoUpdateCouchbaseCacheManager<Tuple<int?, KIndexData.KIndexLabelValues>, (string ico, bool useTemp)>.GetSafeInstance("kindexLabelByICO", getDirectLabel,
 #if (!DEBUG)
-                TimeSpan.FromMinutes(1200)
+                TimeSpan.FromDays(1)
 #else
                 TimeSpan.FromSeconds(120)
 #endif
+                ,
+                Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                key => $"{key.ico}{(key.useTemp?"_useTemp":"")}"
            );
         private static Tuple<int?, KIndexData.KIndexLabelValues> getDirectLabel((string ico, bool useTemp) param)
         {
@@ -130,7 +142,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             }
         }
 
-        public static Tuple<int?, KIndexData.KIndexLabelValues> GetLastLabel(string ico, bool useTemp)
+        public static Tuple<int?, KIndexData.KIndexLabelValues> GetLastLabel(string ico, bool useTemp=false)
         {
             return instanceLabelByIco.Get((ico, useTemp));
         }

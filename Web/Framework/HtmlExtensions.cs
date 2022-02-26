@@ -101,15 +101,11 @@ namespace HlidacStatu.Web.Framework
 
             ico = Util.ParseTools.NormalizeIco(ico);
             var user = htmlHelper.ViewContext.HttpContext.User;
-            var kidx = Lib.Analysis.KorupcniRiziko.KIndex.Get(ico);
+            Tuple<int?, Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues>? kidx = Lib.Analysis.KorupcniRiziko.KIndex.GetLastLabel(ico);
             if (kidx == null)
-                kidx = Lib.Analysis.KorupcniRiziko.KIndexData.Empty(ico);
-            var ann = kidx.ForYear(MaxKIndexYearToShow(user, rok));
-
-            if (ann == null)
                 return htmlHelper.Raw("");
 
-            Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues lbl = ann.KIndexLabel;
+            Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues lbl = kidx.Item2;
             return htmlHelper.KIndexLabelLink(ico, lbl, style, showNone, rok, linkToKindex: linkToKindex);
         }
         public static IHtmlContent KIndexLabelLink(this IHtmlHelper htmlHelper, string ico,
