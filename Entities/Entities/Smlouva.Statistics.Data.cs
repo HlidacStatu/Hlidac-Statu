@@ -31,7 +31,7 @@ namespace HlidacStatu.Entities
                 public long PocetSmluvOVikendu { get; set; }
                 public long PocetSmluvNovaFirma { get; set; }
 
-                public Dictionary<int, BasicData> PoOblastech { get; set; } = new Dictionary<int, BasicData>();
+                public Dictionary<int, SimpleStat> PoOblastech { get; set; } = new Dictionary<int, SimpleStat>();
 
 
                 public decimal PercentSmluvBezCeny => (PocetSmluv == 0 ? 0 : (decimal)PocetSmluvBezCeny / (decimal)PocetSmluv);
@@ -67,7 +67,7 @@ namespace HlidacStatu.Entities
                         PocetSmluvOVikendu = PocetSmluvOVikendu + (other?.PocetSmluvOVikendu ?? 0),
                         PocetSmluvNovaFirma = PocetSmluvNovaFirma + (other?.PocetSmluvNovaFirma ?? 0),
                         PoOblastech = PoOblastech.ToDictionary(entry => entry.Key,
-                            entry => new BasicData(entry.Value))
+                            entry => entry.Value)
                     };
 
                     if (other.PoOblastech != null)

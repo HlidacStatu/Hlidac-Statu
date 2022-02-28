@@ -1,5 +1,6 @@
 ﻿@model Firma
 
+@using HlidacStatu.Lib.Analytics
 @using Nest;
 @using Devmasters.Enums;
 @using HlidacStatu.XLib.Render;
@@ -386,8 +387,8 @@
                                             m.Value.CelkemCena)
                                         );
 
-                    ReportDataSource<KeyValuePair<int, BasicData>> rds = new(
-                            new ReportDataSource<KeyValuePair<int, BasicData>>.Column()
+                    ReportDataSource<KeyValuePair<int, SimpleStat>> rds = new(
+                            new ReportDataSource<KeyValuePair<int, SimpleStat>>.Column()
                             {
                                 Name = "Oblast smluv",
                                 HtmlRender = (m) =>
@@ -398,7 +399,7 @@
                                     +$"</a>";
                                 }
                             },
-                            new ReportDataSource<KeyValuePair<int, BasicData>>.Column()
+                            new ReportDataSource<KeyValuePair<int, SimpleStat>>.Column()
                             {
                                 Name = "Počet smluv",
                                 HtmlRender = (m) =>
@@ -408,7 +409,7 @@
                                 OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
                                 CssClass = "number"
                             },
-                            new ReportDataSource<KeyValuePair<int, BasicData>>.Column()
+                            new ReportDataSource<KeyValuePair<int, SimpleStat>>.Column()
                             {
                                 Name = "Hodnota smluv",
                                 HtmlRender = (m) =>

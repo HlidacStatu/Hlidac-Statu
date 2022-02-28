@@ -117,6 +117,7 @@ namespace HlidacStatu.Util
 
 
 
+
         public static string NicePrice(decimal number, string valueIfZero = "0 {0}", string mena = "Kč", bool html = false, bool shortFormat = false, ShowDecimalVal showDecimal = ShowDecimalVal.Hide)
         {
 

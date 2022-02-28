@@ -33,120 +33,120 @@
 }
 @section scripts
 {
-    <script>
-        _showFAD = false;
-        _showTrackJS = false;
-    </script>
+<script>
+    _showFAD = false;
+    _showTrackJS = false;
+</script>
 
-    <!-- tagify -->
-    <script src="@Html.Raw("/scripts/tagify/tagify.4.8.1.min.js")"></script>
-    <script src="@Html.Raw("/scripts/tagify/tagify.polyfills.4.8.1.min.js")"></script>
-    <link href="@Html.Raw("/scripts/tagify/tagify.4.8.1.css")" rel="stylesheet" type="text/css" />
-    <script src="/scripts/autocomplete.v1.2.js"></script>
-    <script type="text/javascript">
-        if (_showTrackJS)
-        {
-        window.smartlook || (function (d) {
-            var o = smartlook = function () { o.api.push(arguments) }, h = d.getElementsByTagName('head')[0];
-            var c = d.createElement('script'); o.api = new Array(); c.async = true; c.type = 'text/javascript';
-            c.charset = 'utf-8'; c.src = 'https://rec.smartlook.com/recorder.js'; h.appendChild(c);
-        })(document);
-        smartlook('init', '344e291cbee0b3c87748a78b80faf81d6e8628b1');
-        }
-    </script>
+<!-- tagify -->
+<script src="@Html.Raw("/scripts/tagify/tagify.4.8.1.min.js")"></script>
+<script src="@Html.Raw("/scripts/tagify/tagify.polyfills.4.8.1.min.js")"></script>
+<link href="@Html.Raw("/scripts/tagify/tagify.4.8.1.css")" rel="stylesheet" type="text/css" />
+<script src="/scripts/autocomplete.v1.2.js"></script>
+<script type="text/javascript">
+    if (_showTrackJS)
+    {
+    window.smartlook || (function (d) {
+        var o = smartlook = function () { o.api.push(arguments) }, h = d.getElementsByTagName('head')[0];
+        var c = d.createElement('script'); o.api = new Array(); c.async = true; c.type = 'text/javascript';
+        c.charset = 'utf-8'; c.src = 'https://rec.smartlook.com/recorder.js'; h.appendChild(c);
+    })(document);
+    smartlook('init', '344e291cbee0b3c87748a78b80faf81d6e8628b1');
+    }
+</script>
 
     @WebUtil.SetAutofocusOnId("Q")
 }
 
 @section title
 {
-    <div class="header__content ">
-        <!-- desktop menu items only -->
-        <div class="navbar__level2">
-            <ul>
-                <li class=""><a href="/data">Další databáze<sup style="top:0;text-decoration:none;color:yellow;">@(DataSetDB.AllDataSets.Get()?.Count().ToString() ?? "")</sup></a></li>
-                <li class=""><a href="/reporty">Analýzy a reporty<sup style="top:0;text-decoration:none;color:yellow;">@(PocetReportu)</sup></a></li>
-                <li class=""><a @Html.GAClick() style="font-weight:bold;color:yellow;" href="/texty">Zjistili jsme</a></li>
-                <li class=""><a href="https://www.hlidacstatu.cz/texty/series/tipy/">Tipy „Jak používat Hlídače“</a></li>
-            </ul>
-            <ul>
-                <li>
-                    <a href="/pridatse">Přidat se</a>
-                    @*<a href="https://github.com/HlidacStatu/Web/issues" target="_blank" style="color:orange"><span class="fas fa-exclamation-triangle"></span>&nbsp;Nahlásit chybu</a>*@
-                    <a onclick="return trackOutLink(this,'Index.title');" href="https://www.darujme.cz/projekt/1204683">Podpořit nás</a>
-                </li>
-            </ul>
-        </div>
-        <div class="header__title">
-            <h1>Hlídač státu</h1>
-            <span>Hlídáme je, protože si to zaslouží!</span>
-        </div>
-        <!-- desktop menu items only -->
-
-        <div class="header__search">
-            <label class="label" for="Q">Prohledat všechny Hlídače státu:</label>
-            <form class="header__search__input-wrapper old-search-input" action="/hledat" id="old-search-input" method="get" style="visibility:visible">
-                <input value="" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
-                <button class="header__search__btn">Hledat</button>
-            </form>
-
-                @if (false) //newsearch
-                {
-                    <form id="new-search-input" class="new-search-input" action="/hledat" method="get" style="visibility:hidden">
-                        <div class="select2-wrapper">
-                            <div class="input-group input-group-lg">
-                                <select class="form-control input-lg select2-multiple" id="autocomsearch" multiple="multiple">
-                                    @if (!string.IsNullOrWhiteSpace(ViewBag.Query))
-                                    {
-                                        foreach (string option in ViewBag.Query.ToString().Split(' '))
-                                        {
-                                            <option value="@option" selected="selected">@option</option>
-                                        }
-                                    }
-                                </select>
-                                <span class="input-group-btn">
-                                    <button class="btn btn-primary" data-select2-open="autocomsearch" style="left:-7px"> hledat</button>
-                                </span>
-                                <input id="search-result-query-data" name="q" type="hidden" />
-                            </div>
-                        </div>
-                    </form>
-                }
-                else //newsearch2
-                {
-                    <form id="new-search-input" class="new-search-input " method="get" action="/hledat" style="visibility:hidden">
-                        <div class="new-search-wrapper">
-                            <div class="input-group">
-                                <input class="form-control nopadding " name="q" value="@(ViewBag.Query)" id="new-search-input-q" />
-                                <span class="input-group-btn">
-                                    <button id="new-search-input-btn" class="btn btn-primary" style="left:-7px;top:-5px"> hledat</button>
-                                </span>
-                            </div>
-                        </div>
-                    </form>
-                    <script>
-                        MakeAutocomplete('#new-search-input');
-                    </script>
-
-                }
-
-            <div>
-                <button class="header__search__hint btn btn-link new-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
-                    <i class="fas fa-blind"></i> Staré hledání
-                </button>
-                <button class="header__search__hint btn btn-link old-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
-                    <i class="fas fa-baby"></i> Nové hledání
-                </button>
-                <a class="header__search__hint" style="padding-top:2px;font-size:15px;text-decoration:none;padding-top:2px;font-size:15px;text-decoration:none" href="/napoveda">
-                    <i class="far fa-question-square" style=""></i> Nápověda jak vyhledávat
-                </a>
-                <a class="header__search__hint float-end" style="" href="/snadnehledani">
-                    Snadné hledání
-                </a>
-            </div>
-        </div>
-
+<div class="header__content ">
+    <!-- desktop menu items only -->
+    <div class="navbar__level2">
+        <ul>
+            <li class=""><a href="/data">Další databáze<sup style="top:0;text-decoration:none;color:yellow;">@(DataSetDB.AllDataSets.Get()?.Count().ToString() ?? "")</sup></a></li>
+            <li class=""><a href="/reporty">Analýzy a reporty<sup style="top:0;text-decoration:none;color:yellow;">@(PocetReportu)</sup></a></li>
+            <li class=""><a @Html.GAClick() style="font-weight:bold;color:yellow;" href="/texty">Zjistili jsme</a></li>
+            <li class=""><a href="https://www.hlidacstatu.cz/texty/series/tipy/">Tipy „Jak používat Hlídače“</a></li>
+        </ul>
+        <ul>
+            <li>
+                <a href="/pridatse">Přidat se</a>
+                @*<a href="https://github.com/HlidacStatu/Web/issues" target="_blank" style="color:orange"><span class="fas fa-exclamation-triangle"></span>&nbsp;Nahlásit chybu</a>*@
+                <a onclick="return trackOutLink(this,'Index.title');" href="https://www.darujme.cz/projekt/1204683">Podpořit nás</a>
+            </li>
+        </ul>
     </div>
+    <div class="header__title">
+        <h1>Hlídač státu</h1>
+        <span>Hlídáme je, protože si to zaslouží!</span>
+    </div>
+    <!-- desktop menu items only -->
+
+    <div class="header__search">
+        <label class="label" for="Q">Prohledat všechny Hlídače státu:</label>
+        <form class="header__search__input-wrapper old-search-input" action="/hledat" id="old-search-input" method="get" style="visibility:visible">
+            <input value="" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
+            <button class="header__search__btn">Hledat</button>
+        </form>
+
+        @if (false) //newsearch
+        {
+        <form id="new-search-input" class="new-search-input" action="/hledat" method="get" style="visibility:hidden">
+            <div class="select2-wrapper">
+                <div class="input-group input-group-lg">
+                    <select class="form-control input-lg select2-multiple" id="autocomsearch" multiple="multiple">
+                        @if (!string.IsNullOrWhiteSpace(ViewBag.Query))
+                        {
+                        foreach (string option in ViewBag.Query.ToString().Split(' '))
+                        {
+                        <option value="@option" selected="selected">@option</option>
+                        }
+                        }
+                    </select>
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" data-select2-open="autocomsearch" style="left:-7px"> hledat</button>
+                    </span>
+                    <input id="search-result-query-data" name="q" type="hidden" />
+                </div>
+            </div>
+        </form>
+        }
+        else //newsearch2
+        {
+        <form id="new-search-input" class="new-search-input " method="get" action="/hledat" style="visibility:hidden">
+            <div class="new-search-wrapper">
+                <div class="input-group">
+                    <input class="form-control nopadding " name="q" value="@(ViewBag.Query)" id="new-search-input-q" />
+                    <span class="input-group-btn">
+                        <button id="new-search-input-btn" class="btn btn-primary" style="left:-7px;top:-5px"> hledat</button>
+                    </span>
+                </div>
+            </div>
+        </form>
+        <script>
+            MakeAutocomplete('#new-search-input');
+        </script>
+
+        }
+
+        <div>
+            <button class="header__search__hint btn btn-link new-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
+                <i class="fas fa-blind"></i> Staré hledání
+            </button>
+            <button class="header__search__hint btn btn-link old-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
+                <i class="fas fa-baby"></i> Nové hledání
+            </button>
+            <a class="header__search__hint" style="padding-top:2px;font-size:15px;text-decoration:none;padding-top:2px;font-size:15px;text-decoration:none" href="/napoveda">
+                <i class="far fa-question-square" style=""></i> Nápověda jak vyhledávat
+            </a>
+            <a class="header__search__hint float-end" style="" href="/snadnehledani">
+                Snadné hledání
+            </a>
+        </div>
+    </div>
+
+</div>
 }
 
 <div class="watcher-blocks">
@@ -256,6 +256,21 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
         <!-- block 1 -->
         <div class="watcher-block">
             <div class="watcher__title">
+                <img src="/Content/img/logoUA.png" style="height:40px">
+                <h2 class="new-title">
+                    <a href="https://docs.google.com/spreadsheets/d/1oNo6jhtvFY6cPy85Tdv8t3XFUySC8mikdFE22yR-eTs/edit#gid=0">
+                        <span style="font-weight:bold;font-size:inherit;color:rgb(0, 87, 183)">Pomáháme</span> 
+                        <span style="font-weight:bold;font-size:inherit;color:rgb(255, 215, 0)">Ukrajině</span></a>
+                </h2>
+            </div>
+            <div class="block-col block-part">
+                <b>Souhrnnou tabulku s informacemi, pomocí, nabídkou i poptávkou najdete 
+                <a style="display: contents;" href="https://docs.google.com/spreadsheets/d/1oNo6jhtvFY6cPy85Tdv8t3XFUySC8mikdFE22yR-eTs/edit#gid=0">ZDE</a>. 
+                Aktualizujeme neustále, přidávejte komentáře nebo zažádejte o editorský přístup.
+                </b>
+            </div>
+            <div style="margin-top:40px;"></div>
+            <div class="watcher__title">
                 <img src="/Content/img/icon-contracts.svg">
                 <h2 class="new-title">
                     <a href="https://texty.hlidacstatu.cz">Hlídač kauz</a>
@@ -269,11 +284,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
                 </span>
 
                 @foreach (var wp in HlidacStatu.XLib.StaticData.LastBlogPosts
-                   .Get()
-                   .Where(m => m.Date > new DateTime(2020, 1, 25) && m.Categories.Contains(246) == false) //not tipy
-                   .OrderByDescending(m => m.Date)
-                   .Take(5)
-                   )
+                .Get()
+                .Where(m => m.Date > new DateTime(2020, 1, 25) && m.Categories.Contains(246) == false) //not tipy
+                .OrderByDescending(m => m.Date)
+                .Take(5)
+                )
                 {
                     <span class="tag">
                         <a href="@wp.Link">
@@ -427,7 +442,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
                     <ul class="block-list">
                         @{
                             string[] topPolitici = new string[] { "andrej-babis", "pavel-belobradek",
-                                                                    "richard-brabec", "milan-feranec", "martin-pecina", "ivo-valenta", "jiri-mihola" };
+                        "richard-brabec", "milan-feranec", "martin-pecina", "ivo-valenta", "jiri-mihola" };
                         }
                         @foreach (var oid in topPolitici)
                         {
@@ -480,12 +495,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
 
                     Celkem <strong>
                         @RenderData.NiceNumber(VerejnaZakazkaRepo.Searching.CachedSimpleSearch(TimeSpan.FromHours(6),
-                                   new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData() { Q = "*", Page = 0, PageSize = 0, ExactNumOfResults = true }).Total
-                             )
+                        new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData() { Q = "*", Page = 0, PageSize = 0, ExactNumOfResults = true }).Total
+                        )
                     </strong> zakázek,
                     <strong>
                         @RenderData.NiceNumber(VerejnaZakazkaRepo.Searching.CachedSimpleSearch(TimeSpan.FromHours(6),
-                                               new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData() { Q = "zverejneno:[" + DateTime.Now.Date.Year + "-01-01 TO *]", Page = 0, PageSize = 0, ExactNumOfResults = true }).Total)
+                        new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData() { Q = "zverejneno:[" + DateTime.Now.Date.Year + "-01-01 TO *]", Page = 0, PageSize = 0, ExactNumOfResults = true }).Total)
                     </strong> letos.
                 </p>
             </div>
@@ -499,20 +514,20 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
                     foreach (var obl in EnumTools.EnumToEnumerable(typeof(VerejnaZakazkaRepo.Searching.CPVSkupiny)))
                     {
                         var num3M = VerejnaZakazkaRepo.Searching.CachedSimpleSearch(TimeSpan.FromHours(6),
-                            new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData()
-                            {
-                                Q = "zverejneno:[" + DateTime.Now.Date.AddMonths(-3).ToString("yyyy-MM-dd") + " TO *]",
-                                Oblast = obl.Value,
-                                Page = 0,
-                                PageSize = 0,
-                                ExactNumOfResults = true
-                            }).Total;
+                        new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData()
+                {
+                    Q = "zverejneno:[" + DateTime.Now.Date.AddMonths(-3).ToString("yyyy-MM-dd") + " TO *]",
+                    Oblast = obl.Value,
+                    Page = 0,
+                    PageSize = 0,
+                    ExactNumOfResults = true
+                }).Total;
                         topVZ.Add(
-                            new Tuple<string, string, long>(
-                                $"/verejnezakazky/hledat?q=*&oblast={VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.Value)}&order=1",
-                                $"{obl.Key} ({RenderData.NiceNumber(num3M)})",
-                                num3M
-                            )
+                        new Tuple<string, string, long>(
+                        $"/verejnezakazky/hledat?q=*&oblast={VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.Value)}&order=1",
+                        $"{obl.Key} ({RenderData.NiceNumber(num3M)})",
+                        num3M
+                        )
                         );
                     }
                     topVZ = topVZ.OrderByDescending(o => o.Item3).Take(6).ToList();
@@ -546,43 +561,43 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
 
 
 @*
-        <div class="reviews">
-        <h2 class="new-title">Psali o nás</h2>
-        <div class="reviews__carousel">
-            <!-- control arrows -->
-            <!-- TODO: doimplementovat JS - staci posouvat oveflow scroll -->
-            <div class="carousel__arrow">
-                <img class="" src="/Content/img/chevron-reviews.svg">
-            </div>
-            <div class="carousel__arrow carousel__arrow--right">
-                <img class="" src="/Content/img/chevron-reviews.svg">
-            </div>
+    <div class="reviews">
+    <h2 class="new-title">Psali o nás</h2>
+    <div class="reviews__carousel">
+    <!-- control arrows -->
+    <!-- TODO: doimplementovat JS - staci posouvat oveflow scroll -->
+    <div class="carousel__arrow">
+    <img class="" src="/Content/img/chevron-reviews.svg">
+    </div>
+    <div class="carousel__arrow carousel__arrow--right">
+    <img class="" src="/Content/img/chevron-reviews.svg">
+    </div>
 
-            <!-- logos with links below -->
-            <a href="/">
-                <img class="reviews__logo" src="/Content/img/reviews/1.png">
-            </a>
-            <a href="/">
-                <img class="reviews__logo" src="/Content/img/reviews/2.png">
-            </a>
-            <a href="/">
-                <img class="reviews__logo" src="/Content/img/reviews/3.png">
-            </a>
-            <a href="/">
-                <img class="reviews__logo" src="/Content/img/reviews/4.png">
-            </a>
-            <a href="/">
-                <img class="reviews__logo" src="/Content/img/reviews/5.png">
-            </a>
-            <a href="/">
-                <img class="reviews__logo" src="/Content/img/reviews/3.png">
-            </a>
-            <a href="/">
-                <img class="reviews__logo" src="/Content/img/reviews/2.png">
-            </a>
-            <a href="/">
-                <img class="reviews__logo" src="/Content/img/reviews/1.png">
-            </a>
-        </div>
+    <!-- logos with links below -->
+    <a href="/">
+    <img class="reviews__logo" src="/Content/img/reviews/1.png">
+    </a>
+    <a href="/">
+    <img class="reviews__logo" src="/Content/img/reviews/2.png">
+    </a>
+    <a href="/">
+    <img class="reviews__logo" src="/Content/img/reviews/3.png">
+    </a>
+    <a href="/">
+    <img class="reviews__logo" src="/Content/img/reviews/4.png">
+    </a>
+    <a href="/">
+    <img class="reviews__logo" src="/Content/img/reviews/5.png">
+    </a>
+    <a href="/">
+    <img class="reviews__logo" src="/Content/img/reviews/3.png">
+    </a>
+    <a href="/">
+    <img class="reviews__logo" src="/Content/img/reviews/2.png">
+    </a>
+    <a href="/">
+    <img class="reviews__logo" src="/Content/img/reviews/1.png">
+    </a>
+    </div>
     </div>
 *@

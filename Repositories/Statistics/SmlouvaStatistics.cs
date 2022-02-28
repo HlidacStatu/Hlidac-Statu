@@ -30,45 +30,47 @@ namespace HlidacStatu.Repositories.Statistics
 
         public static StatisticsPerYear<Smlouva.Statistics.Data> Calculate(string query)
         {
-            Dictionary<int, BasicData> _calc_SeZasadnimNedostatkem =
+            StatisticsPerYear<SimpleStat> _calc_SeZasadnimNedostatkem =
                 ES.QueryGrouped.SmlouvyPerYear($"({query}) AND chyby:zasadni", Consts.RegistrSmluvYearsList);
 
-            Dictionary<int, BasicData> _calc_UzavrenoOVikendu =
+            StatisticsPerYear<SimpleStat> _calc_UzavrenoOVikendu =
                 ES.QueryGrouped.SmlouvyPerYear($"({query}) AND (hint.denUzavreni:>0)",
                     Consts.RegistrSmluvYearsList);
 
-            Dictionary<int, BasicData> _calc_ULimitu =
+            StatisticsPerYear<SimpleStat> _calc_ULimitu =
                 ES.QueryGrouped.SmlouvyPerYear($"({query}) AND ( hint.smlouvaULimitu:>0 )",
                     Consts.RegistrSmluvYearsList);
 
-            Dictionary<int, BasicData> _calc_NovaFirmaDodavatel =
+            StatisticsPerYear<SimpleStat> _calc_NovaFirmaDodavatel =
                 ES.QueryGrouped.SmlouvyPerYear(
                     $"({query}) AND ( hint.pocetDniOdZalozeniFirmy:>-50 AND hint.pocetDniOdZalozeniFirmy:<30 )",
                     Consts.RegistrSmluvYearsList);
 
-            Dictionary<int, BasicData> _calc_smlouvy =
+            StatisticsPerYear<SimpleStat> _calc_smlouvy =
                 ES.QueryGrouped.SmlouvyPerYear($"({query}) ", Consts.RegistrSmluvYearsList);
 
-            Dictionary<int, BasicData> _calc_bezCeny =
+            StatisticsPerYear<SimpleStat> _calc_bezCeny =
                 ES.QueryGrouped.SmlouvyPerYear($"({query}) AND ( hint.skrytaCena:1 ) ",
                     Consts.RegistrSmluvYearsList);
 
-            Dictionary<int, BasicData> _calc_bezSmlStran =
+            StatisticsPerYear<SimpleStat> _calc_bezSmlStran =
                 ES.QueryGrouped.SmlouvyPerYear($"({query}) AND ( issues.issueTypeId:18 OR issues.issueTypeId:12 ) ",
                     Consts.RegistrSmluvYearsList);
 
-            Dictionary<int, BasicData> _calc_sVazbouNaPolitikyNedavne =
+            StatisticsPerYear<SimpleStat> _calc_sVazbouNaPolitikyNedavne =
                 ES.QueryGrouped.SmlouvyPerYear($"({query}) AND ( sVazbouNaPolitikyNedavne:true ) ",
                     Consts.RegistrSmluvYearsList);
-            Dictionary<int, BasicData> _calc_sVazbouNaPolitikyBezCenyNedavne =
+
+            StatisticsPerYear<SimpleStat> _calc_sVazbouNaPolitikyBezCenyNedavne =
                 ES.QueryGrouped.SmlouvyPerYear(
                     $"({query}) AND ( hint.skrytaCena:1 ) AND ( sVazbouNaPolitikyNedavne:true ) ",
                     Consts.RegistrSmluvYearsList);
 
-            Dictionary<int, BasicData> _calc_soukrome =
+            StatisticsPerYear<SimpleStat> _calc_soukrome =
                 ES.QueryGrouped.SmlouvyPerYear($"({query}) AND ( hint.vztahSeSoukromymSubjektem:>0 ) ",
                     Consts.RegistrSmluvYearsList);
-            Dictionary<int, BasicData> _calc_soukromeBezCeny =
+            
+            StatisticsPerYear<SimpleStat> _calc_soukromeBezCeny =
                 ES.QueryGrouped.SmlouvyPerYear(
                     $"({query}) AND ( hint.skrytaCena:1 ) AND ( hint.vztahSeSoukromymSubjektem:>0 ) ",
                     Consts.RegistrSmluvYearsList);

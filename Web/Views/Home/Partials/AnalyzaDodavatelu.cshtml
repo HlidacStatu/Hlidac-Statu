@@ -1,0 +1,81 @@
+﻿@model HlidacStatu.Lib.Analysis.TemplatedQuery
+@using HlidacStatu.Entities.Entities.Analysis
+@using Nest;
+@using System.Linq
+@using HlidacStatu.Entities
+@using HlidacStatu.Lib.Analytics
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Statistics
+@using HlidacStatu.XLib.Render
+@using Microsoft.AspNetCore.Mvc
+
+
+@{
+    ViewBag.Title = Model.Text ?? $"Hlídač státu: Analýza příjemců peněz pro dotaz \"{Model.Query}\"";
+
+    HlidacStatu.Lib.Analytics.StatisticsPerYear<Smlouva.Statistics.Data> statistics =
+        new StatisticsPerYear<Smlouva.Statistics.Data>(SmlouvaStatistics.Calculate(Model.Query));
+
+    var seasonStat = statistics.CurrentSeasonStatistics();
+    var currentSeasonYear = statistics.CurrentSeasonYear();
+    var zmenaObjemuSmluv = statistics.ChangeBetweenYears(currentSeasonYear - 1, currentSeasonYear, s => s.CelkovaHodnotaSmluv);
+
+}
+
+
+@{
+    var topDodavateleFull = HlidacStatu.Repositories.ES.QueryGrouped.TopDodavatelePerYearStats(
+                Model.Query, HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList);
+
+    var topDodavateleCurrSeason = topDodavateleFull.PerYear.CombinedTop(currentSeasonYear, 10);
+    var topDodavateleAllTime = topDodavateleFull.PerIco;
+
+    int[] Years= HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Where(m=> m > 2018).ToArray();
+}
+
+<div>
+    <h4>Statistika dodavatelů (smluvních partnerů) pro analyzovaný dotaz</h4>
+    <p class="text-muted sub-header-info">
+        Přehledná statistika největších dodavatelů podle smluv v registru smluv.
+    </p>
+
+    <p>
+        Od roku @(HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Min()) byly největšími smluvními dodavateli:
+        <ul>
+            @Html.Raw(string.Join("", topDodavateleAllTime.TopPodleKc.Select(m => $"<li><a href='/subjekt/{m.ICO}'>{Firmy.GetJmeno(m.ICO)}</a></li>")))
+        </ul>
+    </p>
+
+    <p>
+        V roce @currentSeasonYear byly největšími smluvními dodavateli:
+        <ul>
+            @Html.Raw(string.Join("", topDodavateleCurrSeason.Select(m => $"<li><a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a></li>")))
+        </ul>
+    </p>
+    <h4>Detailně</h4>
+    @{
+    }
+    <table class="table table-condensed">
+        <thead>
+        <td>Subjekt</td>
+            @foreach (var y in Years)
+            {
+            <td>@y</td>
+            }
+        </thead>
+        <tbody>
+            @foreach (var ico in topDodavateleFull.PerIco.TopPodleKc.OrderByDescending(o => o.Sum(s => s.CelkemCena)).Select(m=>m.ICO))
+            {
+                StatisticsSubjectPerYear<SimpleStat> fStat = topDodavateleFull.PerIco.TopPodleKc.First(m => m.ICO == ico);
+
+                <tr>
+                    <td>@(Firmy.GetJmeno(ico))</td>
+                    @foreach (var y in Years)
+                    {
+                        <td>@Html.Raw(fStat[y].Formatted(true))</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

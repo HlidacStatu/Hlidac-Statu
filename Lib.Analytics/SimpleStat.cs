@@ -1,9 +1,10 @@
 ﻿namespace HlidacStatu.Lib.Analytics
 {
+
     public class SimpleStat : CoreStat, IAddable<SimpleStat>
     {
-        public long Pocet { get; set; }
-        public decimal CelkemCena { get; set; }
+        public long Pocet { get; set; } = 0;
+        public decimal CelkemCena { get; set; } = 0;
 
         public void Add(long pocet, decimal cena)
         {

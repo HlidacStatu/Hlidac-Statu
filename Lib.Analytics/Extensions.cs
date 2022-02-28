@@ -10,5 +10,24 @@ namespace HlidacStatu.Lib.Analytics
             return StatisticsPerYear<T>.AggregateStats(statistics, onlyYears);
         }
 
+        public static string Formatted(this SimpleStat item, bool html = true, string url = null, bool twoLines = false)
+        {
+
+            if (html && !string.IsNullOrEmpty(url))
+            {
+                var s = "<a href='" + url + "'>" +
+                            Devmasters.Lang.CS.Plural.Get(item.Pocet, "{0} smlouva;{0} smlouvy;{0} smluv") +
+                        "</a>" + (twoLines ? "<br />" : " za ") +
+                        "celkem " +
+                        HlidacStatu.Util.RenderData.NicePrice(item.CelkemCena, html: true, shortFormat: true);
+                return s;
+            }
+            else
+                return Devmasters.Lang.CS.Plural.Get(item.Pocet, "{0} smlouva;{0} smlouvy;{0} smluv") +
+                    " za celkem " + HlidacStatu.Util.RenderData.NicePrice(item.CelkemCena, html: false, shortFormat: true);
+
+        }
+
+
     }
 }
