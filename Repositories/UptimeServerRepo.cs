@@ -225,7 +225,7 @@ namespace HlidacStatu.Repositories
             if (serverIds.Length == 0)
                 return null;
 
-            return _availability();
+            return _availability(serverIds,intervalBack);
         }
 
         public static IEnumerable<UptimeServer.HostAvailability> AvailabilityForDayByIds(int[] serverIds)
