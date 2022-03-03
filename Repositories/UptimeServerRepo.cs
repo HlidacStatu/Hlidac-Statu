@@ -1,7 +1,6 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Util.Cache;
 
-using InfluxDB.Client;
 using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Writes;
 
@@ -17,10 +16,6 @@ namespace HlidacStatu.Repositories
     {
 
 
-
-        static InfluxDBClient influxDbClient = InfluxDBClientFactory.Create(
-            Devmasters.Config.GetWebConfigValue("InfluxDb"),
-            Devmasters.Config.GetWebConfigValue("InfluxDbToken"));
 
 
         public static string PatriPodUradJmeno(this UptimeServer server)
@@ -48,7 +43,7 @@ namespace HlidacStatu.Repositories
                 server.TakenByUptimer = null;
 
                 db.UptimeServers.Attach(server);
-                if (server.Id==0)
+                if (server.Id == 0)
                     db.Entry(server).State = EntityState.Added;
                 else
                     db.Entry(server).State = EntityState.Modified;
@@ -58,33 +53,27 @@ namespace HlidacStatu.Repositories
 
                     db.SaveChanges();
 
-                    using (var writeApi = influxDbClient.GetWriteApi())
-                    {
-                        var point = PointData.Measurement("uptime")
+                    HlidacStatu.Lib.Data.External.InfluxDb.AddPoints("uptimer", "hlidac",
+                        PointData.Measurement("uptime")
                             .Tag("uptimer", lastCheck.Uptimer)
                             .Tag("serverid", lastCheck.ServerId.ToString())
                             .Tag("fieldname", "responseTime")
                             .Field("value", lastCheck.ResponseTimeInMs)
-                            .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S);
-                        writeApi.WritePoint("uptimer", "hlidac", point);
-
-                        point = PointData.Measurement("uptime")
+                            .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S),
+                        PointData.Measurement("uptime")
                             .Tag("uptimer", lastCheck.Uptimer)
                             .Tag("serverid", lastCheck.ServerId.ToString())
                             .Tag("fieldname", "responseSize")
                             .Field("value", lastCheck.ResponseSize)
-                            .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S);
-                        writeApi.WritePoint("uptimer", "hlidac", point);
-
-                        point = PointData.Measurement("uptime")
+                            .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S),
+                        PointData.Measurement("uptime")
                             .Tag("uptimer", lastCheck.Uptimer)
                             .Tag("serverid", lastCheck.ServerId.ToString())
                             .Tag("fieldname", "responseCode")
                             .Field("value", (long)lastCheck.ResponseCode)
-                            .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S);
-                        writeApi.WritePoint("uptimer", "hlidac", point);
-
-                    }
+                            .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S)
+                        );
+                    ;
                 }
                 catch (System.Exception e)
                 {
@@ -112,13 +101,13 @@ namespace HlidacStatu.Repositories
             {
                 var found = db.UptimeServers
                     .AsNoTracking()
-                    .FirstOrDefault(m => m.PublicUrl == url );
+                    .FirstOrDefault(m => m.PublicUrl == url);
                 if (found == null)
-                { 
-                    if (url.EndsWith("/")) 
+                {
+                    if (url.EndsWith("/"))
                         url = url.Substring(0, url.Length - 1);
                     else if (string.IsNullOrEmpty(uri.Query))
-                        url = url+"/";
+                        url = url + "/";
 
                     found = db.UptimeServers
                     .AsNoTracking()
@@ -148,7 +137,7 @@ namespace HlidacStatu.Repositories
                 db.UptimeServers.Attach(uptimeServer);
                 if (uptimeServer.Id == 0)
                 {
-                    db.Entry(uptimeServer).State = EntityState.Added;                    
+                    db.Entry(uptimeServer).State = EntityState.Added;
                 }
                 else
                     db.Entry(uptimeServer).State = EntityState.Modified;
@@ -213,7 +202,7 @@ namespace HlidacStatu.Repositories
             using (Entities.DbEntities db = new HlidacStatu.Entities.DbEntities())
                 return db.UptimeServers
                     .AsNoTracking()
-                    .Where(m=> m.Active == 1)
+                    .Where(m => m.Active == 1)
                     .ToArray();
 
         }
@@ -225,9 +214,20 @@ namespace HlidacStatu.Repositories
         }
         public static UptimeServer.HostAvailability AvailabilityForDayById(int serverId)
         {
-                return AvailabilityForDayByIds(new int[] { serverId }).FirstOrDefault();
-            
+            return AvailabilityForDayByIds(new int[] { serverId }).FirstOrDefault();
+
         }
+
+        public static IEnumerable<UptimeServer.HostAvailability> ShortAvailability(int[] serverIds, TimeSpan intervalBack)
+        {
+            if (serverIds?.Length == null)
+                return null;
+            if (serverIds.Length == 0)
+                return null;
+
+            return _availability();
+        }
+
         public static IEnumerable<UptimeServer.HostAvailability> AvailabilityForDayByIds(int[] serverIds)
         {
             if (serverIds?.Length == null)
@@ -244,7 +244,7 @@ namespace HlidacStatu.Repositories
 
         public static UptimeServer.HostAvailability AvailabilityForWeekById(int serverId)
         {
-            if (serverId==0)
+            if (serverId == 0)
                 return null;
 
             return uptimeServerCache7Day.Get(serverId);
@@ -261,11 +261,12 @@ namespace HlidacStatu.Repositories
 
         private static AutoUpdateMemoryCacheManager<UptimeServer.HostAvailability, int> uptimeServerCache7Day
        = AutoUpdateMemoryCacheManager<UptimeServer.HostAvailability, int>.GetSafeInstance("uptimeServerCache7Day",
-          (id) => {
+          (id) =>
+          {
               var res = _availability(new int[] { id }, 7 * 24);
               return res.FirstOrDefault();
           }
-           ,TimeSpan.FromMinutes(30));
+           , TimeSpan.FromMinutes(30));
 
 
         private static IEnumerable<UptimeServer.HostAvailability> _availability(int hoursBack)
@@ -273,55 +274,22 @@ namespace HlidacStatu.Repositories
             int[] serverIds = AllActiveServers().Select(m => m.Id).ToArray();
             return _availability(serverIds, hoursBack);
         }
+
         private static IEnumerable<UptimeServer.HostAvailability> _availability(int[] serverIds, int hoursBack)
+        {
+            return _availability(serverIds, TimeSpan.FromHours(hoursBack));
+        }
+
+        private static IEnumerable<UptimeServer.HostAvailability> _availability(int[] serverIds, TimeSpan intervalBack)
         {
             UptimeServer[] allServers = AllActiveServers();
 
-
-            string query = "";
-            List<InfluxDB.Client.Core.Flux.Domain.FluxTable> fluxTables = null;
-
-            query = "from(bucket:\"uptimer\")"
-                + $" |> range(start: -{hoursBack}h)"
-                + "  |> filter(fn: (r) => r[\"_measurement\"] == \"uptime\")"
-                + "  |> filter(fn: (r) => " + serverIds.Select(m => $"r[\"serverid\"] == \"{m}\"").Aggregate((f, s) => f + " or " + s) + " )"
-                + "  |> filter(fn: (r) => r[\"_field\"] == \"value\")"
-            ;
-            if (false && hoursBack > 25)
-                query = query + "\n"
-                    + "|> aggregateWindow(every: 10m, fn: max, createEmpty: false)"
-                  + "|> yield(name: \"max\")"
-                  + "|> duplicate(column: \"_stop\", as: \"_time\")";
-
-            fluxTables = influxDbClient.GetQueryApi().QueryAsync(query, "hlidac").Result;
-            var allData = fluxTables.SelectMany(m => m.Records)
-                .Select(m => new
-                {
-                    serverId = Convert.ToInt32(m.Values["serverid"] as string),
-                    fieldname = m.Values["fieldname"] as string,
-                    value = Convert.ToInt64(m.Values["_value"]),
-                    time = ((NodaTime.Instant)m.Values["_time"]).ToDateTimeUtc().ToLocalTime()
-                })
-                .GroupBy(k => new { s = k.serverId, t = k.time }, v => v);
-
-            var items = allData
-                .Select(i => new
-                {
-                    ServerId = i.Key.s,
-                    Server = allServers.First(m => m.Id == i.Key.s),
-                    CheckStart = i.Key.t,
-                    ResponseCode = i.Where(m => m.fieldname == "responseCode").FirstOrDefault()?.value ?? -1,
-                    ResponseSize = i.Where(m => m.fieldname == "responseSize").FirstOrDefault()?.value ?? -1,
-                    ResponseTimeInMs = i.Where(m => m.fieldname == "responseTime").FirstOrDefault()?.value ?? -1,
-                }
-                )
-                .ToArray();
+            var items = HlidacStatu.Lib.Data.External.InfluxDb.GetAvailbility(serverIds, intervalBack);
 
             var zabList = items
                 .GroupBy(k => k.ServerId, v => v)
                 .Select(g => new UptimeServer.HostAvailability(
-                                g.FirstOrDefault()?.Server
-                                ,
+                                allServers.First(m => m.Id == g.First().ServerId),
                                 g.OrderBy(m => m.CheckStart)
                                 .Select(m => new UptimeServer.UptimeMeasure()
                                 {
