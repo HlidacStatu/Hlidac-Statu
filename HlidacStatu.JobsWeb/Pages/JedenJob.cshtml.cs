@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HlidacStatu.JobsWeb.Pages
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize()]
     public class JedenJobModel : PageModel
     {
         public YearlyStatisticsGroup.Key? Key { get; set; }

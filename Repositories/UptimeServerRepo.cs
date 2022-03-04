@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
-    public static class UptimeServerRepo
+    public static partial class UptimeServerRepo
     {
 
 

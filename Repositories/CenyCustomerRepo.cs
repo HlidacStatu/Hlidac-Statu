@@ -25,7 +25,7 @@ namespace HlidacStatu.Repositories
             using (var db = new DbEntities())
             {
                 return await db.CenyCustomer.AsQueryable()
-                    .AnyAsync(m=>m.Username == username && m.Analyza == analyza && m.Rok == rok);
+                    .AnyAsync(m=>m.Username == username && m.Analyza == analyza && m.Rok == rok && m.Paid.HasValue);
             }
         }
 
