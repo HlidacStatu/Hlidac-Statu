@@ -54,6 +54,32 @@ namespace HlidacStatu.Entities
             [JsonIgnore()]
             public decimal? DownloadSpeed { get; set; } = null;
 
+
+            public enum SimpleStatuses
+            {
+                OK = 0,
+                //Slow = 1,
+                Bad = 10,
+                Unknown = -1,
+
+            }
+            public SimpleStatuses SimpleStatus()
+            {
+                switch (this.Status())
+                {
+                    case UptimeSSL.Statuses.OK:
+                    case UptimeSSL.Statuses.Pomalé:
+                        return SimpleStatuses.OK;
+                        //return SimpleStatuses.Slow;
+                    case UptimeSSL.Statuses.Nedostupné:
+                    case UptimeSSL.Statuses.TimeOuted:
+                    case UptimeSSL.Statuses.BadHttpCode:
+                        return SimpleStatuses.Bad;
+                    case UptimeSSL.Statuses.Unknown:
+                    default:
+                        return SimpleStatuses.Unknown;
+                }
+            }
             public UptimeSSL.Statuses Status()
             {
                 if (Response.HasValue == false)

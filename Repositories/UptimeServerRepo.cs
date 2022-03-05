@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 
 namespace HlidacStatu.Repositories
@@ -25,63 +27,77 @@ namespace HlidacStatu.Repositories
             else
                 return Firmy.GetJmeno(server.ICO);
         }
+        public static void SaveAlert(int serverId,Alert.AlertStatus status)
+        {
+            HlidacStatu.Connectors.DirectDB.NoResult("exec UptimeServer_Savealert @serverId, @lastAlertedStatus, @lastAlertSent ",
+                new IDataParameter[]
+                {
+                    new SqlParameter("serverId", serverId),
+                    new SqlParameter("lastAlertedStatus", (int)status),
+                    new SqlParameter("lastAlertSent", DateTime.Now),
+                });
 
-        public static void SaveLastCheck(UptimeItem lastCheck, UptimeServer uptimeServerTrigger)
+        }
+        public static void SaveLastCheck(UptimeItem lastCheck)
         {
             bool triggerScreenshot = false;
             bool triggerAlert = false;
 
+            Devmasters.DT.StopWatchLaps swl = new Devmasters.DT.StopWatchLaps();
 
-
-            using (DbEntities db = new DbEntities())
+            try
             {
-                var server = Load(uptimeServerTrigger.Id);
-                server.LastCheck = lastCheck.CheckStart;
-                server.LastResponseCode = lastCheck.ResponseCode;
-                server.LastResponseSize = lastCheck.ResponseSize;
-                server.LastResponseTimeInMs = lastCheck.ResponseTimeInMs;
-                server.TakenByUptimer = null;
+                var lap = swl.AddAndStartLap("SQL save");
+                HlidacStatu.Connectors.DirectDB.NoResult("exec UptimeServer_SaveStatus @serverId, @lastCheck, @lastResponseCode, @lastResponseSize, @lastResponseTimeInMs, @lastUptimeStatus",
+                    new IDataParameter[]
+                    {
+                        new SqlParameter("serverId", lastCheck.ServerId),
+                        new SqlParameter("lastCheck", lastCheck.CheckStart),
+                        new SqlParameter("lastResponseCode", lastCheck.ResponseCode),
+                        new SqlParameter("lastResponseSize", lastCheck.ResponseSize),
+                        new SqlParameter("lastResponseTimeInMs", lastCheck.ResponseTimeInMs),
+                        new SqlParameter("lastUptimeStatus", lastCheck.ToAvailability().Status()),
+                    });
+                lap.Stop();
 
-                db.UptimeServers.Attach(server);
-                if (server.Id == 0)
-                    db.Entry(server).State = EntityState.Added;
-                else
-                    db.Entry(server).State = EntityState.Modified;
+                lap = swl.AddAndStartLap("InfluxDb save");
+                HlidacStatu.Lib.Data.External.InfluxDb.AddPoints("uptimer", "hlidac",
+                    PointData.Measurement("uptime")
+                        .Tag("uptimer", lastCheck.Uptimer)
+                        .Tag("serverid", lastCheck.ServerId.ToString())
+                        .Tag("fieldname", "responseTime")
+                        .Field("value", lastCheck.ResponseTimeInMs)
+                        .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S),
+                    PointData.Measurement("uptime")
+                        .Tag("uptimer", lastCheck.Uptimer)
+                        .Tag("serverid", lastCheck.ServerId.ToString())
+                        .Tag("fieldname", "responseSize")
+                        .Field("value", lastCheck.ResponseSize)
+                        .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S),
+                    PointData.Measurement("uptime")
+                        .Tag("uptimer", lastCheck.Uptimer)
+                        .Tag("serverid", lastCheck.ServerId.ToString())
+                        .Tag("fieldname", "responseCode")
+                        .Field("value", (long)lastCheck.ResponseCode)
+                        .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S)
+                    );
+                lap.Stop();
 
-                try
-                {
+                lap = swl.AddAndStartLap("CheckAlert ");
+                UptimeServerRepo.Alert.CheckAndAlertServer(lastCheck.ServerId);
+                lap.Stop();
 
-                    db.SaveChanges();
-
-                    HlidacStatu.Lib.Data.External.InfluxDb.AddPoints("uptimer", "hlidac",
-                        PointData.Measurement("uptime")
-                            .Tag("uptimer", lastCheck.Uptimer)
-                            .Tag("serverid", lastCheck.ServerId.ToString())
-                            .Tag("fieldname", "responseTime")
-                            .Field("value", lastCheck.ResponseTimeInMs)
-                            .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S),
-                        PointData.Measurement("uptime")
-                            .Tag("uptimer", lastCheck.Uptimer)
-                            .Tag("serverid", lastCheck.ServerId.ToString())
-                            .Tag("fieldname", "responseSize")
-                            .Field("value", lastCheck.ResponseSize)
-                            .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S),
-                        PointData.Measurement("uptime")
-                            .Tag("uptimer", lastCheck.Uptimer)
-                            .Tag("serverid", lastCheck.ServerId.ToString())
-                            .Tag("fieldname", "responseCode")
-                            .Field("value", (long)lastCheck.ResponseCode)
-                            .Timestamp(lastCheck.CheckStart.ToUniversalTime(), WritePrecision.S)
-                        );
-                    ;
-                }
-                catch (System.Exception e)
-                {
-                    HlidacStatu.Util.Consts.Logger.Error("UptimeServerRepo.SaveLastCheck error ", e);
-                    throw;
-                }
-
+                Console.WriteLine("Times:\n" + swl.ToString());
             }
+            catch (System.Exception e)
+            {
+                Console.WriteLine("Times:\n" + swl.ToString());
+
+                HlidacStatu.Util.Consts.Logger.Error("UptimeServerRepo.SaveLastCheck error ", e);
+                throw;
+            }
+
+
         }
         public static UptimeServer Load(int serverId)
         {
@@ -225,7 +241,7 @@ namespace HlidacStatu.Repositories
             if (serverIds.Length == 0)
                 return null;
 
-            return _availability(serverIds,intervalBack);
+            return _availability(serverIds, intervalBack);
         }
 
         public static IEnumerable<UptimeServer.HostAvailability> AvailabilityForDayByIds(int[] serverIds)

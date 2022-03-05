@@ -38,7 +38,15 @@ namespace HlidacStatu.Entities
         [Nest.Keyword]
         public string Uptimer { get; set; }
 
+        public UptimeServer.Availability ToAvailability()
+        {
+            UptimeServer.Availability av = new UptimeServer.Availability();
+            av.Time = this.CheckStart;
+            av.HttpStatusCode = (int) this.ResponseCode;
+            av.Response = this.ResponseTimeInMs;
+            return av;
 
+        }
 
     }
 }
