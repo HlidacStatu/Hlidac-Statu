@@ -315,7 +315,10 @@ namespace HlidacStatu.Repositories
                                 }
                                 )
                             ) //zabhost
-                    );
+                    )
+                .ToArray()
+                ;
+            
 
             return zabList;
         }

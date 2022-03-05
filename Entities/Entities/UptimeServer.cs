@@ -71,5 +71,11 @@ namespace HlidacStatu.Entities
         [Nest.Date]
         public DateTime? TakenByUptimer { get; set; }
 
+        public int? LastUptimeStatus { get; set; }
+        public int? LastAlertedStatus { get; set; }
+
+        public DateTime? LastAlertSent { get; set; }
+
+
     }
 }

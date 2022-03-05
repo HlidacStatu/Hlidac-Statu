@@ -65,7 +65,11 @@ namespace HlidacStatu.Entities
             }
             public SimpleStatuses SimpleStatus()
             {
-                switch (this.Status())
+                return ToSimpleStatus(this.Status());
+            }
+            public static SimpleStatuses ToSimpleStatus(UptimeSSL.Statuses status)
+            {
+                switch (status)
                 {
                     case UptimeSSL.Statuses.OK:
                     case UptimeSSL.Statuses.Pomalé:

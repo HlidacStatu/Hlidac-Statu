@@ -88,12 +88,12 @@ namespace HlidacStatu.Repositories
                     return AlertStatus.NoChange;
 
 
-                return CheckServerLogic(avail, numToAnalyze);
+                return CheckServerLogic(serverId, avail, numToAnalyze);
 
             }
 
             //should be private
-            public static AlertStatus CheckServerLogic(UptimeServer.Availability[] availabilities, int numToChange = 2)
+            public static AlertStatus CheckServerLogic(int serverId, UptimeServer.Availability[] availabilities, int numToChange = 2)
             {
                 UptimeServer.Availability[] lastChecks = availabilities
                     .OrderByDescending(o=>o.Time)
@@ -120,14 +120,48 @@ namespace HlidacStatu.Repositories
                 //predchozí se lisí
                 //z predchoziho 2x delsiho intervalu vezmu ten necastejsi stav co byl
                 preLastChecks = availabilities.Skip(numToChange).Take(numToChange*2).ToArray();
-                UptimeServer.Availability.SimpleStatuses mostDetectedStatus = preLastChecks
-                    .GroupBy(k => k.SimpleStatus(), (k, v) => new { k = k, v = v.Count() } )
-                    .OrderByDescending(o=>o.v).ThenByDescending(o=>(int)o.k)
-                    .Select(m=>m.k)
-                    .First();
+                var mostDetectedStatus_all = preLastChecks
+                    .GroupBy(k => k.SimpleStatus(), (k, v) => new { status = k, count = v.Count() })
+                    .OrderByDescending(o => o.count).ThenByDescending(o => (int)o.status)
+                    .ToArray();
+
+                UptimeServer.Availability.SimpleStatuses? mostDetectedStatus = null;
+                if (mostDetectedStatus_all.First().count == (numToChange * 2) / mostDetectedStatus_all.Count())
+                {
+                    //stejny pocet, rozhodni podle poslední
+                    var lastAlertStatus = (Alert.AlertStatus?)UptimeServerRepo.Load(serverId).LastAlertedStatus;
+                    switch (lastAlertStatus)
+                    {
+                        case AlertStatus.NoData:
+                        case AlertStatus.NoChange:
+                            mostDetectedStatus = null;
+                            break;
+                        case AlertStatus.ToSlow:
+                            mostDetectedStatus =  UptimeServer.Availability.SimpleStatuses.OK;
+                            break;
+                        case AlertStatus.ToFail:
+                            mostDetectedStatus = UptimeServer.Availability.SimpleStatuses.Bad;
+                            break;
+                        case AlertStatus.BackOk:
+                            mostDetectedStatus = UptimeServer.Availability.SimpleStatuses.OK;
+                            break;
+                        case AlertStatus.BackOkFromSlow:
+                            mostDetectedStatus = UptimeServer.Availability.SimpleStatuses.OK;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                //pokud stale nevim, rozhodni podle priorit
+                mostDetectedStatus = mostDetectedStatus  ?? mostDetectedStatus_all
+                                        .Select(m=>m.status)
+                                        .First();
+
+
 
                 return ChangeStatusLogic(
-                    mostDetectedStatus,
+                    mostDetectedStatus.Value,
                     lastChecks.First().SimpleStatus()
                     );
             }
