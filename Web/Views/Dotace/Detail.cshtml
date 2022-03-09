@@ -1,8 +1,24 @@
-﻿@model HlidacStatu.Entities.Dotace.Dotace
+﻿@using HlidacStatu.Entities.Dotace
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Searching
+@model HlidacStatu.Entities.Dotace.Dotace
 
 @{
     ViewBag.Title = "Hlídač dotací";
     ViewBag.SubTitle = "Detail dotace";
+
+    string duplicitaQuery = $"ico:{Model.Prijemce.Ico} AND kod:{Model.KodProjektu}";
+    List<Dotace> duplicity = null;
+    if (!string.IsNullOrWhiteSpace(Model.Prijemce.Ico)
+        && !string.IsNullOrWhiteSpace(Model.KodProjektu))
+    {
+        var foundDuplicates = DotaceRepo.Searching.SimpleSearch(duplicitaQuery, 0, 1000, DotaceSearchResult.DotaceOrderResult.FastestForScroll);
+        if (foundDuplicates.HasResult)
+        {
+            duplicity = foundDuplicates.Results.ToList();
+        }
+
+    }
 }
 
 @section breadcrumb
@@ -23,10 +39,11 @@
     Detail dotace "@Model.GetNazevDotace()"
 </h2>
 
-@if (!string.IsNullOrWhiteSpace(Model.Duplicita) && Model.Zdroj.Nazev != "cedr")
+@if (duplicity != null && duplicity.Count > 1)
 {
+    var text = Devmasters.Lang.CS.Plural.Get(duplicity.Count(), "pouze jednu možnou duplicitu", "{0} možné duplicity", "{0} možných duplicit");
     <div class="alert alert-warning">
-        <i class="fas fa-exclamation-circle"></i> Tento záznam je velmi pravděpodobně duplicitou dotace <a href="/Dotace/Detail/@Model.Duplicita.ToLower()">@Model.GetNazevDotace()</a>
+        <i class="fas fa-exclamation-circle"></i> Nalezli jsme <a href="/Dotace/Hledat/?q=@duplicitaQuery">@text</a>.
     </div>
 }
 

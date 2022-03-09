@@ -15,10 +15,18 @@
     @foreach (var hit in Model.ElasticResults.Hits)
     {
         var dotaceItem = hit.Source;
-        <tr class="@((!string.IsNullOrWhiteSpace(dotaceItem.Duplicita) && dotaceItem.Zdroj.Nazev != "cedr") ? "alert alert-warning" : "") ">
+        
+        //find duplicates
+        var hasSimilar = Model.ElasticResults.Hits
+            .Count(h => string.IsNullOrWhiteSpace(dotaceItem.Prijemce.Ico)
+                && string.IsNullOrWhiteSpace(dotaceItem.KodProjektu)
+                && h.Source.Prijemce.Ico == dotaceItem.Prijemce.Ico
+                && h.Source.KodProjektu == dotaceItem.KodProjektu) > 1;
+        
+        <tr class="@(hasSimilar ? "alert alert-warning" : "") ">
             <td class="text-nowrap">
 
-                @if (!string.IsNullOrWhiteSpace(dotaceItem.Duplicita) && dotaceItem.Zdroj.Nazev != "cedr")
+                @if (hasSimilar)
                 {
                     <i class="fas fa-exclamation-circle text-warning" title="Potencionální duplicita"></i>
                 }
