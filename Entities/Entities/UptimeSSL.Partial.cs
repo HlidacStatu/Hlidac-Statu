@@ -33,6 +33,53 @@ namespace HlidacStatu.Entities
             return _certExpires;
         }
 
+        public string CertExpirationToString(bool html = true, 
+            string htmlTemplate = "<div>{sentence}</div>", 
+            string textTemplate = "{sentence}",
+            string sentenceTemplate = "{icon} Certifikát {action}{actionPast} {expiration}.",
+            string action = "expiruje",
+            string actionPast = "expiroval")
+        {
+            var template = html ? htmlTemplate : textTemplate;
+
+            if (this.CertExpiration().HasValue == false)
+                return String.Empty;
+
+            string icon = "";
+            string sentence = "";
+            TimeSpan interval = this.CertExpiration().Value - DateTime.Now;
+            var expiresIn = Devmasters.DT.Util.Ago(new TimeSpan(-1 * interval.Ticks), HlidacStatu.Util.Consts.czCulture);
+            if (interval.TotalDays < 0)
+            {
+                icon = "<i class='fa-solid fa-alarm-exclamation text-danger blinking'></i>";
+                sentence = sentenceTemplate
+                    .Replace("{icon}", icon)
+                    .Replace("{action}", "")
+                    .Replace("{actionPast}", actionPast)
+                    .Replace("{expiration}", expiresIn.ToLower());
+            }
+            else if (interval.TotalDays < 4)
+            {
+                icon = "<i class='fa-solid fa-circle-exclamation text-danger'></i>";
+                sentence = sentenceTemplate
+                    .Replace("{icon}", icon)
+                    .Replace("{action}", action)
+                    .Replace("{actionPast}", "")
+                    .Replace("{expiration}", expiresIn.ToLower());
+            }
+            else
+            {
+                icon = "<i class='fa-solid fa-circle-exclamation  text-warning'></i>";
+                sentence = sentenceTemplate
+                    .Replace("{icon}", icon)
+                    .Replace("{action}", action)
+                    .Replace("{actionPast}", "")
+                    .Replace("{expiration}", expiresIn.ToLower());
+            }
+
+            return template.Replace("{sentence}", sentence);
+
+        }
 
         public SSLGrades SSLGrade()
         {

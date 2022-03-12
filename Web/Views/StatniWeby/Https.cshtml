@@ -59,30 +59,10 @@ else
                                 .OrderBy(o=>o.CertExpiration()) 
                 )
                 {
-                    TimeSpan interval = domain.CertExpiration().Value - DateTime.Now;
-                    var expiresIn = Devmasters.DT.Util.Ago(new TimeSpan(-1*interval.Ticks), HlidacStatu.Util.Consts.czCulture);
-                    string icon = "";
                     var server = servers.FirstOrDefault(m => m.HostDomain().ToLower() == domain.Domain.ToLower());
 
-                    if (interval.TotalDays < 0)
-                    {
-                        icon = "<i class='fa-solid fa-alarm-exclamation text-danger blinking'></i>";
-                        expiresIn = "Skončila " + expiresIn.ToLower();
-                    }
-                    else if (interval.TotalDays < 4)
-                    {
-                        icon = "<i class='fa-solid fa-circle-exclamation text-danger'></i>";
-                        expiresIn = "Skončí " + expiresIn.ToLower();
-                    }
-                    else 
-                    {
-                        icon = "<i class='fa-solid fa-circle-exclamation  text-warning'></i>";                        
-                        expiresIn = "Skončí " + expiresIn.ToLower();
-                    }
-
                     <tr>
-                        <td>@Html.Raw(icon)</td>
-                        <td>@(expiresIn)</td>
+                        <td>@Html.Raw(domain.CertExpirationToString(true,"{sentence}", sentenceTemplate:"{icon} {action}{actionPast} {expiration}.", action:"Skončí",actionPast:"Skončila"))</td>
                         <td><a href="@server.pageUrl">@server.Name</a> (@(string.IsNullOrEmpty(server.ICO)?"" : HlidacStatu.Repositories.Firmy.GetJmeno( server.ICO)))</td>
                     </tr>
                 }
