@@ -81,30 +81,44 @@
 
         <div class="d-print-none">
 
-            <div class="header__content ">
+            @if (ViewBag.BigBanner == true)
+            {
+                <div class="header__content ">
 
-                <div style="padding-top:20px;color:#FFF">Cenové analýzy prací, produktů a služeb</div>
-                <!-- desktop menu items only -->
-                <div class="header__title">
-                    <h1>Hlídač státu</h1>
-                    <span>Hlídáme je, protože si to zaslouží!</span>
+                    <div class="header__title">
+                        <h1>Cenové analýzy</h1>
+                        <div class="header__text">
+                            Analýzy nabízí detailní přehled obvyklých cen na českém trhu. 
+                            Zpracovány jsou údaje jednotlivých oborů ze všech smluv se státní správou v daném roce.
+                            
+                            Jde o <b style="color:yellow">nejrozsáhlejší</b> a <b style="color:yellow">nejspolehlivější</b> analýzu jednotkových cen v Česku.
+
+                            <br/>
+                            <a style="margin-top:20px" href="/contact" class="btn btn-primary">Objednat</a>
+                        </div>
+                    </div>
+
                 </div>
-                <!-- desktop menu items only -->
+
+            }
+            else
+            {
+                <div class="header__content ">
+
+                    <div style="padding-top:20px;color:#FFF">Cenové analýzy &gt;</div>
+                    <!-- desktop menu items only -->
+                        <h2 style="padding-top:20px;color:white">@ViewData["Title"]</h2>
+                    <!-- desktop menu items only -->
 
             </div>
-
+            }
         </div>
-        @*disable*@
-        @if (false && ViewBag.HideYearSelector != true)
-        {
-            <div class="mt-2 ms-4">
-                <partial name="_SubjectYearSelector" />
 
-            </div>
-        }
     </header>
-    <div class="container mt-2">
+    <div class="bg-light">
+    <div class="container pt-2">
         <partial name="_NavBar" />
+    </div>
     </div>
     <div class="container mt-2">
         <main role="main" class="pb-3">
@@ -129,7 +143,7 @@
     </div>
 
 
-    <footer style="margin-top:100px;" >
+    <footer style="margin-top:100px;">
 
         <div style="background:#f2f5f7;">
             <div class="footer__content">

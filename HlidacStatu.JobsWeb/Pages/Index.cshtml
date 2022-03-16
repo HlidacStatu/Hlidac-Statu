@@ -1,4 +1,5 @@
 ﻿@page
+
 @model HlidacStatu.JobsWeb.Areas.Identity.Pages.Account.LoginModel
 @using HlidacStatu.JobsWeb.Services
 @using HlidacStatu.JobsWeb.Models
@@ -11,150 +12,117 @@
 @{
     ViewData["Title"] = "Cenové analýzy Hlídače státu";
     ViewBag.HideYearSelector = true;
+    ViewBag.BigBanner = true;
 }
 
-<h1 class="display-4 fw-bold lh-1 mb-3">Cenové analýzy prací, produktů a služeb</h1>
-<div class="container col-xl-10 col-xxl-8 px-4 ">
-    <div class="row align-items-center g-lg-5 ">
-        <div class="col-lg-7 text-center text-lg-start">
-            <p class="col-lg-10 fs-4 text-muted">
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h2 class="fw-bold lh-2 mb-3">Analýzy</h2>
+            <p class="col-lg-10">
                 Pomocí AI, machine learning technologií a pokročilého zpracování obsahu smluv a důkladné osobní kontroly každého údaje, jsme zanalyzovali smluvní podmínky a nasmlouvané ceny v různých oblastech.
                 Naše <b class="text-dark">nejrozsáhlejší cenové analýzy</b> na českém trhu pomohou <b class="text-dark">úřadům s orientací v obvyklých cenových relacích</b>, a <b class="text-dark">dodavatelům s kvalitní a konkureční nabídkou</b> do výběrových řízení.
 
-                <br style="margin-bottom:30px;" />
-                <h3>Dostupné analýzy</h3>
-                <ul class="list-group">
-                    <li class="list-group-item list-group-item-success" ariaaria-disabled="true">
-                        <b>DEMO</b>: Přehled obvyklých cen IT prací ve státní správě za rok Q1/2018 (volně přístupný jako ukázka).
-                        @if (HttpContext.User?.Identity?.IsAuthenticated == false)
-                        {
-                            <b>Pro přístup k reportu se musíte přihlásit.</b>
+                <table class="table ">
+                    <tr>
+                        @{
+                            var a_demo18 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "DEMO", Rok = 2018 });
                         }
-                        else
-                        {
-                            <b><a href="/Souhrn?obor=DEMO&rok=2018">Otevřít analýzu</a></b>
-                        }
-                    </li>
+                        <td width="60%">
+                            <a class="fs-6 fw-bolder text-decoration-none" href="/Souhrn?obor=DEMO&rok=2018">
+                                Přehled obvyklých cen IT prací ve státní správě za rok Q1/2018
+                            </a>
+                        </td>
+                        <td width="20%"><a class="btn btn-success btn-sm" href="/Souhrn?obor=DEMO&rok=2018">Zdarma k nahlédnutí</a></td>
+                        <td width="20%">
+                            <div class="text-muted small">
+                                Ukázkový report za Q1 obsahuje údaje z @a_demo18.PocetSmluv</b> smluv
+                                od <b class="text-black">@a_demo18.PocetZadavatelu</b> zadavatelů, <b class="text-black">@a_demo18.PocetDodavatelu</b> dodavatelů,
+                                zahrnuje <b class="text-black">@a_demo18.PocetCen  cen</a>.
+                            </div>
 
-                    <li class="list-group-item list-group-item-info">Přehled obvyklých cen IT prací ve státní správě za rok 2020 
-                        @if (HttpContext.User?.Identity?.IsAuthenticated == false)
-                        {
-                            <b>Pro přístup k reportu se musíte přihlásit.</b>
-                        }
-                        else if (await HttpContext.HasAccess("IT",2020))
-                        {
-                            <b><a href="/Souhrn?obor=IT&rok=2020">Otevřít analýzu</a></b>
-                        }
-                        </li>
-                </ul>
-                <br style="margin-bottom:30px;" />
-                <h3>Připravované analýzy</h3>
-                <ul class="list-group">
-                    <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019 (bude dostupná v březnu 2022)</li>
-                    <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021 (bude dostupná v květnu 2022)</li>
-                </ul>
+                        </td>
+                    </tr>
+                    @if (await HttpContext.HasAccess("IT", 2020) == false)
+                    {
+                        var a_it20 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 });
+
+                        <tr>
+                            <td>
+                                <div class="fs-6 fw-bolder text-decoration-none text-muted">
+                                    Přehled obvyklých cen IT prací ve státní správě za rok 2020
+                                </div>
+                            </td>
+                            <td>
+                                <a class="btn btn-success btn-sm" href="/contact">Objednat</a>
+                            </td>
+                            <td>
+                                <div class="text-muted small">
+                                    Údaje z @a_it20.PocetSmluv smluv od <b class="text-black">@a_it20.PocetZadavatelu</b> zadavatelů,
+                                    <b class="text-black">@a_it20.PocetDodavatelu</b> dodavatelů,
+                                    zahrnuje <b class="text-black">@a_it20.PocetCen cen</b>.
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                <a class="fs-6 fw-bolder text-decoration-none" href="/Souhrn?obor=IT&rok=2020">Přehled obvyklých cen IT prací ve státní správě za rok 2020</a>
+                            </td>
+                            <td>
+                                <a class="btn btn-success btn-sm" href="/Souhrn?obor=IT&rok=2020)">Otevřít analýzu</a>
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td>
+                            <div class="fs-6 fw-bolder text-decoration-none text-muted">Přehled obvyklých cen IT prací ve státní správě za rok 2021</div>
+                        </td>
+                        <td>
+                            <a class="btn btn-outline-success btn-sm" href="/contact">Dostupné od dubna 2022</a>
+                        </td>
+                    </tr>
+
+                </table>
+                @if (SignInManager.IsSignedIn(User) == false)
+                {
+                <p class="text-muted">
+                    Pokud již máte analýzy zakoupené a nevidíte je zde, <a href="https://www.hlidacstatu.cz/Identity/Account/Login?returnUrl=/cenypracehlidac">zalogujte se</a>.
+                </p>
+                }
 
             </p>
         </div>
-        <div class="col-md-10 mx-auto col-lg-5">
-            @if (SignInManager.IsSignedIn(User))
-            {
-                <div class="p-4 p-md-5 border rounded-3 bg-light">
-                    <h4>Jste přihlášeni</h4>
-                    <div class="mb-3">
-                        @(User.Identity.Name)
-                    </div>
-                    <div class="mb-3">
-                        <b>Máte zakoupeny tyto analýzy:</b>
-                        <ul class="list-group-flush">
-                            @if (await HttpContext.HasAccess("IT",2020))
-                            {
-                                <li class="list-group-item"><a href="/Souhrn?obor=IT&rok=2020">Přehled obvyklých cen IT prací ve státní správě za rok 2020 (<b>report máte zakoupený</b>)</a></li>
-                            }
-                            else
-                            {
-                            }
-                            <li class="list-group-item"><a href="/Souhrn?obor=DEMO&rok=2018">DEMO: Přehled obvyklých cen IT prací ve státní správě za rok 2018 (<b>Demo analýza za Q1 2018</b>)</a></li>
-                        </ul>
-                        <b>Můžete si koupit:</b>
-                        <ul class="list-group-flush">
-                            @if (await HttpContext.HasAccess("IT",2020))
-                            {
-                            }
-                            else
-                            {
-                                <li class="list-group-item">Přehled obvyklých cen IT prací ve státní správě za rok 2020 (<b>report je hotový</b>)</li>
-                            }
-                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2019 (připravujeme)</li>
-                            <li class="list-group-item disabled" aria-disabled="true">Přehled obvyklých cen IT prací ve státní správě za rok 2021 (připravujeme)</li>
-                        </ul>
-                    </div>
-                </div>
-            }
-            else
-            {
 
-                <form asp-antiforgery="true" class="p-4 p-md-5 border rounded-3 bg-light" id="account" action="/Identity/Account/Login" method="post">
-                <div>DEMO report je k dispozici zdarma po přihlášení. </div>
-                    <div asp-validation-summary="All" class="text-danger"></div>
-                    <div class="form-floating mb-3">
-                        <input type="email" class="form-control" asp-for="Input.Email">
-                        <label for="floatingInput" asp-for="Input.Email">Email</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="password" class="form-control" asp-for="Input.Password">
-                        <label asp-for="Input.Password">Heslo</label>
-                    </div>
-                    <button class="w-100 btn btn-lg btn-primary" type="submit">Přihlásit se</button>
-                    <hr class="my-4">
-                    <small class="text-muted">Pokud jste registrováni na www.hlidacstatu.cz, zde funguje stejný login. <b>Registrace je zdarma</b></small>
-                    <small><a id="forgot-password" href="https://www.hlidacstatu.cz/Identity/Account/ForgotPassword">Zapomenuté heslo?</a></small>
-                    <p class="text-dark">Nemáte přístup k analýzám, <a href="https://www.hlidacstatu.cz/Identity/Account/Register">zaregistrujte se</a>.</p>
-                </form>
-            }
-        </div>
     </div>
 </div>
 
 
-<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
-    <h1 class="display-4 fw-normal">Ceník</h1>
+<div class="pricing-header p-3 pb-md-4 mx-auto">
+    <h2 class="fw-normal">Ceník</h2>
     <p class="fs-5 text-muted">
-        Analýzy jsou dostupné ve formě PDF a interaktivní webové analytické aplikace. PDF obsahuje základní a souhrnné údaje.
-        Webová aplikace obsahuje detailní informace a přístup až k jednotlivým analyzovaným smlouvám.
+        Analýzy jsou dostupné pro jednotlivé kalendářní roky a oblasti.
     </p>
 </div>
 
-<div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+<div class="row row-cols-1 row-cols-md-3 mb-4 text-center">
     <div class="col">
         <div class="card mb-4 rounded-3 shadow-sm">
-            <div class="card-header py-3">
-                <h4 class="my-0 fw-normal">Přehled cen IT prací</h4>
+            <div class="card-header py-3 text-white bg-success bg-opacity-75">
+                <h4 class="my-0 fw-normal">Basic</h4>
             </div>
             <div class="card-body">
-                <h2 class="card-title pricing-card-title">za celý rok 2020</h2>
-                @{
-                    var key = new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 };
-                    var stat = JobService.GetStatistics(key);
-                    var distinctJobsForYearAndSubject = JobService.DistinctJobsForYearAndSubject(key);
-                    var pocetSmluv = distinctJobsForYearAndSubject
-                    .Select(m => m.SmlouvaId).Distinct().Count();
-                    var pocetZadavatelu = distinctJobsForYearAndSubject
-                    .Select(m => m.IcoOdberatele).Distinct().Count();
-                    var pocetDodavatelu = distinctJobsForYearAndSubject
-                    .SelectMany(m => m.IcaDodavatelu).Distinct().Count();
-                    var pocetCen = distinctJobsForYearAndSubject
-                    .Count();
-                }
+                <h3 class="card-title pricing-card-title">49 000<small class="text-muted fw-light"> Kč bez DPH</small></h3>
                 <ul class="list-unstyled mt-3 mb-4">
-                    <li>obsahuje údaje z @pocetSmluv smluv</li>
-                    <li>od @pocetZadavatelu zadavatelů</li>
-                    <li>a @pocetDodavatelu dodavatelů</li>
-                    <li>zahrnuje @pocetCen cen</li>
-                    <li>+ detailní rozpad cen</li>
-                    <li>+ obvyklé ceny</li>
-                    <li>+ maximální a minimální ceny</li>
+                    <li>PDF souhrnná analýza</li>
+                    <li>Webová analytická aplikace</li>
+                    <li>Licence na pouze interní použití</li>
+                    <li>Sleva 10 % na analýzy pro jiné roky</li>
+                    <li>Uživatelská a analytická podpora</li>
                 </ul>
+                <a href="/contact" class="w-100 btn btn-lg btn-success">Objednat</a>
             </div>
         </div>
     </div>
@@ -164,175 +132,214 @@
                 <h4 class="my-0 fw-normal">Pro</h4>
             </div>
             <div class="card-body">
-                <h2 class="card-title pricing-card-title">49 000<small class="text-muted fw-light"> Kč bez DPH</small></h2>
+                <h3 class="card-title pricing-card-title">199 000<small class="text-muted fw-light"> Kč bez DPH</small></h3>
                 <ul class="list-unstyled mt-3 mb-4">
-                    <li>PDF</li>
-                    <li>Webová analytická aplikace</li>
-                    <li>Omezená licence (pouze interní použití)</li>
-                    <li>Sleva 20% na analýzu pro jiné roky</li>
+                    <li>Vše jako Basic, navíc</li>
+                    <li>Srovnávací analýzy dodavatelů a zadavatelů</li>
+                    <li>Provázání na jednotlivé smlouvy</li>
+                    <li>Zdrojová data, API</li>
+                    <li>Sleva 20 % na analýzu pro jiné roky</li>
                 </ul>
-                <a href="/contact" class="w-100 btn btn-lg btn-success">Kontaktujte nás</a>
+                <a href="/contact" class="w-100 btn btn-lg btn-success">Objednat</a>
             </div>
         </div>
     </div>
-    <div class="col">
-        <div class="card mb-4 rounded-3 shadow-sm border-primary">
-            <div class="card-header py-3 text-white bg-primary border-primary">
-                <h4 class="my-0 fw-normal">Public</h4>
-            </div>
-            <div class="card-body">
-                <h2 class="card-title pricing-card-title">290 000<small class="text-muted fw-light"> Kč bez DPH</small></h2>
-                <ul class="list-unstyled mt-3 mb-4">
-                    <li>Vše jako Pro, navíc</li>
-                    <li>Veřejná licence (jednotlivé údaje z analýzy <a href="#faq_public">můžete zveřejňit</a>)</li>
-                    <li>Sleva 25% na analýzu pro jiné roky</li>
-                </ul>
-                <a href="/contact" class="w-100 btn btn-lg btn-primary">Kontaktujte nás</a>
-            </div>
-        </div>
+
+</div>
+
+<h4>Další produkty</h4>
+<h5 class="d-inline-flex p-2 bg-primary bg-opacity-75 text-white">Veřejná licence</h5>
+<p class="ps-5">
+    Jednotlivé údaje z analýzy týkající se vašeho subjektu můžete zveřejňit <a href="#faq_public">detail</a>.
+    Nutná licence pro využití dat v rámci veřejných správních řízeních, veřejných soudních sporů, v marketingu a PR.
+    <a href="/contact" class="btn btn-sm btn-outline-primary">Kontaktujte nás</a>
+</p>
+<h5 class="d-inline-flex p-2 bg-primary bg-opacity-75 text-white">Novinářská, NGO a EDU licence</h5>
+<p class="ps-5 pb-5">
+    Přístup k datům a licence pro novináře, redakce, neziskové organizace a pro potřeby vzdělávání a výzkumu.
+    <a href="/contact" class="btn btn-sm btn-outline-primary">Kontaktujte nás</a>
+</p>
+
+
+
+<div class="pt-5 bg-light">
+    <h2 class="mb-4">Porovnání produktů</h2>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+        <symbol id="check" viewBox="0 0 16 16">
+            <title>Check</title>
+            <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
+        </symbol>
+    </svg>
+    <div class="table-responsive">
+        <table class="table text-center table-sm ">
+            <thead>
+                <tr>
+                    <th style="width: 25%;"></th>
+                    <th style="width: 25%;">Basic</th>
+                    <th style="width: 25%;">Pro</th>
+                    <th style="width: 25%;">Licence</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row" class="text-start">PDF se souhrnou analýzou</th>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="row" class="text-start">Analytický web s detailnímy údaji</th>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="row">Neomezený přístup k analytickému webu</th>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="row">Provázání cen až na konkrétní smlouvy</th>
+                    <td><i class="fa-solid fa-x fa-lg fw-bold text-danger"></i></td>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="row">Provázání cen až na konkrétní stránky smlouvy</th>
+                    <td><i class="fa-solid fa-x fa-lg fw-bold text-danger"></i></td>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="row" class="text-start">Použití pro vnitřní potřebu</th>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td>
+                        <i class="fa-solid fa-check fa-xl fw-bold text-success"></i><i class="fa-solid fa-check fa-xl fw-bold text-success"></i>
+                        <br />i veřejně
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row" class="text-start">Právo na zveřejnění částí analýzy</th>
+                    <td><i class="fa-solid fa-x fa-lg fw-bold text-danger"></i></td>
+                    <td><i class="fa-solid fa-x fa-lg fw-bold text-danger"></i></td>
+                    <td>
+                        <i class="fa-solid fa-check fa-xl fw-bold text-success"></i>
+                        <br /><small>vybrané údaje z analýzy <a href="#faq_public">více *)</a></small>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row" class="text-start">Sleva na analýzu pro další roky</th>
+                    <td>10 %</td>
+                    <td>20 %</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="row" class="text-start">Podpora</th>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                </tr>
+                <tr>
+                    <th scope="row" class="text-start">API pro získání analytických dat</th>
+                    <td><i class="fa-solid fa-x fa-lg fw-bold text-danger"></i></td>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <th scope="row" class="text-start">Kompletní data ve formě JSON/XML</th>
+                    <td><i class="fa-solid fa-x fa-lg fw-bold text-danger"></i></td>
+                    <td><i class="fa-solid fa-check fa-xl fw-bold text-success"></i></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
+
 </div>
-<h2 class="display-6 text-center mb-4">Porovnání produktů</h2>
-<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-    <symbol id="check" viewBox="0 0 16 16">
-        <title>Check</title>
-        <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
-    </symbol>
-</svg>
-<div class="table-responsive">
-    <table class="table text-center table-sm table-striped">
-        <thead>
-            <tr>
-                <th style="width: 34%;"></th>
-                <th style="width: 33%;">Pro</th>
-                <th style="width: 33%;">Public</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <th scope="row" class="text-start">PDF se souhrnou analýzou</th>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-start">Analytický web s detailnímy údaji</th>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-start">Neomezený přístup k analytickému webu</th>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-start">Provázání cen až na konkrétní smlouvy</th>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-start">Provázání cen až na konkrétní stránky smlouvy</th>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            </tr>
-        </tbody>
-
-        <tbody>
-            <tr>
-                <th scope="row" class="text-start">Použití pro vnitřní potřebu</th>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-start">Právo na zveřejnění částí analýzy</th>
-                <td></td>
-                <td>
-                    <svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg>
-                    <br /><small>vybrané údaje z analýzy <a href="#faq_public">více *)</a></small>
-                </td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-start">Sleva na analýzu pro další roky</th>
-                <td>20 %</td>
-                <td>25 %</td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-start">Podpora s reakcí do 3 pracovních dní</th>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-                <td></td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-start">Podpora s reakcí do 1 pracovního dne</th>
-                <td></td>
-                <td><svg class="bi" width="24" height="24"><use xlink:href="#check"></use></svg></td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-start">API pro získání analytických dat</th>
-                <td></td>
-                <td>Připravujeme</td>
-            </tr>
-            <tr>
-                <th scope="row" class="text-start">Kompletní data ve formě JSON/XML</th>
-                <td></td>
-                <td>Připravujeme</td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-
 <div class="my-5"></div>
 
 <!--Section: FAQ-->
-<section class="pb-4">
-    <div class="bg-white border rounded-5">
-        <section class="p-4 d-flex justify-content-center w-100" style="border-radius: .5rem .5rem 0 0; background-color:#fbfbfb;">
-            <section>
-                <h3 class="text-center mb-4 pb-2 fw-bold">Otázky a odpovědi</h3>
-                <p class="text-center mb-5">
-                    Odpovědi na nejčastější otázky
+<h3 class="text-center mb-4 pb-2 fw-bold">Otázky a odpovědi</h3>
+<div class="accordion" id="accordionExample">
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading01">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse01" aria-expanded="true" aria-controls="collapse01">
+                Kdo může data využívat?
+            </button>
+        </h2>
+        <div id="collapse01" class="accordion-collapse collapse show" aria-labelledby="heading01" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <p>
+                    Přístup k datům a licenci k používání má pouze fyzická nebo právnická osoba, která si licenci zakoupila.
+                    Jakákoliv data z analýzy <strong><u>nesmí</u></strong> bezplatně či za úplatu poskytnout jiné fyzické či právnické osobě.
+                    Současně musí zajistit, že nedojde k zveřejnění data z analýzy.
+                    V případě zveřejnění dat z analyzy je povinností držitele licence dokoupení <strong>Veřejné licence</strong> s <a href="#faq_public">možností data zveřejnit</a>.
                 </p>
-
-                <div class="row">
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <h6 class="mb-3 text-primary"><i class="far fa-paper-plane text-primary pe-2"></i>Kdo může data využívat?</h6>
-                        <p>
-                            Přístup k datům a licenci k používání má pouze fyzická nebo právnická osoba, která si licenci zakoupila.
-                            Jakákoliv data z analýzy <strong><u>nesmí</u></strong> bezplatně či za úplatu poskytnout jiné fyzické či právnické osobě.
-                            Současně musí zajistit, že nedojde k zveřejnění data z analýzy.
-                            V případě zveřejnění dat z analyzy je povinností držitele licence dokoupení <strong>Public licence</strong> s <a href="#faq_public">možností data zveřejnit</a>.
-                        </p>
-                        <p>Pro licenci <strong>Public</strong> platí mírnější omezení.</p>
-                    </div>
-
-                    <div id="faq_public" class="col-md-6 col-lg-4 mb-4">
-                        <h6 class="mb-3 text-primary"><i class="fas fa-pen-alt text-primary pe-2"></i>Jaké informace z analýzy může zveřejnit držitel <strong>licence Public</strong>?</h6>
-                        <p>
-                            Držitel <strong>licence Public</strong> může zveřejnit jednotlivé údaje z licence,
-                            pokud je to nutné pro soudní či správní spor, řádný výkon úřadu či správního úkonu.
-                            Smí zveřejnit údaje pouze týkající se držitele licence a jeho dodavatelů.
-                            V žádném případě <strong><u>není oprávněn zveřejnit</u></strong> celou analýzu
-                            či její části týkající se jiných právnických či fyzických osob popsaných výše.
-                        </p>
-                    </div>
-
-                    <div class="col-md-6 col-lg-4 mb-4 bg-light p-2">
-                        <h6 class="mb-3 text-primary"><i class="fas fa-user text-primary pe-2"></i>Mohou analýzu používat dceřiné či podřízené organizace držitele licence?</h6>
-                        <p>
-                            Nemohou, licence je vázaná pouze na konkrétní právnickou či fyzickou osobu.
-                            Poskytujeme však <strong><u>množstevní slevy až ve výši 50 %</u></strong>, vhodné pro skupinu firem, holdingy nebo podřízené organizace apod.
-                        </p>
-                    </div>
-
-                    <div class="col-md-6 col-lg-4 mb-4">
-                        <h6 class="mb-3 text-primary"><i class="fas fa-rocket text-primary pe-2"></i>Je možné licenci přeprodat na jiné fyzické či právnické osobě?</h6>
-                        <p>
-                            Ne. V situacích jako prodej podniku či právním nástupnictví je možné převést na novou společnost licence v minimální hodnotě 200 000 Kč bez DPH a to se souhlasem Hlídač státu z.ú.
-                        </p>
-                    </div>
-
-                </div>
-            </section>
-        </section>
+            </div>
+        </div>
     </div>
-</section>
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading02">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse02" aria-expanded="false" aria-controls="collapse02">
+                Jaké informace z analýzy může zveřejnit držitel&nbsp;<strong> Veřejné licence</strong>
+            </button>
+        </h2>
+        <div id="collapse02" class="accordion-collapse collapse" aria-labelledby="heading02" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <p>
+                    Držitel <strong>Veřejné licence</strong> může zveřejnit jednotlivé údaje z licence,
+                    pokud je to nutné pro soudní či správní spor, řádný výkon úřadu či správního úkonu.
+                    Smí zveřejnit údaje pouze týkající se držitele licence a jeho dodavatelů či odběratelů.
+                    Pro marketingové a PR účely je možné využít údaje o max. 3 jiných subjektech.
+                    V žádném případě <strong><u>není oprávněn zveřejnit</u></strong> celou analýzu.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading03">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse03" aria-expanded="false" aria-controls="collapse03">
+                Mohou analýzu používat dceřiné či podřízené organizace držitele licence?
+            </button>
+        </h2>
+        <div id="collapse03" class="accordion-collapse collapse" aria-labelledby="heading03" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <p>
+                    Nemohou, licence je vázaná pouze na konkrétní právnickou či fyzickou osobu.
+                    Poskytujeme však <strong><u>množstevní slevy až ve výši 50 %</u></strong>, vhodné pro skupinu firem, holdingy nebo podřízené organizace apod.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading04">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse04" aria-expanded="false" aria-controls="collapse04">
+                Je možné licenci přeprodat na jiné fyzické či právnické osobě?
+            </button>
+        </h2>
+        <div id="collapse04" class="accordion-collapse collapse" aria-labelledby="heading04" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <p>
+                    Ne. V situacích jako prodej podniku či právním nástupnictví je možné převést na novou společnost licence v minimální hodnotě 200 000 Kč bez DPH a to se souhlasem Hlídač státu z.ú.
+                </p>
+            </div>
+        </div>
+    </div>
+@*    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading05">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse05" aria-expanded="false" aria-controls="collapse05">
+                Je možné licenci přeprodat na jiné fyzické či právnické osobě?
+            </button>
+        </h2>
+        <div id="collapse05" class="accordion-collapse collapse" aria-labelledby="heading05" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <p>
+                    Ne. V situacích jako prodej podniku či právním nástupnictví je možné převést na novou společnost licence v minimální hodnotě 200 000 Kč bez DPH a to se souhlasem Hlídač státu z.ú.
+                </p>
+            </div>
+        </div>
+    </div>
+*@</div>
 <!--Section: FAQ-->
