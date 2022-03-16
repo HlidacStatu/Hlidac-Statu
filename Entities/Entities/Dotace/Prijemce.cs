@@ -19,5 +19,7 @@
         public string Okres { get; set; }
         [Nest.Keyword]
         public string PSC { get; set; }
+        [Nest.Text]
+        public string Ulice { get; set; }
     }
 }
