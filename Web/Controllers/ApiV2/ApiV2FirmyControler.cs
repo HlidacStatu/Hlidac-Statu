@@ -107,7 +107,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "KomercniLicence,PrivateApi,Admin")]
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("vsechny")]
-        public ActionResult<HttpResponseMessage> Vsechny()
+        public ActionResult<string> Vsechny()
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder(1024 * 500);
             string cnnStr = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection");
@@ -129,8 +129,7 @@ namespace HlidacStatu.Web.Controllers
                 }
             }
 
-            var res = new HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new StringContent(sb.ToString()) };
-            return res;
+            return sb.ToString();
         }
 
         // /api/v2/firmy/social?typ=WWW&typ=Youtube
