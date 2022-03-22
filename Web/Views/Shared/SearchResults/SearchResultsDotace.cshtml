@@ -18,9 +18,7 @@
         
         //find duplicates
         var hasSimilar = Model.ElasticResults.Hits
-            .Count(h => string.IsNullOrWhiteSpace(dotaceItem.Prijemce.Ico)
-                && string.IsNullOrWhiteSpace(dotaceItem.KodProjektu)
-                && h.Source.Prijemce.Ico == dotaceItem.Prijemce.Ico
+            .Count(h => h.Source.Prijemce.Ico == dotaceItem.Prijemce.Ico
                 && h.Source.KodProjektu == dotaceItem.KodProjektu) > 1;
         
         <tr class="@(hasSimilar ? "alert alert-warning" : "") ">

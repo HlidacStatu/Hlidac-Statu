@@ -7,7 +7,7 @@
     ViewBag.Title = "Hlídač dotací";
     ViewBag.SubTitle = "Detail dotace";
 
-    string duplicitaQuery = $"ico:{Model.Prijemce.Ico} AND kod:{Model.KodProjektu}";
+    string duplicitaQuery = $"ico:{Model.Prijemce.Ico} AND kod:\"{Model.KodProjektu}\"";
     List<Dotace> duplicity = null;
     if (!string.IsNullOrWhiteSpace(Model.Prijemce.Ico)
         && !string.IsNullOrWhiteSpace(Model.KodProjektu))
