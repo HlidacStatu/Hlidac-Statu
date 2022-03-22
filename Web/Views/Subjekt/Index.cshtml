@@ -12,6 +12,7 @@
 @using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 @using HlidacStatu.Repositories
 @using HlidacStatu.Web.Framework
+@using HlidacStatu.Entities.Entities.Analysis;
 
 @{
     Layout = null;
@@ -31,6 +32,20 @@
     intv = laps.AddAndStartLap("KIndex");
     var kindex = Model.Kindex();
 
+    bool OnSankcniSeznam = false;
+    string[] sankcniSeznamRes = new string[] { };
+    HlidacStatu.Datasets.DataSet sankcniSeznam = HlidacStatu.Datasets.DataSet.CachedDatasets.Get("firmy-na-sankcnim-seznamu");
+    try
+    {
+        sankcniSeznamRes = sankcniSeznam.SearchData("ico:" + Model.ICO, 1, 1).Result.ToList()
+                          .Select(m=>(System.Dynamic.ExpandoObject)m)
+                          .Select(m=>m.FirstOrDefault(p=>p.Key=="sankcni_seznam").Value as string)
+                          .Where(m=>m!=null)                          
+                          .ToArray();
+        OnSankcniSeznam = sankcniSeznamRes.Count() > 0;   
+    }
+    catch {}
+ 
 }
 
 @* První sloupec *@
@@ -79,6 +94,22 @@
         <p class="text-muted sub-header-info">
             Přehled rizik, která u jednotlivých subjektů sledujeme za <b>rok @rok</b>
         </p>
+
+        @if (OnSankcniSeznam)
+        {
+            <p>
+                <i class="fas fa-exclamation-circle" style="color:@Riziko.RizikoColor(Riziko.RizikoValues.F);padding-right:20px;"></i> 
+                <b>Firma je pravděpodobně na sankčním seznamu @(string.Join(" a ",sankcniSeznamRes))</b> 
+                <a href="/data/Hledat/firmy-na-sankcnim-seznamu?Q=ico:@Model.ICO"><i class='fas fa-link'></i></a>
+                <br />
+                <span style="padding-left:40px;">
+                    Je velmi pravděpodobné, že společnost je sankčním seznamu EU nebo USA. <a href="/data/Hledat/firmy-na-sankcnim-seznamu?Q=ico:@Model.ICO">Více</a>
+                </span>
+            </p>
+        }
+
+        
+
 
         <partial name="_rizikoPart" model="@((firma: Model, rok: rok))" />
 

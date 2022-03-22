@@ -130,7 +130,8 @@ namespace HlidacStatu.Web.Controllers
         [Authorize]
         public ActionResult CreateSimple2(CreateSimpleModel model)
         {
-
+            if (string.IsNullOrEmpty(model.Delimiter))
+                model.Delimiter = CreateSimpleModel.GetValidDelimiter(Request.Query["delimiter"].ToString());
             var uTmp = new Connectors.IO.UploadedTmpFile();
             var path = uTmp.GetFullPath(model.FileId.ToString(), model.FileId.ToString() + ".csv");
             if (!System.IO.File.Exists(path))
@@ -155,7 +156,8 @@ namespace HlidacStatu.Web.Controllers
                     {
                         if (csv.Read())
                         {
-                            lines.Add(csv.GetRecords<string>().ToArray());
+                            var rec = (IDictionary<string, object>)csv.GetRecord<dynamic>();
+                            lines.Add(rec.Select(m=>m.Value.ToString()).ToArray());
                         }
                     }
                     List<string> colTypes = null;
@@ -199,6 +201,7 @@ namespace HlidacStatu.Web.Controllers
             var pathModels = uTmp.GetFullPath(model.FileId.ToString(), model.FileId.ToString() + ".json");
 
             model.Headers = form["sheaders"].ToString().Split('|');
+            model.Delimiter = CreateSimpleModel.GetValidDelimiter(Request.Form["Delimiter"]);
 
             //check Keycolumn
             List<CreateSimpleModel.Column> cols = new List<CreateSimpleModel.Column>();
@@ -385,6 +388,7 @@ namespace HlidacStatu.Web.Controllers
         {
             model = model ?? new CreateSimpleModel();
             model.DatasetId = id;
+            model.Delimiter = CreateSimpleModel.GetValidDelimiter(Request.Query["Delimiter"]);
             if (string.IsNullOrEmpty(id))
                 return Redirect("/data");
 
@@ -485,6 +489,7 @@ namespace HlidacStatu.Web.Controllers
             ViewBag.NumOfRows = 0;
 
             model.DatasetId = id;
+            model.Delimiter = CreateSimpleModel.GetValidDelimiter(form["Delimiter"]);
 
 
             string[] csvHeaders = null;
