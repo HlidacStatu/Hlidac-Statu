@@ -37,6 +37,7 @@ namespace HlidacStatu.Repositories
             IEnumerable<Autocomplete> oblasti = new List<Autocomplete>();
             IEnumerable<Autocomplete> synonyms = new List<Autocomplete>();
             IEnumerable<Autocomplete> operators = new List<Autocomplete>();
+            //IEnumerable<Autocomplete> articles = new List<Autocomplete>();
 
             ParallelOptions po = new ParallelOptions();
             po.MaxDegreeOfParallelism = debug ? 1 : 10;
@@ -153,6 +154,20 @@ namespace HlidacStatu.Repositories
                         Consts.Logger.Error("GenerateAutocomplete Operators error ", e);
                     }
                 }
+                
+                // () =>
+                // {
+                //     try
+                //     {
+                //         Consts.Logger.Info("GenerateAutocomplete Loading articles");
+                //         operators = LoadArticles();
+                //         Consts.Logger.Info("GenerateAutocomplete Loading articles done");
+                //     }
+                //     catch (Exception e)
+                //     {
+                //         Consts.Logger.Error("GenerateAutocomplete articles error ", e);
+                //     }
+                // }
                 );
 
             Consts.Logger.Info("GenerateAutocomplete done");
@@ -165,6 +180,7 @@ namespace HlidacStatu.Repositories
             .Concat(oblasti)
             .Concat(synonyms)
             .Concat(operators)
+            //.Concat(articles)
             ;
         }
 
@@ -482,6 +498,11 @@ namespace HlidacStatu.Repositories
                 }
             };
         }
+        
+        // private static IEnumerable<Autocomplete> LoadArticles()
+        // {
+        //     
+        // }
 
         private static string GetNiceNameForEnum(Type enumType, string enumValue)
         {
