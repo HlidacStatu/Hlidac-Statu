@@ -219,6 +219,7 @@ namespace HlidacStatu.Repositories
                     {
                         Id = $"ico:{f.Item2}",
                         Text = f.Item1,
+                        AdditionalHiddenSearchText = f.Item2,
                         Type = ("firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
                         Description = FixKraj(f.Item3),
                         Priority = (f.Item4 == 1 ) ? 0 : -1,
