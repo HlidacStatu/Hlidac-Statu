@@ -136,7 +136,8 @@ namespace FullTextSearch
                             .FirstOrDefault();
                         return chosenResult;
                     })
-                .OrderByDescending(x => x.Score);
+                .OrderBy(x => x.Sentence.Text.Length)  // pokud je stejné skóre, kratší jsou první
+                .ThenByDescending(x => x.Score); // seřadí podle skóre
             intv.Stop();
 
             // pokud existují priority, seřadí ještě pořadí výsledků podle priorit
@@ -210,7 +211,8 @@ namespace FullTextSearch
             int firstWordBonusTokenPosition = 0;
             int chainBonusTokenPosition = 0;
             double chainScore = 0;
-            HashSet<string> tokensToScore = new HashSet<string>(tokenizedQuery);
+            bool isChainBroken = false;
+            HashSet<string> tokensToScore = new HashSet<string>(tokenizedQuery);  //todo: why hashset here?
 
             for (int wordPosition = 0; wordPosition < sentence.Tokens.Count; wordPosition++)
             {
@@ -236,6 +238,7 @@ namespace FullTextSearch
 
                 // bonus for longest word chain
                 if (_options.ChainBonusMultiplier.HasValue
+                    && !isChainBroken
                     && chainBonusTokenPosition < tokenizedQuery.Length)
                 {
                     string queryToken = tokenizedQuery[chainBonusTokenPosition];
@@ -245,7 +248,7 @@ namespace FullTextSearch
                         chainBonusTokenPosition++;
                     }
                     else if (chainScore > 0) // ends after missing match
-                        break;
+                        isChainBroken = true;
 
                     if (chainScore > 1)
                         score += chainScore * _options.ChainBonusMultiplier.Value; //todo: put it to options
@@ -281,6 +284,7 @@ namespace FullTextSearch
                 {
                     double basicScore = queryToken.Length;
 
+                    //todo: redesign scoring to be a percentage of found token length
                     // bonus for whole word
                     if (_options.WholeWordBonusMultiplier.HasValue
                         && queryToken.Length == token.Word.Length)
@@ -296,7 +300,7 @@ namespace FullTextSearch
 
             //one word is only matched once!
             if (!string.IsNullOrWhiteSpace(hit))
-                queryTokens.Remove(hit);
+                queryTokens.Remove(hit);  //todo: chceck if this doesnt interfere with probable better (shorter) matches
 
             return overallScore;
         }

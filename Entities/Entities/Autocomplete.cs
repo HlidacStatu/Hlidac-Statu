@@ -7,6 +7,8 @@ namespace HlidacStatu.Entities
         public string Id { get; set; }
         [FullTextSearch.Search]
         public string Text { get; set; }
+        [FullTextSearch.Search]
+        public string AdditionalHiddenSearchText { get; set; } 
         public string ImageElement { get; set; }
         public string Type { get; set; }
         public string Description { get; set; }
