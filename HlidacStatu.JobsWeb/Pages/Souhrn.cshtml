@@ -4,7 +4,10 @@
 @model SouhrnModel
 
 @{
-    ViewData["Title"] = "Souhrnné statistiky";
+
+JobService.SubjectYearDescription descr = JobService.PerSubjectQuery(Model.Key.Value.Obor, Model.Key.Value.Rok);
+    
+    ViewData["Title"] = $"Analýza \"{descr.NiceName}\"";
 
     CompareDataModel graphModel = new CompareDataModel();
     TableViewModel tableModel = new TableViewModel();
@@ -21,7 +24,7 @@
     
 }
 
-<h2>Souhrnné statistiky</h2>
+<h2 class="fw-bolder">Souhrn</h2>
 @{
     var distinctJobsForYearAndSubject = JobService.DistinctJobsForYearAndSubject(Model.Key.Value);
     var pocetSmluv = distinctJobsForYearAndSubject
@@ -40,6 +43,7 @@
     Analýzu zpracováváme z celkem @pocetCen nalezených cen.
     </p>
 
+    <p>Ceny jsou uvedeny v Kč za jeden člověkoden, včetně DPH.</p>
 @if (Model.Key.HasValue)
 {
     <partial name="Shared/_SouhrnTable" model="tableModel"/>

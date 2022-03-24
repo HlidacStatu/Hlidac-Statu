@@ -24,12 +24,45 @@
                 Naše <b class="text-dark">nejrozsáhlejší cenové analýzy</b> na českém trhu pomohou <b class="text-dark">úřadům s orientací v obvyklých cenových relacích</b>, a <b class="text-dark">dodavatelům s kvalitní a konkureční nabídkou</b> do výběrových řízení.
 
                 <table class="table ">
+                    @if (await HttpContext.HasAccess("IT", 2020) == false)
+                    {
+                        var a_it20 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 });
+
+                        <tr>
+                            <td width="60%">
+                                <div class="fs-6 fw-bolder text-decoration-none text-muted">
+                                    Přehled obvyklých cen IT prací ve státní správě za rok 2020
+                                </div>
+                            </td>
+                            <td width="20%">
+                                <a class="btn btn-success btn-sm" href="/contact">Objednat</a>
+                            </td>
+                            <td width="20%">
+                                <div class="text-muted small">
+                                    Údaje z @a_it20.PocetSmluv smluv od <b class="text-black">@a_it20.PocetZadavatelu</b> zadavatelů,
+                                    <b class="text-black">@a_it20.PocetDodavatelu</b> dodavatelů,
+                                    zahrnuje <b class="text-black">@a_it20.PocetCen cen</b>.
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                <a class="fs-6 fw-bolder" href="/Souhrn?obor=IT&rok=2020">Přehled obvyklých cen IT prací ve státní správě za rok 2020</a>
+                            </td>
+                            <td>
+                                <a class="btn btn-success btn-sm" href="/Souhrn?obor=IT&rok=2020">Otevřít analýzu</a>
+                            </td>
+                        </tr>
+                    }
                     <tr>
                         @{
                             var a_demo18 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "DEMO", Rok = 2018 });
                         }
                         <td width="60%">
-                            <a class="fs-6 fw-bolder text-decoration-none" href="/Souhrn?obor=DEMO&rok=2018">
+                            <a class="fs-6 fw-bolder" href="/Souhrn?obor=DEMO&rok=2018">
                                 Přehled obvyklých cen IT prací ve státní správě za rok Q1/2018
                             </a>
                         </td>
@@ -43,42 +76,9 @@
 
                         </td>
                     </tr>
-                    @if (await HttpContext.HasAccess("IT", 2020) == false)
-                    {
-                        var a_it20 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 });
-
-                        <tr>
-                            <td>
-                                <div class="fs-6 fw-bolder text-decoration-none text-muted">
-                                    Přehled obvyklých cen IT prací ve státní správě za rok 2020
-                                </div>
-                            </td>
-                            <td>
-                                <a class="btn btn-success btn-sm" href="/contact">Objednat</a>
-                            </td>
-                            <td>
-                                <div class="text-muted small">
-                                    Údaje z @a_it20.PocetSmluv smluv od <b class="text-black">@a_it20.PocetZadavatelu</b> zadavatelů,
-                                    <b class="text-black">@a_it20.PocetDodavatelu</b> dodavatelů,
-                                    zahrnuje <b class="text-black">@a_it20.PocetCen cen</b>.
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                    else
-                    {
-                        <tr>
-                            <td>
-                                <a class="fs-6 fw-bolder text-decoration-none" href="/Souhrn?obor=IT&rok=2020">Přehled obvyklých cen IT prací ve státní správě za rok 2020</a>
-                            </td>
-                            <td>
-                                <a class="btn btn-success btn-sm" href="/Souhrn?obor=IT&rok=2020)">Otevřít analýzu</a>
-                            </td>
-                        </tr>
-                    }
                     <tr>
                         <td>
-                            <div class="fs-6 fw-bolder text-decoration-none text-muted">Přehled obvyklých cen IT prací ve státní správě za rok 2021</div>
+                            <div class="fs-6 fw-bolder text-muted">Přehled obvyklých cen IT prací ve státní správě za rok 2021</div>
                         </td>
                         <td>
                             <a class="btn btn-outline-success btn-sm" href="/contact">Dostupné od dubna 2022</a>

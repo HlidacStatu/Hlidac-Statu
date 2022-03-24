@@ -57,7 +57,7 @@
                     <svg width="46" height="46" viewBox="0 0 46 46">
                         <use xlink:href="/content/img/defs.svg#logo"></use>
                     </svg>
-                    <span style="color:#25272d">Hlídač</span>&nbsp;<strong>Státu</strong>
+                    <span style="color:#25272d">Hlídač</span>&nbsp;<strong>státu</strong>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -88,12 +88,12 @@
                     <div class="header__title">
                         <h1>Cenové analýzy</h1>
                         <div class="header__text">
-                            Analýzy nabízí detailní přehled obvyklých cen na českém trhu. 
+                            Analýzy nabízí detailní přehled obvyklých cen na českém trhu.
                             Zpracovány jsou údaje jednotlivých oborů ze všech smluv se státní správou v daném roce.
-                            
+
                             Jde o <b style="color:yellow">nejrozsáhlejší</b> a <b style="color:yellow">nejspolehlivější</b> analýzu jednotkových cen v Česku.
 
-                            <br/>
+                            <br />
                             <a style="margin-top:20px" href="/contact" class="btn btn-primary">Objednat</a>
                         </div>
                     </div>
@@ -105,9 +105,22 @@
             {
                 <div class="header__content ">
 
-                    <div style="padding-top:20px;color:#FFF">Cenové analýzy &gt;</div>
+                    <div style="padding-top:20px;color:#FFF"><a href="/" style="color:#FFF;text-decoration:none;"><i class="fa-regular fa-house"></i> Cenové analýzy</a> &gt;</div>
                     <!-- desktop menu items only -->
-                        <h2 style="padding-top:20px;color:white">@ViewData["Title"]</h2>
+                <h2 style="padding-top:20px;color:white">@ViewData["Title"]</h2>
+                    @{
+                        var analyza = this.Context.TryFindKey();
+                    }
+
+                    @if (!string.IsNullOrEmpty(ViewData["Description"] as string))
+                    {
+                        <small>@ViewData["Description"]</small>
+                    }
+                    else if (analyza?.Obor?.ToLower() == "demo")
+                    {
+                        <small>Toto je ukázková, volně dostupná analáza za období leden-březen 2018. Ostatní analýzy vždy pokrývají celý kalendářní rok.</small>
+
+                    }
                     <!-- desktop menu items only -->
 
             </div>
@@ -116,29 +129,15 @@
 
     </header>
     <div class="bg-light">
-    <div class="container pt-2">
-        <partial name="_NavBar" />
-    </div>
+        <div class="container pt-2">
+            <partial name="_NavBar" />
+        </div>
     </div>
     <div class="container mt-2">
         <main role="main" class="pb-3">
-            @{
-                var analyza = this.Context.TryFindKey();
-            }
-            @if (analyza.HasValue)
-            {
-                JobService.SubjectYearDescription descr = JobService.PerSubjectQuery(analyza.Value.Obor, analyza.Value.Rok);
-                if (descr != null)
-                {
-                    <h2>Analýza "@(descr.NiceName)"</h2>
-                }
-                if (analyza?.Obor?.ToLower() == "demo")
-                {
-                    <p class="alert-warning">Toto je ukázková, volně dostupná analáza za období leden-březen 2018. Ostatní analýzy vždy pokrývají celý kalendářní rok.</p>
-                }
-            }
-
+            <div class="pt-5">
             @RenderBody()
+            </div>
         </main>
     </div>
 
