@@ -1,13 +1,13 @@
+using HlidacStatu.JobsWeb.Models;
+using HlidacStatu.Repositories;
+
+using Microsoft.AspNetCore.Http;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-
-using HlidacStatu.JobsWeb.Models;
-using HlidacStatu.Repositories;
-
-using Microsoft.AspNetCore.Http;
 
 namespace HlidacStatu.JobsWeb.Services
 {
@@ -71,9 +71,10 @@ namespace HlidacStatu.JobsWeb.Services
                             SmlouvaId = firstJobOverview.SmlouvaId,
                             Tags = tags,
                             JobPk = g.Key,
-                            PricePerUnit = firstJobOverview.PricePerUnit ?? (firstJobOverview.PricePerUnitVat/1.21m),
+                            PricePerUnit = firstJobOverview.PricePerUnit ?? (firstJobOverview.PricePerUnitVat / 1.21m),
                             PricePerUnitVat = firstJobOverview.PricePerUnitVat,
                             IcaDodavatelu = g.Select(i => i.IcoDodavatele).ToArray(),
+                            ItemInAnalyseCreated = g.Max(max => max.Created),
                         };
                     }).ToList();
 
@@ -145,7 +146,7 @@ namespace HlidacStatu.JobsWeb.Services
         private static Dictionary<string, List<JobStatistics>> CalculateTags(List<JobPrecalculated> distinctJobs,
             YearlyStatisticsGroup.Key key)
         {
-            Dictionary<string, List<JobStatistics>>  ret = distinctJobs
+            Dictionary<string, List<JobStatistics>> ret = distinctJobs
                 .Where(x => x.AnalyzaName == key.Obor && x.Year == key.Rok) //filtruj analyzu
                 .SelectMany(j => j.Tags, (precalculated, tag) => new { precalculated, tag = tag }) // vem vsechny tagy
                 .GroupBy(j => j.precalculated.Polozka) //groupuj podle pracovni pozici
@@ -293,7 +294,7 @@ namespace HlidacStatu.JobsWeb.Services
             return await CenyCustomerRepo.HasAccessAsync(username, obor, rok).ConfigureAwait(false);
         }
 
-            public static YearlyStatisticsGroup.Key? TryFindKey(this HttpContext context)
+        public static YearlyStatisticsGroup.Key? TryFindKey(this HttpContext context)
         {
             if (context.Items.TryGetValue("obor", out var oborObject))
             {

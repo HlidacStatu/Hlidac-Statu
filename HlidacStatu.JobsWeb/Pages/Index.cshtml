@@ -24,10 +24,11 @@
                 Naše <b class="text-dark">nejrozsáhlejší cenové analýzy</b> na českém trhu pomohou <b class="text-dark">úřadům s orientací v obvyklých cenových relacích</b>, a <b class="text-dark">dodavatelům s kvalitní a konkureční nabídkou</b> do výběrových řízení.
 
                 <table class="table ">
+                    @{
+                        var a_it20 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 });
+                    }
                     @if (await HttpContext.HasAccess("IT", 2020) == false)
                     {
-                        var a_it20 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 });
-
                         <tr>
                             <td width="60%">
                                 <div class="fs-6 fw-bolder text-decoration-none text-muted">
@@ -54,6 +55,13 @@
                             </td>
                             <td>
                                 <a class="btn btn-success btn-sm" href="/Souhrn?obor=IT&rok=2020">Otevřít analýzu</a>
+                            </td>
+                            <td>
+                                <div class="text-muted small">
+                                    Údaje z @a_it20.PocetSmluv smluv od <b class="text-black">@a_it20.PocetZadavatelu</b> zadavatelů,
+                                    <b class="text-black">@a_it20.PocetDodavatelu</b> dodavatelů,
+                                    zahrnuje <b class="text-black">@a_it20.PocetCen cen</b>.
+                                </div>
                             </td>
                         </tr>
                     }
@@ -148,15 +156,28 @@
 </div>
 
 <h4>Další produkty</h4>
-<h5 class="d-inline-flex p-2 bg-primary bg-opacity-75 text-white">Veřejná licence</h5>
+<h5 class="d-inline-flex p-2 bg-success bg-opacity-10 text-black border border-success rounded-3">
+    Veřejná licence
+    -&nbsp; <span class="text-success fw-bolder">99 000 </span>
+    <span class="text-muted fw-light">&nbsp; Kč bez DPH</span>
+
+</h5>
 <p class="ps-5">
     Jednotlivé údaje z analýzy týkající se vašeho subjektu můžete zveřejňit <a href="#faq_public">detail</a>.
     Nutná licence pro využití dat v rámci veřejných správních řízeních, veřejných soudních sporů, v marketingu a PR.
+</p>
+<p class="ps-5">
     <a href="/contact" class="btn btn-sm btn-outline-primary">Kontaktujte nás</a>
 </p>
-<h5 class="d-inline-flex p-2 bg-primary bg-opacity-75 text-white">Novinářská, NGO a EDU licence</h5>
-<p class="ps-5 pb-5">
+<h5 class="d-inline-flex p-2 bg-success bg-opacity-10 text-black border border-success rounded-3">
+    Novinářská, NGO a EDU licence
+    - <span class="text-muted fw-light">&nbsp; cena dle dohody</span>
+
+</h5>
+<p class="ps-5">
     Přístup k datům a licence pro novináře, redakce, neziskové organizace a pro potřeby vzdělávání a výzkumu.
+</p>
+<p class="ps-5  pb-5">
     <a href="/contact" class="btn btn-sm btn-outline-primary">Kontaktujte nás</a>
 </p>
 
@@ -327,19 +348,20 @@
             </div>
         </div>
     </div>
-@*    <div class="accordion-item">
+    @*    <div class="accordion-item">
         <h2 class="accordion-header" id="heading05">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse05" aria-expanded="false" aria-controls="collapse05">
-                Je možné licenci přeprodat na jiné fyzické či právnické osobě?
-            </button>
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse05" aria-expanded="false" aria-controls="collapse05">
+        Je možné licenci přeprodat na jiné fyzické či právnické osobě?
+        </button>
         </h2>
         <div id="collapse05" class="accordion-collapse collapse" aria-labelledby="heading05" data-bs-parent="#accordionExample">
-            <div class="accordion-body">
-                <p>
-                    Ne. V situacích jako prodej podniku či právním nástupnictví je možné převést na novou společnost licence v minimální hodnotě 200 000 Kč bez DPH a to se souhlasem Hlídač státu z.ú.
-                </p>
-            </div>
+        <div class="accordion-body">
+        <p>
+        Ne. V situacích jako prodej podniku či právním nástupnictví je možné převést na novou společnost licence v minimální hodnotě 200 000 Kč bez DPH a to se souhlasem Hlídač státu z.ú.
+        </p>
         </div>
-    </div>
-*@</div>
+        </div>
+        </div>
+    *@
+</div>
 <!--Section: FAQ-->

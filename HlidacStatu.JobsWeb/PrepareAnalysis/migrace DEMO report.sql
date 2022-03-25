@@ -21,7 +21,7 @@ SELECT
 	d.Ico as IcoDodavatele, 
 	j.tablePK,
 	j.jobGrouped as polozka, 
-	j.tags,
+	iif(j.tags='',null, j.tags) as tags,
 	2 as unit, --MD from enum MeasureUnit
 	'MD' as unitText,
 	iif(j.UnitCount>1, j.salaryMD/j.unitcount,j.salaryMD) as pricePerUnit,

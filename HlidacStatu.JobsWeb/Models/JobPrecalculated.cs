@@ -1,3 +1,4 @@
+using System;
 namespace HlidacStatu.JobsWeb.Models
 {
     public class JobPrecalculated
@@ -14,7 +15,7 @@ namespace HlidacStatu.JobsWeb.Models
         public decimal PricePerUnitVat { get; set; }
         public string AnalyzaName { get; set; }
         public string[] Tags { get; set; }
-        
-        
+
+        public DateTime? ItemInAnalyseCreated { get; set; }
     }
 }

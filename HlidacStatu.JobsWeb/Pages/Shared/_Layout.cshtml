@@ -1,4 +1,7 @@
 ﻿@using HlidacStatu.JobsWeb.Services
+@{
+    var analyza = this.Context.TryFindKey();
+}
 
 
 <!DOCTYPE html>
@@ -108,9 +111,6 @@
                     <div style="padding-top:20px;color:#FFF"><a href="/" style="color:#FFF;text-decoration:none;"><i class="fa-regular fa-house"></i> Cenové analýzy</a> &gt;</div>
                     <!-- desktop menu items only -->
                 <h2 style="padding-top:20px;color:white">@ViewData["Title"]</h2>
-                    @{
-                        var analyza = this.Context.TryFindKey();
-                    }
 
                     @if (!string.IsNullOrEmpty(ViewData["Description"] as string))
                     {
@@ -138,13 +138,21 @@
             <div class="pt-5">
             @RenderBody()
             </div>
+            @if (analyza != null && analyza.HasValue)
+        {
+            var data = JobService.DistinctJobsForYearAndSubject(analyza.Value);
+            <div style="margin-top:50px;"  class="alert alert-secondary" >
+                Data jsou platná k @(data.Max(m=>m.ItemInAnalyseCreated)?.ToString("dd. MM. yyyy"))
+                </div>
+        }
         </main>
     </div>
 
 
-    <footer style="margin-top:100px;">
 
-        <div style="background:#f2f5f7;">
+    <footer style="margin-top:50px;" >
+
+        <div style="background:#f2f5f7;" class="d-print-none">
             <div class="footer__content">
                 <div class="footer__content__col">
                     <a href="https://texty.hlidacstatu.cz/o-serveru">O nás</a>
@@ -183,6 +191,9 @@
             </div>
         </div>
     </footer>
+    <footer class="d-none d-print-block">
+        (c) 2022 Hlídač státu z.ú.
 
+    </footer>
 </body>
 </html>

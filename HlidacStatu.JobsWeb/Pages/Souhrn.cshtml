@@ -5,8 +5,8 @@
 
 @{
 
-JobService.SubjectYearDescription descr = JobService.PerSubjectQuery(Model.Key.Value.Obor, Model.Key.Value.Rok);
-    
+    JobService.SubjectYearDescription descr = JobService.PerSubjectQuery(Model.Key.Value.Obor, Model.Key.Value.Rok);
+
     ViewData["Title"] = $"Analýza \"{descr.NiceName}\"";
 
     CompareDataModel graphModel = new CompareDataModel();
@@ -21,7 +21,7 @@ JobService.SubjectYearDescription descr = JobService.PerSubjectQuery(Model.Key.V
         tableModel.LinkHref = "/obor";
         tableModel.Key = Model.Key;
     }
-    
+
 }
 
 <h2 class="fw-bolder">Souhrn</h2>
@@ -39,15 +39,15 @@ JobService.SubjectYearDescription descr = JobService.PerSubjectQuery(Model.Key.V
 }
 
 <p>
-    Analýza obsahuje údaje z @pocetSmluv smluv, od @pocetZadavatelu zadavatelů, a @pocetDodavatelu dodavatelů. 
+    Analýza obsahuje údaje z @pocetSmluv smluv, od @pocetZadavatelu zadavatelů, a @pocetDodavatelu dodavatelů.
     Analýzu zpracováváme z celkem @pocetCen nalezených cen.
-    </p>
+</p>
 
-    <p>Ceny jsou uvedeny v Kč za jeden člověkoden, včetně DPH.</p>
+<p>Ceny jsou uvedeny v Kč za jeden člověkoden, včetně DPH.</p>
 @if (Model.Key.HasValue)
 {
-    <partial name="Shared/_SouhrnTable" model="tableModel"/>
-    <partial name="Shared/_BoxPlot" model="graphModel"/>
-    
+    <partial name="Shared/_SouhrnTable" model="tableModel" />
+    <partial name="Shared/_BoxPlot" model="graphModel" />
+
 }
 

@@ -44,3 +44,6 @@ where j.jobGrouped is not null
 	and j.salaryMDVat is not null
 	and (j.pk not in (select jobpk from Ceny))
 
+
+
+
