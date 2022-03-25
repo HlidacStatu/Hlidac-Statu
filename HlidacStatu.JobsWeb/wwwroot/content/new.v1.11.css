@@ -1053,6 +1053,7 @@ select {
 
 .header__content {
     background: #003688;
+    background-size: cover;
     background-image: url("/Content/img/header-bg.jpg");
     display: -webkit-box;
     display: -ms-flexbox;
