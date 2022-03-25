@@ -71,9 +71,10 @@ namespace HlidacStatu.Repositories
 
         static InDocJobNames FindSimilar(string subject, string jobraw)
         {
+            string subjectNormalized = subject?.ToUpper() ?? ""; 
             jobraw = NormalizeTextNoDiacriticsLower(jobraw);
 
-            foreach (var jobname in jobnames.Where(m => m.Subject == subject))
+            foreach (var jobname in jobnames.Where(m => m.Subject == subjectNormalized))
             {
                 if (jobraw.Equals(jobname.JobRaw, StringComparison.Ordinal))
                     return jobname;
@@ -82,7 +83,7 @@ namespace HlidacStatu.Repositories
             var bestDistance = int.MaxValue;
             InDocJobNames bestJob = null;
             int acceptableDistnace = 2;
-            foreach (var jobname in jobnames.Where(m => m.Subject == subject))
+            foreach (var jobname in jobnames.Where(m => m.Subject == subjectNormalized))
             {
                 if (Math.Abs(jobraw.Length - jobname.JobRaw.Length) > acceptableDistnace + 2)
                     continue;
@@ -131,7 +132,7 @@ namespace HlidacStatu.Repositories
                     }
                     else
                     {
-                        var jobGroup = FindSimilar(jobSubject.ToUpper(), job.JobRaw);
+                        var jobGroup = FindSimilar(jobSubject, job.JobRaw);
                         if (jobGroup != null)
                         {
                             job.JobGrouped = jobGroup.JobGrouped;
