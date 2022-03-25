@@ -40,7 +40,7 @@ namespace HlidacStatu.Repositories
             //IEnumerable<Autocomplete> articles = new List<Autocomplete>();
 
             ParallelOptions po = new ParallelOptions();
-            po.MaxDegreeOfParallelism = debug ? 1 : 10;
+            po.MaxDegreeOfParallelism = debug ? 1 : 5; // 10 bylo moc - timeoutoval nám elastic na osobách => hlidacsmluv
 
             Parallel.Invoke(po,
                 () =>
@@ -253,6 +253,7 @@ namespace HlidacStatu.Repositories
                 {
                     Id = $"ico:{f.Item2}",
                     Text = f.Item1,
+                    AdditionalHiddenSearchText = f.Item2,
                     Type = ("státní firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
                     Description = FixKraj(f.Item3),
                     Priority = 1,
@@ -293,6 +294,7 @@ namespace HlidacStatu.Repositories
                     {
                         Id = $"ico:{f.Item2}",
                         Text = f.Item1,
+                        AdditionalHiddenSearchText = f.Item2,
                         Type = "úřad",
                         Description = FixKraj(f.Item3),
                         Priority = 2,
@@ -354,6 +356,7 @@ namespace HlidacStatu.Repositories
                     {
                         Id = $"ico:{f.Ico}",
                         Text = f.Jmeno,
+                        AdditionalHiddenSearchText = f.Ico,
                         Type = "obec",
                         Description = f.Kraj,
                         Priority = 2,
@@ -424,7 +427,8 @@ namespace HlidacStatu.Repositories
  
                         return new Devmasters.Batch.ActionOutputData();
                     }
-                    , null, progressWriter.Writer, true, prefix: "LoadPeople ");
+                    // tady nemůže být větší paralelita, protože to pak nezvládá elasticsearch
+                    , null, progressWriter.Writer, true, prefix: "LoadPeople ", maxDegreeOfParallelism:5); 
 
             }
             return results;
