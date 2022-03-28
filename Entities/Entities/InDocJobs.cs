@@ -13,6 +13,9 @@ namespace HlidacStatu.Entities
     public partial class InDocJobs
     {
         private decimal? _vat;
+        private decimal? _price;
+        private decimal? _priceVat;
+        private decimal? _priceVatCalculated;
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
@@ -32,10 +35,26 @@ namespace HlidacStatu.Entities
         public string Tags { get; set; }
         
         public MeasureUnit? Unit { get; set; }
-        public decimal? Price { get; set; }
-        public decimal? PriceVAT { get; set; }
-        public decimal? PriceVATCalculated { get; set; }
 
+        public decimal? Price
+        {
+            get => RoundToWholeNumber(_price); //added to prevent user of jobTableEditor from making mistakes
+            set => _price = value;
+        }
+
+        public decimal? PriceVAT
+        {
+            get => RoundToWholeNumber(_priceVat); //added to prevent user of jobTableEditor from making mistakes
+            set => _priceVat = value;
+        }
+
+        public decimal? PriceVATCalculated
+        {
+            get => RoundToWholeNumber(_priceVatCalculated); //added to prevent user of jobTableEditor from making mistakes
+            set => _priceVatCalculated = value;
+        }
+
+        
         public decimal? VAT
         {
             get => _vat;
@@ -61,7 +80,7 @@ namespace HlidacStatu.Entities
             [NiceDisplayName("-nic-")]
             [SortValue(0)]
             None = 0,
-            [NiceDisplayName("h")]
+            [NiceDisplayName("hodina")]
             [SortValue(2)]
             Hour = 1,
             [NiceDisplayName("den")]
@@ -197,6 +216,15 @@ namespace HlidacStatu.Entities
             
             
         }
+        
+        private decimal? RoundToWholeNumber(decimal? value)
+        {
+            if (value is null)
+                return null;
+            
+            return Math.Round(value.Value, 0, MidpointRounding.ToZero);
+        }
+        
         
 
     }

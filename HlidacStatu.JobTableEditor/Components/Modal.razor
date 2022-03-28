@@ -9,6 +9,7 @@
 @inject JobService JobService
 @inject ILogger<Modal> Logger
 @inject ToastService ToastService
+@inject IJSRuntime JSRuntime
 
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-primary" @onclick="LoadJobs">
@@ -123,7 +124,7 @@
                                 @chyba
                             </p>
                         }
-                        
+
                         @if (displayAnotherCategories)
                         {
                             <br/>
@@ -163,13 +164,14 @@
     private bool showModal = false;
     private bool displayAnotherCategories = false;
     private bool isSaveEnabled = true;
-    
+
     private async Task Save()
     {
         bool isValid = IsEverythingValid();
-        if (!isValid)
+        if (!isValid
+            && !await ConfirmAlert(JSRuntime, "Ve formuláři jsou stále chyby. Chcete ho přesto uložit?"))
         {
-            return;
+                return;
         }
 
     //parent save
@@ -179,26 +181,33 @@
 
     private bool IsEverythingValid()
     {
-    // do checks
+        // do checks
+        isSaveEnabled = true;
+        
         if (Table.FoundJobs.Count == 0)
         {
             isSaveEnabled = false;
             return false;
         }
-        if (!IsValidCategory(out string categoryError))
+        if (!IsValidCategory(out _))
         {
             isSaveEnabled = false;
             return false;
         }
+        
+        //need to cycle all
+        bool allJobsValid = true;
         foreach (var job in Table.FoundJobs)
         {
-            if (!IsValidJob(job, out var error))
+            if (!IsValidJob(job, out _))
             {
-                return false;
+                allJobsValid = false;
             }
         }
+        if (!allJobsValid)
+            return false;
+        
 
-        isSaveEnabled = true;
         return true;
     }
 
@@ -215,7 +224,7 @@
 
     private bool IsValidJob(InDocJobs job, out List<string> errorMessages)
     {
-        errorMessages = new();
+        errorMessages = new List<string>();
         if (job.Unit is null)
         {
             isSaveEnabled = false;
@@ -226,27 +235,56 @@
             isSaveEnabled = false;
             errorMessages.Add($"Chybí název jobu.");
         }
-        if (job.Price > 0 
+        if (job.Price > 0
             && (job.PriceVAT is null || job.PriceVAT == 0))
         {
             if (job.VAT is null || job.VAT <= 0)
             {
                 isSaveEnabled = false;
                 errorMessages.Add($"Chybí vyplněná výše DPH.");
-                return false;
+            }
+        }
+        if ((job.Price ?? 0) == 0 && (job.PriceVAT ?? 0) == 0)
+        {
+            isSaveEnabled = false;
+            errorMessages.Add($"Chybí vyplněná cena.");
+        }
+
+
+        if (job.Unit.HasValue)
+        {
+            decimal minimalHourPriceVat = 100 * 1.21m;
+            
+            bool lowHourPrice = job.Unit == InDocJobs.MeasureUnit.Hour && job.PriceVAT < minimalHourPriceVat;
+            bool lowMandayPrice = job.Unit == InDocJobs.MeasureUnit.Day && job.PriceVAT < minimalHourPriceVat;
+
+            if (lowHourPrice || lowMandayPrice)
+            {
+                errorMessages.Add($"Cena se nám zdá nízká.");
             }
         }
 
+
         return errorMessages.Count == 0;
     }
-    
-    
+
 
     private void LoadJobs()
     {
         Table.ParseJobs();
     //todo Table.PrefillValues();
         showModal = true;
+    }
+
+    private void RoundJobPricesToWholeNumbers()
+    {
+        foreach (var job in Table.FoundJobs)
+        {
+            if (job.Price != null)
+                job.Price = Math.Round(job.Price.Value, 0);
+            if (job.PriceVAT != null)
+                job.Price = Math.Round(job.PriceVAT.Value, 0);
+        }
     }
 
     private void ChangeUnit(ChangeEventArgs arg)
@@ -278,7 +316,7 @@
             {
                 setUnitCount = decimal.Parse(value);
             }
-            
+
             foreach (var job in Table.FoundJobs)
             {
                 job.UnitCount = setUnitCount;
@@ -301,7 +339,7 @@
             {
                 setVAT = decimal.Parse(value);
             }
-            
+
             foreach (var job in Table.FoundJobs)
             {
                 job.VAT = setVAT;
@@ -326,15 +364,14 @@
         if (isDefined)
         {
             Table.InDocTable.Analyza = analyzaOption;
-            
+
             var optionValue = Enum.Parse<InDocTables.AnalyzaOption>(analyzaOption, true);
-            //clear klasifikace manual first
+    //clear klasifikace manual first
             Table.InDocTable.KlasifikaceManual = null;
             displayAnotherCategories = optionValue == InDocTables.AnalyzaOption.Jine;
         }
-        
     }
-    
+
     private void SetKlasifikaceManual(ChangeEventArgs arg)
     {
         if (arg.Value is null)
@@ -348,9 +385,8 @@
         {
             Table.InDocTable.KlasifikaceManual = klasifikaceManual;
         }
-        
     }
-    
+
     private List<(string Name, string NiceName)> GetAnalyzaTypes()
     {
         var analyzaOptions = Enum.GetValues<InDocTables.AnalyzaOption>();
@@ -380,6 +416,11 @@
     private void Close()
     {
         showModal = false;
+    }
+    
+    public static ValueTask<bool> ConfirmAlert(IJSRuntime jsRuntime, string message)
+    {
+        return jsRuntime.InvokeAsync<bool>("confirm", message);
     }
 
 }
