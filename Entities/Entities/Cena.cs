@@ -40,6 +40,8 @@ namespace HlidacStatu.Entities
         [StringLength(50)]
         public string UnitText { get; set; }
 
+        // cenu bez DPH nemáme vždy a nejsme ji schopni 100% správně spočítat z ceny s DPH,
+        // protože když máme cenu s DPH, tak neevidujeme sazbu DPH
         public decimal? PricePerUnit { get; set; }
         public decimal PricePerUnitVat { get; set; }
 

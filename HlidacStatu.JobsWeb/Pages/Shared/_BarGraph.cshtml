@@ -6,7 +6,7 @@
     
     var data = Model.Data;
 
-    var res = data.GroupBy(x => Math.Ceiling(x.PricePerUnit / 2000))
+    var res = data.GroupBy(x => Math.Ceiling(x.PricePerUnitVat / 2000))
         .Select(g => new {Klic = g.Key, pocet = g.Count()})
         .OrderBy(x => x.Klic);
 

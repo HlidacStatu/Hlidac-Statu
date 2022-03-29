@@ -71,7 +71,8 @@ namespace HlidacStatu.JobsWeb.Services
                             SmlouvaId = firstJobOverview.SmlouvaId,
                             Tags = tags,
                             JobPk = g.Key,
-                            PricePerUnit = firstJobOverview.PricePerUnit ?? (firstJobOverview.PricePerUnitVat / 1.21m),
+                            // cenu bez daně nemáme vždy a nejsme ji schopni vždy správně spočítat
+                            //PricePerUnit = firstJobOverview.PricePerUnit ?? (firstJobOverview.PricePerUnitVat / 1.21m),
                             PricePerUnitVat = firstJobOverview.PricePerUnitVat,
                             IcaDodavatelu = g.Select(i => i.IcoDodavatele).ToArray(),
                             ItemInAnalyseCreated = g.Max(max => max.Created),
