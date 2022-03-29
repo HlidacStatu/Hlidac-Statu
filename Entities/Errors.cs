@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Components;
 
-namespace HlidacStatu.Entities.Temporary
+namespace HlidacStatu.Entities
 {
     
     public class Errors : IEnumerable<Errors.ErrorMessage>

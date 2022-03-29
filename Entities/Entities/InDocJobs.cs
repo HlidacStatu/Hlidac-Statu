@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using Devmasters.Enums;
-using HlidacStatu.Entities.Temporary;
 
 #nullable disable
 
@@ -215,8 +214,10 @@ namespace HlidacStatu.Entities
                 errors.Add("Chybí název jobu.", Errors.MessageSeverity.Error);
 
 
-            if (Price >= PriceVAT)
+            if (Price > PriceVAT)
                 errors.Add("Cena s DPH musí být větší než cena bez DPH.", Errors.MessageSeverity.Error);
+            if (Price == PriceVAT)
+                errors.Add("Cena s DPH je stejná jako cena bez DPH.", Errors.MessageSeverity.Warning);
 
             if (!taxAndPriceAreKnown && !priceWithTaxIsKnown)
                 errors.Add("Není vyplněno DPH a cena, nebo chybí cena s DPH.", Errors.MessageSeverity.Error);
