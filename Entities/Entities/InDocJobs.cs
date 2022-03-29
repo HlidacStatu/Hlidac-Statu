@@ -5,12 +5,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Reflection;
 using Devmasters.Enums;
+using HlidacStatu.Entities.Temporary;
 
 #nullable disable
 
 namespace HlidacStatu.Entities
 {
-    public partial class InDocJobs
+    public class InDocJobs
     {
         private decimal? _vat;
         private decimal? _price;
@@ -20,20 +21,16 @@ namespace HlidacStatu.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         public long Pk { get; set; }
-        [Required]
-        public long TablePk { get; set; }
-        [Required]
-        [StringLength(300)]
-        public string JobRaw { get; set; }
-        [StringLength(300)]
-        public string JobGrouped { get; set; }
+
+        [Required] public long TablePk { get; set; }
+        [Required] [StringLength(300)] public string JobRaw { get; set; }
+        [StringLength(300)] public string JobGrouped { get; set; }
         public decimal? SalaryMD { get; set; }
         public decimal? SalaryMdVAT { get; set; }
 
-        [Column(TypeName = "datetime")]
-        public DateTime? Created { get; set; }
+        [Column(TypeName = "datetime")] public DateTime? Created { get; set; }
         public string Tags { get; set; }
-        
+
         public MeasureUnit? Unit { get; set; }
 
         public decimal? Price
@@ -50,11 +47,12 @@ namespace HlidacStatu.Entities
 
         public decimal? PriceVATCalculated
         {
-            get => RoundToWholeNumber(_priceVatCalculated); //added to prevent user of jobTableEditor from making mistakes
+            get => RoundToWholeNumber(
+                _priceVatCalculated); //added to prevent user of jobTableEditor from making mistakes
             set => _priceVatCalculated = value;
         }
 
-        
+
         public decimal? VAT
         {
             get => _vat;
@@ -77,79 +75,43 @@ namespace HlidacStatu.Entities
         [ShowNiceDisplayName()]
         public enum MeasureUnit
         {
-            [NiceDisplayName("-nic-")]
-            [SortValue(0)]
-            None = 0,
-            [NiceDisplayName("hodina")]
-            [SortValue(2)]
-            Hour = 1,
-            [NiceDisplayName("den")]
-            [SortValue(3)]
-            Day = 2,
-            [NiceDisplayName("ks")]
-            [SortValue(50)]
-            Kus = 3,
-            [NiceDisplayName("m")]
-            [SortValue(21)]
-            Metr = 4,
-            [NiceDisplayName("km")]
-            [SortValue(22)]
-            Kilometr = 5,
-            [NiceDisplayName("mm")]
-            [SortValue(20)]
-            Milimetr = 6,
-            [NiceDisplayName("m2")]
-            [SortValue(30)]
-            MetrCtverecny = 7,
-            [NiceDisplayName("km2")]
-            [SortValue(32)]
-            KilometrCtverecny = 8,
-            [NiceDisplayName("g")]
-            [SortValue(10)]
-            Gram = 9,
-            [NiceDisplayName("kg")]
-            [SortValue(11)]
-            Kilogram = 10,
-            [NiceDisplayName("t")]
-            [SortValue(12)]
-            Tuna = 11,
-            [NiceDisplayName("ha")]
-            [SortValue(31)]
-            Hektar = 12,
-            [NiceDisplayName("kompletní dodávka (kpl)")]
-            [SortValue(51)]
-            KompletniDodavka = 13,
-            [NiceDisplayName("měsíc")]
-            [SortValue(3)]
-            Mesic = 14,
-            [NiceDisplayName("m3")]
-            [SortValue(42)]
-            MetrKrychlovy = 15,
-            [NiceDisplayName("l")]
-            [SortValue(41)]
-            Litr = 16,
-            [NiceDisplayName("ml")]
-            [SortValue(40)]
-            Mililitr = 17,
-            [NiceDisplayName("minuta")]
-            [SortValue(1)]
-            Minuta = 18,
-            [NiceDisplayName("rok")]
-            [SortValue(4)]
-            Rok = 19,
+            [NiceDisplayName("-nic-")] [SortValue(0)] None = 0,
             
+            [NiceDisplayName("minuta")] [SortValue(1)] Minuta = 18,
+            [NiceDisplayName("hodina")] [SortValue(2)] Hour = 1,
+            [NiceDisplayName("den")] [SortValue(3)] Day = 2,
+            [NiceDisplayName("měsíc")] [SortValue(4)] Mesic = 14,
+            [NiceDisplayName("rok")] [SortValue(5)] Rok = 19,
+
+            [NiceDisplayName("g")] [SortValue(10)] Gram = 9,
+            [NiceDisplayName("kg")] [SortValue(11)] Kilogram = 10,
+            [NiceDisplayName("t")] [SortValue(12)] Tuna = 11,
+            
+            [NiceDisplayName("mm")] [SortValue(20)] Milimetr = 6,
+            [NiceDisplayName("m")] [SortValue(21)] Metr = 4,
+            [NiceDisplayName("km")] [SortValue(22)] Kilometr = 5,
+
+            [NiceDisplayName("m2")] [SortValue(30)] MetrCtverecny = 7,
+            [NiceDisplayName("ha")] [SortValue(31)] Hektar = 12,
+            [NiceDisplayName("km2")] [SortValue(32)] KilometrCtverecny = 8,
+
+            [NiceDisplayName("ml")] [SortValue(40)] Mililitr = 17,
+            [NiceDisplayName("l")] [SortValue(41)] Litr = 16,
+            [NiceDisplayName("m3")] [SortValue(42)] MetrKrychlovy = 15,
+
+            [NiceDisplayName("ks")] [SortValue(50)] Kus = 3,
+            [NiceDisplayName("kompletní dodávka (kpl)")] [SortValue(51)] KompletniDodavka = 13,
         }
 
         public static IEnumerable<MeasureUnit> GetSortedMeasureUnits()
         {
-            Type et = typeof(MeasureUnit); 
+            Type et = typeof(MeasureUnit);
             var units = Enum.GetValues(et).Cast<MeasureUnit>();
             //order units by sort value attribute
             return units.OrderBy(u => u.GetType()
                 .GetField(u.ToString())
                 ?.GetCustomAttribute<SortValueAttribute>()
                 ?.SortValue ?? 0);
-            
         }
 
         public void NormalizePrices()
@@ -163,13 +125,12 @@ namespace HlidacStatu.Entities
 
         private void CalculateSalaryBackwardCompatibility()
         {
-
-            if(Unit != MeasureUnit.Day && Unit != MeasureUnit.Hour)
+            if (Unit != MeasureUnit.Day && Unit != MeasureUnit.Hour)
                 return;
 
             if (UnitCount is null || UnitCount == 0)
                 return;
-            
+
             var recalculatedMdSalary = Price / UnitCount;
             var recalculatedMdSalaryVat = PriceVATCalculated;
             if (Unit == MeasureUnit.Hour)
@@ -177,7 +138,7 @@ namespace HlidacStatu.Entities
                 recalculatedMdSalary *= 8;
                 recalculatedMdSalaryVat *= 8;
             }
-            
+
             if (recalculatedMdSalaryVat is null || recalculatedMdSalaryVat == 0)
             {
                 recalculatedMdSalaryVat = recalculatedMdSalary * 1.21m;
@@ -185,7 +146,6 @@ namespace HlidacStatu.Entities
 
             SalaryMD = recalculatedMdSalary;
             SalaryMdVAT = recalculatedMdSalaryVat;
-
         }
 
         private void FixWhenPriceIsHigherThanPriceWithVat()
@@ -195,37 +155,78 @@ namespace HlidacStatu.Entities
             {
                 (Price, PriceVAT) = (PriceVAT, Price);
             }
+
             // swap if salaryMdVat < salaryMd
             if (SalaryMD > 0 && SalaryMdVAT > 0 && SalaryMD > SalaryMdVAT)
             {
                 (SalaryMD, SalaryMdVAT) = (SalaryMdVAT, SalaryMD);
             }
-            
         }
-        
+
         private void CalculateFinalVatPrice()
         {
             if (UnitCount is null || UnitCount == 0)
                 return;
-            
+
             var unitPrice = Price / UnitCount;
             var unitPriceVat = PriceVAT / UnitCount;
-            
+
             // use unitPriceVAT if it is not null or zero
             PriceVATCalculated = unitPriceVat ?? unitPrice * ((100 + VAT) / 100);
-            
-            
         }
-        
+
         private decimal? RoundToWholeNumber(decimal? value)
         {
             if (value is null)
                 return null;
-            
+
             return Math.Round(value.Value, 0, MidpointRounding.ToZero);
         }
-        
-        
 
+        public bool IsValid(out Errors errors)
+        {
+            errors = new Errors();
+            bool taxAndPriceAreKnown = VAT > 0 && Price > 0;
+            bool priceWithTaxIsKnown = PriceVAT > 0;
+            
+            if (Unit.HasValue)
+            {
+                if (taxAndPriceAreKnown || priceWithTaxIsKnown)
+                {
+                    decimal minimalHourPriceVat = 100 * 1.21m;
+
+                    CalculateFinalVatPrice(); // je potřeba si nejprve spočíst jednotkovou cenu
+
+                    bool lowHourPrice = Unit == MeasureUnit.Hour && PriceVATCalculated < minimalHourPriceVat;
+                    bool lowMandayPrice = Unit == MeasureUnit.Day && PriceVATCalculated < minimalHourPriceVat;
+
+                    if (lowHourPrice || lowMandayPrice)
+                    {
+                        errors.Add("Cena se nám zdá nízká.", Errors.MessageSeverity.Warning);
+                    }
+                }
+            }
+            else
+            {
+                errors.Add("Jednotka není vybrána.", Errors.MessageSeverity.Error);
+            }
+
+            if (string.IsNullOrWhiteSpace(JobRaw))
+                errors.Add("Chybí název jobu.", Errors.MessageSeverity.Error);
+
+
+            if (Price >= PriceVAT)
+                errors.Add("Cena s DPH musí být větší než cena bez DPH.", Errors.MessageSeverity.Error);
+
+            if (!taxAndPriceAreKnown && !priceWithTaxIsKnown)
+                errors.Add("Není vyplněno DPH a cena, nebo chybí cena s DPH.", Errors.MessageSeverity.Error);
+            
+            if ((Price ?? 0) == 0 && (PriceVAT ?? 0) == 0)
+            {
+                errors.Add("Chybí vyplněná cena.", Errors.MessageSeverity.Error);
+            }
+
+            return errors.Count == 0;
+        }
     }
 }

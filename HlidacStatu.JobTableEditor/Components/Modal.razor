@@ -2,6 +2,7 @@
 @using HlidacStatu.Entities
 @using HlidacStatu.DetectJobs
 @using Devmasters.Enums
+@using HlidacStatu.Entities.Temporary
 @using Microsoft.AspNetCore.Mvc.ViewFeatures
 @using Microsoft.Extensions.Logging
 @using Nest
@@ -96,10 +97,10 @@
                                             <input type="number" @bind="@job.UnitCount" class="form-control" autocomplete="off"/>
                                         </td>
                                         <td>
-                                            @if (!IsValidJob(job, out var chyby))
+                                            @if (!job.IsValid(out var chyby))
                                             {
                                                 <p class="alert alert-danger" role="alert">
-                                                    @((MarkupString)string.Join("<br/>", chyby))
+                                                    @chyby.ToMarkupString()
                                                 </p>
                                             }
                                         </td>
@@ -121,7 +122,7 @@
                         @if (!IsValidCategory(out var chyba))
                         {
                             <p class="alert alert-danger" role="alert">
-                                @chyba
+                                @chyba.Message
                             </p>
                         }
 
@@ -171,7 +172,7 @@
         if (!isValid
             && !await ConfirmAlert(JSRuntime, "Ve formuláři jsou stále chyby. Chcete ho přesto uložit?"))
         {
-                return;
+            return;
         }
 
     //parent save
@@ -183,92 +184,46 @@
     {
         // do checks
         isSaveEnabled = true;
+        Errors foundErrors = new Errors(); 
         
         if (Table.FoundJobs.Count == 0)
-        {
-            isSaveEnabled = false;
-            return false;
-        }
-        if (!IsValidCategory(out _))
-        {
-            isSaveEnabled = false;
-            return false;
-        }
+            foundErrors.Add("Nenalezen žádný job.", Errors.MessageSeverity.Error);
+
+        if (!IsValidCategory(out var errorMessage))
+            foundErrors.Add(errorMessage);
         
-        //need to cycle all
-        bool allJobsValid = true;
         foreach (var job in Table.FoundJobs)
         {
-            if (!IsValidJob(job, out _))
+            if (!job.IsValid(out var errors))
             {
-                allJobsValid = false;
+                foundErrors.Add(errors);
             }
         }
-        if (!allJobsValid)
+
+        if (foundErrors.HasErrors)
+        {
+            isSaveEnabled = false;
+            return false;
+        }
+
+        if (foundErrors.HasWarnings)
             return false;
         
-
         return true;
     }
 
-    private bool IsValidCategory(out string error)
+    private bool IsValidCategory(out Errors.ErrorMessage errorMessage)
     {
-        error = null;
         if (string.IsNullOrWhiteSpace(Table.InDocTable.Analyza))
         {
-            error = "Kategorie není vybrána.";
+            errorMessage = new ("Kategorie není vybrána.", Errors.MessageSeverity.Error);
             return false;
         }
+        errorMessage = null;
         return true;
     }
 
-    private bool IsValidJob(InDocJobs job, out List<string> errorMessages)
-    {
-        errorMessages = new List<string>();
-        if (job.Unit is null)
-        {
-            isSaveEnabled = false;
-            errorMessages.Add($"Jednotka není vybrána.");
-        }
-        if (string.IsNullOrWhiteSpace(job.JobRaw))
-        {
-            isSaveEnabled = false;
-            errorMessages.Add($"Chybí název jobu.");
-        }
-        if (job.Price > 0
-            && (job.PriceVAT is null || job.PriceVAT == 0))
-        {
-            if (job.VAT is null || job.VAT <= 0)
-            {
-                isSaveEnabled = false;
-                errorMessages.Add($"Chybí vyplněná výše DPH.");
-            }
-        }
-        if ((job.Price ?? 0) == 0 && (job.PriceVAT ?? 0) == 0)
-        {
-            isSaveEnabled = false;
-            errorMessages.Add($"Chybí vyplněná cena.");
-        }
-
-
-        if (job.Unit.HasValue)
-        {
-            decimal minimalHourPriceVat = 100 * 1.21m;
-            
-            bool lowHourPrice = job.Unit == InDocJobs.MeasureUnit.Hour && job.PriceVAT < minimalHourPriceVat;
-            bool lowMandayPrice = job.Unit == InDocJobs.MeasureUnit.Day && job.PriceVAT < minimalHourPriceVat;
-
-            if (lowHourPrice || lowMandayPrice)
-            {
-                errorMessages.Add($"Cena se nám zdá nízká.");
-            }
-        }
-
-
-        return errorMessages.Count == 0;
-    }
-
-
+    
     private void LoadJobs()
     {
         Table.ParseJobs();
