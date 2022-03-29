@@ -28,55 +28,54 @@ namespace HlidacStatu.JobsWeb.Models
 
         public JobStatistics(IEnumerable<JobPrecalculated> precalculatedJobs, string name)
         {
-            var salarydX = precalculatedJobs.Select(x =>new { p = (double)x.PricePerUnitVat, pk = x.JobPk }).ToList();
+            var precalculatedJobsList = precalculatedJobs.ToList(); // aby nedocházelo k několikanásobné enumeraci
+            
+            //todo: salarydX se nikde nepouziva  dal v kodu - bezi tu zbytecne enumerace
+            var salarydX = precalculatedJobsList.Select(x =>new { p = (double)x.PricePerUnitVat, pk = x.JobPk }).ToList();
 
-
-            var salaryd = precalculatedJobs.Select(x => (double)x.PricePerUnitVat).ToList();
-            decimal dolniKvartil = (decimal)salaryd.LowerQuartile();
-            decimal horniKvartil = (decimal)salaryd.UpperQuartile();
+            var salaryd = precalculatedJobsList.Select(x => (double)x.PricePerUnitVat).ToList();
+            double dolniKvartil = salaryd.LowerQuartile();
+            double horniKvartil = salaryd.UpperQuartile();
             //decimal outlierRange = (horniKvartil - dolniKvartil) * 1.5m;
-            decimal maximum = (decimal)salaryd.Max(x => x);
-            decimal minimum = (decimal)salaryd.Min(x => x); ;
-            decimal leftWhisk = (decimal)salaryd.Percentile(10);
+            double maximum = salaryd.Max(x => x);
+            double minimum = salaryd.Min(x => x); ;
+            double leftWhisk = salaryd.Percentile(10);
             if (leftWhisk < minimum)
                 leftWhisk = minimum;
-            decimal rightWhisk = (decimal)salaryd.Percentile(90);
+            double rightWhisk = salaryd.Percentile(90);
             if (rightWhisk > maximum)
                 rightWhisk = maximum;
 
-
-            precalculatedJobs
+            //todo: vystup z tohohle volani se nikde nepouziva dal v kodu - bezi tu zbytecne enumerace
+            precalculatedJobsList
                 .Select(m => m.AnalyzaName)
                 .Distinct();
             Name = name;
 
             Description = "";
-            var subj = precalculatedJobs.FirstOrDefault(m => !string.IsNullOrEmpty(m.AnalyzaName))?.AnalyzaName?.ToLower();
+            var subj = precalculatedJobsList.FirstOrDefault(m => !string.IsNullOrEmpty(m.AnalyzaName))?.AnalyzaName?.ToLower();
             if (subj != null && jobDescriptions.ContainsKey(subj))
             {
                 Description = jobDescriptions[subj].FirstOrDefault(m => m.JobGrouped.ToLower() == name.ToLower())?.jobGroupedDescription ?? "";
             }
 
-            Average = precalculatedJobs.Average(x => x.PricePerUnit);
-            Maximum = maximum;
-            Minimum = minimum;
+            Average = (decimal)salaryd.Average();
+            Maximum = (decimal)maximum;
+            Minimum = (decimal)minimum;
             Median = (decimal)salaryd.Median();
-            DolniKvartil = dolniKvartil;
-            HorniKvartil = horniKvartil;
-            LeftWhisk = leftWhisk;
-            RightWhisk = rightWhisk;
-            LowOutliers = precalculatedJobs.Where(x => x.PricePerUnit < leftWhisk).Select(x => x.PricePerUnit)
-                .OrderBy(x => x).ToArray();
-            HighOutliers = precalculatedJobs.Where(x => x.PricePerUnit > rightWhisk).Select(x => x.PricePerUnit)
-                .OrderBy(x => x).ToArray();
-            PriceCount = precalculatedJobs.Count();
-            SupplierCount = precalculatedJobs.SelectMany(x => x.IcaDodavatelu).Distinct().Count();
-            ContractCount = precalculatedJobs.Select(x => x.SmlouvaId).Distinct().Count();
-
-            this.Dodavatele = precalculatedJobs.SelectMany(x => x.IcaDodavatelu).Distinct().ToArray();
-            this.Odberatele = precalculatedJobs.Select(x => x.IcoOdberatele).Distinct().ToArray();
-            this.Contracts = precalculatedJobs.Select(x => x.SmlouvaId).Distinct().ToArray();
-
+            DolniKvartil = (decimal)dolniKvartil;
+            HorniKvartil = (decimal)horniKvartil;
+            LeftWhisk = (decimal)leftWhisk;
+            RightWhisk = (decimal)rightWhisk;
+            LowOutliers = salaryd.Where(x => x < leftWhisk).OrderBy(x => x).Select(x => (decimal)x).ToArray();
+            HighOutliers = salaryd.Where(x => x > rightWhisk).OrderBy(x => x).Select(x => (decimal)x).ToArray();
+            PriceCount = salaryd.Count();
+            
+            SupplierCount = precalculatedJobsList.SelectMany(x => x.IcaDodavatelu).Distinct().Count();
+            ContractCount = precalculatedJobsList.Select(x => x.SmlouvaId).Distinct().Count();
+            Dodavatele = precalculatedJobsList.SelectMany(x => x.IcaDodavatelu).Distinct().ToArray();
+            Odberatele = precalculatedJobsList.Select(x => x.IcoOdberatele).Distinct().ToArray();
+            Contracts = precalculatedJobsList.Select(x => x.SmlouvaId).Distinct().ToArray();
         }
 
         public string Name { get; set; }

@@ -26,7 +26,7 @@
 
 <h2 class="fw-bolder">Souhrn</h2>
 @{
-    var distinctJobsForYearAndSubject = JobService.DistinctJobsForYearAndSubject(Model.Key.Value);
+    var distinctJobsForYearAndSubject = JobService.DistinctJobsForYearAndSubject(Model.Key.Value).ToList();
     var pocetSmluv = distinctJobsForYearAndSubject
         .Select(m => m.SmlouvaId).Distinct().Count();
     var pocetZadavatelu = distinctJobsForYearAndSubject
@@ -35,6 +35,8 @@
         .SelectMany(m => m.IcaDodavatelu).Distinct().Count();
     var pocetCen = distinctJobsForYearAndSubject
         .Count();
+    
+    //todo: tmp se nepouziva - zbytecna zatez
     var tmp = distinctJobsForYearAndSubject.OrderByDescending(m => m.PricePerUnitVat).ToArray();
 }
 
