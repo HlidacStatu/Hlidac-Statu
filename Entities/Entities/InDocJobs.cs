@@ -216,7 +216,7 @@ namespace HlidacStatu.Entities
 
             if (Price > PriceVAT)
                 errors.Add("Cena s DPH musí být větší než cena bez DPH.", Errors.MessageSeverity.Error);
-            if (Price == PriceVAT)
+            if (Price == PriceVAT && Price < 10)
                 errors.Add("Cena s DPH je stejná jako cena bez DPH.", Errors.MessageSeverity.Warning);
 
             if (!taxAndPriceAreKnown && !priceWithTaxIsKnown)
