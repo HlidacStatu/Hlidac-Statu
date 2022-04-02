@@ -3,7 +3,7 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iis": {
-      "applicationUrl": "http://lcore.hlidacstatu.cz",
+      "applicationUrl": "https://local.hlidacstatu.cz",
       "sslPort": 0
     },
     "iisExpress": {
@@ -26,19 +26,19 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Petr"
       },
-      "dotnetRunMessages": "true",
-      "applicationUrl": "https://local.hlidacstatu.cz;http://local.hlidacstatu.cz"
+      "applicationUrl": "https://local.hlidacstatu.cz;http://local.hlidacstatu.cz",
+      "dotnetRunMessages": "true"
     },
     "Michal": {
       "commandName": "IIS",
       "launchBrowser": true,
-      "launchUrl": "http://local.hlidacstatu.cz",
+      "launchUrl": "https://local.hlidacstatu.cz",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Michal"
       },
-      "dotnetRunMessages": "true",
       "use64Bit": true,
-      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+      "applicationUrl": "https://localhost:5001;http://localhost:5000",
+      "dotnetRunMessages": "true"
     }
   }
 }
