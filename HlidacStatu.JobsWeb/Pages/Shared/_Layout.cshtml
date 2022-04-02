@@ -116,7 +116,7 @@
                     {
                         <small>@ViewData["Description"]</small>
                     }
-                    else if (analyza?.Obor?.ToLower() == "demo")
+                    else if (analyza?.IsDemo == true)
                     {
                         <small>Toto je ukázková, volně dostupná analáza za období leden-březen 2018. Ostatní analýzy vždy pokrývají celý kalendářní rok.</small>
 
@@ -142,7 +142,9 @@
         {
             var data = JobService.DistinctJobsForYearAndSubject(analyza.Value);
             <div style="margin-top:50px;"  class="alert alert-secondary" >
-                Data jsou platná k @(data.Max(m=>m.ItemInAnalyseCreated)?.ToString("dd. MM. yyyy"))
+                Data jsou platná k @(analyza.Value.PlatnostK), za období <b>@analyza.Value.ProObdobi</b>
+                
+                
                 </div>
         }
         </main>

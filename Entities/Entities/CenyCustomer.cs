@@ -19,7 +19,7 @@ namespace HlidacStatu.Entities
 
 
         [Required]
-        public long Rok { get; set; }
+        public int Rok { get; set; }
 
         [Required]
         [Column(TypeName = "datetime")]

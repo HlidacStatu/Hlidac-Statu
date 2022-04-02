@@ -266,30 +266,30 @@ namespace HlidacStatu.JobsWeb.Services
             return DistinctJobs;
         }
 
-        public static async Task<bool> HasAccess(this HttpContext context)
+        public static async Task<CenyCustomerRepo.AccessDetail> HasAccess(this HttpContext context)
         {
             if (context.User?.Identity?.IsAuthenticated == false)
-                return false;
+                return CenyCustomerRepo.AccessDetail.NoAccess();
             var username = context.User?.Identity?.Name;
             if (string.IsNullOrEmpty(username))
-                return false;
+                return CenyCustomerRepo.AccessDetail.NoAccess();
             var key = TryFindKey(context);
             if (key == null)
-                return false;
+                return CenyCustomerRepo.AccessDetail.NoAccess();
 
             return await HasAccess(username, key?.Obor, key.Value.Rok);
         }
-        public static async Task<bool> HasAccess(this HttpContext context, string obor, int rok)
+        public static async Task<CenyCustomerRepo.AccessDetail> HasAccess(this HttpContext context, string obor, int rok)
         {
             if (context.User?.Identity?.IsAuthenticated == false)
-                return false;
+                return CenyCustomerRepo.AccessDetail.NoAccess();
             var username = context.User?.Identity?.Name;
             if (string.IsNullOrEmpty(username))
-                return false;
+                return CenyCustomerRepo.AccessDetail.NoAccess();
 
             return await HasAccess(username, obor, rok);
         }
-        public static async Task<bool> HasAccess(string username, string obor, int rok)
+        public static async Task<CenyCustomerRepo.AccessDetail> HasAccess(string username, string obor, int rok)
         {
 
             return await CenyCustomerRepo.HasAccessAsync(username, obor, rok).ConfigureAwait(false);

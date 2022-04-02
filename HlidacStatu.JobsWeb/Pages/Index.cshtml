@@ -27,7 +27,7 @@
                     @{
                         var a_it20 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 });
                     }
-                    @if (await HttpContext.HasAccess("IT", 2020) == false)
+                    @if (HttpContext.HasAccess("IT", 2020).Result.Access == false)
                     {
                         <tr>
                             <td width="60%">

@@ -30,7 +30,7 @@
 
 @section Scripts
 {
-    <script>
+<script>
     $(document).ready(function() {
       $("#selectNavigace").change(function(){
         if ($(this).val()!='') {
@@ -38,64 +38,77 @@
         }
       });
     });
-    </script>
+</script>
 }
 
-<h2>Benchmark cen vybraného dodavatele
+<h2>
+    Benchmark cen vybraného dodavatele
     <small class="text-muted">oproti souhrným obvyklým cenám</small>
-    </h2>@if (Model.Key.HasValue)
+</h2>
+
+<div class="input-group mb-3">
+    <label class="input-group-text" for="selectNavigace">Vyberte dodavatele:</label>
+    <select class="form-select" id="selectNavigace">
+        <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte dodavatele...</option>
+        @foreach (var (ico, nazev, pocetCen) in
+        JobService.GetDodavateleList(Model.Key.Value)
+        .Where(m => m.pocetCen > JobService._minimumPriceCountInList)
+        .OrderByDescending(x => x.pocetCen)
+        )
+        {
+            <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetCen cen)</option>
+        }
+    </select>
+</div>
+@if (statistics == null)
 {
 
-    <div class="input-group mb-3">
-        <label class="input-group-text" for="selectNavigace">Vyberte dodavatele:</label>
-        <select class="form-select" id="selectNavigace">
-            <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte dodavatele...</option>
-            @foreach (var (ico, nazev, pocetCen) in 
-            JobService.GetDodavateleList(Model.Key.Value)
-                .Where(m=>m.pocetCen>JobService._minimumPriceCountInList)
-                .OrderByDescending(x => x.pocetCen)
-            )
-            {
-                <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetCen cen)</option>
-            }
-        </select>
+    <div class="alert alert-warning" role="alert">
+        Tohoto dodavatele jsme nenašli.
     </div>
-    
-    if (!string.IsNullOrEmpty(Model.Ico))
-    {
-        <hr/>
-
-        <h2>@Model.Nazev</h2>
-            var RSstat = HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStat(
-            TimeSpan.FromDays(14), 
-            $"icoPrijemce:{Model.Ico} AND " + Model.Key?.PerSubjectDesc?.Query, 
-            1, 0, Repositories.SmlouvaRepo.Searching.OrderResult.FastestForScroll);
-        double sumKc = ((Nest.ValueAggregate)RSstat.ElasticResults?.Aggregations["sumKc"])?.Value ?? 0;
-        var uniqSmluv = JobService.DistinctJobsForYearAndSubject(Model.Key.Value)
-                            .Where(m => m.IcaDodavatelu.Contains(Model.Ico))
-                            .Select(m => m.SmlouvaId)
-                            .Distinct()
-                            .Count();
-        bool showPouze = uniqSmluv * 3 < RSstat.Total;
-        <hr />
-
-        <p>
-        @Model.Nazev má v registru smluv za analyzovanou oblast <b>@Model.Key.Value.Obor</b> a rok <b>@(Model.Key?.Rok)</b> 
-        celkem @(Devmasters.Lang.CS.Plural.Get(RSstat.Total,"jednu smlouvu","{0} smlouvy","{0} smluv")) 
-        za @(HlidacStatu.Util.RenderData.NicePrice((decimal)sumKc,shortFormat:true)), 
-        z nichž @(showPouze ? "pouze" : "") @(Devmasters.Lang.CS.Plural.Get(uniqSmluv,"jedna smlouva obsahovala","{0} smlouvy obsahovaly","{0} smluv obsahovalo")) jednotkové ceny.
-        </p>
-
-
-
-
-        if (showStatistics)
-        {
-            <partial name="Shared/_SouhrnTable" model="tableModel"/>
-
-            <h2>Porovnání cenového rozpětí celku a @Model.Nazev</h2>
-            <partial name="Shared/_CompareTable" model="graphModel"/>
-            <partial name="Shared/_BoxPlot" model="graphModel"/>
-        }
-    }
+    return;
 }
+@if (string.IsNullOrEmpty(Model.Ico))
+{
+    return;
+
+}
+
+<hr />
+
+<h2>@Model.Nazev</h2>
+@{
+    var RSstat = HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStat(
+        TimeSpan.FromDays(14),
+        $"icoPrijemce:{Model.Ico} AND " + Model.Key?.PerSubjectDesc?.Query,
+        1, 0, Repositories.SmlouvaRepo.Searching.OrderResult.FastestForScroll);
+    double sumKc = ((Nest.ValueAggregate)RSstat.ElasticResults?.Aggregations["sumKc"])?.Value ?? 0;
+    var uniqSmluv = JobService.DistinctJobsForYearAndSubject(Model.Key.Value)
+                        .Where(m => m.IcaDodavatelu.Contains(Model.Ico))
+                        .Select(m => m.SmlouvaId)
+                        .Distinct()
+                        .Count();
+    bool showPouze = uniqSmluv * 3 < RSstat.Total;
+}
+<hr />
+
+<p>
+    @Model.Nazev má v registru smluv za analyzovanou oblast <b>@Model.Key.Value.Obor</b> a rok <b>@(Model.Key?.Rok)</b>
+    celkem @(Devmasters.Lang.CS.Plural.Get(RSstat.Total,"jednu smlouvu","{0} smlouvy","{0} smluv"))
+    za @(HlidacStatu.Util.RenderData.NicePrice((decimal)sumKc,shortFormat:true)),
+    z nichž @(showPouze ? "pouze" : "") @(Devmasters.Lang.CS.Plural.Get(uniqSmluv,"jedna smlouva obsahovala","{0} smlouvy obsahovaly","{0} smluv obsahovalo")) jednotkové ceny.
+</p>
+
+
+
+
+@if (showStatistics)
+{
+    <partial name="Shared/_SouhrnTable" model="tableModel" />
+
+    <h2>Porovnání cenového rozpětí celku a @Model.Nazev</h2>
+    <partial name="Shared/_CompareTable" model="graphModel" />
+    <partial name="Shared/_BoxPlot" model="graphModel" />
+}
+
+

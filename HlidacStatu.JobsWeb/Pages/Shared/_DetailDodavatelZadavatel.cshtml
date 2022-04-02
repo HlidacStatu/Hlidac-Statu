@@ -1,0 +1,113 @@
+﻿@model (List<JobStatistics> statistics, YearlyStatisticsGroup.Key? Key)
+
+@using Microsoft.AspNetCore.Http
+@using System.Threading.Tasks;
+@using HlidacStatu.JobsWeb.Models;
+@using HlidacStatu.JobsWeb.Services;
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.AspNetCore.Mvc.RazorPages;
+
+
+
+@{
+    List<JobStatistics> statistics = Model.statistics;
+
+    var smlouvyIds = statistics.SelectMany(m => m.Contracts).Distinct();
+    if (smlouvyIds.Count() == 0)
+    {
+        return;
+    }
+
+    var smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
+
+    var firmyCount = JobService.GetDodavateleList(Model.Key.Value);
+    var firmy = statistics.SelectMany(m => m.Dodavatele).Distinct()
+    .Select(m => new
+    {
+        ico = m,
+        name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
+        count = firmyCount.Any(c => c.ico == m) ? firmyCount.First(c => c.ico == m).pocetCen : 0
+    })
+    .OrderBy(o => o.name);
+
+    var uradyCount = JobService.GetOdberateleList(Model.Key.Value);
+    var urady = statistics.SelectMany(m => m.Odberatele).Distinct()
+    .Select(m => new
+    {
+        ico = m,
+        name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
+        count = uradyCount.Any(c => c.ico == m) ? uradyCount.First(c => c.ico == m).pocetCen : 0
+    })
+    .OrderBy(o => o.name);
+    ;
+}
+
+@if (this.Context.HasAccess().Result.AnalyzeLevel < Repositories.CenyCustomerRepo.AccessDetail.AccessDetailLevel.PRO)
+{
+    <p>
+        Zanalyzovali jsme celkem
+        @Devmasters.Lang.CS.Plural.Get(smlouvyIds.Count(),"jednu smlouvu","{0} smlouvy","{0} smluv")
+        od @(Devmasters.Lang.CS.Plural.Get(firmy.Count(),"jednoho dodavatele","{0} dodavatelů","{0} dodavatelů"))
+        a od @(Devmasters.Lang.CS.Plural.Get(urady.Count(),"jednoho odběratele","{0} odběratelů","{0} odběratelů")).
+    </p>
+    <p>
+        Detailní informace pro zadavatele a dodavatele jsou k dispozici v Analýzách PRO. Tuto úroveň analýzy nemáte zakoupenu.
+        <a class="btn btn-success btn-sm" href="/contact">Objednat</a>
+    </p>
+    return;
+}
+<p>
+    Zanalyzovali jsme celkem
+    @Devmasters.Lang.CS.Plural.Get(smlouvyIds.Count(),"jednu smlouvu","{0} smlouvy","{0} smluv")
+    od @(Devmasters.Lang.CS.Plural.Get(firmy.Count(),"jednoho dodavatele","{0} dodavatelů","{0} dodavatelů"))
+    a od @(Devmasters.Lang.CS.Plural.Get(urady.Count(),"jednoho odběratele","{0} odběratelů","{0} odběratelů")).
+</p>
+<p class="pb-4">
+    <a class="btn btn-sm btn-outline-primary" href="https://www.hlidacstatu.cz/hledatsmlouvy?q=@(System.Net.WebUtility.UrlEncode(smlouvyQuery))">Ukázat všechny zanalyzované smlouvy</a>
+</p>
+<div class="row">
+    <div class="col-12 col-sm-6">
+        <h3>Dodavatelé z analýzy</h3>
+        <ul>
+            @foreach (var f in firmy.OrderByDescending(o=>o.count))
+            {
+                @if (true || f.count > 3)
+                {
+                    <li>
+                        @f.name
+                        - <a href="/BenchmarkDodavatelu/@(f.ico)?@(Model.Key.Value.UrlDecodedParams)">@(Devmasters.Lang.CS.Plural.GetWithZero(f.count,"","jedna cena","{0} ceny","{0} cen"))</a>
+                    </li>
+                }
+                else if (f.count > 0)
+                {
+                    <li>
+                        @f.name - méně než 4 ceny
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+
+    <div class="col-12 col-sm-6">
+        <h3>Zadavatelé z analýzy</h3>
+        <ul>
+            @foreach (var f in urady.OrderByDescending(o=>o.count))
+            {
+                @if (true || f.count > 3)
+                {
+                    <li>
+                        @f.name
+                        - <a href="/BenchmarkUradu/@(f.ico)?@(Model.Key.Value.UrlDecodedParams)">@(Devmasters.Lang.CS.Plural.GetWithZero(f.count,"","jedna cena","{0} ceny","{0} cen"))</a>
+                    </li>
+                }
+                else if (f.count > 0)
+                {
+                    <li>
+                        @f.name - méně než 4 ceny
+                    </li>
+                }
+            }
+        </ul>
+    </div>
+</div>

@@ -18,7 +18,8 @@ namespace HlidacStatu.JobsWeb.Pages
 
         public async Task<IActionResult> OnGetAsync(string id)
         {
-            if (await HttpContext.HasAccess() == false)
+            var ad = await HttpContext.HasAccess();
+            if (ad.Access == false)
                 return Redirect("/");
 
 
