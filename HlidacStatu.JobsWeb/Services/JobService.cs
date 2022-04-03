@@ -1,5 +1,6 @@
 using HlidacStatu.JobsWeb.Models;
 using HlidacStatu.Repositories;
+using HlidacStatu.Entities;
 
 using Microsoft.AspNetCore.Http;
 
@@ -133,6 +134,7 @@ namespace HlidacStatu.JobsWeb.Services
             }
         }
 
+
         private static List<JobStatistics> CalculateJobs(List<JobPrecalculated> distinctJobs,
             YearlyStatisticsGroup.Key key)
         {
@@ -239,6 +241,7 @@ namespace HlidacStatu.JobsWeb.Services
             return result;
         }
 
+
         public static List<(string ico, string nazev, int pocetCen)> GetDodavateleList(YearlyStatisticsGroup.Key key)
         {
             return GlobalStats[key].DodavateleStatistics.Keys.Select(k =>
@@ -261,35 +264,61 @@ namespace HlidacStatu.JobsWeb.Services
             return result;
         }
 
-        public static List<JobPrecalculated> GetDistinctJobs()
+
+
+
+        public static List<JobStatistics> GetDodavatelForOdberatelStatistics(string icoDodavatel, string icoOdberatel, YearlyStatisticsGroup.Key key)
+        {
+            List<JobPrecalculated> jobs = GetDistinctJobs(key);
+            IEnumerable<JobPrecalculated> jobsBetweenThem = jobs
+                .Where(j => j.IcoOdberatele == icoOdberatel)
+                .Where(j => j.IcaDodavatelu.Contains(icoDodavatel));
+
+            List<JobStatistics> perPolozka = jobsBetweenThem
+                .GroupBy(m => m.Polozka)
+                .Select(ig => new JobStatistics(ig, ig.Key))
+                .Where(s => s.PriceCount >= _minimumPriceCount)
+                .ToList();
+
+            return perPolozka;
+        }
+
+        public static List<JobPrecalculated> GetDistinctJobs(YearlyStatisticsGroup.Key key)
+        {
+            return DistinctJobs
+                .Where(x => x.AnalyzaName == key.Obor && x.Year == key.Rok)
+                .ToList();
+        }
+
+        public static List<JobPrecalculated> GetDistinctJobsAllAnalysis()
         {
             return DistinctJobs;
         }
 
-        public static async Task<CenyCustomerRepo.AccessDetail> HasAccess(this HttpContext context)
+        public static async Task<CenyCustomer.AccessDetail> HasAccess(this HttpContext context)
         {
             if (context.User?.Identity?.IsAuthenticated == false)
-                return CenyCustomerRepo.AccessDetail.NoAccess();
+                return CenyCustomer.AccessDetail.NoAccess();
             var username = context.User?.Identity?.Name;
             if (string.IsNullOrEmpty(username))
-                return CenyCustomerRepo.AccessDetail.NoAccess();
+                return CenyCustomer.AccessDetail.NoAccess();
             var key = TryFindKey(context);
             if (key == null)
-                return CenyCustomerRepo.AccessDetail.NoAccess();
+                return CenyCustomer.AccessDetail.NoAccess();
 
             return await HasAccess(username, key?.Obor, key.Value.Rok);
         }
-        public static async Task<CenyCustomerRepo.AccessDetail> HasAccess(this HttpContext context, string obor, int rok)
+        public static async Task<CenyCustomer.AccessDetail> HasAccess(this HttpContext context, string obor, int rok)
         {
             if (context.User?.Identity?.IsAuthenticated == false)
-                return CenyCustomerRepo.AccessDetail.NoAccess();
+                return CenyCustomer.AccessDetail.NoAccess();
             var username = context.User?.Identity?.Name;
             if (string.IsNullOrEmpty(username))
-                return CenyCustomerRepo.AccessDetail.NoAccess();
+                return CenyCustomer.AccessDetail.NoAccess();
 
             return await HasAccess(username, obor, rok);
         }
-        public static async Task<CenyCustomerRepo.AccessDetail> HasAccess(string username, string obor, int rok)
+        public static async Task<CenyCustomer.AccessDetail> HasAccess(string username, string obor, int rok)
         {
 
             return await CenyCustomerRepo.HasAccessAsync(username, obor, rok).ConfigureAwait(false);

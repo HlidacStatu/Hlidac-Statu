@@ -10,5 +10,9 @@ namespace HlidacStatu.JobsWeb.Models
         public int? Height { get; set; }
         public List<JobStatistics> BasicData { get; set; }
         public List<JobStatistics> CompareWith { get; set; }
+
+        public bool ShowPocetSmluv { get; set; } = false;
+        public bool ShowPocetCen { get; set; } = false;
+
     }
 }

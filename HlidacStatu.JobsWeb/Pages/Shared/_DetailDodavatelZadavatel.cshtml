@@ -1,5 +1,6 @@
 ﻿@model (List<JobStatistics> statistics, YearlyStatisticsGroup.Key? Key)
 
+@using HlidacStatu.Entities
 @using Microsoft.AspNetCore.Http
 @using System.Threading.Tasks;
 @using HlidacStatu.JobsWeb.Models;
@@ -43,7 +44,7 @@
     ;
 }
 
-@if (this.Context.HasAccess().Result.AnalyzeLevel < Repositories.CenyCustomerRepo.AccessDetail.AccessDetailLevel.PRO)
+@if (this.Context.HasAccess().Result.AnalyzeLevel < CenyCustomer.AccessDetail.AccessDetailLevel.PRO)
 {
     <p>
         Zanalyzovali jsme celkem

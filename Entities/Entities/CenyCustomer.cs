@@ -17,9 +17,18 @@ namespace HlidacStatu.Entities
         [Required]
         public string Analyza { get; set; }
 
+        [Required]
+        public int Level { get; set; }
+
+        [NotMapped]
+        public AccessDetail.AccessDetailLevel AccessLevel { get => (AccessDetail.AccessDetailLevel)this.Level; }
 
         [Required]
         public int Rok { get; set; }
+
+        [Required]
+        public decimal Amount { get; set; }
+
 
         [Required]
         [Column(TypeName = "datetime")]

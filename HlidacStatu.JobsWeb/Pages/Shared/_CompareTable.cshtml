@@ -11,19 +11,38 @@
             <th scope="col" class="text-end">Dolní kvartil</th>
             <th scope="col" class="text-end">Medián</th>
             <th scope="col" class="text-end">Horní kvartil</th>
-            <th scope="col" class="text-end">Počet<br />smluv</th>
-            <th scope="col" class="text-end">Počet<br />cen</th>
-
+            <th scope="col" class="text-end">
+                @if (Model.ShowPocetSmluv)
+                {
+                    <text>Počet<br />smluv</text>
+                }
+            </th>
+            <th scope="col" class="text-end">
+            @if (Model.ShowPocetCen)
+            {
+                <text>Počet<br />cen</text>
+            }
+            </th>
             <th scope="col" class="text-end">Dolní kvartil</th>
             <th scope="col" class="text-end">Medián</th>
             <th scope="col" class="text-end">Horní kvartil</th>
         </tr>
+        @{
+            int colspanLeft = 3; // 1 + (Model.ShowPocetSmluv ? 1 : 0)  + (Model.ShowPocetCen ? 1 : 0);
+            int colspanRight = 3;
+        }
         <tr>
             <th></th>
             <th class="align-middle border-start"><div class="middle-line right"></div></th>
-            <th colspan="3" class="align-middle text-center"><div class="middle-line left right"><b style="color:black">Obvyklé ceny<br />@Devmasters.TextUtil.ShortenText( Model.SubjectName,50)</b></div></th>
+            <th colspan="@colspanLeft" class="align-middle text-center">
+                <div class="middle-line left right">
+                    <b style="color:black">
+                        Obvyklé ceny<br />@Devmasters.TextUtil.ShortenText( Model.SubjectName,40)
+                    </b>
+                </div>
+            </th>
             <th class="align-middle border-end"><div class="middle-line left "></div></th>
-            <th colspan="3" class="align-middle text-center"><div class="middle-line left right"><b style="color:black">Rozsah obvyklých<br />cen celkově</b></div></th>
+            <th colspan="@colspanRight" class="align-middle text-center"><div class="middle-line left right"><b style="color:black">Rozsah obvyklých<br />cen celkově</b></div></th>
         </tr>
     </thead>
     <tbody>
@@ -36,8 +55,18 @@
                 <td class="text-end number border-start"><b>@row.DolniKvartil.ToString("N0")</b></td>
                 <td class="text-end number"><b>@row.Median.ToString("N0")</b></td>
                 <td class="text-end number"><b>@row.HorniKvartil.ToString("N0")</b></td>
-                <td class="text-end number">@row.ContractCount</td>
-                <td class="text-end number border-end">@row.PriceCount</td>
+                <td class="text-end number">
+                    @if (Model.ShowPocetSmluv)
+                    {
+                        @row.ContractCount
+                    }
+                </td>
+                <td class="text-end number border-end">
+                    @if (Model.ShowPocetCen)
+                    {
+                        @row.PriceCount
+                    }
+                </td>
                 <td class="text-end number border-start"><b>@compRow.DolniKvartil.ToString("N0")</b></td>
                 <td class="text-end number"><b>@compRow.Median.ToString("N0")</b></td>
                 <td class="text-end number border-end"><b>@compRow.HorniKvartil.ToString("N0")</b></td>

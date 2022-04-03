@@ -15,7 +15,7 @@
 
     var histogram = new BarGraph()
             {
-                Data = JobService.GetDistinctJobs()
+                Data = JobService.GetDistinctJobs(Model.Key.Value)
                     .Where(j => j.Polozka == Model.Statistics.Name)
                     .ToList(),
                 Title = Model.Statistics.Name

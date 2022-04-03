@@ -1,0 +1,134 @@
+﻿@model (List<JobStatistics> statistics, Firma zadavatel, YearlyStatisticsGroup.Key? Key)
+
+@using HlidacStatu.Entities
+@using Microsoft.AspNetCore.Http
+@using System.Threading.Tasks;
+@using HlidacStatu.JobsWeb.Models;
+@using HlidacStatu.JobsWeb.Services;
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.AspNetCore.Mvc.RazorPages;
+
+
+
+@{
+    List<JobStatistics> zadavatelStatistics = Model.statistics;
+
+    var smlouvyIds = zadavatelStatistics.SelectMany(m => m.Contracts).Distinct();
+    if (smlouvyIds.Count() == 0)
+    {
+        return;
+    }
+
+    var smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
+
+    var firmyCount = JobService.GetDodavateleList(Model.Key.Value);
+    var firmy = zadavatelStatistics.SelectMany(m => m.Dodavatele).Distinct()
+    .Select(m => new
+    {
+        ico = m,
+        name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
+        count = firmyCount.Any(c => c.ico == m) ? firmyCount.First(c => c.ico == m).pocetCen : 0
+    })
+    .OrderBy(o => o.name);
+
+    var uradyCount = JobService.GetOdberateleList(Model.Key.Value);
+    var urady = zadavatelStatistics.SelectMany(m => m.Odberatele).Distinct()
+    .Select(m => new
+    {
+        ico = m,
+        name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
+        count = uradyCount.Any(c => c.ico == m) ? uradyCount.First(c => c.ico == m).pocetCen : 0
+    })
+    .OrderBy(o => o.name);
+    ;
+}
+
+@if (this.Context.HasAccess().Result.AnalyzeLevel < CenyCustomer.AccessDetail.AccessDetailLevel.PRO)
+{
+    <p>
+        Detailní informace porovnávající ceny mezi jednotlivými pro zadavately a dodavately jsou k dispozici v Analýzách PRO.
+        Tuto úroveň analýzy nemáte zakoupenu.
+        <a class="btn btn-success btn-sm" href="/contact">Objednat</a>
+    </p>
+    return;
+}
+<div class="row">
+    <h2>Porovnání cen dodavatelů pro zadavatele @Model.zadavatel.Jmeno podle jednotlivých položek</h2>
+
+    @{
+        var generalStat = JobService.GetStatistics(Model.Key.Value);
+    }
+    @foreach (var polozka in zadavatelStatistics.OrderBy(m => m.Name))
+    {
+        var zadavatelStatisticsPolozka = zadavatelStatistics.FirstOrDefault(m => m.Name == polozka.Name);
+        <h3> @polozka.Name</h3>
+
+
+        <table class="table table-sm table-striped mt-4">
+            <caption>ceny s DPH</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Firma</th>
+                    <th scope="col" class="text-end">Počet<br />cen</th>
+                    <th scope="col" class="text-end">Minimum</th>
+                    <th scope="col" class="text-end">Dolní kvartil</th>
+                    <th scope="col" class="text-end">Medián</th>
+                    <th scope="col" class="text-end">Horní kvartil</th>
+                    <th scope="col" class="text-end  border-end">Max</th>
+
+                    <th scope="col" class="text-end border-start">Počet<br />cen</th>
+                    <th scope="col" class="text-end">Minimum</th>
+                    <th scope="col" class="text-end">Dolní kvartil</th>
+                    <th scope="col" class="text-end">Medián</th>
+                    <th scope="col" class="text-end">Horní kvartil</th>
+                    <th scope="col" class="text-end border-end">Max</th>
+                </tr>
+                <tr>
+                    <th></th>
+                    <th class="align-middle border-start"><div class="middle-line right"></div></th>
+                    <th class="align-middle text-center" colspan="4"><div class="middle-line left right">
+                        <b style="color:black">Rozsah obvyklých cen<br />této firmy pro zadavatele</b>
+                        </div></th>
+                    <th class="align-middle border-end"><div class="middle-line left "></div></th>
+                    <th class="align-middle border-start"><div class="middle-line right"></div></th>
+                    <th class="align-middle text-center" colspan="3">
+                        <div class="middle-line left right"><b style="color:black">Rozsah obvyklých cen<br />@(Model.zadavatel.Jmeno)</b></div>
+                    </th>
+                    <th class="align-middle border-end"><div class="middle-line left "></div></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var f in firmy.OrderByDescending(o => o.count))
+                {
+                    var firmaStat = JobService.GetDodavatelForOdberatelStatistics(f.ico, Model.zadavatel.ICO, Model.Key.Value);
+                    var firmaPolozka = firmaStat.FirstOrDefault(m => m.Name.ToLowerInvariant() == polozka.Name.ToLowerInvariant());
+                    if (firmaPolozka != null)
+                    {
+                        <tr>
+                            <td scope="row">@f.name</td>
+                            <td class="text-end number border-start">@firmaPolozka.PriceCount</td>
+                            <td class="text-end number">@firmaPolozka.Minimum.ToString("N0")</td>
+                            <td class="text-end number"><b>@firmaPolozka.DolniKvartil.ToString("N0")</b></td>
+                            <td class="text-end number"><b>@firmaPolozka.Median.ToString("N0")</b></td>
+                            <td class="text-end number"><b>@firmaPolozka.HorniKvartil.ToString("N0")</b></td>
+                            <td class="text-end number border-end">@firmaPolozka.Maximum.ToString("N0")</td>
+
+                            <td class="text-end number border-start">@zadavatelStatisticsPolozka.PriceCount</td>
+                            <td class="text-end number">@zadavatelStatisticsPolozka.Minimum.ToString("N0")</td>
+                            <td class="text-end number"><b>@zadavatelStatisticsPolozka.DolniKvartil.ToString("N0")</b></td>
+                            <td class="text-end number"><b>@zadavatelStatisticsPolozka.Median.ToString("N0")</b></td>
+                            <td class="text-end number"><b>@zadavatelStatisticsPolozka.HorniKvartil.ToString("N0")</b></td>
+                            <td class="text-end number border-end">@zadavatelStatisticsPolozka.Maximum.ToString("N0")</td>
+
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+
+    }
+</div>
+
+</div>

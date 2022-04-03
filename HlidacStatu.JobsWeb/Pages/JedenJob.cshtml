@@ -15,7 +15,7 @@
         statistics = JobService.GetStatistics(Model.Key.Value);
         graphModel.BasicData = statistics.Where(s => s.Name == "Programátor").ToList();
 
-        histogram.Data = JobService.GetDistinctJobs();
+        histogram.Data = JobService.GetDistinctJobs(Model.Key.Value);
         histogram.Title = "Histogram všeho";
     }
 }
