@@ -16,6 +16,8 @@
 
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/content/new.v1.11.css" />
+    <link rel="stylesheet" href="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.css"/>
+    
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&amp;subset=latin-ext" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Cabin:400,400i,600,700&amp;subset=latin-ext" rel="stylesheet" />
 
@@ -48,11 +50,11 @@
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-
+    <script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
 </head>
-<body class="new-body">
+<body class="new-body" data-bs-spy="scroll" data-bs-target="#toc">
     <header>
         <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
@@ -128,27 +130,33 @@
         </div>
 
     </header>
-    <div class="bg-light">
-        <div class="container pt-2">
-            <partial name="_NavBar" />
-        </div>
+<div class="bg-light">
+    <div class="container pt-2">
+        <partial name="_NavBar" />
     </div>
-    <div class="container mt-2">
-        <main role="main" class="pb-3">
-            <div class="pt-5">
+</div>
+
+<div class="container mt-2 row">
+    <div class="col-sm-3">
+        <nav id="toc" data-toggle="toc" class="sticky-top"></nav>
+    </div>
+    <main role="main" class="pb-3 col-sm-9">
+
+        <div class="pt-5">
             @RenderBody()
-            </div>
-            @if (analyza != null && analyza.HasValue)
+        </div>
+        @if (analyza != null && analyza.HasValue)
         {
             var data = JobService.DistinctJobsForYearAndSubject(analyza.Value);
-            <div style="margin-top:50px;"  class="alert alert-secondary" >
+            <div style="margin-top:50px;" class="alert alert-secondary">
                 Data jsou platná k @(analyza.Value.PlatnostK), za období <b>@analyza.Value.ProObdobi</b>
-                
-                
-                </div>
+
+
+            </div>
         }
-        </main>
-    </div>
+    </main>
+
+</div>
 
 
 
