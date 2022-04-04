@@ -17,6 +17,7 @@ namespace HlidacStatu.JobsWeb.Models
         public List<JobStatistics> CompareWith { get; set; }
 
         public JobStatistics Baseline { get; set; }
+        public bool ShowHelpDescription { get; set; } = true;
 
         public bool DisplayBaselineBoxPlot
         {

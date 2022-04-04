@@ -61,74 +61,94 @@
     }
     @foreach (var polozka in zadavatelStatistics.OrderBy(m => m.Name))
     {
-        var zadavatelStatisticsPolozka = zadavatelStatistics.FirstOrDefault(m => m.Name == polozka.Name);
+        JobStatistics zadavatelStatisticsPolozka = zadavatelStatistics.FirstOrDefault(m => m.Name == polozka.Name);
+        List<(JobStatistics stat, string firmaName)> firmyStatPolozka = new List<(JobStatistics stat, string firmaName)>();
+        foreach (var f in firmy.OrderByDescending(o => o.count))
+        {
+            var firmaStat = JobService.GetDodavatelForOdberatelStatistics(f.ico, Model.zadavatel.ICO, Model.Key.Value);
+            var firmaPolozka = firmaStat.FirstOrDefault(m => m.Name.ToLowerInvariant() == polozka.Name.ToLowerInvariant());
+            if (firmaPolozka != null)
+            {
+                firmyStatPolozka.Add((firmaPolozka, f.name));
+            }
+        }
+
         <h3> @polozka.Name</h3>
 
 
-        <table class="table table-sm table-striped mt-4">
+        <table class="table table-hover table-sm mt-4">
             <caption>ceny s DPH</caption>
             <thead>
                 <tr>
                     <th scope="col">Firma</th>
-                    <th scope="col" class="text-end">Počet<br />cen</th>
                     <th scope="col" class="text-end">Minimum</th>
                     <th scope="col" class="text-end">Dolní kvartil</th>
                     <th scope="col" class="text-end">Medián</th>
                     <th scope="col" class="text-end">Horní kvartil</th>
-                    <th scope="col" class="text-end  border-end">Max</th>
-
-                    <th scope="col" class="text-end border-start">Počet<br />cen</th>
-                    <th scope="col" class="text-end">Minimum</th>
-                    <th scope="col" class="text-end">Dolní kvartil</th>
-                    <th scope="col" class="text-end">Medián</th>
-                    <th scope="col" class="text-end">Horní kvartil</th>
-                    <th scope="col" class="text-end border-end">Max</th>
-                </tr>
-                <tr>
-                    <th></th>
-                    <th class="align-middle border-start"><div class="middle-line right"></div></th>
-                    <th class="align-middle text-center" colspan="4"><div class="middle-line left right">
-                        <b style="color:black">Rozsah obvyklých cen<br />této firmy pro zadavatele</b>
-                        </div></th>
-                    <th class="align-middle border-end"><div class="middle-line left "></div></th>
-                    <th class="align-middle border-start"><div class="middle-line right"></div></th>
-                    <th class="align-middle text-center" colspan="3">
-                        <div class="middle-line left right"><b style="color:black">Rozsah obvyklých cen<br />@(Model.zadavatel.Jmeno)</b></div>
-                    </th>
-                    <th class="align-middle border-end"><div class="middle-line left "></div></th>
+                    <th scope="col" class="text-end">Max</th>
+                    <th scope="col" class="text-end">Počet cen</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var f in firmy.OrderByDescending(o => o.count))
+                <tr class="bg-success bg-opacity-10">
+                    <th></th>
+                    <th class="align-middle border-start"><div class="middle-line right"></div></th>
+                    <th class="align-middle text-center" colspan="4">
+                        <div class="middle-line left right"><b style="color:black">&nbsp;Rozsah obvyklých cen&nbsp;</b></div>
+                    </th>
+                    <th class="align-middle border-end"><div class="middle-line left "></div></th>
+                </tr>
+                <tr class="bg-success bg-gradient bg-opacity-10">
+                    <td><b>Zadavatel</b><br />@(Devmasters.TextUtil.ShortenText( Model.zadavatel.Jmeno,30))</td>
+                    <td class="text-end number border-start">@zadavatelStatisticsPolozka.Minimum.ToString("N0")</td>
+                    <td class="text-end number"><b>@zadavatelStatisticsPolozka.DolniKvartil.ToString("N0")</b></td>
+                    <td class="text-end number"><b>@zadavatelStatisticsPolozka.Median.ToString("N0")</b></td>
+                    <td class="text-end number"><b>@zadavatelStatisticsPolozka.HorniKvartil.ToString("N0")</b></td>
+                    <td class="text-end number">@zadavatelStatisticsPolozka.Maximum.ToString("N0")</td>
+                    <td class="text-end number">@zadavatelStatisticsPolozka.PriceCount</td>
+
+                </tr>
+                <tr class="bg-light">
+                    <th></th>
+                    <th class="align-middle border-start"><div class="middle-line right"></div></th>
+                    <th class="align-middle text-center" colspan="4">
+                        <div class="middle-line left right">
+                            <b style="color:black">&nbsp;Ceny firmy pro výše <br />uvedeného zadavatele&nbsp;</b>
+                        </div>
+                    </th>
+                    <th class="align-middle border-end"><div class="middle-line left "></div></th>
+                </tr>
+                @foreach (var firmaPolozka in firmyStatPolozka)
                 {
-                    var firmaStat = JobService.GetDodavatelForOdberatelStatistics(f.ico, Model.zadavatel.ICO, Model.Key.Value);
-                    var firmaPolozka = firmaStat.FirstOrDefault(m => m.Name.ToLowerInvariant() == polozka.Name.ToLowerInvariant());
-                    if (firmaPolozka != null)
-                    {
-                        <tr>
-                            <td scope="row">@f.name</td>
-                            <td class="text-end number border-start">@firmaPolozka.PriceCount</td>
-                            <td class="text-end number">@firmaPolozka.Minimum.ToString("N0")</td>
-                            <td class="text-end number"><b>@firmaPolozka.DolniKvartil.ToString("N0")</b></td>
-                            <td class="text-end number"><b>@firmaPolozka.Median.ToString("N0")</b></td>
-                            <td class="text-end number"><b>@firmaPolozka.HorniKvartil.ToString("N0")</b></td>
-                            <td class="text-end number border-end">@firmaPolozka.Maximum.ToString("N0")</td>
+                    <tr class="bg-light">
+                        <td scope="row">@firmaPolozka.firmaName</td>
+                        <td class="text-end border-start number">@firmaPolozka.stat.Minimum.ToString("N0")</td>
+                        <td class="text-end number"><b>@firmaPolozka.stat.DolniKvartil.ToString("N0")</b></td>
+                        <td class="text-end number"><b>@firmaPolozka.stat.Median.ToString("N0")</b></td>
+                        <td class="text-end number"><b>@firmaPolozka.stat.HorniKvartil.ToString("N0")</b></td>
+                        <td class="text-end number ">@firmaPolozka.stat.Maximum.ToString("N0")</td>
+                        <td class="text-end number ">@firmaPolozka.stat.PriceCount</td>
+                    </tr>
 
-                            <td class="text-end number border-start">@zadavatelStatisticsPolozka.PriceCount</td>
-                            <td class="text-end number">@zadavatelStatisticsPolozka.Minimum.ToString("N0")</td>
-                            <td class="text-end number"><b>@zadavatelStatisticsPolozka.DolniKvartil.ToString("N0")</b></td>
-                            <td class="text-end number"><b>@zadavatelStatisticsPolozka.Median.ToString("N0")</b></td>
-                            <td class="text-end number"><b>@zadavatelStatisticsPolozka.HorniKvartil.ToString("N0")</b></td>
-                            <td class="text-end number border-end">@zadavatelStatisticsPolozka.Maximum.ToString("N0")</td>
-
-                        </tr>
-                    }
                 }
             </tbody>
         </table>
 
+        var compareAllFull = new CompareDataModel()
+                {
+                    BasicData = firmyStatPolozka
+                        .Select(m =>
+                            {
+                                var ret = m.stat;
+                                ret.Name = m.firmaName;
+                                return ret;
+                            }).ToList(),
+                    Baseline = zadavatelStatisticsPolozka,
+                    DisplayBaselineBoxPlot = true,
+                    DisplayBaselinePlotLines = true,
+                    ShowHelpDescription = false
+    };
+        <partial name="Shared/_BoxPlot" model="compareAllFull" />
 
     }
-</div>
-
 </div>

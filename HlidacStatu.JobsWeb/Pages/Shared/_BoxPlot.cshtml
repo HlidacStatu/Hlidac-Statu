@@ -32,24 +32,27 @@
     string popisSerie = "'<span style=\"color:{point.color}\">●</span> <b> {series.name}</b><br/>90% percentil: {point.high}<br/>Horní kvartil: {point.q3}<br/>Medián: {point.median}<br/>Dolní kvartil: {point.q1}<br/>10% percentil: {point.low}<br/>'";
 }
 
-<h3 class="fw-bolder">Grafické zobrazení cen</h3>
-<p>
-    Diagram zobrazuje statistické rozložení cen všech typů prací vedle sebe ve stejném měřítku.
-    Na ose x jsou jednotlivé typy prací, na ose y je cena. Boxplot se skládá z obdélníku,
-    svislých čar (vousů) a teček.
+@if (Model.ShowHelpDescription)
+{
+    <h3 class="fw-bolder">Grafické zobrazení cen</h3>
+    <p>
+        Diagram zobrazuje statistické rozložení cen všech typů prací vedle sebe ve stejném měřítku.
+        Na ose x jsou jednotlivé typy prací, na ose y je cena. Boxplot se skládá z obdélníku,
+        svislých čar (vousů) a teček.
 
-</p>
-<p>
-    Obvyklou cenu nejlépe charakterizuje obdélník. Spodní hrana obdélníku
-    ukazuje dolní kvartil, horní hrana obdélníku ukazuje horní kvartil.
-    Vodorovná čára uvnitř obdélníku ukazuje
-    prostřední hodnotu (medián).
-</p>
-<p>
-    Svislé čáry, vousy, popisují variabilitu cenových údajů pod dolním a nad
-    horním kvartilem. Tečky pak popisují odlehlé hodnoty - výjimečně nízké nebo vysoké ceny. Ceny zobrazené
-    pomocí vousů a teček nedoporučujeme považovat za obvyklé ceny.
-</p>
+    </p>
+    <p>
+        Obvyklou cenu nejlépe charakterizuje obdélník. Spodní hrana obdélníku
+        ukazuje dolní kvartil, horní hrana obdélníku ukazuje horní kvartil.
+        Vodorovná čára uvnitř obdélníku ukazuje
+        prostřední hodnotu (medián).
+    </p>
+    <p>
+        Svislé čáry, vousy, popisují variabilitu cenových údajů pod dolním a nad
+        horním kvartilem. Tečky pak popisují odlehlé hodnoty - výjimečně nízké nebo vysoké ceny. Ceny zobrazené
+        pomocí vousů a teček nedoporučujeme považovat za obvyklé ceny.
+    </p>
+}
 <figure class="highcharts-figure" style="max-width: @(100 + jobCount * pixelsPerJob)px">
     <div id="chart-container-@chartId"></div>
 
