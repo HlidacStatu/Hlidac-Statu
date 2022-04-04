@@ -684,7 +684,7 @@ namespace HlidacStatu.Extensions
                 if (stat[rok].PocetSmluvBezCeny > 0)
                 {
                     f.Add(new InfoFact(
-                        $"V <b>{rok} utajil{(sMuzsky ? "" : "a")}</b> hodnotu kontraktu " +
+                        $"V <b>{rok} neuvedl{(sMuzsky ? "" : "a")}</b> hodnotu smlouvy " +
                         Devmasters.Lang.CS.Plural.Get(stat[rok].PocetSmluvBezCeny, "u&nbsp;jedné smlouvy",
                             "u&nbsp;{0} smluv", "u&nbsp;{0} smluv")
                         + $", což je celkem <b>{stat[rok].PercentSmluvBezCeny.ToString("P2")}</b> ze všech. ",
@@ -694,7 +694,7 @@ namespace HlidacStatu.Extensions
                 else if (stat[rok - 1].PocetSmluvBezCeny > 0)
                 {
                     f.Add(new InfoFact(
-                        $"V <b>{rok - 1} utajil{(sMuzsky ? "" : "a")}</b> hodnotu kontraktů " +
+                        $"V <b>{rok - 1} neuvedl{(sMuzsky ? "" : "a")}</b> hodnotu smlouvy " +
                         Devmasters.Lang.CS.Plural.Get(stat[rok - 1].PocetSmluvBezCeny, "u&nbsp;jedné smlouvy",
                             "u&nbsp;{0} smluv", "u&nbsp;{0} smluv")
                         + $", což je celkem <b>{stat[rok - 1].PercentSmluvBezCeny.ToString("P2")}</b> ze všech. "

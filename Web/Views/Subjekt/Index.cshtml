@@ -210,7 +210,7 @@
         </p>
 
         <p>
-            V @(currentSeasonYear) utajil hodnotu kontraktu u
+            V @(currentSeasonYear) neuvedl hodnotu smlouvy u
             <a href="/hledat?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND hint.skrytaCena:1 AND datumUzavreni:[{currentSeasonYear}-01-01 TO {currentSeasonYear + 1}-01-01}}")">
                 @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)seasonStat.PocetSmluvBezCeny, "<strong>0 </strong>smluv,", "<strong>jedné </strong>smlouvy,", "<strong>{0} </strong>smluv,", "<strong>{0:### ### ##0} </strong>smluv,"))
             </a> což je celkem @(seasonStat.PercentSmluvBezCeny.ToString("P2")) ze všech.
