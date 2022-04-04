@@ -62,7 +62,7 @@ namespace HlidacStatu.JobsWeb.Models
             if (DisplayBaselineBoxPlot)
                 categories = $"'{Baseline.Name}',";
             
-            return string.Join(",", BasicData.Select(j => $"'{j.Name}'"));
+            return categories + string.Join(",", BasicData.Select(j => $"'{j.Name}'"));
         }
 
         public string FillCompareData()
