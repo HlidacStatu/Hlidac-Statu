@@ -37,6 +37,15 @@
           window.location.href= '/BenchmarkUradu/' + $(this).val() + window.location.search;
         }
       });
+      Toc.init({
+          $nav: $("#toc"),
+          $scope: $("#content__body h2, #content__body h3")
+          
+        });
+      $("#content__body").scrollspy({
+        target: "#toc",
+        spy: "scroll"
+      });
     });
 </script>
 }
@@ -74,83 +83,93 @@
     return;
 }
 
-@{
-    Firma urad = HlidacStatu.Repositories.Firmy.Get(Model.Ico);
-
-    var RSstat = HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStat(
-    TimeSpan.FromDays(14),
-    $"icoPlatce:{Model.Ico} AND " + Model.Key?.PerSubjectDesc?.Query,
-    1, 0, Repositories.SmlouvaRepo.Searching.OrderResult.FastestForScroll);
-    double sumKc = ((Nest.ValueAggregate)RSstat.ElasticResults?.Aggregations["sumKc"])?.Value ?? 0;
-    var uniqSmluv = JobService.DistinctJobsForYearAndSubject(Model.Key.Value)
-                        .Where(m => m.IcoOdberatele == Model.Ico)
-                        .Select(m => m.SmlouvaId)
-                        .Distinct()
-                        .Count();
-    bool showPouze = uniqSmluv * 3 < RSstat.Total;
-}
-<hr />
-
-<h2>@Model.Nazev</h2>
-<p>
-    @Model.Nazev má v registru smluv za analyzovanou oblast <b>@Model.Key?.PerSubjectDesc?.NiceName</b> a rok <b>@(Model.Key?.Rok)</b>
-    celkem @(Devmasters.Lang.CS.Plural.Get(RSstat.Total,"jednu smlouvu","{0} smlouvy","{0} smluv"))
-    za @(HlidacStatu.Util.RenderData.NicePrice((decimal)sumKc,shortFormat:true)),
-    z nichž @(showPouze ? "pouze" : "") @(Devmasters.Lang.CS.Plural.Get(uniqSmluv,"jedna smlouva obsahovala","{0} smlouvy obsahovaly","{0} smluv obsahovalo")) jednotkové ceny.
-</p>
-@if (showStatistics)
-{
-    <div style="padding-bottom:20px">
-        <partial name="Shared/_SouhrnTable" model="tableModel" />
+<div class="row">
+    <div class="col-2 border-end">
+        <p class="pt-4"><b>Obsah stránky</b></p>
+        <nav id="toc" data-toggle="toc" data-scope="#content__body" class="sticky-top"></nav>
     </div>
+    <div class="col" id="content__body" >
 
-    <h2>Porovnání cenového rozpětí @Model.Nazev a celku</h2>
-    <partial name="Shared/_CompareTable" model="graphModel" />
-    <partial name="Shared/_BoxPlot" model="graphModel" />
-}
+        @{
+            Firma urad = HlidacStatu.Repositories.Firmy.Get(Model.Ico);
 
-<hr />
+            var RSstat = HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStat(
+            TimeSpan.FromDays(14),
+            $"icoPlatce:{Model.Ico} AND " + Model.Key?.PerSubjectDesc?.Query,
+            1, 0, Repositories.SmlouvaRepo.Searching.OrderResult.FastestForScroll);
+            double sumKc = ((Nest.ValueAggregate)RSstat.ElasticResults?.Aggregations["sumKc"])?.Value ?? 0;
+            var uniqSmluv = JobService.DistinctJobsForYearAndSubject(Model.Key.Value)
+            .Where(m => m.IcoOdberatele == Model.Ico)
+            .Select(m => m.SmlouvaId)
+            .Distinct()
+            .Count();
+            bool showPouze = uniqSmluv * 3 < RSstat.Total;
+        }
+        <hr />
 
-@{
-    var smlouvyIds = statistics.SelectMany(m => m.Contracts).Distinct();
-    if (smlouvyIds.Count() == 0)
-    {
-        return;
-    }
+        <h2>@Model.Nazev</h2>
+        <p>
+            @Model.Nazev má v registru smluv za analyzovanou oblast <b>@Model.Key?.PerSubjectDesc?.NiceName</b> a rok <b>@(Model.Key?.Rok)</b>
+            celkem @(Devmasters.Lang.CS.Plural.Get(RSstat.Total,"jednu smlouvu","{0} smlouvy","{0} smluv"))
+            za @(HlidacStatu.Util.RenderData.NicePrice((decimal)sumKc,shortFormat:true)),
+            z nichž @(showPouze ? "pouze" : "") @(Devmasters.Lang.CS.Plural.Get(uniqSmluv,"jedna smlouva obsahovala","{0} smlouvy obsahovaly","{0} smluv obsahovalo")) jednotkové ceny.
+        </p>
+        @if (showStatistics)
+        {
+            <div style="padding-bottom:20px">
+                <partial name="Shared/_SouhrnTable" model="tableModel" />
+            </div>
 
-    var smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
+            <h2>Porovnání cenového rozpětí @Model.Nazev a celku</h2>
+            <partial name="Shared/_CompareTable" model="graphModel" />
+            <partial name="Shared/_BoxPlot" model="graphModel" />
+        }
 
-    var firmyCount = JobService.GetDodavateleList(Model.Key.Value);
-    var firmy = statistics.SelectMany(m => m.Dodavatele).Distinct()
-    .Select(m => new
-    {
-        ico = m,
-        name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
-        count = firmyCount.Any(c => c.ico == m) ? firmyCount.First(c => c.ico == m).pocetCen : 0
-    })
-    .OrderBy(o => o.name);
+        <hr />
 
-    var uradyCount = JobService.GetOdberateleList(Model.Key.Value);
-    var urady = statistics.SelectMany(m => m.Odberatele).Distinct()
-    .Select(m => new
-    {
-        ico = m,
-        name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
-        count = uradyCount.Any(c => c.ico == m) ? uradyCount.First(c => c.ico == m).pocetCen : 0
-    })
-    .OrderBy(o => o.name);
-    ;
-}
-<h2>Detailní informace pro zadavatele <b>@Model.Nazev</b></h2>
+        @{
+            var smlouvyIds = statistics.SelectMany(m => m.Contracts).Distinct();
+            if (smlouvyIds.Count() == 0)
+            {
+                return;
+            }
 
-@{
-    var detailModel = (statistics, Model.Key);
-}
-<partial name="Shared/_DetailDodavatelZadavatel" model="detailModel" />
+            var smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
 
-<hr/>
+            var firmyCount = JobService.GetDodavateleList(Model.Key.Value);
+            var firmy = statistics.SelectMany(m => m.Dodavatele).Distinct()
+            .Select(m => new
+            {
+                ico = m,
+                name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
+                count = firmyCount.Any(c => c.ico == m) ? firmyCount.First(c => c.ico == m).pocetCen : 0
+            })
+            .OrderBy(o => o.name);
 
-@{
-    var porovnaniModel = (statistics, urad, Model.Key);
-}
-<partial name="Shared/_PorovnaniDodavatele_PoPolozkach" model="porovnaniModel" />
+            var uradyCount = JobService.GetOdberateleList(Model.Key.Value);
+            var urady = statistics.SelectMany(m => m.Odberatele).Distinct()
+            .Select(m => new
+            {
+                ico = m,
+                name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
+                count = uradyCount.Any(c => c.ico == m) ? uradyCount.First(c => c.ico == m).pocetCen : 0
+            })
+            .OrderBy(o => o.name);
+            ;
+        }
+        <h2>Detailní informace pro zadavatele <b>@Model.Nazev</b></h2>
+
+        @{
+            var detailModel = (statistics, Model.Key);
+        }
+        <partial name="Shared/_DetailDodavatelZadavatel" model="detailModel" />
+
+        <hr />
+
+        @{
+            var porovnaniModel = (statistics, urad, Model.Key);
+        }
+        <partial name="Shared/_PorovnaniDodavatele_PoPolozkach" model="porovnaniModel" />
+
+    </div>
+</div>

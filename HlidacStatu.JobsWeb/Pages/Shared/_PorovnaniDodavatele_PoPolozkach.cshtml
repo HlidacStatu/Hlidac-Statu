@@ -134,21 +134,6 @@
             </tbody>
         </table>
 
-        var compareAllFull = new CompareDataModel()
-                {
-                    BasicData = firmyStatPolozka
-                        .Select(m =>
-                            {
-                                var ret = m.stat;
-                                ret.Name = m.firmaName;
-                                return ret;
-                            }).ToList(),
-                    Baseline = zadavatelStatisticsPolozka,
-                    DisplayBaselineBoxPlot = true,
-                    DisplayBaselinePlotLines = true,
-                    ShowHelpDescription = false
-    };
-        <partial name="Shared/_BoxPlot" model="compareAllFull" />
 
     }
 </div>
