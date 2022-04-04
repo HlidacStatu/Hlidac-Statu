@@ -1,0 +1,88 @@
+@page
+@using HlidacStatu.JobsWeb.Services
+@using HlidacStatu.JobsWeb.Models
+@model GraphTestModel
+
+@{
+    ViewData["Title"] = "Test Grafů";
+
+    var key = new YearlyStatisticsGroup.Key()
+    {
+        Obor = "IT",
+        Rok = 2020
+    };
+
+    var statistics = JobService.GetStatistics(key);
+    var programatorStatistics = statistics.Where(s => s.Name == "Programátor").ToList();
+    CompareDataModel graphModelOneJob = new()
+    {
+        BasicData = programatorStatistics
+    };
+
+    BarGraph histogram = new()
+    {
+        Data = JobService.GetDistinctJobs(key),
+        Title = "Histogram všeho"
+    };
+
+
+    var uradStatistics = JobService.GetOdberatelStatistics("00007064", key);
+    var grapgModelBenchmarkUradu = new CompareDataModel
+    {
+        BasicData = uradStatistics,
+        CompareWith = JobService.GetStatistics(key),
+        SubjectName = "Benchmark úřadu"
+    };
+
+    
+    CompareDataModel graphModelAll = new CompareDataModel()
+    {
+        BasicData = statistics
+    };
+    
+
+    var compareAllFull = new CompareDataModel()
+    {
+        BasicData = statistics,
+        Baseline = statistics.First(),
+        DisplayBaselineBoxPlot = true,
+        DisplayBaselinePlotLines = true
+    };
+
+    
+    var compareOnlyPlotLines = new CompareDataModel()
+    {
+        BasicData = statistics,
+        Baseline = statistics.First(),
+        DisplayBaselineBoxPlot = false,
+        DisplayBaselinePlotLines = true
+    };
+    
+    var compareOnlyBoxPlot = new CompareDataModel()
+    {
+        BasicData = statistics,
+        Baseline = statistics.First(),
+        DisplayBaselineBoxPlot = true,
+        DisplayBaselinePlotLines = false
+    };
+
+
+
+}
+
+<h1>Souhrnné statistiky</h1>
+
+<h2>OneJob</h2>
+<partial name="Shared/_BoxPlot" model="graphModelOneJob"/>
+<h2>Histogram</h2>
+<partial name="Shared/_BarGraph" model="histogram"/>
+<h2>BenchmarkUradu</h2>
+<partial name="Shared/_BoxPlot" model="grapgModelBenchmarkUradu" />
+<h2>Souhrn</h2>
+<partial name="Shared/_BoxPlot" model="graphModelAll" />
+<h2>Porovnání s prvním full</h2>
+<partial name="Shared/_BoxPlot" model="compareAllFull" />
+<h2>Porovnání s prvním pouze plotlines</h2>
+<partial name="Shared/_BoxPlot" model="compareOnlyPlotLines" />
+<h2>Porovníní s prvním pouze boxplot</h2>
+<partial name="Shared/_BoxPlot" model="compareOnlyBoxPlot" />

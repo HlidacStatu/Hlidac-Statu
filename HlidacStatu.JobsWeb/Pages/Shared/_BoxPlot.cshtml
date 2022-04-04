@@ -3,30 +3,20 @@
 @{
     string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
     Model.BasicData = Model.BasicData.OrderBy(x => x.Name).ToList();
-    string compareData = "";
-    if (Model.CompareWith != null)
-    {
-        Model.CompareWith = Model.CompareWith
-            .Where(x => Model.BasicData.Any(y => y.Name.Equals(x.Name, StringComparison.InvariantCultureIgnoreCase)))
-            .OrderBy(x => x.Name).ToList();
-
-        compareData = string.Join(",",
-            Model.CompareWith.Select(j => $"[{j.LeftWhisk:F0},{j.DolniKvartil:F0},{j.Median:F0},{j.HorniKvartil:F0},{j.RightWhisk:F0}]"));
-    }
 
     var outliers = new List<string>();
+    int comparisonShift = Model.DisplayBaselineBoxPlot ? 1 : 0;
     for (int i = 0; i < Model.BasicData.Count; i++)
     {
         foreach (var outlier in Model.BasicData[i].LowOutliers)
         {
-            outliers.Add($"[{i},{outlier:F0}]");
+            outliers.Add($"[{i + comparisonShift},{outlier:F0}]");
         }
         foreach (var outlier in Model.BasicData[i].HighOutliers)
         {
-            outliers.Add($"[{i},{outlier:F0}]");
+            outliers.Add($"[{i + comparisonShift},{outlier:F0}]");
         }
     }
-
 
     int tickInterval = 5000;
     int pixelsPerTick = 100;
@@ -34,7 +24,7 @@
     int height = Model.Height ?? tickCount * pixelsPerTick;
     height = Math.Min(height, 700);
 
-    int jobCount = Model.BasicData.Count;
+    int jobCount = Model.BasicData.Count + comparisonShift;
     int pixelsPerJob = 100;
 
     string outliersData = string.Join(",", outliers);
@@ -70,7 +60,6 @@
         <p class="highcharts-description">
             Porovnání cen @Model.SubjectName (<b style="border: 1px solid #7cb5ec;padding:1px;">bílé boxy</b>) oproti souhrnným cenám celého trhu (<b style="border: 1px solid #000; padding: 1px; background-color: #8FDB90; color:#000 ">zelené boxy</b>).
         </p>
-
     }
     else
     {
@@ -97,76 +86,116 @@
         },
 
         legend: {
-        enabled: false
+            enabled: false
         },
 
         xAxis: {
-        categories: [
-    @Html.Raw(string.Join(",", Model.BasicData.Select(j => $"'{j.Name}'")))
-        ]
+            categories: [
+                @Html.Raw(Model.FillCategories())
+            ]
         },
 
         yAxis: {
-        title: {
-            text: 'Cena za den práce'
+            title: {
+                text: 'Cena za den práce'
             },
             tickInterval: @tickInterval,
             minorTickInterval: 1000,
             labels: {
-            format: '{value:,.0f} Kč'
+                format: '{value:,.0f} Kč'
+            }
+            @if (Model.DisplayBaselinePlotLines)
+            {
+                @Html.Raw($@",plotLines: [{{
+                    value: {Model.Baseline.Median:F0},
+                    color: 'Green',
+                    width: 2,
+                    label: {{
+                      text: 'Medián: {Model.Baseline.Median:F0}',
+                      align: 'right',
+                      style: {{
+                        color: 'gray'
+                      }}
+                    }}
+                  }}, {{
+                    value: {Model.Baseline.HorniKvartil:F0},
+                    color: 'Green',
+                    width: 2,
+                    label: {{
+                      text: 'Horní kvartil: {Model.Baseline.HorniKvartil:F0}',
+                      align: 'right',
+                      style: {{
+                        color: 'gray'
+                      }}
+                    }}
+                  }},
+                  {{
+                    value: {Model.Baseline.DolniKvartil:F0},
+                    color: 'Green',
+                    width: 2,
+                    label: {{
+                      text: 'Dolní kvartil: {Model.Baseline.DolniKvartil:F0}',
+                      align: 'right',
+                      style: {{
+                        color: 'gray'
+                      }}
+                    }}
+                  }}
+                ]")
             }
 
         },
 
         series: [{
-        name: 'Ceny za den práce',
-            data: [
-    @Html.Raw(string.Join(",",
-                    Model.BasicData.Select(j => $"[{j.LeftWhisk:F0},{j.DolniKvartil:F0},{j.Median:F0},{j.HorniKvartil:F0},{j.RightWhisk:F0}]")))
-            ],
-            tooltip: {
-            headerFormat: '<em>{point.key}</em><br/>',
-                pointFormat: @Html.Raw(popisSerie)
+            name: 'Ceny za den práce',
+                data: [
+                    @Html.Raw(Model.FillBoxplotData())
+                ],
+                tooltip: {
+                headerFormat: '<em>{point.key}</em><br/>',
+                    pointFormat: @Html.Raw(popisSerie)
+                }
             }
-        }
-    @if (Model.CompareWith != null)
-    {
-        @Html.Raw($@",{{
-            name: 'Obvyklé souhrnné ceny',
-            data: [
-                {compareData}
-            ],
-            fillColor: '#8FDB90',
-            lineWidth: 1,
-            medianColor: '#000000',
-            stemColor: '#8FDB90',
-            stemWidth: 1,
-            whiskerColor: '#8FDB90',
-            whiskerWidth: 1,
-            pointWidth: 7,
-            tooltip: {{
-                headerFormat: '<em>{{point.key}}</em><br/>',
-                pointFormat: {popisSerie}
-            }} }}")
-    }
-    @if (Model.CompareWith == null)
-    {
-        @Html.Raw($@",{{
-            name: 'Extrémy',
-            color: Highcharts.getOptions().colors[0],
-            type: 'scatter',
-            data: [
-                {outliersData}
-            ],
-            marker: {{
-                fillColor: 'white',
-                lineWidth: 1,
-                lineColor: Highcharts.getOptions().colors[0]
-            }},
-            tooltip: {{
-                pointFormat: '{{point.y}} Kč'
-                }} }}")
-    }
+            @if (Model.CompareWith != null)
+            {
+                @Html.Raw($@",{{
+                    name: 'Obvyklé souhrnné ceny',
+                    data: [
+                        {Model.FillCompareData()}
+                    ],
+                    fillColor: '#8FDB90',
+                    lineWidth: 1,
+                    medianColor: '#000000',
+                    stemColor: '#8FDB90',
+                    stemWidth: 1,
+                    whiskerColor: '#8FDB90',
+                    whiskerWidth: 1,
+                    pointWidth: 7,
+                    tooltip: {{
+                        headerFormat: '<em>{{point.key}}</em><br/>',
+                        pointFormat: {popisSerie}
+                    }} }}")
+            }
+            @if (Model.CompareWith == null)
+            {
+                @Html.Raw($@",{{
+                    name: 'Extrémy',
+                    color: Highcharts.getOptions().colors[0],
+                    type: 'scatter',
+                    data: [
+                        {outliersData}
+                    ],
+                    marker: {{
+                        fillColor: 'white',
+                        lineWidth: 1,
+                        lineColor: Highcharts.getOptions().colors[0]
+                    }},
+                    tooltip: {{
+                        pointFormat: '{{point.y}} Kč'
+                        }} }}")
+            }
+            
+            
         ]
 
     });
