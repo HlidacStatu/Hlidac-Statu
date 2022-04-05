@@ -42,10 +42,9 @@
           $scope: $("#content__body h2, #content__body h3")
           
         });
-      $("#content__body").scrollspy({
-        target: "#toc",
-        spy: "scroll"
-      });
+      new bootstrap.ScrollSpy(document.body, {
+        target: '#navbar-example'
+      })
     });
 </script>
 }
@@ -86,7 +85,7 @@
 <div class="row">
     <div class="col-2 border-end">
         <p class="pt-4"><b>Obsah stránky</b></p>
-        <nav id="toc" data-toggle="toc" data-scope="#content__body" class="sticky-top"></nav>
+        <nav id="toc" class="sticky-top"></nav>
     </div>
     <div class="col" id="content__body" >
 
