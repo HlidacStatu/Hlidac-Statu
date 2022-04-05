@@ -1216,7 +1216,13 @@ namespace HlidacStatu.Datasets
             {
                 var last = SearchData("*", 1, 1, "DbCreated desc", exactNumOfResults: true);
                 _numberOfRecords = last.Total;
-                _lastRecordUpdated = last.Result.FirstOrDefault()?.DbCreated ?? DateTime.Now.AddYears(-10);
+                var lRec = last.Result.FirstOrDefault();
+                _lastRecordUpdated = DateTime.Now.AddYears(-10);
+                if (((IDictionary<String, object>)lRec).ContainsKey("DbCreated"))
+                {
+                    if (lRec != null)
+                        _lastRecordUpdated = lRec?.DbCreated ?? DateTime.Now.AddYears(-10);
+                }
             }
 
             return _numberOfRecords;

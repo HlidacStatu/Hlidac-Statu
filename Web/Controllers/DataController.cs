@@ -30,9 +30,12 @@ namespace HlidacStatu.Web.Controllers
                         var dsContent = DataSet.CachedDatasets.Get(ds.id.ToString());
                         var allrec = dsContent.SearchData("", 1, 1, sort: "DbCreated desc", exactNumOfResults: true);
                         rec.RecordNum = allrec.Total;
+
                         if (rec.RecordNum > 0)
                         {
-                            rec.LastRecord = (DateTime?)allrec.Result.First().DbCreated;
+                            var lRec = allrec.Result.First();
+                            if (((IDictionary<String, object>)lRec).ContainsKey("DbCreated"))
+                                rec.LastRecord = (DateTime?)lRec.DbCreated;
                         }
 
                         var recordWeek = dsContent.SearchData($"DbCreated:[{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")} TO *]", 1, 0, exactNumOfResults: true);
