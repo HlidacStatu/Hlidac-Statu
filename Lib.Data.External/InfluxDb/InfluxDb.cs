@@ -1,6 +1,4 @@
-﻿using HlidacStatu.Entities;
-
-using InfluxDB.Client;
+﻿using InfluxDB.Client;
 using InfluxDB.Client.Writes;
 
 using System;
