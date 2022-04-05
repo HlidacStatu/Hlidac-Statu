@@ -110,7 +110,9 @@
             {
                 <div class="header__content ">
 
-                    <div style="padding-top:20px;color:#FFF"><a href="/" style="color:#FFF;text-decoration:none;"><i class="fa-regular fa-house"></i> Cenové analýzy</a> &gt;</div>
+                    <div style="padding-top:20px;color:#FFF"><a href="/" style="color:#FFF;text-decoration:none;"><i class="fa-regular fa-house"></i> Cenové analýzy</a> 
+                        <sup class="text-warning">@(this.Context.HasAccess("IT", 2020).Result.AnalyzeLevelText)</sup>
+                        &gt;</div>
                     <!-- desktop menu items only -->
                 <h2 style="padding-top:20px;color:white">@ViewData["Title"]</h2>
 
@@ -120,7 +122,7 @@
                     }
                     else if (analyza?.IsDemo == true)
                     {
-                        <small>Toto je ukázková, volně dostupná analáza za období leden-březen 2018. Ostatní analýzy vždy pokrývají celý kalendářní rok.</small>
+                        <small class="text-warning">Toto je ukázková, volně dostupná analáza za období leden-březen 2018. Ostatní analýzy vždy pokrývají celý kalendářní rok.</small>
 
                     }
                     <!-- desktop menu items only -->
@@ -151,8 +153,10 @@
             var data = JobService.DistinctJobsForYearAndSubject(analyza.Value);
             <div style="margin-top:50px;" class="alert alert-secondary">
                 Data jsou platná k @(analyza.Value.PlatnostK), za období <b>@analyza.Value.ProObdobi</b>
-
-
+                    @if (this.Context.HasAccess("IT", 2020).Result.Access)
+                    {
+                        <span>@(this.Context.User?.Identity?.Name)</span>
+                    }
             </div>
         }
     </main>

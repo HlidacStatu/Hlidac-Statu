@@ -22,8 +22,8 @@
                 @if (choosenAnal)
                 {
                     <a style="margin-right:2em;font-size:1.1em;color:#0074e4;" class="nav-link" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">Souhrn</a>
-                    <a style="margin-right:2em;font-size:1.1em;color:#0074e4;" class="nav-link" asp-page="/BenchmarkUradu" asp-route-obor="@obor" asp-route-rok="@rok">Benchmark úřadů</a>
-                    <a style="margin-right:2em;font-size:1.1em;color:#0074e4;" class="nav-link" asp-page="/BenchmarkDodavatelu" asp-route-obor="@obor" asp-route-rok="@rok">Benchmark dodavatelů</a>
+                    <a style="margin-right:2em;font-size:1.1em;color:#0074e4;" class="nav-link" asp-page="/BenchmarkUradu" asp-route-obor="@obor" asp-route-rok="@rok">Analýza zadavatele</a>
+                    <a style="margin-right:2em;font-size:1.1em;color:#0074e4;" class="nav-link" asp-page="/BenchmarkDodavatelu" asp-route-obor="@obor" asp-route-rok="@rok">Porovnání dodavatelů</a>
                     <a style="margin-right:2em;font-size:1.1em;color:#0074e4;" class="nav-link" asp-page="/Pdf" asp-route-obor="@obor" asp-route-rok="@rok">Celá zpráva</a>
                     @if (this.User.IsInRole("Admin"))
                     {
