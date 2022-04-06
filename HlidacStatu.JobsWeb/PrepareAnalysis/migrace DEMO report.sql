@@ -32,10 +32,8 @@ FROM InDocTables t
     join InDocJobs j on t.pk = j.tablePK
     join SmlouvyIds s on s.Id = t.smlouvaID
     join SmlouvyDodavatele d on s.Id = d.SmlouvaId
-where 
-	(t.subject = 'DEMO' or category between 10000 and 10099)
-	--(t.subject = 'it' and category between 10000 and 10099)
-
+where
+    (t.subject = 'DEMO' or category between 10000 and 10099 or t.Analyza = 'it')
 	and t.year=2018
 	and j.jobGrouped is not null and j.jobGrouped != '0'
 	and j.PriceVATCalculated is not null
@@ -77,11 +75,9 @@ FROM InDocTables t
          join SmlouvyIds s on s.Id = t.smlouvaID
          join SmlouvyDodavatele d on s.Id = d.SmlouvaId
 where
-    (t.subject = 'DEMO' or category between 10000 and 10099)
-  --(t.subject = 'it' and category between 10000 and 10099)
-
-  and t.year=2018
-  and j.jobGrouped is not null and j.jobGrouped != '0'
+    (t.subject = 'DEMO' or category between 10000 and 10099 or t.Analyza = 'it')
+    and t.year=2018
+    and j.jobGrouped is not null and j.jobGrouped != '0'
 	and j.PriceVATCalculated is not null
 	and (j.pk not in (select jobpk from Ceny))
     and Unit = 1 --manday
