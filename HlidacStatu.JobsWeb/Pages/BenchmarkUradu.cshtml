@@ -32,15 +32,15 @@
 {
 <script>
     $(document).ready(function() {
-      $("#selectNavigace").change(function(){
-        if ($(this).val()!='') {
-          window.location.href= '/BenchmarkUradu/' + $(this).val() + window.location.search;
+      $("#submitSelectNavigace").click(function(){
+        if ($("#selectNavigace").val()!='') {
+          window.location.href= '/BenchmarkUradu/' + $("#selectNavigace").val() + window.location.search;
         }
       });
       Toc.init({
           $nav: $("#toc"),
           $scope: $("#content__body h2, #content__body h3")
-          
+
         });
       new bootstrap.ScrollSpy(document.body, {
         target: '#toc'
@@ -54,20 +54,27 @@
     <small class="text-muted">oproti souhrným obvyklým cenám</small>
 </h2>
 
-<div class="input-group mb-3">
-    <label class="input-group-text" for="selectNavigace">Vyberte úřad:</label>
-    <select class="form-select" id="selectNavigace">
-        <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte úřad...</option>
-        @foreach (var (ico, nazev, pocetCen) in JobService.GetOdberateleList(Model.Key.Value)
-        .Where(m => m.pocetCen > JobService._minimumPriceCountInList)
-        .OrderByDescending(x => x.pocetCen)
-        )
-        {
-            <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetCen cen)</option>
-        }
-    </select>
-</div>
+<div class="row">
+    <div class="col-auto">
+        <div class="input-group mb-3">
 
+            <label class="input-group-text" for="selectNavigace">Vyberte úřad:</label>
+            <select class="form-select form-select-sm" id="selectNavigace">
+                <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte úřad...</option>
+                @foreach (var (ico, nazev, pocetCen) in JobService.GetOdberateleList(Model.Key.Value)
+                .Where(m => m.pocetCen > JobService._minimumPriceCountInList)
+                .OrderByDescending(x => x.pocetCen)
+                )
+                {
+                    <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetCen cen)</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-auto">
+        <button type="button" class="btn btn-primary btn-sm" id="submitSelectNavigace">Zobrazit</button>
+    </div>
+</div>
 @if (statistics == null)
 {
 
@@ -87,7 +94,7 @@
         <p class="pt-4"><b>Obsah stránky</b></p>
         <nav id="toc" class="sticky-top"></nav>
     </div>
-    <div class="col-sm-12 col-lg-10" id="content__body" >
+    <div class="col-sm-12 col-lg-10" id="content__body">
 
         @{
             Firma urad = HlidacStatu.Repositories.Firmy.Get(Model.Ico);

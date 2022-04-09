@@ -9,11 +9,11 @@ using Microsoft.Extensions.Logging;
 
 namespace HlidacStatu.JobsWeb.Pages
 {
-    public class ContactModel : PageModel
+    public class ObjednatModel : PageModel
     {
-        private readonly ILogger<ContactModel> _logger;
+        private readonly ILogger<ObjednatModel> _logger;
 
-        public ContactModel(ILogger<ContactModel> logger)
+        public ObjednatModel(ILogger<ObjednatModel> logger)
         {
             _logger = logger;
         }

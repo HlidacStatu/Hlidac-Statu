@@ -633,7 +633,8 @@ namespace HlidacStatu.Datasets
 
             FillPersonData(jpathObjs);
 
-            string updatedData = JsonConvert.SerializeObject(objDyn);
+            string updatedData = JsonConvert.SerializeObject(objDyn)
+                .Replace((char)160, ' '); //hard space to space
             PostData pd = PostData.String(updatedData);
 
             var tres = client.LowLevel.Index<StringResponse>(client.ConnectionSettings.DefaultIndex, id, pd);

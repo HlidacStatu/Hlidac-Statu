@@ -36,7 +36,7 @@
                                 </div>
                             </td>
                             <td width="20%">
-                                <a class="btn btn-success btn-sm" href="/contact">Objednat</a>
+                                <a class="btn btn-success btn-sm" href="/Objednat">Objednat</a>
                             </td>
                             <td width="20%">
                                 <div class="text-muted small">
@@ -65,6 +65,47 @@
                             </td>
                         </tr>
                     }
+                    @{
+                        var a_it21 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2021 });
+                    }
+                    @if (HttpContext.HasAccess("IT", 2021).Result.Access == false)
+                    {
+                        <tr>
+                            <td width="60%">
+                                <div class="fs-6 fw-bolder text-decoration-none text-muted">
+                                    Přehled obvyklých cen IT prací ve státní správě za rok 2021
+                                </div>
+                            </td>
+                            <td width="20%">
+                                <a class="btn btn-success btn-sm disabled" href="/objednat">Doplňujeme</a>
+                            </td>
+                            <td width="20%">
+                                <div class="text-muted small">
+                                    Údaje z @a_it21.PocetSmluv smluv od <b class="text-black">@a_it21.PocetZadavatelu</b> zadavatelů,
+                                    <b class="text-black">@a_it21.PocetDodavatelu</b> dodavatelů,
+                                    zahrnuje <b class="text-black">@a_it21.PocetCen cen</b>.
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                <a class="fs-6 fw-bolder" href="/Souhrn?obor=IT&rok=2021">Přehled obvyklých cen IT prací ve státní správě za rok 2020</a>
+                            </td>
+                            <td>
+                                <a class="btn btn-success btn-sm" href="/Souhrn?obor=IT&rok=2020">Otevřít analýzu</a>
+                            </td>
+                            <td>
+                                <div class="text-muted small">
+                                    Údaje z @a_it21.PocetSmluv smluv od <b class="text-black">@a_it21.PocetZadavatelu</b> zadavatelů,
+                                    <b class="text-black">@a_it21.PocetDodavatelu</b> dodavatelů,
+                                    zahrnuje <b class="text-black">@a_it21.PocetCen cen</b>.
+                                </div>
+                            </td>
+                        </tr>
+                    }
                     <tr>
                         @{
                             var a_demo18 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "DEMO", Rok = 2018 });
@@ -84,15 +125,6 @@
 
                         </td>
                     </tr>
-                    <tr>
-                        <td>
-                            <div class="fs-6 fw-bolder text-muted">Přehled obvyklých cen IT prací ve státní správě za rok 2021</div>
-                        </td>
-                        <td>
-                            <a class="btn btn-outline-success btn-sm" href="/contact">Dostupné od dubna 2022</a>
-                        </td>
-                    </tr>
-
                 </table>
                 @if (SignInManager.IsSignedIn(User) == false)
                 {
@@ -130,7 +162,7 @@
                     <li>Sleva 10 % na analýzy pro jiné roky</li>
                     <li>Uživatelská a analytická podpora</li>
                 </ul>
-                <a href="/contact" class="w-100 btn btn-lg btn-success">Objednat</a>
+                <a href="/objednat" class="w-100 btn btn-lg btn-success">Objednat</a>
             </div>
         </div>
     </div>
@@ -148,7 +180,7 @@
                     <li>Zdrojová data, API</li>
                     <li>Sleva 20 % na analýzu pro jiné roky</li>
                 </ul>
-                <a href="/contact" class="w-100 btn btn-lg btn-success">Objednat</a>
+                <a href="/objednat" class="w-100 btn btn-lg btn-success">Objednat</a>
             </div>
         </div>
     </div>
@@ -163,11 +195,11 @@
 
 </h5>
 <p class="ps-5">
-    Jednotlivé údaje z analýzy týkající se vašeho subjektu můžete zveřejňit <a href="#faq_public">detail</a>.
+    Jednotlivé údaje z analýzy týkající se vašeho subjektu můžete zveřejňit <a href="#heading02">detail</a>.
     Nutná licence pro využití dat v rámci veřejných správních řízeních, veřejných soudních sporů, v marketingu a PR.
 </p>
 <p class="ps-5">
-    <a href="/contact" class="btn btn-sm btn-outline-primary">Kontaktujte nás</a>
+    <a href="/objednat" class="btn btn-sm btn-outline-primary">Objednat</a>
 </p>
 <h5 class="d-inline-flex p-2 bg-success bg-opacity-10 text-black border border-success rounded-3">
     Novinářská, NGO a EDU licence
@@ -178,7 +210,7 @@
     Přístup k datům a licence pro novináře, redakce, neziskové organizace a pro potřeby vzdělávání a výzkumu.
 </p>
 <p class="ps-5  pb-5">
-    <a href="/contact" class="btn btn-sm btn-outline-primary">Kontaktujte nás</a>
+    <a href="/kontakt" class="btn btn-sm btn-outline-primary">Kontaktujte nás</a>
 </p>
 
 
@@ -247,7 +279,7 @@
                     <td><i class="fa-solid fa-x fa-lg fw-bold text-danger"></i></td>
                     <td>
                         <i class="fa-solid fa-check fa-xl fw-bold text-success"></i>
-                        <br /><small>vybrané údaje z analýzy <a href="#faq_public">více *)</a></small>
+                        <br /><small>vybrané údaje z analýzy <a href="#heading02">více *)</a></small>
                     </td>
                 </tr>
                 <tr>
@@ -296,7 +328,7 @@
                     Přístup k datům a licenci k používání má pouze fyzická nebo právnická osoba, která si licenci zakoupila.
                     Jakákoliv data z analýzy <strong><u>nesmí</u></strong> bezplatně či za úplatu poskytnout jiné fyzické či právnické osobě.
                     Současně musí zajistit, že nedojde k zveřejnění data z analýzy.
-                    V případě zveřejnění dat z analyzy je povinností držitele licence dokoupení <strong>Veřejné licence</strong> s <a href="#faq_public">možností data zveřejnit</a>.
+                    V případě zveřejnění dat z analyzy je povinností držitele licence dokoupení <strong>Veřejné licence</strong> s možností data zveřejnit.
                 </p>
             </div>
         </div>

@@ -32,9 +32,9 @@
 {
 <script>
     $(document).ready(function() {
-      $("#selectNavigace").change(function(){
-        if ($(this).val()!='') {
-          window.location.href= '/BenchmarkDodavatelu/' + $(this).val() + window.location.search;
+      $("#submitSelectNavigace").click(function(){
+        if ($("#selectNavigace").val()!='') {
+          window.location.href= '/BenchmarkDodavatelu/' + $("#selectNavigace").val() + window.location.search;
         }
       });
     });
@@ -46,20 +46,29 @@
     <small class="text-muted">oproti souhrným obvyklým cenám</small>
 </h2>
 
-<div class="input-group mb-3">
-    <label class="input-group-text" for="selectNavigace">Vyberte dodavatele:</label>
-    <select class="form-select" id="selectNavigace">
-        <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte dodavatele...</option>
-        @foreach (var (ico, nazev, pocetCen) in
-        JobService.GetDodavateleList(Model.Key.Value)
-        .Where(m => m.pocetCen > JobService._minimumPriceCountInList)
-        .OrderByDescending(x => x.pocetCen)
-        )
-        {
-            <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetCen cen)</option>
-        }
-    </select>
+<div class="row">
+    <div class="col-auto">
+        <div class="input-group mb-3">
+
+            <label class="input-group-text" for="selectNavigace">Vyberte úřad:</label>
+            <select class="form-select form-select-sm" id="selectNavigace">
+                <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte dodavatele...</option>
+                @foreach (var (ico, nazev, pocetCen) in
+                JobService.GetDodavateleList(Model.Key.Value)
+                .Where(m => m.pocetCen > JobService._minimumPriceCountInList)
+                .OrderByDescending(x => x.pocetCen)
+                )
+                {
+                    <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetCen cen)</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-auto">
+        <button type="button" class="btn btn-primary btn-sm" id="submitSelectNavigace">Zobrazit</button>
+    </div>
 </div>
+
 @if (statistics == null)
 {
 

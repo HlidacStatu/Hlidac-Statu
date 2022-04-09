@@ -27,9 +27,10 @@
 
 <h1>@Model.Obor</h1>
 
-    if (showStatistics)
-    {
-<partial name="Shared/_SouhrnTable" model="tableModel" />
+@if (showStatistics)
+{
+    <partial name="Shared/_SouhrnTable" model="tableModel" />
+}
 
 <partial name="Shared/_BoxPlot" model="graphModel" />
 
