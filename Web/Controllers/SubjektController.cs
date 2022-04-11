@@ -164,6 +164,9 @@ namespace HlidacStatu.Web.Controllers
                 dataHierarchy = ossu.FirstOrDefault()?.GenerateD3DataHierarchy();
             }
 
+            var osu = StaticData.OrganizacniStrukturyUradu.Get();
+            ViewBag.ExporDate = StaticData.OrganizacniStrukturyUraduExportDate;
+
             return dataHierarchy is null ? RedirectToAction("Index") : (ActionResult)View(dataHierarchy);
         }
 

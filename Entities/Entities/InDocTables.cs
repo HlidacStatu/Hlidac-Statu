@@ -35,6 +35,9 @@ namespace HlidacStatu.Entities
             {
                 string[][] cells = new string[0][];
 
+                if (string.IsNullOrWhiteSpace(Json))
+                    return cells;
+
                 var json = JArray.Parse(Json);
                 var numRows = json.Count;
 
