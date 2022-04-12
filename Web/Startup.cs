@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Net.Security;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
@@ -151,7 +152,13 @@ namespace HlidacStatu.Web
                         PooledConnectionIdleTimeout = Timeout.InfiniteTimeSpan,
                         KeepAlivePingDelay = TimeSpan.FromSeconds(60),
                         KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
-                        EnableMultipleHttp2Connections = true
+                        EnableMultipleHttp2Connections = true,
+                        
+                        //Accepts whatever certificate
+                        SslOptions = new SslClientAuthenticationOptions()
+                        {
+                            RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true
+                        }
                     };
                 });
             });
