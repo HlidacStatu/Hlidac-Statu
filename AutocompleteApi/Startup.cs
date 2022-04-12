@@ -10,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Polly;
-using ProtoBuf.Grpc.Server;
 
 namespace HlidacStatu.AutocompleteApi
 {
@@ -39,7 +38,6 @@ namespace HlidacStatu.AutocompleteApi
             //add timer to refresh data once a day
             services.AddHostedService<TimedHostedService>();
 
-            services.AddCodeFirstGrpc();
             services.AddControllers();
 
             
@@ -83,7 +81,6 @@ namespace HlidacStatu.AutocompleteApi
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcService<AutocompleteGrpc>();
                 endpoints.MapControllers();
             });
         }

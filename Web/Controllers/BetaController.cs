@@ -4,19 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
 using System.Threading.Tasks;
-using GrpcProtobufs;
-using ProtoBuf.Grpc.Client;
+
 
 namespace HlidacStatu.Web.Controllers
 {
     public class BetaController : Controller
     {
-        private readonly IAutocompleteGrpc _client;
-        public BetaController(IAutocompleteGrpc client)
-        {
-            _client = client;
-        }
-        
         public ActionResult Index()
         {
             return View();
@@ -38,15 +31,7 @@ namespace HlidacStatu.Web.Controllers
             return Json(searchResult.Select(r => r.Original));
         }
 
-        //otestovat
-        public async Task<ContentResult> AutocompleteGrpc(string q)
-        {
-            
-            var reply = await _client.AutocompleteAsync(new AutocompleteRequest() { Query = q });
-
-            return Content(reply.JsonMessage, "application/json; charset=utf-8");
-        }
-
+        
         public JsonResult Autocomplete2(string q)
         {
             var searchCache = StaticData.FulltextSearchForAutocomplete.Get();

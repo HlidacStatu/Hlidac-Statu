@@ -20,14 +20,14 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using GrpcProtobufs;
+
 using HlidacStatu.Entities.Entities;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using ProtoBuf.Grpc.ClientFactory;
+
 
 namespace HlidacStatu.Web
 {
@@ -140,22 +140,6 @@ namespace HlidacStatu.Web
 
             if (_shouldRunHealthcheckFeature)
                 AddAllHealtChecks(services);
-
-            services.AddCodeFirstGrpcClient<IAutocompleteGrpc>(o => {
-                o.Address = new Uri(Configuration.GetValue<string>("AutocompleteEndpoint"));
-                
-                o.ChannelOptionsActions.Add(options =>
-                {
-                    options.HttpHandler = new SocketsHttpHandler()
-                    {
-                        PooledConnectionIdleTimeout = Timeout.InfiniteTimeSpan,
-                        KeepAlivePingDelay = TimeSpan.FromSeconds(60),
-                        KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
-                        EnableMultipleHttp2Connections = true
-                    };
-                });
-            });
-
 
         }
 

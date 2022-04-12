@@ -134,8 +134,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutocompleteApi", "Autocomp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Queue", "Queue", "{24E81119-636A-4383-A22D-A371C119E789}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcProtobufs", "GrpcProtobufs\GrpcProtobufs.csproj", "{40BB9F3F-0C00-4741-B6E2-CA8CA62A4CB7}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MachineLearning", "MachineLearning", "{AF9C295F-FA98-4C4C-9A87-25F1792C9E3D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitPriceDetector", "..\Hlidac-Statu-Private\UnitPriceDetector\UnitPriceDetector.csproj", "{A9F3D2BF-821E-43DB-BE01-29CF2F44325C}"
@@ -338,10 +336,6 @@ Global
 		{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{40BB9F3F-0C00-4741-B6E2-CA8CA62A4CB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{40BB9F3F-0C00-4741-B6E2-CA8CA62A4CB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{40BB9F3F-0C00-4741-B6E2-CA8CA62A4CB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{40BB9F3F-0C00-4741-B6E2-CA8CA62A4CB7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A9F3D2BF-821E-43DB-BE01-29CF2F44325C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A9F3D2BF-821E-43DB-BE01-29CF2F44325C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9F3D2BF-821E-43DB-BE01-29CF2F44325C}.Release|Any CPU.ActiveCfg = Release|Any CPU
