@@ -1,6 +1,8 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Threading.Tasks;
+using HlidacStatu.Entities;
 using ProtoBuf.Grpc;
 
 namespace GrpcProtobufs
