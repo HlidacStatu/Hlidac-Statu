@@ -543,7 +543,12 @@ namespace HlidacStatu.Util
 
             string normText = Regex.Replace(text, "[^a-zA-Z0-9" + accentedCharacters + "'-]{1}", " ");
             if (removeOneCharWords)
-                normText = Regex.Replace(normText, @"\s[a-zA-Z0-9" + accentedCharacters + @"-]{1}\s", " ");
+            {
+                normText = Regex.Replace(normText, @"(\s|^)[a-zA-Z0-9" + accentedCharacters + @"-]{1}(\s|$)", " ");
+                //remove two char word like V1 or 1V
+                normText = Regex.Replace(normText, @"(\s|^)[a-zA-Z0-9" + accentedCharacters + @"-]{1}\d{1}(\s|$)", " ");
+                normText = Regex.Replace(normText, @"(\s|^)\d{1}[a-zA-Z0-9" + accentedCharacters + @"-]{1}(\s|$)", " ");
+            }
             normText = Devmasters.TextUtil.ReplaceDuplicates(normText, " ");
 
             System.Text.StringBuilder sb = new System.Text.StringBuilder(text.Length);
