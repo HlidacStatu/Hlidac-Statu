@@ -4,11 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Web.Framework;
-using Microsoft.Extensions.Options;
 
 
 namespace HlidacStatu.Web.Controllers
@@ -34,7 +32,7 @@ namespace HlidacStatu.Web.Controllers
 
 
         // Used for searching
-        public JsonResult Autocomplete(string q)
+        public JsonResult AutocompleteOld(string q)
         {
             var searchCache = StaticData.FulltextSearchForAutocomplete.Get();
 
@@ -43,7 +41,7 @@ namespace HlidacStatu.Web.Controllers
             return Json(searchResult.Select(r => r.Original));
         }
 
-        public async Task<IActionResult> AutocompleteFromApi(string q, CancellationToken ctx)
+        public async Task<IActionResult> Autocomplete(string q, CancellationToken ctx)
         {
             var autocompleteHost = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint");
             var autocompletePath = $"/autocomplete/autocomplete?q={q}";

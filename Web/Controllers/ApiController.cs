@@ -1,10 +1,11 @@
-﻿using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
-
+﻿using System;
+using HlidacStatu.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-
-using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using HlidacStatu.Web.Framework;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -13,19 +14,39 @@ namespace HlidacStatu.Web.Controllers
     public partial class ApiController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public ApiController(UserManager<ApplicationUser> userManager)
+        public ApiController(UserManager<ApplicationUser> userManager, IHttpClientFactory httpClientFactory)
         {
             _userManager = userManager;
+            _httpClientFactory = httpClientFactory;
         }
 
-        public JsonResult Autocomplete(string q)
+        public async Task<IActionResult> Autocomplete(string q, CancellationToken ctx)
         {
-            var searchCache = StaticData.FulltextSearchForAutocomplete.Get();
+            var autocompleteHost = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint");
+            var autocompletePath = $"/autocomplete/autocomplete?q={q}";
+            var uri = new Uri($"{autocompleteHost}{autocompletePath}");
+            using var client = _httpClientFactory.CreateClient(Constants.DefaultHttpClient);
 
-            var searchResult = searchCache.Search(q, 5, ac => ac.Priority);
+            try
+            {
+                var response = await client.GetAsync(uri, ctx);
 
-            return Json(searchResult.Select(r => r.Original));
+                return new HttpResponseMessageResult(response);
+            }
+            catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
+            {
+                // canceled by user
+                Util.Consts.Logger.Info("Autocomplete canceled by user");
+            }
+            catch (Exception e)
+            {
+                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { q });
+            }
+            
+            return NoContent();
+            
         }
 
         // GET: ApiV1
