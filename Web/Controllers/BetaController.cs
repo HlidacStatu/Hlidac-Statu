@@ -1,15 +1,27 @@
-﻿using HlidacStatu.Repositories;
+﻿using System;
+using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.ServiceModel;
+using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Web.Framework;
+using Microsoft.Extensions.Options;
 
 
 namespace HlidacStatu.Web.Controllers
 {
     public class BetaController : Controller
     {
+        private readonly IHttpClientFactory _httpClientFactory;
+        
+        public BetaController(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
+
         public ActionResult Index()
         {
             return View();
@@ -30,6 +42,21 @@ namespace HlidacStatu.Web.Controllers
 
             return Json(searchResult.Select(r => r.Original));
         }
+
+        public async Task<IActionResult> AutocompleteFromApi(string q, CancellationToken ctx)
+        {
+            var autocompleteHost = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint");
+            var autocompletePath = $"/autocomplete/autocomplete?q={q}";
+            var uri = new Uri($"{autocompleteHost}{autocompletePath}");
+            using var client = _httpClientFactory.CreateClient(Constants.DefaultHttpClient);
+            
+
+            var response = await client.GetAsync(uri, ctx);
+
+            return new HttpResponseMessageResult(response);
+        }
+        
+        
 
         
         public JsonResult Autocomplete2(string q)
