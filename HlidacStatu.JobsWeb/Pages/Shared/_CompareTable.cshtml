@@ -18,10 +18,10 @@
                 }
             </th>
             <th scope="col" class="text-end">
-            @if (Model.ShowPocetCen)
-            {
-                <text>Počet<br />cen</text>
-            }
+                @if (Model.ShowPocetCen)
+                {
+                    <text>Počet<br />cen</text>
+                }
             </th>
             <th scope="col" class="text-end">Dolní kvartil</th>
             <th scope="col" class="text-end">Medián</th>
@@ -52,9 +52,21 @@
 
             <tr>
                 <td scope="row">@row.Name</td>
-                <td class="text-end number border-start"><b>@row.DolniKvartil.ToString("N0")</b></td>
-                <td class="text-end number"><b>@row.Median.ToString("N0")</b></td>
-                <td class="text-end number"><b>@row.HorniKvartil.ToString("N0")</b></td>
+                <td class="text-end number border-start">
+                    <b>@row.DolniKvartil.ToString("N0")</b>
+                    <br />
+                    @Html.Raw(Services.Calc.PercentChangeHtml(compRow.DolniKvartil, row.DolniKvartil))
+                </td>
+                <td class="text-end number">
+                    <b>@row.Median.ToString("N0")</b>
+                    <br />
+                    @Html.Raw(Services.Calc.PercentChangeHtml(compRow.Median, row.Median))
+                </td>
+                <td class="text-end number">
+                    <b>@row.HorniKvartil.ToString("N0")</b>
+                    <br />
+                    @Html.Raw(Services.Calc.PercentChangeHtml(compRow.HorniKvartil, row.HorniKvartil))
+                </td>
                 <td class="text-end number">
                     @if (Model.ShowPocetSmluv)
                     {

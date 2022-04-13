@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HlidacStatu.JobsWeb.Pages
 {
-    [Authorize()]
     public class BenchmarkDodavateluModel : PageModel
     {
         public string Ico { get; set; }

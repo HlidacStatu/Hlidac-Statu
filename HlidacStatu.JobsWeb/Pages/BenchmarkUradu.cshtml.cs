@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HlidacStatu.JobsWeb.Pages
 {
-    [Authorize()]
+
     public class BenchmarkUraduModel : PageModel
     {
         public string Ico { get; set; }

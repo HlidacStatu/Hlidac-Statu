@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HlidacStatu.JobsWeb.Pages
 {
-    [Authorize()]
     public class PdfModel : PageModel
     {
         public YearlyStatisticsGroup.Key? Key { get; set; }

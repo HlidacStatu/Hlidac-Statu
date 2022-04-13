@@ -1,6 +1,6 @@
+using HlidacStatu.Entities;
 using HlidacStatu.JobsWeb.Models;
 using HlidacStatu.Repositories;
-using HlidacStatu.Entities;
 
 using Microsoft.AspNetCore.Http;
 
@@ -297,12 +297,18 @@ namespace HlidacStatu.JobsWeb.Services
 
         public static async Task<CenyCustomer.AccessDetail> HasAccess(this HttpContext context)
         {
+            var key = TryFindKey(context);
+            if (key?.Obor == "DEMO" && key?.Rok == 2018)
+            {
+                return new CenyCustomer.AccessDetail(CenyCustomer.AccessDetail.AccessDetailLevel.PRO);
+            }
+
             if (context.User?.Identity?.IsAuthenticated == false)
                 return CenyCustomer.AccessDetail.NoAccess();
             var username = context.User?.Identity?.Name;
+
             if (string.IsNullOrEmpty(username))
                 return CenyCustomer.AccessDetail.NoAccess();
-            var key = TryFindKey(context);
             if (key == null)
                 return CenyCustomer.AccessDetail.NoAccess();
 
