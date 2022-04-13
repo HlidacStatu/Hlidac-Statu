@@ -1,7 +1,5 @@
 using System;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using HlidacStatu.AutocompleteApi.Controllers;
 using HlidacStatu.AutocompleteApi.Services;
 using HlidacStatu.LibCore.MiddleWares;
 using Microsoft.AspNetCore.Builder;
@@ -74,7 +72,7 @@ namespace HlidacStatu.AutocompleteApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 

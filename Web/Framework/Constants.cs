@@ -14,6 +14,8 @@ namespace HlidacStatu.Web.Framework
         public static string[] DontIndexICOS = null;
         public static string[] DontIndexOsoby = null;
 
+        public const string DefaultHttpClient = "default";
+        
         static object lockObj = new object();
         static bool initialized = false;
         static Constants()

@@ -28,6 +28,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
+using Polly;
+
 
 namespace HlidacStatu.Web
 {
@@ -137,6 +139,11 @@ namespace HlidacStatu.Web
             });
 
 
+            services.AddHttpClient(Constants.DefaultHttpClient)
+                .AddTransientHttpErrorPolicy(policyBuilder =>
+                    policyBuilder.WaitAndRetryAsync(
+                        3, retryNumber => TimeSpan.FromMilliseconds(10)));
+            
 
             if (_shouldRunHealthcheckFeature)
                 AddAllHealtChecks(services);
