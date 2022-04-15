@@ -3,7 +3,7 @@
     <PropertyGroup>
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
         <Version>1.0.0.0</Version>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <UserSecretsId>aspnet-Web-D6658176-CBA9-44EA-823F-F6C01A8F3EE9</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <AssemblyName>HlidacStatu.Web</AssemblyName>

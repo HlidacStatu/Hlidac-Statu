@@ -1,9 +1,8 @@
 ﻿@model List<HlidacStatu.Entities.Views.SponzoringOverview> 
 
-@using HlidacStatu.Entities;
 @using System.Linq;
 @using System.Threading
-@using Devmasters.Collections;
+
 @using HlidacStatu.Repositories
 
 @{
@@ -65,7 +64,7 @@
                                         </div>
                                         <div class="table-col">
                                             @{
-                                                var castka = @strana.DaryCelkem;
+                                                var castka = strana.DaryCelkem;
                                             }
                                             
                                             @if (castka.HasValue && castka.Value > 0)
