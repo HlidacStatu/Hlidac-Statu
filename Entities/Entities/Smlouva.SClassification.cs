@@ -345,7 +345,7 @@ namespace HlidacStatu.Entities
 
                 [NiceDisplayName("Právní a realitní služby")]
                 legal_obecne = 11500,
-                [NiceDisplayName("Realitní služby")]
+                [NiceDisplayName("Realitní služby (poradenství, konzultace)")]
                 legal_reality = 11501,
                 [NiceDisplayName("Právní služby")]
                 legal_pravni = 11502,
@@ -353,6 +353,8 @@ namespace HlidacStatu.Entities
                 legal_najem = 11503,
                 [NiceDisplayName("Pronájem pozemků")]
                 legal_pozemky = 11504,
+                [NiceDisplayName("Nákup, prodej a pronájem nemovitosti (bytové i nebytové)")]
+                legal_nemovitosti = 11505,
 
 
                 [NiceDisplayName("Technické služby")]
@@ -395,6 +397,8 @@ namespace HlidacStatu.Entities
 
                 [NiceDisplayName("Dary a dotace")]
                 dary_obecne = 12000,
+                [NiceDisplayName("Smlouvy o spolupráci")]
+                dary_spoluprace = 12001,
                 
                 [NiceDisplayName("Zvířata (služební psi, koně)")]
                 zvirata_obecne = 12100,
