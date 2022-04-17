@@ -232,36 +232,40 @@ namespace HlidacStatu.Repositories.ES
         static string dataSourceIndexNamePrefix = "data_";
         public static ElasticClient GetESClient(string indexName, int timeOut = 60000, int connectionLimit = 80, IndexType? idxType = null, bool init = true)
         {
-            lock (_clientLock)
+            
+            if (idxType == IndexType.DataSource)
+                indexName = dataSourceIndexNamePrefix + indexName;
+            else if (indexName == defaultIndexName_Audit)
             {
-                if (idxType == IndexType.DataSource)
-                    indexName = dataSourceIndexNamePrefix + indexName;
-                else if (indexName == defaultIndexName_Audit)
-                {
-                    //audit_Year-weekInYear
-                    DateTime d = DateTime.Now;
-                    indexName = $"{indexName}_{d.Year}-{CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(d, CalendarWeekRule.FirstDay, DayOfWeek.Monday)}";
-                }
-                string cnnset = string.Format("{0}|{1}|{2}", indexName, timeOut, connectionLimit);
-                ConnectionSettings sett = GetElasticSearchConnectionSettings(indexName, timeOut, connectionLimit);
-
-                //if (System.Diagnostics.Debugger.IsAttached)
-                //    sett.Proxy(new Uri("http://127.0.0.1:8888"),"","");
-
-                if (!_clients.ContainsKey(cnnset))
-                {
-                    //if (idxType.HasValue == false)
-                    //    idxType = GetIndexTypeForDefaultIndexName(indexName);
-
-                    var _client = new ElasticClient(sett);
-                    if (init)
-                        InitElasticSearchIndex(_client, idxType);
-
-                    _clients.Add(cnnset, _client);
-                }
-                return _clients[cnnset];
+                //audit_Year-weekInYear
+                DateTime d = DateTime.Now;
+                indexName = $"{indexName}_{d.Year}-{CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(d, CalendarWeekRule.FirstDay, DayOfWeek.Monday)}";
             }
+            string cnnset = string.Format("{0}|{1}|{2}", indexName, timeOut, connectionLimit);
+            ConnectionSettings sett = GetElasticSearchConnectionSettings(indexName, timeOut, connectionLimit);
 
+            //if (System.Diagnostics.Debugger.IsAttached)
+            //    sett.Proxy(new Uri("http://127.0.0.1:8888"),"","");
+
+            if (!_clients.ContainsKey(cnnset))
+            {
+                lock (_clientLock)
+                {
+                    if (!_clients.ContainsKey(cnnset))
+                    {
+                        //if (idxType.HasValue == false)
+                        //    idxType = GetIndexTypeForDefaultIndexName(indexName);
+
+                        var _client = new ElasticClient(sett);
+                        if (init)
+                            InitElasticSearchIndex(_client, idxType);
+
+                        _clients.Add(cnnset, _client);
+                    }
+                }
+            }
+            return _clients[cnnset];
+        
         }
 
 
