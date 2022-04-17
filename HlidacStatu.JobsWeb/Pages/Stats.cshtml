@@ -1,0 +1,135 @@
+@page
+@using HlidacStatu.JobsWeb.Services
+@using HlidacStatu.JobsWeb.Models
+@model StatsModel
+
+@section scripts
+{
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+}
+
+@{
+    ViewData["Title"] = "Souhrnné statistiky";
+    List<(string ico, string nazev, int pocetCen)> dodavatele = JobService.GetDodavateleList(Model.Key.Value);
+    List<(string ico, string nazev, int pocetCen)> zadavatele = JobService.GetOdberateleList(Model.Key.Value);
+
+    var marketStat = JobService.GetStatistics(Model.Key.Value);
+    var jobs = marketStat.Where(m => !string.IsNullOrEmpty(m.Name)).OrderBy(x => x.Name).Select(m => m.Name).Distinct();
+}
+<h1>Porovnání cen dodavatelů</h1>
+<script>
+    var tbl;
+    $(document).ready(function () {
+        tbl = $('#tbl_dodav').DataTable({
+                     'language': {
+                        'url': 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/cs.json'
+                    },
+                    "paging":   false,
+                    "ordering": true,
+                    "info":     false
+        });
+        $('#tbl_zadav').DataTable({
+                     'language': {
+                        'url': '//cdn.datatables.net/plug-ins/1.11.5/i18n/Czech.json'
+                    },
+                    "paging":   false,
+                    "ordering": true,
+                    "info":     false
+                    });
+    });
+</script>
+<h2>Dodavatelé</h2>
+<table class="table-sorted table table-sm table-striped" id="tbl_dodav">
+    <thead>
+        <tr>
+            <td>Firma</td>
+            @foreach (var n in jobs)
+            {
+                <td>@n</td>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var dodavatel in dodavatele.Where(m => m.pocetCen >= 10).OrderByDescending(o => o.pocetCen))
+        {
+            var fStat = JobService.GetDodavatelStatistics(dodavatel.ico, Model.Key.Value);
+
+
+            <tr>
+                <td data-order="@dodavatel.nazev">@dodavatel.nazev</td>
+                @foreach (var j in jobs)
+                {
+                    if (fStat.Any(m => m.Name == j))
+                    {
+                        var marketVal = marketStat.First(m => m.Name == j);
+                        var firmaVal = fStat.First(m => m.Name == j);
+                        <td class="align-top" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(firmaVal.Median))">
+                            @firmaVal.DolniKvartil.ToString("######")&nbsp;@Html.Raw(Services.Calc.PercentChangeHtml(marketVal.DolniKvartil, firmaVal.DolniKvartil))
+                            <br />
+                            <b>@firmaVal.Median.ToString("######")&nbsp;@Html.Raw(Services.Calc.PercentChangeHtml(marketVal.Median, firmaVal.Median))</b>
+                            <br />
+                            @firmaVal.HorniKvartil.ToString("######")&nbsp;@Html.Raw(Services.Calc.PercentChangeHtml(marketVal.HorniKvartil, firmaVal.HorniKvartil))
+                        </td>
+                    }
+                    else
+                    {
+                        <td  data-order="0">&nbsp;</td>
+
+                    }
+                }
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+<hr />
+
+
+<h2>Zadavatelé</h2>
+<table class="table table-sm table-striped table-sorted" id="tbl_zadav">
+    <thead>
+        <tr>
+            <td>Úřad</td>
+            @foreach (var n in jobs)
+            {
+                <td>@n</td>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var zadavatel in zadavatele.Where(m => m.pocetCen >= 10).OrderByDescending(o => o.pocetCen))
+        {
+            var fStat = JobService.GetOdberatelStatistics(zadavatel.ico, Model.Key.Value);
+
+
+            <tr>
+                <td data-order="@zadavatel.nazev">@zadavatel.nazev</td>
+                @foreach (var j in jobs)
+                {
+                    if (fStat.Any(m => m.Name == j))
+                    {
+                        var marketVal = marketStat.First(m => m.Name == j);
+                        var firmaVal = fStat.First(m => m.Name == j);
+                        <td class="align-top" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(firmaVal.Median))">
+                            @firmaVal.DolniKvartil.ToString("######")&nbsp;@Html.Raw(Services.Calc.PercentChangeHtml(marketVal.DolniKvartil, firmaVal.DolniKvartil))
+                            <br />
+                            <b>@firmaVal.Median.ToString("######")&nbsp;@Html.Raw(Services.Calc.PercentChangeHtml(marketVal.Median, firmaVal.Median))</b>
+                            <br />
+                            @firmaVal.HorniKvartil.ToString("######")&nbsp;@Html.Raw(Services.Calc.PercentChangeHtml(marketVal.HorniKvartil, firmaVal.HorniKvartil))
+                        </td>
+                    }
+                    else
+                    {
+                        <td data-order="0">&nbsp;</td>
+
+                    }
+                }
+            </tr>
+        }
+
+    </tbody>
+</table>
+

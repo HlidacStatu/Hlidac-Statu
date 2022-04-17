@@ -6,7 +6,7 @@
         { 
             var change = PercentChange(firstVal, changedVal);
             var color = PercentChangeHtmlColorCSS(change);
-            return $"<span title='{title}' style='font-size:90%;{color}'>{HlidacStatu.Util.RenderData.NicePercent(change,1,true)}</style>";
+            return $"<span title='{title}' style='font-size:90%;{color}'>{HlidacStatu.Util.RenderData.NicePercent(change,1,true)}</span>";
         }
 
             public static decimal PercentChange(decimal firstVal, decimal changedVal)
