@@ -17,20 +17,23 @@
 
     var marketStat = JobService.GetStatistics(Model.Key.Value);
     var jobs = marketStat.Where(m => !string.IsNullOrEmpty(m.Name)).OrderBy(x => x.Name).Select(m => m.Name).Distinct();
+
+    var dodavateleStats = dodavatele
+            .Where(m => m.pocetCen >= 10)
+            .Select(m => new { ico = m.ico, stat = JobService.GetDodavatelStatistics(m.ico, Model.Key.Value) })
+            .ToDictionary(m => m.ico, m => m.stat);
+
+    var zadavateleStats = zadavatele
+            .Where(m => m.pocetCen >= 5)
+            .Select(m => new { ico = m.ico, stat = JobService.GetOdberatelStatistics(m.ico, Model.Key.Value) })
+            .ToDictionary(m => m.ico, m => m.stat);
+
 }
 <h1>Porovnání cen dodavatelů</h1>
 <script>
     var tbl;
     $(document).ready(function () {
-        tbl = $('#tbl_dodav').DataTable({
-                     'language': {
-                        'url': 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/cs.json'
-                    },
-                    "paging":   false,
-                    "ordering": true,
-                    "info":     false
-        });
-        $('#tbl_zadav').DataTable({
+        $('#tbl_dodav, #tbl_zadav, #tbl_zebrdodav, tbl_zebrzadav').DataTable({
                      'language': {
                         'url': '//cdn.datatables.net/plug-ins/1.11.5/i18n/Czech.json'
                     },
@@ -54,7 +57,7 @@
     <tbody>
         @foreach (var dodavatel in dodavatele.Where(m => m.pocetCen >= 10).OrderByDescending(o => o.pocetCen))
         {
-            var fStat = JobService.GetDodavatelStatistics(dodavatel.ico, Model.Key.Value);
+            var fStat = dodavateleStats[dodavatel.ico];
 
 
             <tr>
@@ -75,7 +78,7 @@
                     }
                     else
                     {
-                        <td  data-order="0">&nbsp;</td>
+                        <td data-order="0">&nbsp;</td>
 
                     }
                 }
@@ -102,7 +105,7 @@
     <tbody>
         @foreach (var zadavatel in zadavatele.Where(m => m.pocetCen >= 10).OrderByDescending(o => o.pocetCen))
         {
-            var fStat = JobService.GetOdberatelStatistics(zadavatel.ico, Model.Key.Value);
+            var fStat = zadavateleStats[zadavatel.ico];
 
 
             <tr>
@@ -133,3 +136,239 @@
     </tbody>
 </table>
 
+<hr />
+
+<h2>Zebricky drahoty dodavatelu</h2>
+<table class="table-sorted table table-sm table-striped" id="tbl_zebrdodav">
+    <thead>
+        <tr>
+            <td>Firma</td>
+            <td>Pořadí podle mediánu</td>
+            <td>Pořadí podle průmeřu</td>
+            <td>Pořadí podle horního kvartilu</td>
+            <td>Pořadí podle max</td>
+            <td>Průměrná celková pozice</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var dodavatel in dodavatele.Where(m => m.pocetCen >= 10).OrderBy(o => o.nazev))
+        {
+            var fStat = dodavateleStats[dodavatel.ico];
+            Dictionary<string, int> pozicePerJobs = null;
+            List<int> jednotlivePozice = new List<int>();
+
+            <tr>
+                <td data-order="@dodavatel.nazev">@dodavatel.nazev <br/> cen: @dodavatel.pocetCen</td>
+                @{
+                    pozicePerJobs = new Dictionary<string, int>();
+                    jednotlivePozice = new List<int>();
+                    foreach (var j in jobs)
+                    {
+                        var poziceStats = dodavateleStats
+                            .Select(m => new { ico = m.Key, stat = m.Value.FirstOrDefault(m => m.Name == j) })
+                            .Where(m => m.stat != null);
+                        var zebricek = poziceStats
+                            .OrderByDescending(o => o.stat.Median);
+                        var pozice =  zebricek.Select((m, i) => new { poradi = i+1, stat = m.stat, ico = m.ico })
+                            .Where(m => m.ico == dodavatel.ico)
+                            .FirstOrDefault()?.poradi;
+                        if (pozice != null)
+                        {
+                            pozicePerJobs.Add(j, pozice.Value);
+                            jednotlivePozice.Add(pozice.Value);
+                        }
+                    }
+                }
+                <td data-order="0">@Html.Raw(string.Join("<br/>",pozicePerJobs.Select(m=>m.Key + ":" + m.Value)))</td>
+
+                @{
+                    pozicePerJobs = new Dictionary<string, int>();
+                    foreach (var j in jobs)
+                    {
+                        var poziceStats = dodavateleStats
+                            .Select(m => new { ico = m.Key, stat = m.Value.FirstOrDefault(m => m.Name == j) })
+                            .Where(m => m.stat != null);
+                        var zebricek = poziceStats
+                            .OrderByDescending(o => o.stat.Average);
+                        var pozice =  zebricek.Select((m, i) => new { poradi = i+1, stat = m.stat, ico = m.ico })
+                            .Where(m => m.ico == dodavatel.ico)
+                            .FirstOrDefault()?.poradi;
+                        if (pozice != null)
+                        {
+                            pozicePerJobs.Add(j, pozice.Value);
+                            jednotlivePozice.Add(pozice.Value);
+                        }
+                    }
+                }
+                <td data-order="0">@Html.Raw(string.Join("<br/>",pozicePerJobs.Select(m=>m.Key + ":" + m.Value)))</td>
+
+                @{
+                    pozicePerJobs = new Dictionary<string, int>();
+                    foreach (var j in jobs)
+                    {
+                        var poziceStats = dodavateleStats
+                            .Select(m => new { ico = m.Key, stat = m.Value.FirstOrDefault(m => m.Name == j) })
+                            .Where(m => m.stat != null);
+                        var zebricek = poziceStats
+                            .OrderByDescending(o => o.stat.HorniKvartil);
+                        var pozice =  zebricek.Select((m, i) => new { poradi = i+1, stat = m.stat, ico = m.ico })
+                            .Where(m => m.ico == dodavatel.ico)
+                            .FirstOrDefault()?.poradi;
+                        if (pozice != null)
+                        {
+                            pozicePerJobs.Add(j, pozice.Value);
+                            jednotlivePozice.Add(pozice.Value);
+                        }
+                    }
+                }
+                <td>@Html.Raw(string.Join("<br/>",pozicePerJobs.Select(m=>m.Key + ":" + m.Value)))</td>
+                @{
+                    pozicePerJobs = new Dictionary<string, int>();
+                    foreach (var j in jobs)
+                    {
+                        var poziceStats = dodavateleStats
+                            .Select(m => new { ico = m.Key, stat = m.Value.FirstOrDefault(m => m.Name == j) })
+                            .Where(m => m.stat != null);
+                        var zebricek = poziceStats
+                            .OrderByDescending(o => o.stat.Maximum);
+                        var pozice =  zebricek.Select((m, i) => new { poradi = i+1, stat = m.stat, ico = m.ico })
+                            .Where(m => m.ico == dodavatel.ico)
+                            .FirstOrDefault()?.poradi;
+                        if (pozice != null)
+                        {
+                            pozicePerJobs.Add(j, pozice.Value);
+                            jednotlivePozice.Add(pozice.Value);
+                        }
+                    }
+                }
+                <td>@Html.Raw(string.Join("<br/>",pozicePerJobs.Select(m=>m.Key + ":" + m.Value)))</td>
+
+                <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(jednotlivePozice.Average()))">@(jednotlivePozice.Average().ToString("N2"))</td>
+
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+
+
+<hr />
+
+<h2>Zebricky drahoty Zadavatelů</h2>
+<table class="table-sorted table table-sm table-striped" id="tbl_zebrdodav">
+    <thead>
+        <tr>
+            <td>Úřad</td>
+            <td>Pořadí podle mediánu</td>
+            <td>Pořadí podle průmeřu</td>
+            <td>Pořadí podle horního kvartilu</td>
+            <td>Pořadí podle max</td>
+            <td>Průměrná celková pozice</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var zadavatel in zadavatele.Where(m => m.pocetCen >= 5).OrderBy(o => o.nazev))
+        {
+            var fStat = zadavateleStats[zadavatel.ico];
+            Dictionary<string, int> pozicePerJobs = null;
+            List<int> jednotlivePozice = new List<int>();
+
+            <tr>
+                <td data-order="@zadavatel.nazev">@zadavatel.nazev <br/> cen: @zadavatel.pocetCen</td>
+                @{
+                    pozicePerJobs = new Dictionary<string, int>();
+                    jednotlivePozice = new List<int>();
+                    foreach (var j in jobs)
+                    {
+                        var poziceStats = zadavateleStats
+                            .Select(m => new { ico = m.Key, stat = m.Value.FirstOrDefault(m => m.Name == j) })
+                            .Where(m => m.stat != null);
+                        var zebricek = poziceStats
+                            .OrderByDescending(o => o.stat.Median);
+                        var pozice =  zebricek.Select((m, i) => new { poradi = i+1, stat = m.stat, ico = m.ico })
+                            .Where(m => m.ico == zadavatel.ico)
+                            .FirstOrDefault()?.poradi;
+                        if (pozice != null)
+                        {
+                            pozicePerJobs.Add(j, pozice.Value);
+                            jednotlivePozice.Add(pozice.Value);
+                        }
+                    }
+                }
+                <td data-order="0">@Html.Raw(string.Join("<br/>",pozicePerJobs.Select(m=>m.Key + ":" + m.Value)))</td>
+
+                @{
+                    pozicePerJobs = new Dictionary<string, int>();
+                    foreach (var j in jobs)
+                    {
+                        var poziceStats = zadavateleStats
+                            .Select(m => new { ico = m.Key, stat = m.Value.FirstOrDefault(m => m.Name == j) })
+                            .Where(m => m.stat != null);
+                        var zebricek = poziceStats
+                            .OrderByDescending(o => o.stat.Average);
+                        var pozice =  zebricek.Select((m, i) => new { poradi = i+1, stat = m.stat, ico = m.ico })
+                            .Where(m => m.ico == zadavatel.ico)
+                            .FirstOrDefault()?.poradi;
+                        if (pozice != null)
+                        {
+                            pozicePerJobs.Add(j, pozice.Value);
+                            jednotlivePozice.Add(pozice.Value);
+                        }
+                    }
+                }
+                <td data-order="0">@Html.Raw(string.Join("<br/>",pozicePerJobs.Select(m=>m.Key + ":" + m.Value)))</td>
+
+                @{
+                    pozicePerJobs = new Dictionary<string, int>();
+                    foreach (var j in jobs)
+                    {
+                        var poziceStats = zadavateleStats
+                            .Select(m => new { ico = m.Key, stat = m.Value.FirstOrDefault(m => m.Name == j) })
+                            .Where(m => m.stat != null);
+                        var zebricek = poziceStats
+                            .OrderByDescending(o => o.stat.HorniKvartil);
+                        var pozice =  zebricek.Select((m, i) => new { poradi = i+1, stat = m.stat, ico = m.ico })
+                            .Where(m => m.ico == zadavatel.ico)
+                            .FirstOrDefault()?.poradi;
+                        if (pozice != null)
+                        {
+                            pozicePerJobs.Add(j, pozice.Value);
+                            jednotlivePozice.Add(pozice.Value);
+                        }
+                    }
+                }
+                <td>@Html.Raw(string.Join("<br/>",pozicePerJobs.Select(m=>m.Key + ":" + m.Value)))</td>
+                @{
+                    pozicePerJobs = new Dictionary<string, int>();
+                    foreach (var j in jobs)
+                    {
+                        var poziceStats = zadavateleStats
+                            .Select(m => new { ico = m.Key, stat = m.Value.FirstOrDefault(m => m.Name == j) })
+                            .Where(m => m.stat != null);
+                        var zebricek = poziceStats
+                            .OrderByDescending(o => o.stat.Maximum);
+                        var pozice =  zebricek.Select((m, i) => new { poradi = i+1, stat = m.stat, ico = m.ico })
+                            .Where(m => m.ico == zadavatel.ico)
+                            .FirstOrDefault()?.poradi;
+                        if (pozice != null)
+                        {
+                            pozicePerJobs.Add(j, pozice.Value);
+                            jednotlivePozice.Add(pozice.Value);
+                        }
+                    }
+                }
+                <td>@Html.Raw(string.Join("<br/>",pozicePerJobs.Select(m=>m.Key + ":" + m.Value)))</td>
+                @if (jednotlivePozice.Count > 0)
+                {
+                    <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(jednotlivePozice.Average()))">@(jednotlivePozice.Average().ToString("N2"))</td>
+                }
+                else
+                {
+                    <td data-order="9999"></td>
+                }
+            </tr>
+        }
+
+    </tbody>
+</table>
