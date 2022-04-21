@@ -15,7 +15,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        public ActionResult Hledat(string q, string osobaNamedId)
+        public ActionResult Hledat(string q, string page, string osobaNamedId)
         {
             if (string.IsNullOrWhiteSpace(q))
                 return Redirect("/osoby");
@@ -26,8 +26,10 @@ namespace HlidacStatu.Web.Controllers
                 if (o != null)
                     return Redirect(o.GetUrl(true));
             }
+            
+            int pagenum = string.IsNullOrEmpty(page) ? 1 : int.Parse(page); 
 
-            var res = OsobaRepo.Searching.SimpleSearch(q, 1, 25, OsobaRepo.Searching.OrderResult.Relevance);
+            var res = OsobaRepo.Searching.SimpleSearch(q, pagenum, 25, OsobaRepo.Searching.OrderResult.Relevance);
             return View(res);
         }
 
