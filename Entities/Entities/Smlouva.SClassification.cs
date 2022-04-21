@@ -367,10 +367,10 @@ namespace HlidacStatu.Entities
                 techsluzby_uklid = 11603,
 
 
-                [NiceDisplayName("Věda, výzkum a vývoj")]
+                [NiceDisplayName("Věda, výzkum a vzdělávání")]
                 vyzkum_obecne = 11700,
-                //[NiceDisplayName("Výzkum a vývoj")]
-                //vyzkum_vyvoj = 11701,
+                [NiceDisplayName("Školení a kurzy")]
+                vyzkum_skoleni = 11701,
 
                 [NiceDisplayName("Reklamní a marketingové služby")]
                 marketing_obecne = 11800,
