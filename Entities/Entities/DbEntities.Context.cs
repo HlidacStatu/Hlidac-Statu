@@ -236,6 +236,7 @@ namespace HlidacStatu.Entities
         public DbSet<SponzoringSummed> SponzoringSummedView { get; set; }
         public DbSet<JobOverview> JobsOverviewView { get; set; }
         public DbSet<Ids> IdsView { get; set; }
+        public DbSet<UserJobStatistics> UserJobStatistics { get; set; }
 
 
     }

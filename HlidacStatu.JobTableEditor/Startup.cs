@@ -59,6 +59,7 @@ namespace HlidacStatu.JobTableEditor
 
             services.AddSingleton<JobService>();
             services.AddScoped<ToastService>();
+            services.AddScoped<StatisticsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

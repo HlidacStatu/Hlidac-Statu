@@ -1,6 +1,7 @@
 @page "/"
 
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <h1>Aplikace na třídění oborů</h1>
 
@@ -18,6 +19,14 @@
         <label for="specificArea">Oblast tabulky</label>
         <input id="specificArea" type="text" @bind="_tableArea"/>
         <button class="btn btn-primary" @onclick="EditSpecificTable">Načti konkrétní tabulku</button>
+        <hr/>
+        @if (_isAdmin)
+        {
+            <br/>
+            <a href="/statistics">Statistiky</a>
+            
+        }
+        
         
     </Authorized>
     <NotAuthorized>
@@ -31,7 +40,14 @@
 {
     private int _tablePk;
     private string _tableArea="IT";
-    
+    private bool _isAdmin;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        _isAdmin = authState?.User?.IsInRole("Admin") ?? false;
+    }
+
     private void EditSpecificTable()
     {
         if( _tablePk > 0 && !string.IsNullOrWhiteSpace(_tableArea))
