@@ -39,7 +39,7 @@ FROM InDocTables t
                  and Analyza = 'It'
                  and t.year = 2021
                  and j.PriceVATCalculated is not null
-                 and (j.pk not in (select jobpk from Ceny))
+                 and (not exists (select 1 from Ceny c where c.JobPK = j.pk ))
                  and Unit = 2 --manday
                  and j.jobGrouped is not null
                group by jobRaw, PriceVATCalculated, Unit, smlouvaID, page) insel on insel.jobpk = j.pk
@@ -86,7 +86,7 @@ FROM InDocTables t
                  and Analyza = 'It'
                  and t.year = 2021
                  and j.PriceVATCalculated is not null
-                 and (j.pk not in (select jobpk from Ceny))
+                 and (not exists (select 1 from Ceny c where c.JobPK = j.pk ))
                  and Unit = 1 --hour
                  and j.jobGrouped is not null
                group by jobRaw, PriceVATCalculated, Unit, smlouvaID, page) insel on insel.jobpk = j.pk

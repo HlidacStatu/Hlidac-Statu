@@ -37,7 +37,7 @@ where
 	and t.year=2018
 	and j.jobGrouped is not null and j.jobGrouped != '0'
 	and j.PriceVATCalculated is not null
-	and (j.pk not in (select jobpk from Ceny))
+	and (not exists (select 1 from Ceny c where c.JobPK = j.pk ))
     and Unit = 2 --manday
 
 --insert manhours as mandays
@@ -79,6 +79,6 @@ where
     and t.year=2018
     and j.jobGrouped is not null and j.jobGrouped != '0'
 	and j.PriceVATCalculated is not null
-	and (j.pk not in (select jobpk from Ceny))
+	and (not exists (select 1 from Ceny c where c.JobPK = j.pk ))
     and Unit = 1 --manday
 
