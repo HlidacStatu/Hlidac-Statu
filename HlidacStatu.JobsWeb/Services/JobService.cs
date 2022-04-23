@@ -126,8 +126,8 @@ namespace HlidacStatu.JobsWeb.Services
                 case "DEMO":
                     return new SubjectYearDescription()
                     {
-                        Query = $"oblast:IT AND podepsano:[2018-01-01 TO 2018-04-01]",
-                        NiceName = "IT služby Q1 2018 - DEMO "
+                        Query = $"oblast:IT AND podepsano:[2018-01-01 TO 2018-07-01]",
+                        NiceName = "IT služby 01-06/2018 - DEMO "
                     };
                 default:
                     return null;
