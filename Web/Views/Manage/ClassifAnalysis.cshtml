@@ -1,0 +1,87 @@
+﻿@model HlidacStatu.Entities.Smlouva
+@using Devmasters.Enums;
+@using HlidacStatu.Entities
+@using System.Net.Http;
+
+@{
+    ViewBag.Title = "Classif analysis";
+
+}
+
+@using (Html.BeginForm( FormMethod.Get))
+{
+
+    <div class="form-horizontal">
+        <hr/>
+
+        <div class="form-group">
+            <div class="col form-floating">
+                <input name="text" id="text" type="text" class="form-control form-control-sm" value="" />
+                  <label for="text">text</label>
+
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="odeslat" class="btn btn-primary btn-sm"/>
+            </div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty( this.Context.Request.Query["text"]))
+{
+    string text = this.Context.Request.Query["text"];
+    string normText = HlidacStatu.Util.RenderData.NormalizedTextNoStopWords(text, true, false);
+    string[] words = null;
+    // In production code, don't destroy the HttpClient through using, but better use IHttpClientFactory factory or at least reuse an existing HttpClient instance
+    // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-requests
+    // https://www.aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/
+    using (var httpClient = new HttpClient())
+    {
+        using (var request = new HttpRequestMessage(new HttpMethod("POST"), "http://10.10.150.203:8001/text_stemmer_ngrams?ngrams=3"))
+        {
+            request.Headers.TryAddWithoutValidation("accept", "application/json"); 
+
+            request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(normText));
+            request.Content.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json"); 
+
+            var response = await httpClient.SendAsync(request);
+            words = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(response.Content.ReadAsStringAsync().Result);
+        }
+    }
+    var explainStr = "";
+    using (var httpClient = new HttpClient())
+    {
+    using (var request = new HttpRequestMessage(new HttpMethod("POST"), "http://10.10.150.203:8001/explain_text_json"))
+    {
+        request.Headers.TryAddWithoutValidation("accept", "application/json"); 
+
+        request.Content = new StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(normText));
+        request.Content.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json"); 
+
+        var response = await httpClient.SendAsync(request);
+        explainStr = response.Content.ReadAsStringAsync().Result;
+    }
+}
+<hr />
+<h3>@(this.Context.Request.Query["text"])</h3>
+
+    <div>
+        <hr />
+        <h4>explain</h4>
+        <pre>
+            @explainStr
+        </pre>        
+        <hr />
+            <h4>N-gramy</h4>
+        <code>
+            @foreach(var w in words.Where(m=>!string.IsNullOrEmpty(m)).Distinct())
+            {
+                @w <br />       
+            }
+        </code>
+    </div>
+}
