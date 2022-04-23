@@ -29,20 +29,20 @@ SELECT
     j.created
 
 FROM InDocTables t
-         join InDocJobs j on t.pk = j.tablePK
-         join SmlouvyIds s on s.Id = t.smlouvaID
-         join SmlouvyDodavatele d on s.Id = d.SmlouvaId
-         join (select min(j.pk) jobpk
-               from InDocJobs j
-                        join InDocTables t on t.pk = j.tablePK
-               where Unit in (1,2)
-                 and Analyza = 'It'
-                 and t.year = 2021
-                 and j.PriceVATCalculated is not null
-                 and (not exists (select 1 from Ceny c where c.JobPK = j.pk ))
-                 and Unit = 2 --manday
-                 and j.jobGrouped is not null
-               group by jobRaw, PriceVATCalculated, Unit, smlouvaID, page) insel on insel.jobpk = j.pk
+ join InDocJobs j on t.pk = j.tablePK
+ join SmlouvyIds s on s.Id = t.smlouvaID
+ join SmlouvyDodavatele d on s.Id = d.SmlouvaId
+ join (select min(j.pk) jobpk
+       from InDocJobs j
+                join InDocTables t on t.pk = j.tablePK
+       where Unit in (1,2)
+         and Analyza = 'It'
+         and t.year = 2021
+         and j.PriceVATCalculated is not null
+         and Unit = 2 --manday
+         and j.jobGrouped is not null
+       group by jobRaw, PriceVATCalculated, Unit, smlouvaID, page) insel on insel.jobpk = j.pk
+where not exists (select 1 from Ceny c where c.JobPK = j.pk )
 
 
 -- insert hours translated into mandays
@@ -76,17 +76,17 @@ SELECT
     j.created
 
 FROM InDocTables t
-         join InDocJobs j on t.pk = j.tablePK
-         join SmlouvyIds s on s.Id = t.smlouvaID
-         join SmlouvyDodavatele d on s.Id = d.SmlouvaId
-         join (select min(j.pk) jobpk
-               from InDocJobs j
-                        join InDocTables t on t.pk = j.tablePK
-               where Unit in (1,2)
-                 and Analyza = 'It'
-                 and t.year = 2021
-                 and j.PriceVATCalculated is not null
-                 and (not exists (select 1 from Ceny c where c.JobPK = j.pk ))
-                 and Unit = 1 --hour
-                 and j.jobGrouped is not null
-               group by jobRaw, PriceVATCalculated, Unit, smlouvaID, page) insel on insel.jobpk = j.pk
+ join InDocJobs j on t.pk = j.tablePK
+ join SmlouvyIds s on s.Id = t.smlouvaID
+ join SmlouvyDodavatele d on s.Id = d.SmlouvaId
+ join (select min(j.pk) jobpk
+       from InDocJobs j
+                join InDocTables t on t.pk = j.tablePK
+       where Unit in (1,2)
+         and Analyza = 'It'
+         and t.year = 2021
+         and j.PriceVATCalculated is not null
+         and Unit = 1 --hour
+         and j.jobGrouped is not null
+       group by jobRaw, PriceVATCalculated, Unit, smlouvaID, page) insel on insel.jobpk = j.pk
+where not exists (select 1 from Ceny c where c.JobPK = j.pk )
