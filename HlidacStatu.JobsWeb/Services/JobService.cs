@@ -266,7 +266,6 @@ namespace HlidacStatu.JobsWeb.Services
 
 
 
-
         public static List<JobStatistics> GetDodavatelForOdberatelStatistics(string icoDodavatel, string icoOdberatel, YearlyStatisticsGroup.Key key)
         {
             List<JobPrecalculated> jobs = GetDistinctJobs(key);
