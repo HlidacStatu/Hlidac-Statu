@@ -37,23 +37,6 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task<List<JobOverview>> GetAllJobsWithRelatedDataAsync()
-        {
-            using (var db = new DbEntities())
-            {
-                return await db.JobsOverviewView.FromSqlInterpolated(
-                        $@"SELECT t.smlouvaID, s.IcoOdberatele, d.Ico as IcoDodavatele, t.year, j.pk as JobPk, 
-                                  j.jobGrouped, j.salaryMD, j.salaryMDVat, t.subject, j.tags
-                             FROM InDocTables t
-                             join InDocJobs j on t.pk = j.tablePK
-                             join SmlouvyIds s on s.Id = t.smlouvaID
-                             join SmlouvyDodavatele d on s.Id = d.SmlouvaId
-                            where j.jobGrouped is not null")
-                    .ToListAsync();
-            }
-        }
-
-
         public static string NormalizeTextNoDiacriticsLower(string text)
         {
             if (string.IsNullOrWhiteSpace(text))

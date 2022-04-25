@@ -24,8 +24,6 @@ namespace HlidacStatu.Entities
         [Required] public long TablePk { get; set; }
         [Required] [StringLength(300)] public string JobRaw { get; set; }
         [StringLength(300)] public string JobGrouped { get; set; }
-        public decimal? SalaryMD { get; set; }
-        public decimal? SalaryMdVAT { get; set; }
 
         [Column(TypeName = "datetime")] public DateTime? Created { get; set; }
         public string Tags { get; set; }
@@ -118,33 +116,6 @@ namespace HlidacStatu.Entities
             FixWhenPriceIsHigherThanPriceWithVat();
 
             CalculateFinalVatPrice();
-
-            CalculateSalaryBackwardCompatibility();
-        }
-
-        private void CalculateSalaryBackwardCompatibility()
-        {
-            if (Unit != MeasureUnit.Day && Unit != MeasureUnit.Hour)
-                return;
-
-            if (UnitCount is null || UnitCount == 0)
-                return;
-
-            var recalculatedMdSalary = Price / UnitCount;
-            var recalculatedMdSalaryVat = PriceVATCalculated;
-            if (Unit == MeasureUnit.Hour)
-            {
-                recalculatedMdSalary *= 8;
-                recalculatedMdSalaryVat *= 8;
-            }
-
-            if (recalculatedMdSalaryVat is null || recalculatedMdSalaryVat == 0)
-            {
-                recalculatedMdSalaryVat = recalculatedMdSalary * 1.21m;
-            }
-
-            SalaryMD = recalculatedMdSalary;
-            SalaryMdVAT = recalculatedMdSalaryVat;
         }
 
         private void FixWhenPriceIsHigherThanPriceWithVat()
@@ -153,12 +124,6 @@ namespace HlidacStatu.Entities
             if (Price > 0 && PriceVAT > 0 && Price > PriceVAT)
             {
                 (Price, PriceVAT) = (PriceVAT, Price);
-            }
-
-            // swap if salaryMdVat < salaryMd
-            if (SalaryMD > 0 && SalaryMdVAT > 0 && SalaryMD > SalaryMdVAT)
-            {
-                (SalaryMD, SalaryMdVAT) = (SalaryMdVAT, SalaryMD);
             }
         }
 

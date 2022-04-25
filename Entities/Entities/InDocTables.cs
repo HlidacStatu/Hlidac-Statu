@@ -10,7 +10,7 @@ using Devmasters.Enums;
 namespace HlidacStatu.Entities
 {
     [Table("InDocTables")]
-    public partial class InDocTables
+    public class InDocTables
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
