@@ -29,7 +29,7 @@ namespace HlidacStatu.Web.Controllers
             
             int pagenum = string.IsNullOrEmpty(page) ? 1 : int.Parse(page); 
 
-            var res = OsobaRepo.Searching.SimpleSearch(q, pagenum, 25, OsobaRepo.Searching.OrderResult.Relevance);
+            var res = OsobaRepo.Searching.SimpleSearchAsync(q, pagenum, 25, OsobaRepo.Searching.OrderResult.Relevance);
             return View(res);
         }
 

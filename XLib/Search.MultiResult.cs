@@ -156,7 +156,7 @@ namespace HlidacStatu.XLib
                 {
                     try
                     {
-                        res.Smlouvy = SmlouvaRepo.Searching.SimpleSearch(query, 1, pageSize, order,
+                        res.Smlouvy = SmlouvaRepo.Searching.SimpleSearchAsync(query, 1, pageSize, order,
                             anyAggregation: new Nest.AggregationContainerDescriptor<Smlouva>().Sum("sumKc", m => m.Field(f => f.CalculatedPriceWithVATinCZK))
                             );
                     }
@@ -188,7 +188,7 @@ namespace HlidacStatu.XLib
                 {
                     try
                     {
-                        res.VZ = VerejnaZakazkaRepo.Searching.SimpleSearch(query, null, 1, pageSize, order);
+                        res.VZ = VerejnaZakazkaRepo.Searching.SimpleSearchAsync(query, null, 1, pageSize, order);
                     }
                     catch (System.Exception e)
                     {
@@ -203,7 +203,7 @@ namespace HlidacStatu.XLib
                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                         sw.Start();
 
-                        res.Osoby = OsobaRepo.Searching.SimpleSearch(query, 1, 10, OsobaRepo.Searching.OrderResult.Relevance);
+                        res.Osoby = OsobaRepo.Searching.SimpleSearchAsync(query, 1, 10, OsobaRepo.Searching.OrderResult.Relevance);
                         sw.Stop();
                         res.Osoby.ElapsedTime = sw.Elapsed;
 

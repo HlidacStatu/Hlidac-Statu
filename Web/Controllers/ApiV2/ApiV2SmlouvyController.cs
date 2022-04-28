@@ -70,7 +70,7 @@ namespace HlidacStatu.Web.Controllers
                 )
                 platnyzaznam = null;
 
-            result = SmlouvaRepo.Searching.SimpleSearch(dotaz, strana.Value,
+            result = SmlouvaRepo.Searching.SimpleSearchAsync(dotaz, strana.Value,
                 ApiV2Controller.DefaultResultPageSize,
                 (SmlouvaRepo.Searching.OrderResult)razeni.Value,
                 platnyZaznam: platnyzaznam);
@@ -108,7 +108,7 @@ namespace HlidacStatu.Web.Controllers
                 return BadRequest($"Hodnota id chybí.");
             }
 
-            var smlouva = SmlouvaRepo.Load(id);
+            var smlouva = SmlouvaRepo.LoadAsync(id);
             if (smlouva == null)
             {
                 return NotFound($"Smlouva nenalezena");
@@ -140,7 +140,7 @@ namespace HlidacStatu.Web.Controllers
                 return BadRequest($"Hodnota id chybí.");
             }
 
-            var smlouva = SmlouvaRepo.Load(id);
+            var smlouva = SmlouvaRepo.LoadAsync(id);
             if (smlouva == null)
             {
                 return NotFound($"Smlouva nenalezena");
@@ -165,7 +165,7 @@ namespace HlidacStatu.Web.Controllers
                 return BadRequest($"Hodnota id chybí.");
             }
 
-            var smlouva = SmlouvaRepo.Load(id);
+            var smlouva = SmlouvaRepo.LoadAsync(id);
             if (smlouva == null)
             {
                 return NotFound($"Smlouva nenalezena");

@@ -373,13 +373,13 @@ namespace HlidacStatu.Repositories
                             List<double> pol = new List<double>();
                             try
                             {
-                                var res = SmlouvaRepo.Searching.RawSearch("", 1, 0, platnyZaznam: true, anyAggregation:
+                                var res = SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: true, anyAggregation:
                                     new Nest.AggregationContainerDescriptor<Smlouva>()
                                         .Sum("totalPrice", m => m
                                             .Field(ff => ff.CalculatedPriceWithVATinCZK)
                                     ), exactNumOfResults: true
                                     );
-                                var resNepl = SmlouvaRepo.Searching.RawSearch("", 1, 0, platnyZaznam: false, anyAggregation:
+                                var resNepl = SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: false, anyAggregation:
                                     new Nest.AggregationContainerDescriptor<Smlouva>()
                                         .Sum("totalPrice", m => m
                                             .Field(ff => ff.CalculatedPriceWithVATinCZK)

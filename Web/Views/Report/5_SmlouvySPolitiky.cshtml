@@ -133,7 +133,7 @@
 
     var model = new HlidacStatu.Repositories.Searching.SmlouvaSearchResult(Context.Request.Query, SmlouvaRepo.Searching.OrderResult.PriceDesc);
 
-    model.ElasticResults = SmlouvaRepo.Searching.RawSearch(qc, model.Page,
+    model.ElasticResults = SmlouvaRepo.Searching.RawSearchAsync(qc, model.Page,
         100, (SmlouvaRepo.Searching.OrderResult) (Convert.ToInt32(model.Order)));
 
     model.Chyby = false;

@@ -55,7 +55,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                         var profileId = pzd.Source.ProfileId;
                         if (!profily2.Any(m => m.Id == profileId))
                         {
-                            var pz = ProfilZadavateleRepo.GetById(profileId);
+                            var pz = ProfilZadavateleRepo.GetByIdAsync(profileId);
                             if (pz != null)
                                 profily2.Add(pz);
                         }

@@ -22,24 +22,6 @@ namespace HlidacStatu.Lib.OCR.Api
         public string CallbackDataBody { get; set; }
 
 
-        public static string PrepareElasticCallbackDataForOCRReq(string itemPathText, bool addMore = false)
-        {
-            var ss = @"{
-            ""script"": {
-                ""source"": ""ctx._source.#ITEMPATHTEXT# = params.txt;#ADDMORE#"",
-                ""lang"": ""painless"",
-                ""params"" : { ""txt"" : #TEXT# }
-            }
-        }";
-
-            var res = ss
-                .Replace("#ITEMPATHTEXT#", itemPathText);
-
-            if (!addMore)
-                res = res.Replace("#ADDMORE#", "");
-
-
-            return res;
-        }
+        
     }
 }

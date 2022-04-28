@@ -16,7 +16,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrWhiteSpace(id))
                 return NotFound();
 
-            var smlouva = SmlouvaRepo.Load(id);
+            var smlouva = SmlouvaRepo.LoadAsync(id);
 
             if (smlouva is null)
                 return NotFound();
@@ -30,7 +30,7 @@ namespace HlidacStatu.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult EditClassification(string id, string typ1, string typ2)
         {
-            var smlouva = SmlouvaRepo.Load(id);
+            var smlouva = SmlouvaRepo.LoadAsync(id);
             if (smlouva is null)
                 return NotFound();
 

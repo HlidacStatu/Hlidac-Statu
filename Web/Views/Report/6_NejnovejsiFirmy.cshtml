@@ -45,7 +45,7 @@
     );
 
 
-    var res = SmlouvaRepo.Searching.RawSearch("", 1, 0, anyAggregation: aggs);
+    var res = SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, anyAggregation: aggs);
 
     var tmp = ((BucketAggregate)res.Aggregations["perico"])
     .Items

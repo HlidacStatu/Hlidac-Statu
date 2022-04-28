@@ -11,9 +11,9 @@
 
     int lastYear = SponzoringRepo.DefaultLastSponzoringYear;
 
-    var biggestSponsors = SponzoringRepo.BiggestPeopleSponsors(null, CancellationToken.None, take:7);
-    var biggestSponsorsLastYear = SponzoringRepo.BiggestPeopleSponsors(lastYear, CancellationToken.None, take:7);
-    var biggestCompanySponsorsLastYear = SponzoringRepo.BiggestCompanySponsors(lastYear, CancellationToken.None, take:7);
+    var biggestSponsors = SponzoringRepo.BiggestPeopleSponsorsAsync(null, CancellationToken.None, take:7);
+    var biggestSponsorsLastYear = SponzoringRepo.BiggestPeopleSponsorsAsync(lastYear, CancellationToken.None, take:7);
+    var biggestCompanySponsorsLastYear = SponzoringRepo.BiggestCompanySponsorsAsync(lastYear, CancellationToken.None, take:7);
     
 
 }

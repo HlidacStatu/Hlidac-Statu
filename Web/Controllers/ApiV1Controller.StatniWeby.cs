@@ -47,7 +47,7 @@ namespace HlidacStatu.Web.Controllers
                 try
                 {
                     UptimeServer.HostAvailability? data = UptimeServerRepo.AvailabilityForDayById(host.Id);
-                    UptimeSSL? webssl = UptimeSSLRepo.LoadLatest(host.HostDomain());
+                    UptimeSSL? webssl = UptimeSSLRepo.LoadLatestAsync(host.HostDomain());
                     var ssldata = new
                     {
                         grade = webssl==null ? null : webssl.SSLGrade().ToNiceDisplayName(),

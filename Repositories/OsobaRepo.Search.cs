@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -45,13 +46,6 @@ namespace HlidacStatu.Repositories
                 [Disabled] FastestForScroll = 666
             }
 
-            static string[] queryShorcuts = new string[]
-            {
-                "ico:",
-                "osobaid:",
-            };
-
-
             public static IRule[] irules = new IRule[]
             {
                 new TransformPrefix("osobaid:", "osobaid:", null),
@@ -70,17 +64,15 @@ namespace HlidacStatu.Repositories
             static RegexOptions options = ((RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline)
                                            | RegexOptions.IgnoreCase);
 
-            static Regex regFindRegex = new Regex(regex, options);
 
-
-            public static OsobaSearchResult SimpleSearch(string query, int page, int pageSize, string order,
+            public static Task<OsobaSearchResult> SimpleSearchAsync(string query, int page, int pageSize, string order,
                 bool exactNumOfResults = false)
             {
                 order = TextUtil.NormalizeToNumbersOnly(order);
                 OrderResult eorder = OrderResult.Relevance;
                 Enum.TryParse<OrderResult>(order, out eorder);
 
-                return SimpleSearch(query, page, pageSize, eorder, exactNumOfResults);
+                return SimpleSearchAsync(query, page, pageSize, eorder, exactNumOfResults);
             }
 
 
@@ -90,7 +82,7 @@ namespace HlidacStatu.Repositories
                 .Select(m => m.ToLower())
                 .ToArray();
 
-            public static OsobaSearchResult SimpleSearch(string query, int page, int pageSize, OrderResult order
+            public static async Task<OsobaSearchResult> SimpleSearchAsync(string query, int page, int pageSize, OrderResult order
                 , bool exactNumOfResults = false)
             {
                 //fix without elastic
@@ -109,7 +101,7 @@ namespace HlidacStatu.Repositories
 
                 if (peopleIds is null || peopleIds.Count == 0)
                 {
-                    var people = OsobyEsRepo.Searching.FulltextSearch(query, page, pageSize);
+                    var people = await OsobyEsRepo.Searching.FulltextSearchAsync(query, page, pageSize);
                     peopleIds = people.Results
                         .Where(r => r.Status != (int)Osoba.StatusOsobyEnum.Duplicita)
                         .Select(r => r.NameId).ToList();
@@ -143,7 +135,7 @@ namespace HlidacStatu.Repositories
             }
 
 
-            private static ISearchResponse<Smlouva> _coreSearch(QueryContainer query, int page, int pageSize,
+            private static async Task<ISearchResponse<Smlouva>> _coreSearchAsync(QueryContainer query, int page, int pageSize,
                 OrderResult order,
                 AggregationContainerDescriptor<Smlouva> anyAggregation = null,
                 bool? platnyZaznam = null, bool includeNeplatne = false, bool logError = true,
@@ -179,8 +171,8 @@ namespace HlidacStatu.Repositories
                         indexes = Manager.defaultIndexName_SAll;
                     }
 
-                    res = client
-                        .Search<Smlouva>(s => s
+                    res = await client
+                        .SearchAsync<Smlouva>(s => s
                             .Index(indexes)
                             .Size(pageSize)
                             .From(page * pageSize)
@@ -194,8 +186,8 @@ namespace HlidacStatu.Repositories
                     if (withHighlighting && res.Shards != null &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
                     {
-                        res = client
-                            .Search<Smlouva>(s => s
+                        res = await client
+                            .SearchAsync<Smlouva>(s => s
                                 .Index(indexes)
                                 .Size(pageSize)
                                 .From(page * pageSize)
@@ -285,7 +277,7 @@ namespace HlidacStatu.Repositories
                 if (string.IsNullOrWhiteSpace(name)
                     && string.IsNullOrWhiteSpace(birthYear))
                 {
-                    return new Osoba[0];
+                    return Array.Empty<Osoba>();
                 }
 
                 string nquery = TextUtil.RemoveDiacritics(name.NormalizeToPureTextLower());

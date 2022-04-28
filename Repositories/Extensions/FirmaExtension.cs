@@ -41,7 +41,7 @@ namespace HlidacStatu.Extensions
             ret = firma.StatistikaRegistruSmluv().Sum(s => s.PocetSmluv) > 0;
             if (ret) return ret;
 
-            ret = VerejnaZakazkaRepo.Searching.SimpleSearch("ico:" + firma.ICO, null, 1, 1, "0").Total > 0;
+            ret = VerejnaZakazkaRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, null, 1, 1, "0").Total > 0;
             if (ret) return ret;
 
             ret = DotaceRepo.Searching.SimpleSearch("ico:" + firma.ICO, 1, 1, "0").Total > 0;
@@ -702,9 +702,9 @@ namespace HlidacStatu.Extensions
                     );
                 }
 
-                long numFatalIssue = SmlouvaRepo.Searching.SimpleSearch($"ico:{firma.ICO} AND chyby:zasadni", 0, 0,
+                long numFatalIssue = SmlouvaRepo.Searching.SimpleSearchAsync($"ico:{firma.ICO} AND chyby:zasadni", 0, 0,
                     SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true).Total;
-                long numVazneIssue = SmlouvaRepo.Searching.SimpleSearch($"ico:{firma.ICO} AND chyby:vazne", 0, 0,
+                long numVazneIssue = SmlouvaRepo.Searching.SimpleSearchAsync($"ico:{firma.ICO} AND chyby:vazne", 0, 0,
                     SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true).Total;
 
                 if (numFatalIssue > 0)

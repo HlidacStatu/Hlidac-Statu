@@ -461,7 +461,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             if (pocetSmluvCelkem == 0)
                 return 0;
 
-            var res = SmlouvaRepo.Searching.SimpleSearch($"ico:{ico} cena:>0 AND cena:<=50000 AND datumUzavreni:[{year}-01-01 TO {year + 1}-01-01}}"
+            var res = SmlouvaRepo.Searching.SimpleSearchAsync($"ico:{ico} cena:>0 AND cena:<=50000 AND datumUzavreni:[{year}-01-01 TO {year + 1}-01-01}}"
 , 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, null, exactNumOfResults: true);
 
             decimal perc = (decimal)(res.Total) / (decimal)pocetSmluvCelkem;
@@ -481,11 +481,11 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     {
                         decimal smlouvyAllCount = 0;
                         decimal smlouvyPod50kCount = 0;
-                        var res = SmlouvaRepo.Searching.SimpleSearch($"datumUzavreni:[{year}-01-01 TO {year + 1}-01-01}}"
+                        var res = SmlouvaRepo.Searching.SimpleSearchAsync($"datumUzavreni:[{year}-01-01 TO {year + 1}-01-01}}"
                             , 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, null, exactNumOfResults: true);
                         if (res.IsValid)
                             smlouvyAllCount = res.Total;
-                        res = SmlouvaRepo.Searching.SimpleSearch($"cena:>0 AND cena:<=50000 AND datumUzavreni:[{year}-01-01 TO {year + 1}-01-01}}"
+                        res = SmlouvaRepo.Searching.SimpleSearchAsync($"cena:>0 AND cena:<=50000 AND datumUzavreni:[{year}-01-01 TO {year + 1}-01-01}}"
                             , 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, null, exactNumOfResults: true);
                         if (res.IsValid)
                             smlouvyPod50kCount = res.Total;

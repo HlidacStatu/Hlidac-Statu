@@ -42,7 +42,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
             bool jeToDodatek = false;
             if (item.navazanyZaznam != null)
             {
-                Smlouva navSm = SmlouvaRepo.Load(item.navazanyZaznam);
+                Smlouva navSm = SmlouvaRepo.LoadAsync(item.navazanyZaznam);
                 if (navSm != null)
                 {
                     jeToDodatek = jeToDodatek || item.predmet.ToLower().Contains("dodatek");

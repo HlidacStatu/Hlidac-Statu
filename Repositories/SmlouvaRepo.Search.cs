@@ -17,6 +17,7 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -81,37 +82,6 @@ namespace HlidacStatu.Repositories
 
             }
 
-            static string[] queryShorcuts = new string[] {
-                "ico:",
-                "osobaid:",
-                "ds:",
-                "dsprijemce:",
-                "dsplatce:",
-                "icoprijemce:",
-                "icoplatce:",
-                "jmenoprijemce:",
-                "jmenoplatce:",
-                "id:",
-                "idverze:",
-                "idsmlouvy:",
-                "predmet:",
-                "cislosmlouvy:",
-                "mena:",
-                "cenasdph:",
-                "cenabezdph:",
-                "cena:",
-                "zverejneno:",
-                "podepsano:",
-                "schvalil:",
-                "textsmlouvy:",
-                "holding:",
-                "holdingprijemce:",
-                "holdingplatce:",
-                "holdingdodavatel:",
-                "holdingzadavatel:",
-            };
-
-
             public static IRule[] Irules = new IRule[] {
                new OsobaId("osobaid:","ico:" ),
                new Holding("holdingprijemce:","icoprijemce:" ),
@@ -161,10 +131,8 @@ namespace HlidacStatu.Repositories
             static string regex = "[^/]*\r\n/(?<regex>[^/]*)/\r\n[^/]*\r\n";
             static RegexOptions options = ((RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline)
                                            | RegexOptions.IgnoreCase);
-            static Regex regFindRegex = new Regex(regex, options);
 
-
-            public static SmlouvaSearchResult SearchRaw(QueryContainer query, int page, int pageSize, OrderResult order,
+            public static async Task<SmlouvaSearchResult> SearchRawAsync(QueryContainer query, int page, int pageSize, OrderResult order,
         AggregationContainerDescriptor<Smlouva> anyAggregation = null,
         bool? platnyZaznam = null, bool includeNeplatne = false, bool logError = true, bool fixQuery = true,
         bool withHighlighting = false)
@@ -179,7 +147,7 @@ namespace HlidacStatu.Repositories
                     Order = ((int)order).ToString()
                 };
 
-                ISearchResponse<Smlouva> res = _coreSearch(query, page, pageSize, order, anyAggregation, platnyZaznam,
+                ISearchResponse<Smlouva> res = await _coreSearchAsync(query, page, pageSize, order, anyAggregation, platnyZaznam,
                     includeNeplatne, logError, withHighlighting);
 
 
@@ -195,7 +163,7 @@ namespace HlidacStatu.Repositories
 
 
 
-            public static SmlouvaSearchResult SimpleSearch(string query, int page, int pageSize, string order,
+            public static Task<SmlouvaSearchResult> SimpleSearchAsync(string query, int page, int pageSize, string order,
 AggregationContainerDescriptor<Smlouva> anyAggregation = null,
 bool? platnyZaznam = null, bool includeNeplatne = false, bool logError = true, bool fixQuery = true,
 bool withHighlighting = false, bool exactNumOfResults = false)
@@ -204,13 +172,13 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                 OrderResult eorder = OrderResult.Relevance;
                 Enum.TryParse<OrderResult>(order, out eorder);
 
-                return SimpleSearch(query, page, pageSize, eorder, anyAggregation,
+                return SimpleSearchAsync(query, page, pageSize, eorder, anyAggregation,
                     platnyZaznam, includeNeplatne, logError, fixQuery,
                     withHighlighting, exactNumOfResults
                     );
 
             }
-            public static SmlouvaSearchResult SimpleSearch(string query, int page, int pageSize, OrderResult order,
+            public static async Task<SmlouvaSearchResult> SimpleSearchAsync(string query, int page, int pageSize, OrderResult order,
         AggregationContainerDescriptor<Smlouva> anyAggregation = null,
         bool? platnyZaznam = null, bool includeNeplatne = false, bool logError = true, bool fixQuery = true,
         bool withHighlighting = false, bool exactNumOfResults = false)
@@ -247,7 +215,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
 
 
                 ISearchResponse<Smlouva> res =
-                    _coreSearch(GetSimpleQuery(query), page, pageSize, order, anyAggregation, platnyZaznam,
+                    await _coreSearchAsync(GetSimpleQuery(query), page, pageSize, order, anyAggregation, platnyZaznam,
                     includeNeplatne, logError, withHighlighting, exactNumOfResults);
 
                 AuditRepo.Add(Audit.Operations.Search, "", "", "Smlouva", res.IsValid ? "valid" : "invalid", query, null);
@@ -273,7 +241,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
             }
 
 
-            private static ISearchResponse<Smlouva> _coreSearch(QueryContainer query, int page, int pageSize,
+            private static async Task<ISearchResponse<Smlouva>> _coreSearchAsync(QueryContainer query, int page, int pageSize,
                 OrderResult order,
                 AggregationContainerDescriptor<Smlouva> anyAggregation = null,
                 bool? platnyZaznam = null, bool includeNeplatne = false, bool logError = true,
@@ -308,8 +276,8 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                         indexes = Manager.defaultIndexName_SAll;
                     }
 
-                    res = client
-                        .Search<Smlouva>(s => s
+                    res = await client
+                        .SearchAsync<Smlouva>(s => s
                             .Index(indexes)
                             .Size(pageSize)
                             .From(page * pageSize)
@@ -322,9 +290,9 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                     );
                     if (res != null && res.IsValid == false && res.ServerError?.Status == 429)
                     {
-                        Thread.Sleep(100);
-                        res = client
-                            .Search<Smlouva>(s => s
+                        await Task.Delay(100);
+                        res = await client
+                            .SearchAsync<Smlouva>(s => s
                                 .Index(indexes)
                                 .Size(pageSize)
                                 .From(page * pageSize)
@@ -337,9 +305,9 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                         );
                         if (res.IsValid == false && res.ServerError?.Status == 429)
                         {
-                            Thread.Sleep(200);
-                            res = client
-                                .Search<Smlouva>(s => s
+                            await Task.Delay(100);
+                            res = await client
+                                .SearchAsync<Smlouva>(s => s
                                     .Index(indexes)
                                     .Size(pageSize)
                                     .From(page * pageSize)
@@ -357,8 +325,8 @@ bool withHighlighting = false, bool exactNumOfResults = false)
 
                     if (withHighlighting && res.Shards != null && res.Shards.Failed > 0) //if some error, do it again without highlighting
                     {
-                        res = client
-                            .Search<Smlouva>(s => s
+                        res = await client
+                            .SearchAsync<Smlouva>(s => s
                                 .Index(indexes)
                                 .Size(pageSize)
                                 .From(page * pageSize)
@@ -388,21 +356,19 @@ bool withHighlighting = false, bool exactNumOfResults = false)
             }
 
 
-            public static ISearchResponse<Smlouva> RawSearch(string jsonQuery, int page, int pageSize, OrderResult order = OrderResult.Relevance,
+            public static Task<ISearchResponse<Smlouva>> RawSearchAsync(string jsonQuery, int page, int pageSize, OrderResult order = OrderResult.Relevance,
                 AggregationContainerDescriptor<Smlouva> anyAggregation = null, bool? platnyZaznam = null,
-                bool includeNeplatne = false, bool exactNumOfResults = false
-                )
-            {
-                return RawSearch(Tools.GetRawQuery(jsonQuery), page, pageSize, order, anyAggregation, platnyZaznam, includeNeplatne,
+                bool includeNeplatne = false, bool exactNumOfResults = false) 
+                => RawSearchAsync(Tools.GetRawQuery(jsonQuery), page, pageSize, order, anyAggregation, platnyZaznam, includeNeplatne,
                     exactNumOfResults: exactNumOfResults);
-            }
-            public static ISearchResponse<Smlouva> RawSearch(QueryContainer query, int page, int pageSize, OrderResult order = OrderResult.Relevance,
+
+            public static async Task<ISearchResponse<Smlouva>> RawSearchAsync(QueryContainer query, int page, int pageSize, OrderResult order = OrderResult.Relevance,
                 AggregationContainerDescriptor<Smlouva> anyAggregation = null, bool? platnyZaznam = null,
                 bool includeNeplatne = false,
                 bool withHighlighting = false, bool exactNumOfResults = false
                 )
             {
-                var res = _coreSearch(query, page, pageSize, order, anyAggregation, platnyZaznam: platnyZaznam, includeNeplatne: includeNeplatne, logError: true, withHighlighting: withHighlighting, exactNumOfResults: exactNumOfResults);
+                var res = await _coreSearchAsync(query, page, pageSize, order, anyAggregation, platnyZaznam: platnyZaznam, includeNeplatne: includeNeplatne, logError: true, withHighlighting: withHighlighting, exactNumOfResults: exactNumOfResults);
                 return res;
 
             }
@@ -463,11 +429,6 @@ bool withHighlighting = false, bool exactNumOfResults = false)
 
             }
 
-
-
-
-
-
             public static string QueryHash(string typ, string q)
             {
                 if (string.IsNullOrEmpty(q))
@@ -482,9 +443,8 @@ bool withHighlighting = false, bool exactNumOfResults = false)
 
             public static MemoryCacheManager<SmlouvaSearchResult, (string query, AggregationContainerDescriptor<Smlouva> aggr)> cachedSearches = 
                 new MemoryCacheManager<SmlouvaSearchResult, (string query, AggregationContainerDescriptor<Smlouva> aggr)>(
-                    "SMLOUVYsearch", funcSimpleSearch, TimeSpan.FromHours(24));
-
-            //
+                    "SMLOUVYsearch", funcSimpleSearchAsync, TimeSpan.FromHours(24));
+            
             public static SmlouvaSearchResult CachedSimpleSearchWithStat(TimeSpan expiration,
                string query, int page, int pageSize, OrderResult order,
                bool? platnyZaznam = null, bool includeNeplatne = false,
@@ -517,10 +477,10 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                 };
                 return cachedSearches.Get((JsonConvert.SerializeObject(q),q.anyAggregation), expiration);
             }
-            private static SmlouvaSearchResult funcSimpleSearch((string query, AggregationContainerDescriptor<Smlouva> aggr) data)
+            private static async Task<SmlouvaSearchResult> funcSimpleSearchAsync((string query, AggregationContainerDescriptor<Smlouva> aggr) data)
             {
                 var q = JsonConvert.DeserializeObject<FullSearchQuery>(data.query);
-                var ret = SimpleSearch(
+                var ret = await SimpleSearchAsync(
                     q.query, q.page, q.pageSize, q.order, data.aggr, q.platnyZaznam, q.includeNeplatne, 
                     q.logError, q.fixQuery, exactNumOfResults: q.exactNumOfResults
                     );
@@ -544,7 +504,6 @@ bool withHighlighting = false, bool exactNumOfResults = false)
             }
 
         }
-
 
     }
 }

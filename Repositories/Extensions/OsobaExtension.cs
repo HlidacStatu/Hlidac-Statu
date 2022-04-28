@@ -25,10 +25,10 @@ namespace HlidacStatu.Extensions
             var ret = osoba.IsSponzor();
             if (ret) return ret;
 
-            ret = SmlouvaRepo.Searching.SimpleSearch("osobaid:" + osoba.NameId, 1, 1, 0).Total > 0;
+            ret = SmlouvaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, 0).Total > 0;
             if (ret) return ret;
 
-            ret = VerejnaZakazkaRepo.Searching.SimpleSearch("osobaid:" + osoba.NameId, null, 1, 1, "0").Total >
+            ret = VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, null, 1, 1, "0").Total >
                    0;
             if (ret) return ret;
 

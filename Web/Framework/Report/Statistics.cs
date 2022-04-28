@@ -47,7 +47,7 @@ namespace HlidacStatu.Web.Framework.Report
             //var res = Smlouva.Search.RawSearch(
             //    "{\"query_string\": { \"query\": \"-id:pre* AND datumUzavreni:{" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO "+ HlidacStatu.Util.RenderData.ToElasticDate(maxDate) + "}\" } }"
             //        , 1, 0, anyAggregation: aggs);
-            var res = SmlouvaRepo.Searching.SimpleSearch("( " + query + " ) AND datumUzavreni:{" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO " + HlidacStatu.Util.RenderData.ToElasticDate(maxDate) + "}", 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, anyAggregation: aggs, exactNumOfResults: true);
+            var res = SmlouvaRepo.Searching.SimpleSearchAsync("( " + query + " ) AND datumUzavreni:{" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO " + HlidacStatu.Util.RenderData.ToElasticDate(maxDate) + "}", 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, anyAggregation: aggs, exactNumOfResults: true);
 
             ReportDataSource rds = new(new ReportDataSource.Column[]
                 {
@@ -122,7 +122,7 @@ namespace HlidacStatu.Web.Framework.Report
                 },
             });
 
-            var res = SmlouvaRepo.Searching.SimpleSearch("( " + query + " ) AND datumUzavreni:{" + HlidacStatu.Util.RenderData.ToElasticDate(minDate.Value) + " TO " + HlidacStatu.Util.RenderData.ToElasticDate(maxDate.Value) + "}", 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, anyAggregation: aggs, exactNumOfResults: true);
+            var res = SmlouvaRepo.Searching.SimpleSearchAsync("( " + query + " ) AND datumUzavreni:{" + HlidacStatu.Util.RenderData.ToElasticDate(minDate.Value) + " TO " + HlidacStatu.Util.RenderData.ToElasticDate(maxDate.Value) + "}", 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, anyAggregation: aggs, exactNumOfResults: true);
 
             foreach (Nest.DateHistogramBucket val in
                     ((BucketAggregate)res.ElasticResults.Aggregations["x-agg"]).Items
@@ -163,7 +163,7 @@ namespace HlidacStatu.Web.Framework.Report
                     .Size(size)
                 );
 
-            var res = SmlouvaRepo.Searching.RawSearch("{\"query_string\": { \"query\": \"-id:pre*\" } }", 1, 0, anyAggregation: aggs);
+            var res = SmlouvaRepo.Searching.RawSearchAsync("{\"query_string\": { \"query\": \"-id:pre*\" } }", 1, 0, anyAggregation: aggs);
 
             ReportDataSource rdsPerIco = new(new ReportDataSource.Column[]
             {
@@ -222,7 +222,7 @@ namespace HlidacStatu.Web.Framework.Report
                         )
                     );
 
-            var res = SmlouvaRepo.Searching.RawSearch("{\"query_string\": { \"query\": \"-id:pre*\" } }", 1, 0, anyAggregation: aggs);
+            var res = SmlouvaRepo.Searching.RawSearchAsync("{\"query_string\": { \"query\": \"-id:pre*\" } }", 1, 0, anyAggregation: aggs);
 
             ReportDataSource rdsPerPrice = new(new ReportDataSource.Column[]
             {
@@ -279,7 +279,7 @@ namespace HlidacStatu.Web.Framework.Report
                 );
 
             //var res = Smlouva.Search.RawSearch("{\"query_string\": { \"query\": \"-id:pre*\" } }", 1, 0, anyAggregation: aggs);
-            var res = SmlouvaRepo.Searching.SimpleSearch("(" + query + ") AND datumUzavreni:{" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO " + HlidacStatu.Util.RenderData.ToElasticDate(maxDate) + "}", 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, anyAggregation: aggs, exactNumOfResults: true);
+            var res = SmlouvaRepo.Searching.SimpleSearchAsync("(" + query + ") AND datumUzavreni:{" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO " + HlidacStatu.Util.RenderData.ToElasticDate(maxDate) + "}", 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, anyAggregation: aggs, exactNumOfResults: true);
 
             ReportDataSource rds = new(new ReportDataSource.Column[]
                 {

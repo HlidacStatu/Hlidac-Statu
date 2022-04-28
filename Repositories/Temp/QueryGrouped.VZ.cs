@@ -40,7 +40,7 @@ namespace HlidacStatu.Repositories.ES
                     ExactNumOfResults = false
                 };
 
-                var res = VerejnaZakazkaRepo.Searching.SimpleSearch(q, aggYSum);
+                var res = VerejnaZakazkaRepo.Searching.SimpleSearchAsync(q, aggYSum);
 
 
                 Dictionary<int, BasicData> result = new Dictionary<int, BasicData>();
@@ -140,7 +140,7 @@ namespace HlidacStatu.Repositories.ES
                     ExactNumOfResults = false
                 };
 
-                var res = VerejnaZakazkaRepo.Searching.SimpleSearch(q, aggYSum);
+                var res = VerejnaZakazkaRepo.Searching.SimpleSearchAsync(q, aggYSum);
 
 
                 Dictionary<int, (List<(string ico, BasicData stat)> topPodlePoctu, List<(string ico, BasicData stat)> topPodleKc)> result =

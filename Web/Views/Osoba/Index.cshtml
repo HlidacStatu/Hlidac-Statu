@@ -333,8 +333,8 @@
 
     @* ----- Veřejné zakázky -----*@
     @{
-        var resVZdodav = VerejnaZakazkaRepo.Searching.SimpleSearch("osobaiddodavatel:" + Model.NameId, null, 1, 0, "1");
-        var resVZzadav = VerejnaZakazkaRepo.Searching.SimpleSearch("osobaidzadavatel:" + Model.NameId, null, 1, 0, "1");
+        var resVZdodav = VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaiddodavatel:" + Model.NameId, null, 1, 0, "1");
+        var resVZzadav = VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaidzadavatel:" + Model.NameId, null, 1, 0, "1");
         Dictionary<string, long> vzakaz = new();
         vzakaz.Add("dodavatel|dodavatel|dodavatele|dodavatelem", resVZdodav.Total);
         vzakaz.Add("zadavatel|zadavatel|zadavatele|zadavatelem", resVZzadav.Total);

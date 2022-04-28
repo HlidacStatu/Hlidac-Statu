@@ -15,7 +15,7 @@
     try
     {
         web = HlidacStatu.Repositories.UptimeServerRepo.AvailabilityForWeekById(Model.Id);
-        webssl = UptimeSSLRepo.LoadLatest(Model.HostDomain());
+        webssl = UptimeSSLRepo.LoadLatestAsync(Model.HostDomain());
     }
     catch (Exception)
     {

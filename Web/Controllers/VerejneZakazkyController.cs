@@ -24,13 +24,13 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return new NotFoundResult();
 
-            var vz = VerejnaZakazkaRepo.LoadFromES(id);
+            var vz = VerejnaZakazkaRepo.LoadFromESAsync(id);
             if (vz == null)
                 return new NotFoundResult();
 
             if (!string.IsNullOrEmpty(Request.Query["qs"]))
             {
-                var findSm = VerejnaZakazkaRepo.Searching.SimpleSearch(
+                var findSm = VerejnaZakazkaRepo.Searching.SimpleSearchAsync(
                     $"_id:\"{vz.Id}\" AND ({Request.Query["qs"]})",
                     new string[] { }, 1, 1,
                     ((int)SmlouvaRepo.Searching.OrderResult.FastestForScroll).ToString(), withHighlighting: true);
@@ -43,7 +43,7 @@ namespace HlidacStatu.Web.Controllers
 
         public ActionResult TextDokumentu(string id, string hash)
         {
-            var vz = VerejnaZakazkaRepo.LoadFromES(id);
+            var vz = VerejnaZakazkaRepo.LoadFromESAsync(id);
             if (vz == null)
                 return new NotFoundResult();
             if (vz.Dokumenty?.Any(d => d.StorageId == hash) == false)
@@ -60,7 +60,7 @@ namespace HlidacStatu.Web.Controllers
             if (model == null)
                 return View(new Repositories.Searching.VerejnaZakazkaSearchData());
 
-            var res = VerejnaZakazkaRepo.Searching.SimpleSearch(model);
+            var res = VerejnaZakazkaRepo.Searching.SimpleSearchAsync(model);
             AuditRepo.Add(
                     Audit.Operations.UserSearch
                     , User?.Identity?.Name

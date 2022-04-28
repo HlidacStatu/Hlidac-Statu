@@ -33,7 +33,7 @@ namespace HlidacStatu.Web.Controllers
                 return BadRequest($"Hodnota id chybí.");
             }
 
-            var zakazka = VerejnaZakazkaRepo.LoadFromES(id);
+            var zakazka = VerejnaZakazkaRepo.LoadFromESAsync(id);
             if (zakazka == null)
             {
                 return NotFound($"Zakazka nenalezena");
@@ -83,7 +83,7 @@ namespace HlidacStatu.Web.Controllers
                 return BadRequest($"Hodnota dotaz chybí.");
             }
 
-            result = VerejnaZakazkaRepo.Searching.SimpleSearch(dotaz, null, strana.Value,
+            result = VerejnaZakazkaRepo.Searching.SimpleSearchAsync(dotaz, null, strana.Value,
                 ApiV2Controller.DefaultResultPageSize,
                 razeni.Value.ToString());
 

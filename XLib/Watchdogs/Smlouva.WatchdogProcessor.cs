@@ -19,7 +19,7 @@ namespace HlidacStatu.XLib.Watchdogs
         public DateTime GetLatestRec(DateTime toDate)
         {
             var query = "zverejneno:" + string.Format("[* TO {0}]", Repositories.Searching.Tools.ToElasticDate(toDate));
-            var res = SmlouvaRepo.Searching.SimpleSearch(query, 0, 1, SmlouvaRepo.Searching.OrderResult.DateAddedDesc);
+            var res = SmlouvaRepo.Searching.SimpleSearchAsync(query, 0, 1, SmlouvaRepo.Searching.OrderResult.DateAddedDesc);
 
             if (res.IsValid == false)
                 return DateTime.Now.Date.AddYears(-10);
@@ -41,7 +41,7 @@ namespace HlidacStatu.XLib.Watchdogs
                     Repositories.Searching.Tools.ToElasticDate(toDate, "*"));
             }
 
-            var res = SmlouvaRepo.Searching.SimpleSearch(query, 0, maxItems.Value,
+            var res = SmlouvaRepo.Searching.SimpleSearchAsync(query, 0, maxItems.Value,
                 (SmlouvaRepo.Searching.OrderResult)Convert.ToInt32(order ?? "4")
             );
             return new Results(res.ElasticResults.Hits.Select(m => (dynamic)m.Source), res.Total,

@@ -10,7 +10,7 @@
     Exception exc = null;
     try
     {
-        sml = SmlouvaRepo.Load(Model.Item1);
+        sml = SmlouvaRepo.LoadAsync(Model.Item1);
         classif = SmlouvaRepo.GetClassificationFromServer(sml);
     }
     catch (Exception e)

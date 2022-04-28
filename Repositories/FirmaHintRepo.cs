@@ -23,7 +23,7 @@ namespace HlidacStatu.Repositories
 
         public static void Recalculate(this FirmaHint firmaHint)
         {
-            var resMinDate = SmlouvaRepo.Searching.SimpleSearch("ico:" + firmaHint.Ico, 1, 1, SmlouvaRepo.Searching.OrderResult.DateSignedAsc, platnyZaznam: true);
+            var resMinDate = SmlouvaRepo.Searching.SimpleSearchAsync("ico:" + firmaHint.Ico, 1, 1, SmlouvaRepo.Searching.OrderResult.DateSignedAsc, platnyZaznam: true);
             if (resMinDate.Total > 0)
             {
                 DateTime firstSmlouva = resMinDate.Results.First().datumUzavreni;

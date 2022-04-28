@@ -240,7 +240,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "canEditData")]
         public ActionResult EditSmlouva(string Id, string type)
         {
-            object item = SmlouvaRepo.Load(Id);
+            object item = SmlouvaRepo.LoadAsync(Id);
             if (item != null)
             {
                 ViewBag.objectType = type;
@@ -259,7 +259,7 @@ namespace HlidacStatu.Web.Controllers
             string oldJson = form["oldJson"];
             string newJson = form["jsonRaw"];
             Smlouva s = Newtonsoft.Json.JsonConvert.DeserializeObject<Smlouva>(newJson);
-            SmlouvaRepo.Save(s);
+            SmlouvaRepo.SaveAsync(s);
 
             return Redirect("Index");
         }

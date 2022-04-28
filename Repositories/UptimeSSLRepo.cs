@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -12,12 +13,11 @@ namespace HlidacStatu.Repositories
     {
 
         private static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeSSL[]> uptimeSSlCache =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeSSL[]>(TimeSpan.FromHours(2),
-                (obj) =>
+            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeSSL[]>(TimeSpan.FromHours(2), async (obj) =>
                 {
                     UptimeSSL[] res = new UptimeSSL[] { };
-                    var resX = ES.Manager.GetESClient_UptimeSSL()
-                        .Search<UptimeSSL>(s => s
+                    var resX = await ES.Manager.GetESClient_UptimeSSL()
+                        .SearchAsync<UptimeSSL>(s => s
                             .Query(q => q.MatchAll())
                             .Aggregations(agg => agg
                                 .Terms("domains", t => t
@@ -52,12 +52,12 @@ namespace HlidacStatu.Repositories
             return uptimeSSlCache.Get();
         }
 
-        public static void Save(UptimeSSL item)
+        public static async Task SaveAsync(UptimeSSL item)
         {
             try
             {
 
-                var res = Repositories.ES.Manager.GetESClient_UptimeSSL().Index<UptimeSSL>(item, m => m.Id(item.Id));
+                await Repositories.ES.Manager.GetESClient_UptimeSSL().IndexAsync<UptimeSSL>(item, m => m.Id(item.Id));
 
             }
             catch (System.Exception e)
@@ -68,11 +68,11 @@ namespace HlidacStatu.Repositories
 
 
         }
-        public static UptimeSSL LoadLatest(string domain)
+        public static async Task<UptimeSSL> LoadLatestAsync(string domain)
         {
             var cl = Repositories.ES.Manager.GetESClient_UptimeSSL();
 
-            var res = cl.Search<UptimeSSL>(s => s
+            var res = await cl.SearchAsync<UptimeSSL>(s => s
                 .Query(q=>q
                         .Term(t=>t.Field(f=>f.Domain).Value(domain))
                     )

@@ -68,7 +68,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize]
         public ActionResult NasiPolitici_GetPoliticians()
         {
-            var people = OsobyEsRepo.YieldAllPoliticians();
+            var people = OsobyEsRepo.YieldAllPoliticiansAsync();
             string osoby = JsonConvert.SerializeObject(people);
 
             return Content(osoby, "application/json");

@@ -4,7 +4,7 @@
 
     var model = new HlidacStatu.Repositories.Searching.SmlouvaSearchResult(Context.Request.Query);
 
-    model = SmlouvaRepo.Searching.SimpleSearch("*", model.Page,
+    model = SmlouvaRepo.Searching.SimpleSearchAsync("*", model.Page,
 100, (SmlouvaRepo.Searching.OrderResult)(Convert.ToInt32(model.Order)), platnyZaznam: true);
 
     model.Chyby = true;

@@ -166,10 +166,10 @@ namespace HlidacStatu.Extensions
             var result = new List<Smlouva>();
 
 
-            var res = SmlouvaRepo.Searching.SimpleSearch("identifikator.idSmlouvy:" + smlouva.identifikator.idSmlouvy,
+            var res = SmlouvaRepo.Searching.SimpleSearchAsync("identifikator.idSmlouvy:" + smlouva.identifikator.idSmlouvy,
                 1, 50, SmlouvaRepo.Searching.OrderResult.DateAddedDesc, null
             );
-            var resNeplatne = SmlouvaRepo.Searching.SimpleSearch("identifikator.idSmlouvy:" + smlouva.identifikator.idSmlouvy,
+            var resNeplatne = SmlouvaRepo.Searching.SimpleSearchAsync("identifikator.idSmlouvy:" + smlouva.identifikator.idSmlouvy,
                 1, 50, SmlouvaRepo.Searching.OrderResult.DateAddedDesc, null, platnyZaznam: false
             );
 

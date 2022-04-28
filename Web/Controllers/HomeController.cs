@@ -308,7 +308,7 @@ text zpravy: {txt}
             if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(hash))
                 return NotFound();
 
-            var model = SmlouvaRepo.Load(Id);
+            var model = SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return NotFound();
@@ -340,7 +340,7 @@ text zpravy: {txt}
             if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(hash))
                 return NotFound();
 
-            var model = SmlouvaRepo.Load(Id);
+            var model = SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return NotFound();
@@ -613,14 +613,14 @@ text zpravy: {txt}
             if (string.IsNullOrWhiteSpace(Id))
                 return NotFound();
 
-            var model = SmlouvaRepo.Load(Id);
+            var model = SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return NotFound();
             }
             if (!string.IsNullOrEmpty(HttpContext.Request.Query["qs"]))
             {
-                var findSm = SmlouvaRepo.Searching.SimpleSearch($"_id:\"{model.Id}\" AND ({HttpContext.Request.Query["qs"]})", 1, 1,
+                var findSm = SmlouvaRepo.Searching.SimpleSearchAsync($"_id:\"{model.Id}\" AND ({HttpContext.Request.Query["qs"]})", 1, 1,
                     SmlouvaRepo.Searching.OrderResult.FastestForScroll, withHighlighting: true);
                 if (findSm.Total > 0)
                     ViewBag.Highlighting = findSm.ElasticResults.Hits.First().Highlight;
@@ -642,7 +642,7 @@ text zpravy: {txt}
 
 
 
-            var sres = SmlouvaRepo.Searching.SimpleSearch(model.Q, model.Page,
+            var sres = SmlouvaRepo.Searching.SimpleSearchAsync(model.Q, model.Page,
                 SmlouvaRepo.Searching.DefaultPageSize,
                 (SmlouvaRepo.Searching.OrderResult)(Convert.ToInt32(model.Order)),
                 includeNeplatne: model.IncludeNeplatne,
@@ -918,7 +918,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "zakazka")
             {
-                VerejnaZakazka vz = VerejnaZakazkaRepo.LoadFromES(v);
+                VerejnaZakazka vz = VerejnaZakazkaRepo.LoadFromESAsync(v);
                 if (vz != null)
                     try
                     {
@@ -970,7 +970,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "smlouva")
             {
-                Smlouva s = SmlouvaRepo.Load(v);
+                Smlouva s = SmlouvaRepo.LoadAsync(v);
                 if (s != null)
                 {
                     if (!s.NotInterestingToShow())

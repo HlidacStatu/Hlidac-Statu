@@ -32,7 +32,7 @@ namespace HlidacStatu.Repositories.ES
                         )
                     );
 
-            var res = SmlouvaRepo.Searching.SimpleSearch(query, 1, 0,
+            var res = SmlouvaRepo.Searching.SimpleSearchAsync(query, 1, 0,
                 SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggYSum, exactNumOfResults: true);
 
 
@@ -109,7 +109,7 @@ namespace HlidacStatu.Repositories.ES
                         )
                     );
 
-            var res = SmlouvaRepo.Searching.SimpleSearch(query, 1, 0,
+            var res = SmlouvaRepo.Searching.SimpleSearchAsync(query, 1, 0,
                 SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggYSum, exactNumOfResults: true);
 
 
@@ -211,7 +211,7 @@ namespace HlidacStatu.Repositories.ES
                     );
 
 
-            var res = SmlouvaRepo.Searching.SimpleSearch(query, 1, 0,
+            var res = SmlouvaRepo.Searching.SimpleSearchAsync(query, 1, 0,
                 SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggYSum, exactNumOfResults: true);
 
 

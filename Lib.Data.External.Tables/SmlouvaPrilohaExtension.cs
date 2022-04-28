@@ -30,7 +30,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
             var key = smlouvaKeyId.ValueForData.Split("/");
 
 
-            Smlouva s = SmlouvaRepo.Load(key[0]);
+            Smlouva s = SmlouvaRepo.LoadAsync(key[0]);
 
             Smlouva.Priloha p = s?.Prilohy?.FirstOrDefault(m => (m.UniqueHash()) == key[1]);
 

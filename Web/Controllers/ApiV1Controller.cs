@@ -364,7 +364,7 @@ namespace HlidacStatu.Web.Controllers
             VerejnaZakazka? vz = content;
             try
             {
-                VerejnaZakazkaRepo.Save(vz, idxConn);
+                VerejnaZakazkaRepo.SaveAsync(vz, idxConn);
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
                     new { result = "ok" }
                 ), "application/json");
@@ -549,7 +549,7 @@ namespace HlidacStatu.Web.Controllers
             )
                 platnyzaznam = null;
 
-            res = SmlouvaRepo.Searching.SimpleSearch(query, page.Value,
+            res = SmlouvaRepo.Searching.SimpleSearchAsync(query, page.Value,
                 SmlouvaRepo.Searching.DefaultPageSize,
                 (SmlouvaRepo.Searching.OrderResult)order.Value,
                 platnyZaznam: platnyzaznam);
@@ -582,7 +582,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrWhiteSpace(Id))
                 return new NotFoundResult();
 
-            var model = SmlouvaRepo.Load(Id);
+            var model = SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return new NotFoundResult();
@@ -615,7 +615,7 @@ namespace HlidacStatu.Web.Controllers
             if (pageSize > 500)
                 pageSize = 500;
 
-            var items = SmlouvaRepo.Searching.SimpleSearch("NOT(_exists_:prilohy.datlClassification)", 0, pageSize,
+            var items = SmlouvaRepo.Searching.SimpleSearchAsync("NOT(_exists_:prilohy.datlClassification)", 0, pageSize,
                 SmlouvaRepo.Searching.OrderResult.DateAddedDesc, platnyZaznam: true);
 
             if (!items.IsValid)
@@ -648,7 +648,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrWhiteSpace(Id))
                 return new NotFoundResult();
 
-            var model = SmlouvaRepo.Load(Id);
+            var model = SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return new NotFoundResult();
@@ -665,7 +665,7 @@ namespace HlidacStatu.Web.Controllers
 
             if (model.Prilohy != null)
             {
-                SmlouvaRepo.Save(model);
+                SmlouvaRepo.SaveAsync(model);
             }
 
 
@@ -789,7 +789,7 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult CheckText(string smlouvaid)
         {
             Entities.Issues.IIssueAnalyzer textCheck = new Plugin.IssueAnalyzers.Text();
-            Smlouva s = SmlouvaRepo.Load(smlouvaid);
+            Smlouva s = SmlouvaRepo.LoadAsync(smlouvaid);
             if (s != null)
             {
                 if (s.Prilohy != null && s.Prilohy.Count() > 0)
@@ -797,7 +797,7 @@ namespace HlidacStatu.Web.Controllers
                     var newIss = s.Issues.Where(m => m.IssueTypeId != 200).ToList();
                     newIss.AddRange(textCheck.FindIssues(s));
                     s.Issues = newIss.ToArray();
-                    SmlouvaRepo.Save(s);
+                    SmlouvaRepo.SaveAsync(s);
                 }
             }
 

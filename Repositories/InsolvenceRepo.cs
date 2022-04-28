@@ -55,7 +55,7 @@ namespace HlidacStatu.Repositories
 
         public static void SaveRizeni(Rizeni r)
         {
-            RizeniRepo.Save(r);
+            RizeniRepo.SaveAsync(r);
         }
 
         public static DokumentSeSpisovouZnackou LoadDokument(string id, bool limitedView)

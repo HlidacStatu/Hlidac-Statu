@@ -137,8 +137,8 @@
         </p>
         @{
             var currentYear = DateTime.Now.Year;
-            var numFatalIssue = SmlouvaRepo.Searching.SimpleSearch($"ico:{Model.ICO} AND chyby:zasadni  AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}", 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true).ElasticResults.HitsMetadata.Total;
-            var numVazneIssue = SmlouvaRepo.Searching.SimpleSearch($"ico:{Model.ICO} AND chyby:vazne  AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}", 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true).ElasticResults.HitsMetadata.Total;
+            var numFatalIssue = SmlouvaRepo.Searching.SimpleSearchAsync($"ico:{Model.ICO} AND chyby:zasadni  AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}", 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true).ElasticResults.HitsMetadata.Total;
+            var numVazneIssue = SmlouvaRepo.Searching.SimpleSearchAsync($"ico:{Model.ICO} AND chyby:vazne  AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}", 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true).ElasticResults.HitsMetadata.Total;
         }
         @if (numFatalIssue.Value > 0)
         {
@@ -291,9 +291,9 @@
             jak z věstníku veřejných zakázek, tak z profilů zadavatelů.
         </p>
         @{
-            var profilyZadavatele = ProfilZadavateleRepo.GetByIco(Model.ICO).Select(m=>m.Url?.Trim()).Distinct();
-            var resVZdodav = VerejnaZakazkaRepo.Searching.SimpleSearch("icododavatel:" + Model.ICO, null, 1, 0, "1");
-            var resVZzadav = VerejnaZakazkaRepo.Searching.SimpleSearch("icozadavatel:" + Model.ICO, null, 1, 0, "1");
+            var profilyZadavatele = ProfilZadavateleRepo.GetByIcoAsync(Model.ICO).Select(m=>m.Url?.Trim()).Distinct();
+            var resVZdodav = VerejnaZakazkaRepo.Searching.SimpleSearchAsync("icododavatel:" + Model.ICO, null, 1, 0, "1");
+            var resVZzadav = VerejnaZakazkaRepo.Searching.SimpleSearchAsync("icozadavatel:" + Model.ICO, null, 1, 0, "1");
             Dictionary<string, long> vzakaz = new();
             vzakaz.Add("dodavatel|dodavatel|dodavatele|dodavatelem", resVZdodav.Total);
             vzakaz.Add("zadavatel|zadavatel|zadavatele|zadavatelem", resVZzadav.Total);

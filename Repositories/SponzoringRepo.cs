@@ -185,7 +185,7 @@ namespace HlidacStatu.Repositories
 
 
         //přidat cache
-        public static async Task<List<SponzoringOverview>> PartiesPerYearsOverview(int? year, CancellationToken cancellationToken)
+        public static async Task<List<SponzoringOverview>> PartiesPerYearsOverviewAsync(int? year, CancellationToken cancellationToken)
         {
             int rok = year ?? 0;
             int yearSwitch = year.HasValue ? 0 : 1;
@@ -207,7 +207,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task<List<SponzoringSummed>> PeopleSponsors(string party, CancellationToken cancellationToken)
+        public static async Task<List<SponzoringSummed>> PeopleSponsorsAsync(string party, CancellationToken cancellationToken)
         {
             string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
             int tenYearsBack = DateTime.Now.Year - 10;
@@ -234,7 +234,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task<List<SponzoringSummed>> CompanySponsors(string party, CancellationToken cancellationToken)
+        public static async Task<List<SponzoringSummed>> CompanySponsorsAsync(string party, CancellationToken cancellationToken)
         {
             string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
             int tenYearsBack = DateTime.Now.Year - 10;
@@ -264,7 +264,7 @@ namespace HlidacStatu.Repositories
         /// <param name="year">If null it returns sum for all years</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<List<SponzoringSummed>> BiggestPeopleSponsors(int? year, CancellationToken cancellationToken, int? take = null)
+        public static async Task<List<SponzoringSummed>> BiggestPeopleSponsorsAsync(int? year, CancellationToken cancellationToken, int? take = null)
         {
             int rok = year ?? 0;
             int yearSwitch = year.HasValue ? 0 : 1;
@@ -299,7 +299,7 @@ namespace HlidacStatu.Repositories
         /// <param name="year">If null it returns sum for all years</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<List<SponzoringSummed>> BiggestCompanySponsors(int? year, CancellationToken cancellationToken, int? take = null)
+        public static async Task<List<SponzoringSummed>> BiggestCompanySponsorsAsync(int? year, CancellationToken cancellationToken, int? take = null)
         {
             int rok = year ?? 0;
             int yearSwitch = year.HasValue ? 0 : 1;
@@ -328,8 +328,5 @@ namespace HlidacStatu.Repositories
 
             }
         }
-        
-        
-
     }
 }

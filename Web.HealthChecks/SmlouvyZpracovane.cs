@@ -21,7 +21,7 @@ namespace HlidacStatu.Web.HealthChecks
                 for (int i = 1; i <= 3; i++)
                 {
                     DateTime date = DateTime.Now.Date.AddDays(-1 * i);
-                    var res = HlidacStatu.Repositories.SmlouvaRepo.Searching.SimpleSearch($"zverejneno:{date:yyyy-MM-dd}", 1, 1,
+                    var res = HlidacStatu.Repositories.SmlouvaRepo.Searching.SimpleSearchAsync($"zverejneno:{date:yyyy-MM-dd}", 1, 1,
                         Repositories.SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true);
 
                     bool svatek = Devmasters.DT.Util.NepracovniDny[date.Year].Contains(date);

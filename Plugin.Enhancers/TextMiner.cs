@@ -112,7 +112,7 @@ namespace HlidacStatu.Plugin.Enhancers
                                 //    Devmasters.Config.GetWebConfigValue("OCRServerApiKey"),
                                 //    downloadedFile, "TextMiner",
                                 //    HlidacStatu.Lib.OCR.Api.Client.TaskPriority.High, intensity
-                                //    ); //TODOcallBackData: item.CallbackDataForOCRReq(i) );
+                                //    ); 
                                 Base.Logger.Debug($"TextMiner Client.TextFromFile Adding NewTask Id:{item.Id} att:{att.nazevSouboru}  async:{asyncOCR}  skipOCR:{intensity.ToString()}");
                                 res = ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.Smlouva, item.Id, priority: this.priority);
                                 Base.Logger.Debug($"TextMiner Client.TextFromFile Added NewTask Id:{item.Id} att:{att.nazevSouboru}  async:{asyncOCR}  skipOCR:{intensity.ToString()}");

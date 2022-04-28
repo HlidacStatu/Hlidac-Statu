@@ -7,6 +7,7 @@ using HlidacStatu.Repositories.Searching.Rules;
 using Nest;
 
 using System;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -14,7 +15,7 @@ namespace HlidacStatu.Repositories
     {
         public static class Searching
         {
-            public static OsobaEsSearchResult FulltextSearch(string query, int page, int pageSize, int? status = null)
+            public static async Task<OsobaEsSearchResult> FulltextSearchAsync(string query, int page, int pageSize, int? status = null)
             {
                 string modifQ = SimpleQueryCreator
                     .GetSimpleQuery(query, new IRule[] { new RemoveAllOperators() })
@@ -45,8 +46,8 @@ namespace HlidacStatu.Repositories
                     int fuzzyDistance = 1;
                     if (status.HasValue)
                     {
-                        res = _esClient
-                            .Search<OsobaES>(s => s
+                        res = await _esClient
+                            .SearchAsync<OsobaES>(s => s
                                 .Size(pageSize)
                                 .From(page * pageSize)
                                 .Query(_query => _query
@@ -87,8 +88,8 @@ namespace HlidacStatu.Repositories
                     else
                     {
 
-                        res = _esClient //.MultiSearch<OsobaES>(s => s
-                            .Search<OsobaES>(s => s
+                        res = await _esClient //.MultiSearch<OsobaES>(s => s
+                            .SearchAsync<OsobaES>(s => s
                             .Size(pageSize)
                             .From(page * pageSize)
                             .Query(_query => _query

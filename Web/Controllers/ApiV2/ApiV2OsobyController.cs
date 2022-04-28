@@ -59,7 +59,7 @@ namespace HlidacStatu.Web.Controllers
 
             if (strana is null || strana < 1)
                 strana = 1;
-            var osoby = OsobaRepo.Searching.SimpleSearch(ftxDotaz, strana.Value, 30, OsobaRepo.Searching.OrderResult.Relevance);
+            var osoby = OsobaRepo.Searching.SimpleSearchAsync(ftxDotaz, strana.Value, 30, OsobaRepo.Searching.OrderResult.Relevance);
 
             var result = osoby.Results.Select(o => new OsobaDTO(o)).ToList();
 

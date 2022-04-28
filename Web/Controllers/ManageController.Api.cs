@@ -112,7 +112,7 @@ namespace HlidacStatu.Web.Controllers
                 }
                 else if (id == "smlouvy")
                 {
-                    var sres = SmlouvaRepo.Searching.SimpleSearch(q, 0, numOfRecords, o, logError: false);
+                    var sres = SmlouvaRepo.Searching.SimpleSearchAsync(q, 0, numOfRecords, o, logError: false);
 
                     if (sres.IsValid == false && !string.IsNullOrEmpty(sres.Q))
                     {
@@ -129,7 +129,7 @@ namespace HlidacStatu.Web.Controllers
                 {
 
                     string[] cpvs = Request.Query["cpv"].ToString().Split(',');
-                    var sres = VerejnaZakazkaRepo.Searching.SimpleSearch(q, cpvs, 1, numOfRecords,
+                    var sres = VerejnaZakazkaRepo.Searching.SimpleSearchAsync(q, cpvs, 1, numOfRecords,
                         (Util.ParseTools.ToInt(o) ?? 0).ToString(), (Request.Query["zahajeny"] == "1")
                         );
 

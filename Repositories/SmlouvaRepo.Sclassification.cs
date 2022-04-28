@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -15,12 +16,12 @@ namespace HlidacStatu.Repositories
     {
         private static volatile FileCacheManager stemCacheManager
             = FileCacheManager.GetSafeInstance("SmlouvyStems",
-                smlouvaKeyId => getRawStemsFromServer(smlouvaKeyId),
+                smlouvaKeyId => getRawStemsFromServerAsync(smlouvaKeyId),
                 TimeSpan.FromDays(365 * 10)); //10 years
 
-        private static byte[] getRawStemsFromServer(KeyAndId smlouvaKeyId)
+        private static async Task<byte[]> getRawStemsFromServerAsync(KeyAndId smlouvaKeyId)
         {
-            Smlouva s = SmlouvaRepo.Load(smlouvaKeyId.ValueForData);
+            Smlouva s = await SmlouvaRepo.LoadAsync(smlouvaKeyId.ValueForData);
 
             if (s == null)
                 return null;
@@ -153,7 +154,7 @@ namespace HlidacStatu.Repositories
             if (string.IsNullOrWhiteSpace(idSmlouvy))
                 return null;
 
-            Smlouva s = SmlouvaRepo.Load(idSmlouvy);
+            Smlouva s = SmlouvaRepo.LoadAsync(idSmlouvy);
 
             if (s == null)
                 return null;
@@ -201,7 +202,7 @@ namespace HlidacStatu.Repositories
 
             smlouva.Classification.TypesToProperties(newClassification.ToArray());
             smlouva.Classification.LastUpdate = DateTime.Now;
-            SmlouvaRepo.Save(smlouva);
+            SmlouvaRepo.SaveAsync(smlouva);
         }
 
         private static string CallEndpoint(string endpoint, string content, string id, int timeoutMs)
@@ -293,8 +294,10 @@ namespace HlidacStatu.Repositories
                 //
 
                 var newClassRelevant = smlouva.relevantClassif(newClass);
-                smlouva.Classification = new Smlouva.SClassification(newClassRelevant);
-                smlouva.Classification.LastUpdate = DateTime.Now;
+                smlouva.Classification = new Smlouva.SClassification(newClassRelevant)
+                {
+                    LastUpdate = DateTime.Now
+                };
             }
             return true;
         }

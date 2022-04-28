@@ -30,7 +30,7 @@ namespace HlidacStatu.Web.Controllers
         [HttpGet]
         public ActionResult ShowPrilohaTables(string s, string p)
         {
-            Smlouva sml = SmlouvaRepo.Load(s);
+            Smlouva sml = SmlouvaRepo.LoadAsync(s);
             Smlouva.Priloha pr = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == p);
             if (sml == null || pr == null)
                 return NotFound();
@@ -45,7 +45,7 @@ namespace HlidacStatu.Web.Controllers
         [HttpGet]
         public ActionResult ShowPrilohaTablesOnePage(string s, string p, int page)
         {
-            Smlouva sml = SmlouvaRepo.Load(s);
+            Smlouva sml = SmlouvaRepo.LoadAsync(s);
             Smlouva.Priloha pr = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == p);
             if (sml == null || pr == null)
                 return NotFound();
@@ -60,7 +60,7 @@ namespace HlidacStatu.Web.Controllers
         [HttpGet]
         public ActionResult ShowPrilohaTablesOnePageImg(string s, string p, int page)
         {
-            Smlouva sml = SmlouvaRepo.Load(s);
+            Smlouva sml = SmlouvaRepo.LoadAsync(s);
             Smlouva.Priloha pr = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == p);
             if (sml == null || pr == null)
                 return NotFound();
@@ -104,7 +104,7 @@ namespace HlidacStatu.Web.Controllers
                 ModelState.AddModelError("Check", "Nastav smluvni strany");
                 return View();
             }
-            Smlouva s = SmlouvaRepo.Load(id);
+            Smlouva s = SmlouvaRepo.LoadAsync(id);
             if (s == null)
             {
                 ModelState.AddModelError("Check", "smlouva neexistuje");
@@ -139,7 +139,7 @@ namespace HlidacStatu.Web.Controllers
                 s.Issues = issues.ToArray();
 
 
-                SmlouvaRepo.Save(s);
+                SmlouvaRepo.SaveAsync(s);
                 return Redirect(s.GetUrl(true));
             }
         }

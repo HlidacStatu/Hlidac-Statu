@@ -4,13 +4,12 @@ using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
 using HlidacStatu.Util.Cache;
-
 using Nest;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -25,8 +24,7 @@ namespace HlidacStatu.Repositories
                 | RegexOptions.Multiline
                 | RegexOptions.IgnoreCase);
 
-            private static Regex regFindRegex = new Regex(regex, options);
-
+            
             public static IRule[] Rules = new IRule[]
             {
                 new OsobaId("osobaid:", "ico:"),
@@ -147,29 +145,29 @@ namespace HlidacStatu.Repositories
             //source
             public static Dictionary<string, string> cpvSearchGroups = new Dictionary<string, string>
             {
-                {"it", "302,72,64216,791211,48,50312,516,"},
-                {"stav", "44,45,71,75123,34946,351131,4331,433,436,507,51541,7011,79993,909112,"}, //stavebnictvi
-                {"doprava", "34,60,63,09132,091342,0913423,09211,501,502,5114"}, //doprava
-                {"stroje", "16,31,38,42,43,505,515"}, //strojírenské produkty
-                {"telco", "32,64,5033,513,"}, //telco
-                {"zdrav", "33,504,514,"}, //medicínské vybavení
-                {"jidlo", "03,15,4111"}, //potraviny,
-                {"bezpecnost", "35,506,5155,519,"}, //bezpecnost, vojsko, policie
-                {"prirodnizdroj", "14,24,41"},
-                {"energie", "09,65,3112,3113,3114,45251,71314,713231,"}, //energetika
-                {"agro", "16,77,5152"}, //zemedelstvi a lest
-                {"kancelar", "22,301,39,795,796,797,798,799,300,503"}, //kancelářský materiál
-                {"remeslo", "18,19,374,375,378,373,3700"}, //oděvy, obuv a jiné vybavení
-                {"social", "80,85,92,98"}, //zdravotní, sociální a vzdělávací služby
-                {"finance", "66,792,794,"}, //financni služby
-                {"legal", "70,791,7524"}, //právní, poradenské a jiné komerční služby
-                {"techsluzby", "500,51,76,90"}, //technické služby
-                {"vyzkum", "73,79315,452146,45214,3897,3829,3012513"},
+                { "it", "302,72,64216,791211,48,50312,516," },
+                { "stav", "44,45,71,75123,34946,351131,4331,433,436,507,51541,7011,79993,909112," }, //stavebnictvi
+                { "doprava", "34,60,63,09132,091342,0913423,09211,501,502,5114" }, //doprava
+                { "stroje", "16,31,38,42,43,505,515" }, //strojírenské produkty
+                { "telco", "32,64,5033,513," }, //telco
+                { "zdrav", "33,504,514," }, //medicínské vybavení
+                { "jidlo", "03,15,4111" }, //potraviny,
+                { "bezpecnost", "35,506,5155,519," }, //bezpecnost, vojsko, policie
+                { "prirodnizdroj", "14,24,41" },
+                { "energie", "09,65,3112,3113,3114,45251,71314,713231," }, //energetika
+                { "agro", "16,77,5152" }, //zemedelstvi a lest
+                { "kancelar", "22,301,39,795,796,797,798,799,300,503" }, //kancelářský materiál
+                { "remeslo", "18,19,374,375,378,373,3700" }, //oděvy, obuv a jiné vybavení
+                { "social", "80,85,92,98" }, //zdravotní, sociální a vzdělávací služby
+                { "finance", "66,792,794," }, //financni služby
+                { "legal", "70,791,7524" }, //právní, poradenské a jiné komerční služby
+                { "techsluzby", "500,51,76,90" }, //technické služby
+                { "vyzkum", "73,79315,452146,45214,3897,3829,3012513" },
                 {
                     "marketing",
                     "7934,79341,793411,793412,793414,793415,79342,793421,793422,793423,7934231,79342311,7934232,79342321,794,79413,79416,794161"
                 },
-                {"jine", "75,55,793,790,508"},
+                { "jine", "75,55,793,790,508" },
             };
 
             public static string[] CPVOblastToCPV(CPVSkupiny skupina)
@@ -293,26 +291,24 @@ namespace HlidacStatu.Repositories
                 return qc;
             }
 
-            public static VerejnaZakazkaSearchData SimpleSearch(string query, string[] cpv,
+            public static Task<VerejnaZakazkaSearchData> SimpleSearchAsync(string query, string[] cpv,
                 int page, int pageSize, string order, bool Zahajeny = false, bool withHighlighting = false,
                 bool exactNumOfResults = false)
-            {
-                return SimpleSearch(
-                    new VerejnaZakazkaSearchData()
-                    {
-                        Q = query,
-                        OrigQuery = query,
-                        CPV = cpv,
-                        Page = page,
-                        PageSize = pageSize,
-                        Order = Devmasters.TextUtil.NormalizeToNumbersOnly(order),
-                        Zahajeny = Zahajeny,
-                        ExactNumOfResults = exactNumOfResults
-                    }, withHighlighting: withHighlighting
-                );
-            }
+                =>  SimpleSearchAsync(
+                        new VerejnaZakazkaSearchData()
+                        {
+                            Q = query,
+                            OrigQuery = query,
+                            CPV = cpv,
+                            Page = page,
+                            PageSize = pageSize,
+                            Order = Devmasters.TextUtil.NormalizeToNumbersOnly(order),
+                            Zahajeny = Zahajeny,
+                            ExactNumOfResults = exactNumOfResults
+                        }, withHighlighting: withHighlighting
+                    );
 
-            public static VerejnaZakazkaSearchData SimpleSearch(
+            public static async Task<VerejnaZakazkaSearchData> SimpleSearchAsync(
                 VerejnaZakazkaSearchData search,
                 AggregationContainerDescriptor<VerejnaZakazka> anyAggregation = null,
                 bool logError = true, bool fixQuery = true, ElasticClient client = null,
@@ -349,9 +345,8 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<VerejnaZakazka> res = null;
                 try
                 {
-
-                    res = client
-                        .Search<VerejnaZakazka>(s => s
+                    res = await client
+                        .SearchAsync<VerejnaZakazka>(s => s
                             .Size(search.PageSize)
                             .Source(so => so.Excludes(ex => ex.Field("dokumenty.plainText")))
                             .From(page * search.PageSize)
@@ -366,8 +361,8 @@ namespace HlidacStatu.Repositories
                     if (withHighlighting && res.Shards != null &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
                     {
-                        res = client
-                            .Search<VerejnaZakazka>(s => s
+                        res = await client
+                            .SearchAsync<VerejnaZakazka>(s => s
                                 .Size(search.PageSize)
                                 .Source(so => so.Excludes(ex => ex.Field("dokumenty.plainText")))
                                 .From(page * search.PageSize)
@@ -415,15 +410,13 @@ namespace HlidacStatu.Repositories
                 return search;
             }
 
-            public static ISearchResponse<VerejnaZakazka> RawSearch(string jsonQuery, int page, int pageSize,
+            public static Task<ISearchResponse<VerejnaZakazka>> RawSearchAsync(string jsonQuery, int page, int pageSize,
                 VerejnaZakazkaSearchData.VZOrderResult order = VerejnaZakazkaSearchData.VZOrderResult.Relevance,
-                AggregationContainerDescriptor<VerejnaZakazka> anyAggregation = null
-            )
-            {
-                return RawSearch(GetRawQuery(jsonQuery), page, pageSize, order, anyAggregation);
-            }
+                AggregationContainerDescriptor<VerejnaZakazka> anyAggregation = null)
+                => RawSearchAsync(GetRawQuery(jsonQuery), page, pageSize, order, anyAggregation);
 
-            public static ISearchResponse<VerejnaZakazka> RawSearch(QueryContainer query, int page, int pageSize,
+            public static async Task<ISearchResponse<VerejnaZakazka>> RawSearchAsync(QueryContainer query, int page,
+                int pageSize,
                 VerejnaZakazkaSearchData.VZOrderResult order = VerejnaZakazkaSearchData.VZOrderResult.Relevance,
                 AggregationContainerDescriptor<VerejnaZakazka> anyAggregation = null
             )
@@ -444,8 +437,8 @@ namespace HlidacStatu.Repositories
                 var client = Manager.GetESClient();
                 Indices indexes = client.ConnectionSettings.DefaultIndex;
 
-                var res = client
-                    .Search<VerejnaZakazka>(s => s
+                var res = await client
+                    .SearchAsync<VerejnaZakazka>(s => s
                         .Index(indexes)
                         .Size(pageSize)
                         .From(page * pageSize)
@@ -463,7 +456,7 @@ namespace HlidacStatu.Repositories
                 return res;
             }
 
-            public static VerejnaZakazkaSearchData _Search(
+            public static async Task<VerejnaZakazkaSearchData> _SearchAsync(
                 VerejnaZakazkaSearchData search,
                 AggregationContainerDescriptor<VerejnaZakazka> anyAggregation, ElasticClient client)
             {
@@ -498,8 +491,8 @@ namespace HlidacStatu.Repositories
                     page = 0;
                 try
                 {
-                    res = client
-                        .Search<VerejnaZakazka>(a => a
+                    res = await client
+                        .SearchAsync<VerejnaZakazka>(a => a
                             .Size(search.PageSize)
                             .From(search.PageSize * page)
                             .Aggregations(aggrFunc)
@@ -617,7 +610,7 @@ namespace HlidacStatu.Repositories
 
             public static MemoryCacheManager<VerejnaZakazkaSearchData, string>
                 cachedSearches =
-                    new MemoryCacheManager<VerejnaZakazkaSearchData, string>("VZsearch", cachedFuncSimpleSearch,
+                    new MemoryCacheManager<VerejnaZakazkaSearchData, string>("VZsearch", cachedFuncSimpleSearchAsync,
                         TimeSpan.FromHours(24));
 
             public static VerejnaZakazkaSearchData CachedSimpleSearch(TimeSpan expiration,
@@ -634,10 +627,11 @@ namespace HlidacStatu.Repositories
                 return cachedSearches.Get(Newtonsoft.Json.JsonConvert.SerializeObject(q), expiration);
             }
 
-            private static VerejnaZakazkaSearchData cachedFuncSimpleSearch(string jsonFullSearchQuery)
+            private static Task<VerejnaZakazkaSearchData> cachedFuncSimpleSearchAsync(string jsonFullSearchQuery)
             {
                 var query = Newtonsoft.Json.JsonConvert.DeserializeObject<FullSearchQuery>(jsonFullSearchQuery);
-                return SimpleSearch(query.search, query.anyAggregation, query.logError, query.fixQuery, query.client);
+                return SimpleSearchAsync(query.search, query.anyAggregation, query.logError, query.fixQuery,
+                    query.client);
             }
 
             private class FullSearchQuery
@@ -649,15 +643,15 @@ namespace HlidacStatu.Repositories
                 public ElasticClient client = null;
             }
 
-            public static IEnumerable<VerejnaZakazka> GetVZForHolding(string holdingIco)
+            public static IAsyncEnumerable<VerejnaZakazka> GetVZForHoldingAsync(string holdingIco)
             {
                 string query = Tools.FixInvalidQuery($"holding:{holdingIco}", queryShorcuts, queryOperators);
                 var qc = SimpleQueryCreator.GetSimpleQuery<VerejnaZakazka>(query, Rules);
 
-                return YieldAll(qc);
+                return YieldAllAsync(qc);
             }
 
-            private static IEnumerable<VerejnaZakazka> YieldAll(QueryContainer query,
+            private static async IAsyncEnumerable<VerejnaZakazka> YieldAllAsync(QueryContainer query,
                 string scrollTimeout = "2m",
                 int scrollSize = 300)
             {
@@ -665,7 +659,7 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<VerejnaZakazka> initialResponse = null;
                 if (query is null)
                 {
-                    initialResponse = client.Search<VerejnaZakazka>(scr => scr
+                    initialResponse = await client.SearchAsync<VerejnaZakazka>(scr => scr
                         .From(0)
                         .Take(scrollSize)
                         .MatchAll()
@@ -673,7 +667,7 @@ namespace HlidacStatu.Repositories
                 }
                 else
                 {
-                    initialResponse = client.Search<VerejnaZakazka>(scr => scr
+                    initialResponse = await client.SearchAsync<VerejnaZakazka>(scr => scr
                         .From(0)
                         .Take(scrollSize)
                         .Query(q => query)
@@ -694,7 +688,7 @@ namespace HlidacStatu.Repositories
                 while (isScrollSetHasData)
                 {
                     ISearchResponse<VerejnaZakazka> loopingResponse =
-                        client.Scroll<VerejnaZakazka>(scrollTimeout, scrollid);
+                        await client.ScrollAsync<VerejnaZakazka>(scrollTimeout, scrollid);
                     if (loopingResponse.IsValid)
                     {
                         foreach (var vz in loopingResponse.Documents)
@@ -708,7 +702,7 @@ namespace HlidacStatu.Repositories
                     isScrollSetHasData = loopingResponse.Documents.Any();
                 }
 
-                client.ClearScroll(new ClearScrollRequest(scrollid));
+                await client.ClearScrollAsync(new ClearScrollRequest(scrollid));
             }
         }
     }

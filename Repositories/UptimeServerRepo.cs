@@ -16,10 +16,6 @@ namespace HlidacStatu.Repositories
 {
     public static partial class UptimeServerRepo
     {
-
-
-
-
         public static string PatriPodUradJmeno(this UptimeServer server)
         {
             if (string.IsNullOrEmpty(server.ICO))

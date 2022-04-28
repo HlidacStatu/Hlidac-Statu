@@ -8,7 +8,7 @@
 
 
 
-    Smlouva sml = SmlouvaRepo.Load(this.Context.Request.Query["s"].ToString());
+    Smlouva sml = SmlouvaRepo.LoadAsync(this.Context.Request.Query["s"].ToString());
     Smlouva.Priloha priloha = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == this.Context.Request.Query["p"].ToString());
 
 

@@ -47,7 +47,7 @@
                 )
             );
 
-        var res = SmlouvaRepo.Searching.SimpleSearch("icoPlatce:" + ico, 1, 0,
+        var res = SmlouvaRepo.Searching.SimpleSearchAsync("icoPlatce:" + ico, 1, 0,
             SmlouvaRepo.Searching.OrderResult.FastestForScroll,
             anyAggregation: aggs, platnyZaznam: true);
 

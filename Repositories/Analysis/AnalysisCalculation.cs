@@ -509,7 +509,7 @@ namespace HlidacStatu.Repositories
                     else
                     {
 
-                        var res = SmlouvaRepo.Searching.SimpleSearch("ico:" + ico, 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggs, exactNumOfResults: true);
+                        var res = SmlouvaRepo.Searching.SimpleSearchAsync("ico:" + ico, 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggs, exactNumOfResults: true);
                         if (res.ElasticResults.Aggregations.Count > 0)
                         {
                             var epoch = ((ValueAggregate)res.ElasticResults.Aggregations.First().Value).Value;

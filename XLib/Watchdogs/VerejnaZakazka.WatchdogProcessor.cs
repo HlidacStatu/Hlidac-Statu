@@ -21,7 +21,7 @@ namespace HlidacStatu.XLib.Watchdogs
         {
             var query = "posledniZmena:" +
                         string.Format("[* TO {0}]", Repositories.Searching.Tools.ToElasticDate(toDate));
-            var res = VerejnaZakazkaRepo.Searching.SimpleSearch(query, null, 0, 1,
+            var res = VerejnaZakazkaRepo.Searching.SimpleSearchAsync(query, null, 0, 1,
                 ((int)Repositories.Searching.VerejnaZakazkaSearchData.VZOrderResult.LastUpdate).ToString());
 
             if (res.IsValid == false)
@@ -45,7 +45,7 @@ namespace HlidacStatu.XLib.Watchdogs
                     Repositories.Searching.Tools.ToElasticDate(toDate, "*"));
             }
 
-            var res = VerejnaZakazkaRepo.Searching.SimpleSearch(query, null, 0, 50,
+            var res = VerejnaZakazkaRepo.Searching.SimpleSearchAsync(query, null, 0, 50,
                 order == null
                     ? ((int)Repositories.Searching.VerejnaZakazkaSearchData.VZOrderResult.DateAddedDesc).ToString()
                     : order,

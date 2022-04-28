@@ -86,11 +86,11 @@ namespace PeopleLoader
                 }, null, progressWriter.Writer, true, maxDegreeOfParallelism: 10);
 
                 System.Console.WriteLine("Deleting all records");
-                OsobyEsRepo.DeleteAll();
+                OsobyEsRepo.DeleteAllAsync();
                 foreach (var osoba in osobyES.Chunk(1000))
                 {
                     System.Console.WriteLine($"Adding {osoba.Count()} records");
-                    OsobyEsRepo.BulkSave(osoba);
+                    OsobyEsRepo.BulkSaveAsync(osoba);
                 }
             }
         }
