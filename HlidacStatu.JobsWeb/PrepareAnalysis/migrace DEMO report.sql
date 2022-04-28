@@ -37,8 +37,8 @@ where
 	and t.year=2018
 	and j.jobGrouped is not null and j.jobGrouped != '0'
 	and j.PriceVATCalculated is not null
-	and (j.pk not in (select jobpk from Ceny))
     and Unit = 2 --manday
+	and not exists (select 1 from Ceny c where c.JobPK = j.pk )
 
 --insert manhours as mandays
 INSERT INTO Ceny([JobPK]
@@ -79,6 +79,6 @@ where
     and t.year=2018
     and j.jobGrouped is not null and j.jobGrouped != '0'
 	and j.PriceVATCalculated is not null
-	and (j.pk not in (select jobpk from Ceny))
     and Unit = 1 --manday
+	and not exists (select 1 from Ceny c where c.JobPK = j.pk )
 

@@ -74,9 +74,9 @@ namespace HlidacStatu.Repositories.ES
         //public static string defaultIndexName_DataSourceDb = "hlidacstatu_datasources";
         public static string defaultIndexName_Insolvence = "insolvencnirestrik";
         public static string defaultIndexName_Dotace = "dotace";
-        public static string defaultIndexName_Uptime= "uptime";
+        public static string defaultIndexName_Uptime = "uptime";
         public static string defaultIndexName_UptimeSSL = "uptimessl";
-        
+
         public static string defaultIndexName_Osoby = "osoby";
         public static string defaultIndexName_Audit = "audit";
         public static string defaultIndexName_InDocTableCells = "indoctablecells";
@@ -232,7 +232,6 @@ namespace HlidacStatu.Repositories.ES
         static string dataSourceIndexNamePrefix = "data_";
         public static ElasticClient GetESClient(string indexName, int timeOut = 60000, int connectionLimit = 80, IndexType? idxType = null, bool init = true)
         {
-            
             if (idxType == IndexType.DataSource)
                 indexName = dataSourceIndexNamePrefix + indexName;
             else if (indexName == defaultIndexName_Audit)
@@ -260,12 +259,12 @@ namespace HlidacStatu.Repositories.ES
                         if (init)
                             InitElasticSearchIndex(_client, idxType);
 
-                        _clients.Add(cnnset, _client);
+                        _clients.TryAdd(cnnset, _client);
                     }
                 }
             }
             return _clients[cnnset];
-        
+
         }
 
 
@@ -274,7 +273,7 @@ namespace HlidacStatu.Repositories.ES
 
             string esUrl = Devmasters.Config.GetWebConfigValue("ESConnection");
 
-            //var singlePool = new Elasticsearch.Net.SingleNodeConnectionPool(new Uri(esUrl));
+            //var singlePool = new Elasticsearch.Net.SingleNodeConnectionPool(new Uri(esUrl.Split(';').First()));
             var pool = new Elasticsearch.Net.StaticConnectionPool(esUrl
                 .Split(';')
                 .Where(m => !string.IsNullOrWhiteSpace(m))
@@ -318,12 +317,7 @@ namespace HlidacStatu.Repositories.ES
             //.SetProxy(new Uri("http://localhost.fiddler:8888"), "", "")
 
 
-#if DEBUG
-            //settings = settings.;
-#endif
             return settings;
-
-
         }
 
         public static PropertyInfo GetPropertyInfo<TSource, TProperty>(TSource source,
@@ -392,7 +386,7 @@ namespace HlidacStatu.Repositories.ES
                         goto compareValues;
                 }
 
-                compareValues:
+compareValues:
                 object defValue = GetDefault(propertyInfo.PropertyType);
                 if (oldPropVal == defValue && newPropVal != defValue)
                 {
@@ -413,17 +407,11 @@ namespace HlidacStatu.Repositories.ES
         }
 
 
-
-        //public static void CreateIndex()
-        //{
-        //    CreateIndex(defaultIndexName);
-        //}
-
         public static void CreateIndex(ElasticClient client)
         {
             IndexSettings set = new IndexSettings();
-            set.NumberOfReplicas = 2;
-            set.NumberOfShards = 25;
+            set.NumberOfReplicas = 1;
+            set.NumberOfShards = 1;
 
             // Add the Analyzer with a name
             set.Analysis = new Nest.Analysis()
@@ -437,8 +425,10 @@ namespace HlidacStatu.Repositories.ES
             IndexState idxSt = new IndexState();
             idxSt.Settings = set;
 
+            var aliasName = client.ConnectionSettings.DefaultIndex;
+            var indexName = $"hs-{aliasName}-01";
             var res = client.Indices
-                .Create(client.ConnectionSettings.DefaultIndex, i => i
+                .Create(indexName, i => i
                     .InitializeUsing(idxSt)
                     .Map(mm => mm
                     .Properties(ps => ps
@@ -448,20 +438,16 @@ namespace HlidacStatu.Repositories.ES
                     )
 
                 );
+            client.Indices.PutAlias(indexName, aliasName);
 
         }
 
         public static void CreateIndex(ElasticClient client, IndexType idxTyp)
         {
             IndexSettings set = new IndexSettings();
-            set.NumberOfReplicas = 2;
-            if (idxTyp == IndexType.DataSource)
-                set.NumberOfShards = 4;
-            else if (idxTyp == IndexType.UptimeItem || idxTyp == IndexType.UptimeSSL)
-                set.NumberOfShards = 3;
-            else 
-                set.NumberOfShards = 8;
-
+            set.NumberOfReplicas = 1;
+            set.NumberOfShards = 1;
+            
             // Add the Analyzer with a name
             set.Analysis = new Nest.Analysis()
             {
@@ -475,59 +461,61 @@ namespace HlidacStatu.Repositories.ES
             idxSt.Settings = set;
 
             CreateIndexResponse res = null;
+            var aliasName = client.ConnectionSettings.DefaultIndex;
+            var indexName = $"hs-{aliasName}-01";
             switch (idxTyp)
             {
                 case IndexType.VerejneZakazky:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.VZ.VerejnaZakazka>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.ProfilZadavatele:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.VZ.ProfilZadavatele>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Insolvence:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Insolvence.Rizeni>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Dotace:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Dotace.Dotace>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.UptimeSSL:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.UptimeSSL>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.UptimeItem:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.UptimeItem>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Osoby:
                     res = client.Indices
-                        .Create(client.ConnectionSettings.DefaultIndex, i => i
+                        .Create(indexName, i => i
                             .InitializeUsing(new IndexState()
                             {
                                 Settings = new IndexSettings()
                                 {
-                                    NumberOfReplicas = 2,
-                                    NumberOfShards = 2,
+                                    NumberOfReplicas = 1,
+                                    NumberOfShards = 1,
                                     Analysis = new Nest.Analysis()
                                     {
                                         TokenFilters = BasicTokenFilters(),
@@ -563,69 +551,69 @@ namespace HlidacStatu.Repositories.ES
 
                 case IndexType.Smlouvy:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Smlouva>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Firmy:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.FirmaInElastic>(map => map.AutoMap(maxRecursion: 1))
                        );
                     break;
                 case IndexType.KIndex:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<KIndexData>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.KIndexTemp:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<KIndexData>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.KIndexBackup:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Backup>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.KIndexBackupTemp:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Backup>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.KindexFeedback:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<KindexFeedback>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.Logs:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Logs.ProfilZadavateleDownload>(map => map.AutoMap(maxRecursion: 1))
                        );
                     break;
                 case IndexType.Audit:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(new IndexState()
                            {
                                Settings = new IndexSettings()
                                {
                                    NumberOfReplicas = 1,
-                                   NumberOfShards = 2
+                                   NumberOfShards = 1
                                }
                            }
                            )
@@ -634,7 +622,7 @@ namespace HlidacStatu.Repositories.ES
                     break;
                 case IndexType.VerejneZakazkyNaProfiluRaw:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                             .InitializeUsing(idxSt)
                             .Map<ZakazkaRaw>(map => map
                                     .Properties(p => p
@@ -647,13 +635,13 @@ namespace HlidacStatu.Repositories.ES
                     break;
                 case IndexType.RPP_Kategorie:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(new IndexState()
                            {
                                Settings = new IndexSettings()
                                {
-                                   NumberOfReplicas = 2,
-                                   NumberOfShards = 2
+                                   NumberOfReplicas = 1,
+                                   NumberOfShards = 1
                                }
                            }
                            )
@@ -662,13 +650,13 @@ namespace HlidacStatu.Repositories.ES
                     break;
                 case IndexType.RPP_OVM:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(new IndexState()
                            {
                                Settings = new IndexSettings()
                                {
-                                   NumberOfReplicas = 2,
-                                   NumberOfShards = 2
+                                   NumberOfReplicas = 1,
+                                   NumberOfShards = 1
                                }
                            }
                            )
@@ -677,13 +665,13 @@ namespace HlidacStatu.Repositories.ES
                     break;
                 case IndexType.RPP_ISVS:
                     res = client.Indices
-                       .Create(client.ConnectionSettings.DefaultIndex, i => i
+                       .Create(indexName, i => i
                            .InitializeUsing(new IndexState()
                            {
                                Settings = new IndexSettings()
                                {
-                                   NumberOfReplicas = 2,
-                                   NumberOfShards = 2
+                                   NumberOfReplicas = 1,
+                                   NumberOfShards = 1
                                }
                            }
                            )
@@ -692,12 +680,14 @@ namespace HlidacStatu.Repositories.ES
                     break;
                 case IndexType.InDocTableCells:
                     res = client.Indices
-                        .Create(client.ConnectionSettings.DefaultIndex, i => i
+                        .Create(indexName, i => i
                             .InitializeUsing(idxSt)
                             .Map<Entities.InDocTableCells>(map => map.AutoMap().DateDetection(false))
                         );
                     break;
             }
+            
+            client.Indices.PutAlias(indexName, aliasName);
 
         }
 

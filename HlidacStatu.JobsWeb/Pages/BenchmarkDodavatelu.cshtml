@@ -1,7 +1,9 @@
 @page "{id?}"
+@model BenchmarkDodavateluModel
+
+@using HlidacStatu.Entities
 @using HlidacStatu.JobsWeb.Services
 @using HlidacStatu.JobsWeb.Models
-@model BenchmarkDodavateluModel
 
 @{
     ViewData["Title"] = "Benchmark dodavatelů";
@@ -56,7 +58,7 @@
                 @foreach (var (ico, nazev, pocetCen) in
                 JobService.GetDodavateleList(Model.Key.Value)
                 .Where(m => m.pocetCen > JobService._minimumPriceCountInList)
-                .OrderByDescending(x => x.pocetCen)
+                .OrderBy(x => x.nazev)
                 )
                 {
                     <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetCen cen)</option>
@@ -87,6 +89,8 @@
 
 <h2>@Model.Nazev</h2>
 @{
+    Firma dodavatel = HlidacStatu.Repositories.Firmy.Get(Model.Ico);
+
     var RSstat = HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStat(
         TimeSpan.FromDays(14),
         $"icoPrijemce:{Model.Ico} AND " + Model.Key?.PerSubjectDesc?.Query,
@@ -121,3 +125,14 @@
 }
 
 
+ <h2>Detailní informace pro zadavatele <b>@Model.Nazev</b></h2>
+
+ @{
+     var detailModel = (statistics, Model.Key);
+ }
+<partial name="Shared/_DetailDodavatelZadavatel" model="detailModel" />
+
+@{
+    var porovnaniModel = (statistics, dodavatel, Model.Key);
+}
+<partial name="Shared/_PorovnaniZadavatelu_PoPolozkach" model="porovnaniModel" />

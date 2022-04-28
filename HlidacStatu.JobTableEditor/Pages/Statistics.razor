@@ -1,0 +1,106 @@
+﻿@page "/statistics"
+@using Microsoft.Extensions.Logging
+@using HlidacStatu.Entities.Views
+
+@inject StatisticsService StatisticsService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject ILogger<TableEditor> Logger
+
+@attribute [Authorize(Roles = "Admin")]
+
+<h2>Celkové statistiky</h2>
+
+@if (TableStat != null && TableStat.Count > 0)
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Obor klasifikace</th>
+            <th>Čeká na zpracování</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var row in TableStat)
+        {
+            <tr>
+                <th>
+                    @row.Klasifikace
+                </th>
+                <th>
+                    @row.Pocet
+                </th>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Načítám celkové statistiky</p>
+}
+
+<h2>Statistiky pracovníků</h2>
+<input type="date" @onchange="LoadUserStats" value="@_defaultDate.ToString("yyyy-MM-dd")">
+@if (UserStat != null && UserStat.Count > 0)
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Pracovník</th>
+            <th>Typ stavu</th>
+            <th>Počet zpracovaných tabulek</th>
+            <th>Průměrný čas na tabulku [s]</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var row in UserStat)
+        {
+            <tr>
+                <th>
+                    @row.User
+                </th>
+                <th>
+                    @row.GetStatusName()
+                </th>
+                <th>
+                    @row.Count.ToString("N0")
+                </th>
+                <th>
+                    @Math.Round(row.AverageTime / 1000d, 0).ToString("N0")
+                </th>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Načítám celkové statistiky</p>
+}
+
+
+
+@code {
+
+    private DateTime _defaultDate = new DateTime(2022, 2, 16); 
+    private List<UserJobStatistics> UserStat { get; set; }
+    private List<(string Klasifikace, int Pocet)> TableStat { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        UserStat = await StatisticsService.UserStatisticsAsync(_defaultDate);
+        TableStat = await StatisticsService.WaitingInQueuesAsync();
+    }
+
+    private async Task LoadUserStats(ChangeEventArgs args)
+    {
+        if(args is null)
+            return;
+        
+        DateTime.TryParse(args.Value.ToString(), out var date);
+        
+        UserStat = await StatisticsService.UserStatisticsAsync(date);
+    }
+
+}

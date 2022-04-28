@@ -167,5 +167,21 @@ namespace HlidacStatu.Repositories
             
             return count;
         }
+        
+        public static async Task<List<(string Klasifikace, int Pocet)>> WaitingInAllQueuesAsync(CancellationToken cancellationToken)
+        {
+            await using var db = new DbEntities();
+            var count = await db.InDocTables
+                .AsNoTracking()
+                .Where(m => m.Status == (int)InDocTables.CheckState.WaitingInQueue)
+                .Where(m => !string.IsNullOrEmpty(m.Klasifikace))
+                .GroupBy(t => t.Klasifikace)
+                .Select(g => (new { g.Key, Count = g.Count() }))
+                .OrderBy(x => x.Key)
+                .ToListAsync(cancellationToken);
+                
+            
+            return count.Select(x => (x.Key, x.Count)).ToList();
+        }
     }
 }

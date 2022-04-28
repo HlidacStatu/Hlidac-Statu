@@ -63,7 +63,7 @@
                 <option value="" selected="@string.IsNullOrEmpty(Model.Ico)">Zvolte úřad...</option>
                 @foreach (var (ico, nazev, pocetCen) in JobService.GetOdberateleList(Model.Key.Value)
                 .Where(m => m.pocetCen > JobService._minimumPriceCountInList)
-                .OrderByDescending(x => x.pocetCen)
+                .OrderBy(x => x.nazev)
                 )
                 {
                     <option value="@ico" selected="@(Model.Ico == ico)">@nazev (@pocetCen cen)</option>
@@ -100,15 +100,15 @@
             Firma urad = HlidacStatu.Repositories.Firmy.Get(Model.Ico);
 
             var RSstat = HlidacStatu.Repositories.SmlouvaRepo.Searching.CachedSimpleSearchWithStat(
-            TimeSpan.FromDays(14),
-            $"icoPlatce:{Model.Ico} AND " + Model.Key?.PerSubjectDesc?.Query,
-            1, 0, Repositories.SmlouvaRepo.Searching.OrderResult.FastestForScroll);
+                TimeSpan.FromDays(14),
+                $"icoPlatce:{Model.Ico} AND " + Model.Key?.PerSubjectDesc?.Query,
+                1, 0, Repositories.SmlouvaRepo.Searching.OrderResult.FastestForScroll);
             double sumKc = ((Nest.ValueAggregate)RSstat.ElasticResults?.Aggregations["sumKc"])?.Value ?? 0;
             var uniqSmluv = JobService.DistinctJobsForYearAndSubject(Model.Key.Value)
-            .Where(m => m.IcoOdberatele == Model.Ico)
-            .Select(m => m.SmlouvaId)
-            .Distinct()
-            .Count();
+                .Where(m => m.IcoOdberatele == Model.Ico)
+                .Select(m => m.SmlouvaId)
+                .Distinct()
+                .Count();
             bool showPouze = uniqSmluv * 3 < RSstat.Total;
         }
         <hr />
@@ -133,36 +133,7 @@
 
         <hr />
 
-        @{
-            var smlouvyIds = statistics.SelectMany(m => m.Contracts).Distinct();
-            if (smlouvyIds.Count() == 0)
-            {
-                return;
-            }
-
-            var smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
-
-            var firmyCount = JobService.GetDodavateleList(Model.Key.Value);
-            var firmy = statistics.SelectMany(m => m.Dodavatele).Distinct()
-            .Select(m => new
-            {
-                ico = m,
-                name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
-                count = firmyCount.Any(c => c.ico == m) ? firmyCount.First(c => c.ico == m).pocetCen : 0
-            })
-            .OrderBy(o => o.name);
-
-            var uradyCount = JobService.GetOdberateleList(Model.Key.Value);
-            var urady = statistics.SelectMany(m => m.Odberatele).Distinct()
-            .Select(m => new
-            {
-                ico = m,
-                name = HlidacStatu.Repositories.Firmy.GetJmeno(m),
-                count = uradyCount.Any(c => c.ico == m) ? uradyCount.First(c => c.ico == m).pocetCen : 0
-            })
-            .OrderBy(o => o.name);
-            ;
-        }
+       
         <h2>Detailní informace pro zadavatele <b>@Model.Nazev</b></h2>
 
         @{
@@ -175,7 +146,7 @@
         @{
             var porovnaniModel = (statistics, urad, Model.Key);
         }
-        <partial name="Shared/_PorovnaniDodavatele_PoPolozkach" model="porovnaniModel" />
+        <partial name="Shared/_PorovnaniDodavatelu_PoPolozkach" model="porovnaniModel" />
 
     </div>
 </div>

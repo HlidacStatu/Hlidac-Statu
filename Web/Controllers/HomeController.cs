@@ -130,66 +130,6 @@ namespace HlidacStatu.Web.Controllers
             return RedirectPermanent("/texty/provoznipodminky");
         }
 
-        //migrace: šílená konstrukce provázání views... 
-        // #if (!DEBUG)
-        //         [OutputCache(VaryByParam = "*", Duration = 60 * 60 * 1)]
-        // #endif
-        //         public ActionResult PorovnatSubjekty(string id, string ico, string ds, string title, int? width, string specialtype, string specialvalue, string part)
-        //         {
-        //             if (id == "special")
-        //             {
-        //                 if (specialtype != null)
-        //                 {
-        //                     var specval = specialvalue;
-        //                     if (!string.IsNullOrEmpty(specval) && StaticData.MestaPodleKraju.ContainsKey(specval))
-        //                     {
-        //                         ds = StaticData.MestaPodleKraju[specval].Aggregate((f, s) => f + "," + s);
-        //                     }
-        //                 }
-        //             }
-        //
-        //
-        //             if (!string.IsNullOrEmpty(ico) || !string.IsNullOrEmpty(ds))
-        //             {
-        //                 List<string> icos = new();
-        //
-        //                 if (!string.IsNullOrEmpty(ico))
-        //                 {
-        //                     foreach (var i in ico.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
-        //                     {
-        //                         var f = Firmy.Get(i);
-        //                         if (f.Valid)
-        //                             icos.Add(f.ICO);
-        //                     }
-        //                 }
-        //                 if (!string.IsNullOrEmpty(ds))
-        //                 {
-        //                     foreach (var i in ds.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
-        //                     {
-        //                         var f = Firmy.GetByDS(i);
-        //                         if (f.Valid)
-        //                             icos.Add(f.ICO);
-        //                     }
-        //                 }
-        //                 return View(icos.Distinct().ToArray());
-        //             }
-        //             else
-        //                 return Content("<h3>Neplatné parametry stránky</h3>");
-        //         }
-        //
-        //         public ActionResult Porovnat(string id, string ico, string ds, string title, int? width, string specialtype, string specialvalue)
-        //         {
-        //             if (id == "special" || id == "subjekty")
-        //             {
-        //                 ViewBag.NameOfView = "PorovnatSubjekty";
-        //                 return View("Porovnat_child");
-        //             }
-        //
-        //
-        //             return View("Porovnat");
-        //         }
-
-
         public ActionResult Index()
         {
             return View();
