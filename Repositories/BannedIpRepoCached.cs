@@ -27,15 +27,15 @@ namespace HlidacStatu.Repositories
             return _cache.Get();
         }
 
-        public static async Task BanIp(string ipAddress, DateTime expiration, int lastStatusCode, string pathList)
+        public static async Task BanIpAsync(string ipAddress, DateTime expiration, int lastStatusCode, string pathList)
         {
-            await BannedIpRepo.BanIp(ipAddress, expiration, lastStatusCode, pathList);
+            await BannedIpRepo.BanIpAsync(ipAddress, expiration, lastStatusCode, pathList);
             _cache.ForceRefreshCache();
         }
 
-        public static async Task AllowIp(string ipAddress)
+        public static async Task AllowIpAsync(string ipAddress)
         {
-            await BannedIpRepo.AllowIp(ipAddress);
+            await BannedIpRepo.AllowIpAsync(ipAddress);
             _cache.ForceRefreshCache();
         }
     }

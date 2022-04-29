@@ -32,7 +32,7 @@ namespace HlidacStatu.Extensions
                    0;
             if (ret) return ret;
 
-            ret = DotaceRepo.Searching.SimpleSearch("osobaid:" + osoba.NameId, 1, 1, "0").Total > 0;
+            ret = DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, "0").Total > 0;
             return ret;
         }
 

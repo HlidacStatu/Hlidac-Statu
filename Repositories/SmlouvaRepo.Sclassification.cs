@@ -149,12 +149,12 @@ namespace HlidacStatu.Repositories
         /// </summary>
         /// <param name="idSmlouvy"></param>
         /// <returns>Classification json</returns>
-        public static string GetClassificationExplanation(string idSmlouvy)
+        public static async Task<string> GetClassificationExplanationAsync(string idSmlouvy)
         {
             if (string.IsNullOrWhiteSpace(idSmlouvy))
                 return null;
 
-            Smlouva s = SmlouvaRepo.LoadAsync(idSmlouvy);
+            Smlouva s = await SmlouvaRepo.LoadAsync(idSmlouvy);
 
             if (s == null)
                 return null;

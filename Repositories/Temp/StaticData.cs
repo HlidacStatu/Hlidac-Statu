@@ -234,7 +234,7 @@ namespace HlidacStatu.Repositories
                                                  .Select(w => w.To.Id);
                                  if (icos.Count() > 0)
                                  {
-                                     var res = InsolvenceRepo.Searching.SimpleSearch("osobaiddluznik:" + o.NameId, 1, 100,
+                                     var res = InsolvenceRepo.Searching.SimpleSearchAsync("osobaiddluznik:" + o.NameId, 1, 100,
                                             (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc,
                                             limitedView: false);
                                      if (res.IsValid && res.Total > 0)

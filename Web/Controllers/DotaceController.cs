@@ -27,7 +27,7 @@ namespace HlidacStatu.Web.Controllers
                 );
 
 
-            var res = DotaceRepo.Searching.SimpleSearch(model, anyAggregation: aggs);
+            var res = DotaceRepo.Searching.SimpleSearchAsync(model, anyAggregation: aggs);
 
             AuditRepo.Add(
                 Audit.Operations.UserSearch
@@ -47,7 +47,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 return Redirect("/dotace");
             }
-            var dotace = DotaceRepo.Get(id);
+            var dotace = DotaceRepo.GetAsync(id);
             if (dotace is null)
             {
                 return NotFound();

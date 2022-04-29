@@ -193,7 +193,7 @@ namespace HlidacStatu.Web.Controllers
                 {
 
                     string[] cpvs = Request.Query["cpv"].ToString().Split(',');
-                    var sres = DotaceRepo.Searching.SimpleSearch(q, 1, numOfRecords,
+                    var sres = DotaceRepo.Searching.SimpleSearchAsync(q, 1, numOfRecords,
                         (Util.ParseTools.ToInt(o) ?? 0).ToString());
 
                     if (sres.IsValid == false && !string.IsNullOrEmpty(sres.Q))

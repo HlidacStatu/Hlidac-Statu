@@ -174,7 +174,7 @@ namespace HlidacStatu.XLib
                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                         sw.Start();
 
-                        res.Firmy = FirmaRepo.Searching.SimpleSearch(query, 0, 50);
+                        res.Firmy = FirmaRepo.Searching.SimpleSearchAsync(query, 0, 50);
                         sw.Stop();
                         res.Firmy.ElapsedTime = sw.Elapsed;
                     }
@@ -222,7 +222,7 @@ namespace HlidacStatu.XLib
                         var iqu = new InsolvenceSearchResult { Q = query, PageSize = pageSize, Order = order };
                         res.Insolvence = iqu;
                         //if (showBeta)
-                        res.Insolvence = InsolvenceRepo.Searching.SimpleSearch(new InsolvenceSearchResult { Q = query, PageSize = pageSize, Order = order });
+                        res.Insolvence = InsolvenceRepo.Searching.SimpleSearchAsync(new InsolvenceSearchResult { Q = query, PageSize = pageSize, Order = order });
 
                     }
                     catch (System.Exception e)
@@ -236,7 +236,7 @@ namespace HlidacStatu.XLib
                     try
                     {
                         var iqu = new DotaceSearchResult { Q = query, PageSize = pageSize, Order = order };
-                        res.Dotace = DotaceRepo.Searching.SimpleSearch(
+                        res.Dotace = DotaceRepo.Searching.SimpleSearchAsync(
                                 new DotaceSearchResult { Q = query, PageSize = pageSize, Order = order },
                                 anyAggregation: new Nest.AggregationContainerDescriptor<Entities.Dotace.Dotace>().Sum("souhrn", s => s.Field(f => f.DotaceCelkem))
                             );

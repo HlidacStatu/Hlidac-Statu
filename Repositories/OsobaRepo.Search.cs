@@ -58,13 +58,6 @@ namespace HlidacStatu.Repositories
                 return qc;
             }
 
-
-            static string regex = "[^/]*\r\n/(?<regex>[^/]*)/\r\n[^/]*\r\n";
-
-            static RegexOptions options = ((RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline)
-                                           | RegexOptions.IgnoreCase);
-
-
             public static Task<OsobaSearchResult> SimpleSearchAsync(string query, int page, int pageSize, string order,
                 bool exactNumOfResults = false)
             {
@@ -346,7 +339,7 @@ namespace HlidacStatu.Repositories
 
                 var firmy = alreadyFoundFirmyIcos;
                 if (firmy == null)
-                    firmy = FirmaRepo.Searching.SimpleSearch(jmeno, 0, maxNumOfResults * 10).Result;
+                    firmy = FirmaRepo.Searching.SimpleSearchAsync(jmeno, 0, maxNumOfResults * 10).Result;
 
                 if (firmy != null && firmy.Count() > 0)
                 {

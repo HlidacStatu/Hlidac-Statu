@@ -79,7 +79,7 @@ namespace HlidacStatu.Web.Controllers
                 else
                 {
                     var name = Firma.JmenoBezKoncovky(jmenoFirmy);
-                    var found = FirmaRepo.Searching.FindAll(name, 1).FirstOrDefault();
+                    var found = FirmaRepo.Searching.FindAllAsync(name, 1).FirstOrDefault();
                     if (found == null)
                     {
                         return NotFound($"Firma {jmenoFirmy} nenalezena.");

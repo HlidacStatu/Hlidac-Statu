@@ -355,7 +355,7 @@ namespace HlidacStatu.Web.Controllers
                     UserId = HttpContext.User.Identity.Name,
                     //apiCallJson = Newtonsoft.Json.JsonConvert.SerializeObject(authId) ?? null
                 };
-                ErrorEnvelopeRepo.Save(ee, idxConn);
+                ErrorEnvelopeRepo.SaveAsync(ee, idxConn);
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
                     new { error = "data is empty" }
                 ), "application/json");
@@ -378,7 +378,7 @@ namespace HlidacStatu.Web.Controllers
                     UserId = HttpContext.User.Identity.Name,
                     //apiCallJson = Newtonsoft.Json.JsonConvert.SerializeObject(authId) ?? null
                 };
-                ErrorEnvelopeRepo.Save(ee, idxConn);
+                ErrorEnvelopeRepo.SaveAsync(ee, idxConn);
 
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
                     new { error = "deserialization error", descr = e.ToString() }

@@ -33,11 +33,11 @@ namespace HlidacStatu.Repositories
                 switch (obor)
                 {
                     case Firma.Zatrideni.SubjektyObory.Vse:
-                        icos = GetAllSubjektyFromRPP();
+                        icos = GetAllSubjektyFromRpp();
                         break;
                     case Firma.Zatrideni.SubjektyObory.Vsechny_ustredni_organy_statni_spravy:
-                        icos = GetSubjektyFromRPP((int)Firma.Zatrideni.SubjektyObory.Dalsi_ustredni_organy_statni_spravy)
-                            .Concat(GetSubjektyFromRPP((int)Firma.Zatrideni.SubjektyObory.Ministerstva))
+                        icos = GetSubjektyFromRpp((int)Firma.Zatrideni.SubjektyObory.Dalsi_ustredni_organy_statni_spravy)
+                            .Concat(GetSubjektyFromRpp((int)Firma.Zatrideni.SubjektyObory.Ministerstva))
                             .ToArray();
                         break;
                     case Firma.Zatrideni.SubjektyObory.Nemocnice:
@@ -52,7 +52,7 @@ namespace HlidacStatu.Repositories
         								                            
                                     ) as f
                                     where f.ICO not in ('70876606','70994226','45274649','05243793','64203450','25916092','60800691','08297517','00212423')";
-                        icos = GetSubjektyFromSQL(sql)
+                        icos = GetSubjektyFromSql(sql)
                             .Append("00023752")
                             .ToArray();
                         break;
@@ -88,7 +88,7 @@ namespace HlidacStatu.Repositories
                         icos = "46355901,70898219,25702556,03630919,49277600,00001279,70890005,72029455,70889953,70889988,14450216,60193468,04095316,29372259,70994234,70890021,24729035,05800226,00002739,04767543,00007536,07460121,45249130,48133990,49710371,70994226,02795281,00311391,28244532,45274649,60193531,25291581,47114983"
                             .Split(',');
                         sql = @"select ico from Firma f where f.kod_pf in (302,301) and f.IsInRs = 1";
-                        icos = GetSubjektyFromSQL(sql).Union(icos).Distinct().ToArray();
+                        icos = GetSubjektyFromSql(sql).Union(icos).Distinct().ToArray();
 
                         break;
                     case Firma.Zatrideni.SubjektyObory.Agentury:
@@ -104,7 +104,7 @@ namespace HlidacStatu.Repositories
                         icos = "86652052,00020702,68378271,68378033,61389030,61389005,86652036,67985912,68378041,86652079,67985939,61388955,67985998,00027073,67985955,60077344,00027014,67985882,68081731,00027006,61389013,61389021,00020711,68378289,61388971,68081723,60457856,67985530,68081707,67985858,68378050,68081758,67985904,44994575,29372259,61388963,68378025,67985891,67985823,61388998,68145535,00027162,00010669"
                             .Split(',');
                         sql = @"select ico from Firma f where f.kod_pf in (661) and f.IsInRs = 1";
-                        icos = GetSubjektyFromSQL(sql).Union(icos).Distinct().ToArray();
+                        icos = GetSubjektyFromSql(sql).Union(icos).Distinct().ToArray();
                         break;
 
                     case Firma.Zatrideni.SubjektyObory.Krajske_spravy_silnic:
@@ -117,11 +117,11 @@ namespace HlidacStatu.Repositories
                         break;
                     case Firma.Zatrideni.SubjektyObory.Technicke_sluzby:
                         sql = @"select ico from Firma f where Jmeno like N'technické služby%' and f.IsInRS = 1";
-                        icos = GetSubjektyFromSQL(sql);
+                        icos = GetSubjektyFromSql(sql);
                         break;
                     case Firma.Zatrideni.SubjektyObory.Domov_duchodcu:
                         sql = @"select ico from Firma f where Jmeno like N'%domov důchodců%' and f.IsInRs = 1";
-                        icos = GetSubjektyFromSQL(sql);
+                        icos = GetSubjektyFromSql(sql);
                         break;
                     case Firma.Zatrideni.SubjektyObory.Vyjimky_RS:
 
@@ -135,34 +135,34 @@ namespace HlidacStatu.Repositories
                         break;
                     case Firma.Zatrideni.SubjektyObory.Media:
                         sql = @"select ico from Firma f where f.kod_pf in (361,362) and f.IsInRs = 1";
-                        icos = GetSubjektyFromSQL(sql);
+                        icos = GetSubjektyFromSql(sql);
                         break;
                     case Firma.Zatrideni.SubjektyObory.Financni_Banky:
                         sql = @"select ico from Firma f where f.Esa2010 like ('122%') and f.IsInRs = 1";
-                        icos = GetSubjektyFromSQL(sql);
+                        icos = GetSubjektyFromSql(sql);
                         break;
                     case Firma.Zatrideni.SubjektyObory.Financni_Fondy:
                         sql = @"select ico from Firma f where (f.Esa2010 like ('123%') or f.Esa2010 like ('124%') ) and f.IsInRs = 1";
-                        icos = GetSubjektyFromSQL(sql);
+                        icos = GetSubjektyFromSql(sql);
                         break;
                     case Firma.Zatrideni.SubjektyObory.Financni_Ostatni:
                         sql = @"select ico from Firma f where (f.Esa2010 like ('125%') or f.Esa2010 like ('126%') or f.Esa2010 like ('127%') ) and f.IsInRs = 1";
-                        icos = GetSubjektyFromSQL(sql);
+                        icos = GetSubjektyFromSql(sql);
                         break;
                     case Firma.Zatrideni.SubjektyObory.Financni_Pojistovny:
                         sql = @"select ico from Firma f where f.Esa2010 like ('128%') and f.IsInRs = 1";
-                        icos = GetSubjektyFromSQL(sql);
+                        icos = GetSubjektyFromSql(sql);
                         break;
                     case Firma.Zatrideni.SubjektyObory.Financni_PenzijniFondy:
                         sql = @"select ico from Firma f where f.Esa2010 like ('129%') and f.IsInRs = 1";
-                        icos = GetSubjektyFromSQL(sql);
+                        icos = GetSubjektyFromSql(sql);
                         break;
                     case Firma.Zatrideni.SubjektyObory.Financni_VsechnyInstituce:
                         sql = @"select ico from Firma f where f.Esa2010 like ('12%') and f.IsInRs = 1";
-                        icos = GetSubjektyFromSQL(sql);
+                        icos = GetSubjektyFromSql(sql);
                         break;
                     default:
-                        icos = GetSubjektyFromRPP((int)obor);
+                        icos = GetSubjektyFromRpp((int)obor);
                         break;
                 }
                 bool removeKraj = false;
@@ -224,14 +224,14 @@ namespace HlidacStatu.Repositories
                     return ret.ToArray();
                 }
             }
-            private static string[] GetSubjektyFromSQL(string sql)
+            private static string[] GetSubjektyFromSql(string sql)
             {
                 return DirectDB
                     .GetList<string>(sql)
                     .ToArray();
             }
 
-            private static string[] GetSubjektyFromRPP(int rpp_kategorie_id)
+            private static string[] GetSubjektyFromRpp(int rpp_kategorie_id)
             {
                 var res = Manager.GetESClient_RPP_Kategorie()
                     .Get<Lib.Data.External.RPP.KategorieOVM>(rpp_kategorie_id.ToString());
@@ -241,7 +241,7 @@ namespace HlidacStatu.Repositories
                 return new string[] { };
             }
 
-            private static string[] GetAllSubjektyFromRPP()
+            private static string[] GetAllSubjektyFromRpp()
             {
                 var res = Manager.GetESClient_RPP_Kategorie()
                     .Search<Lib.Data.External.RPP.KategorieOVM>(s => s.Size(9000).Query(q => q.MatchAll()));

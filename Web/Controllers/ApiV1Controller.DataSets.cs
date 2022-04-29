@@ -189,7 +189,7 @@ namespace HlidacStatu.Web.Controllers
                 {
                     //Firma f = Validators.FirmaInText(companyName);
                     var name = Firma.JmenoBezKoncovky(companyName);
-                    var found = FirmaRepo.Searching.FindAll(name, 1).FirstOrDefault();
+                    var found = FirmaRepo.Searching.FindAllAsync(name, 1).FirstOrDefault();
                     if (found == null)
                         return Json(new { });
                     else

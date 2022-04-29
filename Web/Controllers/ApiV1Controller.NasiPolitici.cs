@@ -141,21 +141,21 @@ namespace HlidacStatu.Web.Controllers
             string osobaInsQuery = $"{{0}}.osobaId:{o.NameId}";
             //var oinsRes = Insolvence.SimpleSearch("osobaid:" + Model.NameId, 1, 5, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc, false, false);
             //query: dluznici.osobaId:{o.NameId}
-            var oinsDluznik = InsolvenceRepo.Searching.SimpleSearch(string.Format(osobaInsQuery, "dluznici"), 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
+            var oinsDluznik = InsolvenceRepo.Searching.SimpleSearchAsync(string.Format(osobaInsQuery, "dluznici"), 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
             //query: veritele.osobaId:{o.NameId}
-            var oinsVeritel = InsolvenceRepo.Searching.SimpleSearch(string.Format(osobaInsQuery, "veritele"), 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
+            var oinsVeritel = InsolvenceRepo.Searching.SimpleSearchAsync(string.Format(osobaInsQuery, "veritele"), 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
             //query: spravci.osobaId:{o.NameId}
-            var oinsSpravce = InsolvenceRepo.Searching.SimpleSearch(string.Format(osobaInsQuery, "spravci"), 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
+            var oinsSpravce = InsolvenceRepo.Searching.SimpleSearchAsync(string.Format(osobaInsQuery, "spravci"), 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
 
             Dictionary<string, long> oinsolv = new Dictionary<string, long>();
             oinsolv.Add("dluznici|dlužník|dlužníka|dlužníkem", oinsDluznik.Total);
             oinsolv.Add("veritele|věřitel|věřitele|veřitelem", oinsVeritel.Total);
             oinsolv.Add("spravci|insolvenční správce|insolvenčního správce|insolvenčním správcem", oinsSpravce.Total);
 
-            var insRes = InsolvenceRepo.Searching.SimpleSearch("osobaid:" + o.NameId, 1, 5, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc, false, true);
-            var insDluznik = InsolvenceRepo.Searching.SimpleSearch("osobaiddluznik:" + o.NameId, 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
-            var insVeritel = InsolvenceRepo.Searching.SimpleSearch("osobaidveritel:" + o.NameId, 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
-            var insSpravce = InsolvenceRepo.Searching.SimpleSearch("osobaidspravce:" + o.NameId, 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
+            var insRes = InsolvenceRepo.Searching.SimpleSearchAsync("osobaid:" + o.NameId, 1, 5, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc, false, true);
+            var insDluznik = InsolvenceRepo.Searching.SimpleSearchAsync("osobaiddluznik:" + o.NameId, 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
+            var insVeritel = InsolvenceRepo.Searching.SimpleSearchAsync("osobaidveritel:" + o.NameId, 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
+            var insSpravce = InsolvenceRepo.Searching.SimpleSearchAsync("osobaidspravce:" + o.NameId, 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
 
             Dictionary<string, long> insolv = new Dictionary<string, long>();
             insolv.Add("dluznik|dlužník|dlužníka|dlužníkem", insDluznik.Total);

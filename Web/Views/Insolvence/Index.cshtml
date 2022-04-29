@@ -5,7 +5,7 @@
 
 
 @{
-    DateTime dataForDate = InsolvenceRepo.Searching.SimpleSearch("*", 1, 1,
+    DateTime dataForDate = InsolvenceRepo.Searching.SimpleSearchAsync("*", 1, 1,
             (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc,
             limitedView: false)
         .ElasticResults.Hits.First().Source.PosledniZmena;

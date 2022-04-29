@@ -9,12 +9,13 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class InsolvenceRepo
     {
-        public static InsolvenceDetail LoadFromES(string id, bool includeDocumentsPlainText, bool limitedView)
+        public static async Task<InsolvenceDetail> LoadFromEsAsync(string id, bool includeDocumentsPlainText, bool limitedView)
         {
             var client = Manager.GetESClient_Insolvence();
             var spisovaZnacka = ParseId(id);
@@ -22,8 +23,8 @@ namespace HlidacStatu.Repositories
             try
             {
                 var rizeni = includeDocumentsPlainText
-                    ? client.Get<Rizeni>(spisovaZnacka)
-                    : client.Get<Rizeni>(spisovaZnacka, s => s
+                    ? await client.GetAsync<Rizeni>(spisovaZnacka)
+                    : await client.GetAsync<Rizeni>(spisovaZnacka, s => s
                             .SourceExcludes("dokumenty.plainText")
                     //.SourceExclude("")
                     );
@@ -53,18 +54,15 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static void SaveRizeni(Rizeni r)
-        {
-            RizeniRepo.SaveAsync(r);
-        }
+        public static async Task SaveRizeniAsync(Rizeni r) => await RizeniRepo.SaveAsync(r);
 
-        public static DokumentSeSpisovouZnackou LoadDokument(string id, bool limitedView)
+        public static async Task<DokumentSeSpisovouZnackou> LoadDokumentAsync(string id, bool limitedView)
         {
             var client = Manager.GetESClient_Insolvence();
 
             try
             {
-                var data = client.Search<Rizeni>(s => s
+                var data = await client.SearchAsync<Rizeni>(s => s
                     .Source(sr => sr.Includes(r => r.Fields("dokumenty.*").Fields("spisovaZnacka")))
                     .Query(q => q.Match(m => m.Field("dokumenty.id").Query(id)))); //TODO
 
@@ -89,26 +87,19 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static InsolvenceSearchResult NewFirmyVInsolvenci(int count, bool limitedView)
-        {
-            return NewSubjektVInsolvenci(count, "P", limitedView);
-        }
+        public static Task<InsolvenceSearchResult> NewFirmyVInsolvenciAsync(int count, bool limitedView) 
+            => NewSubjektVInsolvenciAsync(count, "P", limitedView);
 
-        public static InsolvenceSearchResult NewOsobyVInsolvenci(int count, bool limitedView)
-        {
-            return NewSubjektVInsolvenci(count, "F", limitedView);
-        }
+        public static Task<InsolvenceSearchResult> NewOsobyVInsolvenciAsync(int count, bool limitedView) 
+            => NewSubjektVInsolvenciAsync(count, "F", limitedView);
 
-        private static InsolvenceSearchResult NewSubjektVInsolvenci(int count, string typ, bool limitedView)
+        private static Task<InsolvenceSearchResult> NewSubjektVInsolvenciAsync(int count, string typ, bool limitedView)
         {
-            var rs = InsolvenceRepo.Searching.SimpleSearch("dluznici.typ:" + typ, 1, count,
+            return InsolvenceRepo.Searching.SimpleSearchAsync("dluznici.typ:" + typ, 1, count,
                 (int)InsolvenceSearchResult.InsolvenceOrderResult.DateAddedDesc, false, limitedView, null);
-
-            return rs;
-
         }
 
-        public static IEnumerable<string> AllIdsFromDB()
+        public static IEnumerable<string> AllIdsFromDb()
         {
             //return AllIdsFromDB(null);
             using (var db = new Lib.Db.Insolvence.InsolvenceEntities())
@@ -118,12 +109,12 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static IEnumerable<string> AllIdsFromES(Action<string> outputWriter = null,
+        public static IEnumerable<string> AllIdsFromEs(Action<string> outputWriter = null,
             Action<Devmasters.Batch.ActionProgressData> progressWriter = null)
         {
-            Func<int, int, ISearchResponse<Rizeni>> searchFunc = (size, page) =>
+            Func<int, int, Task<ISearchResponse<Rizeni>>> searchFunc = async (size, page) =>
             {
-                return Manager.GetESClient_Insolvence().Search<Rizeni>(a => a
+                return await Manager.GetESClient_Insolvence().SearchAsync<Rizeni>(a => a
                     .Size(size)
                     .Source(false)
                     .From(page * size)

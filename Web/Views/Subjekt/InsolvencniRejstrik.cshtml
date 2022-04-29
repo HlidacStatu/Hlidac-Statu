@@ -12,9 +12,9 @@
         <div>
             <h4>Insolvenční rejstřík</h4>
 
-            @{ var insDluznik = InsolvenceRepo.Searching.SimpleSearch("icodluznik:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
-                var insVeritel = InsolvenceRepo.Searching.SimpleSearch("icoveritel:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
-                var insSpravce = InsolvenceRepo.Searching.SimpleSearch("icospravce:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
+            @{ var insDluznik = InsolvenceRepo.Searching.SimpleSearchAsync("icodluznik:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
+                var insVeritel = InsolvenceRepo.Searching.SimpleSearchAsync("icoveritel:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
+                var insSpravce = InsolvenceRepo.Searching.SimpleSearchAsync("icospravce:" + Model.ICO, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, InsolvenceLimitedView.IsLimited(User));
 
                 Dictionary<string, long> insolv = new();
                 insolv.Add("dluznik|dlužník|dlužníka|dlužníkem", insDluznik.Total);

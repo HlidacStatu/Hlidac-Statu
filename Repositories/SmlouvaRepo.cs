@@ -35,7 +35,7 @@ namespace HlidacStatu.Repositories
             return DeleteAsync(smlouva.Id);
         }
 
-        public static Smlouva[] GetPodobneSmlouvy(string idSmlouvy, IEnumerable<QueryContainer> mandatory,
+        public static async Task<Smlouva[]> GetPodobneSmlouvyAsync(string idSmlouvy, IEnumerable<QueryContainer> mandatory,
             IEnumerable<QueryContainer> optional = null, IEnumerable<string> exceptIds = null, int numOfResults = 50)
         {
             optional = optional ?? new QueryContainer[] { };
@@ -49,11 +49,11 @@ namespace HlidacStatu.Repositories
                 tryNum--;
 
                 var tmpResult = new List<Smlouva>();
-                var res = SmlouvaRepo.Searching.RawSearchAsync(
+                var res = await SmlouvaRepo.Searching.RawSearchAsync(
                     new QueryContainerDescriptor<Smlouva>().Bool(b => b.Must(query)),
                     1, numOfResults, SmlouvaRepo.Searching.OrderResult.DateAddedDesc, null
                 );
-                var resN = SmlouvaRepo.Searching.RawSearchAsync(
+                var resN = await SmlouvaRepo.Searching.RawSearchAsync(
                     new QueryContainerDescriptor<Smlouva>().Bool(b => b.Must(query)),
                     1, numOfResults, SmlouvaRepo.Searching.OrderResult.DateAddedDesc, null, platnyZaznam: false
                 );
@@ -121,7 +121,7 @@ namespace HlidacStatu.Repositories
 
             smlouva.Hint.DenUzavreni = (int)Devmasters.DT.Util.TypeOfDay(smlouva.datumUzavreni);
 
-            if (firmy.Count() == 0)
+            if (!firmy.Any())
                 smlouva.Hint.PocetDniOdZalozeniFirmy = 9999;
             else
                 smlouva.Hint.PocetDniOdZalozeniFirmy = (int)firmy

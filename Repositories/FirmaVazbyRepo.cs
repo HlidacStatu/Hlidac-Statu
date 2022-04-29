@@ -67,7 +67,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private static void updateVazby(this Firma firma, bool refresh = false)
+        private static void UpdateVazby(this Firma firma, bool refresh = false)
         {
             try
             {
@@ -86,7 +86,7 @@ namespace HlidacStatu.Repositories
         {
             if (firma._vazby == null || refresh == true)
             {
-                firma.updateVazby(refresh);
+                firma.UpdateVazby(refresh);
             }
 
             return firma._vazby;
@@ -258,7 +258,7 @@ namespace HlidacStatu.Repositories
             return new Vertex<string>($"{HlidacStatu.Datastructures.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}");
         }
 
-        public static void UpdateVazbyFromDB(this Firma firma)
+        public static void UpdateVazbyFromDb(this Firma firma)
         {
             List<Datastructures.Graphs.Graph.Edge> oldRel = new List<Datastructures.Graphs.Graph.Edge>();
 

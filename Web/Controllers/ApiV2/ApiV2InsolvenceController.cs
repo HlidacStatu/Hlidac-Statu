@@ -65,7 +65,7 @@ namespace HlidacStatu.Web.Controllers
                 || HttpContext.User.IsInRole("KomercniLicence")
             );
 
-            result = InsolvenceRepo.Searching.SimpleSearch(dotaz, strana.Value,
+            result = InsolvenceRepo.Searching.SimpleSearchAsync(dotaz, strana.Value,
                 ApiV2Controller.DefaultResultPageSize, razeni.Value, false, isLimited);
 
             if (result.IsValid == false)
@@ -107,7 +107,7 @@ namespace HlidacStatu.Web.Controllers
                 || HttpContext.User.IsInRole("KomercniLicence")
             );
 
-            var ins = InsolvenceRepo.LoadFromES(id, true, isLimited);
+            var ins = InsolvenceRepo.LoadFromEsAsync(id, true, isLimited);
             if (ins == null)
             {
                 return NotFound($"Insolvence nenalezena");

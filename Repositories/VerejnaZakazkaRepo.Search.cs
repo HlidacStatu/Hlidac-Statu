@@ -17,14 +17,6 @@ namespace HlidacStatu.Repositories
     {
         public static class Searching
         {
-            private static string regex = "[^/]*\r\n/(?<regex>[^/]*)/\r\n[^/]*\r\n";
-
-            private static RegexOptions options = (
-                RegexOptions.IgnorePatternWhitespace
-                | RegexOptions.Multiline
-                | RegexOptions.IgnoreCase);
-
-            
             public static IRule[] Rules = new IRule[]
             {
                 new OsobaId("osobaid:", "ico:"),

@@ -85,7 +85,7 @@ namespace HlidacStatu.Repositories.Statistics
 
         private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateDotaceStat(Firma f)
         {
-            var dotaceFirmy = DotaceRepo.GetDotaceForIco(f.ICO);
+            var dotaceFirmy = DotaceRepo.GetDotaceForIcoAsync(f.ICO);
 
             // doplnit počty dotací
             var statistiky = dotaceFirmy.GroupBy(d => d.DatumPodpisu?.Year)

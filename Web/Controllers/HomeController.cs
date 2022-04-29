@@ -264,7 +264,7 @@ text zpravy: {txt}
 ";
                     Util.SMTPTools.SendSimpleMailToPodpora(subject, body, email);
 
-                    string classificationExplanation = SmlouvaRepo.GetClassificationExplanation(data);
+                    string classificationExplanation = SmlouvaRepo.GetClassificationExplanationAsync(data);
 
                     string explain = $"explain result: {classificationExplanation} ";
 
@@ -631,7 +631,7 @@ text zpravy: {txt}
 
         public ActionResult HledatFirmy(string q, int? page = 1)
         {
-            var model = FirmaRepo.Searching.SimpleSearch(q, page.Value, 50);
+            var model = FirmaRepo.Searching.SimpleSearchAsync(q, page.Value, 50);
             return View(model);
         }
 
@@ -990,7 +990,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "insolvence")
             {
-                var s = InsolvenceRepo.LoadFromES(v, false, true)?.Rizeni;
+                var s = InsolvenceRepo.LoadFromEsAsync(v, false, true)?.Rizeni;
                 if (s != null)
                 {
                     if (!s.NotInterestingToShow())

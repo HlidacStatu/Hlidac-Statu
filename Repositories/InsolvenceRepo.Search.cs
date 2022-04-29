@@ -7,6 +7,7 @@ using HlidacStatu.Repositories.Searching.Rules;
 using Nest;
 
 using System;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -14,16 +15,6 @@ namespace HlidacStatu.Repositories
     {
         public static class Searching
         {
-            static string regex = "[^/]*\r\n/(?<regex>[^/]*)/\r\n[^/]*\r\n";
-
-            static System.Text.RegularExpressions.RegexOptions options =
-                ((System.Text.RegularExpressions.RegexOptions.IgnorePatternWhitespace |
-                  System.Text.RegularExpressions.RegexOptions.Multiline)
-                 | System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-
-            static System.Text.RegularExpressions.Regex regFindRegex =
-                new System.Text.RegularExpressions.Regex(regex, options);
-
             static string[] queryShorcuts = new string[]
             {
                 "ico:",
@@ -48,7 +39,6 @@ namespace HlidacStatu.Repositories
             };
 
             static string[] queryOperators = new string[] { "AND", "OR" };
-
 
             public static QueryContainer GetSimpleQuery(string query)
             {
@@ -111,12 +101,11 @@ namespace HlidacStatu.Repositories
             }
 
 
-            public static InsolvenceSearchResult SimpleSearch(string query, int page, int pagesize, int order,
+            public static Task<InsolvenceSearchResult> SimpleSearchAsync(string query, int page, int pagesize, int order,
                 bool withHighlighting = false,
                 bool limitedView = true,
-                AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
-            {
-                return SimpleSearch(new InsolvenceSearchResult()
+                AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false) 
+                => SimpleSearchAsync(new InsolvenceSearchResult()
                 {
                     Q = query,
                     Page = page,
@@ -125,9 +114,8 @@ namespace HlidacStatu.Repositories
                     Order = order.ToString(),
                     ExactNumOfResults = exactNumOfResults
                 }, withHighlighting, anyAggregation);
-            }
 
-            public static InsolvenceSearchResult SimpleSearch(InsolvenceSearchResult search,
+            public static async Task<InsolvenceSearchResult> SimpleSearchAsync(InsolvenceSearchResult search,
                 bool withHighlighting = false,
                 AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
             {
@@ -143,8 +131,8 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<Rizeni> res = null;
                 try
                 {
-                    res = client
-                        .Search<Rizeni>(s => s
+                    res = await client
+                        .SearchAsync<Rizeni>(s => s
                             .Size(search.PageSize)
                             .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)
                             .From(page * search.PageSize)
@@ -161,8 +149,8 @@ namespace HlidacStatu.Repositories
                     if (withHighlighting && res.Shards != null &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
                     {
-                        res = client
-                            .Search<Rizeni>(s => s
+                        res = await client
+                            .SearchAsync<Rizeni>(s => s
                                 .Size(search.PageSize)
                                 .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)
                                 .From(page * search.PageSize)

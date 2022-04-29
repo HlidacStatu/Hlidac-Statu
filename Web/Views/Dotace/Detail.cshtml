@@ -12,7 +12,7 @@
     if (!string.IsNullOrWhiteSpace(Model.Prijemce.Ico)
         && !string.IsNullOrWhiteSpace(Model.KodProjektu))
     {
-        var foundDuplicates = DotaceRepo.Searching.SimpleSearch(duplicitaQuery, 0, 1000, DotaceSearchResult.DotaceOrderResult.FastestForScroll);
+        var foundDuplicates = DotaceRepo.Searching.SimpleSearchAsync(duplicitaQuery, 0, 1000, DotaceSearchResult.DotaceOrderResult.FastestForScroll);
         if (foundDuplicates.HasResult)
         {
             duplicity = foundDuplicates.Results.ToList();

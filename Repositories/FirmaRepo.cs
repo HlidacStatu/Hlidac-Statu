@@ -228,10 +228,8 @@ namespace HlidacStatu.Repositories
         public static Firma FromName(string jmeno)
         {
             var res = AllFromExactName(jmeno);
-            if (res.Count() == 0)
-                return Firma.NotFound;
-            else
-                return res.First();
+            return res.FirstOrDefault(Firma.NotFound);
+            
         }
 
         public static IEnumerable<Firma> AllFromExactName(string jmeno)

@@ -3,6 +3,8 @@ using HlidacStatu.Util.Cache;
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nest;
 
 namespace HlidacStatu.Repositories
 {
@@ -56,15 +58,13 @@ namespace HlidacStatu.Repositories
             if (string.IsNullOrEmpty(query.Query))
                 return new string[] { };
 
-            Func<int, int, Nest.ISearchResponse<Smlouva>> searchFunc = (size, page) =>
+            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = (size, page) =>
             {
-                return ES.Manager.GetESClient().Search<Smlouva>(a => a
+                return ES.Manager.GetESClient().SearchAsync<Smlouva>(a => a
                     .Size(size)
                     .Source(false)
-                    //.Fields(f => f.Field("Id"))
                     .From(page * size)
                     .Query(q => SmlouvaRepo.Searching.GetSimpleQuery(query.Query))
-                    //.Sort(s => s.Ascending(ss => ss.LastUpdate))
                     .Scroll("1m")
                 );
             };

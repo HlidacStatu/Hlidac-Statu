@@ -576,7 +576,7 @@ namespace HlidacStatu.Repositories
         {
             //var dotSer = new Dotace.DotaceService();
 
-            foreach (var dotace in DotaceRepo.GetAll())
+            foreach (var dotace in DotaceRepo.GetAllAsync())
             {
                 bool missingEssentialData = string.IsNullOrWhiteSpace(dotace.Prijemce?.Ico)
                     || !dotace.DatumPodpisu.HasValue;

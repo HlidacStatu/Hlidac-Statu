@@ -127,15 +127,10 @@ namespace HlidacStatu.Repositories
                 return qc;
             }
 
-
-            static string regex = "[^/]*\r\n/(?<regex>[^/]*)/\r\n[^/]*\r\n";
-            static RegexOptions options = ((RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline)
-                                           | RegexOptions.IgnoreCase);
-
             public static async Task<SmlouvaSearchResult> SearchRawAsync(QueryContainer query, int page, int pageSize, OrderResult order,
-        AggregationContainerDescriptor<Smlouva> anyAggregation = null,
-        bool? platnyZaznam = null, bool includeNeplatne = false, bool logError = true, bool fixQuery = true,
-        bool withHighlighting = false)
+                AggregationContainerDescriptor<Smlouva> anyAggregation = null,
+                bool? platnyZaznam = null, bool includeNeplatne = false, bool logError = true, bool fixQuery = true,
+                bool withHighlighting = false)
             {
 
                 var result = new SmlouvaSearchResult()

@@ -30,7 +30,7 @@ namespace HlidacStatu.XLib.Watchdogs
         {
             var query = "posledniZmena:" +
                         string.Format("[* TO {0}]", Repositories.Searching.Tools.ToElasticDate(toDate));
-            var res = InsolvenceRepo.Searching.SimpleSearch(query, 0, 1,
+            var res = InsolvenceRepo.Searching.SimpleSearchAsync(query, 0, 1,
                 (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc,
                 false, isLimited);
 
@@ -55,7 +55,7 @@ namespace HlidacStatu.XLib.Watchdogs
                     Repositories.Searching.Tools.ToElasticDate(toDate, "*"));
             }
 
-            var res = InsolvenceRepo.Searching.SimpleSearch(query, 0, 50,
+            var res = InsolvenceRepo.Searching.SimpleSearchAsync(query, 0, 50,
                 order == null
                     ? (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc
                     : Convert.ToInt32(order),

@@ -51,7 +51,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
 
-            result = DotaceRepo.Searching.SimpleSearch(dotaz, strana.Value,
+            result = DotaceRepo.Searching.SimpleSearchAsync(dotaz, strana.Value,
                 ApiV2Controller.DefaultResultPageSize,
                 (razeni ?? 0).ToString());
 
@@ -83,7 +83,7 @@ namespace HlidacStatu.Web.Controllers
                 return BadRequest($"Hodnota id chybí.");
             }
 
-            var dotace = DotaceRepo.Get(id);
+            var dotace = DotaceRepo.GetAsync(id);
             if (dotace == null)
             {
                 return NotFound($"Dotace nenalezena");

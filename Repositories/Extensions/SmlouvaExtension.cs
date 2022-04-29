@@ -202,7 +202,7 @@ namespace HlidacStatu.Extensions
 
 
             otherVersions = otherVersions
-                .Union(SmlouvaRepo.GetPodobneSmlouvy(smlouva.Id, mustQs, optionalQs, otherVersions.Select(m => m.Id)))
+                .Union(SmlouvaRepo.GetPodobneSmlouvyAsync(smlouva.Id, mustQs, optionalQs, otherVersions.Select(m => m.Id)))
                 .ToArray();
 
             return otherVersions;
@@ -224,7 +224,7 @@ namespace HlidacStatu.Extensions
                         t.Field(f => f.CalculatedPriceWithVATinCZK).Value(smlouva.CalculatedPriceWithVATinCZK)),
             };
 
-            var podobneSmlouvy = SmlouvaRepo.GetPodobneSmlouvy(smlouva.Id, smlouva.sameContractSides(), niceToHaveQs,
+            var podobneSmlouvy = SmlouvaRepo.GetPodobneSmlouvyAsync(smlouva.Id, smlouva.sameContractSides(), niceToHaveQs,
                 smlouva.OtherVersions().Select(m => m.Id), 10);
 
             return podobneSmlouvy;

@@ -21,8 +21,8 @@ namespace HlidacStatu.Web.Controllers
         {
             var model = new InsolvenceIndexViewModel
             {
-                NoveFirmyVInsolvenci = InsolvenceRepo.NewFirmyVInsolvenci(10, IsLimitedView()),
-                NoveOsobyVInsolvenci = InsolvenceRepo.NewOsobyVInsolvenci(10, IsLimitedView())
+                NoveFirmyVInsolvenci = InsolvenceRepo.NewFirmyVInsolvenciAsync(10, IsLimitedView()),
+                NoveOsobyVInsolvenci = InsolvenceRepo.NewOsobyVInsolvenciAsync(10, IsLimitedView())
             };
 
             return View(model);
@@ -36,7 +36,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
             model.LimitedView = IsLimitedView();
-            var res = InsolvenceRepo.Searching.SimpleSearch(model);
+            var res = InsolvenceRepo.Searching.SimpleSearchAsync(model);
 
             AuditRepo.Add(
                 Audit.Operations.UserSearch
@@ -59,7 +59,7 @@ namespace HlidacStatu.Web.Controllers
             //show highlighting
             bool showHighliting = !string.IsNullOrEmpty(Request.Query["qs"]);
 
-            var model = InsolvenceRepo.LoadFromES(id, showHighliting, false);
+            var model = InsolvenceRepo.LoadFromEsAsync(id, showHighliting, false);
             if (model == null)
             {
                 return new NotFoundResult();
@@ -71,7 +71,7 @@ namespace HlidacStatu.Web.Controllers
             if (showHighliting)
             {
                 var findRizeni =
-                    InsolvenceRepo.Searching.SimpleSearch($"_id:\"{model.Rizeni.SpisovaZnacka}\" AND ({Request.Query["qs"]})", 1, 1,
+                    InsolvenceRepo.Searching.SimpleSearchAsync($"_id:\"{model.Rizeni.SpisovaZnacka}\" AND ({Request.Query["qs"]})", 1, 1,
                         0, true);
                 if (findRizeni.Total > 0)
                     ViewBag.Highlighting = findRizeni.ElasticResults.Hits.First().Highlight;
@@ -90,7 +90,7 @@ namespace HlidacStatu.Web.Controllers
 
             bool showHighliting = !string.IsNullOrEmpty(Request.Query["qs"]);
 
-            var data = InsolvenceRepo.LoadFromES(id, showHighliting, false);
+            var data = InsolvenceRepo.LoadFromEsAsync(id, showHighliting, false);
             if (data == null)
             {
                 return new NotFoundResult();
@@ -103,7 +103,7 @@ namespace HlidacStatu.Web.Controllers
             if (showHighliting)
             {
                 var findRizeni =
-                    InsolvenceRepo.Searching.SimpleSearch($"_id:\"{data.Rizeni.SpisovaZnacka}\" AND ({Request.Query["qs"]})", 1, 1, 0,
+                    InsolvenceRepo.Searching.SimpleSearchAsync($"_id:\"{data.Rizeni.SpisovaZnacka}\" AND ({Request.Query["qs"]})", 1, 1, 0,
                         true);
                 if (findRizeni.Total > 0)
                 {
@@ -127,7 +127,7 @@ namespace HlidacStatu.Web.Controllers
                 return new NotFoundResult();
             }
 
-            var dokument = InsolvenceRepo.LoadDokument(id, false);
+            var dokument = InsolvenceRepo.LoadDokumentAsync(id, false);
             if (dokument == null)
             {
                 return new NotFoundResult();

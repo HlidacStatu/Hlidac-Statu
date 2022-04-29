@@ -44,7 +44,7 @@ namespace HlidacStatu.Extensions
             ret = VerejnaZakazkaRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, null, 1, 1, "0").Total > 0;
             if (ret) return ret;
 
-            ret = DotaceRepo.Searching.SimpleSearch("ico:" + firma.ICO, 1, 1, "0").Total > 0;
+            ret = DotaceRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, 1, 1, "0").Total > 0;
             return ret;
         }
 
