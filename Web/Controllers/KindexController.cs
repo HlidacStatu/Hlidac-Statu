@@ -48,7 +48,7 @@ namespace HlidacStatu.Web.Controllers
                 return Redirect("/");
             }
 
-            Backup backup = KIndexData.GetPreviousVersion(id);
+            Backup backup = KIndexData.GetPreviousVersionAsync(id);
 
             SetViewbagSelectedYear(ref rok);
             ViewBag.BackupCreated = backup.Created.ToString("dd.MM.yyyy");
@@ -259,7 +259,7 @@ text zpravy: {txt}";
             if (string.IsNullOrEmpty(id))
                 return NotFound();
 
-            var feedback = KindexFeedback.GetById(id);
+            var feedback = KindexFeedback.GetByIdAsync(id);
 
             if (feedback is null)
                 return NotFound();

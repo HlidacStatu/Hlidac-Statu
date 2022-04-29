@@ -13,11 +13,11 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         static int[] Percentiles = new int[] { 1, 5, 10, 25, 33, 50, 66, 75, 90, 95, 99 };
 
-        public static Devmasters.Cache.File.FileCache<Analysis.KorupcniRiziko.Statistics[]> KIndexStatTotal = new Devmasters.Cache.File.FileCache<Analysis.KorupcniRiziko.Statistics[]>(
+        public static Devmasters.Cache.File.FileCache<Statistics[]> KIndexStatTotal = new Devmasters.Cache.File.FileCache<Statistics[]>(
                 Init.WebAppDataPath, TimeSpan.Zero, "KIndexStat",
                     (o) =>
                     {
-                        return Lib.Analysis.KorupcniRiziko.Statistics.Calculate().ToArray();
+                        return Calculate().ToArray();
                     });
 
 
@@ -86,11 +86,11 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         public decimal Average()
         {
-            return this.AverageKindex;
+            return AverageKindex;
         }
         public decimal Average(KIndexData.KIndexParts part)
         {
-            return this.AverageParts.Radky.First(m => m.Velicina == (int)part).Hodnota;
+            return AverageParts.Radky.First(m => m.Velicina == (int)part).Hodnota;
         }
 
         public IEnumerable<SubjectWithKIndex> Filter(IEnumerable<(string ico, decimal kindex, string krajId)> source, IEnumerable<Firma.Zatrideni.Item> filterIco = null, bool showNone = false)
@@ -176,7 +176,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         public int? SubjektRank(string ico)
         {
-            var res = this.SubjektOrderedListKIndexAsc.FindIndex(m => m.ico == ico);
+            var res = SubjektOrderedListKIndexAsc.FindIndex(m => m.ico == ico);
             if (res == -1)
                 return null;
             else
@@ -184,7 +184,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         }
         public int? SubjektRank(string ico, KIndexData.KIndexParts part)
         {
-            var res = this.SubjektOrderedListPartsAsc[part].FindIndex(m => m.ico == ico);
+            var res = SubjektOrderedListPartsAsc[part].FindIndex(m => m.ico == ico);
             if (res == -1)
                 return null;
             else
@@ -197,7 +197,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             if (rank == null)
                 return "";
             else
-                return RankText(rank.Value, this.SubjektOrderedListKIndexAsc.Count);
+                return RankText(rank.Value, SubjektOrderedListKIndexAsc.Count);
         }
 
         public string SubjektRankText(string ico, KIndexData.KIndexParts part)
@@ -206,7 +206,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             if (rank == null)
                 return "";
             else
-                return RankText(rank.Value, this.SubjektOrderedListPartsAsc[part].Count);
+                return RankText(rank.Value, SubjektOrderedListPartsAsc[part].Count);
         }
 
         public string RankText(int rank, int count)
@@ -236,19 +236,19 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         public decimal Percentil(int perc, KIndexData.KIndexParts part)
         {
-            return this.PercentileParts[perc].Radky.First(m => m.Velicina == (int)part).Hodnota;
+            return PercentileParts[perc].Radky.First(m => m.Velicina == (int)part).Hodnota;
         }
 
 
         public decimal Percentil(int perc)
         {
-            return this.PercentileKIndex[perc];
+            return PercentileKIndex[perc];
         }
 
         public PercInterval GetKIndexPercentile(decimal value)
         {
             int prefValue = 0;
-            foreach (var perc in this.PercentileKIndex)
+            foreach (var perc in PercentileKIndex)
             {
                 if (value <= perc.Value)
                     return new PercInterval(prefValue, perc.Key);
@@ -260,7 +260,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         public PercInterval GetPartPercentil(KIndexData.KIndexParts part, decimal value)
         {
             int prefValue = 0;
-            foreach (var perc in this.PercentileParts)
+            foreach (var perc in PercentileParts)
             {
                 var percValue = perc.Value.Radky.First(m => m.Velicina == (int)part).Hodnota;
                 if (value <= percValue)

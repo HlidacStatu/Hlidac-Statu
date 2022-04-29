@@ -1,5 +1,4 @@
 ﻿using HlidacStatu.Entities;
-
 using System;
 using System.Collections.Generic;
 
@@ -8,8 +7,6 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
     public class SubjectWithKIndex : Firma.Zatrideni.Item
     {
         public decimal KIndex { get; set; }
-
-
     }
 
 
@@ -22,7 +19,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
     public class SubjectWithKIndexAnnualData : Firma.Zatrideni.Item
     {
-        public SubjectWithKIndexAnnualData() { }
+        public SubjectWithKIndexAnnualData()
+        {
+        }
 
         public SubjectWithKIndexAnnualData(Firma.Zatrideni.Item item)
         {
@@ -50,7 +49,5 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         }
 
         public KIndexData.Annual AnnualData { get; set; }
-
     }
-
 }

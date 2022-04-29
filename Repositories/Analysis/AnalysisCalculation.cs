@@ -11,7 +11,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Threading.Tasks;
 using Manager = HlidacStatu.Repositories.ES.Manager;
 
 namespace HlidacStatu.Repositories
@@ -81,14 +81,14 @@ namespace HlidacStatu.Repositories
 
         private static List<Smlouva> SimpleSmlouvyForIco(string ico, DateTime? from, DateTime? to)
         {
-            Func<int, int, ISearchResponse<Smlouva>> searchFunc = searchFunc = (size, page) =>
+            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = searchFunc = (size, page) =>
             {
                 var sdate = "";
                 if (from.HasValue)
                     sdate = $" AND podepsano:[{from?.ToString("yyyy-MM-dd") ?? "*"} TO {from?.ToString("yyyy-MM-dd") ?? DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")}]"; //podepsano:[2016-01-01 TO 2016-12-31]
 
 
-                return Manager.GetESClient().Search<Smlouva>(a => a
+                return Manager.GetESClient().SearchAsync<Smlouva>(a => a
                             .TrackTotalHits(page * size == 0)
                             .Size(size)
                             .From(page * size)
@@ -229,10 +229,10 @@ namespace HlidacStatu.Repositories
             }
 
 
-            Func<int, int, ISearchResponse<Smlouva>> searchFunc = null;
+            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = null;
             searchFunc = (size, page) =>
             {
-                return Manager.GetESClient().Search<Smlouva>(a => a
+                return Manager.GetESClient().SearchAsync<Smlouva>(a => a
                             .TrackTotalHits(page * size == 0)
                             .Size(size)
                             .From(page * size)
@@ -433,18 +433,15 @@ namespace HlidacStatu.Repositories
                 politicisVazbami.Select(m => m.Key).Union(sponzorujiciFirmy.Select(m => m.Ico)).Distinct()
             );
             //smlouvy s politikama
-            Func<int, int, ISearchResponse<Smlouva>> searchFunc = null;
-            searchFunc = (size, page) =>
-            {
-                return Manager.GetESClient().Search<Smlouva>(a => a
-                            .TrackTotalHits(page * size == 0)
-                            .Size(size)
-                            .From(page * size)
-                            .Source(m => m.Excludes(e => e.Field(o => o.Prilohy)))
-                            .Query(q => q.MatchAll())
-                            .Scroll("1m")
-                            );
-            };
+            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = (size, page) 
+                => Manager.GetESClient().SearchAsync<Smlouva>(a => a
+                    .TrackTotalHits(page * size == 0)
+                    .Size(size)
+                    .From(page * size)
+                    .Source(m => m.Excludes(e => e.Field(o => o.Prilohy)))
+                    .Query(q => q.MatchAll())
+                    .Scroll("1m")
+            );
 
 
             List<string> smlouvyIds = new List<string>();
@@ -488,7 +485,7 @@ namespace HlidacStatu.Repositories
             var allIcos = FirmaRepo.AllIcoInRS();
             Dictionary<string, IcoSmlouvaMinMax> firmy = new Dictionary<string, IcoSmlouvaMinMax>();
             object lockFirmy = new object();
-            var client = Manager.GetESClient();
+            
             AggregationContainerDescriptor<Smlouva> aggs = new AggregationContainerDescriptor<Smlouva>()
                 .Min("minDate", m => m
                     .Field(f => f.datumUzavreni)
@@ -509,7 +506,7 @@ namespace HlidacStatu.Repositories
                     else
                     {
 
-                        var res = SmlouvaRepo.Searching.SimpleSearchAsync("ico:" + ico, 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggs, exactNumOfResults: true);
+                        var res = await SmlouvaRepo.Searching.SimpleSearchAsync("ico:" + ico, 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggs, exactNumOfResults: true);
                         if (res.ElasticResults.Aggregations.Count > 0)
                         {
                             var epoch = ((ValueAggregate)res.ElasticResults.Aggregations.First().Value).Value;
@@ -555,7 +552,6 @@ namespace HlidacStatu.Repositories
             true, prefix: "GetFirmyCasovePodezreleZalozene "
             );
 
-
             Util.Consts.Logger.Debug("GetFirmyCasovePodezreleZalozene - filter with close dates");
 
             DateTime minDate = new DateTime(1990, 01, 01);
@@ -572,11 +568,9 @@ namespace HlidacStatu.Repositories
             return badF;
         }
 
-        public static IEnumerable<(string idDotace, string ico, int ageInDays)> CompanyAgeDuringSubsidy()
+        public static async IAsyncEnumerable<(string idDotace, string ico, int ageInDays)> CompanyAgeDuringSubsidy()
         {
-            //var dotSer = new Dotace.DotaceService();
-
-            foreach (var dotace in DotaceRepo.GetAllAsync())
+            await foreach (var dotace in DotaceRepo.GetAllAsync())
             {
                 bool missingEssentialData = string.IsNullOrWhiteSpace(dotace.Prijemce?.Ico)
                     || !dotace.DatumPodpisu.HasValue;

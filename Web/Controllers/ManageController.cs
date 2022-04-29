@@ -159,7 +159,7 @@ namespace HlidacStatu.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                feedback.Save();
+                feedback.SaveAsync();
             }
 
             return RedirectToAction(

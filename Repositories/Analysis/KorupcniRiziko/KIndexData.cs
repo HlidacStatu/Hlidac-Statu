@@ -7,6 +7,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -145,10 +146,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         [Nest.Date]
         public DateTime LastSaved { get; set; }
 
-        public void Save(string comment, bool useTempDb = false)
+        public async Task SaveAsync(string comment, bool useTempDb = false)
         {
-
-            Backup.CreateBackup(comment, this.Ico, useTempDb);
+            await Backup.CreateBackupAsync(comment, this.Ico, useTempDb);
 
             //calculate fields before saving
             this.LastSaved = DateTime.Now;
@@ -156,7 +156,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             if (useTempDb)
                 client = Manager.GetESClient_KIndexTemp();
 
-            var res = client.Index<KIndexData>(this, o => o.Id(this.Ico)); //druhy parametr musi byt pole, ktere je unikatni
+            var res = await client.IndexAsync<KIndexData>(this, o => o.Id(this.Ico)); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)
             {
                 throw new ApplicationException(res.ServerError?.ToString());
@@ -174,9 +174,8 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
             return label;
         }
-        public static KIndexData GetDirect((string ico, bool useTempDb) param)
+        public static async Task<KIndexData> GetDirectAsync((string ico, bool useTempDb) param)
         {
-
             if (Consts.KIndexExceptions.Contains(param.ico) && param.useTempDb == false)
                 return null;
 
@@ -185,7 +184,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 client = Manager.GetESClient_KIndexTemp();
 
 
-            var res = client.Get<KIndexData>(param.ico);
+            var res = await client.GetAsync<KIndexData>(param.ico);
             if (res.Found == false)
                 return null;
             else if (!res.IsValid)
@@ -251,7 +250,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             }
         }
 
-        public IOrderedEnumerable<Backup> GetPreviousVersions(bool futureData = false)
+        public async Task<IOrderedEnumerable<Backup>> GetPreviousVersionsAsync(bool futureData = false)
         {
             ElasticClient client = Manager.GetESClient_KIndexBackup();
             if (futureData)
@@ -260,7 +259,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             ISearchResponse<Backup> searchResults = null;
             try
             {
-                searchResults = client.Search<Backup>(s =>
+                searchResults = await client.SearchAsync<Backup>(s =>
                         s.Query(q => q.Term(f => f.KIndex.Ico, this.Ico)));
 
                 if (searchResults.IsValid && searchResults.Hits.Count > 0)
@@ -289,17 +288,15 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         }
 
-        public static Backup GetPreviousVersion(string id)
+        public static async Task<Backup> GetPreviousVersionAsync(string id)
         {
-
             ElasticClient client = Manager.GetESClient_KIndexBackup();
             if (!string.IsNullOrEmpty(Devmasters.Config.GetWebConfigValue("UseKindexTemp")))
                 client = Manager.GetESClient_KIndexBackupTemp();
 
-            GetResponse<Backup> searchResult = null;
             try
             {
-                searchResult = client.Get<Backup>(id);
+                var searchResult = await client.GetAsync<Backup>(id);
 
                 if (searchResult.IsValid)
                 {

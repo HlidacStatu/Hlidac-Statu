@@ -4,6 +4,7 @@ using HlidacStatu.Connectors;
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -20,13 +21,13 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 Init.WebAppDataPath, TimeSpan.Zero, "KIndexCompanies",
                     (o) =>
                     {
-                        return ListCompanies();
+                        return await ListCompaniesAsync();
                     });
 
-        private static Dictionary<string, SubjectNameCache> ListCompanies()
+        private static async Task<Dictionary<string, SubjectNameCache>> ListCompaniesAsync()
         {
             Dictionary<string, SubjectNameCache> companies = new Dictionary<string, SubjectNameCache>();
-            foreach (var kindexRecord in KIndex.YieldExistingKindexes())
+            await foreach (var kindexRecord in KIndex.YieldExistingKindexesAsync())
             {
                 companies.Add(kindexRecord.Ico, new SubjectNameCache(kindexRecord.Jmeno, kindexRecord.Ico));
             }

@@ -7,6 +7,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -14,7 +15,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
     {
 
         private static AutoUpdateCouchbaseCacheManager<KIndexData, (string ico, bool useTemp)> instanceByIco
-       = AutoUpdateCouchbaseCacheManager<KIndexData, (string ico, bool useTemp)>.GetSafeInstance("kindexByICOv2", KIndexData.GetDirect,
+       = AutoUpdateCouchbaseCacheManager<KIndexData, (string ico, bool useTemp)>.GetSafeInstance("kindexByICOv2", KIndexData.GetDirectAsync,
 #if (!DEBUG)
                 TimeSpan.FromDays(1)
 #else
@@ -83,7 +84,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             return Devmasters.Core.Right(hash, 15);
         }
 
-        public static IEnumerable<KIndexData> YieldExistingKindexes(string scrollTimeout = "2m", int scrollSize = 300, bool? useTempDb = null)
+        public static async IAsyncEnumerable<KIndexData> YieldExistingKindexesAsync(string scrollTimeout = "2m", int scrollSize = 300, bool? useTempDb = null)
         {
             useTempDb = useTempDb ?? !string.IsNullOrEmpty(Devmasters.Config.GetWebConfigValue("UseKindexTemp"));
 
@@ -92,7 +93,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 client = Manager.GetESClient_KIndexTemp();
 
 
-            ISearchResponse<KIndexData> initialResponse = client.Search<KIndexData>
+            ISearchResponse<KIndexData> initialResponse = await client.SearchAsync<KIndexData>
                 (scr => scr.From(0)
                      .Take(scrollSize)
                      .MatchAll()
@@ -113,7 +114,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             bool isScrollSetHasData = true;
             while (isScrollSetHasData)
             {
-                ISearchResponse<KIndexData> loopingResponse = client.Scroll<KIndexData>(scrollTimeout, scrollid);
+                ISearchResponse<KIndexData> loopingResponse = await client.ScrollAsync<KIndexData>(scrollTimeout, scrollid);
                 if (loopingResponse.IsValid)
                 {
                     foreach (var document in loopingResponse.Documents)
@@ -127,7 +128,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 isScrollSetHasData = loopingResponse.Documents.Any();
             }
 
-            client.ClearScroll(new ClearScrollRequest(scrollid));
+            await client.ClearScrollAsync(new ClearScrollRequest(scrollid));
 
         }
 

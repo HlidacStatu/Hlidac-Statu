@@ -23,7 +23,7 @@
 
 
 @{
-    var feedbacks = KindexFeedback.GetKindexFeedbacks(Model.Ico, Model.Year).ToList();
+    var feedbacks = KindexFeedback.GetKindexFeedbacksAsync(Model.Ico, Model.Year).ToList();
 }
 @if (feedbacks.Count() > 0)
 {
