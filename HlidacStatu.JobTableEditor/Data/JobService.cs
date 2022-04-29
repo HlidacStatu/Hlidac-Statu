@@ -132,7 +132,7 @@ namespace HlidacStatu.JobTableEditor.Data
                     Date = DateTime.Now,
                     Cells = JsonConvert.SerializeObject(table.Cells)
                 };
-                InDocTableCellsRepo.AddAsync(cells);
+                await InDocTableCellsRepo.AddAsync(cells);
             }
         }
 

@@ -4,7 +4,7 @@
 
 @{
     Layout = null;
-    var Data = VerejnaZakazkaRepo.Searching.GetVZForHoldingAsync(Model.ICO);
+    var Data = VerejnaZakazkaRepo.Searching.GetVzForHoldingAsync(Model.ICO);
 
     var profilyZadavatele = ProfilZadavateleRepo.GetByIcoAsync(Model.ICO)
         .GroupBy(k=>k.Url?.Trim(),m=>m, (k,m)=> new { k=k, pz = m.First()})

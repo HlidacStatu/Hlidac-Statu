@@ -139,7 +139,7 @@ namespace HlidacStatu.Web.Controllers
                 s.Issues = issues.ToArray();
 
 
-                SmlouvaRepo.SaveAsync(s);
+                await SmlouvaRepo.SaveAsync(s);
                 return Redirect(s.GetUrl(true));
             }
         }

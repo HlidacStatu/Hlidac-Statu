@@ -105,10 +105,10 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                         ReqLog.HttpErrorCode = (int)(((HttpWebResponse)wex.Response).StatusCode);
                     }
                 }
-                ProfilZadavateleDownloadRepo.SaveAsync(ReqLog);
+                await ProfilZadavateleDownloadRepo.SaveAsync(ReqLog);
                 profil.LastAccessResult = ProfilZadavatele.LastAccessResults.HttpError;
                 profil.LastAccess = DateTime.Now;
-                ProfilZadavateleRepo.SaveAsync(profil);
+                await ProfilZadavateleRepo.SaveAsync(profil);
                 return ReqLog;
 
             }
@@ -120,10 +120,10 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                 {
                     ReqLog.HttpErrorCode = (int)(((HttpWebResponse)wex.Response).StatusCode);
                 }
-                ProfilZadavateleDownloadRepo.SaveAsync(ReqLog);
+                await ProfilZadavateleDownloadRepo.SaveAsync(ReqLog);
                 profil.LastAccessResult = ProfilZadavatele.LastAccessResults.HttpError;
                 profil.LastAccess = DateTime.Now;
-                ProfilZadavateleRepo.SaveAsync(profil);
+                await ProfilZadavateleRepo.SaveAsync(profil);
                 return ReqLog;
 
             }
@@ -131,10 +131,10 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
             {
                 ReqLog.HttpValid = false;
                 ReqLog.HttpError = e.ToString();
-                ProfilZadavateleDownloadRepo.SaveAsync(ReqLog);
+                await ProfilZadavateleDownloadRepo.SaveAsync(ReqLog);
                 profil.LastAccessResult = ProfilZadavatele.LastAccessResults.HttpError;
                 profil.LastAccess = DateTime.Now;
-                ProfilZadavateleRepo.SaveAsync(profil);
+                await ProfilZadavateleRepo.SaveAsync(profil);
                 return ReqLog;
             }
             finally
@@ -156,11 +156,11 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                 ReqLog.XmlValid = false;
                 ReqLog.XmlError = e.ToString();
                 ReqLog.XmlInvalidContent = xml;
-                ProfilZadavateleDownloadRepo.SaveAsync(ReqLog);
+                await ProfilZadavateleDownloadRepo.SaveAsync(ReqLog);
 
                 profil.LastAccessResult = ProfilZadavatele.LastAccessResults.XmlError;
                 profil.LastAccess = DateTime.Now;
-                ProfilZadavateleRepo.SaveAsync(profil);
+                await ProfilZadavateleRepo.SaveAsync(profil);
                 return ReqLog;
             }
             if (prof != null)
@@ -170,12 +170,12 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                 foreach (var zak in prof.zakazka)
                 {
                     ZakazkaRaw myZak = new ZakazkaRaw(zak, profil);
-                    myZak.Save();
+                    await myZak.SaveAsync();
                 }
-                ProfilZadavateleDownloadRepo.SaveAsync(ReqLog);
+                await ProfilZadavateleDownloadRepo.SaveAsync(ReqLog);
                 profil.LastAccessResult = ProfilZadavatele.LastAccessResults.OK;
                 profil.LastAccess = DateTime.Now;
-                ProfilZadavateleRepo.SaveAsync(profil);
+                await ProfilZadavateleRepo.SaveAsync(profil);
 
             }
             return ReqLog;

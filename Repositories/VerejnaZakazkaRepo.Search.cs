@@ -162,7 +162,7 @@ namespace HlidacStatu.Repositories
                 { "jine", "75,55,793,790,508" },
             };
 
-            public static string[] CPVOblastToCPV(CPVSkupiny skupina)
+            public static string[] CpvOblastToCpv(CPVSkupiny skupina)
             {
                 var key = skupina.ToString().ToLower();
                 if (cpvSearchGroups.ContainsKey(key))
@@ -171,7 +171,7 @@ namespace HlidacStatu.Repositories
                     throw new ArgumentOutOfRangeException("CPVSkupinaToCPV failed for " + skupina);
             }
 
-            public static string[] CPVOblastToCPV(string skupinaJmeno)
+            public static string[] CpvOblastToCpv(string skupinaJmeno)
             {
                 if (string.IsNullOrWhiteSpace(skupinaJmeno))
                     return null;
@@ -181,7 +181,7 @@ namespace HlidacStatu.Repositories
                     {
                         try
                         {
-                            return CPVOblastToCPV((CPVSkupiny)iSkup);
+                            return CpvOblastToCpv((CPVSkupiny)iSkup);
                         }
                         catch (Exception)
                         {
@@ -602,7 +602,7 @@ namespace HlidacStatu.Repositories
 
             public static MemoryCacheManager<VerejnaZakazkaSearchData, string>
                 cachedSearches =
-                    new MemoryCacheManager<VerejnaZakazkaSearchData, string>("VZsearch", cachedFuncSimpleSearchAsync,
+                    new MemoryCacheManager<VerejnaZakazkaSearchData, string>("VZsearch", CachedFuncSimpleSearchAsync,
                         TimeSpan.FromHours(24));
 
             public static VerejnaZakazkaSearchData CachedSimpleSearch(TimeSpan expiration,
@@ -619,7 +619,7 @@ namespace HlidacStatu.Repositories
                 return cachedSearches.Get(Newtonsoft.Json.JsonConvert.SerializeObject(q), expiration);
             }
 
-            private static Task<VerejnaZakazkaSearchData> cachedFuncSimpleSearchAsync(string jsonFullSearchQuery)
+            private static Task<VerejnaZakazkaSearchData> CachedFuncSimpleSearchAsync(string jsonFullSearchQuery)
             {
                 var query = Newtonsoft.Json.JsonConvert.DeserializeObject<FullSearchQuery>(jsonFullSearchQuery);
                 return SimpleSearchAsync(query.search, query.anyAggregation, query.logError, query.fixQuery,
@@ -635,7 +635,7 @@ namespace HlidacStatu.Repositories
                 public ElasticClient client = null;
             }
 
-            public static IAsyncEnumerable<VerejnaZakazka> GetVZForHoldingAsync(string holdingIco)
+            public static IAsyncEnumerable<VerejnaZakazka> GetVzForHoldingAsync(string holdingIco)
             {
                 string query = Tools.FixInvalidQuery($"holding:{holdingIco}", queryShorcuts, queryOperators);
                 var qc = SimpleQueryCreator.GetSimpleQuery<VerejnaZakazka>(query, Rules);

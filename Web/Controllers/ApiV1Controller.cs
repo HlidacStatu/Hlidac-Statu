@@ -355,7 +355,7 @@ namespace HlidacStatu.Web.Controllers
                     UserId = HttpContext.User.Identity.Name,
                     //apiCallJson = Newtonsoft.Json.JsonConvert.SerializeObject(authId) ?? null
                 };
-                ErrorEnvelopeRepo.SaveAsync(ee, idxConn);
+                await ErrorEnvelopeRepo.SaveAsync(ee, idxConn);
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
                     new { error = "data is empty" }
                 ), "application/json");
@@ -364,7 +364,7 @@ namespace HlidacStatu.Web.Controllers
             VerejnaZakazka? vz = content;
             try
             {
-                VerejnaZakazkaRepo.SaveAsync(vz, idxConn);
+                await VerejnaZakazkaRepo.SaveAsync(vz, idxConn);
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
                     new { result = "ok" }
                 ), "application/json");
@@ -378,7 +378,7 @@ namespace HlidacStatu.Web.Controllers
                     UserId = HttpContext.User.Identity.Name,
                     //apiCallJson = Newtonsoft.Json.JsonConvert.SerializeObject(authId) ?? null
                 };
-                ErrorEnvelopeRepo.SaveAsync(ee, idxConn);
+                await ErrorEnvelopeRepo.SaveAsync(ee, idxConn);
 
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
                     new { error = "deserialization error", descr = e.ToString() }
@@ -786,10 +786,10 @@ namespace HlidacStatu.Web.Controllers
             ), "application/json");
         }
 
-        public ActionResult CheckText(string smlouvaid)
+        public async Task<ActionResult> CheckText(string smlouvaid)
         {
             Entities.Issues.IIssueAnalyzer textCheck = new Plugin.IssueAnalyzers.Text();
-            Smlouva s = SmlouvaRepo.LoadAsync(smlouvaid);
+            Smlouva s = await SmlouvaRepo.LoadAsync(smlouvaid);
             if (s != null)
             {
                 if (s.Prilohy != null && s.Prilohy.Count() > 0)
@@ -797,7 +797,7 @@ namespace HlidacStatu.Web.Controllers
                     var newIss = s.Issues.Where(m => m.IssueTypeId != 200).ToList();
                     newIss.AddRange(textCheck.FindIssues(s));
                     s.Issues = newIss.ToArray();
-                    SmlouvaRepo.SaveAsync(s);
+                    await SmlouvaRepo.SaveAsync(s);
                 }
             }
 

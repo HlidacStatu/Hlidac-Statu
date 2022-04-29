@@ -332,14 +332,14 @@ namespace HlidacStatu.Repositories
                 return res;
             }
 
-            public static IEnumerable<Osoba> GetPolitikByQueryFromFirmy(string jmeno, int maxNumOfResults = 50,
+            public static async Task<IEnumerable<Osoba>> GetPolitikByQueryFromFirmyAsync(string jmeno, int maxNumOfResults = 50,
                 IEnumerable<Firma> alreadyFoundFirmyIcos = null)
             {
                 var res = new Osoba[] { };
 
                 var firmy = alreadyFoundFirmyIcos;
                 if (firmy == null)
-                    firmy = FirmaRepo.Searching.SimpleSearchAsync(jmeno, 0, maxNumOfResults * 10).Result;
+                    firmy = (await FirmaRepo.Searching.SimpleSearchAsync(jmeno, 0, maxNumOfResults * 10)).Result;
 
                 if (firmy != null && firmy.Count() > 0)
                 {

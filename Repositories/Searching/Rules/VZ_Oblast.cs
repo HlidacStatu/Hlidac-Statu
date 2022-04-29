@@ -27,7 +27,7 @@ namespace HlidacStatu.Repositories.Searching.Rules
             if (part.Prefix.Equals("oblast:", StringComparison.InvariantCultureIgnoreCase))
             {
                 var oblastVal = part.Value;
-                var cpvs = VerejnaZakazkaRepo.Searching.CPVOblastToCPV(oblastVal);
+                var cpvs = VerejnaZakazkaRepo.Searching.CpvOblastToCpv(oblastVal);
                 if (cpvs != null)
                 {
                     //var q_cpv = "cPV:(" + cpvs.Select(s => s + "*").Aggregate((f, s) => f + " OR " + s) + ")";

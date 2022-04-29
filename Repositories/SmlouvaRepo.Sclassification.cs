@@ -16,10 +16,10 @@ namespace HlidacStatu.Repositories
     {
         private static volatile FileCacheManager stemCacheManager
             = FileCacheManager.GetSafeInstance("SmlouvyStems",
-                smlouvaKeyId => getRawStemsFromServerAsync(smlouvaKeyId),
+                smlouvaKeyId => GetRawStemsFromServerAsync(smlouvaKeyId),
                 TimeSpan.FromDays(365 * 10)); //10 years
 
-        private static async Task<byte[]> getRawStemsFromServerAsync(KeyAndId smlouvaKeyId)
+        private static async Task<byte[]> GetRawStemsFromServerAsync(KeyAndId smlouvaKeyId)
         {
             Smlouva s = await SmlouvaRepo.LoadAsync(smlouvaKeyId.ValueForData);
 
@@ -202,7 +202,7 @@ namespace HlidacStatu.Repositories
 
             smlouva.Classification.TypesToProperties(newClassification.ToArray());
             smlouva.Classification.LastUpdate = DateTime.Now;
-            SmlouvaRepo.SaveAsync(smlouva);
+            await SmlouvaRepo.SaveAsync(smlouva);
         }
 
         private static string CallEndpoint(string endpoint, string content, string id, int timeoutMs)

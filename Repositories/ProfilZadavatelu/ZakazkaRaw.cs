@@ -8,6 +8,7 @@ using Nest;
 using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.ProfilZadavatelu
 {
@@ -36,7 +37,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
 
         public ZakazkaStructure ZakazkaNaProfilu { get; set; }
 
-        public void Save(bool compare = true, ElasticClient client = null)
+        public async Task SaveAsync(bool compare = true, ElasticClient client = null)
         {
             bool save = false;
             var latest = GetLatest(ZakazkaId);
@@ -52,8 +53,8 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
             if (save)
             {
                 LastUpdate = DateTime.Now;
-                var es = (client ?? Manager.GetESClient_VerejneZakazkyNaProfiluRaw())
-                    .IndexDocument<ZakazkaRaw>(this);
+                var es = await (client ?? Manager.GetESClient_VerejneZakazkyNaProfiluRaw())
+                    .IndexDocumentAsync<ZakazkaRaw>(this);
             }
         }
 
