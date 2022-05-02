@@ -100,7 +100,7 @@
     <td>
         @if (Model.platnyZaznam == false)
         {
-            if (Model.OtherVersions().Length == 0)
+            if (Model.OtherVersionsAsync().Length == 0)
             {
                 <div class="alert alert-danger">
                     <table style="padding:0;margin:0;width:100%">
@@ -132,10 +132,10 @@
                         </tr>
                     </table>
                 </div>
-                if (Model.OtherVersions().Any(m => m.platnyZaznam))
+                if (Model.OtherVersionsAsync().Any(m => m.platnyZaznam))
                 {
                     <div class="alert alert-info">
-                        <a href="/Detail/@(Model.OtherVersions().Where(m => m.platnyZaznam).First().Id)">Ukázat platnou verzi této smlouvy</a>
+                        <a href="/Detail/@(Model.OtherVersionsAsync().Where(m => m.platnyZaznam).First().Id)">Ukázat platnou verzi této smlouvy</a>
                     </div>
                 }
             }

@@ -72,7 +72,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
             Manager.DoActionForAll<ProfilZadavatele>(Devmasters.Collections.Algorithms.RandomShuffle(profily2),
                 (p) =>
                 {
-                    parser.ProcessProfileZadavatelu(p, from);
+                    parser.ProcessProfileZadavateluAsync(p, from);
                     return new ActionOutputData();
                 }, outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter, true, prefix: "profil zadav 3 ");
 

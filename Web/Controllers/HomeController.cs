@@ -901,7 +901,7 @@ text zpravy: {txt}
                 Firma fi = Firmy.Get(v);
                 if (fi.Valid)
                 {
-                    if (!fi.NotInterestingToShow())
+                    if (!fi.NotInterestingToShowAsync())
                     {
                         var social = new ImageBannerCoreData()
                         {
@@ -952,7 +952,7 @@ text zpravy: {txt}
                 Osoba o = Osoby.GetByNameId.Get(v);
                 if (o != null)
                 {
-                    if (!o.NotInterestingToShow())
+                    if (!o.NotInterestingToShowAsync())
                     {
                         var social = new ImageBannerCoreData()
                         {

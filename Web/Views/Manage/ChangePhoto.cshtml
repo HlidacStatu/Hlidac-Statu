@@ -15,7 +15,7 @@
 {
 
     @if (o != null && HlidacStatu.Web.Framework.Constants.DontIndexOsoby.Contains(o.NameId.ToLower())
-                || (o != null && o.NotInterestingToShow() )
+                || (o != null && o.NotInterestingToShowAsync() )
         )
     {
         <meta name="robots" content="noindex, noarchive">

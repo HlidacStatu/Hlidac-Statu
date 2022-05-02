@@ -21,7 +21,7 @@
 }
 
 
-            @if (Model.OtherVersions().Length > 0)
+            @if (Model.OtherVersionsAsync().Length > 0)
             {
                 <tr>
                     <td>
@@ -29,9 +29,9 @@
                     </td>
                     <td>
                         <div>
-                            Nalezli jsme @(Devmasters.Lang.CS.Plural.Get(Model.OtherVersions().Length, "jednu provázanou smlouvu", "{0} provázané smlouvy", "{0} provázaných smluv")):
+                            Nalezli jsme @(Devmasters.Lang.CS.Plural.Get(Model.OtherVersionsAsync().Length, "jednu provázanou smlouvu", "{0} provázané smlouvy", "{0} provázaných smluv")):
                             <ul>
-                                @foreach (var os in Model.OtherVersions())
+                                @foreach (var os in Model.OtherVersionsAsync())
                                 {
                                     <li><a href="/Detail/@os.Id">Verze @os.Id; zveřejněna @os.casZverejneni.ToString("dd.MM.yyyy HH.mm"); @(os.platnyZaznam ? "platná" : "zneplatněna")</a></li>
                                 }
@@ -42,7 +42,7 @@
                 </tr>
             }
 
-            @if (Model.PodobneSmlouvy().Length > 0)
+            @if (Model.PodobneSmlouvyAsync().Length > 0)
             {
                 <tr>
                     <td>
@@ -50,9 +50,9 @@
                     </td>
                     <td>
                         <div>
-                            Nalezli jsme @(Devmasters.Lang.CS.Plural.Get(Model.PodobneSmlouvy().Length, "jednu podobnou smlouvu", "{0} podobné smlouvy", "{0} podobných smluv")):
+                            Nalezli jsme @(Devmasters.Lang.CS.Plural.Get(Model.PodobneSmlouvyAsync().Length, "jednu podobnou smlouvu", "{0} podobné smlouvy", "{0} podobných smluv")):
                             <ul>
-                                @foreach (var os in Model.PodobneSmlouvy())
+                                @foreach (var os in Model.PodobneSmlouvyAsync())
                                 {
                                     <li><a href="/Detail/@os.Id">Zveřejněna @os.casZverejneni.ToString("dd.MM.yyyy HH.mm"); částka @HlidacStatu.Util.RenderData.NicePriceHtml(os.CalculatedPriceWithVATinCZK) s DPH; @(os.platnyZaznam ? "platná" : "zneplatněna")</a></li>
                                 }

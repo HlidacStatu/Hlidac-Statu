@@ -225,8 +225,7 @@ namespace HlidacStatu.Repositories
                      {
                          var ret = new List<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>>();
                          var lockObj = new object();
-                         Devmasters.Batch.Manager.DoActionForAll<Osoba>(OsobaRepo.PolitickyAktivni.Get().Where(m => m.StatusOsoby() == Osoba.StatusOsobyEnum.Politik).Distinct(),
-                             (o) =>
+                         Devmasters.Batch.Manager.DoActionForAll<Osoba>(OsobaRepo.PolitickyAktivni.Get().Where(m => m.StatusOsoby() == Osoba.StatusOsobyEnum.Politik).Distinct(), async (o) =>
                              {
                                  var icos = o.AktualniVazby(Relation.AktualnostType.Nedavny)
                                                  .Where(w => !string.IsNullOrEmpty(w.To.Id))
@@ -234,7 +233,7 @@ namespace HlidacStatu.Repositories
                                                  .Select(w => w.To.Id);
                                  if (icos.Count() > 0)
                                  {
-                                     var res = InsolvenceRepo.Searching.SimpleSearchAsync("osobaiddluznik:" + o.NameId, 1, 100,
+                                     var res = await InsolvenceRepo.Searching.SimpleSearchAsync("osobaiddluznik:" + o.NameId, 1, 100,
                                             (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc,
                                             limitedView: false);
                                      if (res.IsValid && res.Total > 0)
@@ -368,18 +367,18 @@ namespace HlidacStatu.Repositories
 
                 Util.Consts.Logger.Info("Static data - BasicStatisticData ");
                 BasicStatisticData = new Devmasters.Cache.LocalMemory.LocalMemoryCache<List<double>>(
-                        TimeSpan.FromHours(6), (obj) =>
+                        TimeSpan.FromHours(6), async (obj) =>
                         {
                             List<double> pol = new List<double>();
                             try
                             {
-                                var res = SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: true, anyAggregation:
+                                var res = await SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: true, anyAggregation:
                                     new Nest.AggregationContainerDescriptor<Smlouva>()
                                         .Sum("totalPrice", m => m
                                             .Field(ff => ff.CalculatedPriceWithVATinCZK)
                                     ), exactNumOfResults: true
                                     );
-                                var resNepl = SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: false, anyAggregation:
+                                var resNepl = await SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: false, anyAggregation:
                                     new Nest.AggregationContainerDescriptor<Smlouva>()
                                         .Sum("totalPrice", m => m
                                             .Field(ff => ff.CalculatedPriceWithVATinCZK)

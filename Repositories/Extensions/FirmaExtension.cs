@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Extensions
 {
@@ -33,19 +34,12 @@ namespace HlidacStatu.Extensions
                 });
         }
 
-        public static bool MaVztahySeStatem(this Firma firma)
+        public static async Task<bool> MaVztahySeStatemAsync(this Firma firma)
         {
-            var ret = firma.IsSponzor();
-            if (ret) return ret;
-
-            ret = firma.StatistikaRegistruSmluv().Sum(s => s.PocetSmluv) > 0;
-            if (ret) return ret;
-
-            ret = VerejnaZakazkaRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, null, 1, 1, "0").Total > 0;
-            if (ret) return ret;
-
-            ret = DotaceRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, 1, 1, "0").Total > 0;
-            return ret;
+            return firma.IsSponzor()
+                   || firma.StatistikaRegistruSmluv().Sum(s => s.PocetSmluv) > 0
+                   || (await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, null, 1, 1, "0")).Total > 0
+                   || (await DotaceRepo.Searching.SimpleSearchAsync("ico:" + firma.ICO, 1, 1, "0")).Total > 0;
         }
 
         public static bool MaVazbyNaPolitikyPred(this Firma firma, DateTime date)
@@ -195,9 +189,9 @@ namespace HlidacStatu.Extensions
                 return null;
         }
 
-        public static bool NotInterestingToShow(this Firma firma)
+        public static async Task<bool> NotInterestingToShowAsync(this Firma firma)
         {
-            return (firma.MaVztahySeStatem() == false)
+            return (await firma.MaVztahySeStatemAsync() == false)
                    && (firma.IsNespolehlivyPlatceDPH() == false)
                    && (firma.MaVazbyNaPolitiky() == false);
         }
@@ -593,7 +587,7 @@ namespace HlidacStatu.Extensions
         {
             var cache = Util.Cache.CouchbaseCacheManager<InfoFact[], Firma>
                 .GetSafeInstance("Firma_InfoFacts",
-                    (firma) => GetInfoFacts(firma),
+                    (firma) => GetInfoFactsAsync(firma),
                     TimeSpan.FromHours(24),
                     Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                     Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
@@ -609,7 +603,7 @@ namespace HlidacStatu.Extensions
             var inf = _infoFactsCache().Get(firma);
             return inf;
         }
-        private static InfoFact[] GetInfoFacts(Firma firma)
+        private static async Task<InfoFact[]> GetInfoFactsAsync(Firma firma)
         {
             var sName = firma.ObecneJmeno();
             bool sMuzsky = sName == uradName;
@@ -702,10 +696,10 @@ namespace HlidacStatu.Extensions
                     );
                 }
 
-                long numFatalIssue = SmlouvaRepo.Searching.SimpleSearchAsync($"ico:{firma.ICO} AND chyby:zasadni", 0, 0,
-                    SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true).Total;
-                long numVazneIssue = SmlouvaRepo.Searching.SimpleSearchAsync($"ico:{firma.ICO} AND chyby:vazne", 0, 0,
-                    SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true).Total;
+                long numFatalIssue = (await SmlouvaRepo.Searching.SimpleSearchAsync($"ico:{firma.ICO} AND chyby:zasadni", 0, 0,
+                    SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true)).Total;
+                long numVazneIssue = (await SmlouvaRepo.Searching.SimpleSearchAsync($"ico:{firma.ICO} AND chyby:vazne", 0, 0,
+                    SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true)).Total;
 
                 if (numFatalIssue > 0)
                 {

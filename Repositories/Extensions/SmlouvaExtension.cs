@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Extensions
 {
@@ -161,15 +162,15 @@ namespace HlidacStatu.Extensions
 
 
 
-        public static Smlouva[] OtherVersions(this Smlouva smlouva)
+        public static async Task<Smlouva[]> OtherVersionsAsync(this Smlouva smlouva)
         {
             var result = new List<Smlouva>();
 
 
-            var res = SmlouvaRepo.Searching.SimpleSearchAsync("identifikator.idSmlouvy:" + smlouva.identifikator.idSmlouvy,
+            var res = await SmlouvaRepo.Searching.SimpleSearchAsync("identifikator.idSmlouvy:" + smlouva.identifikator.idSmlouvy,
                 1, 50, SmlouvaRepo.Searching.OrderResult.DateAddedDesc, null
             );
-            var resNeplatne = SmlouvaRepo.Searching.SimpleSearchAsync("identifikator.idSmlouvy:" + smlouva.identifikator.idSmlouvy,
+            var resNeplatne = await SmlouvaRepo.Searching.SimpleSearchAsync("identifikator.idSmlouvy:" + smlouva.identifikator.idSmlouvy,
                 1, 50, SmlouvaRepo.Searching.OrderResult.DateAddedDesc, null, platnyZaznam: false
             );
 
@@ -185,7 +186,7 @@ namespace HlidacStatu.Extensions
 
             var otherVersions = result.ToArray();
 
-            List<QueryContainer> mustQs = new List<QueryContainer>(smlouva.sameContractSides());
+            List<QueryContainer> mustQs = new List<QueryContainer>(smlouva.SameContractSides());
             mustQs.AddRange(new QueryContainer[]
             {
                     new QueryContainerDescriptor<Smlouva>().Match(qm => qm.Field(f => f.predmet).Query(smlouva.predmet)),
@@ -200,22 +201,15 @@ namespace HlidacStatu.Extensions
                     new QueryContainerDescriptor<Smlouva>().Term(t =>
                         t.Field(f => f.cisloSmlouvy).Value(smlouva.cisloSmlouvy)));
 
-
             otherVersions = otherVersions
-                .Union(SmlouvaRepo.GetPodobneSmlouvyAsync(smlouva.Id, mustQs, optionalQs, otherVersions.Select(m => m.Id)))
+                .Union(await SmlouvaRepo.GetPodobneSmlouvyAsync(smlouva.Id, mustQs, optionalQs, otherVersions.Select(m => m.Id)))
                 .ToArray();
 
             return otherVersions;
         }
 
-        public static Smlouva[] PodobneSmlouvy(this Smlouva smlouva)
+        public static async Task<Smlouva[]> PodobneSmlouvy(this Smlouva smlouva)
         {
-
-            IEnumerable<QueryContainer> mustQs = smlouva.sameContractSides().Union(new QueryContainer[]
-            {
-                    new QueryContainerDescriptor<Smlouva>().Match(qm => qm.Field(f => f.predmet).Query(smlouva.predmet)),
-                    new QueryContainerDescriptor<Smlouva>().Match(qm => qm.Field(f => f.predmet).Query(smlouva.predmet)),
-            });
             QueryContainer[] niceToHaveQs = new QueryContainer[]
             {
                     new QueryContainerDescriptor<Smlouva>().Term(
@@ -224,8 +218,9 @@ namespace HlidacStatu.Extensions
                         t.Field(f => f.CalculatedPriceWithVATinCZK).Value(smlouva.CalculatedPriceWithVATinCZK)),
             };
 
-            var podobneSmlouvy = SmlouvaRepo.GetPodobneSmlouvyAsync(smlouva.Id, smlouva.sameContractSides(), niceToHaveQs,
-                smlouva.OtherVersions().Select(m => m.Id), 10);
+            var exceptContracts = await smlouva.OtherVersionsAsync(); 
+            var podobneSmlouvy = await SmlouvaRepo.GetPodobneSmlouvyAsync(smlouva.Id, smlouva.SameContractSides(), niceToHaveQs,
+                exceptContracts.Select(m => m.Id), 10);
 
             return podobneSmlouvy;
         }
@@ -321,7 +316,7 @@ namespace HlidacStatu.Extensions
         }
 
 
-        private static QueryContainer[] sameContractSides(this Smlouva smlouva)
+        private static QueryContainer[] SameContractSides(this Smlouva smlouva)
         {
             QueryContainer[] mustQs = new QueryContainer[]
             {

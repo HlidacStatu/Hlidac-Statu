@@ -66,9 +66,9 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
 
 
             DateTime prvniZverejneni = item.casZverejneni;
-            if (item.OtherVersions().Length > 0)
+            if (item.OtherVersionsAsync().Length > 0)
             {
-                var newMin = item.OtherVersions().Min(m => m.casZverejneni);
+                var newMin = item.OtherVersionsAsync().Min(m => m.casZverejneni);
                 if (prvniZverejneni > newMin)
                     prvniZverejneni = newMin;
             }

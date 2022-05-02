@@ -411,7 +411,7 @@ namespace HlidacStatu.Repositories
                             Type = o.StatusOsoby().ToNiceDisplayName(),
                             ImageElement = $"<img src='{o.GetPhotoUrl(false)}' />",
                             Description = InfoFact.RenderInfoFacts(
-                                o.InfoFacts().Where(i => i.Level != InfoFact.ImportanceLevel.Stat).ToArray(),
+                                o.InfoFactsAsync().Where(i => i.Level != InfoFact.ImportanceLevel.Stat).ToArray(),
                                 2, true, false, "", "{0}", false),
                             Category = Autocomplete.CategoryEnum.Person
                         };

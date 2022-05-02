@@ -6,7 +6,9 @@ using HlidacStatu.Entities.VZ;
 using System;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
+using HlidacStatu.Entities.Logs;
 
 namespace HlidacStatu.Repositories.ProfilZadavatelu
 {
@@ -41,11 +43,11 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
         {
         }
 
-        public void ProcessProfileZadavatelu(ProfilZadavatele profil, DateTime from)
+        public async Task ProcessProfileZadavateluAsync(ProfilZadavatele profil, DateTime from)
         {
-            ProcessProfileZadavatelu(profil, from, DateTime.Now);
+            await ProcessProfileZadavateluAsync(profil, from, DateTime.Now);
         }
-        public void ProcessProfileZadavatelu(ProfilZadavatele profil, DateTime from, DateTime to)
+        public async Task ProcessProfileZadavateluAsync(ProfilZadavatele profil, DateTime from, DateTime to)
         {
 
             var di = new DateTimeInterval(from, to);
@@ -57,7 +59,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                 DateTime end = interv.End;
                 if (interv.End > DateTime.Now)
                     end = DateTime.Now;
-                var log = _processReqProfiluZadavatel(profil, interv.Start, end);
+                var log = await _processReqProfiluZadavatelAsync(profil, interv.Start, end);
                 if (log.HttpValid == false || log.XmlValid == false)
                 {
                     break;
@@ -65,7 +67,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
             }
         }
 
-        private Entities.Logs.ProfilZadavateleDownload _processReqProfiluZadavatel(ProfilZadavatele profil, DateTime from, DateTime to)
+        private async Task<ProfilZadavateleDownload> _processReqProfiluZadavatelAsync(ProfilZadavatele profil, DateTime from, DateTime to)
         {
             string xmlUrlTemp = profil.Url;
             if (profil.Url?.EndsWith("/") == true)
