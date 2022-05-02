@@ -295,7 +295,7 @@ namespace HlidacStatu.Web.Controllers
             try
             {
                 if (string.IsNullOrEmpty(id))
-                    return Content(JsonConvert.SerializeObject(DataSetDB.Instance.SearchData("*", 1, 100).Result,
+                    return Content(JsonConvert.SerializeObject(DataSetDB.Instance.SearchDataAsync("*", 1, 100).Result,
                             Formatting.None,
                             new JsonSerializerSettings() { ContractResolver = Serialization.PublicDatasetContractResolver.Instance })
                         , "application/json");
@@ -342,7 +342,7 @@ namespace HlidacStatu.Web.Controllers
                     return Json(ApiResponseStatus.DatasetNoPermision);
                 }
 
-                var res = DataSetDB.Instance.DeleteRegistration(id, HttpContext.User.Identity.Name);
+                var res = DataSetDB.Instance.DeleteRegistrationAsync(id, HttpContext.User.Identity.Name);
                 return Json(new ApiResponseStatus() { valid = res });
             }
             catch (DataSetException dse)
@@ -382,7 +382,7 @@ namespace HlidacStatu.Web.Controllers
 
 
                 bool bDesc = (desc == "1" || desc?.ToLower() == "true");
-                var res = ds.SearchData(q, page.Value, 50, sort + (bDesc ? " desc" : ""));
+                var res = ds.SearchDataAsync(q, page.Value, 50, sort + (bDesc ? " desc" : ""));
                 res.Result = res.Result.Select(m => { m.DbCreatedBy = null; return m; });
 
 
@@ -415,7 +415,7 @@ namespace HlidacStatu.Web.Controllers
             try
             {
                 var ds = DataSet.CachedDatasets.Get(id.ToLower());
-                var value = ds.GetDataObj(dataid);
+                var value = ds.GetDataObjAsync(dataid);
                 //remove from item
                 if (value == null)
                 {
@@ -451,7 +451,7 @@ namespace HlidacStatu.Web.Controllers
             try
             {
                 var ds = DataSet.CachedDatasets.Get(id.ToLower());
-                bool value = ds.ItemExists(dataid);
+                bool value = ds.ItemExistsAsync(dataid);
                 //remove from item
                 if (value == false)
                     return Content(JsonConvert.SerializeObject(false), "application/json");
@@ -494,14 +494,14 @@ namespace HlidacStatu.Web.Controllers
 
                 if (mode == "rewrite")
                 {
-                    newId = ds.AddData(data, dataid, HttpContext.User.Identity.Name, true);
+                    newId = ds.AddDataAsync(data, dataid, HttpContext.User.Identity.Name, true);
                 }
                 else if (mode == "merge")
                 {
-                    if (ds.ItemExists(dataid))
+                    if (ds.ItemExistsAsync(dataid))
                     {
                         //merge
-                        var oldObj = Datasets.Util.CleanHsProcessTypeValuesFromObject(ds.GetData(dataid));
+                        var oldObj = Datasets.Util.CleanHsProcessTypeValuesFromObject(ds.GetDataAsync(dataid));
                         var newObj = Datasets.Util.CleanHsProcessTypeValuesFromObject(data);
 
                         newObj["DbCreated"] = oldObj["DbCreated"];
@@ -517,16 +517,16 @@ namespace HlidacStatu.Web.Controllers
                                 MergeNullValueHandling = Newtonsoft.Json.Linq.MergeNullValueHandling.Ignore
                             }
                             );
-                            newId = ds.AddData(oldObj.ToString(), dataid, HttpContext.User.Identity.Name, true);
+                            newId = ds.AddDataAsync(oldObj.ToString(), dataid, HttpContext.User.Identity.Name, true);
                         }
                     }
                     else
-                        newId = ds.AddData(data, dataid, HttpContext.User.Identity.Name, true);
+                        newId = ds.AddDataAsync(data, dataid, HttpContext.User.Identity.Name, true);
                 }
                 else //skip 
                 {
-                    if (!ds.ItemExists(dataid))
-                        newId = ds.AddData(data, dataid, HttpContext.User.Identity.Name, true);
+                    if (!ds.ItemExistsAsync(dataid))
+                        newId = ds.AddDataAsync(data, dataid, HttpContext.User.Identity.Name, true);
                 }
                 return Json(new { id = newId });
             }

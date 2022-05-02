@@ -71,23 +71,23 @@ namespace HlidacStatu.Datasets.TransparentniUcty
 
         public void Save(string user)
         {
-            _client.AddData(this, Id, user);
+            _client.AddDataAsync(this, Id, user);
         }
 
         public static BankovniUcet Get(string cislo)
         {
-            BankovniUcet bu = _client.GetData<BankovniUcet>(TextUtil.NormalizeToURL(cislo));
+            BankovniUcet bu = _client.GetDataAsync<BankovniUcet>(TextUtil.NormalizeToURL(cislo));
             return bu;
         }
 
         public static bool DeleteUcet(BankovniUcet bu)
         {
-            return _client.DeleteData(bu.Id);
+            return _client.DeleteDataAsync(bu.Id);
         }
 
         public static IEnumerable<BankovniUcet> GetAll()
         {
-            var items = _client.GetAllData<BankovniUcet>();
+            var items = _client.GetAllDataAsync<BankovniUcet>();
 
             //var data = items
             //    .Select(m => Newtonsoft.Json.JsonConvert.SerializeObject(m))

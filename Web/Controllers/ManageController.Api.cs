@@ -172,7 +172,7 @@ namespace HlidacStatu.Web.Controllers
                         return File(rawData, contentType, filename);
                     }
 
-                    var sres = datasource.SearchData(q, 1, numOfRecords, (Util.ParseTools.ToInt(o) ?? 0).ToString());
+                    var sres = datasource.SearchDataAsync(q, 1, numOfRecords, (Util.ParseTools.ToInt(o) ?? 0).ToString());
 
                     if (sres.IsValid == false && !string.IsNullOrEmpty(sres.Q))
                     {
@@ -291,7 +291,7 @@ namespace HlidacStatu.Web.Controllers
                 }
 
                 //var sres = datasource.SearchData(q, 1, 1000, (Util.ParseTools.ToInt(o) ?? 0).ToString());
-                var res = datasource.GetAllDataForQuery(q).ToList();
+                var res = datasource.GetAllDataForQueryAsync(q).ToList();
 
                 if (!res.Any())
                 {

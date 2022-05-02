@@ -75,7 +75,7 @@ namespace HlidacStatu.XLib.Watchdogs
         public DateTime GetLatestRec(DateTime toDate)
         {
             var query = "DbCreated:" + string.Format("[* TO {0}]", Repositories.Searching.Tools.ToElasticDate(toDate));
-            DataSearchResult res = DataSet.SearchData(query, 1, 1, "DbCreated desc");
+            DataSearchResult res = DataSet.SearchDataAsync(query, 1, 1, "DbCreated desc");
 
             if (res.IsValid == false)
                 return DateTime.Now.Date.AddYears(-10);
@@ -97,7 +97,7 @@ namespace HlidacStatu.XLib.Watchdogs
                     Repositories.Searching.Tools.ToElasticDate(toDate, "*"));
             }
 
-            DataSearchResult res = DataSet.SearchData(query, 1, 50, order);
+            DataSearchResult res = DataSet.SearchDataAsync(query, 1, 50, order);
 
             return new Results(res.Result, res.Total,
                 query, fromDate, toDate, res.IsValid, WatchDog.AllDbDataType);

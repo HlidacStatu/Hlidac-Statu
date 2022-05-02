@@ -128,7 +128,7 @@
 
     string[] ignore = new string[] { "Předseda vlády", "Místopředseda", "Ministr bez portfeje" };
 
-    List<ministr> ministriAll = ds.SearchData("*", 1, 1000)
+    List<ministr> ministriAll = ds.SearchDataAsync("*", 1, 1000)
                                 .Result.Select(m =>
                                     new ministr()
                                     {

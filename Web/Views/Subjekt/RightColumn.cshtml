@@ -117,7 +117,7 @@
     @{
         List<HlidacStatu.Web.Models.SkutecniMajitele> majitele = new List<SkutecniMajitele>();
         HlidacStatu.Datasets.DataSet skutMajitDS = HlidacStatu.Datasets.DataSet.CachedDatasets.Get("skutecni-majitele");
-        var skutMajitRes = skutMajitDS.SearchDataRaw("ico:" + Model.ICO, 1, 1).Result.ToList();
+        var skutMajitRes = skutMajitDS.SearchDataRawAsync("ico:" + Model.ICO, 1, 1).Result.ToList();
     }
     @if (skutMajitRes.Any())
     {

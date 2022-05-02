@@ -163,7 +163,7 @@ namespace HlidacStatu.Datasets
                     reg.createdBy = updatedBy;
                     reg.NormalizeShortName();
 
-                    var newreg = RegisterNew(reg, updatedBy);
+                    var newreg = RegisterNewAsync(reg, updatedBy);
 
                     //HlidacStatu.Web.Framework.TemplateVirtualFileCacheManager.InvalidateTemplateCache(reg.datasetId);
 

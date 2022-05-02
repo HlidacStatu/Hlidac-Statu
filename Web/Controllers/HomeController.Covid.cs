@@ -39,7 +39,7 @@ namespace HlidacStatu.Web.Controllers
 
 
             NemocniceData[] nAll = ds
-                .SearchDataRaw("*", 1, 1000).Result
+                .SearchDataRawAsync("*", 1, 1000).Result
                 .Select(s => Newtonsoft.Json.JsonConvert.DeserializeObject<NemocniceData>(s.Item2))
                 .OrderByDescending(m => m.lastUpdated)
                 .Take(120)

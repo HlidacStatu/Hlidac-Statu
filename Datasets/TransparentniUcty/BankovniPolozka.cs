@@ -177,12 +177,12 @@ namespace HlidacStatu.Datasets.TransparentniUcty
             if (string.IsNullOrEmpty(Id))
                 InitId();
 
-            return _client.ItemExists(Id);
+            return _client.ItemExistsAsync(Id);
         }
 
         public bool Delete()
         {
-            return _client.DeleteData(Id);
+            return _client.DeleteDataAsync(Id);
         }
 
         public void Save(string user, bool updateId = true)
@@ -190,19 +190,19 @@ namespace HlidacStatu.Datasets.TransparentniUcty
             if (updateId || string.IsNullOrEmpty(Id))
                 InitId();
 
-            _client.AddData(this, Id, user);
+            _client.AddDataAsync(this, Id, user);
         }
 
 
         public static BankovniPolozka Get(string transactionId)
         {
-            BankovniPolozka bu = _client.GetData<BankovniPolozka>(transactionId);
+            BankovniPolozka bu = _client.GetDataAsync<BankovniPolozka>(transactionId);
             return bu;
         }
 
         public static IEnumerable<BankovniPolozka> GetAll()
         {
-            return _client.GetAllData<BankovniPolozka>();
+            return _client.GetAllDataAsync<BankovniPolozka>();
         }
 
     }

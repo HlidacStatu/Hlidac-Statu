@@ -783,7 +783,7 @@ text zpravy: {txt}
             if (id == "uohs-ed")
             {
                 var ds = DataSet.CachedDatasets.Get("rozhodnuti-uohs");
-                var res = ds.SearchData("*", 0, 30, "PravniMoc desc");
+                var res = ds.SearchDataAsync("*", 0, 30, "PravniMoc desc");
                 if (res.Total > 0)
                 {
                     sb.Append(

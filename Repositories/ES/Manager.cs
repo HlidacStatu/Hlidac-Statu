@@ -15,6 +15,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.ES
 {
@@ -97,19 +98,15 @@ namespace HlidacStatu.Repositories.ES
             System.Net.ServicePointManager.DefaultConnectionLimit = 1000;
         }
 
-        //public static void InitElasticSearchIndex()
-        //{
-        //    InitElasticSearchIndex(defaultIndexName);
-        //}
-        public static void InitElasticSearchIndex(ElasticClient client, IndexType? idxType)
+        public static async Task InitElasticSearchIndexAsync(ElasticClient client, IndexType? idxType)
         {
             if (idxType == null)
                 return;
             if (idxType.Value == IndexType.DataSource)
                 return;
-            var ret = client.Indices.Exists(client.ConnectionSettings.DefaultIndex);
+            var ret = await client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex);
             if (ret.Exists == false)
-                CreateIndex(client, idxType.Value);
+                await CreateIndexAsync(client, idxType.Value);
 
         }
         public static void DeleteIndex()
@@ -257,7 +254,7 @@ namespace HlidacStatu.Repositories.ES
 
                         var _client = new ElasticClient(sett);
                         if (init)
-                            InitElasticSearchIndex(_client, idxType);
+                            InitElasticSearchIndexAsync(_client, idxType);
 
                         _clients.TryAdd(cnnset, _client);
                     }
@@ -382,11 +379,8 @@ namespace HlidacStatu.Repositories.ES
                         propertyInfo.SetValue(first, newPropVal);
                         changed = true;
                     }
-                    else
-                        goto compareValues;
                 }
 
-compareValues:
                 object defValue = GetDefault(propertyInfo.PropertyType);
                 if (oldPropVal == defValue && newPropVal != defValue)
                 {
@@ -407,7 +401,7 @@ compareValues:
         }
 
 
-        public static void CreateIndex(ElasticClient client)
+        public static async Task CreateIndexAsync(ElasticClient client)
         {
             IndexSettings set = new IndexSettings();
             set.NumberOfReplicas = 1;
@@ -427,8 +421,8 @@ compareValues:
 
             var aliasName = client.ConnectionSettings.DefaultIndex;
             var indexName = $"hs-{aliasName}-01";
-            var res = client.Indices
-                .Create(indexName, i => i
+            await client.Indices
+                .CreateAsync(indexName, i => i
                     .InitializeUsing(idxSt)
                     .Map(mm => mm
                     .Properties(ps => ps
@@ -438,11 +432,11 @@ compareValues:
                     )
 
                 );
-            client.Indices.PutAlias(indexName, aliasName);
+            await client.Indices.PutAliasAsync(indexName, aliasName);
 
         }
 
-        public static void CreateIndex(ElasticClient client, IndexType idxTyp)
+        public static async Task CreateIndexAsync(ElasticClient client, IndexType idxTyp)
         {
             IndexSettings set = new IndexSettings();
             set.NumberOfReplicas = 1;
@@ -466,50 +460,50 @@ compareValues:
             switch (idxTyp)
             {
                 case IndexType.VerejneZakazky:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.VZ.VerejnaZakazka>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.ProfilZadavatele:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.VZ.ProfilZadavatele>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Insolvence:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Insolvence.Rizeni>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Dotace:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Dotace.Dotace>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.UptimeSSL:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.UptimeSSL>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.UptimeItem:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.UptimeItem>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Osoby:
-                    res = client.Indices
-                        .Create(indexName, i => i
+                    res = await client.Indices
+                        .CreateAsync(indexName, i => i
                             .InitializeUsing(new IndexState()
                             {
                                 Settings = new IndexSettings()
@@ -550,64 +544,64 @@ compareValues:
                     break;
 
                 case IndexType.Smlouvy:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Smlouva>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Firmy:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.FirmaInElastic>(map => map.AutoMap(maxRecursion: 1))
                        );
                     break;
                 case IndexType.KIndex:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<KIndexData>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.KIndexTemp:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<KIndexData>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.KIndexBackup:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Backup>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.KIndexBackupTemp:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Backup>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.KindexFeedback:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<KindexFeedback>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.Logs:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Logs.ProfilZadavateleDownload>(map => map.AutoMap(maxRecursion: 1))
                        );
                     break;
                 case IndexType.Audit:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(new IndexState()
                            {
                                Settings = new IndexSettings()
@@ -621,8 +615,8 @@ compareValues:
                        );
                     break;
                 case IndexType.VerejneZakazkyNaProfiluRaw:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                             .InitializeUsing(idxSt)
                             .Map<ZakazkaRaw>(map => map
                                     .Properties(p => p
@@ -634,8 +628,8 @@ compareValues:
                        );
                     break;
                 case IndexType.RPP_Kategorie:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(new IndexState()
                            {
                                Settings = new IndexSettings()
@@ -649,8 +643,8 @@ compareValues:
                        );
                     break;
                 case IndexType.RPP_OVM:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(new IndexState()
                            {
                                Settings = new IndexSettings()
@@ -664,8 +658,8 @@ compareValues:
                        );
                     break;
                 case IndexType.RPP_ISVS:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(new IndexState()
                            {
                                Settings = new IndexSettings()
@@ -679,15 +673,15 @@ compareValues:
                        );
                     break;
                 case IndexType.InDocTableCells:
-                    res = client.Indices
-                        .Create(indexName, i => i
+                    res = await client.Indices
+                        .CreateAsync(indexName, i => i
                             .InitializeUsing(idxSt)
                             .Map<Entities.InDocTableCells>(map => map.AutoMap().DateDetection(false))
                         );
                     break;
             }
             
-            client.Indices.PutAlias(indexName, aliasName);
+            await client.Indices.PutAliasAsync(indexName, aliasName);
 
         }
 

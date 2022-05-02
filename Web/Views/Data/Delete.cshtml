@@ -6,7 +6,7 @@
 
     ApiResponseStatus err = ViewBag.ApiResponseError;
 
-    long numOfRec = Model.SearchData("*", 1, 0).Total;
+    long numOfRec = Model.SearchDataAsync("*", 1, 0).Total;
 
 }
 @section scripts

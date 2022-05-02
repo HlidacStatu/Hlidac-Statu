@@ -91,7 +91,7 @@
                 {
                     string order = string.IsNullOrWhiteSpace(Model.Registration().defaultOrderBy) ? "DbCreated desc" : Model.Registration().defaultOrderBy;
                     //new HlidacStatu.Connectors.External.DataSets.DataSearchRawResult() { Q="*", Page=1, PageSize = 5, Order = "DbCreated Desc" });
-                    data = Model.SearchDataRaw("*", 1, 5,  order);
+                    data = Model.SearchDataRawAsync("*", 1, 5,  order);
 
                     if (Model.Registration()?.searchResultTemplate?.IsFullTemplate() == true)
                     {

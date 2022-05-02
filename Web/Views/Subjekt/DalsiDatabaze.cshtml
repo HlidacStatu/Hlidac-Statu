@@ -16,7 +16,7 @@
     List<string> results = new();
     
 
-    var queries = HlidacStatu.Datasets.DatasetRepo.Searching.GetSpecificQueriesForDatasets("ICO", Model.ICO, true);
+    var queries = HlidacStatu.Datasets.DatasetRepo.Searching.GetSpecificQueriesForDatasetsAsync("ICO", Model.ICO, true);
     var dsSearch = HlidacStatu.Datasets.Search.DatasetMultiQueryMultiResult.GeneralSearch(queries, 1, 5);
     if (dsSearch.IsValid && dsSearch.Total > 0)
     {

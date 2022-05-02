@@ -8,7 +8,7 @@
 
 
 
-    JObject jobj = JObject.Parse(Model.Dataset.GetData(Model.Data));
+    JObject jobj = JObject.Parse(Model.Dataset.GetDataAsync(Model.Data));
 
     string path = Context.Request.Query["p"];
     JObject docObj = null;
@@ -33,7 +33,7 @@
         found = true;
     }
 
-    Newtonsoft.Json.Linq.JObject itemjmodel = Model.Dataset.GetDataObj(Model.Data);
+    Newtonsoft.Json.Linq.JObject itemjmodel = Model.Dataset.GetDataObjAsync(Model.Data);
     dynamic itemModel = (dynamic)itemjmodel;
 
     ViewBag.SocialShareTitle = $"<b>{ViewBag.Title}</b>";

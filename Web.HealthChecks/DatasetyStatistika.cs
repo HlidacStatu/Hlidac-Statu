@@ -26,7 +26,7 @@ namespace HlidacStatu.Web.HealthChecks
                           var item = new DatasetStat();
                           item.Dataset = ds;
 
-                          var allrec = ds.SearchData("*", 1, 1, sort: "DbCreated desc", exactNumOfResults: true);
+                          var allrec = ds.SearchDataAsync("*", 1, 1, sort: "DbCreated desc", exactNumOfResults: true);
                           item.PocetCelkem = allrec.Total;
                           if (allrec.Total > 0)
                           {
@@ -62,7 +62,7 @@ namespace HlidacStatu.Web.HealthChecks
                                       break;
                               }
 
-                              var pocet = ds.SearchData($"DbCreated:[{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")} TO *]", 1, 0, exactNumOfResults: true);
+                              var pocet = ds.SearchDataAsync($"DbCreated:[{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")} TO *]", 1, 0, exactNumOfResults: true);
                               if (pocet.IsValid)
                                   item.PocetZaInterval.Add(interval.Value, pocet.Total);
                               else

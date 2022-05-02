@@ -95,7 +95,7 @@ namespace HlidacStatu.Datasets
                     {
                         try
                         {
-                            var rds = ds.SearchData(query, page, pageSize, sort);
+                            var rds = ds.SearchDataAsync(query, page, pageSize, sort);
                             if (rds.IsValid)
                             {
 

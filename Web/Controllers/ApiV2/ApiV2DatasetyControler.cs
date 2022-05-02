@@ -92,7 +92,7 @@ namespace HlidacStatu.Web.Controllers
                 }
 
                 bool bDesc = (desc == "1" || desc?.ToLower() == "true");
-                var res = ds.SearchData(dotaz, strana.Value, ApiV2Controller.DefaultResultPageSize, sort + (bDesc ? " desc" : ""));
+                var res = ds.SearchDataAsync(dotaz, strana.Value, ApiV2Controller.DefaultResultPageSize, sort + (bDesc ? " desc" : ""));
                 res.Result = res.Result.Select(m => { m.DbCreatedBy = null; return m; });
 
                 return new SearchResultDTO<object>(res.Total, res.Page, res.Result);
@@ -187,7 +187,7 @@ namespace HlidacStatu.Web.Controllers
                     return Forbid($"Nejste oprávněn mazat tento dataset.");
                 }
 
-                var res = DataSetDB.Instance.DeleteRegistration(datasetId, HttpContext.User?.Identity?.Name);
+                var res = DataSetDB.Instance.DeleteRegistrationAsync(datasetId, HttpContext.User?.Identity?.Name);
                 return res;
 
             }
@@ -261,7 +261,7 @@ namespace HlidacStatu.Web.Controllers
             try
             {
                 var ds = DataSet.CachedDatasets.Get(datasetId.ToLower());
-                var value = ds.GetDataObj(itemId);
+                var value = ds.GetDataObjAsync(itemId);
                 //remove from item
                 if (value == null)
                 {
@@ -328,13 +328,13 @@ namespace HlidacStatu.Web.Controllers
 
                 if (mode == "rewrite")
                 {
-                    newId = ds.AddData(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
+                    newId = ds.AddDataAsync(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
                 }
                 else if (mode == "merge")
                 {
-                    if (ds.ItemExists(itemId))
+                    if (ds.ItemExistsAsync(itemId))
                     {
-                        var oldObj = Datasets.Util.CleanHsProcessTypeValuesFromObject(ds.GetData(itemId));
+                        var oldObj = Datasets.Util.CleanHsProcessTypeValuesFromObject(ds.GetDataAsync(itemId));
                         var newObj = Datasets.Util.CleanHsProcessTypeValuesFromObject(data.ToString());
 
                         newObj["DbCreated"] = oldObj["DbCreated"];
@@ -350,17 +350,17 @@ namespace HlidacStatu.Web.Controllers
                                     MergeNullValueHandling = Newtonsoft.Json.Linq.MergeNullValueHandling.Ignore
                                 });
 
-                            newId = ds.AddData(oldObj.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
+                            newId = ds.AddDataAsync(oldObj.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
                         }
                     }
                     else
-                        newId = ds.AddData(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
+                        newId = ds.AddDataAsync(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
 
                 }
                 else //skip 
                 {
-                    if (!ds.ItemExists(itemId))
-                        newId = ds.AddData(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
+                    if (!ds.ItemExistsAsync(itemId))
+                        newId = ds.AddDataAsync(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
                 }
                 return new DSItemResponseDTO() { id = newId };
             }
@@ -427,7 +427,7 @@ namespace HlidacStatu.Web.Controllers
             List<string> results = new List<string>();
             try
             {
-                results = ds.AddDataBulk(json, "usr");
+                results = ds.AddDataBulkAsync(json, "usr");
             }
             catch (DataSetException dse)
             {
@@ -459,7 +459,7 @@ namespace HlidacStatu.Web.Controllers
                 {
                     return NotFound($"Dataset {datasetId} nenalezen.");
                 }
-                var value = ds.ItemExists(itemId);
+                var value = ds.ItemExistsAsync(itemId);
                 //remove from item
                 return value;
             }

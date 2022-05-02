@@ -29,7 +29,7 @@ namespace HlidacStatu.Web.Framework.Report
             (o) =>
             {
                 var ds = DataSet.CachedDatasets.Get("pomoc-covid");
-                return ds.GetAllData<covid_pomoc>().ToList();
+                return ds.GetAllDataAsync<covid_pomoc>().ToList();
             });
 
     }

@@ -19,7 +19,7 @@ namespace HlidacStatu.Web.Controllers
                 (o) =>
                 {
                     List<Models.DatasetIndexStat> ret = new List<Models.DatasetIndexStat>();
-                    var datasets = DataSetDB.Instance.SearchDataRaw("*", 1, 200)
+                    var datasets = DataSetDB.Instance.SearchDataRawAsync("*", 1, 200)
                         .Result
                         .Select(s => Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(s.Item2))
                         .Where(m => m.id != null);
@@ -28,7 +28,7 @@ namespace HlidacStatu.Web.Controllers
                     {
                         var rec = new Models.DatasetIndexStat() { Ds = ds };
                         var dsContent = DataSet.CachedDatasets.Get(ds.id.ToString());
-                        var allrec = dsContent.SearchData("", 1, 1, sort: "DbCreated desc", exactNumOfResults: true);
+                        var allrec = dsContent.SearchDataAsync("", 1, 1, sort: "DbCreated desc", exactNumOfResults: true);
                         rec.RecordNum = allrec.Total;
 
                         if (rec.RecordNum > 0)
@@ -38,7 +38,7 @@ namespace HlidacStatu.Web.Controllers
                                 rec.LastRecord = (DateTime?)lRec.DbCreated;
                         }
 
-                        var recordWeek = dsContent.SearchData($"DbCreated:[{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")} TO *]", 1, 0, exactNumOfResults: true);
+                        var recordWeek = dsContent.SearchDataAsync($"DbCreated:[{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")} TO *]", 1, 0, exactNumOfResults: true);
                         rec.RecordNumWeek = recordWeek.Total;
                         //string order = string.IsNullOrWhiteSpace(ds.defaultOrderBy) ? "DbCreated desc" : ds.defaultOrderBy;
                         //var data = dsContent.SearchDataRaw("*", 1, 1, order);
@@ -115,7 +115,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 datasetIndexStatCache.Invalidate();
 
-                DataSetDB.Instance.DeleteRegistration(ds.DatasetId, email);
+                DataSetDB.Instance.DeleteRegistrationAsync(ds.DatasetId, email);
                 return RedirectToAction("Index");
             }
             return View(ds);
@@ -293,7 +293,7 @@ namespace HlidacStatu.Web.Controllers
                 if (ds.Registration().hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
                     return RedirectToAction("index");
 
-                model = ds.SearchDataRaw(model.Q, model.Page, model.PageSize, model.Order);
+                model = ds.SearchDataRawAsync(model.Q, model.Page, model.PageSize, model.Order);
                 AuditRepo.Add(
                     Audit.Operations.UserSearch
                     , User?.Identity?.Name
@@ -338,7 +338,7 @@ namespace HlidacStatu.Web.Controllers
                 if (ds.Registration().hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
                     return RedirectToAction("index");
 
-                var dataItem = ds.GetData(dataid);
+                var dataItem = ds.GetDataAsync(dataid);
                 if (dataItem == null)
                     return RedirectToAction("index", new { id = id });
 
@@ -346,7 +346,7 @@ namespace HlidacStatu.Web.Controllers
                 {
                     try
                     {
-                        var findSm = ds.SearchDataRaw($"_id:\"{dataid}\" AND ({this.Request.Query["qs"]})", 1, 1,
+                        var findSm = ds.SearchDataRawAsync($"_id:\"{dataid}\" AND ({this.Request.Query["qs"]})", 1, 1,
                             null, withHighlighting: true);
                         if (findSm.Total > 0)
                             ViewBag.Highlighting = findSm.ElasticResultsRaw.Hits.First().Highlight;
@@ -388,7 +388,7 @@ namespace HlidacStatu.Web.Controllers
                 if (string.IsNullOrEmpty(dataid))
                     return RedirectToAction("index", new { id = id });
 
-                var dataItem = ds.GetData(dataid);
+                var dataItem = ds.GetDataAsync(dataid);
                 if (dataItem == null)
                     return RedirectToAction("index", new { id = id });
 

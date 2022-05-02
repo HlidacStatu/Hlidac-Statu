@@ -80,7 +80,7 @@ namespace HlidacStatu.Datasets
                     {
                         try
                         {
-                            DataSearchResult rds = ds.Key.SearchData(ds.Value, page, pageSize);
+                            DataSearchResult rds = ds.Key.SearchDataAsync(ds.Value, page, pageSize);
 
                             if (rds.IsValid)
                                 res.Results.Add(rds);

@@ -37,7 +37,7 @@
     HlidacStatu.Datasets.DataSet sankcniSeznam = HlidacStatu.Datasets.DataSet.CachedDatasets.Get("firmy-na-sankcnim-seznamu");
     try
     {
-        sankcniSeznamRes = sankcniSeznam.SearchData("ico:" + Model.ICO, 1, 1).Result.ToList()
+        sankcniSeznamRes = sankcniSeznam.SearchDataAsync("ico:" + Model.ICO, 1, 1).Result.ToList()
                           .Select(m=>(System.Dynamic.ExpandoObject)m)
                           .Select(m=>m.FirstOrDefault(p=>p.Key=="sankcni_seznam").Value as string)
                           .Where(m=>m!=null)                          
@@ -673,7 +673,7 @@ StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
 
     @{
 
-        var queries = HlidacStatu.Datasets.DatasetRepo.Searching.GetSpecificQueriesForDatasets("ICO", Model.ICO, true);
+        var queries = HlidacStatu.Datasets.DatasetRepo.Searching.GetSpecificQueriesForDatasetsAsync("ICO", Model.ICO, true);
         var dsSearch = HlidacStatu.Datasets.Search.DatasetMultiQueryMultiResult.GeneralSearch(queries, 1, 5);
 
     }

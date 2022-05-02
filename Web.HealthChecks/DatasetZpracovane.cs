@@ -70,7 +70,7 @@ namespace HlidacStatu.Web.HealthChecks
                 var ds = HlidacStatu.Datasets.DataSet.CachedDatasets.Get(options.DatasetId);
                 if (ds != null)
                 {
-                    var res = HlidacStatu.Datasets.DatasetRepo.Searching.SearchDataRaw(ds, $"DbCreated:{dateQ}", 1, 1,
+                    var res = HlidacStatu.Datasets.DatasetRepo.Searching.SearchDataRawAsync(ds, $"DbCreated:{dateQ}", 1, 1,
                         "0", exactNumOfResults: true);
 
                     result += $"{res.Total} zaznamů za {options.Interval.ToNiceDisplayName()} \n";

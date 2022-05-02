@@ -62,13 +62,13 @@
                 <tr>
                     <td>Záznamy datového zdroje</td>
                     @{
-                        var first = Model.SearchData("*", 1, 1, "DbCreated");
-                        var last = Model.SearchData("*", 1, 1, "DbCreated desc");
+                        var first = Model.SearchDataAsync("*", 1, 1, "DbCreated");
+                        var last = Model.SearchDataAsync("*", 1, 1, "DbCreated desc");
                     }
                     <td>
                         <p>
-                            Datový zdroj @Devmasters.Lang.CS.Plural.GetWithZero((int)Model.SearchData("", 1, 0).Total
-, "neobsahuje žádný záznam", "obsahuje jeden záznam", "obsahuje {0} záznamy", "obsahuje {0} záznamů")
+                            Datový zdroj @Devmasters.Lang.CS.Plural.GetWithZero((int)Model.SearchDataAsync("", 1, 0).Total
+                                             , "neobsahuje žádný záznam", "obsahuje jeden záznam", "obsahuje {0} záznamy", "obsahuje {0} záznamů")
                         </p>
                         @if (first.Total > 0)
                         {
