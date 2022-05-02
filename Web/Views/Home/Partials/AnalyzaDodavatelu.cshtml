@@ -24,7 +24,7 @@
 
 
 @{
-    var topDodavateleFull = HlidacStatu.Repositories.ES.QueryGrouped.TopDodavatelePerYearStats(
+    var topDodavateleFull = HlidacStatu.Repositories.ES.QueryGrouped.TopDodavatelePerYearStatsAsync(
                 Model.Query, HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList);
 
     var topDodavateleCurrSeason = topDodavateleFull.PerYear.CombinedTop(currentSeasonYear, 10);

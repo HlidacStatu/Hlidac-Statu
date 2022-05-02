@@ -70,7 +70,7 @@ namespace HlidacStatu.Repositories
             };
 
             List<string> ids2Process = new List<string>();
-            Repositories.Searching.Tools.DoActionForQuery<Smlouva>(ES.Manager.GetESClient(),
+            Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(ES.Manager.GetESClient(),
                 searchFunc, (hit, param) =>
                 {
                     ids2Process.Add(hit.Id);

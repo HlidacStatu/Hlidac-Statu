@@ -31,53 +31,53 @@ namespace HlidacStatu.Repositories.Statistics
         public static StatisticsPerYear<Smlouva.Statistics.Data> Calculate(string query)
         {
             StatisticsPerYear<SimpleStat> _calc_SeZasadnimNedostatkem =
-                ES.QueryGrouped.SmlouvyPerYear($"({query}) AND chyby:zasadni", Consts.RegistrSmluvYearsList);
+                ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND chyby:zasadni", Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_UzavrenoOVikendu =
-                ES.QueryGrouped.SmlouvyPerYear($"({query}) AND (hint.denUzavreni:>0)",
+                ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND (hint.denUzavreni:>0)",
                     Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_ULimitu =
-                ES.QueryGrouped.SmlouvyPerYear($"({query}) AND ( hint.smlouvaULimitu:>0 )",
+                ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND ( hint.smlouvaULimitu:>0 )",
                     Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_NovaFirmaDodavatel =
-                ES.QueryGrouped.SmlouvyPerYear(
+                ES.QueryGrouped.SmlouvyPerYearAsync(
                     $"({query}) AND ( hint.pocetDniOdZalozeniFirmy:>-50 AND hint.pocetDniOdZalozeniFirmy:<30 )",
                     Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_smlouvy =
-                ES.QueryGrouped.SmlouvyPerYear($"({query}) ", Consts.RegistrSmluvYearsList);
+                ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) ", Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_bezCeny =
-                ES.QueryGrouped.SmlouvyPerYear($"({query}) AND ( hint.skrytaCena:1 ) ",
+                ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND ( hint.skrytaCena:1 ) ",
                     Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_bezSmlStran =
-                ES.QueryGrouped.SmlouvyPerYear($"({query}) AND ( issues.issueTypeId:18 OR issues.issueTypeId:12 ) ",
+                ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND ( issues.issueTypeId:18 OR issues.issueTypeId:12 ) ",
                     Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_sVazbouNaPolitikyNedavne =
-                ES.QueryGrouped.SmlouvyPerYear($"({query}) AND ( sVazbouNaPolitikyNedavne:true ) ",
+                ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND ( sVazbouNaPolitikyNedavne:true ) ",
                     Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_sVazbouNaPolitikyBezCenyNedavne =
-                ES.QueryGrouped.SmlouvyPerYear(
+                ES.QueryGrouped.SmlouvyPerYearAsync(
                     $"({query}) AND ( hint.skrytaCena:1 ) AND ( sVazbouNaPolitikyNedavne:true ) ",
                     Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_soukrome =
-                ES.QueryGrouped.SmlouvyPerYear($"({query}) AND ( hint.vztahSeSoukromymSubjektem:>0 ) ",
+                ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND ( hint.vztahSeSoukromymSubjektem:>0 ) ",
                     Consts.RegistrSmluvYearsList);
             
             StatisticsPerYear<SimpleStat> _calc_soukromeBezCeny =
-                ES.QueryGrouped.SmlouvyPerYear(
+                ES.QueryGrouped.SmlouvyPerYearAsync(
                     $"({query}) AND ( hint.skrytaCena:1 ) AND ( hint.vztahSeSoukromymSubjektem:>0 ) ",
                     Consts.RegistrSmluvYearsList);
             //ES.QueryGrouped.SmlouvyPerYear($"({query}) AND ( issues.skrytaCena:1 ) AND ( hint.vztahSeSoukromymSubjektem:>0 ) ", Consts.RegistrSmluvYearsList);
 
             var _calc_poOblastech =
-                ES.QueryGrouped.OblastiPerYear($"( {query} )", Consts.RegistrSmluvYearsList);
+                ES.QueryGrouped.OblastiPerYearAsync($"( {query} )", Consts.RegistrSmluvYearsList);
 
             Dictionary<int, Smlouva.Statistics.Data> data = new Dictionary<int, Smlouva.Statistics.Data>();
             foreach (var year in Consts.RegistrSmluvYearsList)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.Searching
 {
@@ -53,9 +54,7 @@ namespace HlidacStatu.Repositories.Searching
             {
                 var cols = new string[] { p.Jmeno.ToLower(), p.Prijmeni.ToLower() };
                 var key = p.NameId;
-                List<string> variants = new List<string>();
-
-
+                
                 List<string> names = new List<string>();
                 for (int i = 1; i < cols.Length; i++)
                 {
@@ -87,13 +86,13 @@ namespace HlidacStatu.Repositories.Searching
             return politiciStems;
         }
 
-        public static string[] Stems(string text)
+        public static async Task<string[]> StemsAsync(string text)
         {
             using var wc = new System.Net.Http.HttpClient();
             var data = new System.Net.Http.StringContent(Newtonsoft.Json.JsonConvert.ToString(text));
-            var res = wc.PostAsync(classificationBaseUrl() + "/text_stemmer?ngrams=1", data).Result;
+            var res = await wc.PostAsync(classificationBaseUrl() + "/text_stemmer?ngrams=1", data).ConfigureAwait(false);
 
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(res.Content.ReadAsStringAsync().Result);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(await res.Content.ReadAsStringAsync().ConfigureAwait(false));
         }
 
         private static string classificationBaseUrl()
@@ -110,11 +109,11 @@ namespace HlidacStatu.Repositories.Searching
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static string[] FindCitations(string text)
+        public static async Task<string[]> FindCitations(string text)
         {
             var stopw = new Devmasters.DT.StopWatchEx();
             stopw.Start();
-            string[] sText = Stems(text);
+            string[] sText = await StemsAsync(text);
             stopw.Stop();
             //Console.WriteLine($"stemmer {stopw.ExactElapsedMiliseconds} ");
             stopw.Restart();

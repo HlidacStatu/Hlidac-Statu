@@ -99,7 +99,7 @@ namespace HlidacStatu.Repositories
             };
 
             List<Smlouva> smlouvy = new List<Smlouva>();
-            Repositories.Searching.Tools.DoActionForQuery<Smlouva>(Manager.GetESClient(), searchFunc,
+            Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(), searchFunc,
                   (hit, o) =>
                   {
                       smlouvy.Add(hit.Source);
@@ -248,7 +248,7 @@ namespace HlidacStatu.Repositories
             Dictionary<string, BasicDataForSubject<List<BasicData<string>>>> uradyStatni = new Dictionary<string, BasicDataForSubject<List<BasicData<string>>>>();
             Dictionary<string, BasicDataForSubject<List<BasicData<string>>>> uradySoukr = new Dictionary<string, BasicDataForSubject<List<BasicData<string>>>>();
             object lockObj = new object();
-            Repositories.Searching.Tools.DoActionForQuery<Smlouva>(Manager.GetESClient(), searchFunc,
+            Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(), searchFunc,
                   (hit, param) =>
                   {
                       Smlouva s = hit.Source;
@@ -445,7 +445,7 @@ namespace HlidacStatu.Repositories
 
 
             List<string> smlouvyIds = new List<string>();
-            Repositories.Searching.Tools.DoActionForQuery<Smlouva>(Manager.GetESClient(), searchFunc,
+            Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(), searchFunc,
                   (hit, param) =>
                   {
 

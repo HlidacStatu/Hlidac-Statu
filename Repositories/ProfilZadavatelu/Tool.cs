@@ -5,6 +5,9 @@ using HlidacStatu.Entities.VZ;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using HlidacStatu.Entities.Logs;
+using Nest;
 
 namespace HlidacStatu.Repositories.ProfilZadavatelu
 {
@@ -19,7 +22,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
             if (onlyWithErr == false) //vsechny profily
             {
                 Console.WriteLine("Reading profily zadavatelu");
-                Repositories.Searching.Tools.DoActionForAll<ProfilZadavatele>(
+                Repositories.Searching.Tools.DoActionForAllAsync<ProfilZadavatele>(
                     (pz, obj) =>
                     {
                         profily2.Add(pz.Source);
@@ -37,10 +40,10 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
             else //jen ty s http chybami
             {
                 Console.WriteLine("Reading profily zadavatelu with HTTP error");
-                Func<int, int, Nest.ISearchResponse<Entities.Logs.ProfilZadavateleDownload>> searchFunc = (size, page) =>
+                Func<int, int, Task<ISearchResponse<ProfilZadavateleDownload>>> searchFunc = (size, page) =>
                 {
                     return Repositories.ES.Manager.GetESClient_Logs()
-                            .Search<Entities.Logs.ProfilZadavateleDownload>(a => a
+                            .SearchAsync<Entities.Logs.ProfilZadavateleDownload>(a => a
                                 .Size(size)
                                 .Source(ss => ss.Excludes(f => f.Fields("xmlError", "xmlInvalidContent", "httpError")))
                                 .From(page * size)
@@ -49,13 +52,12 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                                 .Scroll("2m")
                                 );
                 };
-                Repositories.Searching.Tools.DoActionForQuery<Entities.Logs.ProfilZadavateleDownload>(Repositories.ES.Manager.GetESClient_Logs(), searchFunc,
-                    (pzd, obj) =>
+                Repositories.Searching.Tools.DoActionForQueryAsync<Entities.Logs.ProfilZadavateleDownload>(Repositories.ES.Manager.GetESClient_Logs(), searchFunc, async (pzd, obj) =>
                     {
                         var profileId = pzd.Source.ProfileId;
                         if (!profily2.Any(m => m.Id == profileId))
                         {
-                            var pz = ProfilZadavateleRepo.GetByIdAsync(profileId);
+                            var pz = await ProfilZadavateleRepo.GetByIdAsync(profileId);
                             if (pz != null)
                                 profily2.Add(pz);
                         }
@@ -69,10 +71,9 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
 
             Console.WriteLine("Let's go mining");
             Util.Consts.Logger.Debug("ProfilyZadavatelu: Let's go mining num." + profily2.Count);
-            Manager.DoActionForAll<ProfilZadavatele>(Devmasters.Collections.Algorithms.RandomShuffle(profily2),
-                (p) =>
+            Manager.DoActionForAll<ProfilZadavatele>(Devmasters.Collections.Algorithms.RandomShuffle(profily2), async (p) =>
                 {
-                    parser.ProcessProfileZadavateluAsync(p, from);
+                    await parser.ProcessProfileZadavateluAsync(p, from);
                     return new ActionOutputData();
                 }, outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter, true, prefix: "profil zadav 3 ");
 

@@ -1,18 +1,13 @@
 ﻿using Devmasters;
 using Devmasters.Batch;
-
-using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Util;
-
 using Nest;
-
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Manager = HlidacStatu.Repositories.ES.Manager;
 
 namespace HlidacStatu.Repositories.Searching
@@ -22,7 +17,9 @@ namespace HlidacStatu.Repositories.Searching
         public const int MaxResultWindow = 10000;
 
         static string regexInvalidQueryTemplate = @"(^|\s|[(])(?<q>$operator$\s{1} (?<v>(\w{1,})) )($|\s|[)])";
-        static RegexOptions regexQueryOption = RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline;
+
+        static RegexOptions regexQueryOption =
+            RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline;
 
         public static readonly string[] DefaultQueryOperators = new string[] { "AND", "OR" };
 
@@ -33,24 +30,26 @@ namespace HlidacStatu.Repositories.Searching
             HighlightDescriptor<T> hh = new HighlightDescriptor<T>();
             if (enable)
                 hh = hh.Order(HighlighterOrder.Score)
-                        .PreTags("<highl>")
-                        .PostTags("</highl>")
-                        .Fields(ff => ff
-                                    .Field("*")
-                                    .RequireFieldMatch(false)
-                                    .Type(HighlighterType.Unified)
-                                    .FragmentSize(100)
-                                    .NumberOfFragments(3)
-                                    .Fragmenter(HighlighterFragmenter.Span)
-                                    .BoundaryScanner(BoundaryScanner.Sentence)
-                                    .BoundaryScannerLocale("cs_CZ")
-                        );
+                    .PreTags("<highl>")
+                    .PostTags("</highl>")
+                    .Fields(ff => ff
+                        .Field("*")
+                        .RequireFieldMatch(false)
+                        .Type(HighlighterType.Unified)
+                        .FragmentSize(100)
+                        .NumberOfFragments(3)
+                        .Fragmenter(HighlighterFragmenter.Span)
+                        .BoundaryScanner(BoundaryScanner.Sentence)
+                        .BoundaryScannerLocale("cs_CZ")
+                    );
             return hh;
         }
+
         public static string FixInvalidQuery(string query, Rules.IRule[] rules, string[] operators = null)
         {
             return FixInvalidQuery(query, rules.SelectMany(m => m.Prefixes).ToArray(), operators);
         }
+
         public static string FixInvalidQuery(string query, string[] shortcuts, string[] operators = null)
         {
             if (operators == null)
@@ -80,6 +79,7 @@ namespace HlidacStatu.Repositories.Searching
                     if (operators.Contains(v))
                         return s;
                 }
+
                 var newVal = s.Replace(": ", ":");
                 return newVal;
             };
@@ -96,10 +96,12 @@ namespace HlidacStatu.Repositories.Searching
 
             // [\p{L}\p{M}\d_] \p{L} -znaky všech abeced \p{M} -kombinované znaky
             string invalidFormatRegex = @"(AND \s+)? ([^""]\w +\.?\w +) :($|[^\""=><[\p{L}\p{M}\d_{)]) (AND )?";
-            Match mIsInvalid = Regex.Match(query, invalidFormatRegex, (RegexOptions.IgnorePatternWhitespace | RegexOptions.IgnoreCase));
+            Match mIsInvalid = Regex.Match(query, invalidFormatRegex,
+                (RegexOptions.IgnorePatternWhitespace | RegexOptions.IgnoreCase));
             if (mIsInvalid.Success)
             {
-                newquery = Regex.Replace(newquery, invalidFormatRegex, " ", RegexOptions.IgnorePatternWhitespace | RegexOptions.IgnoreCase).Trim();
+                newquery = Regex.Replace(newquery, invalidFormatRegex, " ",
+                    RegexOptions.IgnorePatternWhitespace | RegexOptions.IgnoreCase).Trim();
             }
 
             var textParts = TextUtil.SplitStringToPartsWithQuotes(newquery, '\"');
@@ -116,7 +118,9 @@ namespace HlidacStatu.Repositories.Searching
                         var fixPart = tp.Item1;
                         fixPart = System.Net.WebUtility.UrlDecode(fixPart);
                         fixPart = System.Net.WebUtility.HtmlDecode(fixPart);
-                        Regex opReg = new Regex(string.Format(@"(^|\s)({0})(\s|$)", operators.Aggregate((f, s) => f + "|" + s)), regexQueryOption);
+                        Regex opReg =
+                            new Regex(string.Format(@"(^|\s)({0})(\s|$)", operators.Aggregate((f, s) => f + "|" + s)),
+                                regexQueryOption);
 
                         //UPPER Operator
                         fixPart = opReg.Replace(fixPart, (me) => { return me.Value.ToUpper(); });
@@ -126,6 +130,7 @@ namespace HlidacStatu.Repositories.Searching
                         fixedOperator = fixedOperator + fixPart;
                     }
                 }
+
                 newquery = fixedOperator;
             }
 
@@ -139,7 +144,8 @@ namespace HlidacStatu.Repositories.Searching
             //}
 
             //fix with small "to" in zverejneno:[2018-12-13 to *]
-            var dateintervalRegex = @"(podepsano|zverejneno):({|\[)\d{4}\-\d{2}\-\d{2}(?<to> \s*to\s*)(\d{4}-\d{2}-\d{2}|\*)(}|\])";
+            var dateintervalRegex =
+                @"(podepsano|zverejneno):({|\[)\d{4}\-\d{2}\-\d{2}(?<to> \s*to\s*)(\d{4}-\d{2}-\d{2}|\*)(}|\])";
             if (Regex.IsMatch(newquery, dateintervalRegex, regexQueryOption))
             {
                 newquery = newquery.ReplaceGroupMatchNameWithRegex(dateintervalRegex, "to", " TO ");
@@ -153,7 +159,7 @@ namespace HlidacStatu.Repositories.Searching
         }
 
         public static bool ValidateQuery<T>(ElasticClient client, QueryContainer qc)
-       where T : class
+            where T : class
         {
             return ValidateSpecificQueryRaw<T>(client, qc)?.Valid ?? false;
         }
@@ -162,6 +168,7 @@ namespace HlidacStatu.Repositories.Searching
         {
             return ValidateQueryRaw(query)?.Valid ?? false;
         }
+
         public static ValidateQueryResponse ValidateQueryRaw(string query)
         {
             return ValidateSpecificQueryRaw<Smlouva>(Manager.GetESClient(),
@@ -170,7 +177,7 @@ namespace HlidacStatu.Repositories.Searching
 
 
         public static ValidateQueryResponse ValidateSpecificQueryRaw<T>(ElasticClient client, QueryContainer qc)
-        where T : class
+            where T : class
         {
             var res = client.Indices
                 .ValidateQuery<T>(v => v
@@ -180,15 +187,10 @@ namespace HlidacStatu.Repositories.Searching
             return res;
         }
 
-        
-
-
-
-
-
 
         static string ScrollLifeTime = "2m";
-        public static void DoActionForAll<T>(
+
+        public static async Task DoActionForAllAsync<T>(
             Func<IHit<T>, object, ActionOutputData> action,
             object actionParameters,
             Action<string> logOutputFunc,
@@ -199,74 +201,65 @@ namespace HlidacStatu.Repositories.Searching
             ElasticClient elasticClient = null,
             string query = null,
             Indices indexes = null, string prefix = null
-
-            )
+        )
             where T : class
         {
             prefix = prefix ?? HlidacStatu.Util.StackReport.GetCallingMethod(false, skipFrames: 1);
 
             var client = elasticClient ?? Manager.GetESClient();
 
-            Func<int, int, ISearchResponse<T>> searchFunc = null;
+            Func<int, int, Task<ISearchResponse<T>>> searchFunc = null;
 
             var qs = new QueryContainerDescriptor<T>().MatchAll();
             if (!string.IsNullOrEmpty(query))
             {
                 qs = new QueryContainerDescriptor<T>()
-                        .QueryString(qq => qq
-                            .Query(query)
-                            .DefaultOperator(Operator.And)
-                        );
+                    .QueryString(qq => qq
+                        .Query(query)
+                        .DefaultOperator(Operator.And)
+                    );
             }
 
-
             if (IdOnly)
-                searchFunc = (size, page) =>
-                {
-                    return client.Search<T>(a => a
-                                .Index(indexes ?? client.ConnectionSettings.DefaultIndex)
-                                .Source(false)
-                                //.Fields(f => f.Field("Id"))
-                                .Size(size)
-                                .From(page * size)
-                                .Query(q => qs)
-                                .Scroll(ScrollLifeTime)
-                                );
-                };
+                searchFunc = (size, page) => client.SearchAsync<T>(a => a
+                    .Index(indexes ?? client.ConnectionSettings.DefaultIndex)
+                    .Source(false)
+                    //.Fields(f => f.Field("Id"))
+                    .Size(size)
+                    .From(page * size)
+                    .Query(q => qs)
+                    .Scroll(ScrollLifeTime)
+                );
             else
-                searchFunc = (size, page) =>
-                {
-                    return client.Search<T>(a => a
-                            .Index(indexes ?? client.ConnectionSettings.DefaultIndex)
-                            .Size(size)
-                            .From(page * size)
-                            .Query(q => qs)
-                            .Scroll(ScrollLifeTime)
-                        );
-                };
-
-            DoActionForQuery<T>(client,
-                    searchFunc,
-                    action, actionParameters,
-                    logOutputFunc,
-                    progressOutputFunc,
-                    parallel,
-                    blockSize, maxDegreeOfParallelism, prefix
+                searchFunc = (size, page) => client.SearchAsync<T>(a => a
+                        .Index(indexes ?? client.ConnectionSettings.DefaultIndex)
+                        .Size(size)
+                        .From(page * size)
+                        .Query(q => qs)
+                        .Scroll(ScrollLifeTime)
                     );
 
+            await DoActionForQueryAsync<T>(client,
+                searchFunc,
+                action, actionParameters,
+                logOutputFunc,
+                progressOutputFunc,
+                parallel,
+                blockSize, maxDegreeOfParallelism, prefix
+            );
         }
 
-        public static void DoActionForQuery<T>(ElasticClient client,
-            Func<int, int, ISearchResponse<T>> searchFunc,
+        public static async Task DoActionForQueryAsync<T>(ElasticClient client,
+            Func<int, int, Task<ISearchResponse<T>>> searchFunc,
             Func<IHit<T>, object, ActionOutputData> action, object actionParameters,
             Action<string> logOutputFunc,
             Action<ActionProgressData> progressOutputFunc,
             bool parallel,
             int blockSize = 500, int? maxDegreeOfParallelism = null, string prefix = null
-            )
+        )
             where T : class
         {
-            prefix = prefix ?? HlidacStatu.Util.StackReport.GetCallingMethod(false,skipFrames:1);
+            prefix = prefix ?? HlidacStatu.Util.StackReport.GetCallingMethod(false, skipFrames: 1);
 
             DateTime started = DateTime.Now;
             long total = 0;
@@ -284,25 +277,23 @@ namespace HlidacStatu.Repositories.Searching
                 parallel = false;
             try
             {
-                result = searchFunc(blockSize, currIteration);
+                result = await searchFunc(blockSize, currIteration);
                 if (result.IsValid == false)
                     Manager.LogQueryError<T>(result);
             }
             catch (Exception)
             {
-                Thread.Sleep(10000);
+                await Task.Delay(10000);
                 try
                 {
-                    result = searchFunc(blockSize, currIteration);
-
+                    result = await searchFunc(blockSize, currIteration);
                 }
                 catch (Exception)
                 {
-                    Thread.Sleep(20000);
+                    await Task.Delay(20000);
                     try
                     {
-                        result = searchFunc(blockSize, currIteration);
-
+                        result = await searchFunc(blockSize, currIteration);
                     }
                     catch (Exception ex)
                     {
@@ -311,20 +302,21 @@ namespace HlidacStatu.Repositories.Searching
                     }
                 }
             }
+
             scrollId = result.ScrollId;
 
             do
             {
-                DateTime iterationStart = DateTime.Now;
                 if (firstResult)
                 {
                     firstResult = false;
                 }
                 else
                 {
-                    result = client.Scroll<T>(ScrollLifeTime, scrollId);
+                    result = await client.ScrollAsync<T>(ScrollLifeTime, scrollId);
                     scrollId = result.ScrollId;
                 }
+
                 currIteration++;
 
                 if (result.Hits.Count() == 0)
@@ -336,7 +328,6 @@ namespace HlidacStatu.Repositories.Searching
 
                 if (parallel)
                 {
-
                     CancellationTokenSource cts = new CancellationTokenSource();
                     try
                     {
@@ -364,11 +355,10 @@ namespace HlidacStatu.Repositories.Searching
                                     Consts.Logger.Error("DoActionForAll action error", e);
                                     cts.Cancel();
                                 }
-
                             }
+
                             if (progressOutputFunc != null)
                             {
-
                                 ActionProgressData apd = new ActionProgressData(total, processedCount, started, prefix);
                                 progressOutputFunc(apd);
                             }
@@ -379,8 +369,6 @@ namespace HlidacStatu.Repositories.Searching
                         //Catestrophic Failure
                         canceled = true;
                     }
-
-
                 }
                 else
                     foreach (var hit in result.Hits)
@@ -398,6 +386,7 @@ namespace HlidacStatu.Repositories.Searching
                                 break;
                             }
                         }
+
                         if (progressOutputFunc != null)
                         {
                             ActionProgressData apd = new ActionProgressData(total, processedCount, started, prefix);
@@ -409,11 +398,11 @@ namespace HlidacStatu.Repositories.Searching
                 if (canceled)
                     break;
             } while (result.Hits.Count() > 0);
-            client.ClearScroll(c => c.ScrollId(scrollId));
+
+            await client.ClearScrollAsync(c => c.ScrollId(scrollId));
 
             if (logOutputFunc != null)
                 logOutputFunc("Done");
-
         }
 
 
@@ -428,9 +417,7 @@ namespace HlidacStatu.Repositories.Searching
             }
 
             return qc;
-
         }
-
 
 
         public static string ToElasticDate(DateTime? date, string defaultValue = "")
@@ -449,6 +436,5 @@ namespace HlidacStatu.Repositories.Searching
                     return date.Value.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
             }
         }
-
     }
 }

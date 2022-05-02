@@ -210,15 +210,6 @@ namespace HlidacStatu.Repositories
                         return data;
                     });
 
-
-                //HlidacStatu.Util.Consts.Logger.Info("Static data - FirmyStatsCache ");
-                //FirmyStatsCache = new Devmasters.Cache.File.FileCache<Dictionary<string, QueryStatistic.StatData>>
-                //        (StaticData.App_Data_Path, TimeSpan.Zero, "FirmyStats",
-                //            null //don't calculate new content. It's too time comsuming
-                //        );
-
-
-
                 Util.Consts.Logger.Info("Static data - Insolvence_firem_politiku ");
                 Insolvence_firem_politiku_Cache = new Devmasters.Cache.File.FileCache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]>(
                     Connectors.Init.WebAppDataPath, TimeSpan.Zero, "Insolvence_firem_politiku", (obj) =>

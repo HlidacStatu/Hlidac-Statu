@@ -76,7 +76,7 @@ namespace HlidacStatu.Repositories
                                 .Order(o => o.Descending("_count"))
                                 );
 
-                        var res = SmlouvaRepo.Searching.SimpleSearchAsync("(issues.issueTypeId:18 OR issues.issueTypeId:12)", 1, 0,
+                        var res = await SmlouvaRepo.Searching.SimpleSearchAsync("(issues.issueTypeId:18 OR issues.issueTypeId:12)", 1, 0,
                             SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggs, platnyZaznam: true);
 
                         foreach (KeyedBucket<object> val in ((BucketAggregate)res.ElasticResults.Aggregations["perIco"]).Items)
@@ -104,7 +104,7 @@ namespace HlidacStatu.Repositories
                                 .Order(o => o.Descending("_count"))
                                 );
 
-                        res = SmlouvaRepo.Searching.SimpleSearchAsync("(hint.skrytaCena:1)", 1, 0,
+                        res = await SmlouvaRepo.Searching.SimpleSearchAsync("(hint.skrytaCena:1)", 1, 0,
                             SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggs, platnyZaznam: true);
 
                         foreach (KeyedBucket<object> val in ((BucketAggregate)res.ElasticResults.Aggregations["perIco"]).Items)
