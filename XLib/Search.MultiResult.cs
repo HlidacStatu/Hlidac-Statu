@@ -125,10 +125,7 @@ namespace HlidacStatu.XLib
 
         }
 
-
-
-        static object objGeneralSearchLock = new object();
-        public static MultiResult GeneralSearch(string query, int page = 1, int pageSize = 10, bool showBeta = false, string order = null)
+        public static async Task<MultiResult> GeneralSearchAsync(string query, int page = 1, int pageSize = 10, bool showBeta = false, string order = null)
         {
             MultiResult res = new MultiResult() { Query = query };
 
@@ -147,34 +144,36 @@ namespace HlidacStatu.XLib
             var totalsw = new Devmasters.DT.StopWatchEx();
             totalsw.Start();
 
-            ParallelOptions po = new ParallelOptions();
-            //po.MaxDegreeOfParallelism = 20;
-            po.MaxDegreeOfParallelism = System.Diagnostics.Debugger.IsAttached ? 1 : po.MaxDegreeOfParallelism;
+            var taskList = new List<Task>();
 
-            Parallel.Invoke(po,
-                () =>
-                {
-                    try
-                    {
-                        res.Smlouvy = SmlouvaRepo.Searching.SimpleSearchAsync(query, 1, pageSize, order,
-                            anyAggregation: new Nest.AggregationContainerDescriptor<Smlouva>().Sum("sumKc", m => m.Field(f => f.CalculatedPriceWithVATinCZK))
-                            );
-                    }
-                    catch (System.Exception e)
-                    {
-                        Util.Consts.Logger.Error("MultiResult GeneralSearch for Smlouvy query" + query, e);
-                    }
-
-
-                },
-                () =>
+            taskList.Add(
+                Task.Run(async () =>
                 {
                     try
                     {
                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                         sw.Start();
-
-                        res.Firmy = FirmaRepo.Searching.SimpleSearchAsync(query, 0, 50);
+                        res.Smlouvy = await SmlouvaRepo.Searching.SimpleSearchAsync(query, 1, pageSize, order,
+                            anyAggregation: new Nest.AggregationContainerDescriptor<Smlouva>().Sum("sumKc",
+                                m => m.Field(f => f.CalculatedPriceWithVATinCZK))
+                        );
+                        sw.Stop();
+                        res.Smlouvy.ElapsedTime = sw.Elapsed;
+                    }
+                    catch (System.Exception e)
+                    {
+                        Util.Consts.Logger.Error("MultiResult GeneralSearch for Smlouvy query" + query, e);
+                    }
+                }));
+            
+            taskList.Add(
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+                        sw.Start();
+                        res.Firmy = await FirmaRepo.Searching.SimpleSearchAsync(query, 0, 50);
                         sw.Stop();
                         res.Firmy.ElapsedTime = sw.Elapsed;
                     }
@@ -182,94 +181,101 @@ namespace HlidacStatu.XLib
                     {
                         Util.Consts.Logger.Error("MultiResult GeneralSearch for Firmy query" + query, e);
                     }
-
-                },
-                () =>
-                {
-                    try
-                    {
-                        res.VZ = VerejnaZakazkaRepo.Searching.SimpleSearchAsync(query, null, 1, pageSize, order);
-                    }
-                    catch (System.Exception e)
-                    {
-                        Util.Consts.Logger.Error("MultiResult GeneralSearch for Verejne zakazky query" + query, e);
-                    }
-
-                },
-                () =>
+                }));
+            
+            taskList.Add(
+                Task.Run(async () =>
                 {
                     try
                     {
                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                         sw.Start();
-
-                        res.Osoby = OsobaRepo.Searching.SimpleSearchAsync(query, 1, 10, OsobaRepo.Searching.OrderResult.Relevance);
+                        res.VZ = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(query, null, 1, pageSize, order);
+                        sw.Stop();
+                        res.VZ.ElapsedTime = sw.Elapsed;
+                    }
+                    catch (System.Exception e)
+                    {
+                        Util.Consts.Logger.Error("MultiResult GeneralSearch for Verejne zakazky query" + query, e);
+                    }
+                }));
+            
+            taskList.Add(
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+                        sw.Start();
+                        res.Osoby = await OsobaRepo.Searching.SimpleSearchAsync(query, 1, 10, OsobaRepo.Searching.OrderResult.Relevance);
                         sw.Stop();
                         res.Osoby.ElapsedTime = sw.Elapsed;
-
                     }
                     catch (System.Exception e)
                     {
                         Util.Consts.Logger.Error("MultiResult GeneralSearch for Osoba query" + query, e);
                     }
+                }));
 
-
-                },
-                () =>
+            taskList.Add(
+                Task.Run(async() =>
                 {
                     try
                     {
+                        Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+                        sw.Start();
                         var iqu = new InsolvenceSearchResult { Q = query, PageSize = pageSize, Order = order };
                         res.Insolvence = iqu;
-                        //if (showBeta)
-                        res.Insolvence = InsolvenceRepo.Searching.SimpleSearchAsync(new InsolvenceSearchResult { Q = query, PageSize = pageSize, Order = order });
-
+                        res.Insolvence = await InsolvenceRepo.Searching.SimpleSearchAsync(new InsolvenceSearchResult { Q = query, PageSize = pageSize, Order = order });
+                        sw.Stop();
+                        res.Insolvence.ElapsedTime = sw.Elapsed;
                     }
                     catch (System.Exception e)
                     {
                         Util.Consts.Logger.Error("MultiResult GeneralSearch for insolvence query" + query, e);
                     }
-
-                },
-                () =>
+                }));
+            
+            taskList.Add(
+                Task.Run(async () =>
                 {
                     try
                     {
-                        var iqu = new DotaceSearchResult { Q = query, PageSize = pageSize, Order = order };
-                        res.Dotace = DotaceRepo.Searching.SimpleSearchAsync(
+                        Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+                        sw.Start();
+                        res.Dotace = await DotaceRepo.Searching.SimpleSearchAsync(
                                 new DotaceSearchResult { Q = query, PageSize = pageSize, Order = order },
                                 anyAggregation: new Nest.AggregationContainerDescriptor<Entities.Dotace.Dotace>().Sum("souhrn", s => s.Field(f => f.DotaceCelkem))
                             );
+                        sw.Stop();
+                        res.Dotace.ElapsedTime = sw.Elapsed;
+
                     }
                     catch (System.Exception e)
                     {
                         Util.Consts.Logger.Error("MultiResult GeneralSearch for insolvence query" + query, e);
                     }
+                }));
 
-                },
-                () =>
-                 {
-                     try
-                     {
-                         res.Datasets = Datasets.Search.DatasetMultiResult.GeneralSearch(query, null, 1, 5);
-                         if (res.Datasets.Exceptions.Count > 0)
-                         {
-                             Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetMulti query " + query,
-                                 res.Datasets.GetExceptions());
-                         }
-                     }
-                     catch (System.Exception e)
-                     {
-                         Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetMulti query " + query, e);
-                     }
-                     finally
-                     {
-                     }
-                 }
+            taskList.Add(
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        res.Datasets = Datasets.Search.DatasetMultiResult.GeneralSearch(query, null, 1, 5);
+                        if (res.Datasets.Exceptions.Count > 0)
+                        {
+                            Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetMulti query " + query,
+                                res.Datasets.GetExceptions());
+                        }
+                    }
+                    catch (System.Exception e)
+                    {
+                        Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetMulti query " + query, e);
+                    }
+                }));
 
-            );
-
-            //TODO too slow, temporarily disabled
+            await Task.WhenAll(taskList);
 
             totalsw.Stop();
             res.TotalSearchTime = totalsw.Elapsed;

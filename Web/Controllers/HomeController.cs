@@ -669,7 +669,7 @@ text zpravy: {txt}
         {
             bool showBeta = User.Identity?.IsAuthenticated == true && User.IsInRole("BetaTester");
 
-            var res = XLib.Search.GeneralSearch(q, 1, Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal, showBeta, order);
+            var res = XLib.Search.GeneralSearchAsync(q, 1, Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal, showBeta, order);
             AuditRepo.Add(
                 Audit.Operations.UserSearch
                 , User?.Identity?.Name
