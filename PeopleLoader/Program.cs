@@ -7,6 +7,7 @@ using HlidacStatu.Repositories;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,7 +19,7 @@ namespace PeopleLoader
         public static Devmasters.Batch.ActionProgressWriter progressWriter =
                 new Devmasters.Batch.ActionProgressWriter(0.1f, HlidacStatu.XLib.RenderTools.ProgressWriter_OutputFunc_EndIn);
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             //List<OsobaES> osoby = null;
             //OsobyEsService.Get("aaa");

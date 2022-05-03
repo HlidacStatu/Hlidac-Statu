@@ -568,7 +568,7 @@ namespace HlidacStatu.Repositories
             return badF;
         }
 
-        public static async IAsyncEnumerable<(string idDotace, string ico, int ageInDays)> CompanyAgeDuringSubsidy()
+        public static async IAsyncEnumerable<(string idDotace, string ico, int ageInDays)> CompanyAgeDuringSubsidyAsync()
         {
             await foreach (var dotace in DotaceRepo.GetAllAsync())
             {
