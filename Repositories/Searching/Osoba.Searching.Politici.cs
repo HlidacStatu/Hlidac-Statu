@@ -109,7 +109,7 @@ namespace HlidacStatu.Repositories.Searching
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static async Task<string[]> FindCitations(string text)
+        public static async Task<string[]> FindCitationsAsync(string text)
         {
             var stopw = new Devmasters.DT.StopWatchEx();
             stopw.Start();

@@ -431,7 +431,7 @@ namespace HlidacStatu.Repositories
 
             public static IEnumerable<Osoba> GetAllPoliticiFromText(string text)
             {
-                var parsedName = Repositories.Searching.Politici.FindCitations(text); //Validators.JmenoInText(text);
+                var parsedName = Repositories.Searching.Politici.FindCitationsAsync(text); //Validators.JmenoInText(text);
 
                 var oo = parsedName.Select(nm => Osoby.GetByNameId.Get(nm))
                     .Where(o => o != null)
