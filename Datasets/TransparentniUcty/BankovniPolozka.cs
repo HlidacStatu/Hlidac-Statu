@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Datasets.TransparentniUcty
 {
@@ -87,28 +88,23 @@ namespace HlidacStatu.Datasets.TransparentniUcty
         public string ZdrojUrl { get; set; }
 
         private BankovniUcet _bu = null;
-        public BankovniUcet GetBankovniUcet()
+        public async Task<BankovniUcet> GetBankovniUcetAsync()
         {
             if (_bu == null)
-                _bu = BankovniUcet.Get(CisloUctu);
+                _bu = await BankovniUcet.GetAsync(CisloUctu);
             return _bu;
         }
 
-        public string GetUrl(bool local = true)
-        {
-            return GetUrl(local, false, string.Empty);
-        }
+        public Task<string> GetUrlAsync(bool local = true) => GetUrlAsync(local, false, string.Empty);
+        public Task<string> GetUrlAsync(bool local, string foundWithQuery) => GetUrlAsync(local, false, "");
 
-        public string GetUrl(bool local, string foundWithQuery)
+        public async Task<string> GetUrlAsync(bool local = true, bool onList = false, string foundWithQuery = "")
         {
-            return GetUrl(local, false, "");
-        }
-        public string GetUrl(bool local = true, bool onList = false, string foundWithQuery = "")
-        {
-            if (GetBankovniUcet() == null)
+            var bu = await GetBankovniUcetAsync(); 
+            if (bu == null)
                 return "";
             if (onList)
-                return GetBankovniUcet().GetUrl(local, foundWithQuery) + "#" + Id;
+                return bu.GetUrl(local, foundWithQuery) + "#" + Id;
             else
             {
                 string url = "/data/Detail/transparentni-ucty-transakce/" + System.Net.WebUtility.UrlEncode(Id);
@@ -172,37 +168,37 @@ namespace HlidacStatu.Datasets.TransparentniUcty
                 }.GetHashCode();
         }
 
-        public bool Exists()
+        public async Task<bool> ExistsAsync()
         {
             if (string.IsNullOrEmpty(Id))
                 InitId();
 
-            return _client.ItemExistsAsync(Id);
+            return await _client.ItemExistsAsync(Id);
         }
 
-        public bool Delete()
+        public async Task<bool> DeleteAsync()
         {
-            return _client.DeleteDataAsync(Id);
+            return await _client.DeleteDataAsync(Id);
         }
 
-        public void Save(string user, bool updateId = true)
+        public async Task SaveAsync(string user, bool updateId = true)
         {
             if (updateId || string.IsNullOrEmpty(Id))
                 InitId();
 
-            _client.AddDataAsync(this, Id, user);
+            await _client.AddDataAsync(this, Id, user);
         }
 
 
-        public static BankovniPolozka Get(string transactionId)
+        public static async Task<BankovniPolozka> GetAsync(string transactionId)
         {
-            BankovniPolozka bu = _client.GetDataAsync<BankovniPolozka>(transactionId);
+            BankovniPolozka bu = await _client.GetDataAsync<BankovniPolozka>(transactionId);
             return bu;
         }
 
-        public static IEnumerable<BankovniPolozka> GetAll()
+        public static async Task<IEnumerable<BankovniPolozka>> GetAllAsync()
         {
-            return _client.GetAllDataAsync<BankovniPolozka>();
+            return await _client.GetAllDataAsync<BankovniPolozka>();
         }
 
     }

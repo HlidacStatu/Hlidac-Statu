@@ -70,12 +70,12 @@ namespace HlidacStatu.Datasets.TransparentniUcty
         */
         public string TypUctu { get; set; }
 
-        public async Task Save(string user)
+        public async Task SaveAsync(string user)
         {
             await _client.AddDataAsync(this, Id, user);
         }
 
-        public static async Task<BankovniUcet> Get(string cislo)
+        public static async Task<BankovniUcet> GetAsync(string cislo)
         {
             BankovniUcet bu = await _client.GetDataAsync<BankovniUcet>(TextUtil.NormalizeToURL(cislo));
             return bu;
