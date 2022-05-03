@@ -4,6 +4,7 @@ using HlidacStatu.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
@@ -16,10 +17,10 @@ namespace HlidacStatu.XLib.Watchdogs
             OrigWD = wd;
         }
 
-        public DateTime GetLatestRec(DateTime toDate)
+        public async Task<DateTime> GetLatestRecAsync(DateTime toDate)
         {
             var query = "zverejneno:" + string.Format("[* TO {0}]", Repositories.Searching.Tools.ToElasticDate(toDate));
-            var res = SmlouvaRepo.Searching.SimpleSearchAsync(query, 0, 1, SmlouvaRepo.Searching.OrderResult.DateAddedDesc);
+            var res = await SmlouvaRepo.Searching.SimpleSearchAsync(query, 0, 1, SmlouvaRepo.Searching.OrderResult.DateAddedDesc);
 
             if (res.IsValid == false)
                 return DateTime.Now.Date.AddYears(-10);
@@ -29,7 +30,7 @@ namespace HlidacStatu.XLib.Watchdogs
         }
 
 
-        public Results GetResults(DateTime? fromDate = null, DateTime? toDate = null, int? maxItems = null,
+        public async Task<Results> GetResultsAsync(DateTime? fromDate = null, DateTime? toDate = null, int? maxItems = null,
             string order = null)
         {
             maxItems = maxItems ?? 30;
@@ -41,17 +42,16 @@ namespace HlidacStatu.XLib.Watchdogs
                     Repositories.Searching.Tools.ToElasticDate(toDate, "*"));
             }
 
-            var res = SmlouvaRepo.Searching.SimpleSearchAsync(query, 0, maxItems.Value,
+            var res = await SmlouvaRepo.Searching.SimpleSearchAsync(query, 0, maxItems.Value,
                 (SmlouvaRepo.Searching.OrderResult)Convert.ToInt32(order ?? "4")
             );
             return new Results(res.ElasticResults.Hits.Select(m => (dynamic)m.Source), res.Total,
                 query, fromDate, toDate, res.IsValid, typeof(Smlouva).Name);
         }
 
-        public RenderedContent RenderResults(Results data, long numOfListed = 5)
+        public Task<RenderedContent> RenderResultsAsync(Results data, long numOfListed = 5)
         {
             RenderedContent ret = new RenderedContent();
-            List<RenderedContent> items = new List<RenderedContent>();
             if (data.Total <= (numOfListed + 2))
                 numOfListed = data.Total;
 
@@ -61,7 +61,7 @@ namespace HlidacStatu.XLib.Watchdogs
             ret.ContentText = renderT.Render(data);
             ret.ContentTitle = "Smlouvy";
 
-            return ret;
+            return Task.FromResult(ret);
         }
 
         static string HtmlTemplate = @"

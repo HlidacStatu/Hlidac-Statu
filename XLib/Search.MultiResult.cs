@@ -262,7 +262,7 @@ namespace HlidacStatu.XLib
                 {
                     try
                     {
-                        res.Datasets = Datasets.Search.DatasetMultiResult.GeneralSearchAsync(query, null, 1, 5);
+                        res.Datasets = await Datasets.Search.DatasetMultiResult.GeneralSearchAsync(query, null, 1, 5);
                         if (res.Datasets.Exceptions.Count > 0)
                         {
                             Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetMulti query " + query,

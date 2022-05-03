@@ -6,7 +6,6 @@ namespace HlidacStatu.XLib
     {
         public static void ProgressWriter_OutputFunc_EndIn(Devmasters.Batch.ActionProgressData data)
         {
-            DateTime end = data.EstimatedFinish;
             string send = "";
             if (data.EstimatedFinish > DateTime.MinValue)
             {
@@ -119,11 +118,7 @@ namespace HlidacStatu.XLib
                 return s;
             }
 
-            //if (dts.Milliseconds > 0)
-            //    s += " " + Devmasters.Lang.CS.Plural.Get(dts.Milliseconds, "{0} ms;{0} ms;{0} ms");
-
             return s.Trim();
-
         }
 
         public static string FormatAvailability2(TimeSpan ts)

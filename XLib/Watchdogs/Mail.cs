@@ -4,6 +4,7 @@ using HlidacStatu.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
@@ -16,26 +17,23 @@ namespace HlidacStatu.XLib.Watchdogs
             Disabled,
             SendingError
         }
-        internal static SendStatus SendWatchdog(WatchDog watchdog,
+        internal static Task<SendStatus> SendWatchdogAsync(WatchDog watchdog,
             ApplicationUser aspnetUser,
             bool force = false, string[] specificContacts = null,
             DateTime? fromSpecificDate = null, DateTime? toSpecificDate = null,
             string openingText = null,
             int maxDegreeOfParallelism = 20,
             Action<string> logOutputFunc = null,
-            Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null
-            )
-        {
-            return SendWatchdogsInOneEmail(new WatchDog[] { watchdog },
-            aspnetUser,
-            force, specificContacts,
-            fromSpecificDate, toSpecificDate,
-            openingText
+            Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null) 
+            => SendWatchdogsInOneEmailAsync(new WatchDog[] { watchdog },
+                aspnetUser,
+                force, specificContacts,
+                fromSpecificDate, toSpecificDate,
+                openingText
             );
-        }
 
 
-        internal static SendStatus SendWatchdogsInOneEmail(IEnumerable<WatchDog> watchdogs,
+        internal static async Task<SendStatus> SendWatchdogsInOneEmailAsync(IEnumerable<WatchDog> watchdogs,
             ApplicationUser aspnetUser,
         bool force = false, string[] specificContacts = null,
         DateTime? fromSpecificDate = null, DateTime? toSpecificDate = null,
@@ -108,10 +106,10 @@ namespace HlidacStatu.XLib.Watchdogs
                     try
                     {
 
-                        var results = wdp.GetResults(fromDate, toDate, 30);
+                        var results = await wdp.GetResultsAsync(fromDate, toDate, 30);
                         if (results.Total > 0)
                         {
-                            RenderedContent rres = wdp.RenderResults(results, 5);
+                            RenderedContent rres = await wdp.RenderResultsAsync(results, 5);
                             wdParts.Add(Template.DataContent(results.Total, rres));
                             wdParts.Add(Template.Margin(50));
 

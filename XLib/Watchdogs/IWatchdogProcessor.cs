@@ -1,6 +1,7 @@
 ﻿using HlidacStatu.Entities;
 
 using System;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
@@ -8,12 +9,13 @@ namespace HlidacStatu.XLib.Watchdogs
         : IEmailFormatter
     {
         WatchDog OrigWD { get; }
-        Results GetResults(DateTime? fromDate = null, DateTime? toDate = null, int? maxItems = null, string order = null);
-        DateTime GetLatestRec(DateTime toDate);
+        Task<Results> GetResultsAsync(DateTime? fromDate = null, DateTime? toDate = null, int? maxItems = null,
+            string order = null);
+        Task<DateTime> GetLatestRecAsync(DateTime toDate);
 
     }
     public interface IEmailFormatter
     {
-        RenderedContent RenderResults(Results data, long numOfListed = 5);
+        Task<RenderedContent> RenderResultsAsync(Results data, long numOfListed = 5);
     }
 }
