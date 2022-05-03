@@ -333,7 +333,7 @@ namespace HlidacStatu.Web.Controllers
                     return Json(ApiResponseStatus.DatasetNotFound);
 
                 id = id.ToLower();
-                var r = DataSetDB.Instance.GetRegistration(id);
+                var r = DataSetDB.Instance.GetRegistrationAsync(id);
                 if (r == null)
                     return Json(ApiResponseStatus.DatasetNotFound);
 

@@ -254,7 +254,7 @@ namespace HlidacStatu.Repositories.ES
 
                         var _client = new ElasticClient(sett);
                         if (init)
-                            InitElasticSearchIndexAsync(_client, idxType);
+                            await InitElasticSearchIndexAsync(_client, idxType);
 
                         _clients.TryAdd(cnnset, _client);
                     }

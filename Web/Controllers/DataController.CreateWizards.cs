@@ -336,7 +336,7 @@ namespace HlidacStatu.Web.Controllers
             if (status.valid == false)
             {
                 if (DataSet.ExistsDataset((status.value?.ToString() ?? "")))
-                    DataSetDB.Instance.DeleteRegistrationAsync(status.value?.ToString(), email);
+                    await DataSetDB.Instance.DeleteRegistrationAsync(status.value?.ToString(), email);
 
                 ViewBag.ApiResponseError = status;
                 return View(model);

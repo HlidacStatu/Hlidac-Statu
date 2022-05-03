@@ -21,7 +21,7 @@ namespace HlidacStatu.Datasets
                         TimeSpan.FromMinutes(5), (obj) =>
                         {
 
-                            var datasets = Instance.SearchDataRawAsync("*", 1, 500)
+                            var datasets = (await Instance.SearchDataRawAsync("*", 1, 500).ConfigureAwait(false))
                             .Result
                             .Select(s => CachedDatasets.Get(s.Item1))
                             .Where(d => d != null)
@@ -36,7 +36,7 @@ namespace HlidacStatu.Datasets
                         TimeSpan.FromMinutes(5), (obj) =>
                         {
 
-                            var datasets = Instance.SearchDataRawAsync("*", 1, 500)
+                            var datasets = (await Instance.SearchDataRawAsync("*", 1, 500).ConfigureAwait(false))
                             .Result
                             .Select(s => CachedDatasets.Get(s.Item1))
                             .Where(d => d != null)
@@ -80,17 +80,17 @@ namespace HlidacStatu.Datasets
             }
         }
 
-        public Registration GetRegistration(string datasetId)
+        public async Task<Registration> GetRegistrationAsync(string datasetId)
         {
             datasetId = datasetId.ToLower();
-            var s = GetDataAsync(datasetId);
+            var s = await GetDataAsync(datasetId);
             if (string.IsNullOrEmpty(s))
                 return null;
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(s, DefaultDeserializationSettings);
         }
 
 
-        public virtual string AddData(Registration reg, string user, bool skipallowWriteAccess = false)
+        public virtual async Task<string> AddDataAsync(Registration reg, string user, bool skipallowWriteAccess = false)
         {
             if (reg.jsonSchema == null)
                 throw new DataSetException(datasetId, ApiResponseStatus.DatasetJsonSchemaMissing);
@@ -102,7 +102,7 @@ namespace HlidacStatu.Datasets
             else
                 AuditRepo.Add<Registration>(Audit.Operations.Update, user, reg, oldReg);
 
-            var addDataResult = base.AddDataAsync(reg, reg.datasetId, reg.createdBy, validateSchema: false, skipallowWriteAccess: true);
+            var addDataResult = await base.AddDataAsync(reg, reg.datasetId, reg.createdBy, validateSchema: false, skipallowWriteAccess: true);
             CachedDatasets.Delete(reg.datasetId);
 
             //check orderList
@@ -111,8 +111,11 @@ namespace HlidacStatu.Datasets
 
                 //get mapping
                 var ds = CachedDatasets.Get(addDataResult);
-                var txtProps = ds.GetTextMappingListAsync();
-                var allProps = ds.GetMappingListAsync();
+                
+                var txtPropsTask = ds.GetTextMappingListAsync();
+                var allPropsTask = ds.GetMappingListAsync();
+                var txtProps = await txtPropsTask;
+                var allProps = await allPropsTask;
                 if (allProps.Where(m => !DefaultDatasetProperties.Keys.Contains(m)).Count() > 0) //0=mapping not available , (no record in db)
                 {
 
@@ -163,7 +166,7 @@ namespace HlidacStatu.Datasets
                     }
 
                     if (changedOrderList)
-                        addDataResult = base.AddDataAsync(reg, reg.datasetId, reg.createdBy);
+                        addDataResult = await base.AddDataAsync(reg, reg.datasetId, reg.createdBy);
                 }
 
             }
@@ -178,7 +181,7 @@ namespace HlidacStatu.Datasets
             AuditRepo.Add<Registration>(Audit.Operations.Delete, user, Registration(), null);
 
             datasetId = datasetId.ToLower();
-            var res = DeleteDataAsync(datasetId);
+            var res = await DeleteDataAsync(datasetId);
             var idxClient = Manager.GetESClient(datasetId, idxType: Manager.IndexType.DataSource);
 
             var delRes = await idxClient.Indices.DeleteAsync(idxClient.ConnectionSettings.DefaultIndex);
@@ -186,12 +189,11 @@ namespace HlidacStatu.Datasets
             return res && delRes.IsValid;
         }
 
-
-        public override Task<DataSearchResult> SearchDataAsync(string queryString, int page, int pageSize,
+        public override async Task<DataSearchResult> SearchDataAsync(string queryString, int page, int pageSize,
             string sort = null,
             bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false)
         {
-            var resData = base.SearchDataAsync(queryString, page, pageSize, sort, excludeBigProperties, withHighlighting, exactNumOfResults);
+            var resData = await base.SearchDataAsync(queryString, page, pageSize, sort, excludeBigProperties, withHighlighting, exactNumOfResults);
             if (resData == null || resData?.Result == null)
                 return resData;
 
@@ -200,20 +202,18 @@ namespace HlidacStatu.Datasets
             return resData;
 
         }
-        public override Task<DataSearchRawResult> SearchDataRawAsync(string queryString, int page, int pageSize,
+        
+        public override async Task<DataSearchRawResult> SearchDataRawAsync(string queryString, int page, int pageSize,
             string sort = null,
             bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false)
         {
-            var resData = base.SearchDataRawAsync($"NOT(id:{DataSourcesDbName}) AND ({queryString})", page, pageSize,
+            var resData = await base.SearchDataRawAsync($"NOT(id:{DataSourcesDbName}) AND ({queryString})", page, pageSize,
                 sort, excludeBigProperties, withHighlighting, exactNumOfResults);
             //var resData = base.SearchDataRaw($"({queryString})", page, pageSize, sort);
             if (resData == null || resData?.Result == null)
                 return resData;
 
             return resData;
-
         }
-
-
     }
 }

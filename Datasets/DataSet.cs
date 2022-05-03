@@ -79,7 +79,7 @@ namespace HlidacStatu.Datasets
             else
             {
                 await Manager.CreateIndexAsync(client);
-                DataSetDB.Instance.AddData(reg, user);
+                await DataSetDB.Instance.AddDataAsync(reg, user);
             }
 
 
@@ -97,7 +97,7 @@ namespace HlidacStatu.Datasets
                 string t = "";
                 if (o != null && o.GetType() == typeof(JValue))
                     t = o.Value<string>() ?? "";
-                //var t = ((string)Dynamitey.Dynamic.InvokeGetChain(item, prop)) ?? "";
+                
                 if (DataValidators.CheckCZICO(t))
                 {
                     Firma f = Firmy.Get(t);
@@ -117,7 +117,7 @@ namespace HlidacStatu.Datasets
                 string t = "";
                 if (o != null && o.GetType() == typeof(JValue))
                     t = o.Value<string>() ?? "";
-                //var t = ((string)Dynamitey.Dynamic.InvokeGetChain(item, prop)) ?? "";
+                
                 if (!string.IsNullOrEmpty(t))
                 {
                     Osoba os = Osoby.GetByNameId.Get(t);
@@ -325,7 +325,6 @@ namespace HlidacStatu.Datasets
             return obj;
         }
 
-
         public bool IsFlatStructure()
         {
             //important from import data from CSV
@@ -510,10 +509,10 @@ namespace HlidacStatu.Datasets
 
         private Registration _registration = null;
 
-        public Registration Registration()
+        public async Task<Registration> Registration()
         {
             if (_registration == null)
-                _registration = DataSetDB.Instance.GetRegistration(datasetId);
+                _registration = await DataSetDB.Instance.GetRegistrationAsync(datasetId);
 
             return _registration;
         }
@@ -564,7 +563,7 @@ namespace HlidacStatu.Datasets
             {
                 if (schema == null)
                 {
-                    schema = DataSetDB.Instance.GetRegistration(DatasetId)
+                    schema = DataSetDB.Instance.GetRegistrationAsync(DatasetId)
                         ?.GetSchema();
                 }
 
@@ -816,7 +815,7 @@ namespace HlidacStatu.Datasets
         /// </summary>
         private bool CheckSchema(JObject obj)
         {
-            JSchema schema = DataSetDB.Instance.GetRegistration(datasetId).GetSchema();
+            JSchema schema = DataSetDB.Instance.GetRegistrationAsync(datasetId).GetSchema();
 
             if (schema != null)
             {

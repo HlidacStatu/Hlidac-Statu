@@ -115,7 +115,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 datasetIndexStatCache.Invalidate();
 
-                DataSetDB.Instance.DeleteRegistrationAsync(ds.DatasetId, email);
+                await DataSetDB.Instance.DeleteRegistrationAsync(ds.DatasetId, email);
                 return RedirectToAction("Index");
             }
             return View(ds);

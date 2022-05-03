@@ -22,7 +22,7 @@ namespace HlidacStatu.Datasets
                     if (string.IsNullOrEmpty(id))
                         return ApiResponseStatus.DatasetNotFound;
 
-                    var oldReg = DataSetDB.Instance.GetRegistration(id);
+                    var oldReg = DataSetDB.Instance.GetRegistrationAsync(id);
                     if (oldReg == null)
                         return ApiResponseStatus.DatasetNotFound;
 
@@ -106,7 +106,7 @@ namespace HlidacStatu.Datasets
                         }
                     }
 
-                    DataSetDB.Instance.AddData(dataset, updatedBy, skipallowWriteAccess: skipallowWriteAccess);
+                    await DataSetDB.Instance.AddDataAsync(dataset, updatedBy, skipallowWriteAccess: skipallowWriteAccess);
 
                     //HlidacStatu.Web.Framework.TemplateVirtualFileCacheManager.InvalidateTemplateCache(oldReg.datasetId);
 

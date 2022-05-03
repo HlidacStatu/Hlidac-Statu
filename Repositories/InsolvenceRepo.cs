@@ -125,7 +125,7 @@ namespace HlidacStatu.Repositories
             };
 
             List<string> ids = new List<string>();
-            Tools.DoActionForQueryAsync<Rizeni>(Manager.GetESClient_Insolvence(),
+            await Tools.DoActionForQueryAsync<Rizeni>(Manager.GetESClient_Insolvence(),
                 searchFunc, (hit, param) =>
                 {
                     ids.Add(hit.Id);

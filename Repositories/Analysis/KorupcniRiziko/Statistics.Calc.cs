@@ -61,7 +61,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             }
 
             List<KIndexData> data = new List<KIndexData>();
-            Repositories.Searching.Tools.DoActionForQueryAsync<KIndexData>(client,
+            await Repositories.Searching.Tools.DoActionForQueryAsync<KIndexData>(client,
                 searchfnc,
                 (hit, param) =>
                 {

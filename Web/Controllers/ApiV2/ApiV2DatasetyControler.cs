@@ -176,7 +176,7 @@ namespace HlidacStatu.Web.Controllers
                 }
 
                 datasetId = datasetId.ToLower();
-                var r = DataSetDB.Instance.GetRegistration(datasetId);
+                var r = DataSetDB.Instance.GetRegistrationAsync(datasetId);
                 if (r == null)
                 {
                     return NotFound($"Dataset nenalezen.");

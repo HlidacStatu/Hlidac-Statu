@@ -63,7 +63,7 @@
                 var dataset = Model.Dataset;
                 var itemInS = dataset.GetDataAsync(dataId);
                 var newModel = new DataDetailModel() { Dataset = dataset, Data = itemInS };
-                Registration dsReg = DataSetDB.Instance.GetRegistration(model.Dataset.DatasetId);
+                Registration dsReg = DataSetDB.Instance.GetRegistrationAsync(model.Dataset.DatasetId);
                 if (dsReg == null)
                 {
                     <partial name="Partials/_data_noTemplate" model="@(newModel)"/>

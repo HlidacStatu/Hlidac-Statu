@@ -22,7 +22,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
             if (onlyWithErr == false) //vsechny profily
             {
                 Console.WriteLine("Reading profily zadavatelu");
-                Repositories.Searching.Tools.DoActionForAllAsync<ProfilZadavatele>(
+                await Repositories.Searching.Tools.DoActionForAllAsync<ProfilZadavatele>(
                     (pz, obj) =>
                     {
                         profily2.Add(pz.Source);

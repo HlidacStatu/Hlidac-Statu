@@ -604,7 +604,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 );
 
             List<smlouvaStat> smlStat = new List<smlouvaStat>();
-            Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(),
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(),
                 searchFunc,
                 (h, o) =>
                 {

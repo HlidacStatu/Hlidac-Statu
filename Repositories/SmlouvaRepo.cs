@@ -471,7 +471,7 @@ namespace HlidacStatu.Repositories
                 };
 
 
-            Tools.DoActionForQueryAsync<Smlouva>(client,
+            await Tools.DoActionForQueryAsync<Smlouva>(client,
                 searchFunc, (hit, param) =>
                 {
                     ids.Add(hit.Id);
@@ -569,7 +569,7 @@ namespace HlidacStatu.Repositories
             sb.AppendLine(
                 "URL\tID smlouvy\tPodepsána\tZveřejněna\tHodnota smlouvy\tPředmět smlouvy\tPlátce\tPlatce IC\tDodavatele a jejich ICO");
             int c = 0;
-            Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(),
+            await Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(),
                 searchFunc, (hit, param) =>
                 {
                     var s = hit.Source;
@@ -601,7 +601,7 @@ namespace HlidacStatu.Repositories
             var s = await _loadAsync(idVerze, client, includePrilohy);
             if (s == null)
                 return s;
-            var _ = s.GetRelevantClassification();
+            _ = s.GetRelevantClassification();
             if (s.Classification?.Version == 1 && s.Classification?.Types != null)
             {
                 s.Classification.ConvertToV2();
