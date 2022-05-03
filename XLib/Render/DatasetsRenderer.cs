@@ -3,6 +3,7 @@ using HlidacStatu.Datasets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.XLib.Render
 {
@@ -27,14 +28,15 @@ namespace HlidacStatu.XLib.Render
             return res;
         }
 
-        private static string _renderResultsInHtml<T>(this DataSearchResultBase<T> dataSearchResultBase, string query,
+        private static async Task<string> _renderResultsInHtmlAsync<T>(this DataSearchResultBase<T> dataSearchResultBase, string query,
             Func<T, dynamic> itemToDynamicFunc, int maxToRender = int.MaxValue) where T : class
         {
             var actualNumToRender = Math.Min(maxToRender, dataSearchResultBase.Result?.Count() ?? 0);
             var content = "";
             try
             {
-                if (dataSearchResultBase.DataSet.RegistrationAsync()?.searchResultTemplate?.IsFullTemplate() == true)
+                var registration = await dataSearchResultBase.DataSet.RegistrationAsync(); 
+                if (registration?.searchResultTemplate?.IsFullTemplate() == true)
                 {
                     var model = new Registration.Template.SearchTemplateResults();
                     model.Total = dataSearchResultBase.Total;
@@ -45,19 +47,14 @@ namespace HlidacStatu.XLib.Render
                         .Select(s => itemToDynamicFunc(s))
                         .ToArray();
 
-                    content = dataSearchResultBase
-                        .DataSet
-                        .RegistrationAsync()
+                    content = registration
                         .searchResultTemplate
                         .Render(dataSearchResultBase.DataSet, model, qs: query);
                 }
                 else
                 {
-                    //content = ControllerExtensions.RenderRazorViewToString(this.ViewContext.Controller, "HledatProperties_CustomdataTemplate", rds);
-                    //Html.RenderAction("HledatProperties_CustomdataTemplate", rds);
                     content = "<h3>Nepodařilo se nám zobrazit vyhledané výsledky</h3>" +
                                 $"<div class=\"text-center\"><a class=\"btn btn-default btn-default-new\" href=\"{dataSearchResultBase.DataSet.DatasetSearchUrl(query)}\">zobrazit všechny nalezené záznamy zde</a></div>";
-
                 }
                 if (dataSearchResultBase.Total > actualNumToRender)
                 {
@@ -74,9 +71,7 @@ namespace HlidacStatu.XLib.Render
             }
         }
 
-        public static string RenderResultsInHtml(this DataSearchResult dataSearchResult, string query, int maxToRender = int.MaxValue)
-        {
-            return dataSearchResult._renderResultsInHtml(query, (d) => d, maxToRender);
-        }
+        public static Task<string> RenderResultsInHtmlAsync(this DataSearchResult dataSearchResult, string query, int maxToRender = int.MaxValue) 
+            => dataSearchResult._renderResultsInHtmlAsync(query, (d) => d, maxToRender);
     }
 }

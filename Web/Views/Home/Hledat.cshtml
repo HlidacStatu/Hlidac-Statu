@@ -709,7 +709,7 @@ else if (Model.HasResults == false)
                             .Where(m => m.Total > 0)
                             .OrderByDescending(m => m.Total))
                             {
-                                results.Add(rds.RenderResultsInHtml(Model.Query));
+                                results.Add(rds.RenderResultsInHtmlAsync(Model.Query));
                             }
                         }
                         <partial name="WebUtil/VerticalTabs" model="@(new VerticalTabsViewModel(tabs?.ToList(), results))" />
