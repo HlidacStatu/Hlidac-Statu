@@ -4,6 +4,8 @@ using HlidacStatu.Repositories.Searching;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HlidacStatu.Datasets
 {
@@ -50,7 +52,7 @@ namespace HlidacStatu.Datasets
         public DataSearchResultBase()
                 : base(null)
         {
-            orderFill = getDatasetOrderList;
+            orderFill = await getDatasetOrderListAsync;
             InitOrderList();
             Page = 1;
         }
@@ -75,35 +77,32 @@ namespace HlidacStatu.Datasets
         public const string OrderAscUrl = " asc";
         public const string OrderDesc = " sestupně";
         public const string OrderDescUrl = " desc";
-        protected List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> getDatasetOrderList()
+        protected async Task<List<SelectListItem>> getDatasetOrderListAsync()
         {
             if (DataSet == null)
-                return new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+                return new List<SelectListItem>();
 
-            List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> list = new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
-            list.Add(new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
+            List<SelectListItem> list = new List<SelectListItem>();
+            list.Add(new SelectListItem()
             {
                 Text = "Relevance",
                 Value = "0"
             });
 
-            for (int i = 0; i < DataSet.Registration().orderList.GetLength(0); i++)
+            for (int i = 0; i < (await DataSet.RegistrationAsync()).orderList.GetLength(0); i++)
             {
-                list.Add(new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
+                list.Add(new SelectListItem()
                 {
-                    Text = DataSet.Registration().orderList[i, 0] + OrderAsc,
-                    Value = DataSet.Registration().orderList[i, 1] + OrderAscUrl
+                    Text = (await DataSet.RegistrationAsync()).orderList[i, 0] + OrderAsc,
+                    Value = (await DataSet.RegistrationAsync()).orderList[i, 1] + OrderAscUrl
                 });
-                list.Add(new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem()
+                list.Add(new SelectListItem()
                 {
-                    Text = DataSet.Registration().orderList[i, 0] + OrderDesc,
-                    Value = DataSet.Registration().orderList[i, 1] + OrderDescUrl
+                    Text = (await DataSet.RegistrationAsync()).orderList[i, 0] + OrderDesc,
+                    Value = (await DataSet.RegistrationAsync()).orderList[i, 1] + OrderDescUrl
                 });
             }
             return list;
-            //Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(SmlouvaRepo.Search.OrderResult)).Select(
-            //    m => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem() { Value = m.Value, Text = "Řadit " + m.Key }
-            //    ).ToList();
         }
 
 
@@ -126,11 +125,10 @@ namespace HlidacStatu.Datasets
             Order = iorder.ToString();
         }
 
-        protected static Func<List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>> getVZOrderList = () =>
+        protected static Func<List<SelectListItem>> getVZOrderList = () =>
         {
-            return new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+            return new List<SelectListItem>();
         };
-
 
         public new object ToRouteValues(int page)
         {
@@ -143,7 +141,6 @@ namespace HlidacStatu.Datasets
             };
         }
 
-
         public static string GetSearchUrl(string pageUrl, string Q, SmlouvaRepo.Searching.OrderResult? order = null, int? page = null)
         {
 
@@ -153,7 +150,6 @@ namespace HlidacStatu.Datasets
 
             return ret;
         }
-
 
         public static string GetSearchUrlQueryString(string Q, SmlouvaRepo.Searching.OrderResult? order = null, int? page = null)
         {
@@ -167,8 +163,6 @@ namespace HlidacStatu.Datasets
                 ret = ret + "&page=" + page.Value.ToString();
             return ret;
         }
-
-
 
     }
 }

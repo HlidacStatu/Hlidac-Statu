@@ -59,8 +59,6 @@ namespace HlidacStatu.Datasets
                 _orderList = tmp;
             }
         }
-        //.Replace("\r","").Replace("\n","").Replace("\t", "").Trim()    
-
 
         public void NormalizeShortName()
         {

@@ -120,7 +120,7 @@ namespace HlidacStatu.XLib.Watchdogs
             resultToRender.Result = dataToRender;
 
             //var renderH = new Lib.Render.ScribanT(HtmlTemplate.Replace("#LIMIT#", numOfListed.ToString()));
-            ret.ContentHtml = DataSet.Registration().searchResultTemplate
+            ret.ContentHtml = DataSet.RegistrationAsync().searchResultTemplate
                 .Render(DataSet, resultToRender, data.SearchQuery);
             if (data.Total > dataToRender.Count())
             {
@@ -139,7 +139,7 @@ namespace HlidacStatu.XLib.Watchdogs
 
             //var renderT = new Lib.Render.ScribanT(TextTemplate.Replace("#LIMIT#", numOfListed.ToString()));
             ret.ContentText = " ";
-            ret.ContentTitle = DataSet.Registration().name;
+            ret.ContentTitle = DataSet.RegistrationAsync().name;
 
             return ret;
         }

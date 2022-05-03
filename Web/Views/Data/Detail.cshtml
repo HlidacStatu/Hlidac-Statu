@@ -5,13 +5,13 @@
 @model HlidacStatu.Web.Models.DataDetailModel
 
 @{
-    var registration = Model.Dataset.Registration();
+    var registration = Model.Dataset.RegistrationAsync();
 
     Newtonsoft.Json.Linq.JObject jmodel = Model.Dataset.GetDataObjAsync(Model.Data);
     dynamic model = (dynamic)jmodel;
 
     string itemId = (model.Id ?? model.id) ?? "";
-    ViewBag.Title = Model.Dataset.Registration().name;
+    ViewBag.Title = Model.Dataset.RegistrationAsync().name;
     ViewBag.SubTitle = itemId ;
 
 
@@ -51,9 +51,9 @@
     @{
         try
         {
-            if (Model.Dataset.Registration()?.detailTemplate?.IsNewTemplate() == true)
+            if (Model.Dataset.RegistrationAsync()?.detailTemplate?.IsNewTemplate() == true)
             {
-                var html = DatasetsRenderer.Render(Model.Dataset.Registration().detailTemplate, Model.Dataset, model, highlightingData: highlightingData);
+                var html = DatasetsRenderer.Render(Model.Dataset.RegistrationAsync().detailTemplate, Model.Dataset, model, highlightingData: highlightingData);
                 @Html.Raw(html)
             }
             else

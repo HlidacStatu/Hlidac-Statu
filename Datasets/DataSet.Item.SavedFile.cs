@@ -120,7 +120,6 @@ namespace HlidacStatu.Datasets
                     }
                 }
 
-
                 private static string VersionedFilename(string fullname, int version)
                 {
                     if (version == 0)
@@ -135,31 +134,23 @@ namespace HlidacStatu.Datasets
                 }
                 private bool SaveMeOnDisk(ref byte[] data, string fullname, FileAttributes attrs)
                 {
-
                     var fullnameAttrs = fullname + ".attrs";
-                    try
+                    if (System.IO.File.Exists(fullname))
                     {
-                        if (System.IO.File.Exists(fullname))
+                        int nextVersion = FindNextVersion(fullname);
+                        int lastVersion = nextVersion - 1;
+                        System.IO.FileInfo fiLast = new System.IO.FileInfo(VersionedFilename(fullname, lastVersion));
+                        if (Devmasters.IO.BinaryCompare.FilesContentsAreEqual(fiLast, data))
                         {
-                            int nextVersion = FindNextVersion(fullname);
-                            int lastVersion = nextVersion - 1;
-                            System.IO.FileInfo fiLast = new System.IO.FileInfo(VersionedFilename(fullname, lastVersion));
-                            if (Devmasters.IO.BinaryCompare.FilesContentsAreEqual(fiLast, data))
-                            {
-                                data = null;
-                                return true;
-                            }
-                            attrs.Version = nextVersion;
+                            data = null;
+                            return true;
                         }
-                        System.IO.File.WriteAllBytes(VersionedFilename(fullname, attrs.Version), data);
-                        System.IO.File.WriteAllText(fullnameAttrs, Newtonsoft.Json.JsonConvert.SerializeObject(attrs));
-                        data = null;
-                        return true;
+                        attrs.Version = nextVersion;
                     }
-                    catch (Exception)
-                    {
-                        throw;
-                    }
+                    System.IO.File.WriteAllBytes(VersionedFilename(fullname, attrs.Version), data);
+                    System.IO.File.WriteAllText(fullnameAttrs, Newtonsoft.Json.JsonConvert.SerializeObject(attrs));
+                    data = null;
+                    return true;
                 }
 
                 private static int FindNextVersion(string fullname)
@@ -177,9 +168,6 @@ namespace HlidacStatu.Datasets
                             return maxVersions;
                     }
                 }
-
-
-
             }
         }
     }

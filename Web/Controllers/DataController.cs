@@ -92,8 +92,8 @@ namespace HlidacStatu.Web.Controllers
                 if (ds == null)
                     return Redirect("/data");
 
-                if (ds.HasAdminAccess(Request?.HttpContext?.User))
-                    return View(ds?.Registration());
+                if (ds.HasAdminAccessAsync(Request?.HttpContext?.User))
+                    return View(ds?.RegistrationAsync());
             }
             return View();
         }
@@ -104,7 +104,7 @@ namespace HlidacStatu.Web.Controllers
             var ds = DataSet.CachedDatasets.Get(id);
             if (ds == null)
                 return Redirect("/data");
-            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
+            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
                 return View("NoAccess");
 
             string[] neverDelete = new string[] { "veklep", "rozhodnuti-uohs", "centralniregistroznameni", "datasourcesdb" };
@@ -130,14 +130,14 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return RedirectToAction("index");
 
-            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
+            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
             {
                 ViewBag.DatasetId = id;
                 return View("NoAccess");
             }
             return File(
                 System.Text.UTF8Encoding.UTF8.GetBytes(
-                    Newtonsoft.Json.JsonConvert.SerializeObject(ds.Registration(), Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings() { ContractResolver = Serialization.PublicDatasetContractResolver.Instance })
+                    Newtonsoft.Json.JsonConvert.SerializeObject(ds.RegistrationAsync(), Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings() { ContractResolver = Serialization.PublicDatasetContractResolver.Instance })
                     ),
                 "application/octet-streamSection", id + ".json");
 
@@ -155,13 +155,13 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return RedirectToAction("index");
 
-            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
+            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
             {
                 ViewBag.DatasetId = id;
                 return View("NoAccess");
             }
 
-            return View(ds.Registration());
+            return View(ds.RegistrationAsync());
         }
 
         [HttpPost]
@@ -177,7 +177,7 @@ namespace HlidacStatu.Web.Controllers
                 return RedirectToAction("index");
 
 
-            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
+            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
             {
                 ViewBag.DatasetId = id;
                 return View("NoAccess");
@@ -198,7 +198,7 @@ namespace HlidacStatu.Web.Controllers
                 newReg.createdBy = Request?.HttpContext?.User?.Identity?.Name;
 
 
-            var res = DataSet.Api.Update(newReg, ApplicationUser.GetByEmail(Request?.HttpContext?.User?.Identity?.Name));
+            var res = DataSet.Api.UpdateAsync(newReg, ApplicationUser.GetByEmail(Request?.HttpContext?.User?.Identity?.Name));
             if (res.valid)
                 return RedirectToAction("Edit", "Data", new { id = ds.DatasetId });
             else
@@ -290,7 +290,7 @@ namespace HlidacStatu.Web.Controllers
                 if (ds == null)
                     return RedirectToAction("index");
 
-                if (ds.Registration().hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
+                if (ds.RegistrationAsync().hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
                     return RedirectToAction("index");
 
                 model = ds.SearchDataRawAsync(model.Q, model.Page, model.PageSize, model.Order);
@@ -335,7 +335,7 @@ namespace HlidacStatu.Web.Controllers
                 if (string.IsNullOrEmpty(dataid))
                     return RedirectToAction("index", new { id = id });
 
-                if (ds.Registration().hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
+                if (ds.RegistrationAsync().hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
                     return RedirectToAction("index");
 
                 var dataItem = ds.GetDataAsync(dataid);
@@ -382,7 +382,7 @@ namespace HlidacStatu.Web.Controllers
                 if (ds == null)
                     return RedirectToAction("index");
 
-                if (ds.Registration().hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
+                if (ds.RegistrationAsync().hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
                     return RedirectToAction("index");
 
                 if (string.IsNullOrEmpty(dataid))

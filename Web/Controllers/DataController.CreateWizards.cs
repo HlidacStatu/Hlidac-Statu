@@ -35,7 +35,7 @@ namespace HlidacStatu.Web.Controllers
             newReg.datasetId = form["datasetId"];
             newReg.created = DateTime.Now;
 
-            var res = DataSet.Api.Create(newReg, email, form["jsonSchema"]);
+            var res = DataSet.Api.CreateAsync(newReg, email, form["jsonSchema"]);
             if (res.valid)
                 return RedirectToAction("Manage", "Data", new { id = res.value });
             else
@@ -331,7 +331,7 @@ namespace HlidacStatu.Web.Controllers
 
             datasetIndexStatCache.Invalidate();
 
-            var status = DataSet.Api.Create(reg, email);
+            var status = DataSet.Api.CreateAsync(reg, email);
 
             if (status.valid == false)
             {
@@ -396,7 +396,7 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return Redirect("/data");
 
-            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
+            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
                 return View("NoAccess");
 
 
@@ -448,7 +448,7 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return Redirect("/data");
 
-            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
+            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
                 return View("NoAccess");
 
             datasetIndexStatCache.Invalidate();
@@ -501,7 +501,7 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return Redirect("/data");
 
-            if (ds.HasAdminAccess(Request?.HttpContext?.User) == false)
+            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
                 return View("NoAccess");
 
             datasetIndexStatCache.Invalidate();

@@ -40,18 +40,14 @@ namespace HlidacStatu.Datasets
                             .Result
                             .Select(s => CachedDatasets.Get(s.Item1))
                             .Where(d => d != null)
-                            .Where(d => d.Registration().betaversion == false && d.Registration().hidden == false)
+                            .Where(d => (await d.RegistrationAsync()).betaversion == false && (await d.RegistrationAsync()).hidden == false)
                             .ToArray();
 
                             return datasets;
                         }
                     );
 
-        //    var datasets = HlidacStatu.Connectors.External.DataSets.DataSetDB.Instance.SearchDataRaw("*", 1, 100)
-        //.Result
-        //.Select(s => Newtonsoft.Json.JsonConvert.DeserializeObject<HlidacStatu.Connectors.External.DataSets.Registration>(s.Item2));
-
-
+        
         private DataSetDB() : base(DataSourcesDbName, false)
         {
 
@@ -96,7 +92,7 @@ namespace HlidacStatu.Datasets
                 throw new DataSetException(datasetId, ApiResponseStatus.DatasetJsonSchemaMissing);
 
             Registration oldReg = null;
-            oldReg = CachedDatasets.Get(reg.datasetId)?.Registration();
+            oldReg = await CachedDatasets.Get(reg.datasetId)?.RegistrationAsync();
             if (oldReg == null)
                 AuditRepo.Add<Registration>(Audit.Operations.Create, user, reg, null);
             else
@@ -178,7 +174,7 @@ namespace HlidacStatu.Datasets
 
         public async Task<bool> DeleteRegistrationAsync(string datasetId, string user)
         {
-            AuditRepo.Add<Registration>(Audit.Operations.Delete, user, Registration(), null);
+            AuditRepo.Add<Registration>(Audit.Operations.Delete, user, (await RegistrationAsync()), null);
 
             datasetId = datasetId.ToLower();
             var res = await DeleteDataAsync(datasetId);

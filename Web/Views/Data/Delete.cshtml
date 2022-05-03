@@ -2,7 +2,7 @@
 @model HlidacStatu.Datasets.DataSet
 @{
 
-    ViewBag.Title = "Smazání datového zdroje " + Model.Registration().name;
+    ViewBag.Title = "Smazání datového zdroje " + Model.RegistrationAsync().name;
 
     ApiResponseStatus err = ViewBag.ApiResponseError;
 
@@ -19,7 +19,7 @@
     <ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
         <li><a href="/data">Další databáze</a></li>
-        <li><a href="@Model.DatasetUrl()">@Model.Registration().name</a></li>
+        <li><a href="@Model.DatasetUrl()">@Model.RegistrationAsync().name</a></li>
         <li class="active">Smazání datasetu</li>
     </ol>
 }

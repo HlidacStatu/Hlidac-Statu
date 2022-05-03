@@ -204,7 +204,7 @@ namespace HlidacStatu.Web.Controllers
                     try
                     {
                         var ds = DataSet.CachedDatasets.Get(data);
-                        to = ds.Registration().createdBy;
+                        to = ds.RegistrationAsync().createdBy;
                         subject = subject + $" ohledně databáze {ds.DatasetId}";
                     }
                     catch (Exception)
@@ -1018,7 +1018,7 @@ text zpravy: {txt}
                     {
                         var social = new ImageBannerCoreData()
                         {
-                            title = s.SocialInfoTitle(),
+                            title = s.SocialInfoTitleAsync(),
                             body = s.SocialInfoBody(),
                             footer = s.SocialInfoFooter(),
                             subtitle = s.SocialInfoSubTitle(),

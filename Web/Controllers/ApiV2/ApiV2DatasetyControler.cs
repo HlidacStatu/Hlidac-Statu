@@ -132,7 +132,7 @@ namespace HlidacStatu.Web.Controllers
 
             try
             {
-                var res = DataSet.Api.Create(data, HttpContext.User?.Identity?.Name);
+                var res = DataSet.Api.CreateAsync(data, HttpContext.User?.Identity?.Name);
 
                 if (res.valid)
                 {
@@ -230,7 +230,7 @@ namespace HlidacStatu.Web.Controllers
             ApiResponseStatus res;
             try
             {
-                res = DataSet.Api.Update(data, AuthUser()); //blablablabla HttpContext.User?.Identity?.Name);
+                res = DataSet.Api.UpdateAsync(data, AuthUser()); //blablablabla HttpContext.User?.Identity?.Name);
             }
             catch (Exception ex)
             {

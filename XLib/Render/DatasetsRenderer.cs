@@ -34,7 +34,7 @@ namespace HlidacStatu.XLib.Render
             var content = "";
             try
             {
-                if (dataSearchResultBase.DataSet.Registration()?.searchResultTemplate?.IsFullTemplate() == true)
+                if (dataSearchResultBase.DataSet.RegistrationAsync()?.searchResultTemplate?.IsFullTemplate() == true)
                 {
                     var model = new Registration.Template.SearchTemplateResults();
                     model.Total = dataSearchResultBase.Total;
@@ -47,7 +47,7 @@ namespace HlidacStatu.XLib.Render
 
                     content = dataSearchResultBase
                         .DataSet
-                        .Registration()
+                        .RegistrationAsync()
                         .searchResultTemplate
                         .Render(dataSearchResultBase.DataSet, model, qs: query);
                 }

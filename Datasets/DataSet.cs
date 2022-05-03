@@ -215,7 +215,7 @@ namespace HlidacStatu.Datasets
             return _mapping;
         }
 
-        public bool HasAdminAccess(ClaimsPrincipal user)
+        public async Task<bool> HasAdminAccessAsync(ClaimsPrincipal user)
         {
             if (user is null)
                 return false;
@@ -223,7 +223,7 @@ namespace HlidacStatu.Datasets
             if (user.IsInRole("Admin"))
                 return true;
 
-            return Registration()?.HasAdminAccess(user) ?? false;
+            return (await RegistrationAsync())?.HasAdminAccess(user) ?? false;
         }
 
         public virtual Task<DataSearchResult> SearchDataAsync(string queryString, int page, int pageSize, string sort = null,
@@ -474,19 +474,19 @@ namespace HlidacStatu.Datasets
             return ret;
         }
 
-        public void SendErrorMsgToAuthor(string url, string errMsg)
+        public async Task SendErrorMsgToAuthor(string url, string errMsg)
         {
-            if (Devmasters.TextUtil.IsValidEmail(Registration().createdBy ?? ""))
+            if (Devmasters.TextUtil.IsValidEmail((await RegistrationAsync()).createdBy ?? ""))
             {
                 try
                 {
-                    using (MailMessage msg = new MailMessage("podpora@hlidacstatu.cz", Registration().createdBy))
+                    using (MailMessage msg = new MailMessage("podpora@hlidacstatu.cz", (await RegistrationAsync()).createdBy))
                     {
                         msg.Bcc.Add("michal@michalblaha.cz");
-                        msg.Subject = "Chyba v template vasi databáze " + Registration().name;
+                        msg.Subject = "Chyba v template vasi databáze " + (await RegistrationAsync()).name;
                         msg.IsBodyHtml = false;
                         msg.Body =
-                            $"Upozornění!V template vaší databáze {Registration().datasetId} na adrese {url} došlo k chybě:\n\n{errMsg}\n\nProsíme opravte ji co nejdříve.\nDíky\n\nTeam Hlídače státu.";
+                            $"Upozornění!V template vaší databáze {(await RegistrationAsync()).datasetId} na adrese {url} došlo k chybě:\n\n{errMsg}\n\nProsíme opravte ji co nejdříve.\nDíky\n\nTeam Hlídače státu.";
                         msg.BodyEncoding = System.Text.Encoding.UTF8;
                         msg.SubjectEncoding = System.Text.Encoding.UTF8;
                         using (SmtpClient smtp = new SmtpClient())
@@ -509,7 +509,7 @@ namespace HlidacStatu.Datasets
 
         private Registration _registration = null;
 
-        public async Task<Registration> Registration()
+        public async Task<Registration> RegistrationAsync()
         {
             if (_registration == null)
                 _registration = await DataSetDB.Instance.GetRegistrationAsync(datasetId);
@@ -563,7 +563,8 @@ namespace HlidacStatu.Datasets
             {
                 if (schema == null)
                 {
-                    schema = DataSetDB.Instance.GetRegistrationAsync(DatasetId)
+                    schema = DataSetDB.Instance.GetRegistrationAsync(DatasetId).ConfigureAwait(false)
+                        .GetAwaiter().GetResult()
                         ?.GetSchema();
                 }
 
@@ -579,10 +580,10 @@ namespace HlidacStatu.Datasets
         public virtual async Task<string> AddDataAsync(string data, string id, string createdBy, bool validateSchema = true,
             bool skipOCR = false, bool skipallowWriteAccess = false)
         {
-            if (Registration().allowWriteAccess == false && createdBy != "michal@michalblaha.cz" &&
-                skipallowWriteAccess == false)
+            if ((await RegistrationAsync()).allowWriteAccess == false && createdBy != "michal@michalblaha.cz" &&
+                 skipallowWriteAccess == false)
             {
-                if (Registration().createdBy != createdBy)
+                if ((await RegistrationAsync()).createdBy != createdBy)
                     throw new DataSetException(datasetId, ApiResponseStatus.DatasetNoPermision);
             }
 
@@ -813,9 +814,9 @@ namespace HlidacStatu.Datasets
         /// <summary>
         /// Checks if Json is valid. If not throws error
         /// </summary>
-        private bool CheckSchema(JObject obj)
+        private async Task<bool> CheckSchema(JObject obj)
         {
-            JSchema schema = DataSetDB.Instance.GetRegistrationAsync(datasetId).GetSchema();
+            JSchema schema = (await DataSetDB.Instance.GetRegistrationAsync(datasetId)).GetSchema();
 
             if (schema != null)
             {
@@ -1138,7 +1139,7 @@ namespace HlidacStatu.Datasets
 
         public string BookmarkName()
         {
-            return Registration().name;
+            return RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult().name;
         }
 
         public string ToAuditJson()
@@ -1156,9 +1157,9 @@ namespace HlidacStatu.Datasets
             return DatasetId;
         }
 
-        public string SocialInfoTitle()
+        public async Task<string> SocialInfoTitleAsync()
         {
-            return Devmasters.TextUtil.ShortenText(Registration().name, 70);
+            return Devmasters.TextUtil.ShortenText((await RegistrationAsync()).name, 70);
         }
 
         public string SocialInfoSubTitle()
@@ -1233,7 +1234,7 @@ namespace HlidacStatu.Datasets
                 {
                     List<InfoFact> f = new List<InfoFact>();
 
-                    DateTime dbCreated = Registration().created;
+                    DateTime dbCreated = (await RegistrationAsync()).created;
                     var first = await SearchDataAsync("*", 1, 1, "DbCreated", exactNumOfResults: true);
                     var total = (int)first.Total;
                     var last = await SearchDataAsync("*", 1, 1, "DbCreated desc");

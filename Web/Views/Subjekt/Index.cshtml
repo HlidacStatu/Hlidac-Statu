@@ -674,7 +674,7 @@ StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
     @{
 
         var queries = HlidacStatu.Datasets.DatasetRepo.Searching.GetSpecificQueriesForDatasetsAsync("ICO", Model.ICO, true);
-        var dsSearch = HlidacStatu.Datasets.Search.DatasetMultiQueryMultiResult.GeneralSearch(queries, 1, 5);
+        var dsSearch = HlidacStatu.Datasets.Search.DatasetMultiQueryMultiResult.GeneralSearchAsync(queries, 1, 5);
 
     }
     @if (dsSearch.IsValid && dsSearch.Total > 0)
@@ -697,7 +697,7 @@ StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
                                 .Where(m => m.Total > 0)
                                 .OrderByDescending(o => o.Total)
                                 .Take(4)
-                                .Select(m => $"<li><a href='{m.DataSet.DatasetSearchUrl(m.RenderQuery())}'>{m.DataSet.Registration().name}</a> ({HlidacStatu.Util.RenderData.NiceNumber(m.Total)})</li>")))
+                                .Select(m => $"<li><a href='{m.DataSet.DatasetSearchUrl(m.RenderQuery())}'>{m.DataSet.RegistrationAsync().name}</a> ({HlidacStatu.Util.RenderData.NiceNumber(m.Total)})</li>")))
 
                         </ul>
                     </text>

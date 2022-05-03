@@ -3,13 +3,13 @@
 @using HlidacStatu.Datasets
 
 @{
-    var reg = Model.Registration();
+    var reg = Model.RegistrationAsync();
 
-    ViewBag.Title = "Datový zdroj " + Model.Registration().name;
+    ViewBag.Title = "Datový zdroj " + Model.RegistrationAsync().name;
     ViewBag.SubTitle = "Podrobné informace";
 
     var email = User.Identity?.Name;
-    bool showEditBtn = (Model != null && Model.HasAdminAccess(Context.User));
+    bool showEditBtn = (Model != null && Model.HasAdminAccessAsync(Context.User));
 
 }
 @section scripts

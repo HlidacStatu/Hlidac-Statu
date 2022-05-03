@@ -20,12 +20,12 @@
     
 
     var dsQuery = $"( OsobaId:{Model.NameId} ) ";
-    var dsSearch = HlidacStatu.Datasets.Search.DatasetMultiResult.GeneralSearch(dsQuery, pageSize: 5);
+    var dsSearch = HlidacStatu.Datasets.Search.DatasetMultiResult.GeneralSearchAsync(dsQuery, pageSize: 5);
     if (dsSearch.IsValid && dsSearch.Total > 0)
     {
         foreach (var dss in dsSearch.Results.Where(r => r.Total > 0))
         {
-            tabs.Add($"{dss.DataSet.Registration().name} ({HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(dss.Total)})");
+            tabs.Add($"{dss.DataSet.RegistrationAsync().name} ({HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(dss.Total)})");
             results.Add(dss.RenderResultsInHtml(dss.Q, 5));
         }
     }
@@ -37,13 +37,13 @@
     <ol>
     @foreach (var dss in dsSearch.Results.Where(r => r.Total > 0))
     {
-        <li><a href="#@System.Net.WebUtility.UrlEncode(dss.DataSet.Registration().name)">@(dss.DataSet.Registration().name) (@(HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(dss.Total)))</a></li>
+        <li><a href="#@System.Net.WebUtility.UrlEncode(dss.DataSet.RegistrationAsync().name)">@(dss.DataSet.RegistrationAsync().name) (@(HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(dss.Total)))</a></li>
     }
     </ol>
 
     foreach (var dss in dsSearch.Results.Where(r => r.Total > 0))
     {
-        <h3 id="@System.Net.WebUtility.UrlEncode(dss.DataSet.Registration().name)">@dss.DataSet.Registration().name</h3>
+        <h3 id="@System.Net.WebUtility.UrlEncode(dss.DataSet.RegistrationAsync().name)">@dss.DataSet.RegistrationAsync().name</h3>
         <p>
             @Html.Raw(dss.RenderResultsInHtml(dss.Q, 10))
         </p>

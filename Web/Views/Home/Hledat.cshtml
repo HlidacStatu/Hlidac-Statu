@@ -331,7 +331,7 @@ else if (Model.HasResults == false)
                 .Where(m => m.Total > 0)
                 .OrderByDescending(m => m.Total))
             {
-                htmlLinks.Add(new Tuple<string, string>(ds.DataSet.DatasetSearchUrl(ds.Q), ds.Total + "&nbsp;v&nbsp;" + Devmasters.TextUtil.ShortenText(ds.DataSet.Registration().name, 28)));
+                htmlLinks.Add(new Tuple<string, string>(ds.DataSet.DatasetSearchUrl(ds.Q), ds.Total + "&nbsp;v&nbsp;" + Devmasters.TextUtil.ShortenText(ds.DataSet.RegistrationAsync().name, 28)));
             }
         }
     }
@@ -676,7 +676,7 @@ else if (Model.HasResults == false)
                                 @foreach (var ds in Model.Datasets.Results.Where(m => m.Total > 0).OrderByDescending(m => m.Total))
                                 {
                                     <li style="padding-bottom:5px;margin-bottom:5px;border-bottom:1px #eee dashed">
-                                        @(ds.DataSet.Registration().name)&nbsp;<a href="@(ds.DataSet.DatasetSearchUrl(ds.Q))">@(HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(ds.Total))&nbsp;<i class="far fa-angle-double-right"></i></a>
+                                        @(ds.DataSet.RegistrationAsync().name)&nbsp;<a href="@(ds.DataSet.DatasetSearchUrl(ds.Q))">@(HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(ds.Total))&nbsp;<i class="far fa-angle-double-right"></i></a>
                                     </li>
                                 }
                             </ul>
@@ -702,7 +702,7 @@ else if (Model.HasResults == false)
                     <div class="row">
                         @{
                             var tabs = Model.Datasets.Results.Where(m => m.Total > 0).OrderByDescending(m => m.Total)
-                                                .Select(m => $"{m.DataSet.Registration().name}&nbsp;({HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(m.Total)})");
+                                                .Select(m => $"{m.DataSet.RegistrationAsync().name}&nbsp;({HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(m.Total)})");
                             List<string> results = new();
 
                             foreach (var rds in Model.Datasets.Results

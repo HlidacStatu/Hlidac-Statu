@@ -380,7 +380,7 @@
             datasetsToSearch = datasetsToSearch.Where(m => m.DatasetId != "skutecni-majitele").ToArray();
         }
         var dsQuery = $"( OsobaId:{Model.NameId} ) ";
-        var dsSearch = HlidacStatu.Datasets.Search.DatasetMultiResult.GeneralSearch(dsQuery,
+        var dsSearch = HlidacStatu.Datasets.Search.DatasetMultiResult.GeneralSearchAsync(dsQuery,
             datasets:datasetsToSearch, 
             pageSize: 5);
 

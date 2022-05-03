@@ -216,7 +216,7 @@ namespace HlidacStatu.Web.Controllers
             try
             {
                 var reg = JsonConvert.DeserializeObject<Registration>(data, DataSet.DefaultDeserializationSettings);
-                var res = DataSet.Api.Create(reg, HttpContext.User.Identity.Name);
+                var res = DataSet.Api.CreateAsync(reg, HttpContext.User.Identity.Name);
 
                 if (res.valid)
                     return Json(new { datasetId = ((DataSet)res.value).DatasetId });
@@ -248,7 +248,7 @@ namespace HlidacStatu.Web.Controllers
             string id = _id;
 
             if (ModelState.IsValid)
-                return Json(DataSet.Api.Update(data, ApplicationUser.GetByEmail(HttpContext.User.Identity.Name)));
+                return Json(DataSet.Api.UpdateAsync(data, ApplicationUser.GetByEmail(HttpContext.User.Identity.Name)));
 
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             var errorsStringified = string.Join(";\n", errors);
@@ -270,7 +270,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 try
                 {
-                    return Json(DataSet.Api.Update(data,
+                    return Json(DataSet.Api.UpdateAsync(data,
                         ApplicationUser.GetByEmail(HttpContext.User.Identity.Name))); //blablablabla apiAuth.ApiCall?.User?.ToLower()));
                 }
                 catch (DataSetException dse)
