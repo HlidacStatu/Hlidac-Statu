@@ -1120,8 +1120,15 @@ namespace HlidacStatu.Datasets
         public bool DeleteData(string Id)
         {
             //DeleteRequest req = new DeleteRequest(client.ConnectionSettings.DefaultIndex, "data", Id);
-            var res = client.LowLevel.Delete<StringResponse>(client.ConnectionSettings.DefaultIndex, Id);
-            return res.Success;
+
+            //delete /hs-data_rozhodnuti-uohs*
+
+            for (int i = 0; i < 99; i++)
+            {
+                var _id = $"id_{Id}-{i:00}";
+                client.LowLevel.Delete<StringResponse>(client.ConnectionSettings.DefaultIndex, _id);
+            }
+            return true;
         }
 
         public static bool ExistsDataset(string datasetId)
