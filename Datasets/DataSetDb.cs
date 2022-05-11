@@ -180,9 +180,17 @@ namespace HlidacStatu.Datasets
             var res = DeleteData(datasetId);
             var idxClient = Manager.GetESClient(datasetId, idxType: Manager.IndexType.DataSource);
 
-            var delRes = idxClient.Indices.Delete(idxClient.ConnectionSettings.DefaultIndex);
+            //delete /hs-data_rozhodnuti-uohs*
+            for (int i = 1; i < 99; i++)
+            {
+                var _dsId = $"hs-data_{DatasetId}-{i:00}";
+                var delRes = idxClient.Indices.Delete(_dsId);
+                if (delRes.IsValid == false)
+                    break;
+
+            }
             CachedDatasets.Delete(datasetId);
-            return res && delRes.IsValid;
+            return res;
         }
 
 

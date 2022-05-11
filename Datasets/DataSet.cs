@@ -1013,9 +1013,9 @@ namespace HlidacStatu.Datasets
             var fixedQuery = Repositories.Searching.Tools.FixInvalidQuery(queryString,
                 DatasetRepo.Searching.QueryShorcuts,
                 DatasetRepo.Searching.QueryOperators);
-            
+
             QueryContainer qc = DatasetRepo.Searching.GetSimpleQuery(this, fixedQuery);
-            
+
             ISearchResponse<dynamic> initialResponse = client.Search<dynamic>
             (scr => scr.From(0)
                 .Take(scrollSize)
@@ -1047,16 +1047,16 @@ namespace HlidacStatu.Datasets
             client.ClearScroll(new ClearScrollRequest(scrollid));
 
             var expConverter = new ExpandoObjectConverter();
-            
+
             var data = results
                 .Select(m => JsonConvert.SerializeObject(m))
                 .Select(s => (dynamic)JsonConvert.DeserializeObject<ExpandoObject>(s, expConverter));
-            
+
             return data;
 
             //return results;
         }
-        
+
         public IEnumerable<T> GetAllData<T>(string scrollTimeout = "2m", int scrollSize = 1000) where T : class
         {
             ISearchResponse<dynamic> initialResponse = client.Search<dynamic>
@@ -1121,14 +1121,9 @@ namespace HlidacStatu.Datasets
         {
             //DeleteRequest req = new DeleteRequest(client.ConnectionSettings.DefaultIndex, "data", Id);
 
-            //delete /hs-data_rozhodnuti-uohs*
 
-            for (int i = 0; i < 99; i++)
-            {
-                var _id = $"id_{Id}-{i:00}";
-                client.LowLevel.Delete<StringResponse>(client.ConnectionSettings.DefaultIndex, _id);
-            }
-            return true;
+            var res = client.LowLevel.Delete<StringResponse>(client.ConnectionSettings.DefaultIndex, Id);
+            return res.Success;
         }
 
         public static bool ExistsDataset(string datasetId)
