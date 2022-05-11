@@ -176,6 +176,10 @@ namespace HlidacStatu.Datasets
         {
             AuditRepo.Add<Registration>(Audit.Operations.Delete, user, Registration(), null);
 
+            if (datasetId.ToLower() == "datasourcesdb")
+                return true;
+
+
             datasetId = datasetId.ToLower();
             var res = DeleteData(datasetId);
             var idxClient = Manager.GetESClient(datasetId, idxType: Manager.IndexType.DataSource);
@@ -183,12 +187,13 @@ namespace HlidacStatu.Datasets
             //delete /hs-data_rozhodnuti-uohs*
             for (int i = 1; i < 99; i++)
             {
-                var _dsId = $"hs-data_{DatasetId}-{i:00}";
+                var _dsId = $"hs-data_{datasetId}-{i:00}";
                 var delRes = idxClient.Indices.Delete(_dsId);
                 if (delRes.IsValid == false)
                     break;
 
             }
+
             CachedDatasets.Delete(datasetId);
             return res;
         }
