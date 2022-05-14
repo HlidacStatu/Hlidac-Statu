@@ -93,10 +93,15 @@
                     <div class="card-body">
                         <p class="card-text">
                             <ul class="list-inline">
-                                @foreach (var domain in closeToExpiration.Where(m => (m.CertExpiration().Value - DateTime.Now).TotalDays < 8))
+                                @foreach (var _dom in closeToExpiration.Where(m => (m.CertExpiration().Value - DateTime.Now).TotalDays < 15)
+                                )
                                 {
-                                    var server = servers.FirstOrDefault(m => m.HostDomain().ToLower() == domain.Domain.ToLower());
-                                    TimeSpan interval = domain.CertExpiration().Value - DateTime.Now;
+                                    var server = servers.FirstOrDefault(m => m.HostDomain().ToLower() == _dom.Domain.ToLower());
+                                    if (server == null)
+                                    {
+                                        continue;
+                                    }
+                                    TimeSpan interval = _dom.CertExpiration().Value - DateTime.Now;
                                     var expiresIn = "Skončí " + Devmasters.DT.Util.Ago(new TimeSpan(-1 * interval.Ticks), HlidacStatu.Util.Consts.czCulture);
                                     string icon = "";
                                     if (interval.TotalDays < 4)
