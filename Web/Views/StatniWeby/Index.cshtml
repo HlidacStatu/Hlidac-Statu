@@ -7,18 +7,31 @@
 
 }
 @section scripts
-{
-<script src="/scripts/highcharts-6/highcharts.js"></script>
-<script src="/scripts/highcharts-6/modules/heatmap.js"></script>
-<script src="/scripts/highcharts-6/modules/data.js"></script>
-<script src="/scripts/highcharts-6/modules/boost-canvas.js"></script>
-<script src="/scripts/highcharts-6/modules/boost.js"></script>
+    {
+    <script src="/scripts/highcharts-6/highcharts.js"></script>
+    <script src="/scripts/highcharts-6/modules/heatmap.js"></script>
+    <script src="/scripts/highcharts-6/modules/data.js"></script>
+    <script src="/scripts/highcharts-6/modules/boost-canvas.js"></script>
+    <script src="/scripts/highcharts-6/modules/boost.js"></script>
     @WebyChartUtil.OnPageSharedJavascript()
+
+    <style>
+        .avail_OK {
+            color: @(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.OK));
+        }
+        .avail_Pomale {
+            color: @(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Pomalé));
+        }
+        .avail_Nedostupne {
+            color: @(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Nedostupné));
+        }
+    </style>
+
 
 
 }
 
-@*<div class="card bg-danger">
+    @*<div class="card bg-danger">
     <div class="card-header">
     <h3 class="card-title">Chyba!</h3>
     </div>
@@ -26,23 +39,15 @@
     Data dostupnosti webů nejsou v tuto chvíli k dispozici. Omlouváme se, zkuste to znovu za pár minut.
     </div>
     </div>*@
-@section breadcrumb
-{
-<ol class="breadcrumb">
-    <li><a href="/">Hlídač Státu</a></li>
-    <li><a href="@Url.Action("Index","StatniWeby")">Hlídač Webů</a></li>
-    <li class="active">Dostupnost nejdůležitějších webů</li>
-</ol>
+    @section breadcrumb
+    {
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="@Url.Action("Index","StatniWeby")">Hlídač Webů</a></li>
+        <li class="active">Dostupnost nejdůležitějších webů</li>
+    </ol>
 }
-<partial name="~/Views/StatniWeby/_Info.cshtml" model="@ViewData" />
-
-<h2>Dostupnost nejdůležitějších služeb <small>za posledních 24 hodin</small></h2>
-<div class="row">
-    <div class="col-sm-12">
-        @WebyChartUtil.Chart("index", 48, 750, false)
-    </div>
-</div>
-
+    <partial name="~/Views/StatniWeby/_Info.cshtml" model="@ViewData" />
 
 @{
     var data = HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()
@@ -94,7 +99,7 @@
                         <p class="card-text">
                             <ul class="list-inline">
                                 @foreach (var _dom in closeToExpiration.Where(m => (m.CertExpiration().Value - DateTime.Now).TotalDays < 15)
-                                )
+                               )
                                 {
                                     var server = servers.FirstOrDefault(m => m.HostDomain().ToLower() == _dom.Domain.ToLower());
                                     if (server == null)
@@ -119,7 +124,7 @@
                         </p>
                     </div>
                 </div>
-<a href="/statniweby/https"class="btn btn-warning btn-sm">Více informací o HTTPS všech serverů</a>
+                <a href="/statniweby/https" class="btn btn-warning btn-sm">Více informací o HTTPS všech serverů</a>
 
             }
         </div>
@@ -128,6 +133,65 @@
 
 
 }
+<div class="clearfix" style="margin-bottom:30px"></div>
+<hr />
+    @{
+    var topNedostupnosti = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers24hoursStat()
+                    //.Where(m=>m.Host.Id == 108)
+                    .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                    .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
+                    .Take(30);
+
+    int pocetNedostupnost = Math.Max(10, topNedostupnosti.Count() / 2);
+}
+
+@if (topNedostupnosti.Count() > 0)
+{
+    <h2>Nejhorší dostupnosti služeb <small>za posledních 24 hodin</small></h2>
+    <p>
+        Služby, které mají největší výpadky za posledních 24 hodin.
+    </p>
+            @foreach (var item in topNedostupnosti)
+            {
+                pocetNedostupnost = pocetNedostupnost - 1;
+                if (pocetNedostupnost == 0)
+                {
+                    <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target=".next_charts">
+                        Ukázat další
+                    </button>
+                }
+                
+            <div class="row collapse@(pocetNedostupnost>0 ? ".show" : " next_charts") ">
+                <div class="col-sm-8 col-xs-12">
+                    <a href="@item.Host.pageUrl">Služba @(item.Host.Name)</a>
+                    @if (item.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                    {
+                        <span>
+                            nedostupná <span class="avail_Nedostupne">@item.Statistics().PercentOfTime.Nedostupne.ToString("P2") (@HlidacStatu.XLib.RenderTools.FormatAvailability(item.Statistics().DurationTotal.Nedostupne, HlidacStatu.XLib.RenderTools.DateTimePart.Minute))</span>
+                        </span>
+                    }
+                    @if (item.Statistics().DurationTotal.Pomale.TotalSeconds > 0 && item.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                    {
+                        <span> a </span>
+
+                    }
+                    @if (item.Statistics().DurationTotal.Pomale.TotalSeconds > 0)
+                    {
+                        <span >
+                            pomalá <span class="avail_Pomale">@item.Statistics().PercentOfTime.Pomale.ToString("P2") (@HlidacStatu.XLib.RenderTools.FormatAvailability(item.Statistics().DurationTotal.Pomale, HlidacStatu.XLib.RenderTools.DateTimePart.Minute))</span>
+                        </span>
+                    }
+
+                </div>
+                <div class="col-sm-4 col-xs-12 ">
+                    @WebyChartUtil.Chart("w" + item.Host.Id, 24, 30, true, item.Host.Hash,showLegend:false, showYAxisNames:false, showXAxis:false)
+                </div>
+            </div>
+
+            }
+        
+}
+
 <div class="clearfix"></div>
 
 @WebyChartUtil.TableNextGroups("index")

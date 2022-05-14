@@ -1,14 +1,12 @@
-﻿using HlidacStatu.Entities;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 
-using InfluxDB.Client;
-
 using Microsoft.AspNetCore.Mvc;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -25,44 +23,14 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult Dalsi(string id)
         {
             ViewBag.ID = id;
-            if (Devmasters.TextUtil.IsNumeric(id))
-            { //priorita
-
-                int iid = Convert.ToInt32(id);
-                if (iid < 1)
-                    return RedirectToAction("Index", "StatniWeby");
-                if (iid > 3)
-                    return RedirectToAction("Index", "StatniWeby");
-
-                ViewBag.SubTitle = "Další státní weby";
-                return View((list: Repositories.UptimeServerRepo.ServersIn(iid.ToString()), id: id) );
-            }
-            else if (id?.ToLower() == "ustredni")
+            var servers = Repositories.UptimeServerRepo.ServersIn(id.ToString());
+            if (servers != null || servers?.Count() > 0)
             {
-                var list = Repositories.UptimeServerRepo.ServersIn(id);
-                if (list == null)
-                    return RedirectToAction("Index", "StatniWeby");
-                if (list.Count() == 0)
-                    return RedirectToAction("Index", "StatniWeby");
-
-                ViewBag.SubTitle = "Weby ústředních orgánů státní správy";
-                return View((list: list, id: id));
-
+                ViewBag.SubTitle = HlidacStatu.Web.Framework.WebyChartUtil.TableGroupsTitle(id);
+                return View((list: servers, id: id));
             }
-            else if (id?.ToLower() == "samosprava")
-            {
-                var list = Repositories.UptimeServerRepo.ServersIn(id);
-                if (list == null)
-                    return RedirectToAction("Index", "StatniWeby");
-                if (list.Count() == 0)
-                    return RedirectToAction("Index", "StatniWeby");
 
-                ViewBag.SubTitle = "Weby a služby velkých měst a krajských úřadů";
-                return View( (list: list, id: id) );
-
-            }
-            else
-                return RedirectToAction("Index", "StatniWeby");
+            return RedirectToAction("Index", "StatniWeby");
 
 
         }
@@ -90,38 +58,10 @@ namespace HlidacStatu.Web.Controllers
                 toDate = new DateTime(t.Value);
 
             IEnumerable<Entities.UptimeServer.HostAvailability> data = null;
-
-            switch (id)
-            {
-                case "index":
-                    data = Repositories.UptimeServerRepo.AvailabilityForDayByGroup("0")
-                        ?.OrderBy(o => o.Host.Name)
-                        ?.Reverse()
-                        ?.ToList();
-
-                    break;
-                case "1":
-                case "2":
-                case "3":
-                    data = Repositories.UptimeServerRepo.AvailabilityForDayByGroup(id)
-                        ?.OrderBy(o => o.Host.Name)
-                        ?.Reverse()
-                        ?.ToList();
-                    break;
-                case "ustredni":
-                case "samosprava":
-                    data = Repositories.UptimeServerRepo.AvailabilityForDayByGroup(id)
-                        ?.OrderBy(o => o.Host.Name)
-                        ?.Reverse()
-                        ?.ToList();
-                    break;
-                default:
-                    break;
-            }
             if (id.StartsWith("w"))
             {
                 id = id.Replace("w", "");
-                var host = Repositories.UptimeServerRepo.Load(Convert.ToInt32( id));
+                var host = Repositories.UptimeServerRepo.Load(Convert.ToInt32(id));
                 if (host != null)
                 {
                     if (host.ValidHash(hh))
@@ -130,7 +70,8 @@ namespace HlidacStatu.Web.Controllers
                     }
                 }
             }
-
+            else
+                data = Repositories.UptimeServerRepo.AvailabilityForDayByGroup(id);
 
             if (data?.Count() > 0)
             {

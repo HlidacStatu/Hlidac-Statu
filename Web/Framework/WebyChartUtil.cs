@@ -1,4 +1,4 @@
-﻿
+﻿using System.Collections.Generic;
 using HlidacStatu.Repositories;
 
 using Microsoft.AspNetCore.Html;
@@ -52,31 +52,69 @@ namespace HlidacStatu.Web.Framework
         }
 
 
-        public static IHtmlContent TableNextGroups(string active)
+        static Dictionary<string, string> tabs = new Dictionary<string, string>()
         {
-            var s = $@"
+            {"ustredni","Služby nejdůležitějších úřadů" },
+            {"registr","Rejstříky, registry a důležité databáze" },
+            {"sluzba","Důležité služby a weby veřejné správy" },
+            {"mesta","Městské weby" },
+            {"kraj","Krajské weby" },
+            {"opendata","Open data, open source" },
+            {"geo","Mapy, geografické služby" },
+            {"api","API rozhraní digitálních služeb státu" },
+            {UptimeServerRepo.NotInGroup ,"Ostatní weby" },
+
+        };
+        public static string TableGroupsTitle(string groupName)
+        {
+            if (tabs.ContainsKey(groupName.ToLower()))
+                return tabs[groupName.ToLower()];
+            else
+                return "";
+        }
+        public static IHtmlContent TableNextGroups(string groupName)
+        {
+
+
+            StringBuilder sb = new StringBuilder($@"
     <h2 style='margin-top:40px'>Další služby</h2>
 
     <div class='row'>
         <div class='col-xs-12 col-sm-6 '>
             <div class='list-group'>
 
-                <a href='/StatniWeby/Https' class='list-group-item {WebUtil.IfExists(active == "https", "active disabled")}'>
+                <a href='/StatniWeby/Https' class='list-group-item {WebUtil.IfExists(groupName == "https", "active disabled")}'>
                     <span class='badge float-end rounded-pill bg-secondary'>{HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()?.Count() ?? 0}</span>
                     Žebříček státních serverů podle HTTPS Labs hodnocení
                 </a>
 
-
-                <a href='/StatniWeby/Index' class='list-group-item {WebUtil.IfExists(active == "index", "active disabled")}'>
-                    <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("0")?.Count() ?? 0}</span>
-                    Nejdůležitější služby státní správy
+                <a href='/StatniWeby/Index' class='list-group-item {WebUtil.IfExists(groupName == "index" || string.IsNullOrEmpty(groupName), "active disabled")}'>                    
+                    Přehled a statistiky
                 </a>
+            ");
 
+            foreach (var item in tabs)
+            {
+                sb.AppendLine($@"
+<a href='/StatniWeby/Dalsi/{item.Key}' class='list-group-item {WebUtil.IfExists(groupName == item.Key, "active disabled")}'>
+    <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn(item.Key)?.Count() ?? 0}</span>
+    {item.Value}
+</a>
+");
+            }
+            sb.AppendLine($@"
+<a href='/StatniWeby/opendata' class='list-group-item {WebUtil.IfExists(groupName == "opendatapage", "active disabled")}'>
+    <span class='badge float-end rounded-pill bg-secondary'>JSON</span>
+    Naměřené údaje jako open data
+</a>");
+            sb.AppendLine("</div></div></div>");
+
+            /*
                 <a href='/StatniWeby/Dalsi/ustredni' class='list-group-item {WebUtil.IfExists(active == "ustredni", "active disabled")}'>
                     <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("ustredni")?.Count() ?? 0}</span>
-                    Služby ústředních orgánů státní správy
+                    Služby nejdůležitějších úřadů
                 </a>
-                <a href='/StatniWeby/Dalsi/3' class='list-group-item {WebUtil.IfExists(active == "3", "active disabled")}'>
+                <a href='/StatniWeby/Dalsi/opendata' class='list-group-item {WebUtil.IfExists(active == "opendata", "active disabled")}'>
                     <span class='badge float-end rounded-pill bg-secondary'>{UptimeServerRepo.ServersIn("3")?.Count() ?? 0}</span>
                     Open source/open data weby
                 </a>
@@ -96,14 +134,12 @@ namespace HlidacStatu.Web.Framework
                     <span class='badge float-end rounded-pill bg-secondary'>JSON</span>
                     Naměřené údaje jako open data
                 </a>
-            </div>
-        </div>
-    </div>
-";
-            return new HtmlString(s);
+            */
+            return new HtmlString(sb.ToString());
         }
 
-        public static IHtmlContent Chart(string dataName, int hoursBack, int height, bool detail, string hash = "", string path = "/StatniWeby")
+        public static IHtmlContent Chart(string dataName, int hoursBack, int height, bool detail, string hash = "", 
+            string path = "/StatniWeby", bool showLegend = true, bool showYAxisNames = true, bool showXAxis = true)
         {
             var uniqueId = "_chart_" + Devmasters.TextUtil.GenRandomString(8);
             var colsize = 0; //data.Select(d => d.ColSize(fromDate, toDate)).Max();
@@ -117,17 +153,20 @@ namespace HlidacStatu.Web.Framework
 
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine($@"
-<div id='adbmsg{uniqueId}' style='display: none; ' class='row'>
-      <div class='col-xs-12 text-center center-block'>
-        <div class='alert alert-danger'>
-            <p>
-                <strong>Nevidíte žádný graf?</strong> Některé verze AdBlock a jiných blokovačů reklam přeruší vykreslení grafu.
-            </p><p>Vypněte AdBlock pro naše servery a graf poběží. A nebojte, reklamy vám tu nebudeme ukazovat.</p>
-        </div>
-    </div>
-</div>
-");
+            if (showLegend)
+            {
+                sb.AppendLine($@"
+                    <div id='adbmsg{uniqueId}' style='display: none; ' class=''>
+                          <div class='col-xs-12 text-center center-block'>
+                            <div class='alert alert-danger'>
+                                <p>
+                                    <strong>Nevidíte žádný graf?</strong> Některé verze AdBlock a jiných blokovačů reklam přeruší vykreslení grafu.
+                                </p><p>Vypněte AdBlock pro naše servery a graf poběží. A nebojte, reklamy vám tu nebudeme ukazovat.</p>
+                            </div>
+                        </div>
+                    </div>
+                    ");
+            }
             sb.AppendLine($"<div id='container{uniqueId}' style='height:{height}px; min-width: 310px; max-width: 1000px; margin: 0 auto'></div>");
             sb.AppendLine("<script>");
 
@@ -158,6 +197,7 @@ Highcharts.setOptions({
                 chart: {
                     renderTo:'container" + uniqueId + @"',
                     type: 'heatmap',
+                    " + ((showXAxis==false || showYAxisNames==false) ? "spacing: [0, 0, 0, 0]," : "") + @" 
                     events: {
                         load: function () {
                             $('#adbmsg" + uniqueId + @"').hide();
@@ -168,18 +208,22 @@ Highcharts.setOptions({
                     }
                 },
                 title: null, //{text: 'Dostupnost služeb za poslední 2 dny'},
+                credits: { enabled : " + (showXAxis ? "true" : "false") + @" },
                 plotOptions: {
                 },
 
                 xAxis: {
                     type: 'datetime',
+                    visible: " + (showXAxis ? "true" : "false") + @",
                     labels: {
+                        enabled: " + (showYAxisNames ? "true" : "false") + @",
                         align: 'left',
                         x: 5,
                         y: 14,
                         format: '{value:%a %H:%M}' // long month
                     },
                     showLastLabel: false,
+
                     //tickLength: 16
                 },
                 legend: {
@@ -187,6 +231,7 @@ Highcharts.setOptions({
                     verticalAlign: 'top',
                     align: 'right',
                     y: 25,
+                    enabled: " + (showLegend ? "true" : "false" )+ @"
                 },
 ");
 
@@ -239,7 +284,9 @@ Highcharts.setOptions({
                     title: {
                         text: null
                     },
+                    visible: " + (showYAxisNames ? "true" : "false") + @",
                     labels: {
+                        enabled: " + (showYAxisNames? "true" : "false") + @",
                         useHTML: true,
                         formatter: function () {
                             var obj = cats" + uniqueId + @"[this.value];
@@ -291,7 +338,8 @@ Highcharts.setOptions({
                     colsize: " + colsize + @", 
                     rowsize: 1,
                     tooltip: {
-                        headerFormat: 'Rychlost odezvy<br/>',
+                        headerFormat: " + (height<50 ? "''" : "'Rychlost odezvy<br/>'") + @",
+
                         //pointFormat: '{point.x:%a %H:%M:%S}  <b>{point.value:.2f}s</b>',
                         pointFormatter: function () {
                             var timeout = " + Entities.UptimeServer.Availability.TimeOuted.ToString(HlidacStatu.Util.Consts.enCulture) + @";
@@ -308,7 +356,7 @@ Highcharts.setOptions({
                             }
                             else
                                 s = Highcharts.dateFormat('%a %H:%M:%S', this.x) + ' '
-                                    + '<b>Služba ' + getChartStatus(this.value, 0) + '</b><br/>'
+                                    + '<b>Služba ' + getChartStatus(this.value, 0) + '</b>" + (height < 50 ? " " : "<br/>") + @"'
                                     + '(' + val + ')';
 
                             return s;
