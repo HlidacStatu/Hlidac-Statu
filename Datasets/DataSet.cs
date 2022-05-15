@@ -208,7 +208,7 @@ namespace HlidacStatu.Datasets
             if (_mapping == null)
             {
                 var getIndexResponse = client.Indices.Get(client.ConnectionSettings.DefaultIndex);
-                IIndexState remote = getIndexResponse.Indices[client.ConnectionSettings.DefaultIndex];
+                IIndexState remote = getIndexResponse.Indices.Count>0 ? getIndexResponse.Indices.FirstOrDefault().Value : null;
                 var dataMapping = remote?.Mappings?.Properties;
                 if (dataMapping == null)
                     return new CorePropertyBase[] { };
