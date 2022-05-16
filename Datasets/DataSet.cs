@@ -19,6 +19,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Net.Mail;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Datasets
@@ -1169,7 +1170,8 @@ namespace HlidacStatu.Datasets
 
         public string SocialInfoBody()
         {
-            return InfoFact.RenderInfoFacts(InfoFacts(), 2, true, html: true);
+            var infoFacts = InfoFactsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            return InfoFact.RenderInfoFacts(infoFacts, 2, true, html: true);
         }
 
         public string SocialInfoFooter()
@@ -1224,11 +1226,14 @@ namespace HlidacStatu.Datasets
         }
 
         InfoFact[] _infofacts = null;
-        object lockInfoObj = new object();
+        
+        private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
-        public InfoFact[] InfoFacts()
+        public async Task<InfoFact[]> InfoFactsAsync()
         {
-            lock (lockInfoObj)
+            await _semaphoreSlim.WaitAsync();
+
+            try
             {
                 if (_infofacts == null)
                 {
@@ -1271,6 +1276,10 @@ namespace HlidacStatu.Datasets
                     f.Add(new InfoFact(stat, InfoFact.ImportanceLevel.Stat));
                     _infofacts = f.ToArray();
                 }
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
             }
 
             return _infofacts;

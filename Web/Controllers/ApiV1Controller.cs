@@ -795,7 +795,7 @@ namespace HlidacStatu.Web.Controllers
                 if (s.Prilohy != null && s.Prilohy.Count() > 0)
                 {
                     var newIss = s.Issues.Where(m => m.IssueTypeId != 200).ToList();
-                    newIss.AddRange(textCheck.FindIssues(s));
+                    newIss.AddRange(textCheck.FindIssuesAsync(s));
                     s.Issues = newIss.ToArray();
                     await SmlouvaRepo.SaveAsync(s);
                 }

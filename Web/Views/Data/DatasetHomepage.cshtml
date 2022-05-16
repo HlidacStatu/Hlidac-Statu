@@ -18,7 +18,7 @@
     ViewBag.SubTitle = "Podrobné informace";
 
     ViewBag.SocialShareTitle = "Databáze " + Model.RegistrationAsync().name + " na hlidacstatu.cz";
-    ViewBag.SocialShareText = Model.InfoFacts().RenderInfoFacts(2, true, true);
+    ViewBag.SocialShareText = Model.InfoFactsAsync().RenderInfoFacts(2, true, true);
     ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/dataset?d={DateTime.Now.ToString("d.M.yy")}&v=" + Model.DatasetId;
     ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"
                 + "<meta property=\"og:image:height\" content=\"1080\" />"
@@ -75,7 +75,7 @@
             {
                 <p class="lead">@Html.Raw(Devmasters.TextUtil.FormatPlainTextForArticle(reg.description))</p>
             }
-            <p>@Html.Raw(Model.InfoFacts().RenderInfoFacts(1, true, true, html: true))</p>
+            <p>@Html.Raw(Model.InfoFactsAsync().RenderInfoFacts(1, true, true, html: true))</p>
             @if (Model.RegistrationAsync().betaversion)
             {
                 <p class="bg-warning" style="padding:15px;"><b>Pozor!</b> Tato databáze zatím pracuje v testovací režimu. Může být nefunkční, obsahovat zkušební, neúplná či testovací data</p>

@@ -6,6 +6,7 @@ using HlidacStatu.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Plugin.IssueAnalyzers
 {
@@ -36,7 +37,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
             System.Text.RegularExpressions.RegexOptions.IgnorePatternWhitespace |
             System.Text.RegularExpressions.RegexOptions.IgnoreCase |
             System.Text.RegularExpressions.RegexOptions.Multiline;
-        public IEnumerable<Issue> FindIssues(Smlouva item)
+        public async Task<IEnumerable<Issue>> FindIssuesAsync(Smlouva item)
         {
             List<Issue> issues = new List<Issue>();
 
@@ -66,9 +67,10 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
 
 
             DateTime prvniZverejneni = item.casZverejneni;
-            if (item.OtherVersionsAsync().Length > 0)
+            var otherVersion = await item.OtherVersionsAsync(); 
+            if (otherVersion.Length > 0)
             {
-                var newMin = item.OtherVersionsAsync().Min(m => m.casZverejneni);
+                var newMin = otherVersion.Min(m => m.casZverejneni);
                 if (prvniZverejneni > newMin)
                     prvniZverejneni = newMin;
             }

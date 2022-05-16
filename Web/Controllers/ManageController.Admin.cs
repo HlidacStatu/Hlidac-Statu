@@ -130,7 +130,7 @@ namespace HlidacStatu.Web.Controllers
                 List<Entities.Issues.Issue> issues = new List<Entities.Issues.Issue>();
                 foreach (var ia in Entities.Issues.Util.GetIssueAnalyzers())
                 {
-                    var iss = ia.FindIssues(s);
+                    var iss = ia.FindIssuesAsync(s);
 
                     if (iss != null)
                         issues.AddRange(iss);

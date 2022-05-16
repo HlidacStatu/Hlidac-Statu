@@ -4,6 +4,7 @@ using HlidacStatu.Entities.Issues;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Plugin.IssueAnalyzers
 {
@@ -28,14 +29,14 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
         }
 
         static DateTime startRS = new DateTime(2016, 7, 1);
-        public IEnumerable<Issue> FindIssues(Smlouva item)
+        public Task<IEnumerable<Issue>> FindIssuesAsync(Smlouva item)
         {
             List<Issue> issues = new List<Issue>();
             if (item.spadaPodRS == false)
-                return issues;
+                return Task.FromResult<IEnumerable<Issue>>(issues);
 
             if (item.datumUzavreni < startRS)
-                return issues;
+                return Task.FromResult<IEnumerable<Issue>>(issues);
 
             if (item.Prilohy != null && item.Prilohy.Count() > 0)
             {
@@ -64,7 +65,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
 
 
             }
-            return issues;
+            return Task.FromResult<IEnumerable<Issue>>(issues);
         }
 
 
@@ -72,22 +73,17 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
         DateTime datumUzavreni = new DateTime(2016, 1, 7);
         private string CheckAttachment(Smlouva.Priloha p, Smlouva item)
         {
-            List<Issue> issues = new List<Issue>();
-
             if (
                 (!p.EnoughExtractedText || p.PlainTextContentQuality == DataQualityEnum.Estimated)
                 && (p.LastUpdate > historyDate)
                 && item.datumUzavreni > datumUzavreni
                 && p.PlainTextContentQuality != DataQualityEnum.Unknown
                 )
-
             {
                 return p.nazevSouboru;
             }
 
-
             return string.Empty;
-
         }
 
     }

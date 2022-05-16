@@ -1,6 +1,4 @@
-﻿
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System;
 using System.Linq;
 using System.Threading;
@@ -10,10 +8,9 @@ namespace HlidacStatu.Web.HealthChecks
 {
     public class VerejneZakazkyZpracovane : IHealthCheck
     {
-
-        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
+            CancellationToken cancellationToken = default)
         {
-
             try
             {
                 string result = "";
@@ -21,7 +18,8 @@ namespace HlidacStatu.Web.HealthChecks
                 for (int i = 1; i <= 3; i++)
                 {
                     DateTime date = DateTime.Now.Date.AddDays(-1 * i);
-                    var res = HlidacStatu.Repositories.VerejnaZakazkaRepo.Searching.SimpleSearchAsync($"lastUpdated:{date:yyyy-MM-dd}", null, 1, 1,
+                    var res = await HlidacStatu.Repositories.VerejnaZakazkaRepo.Searching.SimpleSearchAsync(
+                        $"lastUpdated:{date:yyyy-MM-dd}", null, 1, 1,
                         "0", exactNumOfResults: true);
 
                     bool svatek = Devmasters.DT.Util.NepracovniDny[date.Year].Contains(date);
@@ -30,26 +28,17 @@ namespace HlidacStatu.Web.HealthChecks
                         bad = true;
                     else if (res.Total < 30)
                         bad = true;
-
                 }
-                if (bad)
-                    return Task.FromResult(HealthCheckResult.Degraded(result));
-                else
-                    return Task.FromResult(HealthCheckResult.Healthy(result));
 
+                if (bad)
+                    return HealthCheckResult.Degraded(result);
+                else
+                    return HealthCheckResult.Healthy(result);
             }
             catch (Exception e)
             {
-                return Task.FromResult(HealthCheckResult.Unhealthy("Unknown status, cannot read data from network disk", e));
+                return HealthCheckResult.Unhealthy("Unknown status, cannot read data from network disk", e);
             }
-
-
         }
-
-
-
-
     }
 }
-
-

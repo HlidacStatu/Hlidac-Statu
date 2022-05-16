@@ -7,6 +7,7 @@ using HlidacStatu.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Plugin.IssueAnalyzers
 {
@@ -31,7 +32,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
 
         }
 
-        public IEnumerable<Issue> FindIssues(Smlouva item)
+        public async Task<IEnumerable<Issue>> FindIssuesAsync(Smlouva item)
         {
             List<Issue> issues = new List<Issue>();
             if (item.ciziMena != null && item.ciziMena.hodnota > 0)
@@ -42,7 +43,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
             bool jeToDodatek = false;
             if (item.navazanyZaznam != null)
             {
-                Smlouva navSm = SmlouvaRepo.LoadAsync(item.navazanyZaznam);
+                Smlouva navSm = await SmlouvaRepo.LoadAsync(item.navazanyZaznam);
                 if (navSm != null)
                 {
                     jeToDodatek = jeToDodatek || item.predmet.ToLower().Contains("dodatek");
