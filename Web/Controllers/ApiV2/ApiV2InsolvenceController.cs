@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Authorization;
 
@@ -37,7 +38,7 @@ namespace HlidacStatu.Web.Controllers
         [HttpGet("hledat")]
         [Authorize]
         [SwaggerOperation(Tags = new[] { "Insolvence" })]
-        public ActionResult<SearchResultDTO<Rizeni>> Hledat([FromQuery] string? dotaz = null,
+        public async Task<ActionResult<SearchResultDTO<Rizeni>>> Hledat([FromQuery] string? dotaz = null,
             [FromQuery] int? strana = null,
             [FromQuery] int? razeni = null)
         {
@@ -65,7 +66,7 @@ namespace HlidacStatu.Web.Controllers
                 || HttpContext.User.IsInRole("KomercniLicence")
             );
 
-            result = InsolvenceRepo.Searching.SimpleSearchAsync(dotaz, strana.Value,
+            result = await InsolvenceRepo.Searching.SimpleSearchAsync(dotaz, strana.Value,
                 ApiV2Controller.DefaultResultPageSize, razeni.Value, false, isLimited);
 
             if (result.IsValid == false)
@@ -93,7 +94,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>detail smlouvy</returns>
         [HttpGet("{id?}")]
         [Authorize]
-        public ActionResult<Rizeni> Detail([FromRoute] string? id = null)
+        public async Task<ActionResult<Rizeni>> Detail([FromRoute] string? id = null)
         {
             id = HttpUtility.UrlDecode(id);
             if (string.IsNullOrWhiteSpace(id))
@@ -107,7 +108,7 @@ namespace HlidacStatu.Web.Controllers
                 || HttpContext.User.IsInRole("KomercniLicence")
             );
 
-            var ins = InsolvenceRepo.LoadFromEsAsync(id, true, isLimited);
+            var ins = await InsolvenceRepo.LoadFromEsAsync(id, true, isLimited);
             if (ins == null)
             {
                 return NotFound($"Insolvence nenalezena");

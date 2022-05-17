@@ -2,14 +2,12 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
-
 using Microsoft.AspNetCore.Mvc;
-
 using Newtonsoft.Json;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
@@ -22,7 +20,7 @@ namespace HlidacStatu.Web.Controllers
         {
             page = page ?? 1;
             order = order ?? 0;
-            
+
             return Json(new { Ok = true });
         }
 
@@ -94,7 +92,6 @@ namespace HlidacStatu.Web.Controllers
                     OsobaId = f.NameId
                 });
             }
-            
         }
 
         [NonAction]
@@ -106,27 +103,26 @@ namespace HlidacStatu.Web.Controllers
             }
 
             var found = OsobaRepo.PolitickyAktivni.Get()
-                        .Where(o =>
-                            string.Equals(o.Jmeno, jmeno, StringComparison.OrdinalIgnoreCase)
-                            && string.Equals(o.Prijmeni, prijmeni, StringComparison.OrdinalIgnoreCase)
-                            )
-                        .ToArray();
+                .Where(o =>
+                    string.Equals(o.Jmeno, jmeno, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(o.Prijmeni, prijmeni, StringComparison.OrdinalIgnoreCase)
+                )
+                .ToArray();
             ;
 
             if (found?.Count() > 0)
             {
-
             }
             else
             {
                 string jmenoasc = Devmasters.TextUtil.RemoveDiacritics(jmeno);
                 string prijmeniasc = Devmasters.TextUtil.RemoveDiacritics(prijmeni);
                 found = OsobaRepo.PolitickyAktivni.Get()
-                            .Where(o =>
-                                string.Equals(o.JmenoAscii, jmenoasc, StringComparison.OrdinalIgnoreCase)
-                                && string.Equals(o.PrijmeniAscii, prijmeniasc, StringComparison.OrdinalIgnoreCase)
-                                )
-                            .ToArray();
+                    .Where(o =>
+                        string.Equals(o.JmenoAscii, jmenoasc, StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(o.PrijmeniAscii, prijmeniasc, StringComparison.OrdinalIgnoreCase)
+                    )
+                    .ToArray();
             }
 
             funkce = Util.ParseTools.NormalizePolitikFunkce(funkce);
@@ -134,7 +130,7 @@ namespace HlidacStatu.Web.Controllers
             found = found
                 .Where(m =>
                     m.Events().Any(e => Util.ParseTools.FindInStringSqlLike(e.AddInfo, funkce))
-                    )
+                )
                 .ToArray();
 
             return found ?? new Osoba[] { };
@@ -150,10 +146,10 @@ namespace HlidacStatu.Web.Controllers
             }
 
             var found = OsobaRepo.PolitickyAktivni.Get()
-                        .Where(o =>
-                            string.Equals(o.Jmeno, jmeno, StringComparison.OrdinalIgnoreCase)
-                            && string.Equals(o.Prijmeni, prijmeni, StringComparison.OrdinalIgnoreCase)
-                            && o.Narozeni == dt.Value);
+                .Where(o =>
+                    string.Equals(o.Jmeno, jmeno, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(o.Prijmeni, prijmeni, StringComparison.OrdinalIgnoreCase)
+                    && o.Narozeni == dt.Value);
 
             if (found?.Count() > 0)
                 return found;
@@ -161,25 +157,25 @@ namespace HlidacStatu.Web.Controllers
             string jmenoasc = Devmasters.TextUtil.RemoveDiacritics(jmeno);
             string prijmeniasc = Devmasters.TextUtil.RemoveDiacritics(prijmeni);
             found = OsobaRepo.PolitickyAktivni.Get()
-                        .Where(o =>
-                            string.Equals(o.JmenoAscii, jmenoasc, StringComparison.OrdinalIgnoreCase)
-                            && string.Equals(o.PrijmeniAscii, prijmeniasc, StringComparison.OrdinalIgnoreCase)
-                            && o.Narozeni == dt.Value)
-                        ;
+                    .Where(o =>
+                        string.Equals(o.JmenoAscii, jmenoasc, StringComparison.OrdinalIgnoreCase)
+                        && string.Equals(o.PrijmeniAscii, prijmeniasc, StringComparison.OrdinalIgnoreCase)
+                        && o.Narozeni == dt.Value)
+                ;
 
             return found ?? new Osoba[] { };
         }
 
 
         [HttpGet]
-        public ActionResult FindCompanyID(string companyName)
+        public async Task<ActionResult> FindCompanyID(string companyName)
         {
-            return CompanyID(companyName);
+            return await CompanyID(companyName);
         }
-        
+
         [HttpGet]
         [Authorize]
-        public ActionResult CompanyID(string companyName)
+        public async Task<ActionResult> CompanyID(string companyName)
         {
             try
             {
@@ -189,11 +185,12 @@ namespace HlidacStatu.Web.Controllers
                 {
                     //Firma f = Validators.FirmaInText(companyName);
                     var name = Firma.JmenoBezKoncovky(companyName);
-                    var found = FirmaRepo.Searching.FindAllAsync(name, 1).FirstOrDefault();
+                    var found = (await FirmaRepo.Searching.FindAllAsync(name, 1)).FirstOrDefault();
                     if (found == null)
                         return Json(new { });
                     else
-                        return Json(new { ICO = found.ICO, Jmeno = found.Jmeno, DatovaSchranka = found.DatovaSchranka });
+                        return Json(new
+                            { ICO = found.ICO, Jmeno = found.Jmeno, DatovaSchranka = found.DatovaSchranka });
                 }
             }
             catch (DataSetException dse)
@@ -209,14 +206,14 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpPost, ActionName("Datasets")]
         [Authorize]
-        public ActionResult Datasets_Create()
+        public async Task<ActionResult> Datasets_Create()
         {
             var data = ReadRequestBody(HttpContext.Request);
-            
+
             try
             {
                 var reg = JsonConvert.DeserializeObject<Registration>(data, DataSet.DefaultDeserializationSettings);
-                var res = DataSet.Api.CreateAsync(reg, HttpContext.User.Identity.Name);
+                var res = await DataSet.Api.CreateAsync(reg, HttpContext.User.Identity.Name);
 
                 if (res.valid)
                     return Json(new { datasetId = ((DataSet)res.value).DatasetId });
@@ -240,21 +237,20 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
-
         [HttpPut, ActionName("Datasets")]
         [Authorize]
-        public ActionResult Datasets_Update(string _id, [FromBody] Registration data)
+        public async Task<ActionResult> Datasets_Update(string _id, [FromBody] Registration data)
         {
             string id = _id;
 
             if (ModelState.IsValid)
-                return Json(DataSet.Api.UpdateAsync(data, ApplicationUser.GetByEmail(HttpContext.User.Identity.Name)));
+                return Json(await DataSet.Api.UpdateAsync(data,
+                    ApplicationUser.GetByEmail(HttpContext.User.Identity.Name)));
 
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             var errorsStringified = string.Join(";\n", errors);
             Util.Consts.Logger.Error($"Dataset API:\n {errorsStringified}");
             return Json(ApiResponseStatus.GeneralExceptionError(errorsStringified));
-
         }
 
         [HttpPut, ActionName("DatasetsPart")]
@@ -271,7 +267,8 @@ namespace HlidacStatu.Web.Controllers
                 try
                 {
                     return Json(DataSet.Api.UpdateAsync(data,
-                        ApplicationUser.GetByEmail(HttpContext.User.Identity.Name))); //blablablabla apiAuth.ApiCall?.User?.ToLower()));
+                        ApplicationUser.GetByEmail(HttpContext.User.Identity
+                            .Name))); //blablablabla apiAuth.ApiCall?.User?.ToLower()));
                 }
                 catch (DataSetException dse)
                 {
@@ -288,16 +285,18 @@ namespace HlidacStatu.Web.Controllers
 
         [Authorize]
         [HttpGet, ActionName("Datasets")]
-        public ActionResult Datasets_GET(string _id)
+        public async Task<ActionResult> Datasets_GET(string _id)
         {
             string id = _id;
-            
+
             try
             {
                 if (string.IsNullOrEmpty(id))
-                    return Content(JsonConvert.SerializeObject(DataSetDB.Instance.SearchDataAsync("*", 1, 100).Result,
+                    return Content(JsonConvert.SerializeObject(
+                            (await DataSetDB.Instance.SearchDataAsync("*", 1, 100)).Result,
                             Formatting.None,
-                            new JsonSerializerSettings() { ContractResolver = Serialization.PublicDatasetContractResolver.Instance })
+                            new JsonSerializerSettings()
+                                { ContractResolver = Serialization.PublicDatasetContractResolver.Instance })
                         , "application/json");
                 else
                 {
@@ -305,9 +304,8 @@ namespace HlidacStatu.Web.Controllers
                     if (ds == null)
                         return Json(ApiResponseStatus.DatasetNotFound);
                     else
-                        return Content(JsonConvert.SerializeObject(ds.Registration()), "application/json");
+                        return Content(JsonConvert.SerializeObject((await ds.RegistrationAsync())), "application/json");
                 }
-
             }
             catch (DataSetException dse)
             {
@@ -317,13 +315,12 @@ namespace HlidacStatu.Web.Controllers
             {
                 Util.Consts.Logger.Error("Dataset API", ex);
                 return Json(ApiResponseStatus.GeneralExceptionError(ex));
-
             }
         }
 
         [Authorize]
         [HttpDelete, ActionName("Datasets")]
-        public ActionResult Datasets_Delete(string _id)
+        public async Task<ActionResult> Datasets_Delete(string _id)
         {
             string id = _id;
 
@@ -333,7 +330,7 @@ namespace HlidacStatu.Web.Controllers
                     return Json(ApiResponseStatus.DatasetNotFound);
 
                 id = id.ToLower();
-                var r = DataSetDB.Instance.GetRegistrationAsync(id);
+                var r = await DataSetDB.Instance.GetRegistrationAsync(id);
                 if (r == null)
                     return Json(ApiResponseStatus.DatasetNotFound);
 
@@ -342,7 +339,7 @@ namespace HlidacStatu.Web.Controllers
                     return Json(ApiResponseStatus.DatasetNoPermision);
                 }
 
-                var res = DataSetDB.Instance.DeleteRegistrationAsync(id, HttpContext.User.Identity.Name);
+                var res = await DataSetDB.Instance.DeleteRegistrationAsync(id, HttpContext.User.Identity.Name);
                 return Json(new ApiResponseStatus() { valid = res });
             }
             catch (DataSetException dse)
@@ -353,14 +350,13 @@ namespace HlidacStatu.Web.Controllers
             {
                 Util.Consts.Logger.Error("Dataset API", ex);
                 return Json(ApiResponseStatus.GeneralExceptionError(ex));
-
             }
         }
 
-
         [Authorize]
         [HttpGet, ActionName("DatasetSearch")]
-        public ActionResult DatasetSearch(string _id, string q, int? page, string sort = null, string desc = "0")
+        public async Task<ActionResult> DatasetSearch(string _id, string q, int? page, string sort = null,
+            string desc = "0")
         {
             string id = _id;
 
@@ -370,10 +366,10 @@ namespace HlidacStatu.Web.Controllers
             if (page > 200)
                 return Content(
                     JsonConvert.SerializeObject(
-                    new { total = 0, page = 201, results = Array.Empty<dynamic>() }
-                )
-                , "application/json");
-            
+                        new { total = 0, page = 201, results = Array.Empty<dynamic>() }
+                    )
+                    , "application/json");
+
             try
             {
                 var ds = DataSet.CachedDatasets.Get(id?.ToLower());
@@ -382,18 +378,19 @@ namespace HlidacStatu.Web.Controllers
 
 
                 bool bDesc = (desc == "1" || desc?.ToLower() == "true");
-                var res = ds.SearchDataAsync(q, page.Value, 50, sort + (bDesc ? " desc" : ""));
-                res.Result = res.Result.Select(m => { m.DbCreatedBy = null; return m; });
+                var res = await ds.SearchDataAsync(q, page.Value, 50, sort + (bDesc ? " desc" : ""));
+                res.Result = res.Result.Select(m =>
+                {
+                    m.DbCreatedBy = null;
+                    return m;
+                });
 
 
                 return Content(
                     JsonConvert.SerializeObject(
-                    new { total = res.Total, page = res.Page, results = res.Result }
-                )
-                , "application/json");
-
-
-
+                        new { total = res.Total, page = res.Page, results = res.Result }
+                    )
+                    , "application/json");
             }
             catch (DataSetException dex)
             {
@@ -404,10 +401,10 @@ namespace HlidacStatu.Web.Controllers
                 return Json(ApiResponseStatus.GeneralExceptionError(ex));
             }
         }
-        
+
         [Authorize]
         [HttpGet, ActionName("DatasetItem")]
-        public ActionResult DatasetItem_Get(string _id, string _dataid)
+        public async Task<ActionResult> DatasetItem_Get(string _id, string _dataid)
         {
             string id = _id;
             string dataid = _dataid;
@@ -415,7 +412,7 @@ namespace HlidacStatu.Web.Controllers
             try
             {
                 var ds = DataSet.CachedDatasets.Get(id.ToLower());
-                var value = ds.GetDataObjAsync(dataid);
+                var value = await ds.GetDataObjAsync(dataid);
                 //remove from item
                 if (value == null)
                 {
@@ -427,7 +424,7 @@ namespace HlidacStatu.Web.Controllers
                     return Content(
                         JsonConvert.SerializeObject(
                             value, Request.Query["nice"] == "1" ? Formatting.Indented : Formatting.None
-                            ) ?? "null", "application/json");
+                        ) ?? "null", "application/json");
                 }
             }
             catch (DataSetException)
@@ -443,15 +440,15 @@ namespace HlidacStatu.Web.Controllers
 
         [Authorize]
         [HttpGet, ActionName("DatasetItem_Exists")]
-        public ActionResult DatasetItem_Exists(string _id, string _dataid)
+        public async Task<ActionResult> DatasetItem_Exists(string _id, string _dataid)
         {
             string id = _id;
             string dataid = _dataid;
- 
+
             try
             {
                 var ds = DataSet.CachedDatasets.Get(id.ToLower());
-                bool value = ds.ItemExistsAsync(dataid);
+                bool value = await ds.ItemExistsAsync(dataid);
                 //remove from item
                 if (value == false)
                     return Content(JsonConvert.SerializeObject(false), "application/json");
@@ -470,7 +467,8 @@ namespace HlidacStatu.Web.Controllers
 
         [Authorize]
         [HttpPost, ActionName("DatasetItem")]
-        public ActionResult DatasetItem_Post(string _id, string _dataid, [FromBody] Object body, string mode = "", bool? rewrite = false) //rewrite for backwards compatibility
+        public async Task<ActionResult> DatasetItem_Post(string _id, string _dataid, [FromBody] Object body,
+            string mode = "", bool? rewrite = false) //rewrite for backwards compatibility
         {
             string id = _id;
             string dataid = _dataid;
@@ -494,14 +492,14 @@ namespace HlidacStatu.Web.Controllers
 
                 if (mode == "rewrite")
                 {
-                    newId = ds.AddDataAsync(data, dataid, HttpContext.User.Identity.Name, true);
+                    newId = await ds.AddDataAsync(data, dataid, HttpContext.User.Identity.Name, true);
                 }
                 else if (mode == "merge")
                 {
-                    if (ds.ItemExistsAsync(dataid))
+                    if (await ds.ItemExistsAsync(dataid))
                     {
                         //merge
-                        var oldObj = Datasets.Util.CleanHsProcessTypeValuesFromObject(ds.GetDataAsync(dataid));
+                        var oldObj = Datasets.Util.CleanHsProcessTypeValuesFromObject(await ds.GetDataAsync(dataid));
                         var newObj = Datasets.Util.CleanHsProcessTypeValuesFromObject(data);
 
                         newObj["DbCreated"] = oldObj["DbCreated"];
@@ -511,23 +509,25 @@ namespace HlidacStatu.Web.Controllers
                         if (diffs.Count > 0)
                         {
                             oldObj.Merge(newObj,
-                            new Newtonsoft.Json.Linq.JsonMergeSettings()
-                            {
-                                MergeArrayHandling = Newtonsoft.Json.Linq.MergeArrayHandling.Union,
-                                MergeNullValueHandling = Newtonsoft.Json.Linq.MergeNullValueHandling.Ignore
-                            }
+                                new Newtonsoft.Json.Linq.JsonMergeSettings()
+                                {
+                                    MergeArrayHandling = Newtonsoft.Json.Linq.MergeArrayHandling.Union,
+                                    MergeNullValueHandling = Newtonsoft.Json.Linq.MergeNullValueHandling.Ignore
+                                }
                             );
-                            newId = ds.AddDataAsync(oldObj.ToString(), dataid, HttpContext.User.Identity.Name, true);
+                            newId = await ds.AddDataAsync(oldObj.ToString(), dataid, HttpContext.User.Identity.Name,
+                                true);
                         }
                     }
                     else
-                        newId = ds.AddDataAsync(data, dataid, HttpContext.User.Identity.Name, true);
+                        newId = await ds.AddDataAsync(data, dataid, HttpContext.User.Identity.Name, true);
                 }
                 else //skip 
                 {
-                    if (!ds.ItemExistsAsync(dataid))
-                        newId = ds.AddDataAsync(data, dataid, HttpContext.User.Identity.Name, true);
+                    if (!(await ds.ItemExistsAsync(dataid)))
+                        newId = await ds.AddDataAsync(data, dataid, HttpContext.User.Identity.Name, true);
                 }
+
                 return Json(new { id = newId });
             }
             catch (DataSetException dse)
@@ -538,11 +538,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 Util.Consts.Logger.Error("Dataset API", ex);
                 return Json(ApiResponseStatus.GeneralExceptionError(ex));
-
             }
-
         }
     }
 }
-
-

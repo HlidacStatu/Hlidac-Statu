@@ -333,7 +333,7 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpPost()]
         [Authorize]
-        public ActionResult VZDetail(string _id, [FromBody] VerejnaZakazka content)
+        public async Task<ActionResult> VZDetail(string _id, [FromBody] VerejnaZakazka content)
         {
             string id = _id;
 
@@ -386,7 +386,6 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
-
         public ActionResult Status()
         {
             ClusterHealthResponse res = null;
@@ -411,7 +410,6 @@ namespace HlidacStatu.Web.Controllers
                     ).Body
                     ?.Replace("10.10.", "");
 
-                ;
                 nodes = nodes + catr;
             }
             catch (Exception e)
@@ -422,7 +420,6 @@ namespace HlidacStatu.Web.Controllers
 
             return Content(string.Format("{0}-{1}\n\n" + nodes, num, status), "text/plain");
         }
-
 
         public ActionResult Persons(string q)
         {
@@ -445,7 +442,6 @@ namespace HlidacStatu.Web.Controllers
                 )
                     Response.Headers.Add("Access-Control-Allow-Origin", Request.Headers["Origin"]);
             }
-
             return Json(res);
         }
 
@@ -528,7 +524,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize]
-        public ActionResult Search(string query, int? page, int? order)
+        public async Task<ActionResult> Search(string query, int? page, int? order)
         {
             page = page ?? 1;
             order = order ?? 0;
@@ -549,11 +545,10 @@ namespace HlidacStatu.Web.Controllers
             )
                 platnyzaznam = null;
 
-            res = SmlouvaRepo.Searching.SimpleSearchAsync(query, page.Value,
+            res = await SmlouvaRepo.Searching.SimpleSearchAsync(query, page.Value,
                 SmlouvaRepo.Searching.DefaultPageSize,
                 (SmlouvaRepo.Searching.OrderResult)order.Value,
                 platnyZaznam: platnyzaznam);
-
 
             if (res.IsValid == false)
             {
@@ -571,18 +566,17 @@ namespace HlidacStatu.Web.Controllers
                     Newtonsoft.Json.JsonConvert.SerializeObject(new { total = res.Total, items = filtered },
                         Newtonsoft.Json.Formatting.None), "application/json");
             }
-           
         }
 
         [Authorize]
-        public ActionResult Detail(string _id)
+        public async Task<ActionResult> Detail(string _id)
         {
             string Id = _id;
            
             if (string.IsNullOrWhiteSpace(Id))
                 return new NotFoundResult();
 
-            var model = SmlouvaRepo.LoadAsync(Id);
+            var model = await SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return new NotFoundResult();
@@ -608,14 +602,14 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize]
-        public ActionResult ClassificationList(int pageSize = 200)
+        public async Task<ActionResult> ClassificationList(int pageSize = 200)
         {
             string urlItemTemplate = "https://www.hlidacstatu.cz/api/v1/GetForClassification/{0}";
 
             if (pageSize > 500)
                 pageSize = 500;
 
-            var items = SmlouvaRepo.Searching.SimpleSearchAsync("NOT(_exists_:prilohy.datlClassification)", 0, pageSize,
+            var items = await SmlouvaRepo.Searching.SimpleSearchAsync("NOT(_exists_:prilohy.datlClassification)", 0, pageSize,
                 SmlouvaRepo.Searching.OrderResult.DateAddedDesc, platnyZaznam: true);
 
             if (!items.IsValid)
@@ -641,14 +635,14 @@ namespace HlidacStatu.Web.Controllers
 
         [Obsolete]
         [Authorize]
-        public ActionResult GetForClassification(string _id)
+        public async Task<ActionResult> GetForClassification(string _id)
         {
             string Id = _id;
 
             if (string.IsNullOrWhiteSpace(Id))
                 return new NotFoundResult();
 
-            var model = SmlouvaRepo.LoadAsync(Id);
+            var model = await SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return new NotFoundResult();
@@ -665,7 +659,7 @@ namespace HlidacStatu.Web.Controllers
 
             if (model.Prilohy != null)
             {
-                SmlouvaRepo.SaveAsync(model);
+                await SmlouvaRepo.SaveAsync(model);
             }
 
 
@@ -795,7 +789,7 @@ namespace HlidacStatu.Web.Controllers
                 if (s.Prilohy != null && s.Prilohy.Count() > 0)
                 {
                     var newIss = s.Issues.Where(m => m.IssueTypeId != 200).ToList();
-                    newIss.AddRange(textCheck.FindIssuesAsync(s));
+                    newIss.AddRange(await textCheck.FindIssuesAsync(s));
                     s.Issues = newIss.ToArray();
                     await SmlouvaRepo.SaveAsync(s);
                 }

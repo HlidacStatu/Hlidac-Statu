@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
@@ -26,17 +27,17 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize]
-        public ActionResult WebStatus(string _id, string h)
+        public async Task<ActionResult> WebStatus(string _id, string h)
         {
             string id = _id;
 
             if (Devmasters.TextUtil.IsNumeric(id))
-                return _DataHost(Convert.ToInt32(id), h);
+                return await DataHostAsync(Convert.ToInt32(id), h);
             else
                 return Json(ApiResponseStatus.StatniWebNotFound);
         }
 
-        private ActionResult _DataHost(int id, string h)
+        private async Task<ActionResult> DataHostAsync(int id, string h)
         {
             UptimeServer host = UptimeServerRepo.AllActiveServers().Where(w => w.Id == id).FirstOrDefault();
             if (host == null)
@@ -47,7 +48,7 @@ namespace HlidacStatu.Web.Controllers
                 try
                 {
                     UptimeServer.HostAvailability? data = UptimeServerRepo.AvailabilityForDayById(host.Id);
-                    UptimeSSL? webssl = UptimeSSLRepo.LoadLatestAsync(host.HostDomain());
+                    UptimeSSL? webssl = await UptimeSSLRepo.LoadLatestAsync(host.HostDomain());
                     var ssldata = new
                     {
                         grade = webssl==null ? null : webssl.SSLGrade().ToNiceDisplayName(),
@@ -65,7 +66,6 @@ namespace HlidacStatu.Web.Controllers
                             ssl = ssldata
                         })
                         , "text/json");
-
                 }
                 catch (Exception e)
                 {

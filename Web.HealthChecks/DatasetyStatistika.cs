@@ -12,8 +12,7 @@ namespace HlidacStatu.Web.HealthChecks
     {
         Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<DatasetStat>> statistiky =
             new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<DatasetStat>>(
-                TimeSpan.FromMinutes(60), "DatasetStat_all",
-                _ =>
+                TimeSpan.FromMinutes(60), "DatasetStat_all", async _ =>
                 {
                     try
                     {

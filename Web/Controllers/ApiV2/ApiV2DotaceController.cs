@@ -1,6 +1,5 @@
 ﻿using HlidacStatu.Entities.Dotace;
 using HlidacStatu.Repositories;
-using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
 
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
@@ -34,7 +34,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns></returns>
         [HttpGet("hledat")]
         [Authorize]
-        public ActionResult<SearchResultDTO<Dotace>> Hledat([FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
+        public async Task<ActionResult<SearchResultDTO<Dotace>>> Hledat([FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
         {
             if (strana is null || strana < 1)
                 strana = 1;
@@ -51,7 +51,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
 
-            result = DotaceRepo.Searching.SimpleSearchAsync(dotaz, strana.Value,
+            result = await DotaceRepo.Searching.SimpleSearchAsync(dotaz, strana.Value,
                 ApiV2Controller.DefaultResultPageSize,
                 (razeni ?? 0).ToString());
 
@@ -76,14 +76,14 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>detail dotace</returns>
         [HttpGet("{id?}")]
         [Authorize]
-        public ActionResult<Dotace> Detail([FromRoute] string? id = null)
+        public async Task<ActionResult<Dotace>> Detail([FromRoute] string? id = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
                 return BadRequest($"Hodnota id chybí.");
             }
 
-            var dotace = DotaceRepo.GetAsync(id);
+            var dotace = await DotaceRepo.GetAsync(id);
             if (dotace == null)
             {
                 return NotFound($"Dotace nenalezena");

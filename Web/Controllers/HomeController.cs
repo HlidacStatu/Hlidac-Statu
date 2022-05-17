@@ -192,7 +192,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        public ActionResult sendFeedbackMail(string typ, string email, string txt, string url, bool? auth, string data)
+        public async Task<ActionResult> sendFeedbackMail(string typ, string email, string txt, string url, bool? auth, string data)
         {
             string to = "podpora@hlidacstatu.cz";
             string subject = "Zprava z HlidacStatu.cz: " + typ;
@@ -204,7 +204,7 @@ namespace HlidacStatu.Web.Controllers
                     try
                     {
                         var ds = DataSet.CachedDatasets.Get(data);
-                        to = ds.RegistrationAsync().createdBy;
+                        to = (await ds.RegistrationAsync()).createdBy;
                         subject = subject + $" ohledně databáze {ds.DatasetId}";
                     }
                     catch (Exception)
@@ -247,7 +247,7 @@ text zpravy: {txt}";
         public ActionResult ClassificationFeedback(string typ, string email, string txt, string url, string data)
         {
             // create a task, so user doesn't have to wait for anything
-            System.Threading.Tasks.Task.Run(() =>
+            Task.Run(async () =>
             {
 
                 try
@@ -264,7 +264,7 @@ text zpravy: {txt}
 ";
                     Util.SMTPTools.SendSimpleMailToPodpora(subject, body, email);
 
-                    string classificationExplanation = SmlouvaRepo.GetClassificationExplanationAsync(data);
+                    string classificationExplanation = await SmlouvaRepo.GetClassificationExplanationAsync(data);
 
                     string explain = $"explain result: {classificationExplanation} ";
 
@@ -303,12 +303,12 @@ text zpravy: {txt}
             return Content("");
         }
 
-        public ActionResult TextSmlouvy(string Id, string hash, string secret)
+        public async Task<ActionResult> TextSmlouvy(string Id, string hash, string secret)
         {
             if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(hash))
                 return NotFound();
 
-            var model = SmlouvaRepo.LoadAsync(Id);
+            var model = await SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return NotFound();
@@ -335,12 +335,12 @@ text zpravy: {txt}
             ViewBag.hashValue = hash;
             return View(model);
         }
-        public ActionResult KopiePrilohy(string Id, string hash, string secret)
+        public async Task<ActionResult> KopiePrilohy(string Id, string hash, string secret)
         {
             if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(hash))
                 return NotFound();
 
-            var model = SmlouvaRepo.LoadAsync(Id);
+            var model = await SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return NotFound();
@@ -608,7 +608,7 @@ text zpravy: {txt}
             return RedirectPermanent(Url.Action("Vazby", "Osoba", new { Id = Id, aktualnost = aktualnost }));
         }
 
-        public ActionResult Detail(string Id)
+        public async Task<ActionResult> Detail(string Id)
         {
             if (string.IsNullOrWhiteSpace(Id))
                 return NotFound();
@@ -620,7 +620,8 @@ text zpravy: {txt}
             }
             if (!string.IsNullOrEmpty(HttpContext.Request.Query["qs"]))
             {
-                var findSm = SmlouvaRepo.Searching.SimpleSearchAsync($"_id:\"{model.Id}\" AND ({HttpContext.Request.Query["qs"]})", 1, 1,
+                var findSm = await SmlouvaRepo.Searching
+                    .SimpleSearchAsync($"_id:\"{model.Id}\" AND ({HttpContext.Request.Query["qs"]})", 1, 1,
                     SmlouvaRepo.Searching.OrderResult.FastestForScroll, withHighlighting: true);
                 if (findSm.Total > 0)
                     ViewBag.Highlighting = findSm.ElasticResults.Hits.First().Highlight;
@@ -629,20 +630,20 @@ text zpravy: {txt}
             return View(model);
         }
 
-        public ActionResult HledatFirmy(string q, int? page = 1)
+        public async Task<ActionResult> HledatFirmy(string q, int? page = 1)
         {
-            var model = FirmaRepo.Searching.SimpleSearchAsync(q, page.Value, 50);
+            var model = await FirmaRepo.Searching.SimpleSearchAsync(q, page.Value, 50);
             return View(model);
         }
 
-        public ActionResult HledatSmlouvy(Repositories.Searching.SmlouvaSearchResult model)
+        public async Task<ActionResult> HledatSmlouvy(Repositories.Searching.SmlouvaSearchResult model)
         {
             if (model == null || ModelState.IsValid == false)
                 return View(new Repositories.Searching.SmlouvaSearchResult());
 
 
 
-            var sres = SmlouvaRepo.Searching.SimpleSearchAsync(model.Q, model.Page,
+            var sres = await SmlouvaRepo.Searching.SimpleSearchAsync(model.Q, model.Page,
                 SmlouvaRepo.Searching.DefaultPageSize,
                 (SmlouvaRepo.Searching.OrderResult)(Convert.ToInt32(model.Order)),
                 includeNeplatne: model.IncludeNeplatne,
@@ -665,11 +666,12 @@ text zpravy: {txt}
             return View(sres);
         }
 
-        public ActionResult Hledat(string q, string order)
+        public async Task<ActionResult> Hledat(string q, string order)
         {
             bool showBeta = User.Identity?.IsAuthenticated == true && User.IsInRole("BetaTester");
 
-            var res = XLib.Search.GeneralSearchAsync(q, 1, Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal, showBeta, order);
+            var res = await XLib.Search
+                .GeneralSearchAsync(q, 1, Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal, showBeta, order);
             AuditRepo.Add(
                 Audit.Operations.UserSearch
                 , User?.Identity?.Name
@@ -776,14 +778,14 @@ text zpravy: {txt}
         }
 
         [HlidacCache(60 * 60, "id", false)]
-        public ActionResult Export(string id)
+        public async Task<ActionResult> Export(string id)
         {
             System.Text.StringBuilder sb = new(2048);
 
             if (id == "uohs-ed")
             {
                 var ds = DataSet.CachedDatasets.Get("rozhodnuti-uohs");
-                var res = ds.SearchDataAsync("*", 0, 30, "PravniMoc desc");
+                var res = await ds.SearchDataAsync("*", 0, 30, "PravniMoc desc");
                 if (res.Total > 0)
                 {
                     sb.Append(
@@ -880,7 +882,7 @@ text zpravy: {txt}
             return View(viewName, new ImageBannerCoreData() { title = title, subtitle = subtitle, body = body, footer = footer, img = img, color = color });
         }
 
-        public ActionResult SocialBanner(string id, string v, string t, string st, string b, string f, string img, string rat = "16x9", string res = "1200x628", string col = "")
+        public async Task<ActionResult> SocialBanner(string id, string v, string t, string st, string b, string f, string img, string rat = "16x9", string res = "1200x628", string col = "")
         {
             string mainUrl = HttpContext.Request.Scheme + "://" + HttpContext.Request.Host;
 
@@ -901,7 +903,7 @@ text zpravy: {txt}
                 Firma fi = Firmy.Get(v);
                 if (fi.Valid)
                 {
-                    if (!fi.NotInterestingToShowAsync())
+                    if (!(await fi.NotInterestingToShowAsync()))
                     {
                         var social = new ImageBannerCoreData()
                         {
@@ -918,7 +920,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "zakazka")
             {
-                VerejnaZakazka vz = VerejnaZakazkaRepo.LoadFromESAsync(v);
+                VerejnaZakazka vz = await VerejnaZakazkaRepo.LoadFromESAsync(v);
                 if (vz != null)
                     try
                     {
@@ -952,7 +954,7 @@ text zpravy: {txt}
                 Osoba o = Osoby.GetByNameId.Get(v);
                 if (o != null)
                 {
-                    if (!o.NotInterestingToShowAsync())
+                    if (!(await o.NotInterestingToShowAsync()))
                     {
                         var social = new ImageBannerCoreData()
                         {
@@ -970,7 +972,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "smlouva")
             {
-                Smlouva s = SmlouvaRepo.LoadAsync(v);
+                Smlouva s = await SmlouvaRepo.LoadAsync(v);
                 if (s != null)
                 {
                     if (!s.NotInterestingToShow())
@@ -990,7 +992,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "insolvence")
             {
-                var s = InsolvenceRepo.LoadFromEsAsync(v, false, true)?.Rizeni;
+                var s = (await InsolvenceRepo.LoadFromEsAsync(v, false, true))?.Rizeni;
                 if (s != null)
                 {
                     if (!s.NotInterestingToShow())
@@ -1018,7 +1020,7 @@ text zpravy: {txt}
                     {
                         var social = new ImageBannerCoreData()
                         {
-                            title = s.SocialInfoTitleAsync(),
+                            title = await s.SocialInfoTitleAsync(),
                             body = s.SocialInfoBody(),
                             footer = s.SocialInfoFooter(),
                             subtitle = s.SocialInfoSubTitle(),

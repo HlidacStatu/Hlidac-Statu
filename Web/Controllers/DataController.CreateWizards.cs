@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace HlidacStatu.Web.Controllers
@@ -24,7 +25,7 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpPost]
         [Authorize]
-        public ActionResult CreateAdv(Registration data, IFormCollection form)
+        public async Task<ActionResult> CreateAdv(Registration data, IFormCollection form)
         {
 
             var email = Request?.HttpContext?.User?.Identity?.Name;
@@ -35,7 +36,7 @@ namespace HlidacStatu.Web.Controllers
             newReg.datasetId = form["datasetId"];
             newReg.created = DateTime.Now;
 
-            var res = DataSet.Api.CreateAsync(newReg, email, form["jsonSchema"]);
+            var res = await DataSet.Api.CreateAsync(newReg, email, form["jsonSchema"]);
             if (res.valid)
                 return RedirectToAction("Manage", "Data", new { id = res.value });
             else
@@ -54,7 +55,7 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpPost]
         [Authorize]
-        public ActionResult CreateFromBackup(IFormCollection form, int step, IFormFile file)
+        public async Task<ActionResult> CreateFromBackup(IFormCollection form, int step, IFormFile file)
         {
             var email = Request?.HttpContext?.User?.Identity?.Name;
 
@@ -64,7 +65,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 using (StreamReader reader = new StreamReader(file.OpenReadStream()))
                 {
-                    json = reader.ReadToEnd();
+                    json = await reader.ReadToEndAsync();
                 }
             }
             Registration reg = null;
@@ -72,7 +73,11 @@ namespace HlidacStatu.Web.Controllers
             {
                 reg = Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(json);
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
+
             if (reg == null)
                 ViewBag.ApiResponseError = ApiResponseStatus.Error(500, "Nekorektní záloha datasetu", "Nekorektní záloha datasetu");
 
@@ -83,7 +88,7 @@ namespace HlidacStatu.Web.Controllers
                 var ds = DataSet.CachedDatasets.Get(reg.datasetId);
                 if (ds != null)
                 {
-                    ViewBag.ExistsDS = ds.Registration();
+                    ViewBag.ExistsDS = await ds.RegistrationAsync();
                 }
             }
 
@@ -193,7 +198,7 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpPost]
         [Authorize]
-        public ActionResult CreateSimple2(CreateSimpleModel model, IFormCollection form)
+        public async Task<ActionResult> CreateSimple2(CreateSimpleModel model, IFormCollection form)
         {
             var email = Request?.HttpContext?.User?.Identity?.Name;
             var uTmp = new Connectors.IO.UploadedTmpFile();
@@ -331,7 +336,7 @@ namespace HlidacStatu.Web.Controllers
 
             datasetIndexStatCache.Invalidate();
 
-            var status = DataSet.Api.CreateAsync(reg, email);
+            var status = await DataSet.Api.CreateAsync(reg, email);
 
             if (status.valid == false)
             {
@@ -384,7 +389,7 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpGet]
         [Authorize]
-        public ActionResult ImportData(string id, CreateSimpleModel model)
+        public async Task<ActionResult> ImportData(string id, CreateSimpleModel model)
         {
             model = model ?? new CreateSimpleModel();
             model.DatasetId = id;
@@ -396,7 +401,7 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return Redirect("/data");
 
-            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
+            if ((await ds.HasAdminAccessAsync(Request?.HttpContext?.User)) == false)
                 return View("NoAccess");
 
 
@@ -424,9 +429,9 @@ namespace HlidacStatu.Web.Controllers
                         model.Delimiter = Devmasters.IO.IOTools.DetectCSVDelimiter(r);
                     }
 
-
                     var csv = new CsvHelper.CsvReader(r, new CsvHelper.Configuration.CsvConfiguration(Util.Consts.csCulture) { HasHeaderRecord = true, Delimiter = model.GetValidDelimiter() });
-                    csv.Read(); csv.ReadHeader();
+                    await csv.ReadAsync(); 
+                    csv.ReadHeader();
                     model.Headers = csv.HeaderRecord.Where(m => !string.IsNullOrEmpty(m?.Trim())).ToArray();
                 }
                 return View("ImportData.mapping", model);
@@ -439,7 +444,7 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpPost]
         [Authorize]
-        public ActionResult ImportData(string id, string delimiter, string data, IFormCollection form, IFormFile file)
+        public async Task<ActionResult> ImportData(string id, string delimiter, string data, IFormCollection form, IFormFile file)
         {
             if (string.IsNullOrEmpty(id))
                 return Redirect("/data");
@@ -448,7 +453,7 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return Redirect("/data");
 
-            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
+            if ((await ds.HasAdminAccessAsync(Request?.HttpContext?.User)) == false)
                 return View("NoAccess");
 
             datasetIndexStatCache.Invalidate();
@@ -483,7 +488,7 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpPost]
         [Authorize]
-        public ActionResult ImportDataProcess(string id, CreateSimpleModel model, IFormCollection form)
+        public async Task<ActionResult> ImportDataProcess(string id, CreateSimpleModel model, IFormCollection form)
         {
 
             ViewBag.NumOfRows = 0;
@@ -501,16 +506,14 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return Redirect("/data");
 
-            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
+            if ((await ds.HasAdminAccessAsync(Request?.HttpContext?.User)) == false)
                 return View("NoAccess");
 
             datasetIndexStatCache.Invalidate();
 
-
             if (ds.IsFlatStructure() == false)
             {
                 return RedirectToAction("ImportData", new { id = ds.DatasetId, fileId = model.FileId, delimiter = model.GetValidDelimiter() });
-
             }
 
             var uTmp = new Connectors.IO.UploadedTmpFile();
@@ -534,8 +537,7 @@ namespace HlidacStatu.Web.Controllers
                         sourceCSV = form["source_" + i],
                         TargetJSON = form["target_" + i],
                         Transform = form["transform_" + i]
-                    }
-                    );
+                    });
                 }
             }
 
@@ -560,10 +562,11 @@ namespace HlidacStatu.Web.Controllers
                         //,MissingFieldFound = null 
                     }
                     );
-                    csv.Read(); csv.ReadHeader();
+                    await csv.ReadAsync(); 
+                    csv.ReadHeader();
                     csvHeaders = csv.HeaderRecord.Where(m => !string.IsNullOrEmpty(m?.Trim())).ToArray(); //for future control
 
-                    while (csv.Read())
+                    while (await csv.ReadAsync())
                     {
                         var newObj = rcb.CreateObject();
                         for (int m = 0; m < mappingProps.Count; m++)

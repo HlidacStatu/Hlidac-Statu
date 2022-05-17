@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -15,11 +16,10 @@ namespace HlidacStatu.Web.Controllers
     {
 
         static Devmasters.Cache.LocalMemory.LocalMemoryCache<Models.DatasetIndexStat[]> datasetIndexStatCache =
-            new Devmasters.Cache.LocalMemory.LocalMemoryCache<Models.DatasetIndexStat[]>(TimeSpan.FromMinutes(15),
-                (o) =>
+            new Devmasters.Cache.LocalMemory.LocalMemoryCache<Models.DatasetIndexStat[]>(TimeSpan.FromMinutes(15), async (o) =>
                 {
                     List<Models.DatasetIndexStat> ret = new List<Models.DatasetIndexStat>();
-                    var datasets = DataSetDB.Instance.SearchDataRawAsync("*", 1, 200)
+                    var datasets = (await DataSetDB.Instance.SearchDataRawAsync("*", 1, 200))
                         .Result
                         .Select(s => Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(s.Item2))
                         .Where(m => m.id != null);
@@ -28,7 +28,7 @@ namespace HlidacStatu.Web.Controllers
                     {
                         var rec = new Models.DatasetIndexStat() { Ds = ds };
                         var dsContent = DataSet.CachedDatasets.Get(ds.id.ToString());
-                        var allrec = dsContent.SearchDataAsync("", 1, 1, sort: "DbCreated desc", exactNumOfResults: true);
+                        var allrec = await dsContent.SearchDataAsync("", 1, 1, sort: "DbCreated desc", exactNumOfResults: true);
                         rec.RecordNum = allrec.Total;
 
                         if (rec.RecordNum > 0)
@@ -38,7 +38,7 @@ namespace HlidacStatu.Web.Controllers
                                 rec.LastRecord = (DateTime?)lRec.DbCreated;
                         }
 
-                        var recordWeek = dsContent.SearchDataAsync($"DbCreated:[{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")} TO *]", 1, 0, exactNumOfResults: true);
+                        var recordWeek = await dsContent.SearchDataAsync($"DbCreated:[{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")} TO *]", 1, 0, exactNumOfResults: true);
                         rec.RecordNumWeek = recordWeek.Total;
                         //string order = string.IsNullOrWhiteSpace(ds.defaultOrderBy) ? "DbCreated desc" : ds.defaultOrderBy;
                         //var data = dsContent.SearchDataRaw("*", 1, 1, order);
@@ -84,7 +84,7 @@ namespace HlidacStatu.Web.Controllers
             return View(ds);
         }
 
-        public ActionResult Manage(string id)
+        public async Task<ActionResult> Manage(string id)
         {
             if (!string.IsNullOrEmpty(id))
             {
@@ -92,19 +92,19 @@ namespace HlidacStatu.Web.Controllers
                 if (ds == null)
                     return Redirect("/data");
 
-                if (ds.HasAdminAccessAsync(Request?.HttpContext?.User))
-                    return View(ds?.RegistrationAsync());
+                if ((await ds.HasAdminAccessAsync(Request?.HttpContext?.User)))
+                    return View(await ds?.RegistrationAsync());
             }
             return View();
         }
 
-        public ActionResult Delete(string id, string confirmation)
+        public async Task<ActionResult> Delete(string id, string confirmation)
         {
             string email = Request.HttpContext.User.Identity?.Name ?? "";
             var ds = DataSet.CachedDatasets.Get(id);
             if (ds == null)
                 return Redirect("/data");
-            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
+            if ((await ds.HasAdminAccessAsync(Request?.HttpContext?.User)) == false)
                 return View("NoAccess");
 
             string[] neverDelete = new string[] { "veklep", "rozhodnuti-uohs", "centralniregistroznameni", "datasourcesdb" };
@@ -121,7 +121,7 @@ namespace HlidacStatu.Web.Controllers
             return View(ds);
         }
 
-        public ActionResult Backup(string id)
+        public async Task<ActionResult> Backup(string id)
         {
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("Index");
@@ -130,23 +130,19 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return RedirectToAction("index");
 
-            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
+            if ((await ds.HasAdminAccessAsync(Request?.HttpContext?.User)) == false)
             {
                 ViewBag.DatasetId = id;
                 return View("NoAccess");
             }
             return File(
-                System.Text.UTF8Encoding.UTF8.GetBytes(
-                    Newtonsoft.Json.JsonConvert.SerializeObject(ds.RegistrationAsync(), Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings() { ContractResolver = Serialization.PublicDatasetContractResolver.Instance })
+                System.Text.Encoding.UTF8.GetBytes(
+                    Newtonsoft.Json.JsonConvert.SerializeObject(await ds.RegistrationAsync(), Newtonsoft.Json.Formatting.Indented, new Newtonsoft.Json.JsonSerializerSettings() { ContractResolver = Serialization.PublicDatasetContractResolver.Instance })
                     ),
                 "application/octet-streamSection", id + ".json");
-
         }
 
-
-
-
-        public ActionResult Edit(string id)
+        public async Task<ActionResult> Edit(string id)
         {
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("Index");
@@ -155,17 +151,17 @@ namespace HlidacStatu.Web.Controllers
             if (ds == null)
                 return RedirectToAction("index");
 
-            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
+            if ((await ds.HasAdminAccessAsync(Request?.HttpContext?.User)) == false)
             {
                 ViewBag.DatasetId = id;
                 return View("NoAccess");
             }
 
-            return View(ds.RegistrationAsync());
+            return View(await ds.RegistrationAsync());
         }
 
         [HttpPost]
-        public ActionResult Edit(string id, Registration update, IFormCollection form)
+        public async Task<ActionResult> Edit(string id, Registration update, IFormCollection form)
         {
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("Index");
@@ -177,7 +173,7 @@ namespace HlidacStatu.Web.Controllers
                 return RedirectToAction("index");
 
 
-            if (ds.HasAdminAccessAsync(Request?.HttpContext?.User) == false)
+            if ((await ds.HasAdminAccessAsync(Request?.HttpContext?.User)) == false)
             {
                 ViewBag.DatasetId = id;
                 return View("NoAccess");
@@ -198,7 +194,7 @@ namespace HlidacStatu.Web.Controllers
                 newReg.createdBy = Request?.HttpContext?.User?.Identity?.Name;
 
 
-            var res = DataSet.Api.UpdateAsync(newReg, ApplicationUser.GetByEmail(Request?.HttpContext?.User?.Identity?.Name));
+            var res = await DataSet.Api.UpdateAsync(newReg, ApplicationUser.GetByEmail(Request?.HttpContext?.User?.Identity?.Name));
             if (res.valid)
                 return RedirectToAction("Edit", "Data", new { id = ds.DatasetId });
             else
@@ -277,7 +273,7 @@ namespace HlidacStatu.Web.Controllers
 
             return View(datasource);
         }
-        public ActionResult Hledat(string id, DataSearchRawResult model)
+        public async Task<ActionResult> Hledat(string id, DataSearchRawResult model)
         {
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("index");
@@ -290,10 +286,10 @@ namespace HlidacStatu.Web.Controllers
                 if (ds == null)
                     return RedirectToAction("index");
 
-                if (ds.RegistrationAsync().hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
+                if ((await ds.RegistrationAsync()).hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
                     return RedirectToAction("index");
 
-                model = ds.SearchDataRawAsync(model.Q, model.Page, model.PageSize, model.Order);
+                model = await ds.SearchDataRawAsync(model.Q, model.Page, model.PageSize, model.Order);
                 AuditRepo.Add(
                     Audit.Operations.UserSearch
                     , User?.Identity?.Name
@@ -322,7 +318,7 @@ namespace HlidacStatu.Web.Controllers
 
         }
 
-        public ActionResult Detail(string id, string dataid)
+        public async Task<ActionResult> Detail(string id, string dataid)
         {
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("index");
@@ -335,7 +331,7 @@ namespace HlidacStatu.Web.Controllers
                 if (string.IsNullOrEmpty(dataid))
                     return RedirectToAction("index", new { id = id });
 
-                if (ds.RegistrationAsync().hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
+                if ((await ds.RegistrationAsync()).hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
                     return RedirectToAction("index");
 
                 var dataItem = ds.GetDataAsync(dataid);
@@ -346,7 +342,7 @@ namespace HlidacStatu.Web.Controllers
                 {
                     try
                     {
-                        var findSm = ds.SearchDataRawAsync($"_id:\"{dataid}\" AND ({this.Request.Query["qs"]})", 1, 1,
+                        var findSm = await ds.SearchDataRawAsync($"_id:\"{dataid}\" AND ({this.Request.Query["qs"]})", 1, 1,
                             null, withHighlighting: true);
                         if (findSm.Total > 0)
                             ViewBag.Highlighting = findSm.ElasticResultsRaw.Hits.First().Highlight;
@@ -371,7 +367,7 @@ namespace HlidacStatu.Web.Controllers
 
         }
 
-        public ActionResult DetailText(string id, string dataid)
+        public async Task<ActionResult> DetailText(string id, string dataid)
         {
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("index");
@@ -382,13 +378,13 @@ namespace HlidacStatu.Web.Controllers
                 if (ds == null)
                     return RedirectToAction("index");
 
-                if (ds.RegistrationAsync().hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
+                if ((await ds.RegistrationAsync()).hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
                     return RedirectToAction("index");
 
                 if (string.IsNullOrEmpty(dataid))
                     return RedirectToAction("index", new { id = id });
 
-                var dataItem = ds.GetDataAsync(dataid);
+                var dataItem = await ds.GetDataAsync(dataid);
                 if (dataItem == null)
                     return RedirectToAction("index", new { id = id });
 

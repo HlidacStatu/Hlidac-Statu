@@ -27,12 +27,10 @@ namespace HlidacStatu.Web.Controllers
     public partial class ManageController : Controller
     {
         private readonly UserManager<Entities.ApplicationUser> _userManager;
-        private readonly SignInManager<Entities.ApplicationUser> _signInManager;
 
         public ManageController(UserManager<Entities.ApplicationUser> userManager, SignInManager<Entities.ApplicationUser> signInManager)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
         }
 
 
@@ -155,7 +153,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "canEditData")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AddKindexFeedback(KindexFeedback feedback)
+        public async Task<ActionResult> AddKindexFeedback(KindexFeedback feedback)
         {
             if (ModelState.IsValid)
             {
@@ -254,7 +252,7 @@ namespace HlidacStatu.Web.Controllers
 
         [Authorize(Roles = "canEditData")]
         [HttpPost]
-        public ActionResult EditSmlouva(string Id, IFormCollection form)
+        public async Task<ActionResult> EditSmlouva(string Id, IFormCollection form)
         {
             string oldJson = form["oldJson"];
             string newJson = form["jsonRaw"];
@@ -714,13 +712,8 @@ namespace HlidacStatu.Web.Controllers
 
         }
 
-
-
         #region Helpers
-        // Used for XSRF protection when adding external logins
-        private const string XsrfKey = "XsrfId";
-
-
+        
         private async Task<bool> HasPassword()
         {
             var user = await _userManager.GetUserAsync(User);

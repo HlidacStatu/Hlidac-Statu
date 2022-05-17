@@ -7,12 +7,13 @@ using Nest;
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Framework.Report
 {
     public static class GlobalStatistics
     {
-        public static ReportDataSource PocetSmluvPerUzavreni(string query, Nest.DateInterval interval)
+        public static async Task<ReportDataSource> PocetSmluvPerUzavreni(string query, Nest.DateInterval interval)
         {
             DateTime minDate = new DateTime(2012, 1, 1);
             DateTime maxDate = DateTime.Now.Date.AddDays(1);
@@ -47,7 +48,7 @@ namespace HlidacStatu.Web.Framework.Report
             //var res = Smlouva.Search.RawSearch(
             //    "{\"query_string\": { \"query\": \"-id:pre* AND datumUzavreni:{" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO "+ HlidacStatu.Util.RenderData.ToElasticDate(maxDate) + "}\" } }"
             //        , 1, 0, anyAggregation: aggs);
-            var res = SmlouvaRepo.Searching.SimpleSearchAsync("( " + query + " ) AND datumUzavreni:{" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO " + HlidacStatu.Util.RenderData.ToElasticDate(maxDate) + "}", 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, anyAggregation: aggs, exactNumOfResults: true);
+            var res = await SmlouvaRepo.Searching.SimpleSearchAsync("( " + query + " ) AND datumUzavreni:{" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO " + HlidacStatu.Util.RenderData.ToElasticDate(maxDate) + "}", 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, anyAggregation: aggs, exactNumOfResults: true);
 
             ReportDataSource rds = new(new ReportDataSource.Column[]
                 {

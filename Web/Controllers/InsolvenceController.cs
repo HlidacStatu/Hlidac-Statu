@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -17,18 +18,18 @@ namespace HlidacStatu.Web.Controllers
         }
 
         // GET: Insolvence
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             var model = new InsolvenceIndexViewModel
             {
-                NoveFirmyVInsolvenci = InsolvenceRepo.NewFirmyVInsolvenciAsync(10, IsLimitedView()),
-                NoveOsobyVInsolvenci = InsolvenceRepo.NewOsobyVInsolvenciAsync(10, IsLimitedView())
+                NoveFirmyVInsolvenci = await InsolvenceRepo.NewFirmyVInsolvenciAsync(10, IsLimitedView()),
+                NoveOsobyVInsolvenci = await InsolvenceRepo.NewOsobyVInsolvenciAsync(10, IsLimitedView())
             };
 
             return View(model);
         }
 
-        public ActionResult Hledat(Repositories.Searching.InsolvenceSearchResult model)
+        public async Task<ActionResult> Hledat(Repositories.Searching.InsolvenceSearchResult model)
         {
             if (model == null || ModelState.IsValid == false)
             {
@@ -36,7 +37,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
             model.LimitedView = IsLimitedView();
-            var res = InsolvenceRepo.Searching.SimpleSearchAsync(model);
+            var res = await InsolvenceRepo.Searching.SimpleSearchAsync(model);
 
             AuditRepo.Add(
                 Audit.Operations.UserSearch
@@ -49,7 +50,7 @@ namespace HlidacStatu.Web.Controllers
             return View(res);
         }
 
-        public ActionResult Rizeni(string id)
+        public async Task<ActionResult> Rizeni(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -59,7 +60,7 @@ namespace HlidacStatu.Web.Controllers
             //show highlighting
             bool showHighliting = !string.IsNullOrEmpty(Request.Query["qs"]);
 
-            var model = InsolvenceRepo.LoadFromEsAsync(id, showHighliting, false);
+            var model = await InsolvenceRepo.LoadFromEsAsync(id, showHighliting, false);
             if (model == null)
             {
                 return new NotFoundResult();
@@ -70,9 +71,8 @@ namespace HlidacStatu.Web.Controllers
 
             if (showHighliting)
             {
-                var findRizeni =
-                    InsolvenceRepo.Searching.SimpleSearchAsync($"_id:\"{model.Rizeni.SpisovaZnacka}\" AND ({Request.Query["qs"]})", 1, 1,
-                        0, true);
+                var findRizeni = await InsolvenceRepo.Searching
+                    .SimpleSearchAsync($"_id:\"{model.Rizeni.SpisovaZnacka}\" AND ({Request.Query["qs"]})", 1, 1, 0, true);
                 if (findRizeni.Total > 0)
                     ViewBag.Highlighting = findRizeni.ElasticResults.Hits.First().Highlight;
             }
@@ -81,7 +81,7 @@ namespace HlidacStatu.Web.Controllers
             return View(model);
         }
 
-        public ActionResult Dokumenty(string id)
+        public async Task<ActionResult> Dokumenty(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -90,7 +90,7 @@ namespace HlidacStatu.Web.Controllers
 
             bool showHighliting = !string.IsNullOrEmpty(Request.Query["qs"]);
 
-            var data = InsolvenceRepo.LoadFromEsAsync(id, showHighliting, false);
+            var data = await InsolvenceRepo.LoadFromEsAsync(id, showHighliting, false);
             if (data == null)
             {
                 return new NotFoundResult();
@@ -102,9 +102,8 @@ namespace HlidacStatu.Web.Controllers
             IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlighting = null;
             if (showHighliting)
             {
-                var findRizeni =
-                    InsolvenceRepo.Searching.SimpleSearchAsync($"_id:\"{data.Rizeni.SpisovaZnacka}\" AND ({Request.Query["qs"]})", 1, 1, 0,
-                        true);
+                var findRizeni = await InsolvenceRepo.Searching
+                    .SimpleSearchAsync($"_id:\"{data.Rizeni.SpisovaZnacka}\" AND ({Request.Query["qs"]})", 1, 1, 0, true);
                 if (findRizeni.Total > 0)
                 {
                     highlighting = findRizeni.ElasticResults.Hits.First().Highlight;
@@ -120,14 +119,14 @@ namespace HlidacStatu.Web.Controllers
             });
         }
 
-        public ActionResult TextDokumentu(string id)
+        public async Task<ActionResult> TextDokumentu(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
                 return new NotFoundResult();
             }
 
-            var dokument = InsolvenceRepo.LoadDokumentAsync(id, false);
+            var dokument = await InsolvenceRepo.LoadDokumentAsync(id, false);
             if (dokument == null)
             {
                 return new NotFoundResult();

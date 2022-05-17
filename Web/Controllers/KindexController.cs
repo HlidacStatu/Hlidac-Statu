@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -41,14 +42,14 @@ namespace HlidacStatu.Web.Controllers
             return View("Index");
         }
 
-        public ActionResult Backup(string id, int? rok = null)
+        public async Task<ActionResult> Backup(string id, int? rok = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
                 return Redirect("/");
             }
 
-            Backup backup = KIndexData.GetPreviousVersionAsync(id);
+            Backup backup = await KIndexData.GetPreviousVersionAsync(id);
 
             SetViewbagSelectedYear(ref rok);
             ViewBag.BackupCreated = backup.Created.ToString("dd.MM.yyyy");
@@ -254,12 +255,12 @@ text zpravy: {txt}";
             return Json(null);
         }
 
-        public ActionResult Feedback(string id)
+        public async Task<ActionResult> Feedback(string id)
         {
             if (string.IsNullOrEmpty(id))
                 return NotFound();
 
-            var feedback = KindexFeedback.GetByIdAsync(id);
+            var feedback = await KindexFeedback.GetByIdAsync(id);
 
             if (feedback is null)
                 return NotFound();
