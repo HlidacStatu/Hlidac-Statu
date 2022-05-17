@@ -6,7 +6,7 @@
 
 
     var model = new ReportModel();
-    var sumCount = HlidacStatu.Web.Framework.Report.GlobalStatistics.TopListPerCount(false);
+    var sumCount = HlidacStatu.Web.Framework.Report.GlobalStatistics.TopListPerCountAsync(false);
     model.Add("perIcoChart", "Nejúspěšnější dodavatelé podle počtu smluv",
         Html.SimpleBarChart(
             false, false,
@@ -18,7 +18,7 @@
     model.Add("perIcoTable", "", sumCount);
 
 
-    var sumPrice = HlidacStatu.Web.Framework.Report.GlobalStatistics.TopListPerSum(false);
+    var sumPrice = HlidacStatu.Web.Framework.Report.GlobalStatistics.TopListPerSumAsync(false);
     model.Add("perPriceChart", "Nejúspěšnější dodavatelé podle celkové hodnoty smluv",
         Html.SimpleBarChart(
             false, false,

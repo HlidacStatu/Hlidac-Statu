@@ -6,36 +6,36 @@
     var model = new ReportModel();
     model.Add("price_year_chart", "Hodnota uzavřených smluv v Kč v jednotlivých letech",
         Html.SimpleBarChart(true, true, 400, "price_year_chart", "Rok", "Kč",
-            HlidacStatu.Web.Framework.Report.GlobalStatistics.HodnotaSmluvPerUzavreni(Nest.DateInterval.Year), xValueFormat: "{value:%Y}")
+            HlidacStatu.Web.Framework.Report.GlobalStatistics.HodnotaSmluvPerUzavreniAsync(Nest.DateInterval.Year), xValueFormat: "{value:%Y}")
         );
     model.Add("year_chart", "Počet vložených smluv v jednotlivých letech",
         Html.SimpleBarChart(true, true, 400, "year_chart", "Rok", "Počet smluv",
-            HlidacStatu.Web.Framework.Report.GlobalStatistics.PocetSmluvPerUzavreni(Nest.DateInterval.Year), xValueFormat: "{value:%Y}")
+            HlidacStatu.Web.Framework.Report.GlobalStatistics.PocetSmluvPerUzavreniAsync(Nest.DateInterval.Year), xValueFormat: "{value:%Y}")
         );
 
 
     model.Add("price_month_chart", "Hodnota uzavřených smluv v Kč po měsících",
         Html.SimpleBarChart(true, true, 400, "price_month_chart", "Měsíc", "Kč",
-            HlidacStatu.Web.Framework.Report.GlobalStatistics.HodnotaSmluvPerUzavreni(Nest.DateInterval.Month))
+            HlidacStatu.Web.Framework.Report.GlobalStatistics.HodnotaSmluvPerUzavreniAsync(Nest.DateInterval.Month))
         );
 
 
     model.Add("month_chart", "Počet vložených smluv po měsících",
         Html.SimpleBarChart(true, true, 400, "month_chart", "Měsíc", "Počet smluv",
-            HlidacStatu.Web.Framework.Report.GlobalStatistics.PocetSmluvPerUzavreni(Nest.DateInterval.Month))
+            HlidacStatu.Web.Framework.Report.GlobalStatistics.PocetSmluvPerUzavreniAsync(Nest.DateInterval.Month))
         );
 
 
-    model.Add("tPercentPerSum", "Smlouvy podle hodnoty", HlidacStatu.Web.Framework.Report.GlobalStatistics.SmlouvyPodleCeny());
+    model.Add("tPercentPerSum", "Smlouvy podle hodnoty", HlidacStatu.Web.Framework.Report.GlobalStatistics.SmlouvyPodleCenyAsync());
 
     model.Add("PercentPerSum", "Smlouvy podle hodnoty",
         Html.SimpleBarChart(true, false, 300, "PercentPerSum", "Hodnota smlouvy", "% smluv",
-            HlidacStatu.Web.Framework.Report.GlobalStatistics.SmlouvyPodleCeny())
+            HlidacStatu.Web.Framework.Report.GlobalStatistics.SmlouvyPodleCenyAsync())
         );
 
     model.Add("week", "Počet vložených smluv po týdnech",
         Html.SimpleBarChart(true, true, 400, "week_chart", "Týden", "Počet smluv",
-            HlidacStatu.Web.Framework.Report.GlobalStatistics.PocetSmluvPerUzavreni(Nest.DateInterval.Week))
+            HlidacStatu.Web.Framework.Report.GlobalStatistics.PocetSmluvPerUzavreniAsync(Nest.DateInterval.Week))
         );
 
 
@@ -44,7 +44,7 @@
     double celkemKc = StaticData.BasicStatisticData.Get()[2];
 
 
-    var sumCountZad = HlidacStatu.Web.Framework.Report.GlobalStatistics.TopListPerCount(true);
+    var sumCountZad = HlidacStatu.Web.Framework.Report.GlobalStatistics.TopListPerCountAsync(true);
     model.Add("perIcoChartZad", "Nejaktivnější plátci podle počtu smluv",
         Html.SimpleBarChart(
             false, false,
@@ -56,7 +56,7 @@
     model.Add("perIcoTableZad", "", sumCountZad);
 
 
-    var sumPriceZad = HlidacStatu.Web.Framework.Report.GlobalStatistics.TopListPerSum(true);
+    var sumPriceZad = HlidacStatu.Web.Framework.Report.GlobalStatistics.TopListPerSumAsync(true);
     model.Add("perPriceChartZad", "Největší plátci podle celkové hodnoty smluv",
         Html.SimpleBarChart(
             false, false,
@@ -67,7 +67,7 @@
         );
     model.Add("perPriceTableZad", "", sumPriceZad);
 
-    var sumCount = HlidacStatu.Web.Framework.Report.GlobalStatistics.TopListPerCount(false);
+    var sumCount = HlidacStatu.Web.Framework.Report.GlobalStatistics.TopListPerCountAsync(false);
     model.Add("perIcoChart", "Nejúspěšnější dodavatelé podle počtu smluv",
         Html.SimpleBarChart(
             false, false,
@@ -79,7 +79,7 @@
     model.Add("perIcoTable", "", sumCount);
 
 
-    var sumPrice = HlidacStatu.Web.Framework.Report.GlobalStatistics.TopListPerSum(false);
+    var sumPrice = HlidacStatu.Web.Framework.Report.GlobalStatistics.TopListPerSumAsync(false);
     model.Add("perPriceChart", "Nejúspěšnější dodavatelé podle celkové hodnoty smluv",
         Html.SimpleBarChart(
             false, false,

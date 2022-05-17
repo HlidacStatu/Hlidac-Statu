@@ -150,7 +150,7 @@
         @ChartUtil.RenderReport("Hodnota uzavřených smluv v Kč v jednotlivých letech", ReportModel.QueueItem.types.chart,
                     Html.SimpleBarChart(true, true, 360, "price_year_chart",
                      "Rok", "Kč",
-                        HlidacStatu.Web.Framework.Report.GlobalStatistics.HodnotaSmluvPerUzavreni(Model.Query, Nest.DateInterval.Year),
+                        HlidacStatu.Web.Framework.Report.GlobalStatistics.HodnotaSmluvPerUzavreniAsync(Model.Query, Nest.DateInterval.Year),
                         xValueFormat: "{value:%Y}")
                         , ""
                     )
@@ -182,7 +182,7 @@
         <h4>Počet uzavřených smluv pro tento dotaz</h4>
         @ChartUtil.RenderReport("Počet uzavřených smluv v jednotlivých letech", ReportModel.QueueItem.types.chart,
                     Html.SimpleBarChart(true, true, 360, "price_year_chart_pocet", "Rok", "Počet",
-                        HlidacStatu.Web.Framework.Report.GlobalStatistics.PocetSmluvPerUzavreni(Model.Query, Nest.DateInterval.Year), xValueFormat: "{value:%Y}")
+                        HlidacStatu.Web.Framework.Report.GlobalStatistics.PocetSmluvPerUzavreniAsync(Model.Query, Nest.DateInterval.Year), xValueFormat: "{value:%Y}")
                         , ""
                     )
 
@@ -208,7 +208,7 @@
         <h4>Nalezené smlouvy pouze měsíce uzavření (poslední 4 roky)</h4>
         @ChartUtil.RenderReport("Hodnota uzavřených smluv za poslední 2 roky po měsících", ReportModel.QueueItem.types.chart,
                     Html.SimpleBarChart(true, true, 360, "price_yearmonth_chart_pocet", "Měsíc a rok", "Hodnota smluv v Kč",
-                        HlidacStatu.Web.Framework.Report.GlobalStatistics.HodnotaSmluvPerUzavreni(Model.Query, Nest.DateInterval.Month, minDate: Devmasters.DT.Util.FirstDayOfMonth(DateTime.Now).AddYears(-4))
+                        HlidacStatu.Web.Framework.Report.GlobalStatistics.HodnotaSmluvPerUzavreniAsync(Model.Query, Nest.DateInterval.Month, minDate: Devmasters.DT.Util.FirstDayOfMonth(DateTime.Now).AddYears(-4))
                         //, xValueFormat: "{value:%Y}"
                         )
                         , ""
