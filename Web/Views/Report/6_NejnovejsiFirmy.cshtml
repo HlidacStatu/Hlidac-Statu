@@ -37,15 +37,9 @@
                )
 
             )
-    //.Aggregations(agg => agg
-    //   .Sum("sumico2", s => s
-    //       .Field(ff => ff.CalculatedPriceWithVATinCZK)
-    //   )
-    //)
     );
 
-
-    var res = SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, anyAggregation: aggs);
+    var res = await SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, anyAggregation: aggs);
 
     var tmp = ((BucketAggregate)res.Aggregations["perico"])
     .Items

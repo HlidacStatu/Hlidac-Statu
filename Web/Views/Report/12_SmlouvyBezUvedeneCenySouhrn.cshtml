@@ -17,7 +17,7 @@
         );
 
 
-    var res = SmlouvaRepo.Searching.SimpleSearchAsync("hint.skrytaCena:1", 1, 0,
+    var res = await SmlouvaRepo.Searching.SimpleSearchAsync("hint.skrytaCena:1", 1, 0,
         SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggs, platnyZaznam: true);
 
     ReportDataSource rdsPerIco = new(new ReportDataSource.Column[]

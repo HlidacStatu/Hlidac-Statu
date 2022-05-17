@@ -116,8 +116,8 @@
 
             });
 
-                var res = SmlouvaRepo.Searching.SimpleSearchAsync("*", 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, anyAggregation: aggs, exactNumOfResults: true);
-                var reszero = SmlouvaRepo.Searching.SimpleSearchAsync("*", 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, anyAggregation: aggsZero, exactNumOfResults: true);
+                var res = await SmlouvaRepo.Searching.SimpleSearchAsync("*", 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, anyAggregation: aggs, exactNumOfResults: true);
+                var reszero = await SmlouvaRepo.Searching.SimpleSearchAsync("*", 1, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, anyAggregation: aggsZero, exactNumOfResults: true);
 
                 Dictionary<int, long> noPrices = new();
                 var filtered = ((SingleBucketAggregate)reszero.ElasticResults.Aggregations["zero"]).Values.First();
