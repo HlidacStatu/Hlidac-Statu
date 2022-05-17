@@ -3,12 +3,12 @@
 @using System.Net
 @{
 
-    ViewBag.Title = Model.Dataset.Registration().name + " - textová podoba dokumentu";
+    var registration = await Model.Dataset.RegistrationAsync();
+    
+    ViewBag.Title = registration.name + " - textová podoba dokumentu";
     bool found = false;
 
-
-
-    JObject jobj = JObject.Parse(Model.Dataset.GetDataAsync(Model.Data));
+    JObject jobj = JObject.Parse(await Model.Dataset.GetDataAsync(Model.Data));
 
     string path = Context.Request.Query["p"];
     JObject docObj = null;
@@ -33,7 +33,7 @@
         found = true;
     }
 
-    Newtonsoft.Json.Linq.JObject itemjmodel = Model.Dataset.GetDataObjAsync(Model.Data);
+    Newtonsoft.Json.Linq.JObject itemjmodel = await Model.Dataset.GetDataObjAsync(Model.Data);
     dynamic itemModel = (dynamic)itemjmodel;
 
     ViewBag.SocialShareTitle = $"<b>{ViewBag.Title}</b>";
@@ -56,8 +56,8 @@
     <ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
         <li><a href="/data">Další databáze</a></li>
-        <li><a href="@Model.Dataset.DatasetUrl()">@Model.Dataset.Registration().name</a></li>
-        <li><a href="/data/Detail/@Model.Dataset.Registration().datasetId/@Model.Data">@Model.Data</a></li>
+        <li><a href="@Model.Dataset.DatasetUrl()">@registration.name</a></li>
+        <li><a href="/data/Detail/@registration.datasetId/@Model.Data">@Model.Data</a></li>
         <li class="active">Obsah dokumentu</li>
     </ol>
 }
@@ -68,7 +68,7 @@
         <b>Upozornění</b>: Text přílohy byl získán strojově a nemusí přesně odpovídat originálu. Zejména u strojově nečitelných smluv, kde jsme použili OCR.
         <a href="@url" target="_blank">originál dokumentu stáhnete odsud</a>
     </p>
-    <p><a href="/data/Detail/@Model.Dataset.Registration().datasetId/@Model.Data">Celý záznam @Model.Data najdete zde</a></p>
+    <p><a href="/data/Detail/@registration.datasetId/@Model.Data">Celý záznam @Model.Data najdete zde</a></p>
 
     <hr />
     <div class="row">
@@ -83,7 +83,7 @@
 else
 {
     <div class="text-danger">Odkazovaný dokument nebyl nalezena</div>
-    <p><a href="/data/Detail/@Model.Dataset.Registration().datasetId/@Model.Data">Zpět na celý záznam</a></p>
+    <p><a href="/data/Detail/@registration.datasetId/@Model.Data">Zpět na celý záznam</a></p>
 }
 
 

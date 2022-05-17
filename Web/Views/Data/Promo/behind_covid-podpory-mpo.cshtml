@@ -1,9 +1,7 @@
 ﻿@model object
 @using Nest;
 @using System.Linq;
-@using Devmasters.Collections;
 @using HlidacStatu.Datasets
-@using HlidacStatu.Entities
 @using HlidacStatu.Repositories
 
 @{
@@ -11,9 +9,8 @@
 
     DataSet ds =
         DataSet.CachedDatasets.Get((string)Model);
-    var reg = ds.Registration();
 
-    var vyzvy = ds.ESClient.Search<object>(s => s
+    var vyzvy = await ds.ESClient.SearchAsync<object>(s => s
     .MatchAll()
     .Size(0)
     .Aggregations(a => a
@@ -26,7 +23,7 @@
 
         )
     );
-    var vyzvyVds = ds.ESClient.Search<object>(s => s
+    var vyzvyVds = await ds.ESClient.SearchAsync<object>(s => s
         .MatchAll()
         .Size(0)
         .Aggregations(a => a
@@ -86,7 +83,7 @@
             )
             {
                 Dictionary<string, Nest.StatsAggregate> statPerIco = null;
-                var icoQ = ds.ESClient.Search<object>(s => s
+                var icoQ = await ds.ESClient.SearchAsync<object>(s => s
                     .Size(0)
                     .Query(q => q.Term(t => t.Field("kod_vyzvy.keyword").Value(vyzvaId)))
                     .Aggregations(a => a

@@ -475,7 +475,7 @@ namespace HlidacStatu.Datasets
             return ret;
         }
 
-        public async Task SendErrorMsgToAuthor(string url, string errMsg)
+        public async Task SendErrorMsgToAuthorAsync(string url, string errMsg)
         {
             if (Devmasters.TextUtil.IsValidEmail((await RegistrationAsync()).createdBy ?? ""))
             {

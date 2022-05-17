@@ -5,13 +5,13 @@
 @model HlidacStatu.Web.Models.DataDetailModel
 
 @{
-    var registration = Model.Dataset.RegistrationAsync();
+    var registration = await Model.Dataset.RegistrationAsync();
 
-    Newtonsoft.Json.Linq.JObject jmodel = Model.Dataset.GetDataObjAsync(Model.Data);
+    Newtonsoft.Json.Linq.JObject jmodel = await Model.Dataset.GetDataObjAsync(Model.Data);
     dynamic model = (dynamic)jmodel;
 
     string itemId = (model.Id ?? model.id) ?? "";
-    ViewBag.Title = Model.Dataset.RegistrationAsync().name;
+    ViewBag.Title = registration.name;
     ViewBag.SubTitle = itemId ;
 
 
@@ -51,9 +51,9 @@
     @{
         try
         {
-            if (Model.Dataset.RegistrationAsync()?.detailTemplate?.IsNewTemplate() == true)
+            if (registration?.detailTemplate?.IsNewTemplate() == true)
             {
-                var html = DatasetsRenderer.Render(Model.Dataset.RegistrationAsync().detailTemplate, Model.Dataset, model, highlightingData: highlightingData);
+                var html = DatasetsRenderer.Render(registration.detailTemplate, Model.Dataset, model, highlightingData: highlightingData);
                 @Html.Raw(html)
             }
             else
@@ -61,7 +61,7 @@
 
                 var dataId = Model.Data;
                 var dataset = Model.Dataset;
-                var itemInS = dataset.GetDataAsync(dataId);
+                var itemInS = await dataset.GetDataAsync(dataId);
                 var newModel = new DataDetailModel() { Dataset = dataset, Data = itemInS };
                 Registration dsReg = DataSetDB.Instance.GetRegistrationAsync(model.Dataset.DatasetId);
                 if (dsReg == null)
@@ -85,7 +85,7 @@
 
             if (msg != "Interní chyba")
             {
-                Model.Dataset.SendErrorMsgToAuthor(ViewContext.GetDisplayUrl(), msg);
+                await Model.Dataset.SendErrorMsgToAuthorAsync(ViewContext.GetDisplayUrl(), msg);
             }
         }
     }

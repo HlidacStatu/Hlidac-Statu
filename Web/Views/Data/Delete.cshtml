@@ -2,11 +2,12 @@
 @model HlidacStatu.Datasets.DataSet
 @{
 
-    ViewBag.Title = "Smazání datového zdroje " + Model.RegistrationAsync().name;
+    var registration = await Model.RegistrationAsync();
+    ViewBag.Title = "Smazání datového zdroje " + registration.name;
 
     ApiResponseStatus err = ViewBag.ApiResponseError;
 
-    long numOfRec = Model.SearchDataAsync("*", 1, 0).Total;
+    long numOfRec = (await Model.SearchDataAsync("*", 1, 0)).Total;
 
 }
 @section scripts
@@ -19,7 +20,7 @@
     <ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
         <li><a href="/data">Další databáze</a></li>
-        <li><a href="@Model.DatasetUrl()">@Model.RegistrationAsync().name</a></li>
+        <li><a href="@Model.DatasetUrl()">@registration.name</a></li>
         <li class="active">Smazání datasetu</li>
     </ol>
 }

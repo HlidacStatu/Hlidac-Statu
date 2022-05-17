@@ -11,9 +11,8 @@
 
     DataSet ds =
         DataSet.CachedDatasets.Get((string)Model);
-    var reg = ds.Registration();
 
-    var mestaVds = ds.ESClient.Search<object>(s => s
+    var mestaVds = await ds.ESClient.SearchAsync<object>(s => s
         .MatchAll()
         .Size(0)
         .Aggregations(a => a
