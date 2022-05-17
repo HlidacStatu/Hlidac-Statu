@@ -391,41 +391,53 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
                 </div>
                 <div class="block-tags">
 
+                    @{
+                        var veklep = DataSet.CachedDatasets.Get("veklep");
+                        var vyjadreniPolitiku = DataSet.CachedDatasets.Get("vyjadreni-politiku");
+                        var jednaniVlady = DataSet.CachedDatasets.Get("jednani-vlady");
+                        var stenoZaznamy = DataSet.CachedDatasets.Get("stenozaznamy-psp");
+                        var ministryInvoices = DataSet.CachedDatasets.Get("ministry-invoices");
+                        var rozhodnutiUohs = DataSet.CachedDatasets.Get("rozhodnuti-uohs");
+                        var rejstrikTrestuPravnickychOsob = DataSet.CachedDatasets.Get("rejstrik-trestu-pravnickych-osob");
+                        var stavMostu = DataSet.CachedDatasets.Get("stav-mostu");
+                        var narodniInvesticniPlan = DataSet.CachedDatasets.Get("narodni-investicni-plan");
+                    }
+                    
                     <a href="/data/Index/veklep" class="tag">
                         Elektronická knihovna legislativního procesu
-                        (@RenderData.NiceNumber(DataSet.CachedDatasets.Get("veklep")?.NumberOfRecordsAsync() ?? 0))
+                        (@RenderData.NiceNumber(veklep is null? 0 : await veklep.NumberOfRecordsAsync()))
                     </a>
                     <a href="/data/Index/vyjadreni-politiku" class="tag">
                         Vyjádření politiků na <i class="fab fa-facebook-square"></i> a <i class="fab fa-twitter-square"></i>
-                        (@RenderData.NiceNumber(DataSet.CachedDatasets.Get("vyjadreni-politiku")?.NumberOfRecordsAsync() ?? 0))
+                        (@RenderData.NiceNumber(vyjadreniPolitiku is null? 0 : await vyjadreniPolitiku.NumberOfRecordsAsync()))
                     </a>
                     <a href="/data/Index/jednani-vlady" class="tag newbadge top-right">
                         Jednání vlády od 2007
-                        (@RenderData.NiceNumber(DataSet.CachedDatasets.Get("jednani-vlady")?.NumberOfRecordsAsync() ?? 0))
+                        (@RenderData.NiceNumber(jednaniVlady is null? 0 : await jednaniVlady.NumberOfRecordsAsync()))
                     </a>
                     <a href="/data/Index/stenozaznamy-psp" class="tag">
                         Proslovy poslanců v Poslanecké sněmovně od 2008
-                        (@RenderData.NiceNumber(DataSet.CachedDatasets.Get("stenozaznamy-psp")?.NumberOfRecordsAsync() ?? 0))
+                        (@RenderData.NiceNumber(stenoZaznamy is null? 0 : await stenoZaznamy.NumberOfRecordsAsync()))
                     </a>
                     <a href="/data/Index/ministry-invoices" class="tag">
                         Faktury ministerstev za poslední roky
-                        (@RenderData.NiceNumber(DataSet.CachedDatasets.Get("ministry-invoices")?.NumberOfRecordsAsync() ?? 0))
+                        (@RenderData.NiceNumber(ministryInvoices is null? 0 : await ministryInvoices.NumberOfRecordsAsync()))
                     </a>
                     <a href="/data/Index/rozhodnuti-uohs" class="tag">
                         Rozhodnutí ÚOHS
-                        (@RenderData.NiceNumber(DataSet.CachedDatasets.Get("rozhodnuti-uohs")?.NumberOfRecordsAsync() ?? 0))
+                        (@RenderData.NiceNumber(rozhodnutiUohs is null? 0 : await rozhodnutiUohs.NumberOfRecordsAsync()))
                     </a>
                     <a href="/data/Index/rejstrik-trestu-pravnickych-osob" class="tag">
                         Rejstřík trestů právnických osob
-                        (@RenderData.NiceNumber(DataSet.CachedDatasets.Get("rejstrik-trestu-pravnickych-osob")?.NumberOfRecordsAsync() ?? 0))
+                        (@RenderData.NiceNumber(rejstrikTrestuPravnickychOsob is null? 0 : await rejstrikTrestuPravnickychOsob.NumberOfRecordsAsync()))
                     </a>
                     <a href="/data/Index/stav-mostu" class="tag">
                         Stav Mostů v ČR
-                        (@RenderData.NiceNumber(DataSet.CachedDatasets.Get("stav-mostu")?.NumberOfRecordsAsync() ?? 0))
+                        (@RenderData.NiceNumber(stavMostu is null? 0 : await stavMostu.NumberOfRecordsAsync()))
                     </a>
                     <a href="/data/Index/narodni-investicni-plan" class="tag">
                         Národní investiční plán 2019
-                        (@RenderData.NiceNumber(DataSet.CachedDatasets.Get("narodni-investicni-plan")?.NumberOfRecordsAsync() ?? 0))
+                        (@RenderData.NiceNumber(narodniInvesticniPlan is null? 0 : await narodniInvesticniPlan.NumberOfRecordsAsync()))
                     </a>
                     <a href="/data/" class="tag">
                         a další databáze

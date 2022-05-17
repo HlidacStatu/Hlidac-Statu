@@ -5,9 +5,9 @@
 
 
 @{
-    DateTime dataForDate = InsolvenceRepo.Searching.SimpleSearchAsync("*", 1, 1,
+    DateTime dataForDate = (await InsolvenceRepo.Searching.SimpleSearchAsync("*", 1, 1,
             (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc,
-            limitedView: false)
+            limitedView: false))
         .ElasticResults.Hits.First().Source.PosledniZmena;
 
     ViewBag.Title = "Hlídač insolvencí";

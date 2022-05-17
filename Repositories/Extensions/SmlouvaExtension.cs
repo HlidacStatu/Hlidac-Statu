@@ -208,7 +208,7 @@ namespace HlidacStatu.Extensions
             return otherVersions;
         }
 
-        public static async Task<Smlouva[]> PodobneSmlouvy(this Smlouva smlouva)
+        public static async Task<Smlouva[]> PodobneSmlouvyAsync(this Smlouva smlouva)
         {
             QueryContainer[] niceToHaveQs = new QueryContainer[]
             {

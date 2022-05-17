@@ -79,7 +79,7 @@
                                 .Sum("sum", ss => ss.Field(ff => ff.DotaceCelkem))
                             )
                         );
-        var dotaceSearchH = DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + Model.NameId, 1, 1,
+        var dotaceSearchH = await DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + Model.NameId, 1, 1,
             ((int)HlidacStatu.Repositories.Searching.DotaceSearchResult.DotaceOrderResult.FastestForScroll).ToString(), false,
             dotaceAggsH, exactNumOfResults: true);
 

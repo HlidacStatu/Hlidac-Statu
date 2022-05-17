@@ -130,8 +130,8 @@ $(document).ready(function(){
 
 @if (this.User.IsInRole("Admin"))
 {
-    HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndexData kidxPublic = HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndex.Get(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), false);
-    HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndexData kidxFuture = HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndex.Get(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), true);
+    KIndexData kidxPublic = HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndex.Get(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), false);
+    KIndexData kidxFuture = HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndex.Get(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), true);
 
     <h3>Info pro adminy</h3>
     <table class="table table-bordered table-condensed table-striped">
@@ -144,7 +144,7 @@ $(document).ready(function(){
                 var kidxP = kidxPublic?.ForYear(rok);
                 var kidxF = kidxFuture?.ForYear(rok);
                 //var prevP = kidxPublic.GetPreviousVersions()?.Select(m => m?.KIndex?.ForYear(rok)?.KIndex)?.Where(m=>m!=null);
-                var prevF = kidxFuture?.GetPreviousVersionsAsync(true)?
+                var prevF = (await kidxFuture?.GetPreviousVersionsAsync(true))?
                     .OrderByDescending(o => o.Created)?
                     .Select(m => m?.KIndex?.ForYear(rok)?.KIndex)?
                     .Where(m => m != null)?

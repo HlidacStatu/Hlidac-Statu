@@ -120,7 +120,7 @@
                 Detailní informace o smlouvách uzavřených firmami, ve kterých se angažuje či angažoval @Model.FullName().
             </p>
             <p>
-                @Html.Raw(Model.InfoFactsAsync().Where(m => m.Level == HlidacStatu.Util.InfoFact.ImportanceLevel.Stat).FirstOrDefault()?.Render(true) ?? Model.InfoFactsAsync().First().Render(true))
+                @Html.Raw((await Model.InfoFactsAsync()).Where(m => m.Level == HlidacStatu.Util.InfoFact.ImportanceLevel.Stat).FirstOrDefault()?.Render(true) ?? (await Model.InfoFactsAsync()).First().Render(true))
             </p>
             <a asp-action="RegistrSmluv" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
                 <strong>Zobrazit podrobnosti</strong>
@@ -188,7 +188,7 @@
                     </ul>
                 </p>
             }
-            @if (Model.NotInterestingToShowAsync() == false)
+            @if ((await Model.NotInterestingToShowAsync()) == false)
             {
                 <a asp-action="Vazby" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
                     <strong>Zobrazit podrobnosti</strong>
@@ -210,7 +210,7 @@
                     .Sum("sum", ss => ss.Field(ff => ff.DotaceCelkem))
                 )
             );
-        var dotaceSearchH = DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + Model.NameId, 1, 1,
+        var dotaceSearchH = await DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + Model.NameId, 1, 1,
             ((int)HlidacStatu.Repositories.Searching.DotaceSearchResult.DotaceOrderResult.FastestForScroll).ToString(), false,
             dotaceAggsH, exactNumOfResults: true);
 
@@ -255,18 +255,18 @@
 
     @* ----- Insolvence -----*@
     @{
-        var oinsDluznik = InsolvenceRepo.Searching.SimpleSearchAsync("dluznici.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
-        var oinsVeritel = InsolvenceRepo.Searching.SimpleSearchAsync("veritele.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
-        var oinsSpravce = InsolvenceRepo.Searching.SimpleSearchAsync("spravci.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var oinsDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("dluznici.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var oinsVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("veritele.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var oinsSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync("spravci.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
 
         Dictionary<string, long> oinsolv = new();
         oinsolv.Add("dluznici|dlužník|dlužníka|dlužníkem", oinsDluznik.Total);
         oinsolv.Add("veritele|věřitel|věřitele|veřitelem", oinsVeritel.Total);
         oinsolv.Add("spravci|insolvenční správce|insolvenčního správce|insolvenčním správcem", oinsSpravce.Total);
 
-        var insDluznik = InsolvenceRepo.Searching.SimpleSearchAsync("osobaIddluznik:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
-        var insVeritel = InsolvenceRepo.Searching.SimpleSearchAsync("osobaIdveritel:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
-        var insSpravce = InsolvenceRepo.Searching.SimpleSearchAsync("osobaIdspravce:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var insDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("osobaIddluznik:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var insVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("osobaIdveritel:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var insSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync("osobaIdspravce:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
 
         Dictionary<string, long> insolv = new();
         insolv.Add("dluznik|dlužník|dlužníka|dlužníkem", insDluznik.Total);
@@ -333,8 +333,8 @@
 
     @* ----- Veřejné zakázky -----*@
     @{
-        var resVZdodav = VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaiddodavatel:" + Model.NameId, null, 1, 0, "1");
-        var resVZzadav = VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaidzadavatel:" + Model.NameId, null, 1, 0, "1");
+        var resVZdodav = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaiddodavatel:" + Model.NameId, null, 1, 0, "1");
+        var resVZzadav = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaidzadavatel:" + Model.NameId, null, 1, 0, "1");
         Dictionary<string, long> vzakaz = new();
         vzakaz.Add("dodavatel|dodavatel|dodavatele|dodavatelem", resVZdodav.Total);
         vzakaz.Add("zadavatel|zadavatel|zadavatele|zadavatelem", resVZzadav.Total);
@@ -375,12 +375,12 @@
 
     @{
         var datasetsToSearch = DataSetDB.ProductionDataSets.Get();
-        if (Model.NotInterestingToShowAsync())
+        if (await Model.NotInterestingToShowAsync())
         {
             datasetsToSearch = datasetsToSearch.Where(m => m.DatasetId != "skutecni-majitele").ToArray();
         }
         var dsQuery = $"( OsobaId:{Model.NameId} ) ";
-        var dsSearch = HlidacStatu.Datasets.Search.DatasetMultiResult.GeneralSearchAsync(dsQuery,
+        var dsSearch = await HlidacStatu.Datasets.Search.DatasetMultiResult.GeneralSearchAsync(dsQuery,
             datasets:datasetsToSearch, 
             pageSize: 5);
 
@@ -405,7 +405,7 @@
                                 .Join("", dsSearch.Results.Where(m => m.Total > 0)
                                 .OrderByDescending(o => o.Total)
                                 .Take(4)
-                                .Select(m => $"<li><a href='{m.DataSet.DatasetSearchUrl(m.RenderQuery())}'>{m.DataSet.Registration().name}</a> ({HlidacStatu.Util.RenderData.NiceNumber(m.Total)})</li>"))
+                                .Select(m => $"<li><a href='{m.DataSet.DatasetSearchUrl(m.RenderQuery())}'>{m.DataSet.RegistrationAsync().GetAwaiter().GetResult().name}</a> ({HlidacStatu.Util.RenderData.NiceNumber(m.Total)})</li>"))
                             )
                         </ul>
                     </text>

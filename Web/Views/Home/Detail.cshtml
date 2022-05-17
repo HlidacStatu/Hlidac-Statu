@@ -22,6 +22,7 @@
     bool znepristupnena = Model.znepristupnenaSmlouva();
 
     IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlightingData = ViewBag.Highlighting as IReadOnlyDictionary<string, IReadOnlyCollection<string>>;
+    var otherVersion = await Model.OtherVersionsAsync();
 }
 
 @section scripts
@@ -100,7 +101,7 @@
     <td>
         @if (Model.platnyZaznam == false)
         {
-            if (Model.OtherVersionsAsync().Length == 0)
+            if (otherVersion.Length == 0)
             {
                 <div class="alert alert-danger">
                     <table style="padding:0;margin:0;width:100%">
@@ -132,10 +133,10 @@
                         </tr>
                     </table>
                 </div>
-                if (Model.OtherVersionsAsync().Any(m => m.platnyZaznam))
+                if (otherVersion.Any(m => m.platnyZaznam))
                 {
                     <div class="alert alert-info">
-                        <a href="/Detail/@(Model.OtherVersionsAsync().Where(m => m.platnyZaznam).First().Id)">Ukázat platnou verzi této smlouvy</a>
+                        <a href="/Detail/@(otherVersion.Where(m => m.platnyZaznam).First().Id)">Ukázat platnou verzi této smlouvy</a>
                     </div>
                 }
             }
