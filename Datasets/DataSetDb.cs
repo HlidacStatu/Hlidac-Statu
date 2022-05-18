@@ -21,7 +21,8 @@ namespace HlidacStatu.Datasets
                         TimeSpan.FromMinutes(5), (obj) =>
                         {
 
-                            var datasets = (await Instance.SearchDataRawAsync("*", 1, 500).ConfigureAwait(false))
+                            var datasets = Instance.SearchDataRawAsync("*", 1, 500)
+                                .ConfigureAwait(false).GetAwaiter().GetResult()
                             .Result
                             .Select(s => CachedDatasets.Get(s.Item1))
                             .Where(d => d != null)
@@ -36,11 +37,13 @@ namespace HlidacStatu.Datasets
                         TimeSpan.FromMinutes(5), (obj) =>
                         {
 
-                            var datasets = (await Instance.SearchDataRawAsync("*", 1, 500).ConfigureAwait(false))
+                            var datasets = Instance.SearchDataRawAsync("*", 1, 500)
+                                .ConfigureAwait(false).GetAwaiter().GetResult()
                             .Result
                             .Select(s => CachedDatasets.Get(s.Item1))
                             .Where(d => d != null)
-                            .Where(d => (await d.RegistrationAsync()).betaversion == false && (await d.RegistrationAsync()).hidden == false)
+                            .Where(d => d.RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult().betaversion == false 
+                                        && d.RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult().hidden == false)
                             .ToArray();
 
                             return datasets;
@@ -53,8 +56,10 @@ namespace HlidacStatu.Datasets
 
             if (client == null)
             {
-                client = Manager.GetESClientAsync(DataSourcesDbName, idxType: Manager.IndexType.DataSource);
-                var ret = await client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex);
+                client = Manager.GetESClientAsync(DataSourcesDbName, idxType: Manager.IndexType.DataSource)
+                    .ConfigureAwait(false).GetAwaiter().GetResult();
+                var ret = client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex)
+                    .ConfigureAwait(false).GetAwaiter().GetResult();
                 if (!ret.Exists)
                 {
                     Newtonsoft.Json.Schema.Generation.JSchemaGenerator jsonG = new Newtonsoft.Json.Schema.Generation.JSchemaGenerator();
@@ -64,12 +69,13 @@ namespace HlidacStatu.Datasets
                         datasetId = DataSourcesDbName,
                         jsonSchema = jsonG.Generate(typeof(Registration)).ToString()
                     };
-                    await Manager.CreateIndexAsync(client);
+                    Manager.CreateIndexAsync(client).ConfigureAwait(false).GetAwaiter().GetResult();
 
                     //add record
                     Elasticsearch.Net.PostData pd = Elasticsearch.Net.PostData.String(Newtonsoft.Json.JsonConvert.SerializeObject(reg));
 
-                    var tres = await client.LowLevel.IndexAsync<Elasticsearch.Net.StringResponse>(client.ConnectionSettings.DefaultIndex, DataSourcesDbName, pd);
+                    var tres = client.LowLevel.IndexAsync<Elasticsearch.Net.StringResponse>(client.ConnectionSettings.DefaultIndex, DataSourcesDbName, pd)
+                        .ConfigureAwait(false).GetAwaiter().GetResult();
                     if (tres.Success == false)
                         throw new ApplicationException(tres.DebugInformation);
                 }
@@ -178,7 +184,7 @@ namespace HlidacStatu.Datasets
 
             datasetId = datasetId.ToLower();
             var res = await DeleteDataAsync(datasetId);
-            var idxClient = Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource);
+            var idxClient = await Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource);
 
             var delRes = await idxClient.Indices.DeleteAsync(idxClient.ConnectionSettings.DefaultIndex);
             CachedDatasets.Delete(datasetId);

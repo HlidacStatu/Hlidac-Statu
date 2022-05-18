@@ -48,7 +48,7 @@ namespace HlidacStatu.Datasets
 
 
             reg.NormalizeShortName();
-            var client = Manager.GetESClientAsync(reg.datasetId, idxType: Manager.IndexType.DataSource);
+            var client = await Manager.GetESClientAsync(reg.datasetId, idxType: Manager.IndexType.DataSource);
 
             if (reg.searchResultTemplate != null && !string.IsNullOrEmpty(reg.searchResultTemplate?.body))
             {
@@ -90,7 +90,7 @@ namespace HlidacStatu.Datasets
         private async Task<IEnumerable<string>> _getPreviewTopValueFromItemAsync(JObject item, bool fromAllTopValues = false)
         {
             List<string> topTxts = new List<string>();
-            List<string> texts = new List<string>();
+            
             var props = await GetMappingListAsync("ICO");
             foreach (var prop in props)
             {
@@ -182,9 +182,11 @@ namespace HlidacStatu.Datasets
         protected DataSet(string datasourceName, bool fireException)
         {
             datasetId = datasourceName.ToLower();
-            client = Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource);
+            client = Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
 
-            var ret = await client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex);
+            var ret = client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
             if (ret.Exists == false)
             {
                 if (fireException)

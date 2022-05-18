@@ -73,7 +73,7 @@ namespace HlidacStatu.Datasets
                 if (string.IsNullOrEmpty(query))
                     return res;
 
-                if (!Repositories.Searching.Tools.ValidateQueryAsync(query))
+                if (!(await Repositories.Searching.Tools.ValidateQueryAsync(query)))
                 {
                     res.Exceptions.Add(new Exception($"Invalid Query: {query}"));
                     return res;

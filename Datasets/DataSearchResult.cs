@@ -52,7 +52,7 @@ namespace HlidacStatu.Datasets
         public DataSearchResultBase()
                 : base(null)
         {
-            orderFill = await getDatasetOrderListAsync;
+            orderFill = getDatasetOrderList;
             InitOrderList();
             Page = 1;
         }
@@ -77,7 +77,7 @@ namespace HlidacStatu.Datasets
         public const string OrderAscUrl = " asc";
         public const string OrderDesc = " sestupně";
         public const string OrderDescUrl = " desc";
-        protected async Task<List<SelectListItem>> getDatasetOrderListAsync()
+        protected List<SelectListItem> getDatasetOrderList()
         {
             if (DataSet == null)
                 return new List<SelectListItem>();
@@ -89,17 +89,19 @@ namespace HlidacStatu.Datasets
                 Value = "0"
             });
 
-            for (int i = 0; i < (await DataSet.RegistrationAsync()).orderList.GetLength(0); i++)
+            var registration = DataSet.RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            
+            for (int i = 0; i < registration.orderList.GetLength(0); i++)
             {
                 list.Add(new SelectListItem()
                 {
-                    Text = (await DataSet.RegistrationAsync()).orderList[i, 0] + OrderAsc,
-                    Value = (await DataSet.RegistrationAsync()).orderList[i, 1] + OrderAscUrl
+                    Text = registration.orderList[i, 0] + OrderAsc,
+                    Value = registration.orderList[i, 1] + OrderAscUrl
                 });
                 list.Add(new SelectListItem()
                 {
-                    Text = (await DataSet.RegistrationAsync()).orderList[i, 0] + OrderDesc,
-                    Value = (await DataSet.RegistrationAsync()).orderList[i, 1] + OrderDescUrl
+                    Text = registration.orderList[i, 0] + OrderDesc,
+                    Value = registration.orderList[i, 1] + OrderDescUrl
                 });
             }
             return list;
