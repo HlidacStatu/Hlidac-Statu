@@ -9,17 +9,6 @@
 @{
     Layout = "_ReportLayout";
 
-    var uradyIco = FirmaRepo.MinisterstvaCache.Get()
-        .Union(FirmaRepo.KrajskeUradyCache.Get())
-        .Union(FirmaRepo.ManualChoosenCache.Get())
-        .Union(FirmaRepo.StatutarniMestaAllCache.Get())
-        .Union(FirmaRepo.PrahaManualCache.Get())
-        .Union(FirmaRepo.OrganizacniSlozkyStatuCache.Get())
-        .Select(m => m.ICO)
-        .Where(i => i != null)
-        ;
-
-
     var tableSloupce = new[]
     {
         new ReportDataSource<BasicDataForSubject<List<BasicData<string>>>>.Column()
@@ -49,7 +38,7 @@
                 var stat = Firmy.Get(s.Ico).StatistikaRegistruSmluv();
                 if (stat.Summary().PocetSmluv > 0)
                 {
-                    return ((double) s.Pocet / (double) stat.Summary().PocetSmluv).ToString("P2");
+                    return ((double)s.Pocet / (double)stat.Summary().PocetSmluv).ToString("P2");
                 }
                 else
                     return "0";
@@ -140,20 +129,18 @@
     }
 
 
+        @(ChartUtil.RenderReportTable<BasicDataForSubject<List<BasicData<string>>>>("",
+            new ReportModel.QueueItem()
+            {
+                Type = ReportModel.QueueItem.types.table,
+                Data = rds1
+            }, @"{
+                'language': {
+                'url': '//cdn.datatables.net/plug-ins/1.10.19/i18n/Czech.json'
+            },
+            'order': [[2, 'desc']],
+            'lengthChange': false,
+            'info': false,
+            }", "t1")
+        )
 }
-
-@(ChartUtil.RenderReportTable<BasicDataForSubject<List<BasicData<string>>>>("",
-    new ReportModel.QueueItem()
-    {
-        Type = ReportModel.QueueItem.types.table,
-        Data = rds1
-    }
-    , @"{
-            'language': {
-            'url': '//cdn.datatables.net/plug-ins/1.10.19/i18n/Czech.json'
-        },
-        'order': [[2, 'desc']],
-        'lengthChange': false,
-        'info': false,
-        }", "t1")
-)
