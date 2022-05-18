@@ -26,7 +26,7 @@ namespace HlidacStatu.Repositories
             private static volatile ElasticCacheManager<string[], QueryBatch> cacheSmlouvy
                 = ElasticCacheManager<string[], QueryBatch>.GetSafeInstance(
                     "cachedIdsSmlouvy",
-                    q => GetSmlouvy(q),
+                    q => GetSmlouvyAsync(q),
                     TimeSpan.FromHours(24),
                     Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
                     "DevmastersCache", null, null,
@@ -48,7 +48,7 @@ namespace HlidacStatu.Repositories
             
         }
 
-        public static string[] GetSmlouvy(QueryBatch query)
+        public static async Task<string[]> GetSmlouvyAsync(QueryBatch query)
         {
             var stack = HlidacStatu.Util.StackReport.GetCallingMethod(true);
 

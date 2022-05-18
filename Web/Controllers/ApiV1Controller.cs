@@ -726,7 +726,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "TeamMember")]
         public ActionResult PolitikFromText(string text)
         {
-            var oo = OsobaRepo.Searching.GetFirstPolitikFromText(text);
+            var oo = OsobaRepo.Searching.GetFirstPolitikFromTextAsync(text);
 
             if (oo != null)
             {
@@ -743,7 +743,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "TeamMember")]
         public ActionResult PoliticiFromText(string text)
         {
-            var oo = OsobaRepo.Searching.GetBestPoliticiFromText(text);
+            var oo = OsobaRepo.Searching.GetBestPoliticiFromTextAsync(text);
 
             if (oo != null)
             {

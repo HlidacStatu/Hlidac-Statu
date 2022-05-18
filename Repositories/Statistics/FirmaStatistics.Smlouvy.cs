@@ -6,6 +6,7 @@ using HlidacStatu.Lib.Analytics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.Statistics
 {
@@ -51,7 +52,7 @@ namespace HlidacStatu.Repositories.Statistics
         static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)> _smlouvaCache
             = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
                 .GetSafeInstance("Firma_SmlouvyStatistics_v3_",
-                    (obj) => _calculateSmlouvyStats(obj.firma, obj.obor),
+                    (obj) => _calculateSmlouvyStatsAsync(obj.firma, obj.obor),
                     TimeSpan.FromHours(12),
                     Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                     Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
@@ -66,18 +67,18 @@ namespace HlidacStatu.Repositories.Statistics
 
             return _smlouvaCache.Get((firma, obor));
         }
-        private static StatisticsSubjectPerYear<Smlouva.Statistics.Data> _calculateSmlouvyStats(Firma f, int? obor)
+        private static async Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> _calculateSmlouvyStatsAsync(Firma f, int? obor)
         {
             StatisticsSubjectPerYear<Smlouva.Statistics.Data> res = null;
             if (obor.HasValue && obor != 0)
                 res = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(
                     f.ICO,
-                    SmlouvaStatistics.Calculate($"ico:{f.ICO} AND oblast:{Smlouva.SClassification.Classification.ClassifSearchQuery(obor.Value)}")
+                    await SmlouvaStatistics.CalculateAsync($"ico:{f.ICO} AND oblast:{Smlouva.SClassification.Classification.ClassifSearchQuery(obor.Value)}")
                 );
             else
                 res = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(
                     f.ICO,
-                    SmlouvaStatistics.Calculate($"ico:{f.ICO}")
+                    await SmlouvaStatistics.CalculateAsync($"ico:{f.ICO}")
                 );
 
             return res;

@@ -12,8 +12,8 @@ namespace HlidacStatu.Repositories
     public static class UptimeSSLRepo
     {
 
-        private static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeSSL[]> uptimeSSlCache =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeSSL[]>(TimeSpan.FromHours(2), async (obj) =>
+        private static Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeSSL[]> uptimeSSlCache =
+            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeSSL[]>(TimeSpan.FromHours(2), async (obj) =>
                 {
                     UptimeSSL[] res = new UptimeSSL[] { };
                     var resX = await ES.Manager.GetESClient_UptimeSSL()

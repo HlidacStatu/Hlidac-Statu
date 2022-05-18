@@ -16,8 +16,8 @@ namespace HlidacStatu.Repositories
     {
         private static string AppDataPath = null;
 
-        public static AutoUpdatedLocalMemoryCache<List<Osoba>> PolitickyAktivni = null;
-        public static AutoUpdatedLocalMemoryCache<List<Osoba>> Politici = null;
+        public static AutoUpdatedCache<List<Osoba>> PolitickyAktivni = null;
+        public static AutoUpdatedCache<List<Osoba>> Politici = null;
 
         static OsobaRepo()
         {
@@ -30,7 +30,7 @@ namespace HlidacStatu.Repositories
 
 
             Consts.Logger.Info("Static data - Politici");
-            Politici = new AutoUpdatedLocalMemoryCache<List<Osoba>>(
+            Politici = new AutoUpdatedCache<List<Osoba>>(
                 TimeSpan.FromHours(36), "politiciOnly", (obj) =>
                 {
                     List<Osoba> osoby = null;
@@ -53,7 +53,7 @@ namespace HlidacStatu.Repositories
                     }
                 }
             );
-            PolitickyAktivni = new AutoUpdatedLocalMemoryCache<List<Osoba>>(
+            PolitickyAktivni = new AutoUpdatedCache<List<Osoba>>(
                 TimeSpan.FromHours(36), "politickyAktivni", (obj) =>
                 {
                     List<Osoba> osoby = new List<Osoba>();

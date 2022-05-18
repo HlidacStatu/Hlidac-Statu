@@ -10,7 +10,7 @@ namespace HlidacStatu.Web.HealthChecks
 {
     public class OCRServer : IHealthCheck
     {
-        Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<OCRDataStat> ocrDataStat = new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<OCRDataStat>(
+        Devmasters.Cache.LocalMemory.AutoUpdatedCache<OCRDataStat> ocrDataStat = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<OCRDataStat>(
             TimeSpan.FromMinutes(2), "ocrDataStat_net",
             _ =>
             {

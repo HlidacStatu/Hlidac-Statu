@@ -109,7 +109,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static IEnumerable<string> AllIdsFromEs(Action<string> outputWriter = null,
+        public static async Task<IEnumerable<string>> AllIdsFromEsAsync(Action<string> outputWriter = null,
             Action<Devmasters.Batch.ActionProgressData> progressWriter = null)
         {
             Func<int, int, Task<ISearchResponse<Rizeni>>> searchFunc = async (size, page) =>

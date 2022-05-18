@@ -392,8 +392,7 @@ namespace HlidacStatu.Repositories
                 Devmasters.Batch.Manager.DoActionForAll<Osoba>(db.Osoba.AsQueryable()
                     .Where(o => o.Status == (int)Osoba.StatusOsobyEnum.Politik
                         || o.Status == (int)Osoba.StatusOsobyEnum.VysokyUrednik
-                        || o.Status == (int)Osoba.StatusOsobyEnum.Sponzor),
-                    o =>
+                        || o.Status == (int)Osoba.StatusOsobyEnum.Sponzor), async o =>
                     {
                         int priority = o.Status switch
                         {
@@ -410,8 +409,8 @@ namespace HlidacStatu.Repositories
                             Priority = priority,
                             Type = o.StatusOsoby().ToNiceDisplayName(),
                             ImageElement = $"<img src='{o.GetPhotoUrl(false)}' />",
-                            Description = InfoFact.RenderInfoFacts(
-                                o.InfoFactsAsync().Where(i => i.Level != InfoFact.ImportanceLevel.Stat).ToArray(),
+                            Description = InfoFact.RenderInfoFacts((await 
+                                o.InfoFactsAsync()).Where(i => i.Level != InfoFact.ImportanceLevel.Stat).ToArray(),
                                 2, true, false, "", "{0}", false),
                             Category = Autocomplete.CategoryEnum.Person
                         };

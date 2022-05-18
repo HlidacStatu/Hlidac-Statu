@@ -452,7 +452,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static IEnumerable<string> _allIdsFromES(bool deleted, Action<string> outputWriter = null,
+        public static async Task<IEnumerable<string>> _allIdsFromESAsync(bool deleted, Action<string> outputWriter = null,
             Action<ActionProgressData> progressWriter = null)
         {
             List<string> ids = new List<string>();
@@ -502,20 +502,20 @@ namespace HlidacStatu.Repositories
             return ids;
         }
 
-        public static IEnumerable<string> AllIdsFromES()
+        public static Task<IEnumerable<string>> AllIdsFromESAsync()
         {
-            return AllIdsFromES(null);
+            return AllIdsFromESAsync(null);
         }
 
-        public static IEnumerable<string> AllIdsFromES(bool? deleted, Action<string> outputWriter = null,
+        public static async Task<IEnumerable<string>> AllIdsFromESAsync(bool? deleted, Action<string> outputWriter = null,
             Action<ActionProgressData> progressWriter = null)
         {
             if (deleted.HasValue)
-                return _allIdsFromES(deleted.Value, outputWriter, progressWriter);
+                return await _allIdsFromESAsync(deleted.Value, outputWriter, progressWriter);
             else
                 return
-                    _allIdsFromES(false, outputWriter, progressWriter)
-                        .Union(_allIdsFromES(true, outputWriter, progressWriter));
+                    (await _allIdsFromESAsync(false, outputWriter, progressWriter))
+                        .Union(await _allIdsFromESAsync(true, outputWriter, progressWriter));
         }
 
         public static async Task<bool> DeleteAsync(string Id, ElasticClient client = null)
@@ -542,59 +542,6 @@ namespace HlidacStatu.Repositories
                 return res.Exists;
         }
 
-
-        public static StringBuilder ExportData(string query, int count, string order,
-            ExportDataFormat format, bool withPlainText, out string contenttype)
-        {
-            //TODO ignored format
-
-            contenttype = "text/tab-separated-values";
-
-            StringBuilder sb = new StringBuilder();
-
-            if (count > 10000)
-                count = 10000;
-
-            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
-                {
-                    return await Manager.GetESClient().SearchAsync<Smlouva>(a => a
-                        .Size(size)
-                        .Source(m => m.Excludes(e => e.Field(o => o.Prilohy)))
-                        .From(page * size)
-                        .Query(q => SmlouvaRepo.Searching.GetSimpleQuery(query))
-                        .Scroll("1m")
-                    );
-                };
-
-            sb.AppendLine(
-                "URL\tID smlouvy\tPodepsána\tZveřejněna\tHodnota smlouvy\tPředmět smlouvy\tPlátce\tPlatce IC\tDodavatele a jejich ICO");
-            int c = 0;
-            await Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(),
-                searchFunc, (hit, param) =>
-                {
-                    var s = hit.Source;
-                    sb.AppendLine(
-                        s.GetUrl(false) + "\t"
-                                        + s.Id + "\t"
-                                        + s.datumUzavreni.ToString("dd.MM.yyyy") + "\t"
-                                        + s.casZverejneni.ToString("dd.MM.yyyy") + "\t"
-                                        + s.CalculatedPriceWithVATinCZK.ToString(Util.Consts.czCulture) + "\t"
-                                        + TextUtil.NormalizeToBlockText(s.predmet) + "\t"
-                                        + s.Platce.nazev + "\t"
-                                        + s.Platce.ico + "\t"
-                                        + ((s.Prijemce?.Count() > 0)
-                                            ? s.Prijemce.Select(p => p.nazev + "\t" + p.ico)
-                                                .Aggregate((f, sec) => f + "\t" + sec)
-                                            : "")
-                    );
-
-                    Console.Write(c++);
-                    return new ActionOutputData() { CancelRunning = false, Log = null };
-                }, null, null, null, false);
-
-
-            return sb;
-        }
 
         public static async Task<Smlouva> LoadAsync(string idVerze, ElasticClient client = null, bool includePrilohy = true)
         {

@@ -429,9 +429,9 @@ namespace HlidacStatu.Repositories
                 (int) OsobaEvent.Types.VolenaFunkce
             };
 
-            public static IEnumerable<Osoba> GetAllPoliticiFromText(string text)
+            public static async Task<IEnumerable<Osoba>> GetAllPoliticiFromTextAsync(string text)
             {
-                var parsedName = Repositories.Searching.Politici.FindCitationsAsync(text); //Validators.JmenoInText(text);
+                var parsedName = await Repositories.Searching.Politici.FindCitationsAsync(text); //Validators.JmenoInText(text);
 
                 var oo = parsedName.Select(nm => Osoby.GetByNameId.Get(nm))
                     .Where(o => o != null)
@@ -439,10 +439,10 @@ namespace HlidacStatu.Repositories
                 return oo;
             }
 
-            public static IEnumerable<Osoba> GetBestPoliticiFromText(string text)
+            public static async Task<IEnumerable<Osoba>> GetBestPoliticiFromTextAsync(string text)
             {
                 List<Osoba> uniqO = new List<Osoba>();
-                var oo = GetAllPoliticiFromText(text);
+                var oo = await GetAllPoliticiFromTextAsync(text);
                 foreach (var o in oo)
                 {
                     if (
@@ -456,9 +456,9 @@ namespace HlidacStatu.Repositories
                 return ret;
             }
 
-            public static Osoba GetFirstPolitikFromText(string text)
+            public static async Task<Osoba> GetFirstPolitikFromTextAsync(string text)
             {
-                var osoby = GetBestPoliticiFromText(text);
+                var osoby = await GetBestPoliticiFromTextAsync(text);
                 if (osoby.Count() == 0)
                     return null;
 

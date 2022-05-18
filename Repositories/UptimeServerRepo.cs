@@ -263,8 +263,8 @@ namespace HlidacStatu.Repositories
         }
 
 
-        private static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]> uptimeServersCache1Day =
-      new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]>(TimeSpan.FromMinutes(1),
+        private static Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeServer.HostAvailability[]> uptimeServersCache1Day =
+      new Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeServer.HostAvailability[]>(TimeSpan.FromMinutes(1),
           (obj) =>
           {
               var res = _availability(24);

@@ -45,7 +45,7 @@ namespace HlidacStatu.Repositories
 
         public static Devmasters.Cache.File.FileCache<byte[]> Autocomplete_Cache = null;
         public static Devmasters.Cache.File.FileCache<List<Autocomplete>> Autocomplete_Firmy_Cache = null;
-        public static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<FullTextSearch.Index<Autocomplete>> FulltextSearchForAutocomplete = null;
+        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<FullTextSearch.Index<Autocomplete>> FulltextSearchForAutocomplete = null;
 
 
         public static Devmasters.Cache.File.FileCache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]> Insolvence_firem_politiku_Cache = null;
@@ -57,8 +57,8 @@ namespace HlidacStatu.Repositories
         public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSNespolehlivymiPlatciDPH_Cache = null;
         public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat> NespolehlivyPlatciDPH_obchodySurady_Cache = null;
 
-        public static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<Sponzoring>> SponzorujiciFirmy_Vsechny = null;
-        public static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<Sponzoring>> SponzorujiciFirmy_Nedavne = null;
+        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Vsechny = null;
+        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Nedavne = null;
 
         public static Devmasters.Cache.LocalMemory.LocalMemoryCache<List<double>> BasicStatisticData = null;
 
@@ -285,7 +285,7 @@ namespace HlidacStatu.Repositories
                 Util.Consts.Logger.Info("Static data - SponzorujiciFirmy_Vsechny ");
 
 
-                SponzorujiciFirmy_Vsechny = new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<Sponzoring>>(
+                SponzorujiciFirmy_Vsechny = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>>(
                                 TimeSpan.FromHours(3), (obj) =>
                                 {
                                     List<Sponzoring> dary = null;
@@ -305,7 +305,7 @@ namespace HlidacStatu.Repositories
                             );
 
                 Util.Consts.Logger.Info("Static data - SponzorujiciFirmy_nedavne");
-                SponzorujiciFirmy_Nedavne = new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<Sponzoring>>(
+                SponzorujiciFirmy_Nedavne = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>>(
                         TimeSpan.FromHours(3), (obj) =>
                         {
                             return SponzorujiciFirmy_Vsechny.Get()
@@ -447,7 +447,7 @@ namespace HlidacStatu.Repositories
                        return serialized;
                    });
 
-                FulltextSearchForAutocomplete = new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<FullTextSearch.Index<Autocomplete>>(
+                FulltextSearchForAutocomplete = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<FullTextSearch.Index<Autocomplete>>(
                         TimeSpan.FromHours(12),
                         "FulltextSearchForAutocomplete_main",
                         o =>
