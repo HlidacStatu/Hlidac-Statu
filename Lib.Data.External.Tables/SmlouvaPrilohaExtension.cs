@@ -15,7 +15,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
         private static volatile MinioCacheManager<Lib.Data.External.Tables.Result[],KeyAndId> prilohaTblsMinioCacheManager
         = MinioCacheManager<Lib.Data.External.Tables.Result[],KeyAndId>.GetSafeInstance(
             "SmlouvyPrilohyTbls/",
-            smlouvaKeyId => getTablesFromDocumentAsync(smlouvaKeyId),
+            smlouvaKeyId => getTablesFromDocumentAsync(smlouvaKeyId).ConfigureAwait(false).GetAwaiter().GetResult(),
             TimeSpan.Zero,
             new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
             Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
