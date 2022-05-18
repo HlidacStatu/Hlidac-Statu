@@ -113,7 +113,7 @@ namespace HlidacStatu.Repositories
                 throw new ApplicationException("Cannot save partial Insolvence document");
 
             if (client == null)
-                client = Manager.GetESClient_Insolvence();
+                client = await Manager.GetESClient_InsolvenceAsync();
 
             PrepareForSave(rizeni);
             if (forceOnRadarValue.HasValue)

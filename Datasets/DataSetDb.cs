@@ -53,7 +53,7 @@ namespace HlidacStatu.Datasets
 
             if (client == null)
             {
-                client = Manager.GetESClient(DataSourcesDbName, idxType: Manager.IndexType.DataSource);
+                client = Manager.GetESClientAsync(DataSourcesDbName, idxType: Manager.IndexType.DataSource);
                 var ret = await client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex);
                 if (!ret.Exists)
                 {
@@ -178,7 +178,7 @@ namespace HlidacStatu.Datasets
 
             datasetId = datasetId.ToLower();
             var res = await DeleteDataAsync(datasetId);
-            var idxClient = Manager.GetESClient(datasetId, idxType: Manager.IndexType.DataSource);
+            var idxClient = Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource);
 
             var delRes = await idxClient.Indices.DeleteAsync(idxClient.ConnectionSettings.DefaultIndex);
             CachedDatasets.Delete(datasetId);

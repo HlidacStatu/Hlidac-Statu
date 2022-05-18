@@ -63,7 +63,7 @@ namespace HlidacStatu.Datasets
                 if (datasetsWithQuery == null || datasetsWithQuery.Count == 0)
                     return res;
 
-                if (!Repositories.Searching.Tools.ValidateQuery(datasetsWithQuery.First().Value))
+                if (!Repositories.Searching.Tools.ValidateQueryAsync(datasetsWithQuery.First().Value))
                 {
                     res.Exceptions.Add(new System.Exception($"Invalid Query: {datasetsWithQuery.First().Value}"));
                     return res;

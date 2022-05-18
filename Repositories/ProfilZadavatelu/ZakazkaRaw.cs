@@ -40,7 +40,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
         public async Task SaveAsync(bool compare = true, ElasticClient client = null)
         {
             bool save = false;
-            var latest = GetLatest(ZakazkaId);
+            var latest = GetLatestAsync(ZakazkaId);
             if (compare)
             {
                 if (!Validators.AreObjectsEqual(this, latest, false, "LastUpdate"))
@@ -53,17 +53,17 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
             if (save)
             {
                 LastUpdate = DateTime.Now;
-                var es = await (client ?? Manager.GetESClient_VerejneZakazkyNaProfiluRaw())
-                    .IndexDocumentAsync<ZakazkaRaw>(this);
+                var cli = client ?? await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
+                var es = await (client ?? cli).IndexDocumentAsync<ZakazkaRaw>(this);
             }
         }
 
 
-        public static ZakazkaRaw GetLatest(string zakazkaId, ElasticClient client = null)
+        public static async Task<ZakazkaRaw> GetLatestAsync(string zakazkaId, ElasticClient client = null)
         {
-            client = client ?? Manager.GetESClient_VerejneZakazkyNaProfiluRaw();
+            client = client ?? await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
 
-            var res = client.Search<ZakazkaRaw>(s => s
+            var res = await client.SearchAsync<ZakazkaRaw>(s => s
                         .Query(q => q
                             .Term(t => t.Field(f => f.ZakazkaId).Value(zakazkaId))
                         )

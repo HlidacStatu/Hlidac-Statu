@@ -1,9 +1,5 @@
 using HlidacStatu.Entities;
-
-using Microsoft.EntityFrameworkCore;
-
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,10 +9,11 @@ namespace HlidacStatu.Repositories
     {
 
         private static Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeSSL[]> uptimeSSlCache =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeSSL[]>(TimeSpan.FromHours(2), async (obj) =>
+            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeSSL[]>(TimeSpan.FromHours(2), (obj) =>
                 {
                     UptimeSSL[] res = new UptimeSSL[] { };
-                    var resX = await ES.Manager.GetESClient_UptimeSSL()
+                    var client = ES.Manager.GetESClient_UptimeSSLAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                    var resX = client
                         .SearchAsync<UptimeSSL>(s => s
                             .Query(q => q.MatchAll())
                             .Aggregations(agg => agg
@@ -31,7 +28,7 @@ namespace HlidacStatu.Repositories
                                     )
                                 )
                             )
-                        );
+                        ).ConfigureAwait(false).GetAwaiter().GetResult();
 
                     var latest = ((Nest.BucketAggregate)resX.Aggregations["domains"]).Items
                         .Select(i =>
@@ -56,8 +53,8 @@ namespace HlidacStatu.Repositories
         {
             try
             {
-
-                await Repositories.ES.Manager.GetESClient_UptimeSSL().IndexAsync<UptimeSSL>(item, m => m.Id(item.Id));
+                var client = await Repositories.ES.Manager.GetESClient_UptimeSSLAsync();
+                await client.IndexAsync<UptimeSSL>(item, m => m.Id(item.Id));
 
             }
             catch (System.Exception e)
@@ -70,7 +67,7 @@ namespace HlidacStatu.Repositories
         }
         public static async Task<UptimeSSL> LoadLatestAsync(string domain)
         {
-            var cl = Repositories.ES.Manager.GetESClient_UptimeSSL();
+            var cl = await ES.Manager.GetESClient_UptimeSSLAsync();
 
             var res = await cl.SearchAsync<UptimeSSL>(s => s
                 .Query(q=>q

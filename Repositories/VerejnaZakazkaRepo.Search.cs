@@ -307,7 +307,7 @@ namespace HlidacStatu.Repositories
                 bool withHighlighting = false)
             {
                 if (client == null)
-                    client = Manager.GetESClient_VZ();
+                    client = await Manager.GetESClient_VZAsync();
 
                 string query = search.Q ?? "";
 
@@ -426,7 +426,7 @@ namespace HlidacStatu.Repositories
                     aggrFunc
                         = (aggr) => { return baseAggrDesc; };
 
-                var client = Manager.GetESClient();
+                var client = await Manager.GetESClientAsync();
                 Indices indexes = client.ConnectionSettings.DefaultIndex;
 
                 var res = await client
@@ -456,7 +456,7 @@ namespace HlidacStatu.Repositories
                     return null;
 
                 if (client == null)
-                    client = Manager.GetESClient_VZ();
+                    client = await Manager.GetESClient_VZAsync();
 
                 AggregationContainerDescriptor<VerejnaZakazka> baseAggrDesc = null;
                 baseAggrDesc = anyAggregation == null
@@ -602,7 +602,8 @@ namespace HlidacStatu.Repositories
 
             public static MemoryCacheManager<VerejnaZakazkaSearchData, string>
                 cachedSearches =
-                    new MemoryCacheManager<VerejnaZakazkaSearchData, string>("VZsearch", CachedFuncSimpleSearchAsync,
+                    new MemoryCacheManager<VerejnaZakazkaSearchData, string>("VZsearch", 
+                        s => CachedFuncSimpleSearchAsync(s).ConfigureAwait(false).GetAwaiter().GetResult(),
                         TimeSpan.FromHours(24));
 
             public static VerejnaZakazkaSearchData CachedSimpleSearch(TimeSpan expiration,
@@ -647,7 +648,7 @@ namespace HlidacStatu.Repositories
                 string scrollTimeout = "2m",
                 int scrollSize = 300)
             {
-                var client = Manager.GetESClient_VZ();
+                var client = await Manager.GetESClient_VZAsync();
                 ISearchResponse<VerejnaZakazka> initialResponse = null;
                 if (query is null)
                 {

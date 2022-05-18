@@ -15,6 +15,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.ES
@@ -86,10 +87,10 @@ namespace HlidacStatu.Repositories.ES
         public static string defaultIndexName_RPP_OVM = "rpp_ovm";
         public static string defaultIndexName_RPP_ISVS = "rpp_isvs";
 
-        private static object _clientLock = new object();
+
+        private static SemaphoreSlim _clientSemaphore = new SemaphoreSlim(1, 1);
         private static Dictionary<string, ElasticClient> _clients = new Dictionary<string, ElasticClient>();
 
-        private static object locker = new object();
 
         static Manager()
         {
@@ -113,121 +114,121 @@ namespace HlidacStatu.Repositories.ES
         {
             //GetESClient().DeleteIndex(defaultIndexName);
         }
-        public static ElasticClient GetESClient(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClientAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName, timeOut, connectionLimit);
+            return GetESClientAsync(defaultIndexName, timeOut, connectionLimit);
         }
-        public static ElasticClient GetESClient_Sneplatne(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_SneplatneAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Sneplatne, timeOut, connectionLimit);
+            return GetESClientAsync(defaultIndexName_Sneplatne, timeOut, connectionLimit);
         }
 
-        public static ElasticClient GetESClient_VZ(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_VZAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_VerejneZakazky, timeOut, connectionLimit, IndexType.VerejneZakazky);
+            return GetESClientAsync(defaultIndexName_VerejneZakazky, timeOut, connectionLimit, IndexType.VerejneZakazky);
         }
-        public static ElasticClient GetESClient_ProfilZadavatele(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_ProfilZadavateleAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_ProfilZadavatele, timeOut, connectionLimit, IndexType.ProfilZadavatele);
+            return GetESClientAsync(defaultIndexName_ProfilZadavatele, timeOut, connectionLimit, IndexType.ProfilZadavatele);
         }
-        public static ElasticClient GetESClient_VerejneZakazkyRaw2006(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_VerejneZakazkyRaw2006Async(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_VerejneZakazkyRaw2006, timeOut, connectionLimit, IndexType.VerejneZakazkyRaw2006);
+            return GetESClientAsync(defaultIndexName_VerejneZakazkyRaw2006, timeOut, connectionLimit, IndexType.VerejneZakazkyRaw2006);
         }
-        public static ElasticClient GetESClient_VerejneZakazkyNaProfiluRaw(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_VerejneZakazkyNaProfiluRawAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_VerejneZakazkyNaProfiluRaw, timeOut, connectionLimit, IndexType.VerejneZakazkyNaProfiluRaw);
+            return GetESClientAsync(defaultIndexName_VerejneZakazkyNaProfiluRaw, timeOut, connectionLimit, IndexType.VerejneZakazkyNaProfiluRaw);
         }
-        public static ElasticClient GetESClient_VerejneZakazkyNaProfiluConverted(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_VerejneZakazkyNaProfiluConvertedAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_VerejneZakazkyNaProfiluConverted, timeOut, connectionLimit, IndexType.VerejneZakazky);
+            return GetESClientAsync(defaultIndexName_VerejneZakazkyNaProfiluConverted, timeOut, connectionLimit, IndexType.VerejneZakazky);
         }
-        public static ElasticClient GetESClient_VerejneZakazkyRaw(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_VerejneZakazkyRawAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_VerejneZakazkyRaw, timeOut, connectionLimit, IndexType.VerejneZakazkyRaw
+            return GetESClientAsync(defaultIndexName_VerejneZakazkyRaw, timeOut, connectionLimit, IndexType.VerejneZakazkyRaw
                 );
         }
-        public static ElasticClient GetESClient_Logs(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_LogsAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Logs, timeOut, connectionLimit, IndexType.Logs
+            return GetESClientAsync(defaultIndexName_Logs, timeOut, connectionLimit, IndexType.Logs
                 );
         }
-        public static ElasticClient GetESClient_Audit(int timeOut = 1000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_AuditAsync(int timeOut = 1000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Audit, timeOut, connectionLimit, IndexType.Audit
+            return GetESClientAsync(defaultIndexName_Audit, timeOut, connectionLimit, IndexType.Audit
                 );
         }
-        public static ElasticClient GetESClient_InDocTableCells(int timeOut = 1000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_InDocTableCellsAsync(int timeOut = 1000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_InDocTableCells, timeOut, connectionLimit, IndexType.InDocTableCells
+            return GetESClientAsync(defaultIndexName_InDocTableCells, timeOut, connectionLimit, IndexType.InDocTableCells
             );
         }
-        public static ElasticClient GetESClient_RPP_OVM(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_RPP_OVMAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_RPP_OVM, timeOut, connectionLimit, IndexType.RPP_OVM
+            return GetESClientAsync(defaultIndexName_RPP_OVM, timeOut, connectionLimit, IndexType.RPP_OVM
                 );
         }
-        public static ElasticClient GetESClient_RPP_ISVS(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_RPP_ISVSAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_RPP_ISVS, timeOut, connectionLimit, IndexType.RPP_ISVS
+            return GetESClientAsync(defaultIndexName_RPP_ISVS, timeOut, connectionLimit, IndexType.RPP_ISVS
                 );
         }
-        public static ElasticClient GetESClient_RPP_Kategorie(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_RPP_KategorieAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_RPP_Kategorie, timeOut, connectionLimit, IndexType.RPP_Kategorie
+            return GetESClientAsync(defaultIndexName_RPP_Kategorie, timeOut, connectionLimit, IndexType.RPP_Kategorie
                 );
         }
 
-        public static ElasticClient GetESClient_Insolvence(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_InsolvenceAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Insolvence, timeOut, connectionLimit, IndexType.Insolvence);
+            return GetESClientAsync(defaultIndexName_Insolvence, timeOut, connectionLimit, IndexType.Insolvence);
         }
         //public static ElasticClient GetESClient_Uptime(int timeOut = 60000, int connectionLimit = 80)
         //{
         //    return GetESClient(defaultIndexName_Uptime, timeOut, connectionLimit, IndexType.UptimeItem);
         //}
-        public static ElasticClient GetESClient_UptimeSSL(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_UptimeSSLAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_UptimeSSL, timeOut, connectionLimit, IndexType.UptimeSSL);
+            return GetESClientAsync(defaultIndexName_UptimeSSL, timeOut, connectionLimit, IndexType.UptimeSSL);
         }
 
-        public static ElasticClient GetESClient_Dotace(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_DotaceAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Dotace, timeOut, connectionLimit, IndexType.Dotace);
+            return GetESClientAsync(defaultIndexName_Dotace, timeOut, connectionLimit, IndexType.Dotace);
         }
 
-        public static ElasticClient GetESClient_Osoby(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_OsobyAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Osoby, timeOut, connectionLimit, IndexType.Osoby);
+            return GetESClientAsync(defaultIndexName_Osoby, timeOut, connectionLimit, IndexType.Osoby);
         }
 
-        public static ElasticClient GetESClient_Firmy(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_FirmyAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Firmy, timeOut, connectionLimit, IndexType.Firmy);
+            return GetESClientAsync(defaultIndexName_Firmy, timeOut, connectionLimit, IndexType.Firmy);
         }
-        public static ElasticClient GetESClient_KIndex(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_KIndexAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_KIndex, timeOut, connectionLimit, IndexType.Firmy);
+            return GetESClientAsync(defaultIndexName_KIndex, timeOut, connectionLimit, IndexType.Firmy);
         }
-        public static ElasticClient GetESClient_KIndexTemp(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_KIndexTempAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_KIndexTemp, timeOut, connectionLimit, IndexType.Firmy);
+            return GetESClientAsync(defaultIndexName_KIndexTemp, timeOut, connectionLimit, IndexType.Firmy);
         }
-        public static ElasticClient GetESClient_KIndexBackup(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_KIndexBackupAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_KIndexBackup, timeOut, connectionLimit, IndexType.Firmy);
+            return GetESClientAsync(defaultIndexName_KIndexBackup, timeOut, connectionLimit, IndexType.Firmy);
         }
-        public static ElasticClient GetESClient_KIndexBackupTemp(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_KIndexBackupTempAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_KIndexBackupTemp, timeOut, connectionLimit, IndexType.Firmy);
+            return GetESClientAsync(defaultIndexName_KIndexBackupTemp, timeOut, connectionLimit, IndexType.Firmy);
         }
-        public static ElasticClient GetESClient_KindexFeedback(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_KindexFeedbackAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_KindexFeedback, timeOut, connectionLimit, IndexType.KindexFeedback);
+            return GetESClientAsync(defaultIndexName_KindexFeedback, timeOut, connectionLimit, IndexType.KindexFeedback);
         }
 
         static string dataSourceIndexNamePrefix = "data_";
-        public static ElasticClient GetESClient(string indexName, int timeOut = 60000, int connectionLimit = 80, IndexType? idxType = null, bool init = true)
+        public static async Task<ElasticClient> GetESClientAsync(string indexName, int timeOut = 60000, int connectionLimit = 80, IndexType? idxType = null, bool init = true)
         {
             if (idxType == IndexType.DataSource)
                 indexName = dataSourceIndexNamePrefix + indexName;
@@ -245,7 +246,8 @@ namespace HlidacStatu.Repositories.ES
 
             if (!_clients.ContainsKey(cnnset))
             {
-                lock (_clientLock)
+                await _clientSemaphore.WaitAsync();
+                try
                 {
                     if (!_clients.ContainsKey(cnnset))
                     {
@@ -258,6 +260,10 @@ namespace HlidacStatu.Repositories.ES
 
                         _clients.TryAdd(cnnset, _client);
                     }
+                }
+                finally
+                {
+                    _clientSemaphore.Release();
                 }
             }
             return _clients[cnnset];

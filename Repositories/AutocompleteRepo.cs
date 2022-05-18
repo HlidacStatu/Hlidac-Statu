@@ -104,7 +104,7 @@ namespace HlidacStatu.Repositories
                     try
                     {
                         Consts.Logger.Info("GenerateAutocomplete Loading people");
-                        people = LoadPeople();
+                        people = LoadPeopleAsync().ConfigureAwait(false).GetAwaiter().GetResult();
                         Consts.Logger.Info("GenerateAutocomplete Loading people done");
                     }
                     catch (Exception e)
@@ -383,13 +383,13 @@ namespace HlidacStatu.Repositories
 
         //lidi
         static object _loadPlock = new object();
-        private static List<Autocomplete> LoadPeople()
+        private static async Task<List<Autocomplete>> LoadPeopleAsync()
         {
             List<Autocomplete> results = new List<Autocomplete>();
             using (DbEntities db = new DbEntities())
             {
 
-                Devmasters.Batch.Manager.DoActionForAll<Osoba>(db.Osoba.AsQueryable()
+                await Devmasters.Batch.Manager.DoActionForAllAsync<Osoba>(db.Osoba.AsQueryable()
                     .Where(o => o.Status == (int)Osoba.StatusOsobyEnum.Politik
                         || o.Status == (int)Osoba.StatusOsobyEnum.VysokyUrednik
                         || o.Status == (int)Osoba.StatusOsobyEnum.Sponzor), async o =>

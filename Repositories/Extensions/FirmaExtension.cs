@@ -16,6 +16,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using HlidacStatu.Lib.Data.External.RPP;
 
 namespace HlidacStatu.Extensions
 {
@@ -60,7 +61,7 @@ namespace HlidacStatu.Extensions
 
 
         static string[] vyjimky_v_RS_ = new string[] { "00006572", "63839407", "48136000", "48513687", "49370227", "70836981", "05553539" }; //§ 3 odst. 2 f) ... Poslanecká sněmovna, Senát, Kancelář prezidenta republiky, Ústavní soud, Nejvyšší kontrolní úřad, Kancelář veřejného ochránce práv a Úřad Národní rozpočtové rady
-        public static bool MusiPublikovatDoRS(this Firma firma)
+        public static async Task<bool> MusiPublikovatDoRSAsync(this Firma firma)
         {
             if (vyjimky_v_RS_.Contains(firma.ICO))
                 return false;
@@ -68,8 +69,9 @@ namespace HlidacStatu.Extensions
 
             if (firma.JsemOVM()) //Obec co neni v kategorii Obce s rozšířenou působností
             {
-                if (firma.KategorieOVM().Any(m => m.id == 14) == true && //je obec
-                        firma.KategorieOVM().Any(m => m.id == 11) == false //neni v kategorii Obce s rozšířenou působností
+                var ovmCat = await firma.KategorieOVMAsync();
+                if (ovmCat.Any(m => m.id == 14) == true && //je obec
+                        ovmCat.Any(m => m.id == 11) == false //neni v kategorii Obce s rozšířenou působností
                    )
                 {
                     musi = false;
@@ -81,20 +83,21 @@ namespace HlidacStatu.Extensions
                     .ToArray();
 
                 musi = parentOVM
-                    .Any(m => m.JsemOVM() && m.KategorieOVM().Any(k => k.id == 11) == true);
+                    .Any(m => m.JsemOVM() && m.KategorieOVMAsync().ConfigureAwait(false).GetAwaiter().GetResult().Any(k => k.id == 11));
             }
             return musi;
         }
 
 
 
-        public static Lib.Data.External.RPP.KategorieOVM[] KategorieOVM(this Firma firma)
+        public static async Task<KategorieOVM[]> KategorieOVMAsync(this Firma firma)
         {
             Lib.Data.External.RPP.KategorieOVM[] _kategorieOVM = null; //migrace: tohle by šlo zjednodušit + možná cache
 
             if (_kategorieOVM == null)
             {
-                var res = Manager.GetESClient_RPP_Kategorie().Search<Lib.Data.External.RPP.KategorieOVM>(
+                var client = await Manager.GetESClient_RPP_KategorieAsync(); 
+                var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(
                     s => s
                         .Query(q => q.QueryString(qs => qs.Query($"oVM_v_kategorii.kodOvm:{firma.ICO}")))
                         .Source(so => so.Excludes(ex => ex.Field("oVM_v_kategorii")))
@@ -253,10 +256,11 @@ namespace HlidacStatu.Extensions
                 return res.ToArray();
             }
         }
-        public static (string jmeno, string prijmeni, DateTime? poslednizmena)[] CeoFromRPP(this Firma firma)
+        public static async Task<(string jmeno, string prijmeni, DateTime? poslednizmena)[]> CeoFromRPPAsync(this Firma firma)
         {
             List<(string jmeno, string prijmeni, DateTime? poslednizmena)> osoby = new List<(string jmeno, string prijmeni, DateTime? poslednizmena)>();
-            var rppReq = Manager.GetESClient_RPP_OVM().Get<HlidacStatu.Lib.Data.External.RPP.OVMFull>(firma.ICO);
+            var client = await Manager.GetESClient_RPP_OVMAsync();
+            var rppReq = await client.GetAsync<HlidacStatu.Lib.Data.External.RPP.OVMFull>(firma.ICO);
             if (rppReq.Found && rppReq.Source.angazovaneOsoby?.Count() > 0)
             {
                 var rppOs = rppReq.Source.angazovaneOsoby;
@@ -272,10 +276,11 @@ namespace HlidacStatu.Extensions
             return osoby.ToArray();
 
         }
-        public static HlidacStatu.Lib.Data.External.RPP.OVMFull.Osoba[] CeoFromRPP_Full(this Firma firma)
+        public static async Task<OVMFull.Osoba[]> CeoFromRPP_FullAsync(this Firma firma)
         {
             List<(string jmeno, string prijmeni, DateTime? poslednizmena)> osoby = new List<(string jmeno, string prijmeni, DateTime? poslednizmena)>();
-            var rppReq = Manager.GetESClient_RPP_OVM().Get<HlidacStatu.Lib.Data.External.RPP.OVMFull>(firma.ICO);
+            var client = await Manager.GetESClient_RPP_OVMAsync();
+            var rppReq = await client.GetAsync<HlidacStatu.Lib.Data.External.RPP.OVMFull>(firma.ICO);
             if (rppReq.Found && rppReq.Source.angazovaneOsoby?.Count() > 0)
             {
                 Lib.Data.External.RPP.OVMFull.Osoba[] rppOs = rppReq.Source.angazovaneOsoby;
@@ -390,12 +395,12 @@ namespace HlidacStatu.Extensions
         }
 
 
-        public static void SetTyp(this Firma firma)
+        public static async Task SetTypAsync(this Firma firma)
         {
             bool obec = false;
             if (firma._jsemOVM()) //Obec co neni v kategorii Obce s rozšířenou působností
             {
-                if (firma.KategorieOVM().Any(m => m.id == 14) == true //je obec
+                if ((await firma.KategorieOVMAsync()).Any(m => m.id == 14) == true //je obec
                    )
                 {
                     obec = true;
@@ -525,7 +530,6 @@ namespace HlidacStatu.Extensions
             string template = "{0}", string itemTemplate = "{0}",
             string itemDelimeter = "<br/>", int numOfRecords = int.MaxValue)
         {
-            StringBuilder sb = new StringBuilder();
             var events = firma.Events(predicate);
             if (events.Count() == 0)
                 return string.Empty;
@@ -587,7 +591,7 @@ namespace HlidacStatu.Extensions
         {
             var cache = Util.Cache.CouchbaseCacheManager<InfoFact[], Firma>
                 .GetSafeInstance("Firma_InfoFacts",
-                    (firma) => GetInfoFactsAsync(firma),
+                    (firma) => GetInfoFactsAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(24),
                     Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                     Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),

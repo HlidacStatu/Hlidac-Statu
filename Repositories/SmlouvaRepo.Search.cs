@@ -262,9 +262,9 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                 ISearchResponse<Smlouva> res = null;
                 try
                 {
-                    var client = Manager.GetESClient();
+                    var client = await Manager.GetESClientAsync();
                     if (platnyZaznam.HasValue && platnyZaznam == false)
-                        client = Manager.GetESClient_Sneplatne();
+                        client = await Manager.GetESClient_SneplatneAsync();
                     Indices indexes = client.ConnectionSettings.DefaultIndex;
                     if (includeNeplatne)
                     {
@@ -438,7 +438,9 @@ bool withHighlighting = false, bool exactNumOfResults = false)
 
             public static MemoryCacheManager<SmlouvaSearchResult, (string query, AggregationContainerDescriptor<Smlouva> aggr)> cachedSearches = 
                 new MemoryCacheManager<SmlouvaSearchResult, (string query, AggregationContainerDescriptor<Smlouva> aggr)>(
-                    "SMLOUVYsearch", funcSimpleSearchAsync, TimeSpan.FromHours(24));
+                    "SMLOUVYsearch", 
+                    tuple => funcSimpleSearchAsync(tuple).ConfigureAwait(false).GetAwaiter().GetResult(), 
+                    TimeSpan.FromHours(24));
             
             public static SmlouvaSearchResult CachedSimpleSearchWithStat(TimeSpan expiration,
                string query, int page, int pageSize, OrderResult order,

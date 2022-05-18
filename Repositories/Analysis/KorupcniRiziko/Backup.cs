@@ -33,9 +33,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             b.Id = $"{kidx.Ico}_{b.Created:s}";
             b.Comment = comment;
             b.KIndex = kidx;
-            var client = Manager.GetESClient_KIndexBackup();
+            var client = await Manager.GetESClient_KIndexBackupAsync();
             if (useTempDb)
-                client = Manager.GetESClient_KIndexBackupTemp();
+                client = await Manager.GetESClient_KIndexBackupTempAsync();
 
             var res = await client.IndexAsync<Backup>(b, o => o.Id(b.Id)); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)

@@ -551,7 +551,8 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this Osoba osoba)
         {
             return "<ul>"
-                   + InfoFact.RenderInfoFacts(osoba.InfoFactsAsync(), 4, true, true, "", "<li>{0}</li>", true)
+                   + InfoFact.RenderInfoFacts(osoba.InfoFactsAsync().ConfigureAwait(false).GetAwaiter().GetResult(), 
+                       4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 

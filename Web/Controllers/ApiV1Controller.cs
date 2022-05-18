@@ -240,7 +240,7 @@ namespace HlidacStatu.Web.Controllers
         {
             
             List<VZProfilesListRes> list = new();
-            var res = Manager.GetESClient_VerejneZakazkyNaProfiluRaw()
+            var res = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync()
                 .Search<ZakazkaRaw>(s => s
                     .Query(q => q.Bool(b => b.MustNot(mn => mn.Term(t => t.Field(f => f.Converted).Value(1)))))
                     .Size(0)
@@ -256,7 +256,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 foreach (KeyedBucket<object> val in ((BucketAggregate)res.Aggregations["profiles"]).Items)
                 {
-                    var resProf = Manager.GetESClient_VZ()
+                    var resProf = await Manager.GetESClient_VZAsync()
                         .Get<ProfilZadavatele>((string)val.Key);
                     list.Add(new VZProfilesListRes()
                     { profileId = (string)val.Key, url = resProf?.Source?.Url, count = val.DocCount });
@@ -275,7 +275,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return new NotFoundResult();
             
-            var res = Manager.GetESClient_VerejneZakazkyNaProfiluRaw()
+            var res = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync()
                 .Search<ZakazkaRaw>(s => s
                     .Query(q => q
                         .QueryString(qs =>
@@ -305,7 +305,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return new NotFoundResult();
 
-            var res = Manager.GetESClient_VerejneZakazkyNaProfiluRaw()
+            var res = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync()
                 .Search<ZakazkaRaw>(s => s
                     .Query(q => q
                         .QueryString(qs => qs.DefaultOperator(Operator.And).Query("zakazkaId:\"" + id + "\""))
@@ -340,7 +340,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return new NotFoundResult();
             
-            var idxConn = Manager.GetESClient_VerejneZakazkyNaProfiluConverted();
+            var idxConn = await Manager.GetESClient_VerejneZakazkyNaProfiluConvertedAsync();
 
             if (!ModelState.IsValid || content is null)
             {
@@ -394,12 +394,12 @@ namespace HlidacStatu.Web.Controllers
             string nodes = "-------------------------\n";
             try
             {
-                res = Manager.GetESClient().Cluster.Health();
+                res = Manager.GetESClientAsync().Cluster.Health();
                 num = res?.NumberOfNodes ?? 0;
                 status = res?.Status.ToString() ?? "unknown";
 
                 //GET /_cat/nodes?v&h=m,name,ip,u&s=name
-                var catr = Manager.GetESClient()
+                var catr = Manager.GetESClientAsync()
                     .LowLevel.Cat.Nodes<Elasticsearch.Net.StringResponse>(
                         new Elasticsearch.Net.Specification.CatApi.CatNodesRequestParameters()
                         {

@@ -281,9 +281,9 @@ namespace HlidacStatu.Repositories
             if (c == null)
             {
                 if (smlouva.platnyZaznam)
-                    c = Manager.GetESClient();
+                    c = await Manager.GetESClientAsync();
                 else
-                    c = Manager.GetESClient_Sneplatne();
+                    c = await Manager.GetESClient_SneplatneAsync();
             }
 
             var res = await c.IndexAsync<Smlouva>(smlouva, m => m.Id(smlouva.Id));
@@ -291,7 +291,7 @@ namespace HlidacStatu.Repositories
             if (smlouva.platnyZaznam == false && res.IsValid)
             {
                 //zkontroluj zda neni v indexu s platnymi. pokud ano, smaz ho tam
-                var cExist = Manager.GetESClient();
+                var cExist = await Manager.GetESClientAsync();
                 var s = await LoadAsync(smlouva.Id, cExist);
                 if (s != null)
                     await DeleteAsync(smlouva.Id, cExist);
@@ -456,7 +456,7 @@ namespace HlidacStatu.Repositories
             Action<ActionProgressData> progressWriter = null)
         {
             List<string> ids = new List<string>();
-            var client = deleted ? Manager.GetESClient_Sneplatne() : Manager.GetESClient();
+            var client = deleted ? await Manager.GetESClient_SneplatneAsync() : await Manager.GetESClientAsync();
 
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc =
                 searchFunc = async (size, page) =>
@@ -520,7 +520,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<bool> DeleteAsync(string Id, ElasticClient client = null)
         {
-            client ??= Manager.GetESClient();
+            client ??= await Manager.GetESClientAsync();
             var res = await client.DeleteAsync<Smlouva>(Id);
             return res.IsValid;
         }
@@ -528,13 +528,13 @@ namespace HlidacStatu.Repositories
         public static async Task<bool> ExistsZaznamAsync(string id, ElasticClient client = null)
         {
             bool noSetClient = client == null;
-            client ??= Manager.GetESClient();
+            client ??= await Manager.GetESClientAsync();
             var res = await client.DocumentExistsAsync<Smlouva>(id);
             if (noSetClient)
             {
                 if (res.Exists)
                     return true;
-                client = Manager.GetESClient_Sneplatne();
+                client = await Manager.GetESClient_SneplatneAsync();
                 res = await client.DocumentExistsAsync<Smlouva>(id);
                 return res.Exists;
             }
@@ -567,7 +567,7 @@ namespace HlidacStatu.Repositories
                 if (specClient)
                     c = client;
                 else
-                    c = Manager.GetESClient();
+                    c = await Manager.GetESClientAsync();
 
                 //var res = c.Get<Smlouva>(idVerze);
 
@@ -582,7 +582,7 @@ namespace HlidacStatu.Repositories
                 {
                     if (specClient == false)
                     {
-                        var c1 = Manager.GetESClient_Sneplatne();
+                        var c1 = await Manager.GetESClient_SneplatneAsync();
 
                         res = includePrilohy
                             ? await c1.GetAsync<Smlouva>(idVerze)

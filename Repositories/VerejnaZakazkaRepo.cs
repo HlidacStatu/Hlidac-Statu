@@ -46,7 +46,7 @@ namespace HlidacStatu.Repositories
                     verejnaZakazka.PosledniZmena = posledniZmena;
                 else
                     verejnaZakazka.PosledniZmena = verejnaZakazka.GetPosledniZmena();
-                var es = client ?? Manager.GetESClient_VZ();
+                var es = client ??await Manager.GetESClient_VZAsync();
                 await es.IndexDocumentAsync<VerejnaZakazka>(verejnaZakazka);
             }
             catch (Exception e)
@@ -58,7 +58,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<VerejnaZakazka> LoadFromESAsync(string id, ElasticClient client = null)
         {
-            var es = client ?? Manager.GetESClient_VZ();
+            var es = client ??await Manager.GetESClient_VZAsync();
             var res = await es.GetAsync<VerejnaZakazka>(id);
             if (res.Found)
                 return res.Source;
@@ -73,7 +73,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<bool> ExistsAsync(string id, ElasticClient client = null)
         {
-            var es = client ?? Manager.GetESClient_VZ();
+            var es = client ?? await Manager.GetESClient_VZAsync();
             var res = await es.DocumentExistsAsync<VerejnaZakazka>(id);
             return res.Exists;
         }

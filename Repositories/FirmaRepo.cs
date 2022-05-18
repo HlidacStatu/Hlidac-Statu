@@ -19,7 +19,7 @@ namespace HlidacStatu.Repositories
         private static void PrepareBeforeSave(Firma firma, bool updateLastUpdateValue = true)
         {
             firma.JmenoAscii = TextUtil.RemoveDiacritics(firma.Jmeno);
-            firma.SetTyp();
+            firma.SetTypAsync();
 
         }
 

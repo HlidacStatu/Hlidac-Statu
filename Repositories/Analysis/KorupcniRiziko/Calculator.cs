@@ -7,6 +7,7 @@ using HlidacStatu.Repositories.ES;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Nest;
 
@@ -26,29 +27,41 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         private KIndexData kindex = null;
 
-        public Calculator(string ico, bool useTemp)
+        private Calculator(string ico)
         {
-            this.Ico = ico;
+            Ico = ico;
 
-            this.urad = Firmy.Get(this.Ico);
+            urad = Firmy.Get(this.Ico);
             if (urad.Valid == false)
                 throw new ArgumentOutOfRangeException("invalid ICO");
-
-            kindex = await KIndexData.GetDirectAsync((ico, useTemp));
         }
 
-        object lockCalc = new object();
+        public static async Task<Calculator> CreateCalculatorAsync(string ico, bool useTemp)
+        {
+            var calculator = new Calculator(ico);
+            calculator.kindex = await KIndexData.GetDirectAsync((ico, useTemp));
+            return calculator;
+        }
 
-        public KIndexData GetData(bool refreshData = false, bool forceCalculateAllYears = false)
+        
+        private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1,1);
+
+        public async Task<KIndexData> GetDataAsync(bool refreshData = false, bool forceCalculateAllYears = false)
         {
             if (refreshData || forceCalculateAllYears)
                 kindex = null;
-            lock (lockCalc)
+            
+            await _semaphoreSlim.WaitAsync();
+            try
             {
                 if (kindex == null)
                 {
                     kindex = await CalculateSourceDataAsync(forceCalculateAllYears);
                 }
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
             }
 
             return kindex;
@@ -128,7 +141,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
             if (smlouvyZaRok >= minPocetSmluvKoncentraceDodavateluProZahajeniVypoctu)
             {
-                IEnumerable<Calculator.SmlouvyForIndex> allSmlouvy = GetSmlouvy(queryPlatce).ToArray();
+                IEnumerable<Calculator.SmlouvyForIndex> allSmlouvy = (await GetSmlouvyAsync(queryPlatce)).ToArray();
                 IEnumerable<Calculator.SmlouvyForIndex> allSmlouvy_BezBLACKLIST_Obor = allSmlouvy
                     .Where(m => m.Obor != OBOR_BLACKLIST_bankovnirepo && m.Obor != OBOR_BLACKLIST_finance_formality)
                     .ToArray();
@@ -267,18 +280,18 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 } // if (ret.CelkovaKoncentraceDodavatelu != null)
             }
 
-            ret.TotalAveragePercSmlouvyPod50k = TotalAveragePercSmlouvyPod50K(ret.Rok);
+            ret.TotalAveragePercSmlouvyPod50k = await TotalAveragePercSmlouvyPod50KAsync(ret.Rok);
 
             ret.PercSmlouvyPod50k = await AveragePercSmlouvyPod50KAsync(this.Ico, ret.Rok, ret.Statistika.PocetSmluv);
             ret.PercSmlouvyPod50kBonus = SmlouvyPod50kBonus(ret.PercSmlouvyPod50k, ret.TotalAveragePercSmlouvyPod50k);
 
 
-            ret = FinalCalculationKIdx(ret, forceCalculateAllYears);
+            ret = await FinalCalculationKIdxAsync(ret, forceCalculateAllYears);
 
             return ret;
         }
 
-        public KIndexData.Annual FinalCalculationKIdx(KIndexData.Annual ret, bool forceCalculateAllYears)
+        public async Task<KIndexData.Annual> FinalCalculationKIdxAsync(KIndexData.Annual ret, bool forceCalculateAllYears)
         {
             decimal smlouvyZaRok = (decimal)urad.StatistikaRegistruSmluv()[ret.Rok].PocetSmluv;
 
@@ -296,7 +309,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 ret.KIndexReady = true;
                 ret.KIndexIssues = null;
             }
-            else if (Firmy.Get(this.Ico).MusiPublikovatDoRS() == false)
+            else if (await Firmy.Get(this.Ico).MusiPublikovatDoRSAsync() == false)
             {
                 if (forceCalculateAllYears == false)
                 {
@@ -534,12 +547,14 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         static Dictionary<int, decimal> totalsAvg50k = new Dictionary<int, decimal>();
         static object totalsAvg50kLock = new object();
+        private static SemaphoreSlim _totalsAvg50kSemaphore = new SemaphoreSlim(1, 1);
 
-        public static decimal TotalAveragePercSmlouvyPod50K(int year)
+        public static async Task<decimal> TotalAveragePercSmlouvyPod50KAsync(int year)
         {
             if (!totalsAvg50k.ContainsKey(year))
             {
-                lock (totalsAvg50kLock)
+                await _totalsAvg50kSemaphore.WaitAsync();
+                try
                 {
                     if (!totalsAvg50k.ContainsKey(year))
                     {
@@ -564,6 +579,10 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
                         totalsAvg50k.Add(year, smlouvyPod50kperc);
                     }
+                }
+                finally
+                {
+                    _totalsAvg50kSemaphore.Release();
                 }
             }
 
@@ -592,19 +611,23 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             public int Obor { get; set; }
         }
 
-        public IEnumerable<SmlouvyForIndex> GetSmlouvy(string query)
+        public async Task<IEnumerable<SmlouvyForIndex>> GetSmlouvyAsync(string query)
         {
-            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = (size, page) =>
-                Manager.GetESClient().SearchAsync<Smlouva>(a => a
+            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
+            {
+                var client = await Manager.GetESClientAsync();
+                return await client.SearchAsync<Smlouva>(a => a
                     .Size(size)
                     .Source(ss => ss.Excludes(sml => sml.Field(ff => ff.Prilohy)))
                     .From(page * size)
                     .Query(q => SmlouvaRepo.Searching.GetSimpleQuery(query))
                     .Scroll("1m")
                 );
+            };
+                
 
             List<smlouvaStat> smlStat = new List<smlouvaStat>();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(),
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(),
                 searchFunc,
                 (h, o) =>
                 {

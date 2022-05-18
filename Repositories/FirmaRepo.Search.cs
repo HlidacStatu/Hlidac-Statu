@@ -74,8 +74,8 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<FirmaInElastic> res = null;
                 try
                 {
-                    res = await Manager.GetESClient_Firmy()
-                        .SearchAsync<FirmaInElastic>(s => s
+                    var client = await Manager.GetESClient_FirmyAsync(); 
+                    res = await client.SearchAsync<FirmaInElastic>(s => s
                             .Size(size)
                             .From(page * size)
                             .TrackTotalHits(size == 0 ? true : (bool?)null)

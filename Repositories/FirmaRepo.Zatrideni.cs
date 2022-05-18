@@ -6,9 +6,8 @@ using HlidacStatu.Util;
 using HlidacStatu.Util.Cache;
 
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace HlidacStatu.Repositories
@@ -19,25 +18,25 @@ namespace HlidacStatu.Repositories
         {
             private static CouchbaseCacheManager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory> instanceByZatrideni
                 = CouchbaseCacheManager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory>.GetSafeInstance("oboryByObor", 
-                    GetSubjektyDirect,
+                    obor => GetSubjektyDirectAsync(obor).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromDays(2),
                     Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                     Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                     Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
                     Devmasters.Config.GetWebConfigValue("CouchbasePassword")
                 );
-            private static Firma.Zatrideni.Item[] GetSubjektyDirect(Firma.Zatrideni.SubjektyObory obor)
+            private static async Task<Firma.Zatrideni.Item[]> GetSubjektyDirectAsync(Firma.Zatrideni.SubjektyObory obor)
             {
                 string[] icos = null;
                 string sql = "";
                 switch (obor)
                 {
                     case Firma.Zatrideni.SubjektyObory.Vse:
-                        icos = GetAllSubjektyFromRpp();
+                        icos = await GetAllSubjektyFromRppAsync();
                         break;
                     case Firma.Zatrideni.SubjektyObory.Vsechny_ustredni_organy_statni_spravy:
-                        icos = GetSubjektyFromRpp((int)Firma.Zatrideni.SubjektyObory.Dalsi_ustredni_organy_statni_spravy)
-                            .Concat(GetSubjektyFromRpp((int)Firma.Zatrideni.SubjektyObory.Ministerstva))
+                        icos = (await GetSubjektyFromRppAsync((int)Firma.Zatrideni.SubjektyObory.Dalsi_ustredni_organy_statni_spravy))
+                            .Concat(await GetSubjektyFromRppAsync((int)Firma.Zatrideni.SubjektyObory.Ministerstva))
                             .ToArray();
                         break;
                     case Firma.Zatrideni.SubjektyObory.Nemocnice:
@@ -162,7 +161,7 @@ namespace HlidacStatu.Repositories
                         icos = GetSubjektyFromSql(sql);
                         break;
                     default:
-                        icos = GetSubjektyFromRpp((int)obor);
+                        icos = await GetSubjektyFromRppAsync((int)obor);
                         break;
                 }
                 bool removeKraj = false;
@@ -231,20 +230,20 @@ namespace HlidacStatu.Repositories
                     .ToArray();
             }
 
-            private static string[] GetSubjektyFromRpp(int rpp_kategorie_id)
+            private static async Task<string[]> GetSubjektyFromRppAsync(int rpp_kategorie_id)
             {
-                var res = Manager.GetESClient_RPP_Kategorie()
-                    .Get<Lib.Data.External.RPP.KategorieOVM>(rpp_kategorie_id.ToString());
+                var client = await Manager.GetESClient_RPP_KategorieAsync();
+                var res = await client.GetAsync<Lib.Data.External.RPP.KategorieOVM>(rpp_kategorie_id.ToString());
                 if (res.Found)
                     return res.Source.OVM_v_kategorii.Select(m => m.kodOvm).ToArray();
 
                 return new string[] { };
             }
 
-            private static string[] GetAllSubjektyFromRpp()
+            private static async Task<string[]> GetAllSubjektyFromRppAsync()
             {
-                var res = Manager.GetESClient_RPP_Kategorie()
-                    .Search<Lib.Data.External.RPP.KategorieOVM>(s => s.Size(9000).Query(q => q.MatchAll()));
+                var client = await Manager.GetESClient_RPP_KategorieAsync(); 
+                var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(s => s.Size(9000).Query(q => q.MatchAll()));
                 if (res.IsValid)
                     return res.Hits
                         .Select(m => m.Source)

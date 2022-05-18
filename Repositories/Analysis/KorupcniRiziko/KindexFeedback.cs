@@ -40,7 +40,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 var firma = FirmaRepo.FromIco(Ico);
                 Company = firma.Jmeno;
             }
-            var res = await Manager.GetESClient_KindexFeedback().IndexDocumentAsync(this); //druhy parametr musi byt pole, ktere je unikatni
+
+            var client = await Manager.GetESClient_KindexFeedbackAsync();
+            var res = await client.IndexDocumentAsync(this); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)
             {
                 throw new ApplicationException(res.ServerError?.ToString());
@@ -49,7 +51,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         public static async Task<IEnumerable<KindexFeedback>> GetKindexFeedbacksAsync(string ico, int year)
         {
-            ElasticClient esClient = Manager.GetESClient_KindexFeedback();
+            ElasticClient esClient = await Manager.GetESClient_KindexFeedbackAsync();
 
             ISearchResponse<KindexFeedback> searchResults = null;
             try
@@ -89,7 +91,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         public static async Task<KindexFeedback> GetByIdAsync(string id)
         {
 
-            ElasticClient esClient = Manager.GetESClient_KindexFeedback();
+            ElasticClient esClient = await Manager.GetESClient_KindexFeedbackAsync();
 
             ISearchResponse<KindexFeedback> searchResults = null;
             try

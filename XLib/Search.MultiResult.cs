@@ -132,7 +132,7 @@ namespace HlidacStatu.XLib
             if (string.IsNullOrEmpty(query))
                 return res;
 
-            if (!Tools.ValidateQuery(query))
+            if (!Tools.ValidateQueryAsync(query))
             {
                 res.Smlouvy = new SmlouvaSearchResult();
                 res.Smlouvy.Q = query;

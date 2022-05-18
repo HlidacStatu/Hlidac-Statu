@@ -26,7 +26,7 @@ namespace HlidacStatu.Repositories
             private static volatile ElasticCacheManager<string[], QueryBatch> cacheSmlouvy
                 = ElasticCacheManager<string[], QueryBatch>.GetSafeInstance(
                     "cachedIdsSmlouvy",
-                    q => GetSmlouvyAsync(q),
+                    q => GetSmlouvyAsync(q).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(24),
                     Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
                     "DevmastersCache", null, null,
@@ -58,9 +58,10 @@ namespace HlidacStatu.Repositories
             if (string.IsNullOrEmpty(query.Query))
                 return new string[] { };
 
-            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = (size, page) =>
+            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
             {
-                return ES.Manager.GetESClient().SearchAsync<Smlouva>(a => a
+                var client = await ES.Manager.GetESClientAsync();
+                return await client.SearchAsync<Smlouva>(a => a
                     .Size(size)
                     .Source(false)
                     .From(page * size)
@@ -70,7 +71,7 @@ namespace HlidacStatu.Repositories
             };
 
             List<string> ids2Process = new List<string>();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(ES.Manager.GetESClient(),
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await ES.Manager.GetESClientAsync(),
                 searchFunc, (hit, param) =>
                 {
                     ids2Process.Add(hit.Id);

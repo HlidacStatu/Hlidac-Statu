@@ -48,7 +48,7 @@ namespace HlidacStatu.Datasets
 
 
             reg.NormalizeShortName();
-            var client = Manager.GetESClient(reg.datasetId, idxType: Manager.IndexType.DataSource);
+            var client = Manager.GetESClientAsync(reg.datasetId, idxType: Manager.IndexType.DataSource);
 
             if (reg.searchResultTemplate != null && !string.IsNullOrEmpty(reg.searchResultTemplate?.body))
             {
@@ -182,7 +182,7 @@ namespace HlidacStatu.Datasets
         protected DataSet(string datasourceName, bool fireException)
         {
             datasetId = datasourceName.ToLower();
-            client = Manager.GetESClient(datasetId, idxType: Manager.IndexType.DataSource);
+            client = Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource);
 
             var ret = await client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex);
             if (ret.Exists == false)

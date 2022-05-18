@@ -90,8 +90,8 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<Dotace> res = null;
                 try
                 {
-                    res = await Manager.GetESClient_Dotace()
-                        .SearchAsync<Dotace>(s => s
+                    var client = await Manager.GetESClient_DotaceAsync();
+                    res = await client.SearchAsync<Dotace>(s => s
                             .Size(search.PageSize)
                             .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)
                             .From(page * search.PageSize)
@@ -106,8 +106,7 @@ namespace HlidacStatu.Repositories
                     if (res.IsValid && withHighlighting &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
                     {
-                        res = await Manager.GetESClient_Dotace()
-                            .SearchAsync<Dotace>(s => s
+                        res = await client.SearchAsync<Dotace>(s => s
                                 .Size(search.PageSize)
                                 .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)
                                 .From(page * search.PageSize)

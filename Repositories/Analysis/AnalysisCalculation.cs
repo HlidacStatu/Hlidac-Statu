@@ -79,27 +79,27 @@ namespace HlidacStatu.Repositories
 
 
 
-        private static List<Smlouva> SimpleSmlouvyForIco(string ico, DateTime? from, DateTime? to)
+        private static async Task<List<Smlouva>> SimpleSmlouvyForIcoAsync(string ico, DateTime? from, DateTime? to)
         {
-            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = searchFunc = (size, page) =>
+            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
             {
                 var sdate = "";
                 if (from.HasValue)
                     sdate = $" AND podepsano:[{from?.ToString("yyyy-MM-dd") ?? "*"} TO {from?.ToString("yyyy-MM-dd") ?? DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")}]"; //podepsano:[2016-01-01 TO 2016-12-31]
 
-
-                return Manager.GetESClient().SearchAsync<Smlouva>(a => a
-                            .TrackTotalHits(page * size == 0)
-                            .Size(size)
-                            .From(page * size)
-                            .Source(m => m.Excludes(e => e.Field(o => o.Prilohy)))
-                            .Query(q => SmlouvaRepo.Searching.GetSimpleQuery("ico:" + ico + sdate))
-                            .Scroll("1m")
-                            );
+                var client = await Manager.GetESClientAsync();
+                return await client.SearchAsync<Smlouva>(a => a
+                    .TrackTotalHits(page * size == 0)
+                    .Size(size)
+                    .From(page * size)
+                    .Source(m => m.Excludes(e => e.Field(o => o.Prilohy)))
+                    .Query(q => SmlouvaRepo.Searching.GetSimpleQuery("ico:" + ico + sdate))
+                    .Scroll("1m")
+                );
             };
 
             List<Smlouva> smlouvy = new List<Smlouva>();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(), searchFunc,
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(), searchFunc,
                   (hit, o) =>
                   {
                       smlouvy.Add(hit.Source);
@@ -111,7 +111,7 @@ namespace HlidacStatu.Repositories
             return smlouvy;
         }
 
-        public static Tuple<VazbyFiremNaUradyStat, VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_NespolehlivymiPlatciDPH(bool showProgress = false)
+        public static async Task<Tuple<VazbyFiremNaUradyStat, VazbyFiremNaUradyStat>> UradyObchodujiciSFirmami_NespolehlivymiPlatciDPHAsync(bool showProgress = false)
         {
             var nespolehliveFirmy = StaticData.NespolehlivyPlatciDPH.Get();
 
@@ -121,11 +121,11 @@ namespace HlidacStatu.Repositories
 
             var lockObj = new object();
 
-            Devmasters.Batch.Manager.DoActionForAll<NespolehlivyPlatceDPH>(nespolehliveFirmy.Values,
-                (nf) =>
+            await Devmasters.Batch.Manager.DoActionForAllAsync<NespolehlivyPlatceDPH>(nespolehliveFirmy.Values, 
+                async (nf) =>
                 {
                     var ico = nf.Ico;
-                    var smlouvy = SimpleSmlouvyForIco(ico, nf.FromDate, nf.ToDate);
+                    var smlouvy = await SimpleSmlouvyForIcoAsync(ico, nf.FromDate, nf.ToDate);
                     foreach (var s in smlouvy)
                     {
                         var allIco = new List<string>(
@@ -201,7 +201,7 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static VazbyFiremNaUradyStat UradyObchodujiciSFirmami_s_vazbouNaPolitiky(Relation.AktualnostType aktualnost, bool showProgress = false)
+        public static async Task<VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitikyAsync(Relation.AktualnostType aktualnost, bool showProgress = false)
         {
             VazbyFiremNaPolitiky vazbyNaPolitiky = null;
             List<Sponzoring> sponzorujiciFirmy = null;
@@ -230,9 +230,10 @@ namespace HlidacStatu.Repositories
 
 
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = null;
-            searchFunc = (size, page) =>
+            searchFunc = async (size, page) =>
             {
-                return Manager.GetESClient().SearchAsync<Smlouva>(a => a
+                var client = await Manager.GetESClientAsync();
+                return await client.SearchAsync<Smlouva>(a => a
                             .TrackTotalHits(page * size == 0)
                             .Size(size)
                             .From(page * size)
@@ -248,7 +249,7 @@ namespace HlidacStatu.Repositories
             Dictionary<string, BasicDataForSubject<List<BasicData<string>>>> uradyStatni = new Dictionary<string, BasicDataForSubject<List<BasicData<string>>>>();
             Dictionary<string, BasicDataForSubject<List<BasicData<string>>>> uradySoukr = new Dictionary<string, BasicDataForSubject<List<BasicData<string>>>>();
             object lockObj = new object();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(), searchFunc,
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(), searchFunc,
                   (hit, param) =>
                   {
                       Smlouva s = hit.Source;
@@ -427,25 +428,28 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static string[] SmlouvyIdSPolitiky(Dictionary<string, List<int>> politicisVazbami, List<OsobaEvent> sponzorujiciFirmy, bool showProgress = false)
+        public static async Task<string[]> SmlouvyIdSPolitikyAsync(Dictionary<string, List<int>> politicisVazbami, List<OsobaEvent> sponzorujiciFirmy, bool showProgress = false)
         {
             HashSet<string> allIco = new HashSet<string>(
                 politicisVazbami.Select(m => m.Key).Union(sponzorujiciFirmy.Select(m => m.Ico)).Distinct()
             );
             //smlouvy s politikama
-            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = (size, page) 
-                => Manager.GetESClient().SearchAsync<Smlouva>(a => a
+            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
+            {
+                var client = await Manager.GetESClientAsync();
+                return await client.SearchAsync<Smlouva>(a => a
                     .TrackTotalHits(page * size == 0)
                     .Size(size)
                     .From(page * size)
                     .Source(m => m.Excludes(e => e.Field(o => o.Prilohy)))
                     .Query(q => q.MatchAll())
                     .Scroll("1m")
-            );
+                );
+            };
 
 
             List<string> smlouvyIds = new List<string>();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(Manager.GetESClient(), searchFunc,
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(), searchFunc,
                   (hit, param) =>
                   {
 
@@ -479,7 +483,7 @@ namespace HlidacStatu.Repositories
             return smlouvyIds.ToArray();
         }
 
-        public static IEnumerable<IcoSmlouvaMinMax> GetFirmyCasovePodezreleZalozene(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
+        public static async Task<IEnumerable<IcoSmlouvaMinMax>> GetFirmyCasovePodezreleZalozeneAsync(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
         {
             Util.Consts.Logger.Debug("GetFirmyCasovePodezreleZalozene - getting all ico");
             var allIcos = FirmaRepo.AllIcoInRS();
@@ -493,8 +497,7 @@ namespace HlidacStatu.Repositories
 
 
             Util.Consts.Logger.Debug("GetFirmyCasovePodezreleZalozene - getting first smlouva for all ico from ES");
-            Devmasters.Batch.Manager.DoActionForAll<string, object>(allIcos,
-            (ico, param) =>
+            await Devmasters.Batch.Manager.DoActionForAllAsync<string, object>(allIcos, async (ico, param) =>
             {
                 Firma ff = Firmy.Get(ico);
                 if (Firma.IsValid(ff))

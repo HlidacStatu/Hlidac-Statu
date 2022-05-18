@@ -13,7 +13,7 @@ namespace HlidacStatu.Repositories
         public static async Task SaveAsync(ErrorEnvelope errorEnvelope, ElasticClient client = null)
         {
             errorEnvelope.LastUpdate = DateTime.Now;
-            var es = client ?? Manager.GetESClient_VerejneZakazkyNaProfiluConverted();
+            var es = client ?? await Manager.GetESClient_VerejneZakazkyNaProfiluConvertedAsync();
             await es.IndexDocumentAsync<ErrorEnvelope>(errorEnvelope);
         }
     }

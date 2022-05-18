@@ -16,12 +16,12 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             Ico = ico;
         }
 
-        public static Devmasters.Cache.File.FileCache<Dictionary<string, SubjectNameCache>> CachedCompanies =
-            new Devmasters.Cache.File.FileCache<Dictionary<string, SubjectNameCache>>(
+        public static Devmasters.Cache.File.Cache<Dictionary<string, SubjectNameCache>> CachedCompanies =
+            new Devmasters.Cache.File.Cache<Dictionary<string, SubjectNameCache>>(
                 Init.WebAppDataPath, TimeSpan.Zero, "KIndexCompanies",
                     (o) =>
                     {
-                        return await ListCompaniesAsync();
+                        return ListCompaniesAsync().ConfigureAwait(false).GetAwaiter().GetResult();
                     });
 
         private static async Task<Dictionary<string, SubjectNameCache>> ListCompaniesAsync()

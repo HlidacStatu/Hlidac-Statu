@@ -155,9 +155,9 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<Smlouva> res = null;
                 try
                 {
-                    var client = Manager.GetESClient();
+                    var client = await Manager.GetESClientAsync();
                     if (platnyZaznam.HasValue && platnyZaznam == false)
-                        client = Manager.GetESClient_Sneplatne();
+                        client = await Manager.GetESClient_SneplatneAsync();
                     Indices indexes = client.ConnectionSettings.DefaultIndex;
                     if (includeNeplatne)
                     {

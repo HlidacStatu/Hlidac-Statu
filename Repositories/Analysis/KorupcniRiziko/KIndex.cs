@@ -15,7 +15,8 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
     {
 
         private static AutoUpdateCouchbaseCacheManager<KIndexData, (string ico, bool useTemp)> instanceByIco
-       = AutoUpdateCouchbaseCacheManager<KIndexData, (string ico, bool useTemp)>.GetSafeInstance("kindexByICOv2", KIndexData.GetDirectAsync,
+       = AutoUpdateCouchbaseCacheManager<KIndexData, (string ico, bool useTemp)>.GetSafeInstance("kindexByICOv2", 
+           tuple => KIndexData.GetDirectAsync(tuple).ConfigureAwait(false).GetAwaiter().GetResult(),
 #if (!DEBUG)
                 TimeSpan.FromDays(1)
 #else
@@ -88,9 +89,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         {
             useTempDb = useTempDb ?? !string.IsNullOrEmpty(Devmasters.Config.GetWebConfigValue("UseKindexTemp"));
 
-            var client = Manager.GetESClient_KIndex();
+            var client = await Manager.GetESClient_KIndexAsync();
             if (useTempDb.Value)
-                client = Manager.GetESClient_KIndexTemp();
+                client = await Manager.GetESClient_KIndexTempAsync();
 
 
             ISearchResponse<KIndexData> initialResponse = await client.SearchAsync<KIndexData>

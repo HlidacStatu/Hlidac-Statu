@@ -13,7 +13,7 @@ namespace HlidacStatu.Util.Cache
         private string password = "";
         private string[] serversUrl;
         Func<Key, string> keyValueSelector = null;
-        public CouchbaseCacheManager(string keyPrefix, Func<Key, Task<T>> func, TimeSpan expiration
+        public CouchbaseCacheManager(string keyPrefix, Func<Key, T> func, TimeSpan expiration
             , string[] serversUrl, string couchbaseBucketName, string username, string password
             , Func<Key, string> keyValueSelector = null)
             : base(keyPrefix, func, expiration)

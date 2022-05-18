@@ -158,29 +158,29 @@ namespace HlidacStatu.Repositories.Searching
                 return query;
         }
 
-        public static bool ValidateQuery<T>(ElasticClient client, QueryContainer qc)
+        public static async Task<bool> ValidateQueryAsync<T>(ElasticClient client, QueryContainer qc)
             where T : class
         {
-            return ValidateSpecificQueryRaw<T>(client, qc)?.Valid ?? false;
+            return (await ValidateSpecificQueryRawAsync<T>(client, qc))?.Valid ?? false;
         }
 
-        public static bool ValidateQuery(string query)
+        public static async Task<bool> ValidateQueryAsync(string query)
         {
-            return ValidateQueryRaw(query)?.Valid ?? false;
+            return (await ValidateQueryRawAsync(query))?.Valid ?? false;
         }
 
-        public static ValidateQueryResponse ValidateQueryRaw(string query)
+        public static async Task<ValidateQueryResponse> ValidateQueryRawAsync(string query)
         {
-            return ValidateSpecificQueryRaw<Smlouva>(Manager.GetESClient(),
+            return await ValidateSpecificQueryRawAsync<Smlouva>(await Manager.GetESClientAsync(),
                 SmlouvaRepo.Searching.GetSimpleQuery(query));
         }
 
 
-        public static ValidateQueryResponse ValidateSpecificQueryRaw<T>(ElasticClient client, QueryContainer qc)
+        public static async Task<ValidateQueryResponse> ValidateSpecificQueryRawAsync<T>(ElasticClient client, QueryContainer qc)
             where T : class
         {
-            var res = client.Indices
-                .ValidateQuery<T>(v => v
+            var res = await client.Indices
+                .ValidateQueryAsync<T>(v => v
                     .Query(q => qc)
                 );
 
@@ -206,7 +206,7 @@ namespace HlidacStatu.Repositories.Searching
         {
             prefix = prefix ?? HlidacStatu.Util.StackReport.GetCallingMethod(false, skipFrames: 1);
 
-            var client = elasticClient ?? Manager.GetESClient();
+            var client = elasticClient ?? await Manager.GetESClientAsync();
 
             Func<int, int, Task<ISearchResponse<T>>> searchFunc = null;
 

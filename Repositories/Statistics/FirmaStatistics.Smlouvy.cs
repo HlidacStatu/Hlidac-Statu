@@ -52,7 +52,7 @@ namespace HlidacStatu.Repositories.Statistics
         static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)> _smlouvaCache
             = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
                 .GetSafeInstance("Firma_SmlouvyStatistics_v3_",
-                    (obj) => _calculateSmlouvyStatsAsync(obj.firma, obj.obor),
+                    (obj) => _calculateSmlouvyStatsAsync(obj.firma, obj.obor).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(12),
                     Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                     Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),

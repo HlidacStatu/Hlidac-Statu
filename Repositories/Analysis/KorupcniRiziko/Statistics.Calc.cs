@@ -33,11 +33,11 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         }
 
 
-        public static IEnumerable<Statistics> Calculate(string[] forIcos = null, bool futureKIDX = false)
+        public static async Task<IEnumerable<Statistics>> CalculateAsync(string[] forIcos = null, bool futureKIDX = false)
         {
-            var client = Manager.GetESClient_KIndex();
+            var client = await Manager.GetESClient_KIndexAsync();
             if (futureKIDX)
-                client = Manager.GetESClient_KIndexTemp();
+                client = await Manager.GetESClient_KIndexTempAsync();
 
             int[] calculationYears = Consts.ToCalculationYears;
             Func<int, int, Task<ISearchResponse<KIndexData>>> searchfnc = null;
@@ -63,7 +63,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             List<KIndexData> data = new List<KIndexData>();
             await Repositories.Searching.Tools.DoActionForQueryAsync<KIndexData>(client,
                 searchfnc,
-                (hit, param) =>
+                (hit, _) =>
                 {
                     if (hit.Source.roky.Any(m => m.KIndexReady))
                         data.Add(hit.Source);

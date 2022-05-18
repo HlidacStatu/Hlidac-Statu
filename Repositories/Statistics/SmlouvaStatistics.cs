@@ -13,7 +13,7 @@ namespace HlidacStatu.Repositories.Statistics
         static Util.Cache.CouchbaseCacheManager<StatisticsPerYear<Smlouva.Statistics.Data>, string> _cache
             = Util.Cache.CouchbaseCacheManager<StatisticsPerYear<Smlouva.Statistics.Data>, string>
                 .GetSafeInstance("SmlouvyStatistics_Query_v3_",
-                    (query) => CalculateAsync(query),
+                    (query) => CalculateAsync(query).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(12),
                     Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                     Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),

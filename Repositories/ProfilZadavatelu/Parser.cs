@@ -167,7 +167,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
             }
             if (prof != null)
             {
-                var cli = ES.Manager.GetESClient_VerejneZakazkyNaProfiluRaw();
+                var cli = ES.Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
 
                 foreach (var zak in prof.zakazka)
                 {

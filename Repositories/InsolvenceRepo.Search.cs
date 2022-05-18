@@ -119,7 +119,7 @@ namespace HlidacStatu.Repositories
                 bool withHighlighting = false,
                 AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
             {
-                var client = Manager.GetESClient_Insolvence();
+                var client = await Manager.GetESClient_InsolvenceAsync();
                 var page = search.Page - 1 < 0 ? 0 : search.Page - 1;
 
                 var sw = new Devmasters.DT.StopWatchEx();

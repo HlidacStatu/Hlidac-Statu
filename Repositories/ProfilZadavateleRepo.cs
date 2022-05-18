@@ -19,14 +19,14 @@ namespace HlidacStatu.Repositories
                 && !string.IsNullOrEmpty(profilZadavatele.Url)
             )
             {
-                await (client ?? Manager.GetESClient_ProfilZadavatele())
+                await (client ?? await Manager.GetESClient_ProfilZadavateleAsync())
                     .IndexDocumentAsync<ProfilZadavatele>(profilZadavatele);
             }
         }
 
         public static async Task<ProfilZadavatele> GetByUrlAsync(string url, ElasticClient client = null)
         {
-            var f = await (client ?? Manager.GetESClient_ProfilZadavatele())
+            var f = await (client ?? await Manager.GetESClient_ProfilZadavateleAsync())
                 .SearchAsync<ProfilZadavatele>(s => s
                     .Query(q => q
                         .Term(t => t.Field(ff => ff.Url).Value(url))
@@ -47,7 +47,7 @@ namespace HlidacStatu.Repositories
         {
             if (string.IsNullOrEmpty(profileId))
                 return null;
-            var f = await (client ?? Manager.GetESClient_ProfilZadavatele())
+            var f = await (client ?? await Manager.GetESClient_ProfilZadavateleAsync())
                 .GetAsync<ProfilZadavatele>(profileId);
             if (f.Found)
                 return f.Source;
@@ -59,7 +59,7 @@ namespace HlidacStatu.Repositories
         {
             try
             {
-                var f = await (client ?? Manager.GetESClient_ProfilZadavatele())
+                var f = await (client ?? await Manager.GetESClient_ProfilZadavateleAsync())
                     .SearchAsync<ProfilZadavatele>(s => s
                         .Query(q => q
                             .Term(t => t.Field(ff => ff.Zadavatel.ICO).Value(ico))

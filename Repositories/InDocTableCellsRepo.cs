@@ -15,8 +15,8 @@ namespace HlidacStatu.Repositories
             IndexResponse res; 
             try
             {
-                res = await Manager.GetESClient_InDocTableCells()
-                    .IndexAsync<InDocTableCells>(cells, m => m.Id(cells.Id));
+                var client = await Manager.GetESClient_InDocTableCellsAsync(); 
+                res = await client.IndexAsync<InDocTableCells>(cells, m => m.Id(cells.Id));
             }
             catch (Exception ex)
             {

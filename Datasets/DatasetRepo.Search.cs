@@ -230,7 +230,7 @@ namespace HlidacStatu.Datasets
 
                 }
 
-                ElasticClient client = Manager.GetESClient(ds.DatasetId, idxType: Manager.IndexType.DataSource);
+                ElasticClient client = Manager.GetESClientAsync(ds.DatasetId, idxType: Manager.IndexType.DataSource);
 
                 QueryContainer qc = await GetSimpleQueryAsync(ds, queryString);
 

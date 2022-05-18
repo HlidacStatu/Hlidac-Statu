@@ -13,12 +13,14 @@ namespace HlidacStatu.Repositories
 {
     public static partial class DotaceRepo
     {
+        
+        private static ElasticClient _dotaceClient = await Manager.GetESClient_DotaceAsync();
 
         public static async Task<Dotace> GetAsync(string idDotace)
         {
             if (idDotace == null) throw new ArgumentNullException(nameof(idDotace));
 
-            var response = await Manager.GetESClient_Dotace().GetAsync<Dotace>(idDotace);
+            var response = await _dotaceClient.GetAsync<Dotace>(idDotace);
 
             return response.IsValid
                 ? response.Source
@@ -38,8 +40,7 @@ namespace HlidacStatu.Repositories
             dotace.CalculateTotals();
             dotace.CalculateCerpaniYears();
 
-            var client = Manager.GetESClient_Dotace();
-            var res = await client.IndexAsync(dotace, o => o.Id(dotace.IdDotace)); //druhy parametr musi byt pole, ktere je unikatni
+            var res = await _dotaceClient.IndexAsync(dotace, o => o.Id(dotace.IdDotace)); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)
             {
                 throw new ApplicationException(res.ServerError?.ToString());
@@ -60,7 +61,7 @@ namespace HlidacStatu.Repositories
                 d.CalculateCerpaniYears();
             }
 
-            var result = await Manager.GetESClient_Dotace().IndexManyAsync(dotace);
+            var result = await _dotaceClient.IndexManyAsync(dotace);
 
             if (result.Errors)
             {
@@ -137,7 +138,7 @@ namespace HlidacStatu.Repositories
             ISearchResponse<Dotace> initialResponse = null;
             if (query is null)
             {
-                initialResponse = await Manager.GetESClient_Dotace().SearchAsync<Dotace>(scr => scr
+                initialResponse = await _dotaceClient.SearchAsync<Dotace>(scr => scr
                     .From(0)
                     .Take(scrollSize)
                     .MatchAll()
@@ -145,7 +146,7 @@ namespace HlidacStatu.Repositories
             }
             else
             {
-                initialResponse = await Manager.GetESClient_Dotace().SearchAsync<Dotace>(scr => scr
+                initialResponse = await _dotaceClient.SearchAsync<Dotace>(scr => scr
                     .From(0)
                     .Take(scrollSize)
                     .Query(q => query)
@@ -165,7 +166,7 @@ namespace HlidacStatu.Repositories
             bool isScrollSetHasData = true;
             while (isScrollSetHasData)
             {
-                ISearchResponse<Dotace> loopingResponse = await Manager.GetESClient_Dotace().ScrollAsync<Dotace>(scrollTimeout, scrollid);
+                ISearchResponse<Dotace> loopingResponse = await _dotaceClient.ScrollAsync<Dotace>(scrollTimeout, scrollid);
                 if (loopingResponse.IsValid)
                 {
                     foreach (var dotace in loopingResponse.Documents)
@@ -177,7 +178,7 @@ namespace HlidacStatu.Repositories
                 isScrollSetHasData = loopingResponse.Documents.Any();
             }
 
-            await Manager.GetESClient_Dotace().ClearScrollAsync(new ClearScrollRequest(scrollid));
+            await _dotaceClient.ClearScrollAsync(new ClearScrollRequest(scrollid));
         }
 
     }

@@ -152,9 +152,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
             //calculate fields before saving
             this.LastSaved = DateTime.Now;
-            var client = Manager.GetESClient_KIndex();
+            var client = await Manager.GetESClient_KIndexAsync();
             if (useTempDb)
-                client = Manager.GetESClient_KIndexTemp();
+                client = await Manager.GetESClient_KIndexTempAsync();
 
             var res = await client.IndexAsync<KIndexData>(this, o => o.Id(this.Ico)); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)
@@ -179,9 +179,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             if (Consts.KIndexExceptions.Contains(param.ico) && param.useTempDb == false)
                 return null;
 
-            var client = Manager.GetESClient_KIndex();
+            var client = await Manager.GetESClient_KIndexAsync();
             if (param.useTempDb)
-                client = Manager.GetESClient_KIndexTemp();
+                client = await Manager.GetESClient_KIndexTempAsync();
 
 
             var res = await client.GetAsync<KIndexData>(param.ico);
@@ -252,9 +252,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         public async Task<IOrderedEnumerable<Backup>> GetPreviousVersionsAsync(bool futureData = false)
         {
-            ElasticClient client = Manager.GetESClient_KIndexBackup();
+            ElasticClient client = await Manager.GetESClient_KIndexBackupAsync();
             if (futureData)
-                client = Manager.GetESClient_KIndexBackupTemp();
+                client = await Manager.GetESClient_KIndexBackupTempAsync();
 
             ISearchResponse<Backup> searchResults = null;
             try
@@ -290,9 +290,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         public static async Task<Backup> GetPreviousVersionAsync(string id)
         {
-            ElasticClient client = Manager.GetESClient_KIndexBackup();
+            ElasticClient client = await Manager.GetESClient_KIndexBackupAsync();
             if (!string.IsNullOrEmpty(Devmasters.Config.GetWebConfigValue("UseKindexTemp")))
-                client = Manager.GetESClient_KIndexBackupTemp();
+                client = await Manager.GetESClient_KIndexBackupTempAsync();
 
             try
             {

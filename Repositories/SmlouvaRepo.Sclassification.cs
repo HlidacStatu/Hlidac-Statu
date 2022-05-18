@@ -16,7 +16,7 @@ namespace HlidacStatu.Repositories
     {
         private static volatile FileCacheManager stemCacheManager
             = FileCacheManager.GetSafeInstance("SmlouvyStems",
-                smlouvaKeyId => GetRawStemsFromServerAsync(smlouvaKeyId),
+                smlouvaKeyId => GetRawStemsFromServerAsync(smlouvaKeyId).ConfigureAwait(false).GetAwaiter().GetResult(),
                 TimeSpan.FromDays(365 * 10)); //10 years
 
         private static async Task<byte[]> GetRawStemsFromServerAsync(KeyAndId smlouvaKeyId)
@@ -175,7 +175,7 @@ namespace HlidacStatu.Repositories
         /// </summary>
         /// <param name="typeValues">new classification</param>
         /// <param name="username">author</param>
-        public static void OverrideClassification(this Smlouva smlouva, int[] typeValues, string username)
+        public static async Task OverrideClassificationAsync(this Smlouva smlouva, int[] typeValues, string username)
         {
             if (typeValues.Length == 0)
                 throw new ArgumentException($"typeValues is empty");
