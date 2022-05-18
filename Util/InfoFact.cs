@@ -57,7 +57,7 @@ namespace HlidacStatu.Util
             if (taken.Count < number)
             {
                 if (shuffle && taken.Count() > 1)
-                    taken.AddRange(infof.Shuffle().Take(number - taken.Count));
+                    taken.AddRange(infof.ShuffleMe().Take(number - taken.Count));
                 else
                     taken.AddRange(infof.Take(number - taken.Count));
             }

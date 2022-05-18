@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace HlidacStatu.XLib
 {
-    public partial class Search
+    public class Search
     {
 
         public class MultiResult
@@ -132,7 +132,7 @@ namespace HlidacStatu.XLib
             if (string.IsNullOrEmpty(query))
                 return res;
 
-            if (!Tools.ValidateQueryAsync(query))
+            if (!(await Tools.ValidateQueryAsync(query)))
             {
                 res.Smlouvy = new SmlouvaSearchResult();
                 res.Smlouvy.Q = query;

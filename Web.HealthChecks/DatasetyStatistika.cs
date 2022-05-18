@@ -12,18 +12,18 @@ namespace HlidacStatu.Web.HealthChecks
     {
         Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<DatasetStat>> statistiky =
             new Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<DatasetStat>>(
-                TimeSpan.FromMinutes(60), "DatasetStat_all", async _ =>
+                TimeSpan.FromMinutes(60), "DatasetStat_all", _ =>
                 {
                     try
                     {
                         List<DatasetStat> res = new List<DatasetStat>();
-                        foreach (var ds in HlidacStatu.Datasets.DataSetDB.ProductionDataSets.Get())
+                        foreach (var ds in Datasets.DataSetDB.ProductionDataSets.Get())
                         {
                             var item = new DatasetStat();
                             item.Dataset = ds;
 
-                            var allrec = await ds.SearchDataAsync("*", 1, 1, sort: "DbCreated desc",
-                                exactNumOfResults: true);
+                            var allrec = ds.SearchDataAsync("*", 1, 1, sort: "DbCreated desc", exactNumOfResults: true)
+                                .ConfigureAwait(false).GetAwaiter().GetResult();
                             item.PocetCelkem = allrec.Total;
                             if (allrec.Total > 0)
                             {
@@ -58,9 +58,10 @@ namespace HlidacStatu.Web.HealthChecks
                                         break;
                                 }
 
-                                var pocet = await ds.SearchDataAsync(
-                                    $"DbCreated:[{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")} TO *]", 1, 0,
-                                    exactNumOfResults: true);
+                                var pocet = ds.SearchDataAsync(
+                                        $"DbCreated:[{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")} TO *]", 1, 0,
+                                        exactNumOfResults: true)
+                                    .ConfigureAwait(false).GetAwaiter().GetResult();
                                 if (pocet.IsValid)
                                     item.PocetZaInterval.Add(interval.Value, pocet.Total);
                                 else
@@ -87,19 +88,19 @@ namespace HlidacStatu.Web.HealthChecks
             public Dictionary<IntervalEnum, long> PocetZaInterval { get; set; } = new Dictionary<IntervalEnum, long>();
         }
 
-        [Devmasters.Enums.ShowNiceDisplayName]
+        [ShowNiceDisplayName]
         public enum IntervalEnum
         {
-            [Devmasters.Enums.NiceDisplayName("Den")]
+            [NiceDisplayName("Den")]
             Day,
 
-            [Devmasters.Enums.NiceDisplayName("Týden")]
+            [NiceDisplayName("Týden")]
             Week,
 
-            [Devmasters.Enums.NiceDisplayName("Měsíc")]
+            [NiceDisplayName("Měsíc")]
             Month,
 
-            [Devmasters.Enums.NiceDisplayName("Rok")]
+            [NiceDisplayName("Rok")]
             Year
         }
 
