@@ -613,7 +613,7 @@ text zpravy: {txt}
             if (string.IsNullOrWhiteSpace(Id))
                 return NotFound();
 
-            var model = SmlouvaRepo.LoadAsync(Id);
+            var model = await SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return NotFound();
