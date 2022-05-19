@@ -10,7 +10,7 @@
     ViewBag.Title = Model.Text ?? $"Hlídač státu: Analýza příjemců peněz pro dotaz \"{Model.Query}\"";
 
     HlidacStatu.Lib.Analytics.StatisticsPerYear<Smlouva.Statistics.Data> statistics =
-        new StatisticsPerYear<Smlouva.Statistics.Data>(SmlouvaStatistics.CalculateAsync(Model.Query));
+        new StatisticsPerYear<Smlouva.Statistics.Data>(await SmlouvaStatistics.CalculateAsync(Model.Query));
 
     //var seasonStat = statistics.CurrentSeasonStatistics();
     var currentSeasonYear = statistics.CurrentSeasonYear();

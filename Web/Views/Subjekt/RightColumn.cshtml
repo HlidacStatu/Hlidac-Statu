@@ -47,7 +47,7 @@
         }
         else
         {
-            var rppOsoby = Model.CeoFromRPPAsync();
+            var rppOsoby = await Model.CeoFromRPPAsync();
             if (rppOsoby.Count() > 0)
             {
                 <div class="col-sm-4">

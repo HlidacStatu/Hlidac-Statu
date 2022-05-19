@@ -13,8 +13,6 @@
     {
         oborFromId = ob;
     }
-
-
 }
 
 @if (oborFromId.HasValue == false)
@@ -89,7 +87,7 @@
                         }
                         else
                         {
-                            var rppOsoby = firma.CeoFromRPPAsync();
+                            var rppOsoby = await firma.CeoFromRPPAsync();
                             if (rppOsoby.Count() > 0)
                             {
                                 <div class="person-profile-thumb person-profile-thumb--small" style="float:left">

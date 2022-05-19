@@ -236,12 +236,12 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize]
-        public ActionResult VZProfilesList()
+        public async Task<ActionResult> VZProfilesList()
         {
             
             List<VZProfilesListRes> list = new();
-            var res = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync()
-                .Search<ZakazkaRaw>(s => s
+            var client = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
+            var res = await client.SearchAsync<ZakazkaRaw>(s => s
                     .Query(q => q.Bool(b => b.MustNot(mn => mn.Term(t => t.Field(f => f.Converted).Value(1)))))
                     .Size(0)
                     .Aggregations(agg => agg
@@ -256,8 +256,8 @@ namespace HlidacStatu.Web.Controllers
             {
                 foreach (KeyedBucket<object> val in ((BucketAggregate)res.Aggregations["profiles"]).Items)
                 {
-                    var resProf = await Manager.GetESClient_VZAsync()
-                        .Get<ProfilZadavatele>((string)val.Key);
+                    var vzClient = await Manager.GetESClient_VZAsync();
+                    var resProf = await client.GetAsync<ProfilZadavatele>((string)val.Key);
                     list.Add(new VZProfilesListRes()
                     { profileId = (string)val.Key, url = resProf?.Source?.Url, count = val.DocCount });
                 }
@@ -268,15 +268,15 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize]
-        public ActionResult VZList(string _id)
+        public async Task<ActionResult> VZList(string _id)
         {
             string id = _id;
 
             if (string.IsNullOrEmpty(id))
                 return new NotFoundResult();
-            
-            var res = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync()
-                .Search<ZakazkaRaw>(s => s
+
+            var client = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
+            var res = await client.SearchAsync<ZakazkaRaw>(s => s
                     .Query(q => q
                         .QueryString(qs =>
                             qs.DefaultOperator(Operator.And).Query("NOT(converted:1) AND profil:\"" + id + "\""))
@@ -298,15 +298,15 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpGet()]
         [Authorize]
-        public ActionResult VZDetail(string _id)
+        public async Task<ActionResult> VZDetail(string _id)
         {
             string id = _id;
 
             if (string.IsNullOrEmpty(id))
                 return new NotFoundResult();
 
-            var res = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync()
-                .Search<ZakazkaRaw>(s => s
+            var client = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
+            var res = await client.SearchAsync<ZakazkaRaw>(s => s
                     .Query(q => q
                         .QueryString(qs => qs.DefaultOperator(Operator.And).Query("zakazkaId:\"" + id + "\""))
                     )
@@ -386,7 +386,7 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
-        public ActionResult Status()
+        public async Task<ActionResult> Status()
         {
             ClusterHealthResponse res = null;
             int num = 0;
@@ -394,13 +394,13 @@ namespace HlidacStatu.Web.Controllers
             string nodes = "-------------------------\n";
             try
             {
-                res = Manager.GetESClientAsync().Cluster.Health();
+                var client = await Manager.GetESClientAsync(); 
+                res = client.Cluster.Health();
                 num = res?.NumberOfNodes ?? 0;
                 status = res?.Status.ToString() ?? "unknown";
 
                 //GET /_cat/nodes?v&h=m,name,ip,u&s=name
-                var catr = Manager.GetESClientAsync()
-                    .LowLevel.Cat.Nodes<Elasticsearch.Net.StringResponse>(
+                var catr = client.LowLevel.Cat.Nodes<Elasticsearch.Net.StringResponse>(
                         new Elasticsearch.Net.Specification.CatApi.CatNodesRequestParameters()
                         {
                             Headers = new[] { "m", "name", "ip", "u" },
@@ -496,7 +496,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "NasiPoliticiAdmin")]
         public ActionResult Companies(string q)
         {
-            Devmasters.Cache.LocalMemory.LocalMemoryCache<Index<Autocomplete>> FullTextSearchCache =
+            Devmasters.Cache.LocalMemory.Cache<Index<Autocomplete>> FullTextSearchCache =
                 new(TimeSpan.FromDays(30),
                     "nasipolitici_firmy_autocomplete",
                     o => { return BuildNPFirmySearchIndex(); });
@@ -724,9 +724,9 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize(Roles = "TeamMember")]
-        public ActionResult PolitikFromText(string text)
+        public async Task<ActionResult> PolitikFromText(string text)
         {
-            var oo = OsobaRepo.Searching.GetFirstPolitikFromTextAsync(text);
+            var oo = await OsobaRepo.Searching.GetFirstPolitikFromTextAsync(text);
 
             if (oo != null)
             {
@@ -741,15 +741,14 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize(Roles = "TeamMember")]
-        public ActionResult PoliticiFromText(string text)
+        public async Task<ActionResult> PoliticiFromText(string text)
         {
-            var oo = OsobaRepo.Searching.GetBestPoliticiFromTextAsync(text);
+            var oo = await OsobaRepo.Searching.GetBestPoliticiFromTextAsync(text);
 
             if (oo != null)
             {
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    oo
-                        .Select(o => new { osobaid = o.NameId, jmeno = o.Jmeno, prijmeni = o.Prijmeni })
+                    oo.Select(o => new { osobaid = o.NameId, jmeno = o.Jmeno, prijmeni = o.Prijmeni })
                         .ToArray()
                 ), "application/json");
             }

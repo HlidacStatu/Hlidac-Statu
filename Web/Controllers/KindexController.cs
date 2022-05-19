@@ -202,8 +202,8 @@ text zpravy: {txt}";
         // Used for searching
         public JsonResult FindCompany(string id)
         {
-            Devmasters.Cache.LocalMemory.LocalMemoryCache<Index<SubjectNameCache>> FullTextSearchCache =
-                new Devmasters.Cache.LocalMemory.LocalMemoryCache<Index<SubjectNameCache>>(TimeSpan.Zero,
+            Devmasters.Cache.LocalMemory.Cache<Index<SubjectNameCache>> FullTextSearchCache =
+                new Devmasters.Cache.LocalMemory.Cache<Index<SubjectNameCache>>(TimeSpan.Zero,
                 o =>
                 {
                     return new Index<SubjectNameCache>(SubjectNameCache.GetCompanies().Values);

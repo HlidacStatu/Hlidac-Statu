@@ -24,11 +24,11 @@ namespace HlidacStatu.Web.Framework.Report
             return dataCache.Get();
         }
 
-        static Devmasters.Cache.LocalMemory.LocalMemoryCache<List<covid_pomoc>> dataCache =
-            new(TimeSpan.FromMinutes(10), "covid_pomoc", async (o) =>
+        static Devmasters.Cache.LocalMemory.Cache<List<covid_pomoc>> dataCache =
+            new(TimeSpan.FromMinutes(10), "covid_pomoc", (o) =>
             {
                 var ds = DataSet.CachedDatasets.Get("pomoc-covid");
-                return (await ds.GetAllDataAsync<covid_pomoc>()).ToList();
+                return ds.GetAllDataAsync<covid_pomoc>().ConfigureAwait(false).GetAwaiter().GetResult().ToList();
             });
 
     }
