@@ -11,7 +11,7 @@
     <PackageReference Include="Devmasters.Batch" Version="4.0.0" />
     <PackageReference Include="Devmasters.Collections" Version="4.0.0" />
     <PackageReference Include="Devmasters.Core" Version="4.0.0" />
-    <PackageReference Include="Devmasters.DT" Version="4.0.0" />
+    <PackageReference Include="Devmasters.DT" Version="4.0.3" />
     <PackageReference Include="Devmasters.Lang" Version="4.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.11" />
