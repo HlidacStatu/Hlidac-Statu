@@ -23,7 +23,8 @@ namespace HlidacStatu.Repositories.Searching.Rules
         }
 
 
-        public readonly static Dictionary<int, string[]> AllValues = await GetAllValuesAsync();
+        public readonly static Dictionary<int, string[]> AllValues = GetAllValuesAsync()
+            .ConfigureAwait(false).GetAwaiter().GetResult();
 
         private static async Task<Dictionary<int, string[]>> GetAllValuesAsync()
         {

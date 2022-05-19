@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -16,10 +17,10 @@ namespace HlidacStatu.Repositories
     {
         static string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
 
-        private static void PrepareBeforeSave(Firma firma, bool updateLastUpdateValue = true)
+        private static async Task PrepareBeforeSaveAsync(Firma firma, bool updateLastUpdateValue = true)
         {
             firma.JmenoAscii = TextUtil.RemoveDiacritics(firma.Jmeno);
-            firma.SetTypAsync();
+            await firma.SetTypAsync();
 
         }
 

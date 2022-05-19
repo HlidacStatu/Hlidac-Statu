@@ -13,7 +13,8 @@ namespace HlidacStatu.Repositories
 {
     public static partial class OsobyEsRepo
     {
-        private static readonly ElasticClient _esClient = await Manager.GetESClient_OsobyAsync();
+        private static readonly ElasticClient _esClient = Manager.GetESClient_OsobyAsync()
+            .ConfigureAwait(false).GetAwaiter().GetResult();
 
         public static async Task<bool> DeleteAllAsync()
         {

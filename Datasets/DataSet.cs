@@ -601,7 +601,7 @@ namespace HlidacStatu.Datasets
             if (validateSchema)
             {
                 //throws error if schema is not valid
-                CheckSchema(obj);
+                await CheckSchemaAsync(obj);
             }
 
             if (string.IsNullOrEmpty(id))
@@ -678,7 +678,7 @@ namespace HlidacStatu.Datasets
             foreach (var jtoken in jArray)
             {
                 var jobj = (JObject)jtoken;
-                CheckSchema(jobj);
+                await CheckSchemaAsync(jobj);
 
                 jobj.Add("DbCreated", JToken.FromObject(DateTime.UtcNow));
                 jobj.Add("DbCreatedBy", JToken.FromObject(createdBy));
@@ -817,7 +817,7 @@ namespace HlidacStatu.Datasets
         /// <summary>
         /// Checks if Json is valid. If not throws error
         /// </summary>
-        private async Task<bool> CheckSchema(JObject obj)
+        private async Task<bool> CheckSchemaAsync(JObject obj)
         {
             JSchema schema = (await DataSetDB.Instance.GetRegistrationAsync(datasetId)).GetSchema();
 

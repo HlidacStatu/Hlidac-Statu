@@ -44,7 +44,7 @@ namespace HlidacStatu.Web.Controllers
 
             if (typeVals.Count > 0)
             {
-                smlouva.OverrideClassificationAsync(typeVals.ToArray(), this.User.Identity.Name);
+                await smlouva.OverrideClassificationAsync(typeVals.ToArray(), this.User.Identity.Name);
             }
 
             return Redirect(smlouva.GetUrl(true));

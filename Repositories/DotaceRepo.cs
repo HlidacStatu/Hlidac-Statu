@@ -14,7 +14,8 @@ namespace HlidacStatu.Repositories
     public static partial class DotaceRepo
     {
         
-        private static ElasticClient _dotaceClient = await Manager.GetESClient_DotaceAsync();
+        private static ElasticClient _dotaceClient = Manager.GetESClient_DotaceAsync()
+            .ConfigureAwait(false).GetAwaiter().GetResult();
 
         public static async Task<Dotace> GetAsync(string idDotace)
         {
