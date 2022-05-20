@@ -225,7 +225,7 @@ namespace HlidacStatu.Repositories
             return serverIds;
         }
         static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>> _allActiveServers24hoursStatsCache =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>>(TimeSpan.FromHours(6), "_allActiveStatniWebyServersStat",
+            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>>(TimeSpan.FromMinutes(20), "_allActiveStatniWebyServersStat",
                 (o) =>
                 {
                     var res = AllActiveServers()
@@ -237,7 +237,7 @@ namespace HlidacStatu.Repositories
         );
 
         static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>> _allActiveServersWeekStatsCache =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>>(TimeSpan.FromHours(6), "_allActiveStatniWebyServersStat",
+            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>>(TimeSpan.FromHours(6), "_allActiveStatniWebyServersStatWeek",
                 (o) =>
                 {
                     var res = AllActiveServers()
@@ -319,7 +319,7 @@ namespace HlidacStatu.Repositories
 
 
         private static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]> uptimeServersCache1Day =
-      new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]>(TimeSpan.FromMinutes(1),
+      new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]>(TimeSpan.FromMinutes(2),
           (obj) =>
           {
               var res = _availability(24);

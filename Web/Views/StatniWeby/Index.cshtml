@@ -19,9 +19,11 @@
         .avail_OK {
             color: @(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.OK));
         }
+
         .avail_Pomale {
             color: @(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Pomalé));
         }
+
         .avail_Nedostupne {
             color: @(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Nedostupné));
         }
@@ -49,7 +51,7 @@
 }
     <partial name="~/Views/StatniWeby/_Info.cshtml" model="@ViewData" />
 
-@{
+    @{
     var data = HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()
             .OrderByDescending(m => m.SSLGrade())
             .ToArray();
@@ -138,61 +140,111 @@
 }
 <div class="clearfix" style="margin-bottom:30px"></div>
 <hr />
-    @{
-    var topNedostupnosti = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers24hoursStat()
+@{
+    var topNedostupnosti24H = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers24hoursStat()
                     //.Where(m=>m.Host.Id == 108)
                     .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
                     .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
                     .Take(30);
 
-    int pocetNedostupnost = Math.Max(10, topNedostupnosti.Count() / 2);
+    var topNedostupnostiW = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServersWeekStat()
+                    //.Where(m=>m.Host.Id == 108)
+                    .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                    .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
+                    .Take(30);
+
+    int pocetNedostupnost = Math.Max(10, topNedostupnosti24H.Count() / 2);
 }
 
-@if (topNedostupnosti.Count() > 0)
+@if (topNedostupnosti24H.Count() > 0 || topNedostupnostiW.Count() > 0)
 {
-    <h2>Nejhorší dostupnosti služeb <small>za posledních 24 hodin</small></h2>
-    <p>
-        Služby, které mají největší výpadky za posledních 24 hodin.
-    </p>
-            @foreach (var item in topNedostupnosti)
-            {
-                pocetNedostupnost = pocetNedostupnost - 1;
-                if (pocetNedostupnost == 0)
-                {
-                    <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target=".next_charts">
-                        Ukázat další
-                    </button>
-                }
-                
-            <div class="row collapse@(pocetNedostupnost>0 ? ".show" : " next_charts") ">
-                <div class="col-sm-8 col-xs-12">
-                    <a href="@item.Host.pageUrl">Služba @(item.Host.Name)</a>
-                    @if (item.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
-                    {
-                        <span>
-                            nedostupná <span class="avail_Nedostupne">@item.Statistics().PercentOfTime.Nedostupne.ToString("P2") (@HlidacStatu.XLib.RenderTools.FormatAvailability(item.Statistics().DurationTotal.Nedostupne, HlidacStatu.XLib.RenderTools.DateTimePart.Minute))</span>
-                        </span>
-                    }
-                    @if (item.Statistics().DurationTotal.Pomale.TotalSeconds > 0 && item.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
-                    {
-                        <span> a </span>
+    <h2>Nejdelší výpadky služeb </h2>
+    <div class="col">
+        <button class="btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target=".chart">Ukázat výpadky graficky</button>
+    </div>
+    <div class="row">
+        @if (topNedostupnosti24H.Count() > 0)
+        {
+            <div class="col-sm-6 col-xs-12">
+                <h2>za posledních 24 hodin</h2>
+                <ol>
 
-                    }
-                    @if (item.Statistics().DurationTotal.Pomale.TotalSeconds > 0)
+                    @foreach (var item in topNedostupnosti24H)
                     {
-                        <span >
-                            pomalá <span class="avail_Pomale">@item.Statistics().PercentOfTime.Pomale.ToString("P2") (@HlidacStatu.XLib.RenderTools.FormatAvailability(item.Statistics().DurationTotal.Pomale, HlidacStatu.XLib.RenderTools.DateTimePart.Minute))</span>
-                        </span>
+                        <li>
+                            <div>
+                                <a href="@item.Host.pageUrl">@(Devmasters.TextUtil.ShortenText( item.Host.Name,38))</a>
+                                @if (item.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                                {
+                                    <span>
+                                        nedostupná <span class="avail_Nedostupne">@item.Statistics().PercentOfTime.Nedostupne.ToString("P2")</span>
+                                    </span>
+                                }
+                                @if (item.Statistics().DurationTotal.Pomale.TotalSeconds > 0 && item.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                                {
+                                    <span> a </span>
+
+                                }
+                                @if (item.Statistics().DurationTotal.Pomale.TotalSeconds > 0)
+                                {
+                                    <span>
+                                        pomalá <span class="avail_Pomale">@item.Statistics().PercentOfTime.Pomale.ToString("P2")</span>
+                                    </span>
+                                }
+                                .
+                            </div>
+                            <div class="row collapse chart">
+                                @WebyChartUtil.Chart("w" + item.Host.Id, 24, 30, true, item.Host.Hash,showLegend:false, showYAxisNames:false, showXAxis:false)
+                            </div>
+                        </li>
                     }
 
-                </div>
-                <div class="col-sm-4 col-xs-12 ">
-                    @WebyChartUtil.Chart("w" + item.Host.Id, 24, 30, true, item.Host.Hash,showLegend:false, showYAxisNames:false, showXAxis:false)
-                </div>
+                </ol>
+
             </div>
+        }
 
-            }
-        
+        @if (topNedostupnostiW.Count() > 0)
+        {
+            <div class="col-sm-6 col-xs-12">
+                <h2>za poslední týden</h2>
+                <ol>
+
+                    @foreach (var item in topNedostupnostiW)
+                    {
+                        <li>
+                            <div>
+                                <a href="@item.Host.pageUrl">@(Devmasters.TextUtil.ShortenText( item.Host.Name,38))</a>
+                                @if (item.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                                {
+                                    <span>
+                                        nedostupná <span class="avail_Nedostupne">@item.Statistics().PercentOfTime.Nedostupne.ToString("P2")</span>
+                                    </span>
+                                }
+                                @if (item.Statistics().DurationTotal.Pomale.TotalSeconds > 0 && item.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                                {
+                                    <span> a </span>
+
+                                }
+                                @if (item.Statistics().DurationTotal.Pomale.TotalSeconds > 0)
+                                {
+                                    <span>
+                                        pomalá <span class="avail_Pomale">@item.Statistics().PercentOfTime.Pomale.ToString("P2")</span>
+                                    </span>
+                                }
+                                .
+                            </div>
+                            <div class="row collapse chart">
+                                @WebyChartUtil.Chart("w" + item.Host.Id, 24*7, 30, true, item.Host.Hash,showLegend:false, showYAxisNames:false, showXAxis:false)
+                            </div>
+                        </li>
+                    }
+
+                </ol>
+
+            </div>
+        }
+    </div>
 }
 
 <div class="clearfix"></div>
