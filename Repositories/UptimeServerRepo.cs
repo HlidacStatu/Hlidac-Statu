@@ -220,8 +220,8 @@ namespace HlidacStatu.Repositories
             }
             return serverIds;
         }
-        static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>> _allActiveServers24hoursStatsCache =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>>(TimeSpan.FromHours(6), "_allActiveStatniWebyServersStat",
+        static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<UptimeServer.HostAvailability>> _allActiveServers24hoursStatsCache =
+            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<UptimeServer.HostAvailability>>(TimeSpan.FromHours(6), "_allActiveStatniWebyServersStat",
                 (o) =>
                 {
                     var res = AllActiveServers()
@@ -232,8 +232,8 @@ namespace HlidacStatu.Repositories
                 }
         );
 
-        static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>> _allActiveServersWeekStatsCache =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>>(TimeSpan.FromHours(6), "_allActiveStatniWebyServersStat",
+        static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<UptimeServer.HostAvailability>> _allActiveServersWeekStatsCache =
+            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<UptimeServer.HostAvailability>>(TimeSpan.FromHours(6), "_allActiveStatniWebyServersStat",
                 (o) =>
                 {
                     var res = AllActiveServers()
@@ -244,8 +244,8 @@ namespace HlidacStatu.Repositories
                 }
         );
 
-        static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer[]> _allActiveServersCache =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer[]>(TimeSpan.FromMinutes(30), "_allActiveStatniWebyServers",
+        static Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeServer[]> _allActiveServersCache =
+            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeServer[]>(TimeSpan.FromMinutes(30), "_allActiveStatniWebyServers",
                 (o) =>
             {
                 using (Entities.DbEntities db = new HlidacStatu.Entities.DbEntities())
@@ -300,8 +300,7 @@ namespace HlidacStatu.Repositories
 
             UptimeServer.HostAvailability[] allData = uptimeServersCache1Day.Get();
 
-            List<UptimeServer.HostAvailability> choosen = new List<UptimeServer.HostAvailability>();
-            choosen = allData.Where(m => serverIds.Contains(m.Host.Id)).ToList();
+            List<UptimeServer.HostAvailability> choosen = allData.Where(m => serverIds.Contains(m.Host.Id)).ToList();
             return choosen;
         }
 
