@@ -1,3 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Threading.Tasks;
+
 using HlidacStatu.Entities;
 using HlidacStatu.Util.Cache;
 
@@ -5,12 +12,6 @@ using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Writes;
 
 using Microsoft.EntityFrameworkCore;
-
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
@@ -23,7 +24,7 @@ namespace HlidacStatu.Repositories
             else
                 return Firmy.GetJmeno(server.ICO);
         }
-        public static void SaveAlert(int serverId,Alert.AlertStatus status)
+        public static void SaveAlert(int serverId, Alert.AlertStatus status)
         {
             HlidacStatu.Connectors.DirectDB.NoResult("exec UptimeServer_Savealert @serverId, @lastAlertedStatus, @lastAlertSent ",
                 new IDataParameter[]
@@ -158,14 +159,22 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static List<UptimeServer> GetServersToCheck(int numOfServers = 30)
+        public static List<UptimeServer> GetServersToCheck(int numOfServers = 30, bool debug = false)
         {
             try
             {
-
+                List<UptimeServer> list = null;
                 using (DbEntities db = new DbEntities())
                 {
-                    var list = db.UptimeServers.FromSqlInterpolated($"exec GetUptimeServers {numOfServers}")
+                    if (debug)
+                    {
+                        list = db.UptimeServers
+                            .AsNoTracking()
+                            .Where(m => m.Id == 230)
+                            .ToList();
+                    }
+                    else
+                        list = db.UptimeServers.FromSqlInterpolated($"exec GetUptimeServers {numOfServers}")
                         .AsNoTracking()
                         .ToList();
 
@@ -180,13 +189,21 @@ namespace HlidacStatu.Repositories
 
         }
 
+        public const string NotInGroup = "other";
         public static IEnumerable<int> ServersIn(string group)
         {
             int[] serverIds = null;
             using (Entities.DbEntities db = new HlidacStatu.Entities.DbEntities())
             {
-                var servers = AllActiveServers(db);
-                if (Devmasters.TextUtil.IsNumeric(group))
+                var servers = AllActiveServers();
+                if (group == NotInGroup)
+                {
+                    serverIds = servers
+                        .Where(m => m.GroupArray()?.Count() == 0)
+                        .Select(m => m.Id)
+                        .ToArray();
+                }
+                else if (Devmasters.TextUtil.IsNumeric(group))
                     serverIds = servers
                         .Where(m => m.Priorita == Convert.ToInt32(group))
                         .Select(m => m.Id)
@@ -203,20 +220,54 @@ namespace HlidacStatu.Repositories
             }
             return serverIds;
         }
+        static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>> _allActiveServers24hoursStatsCache =
+            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>>(TimeSpan.FromHours(6), "_allActiveStatniWebyServersStat",
+                (o) =>
+                {
+                    var res = AllActiveServers()
+                        .AsParallel()
+                        .Select(m => AvailabilityForDayById(m.Id))
+                        .ToList();
+                    return res;
+                }
+        );
 
+        static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>> _allActiveServersWeekStatsCache =
+            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>>(TimeSpan.FromHours(6), "_allActiveStatniWebyServersStat",
+                (o) =>
+                {
+                    var res = AllActiveServers()
+                        .AsParallel()
+                        .Select(m => AvailabilityForWeekById(m.Id))
+                        .ToList();
+                    return res;
+                }
+        );
 
-        public static UptimeServer[] AllActiveServers(Entities.DbEntities existingConn = null)
+        static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer[]> _allActiveServersCache =
+            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer[]>(TimeSpan.FromMinutes(30), "_allActiveStatniWebyServers",
+                (o) =>
+            {
+                using (Entities.DbEntities db = new HlidacStatu.Entities.DbEntities())
+                    return db.UptimeServers
+                        .AsNoTracking()
+                        .Where(m => m.Active == 1)
+                        .ToArray();
+            }
+        );
+        public static List<UptimeServer.HostAvailability> AllActiveServers24hoursStat()
         {
-            if (existingConn != null)
-                return existingConn.UptimeServers.AsNoTracking().ToArray();
+            return _allActiveServers24hoursStatsCache.Get();
+        }
 
+        public static List<UptimeServer.HostAvailability> AllActiveServersWeekStat()
+        {
+            return _allActiveServersWeekStatsCache.Get();
+        }
 
-            using (Entities.DbEntities db = new HlidacStatu.Entities.DbEntities())
-                return db.UptimeServers
-                    .AsNoTracking()
-                    .Where(m => m.Active == 1)
-                    .ToArray();
-
+        public static UptimeServer[] AllActiveServers()
+        {
+            return _allActiveServersCache.Get();
         }
 
         public static IEnumerable<UptimeServer.HostAvailability> AvailabilityForDayByGroup(string group)
@@ -240,11 +291,11 @@ namespace HlidacStatu.Repositories
             return _availability(serverIds, intervalBack);
         }
 
-        public static IEnumerable<UptimeServer.HostAvailability> AvailabilityForDayByIds(int[] serverIds)
+        public static IEnumerable<UptimeServer.HostAvailability> AvailabilityForDayByIds(IEnumerable<int> serverIds)
         {
-            if (serverIds?.Length == null)
+            if (serverIds?.Count() == null)
                 return null;
-            if (serverIds.Length == 0)
+            if (serverIds.Count() == 0)
                 return null;
 
             UptimeServer.HostAvailability[] allData = uptimeServersCache1Day.Get();
@@ -314,7 +365,7 @@ namespace HlidacStatu.Repositories
                     )
                 .ToArray()
                 ;
-            
+
 
             return zabList;
         }

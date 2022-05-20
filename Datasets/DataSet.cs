@@ -208,7 +208,7 @@ namespace HlidacStatu.Datasets
             if (_mapping == null)
             {
                 var getIndexResponse = await client.Indices.GetAsync(client.ConnectionSettings.DefaultIndex);
-                IIndexState remote = getIndexResponse.Indices[client.ConnectionSettings.DefaultIndex];
+                IIndexState remote = getIndexResponse.Indices.Count>0 ? getIndexResponse.Indices.FirstOrDefault().Value : null;
                 var dataMapping = remote?.Mappings?.Properties;
                 if (dataMapping == null)
                     return new CorePropertyBase[] { };
@@ -1036,11 +1036,11 @@ namespace HlidacStatu.Datasets
             await client.ClearScrollAsync(new ClearScrollRequest(scrollid));
 
             var expConverter = new ExpandoObjectConverter();
-            
+
             var data = results
                 .Select(m => JsonConvert.SerializeObject(m))
                 .Select(s => (dynamic)JsonConvert.DeserializeObject<ExpandoObject>(s, expConverter));
-            
+
             return data;
         }
         

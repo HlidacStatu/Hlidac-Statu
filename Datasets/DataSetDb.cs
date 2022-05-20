@@ -182,13 +182,26 @@ namespace HlidacStatu.Datasets
         {
             AuditRepo.Add<Registration>(Audit.Operations.Delete, user, (await RegistrationAsync()), null);
 
+            if (datasetId.ToLower() == "datasourcesdb")
+                return true;
+
+
             datasetId = datasetId.ToLower();
             var res = await DeleteDataAsync(datasetId);
             var idxClient = await Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource);
 
-            var delRes = await idxClient.Indices.DeleteAsync(idxClient.ConnectionSettings.DefaultIndex);
+            //delete /hs-data_rozhodnuti-uohs*
+            for (int i = 1; i < 99; i++)
+            {
+                var _dsId = $"hs-data_{datasetId}-{i:00}";
+                var delRes = idxClient.Indices.Delete(_dsId);
+                if (delRes.IsValid == false)
+                    break;
+
+            }
+
             CachedDatasets.Delete(datasetId);
-            return res && delRes.IsValid;
+            return res;
         }
 
         public override async Task<DataSearchResult> SearchDataAsync(string queryString, int page, int pageSize,

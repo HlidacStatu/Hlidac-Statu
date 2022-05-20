@@ -5,23 +5,29 @@ namespace HlidacStatu.Entities
 {
     public partial class UptimeServer
     {
-
+        string[] _groupArray = null;
         public string[] GroupArray()
         {
-            if (string.IsNullOrEmpty(this.Groups))
-                return new string[] { this.Priorita.ToString() };
-            else
-                return this.Groups.Split('|', StringSplitOptions.RemoveEmptyEntries)
-                    .Append(this.Priorita.ToString())
+            if (_groupArray == null)
+            {
+                if (string.IsNullOrEmpty(this.Groups))
+                    _groupArray = new string[] { };
+                else
+                    _groupArray = this.Groups.Split('|', StringSplitOptions.RemoveEmptyEntries)
                     .ToArray();
+            }
+            return _groupArray;
         }
 
 
+        string _hash = null;
         public string Hash
         {
             get
             {
-                return Devmasters.Crypto.Hash.ComputeHashToHex(Id + "xxttxx" + Id);
+                if (_hash == null)
+                    _hash = Devmasters.Crypto.Hash.ComputeHashToHex(Id + "xxttxx" + Id);
+                return _hash;
             }
         }
         public bool ValidHash(string h)

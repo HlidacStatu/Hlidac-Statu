@@ -137,11 +137,18 @@ namespace HlidacStatu.Entities
                 return Data.LongLength;
             }
 
+            static object lockObj = new object();
             AvailabilityStatistics _stat = null;
             public AvailabilityStatistics Statistics()
             {
                 if (_stat == null)
-                    _stat = new AvailabilityStatistics(Data);
+                {
+                    lock (lockObj)
+                    {
+                        if (_stat == null)
+                            _stat = new AvailabilityStatistics(Data);
+                    }
+                }
                 return _stat;
             }
 

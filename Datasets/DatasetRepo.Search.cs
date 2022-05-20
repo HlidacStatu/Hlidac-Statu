@@ -202,7 +202,7 @@ namespace HlidacStatu.Datasets
                         sort = sort.Replace(DataSearchResult.OrderDesc, "").Replace(DataSearchResult.OrderDescUrl, "")
                             .Trim();
                         if (sort.EndsWith(".keyword", StringComparison.OrdinalIgnoreCase))
-                            sort = sort.Replace(".keywork", "", StringComparison.OrdinalIgnoreCase).Trim();
+                            sort = sort.Replace(".keyword", "", StringComparison.OrdinalIgnoreCase).Trim();
                         if (allProps.Any(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase)))
                         {
                             var found = txtProps.FirstOrDefault(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase));
@@ -217,13 +217,12 @@ namespace HlidacStatu.Datasets
                         sort = sort.Replace(DataSearchResult.OrderAsc, "").Replace(DataSearchResult.OrderAscUrl, "")
                             .Trim();
                         if (sort.EndsWith(".keyword", StringComparison.OrdinalIgnoreCase))
-                            sort = sort.Replace(".keywork", "", StringComparison.OrdinalIgnoreCase).Trim();
+                            sort = sort.Replace(".keyword", "", StringComparison.OrdinalIgnoreCase).Trim();
                         if (allProps.Any(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase)))
                         {
                             var found = txtProps.FirstOrDefault(k => string.Equals(k, sort, StringComparison.OrdinalIgnoreCase));
                             if (found != null)
                                 sort = found + ".keyword";
-                            sortD = sortD.Field(sort, SortOrder.Descending);
                         }
                         sortD = sortD.Field(sort, SortOrder.Ascending);
                     }
