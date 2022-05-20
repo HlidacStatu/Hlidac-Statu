@@ -78,6 +78,8 @@
                                 @foreach (var domain in expired)
                                 {
                                     var server = servers.FirstOrDefault(m => m.HostDomain().ToLower() == domain.Domain.ToLower());
+                                    if (server is null)
+                                        continue;
                                     TimeSpan interval = domain.CertExpiration().Value - DateTime.Now;
                                     var expiresIn = "Skončila " + Devmasters.DT.Util.Ago(new TimeSpan(-1 * interval.Ticks), HlidacStatu.Util.Consts.czCulture);
 

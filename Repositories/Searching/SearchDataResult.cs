@@ -11,7 +11,7 @@ namespace HlidacStatu.Repositories.Searching
         public const int DefaultPageSizeGlobal = 25;
         public virtual int DefaultPageSize() { return DefaultPageSizeGlobal; }
         public virtual int MaxResultWindow() { return Tools.MaxResultWindow; }
-        public string Query { get; set; }
+        public string Query { get; set; } = "";
 
         public RouteValues ToRouteValues(int page)
         {
