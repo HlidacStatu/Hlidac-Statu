@@ -60,6 +60,8 @@ else
                 )
                 {
                     var server = servers.FirstOrDefault(m => m.HostDomain().ToLower() == domain.Domain.ToLower());
+                    if (server == null)
+                        continue;
 
                     <tr>
                         <td>@Html.Raw(domain.CertExpirationToString(true,"{sentence}", sentenceTemplate:"{icon} {action}{actionPast} {expiration}.", action:"Skončí",actionPast:"Skončila"))</td>

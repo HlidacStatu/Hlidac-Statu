@@ -84,10 +84,15 @@ namespace HlidacStatu.Web.Controllers
                 {
                     data = dataArr.AsEnumerable()
                       .Select((x, l) => x.DataForChart(fromDate, toDate, l))
+                      //.Reverse()
                       .SelectMany(x => x)
                       .ToArray(),
-                    cats = data.ToDictionary(k => k.Host.Id, d => new { host = d.Host, lastResponse = d.Data.Last() }),
-                    categories = data.Select(m => m.Host.Id).ToArray(),
+                    cats = data
+                        //.Reverse()
+                        .ToDictionary(k => k.Host.Id, d => new { host = d.Host, lastResponse = d.Data.Last() }),
+                    categories = data.Select(m => m.Host.Id)
+                            //.Reverse()
+                            .ToArray(),
                     colsize = data.Select(d => d.ColSize(fromDate, toDate)).Max(),
                 };
                 content = Newtonsoft.Json.JsonConvert.SerializeObject(dataready);

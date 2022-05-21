@@ -305,7 +305,10 @@ namespace HlidacStatu.Repositories
             UptimeServer.HostAvailability[] allData = uptimeServersCache1Day.Get();
 
             List<UptimeServer.HostAvailability> choosen = new List<UptimeServer.HostAvailability>();
-            choosen = allData.Where(m => serverIds.Contains(m.Host.Id)).ToList();
+            choosen = allData
+                .Where(m => serverIds.Contains(m.Host.Id))
+                .OrderByDescending(o=>o.Host.Name)
+                .ToList();
             return choosen;
         }
 
@@ -367,6 +370,7 @@ namespace HlidacStatu.Repositories
                                 )
                             ) //zabhost
                     )
+                .OrderBy(o=>o.Host.Name)
                 .ToArray()
                 ;
 
