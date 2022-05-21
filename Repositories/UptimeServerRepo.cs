@@ -249,7 +249,7 @@ namespace HlidacStatu.Repositories
         );
 
         static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer[]> _allActiveServersCache =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer[]>(TimeSpan.FromMinutes(30), "_allActiveStatniWebyServers",
+            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer[]>(TimeSpan.FromMinutes(10), "_allActiveStatniWebyServers",
                 (o) =>
             {
                 using (Entities.DbEntities db = new HlidacStatu.Entities.DbEntities())

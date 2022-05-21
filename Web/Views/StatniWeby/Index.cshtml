@@ -145,13 +145,27 @@
                     //.Where(m=>m.Host.Id == 108)
                     .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
                     .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
-                    .Take(30);
+                    .Take(30)
+                    .ToArray();
+    //debug
+    foreach (var item in HlidacStatu.Repositories.UptimeServerRepo.AllActiveServersWeekStat())
+    {
+        try
+        {
+            var i = item.Statistics().DurationTotal.Pomale.TotalSeconds + item.Statistics().DurationTotal.Nedostupne.TotalSeconds;
+        }
+        catch (Exception)
+        {
+            HlidacStatu.Util.Consts.Logger.Error($"Statistics error for {item.Host.Id} - {item.Host.Name}");           
+        }
+    }
 
     var topNedostupnostiW = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServersWeekStat()
                     //.Where(m=>m.Host.Id == 108)
                     .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
                     .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
-                    .Take(30);
+                    .Take(30)
+                    .ToArray();
 
     int pocetNedostupnost = Math.Max(10, topNedostupnosti24H.Count() / 2);
 }
@@ -163,7 +177,7 @@
         <button class="btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target=".chart">Ukázat výpadky graficky</button>
     </div>
     <div class="row">
-        @if (topNedostupnosti24H.Count() > 0)
+        @if (topNedostupnosti24H?.Count() > 0)
         {
             <div class="col-sm-6 col-xs-12">
                 <h2>za posledních 24 hodin</h2>
@@ -204,7 +218,7 @@
             </div>
         }
 
-        @if (topNedostupnostiW.Count() > 0)
+        @if (topNedostupnostiW?.Count() > 0)
         {
             <div class="col-sm-6 col-xs-12">
                 <h2>za poslední týden</h2>
