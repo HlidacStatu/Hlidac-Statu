@@ -48,6 +48,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         /// <returns></returns>
         public static int FixKindexYear(int? year)
         {
+
             if (year < AvailableCalculationYears.Min())
                 return AvailableCalculationYears.Min();
             if (year is null || year >= AvailableCalculationYears.Max())

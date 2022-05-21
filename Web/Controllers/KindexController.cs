@@ -61,6 +61,10 @@ namespace HlidacStatu.Web.Controllers
         private void SetViewbagSelectedYear(ref int? rok, int? maxYear = null)
         {
             rok = Consts.FixKindexYear(rok);
+            if (maxYear == null)
+            {
+                maxYear = Devmasters.ParseText.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear"));
+            }
             if (maxYear.HasValue && rok > maxYear.Value)
                 rok = maxYear;
             ViewBag.SelectedYear = rok;
@@ -105,7 +109,8 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult Zebricek(string id, int? rok = null, string group = null, string kraj = null, string part = null)
         {
 
-            SetViewbagSelectedYear(ref rok, Statistics.KIndexStatTotal.Get().Max(m => m.Rok));
+            //SetViewbagSelectedYear(ref rok, Statistics.KIndexStatTotal.Get().Max(m => m.Rok));
+            SetViewbagSelectedYear(ref rok);
             ViewBag.SelectedLadder = id;
             ViewBag.SelectedGroup = group;
             ViewBag.SelectedKraj = kraj;
