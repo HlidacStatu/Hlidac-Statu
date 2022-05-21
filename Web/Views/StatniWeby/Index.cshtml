@@ -148,8 +148,8 @@
                     .Take(30)
                     .ToArray();
 
-    List<int> serverWithSomeStrangeError = new List<int>();
     //debug
+    List<int> serverWithSomeStrangeError = new List<int>();
     foreach (var item in HlidacStatu.Repositories.UptimeServerRepo.AllActiveServersWeekStat())
     {
         try
