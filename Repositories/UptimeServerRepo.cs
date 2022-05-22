@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Threading.Tasks;
 
 using HlidacStatu.Entities;
-using HlidacStatu.Util.Cache;
 
 using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Writes;
@@ -228,9 +226,7 @@ namespace HlidacStatu.Repositories
             new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<UptimeServer.HostAvailability>>(TimeSpan.FromMinutes(20), "_allActiveStatniWebyServersStat",
                 (o) =>
                 {
-                    var res = AllActiveServers()
-                        .AsParallel()
-                        .Select(m => AvailabilityForDayById(m.Id))
+                    List<UptimeServer.HostAvailability> res = AvailabilityForDayByIds(AllActiveServers().Select(m=>m.Id))
                         .ToList();
                     return res;
                 }
@@ -307,17 +303,29 @@ namespace HlidacStatu.Repositories
             List<UptimeServer.HostAvailability> choosen = new List<UptimeServer.HostAvailability>();
             choosen = allData
                 .Where(m => serverIds.Contains(m.Host.Id))
-                .OrderByDescending(o=>o.Host.Name)
+                .OrderByDescending(o => o.Host.Name)
                 .ToList();
             return choosen;
         }
-
         public static UptimeServer.HostAvailability AvailabilityForWeekById(int serverId)
         {
-            if (serverId == 0)
+            return AvailabilityForWeekByIds(new int[] { serverId }).FirstOrDefault();
+        }
+        public static IEnumerable<UptimeServer.HostAvailability> AvailabilityForWeekByIds(IEnumerable<int> serverIds)
+        {
+            if (serverIds?.Count() == null)
+                return null;
+            if (serverIds.Count() == 0)
                 return null;
 
-            return uptimeServerCache7Day.Get(serverId);
+            UptimeServer.HostAvailability[] allData = uptimeServersCache7Days.Get();
+
+            List<UptimeServer.HostAvailability> choosen = new List<UptimeServer.HostAvailability>();
+            choosen = allData
+                .Where(m => serverIds.Contains(m.Host.Id))
+                .OrderByDescending(o => o.Host.Name)
+                .ToList();
+            return choosen;
         }
 
 
@@ -329,14 +337,15 @@ namespace HlidacStatu.Repositories
               return res.ToArray();
           });
 
-        private static AutoUpdateMemoryCacheManager<UptimeServer.HostAvailability, int> uptimeServerCache7Day
-       = AutoUpdateMemoryCacheManager<UptimeServer.HostAvailability, int>.GetSafeInstance("uptimeServerCache7Day",
+        private static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]> uptimeServersCache7Days
+       = new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeServer.HostAvailability[]>(TimeSpan.FromMinutes(30),
+           "uptimeServersCache7Days",
           (id) =>
           {
-              var res = _availability(new int[] { id }, 7 * 24);
-              return res.FirstOrDefault();
+              var res = _availability(7 * 24);
+              return res.ToArray();
           }
-           , TimeSpan.FromMinutes(30));
+          );
 
 
         private static IEnumerable<UptimeServer.HostAvailability> _availability(int hoursBack)
@@ -370,7 +379,7 @@ namespace HlidacStatu.Repositories
                                 )
                             ) //zabhost
                     )
-                .OrderBy(o=>o.Host.Name)
+                .OrderBy(o => o.Host.Name)
                 .ToArray()
                 ;
 

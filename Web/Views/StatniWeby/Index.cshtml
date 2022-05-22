@@ -159,13 +159,13 @@
         }
         catch (Exception)
         {
-            serverWithSomeStrangeError.Add(item.Host.Id);
-            HlidacStatu.Util.Consts.Logger.Error($"Statistics error for {item.Host.Id} - {item.Host.Name}");           
+            serverWithSomeStrangeError.Add((item?.Host?.Id) ?? 0);
+            HlidacStatu.Util.Consts.Logger.Error($"Statistics error for {item?.Host?.Id} - {item?.Host?.Name}");           
         }
     }
 
     var topNedostupnostiW = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServersWeekStat()
-                    //.Where(m=>m.Host.Id == 108)
+                    .Where(m=>m?.Host?.Id != null)
                     .Where(m=>serverWithSomeStrangeError.Contains(m.Host.Id)==false)
                     .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
                     .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))

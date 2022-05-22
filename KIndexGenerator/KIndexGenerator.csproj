@@ -22,6 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="StatniWebyTemplate.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="PercentilBanner.svg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -105,8 +105,7 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult Info(int id, string h)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
-                .FirstOrDefault(w => w.Id == id)
-                ;
+                .FirstOrDefault(w => w.Id == id);
             if (host == null)
                 return RedirectToAction("Index", "StatniWeby");
 

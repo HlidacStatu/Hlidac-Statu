@@ -1,4 +1,10 @@
-﻿using Devmasters;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Devmasters;
 using Devmasters.Enums;
 
 using HlidacStatu.Connectors;
@@ -7,6 +13,7 @@ using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Extensions;
+using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Web.Filters;
@@ -20,12 +27,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using HlidacStatu.LibCore.Extensions;
 using Visit = HlidacStatu.Web.Framework.Visit;
 
 
@@ -37,7 +38,7 @@ namespace HlidacStatu.Web.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         protected readonly IWebHostEnvironment _hostingEnvironment;
         private readonly TelemetryClient _telemetryClient;
-        
+
         public HomeController(IWebHostEnvironment hostingEnvironment, UserManager<ApplicationUser> userManager, TelemetryClient telemetryClient)
         {
             _hostingEnvironment = hostingEnvironment;
@@ -56,7 +57,7 @@ namespace HlidacStatu.Web.Controllers
 
                 return View(true);
             }
-            
+
             return View(false);
 
 
@@ -745,7 +746,7 @@ text zpravy: {txt}
 
                 var data = res.SearchTimes();
 
-                
+
                 // Set up some properties:
 
                 foreach (var kv in data)
@@ -1106,7 +1107,7 @@ text zpravy: {txt}
             {
                 data = RemoteUrlFromWebCache.GetBinary(mainUrl + "/kindex/banner/" + v, "kindex-banner-" + v, HttpContext.Request.Query["refresh"] == "1");
             }
-            else if (id?.ToLower() == "page" && string.IsNullOrEmpty(v)==false)
+            else if (id?.ToLower() == "page" && string.IsNullOrEmpty(v) == false)
             {
                 var pageUrl = v;
                 string socialTitle = "";
