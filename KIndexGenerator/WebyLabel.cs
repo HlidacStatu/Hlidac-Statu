@@ -18,19 +18,30 @@ namespace HlidacStatu.KIndexGenerator
             _dataFolder = dataFolder;
         }
         // correct setting is kind of alchemy
-        public float HeadingMinFontSize { get; set; } = 32f;
-        public float FourLinerFontSize { get; set; } = 28f;
+        public float HeadingMinFontSize { get; set; } = 24f;
+        public float FourLinerFontSize { get; set; } = 24f;
         public float YearFontSize { get; set; } = 28f;
-        public string FontFamily { get; set; } = "Cabin SemiBold";
-        public string FontFamilyFourLiner { get; set; } = "Cabin Medium";
+        public string FontFamily { get; set; } = "Cabin";
+        public string FontFamilySemiBold { get; set; } = "Cabin SemiBold";
+        public string FontFamilyMedium { get; set; } = "Cabin Medium";
 
-        public RectangleF HeadingPosition { get; set; } = new RectangleF(20, 50, 960, 110);
-        public RectangleF YearPosition { get; set; } = new RectangleF(793, 481, 147, 45);
-        public RectangleF FourlinerPosition { get; set; } = new RectangleF(242, 625, 684, 192);
+        public RectangleF HeadingPosition { get; set; } = new RectangleF(300, 35, 665, 80);
+        public RectangleF ExpirationPosition { get; set; } = new RectangleF(16, 300, 230, 39);
+        public RectangleF FourlinerPosition { get; set; } = new RectangleF(300, 120, 665, 200);
 
-        public Byte[] GenerateImageByteArray(string headingText, string fourLinerText, string label, string year)
+        public Byte[] GenerateImageByteArray(string headingText, string fourLinerText,
+            string year, string label, Color labelColor,
+            decimal okPercentDay, string okStrDay, decimal okPercentWeek, string okStrWeek,
+            decimal slowPercentDay, string slowStrDay, decimal slowPercentWeek, string slowStrWeek,
+            decimal badPercentDay, string badStrDay, decimal badPercentWeek, string badStrWeek
+        )
         {
-            using (MemoryStream ms = GenerateImage(headingText, fourLinerText, label, year))
+            using (MemoryStream ms = GenerateImage(headingText, fourLinerText,
+                year, label, labelColor,
+                okPercentDay, okStrDay, okPercentWeek, okStrWeek,
+                slowPercentDay, slowStrDay, slowPercentWeek, slowStrWeek,
+                badPercentDay, badStrDay, badPercentWeek, badStrWeek
+                ))
             {
                 return ms.ToArray();
             }
@@ -42,21 +53,35 @@ namespace HlidacStatu.KIndexGenerator
         /// <param name="headingText"></param>
         /// <param name="fourLinerText"></param>
         /// <returns></returns>
-        public MemoryStream GenerateImage(string headingText, string fourLinerText, string label, string year)
+        public MemoryStream GenerateImage(string headingText, string fourLinerText,
+            string year, string label, Color labelColor,
+            decimal okPercentDay, string okStrDay, decimal okPercentWeek, string okStrWeek,
+            decimal slowPercentDay, string slowStrDay, decimal slowPercentWeek, string slowStrWeek,
+            decimal badPercentDay, string badStrDay, decimal badPercentWeek, string badStrWeek
+            )
         {
-            using (Image image = Bitmap.FromFile(GetFileNameOnDisk(label)))
+            using (Image image = Bitmap.FromFile(GetFileNameOnDisk()))
             {
                 using (Graphics graphics = Graphics.FromImage(image))
                 {
                     graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
                     graphics.DrawImage(image, 0, 0);
 
-                    FontFamily fontFamily = MyFonts().Families
+                    FontFamily semiBold = MyFonts().Families
+                        .Where(f => f.Name == this.FontFamilySemiBold)
+                        .FirstOrDefault();
+
+                    FontFamily regular = MyFonts().Families
                         .Where(f => f.Name == this.FontFamily)
                         .FirstOrDefault();
 
+                    FontFamily medium = MyFonts().Families
+                        .Where(f => f.Name == this.FontFamilyMedium)
+                        .FirstOrDefault();
+
+
                     // nadpis
-                    using (Font basicFont = new Font(fontFamily, this.HeadingMinFontSize, FontStyle.Bold))
+                    using (Font basicFont = new Font(semiBold, this.HeadingMinFontSize, FontStyle.Bold))
                     {
                         using (StringFormat stringFormat = new StringFormat())
                         {
@@ -69,7 +94,8 @@ namespace HlidacStatu.KIndexGenerator
                                                                graphics,
                                                                basicFont,
                                                                this.HeadingPosition,
-                                                               stringFormat))
+                                                               stringFormat, 0.8f))
+
                                 graphics.DrawString(
                                     headingText,
                                     correctFont,
@@ -79,11 +105,8 @@ namespace HlidacStatu.KIndexGenerator
                         }
                     }
 
-                    FontFamily fontFamilyFourLiner = MyFonts().Families
-                        .Where(f => f.Name == this.FontFamilyFourLiner)
-                        .FirstOrDefault();
                     // Box dole - ten bych nechal vždy velikostí 30, tady neresizuju text
-                    using (Font fourLinerFont = new Font(fontFamilyFourLiner, this.FourLinerFontSize, FontStyle.Regular))
+                    using (Font fourLinerFont = new Font(medium, this.FourLinerFontSize, FontStyle.Regular))
                     {
                         using (StringFormat stringFormat = new StringFormat())
                         {
@@ -94,29 +117,121 @@ namespace HlidacStatu.KIndexGenerator
                             // Vykreslení boxu
                             graphics.DrawString(fourLinerText,
                                 fourLinerFont,
-                                new SolidBrush(Color.FromArgb(60, 60, 60)),
+                                new SolidBrush(Color.FromArgb(80, 80, 80)),
                                 //Brushes.Black,
                                 this.FourlinerPosition,
                                 stringFormat);
                         }
                     }
 
-                    // Rok - ten bych nechal vždy velikostí 36, tady neresizuju text
-                    using (Font yearFont = new Font(fontFamily, this.YearFontSize, FontStyle.Regular))
+                    if (!string.IsNullOrEmpty(year))
                     {
+
+                        year = "expiruje " + year;
+                        // Rok - 
                         using (StringFormat stringFormat = new StringFormat())
                         {
                             stringFormat.LineAlignment = StringAlignment.Center;
-                            stringFormat.Alignment = StringAlignment.Far;
+                            stringFormat.Alignment = StringAlignment.Center;
+                            using (Font basicFont = new Font(regular, 10f, FontStyle.Regular))
+                            {
+                                using (Font yearFont = SizeFont(year,
+                                                                graphics,
+                                                                basicFont,
+                                                                this.ExpirationPosition,
+                                                                stringFormat, 0.8f)
+                                        )
+                                {
+                                    // Vykreslení roku
+                                    graphics.DrawString(year,
+                                        yearFont,
+                                        new SolidBrush(Color.FromArgb(80, 80, 80)),
+                                        this.ExpirationPosition,
+                                        stringFormat);
+                                }
+                            }
+                        }
+                    } //year
 
-                            // Vykreslení roku
-                            graphics.DrawString(year.ToString(),
-                                yearFont,
-                                Brushes.Black,
-                                this.YearPosition,
-                                stringFormat);
+                    if (!string.IsNullOrEmpty(label))
+                    {
+
+                        // label
+                        using (StringFormat stringFormat = new StringFormat())
+                        {
+                            stringFormat.LineAlignment = StringAlignment.Center;
+                            stringFormat.Alignment = StringAlignment.Center;
+                            using (Font basicFont = new Font(semiBold, 180f, FontStyle.Regular))
+                            {
+                                // Vykreslení roku
+                                graphics.DrawString(label,
+                                    basicFont,
+                                    new SolidBrush(labelColor),
+                                    new RectangleF(16, 16, 230, 216),
+                                    stringFormat);
+
+                            }
+                        }
+                    } //label
+
+
+                    //OK banner                    
+                    using (StringFormat stringFormat = new StringFormat())
+                    {
+                        stringFormat.LineAlignment = StringAlignment.Center;
+                        stringFormat.Alignment = StringAlignment.Center;
+                        using (Font basicFont = new Font(semiBold, 20f, FontStyle.Regular))
+                        {
+                            using (Font smaller = new Font(regular, 16f, FontStyle.Regular))
+                            {
+                                //#497443
+                                var color = Color.FromArgb(73, 116, 67);
+                                var box = new Rectangle(176, 447, 790, 114);
+                                DrawRectangle(graphics, basicFont, smaller, stringFormat,
+                                    color, box,
+                                    okStrDay, okStrWeek, okPercentDay, okPercentWeek
+                                    );
+
+                                //slow #f19b38
+                                color = Color.FromArgb(241, 155, 56);
+                                box = new Rectangle(176, 593, 790, 114);
+                                DrawRectangle(graphics, basicFont, smaller, stringFormat,
+                                    color, box,
+                                    slowStrDay, slowStrWeek, slowPercentDay, slowPercentWeek
+                                    );
+
+                                //bad #CA4339
+                                color = Color.FromArgb(202, 67, 57);
+                                box = new Rectangle(176, 739, 790, 114);
+                                DrawRectangle(graphics, basicFont, smaller, stringFormat,
+                                    color, box,
+                                    badStrDay, badStrWeek, badPercentDay, badPercentWeek
+                                    );
+                            }
                         }
                     }
+
+
+
+                    // datetime
+                    using (StringFormat stringFormat = new StringFormat())
+                    {
+                        stringFormat.LineAlignment = StringAlignment.Center;
+                        stringFormat.Alignment = StringAlignment.Far;
+                        using (Font basicFont = new Font(semiBold, 15f, FontStyle.Regular))
+                        {
+                            // Vykreslení roku
+                            graphics.DrawString("stav k " + DateTime.Now.ToString("d.M.yyyy HH:mm"),
+                                basicFont,
+                                new SolidBrush(Color.FromArgb(100,100,100)),
+                                new RectangleF(754, 867, 230, 20),
+                                stringFormat);
+
+                        }
+                    }
+
+
+
                 }
 
                 MemoryStream ms = new MemoryStream();
@@ -124,6 +239,43 @@ namespace HlidacStatu.KIndexGenerator
                 return ms;
             }
         }
+
+        private void DrawRectangle(Graphics graphics, Font basicFont, Font smallerFont, StringFormat stringFormat,
+            Color color, Rectangle box,
+            string strDay, string strWeek, decimal percentDay, decimal percentWeek
+            )
+        {
+            graphics.DrawRectangle(new Pen(Color.FromArgb(255, color)), box);
+            // Vykreslení okDay
+            graphics.FillRectangle(new SolidBrush(Color.FromArgb(125, color)), new Rectangle(box.X, box.Y, (int)(box.Width * percentDay), box.Height / 2));
+            graphics.DrawString(strDay,
+                basicFont,
+                new SolidBrush(Color.Black),
+                new RectangleF(box.X, box.Y, box.Width, box.Height / 2),
+                stringFormat);
+            graphics.DrawString("za 24 hodin",
+                smallerFont,
+                new SolidBrush(Color.FromArgb(80, 80, 80)),
+                new RectangleF(box.X, box.Y, 130, box.Height / 2),
+                stringFormat);
+
+            // Vykreslení okWeek
+            graphics.FillRectangle(new SolidBrush(Color.FromArgb(125, color)), new Rectangle(box.X, box.Y + (box.Height / 2), (int)(box.Width * percentWeek), box.Height / 2));
+            graphics.DrawString(strWeek,
+                basicFont,
+                new SolidBrush(Color.Black),
+                new RectangleF(box.X, box.Y + (box.Height / 2), box.Width, box.Height / 2),
+                stringFormat);
+            graphics.DrawString("za týden",
+                smallerFont,
+                new SolidBrush(Color.FromArgb(80, 80, 80)),
+                new RectangleF(box.X, box.Y + (box.Height / 2), 100, box.Height / 2),
+                stringFormat);
+
+            graphics.DrawLine(new Pen(Color.FromArgb(255, color), 2), box.X, box.Y + (box.Height / 2), box.X + box.Width, box.Y + (box.Height / 2));
+
+        }
+
 
         private PrivateFontCollection MyFonts()
         {
@@ -143,23 +295,24 @@ namespace HlidacStatu.KIndexGenerator
                                     Graphics graphics,
                                     Font font,
                                     RectangleF fontArea,
-                                    StringFormat stringFormat)
+                                    StringFormat stringFormat,
+                                    float sizeFactor = 1.0f)
         {
             SizeF extent = graphics.MeasureString(text, font, fontArea.Size, stringFormat);
             float hRatio = fontArea.Height / extent.Height;
             float wRatio = fontArea.Width / extent.Width;
             float ratio = (hRatio < wRatio) ? hRatio : wRatio;
 
-            float fontSize = font.Size * ratio;
+            float fontSize = font.Size * ratio * sizeFactor;
 
             return new Font(font.FontFamily, fontSize, font.Style, font.Unit);
         }
 
         private readonly string _dataFolder;
-        private string GetFileNameOnDisk(string label)
+        private string GetFileNameOnDisk()
         {
 
-            return Path.Combine(_dataFolder, $"Label{label}.png");
+            return Path.Combine(_dataFolder, $"StatniWebyTemplate.png");
         }
     }
 

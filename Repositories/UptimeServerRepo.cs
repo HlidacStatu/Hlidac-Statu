@@ -358,6 +358,10 @@ namespace HlidacStatu.Repositories
         {
             return _availability(serverIds, TimeSpan.FromHours(hoursBack));
         }
+        public static IEnumerable<UptimeServer.HostAvailability> GetAvailabilityNoCache(TimeSpan intervalBack, params int[] serverIds)
+        {
+            return _availability(serverIds, intervalBack);
+        }
 
         private static IEnumerable<UptimeServer.HostAvailability> _availability(int[] serverIds, TimeSpan intervalBack)
         {

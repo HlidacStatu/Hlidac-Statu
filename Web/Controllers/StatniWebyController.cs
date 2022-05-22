@@ -115,6 +115,74 @@ namespace HlidacStatu.Web.Controllers
                 return RedirectToAction("Index", "StatniWeby");
         }
 
+
+        static byte[] EmptyPng = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFhAJ/wlseKgAAAABJRU5ErkJggg==");
+        [HlidacCache(2 * 60, "id", false)]
+        public ActionResult Banner(int id, string h)
+        {
+            UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
+                .FirstOrDefault(w => w.Id == id);
+            if (host == null)
+            {
+                return File(EmptyPng, "image/png");
+            }
+            if (!host.ValidHash(h))
+            {
+                return File(EmptyPng, "image/png");
+            }
+            UptimeServer.HostAvailability? webDay = null;
+            UptimeServer.HostAvailability? webWeek = null;
+
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                webDay = HlidacStatu.Repositories.UptimeServerRepo.GetAvailabilityNoCache(TimeSpan.FromHours(24), id)
+                    .FirstOrDefault();
+                webWeek = HlidacStatu.Repositories.UptimeServerRepo.GetAvailabilityNoCache(TimeSpan.FromHours(24 * 7), id)
+                    .FirstOrDefault();
+            }
+            else
+            {
+                webDay = HlidacStatu.Repositories.UptimeServerRepo.AvailabilityForDayById(id);
+                webWeek = HlidacStatu.Repositories.UptimeServerRepo.AvailabilityForWeekById(id);
+            }
+
+            if (webDay == null || webWeek == null)
+            {
+                return File(EmptyPng, "image/png");
+            }
+            var webssl = UptimeSSLRepo.LoadLatest(webDay.Host.HostDomain());
+
+            HlidacStatu.KIndexGenerator.WebyLabel img = new HlidacStatu.KIndexGenerator.WebyLabel();
+            var rgb = new Devmasters.Imaging.RGB(UptimeSSL.StatusOrigColor(webssl.SSLGrade()).Replace("#", ""));
+            var data = img.GenerateImageByteArray(
+                webDay.Host.Name,
+                webDay.Host.Description,
+
+                HlidacStatu.Util.RenderData.ToDate(webssl.CertExpiration(), "d.M.yyyy"),
+                    webssl.OverallGrade, System.Drawing.Color.FromArgb(rgb.R, rgb.G, rgb.B),
+
+                webDay.Statistics().PercentOfTime.OK,
+                    $"{HlidacStatu.XLib.RenderTools.FormatAvailability(webDay.Statistics().DurationTotal.OK, HlidacStatu.XLib.RenderTools.DateTimePart.Minute)} ({webDay.Statistics().PercentOfTime.OK:P1})",
+                webWeek.Statistics().PercentOfTime.OK,
+                    $"{HlidacStatu.XLib.RenderTools.FormatAvailability(webWeek.Statistics().DurationTotal.OK, HlidacStatu.XLib.RenderTools.DateTimePart.Minute)} ({webWeek.Statistics().PercentOfTime.OK:P1})",
+
+
+                webWeek.Statistics().PercentOfTime.Pomale,
+                    $"{HlidacStatu.XLib.RenderTools.FormatAvailability(webDay.Statistics().DurationTotal.Pomale, HlidacStatu.XLib.RenderTools.DateTimePart.Minute)} ({webDay.Statistics().PercentOfTime.Pomale:P1})",
+                webWeek.Statistics().PercentOfTime.Pomale,
+                    $"{HlidacStatu.XLib.RenderTools.FormatAvailability(webWeek.Statistics().DurationTotal.Pomale, HlidacStatu.XLib.RenderTools.DateTimePart.Minute)} ({webWeek.Statistics().PercentOfTime.Pomale:P1})",
+
+                webWeek.Statistics().PercentOfTime.Nedostupne,
+                    $"{HlidacStatu.XLib.RenderTools.FormatAvailability(webDay.Statistics().DurationTotal.Nedostupne, HlidacStatu.XLib.RenderTools.DateTimePart.Minute)} ({webDay.Statistics().PercentOfTime.Nedostupne:P1})",
+                webWeek.Statistics().PercentOfTime.Nedostupne,
+                    $"{HlidacStatu.XLib.RenderTools.FormatAvailability(webWeek.Statistics().DurationTotal.Nedostupne, HlidacStatu.XLib.RenderTools.DateTimePart.Minute)} ({webWeek.Statistics().PercentOfTime.Nedostupne:P1})"
+
+                );
+            return File(data, "image/png");
+
+        }
+
+
         [HlidacCache(2 * 60, "id;h;embed", false)]
         public ActionResult InfoHttps(int id, string h)
         {
