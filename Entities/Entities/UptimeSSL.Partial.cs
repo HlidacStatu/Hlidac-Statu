@@ -53,7 +53,7 @@ namespace HlidacStatu.Entities
             {
                 icon = "<i class='fa-solid fa-alarm-exclamation text-danger blinking'></i>";
                 sentence = sentenceTemplate
-                    .Replace("{icon}", icon)
+                    .Replace("{icon}", html ? icon : "")
                     .Replace("{action}", "")
                     .Replace("{actionPast}", actionPast)
                     .Replace("{expiration}", expiresIn.ToLower());
@@ -62,7 +62,7 @@ namespace HlidacStatu.Entities
             {
                 icon = "<i class='fa-solid fa-circle-exclamation text-danger'></i>";
                 sentence = sentenceTemplate
-                    .Replace("{icon}", icon)
+                    .Replace("{icon}", html ? icon : "")
                     .Replace("{action}", action)
                     .Replace("{actionPast}", "")
                     .Replace("{expiration}", expiresIn.ToLower());
@@ -71,7 +71,7 @@ namespace HlidacStatu.Entities
             {
                 icon = "<i class='fa-solid fa-circle-exclamation  text-warning'></i>";
                 sentence = sentenceTemplate
-                    .Replace("{icon}", icon)
+                    .Replace("{icon}", html ? icon : "")
                     .Replace("{action}", action)
                     .Replace("{actionPast}", "")
                     .Replace("{expiration}", expiresIn.ToLower());

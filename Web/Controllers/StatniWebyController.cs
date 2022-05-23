@@ -156,10 +156,9 @@ namespace HlidacStatu.Web.Controllers
             var rgb = new Devmasters.Imaging.RGB(UptimeSSL.StatusOrigColor(webssl.SSLGrade()).Replace("#", ""));
             var data = img.GenerateImageByteArray(
                 webDay.Host.Name,
-                webDay.Host.Description,
 
-                HlidacStatu.Util.RenderData.ToDate(webssl.CertExpiration(), "d.M.yyyy"),
-                    webssl.OverallGrade, System.Drawing.Color.FromArgb(rgb.R, rgb.G, rgb.B),
+                webssl.OverallGrade, System.Drawing.Color.FromArgb(rgb.R, rgb.G, rgb.B),
+                    webssl.CertExpirationToString(false) + " " + UptimeSSL.StatusDescription(webssl.SSLGrade(), true),
 
                 webDay.Statistics().PercentOfTime.OK,
                     $"{HlidacStatu.XLib.RenderTools.FormatAvailability(webDay.Statistics().DurationTotal.OK, HlidacStatu.XLib.RenderTools.DateTimePart.Minute)} ({webDay.Statistics().PercentOfTime.OK:P1})",
