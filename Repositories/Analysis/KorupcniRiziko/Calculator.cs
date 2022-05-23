@@ -79,7 +79,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             return kindex;
         }
 
-        private void InitData()
+        public void InitData()
         {
             kindex = new KIndexData();
             kindex.Ico = urad.ICO;
@@ -95,6 +95,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         //todo: dalo by se ještě refaktorovat, aby se vše bralo ze statistiky
         public async Task<KIndexData.Annual> CalculateForYearAsync(int year, bool forceCalculateAllYears)
         {
+            if (_calc_Stat?[year] == null)
+                InitData();
+
             decimal smlouvyZaRok = (decimal)urad.StatistikaRegistruSmluv()[year].PocetSmluv;
 
             KIndexData.Annual ret = new KIndexData.Annual(year);

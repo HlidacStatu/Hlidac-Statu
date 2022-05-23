@@ -15,50 +15,50 @@ namespace HlidacStatu.Util.Cache
         where TCache : Devmasters.Cache.BaseCache<T>
     {
         protected Func<Key, T> contentFunc = null;
-        protected TimeSpan expiration = TimeSpan.Zero;
+        protected TimeSpan defaultExpiration = TimeSpan.Zero;
         protected string keyPrefix = null;
         protected object lockObj = new object();
 
         public Manager(string keyprefix, Func<Key, T> func, TimeSpan expiration)
         {
             contentFunc = func;
-            this.expiration = expiration;
+            this.defaultExpiration = expiration;
             keyPrefix = keyprefix;
         }
 
         public virtual T Get(Key key)
         {
-            return Get(key, expiration);
+            return Get(key, this.defaultExpiration);
         }
-        public virtual T Get(Key key, TimeSpan expiration)
+        public virtual T Get(Key key, TimeSpan itemSpecificExpiration)
         {
-            return getTCacheInstance(key, expiration, o => contentFunc.Invoke(key)).Get();
+            return getTCacheInstance(key, itemSpecificExpiration, o => contentFunc.Invoke(key)).Get();
         }
 
-        protected abstract TCache getTCacheInstance(Key key, TimeSpan expiration, Func<Key, T> contentFunc);
+        protected abstract TCache getTCacheInstance(Key key, TimeSpan itemSpecificExpiration, Func<Key, T> contentFunc);
 
         public bool Exists(Key key)
         {
-            return getTCacheInstance(key, expiration, o => contentFunc.Invoke(key)).Exists();
+            return getTCacheInstance(key, this.defaultExpiration, o => contentFunc.Invoke(key)).Exists();
         }
 
         public void Delete(Key key)
         {
-            Set(key, null, expiration);
+            Set(key, null, defaultExpiration);
         }
 
         public void Set(Key key, T obj)
         {
-            Set(key, obj, expiration);
+            Set(key, obj, defaultExpiration);
         }
 
-        public void Set(Key key, T obj, TimeSpan expiration)
+        public void Set(Key key, T obj, TimeSpan itemSpecificExpiration)
         {
             if (obj == null)
-                getTCacheInstance(key, expiration, o => contentFunc.Invoke(key)).Invalidate();
+                getTCacheInstance(key, itemSpecificExpiration, o => contentFunc.Invoke(key)).Invalidate();
             else
             {
-                getTCacheInstance(key, expiration, o => contentFunc.Invoke(key)).ForceRefreshCache(obj);
+                getTCacheInstance(key, itemSpecificExpiration, o => contentFunc.Invoke(key)).ForceRefreshCache(obj);
             }
         }
 
