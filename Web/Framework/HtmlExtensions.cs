@@ -172,7 +172,7 @@ namespace HlidacStatu.Web.Framework
         }
         public static int MaxKIndexYearToShow(System.Security.Principal.IPrincipal user)
         {
-            int lastY = Devmasters.ParseText.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYearToShow"))
+            int lastY = Devmasters.ParseText.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear"))
                 ?? HlidacStatu.Lib.Analysis.KorupcniRiziko.Consts.AvailableCalculationYears.Max();
             if (
                 IfInRoles(user, "TK-KIndex-2021")

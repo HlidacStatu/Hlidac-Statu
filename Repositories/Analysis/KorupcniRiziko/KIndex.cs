@@ -52,7 +52,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             var kidx = Get(param.ico, param.useTemp);
             if (kidx != null)
             {
-                var lbl = kidx.LastKIndexLabel(out int? rok, Devmasters.ParseText.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYearToShow")));
+                var lbl = kidx.LastKIndexLabel(out int? rok);
                 return new Tuple<int?, KIndexData.KIndexLabelValues>(rok, lbl);
             }
 
