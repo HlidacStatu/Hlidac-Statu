@@ -12,16 +12,16 @@ namespace HlidacStatu.Web.HealthChecks
     public class DatasetZpracovane : IHealthCheck
     {
 
-        [Devmasters.Enums.ShowNiceDisplayName]
+        [ShowNiceDisplayName]
         public enum IntervalEnum
         {
-            [Devmasters.Enums.NiceDisplayName("Den")]
+            [NiceDisplayName("Den")]
             Day,
-            [Devmasters.Enums.NiceDisplayName("Týden")]
+            [NiceDisplayName("Týden")]
             Week,
-            [Devmasters.Enums.NiceDisplayName("Měsíc")]
+            [NiceDisplayName("Měsíc")]
             Month,
-            [Devmasters.Enums.NiceDisplayName("Rok")]
+            [NiceDisplayName("Rok")]
             Year
         }
 
@@ -39,7 +39,7 @@ namespace HlidacStatu.Web.HealthChecks
         }
 
 
-        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
 
             try
@@ -67,10 +67,10 @@ namespace HlidacStatu.Web.HealthChecks
                         break;
                 }
 
-                var ds = HlidacStatu.Datasets.DataSet.CachedDatasets.Get(options.DatasetId);
+                var ds = Datasets.DataSet.CachedDatasets.Get(options.DatasetId);
                 if (ds != null)
                 {
-                    var res = HlidacStatu.Datasets.DatasetRepo.Searching.SearchDataRaw(ds, $"DbCreated:{dateQ}", 1, 1,
+                    var res = await Datasets.DatasetRepo.Searching.SearchDataRawAsync(ds, $"DbCreated:{dateQ}", 1, 1,
                         "0", exactNumOfResults: true);
 
                     result += $"{res.Total} zaznamů za {options.Interval.ToNiceDisplayName()} \n";
@@ -79,15 +79,15 @@ namespace HlidacStatu.Web.HealthChecks
 
 
                     if (bad)
-                        return Task.FromResult(HealthCheckResult.Degraded(result));
+                        return HealthCheckResult.Degraded(result);
                     else
-                        return Task.FromResult(HealthCheckResult.Healthy(result));
+                        return HealthCheckResult.Healthy(result);
                 }
-                return Task.FromResult(HealthCheckResult.Unhealthy($"Dataset {options.DatasetId} doesn't exists."));
+                return HealthCheckResult.Unhealthy($"Dataset {options.DatasetId} doesn't exists.");
             }
             catch (Exception e)
             {
-                return Task.FromResult(HealthCheckResult.Unhealthy("Unknown status, cannot read data from network disk", e));
+                return HealthCheckResult.Unhealthy("Unknown status, cannot read data from network disk", e);
             }
 
 

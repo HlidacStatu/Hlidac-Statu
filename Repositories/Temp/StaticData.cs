@@ -32,46 +32,46 @@ namespace HlidacStatu.Repositories
         public static string[] Mestske_Firmy = new string[] { };
 
 
-        public static Devmasters.Cache.File.FileCache<Dictionary<string, List<JednotkaOrganizacni>>> OrganizacniStrukturyUradu = null;
+        public static Devmasters.Cache.File.Cache<Dictionary<string, List<JednotkaOrganizacni>>> OrganizacniStrukturyUradu = null;
         public static DateTime OrganizacniStrukturyUraduExportDate;
 
 
 
 
-        public static Devmasters.Cache.File.FileCache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>> FirmyCasovePodezreleZalozene = null;
-        public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_aktualni_Cache = null;
-        public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_nedavne_Cache = null;
-        public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_vsechny_Cache = null;
+        public static Devmasters.Cache.File.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>> FirmyCasovePodezreleZalozene = null;
+        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_aktualni_Cache = null;
+        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_nedavne_Cache = null;
+        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_vsechny_Cache = null;
 
-        public static Devmasters.Cache.File.FileCache<byte[]> Autocomplete_Cache = null;
-        public static Devmasters.Cache.File.FileCache<List<Autocomplete>> Autocomplete_Firmy_Cache = null;
-        public static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<FullTextSearch.Index<Autocomplete>> FulltextSearchForAutocomplete = null;
+        public static Devmasters.Cache.File.Cache<byte[]> Autocomplete_Cache = null;
+        public static Devmasters.Cache.File.Cache<List<Autocomplete>> Autocomplete_Firmy_Cache = null;
+        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<FullTextSearch.Index<Autocomplete>> FulltextSearchForAutocomplete = null;
 
 
-        public static Devmasters.Cache.File.FileCache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]> Insolvence_firem_politiku_Cache = null;
+        public static Devmasters.Cache.File.Cache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]> Insolvence_firem_politiku_Cache = null;
 
-        public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = null;
-        public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache = null;
-        public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache = null;
+        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = null;
+        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache = null;
+        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache = null;
 
-        public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSNespolehlivymiPlatciDPH_Cache = null;
-        public static Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat> NespolehlivyPlatciDPH_obchodySurady_Cache = null;
+        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSNespolehlivymiPlatciDPH_Cache = null;
+        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> NespolehlivyPlatciDPH_obchodySurady_Cache = null;
 
-        public static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<Sponzoring>> SponzorujiciFirmy_Vsechny = null;
-        public static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<Sponzoring>> SponzorujiciFirmy_Nedavne = null;
+        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Vsechny = null;
+        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Nedavne = null;
 
-        public static Devmasters.Cache.LocalMemory.LocalMemoryCache<List<double>> BasicStatisticData = null;
+        public static Devmasters.Cache.LocalMemory.Cache<List<double>> BasicStatisticData = null;
 
 
         public static Dictionary<string, Lib.Analysis.TemplatedQuery> Afery = new Dictionary<string, Lib.Analysis.TemplatedQuery>();
 
-        public static Devmasters.Cache.LocalMemory.LocalMemoryCache<Dictionary<string, NespolehlivyPlatceDPH>> NespolehlivyPlatciDPH = null;
+        public static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, NespolehlivyPlatceDPH>> NespolehlivyPlatciDPH = null;
 
         //public static SingletonManagerWithSetup<Data.External.TwitterPublisher, Tweetinvi.Models.TwitterCredentials> TweetingManager = null;
 
-        public static Devmasters.Cache.LocalMemory.LocalMemoryCache<Darujme.Stats> DarujmeStats = null;
+        public static Devmasters.Cache.LocalMemory.Cache<Darujme.Stats> DarujmeStats = null;
 
-        public static Devmasters.Cache.LocalMemory.LocalMemoryCache<Dictionary<string, string>> ZkratkyStran_cache = null;
+        public static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>> ZkratkyStran_cache = null;
 
 
         public static string[] HejtmaniOd2016 = new string[] {
@@ -197,7 +197,7 @@ namespace HlidacStatu.Repositories
 
 
                 Util.Consts.Logger.Info("Static data - NespolehlivyPlatciDPH ");
-                NespolehlivyPlatciDPH = new Devmasters.Cache.LocalMemory.LocalMemoryCache<Dictionary<string, NespolehlivyPlatceDPH>>
+                NespolehlivyPlatciDPH = new Devmasters.Cache.LocalMemory.Cache<Dictionary<string, NespolehlivyPlatceDPH>>
                     (TimeSpan.FromHours(12), "NespolehlivyPlatciDPH",
                     (o) =>
                     {
@@ -210,23 +210,13 @@ namespace HlidacStatu.Repositories
                         return data;
                     });
 
-
-                //HlidacStatu.Util.Consts.Logger.Info("Static data - FirmyStatsCache ");
-                //FirmyStatsCache = new Devmasters.Cache.File.FileCache<Dictionary<string, QueryStatistic.StatData>>
-                //        (StaticData.App_Data_Path, TimeSpan.Zero, "FirmyStats",
-                //            null //don't calculate new content. It's too time comsuming
-                //        );
-
-
-
                 Util.Consts.Logger.Info("Static data - Insolvence_firem_politiku ");
-                Insolvence_firem_politiku_Cache = new Devmasters.Cache.File.FileCache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]>(
+                Insolvence_firem_politiku_Cache = new Devmasters.Cache.File.Cache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]>(
                     Connectors.Init.WebAppDataPath, TimeSpan.Zero, "Insolvence_firem_politiku", (obj) =>
                      {
                          var ret = new List<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>>();
                          var lockObj = new object();
-                         Devmasters.Batch.Manager.DoActionForAll<Osoba>(OsobaRepo.PolitickyAktivni.Get().Where(m => m.StatusOsoby() == Osoba.StatusOsobyEnum.Politik).Distinct(),
-                             (o) =>
+                         Devmasters.Batch.Manager.DoActionForAllAsync<Osoba>(OsobaRepo.PolitickyAktivni.Get().Where(m => m.StatusOsoby() == Osoba.StatusOsobyEnum.Politik).Distinct(), async (o) =>
                              {
                                  var icos = o.AktualniVazby(Relation.AktualnostType.Nedavny)
                                                  .Where(w => !string.IsNullOrEmpty(w.To.Id))
@@ -234,7 +224,7 @@ namespace HlidacStatu.Repositories
                                                  .Select(w => w.To.Id);
                                  if (icos.Count() > 0)
                                  {
-                                     var res = InsolvenceRepo.Searching.SimpleSearch("osobaiddluznik:" + o.NameId, 1, 100,
+                                     var res = await InsolvenceRepo.Searching.SimpleSearchAsync("osobaiddluznik:" + o.NameId, 1, 100,
                                             (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc,
                                             limitedView: false);
                                      if (res.IsValid && res.Total > 0)
@@ -286,7 +276,8 @@ namespace HlidacStatu.Repositories
                              Util.Consts.outputWriter.OutputWriter,
                              Util.Consts.progressWriter.ProgressWriter,
                              true, //!System.Diagnostics.Debugger.IsAttached,
-                             maxDegreeOfParallelism: 6, prefix:"Insolvence politiku ");
+                             maxDegreeOfParallelism: 6, prefix:"Insolvence politiku ")
+                             .ConfigureAwait(false).GetAwaiter().GetResult();
 
                          return ret.ToArray();
                      }
@@ -295,7 +286,7 @@ namespace HlidacStatu.Repositories
                 Util.Consts.Logger.Info("Static data - SponzorujiciFirmy_Vsechny ");
 
 
-                SponzorujiciFirmy_Vsechny = new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<Sponzoring>>(
+                SponzorujiciFirmy_Vsechny = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>>(
                                 TimeSpan.FromHours(3), (obj) =>
                                 {
                                     List<Sponzoring> dary = null;
@@ -315,7 +306,7 @@ namespace HlidacStatu.Repositories
                             );
 
                 Util.Consts.Logger.Info("Static data - SponzorujiciFirmy_nedavne");
-                SponzorujiciFirmy_Nedavne = new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<List<Sponzoring>>(
+                SponzorujiciFirmy_Nedavne = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>>(
                         TimeSpan.FromHours(3), (obj) =>
                         {
                             return SponzorujiciFirmy_Vsechny.Get()
@@ -334,7 +325,7 @@ namespace HlidacStatu.Repositories
 
                 Util.Consts.Logger.Info("Static data - DarujmeStats");
 
-                DarujmeStats = new Devmasters.Cache.LocalMemory.LocalMemoryCache<Darujme.Stats>(
+                DarujmeStats = new Devmasters.Cache.LocalMemory.Cache<Darujme.Stats>(
                         TimeSpan.FromHours(3), (obj) =>
                         {
                             var defData = new Darujme.Stats()
@@ -367,24 +358,24 @@ namespace HlidacStatu.Repositories
                     );
 
                 Util.Consts.Logger.Info("Static data - BasicStatisticData ");
-                BasicStatisticData = new Devmasters.Cache.LocalMemory.LocalMemoryCache<List<double>>(
+                BasicStatisticData = new Devmasters.Cache.LocalMemory.Cache<List<double>>(
                         TimeSpan.FromHours(6), (obj) =>
                         {
                             List<double> pol = new List<double>();
                             try
                             {
-                                var res = SmlouvaRepo.Searching.RawSearch("", 1, 0, platnyZaznam: true, anyAggregation:
+                                var res = SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: true, anyAggregation:
                                     new Nest.AggregationContainerDescriptor<Smlouva>()
                                         .Sum("totalPrice", m => m
                                             .Field(ff => ff.CalculatedPriceWithVATinCZK)
                                     ), exactNumOfResults: true
-                                    );
-                                var resNepl = SmlouvaRepo.Searching.RawSearch("", 1, 0, platnyZaznam: false, anyAggregation:
+                                    ).ConfigureAwait(false).GetAwaiter().GetResult();
+                                var resNepl = SmlouvaRepo.Searching.RawSearchAsync("", 1, 0, platnyZaznam: false, anyAggregation:
                                     new Nest.AggregationContainerDescriptor<Smlouva>()
                                         .Sum("totalPrice", m => m
                                             .Field(ff => ff.CalculatedPriceWithVATinCZK)
                                     ), exactNumOfResults: true
-                                    );
+                                    ).ConfigureAwait(false).GetAwaiter().GetResult();
 
                                 long platnych = res.Total;
                                 long neplatnych = resNepl.Total; ;
@@ -415,14 +406,14 @@ namespace HlidacStatu.Repositories
 
 
                 Util.Consts.Logger.Info("Static data - FirmySVazbamiNaPolitiky_*");
-                FirmySVazbamiNaPolitiky_aktualni_Cache = new Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaPolitiky>
+                FirmySVazbamiNaPolitiky_aktualni_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "FirmySVazbamiNaPolitiky_Aktualni",
                    (o) =>
                        {
                            return AnalysisCalculation.LoadFirmySVazbamiNaPolitiky(Relation.AktualnostType.Aktualni, true);
                        });
 
-                FirmySVazbamiNaPolitiky_nedavne_Cache = new Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaPolitiky>
+                FirmySVazbamiNaPolitiky_nedavne_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "FirmySVazbamiNaPolitiky_Nedavne",
                    (o) =>
                    {
@@ -430,7 +421,7 @@ namespace HlidacStatu.Repositories
                        
                    });
 
-                FirmySVazbamiNaPolitiky_vsechny_Cache = new Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaPolitiky>
+                FirmySVazbamiNaPolitiky_vsechny_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "FirmySVazbamiNaPolitiky_Vsechny",
                    (o) =>
                    {
@@ -438,14 +429,15 @@ namespace HlidacStatu.Repositories
                    });
 
 
-                FirmyCasovePodezreleZalozene = new Devmasters.Cache.File.FileCache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>>
+                FirmyCasovePodezreleZalozene = new Devmasters.Cache.File.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>>
                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "FirmyCasovePodezreleZalozene",
                    (o) =>
                    {
-                       return AnalysisCalculation.GetFirmyCasovePodezreleZalozene();
+                       return AnalysisCalculation.GetFirmyCasovePodezreleZalozeneAsync()
+                           .ConfigureAwait(false).GetAwaiter().GetResult();
                    });
 
-                Autocomplete_Cache = new Devmasters.Cache.File.FileCache<byte[]>
+                Autocomplete_Cache = new Devmasters.Cache.File.Cache<byte[]>
                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "AutocompleteV3",
                    (o) =>
                    {
@@ -457,7 +449,7 @@ namespace HlidacStatu.Repositories
                        return serialized;
                    });
 
-                FulltextSearchForAutocomplete = new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<FullTextSearch.Index<Autocomplete>>(
+                FulltextSearchForAutocomplete = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<FullTextSearch.Index<Autocomplete>>(
                         TimeSpan.FromHours(12),
                         "FulltextSearchForAutocomplete_main",
                         o =>
@@ -470,7 +462,7 @@ namespace HlidacStatu.Repositories
                             return index;
                         });
 
-                Autocomplete_Firmy_Cache = new Devmasters.Cache.File.FileCache<List<Autocomplete>>
+                Autocomplete_Firmy_Cache = new Devmasters.Cache.File.Cache<List<Autocomplete>>
                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "Autocomplete_firmyOnly",
                    (o) =>
                    {
@@ -478,7 +470,7 @@ namespace HlidacStatu.Repositories
                    });
 
                 //migrace: tohle by mělo jít odsud do Repo cache
-                ZkratkyStran_cache = new Devmasters.Cache.LocalMemory.LocalMemoryCache<Dictionary<string, string>>
+                ZkratkyStran_cache = new Devmasters.Cache.LocalMemory.Cache<Dictionary<string, string>>
                     (TimeSpan.FromHours(24), "ZkratkyStran",
                     (o) =>
                     {
@@ -487,37 +479,40 @@ namespace HlidacStatu.Repositories
 
 
                 Util.Consts.Logger.Info("Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*");
-                UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = new Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat>
+                UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
                     (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni",
                     (o) =>
                     {
-                        return AnalysisCalculation.UradyObchodujiciSFirmami_s_vazbouNaPolitiky(Relation.AktualnostType.Aktualni, true);
+                        return AnalysisCalculation.UradyObchodujiciSFirmami_s_vazbouNaPolitikyAsync(Relation.AktualnostType.Aktualni, true)
+                            .ConfigureAwait(false).GetAwaiter().GetResult();
                     }
                     );
-                UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache = new Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat>
+                UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
                     (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne",
                     (o) =>
                     {
-                        return AnalysisCalculation.UradyObchodujiciSFirmami_s_vazbouNaPolitiky(Relation.AktualnostType.Nedavny, true);
+                        return AnalysisCalculation.UradyObchodujiciSFirmami_s_vazbouNaPolitikyAsync(Relation.AktualnostType.Nedavny, true)
+                            .ConfigureAwait(false).GetAwaiter().GetResult();
                     }
                     );
-                UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache = new Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat>
+                UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
                     (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny",
                     (o) =>
                     {
-                        return AnalysisCalculation.UradyObchodujiciSFirmami_s_vazbouNaPolitiky(Relation.AktualnostType.Libovolny, true);
+                        return AnalysisCalculation.UradyObchodujiciSFirmami_s_vazbouNaPolitikyAsync(Relation.AktualnostType.Libovolny, true)
+                            .ConfigureAwait(false).GetAwaiter().GetResult();
                     }
                     );
 
                 Util.Consts.Logger.Info("Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*");
-                UradyObchodujiciSNespolehlivymiPlatciDPH_Cache = new Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat>
+                UradyObchodujiciSNespolehlivymiPlatciDPH_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
                     (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "UradyObchodujiciSNespolehlivymiPlatciDPH",
                     (o) =>
                     {
                         return new AnalysisCalculation.VazbyFiremNaUradyStat(); //refresh from task
                     }
                     );
-                NespolehlivyPlatciDPH_obchodySurady_Cache = new Devmasters.Cache.File.FileCache<AnalysisCalculation.VazbyFiremNaUradyStat>
+                NespolehlivyPlatciDPH_obchodySurady_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
                     (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "NespolehlivyPlatciDPH_obchodySurady",
                     (o) =>
                     {
@@ -581,7 +576,7 @@ namespace HlidacStatu.Repositories
                 try
                 {
                     var ossu = ParseOssu();
-                    OrganizacniStrukturyUradu = new Devmasters.Cache.File.FileCache<Dictionary<string, List<JednotkaOrganizacni>>>(
+                    OrganizacniStrukturyUradu = new Devmasters.Cache.File.Cache<Dictionary<string, List<JednotkaOrganizacni>>>(
                         Connectors.Init.WebAppDataPath, TimeSpan.FromDays(90), "OrganizacniStrukturyUradu", (obj) =>
                         {
                             var _organizaniStrukturyUradu = new Dictionary<string, List<JednotkaOrganizacni>>();

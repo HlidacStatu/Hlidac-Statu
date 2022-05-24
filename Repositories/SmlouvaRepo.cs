@@ -22,7 +22,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-
+using System.Threading.Tasks;
 using Manager = HlidacStatu.Repositories.ES.Manager;
 
 
@@ -30,34 +30,12 @@ namespace HlidacStatu.Repositories
 {
     public static partial class SmlouvaRepo
     {
-        public static Lib.OCR.Api.CallbackData CallbackDataForOCRReq(Smlouva smlouva, int prilohaindex)
+        public static Task<bool> DeleteAsync(Smlouva smlouva, ElasticClient client = null)
         {
-            var url = Config.GetWebConfigValue("ESConnection");
-
-            if (smlouva.platnyZaznam)
-                url = url + $"/{Manager.defaultIndexName}/smlouva/{smlouva.Id}/_update";
-            else
-                url = url + $"/{Manager.defaultIndexName_Sneplatne}/smlouva/{smlouva.Id}/_update";
-
-            string callback =
-                Lib.OCR.Api.CallbackData.PrepareElasticCallbackDataForOCRReq(
-                    $"prilohy[{prilohaindex}].plainTextContent",
-                    true);
-            callback = callback.Replace("#ADDMORE#", $"ctx._source.prilohy[{prilohaindex}].lastUpdate = '#NOW#';"
-                                                     + $"ctx._source.prilohy[{prilohaindex}].lenght = #LENGTH#;"
-                                                     + $"ctx._source.prilohy[{prilohaindex}].wordCount=#WORDCOUNT#;"
-                                                     + $"ctx._source.prilohy[{prilohaindex}].contentType='#CONTENTTYPE#'");
-
-            return new Lib.OCR.Api.CallbackData(new Uri(url), callback,
-                Lib.OCR.Api.CallbackData.CallbackType.LocalElastic);
+            return DeleteAsync(smlouva.Id);
         }
 
-        public static bool Delete(Smlouva smlouva, ElasticClient client = null)
-        {
-            return Delete(smlouva.Id);
-        }
-
-        public static Smlouva[] GetPodobneSmlouvy(string idSmlouvy, IEnumerable<QueryContainer> mandatory,
+        public static async Task<Smlouva[]> GetPodobneSmlouvyAsync(string idSmlouvy, IEnumerable<QueryContainer> mandatory,
             IEnumerable<QueryContainer> optional = null, IEnumerable<string> exceptIds = null, int numOfResults = 50)
         {
             optional = optional ?? new QueryContainer[] { };
@@ -71,11 +49,11 @@ namespace HlidacStatu.Repositories
                 tryNum--;
 
                 var tmpResult = new List<Smlouva>();
-                var res = SmlouvaRepo.Searching.RawSearch(
+                var res = await SmlouvaRepo.Searching.RawSearchAsync(
                     new QueryContainerDescriptor<Smlouva>().Bool(b => b.Must(query)),
                     1, numOfResults, SmlouvaRepo.Searching.OrderResult.DateAddedDesc, null
                 );
-                var resN = SmlouvaRepo.Searching.RawSearch(
+                var resN = await SmlouvaRepo.Searching.RawSearchAsync(
                     new QueryContainerDescriptor<Smlouva>().Bool(b => b.Must(query)),
                     1, numOfResults, SmlouvaRepo.Searching.OrderResult.DateAddedDesc, null, platnyZaznam: false
                 );
@@ -100,22 +78,10 @@ namespace HlidacStatu.Repositories
                 }
             }
 
-            ;
-            if (_result == null)
-                _result = new Smlouva[] { }; //not found anything
+            _result ??= new Smlouva[] { };
 
             return _result.Take(numOfResults).ToArray();
         }
-
-        static string[] bankyIcoList = new string[]
-        {
-            "29045371", "24131768", "04253434", "07662645", "63492555", "03814742", "06325416", "28198131", "47610921",
-            "63078333", "45244782", "44848943", "00001350", "49241397", "60433566", "47116102", "14893649", "61858374",
-            "07482728", "13584324", "05638216", "49279866", "47115378", "45317054", "27943445", "60192852", "25672720",
-            "47115289", "27427901", "26080222", "07639996", "05658446", "28992610", "47116129", "27184765", "06718159",
-            "49241257", "49240901", "28949587", "25083325", "07920245", "60197609", "25307835", "64948242", "00671126",
-            "48550019", "01555332", "25778722", "25783301", "27444376", "64946649", "26137755", "64508889", "63083868"
-        };
 
         private static void PrepareBeforeSave(Smlouva smlouva, bool updateLastUpdateValue = true)
         {
@@ -155,7 +121,7 @@ namespace HlidacStatu.Repositories
 
             smlouva.Hint.DenUzavreni = (int)Devmasters.DT.Util.TypeOfDay(smlouva.datumUzavreni);
 
-            if (firmy.Count() == 0)
+            if (!firmy.Any())
                 smlouva.Hint.PocetDniOdZalozeniFirmy = 9999;
             else
                 smlouva.Hint.PocetDniOdZalozeniFirmy = (int)firmy
@@ -199,15 +165,6 @@ namespace HlidacStatu.Repositories
             //vyjimky
             //smlouvy s bankama o repo a vkladech
             bool vyjimkaNaLimit = false;
-            Smlouva.SClassification.ClassificationsTypes[] vyjimkyClassif =
-                new Smlouva.SClassification.ClassificationsTypes[]
-                {
-                    Smlouva.SClassification.ClassificationsTypes.finance_formality,
-                    Smlouva.SClassification.ClassificationsTypes.finance_repo,
-                    Smlouva.SClassification.ClassificationsTypes.finance_bankovni,
-                    Smlouva.SClassification.ClassificationsTypes.dary_obecne
-                };
-
             if (vyjimkaNaLimit == false)
             {
                 if (
@@ -243,7 +200,6 @@ namespace HlidacStatu.Repositories
                     p.UpdateStatistics();
             }
 
-
             if (ClassificationOverrideRepo.TryGetOverridenClassification(smlouva.Id, out var classificationOverride))
             {
                 var types = new List<Smlouva.SClassification.Classification>();
@@ -271,7 +227,6 @@ namespace HlidacStatu.Repositories
                 icos = ico_s_VazbouPolitikNedavne;
             if (aktualnost == Relation.AktualnostType.Aktualni)
                 icos = ico_s_VazbouPolitikAktualni;
-
 
             Firma f = null;
             if (smlouva.platnyZaznam)
@@ -316,7 +271,7 @@ namespace HlidacStatu.Repositories
                 .Distinct()
         );
 
-        public static bool Save(Smlouva smlouva, ElasticClient client = null, bool updateLastUpdateValue = true)
+        public static async Task<bool> SaveAsync(Smlouva smlouva, ElasticClient client = null, bool updateLastUpdateValue = true)
         {
             if (smlouva == null)
                 return false;
@@ -326,22 +281,20 @@ namespace HlidacStatu.Repositories
             if (c == null)
             {
                 if (smlouva.platnyZaznam)
-                    c = Manager.GetESClient();
+                    c = await Manager.GetESClientAsync();
                 else
-                    c = Manager.GetESClient_Sneplatne();
+                    c = await Manager.GetESClient_SneplatneAsync();
             }
 
-            var res = c
-                //.Update<Smlouva>()
-                .Index<Smlouva>(smlouva, m => m.Id(smlouva.Id));
+            var res = await c.IndexAsync<Smlouva>(smlouva, m => m.Id(smlouva.Id));
 
             if (smlouva.platnyZaznam == false && res.IsValid)
             {
                 //zkontroluj zda neni v indexu s platnymi. pokud ano, smaz ho tam
-                var cExist = Manager.GetESClient();
-                var s = Load(smlouva.Id, cExist);
+                var cExist = await Manager.GetESClientAsync();
+                var s = await LoadAsync(smlouva.Id, cExist);
                 if (s != null)
-                    Delete(smlouva.Id, cExist);
+                    await DeleteAsync(smlouva.Id, cExist);
             }
 
             if (res.IsValid)
@@ -470,7 +423,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static void ZmenStavSmlouvyNa(Smlouva smlouva, bool platnyZaznam)
+        public static async Task ZmenStavSmlouvyNaAsync(Smlouva smlouva, bool platnyZaznam)
         {
             var issueTypeId = -1;
             var issue = new Issue(null, issueTypeId, "Smlouva byla znepřístupněna",
@@ -488,27 +441,27 @@ namespace HlidacStatu.Repositories
                         .ToArray();
                 }
 
-                Save(smlouva);
+                await SaveAsync(smlouva);
             }
             else if (platnyZaznam == false && smlouva.znepristupnenaSmlouva() == false)
             {
                 smlouva.platnyZaznam = platnyZaznam;
                 if (!smlouva.Issues.Any(m => m.IssueTypeId == -1))
                     smlouva.AddSpecificIssue(issue);
-                Save(smlouva);
+                await SaveAsync(smlouva);
             }
         }
 
-        public static IEnumerable<string> _allIdsFromES(bool deleted, Action<string> outputWriter = null,
+        public static async Task<IEnumerable<string>> _allIdsFromESAsync(bool deleted, Action<string> outputWriter = null,
             Action<ActionProgressData> progressWriter = null)
         {
             List<string> ids = new List<string>();
-            var client = deleted ? Manager.GetESClient_Sneplatne() : Manager.GetESClient();
+            var client = deleted ? await Manager.GetESClient_SneplatneAsync() : await Manager.GetESClientAsync();
 
-            Func<int, int, ISearchResponse<Smlouva>> searchFunc =
-                searchFunc = (size, page) =>
+            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc =
+                searchFunc = async (size, page) =>
                 {
-                    return client.Search<Smlouva>(a => a
+                    return await client.SearchAsync<Smlouva>(a => a
                         .Size(size)
                         .From(page * size)
                         .Source(false)
@@ -518,7 +471,7 @@ namespace HlidacStatu.Repositories
                 };
 
 
-            Tools.DoActionForQuery<Smlouva>(client,
+            await Tools.DoActionForQueryAsync<Smlouva>(client,
                 searchFunc, (hit, param) =>
                 {
                     ids.Add(hit.Id);
@@ -549,45 +502,40 @@ namespace HlidacStatu.Repositories
             return ids;
         }
 
-        public static IEnumerable<string> AllIdsFromES()
+        public static Task<IEnumerable<string>> AllIdsFromESAsync()
         {
-            return AllIdsFromES(null);
+            return AllIdsFromESAsync(null);
         }
 
-        public static IEnumerable<string> AllIdsFromES(bool? deleted, Action<string> outputWriter = null,
+        public static async Task<IEnumerable<string>> AllIdsFromESAsync(bool? deleted, Action<string> outputWriter = null,
             Action<ActionProgressData> progressWriter = null)
         {
             if (deleted.HasValue)
-                return _allIdsFromES(deleted.Value, outputWriter, progressWriter);
+                return await _allIdsFromESAsync(deleted.Value, outputWriter, progressWriter);
             else
                 return
-                    _allIdsFromES(false, outputWriter, progressWriter)
-                        .Union(_allIdsFromES(true, outputWriter, progressWriter))
-                    ;
+                    (await _allIdsFromESAsync(false, outputWriter, progressWriter))
+                        .Union(await _allIdsFromESAsync(true, outputWriter, progressWriter));
         }
 
-        public static bool Delete(string Id, ElasticClient client = null)
+        public static async Task<bool> DeleteAsync(string Id, ElasticClient client = null)
         {
-            if (client == null)
-                client = Manager.GetESClient();
-            var res = client
-                .Delete<Smlouva>(Id);
+            client ??= await Manager.GetESClientAsync();
+            var res = await client.DeleteAsync<Smlouva>(Id);
             return res.IsValid;
         }
 
-        public static bool ExistsZaznam(string id, ElasticClient client = null)
+        public static async Task<bool> ExistsZaznamAsync(string id, ElasticClient client = null)
         {
             bool noSetClient = client == null;
-            if (client == null)
-                client = Manager.GetESClient();
-            var res = client
-                .DocumentExists<Smlouva>(id);
+            client ??= await Manager.GetESClientAsync();
+            var res = await client.DocumentExistsAsync<Smlouva>(id);
             if (noSetClient)
             {
                 if (res.Exists)
                     return true;
-                client = Manager.GetESClient_Sneplatne();
-                res = client.DocumentExists<Smlouva>(id);
+                client = await Manager.GetESClient_SneplatneAsync();
+                res = await client.DocumentExistsAsync<Smlouva>(id);
                 return res.Exists;
             }
             else
@@ -595,76 +543,22 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static StringBuilder ExportData(string query, int count, string order,
-            ExportDataFormat format, bool withPlainText, out string contenttype)
+        public static async Task<Smlouva> LoadAsync(string idVerze, ElasticClient client = null, bool includePrilohy = true)
         {
-            //TODO ignored format
-
-            contenttype = "text/tab-separated-values";
-
-            StringBuilder sb = new StringBuilder();
-
-            if (count > 10000)
-                count = 10000;
-
-            Func<int, int, ISearchResponse<Smlouva>> searchFunc =
-                (size, page) =>
-                {
-                    return Manager.GetESClient().Search<Smlouva>(a => a
-                        .Size(size)
-                        .Source(m => m.Excludes(e => e.Field(o => o.Prilohy)))
-                        .From(page * size)
-                        .Query(q => SmlouvaRepo.Searching.GetSimpleQuery(query))
-                        .Scroll("1m")
-                    );
-                };
-
-            sb.AppendLine(
-                "URL\tID smlouvy\tPodepsána\tZveřejněna\tHodnota smlouvy\tPředmět smlouvy\tPlátce\tPlatce IC\tDodavatele a jejich ICO");
-            int c = 0;
-            Tools.DoActionForQuery<Smlouva>(Manager.GetESClient(),
-                searchFunc, (hit, param) =>
-                {
-                    var s = hit.Source;
-                    sb.AppendLine(
-                        s.GetUrl(false) + "\t"
-                                        + s.Id + "\t"
-                                        + s.datumUzavreni.ToString("dd.MM.yyyy") + "\t"
-                                        + s.casZverejneni.ToString("dd.MM.yyyy") + "\t"
-                                        + s.CalculatedPriceWithVATinCZK.ToString(Util.Consts.czCulture) + "\t"
-                                        + TextUtil.NormalizeToBlockText(s.predmet) + "\t"
-                                        + s.Platce.nazev + "\t"
-                                        + s.Platce.ico + "\t"
-                                        + ((s.Prijemce?.Count() > 0)
-                                            ? s.Prijemce.Select(p => p.nazev + "\t" + p.ico)
-                                                .Aggregate((f, sec) => f + "\t" + sec)
-                                            : "")
-                    );
-
-                    Console.Write(c++);
-                    return new ActionOutputData() { CancelRunning = false, Log = null };
-                }, null, null, null, false);
-
-
-            return sb;
-        }
-
-        public static Smlouva Load(string idVerze, ElasticClient client = null, bool includePrilohy = true)
-        {
-            var s = _load(idVerze, client, includePrilohy);
+            var s = await _loadAsync(idVerze, client, includePrilohy);
             if (s == null)
                 return s;
-            var sclass = s.GetRelevantClassification();
+            _ = s.GetRelevantClassification();
             if (s.Classification?.Version == 1 && s.Classification?.Types != null)
             {
                 s.Classification.ConvertToV2();
-                Save(s, null, false);
+                await SaveAsync(s, null, false);
             }
 
             return s;
         }
 
-        private static Smlouva _load(string idVerze, ElasticClient client = null, bool includePrilohy = true)
+        private static async Task<Smlouva> _loadAsync(string idVerze, ElasticClient client = null, bool includePrilohy = true)
         {
             bool specClient = client != null;
             try
@@ -673,13 +567,13 @@ namespace HlidacStatu.Repositories
                 if (specClient)
                     c = client;
                 else
-                    c = Manager.GetESClient();
+                    c = await Manager.GetESClientAsync();
 
                 //var res = c.Get<Smlouva>(idVerze);
 
                 var res = includePrilohy
-                    ? c.Get<Smlouva>(idVerze)
-                    : c.Get<Smlouva>(idVerze, s => s.SourceExcludes("prilohy.plainTextContent"));
+                    ? await c.GetAsync<Smlouva>(idVerze)
+                    : await c.GetAsync<Smlouva>(idVerze, s => s.SourceExcludes("prilohy.plainTextContent"));
 
 
                 if (res.Found)
@@ -688,11 +582,11 @@ namespace HlidacStatu.Repositories
                 {
                     if (specClient == false)
                     {
-                        var c1 = Manager.GetESClient_Sneplatne();
+                        var c1 = await Manager.GetESClient_SneplatneAsync();
 
                         res = includePrilohy
-                            ? c1.Get<Smlouva>(idVerze)
-                            : c1.Get<Smlouva>(idVerze, s => s.SourceExcludes(sml => sml.Prilohy));
+                            ? await c1.GetAsync<Smlouva>(idVerze)
+                            : await c1.GetAsync<Smlouva>(idVerze, s => s.SourceExcludes(sml => sml.Prilohy));
 
                         if (res.Found)
                             return res.Source;

@@ -1,7 +1,6 @@
 ﻿using HlidacStatu.Datasets;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
 
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +12,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
@@ -68,7 +67,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>Ico, jméno a datová schránka</returns>
         [Authorize]
         [HttpGet("{jmenoFirmy}")]
-        public ActionResult<FirmaDTO> CompanyID([FromRoute] string jmenoFirmy)
+        public async Task<ActionResult<FirmaDTO>> CompanyID([FromRoute] string jmenoFirmy)
         {
             try
             {
@@ -79,7 +78,7 @@ namespace HlidacStatu.Web.Controllers
                 else
                 {
                     var name = Firma.JmenoBezKoncovky(jmenoFirmy);
-                    var found = FirmaRepo.Searching.FindAll(name, 1).FirstOrDefault();
+                    var found = (await FirmaRepo.Searching.FindAllAsync(name, 1)).FirstOrDefault();
                     if (found == null)
                     {
                         return NotFound($"Firma {jmenoFirmy} nenalezena.");

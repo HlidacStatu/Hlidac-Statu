@@ -4,7 +4,7 @@
 
     var model = new HlidacStatu.Repositories.Searching.SmlouvaSearchResult(Context.Request.Query, SmlouvaRepo.Searching.OrderResult.DateAddedDesc);
     model.Q = "hint.skrytaCena:1";
-    model = SmlouvaRepo.Searching.SimpleSearch(model.Q, model.Page,
+    model = await SmlouvaRepo.Searching.SimpleSearchAsync(model.Q, model.Page,
 100, (SmlouvaRepo.Searching.OrderResult)(Convert.ToInt32(model.Order)), platnyZaznam: true);
 
     //model.Chyby = true;

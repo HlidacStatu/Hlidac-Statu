@@ -12,7 +12,6 @@
     Layout = null;
 
     var ceo = Model.Ceo();
-
 }
 
 @* Pravý sloupec *@
@@ -48,7 +47,7 @@
         }
         else
         {
-            var rppOsoby = Model.CeoFromRPP();
+            var rppOsoby = await Model.CeoFromRPPAsync();
             if (rppOsoby.Count() > 0)
             {
                 <div class="col-sm-4">
@@ -115,9 +114,8 @@
     <hr />
 
     @{
-        List<HlidacStatu.Web.Models.SkutecniMajitele> majitele = new List<SkutecniMajitele>();
         HlidacStatu.Datasets.DataSet skutMajitDS = HlidacStatu.Datasets.DataSet.CachedDatasets.Get("skutecni-majitele");
-        var skutMajitRes = skutMajitDS.SearchDataRaw("ico:" + Model.ICO, 1, 1).Result.ToList();
+        var skutMajitRes = (await skutMajitDS.SearchDataRawAsync("ico:" + Model.ICO, 1, 1)).Result.ToList();
     }
     @if (skutMajitRes.Any())
     {

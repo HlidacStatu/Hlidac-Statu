@@ -19,6 +19,8 @@ using System.Dynamic;
 using System.Linq;
 using System.Net.Mail;
 using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Datasets
 {
@@ -36,7 +38,7 @@ namespace HlidacStatu.Datasets
             NullValueHandling = NullValueHandling.Ignore
         };
 
-        public static DataSet RegisterNew(Registration reg, string user)
+        public static async Task<DataSet> RegisterNewAsync(Registration reg, string user)
         {
             if (reg == null)
                 throw new DataSetException(reg.datasetId, ApiResponseStatus.DatasetNotFound);
@@ -46,7 +48,7 @@ namespace HlidacStatu.Datasets
 
 
             reg.NormalizeShortName();
-            var client = Manager.GetESClient(reg.datasetId, idxType: Manager.IndexType.DataSource);
+            var client = await Manager.GetESClientAsync(reg.datasetId, idxType: Manager.IndexType.DataSource);
 
             if (reg.searchResultTemplate != null && !string.IsNullOrEmpty(reg.searchResultTemplate?.body))
             {
@@ -70,33 +72,33 @@ namespace HlidacStatu.Datasets
                 }
             }
 
-            var ret = client.Indices.Exists(client.ConnectionSettings.DefaultIndex);
+            var ret = await client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex);
             if (ret.Exists)
             {
                 throw new DataSetException(reg.datasetId, ApiResponseStatus.DatasetRegistered);
             }
             else
             {
-                Manager.CreateIndex(client);
-                DataSetDB.Instance.AddData(reg, user);
+                await Manager.CreateIndexAsync(client);
+                await DataSetDB.Instance.AddDataAsync(reg, user);
             }
 
 
             return new DataSet(reg.datasetId);
         }
 
-        private IEnumerable<string> _getPreviewTopValueFromItem(JObject item, bool fromAllTopValues = false)
+        private async Task<IEnumerable<string>> _getPreviewTopValueFromItemAsync(JObject item, bool fromAllTopValues = false)
         {
             List<string> topTxts = new List<string>();
-            List<string> texts = new List<string>();
-            var props = GetMappingList("ICO");
+            
+            var props = await GetMappingListAsync("ICO");
             foreach (var prop in props)
             {
                 var o = item.SelectTokens(prop).FirstOrDefault();
                 string t = "";
                 if (o != null && o.GetType() == typeof(JValue))
                     t = o.Value<string>() ?? "";
-                //var t = ((string)Dynamitey.Dynamic.InvokeGetChain(item, prop)) ?? "";
+                
                 if (DataValidators.CheckCZICO(t))
                 {
                     Firma f = Firmy.Get(t);
@@ -109,14 +111,14 @@ namespace HlidacStatu.Datasets
                 }
             }
 
-            props = GetMappingList("Osobaid");
+            props = await GetMappingListAsync("Osobaid");
             foreach (var prop in props)
             {
                 var o = item.SelectTokens(prop).FirstOrDefault();
                 string t = "";
                 if (o != null && o.GetType() == typeof(JValue))
                     t = o.Value<string>() ?? "";
-                //var t = ((string)Dynamitey.Dynamic.InvokeGetChain(item, prop)) ?? "";
+                
                 if (!string.IsNullOrEmpty(t))
                 {
                     Osoba os = Osoby.GetByNameId.Get(t);
@@ -132,18 +134,15 @@ namespace HlidacStatu.Datasets
             return topTxts;
         }
 
-        public IEnumerable<string> _getPreviewTextValueFromItem(JObject item)
+        public async Task<IEnumerable<string>> _getPreviewTextValueFromItemAsync(JObject item)
         {
-            List<string> topTxts = new List<string>();
             List<string> texts = new List<string>();
-            var topProps = GetMappingList("ICO")
-                .Union(GetMappingList("Osobaid"));
+            var topProps = (await GetMappingListAsync("ICO"))
+                .Union(await GetMappingListAsync("Osobaid"));
 
-
-            var textProps = GetTextMappingList().Except(topProps);
+            var textProps = (await GetTextMappingListAsync()).Except(topProps);
             foreach (var prop in textProps)
             {
-                //var t = ((string)Dynamitey.Dynamic.InvokeGetChain(item, prop)) ?? "";
                 var o = item.SelectTokens(prop).FirstOrDefault();
                 string t = "";
                 if (o != null && o.GetType() == typeof(JValue))
@@ -153,21 +152,21 @@ namespace HlidacStatu.Datasets
                 {
                     //migrace: je potřeba při vzniku záznamu naplnit SocialShareText v datasetu
                     texts.Add(t);
-
                 }
             }
 
             return texts.OrderByDescending(o => o.Length);
         }
 
-        public string GetPreviewTextValueFromItem(JObject item, int maxLength = 320, bool useSpecProperties = true,
+        public async Task<string> GetPreviewTextValueFromItemAsync(JObject item, int maxLength = 320,
+            bool useSpecProperties = true,
             bool useTextProperties = true)
         {
             var txts = new List<string>();
             if (useSpecProperties)
-                txts.AddRange(_getPreviewTopValueFromItem(item));
+                txts.AddRange(await _getPreviewTopValueFromItemAsync(item));
             if (useTextProperties)
-                txts.AddRange(_getPreviewTextValueFromItem(item));
+                txts.AddRange(await _getPreviewTextValueFromItemAsync(item));
 
             return Devmasters.TextUtil.ShortenText(
                 string.Join(" ", txts)
@@ -183,10 +182,11 @@ namespace HlidacStatu.Datasets
         protected DataSet(string datasourceName, bool fireException)
         {
             datasetId = datasourceName.ToLower();
-            client = Manager.GetESClient(datasetId, idxType: Manager.IndexType.DataSource);
+            client = Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
 
-
-            var ret = client.Indices.Exists(client.ConnectionSettings.DefaultIndex);
+            var ret = client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex)
+                .ConfigureAwait(false).GetAwaiter().GetResult();
             if (ret.Exists == false)
             {
                 if (fireException)
@@ -203,11 +203,11 @@ namespace HlidacStatu.Datasets
 
         IEnumerable<CorePropertyBase> _mapping = null;
 
-        protected IEnumerable<CorePropertyBase> GetElasticMapping()
+        protected async Task<IEnumerable<CorePropertyBase>> GetElasticMappingAsync()
         {
             if (_mapping == null)
             {
-                var getIndexResponse = client.Indices.Get(client.ConnectionSettings.DefaultIndex);
+                var getIndexResponse = await client.Indices.GetAsync(client.ConnectionSettings.DefaultIndex);
                 IIndexState remote = getIndexResponse.Indices.Count>0 ? getIndexResponse.Indices.FirstOrDefault().Value : null;
                 var dataMapping = remote?.Mappings?.Properties;
                 if (dataMapping == null)
@@ -218,7 +218,7 @@ namespace HlidacStatu.Datasets
             return _mapping;
         }
 
-        public bool HasAdminAccess(ClaimsPrincipal user)
+        public async Task<bool> HasAdminAccessAsync(ClaimsPrincipal user)
         {
             if (user is null)
                 return false;
@@ -226,77 +226,70 @@ namespace HlidacStatu.Datasets
             if (user.IsInRole("Admin"))
                 return true;
 
-            return Registration()?.HasAdminAccess(user) ?? false;
+            return (await RegistrationAsync())?.HasAdminAccess(user) ?? false;
         }
 
-        public virtual DataSearchResult SearchData(string queryString, int page, int pageSize, string sort = null,
-            bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false)
-        {
-            return DatasetRepo.Searching.SearchData(this, queryString, page, pageSize, sort, excludeBigProperties,
+        public virtual Task<DataSearchResult> SearchDataAsync(string queryString, int page, int pageSize, string sort = null,
+            bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false) 
+            => DatasetRepo.Searching.SearchDataAsync(this, queryString, page, pageSize, sort, excludeBigProperties,
                 withHighlighting, exactNumOfResults);
-        }
 
-        public virtual DataSearchRawResult SearchDataRaw(string queryString, int page, int pageSize, string sort = null,
-            bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false)
-        {
-            return DatasetRepo.Searching.SearchDataRaw(this, queryString, page, pageSize, sort, excludeBigProperties,
+        public virtual Task<DataSearchRawResult> SearchDataRawAsync(string queryString, int page, int pageSize,
+            string sort = null,
+            bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false) 
+            => DatasetRepo.Searching.SearchDataRawAsync(this, queryString, page, pageSize, sort, excludeBigProperties,
                 withHighlighting, exactNumOfResults);
-        }
 
-        public IEnumerable<string> GetMappingList(string specificMapName = null, string attrNameModif = "")
+        public async Task<IEnumerable<string>> GetMappingListAsync(string specificMapName = null, string attrNameModif = "")
         {
             List<string> properties = new List<string>();
-            var mapping = GetElasticMapping();
-            properties.AddRange(getMappingType("", null, mapping, specificMapName, attrNameModif));
+            var mapping = await GetElasticMappingAsync();
+            properties.AddRange(GetMappingType("", null, mapping, specificMapName, attrNameModif));
             return properties;
         }
 
-        public IEnumerable<string> GetTextMappingList()
+        public async Task<IEnumerable<string>> GetTextMappingListAsync()
         {
             List<string> properties = new List<string>();
-            var mapping = GetElasticMapping();
-            properties.AddRange(getMappingType("", typeof(TextProperty), mapping));
+            var mapping = await GetElasticMappingAsync();
+            properties.AddRange(GetMappingType("", typeof(TextProperty), mapping));
             return properties;
         }
 
-        public IEnumerable<string> GetDatetimeMappingList()
+        public async Task<IEnumerable<string>> GetDatetimeMappingListAsync()
         {
             List<string> properties = new List<string>();
-            var mapping = GetElasticMapping();
-            properties.AddRange(getMappingType("", typeof(DateProperty), mapping));
+            var mapping = await GetElasticMappingAsync();
+            properties.AddRange(GetMappingType("", typeof(DateProperty), mapping));
             return properties;
         }
 
-        public bool IsPropertyDatetime(string property)
+        public async Task<bool> IsPropertyDatetimeAsync(string property)
         {
-            var props = GetMappingList(property);
-            var isDt = true;
+            var props = await GetMappingListAsync(property);
             foreach (var p in props)
             {
-                isDt = isDt && IsMappedPropertyDatetime(p);
-                if (isDt == false)
+                if (await IsMappedPropertyDatetimeAsync(p) == false)
                     return false;
             }
 
-            return isDt;
+            return true;
         }
 
-        public bool IsMappedPropertyDatetime(string mappedProperty)
-        {
-            return GetDatetimeMappingList().Contains(mappedProperty);
-        }
+        public async Task<bool> IsMappedPropertyDatetimeAsync(string mappedProperty) 
+            => (await GetDatetimeMappingListAsync()).Contains(mappedProperty);
 
-        protected IEnumerable<string> getMappingType(string prefix, Type mappingType,
+        protected IEnumerable<string> GetMappingType(string prefix, Type mappingType,
             IEnumerable<CorePropertyBase> props, string specName = null, string attrNameModif = "")
         {
-            List<string> _props = new List<string>();
+            List<string> mappingTypes = new List<string>();
 
             foreach (var p in props)
             {
                 if (mappingType == null || p.GetType() == mappingType)
                 {
                     if (specName == null || p.Name.Name.ToLower() == specName.ToLower())
-                        _props.Add(prefix + attrNameModif + p.Name.Name + attrNameModif);
+                        mappingTypes.Add(prefix + attrNameModif + p.Name.Name + attrNameModif);
                 }
 
                 if (p.GetType() == typeof(ObjectProperty))
@@ -304,13 +297,13 @@ namespace HlidacStatu.Datasets
                     ObjectProperty pObj = (ObjectProperty)p;
                     if (pObj.Properties != null)
                     {
-                        _props.AddRange(getMappingType(prefix + p.Name.Name + ".", mappingType,
+                        mappingTypes.AddRange(GetMappingType(prefix + p.Name.Name + ".", mappingType,
                             pObj.Properties.Select(m => (CorePropertyBase)m.Value), specName, attrNameModif));
                     }
                 }
             }
 
-            return _props;
+            return mappingTypes;
         }
 
         public ExpandoObject ExportFlatObject(string serializedObj)
@@ -335,7 +328,6 @@ namespace HlidacStatu.Datasets
             return obj;
         }
 
-
         public bool IsFlatStructure()
         {
             //important from import data from CSV
@@ -347,7 +339,7 @@ namespace HlidacStatu.Datasets
         {
             Dictionary<string, Property> names = new Dictionary<string, Property>();
             var sch = Schema;
-            getPropertyNameTypeFromSchemaInternal(new JSchema[] { sch }, "", name, ref names);
+            GetPropertyNameTypeFromSchemaInternal(new JSchema[] { sch }, "", name, ref names);
             return names.Keys.ToArray();
         }
 
@@ -387,11 +379,11 @@ namespace HlidacStatu.Datasets
         {
             Dictionary<string, Property> names = new Dictionary<string, Property>();
             var sch = Schema;
-            getPropertyNameTypeFromSchemaInternal(new JSchema[] { sch }, "", name, ref names);
+            GetPropertyNameTypeFromSchemaInternal(new JSchema[] { sch }, "", name, ref names);
             return names;
         }
 
-        private void getPropertyNameTypeFromSchemaInternal(IEnumerable<JSchema> subschema, string prefix, string name,
+        private void GetPropertyNameTypeFromSchemaInternal(IEnumerable<JSchema> subschema, string prefix, string name,
             ref Dictionary<string, Property> names)
         {
             foreach (var ss in subschema)
@@ -406,11 +398,11 @@ namespace HlidacStatu.Datasets
                     }
 
                     if (prop.Value.Items.Count > 0)
-                        getPropertyNameTypeFromSchemaInternal(prop.Value.Items, prefix + prop.Key + ".", name,
+                        GetPropertyNameTypeFromSchemaInternal(prop.Value.Items, prefix + prop.Key + ".", name,
                             ref names);
                     else if (prop.Value.Properties?.Count > 0)
                     {
-                        getPropertyNameTypeFromSchemaInternal(
+                        GetPropertyNameTypeFromSchemaInternal(
                             new JSchema[] { prop.Value }
                             , prefix + prop.Key + ".", name, ref names);
                     }
@@ -485,19 +477,19 @@ namespace HlidacStatu.Datasets
             return ret;
         }
 
-        public void SendErrorMsgToAuthor(string url, string errMsg)
+        public async Task SendErrorMsgToAuthorAsync(string url, string errMsg)
         {
-            if (Devmasters.TextUtil.IsValidEmail(Registration().createdBy ?? ""))
+            if (Devmasters.TextUtil.IsValidEmail((await RegistrationAsync()).createdBy ?? ""))
             {
                 try
                 {
-                    using (MailMessage msg = new MailMessage("podpora@hlidacstatu.cz", Registration().createdBy))
+                    using (MailMessage msg = new MailMessage("podpora@hlidacstatu.cz", (await RegistrationAsync()).createdBy))
                     {
                         msg.Bcc.Add("michal@michalblaha.cz");
-                        msg.Subject = "Chyba v template vasi databáze " + Registration().name;
+                        msg.Subject = "Chyba v template vasi databáze " + (await RegistrationAsync()).name;
                         msg.IsBodyHtml = false;
                         msg.Body =
-                            $"Upozornění!V template vaší databáze {Registration().datasetId} na adrese {url} došlo k chybě:\n\n{errMsg}\n\nProsíme opravte ji co nejdříve.\nDíky\n\nTeam Hlídače státu.";
+                            $"Upozornění!V template vaší databáze {(await RegistrationAsync()).datasetId} na adrese {url} došlo k chybě:\n\n{errMsg}\n\nProsíme opravte ji co nejdříve.\nDíky\n\nTeam Hlídače státu.";
                         msg.BodyEncoding = System.Text.Encoding.UTF8;
                         msg.SubjectEncoding = System.Text.Encoding.UTF8;
                         using (SmtpClient smtp = new SmtpClient())
@@ -520,10 +512,10 @@ namespace HlidacStatu.Datasets
 
         private Registration _registration = null;
 
-        public Registration Registration()
+        public async Task<Registration> RegistrationAsync()
         {
             if (_registration == null)
-                _registration = DataSetDB.Instance.GetRegistration(datasetId);
+                _registration = await DataSetDB.Instance.GetRegistrationAsync(datasetId);
 
             return _registration;
         }
@@ -574,7 +566,8 @@ namespace HlidacStatu.Datasets
             {
                 if (schema == null)
                 {
-                    schema = DataSetDB.Instance.GetRegistration(DatasetId)
+                    schema = DataSetDB.Instance.GetRegistrationAsync(DatasetId).ConfigureAwait(false)
+                        .GetAwaiter().GetResult()
                         ?.GetSchema();
                 }
 
@@ -582,20 +575,18 @@ namespace HlidacStatu.Datasets
             }
         }
 
-        public virtual string AddData(object data, string id, string createdBy, bool validateSchema = true,
-            bool skipallowWriteAccess = false)
-        {
-            return AddData(JsonConvert.SerializeObject(data), id, createdBy, validateSchema,
+        public virtual Task<string> AddDataAsync(object data, string id, string createdBy, bool validateSchema = true,
+            bool skipallowWriteAccess = false) 
+            => AddDataAsync(JsonConvert.SerializeObject(data), id, createdBy, validateSchema,
                 skipallowWriteAccess: skipallowWriteAccess);
-        }
 
-        public virtual string AddData(string data, string id, string createdBy, bool validateSchema = true,
+        public virtual async Task<string> AddDataAsync(string data, string id, string createdBy, bool validateSchema = true,
             bool skipOCR = false, bool skipallowWriteAccess = false)
         {
-            if (Registration().allowWriteAccess == false && createdBy != "michal@michalblaha.cz" &&
-                skipallowWriteAccess == false)
+            if ((await RegistrationAsync()).allowWriteAccess == false && createdBy != "michal@michalblaha.cz" &&
+                 skipallowWriteAccess == false)
             {
-                if (Registration().createdBy != createdBy)
+                if ((await RegistrationAsync()).createdBy != createdBy)
                     throw new DataSetException(datasetId, ApiResponseStatus.DatasetNoPermision);
             }
 
@@ -610,7 +601,7 @@ namespace HlidacStatu.Datasets
             if (validateSchema)
             {
                 //throws error if schema is not valid
-                CheckSchema(obj);
+                await CheckSchemaAsync(obj);
             }
 
             if (string.IsNullOrEmpty(id))
@@ -637,7 +628,7 @@ namespace HlidacStatu.Datasets
                 .Replace((char)160, ' '); //hard space to space
             PostData pd = PostData.String(updatedData);
 
-            var tres = client.LowLevel.Index<StringResponse>(client.ConnectionSettings.DefaultIndex, id, pd);
+            var tres = await client.LowLevel.IndexAsync<StringResponse>(client.ConnectionSettings.DefaultIndex, id, pd);
 
             if (tres.Success)
             {
@@ -670,8 +661,6 @@ namespace HlidacStatu.Datasets
                 throw new DataSetException(datasetId, status);
             }
 
-            //return res.ToString();
-            //ElasticsearchResponse<string> result = this.client.Raw.Index(document.Index, document.Type, document.Id, documentJson);
         }
 
         /// <summary>
@@ -680,7 +669,7 @@ namespace HlidacStatu.Datasets
         /// <param name="data"></param>
         /// <param name="createdBy"></param>
         /// <returns></returns>
-        public List<string> AddDataBulk(string data, string createdBy)
+        public async Task<List<string>> AddDataBulkAsync(string data, string createdBy)
         {
             JArray jArray = JArray.Parse(data);
 
@@ -689,7 +678,7 @@ namespace HlidacStatu.Datasets
             foreach (var jtoken in jArray)
             {
                 var jobj = (JObject)jtoken;
-                CheckSchema(jobj);
+                await CheckSchemaAsync(jobj);
 
                 jobj.Add("DbCreated", JToken.FromObject(DateTime.UtcNow));
                 jobj.Add("DbCreatedBy", JToken.FromObject(createdBy));
@@ -734,7 +723,7 @@ namespace HlidacStatu.Datasets
             // ale protože expando nemá property, tak nedokáže správně nastavit elastic _id
 
             PostData pd = PostData.MultiJson(bulkRequestBuilder);
-            var result = client.LowLevel.Bulk<BulkResponse>(pd);
+            var result = await client.LowLevel.BulkAsync<BulkResponse>(pd);
 
 
             if (!result.IsValid)
@@ -828,9 +817,9 @@ namespace HlidacStatu.Datasets
         /// <summary>
         /// Checks if Json is valid. If not throws error
         /// </summary>
-        private bool CheckSchema(JObject obj)
+        private async Task<bool> CheckSchemaAsync(JObject obj)
         {
-            JSchema schema = DataSetDB.Instance.GetRegistration(datasetId).GetSchema();
+            JSchema schema = (await DataSetDB.Instance.GetRegistrationAsync(datasetId)).GetSchema();
 
             if (schema != null)
             {
@@ -976,16 +965,16 @@ namespace HlidacStatu.Datasets
             }
         }
 
-        public bool ItemExists(string Id)
+        public async Task<bool> ItemExistsAsync(string Id)
         {
             //GetRequest req = new GetRequest(client.ConnectionSettings.DefaultIndex, "data", Id);
-            var res = client.LowLevel.DocumentExists<ExistsResponse>(client.ConnectionSettings.DefaultIndex, Id);
+            var res = await client.LowLevel.DocumentExistsAsync<ExistsResponse>(client.ConnectionSettings.DefaultIndex, Id);
             return res.Exists;
         }
 
-        public dynamic GetDataObj(string Id)
+        public async Task<dynamic> GetDataObjAsync(string Id)
         {
-            var data = GetData(Id);
+            var data = await GetDataAsync(Id);
             if (string.IsNullOrEmpty(data))
                 return (dynamic)null;
             else
@@ -998,25 +987,25 @@ namespace HlidacStatu.Datasets
         /// <typeparam name="T">class where data is going to be serialized to</typeparam>
         /// <param name="Id">id field in elastic</param>
         /// <returns>Object T</returns>
-        public T GetData<T>(string Id) where T : class
+        public async Task<T> GetDataAsync<T>(string Id) where T : class
         {
             GetRequest req = new GetRequest(client.ConnectionSettings.DefaultIndex, Id);
-            var res = client.Get<T>(req);
+            var res = await client.GetAsync<T>(req);
             if (res.Found)
                 return res.Source;
             else
                 return (T)null;
         }
 
-        public IEnumerable<dynamic> GetAllDataForQuery(string queryString, string scrollTimeout = "2m", int scrollSize = 1000)
+        public async Task<IEnumerable<dynamic>> GetAllDataForQueryAsync(string queryString, string scrollTimeout = "2m", int scrollSize = 1000)
         {
             var fixedQuery = Repositories.Searching.Tools.FixInvalidQuery(queryString,
                 DatasetRepo.Searching.QueryShorcuts,
                 DatasetRepo.Searching.QueryOperators);
-
-            QueryContainer qc = DatasetRepo.Searching.GetSimpleQuery(this, fixedQuery);
-
-            ISearchResponse<dynamic> initialResponse = client.Search<dynamic>
+            
+            QueryContainer qc = await DatasetRepo.Searching.GetSimpleQueryAsync(this, fixedQuery);
+            
+            ISearchResponse<dynamic> initialResponse = await client.SearchAsync<dynamic>
             (scr => scr.From(0)
                 .Take(scrollSize)
                 .Query(q => qc)
@@ -1034,7 +1023,7 @@ namespace HlidacStatu.Datasets
             bool isScrollSetHasData = true;
             while (isScrollSetHasData)
             {
-                ISearchResponse<dynamic> loopingResponse = client.Scroll<dynamic>(scrollTimeout, scrollid);
+                ISearchResponse<dynamic> loopingResponse = await client.ScrollAsync<dynamic>(scrollTimeout, scrollid);
                 if (loopingResponse.IsValid)
                 {
                     results.AddRange(loopingResponse.Documents);
@@ -1044,7 +1033,7 @@ namespace HlidacStatu.Datasets
                 isScrollSetHasData = loopingResponse.Documents.Any();
             }
 
-            client.ClearScroll(new ClearScrollRequest(scrollid));
+            await client.ClearScrollAsync(new ClearScrollRequest(scrollid));
 
             var expConverter = new ExpandoObjectConverter();
 
@@ -1053,13 +1042,11 @@ namespace HlidacStatu.Datasets
                 .Select(s => (dynamic)JsonConvert.DeserializeObject<ExpandoObject>(s, expConverter));
 
             return data;
-
-            //return results;
         }
-
-        public IEnumerable<T> GetAllData<T>(string scrollTimeout = "2m", int scrollSize = 1000) where T : class
+        
+        public async Task<IEnumerable<T>> GetAllDataAsync<T>(string scrollTimeout = "2m", int scrollSize = 1000) where T : class
         {
-            ISearchResponse<dynamic> initialResponse = client.Search<dynamic>
+            ISearchResponse<dynamic> initialResponse = await client.SearchAsync<dynamic>
             (scr => scr.From(0)
                 .Take(scrollSize)
                 .MatchAll()
@@ -1077,7 +1064,7 @@ namespace HlidacStatu.Datasets
             bool isScrollSetHasData = true;
             while (isScrollSetHasData)
             {
-                ISearchResponse<dynamic> loopingResponse = client.Scroll<dynamic>(scrollTimeout, scrollid);
+                ISearchResponse<dynamic> loopingResponse = await client.ScrollAsync<dynamic>(scrollTimeout, scrollid);
                 if (loopingResponse.IsValid)
                 {
                     results.AddRange(loopingResponse.Documents);
@@ -1087,23 +1074,20 @@ namespace HlidacStatu.Datasets
                 isScrollSetHasData = loopingResponse.Documents.Any();
             }
 
-            client.ClearScroll(new ClearScrollRequest(scrollid));
+            await client.ClearScrollAsync(new ClearScrollRequest(scrollid));
 
             var data = results
                 .Select(m => JsonConvert.SerializeObject(m))
                 .Select(j => JsonConvert.DeserializeObject<T>(j))
                 .Cast<T>();
-            ;
-
+            
             return data;
-
-            //return results;
         }
 
-        public string GetData(string Id)
+        public async Task<string> GetDataAsync(string Id)
         {
-            GetRequest req = new GetRequest(client.ConnectionSettings.DefaultIndex, Id);
-            var res = client.Get<object>(req);
+            IGetRequest req = new GetRequest(client.ConnectionSettings.DefaultIndex, Id);
+            var res = await client.GetAsync<object>(req);
             if (res.Found)
                 return JsonConvert.SerializeObject(res.Source);
             else
@@ -1117,12 +1101,9 @@ namespace HlidacStatu.Datasets
             }
         }
 
-        public bool DeleteData(string Id)
+        public async Task<bool> DeleteDataAsync(string Id)
         {
-            //DeleteRequest req = new DeleteRequest(client.ConnectionSettings.DefaultIndex, "data", Id);
-
-
-            var res = client.LowLevel.Delete<StringResponse>(client.ConnectionSettings.DefaultIndex, Id);
+            var res = await client.LowLevel.DeleteAsync<StringResponse>(client.ConnectionSettings.DefaultIndex, Id);
             return res.Success;
         }
 
@@ -1161,7 +1142,7 @@ namespace HlidacStatu.Datasets
 
         public string BookmarkName()
         {
-            return Registration().name;
+            return RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult().name;
         }
 
         public string ToAuditJson()
@@ -1179,9 +1160,9 @@ namespace HlidacStatu.Datasets
             return DatasetId;
         }
 
-        public string SocialInfoTitle()
+        public async Task<string> SocialInfoTitleAsync()
         {
-            return Devmasters.TextUtil.ShortenText(Registration().name, 70);
+            return Devmasters.TextUtil.ShortenText((await RegistrationAsync()).name, 70);
         }
 
         public string SocialInfoSubTitle()
@@ -1191,7 +1172,8 @@ namespace HlidacStatu.Datasets
 
         public string SocialInfoBody()
         {
-            return InfoFact.RenderInfoFacts(InfoFacts(), 2, true, html: true);
+            var infoFacts = InfoFactsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            return InfoFact.RenderInfoFacts(infoFacts, 2, true, html: true);
         }
 
         public string SocialInfoFooter()
@@ -1213,11 +1195,11 @@ namespace HlidacStatu.Datasets
         //var last = this.SearchData("*", 1, 1, "DbCreated desc");
         long _numberOfRecords = -1;
 
-        public long NumberOfRecords()
+        public async Task<long> NumberOfRecordsAsync()
         {
             if (_numberOfRecords == -1)
             {
-                var last = SearchData("*", 1, 1, "DbCreated desc", exactNumOfResults: true);
+                var last = await SearchDataAsync("*", 1, 1, "DbCreated desc", exactNumOfResults: true);
                 _numberOfRecords = last.Total;
                 var lRec = last.Result.FirstOrDefault();
                 _lastRecordUpdated = DateTime.Now.AddYears(-10);
@@ -1233,11 +1215,11 @@ namespace HlidacStatu.Datasets
 
         DateTime _lastRecordUpdated = DateTime.MinValue;
 
-        public DateTime LastRecordUpdated()
+        public async Task<DateTime> LastRecordUpdatedAsync()
         {
             if (_lastRecordUpdated == DateTime.MinValue)
             {
-                var last = SearchData("*", 1, 1, "DbCreated desc", exactNumOfResults: true);
+                var last = await SearchDataAsync("*", 1, 1, "DbCreated desc", exactNumOfResults: true);
                 _numberOfRecords = last.Total;
                 _lastRecordUpdated = last.Result.FirstOrDefault()?.DbCreated ?? DateTime.Now.AddYears(-10);
             }
@@ -1246,20 +1228,23 @@ namespace HlidacStatu.Datasets
         }
 
         InfoFact[] _infofacts = null;
-        object lockInfoObj = new object();
+        
+        private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
-        public InfoFact[] InfoFacts()
+        public async Task<InfoFact[]> InfoFactsAsync()
         {
-            lock (lockInfoObj)
+            await _semaphoreSlim.WaitAsync();
+
+            try
             {
                 if (_infofacts == null)
                 {
                     List<InfoFact> f = new List<InfoFact>();
 
-                    DateTime dbCreated = Registration().created;
-                    var first = SearchData("*", 1, 1, "DbCreated", exactNumOfResults: true);
+                    DateTime dbCreated = (await RegistrationAsync()).created;
+                    var first = await SearchDataAsync("*", 1, 1, "DbCreated", exactNumOfResults: true);
                     var total = (int)first.Total;
-                    var last = SearchData("*", 1, 1, "DbCreated desc");
+                    var last = await SearchDataAsync("*", 1, 1, "DbCreated desc");
                     if (total == 0)
                     {
                         _infofacts = f.ToArray();
@@ -1293,6 +1278,10 @@ namespace HlidacStatu.Datasets
                     f.Add(new InfoFact(stat, InfoFact.ImportanceLevel.Stat));
                     _infofacts = f.ToArray();
                 }
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
             }
 
             return _infofacts;

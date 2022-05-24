@@ -7,8 +7,6 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
     public partial class KIndexData
     {
-
-
         public static string KIndexCommentForPart(KIndexParts part, KIndexData.Annual data, bool html = false)
         {
             var txt = data.Info(part).ShortComment;
@@ -18,11 +16,8 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 return Devmasters.TextUtil.RemoveHTML(txt);
         }
 
-
         private string Best(Annual data, int year, string ico, out KIndexParts? usedPart)
         {
-            Statistics stat = Statistics.GetStatistics(year);
-
             usedPart = data.OrderedValuesFromBestForInfofacts(ico).FirstOrDefault();
             if (usedPart != null)
             {

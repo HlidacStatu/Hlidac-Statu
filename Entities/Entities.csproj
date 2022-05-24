@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <AssemblyName>HlidacStatu.Entities</AssemblyName>
         <RootNamespace>HlidacStatu.Entities</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="CsvHelper" Version="27.1.1" />
-      <PackageReference Include="Devmasters.Core" Version="3.1.0" />
-      <PackageReference Include="Devmasters.DT" Version="3.1.1.1" />
-      <PackageReference Include="Devmasters.Enums" Version="3.1.0" />
-      <PackageReference Include="Devmasters.IO" Version="3.1.1.1" />
-      <PackageReference Include="Devmasters.Lang" Version="3.1.0" />
+      <PackageReference Include="Devmasters.Core" Version="4.0.0" />
+      <PackageReference Include="Devmasters.DT" Version="4.0.3" />
+      <PackageReference Include="Devmasters.Enums" Version="4.0.0" />
+      <PackageReference Include="Devmasters.IO" Version="4.0.0" />
+      <PackageReference Include="Devmasters.Lang" Version="4.0.0" />
       <PackageReference Include="Enums.NET" Version="4.0.0" />
       <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="5.0.14" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.11" />

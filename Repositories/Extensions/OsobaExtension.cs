@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Extensions
 {
@@ -20,20 +21,12 @@ namespace HlidacStatu.Extensions
     {
         private static DateTime minLookBack = new DateTime(DateTime.Now.Year - 5, 1, 1);
 
-        public static bool MaVztahySeStatem(this Osoba osoba)
+        public static async Task<bool> MaVztahySeStatemAsync(this Osoba osoba)
         {
-            var ret = osoba.IsSponzor();
-            if (ret) return ret;
-
-            ret = SmlouvaRepo.Searching.SimpleSearch("osobaid:" + osoba.NameId, 1, 1, 0).Total > 0;
-            if (ret) return ret;
-
-            ret = VerejnaZakazkaRepo.Searching.SimpleSearch("osobaid:" + osoba.NameId, null, 1, 1, "0").Total >
-                   0;
-            if (ret) return ret;
-
-            ret = DotaceRepo.Searching.SimpleSearch("osobaid:" + osoba.NameId, 1, 1, "0").Total > 0;
-            return ret;
+            return osoba.IsSponzor()
+               || (await SmlouvaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, 0)).Total > 0
+               || (await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, null, 1, 1, "0")).Total > 0
+               || (await DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, "0")).Total > 0; 
         }
 
         public static bool IsPolitikBasedOnEvents(this Osoba osoba)
@@ -72,7 +65,7 @@ namespace HlidacStatu.Extensions
         /// <summary>
         /// returns true if changed
         /// </summary>
-        public static bool RecalculateStatus(this Osoba osoba)
+        public static async Task<bool> RecalculateStatusAsync(this Osoba osoba)
         {
             switch (osoba.StatusOsoby())
             {
@@ -95,7 +88,7 @@ namespace HlidacStatu.Extensions
                         return true;
                     }
 
-                    if (osoba.IsSponzor() == false && osoba.MaVztahySeStatem() == false)
+                    if (osoba.IsSponzor() == false && await osoba.MaVztahySeStatemAsync() == false)
                     {
                         osoba.Status = (int)Osoba.StatusOsobyEnum.NeniPolitik;
                         return true;
@@ -110,7 +103,7 @@ namespace HlidacStatu.Extensions
                         chgnd = true;
                     }
 
-                    if (chgnd && osoba.IsSponzor() == false && osoba.MaVztahySeStatem() == false)
+                    if (chgnd && osoba.IsSponzor() == false && await osoba.MaVztahySeStatemAsync() == false)
                     {
                         osoba.Status = (int)Osoba.StatusOsobyEnum.NeniPolitik;
                         chgnd = true;
@@ -129,7 +122,7 @@ namespace HlidacStatu.Extensions
             return false;
         }
 
-        public static bool NotInterestingToShow(this Osoba osoba)
+        public static async Task<bool> NotInterestingToShowAsync(this Osoba osoba)
         {
             var showIt = osoba.StatusOsoby() == Osoba.StatusOsobyEnum.Politik 
                 || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.ByvalyPolitik
@@ -140,7 +133,7 @@ namespace HlidacStatu.Extensions
             if (showIt)
                 return !showIt;
 
-            showIt = showIt || osoba.MaVztahySeStatem();
+            showIt = showIt || await osoba.MaVztahySeStatemAsync();
             if (showIt)
                 return !showIt;
 
@@ -386,7 +379,7 @@ namespace HlidacStatu.Extensions
         }
 
 
-        public static InfoFact[] InfoFacts(this Osoba osoba)
+        public static async Task<InfoFact[]> InfoFactsAsync(this Osoba osoba)
         {
             int[] types =
             {
@@ -412,7 +405,7 @@ namespace HlidacStatu.Extensions
                 2, itemDelimeter: ", ");
 
             var descr = "";
-            if (osoba.NotInterestingToShow())
+            if (await osoba.NotInterestingToShowAsync()) //todo: předělat na async
                 descr = $"<b>{osoba.FullName()}</b>";
             else
                 descr = $"<b>{osoba.FullNameWithYear()}</b>";
@@ -460,7 +453,7 @@ namespace HlidacStatu.Extensions
                 f.Add(new InfoFact(statDesc, InfoFact.ImportanceLevel.Stat));
 
             DateTime datumOd = new DateTime(DateTime.Now.Year - 10, 1, 1);
-            var sponzoring = osoba.Sponzoring(s => s.IcoPrijemce != null && s.DarovanoDne >= datumOd);
+            var sponzoring = osoba.Sponzoring(s => s.IcoPrijemce != null && s.DarovanoDne >= datumOd).ToList();
             if (sponzoring != null && sponzoring.Count() > 0)
             {
                 string[] strany = sponzoring.Select(m => m.IcoPrijemce).Distinct().ToArray();
@@ -558,7 +551,8 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this Osoba osoba)
         {
             return "<ul>"
-                   + InfoFact.RenderInfoFacts(osoba.InfoFacts(), 4, true, true, "", "<li>{0}</li>", true)
+                   + InfoFact.RenderInfoFacts(osoba.InfoFactsAsync().ConfigureAwait(false).GetAwaiter().GetResult(), 
+                       4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }
 

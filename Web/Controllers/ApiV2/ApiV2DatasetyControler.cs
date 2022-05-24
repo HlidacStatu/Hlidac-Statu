@@ -11,6 +11,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
@@ -25,7 +26,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>Seznam datasetů</returns>
         [Authorize]
         [HttpGet]
-        public ActionResult<SearchResultDTO<Registration>> GetAll()
+        public async Task<ActionResult<SearchResultDTO<Registration>>> GetAll()
         {
 
             DataSet[] result = null;
@@ -33,7 +34,11 @@ namespace HlidacStatu.Web.Controllers
                 result = DataSetDB.AllDataSets.Get();
             else
                 result = DataSetDB.ProductionDataSets.Get();
-            return new SearchResultDTO<Registration>(result.Length, 1, result.Select(m => m.Registration()));
+
+            var dataTasks = result.Select(m => m.RegistrationAsync());
+            var data = await Task.WhenAll(dataTasks);
+
+            return new SearchResultDTO<Registration>(result.Length, 1, data);
         }
 
         /// <summary>
@@ -44,7 +49,7 @@ namespace HlidacStatu.Web.Controllers
         //[Authorize]
         [Authorize]
         [HttpGet("{datasetId}")]
-        public ActionResult<Registration> Detail(string datasetId)
+        public async Task<ActionResult<Registration>> Detail(string datasetId)
         {
             if (string.IsNullOrWhiteSpace(datasetId))
             {
@@ -57,7 +62,7 @@ namespace HlidacStatu.Web.Controllers
                 return NotFound($"Dataset {datasetId} nenalezen.");
             }
 
-            return ds.Registration();
+            return await ds.RegistrationAsync();
         }
 
         /// <summary>
@@ -71,7 +76,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpGet("{datasetId}/hledat")]
-        public ActionResult<SearchResultDTO<object>> DatasetSearch(string datasetId, [FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] string? sort = null, [FromQuery] string? desc = "0")
+        public async Task<ActionResult<SearchResultDTO<object>>> DatasetSearch(string datasetId, [FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] string? sort = null, [FromQuery] string? desc = "0")
         {
             strana ??= 1;
             if (strana < 1)
@@ -92,7 +97,7 @@ namespace HlidacStatu.Web.Controllers
                 }
 
                 bool bDesc = (desc == "1" || desc?.ToLower() == "true");
-                var res = ds.SearchData(dotaz, strana.Value, ApiV2Controller.DefaultResultPageSize, sort + (bDesc ? " desc" : ""));
+                var res = await ds.SearchDataAsync(dotaz, strana.Value, ApiV2Controller.DefaultResultPageSize, sort + (bDesc ? " desc" : ""));
                 res.Result = res.Result.Select(m => { m.DbCreatedBy = null; return m; });
 
                 return new SearchResultDTO<object>(res.Total, res.Page, res.Result);
@@ -122,7 +127,7 @@ namespace HlidacStatu.Web.Controllers
         /// <response code="400">Chyba v datech</response>
         [Authorize]
         [HttpPost]
-        public ActionResult<DSCreatedDTO> Create([FromBody] Registration data)
+        public async Task<ActionResult<DSCreatedDTO>> Create([FromBody] Registration data)
         {
             if (!ModelState.IsValid)
             {
@@ -132,7 +137,7 @@ namespace HlidacStatu.Web.Controllers
 
             try
             {
-                var res = DataSet.Api.Create(data, HttpContext.User?.Identity?.Name);
+                var res = await DataSet.Api.CreateAsync(data, HttpContext.User?.Identity?.Name);
 
                 if (res.valid)
                 {
@@ -166,7 +171,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>True/False</returns>
         [Authorize]
         [HttpDelete("{datasetId}")]
-        public ActionResult<bool> Delete(string datasetId)
+        public async Task<ActionResult<bool>> Delete(string datasetId)
         {
             try
             {
@@ -176,7 +181,7 @@ namespace HlidacStatu.Web.Controllers
                 }
 
                 datasetId = datasetId.ToLower();
-                var r = DataSetDB.Instance.GetRegistration(datasetId);
+                var r = await DataSetDB.Instance.GetRegistrationAsync(datasetId);
                 if (r == null)
                 {
                     return NotFound($"Dataset nenalezen.");
@@ -187,7 +192,7 @@ namespace HlidacStatu.Web.Controllers
                     return Forbid($"Nejste oprávněn mazat tento dataset.");
                 }
 
-                var res = DataSetDB.Instance.DeleteRegistration(datasetId, HttpContext.User?.Identity?.Name);
+                var res = await DataSetDB.Instance.DeleteRegistrationAsync(datasetId, HttpContext.User?.Identity?.Name);
                 return res;
 
             }
@@ -219,7 +224,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPut]
-        public ActionResult<Registration> Update([FromBody] Registration data)
+        public async Task<ActionResult<Registration>> Update([FromBody] Registration data)
         {
             if (!ModelState.IsValid)
             {
@@ -230,7 +235,7 @@ namespace HlidacStatu.Web.Controllers
             ApiResponseStatus res;
             try
             {
-                res = DataSet.Api.Update(data, AuthUser()); //blablablabla HttpContext.User?.Identity?.Name);
+                res = await DataSet.Api.UpdateAsync(data, AuthUser()); //blablablabla HttpContext.User?.Identity?.Name);
             }
             catch (Exception ex)
             {
@@ -256,12 +261,12 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>Vrací detail položky</returns>
         [Authorize]
         [HttpGet("{datasetId}/zaznamy/{itemId}")]
-        public ActionResult<object> DatasetItem_Get(string datasetId, string itemId)
+        public async Task<ActionResult<object>> DatasetItem_Get(string datasetId, string itemId)
         {
             try
             {
                 var ds = DataSet.CachedDatasets.Get(datasetId.ToLower());
-                var value = ds.GetDataObj(itemId);
+                var value = await ds.GetDataObjAsync(itemId);
                 //remove from item
                 if (value == null)
                 {
@@ -298,7 +303,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost("{datasetId}/zaznamy/{itemId}")]
-        public ActionResult<DSItemResponseDTO> DatasetItem_Update(string datasetId, string itemId,
+        public async Task<ActionResult<DSItemResponseDTO>> DatasetItem_Update(string datasetId, string itemId,
             [FromBody] object data,
             string? mode = "")
         {
@@ -328,13 +333,13 @@ namespace HlidacStatu.Web.Controllers
 
                 if (mode == "rewrite")
                 {
-                    newId = ds.AddData(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
+                    newId = await ds.AddDataAsync(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
                 }
                 else if (mode == "merge")
                 {
-                    if (ds.ItemExists(itemId))
+                    if (await ds.ItemExistsAsync(itemId))
                     {
-                        var oldObj = Datasets.Util.CleanHsProcessTypeValuesFromObject(ds.GetData(itemId));
+                        var oldObj = Datasets.Util.CleanHsProcessTypeValuesFromObject(await ds.GetDataAsync(itemId));
                         var newObj = Datasets.Util.CleanHsProcessTypeValuesFromObject(data.ToString());
 
                         newObj["DbCreated"] = oldObj["DbCreated"];
@@ -350,17 +355,17 @@ namespace HlidacStatu.Web.Controllers
                                     MergeNullValueHandling = Newtonsoft.Json.Linq.MergeNullValueHandling.Ignore
                                 });
 
-                            newId = ds.AddData(oldObj.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
+                            newId = await ds.AddDataAsync(oldObj.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
                         }
                     }
                     else
-                        newId = ds.AddData(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
+                        newId = await ds.AddDataAsync(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
 
                 }
                 else //skip 
                 {
-                    if (!ds.ItemExists(itemId))
-                        newId = ds.AddData(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
+                    if (!(await ds.ItemExistsAsync(itemId)))
+                        newId = await ds.AddDataAsync(data.ToString(), itemId, HttpContext.User?.Identity?.Name, true);
                 }
                 return new DSItemResponseDTO() { id = newId };
             }
@@ -409,7 +414,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>Id vložených záznamů</returns>
         [Authorize]
         [HttpPost("{datasetId}/zaznamy/")]
-        public ActionResult<List<DSItemResponseDTO>> DatasetItem_BulkInsert(string datasetId, [FromBody] object data)
+        public async Task<ActionResult<List<DSItemResponseDTO>>> DatasetItem_BulkInsert(string datasetId, [FromBody] object data)
         {
             if (!ModelState.IsValid)
             {
@@ -427,7 +432,7 @@ namespace HlidacStatu.Web.Controllers
             List<string> results = new List<string>();
             try
             {
-                results = ds.AddDataBulk(json, "usr");
+                results = await ds.AddDataBulkAsync(json, "usr");
             }
             catch (DataSetException dse)
             {
@@ -450,7 +455,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>true/false</returns>
         [Authorize]
         [HttpGet("{datasetId}/zaznamy/{itemId}/existuje")]
-        public ActionResult<bool> DatasetItem_Exists(string datasetId, string itemId)
+        public async Task<ActionResult<bool>> DatasetItem_Exists(string datasetId, string itemId)
         {
             try
             {
@@ -459,7 +464,7 @@ namespace HlidacStatu.Web.Controllers
                 {
                     return NotFound($"Dataset {datasetId} nenalezen.");
                 }
-                var value = ds.ItemExists(itemId);
+                var value = await ds.ItemExistsAsync(itemId);
                 //remove from item
                 return value;
             }

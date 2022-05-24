@@ -6,6 +6,7 @@ using Nest;
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -106,35 +107,19 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static Lib.OCR.Api.CallbackData CallbackDataForOCRReq(Rizeni rizeni, int prilohaindex)
-        {
-            var url = Devmasters.Config.GetWebConfigValue("ESConnection");
-
-            url = url +
-                  $"/{Manager.defaultIndexName_Insolvence}/rizeni/{System.Net.WebUtility.UrlEncode(rizeni.SpisovaZnacka)}/_update";
-
-            string callback =
-                Lib.OCR.Api.CallbackData.PrepareElasticCallbackDataForOCRReq($"dokumenty[{prilohaindex}].plainText", true);
-            callback = callback.Replace("#ADDMORE#", $"ctx._source.dokumenty[{prilohaindex}].lastUpdate = '#NOW#';"
-                                                     + $"ctx._source.dokumenty[{prilohaindex}].lenght = #LENGTH#;"
-                                                     + $"ctx._source.dokumenty[{prilohaindex}].wordCount=#WORDCOUNT#;");
-
-            return new Lib.OCR.Api.CallbackData(new Uri(url), callback, Lib.OCR.Api.CallbackData.CallbackType.LocalElastic);
-        }
-
-        public static void Save(Rizeni rizeni, ElasticClient client = null, bool? forceOnRadarValue = null)
+        public static async Task SaveAsync(Rizeni rizeni, ElasticClient client = null, bool? forceOnRadarValue = null)
         {
             if (rizeni.IsFullRecord == false)
                 throw new ApplicationException("Cannot save partial Insolvence document");
 
             if (client == null)
-                client = Manager.GetESClient_Insolvence();
+                client = await Manager.GetESClient_InsolvenceAsync();
 
             PrepareForSave(rizeni);
             if (forceOnRadarValue.HasValue)
                 rizeni.OnRadar = forceOnRadarValue.Value;
 
-            var res = client.Index<Rizeni>(rizeni,
+            var res = await client.IndexAsync<Rizeni>(rizeni,
                 o => o.Id(rizeni.SpisovaZnacka)); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)
             {

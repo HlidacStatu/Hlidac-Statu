@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -115,7 +116,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static OsobaEvent AddCleverCEOIntoOsobaEvent(
+        public static async Task<OsobaEvent> AddCleverCEOIntoOsobaEventAsync(
             this Osoba osoba, Firma CeoOf, DateTime? dateFrom, DateTime? dateTo,
             string zdroj,
             bool overrideExisting,
@@ -123,6 +124,8 @@ namespace HlidacStatu.Repositories
         {
             string pozice = osoba.Pohlavi == "f" ? "Ředitelka" : "Ředitel";
             OsobaEvent.Types type = OsobaEvent.Types.VerejnaSpravaPracovni;
+            var firmaCat = await CeoOf.KategorieOVMAsync();
+            
             if (CeoOf.ICO == "48136450") //CNB
             {
                 pozice = osoba.Pohlavi == "f" ? "Guvernérka" : "Guvernér";
@@ -148,54 +151,52 @@ namespace HlidacStatu.Repositories
                 pozice = osoba.Pohlavi == "f" ? "Předsedkyně nejvyššího správního soudu" : "Předseda nejvyššího správního soudu";
                 type = OsobaEvent.Types.VerejnaSpravaPracovni;
             }
-
-
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Verejne_vysoke_skoly))
+            else if (firmaCat.Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Verejne_vysoke_skoly))
             {
                 pozice = osoba.Pohlavi == "f" ? "Rektorka" : "Rektor";
                 type = OsobaEvent.Types.VerejnaSpravaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Kraje_Praha))
+            else if (firmaCat.Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Kraje_Praha))
             {
                 pozice = osoba.Pohlavi == "f" ? "Hejtmanka" : "Hejtman";
                 type = OsobaEvent.Types.PolitickaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Ministerstva))
+            else if (firmaCat.Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Ministerstva))
             {
                 pozice = osoba.Pohlavi == "f" ? "Ministryně" : "Ministr";
                 type = OsobaEvent.Types.PolitickaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Statutarni_mesta))
+            else if (firmaCat.Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Statutarni_mesta))
             {
                 pozice = osoba.Pohlavi == "f" ? "Primátorka" : "Primátor";
                 type = OsobaEvent.Types.PolitickaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Obce))
+            else if (firmaCat.Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Obce))
             {
                 pozice = osoba.Pohlavi == "f" ? "Starostka" : "Starosta";
                 type = OsobaEvent.Types.PolitickaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Zakladni_a_stredni_skoly))
+            else if (firmaCat.Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Zakladni_a_stredni_skoly))
             {
                 pozice = osoba.Pohlavi == "f" ? "Ředitelka" : "Ředitel";
                 type = OsobaEvent.Types.VerejnaSpravaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Vrchni_statni_zastupitelstvi))
+            else if (firmaCat.Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Vrchni_statni_zastupitelstvi))
             {
                 pozice = osoba.Pohlavi == "f" ? "Vrchní státní zástupkyně" : "Vrchní státní zástupce";
                 type = OsobaEvent.Types.VerejnaSpravaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Krajska_statni_zastupitelstvi))
+            else if (firmaCat.Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Krajska_statni_zastupitelstvi))
             {
                 pozice = osoba.Pohlavi == "f" ? "Krajská státní zástupkyně" : "Krajský státní zástupce";
                 type = OsobaEvent.Types.VerejnaSpravaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Krajske_soudy))
+            else if (firmaCat.Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Krajske_soudy))
             {
                 pozice = osoba.Pohlavi == "f" ? "Předsedkyně krajského soudu" : "Předseda krajského soudu";
                 type = OsobaEvent.Types.VerejnaSpravaPracovni;
             }
-            else if (CeoOf.KategorieOVM().Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Soudy))
+            else if (firmaCat.Any(m => m.id == (int)Firma.Zatrideni.SubjektyObory.Soudy))
             {
                 pozice = osoba.Pohlavi == "f" ? "Předsedkyně soudu" : "Předseda soudu";
                 type = OsobaEvent.Types.VerejnaSpravaPracovni;
@@ -228,8 +229,6 @@ namespace HlidacStatu.Repositories
             newOE.Organizace = CeoOf.Jmeno;
             newOE.Zdroj = zdroj;
             return AddOrUpdateEvent(osoba, newOE, changingUser);
-
-
 
         }
 

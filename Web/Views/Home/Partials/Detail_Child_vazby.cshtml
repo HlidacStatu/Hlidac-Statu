@@ -17,11 +17,14 @@
             .Any(m => Firmy.Get(m.ico).Valid && Firmy.Get(m.ico).IsSponzor());
     }
 
+    var otherVersion = await Model.OtherVersionsAsync();
+    var podobneSmlouvy = await Model.PodobneSmlouvyAsync();
+
 
 }
 
 
-            @if (Model.OtherVersions().Length > 0)
+            @if (otherVersion.Length > 0)
             {
                 <tr>
                     <td>
@@ -29,9 +32,9 @@
                     </td>
                     <td>
                         <div>
-                            Nalezli jsme @(Devmasters.Lang.CS.Plural.Get(Model.OtherVersions().Length, "jednu provázanou smlouvu", "{0} provázané smlouvy", "{0} provázaných smluv")):
+                            Nalezli jsme @(Devmasters.Lang.CS.Plural.Get(otherVersion.Length, "jednu provázanou smlouvu", "{0} provázané smlouvy", "{0} provázaných smluv")):
                             <ul>
-                                @foreach (var os in Model.OtherVersions())
+                                @foreach (var os in otherVersion)
                                 {
                                     <li><a href="/Detail/@os.Id">Verze @os.Id; zveřejněna @os.casZverejneni.ToString("dd.MM.yyyy HH.mm"); @(os.platnyZaznam ? "platná" : "zneplatněna")</a></li>
                                 }
@@ -42,7 +45,7 @@
                 </tr>
             }
 
-            @if (Model.PodobneSmlouvy().Length > 0)
+            @if (podobneSmlouvy.Length > 0)
             {
                 <tr>
                     <td>
@@ -50,9 +53,9 @@
                     </td>
                     <td>
                         <div>
-                            Nalezli jsme @(Devmasters.Lang.CS.Plural.Get(Model.PodobneSmlouvy().Length, "jednu podobnou smlouvu", "{0} podobné smlouvy", "{0} podobných smluv")):
+                            Nalezli jsme @(Devmasters.Lang.CS.Plural.Get(podobneSmlouvy.Length, "jednu podobnou smlouvu", "{0} podobné smlouvy", "{0} podobných smluv")):
                             <ul>
-                                @foreach (var os in Model.PodobneSmlouvy())
+                                @foreach (var os in podobneSmlouvy)
                                 {
                                     <li><a href="/Detail/@os.Id">Zveřejněna @os.casZverejneni.ToString("dd.MM.yyyy HH.mm"); částka @HlidacStatu.Util.RenderData.NicePriceHtml(os.CalculatedPriceWithVATinCZK) s DPH; @(os.platnyZaznam ? "platná" : "zneplatněna")</a></li>
                                 }

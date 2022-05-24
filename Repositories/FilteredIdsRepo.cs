@@ -3,6 +3,8 @@ using HlidacStatu.Util.Cache;
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Nest;
 
 namespace HlidacStatu.Repositories
 {
@@ -24,7 +26,7 @@ namespace HlidacStatu.Repositories
             private static volatile ElasticCacheManager<string[], QueryBatch> cacheSmlouvy
                 = ElasticCacheManager<string[], QueryBatch>.GetSafeInstance(
                     "cachedIdsSmlouvy",
-                    q => GetSmlouvy(q),
+                    q => GetSmlouvyAsync(q).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(24),
                     Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
                     "DevmastersCache", null, null,
@@ -46,7 +48,7 @@ namespace HlidacStatu.Repositories
             
         }
 
-        public static string[] GetSmlouvy(QueryBatch query)
+        public static async Task<string[]> GetSmlouvyAsync(QueryBatch query)
         {
             var stack = HlidacStatu.Util.StackReport.GetCallingMethod(true);
 
@@ -56,21 +58,20 @@ namespace HlidacStatu.Repositories
             if (string.IsNullOrEmpty(query.Query))
                 return new string[] { };
 
-            Func<int, int, Nest.ISearchResponse<Smlouva>> searchFunc = (size, page) =>
+            Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
             {
-                return ES.Manager.GetESClient().Search<Smlouva>(a => a
+                var client = await ES.Manager.GetESClientAsync();
+                return await client.SearchAsync<Smlouva>(a => a
                     .Size(size)
                     .Source(false)
-                    //.Fields(f => f.Field("Id"))
                     .From(page * size)
                     .Query(q => SmlouvaRepo.Searching.GetSimpleQuery(query.Query))
-                    //.Sort(s => s.Ascending(ss => ss.LastUpdate))
                     .Scroll("1m")
                 );
             };
 
             List<string> ids2Process = new List<string>();
-            Repositories.Searching.Tools.DoActionForQuery<Smlouva>(ES.Manager.GetESClient(),
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await ES.Manager.GetESClientAsync(),
                 searchFunc, (hit, param) =>
                 {
                     ids2Process.Add(hit.Id);

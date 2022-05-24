@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities;
+﻿using System.Threading.Tasks;
+using HlidacStatu.Entities;
 using HlidacStatu.Entities.Dotace;
 using HlidacStatu.Repositories;
 
@@ -13,7 +14,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        public ActionResult Hledat(Repositories.Searching.DotaceSearchResult model)
+        public async Task<ActionResult> Hledat(Repositories.Searching.DotaceSearchResult model)
         {
             if (model == null || ModelState.IsValid == false)
             {
@@ -27,7 +28,7 @@ namespace HlidacStatu.Web.Controllers
                 );
 
 
-            var res = DotaceRepo.Searching.SimpleSearch(model, anyAggregation: aggs);
+            var res = await DotaceRepo.Searching.SimpleSearchAsync(model, anyAggregation: aggs);
 
             AuditRepo.Add(
                 Audit.Operations.UserSearch
@@ -41,13 +42,13 @@ namespace HlidacStatu.Web.Controllers
             return View(res);
         }
 
-        public ActionResult Detail(string id)
+        public async Task<ActionResult> Detail(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
                 return Redirect("/dotace");
             }
-            var dotace = DotaceRepo.Get(id);
+            var dotace = await DotaceRepo.GetAsync(id);
             if (dotace is null)
             {
                 return NotFound();

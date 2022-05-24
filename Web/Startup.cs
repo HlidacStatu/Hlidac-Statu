@@ -264,6 +264,7 @@ namespace HlidacStatu.Web
                     pattern: "{action}/{id?}",
                     defaults: new { controller = "Home" });
 
+                // ReSharper disable once Mvc.ActionNotResolved
                 endpoints.MapControllerRoute(
                     name: "directIndex",
                     pattern: "{controller}/{id?}",

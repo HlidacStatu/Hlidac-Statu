@@ -6,7 +6,7 @@ namespace HlidacStatu.Util.Cache
 {
 
     public class AutoUpdateMemoryCacheManager<T, Key>
-        : Manager<T, Key, AutoUpdatedLocalMemoryCache<T>>
+        : Manager<T, Key, AutoUpdatedCache<T>>
         where T : class
     {
 
@@ -17,9 +17,9 @@ namespace HlidacStatu.Util.Cache
         {
             this.keyValueSelector = keyValueSelector ?? new Func<Key, string>(k => k.ToString());
         }
-        protected override AutoUpdatedLocalMemoryCache<T> getTCacheInstance(Key key, TimeSpan expiration, Func<Key, T> contentFunc)
+        protected override AutoUpdatedCache<T> getTCacheInstance(Key key, TimeSpan expiration, Func<Key, T> contentFunc)
         {
-            return new AutoUpdatedLocalMemoryCache<T>(expiration, keyPrefix + keyValueSelector(key), (o) => contentFunc.Invoke(key));
+            return new AutoUpdatedCache<T>(expiration, keyPrefix + keyValueSelector(key), (o) => contentFunc.Invoke(key));
         }
 
         private static AutoUpdateMemoryCacheManager<T, Key> GetSafeInstance(Type instanceType)

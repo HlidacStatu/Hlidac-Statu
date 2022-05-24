@@ -160,8 +160,10 @@
         <div>
             @{
                 var currentYear = DateTime.Now.Year;
-                var numFatalIssue = SmlouvaRepo.Searching.SimpleSearch($"ico:{Model.ICO} AND chyby:zasadni AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}", 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true).ElasticResults.HitsMetadata.Total;
-                var numVazneIssue = SmlouvaRepo.Searching.SimpleSearch($"ico:{Model.ICO} AND chyby:vazne AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}", 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true).ElasticResults.HitsMetadata.Total;
+                var numFatalIssue = (await SmlouvaRepo.Searching.SimpleSearchAsync($"ico:{Model.ICO} AND chyby:zasadni AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}", 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true))
+                    .ElasticResults.HitsMetadata.Total;
+                var numVazneIssue = (await SmlouvaRepo.Searching.SimpleSearchAsync($"ico:{Model.ICO} AND chyby:vazne AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}", 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true))
+                    .ElasticResults.HitsMetadata.Total;
             }
             @if (numFatalIssue.Value > 0)
             {

@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -45,13 +46,6 @@ namespace HlidacStatu.Repositories
                 [Disabled] FastestForScroll = 666
             }
 
-            static string[] queryShorcuts = new string[]
-            {
-                "ico:",
-                "osobaid:",
-            };
-
-
             public static IRule[] irules = new IRule[]
             {
                 new TransformPrefix("osobaid:", "osobaid:", null),
@@ -64,23 +58,14 @@ namespace HlidacStatu.Repositories
                 return qc;
             }
 
-
-            static string regex = "[^/]*\r\n/(?<regex>[^/]*)/\r\n[^/]*\r\n";
-
-            static RegexOptions options = ((RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline)
-                                           | RegexOptions.IgnoreCase);
-
-            static Regex regFindRegex = new Regex(regex, options);
-
-
-            public static OsobaSearchResult SimpleSearch(string query, int page, int pageSize, string order,
+            public static Task<OsobaSearchResult> SimpleSearchAsync(string query, int page, int pageSize, string order,
                 bool exactNumOfResults = false)
             {
                 order = TextUtil.NormalizeToNumbersOnly(order);
                 OrderResult eorder = OrderResult.Relevance;
                 Enum.TryParse<OrderResult>(order, out eorder);
 
-                return SimpleSearch(query, page, pageSize, eorder, exactNumOfResults);
+                return SimpleSearchAsync(query, page, pageSize, eorder, exactNumOfResults);
             }
 
 
@@ -90,7 +75,7 @@ namespace HlidacStatu.Repositories
                 .Select(m => m.ToLower())
                 .ToArray();
 
-            public static OsobaSearchResult SimpleSearch(string query, int page, int pageSize, OrderResult order
+            public static async Task<OsobaSearchResult> SimpleSearchAsync(string query, int page, int pageSize, OrderResult order
                 , bool exactNumOfResults = false)
             {
                 //fix without elastic
@@ -109,7 +94,7 @@ namespace HlidacStatu.Repositories
 
                 if (peopleIds is null || peopleIds.Count == 0)
                 {
-                    var people = OsobyEsRepo.Searching.FulltextSearch(query, page, pageSize);
+                    var people = await OsobyEsRepo.Searching.FulltextSearchAsync(query, page, pageSize);
                     peopleIds = people.Results
                         .Where(r => r.Status != (int)Osoba.StatusOsobyEnum.Duplicita)
                         .Select(r => r.NameId).ToList();
@@ -143,7 +128,7 @@ namespace HlidacStatu.Repositories
             }
 
 
-            private static ISearchResponse<Smlouva> _coreSearch(QueryContainer query, int page, int pageSize,
+            private static async Task<ISearchResponse<Smlouva>> _coreSearchAsync(QueryContainer query, int page, int pageSize,
                 OrderResult order,
                 AggregationContainerDescriptor<Smlouva> anyAggregation = null,
                 bool? platnyZaznam = null, bool includeNeplatne = false, bool logError = true,
@@ -170,17 +155,17 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<Smlouva> res = null;
                 try
                 {
-                    var client = Manager.GetESClient();
+                    var client = await Manager.GetESClientAsync();
                     if (platnyZaznam.HasValue && platnyZaznam == false)
-                        client = Manager.GetESClient_Sneplatne();
+                        client = await Manager.GetESClient_SneplatneAsync();
                     Indices indexes = client.ConnectionSettings.DefaultIndex;
                     if (includeNeplatne)
                     {
                         indexes = Manager.defaultIndexName_SAll;
                     }
 
-                    res = client
-                        .Search<Smlouva>(s => s
+                    res = await client
+                        .SearchAsync<Smlouva>(s => s
                             .Index(indexes)
                             .Size(pageSize)
                             .From(page * pageSize)
@@ -194,8 +179,8 @@ namespace HlidacStatu.Repositories
                     if (withHighlighting && res.Shards != null &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
                     {
-                        res = client
-                            .Search<Smlouva>(s => s
+                        res = await client
+                            .SearchAsync<Smlouva>(s => s
                                 .Index(indexes)
                                 .Size(pageSize)
                                 .From(page * pageSize)
@@ -285,7 +270,7 @@ namespace HlidacStatu.Repositories
                 if (string.IsNullOrWhiteSpace(name)
                     && string.IsNullOrWhiteSpace(birthYear))
                 {
-                    return new Osoba[0];
+                    return Array.Empty<Osoba>();
                 }
 
                 string nquery = TextUtil.RemoveDiacritics(name.NormalizeToPureTextLower());
@@ -347,14 +332,14 @@ namespace HlidacStatu.Repositories
                 return res;
             }
 
-            public static IEnumerable<Osoba> GetPolitikByQueryFromFirmy(string jmeno, int maxNumOfResults = 50,
+            public static async Task<IEnumerable<Osoba>> GetPolitikByQueryFromFirmyAsync(string jmeno, int maxNumOfResults = 50,
                 IEnumerable<Firma> alreadyFoundFirmyIcos = null)
             {
                 var res = new Osoba[] { };
 
                 var firmy = alreadyFoundFirmyIcos;
                 if (firmy == null)
-                    firmy = FirmaRepo.Searching.SimpleSearch(jmeno, 0, maxNumOfResults * 10).Result;
+                    firmy = (await FirmaRepo.Searching.SimpleSearchAsync(jmeno, 0, maxNumOfResults * 10)).Result;
 
                 if (firmy != null && firmy.Count() > 0)
                 {
@@ -444,9 +429,9 @@ namespace HlidacStatu.Repositories
                 (int) OsobaEvent.Types.VolenaFunkce
             };
 
-            public static IEnumerable<Osoba> GetAllPoliticiFromText(string text)
+            public static async Task<IEnumerable<Osoba>> GetAllPoliticiFromTextAsync(string text)
             {
-                var parsedName = Repositories.Searching.Politici.FindCitations(text); //Validators.JmenoInText(text);
+                var parsedName = await Repositories.Searching.Politici.FindCitationsAsync(text); //Validators.JmenoInText(text);
 
                 var oo = parsedName.Select(nm => Osoby.GetByNameId.Get(nm))
                     .Where(o => o != null)
@@ -454,10 +439,10 @@ namespace HlidacStatu.Repositories
                 return oo;
             }
 
-            public static IEnumerable<Osoba> GetBestPoliticiFromText(string text)
+            public static async Task<IEnumerable<Osoba>> GetBestPoliticiFromTextAsync(string text)
             {
                 List<Osoba> uniqO = new List<Osoba>();
-                var oo = GetAllPoliticiFromText(text);
+                var oo = await GetAllPoliticiFromTextAsync(text);
                 foreach (var o in oo)
                 {
                     if (
@@ -471,9 +456,9 @@ namespace HlidacStatu.Repositories
                 return ret;
             }
 
-            public static Osoba GetFirstPolitikFromText(string text)
+            public static async Task<Osoba> GetFirstPolitikFromTextAsync(string text)
             {
-                var osoby = GetBestPoliticiFromText(text);
+                var osoby = await GetBestPoliticiFromTextAsync(text);
                 if (osoby.Count() == 0)
                     return null;
 

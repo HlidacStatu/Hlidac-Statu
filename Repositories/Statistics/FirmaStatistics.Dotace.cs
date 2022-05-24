@@ -5,6 +5,7 @@ using HlidacStatu.Lib.Analytics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.Statistics
 {
@@ -13,7 +14,7 @@ namespace HlidacStatu.Repositories.Statistics
         static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
             _dotaceCache = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
                 .GetSafeInstance("Firma_DotaceStatistics_v2",
-                    (firma) => CalculateDotaceStat(firma),
+                    (firma) => CalculateDotaceStatAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromDays(7),
                     Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                     Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
@@ -83,9 +84,9 @@ namespace HlidacStatu.Repositories.Statistics
             return aggregate;
         }
 
-        private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateDotaceStat(Firma f)
+        private static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> CalculateDotaceStatAsync(Firma f)
         {
-            var dotaceFirmy = DotaceRepo.GetDotaceForIco(f.ICO);
+            var dotaceFirmy = await DotaceRepo.GetDotaceForIcoAsync(f.ICO).ToListAsync();
 
             // doplnit počty dotací
             var statistiky = dotaceFirmy.GroupBy(d => d.DatumPodpisu?.Year)

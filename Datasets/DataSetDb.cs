@@ -5,6 +5,7 @@ using HlidacStatu.Repositories.ES;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Datasets
 {
@@ -15,12 +16,13 @@ namespace HlidacStatu.Datasets
         public static DataSetDB Instance = new DataSetDB();
 
 
-        public static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<DataSet[]> AllDataSets =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<DataSet[]>(
+        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]> AllDataSets =
+            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]>(
                         TimeSpan.FromMinutes(5), (obj) =>
                         {
 
-                            var datasets = Instance.SearchDataRaw("*", 1, 500)
+                            var datasets = Instance.SearchDataRawAsync("*", 1, 500)
+                                .ConfigureAwait(false).GetAwaiter().GetResult()
                             .Result
                             .Select(s => CachedDatasets.Get(s.Item1))
                             .Where(d => d != null)
@@ -30,34 +32,34 @@ namespace HlidacStatu.Datasets
                         }
                     );
 
-        public static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<DataSet[]> ProductionDataSets =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<DataSet[]>(
+        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]> ProductionDataSets =
+            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]>(
                         TimeSpan.FromMinutes(5), (obj) =>
                         {
 
-                            var datasets = Instance.SearchDataRaw("*", 1, 500)
+                            var datasets = Instance.SearchDataRawAsync("*", 1, 500)
+                                .ConfigureAwait(false).GetAwaiter().GetResult()
                             .Result
                             .Select(s => CachedDatasets.Get(s.Item1))
                             .Where(d => d != null)
-                            .Where(d => d.Registration().betaversion == false && d.Registration().hidden == false)
+                            .Where(d => d.RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult().betaversion == false 
+                                        && d.RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult().hidden == false)
                             .ToArray();
 
                             return datasets;
                         }
                     );
 
-        //    var datasets = HlidacStatu.Connectors.External.DataSets.DataSetDB.Instance.SearchDataRaw("*", 1, 100)
-        //.Result
-        //.Select(s => Newtonsoft.Json.JsonConvert.DeserializeObject<HlidacStatu.Connectors.External.DataSets.Registration>(s.Item2));
-
-
+        
         private DataSetDB() : base(DataSourcesDbName, false)
         {
 
             if (client == null)
             {
-                client = Manager.GetESClient(DataSourcesDbName, idxType: Manager.IndexType.DataSource);
-                var ret = client.Indices.Exists(client.ConnectionSettings.DefaultIndex);
+                client = Manager.GetESClientAsync(DataSourcesDbName, idxType: Manager.IndexType.DataSource)
+                    .ConfigureAwait(false).GetAwaiter().GetResult();
+                var ret = client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex)
+                    .ConfigureAwait(false).GetAwaiter().GetResult();
                 if (!ret.Exists)
                 {
                     Newtonsoft.Json.Schema.Generation.JSchemaGenerator jsonG = new Newtonsoft.Json.Schema.Generation.JSchemaGenerator();
@@ -67,41 +69,42 @@ namespace HlidacStatu.Datasets
                         datasetId = DataSourcesDbName,
                         jsonSchema = jsonG.Generate(typeof(Registration)).ToString()
                     };
-                    Manager.CreateIndex(client);
+                    Manager.CreateIndexAsync(client).ConfigureAwait(false).GetAwaiter().GetResult();
 
                     //add record
                     Elasticsearch.Net.PostData pd = Elasticsearch.Net.PostData.String(Newtonsoft.Json.JsonConvert.SerializeObject(reg));
 
-                    var tres = client.LowLevel.Index<Elasticsearch.Net.StringResponse>(client.ConnectionSettings.DefaultIndex, DataSourcesDbName, pd);
+                    var tres = client.LowLevel.IndexAsync<Elasticsearch.Net.StringResponse>(client.ConnectionSettings.DefaultIndex, DataSourcesDbName, pd)
+                        .ConfigureAwait(false).GetAwaiter().GetResult();
                     if (tres.Success == false)
                         throw new ApplicationException(tres.DebugInformation);
                 }
             }
         }
 
-        public Registration GetRegistration(string datasetId)
+        public async Task<Registration> GetRegistrationAsync(string datasetId)
         {
             datasetId = datasetId.ToLower();
-            var s = GetData(datasetId);
+            var s = await GetDataAsync(datasetId);
             if (string.IsNullOrEmpty(s))
                 return null;
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(s, DefaultDeserializationSettings);
         }
 
 
-        public virtual string AddData(Registration reg, string user, bool skipallowWriteAccess = false)
+        public virtual async Task<string> AddDataAsync(Registration reg, string user, bool skipallowWriteAccess = false)
         {
             if (reg.jsonSchema == null)
                 throw new DataSetException(datasetId, ApiResponseStatus.DatasetJsonSchemaMissing);
 
             Registration oldReg = null;
-            oldReg = CachedDatasets.Get(reg.datasetId)?.Registration();
+            oldReg = await CachedDatasets.Get(reg.datasetId)?.RegistrationAsync();
             if (oldReg == null)
                 AuditRepo.Add<Registration>(Audit.Operations.Create, user, reg, null);
             else
                 AuditRepo.Add<Registration>(Audit.Operations.Update, user, reg, oldReg);
 
-            var addDataResult = base.AddData(reg, reg.datasetId, reg.createdBy, validateSchema: false, skipallowWriteAccess: true);
+            var addDataResult = await base.AddDataAsync(reg, reg.datasetId, reg.createdBy, validateSchema: false, skipallowWriteAccess: true);
             CachedDatasets.Delete(reg.datasetId);
 
             //check orderList
@@ -110,8 +113,11 @@ namespace HlidacStatu.Datasets
 
                 //get mapping
                 var ds = CachedDatasets.Get(addDataResult);
-                var txtProps = ds.GetTextMappingList();
-                var allProps = ds.GetMappingList();
+                
+                var txtPropsTask = ds.GetTextMappingListAsync();
+                var allPropsTask = ds.GetMappingListAsync();
+                var txtProps = await txtPropsTask;
+                var allProps = await allPropsTask;
                 if (allProps.Where(m => !DefaultDatasetProperties.Keys.Contains(m)).Count() > 0) //0=mapping not available , (no record in db)
                 {
 
@@ -162,7 +168,7 @@ namespace HlidacStatu.Datasets
                     }
 
                     if (changedOrderList)
-                        addDataResult = base.AddData(reg, reg.datasetId, reg.createdBy);
+                        addDataResult = await base.AddDataAsync(reg, reg.datasetId, reg.createdBy);
                 }
 
             }
@@ -172,17 +178,17 @@ namespace HlidacStatu.Datasets
         }
 
 
-        public bool DeleteRegistration(string datasetId, string user)
+        public async Task<bool> DeleteRegistrationAsync(string datasetId, string user)
         {
-            AuditRepo.Add<Registration>(Audit.Operations.Delete, user, Registration(), null);
+            AuditRepo.Add<Registration>(Audit.Operations.Delete, user, (await RegistrationAsync()), null);
 
             if (datasetId.ToLower() == "datasourcesdb")
                 return true;
 
 
             datasetId = datasetId.ToLower();
-            var res = DeleteData(datasetId);
-            var idxClient = Manager.GetESClient(datasetId, idxType: Manager.IndexType.DataSource);
+            var res = await DeleteDataAsync(datasetId);
+            var idxClient = await Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource);
 
             //delete /hs-data_rozhodnuti-uohs*
             for (int i = 1; i < 99; i++)
@@ -198,11 +204,11 @@ namespace HlidacStatu.Datasets
             return res;
         }
 
-
-        public override DataSearchResult SearchData(string queryString, int page, int pageSize, string sort = null,
+        public override async Task<DataSearchResult> SearchDataAsync(string queryString, int page, int pageSize,
+            string sort = null,
             bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false)
         {
-            var resData = base.SearchData(queryString, page, pageSize, sort, excludeBigProperties, withHighlighting, exactNumOfResults);
+            var resData = await base.SearchDataAsync(queryString, page, pageSize, sort, excludeBigProperties, withHighlighting, exactNumOfResults);
             if (resData == null || resData?.Result == null)
                 return resData;
 
@@ -211,19 +217,18 @@ namespace HlidacStatu.Datasets
             return resData;
 
         }
-        public override DataSearchRawResult SearchDataRaw(string queryString, int page, int pageSize, string sort = null,
+        
+        public override async Task<DataSearchRawResult> SearchDataRawAsync(string queryString, int page, int pageSize,
+            string sort = null,
             bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false)
         {
-            var resData = base.SearchDataRaw($"NOT(id:{DataSourcesDbName}) AND ({queryString})", page, pageSize,
+            var resData = await base.SearchDataRawAsync($"NOT(id:{DataSourcesDbName}) AND ({queryString})", page, pageSize,
                 sort, excludeBigProperties, withHighlighting, exactNumOfResults);
             //var resData = base.SearchDataRaw($"({queryString})", page, pageSize, sort);
             if (resData == null || resData?.Result == null)
                 return resData;
 
             return resData;
-
         }
-
-
     }
 }

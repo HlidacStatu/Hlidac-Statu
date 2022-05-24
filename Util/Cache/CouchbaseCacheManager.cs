@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Util.Cache
 {
 
     public class CouchbaseCacheManager<T, Key>
-        : Manager<T, Key, Devmasters.Cache.Couchbase.CouchbaseCache<T>>
+        : Manager<T, Key, Devmasters.Cache.Couchbase.Cache<T>>
         where T : class
     {
         private string bucketName = "";
@@ -23,9 +24,9 @@ namespace HlidacStatu.Util.Cache
             this.password = password;
             this.keyValueSelector = keyValueSelector ?? new Func<Key, string>(k => k.ToString());
         }
-        protected override Devmasters.Cache.Couchbase.CouchbaseCache<T> getTCacheInstance(Key key, TimeSpan expiration, Func<Key, T> contentFunc)
+        protected override Devmasters.Cache.Couchbase.Cache<T> getTCacheInstance(Key key, TimeSpan expiration, Func<Key, T> contentFunc)
         {
-            return new Devmasters.Cache.Couchbase.CouchbaseCache<T>(expiration, keyPrefix + keyValueSelector(key), (o) => contentFunc.Invoke(key),
+            return new Devmasters.Cache.Couchbase.Cache<T>(expiration, keyPrefix + keyValueSelector(key), (o) => contentFunc.Invoke(key),
                                 serversUrl, bucketName, username, password);
         }
 

@@ -1,9 +1,8 @@
 ﻿@model object
 @using Nest;
 @using System.Linq;
-@using Devmasters.Collections;
 @using HlidacStatu.Datasets
-@using HlidacStatu.Entities
+
 @using HlidacStatu.Repositories
 
 @{
@@ -11,9 +10,8 @@
 
     DataSet ds =
         DataSet.CachedDatasets.Get((string)Model);
-    var reg = ds.Registration();
-
-    var vyzvy = ds.ESClient.Search<object>(s => s
+    
+    var vyzvy = await ds.ESClient.SearchAsync<object>(s => s
     .MatchAll()
     .Size(0)
     .Aggregations(a => a
@@ -26,7 +24,7 @@
 
         )
     );
-    var vyzvyGroup = ds.ESClient.Search<object>(s => s
+    var vyzvyGroup = await ds.ESClient.SearchAsync<object>(s => s
         .MatchAll()
         .Size(0)
         .Aggregations(a => a
@@ -46,7 +44,7 @@
         )
     );
 
-     var vyzvyTopPrijemci = ds.ESClient.Search<object>(s => s
+     var vyzvyTopPrijemci = await ds.ESClient.SearchAsync<object>(s => s
      .MatchAll()
      .Size(0)
      .Aggregations(a => a

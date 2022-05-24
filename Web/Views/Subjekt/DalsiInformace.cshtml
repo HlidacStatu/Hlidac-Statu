@@ -5,6 +5,7 @@
 @{
     Layout = null;
     ViewBag.Title = "Další informace " + Model.Jmeno;
+    var ovmCats = await Model.KategorieOVMAsync();
 }
 <style>
     .chart-tooltip-shared {
@@ -33,12 +34,12 @@
 @* První sloupec *@
 <div class="col-sm-7 col-xs-12 order-1">
 
-    @if (Model.KategorieOVM().Count() > 0)
+    @if (ovmCats.Count() > 0)
     {
         <div>
             <h4>Kategorie OVM (orgánů veřejné moci)</h4>
             <p class="text-muted sub-header-info">Všechny kategorie, ve kterých je úřad veden v RPP (Registr práv a povinností). </p>
-            @foreach (var cat in Model.KategorieOVM())
+            @foreach (var cat in ovmCats)
             {
                 <div>@(cat.nazev)&nbsp;<a href="/HledatFirmy?q=kategorieid:@(cat.id)&subtitle=@(System.Net.WebUtility.UrlEncode($"Subjekty v kategorii {cat.nazev}"))"><i title="Najít další organizace v této kategorii" alt="Najít další organizace v této kategorii" class="fas fa-search"></i></a></div>
             }

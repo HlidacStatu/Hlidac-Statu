@@ -1,9 +1,8 @@
-﻿@using HlidacStatu.Repositories.Searching
-@using HlidacStatu.Datasets
+﻿@using HlidacStatu.Datasets
 @model HlidacStatu.Datasets.DataSet
 
 @{
-    var reg = Model.Registration();
+    var reg = await Model.RegistrationAsync();
     ViewBag.Title = $"Nápověda k hledání pro databázi {reg.name}";
 }
 
@@ -25,26 +24,26 @@
     <dl>
         <dt>Hledat všechna slova v různých tvarech</dt>
         <dd>
-            @{ Try("Česká republika", true);}
+            @{ Try(reg, "Česká republika", true);}
             <br />Hledá smlouvy obsahující všechna uvedená slova v různých mluvnických tvarech
         </dd>
         <dt>Hledat přesně slovo nebo sousloví</dt>
         <dd>
-            @{ Try("\"premiér Babiš\"");}
+            @{ Try(reg, "\"premiér Babiš\"");}
             <br />Hledá záznamy obsahující uvedená slova či sousloví v přesném tvaru jako je v uvozovkách
         </dd>
         <dt>Kterékoliv z těchto slov</dt>
         <dd>
             mezi všechna požadovaná slova vložte operátor OR:<br />
-            @{ Try("premiér OR ministr");}
+            @{ Try(reg, "premiér OR ministr");}
             <br />Hledá záznamy obsahující alespoň jedno z uvedených slov
         </dd>
         <dt>Toto slovo tam být nesmí </dt>
         <dd>
             Před slova, která nechcete, zadejte znaménko mínus:<br />
-            @{ Try("premiér -Sobotka");}.
+            @{ Try(reg, "premiér -Sobotka");}.
             Tento dotaz najde záznamy se slovem premiér, kde není zmíněn Sobotka.
-            Možno použít i pro sousloví @{ Try("-\"Andrej Babiš\"");} (výsledky bez Andreje Babiše)
+            Možno použít i pro sousloví @{ Try(reg, "-\"Andrej Babiš\"");} (výsledky bez Andreje Babiše)
         </dd>
         <dt>Kombinace výrazů</dt>
         <dd>
@@ -56,7 +55,7 @@
         <dd>
             Mezi jednotnotlivými částmi dotazu můžete používat operátory <kbd>AND</kbd> a <kbd>OR</kbd>.<br />
             Můžete používat zástupné znaky (wildcards) <kbd>?</kbd> - zastupuje 1 znak, nebo <kbd>*</kbd>zastupující více znaků. Příklad:<kbd>Ministerstvo z*</kbd><br />
-            Příklad: @{ Try("ico:27295567 AND smlouva.predmet:\"Kupní smlouva\"");}
+            Příklad: @{ Try(reg, "ico:27295567 AND smlouva.predmet:\"Kupní smlouva\"");}
         </dd>
 
     </dl>
@@ -65,7 +64,7 @@
     <dl>
         <dt>Jak prohledávat specifické položky v databázích?</dt>
         <dd>
-            napište prefix s ":" bez mezery následovaný hledanou hodnotou<br />@{ Try("ico:00007064"); }
+            napište prefix s ":" bez mezery následovaný hledanou hodnotou<br />@{ Try(reg, "ico:00007064"); }
             hledá smlouvy kde je v záznamech Ministerstvo vnitra (ICO 00007064).
             <br /><br />
             Pokud hledaná hodnota obsahuje mezery, musí být v uvozovkách <kbd>jmeno:"Hlídač státu"</kbd>
@@ -93,7 +92,7 @@
                             <ul style="line-height: 1.4em;">
                             @foreach (var s in prop.Value.TypeSamples())
                             {
-                                <li>@{ Try($"{prop.Key}:{s.q}"); } <i>@s.desc</i></li>
+                                <li>@{ Try(reg, $"{prop.Key}:{s.q}"); } <i>@s.desc</i></li>
                             }
                             </ul>
                         }
@@ -109,9 +108,9 @@
 
 @functions
 {
-    private void Try(string q, bool showT = false)
+    private void Try(Registration reg, string q, bool showT = false)
     {
-        <kbd>@q</kbd><a style="padding-left:5px"  class="small" href="@("/data/hledat/"+ Model.Registration().datasetId + "?q=" + System.Net.WebUtility.UrlEncode(q))" target="_blank">@(showT ? "Zkusit " : "")<i class="fas fa-external-link-alt" title="Vyzkoušet" alt="Vyzkoušet"></i></a>
+        <kbd>@q</kbd><a style="padding-left:5px"  class="small" href="@("/data/hledat/"+ reg.datasetId + "?q=" + System.Net.WebUtility.UrlEncode(q))" target="_blank">@(showT ? "Zkusit " : "")<i class="fas fa-external-link-alt" title="Vyzkoušet" alt="Vyzkoušet"></i></a>
     }
 }
 

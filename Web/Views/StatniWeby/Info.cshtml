@@ -15,7 +15,7 @@
     try
     {
         web = HlidacStatu.Repositories.UptimeServerRepo.AvailabilityForWeekById(Model.Id);
-        webssl = UptimeSSLRepo.LoadLatest(Model.HostDomain());
+        webssl = await UptimeSSLRepo.LoadLatestAsync(Model.HostDomain());
     }
     catch (Exception)
     {
@@ -170,10 +170,9 @@ else
         {
             <p>
                 V @web.Statistics().PercentOfTime.Unknown.ToString("P2") času se nám nepodařilo odezvu serveru změřit z důvodu neschopnosti připojit se k serveru či z důvodů chybového návratového kódu serveru.
-
             </p>
         }
-        </p>
+    </p>
         <hr />
 
         <h2>

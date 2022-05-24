@@ -6,7 +6,7 @@
 
     DataSet ds =
         DataSet.CachedDatasets.Get((string)Model);
-    var reg = ds.Registration();
+    var reg = await ds.RegistrationAsync();
 
 }
 <div class="row">

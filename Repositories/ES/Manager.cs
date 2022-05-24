@@ -15,6 +15,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.ES
 {
@@ -85,10 +87,10 @@ namespace HlidacStatu.Repositories.ES
         public static string defaultIndexName_RPP_OVM = "rpp_ovm";
         public static string defaultIndexName_RPP_ISVS = "rpp_isvs";
 
-        private static object _clientLock = new object();
+
+        private static SemaphoreSlim _clientSemaphore = new SemaphoreSlim(1, 1);
         private static Dictionary<string, ElasticClient> _clients = new Dictionary<string, ElasticClient>();
 
-        private static object locker = new object();
 
         static Manager()
         {
@@ -97,140 +99,136 @@ namespace HlidacStatu.Repositories.ES
             System.Net.ServicePointManager.DefaultConnectionLimit = 1000;
         }
 
-        //public static void InitElasticSearchIndex()
-        //{
-        //    InitElasticSearchIndex(defaultIndexName);
-        //}
-        public static void InitElasticSearchIndex(ElasticClient client, IndexType? idxType)
+        public static async Task InitElasticSearchIndexAsync(ElasticClient client, IndexType? idxType)
         {
             if (idxType == null)
                 return;
             if (idxType.Value == IndexType.DataSource)
                 return;
-            var ret = client.Indices.Exists(client.ConnectionSettings.DefaultIndex);
+            var ret = await client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex);
             if (ret.Exists == false)
-                CreateIndex(client, idxType.Value);
+                await CreateIndexAsync(client, idxType.Value);
 
         }
         public static void DeleteIndex()
         {
             //GetESClient().DeleteIndex(defaultIndexName);
         }
-        public static ElasticClient GetESClient(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClientAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName, timeOut, connectionLimit);
+            return GetESClientAsync(defaultIndexName, timeOut, connectionLimit);
         }
-        public static ElasticClient GetESClient_Sneplatne(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_SneplatneAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Sneplatne, timeOut, connectionLimit);
+            return GetESClientAsync(defaultIndexName_Sneplatne, timeOut, connectionLimit);
         }
 
-        public static ElasticClient GetESClient_VZ(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_VZAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_VerejneZakazky, timeOut, connectionLimit, IndexType.VerejneZakazky);
+            return GetESClientAsync(defaultIndexName_VerejneZakazky, timeOut, connectionLimit, IndexType.VerejneZakazky);
         }
-        public static ElasticClient GetESClient_ProfilZadavatele(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_ProfilZadavateleAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_ProfilZadavatele, timeOut, connectionLimit, IndexType.ProfilZadavatele);
+            return GetESClientAsync(defaultIndexName_ProfilZadavatele, timeOut, connectionLimit, IndexType.ProfilZadavatele);
         }
-        public static ElasticClient GetESClient_VerejneZakazkyRaw2006(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_VerejneZakazkyRaw2006Async(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_VerejneZakazkyRaw2006, timeOut, connectionLimit, IndexType.VerejneZakazkyRaw2006);
+            return GetESClientAsync(defaultIndexName_VerejneZakazkyRaw2006, timeOut, connectionLimit, IndexType.VerejneZakazkyRaw2006);
         }
-        public static ElasticClient GetESClient_VerejneZakazkyNaProfiluRaw(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_VerejneZakazkyNaProfiluRawAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_VerejneZakazkyNaProfiluRaw, timeOut, connectionLimit, IndexType.VerejneZakazkyNaProfiluRaw);
+            return GetESClientAsync(defaultIndexName_VerejneZakazkyNaProfiluRaw, timeOut, connectionLimit, IndexType.VerejneZakazkyNaProfiluRaw);
         }
-        public static ElasticClient GetESClient_VerejneZakazkyNaProfiluConverted(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_VerejneZakazkyNaProfiluConvertedAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_VerejneZakazkyNaProfiluConverted, timeOut, connectionLimit, IndexType.VerejneZakazky);
+            return GetESClientAsync(defaultIndexName_VerejneZakazkyNaProfiluConverted, timeOut, connectionLimit, IndexType.VerejneZakazky);
         }
-        public static ElasticClient GetESClient_VerejneZakazkyRaw(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_VerejneZakazkyRawAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_VerejneZakazkyRaw, timeOut, connectionLimit, IndexType.VerejneZakazkyRaw
+            return GetESClientAsync(defaultIndexName_VerejneZakazkyRaw, timeOut, connectionLimit, IndexType.VerejneZakazkyRaw
                 );
         }
-        public static ElasticClient GetESClient_Logs(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_LogsAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Logs, timeOut, connectionLimit, IndexType.Logs
+            return GetESClientAsync(defaultIndexName_Logs, timeOut, connectionLimit, IndexType.Logs
                 );
         }
-        public static ElasticClient GetESClient_Audit(int timeOut = 1000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_AuditAsync(int timeOut = 1000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Audit, timeOut, connectionLimit, IndexType.Audit
+            return GetESClientAsync(defaultIndexName_Audit, timeOut, connectionLimit, IndexType.Audit
                 );
         }
-        public static ElasticClient GetESClient_InDocTableCells(int timeOut = 1000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_InDocTableCellsAsync(int timeOut = 1000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_InDocTableCells, timeOut, connectionLimit, IndexType.InDocTableCells
+            return GetESClientAsync(defaultIndexName_InDocTableCells, timeOut, connectionLimit, IndexType.InDocTableCells
             );
         }
-        public static ElasticClient GetESClient_RPP_OVM(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_RPP_OVMAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_RPP_OVM, timeOut, connectionLimit, IndexType.RPP_OVM
+            return GetESClientAsync(defaultIndexName_RPP_OVM, timeOut, connectionLimit, IndexType.RPP_OVM
                 );
         }
-        public static ElasticClient GetESClient_RPP_ISVS(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_RPP_ISVSAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_RPP_ISVS, timeOut, connectionLimit, IndexType.RPP_ISVS
+            return GetESClientAsync(defaultIndexName_RPP_ISVS, timeOut, connectionLimit, IndexType.RPP_ISVS
                 );
         }
-        public static ElasticClient GetESClient_RPP_Kategorie(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_RPP_KategorieAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_RPP_Kategorie, timeOut, connectionLimit, IndexType.RPP_Kategorie
+            return GetESClientAsync(defaultIndexName_RPP_Kategorie, timeOut, connectionLimit, IndexType.RPP_Kategorie
                 );
         }
 
-        public static ElasticClient GetESClient_Insolvence(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_InsolvenceAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Insolvence, timeOut, connectionLimit, IndexType.Insolvence);
+            return GetESClientAsync(defaultIndexName_Insolvence, timeOut, connectionLimit, IndexType.Insolvence);
         }
         //public static ElasticClient GetESClient_Uptime(int timeOut = 60000, int connectionLimit = 80)
         //{
         //    return GetESClient(defaultIndexName_Uptime, timeOut, connectionLimit, IndexType.UptimeItem);
         //}
-        public static ElasticClient GetESClient_UptimeSSL(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_UptimeSSLAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_UptimeSSL, timeOut, connectionLimit, IndexType.UptimeSSL);
+            return GetESClientAsync(defaultIndexName_UptimeSSL, timeOut, connectionLimit, IndexType.UptimeSSL);
         }
 
-        public static ElasticClient GetESClient_Dotace(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_DotaceAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Dotace, timeOut, connectionLimit, IndexType.Dotace);
+            return GetESClientAsync(defaultIndexName_Dotace, timeOut, connectionLimit, IndexType.Dotace);
         }
 
-        public static ElasticClient GetESClient_Osoby(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_OsobyAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Osoby, timeOut, connectionLimit, IndexType.Osoby);
+            return GetESClientAsync(defaultIndexName_Osoby, timeOut, connectionLimit, IndexType.Osoby);
         }
 
-        public static ElasticClient GetESClient_Firmy(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_FirmyAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_Firmy, timeOut, connectionLimit, IndexType.Firmy);
+            return GetESClientAsync(defaultIndexName_Firmy, timeOut, connectionLimit, IndexType.Firmy);
         }
-        public static ElasticClient GetESClient_KIndex(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_KIndexAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_KIndex, timeOut, connectionLimit, IndexType.Firmy);
+            return GetESClientAsync(defaultIndexName_KIndex, timeOut, connectionLimit, IndexType.Firmy);
         }
-        public static ElasticClient GetESClient_KIndexTemp(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_KIndexTempAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_KIndexTemp, timeOut, connectionLimit, IndexType.Firmy);
+            return GetESClientAsync(defaultIndexName_KIndexTemp, timeOut, connectionLimit, IndexType.Firmy);
         }
-        public static ElasticClient GetESClient_KIndexBackup(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_KIndexBackupAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_KIndexBackup, timeOut, connectionLimit, IndexType.Firmy);
+            return GetESClientAsync(defaultIndexName_KIndexBackup, timeOut, connectionLimit, IndexType.Firmy);
         }
-        public static ElasticClient GetESClient_KIndexBackupTemp(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_KIndexBackupTempAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_KIndexBackupTemp, timeOut, connectionLimit, IndexType.Firmy);
+            return GetESClientAsync(defaultIndexName_KIndexBackupTemp, timeOut, connectionLimit, IndexType.Firmy);
         }
-        public static ElasticClient GetESClient_KindexFeedback(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_KindexFeedbackAsync(int timeOut = 60000, int connectionLimit = 80)
         {
-            return GetESClient(defaultIndexName_KindexFeedback, timeOut, connectionLimit, IndexType.KindexFeedback);
+            return GetESClientAsync(defaultIndexName_KindexFeedback, timeOut, connectionLimit, IndexType.KindexFeedback);
         }
 
         static string dataSourceIndexNamePrefix = "data_";
-        public static ElasticClient GetESClient(string indexName, int timeOut = 60000, int connectionLimit = 80, IndexType? idxType = null, bool init = true)
+        public static async Task<ElasticClient> GetESClientAsync(string indexName, int timeOut = 60000, int connectionLimit = 80, IndexType? idxType = null, bool init = true)
         {
             if (idxType == IndexType.DataSource)
                 indexName = dataSourceIndexNamePrefix + indexName;
@@ -248,7 +246,8 @@ namespace HlidacStatu.Repositories.ES
 
             if (!_clients.ContainsKey(cnnset))
             {
-                lock (_clientLock)
+                await _clientSemaphore.WaitAsync();
+                try
                 {
                     if (!_clients.ContainsKey(cnnset))
                     {
@@ -257,10 +256,14 @@ namespace HlidacStatu.Repositories.ES
 
                         var _client = new ElasticClient(sett);
                         if (init)
-                            InitElasticSearchIndex(_client, idxType);
+                            await InitElasticSearchIndexAsync(_client, idxType);
 
                         _clients.TryAdd(cnnset, _client);
                     }
+                }
+                finally
+                {
+                    _clientSemaphore.Release();
                 }
             }
             return _clients[cnnset];
@@ -382,11 +385,8 @@ namespace HlidacStatu.Repositories.ES
                         propertyInfo.SetValue(first, newPropVal);
                         changed = true;
                     }
-                    else
-                        goto compareValues;
                 }
 
-compareValues:
                 object defValue = GetDefault(propertyInfo.PropertyType);
                 if (oldPropVal == defValue && newPropVal != defValue)
                 {
@@ -407,7 +407,7 @@ compareValues:
         }
 
 
-        public static void CreateIndex(ElasticClient client)
+        public static async Task CreateIndexAsync(ElasticClient client)
         {
             IndexSettings set = new IndexSettings();
             set.NumberOfReplicas = 1;
@@ -427,8 +427,8 @@ compareValues:
 
             var aliasName = client.ConnectionSettings.DefaultIndex;
             var indexName = $"hs-{aliasName}-01";
-            var res = client.Indices
-                .Create(indexName, i => i
+            await client.Indices
+                .CreateAsync(indexName, i => i
                     .InitializeUsing(idxSt)
                     .Map(mm => mm
                     .Properties(ps => ps
@@ -438,11 +438,11 @@ compareValues:
                     )
 
                 );
-            client.Indices.PutAlias(indexName, aliasName);
+            await client.Indices.PutAliasAsync(indexName, aliasName);
 
         }
 
-        public static void CreateIndex(ElasticClient client, IndexType idxTyp)
+        public static async Task CreateIndexAsync(ElasticClient client, IndexType idxTyp)
         {
             IndexSettings set = new IndexSettings();
             set.NumberOfReplicas = 1;
@@ -466,50 +466,50 @@ compareValues:
             switch (idxTyp)
             {
                 case IndexType.VerejneZakazky:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.VZ.VerejnaZakazka>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.ProfilZadavatele:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.VZ.ProfilZadavatele>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Insolvence:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Insolvence.Rizeni>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Dotace:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Dotace.Dotace>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.UptimeSSL:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.UptimeSSL>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.UptimeItem:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.UptimeItem>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Osoby:
-                    res = client.Indices
-                        .Create(indexName, i => i
+                    res = await client.Indices
+                        .CreateAsync(indexName, i => i
                             .InitializeUsing(new IndexState()
                             {
                                 Settings = new IndexSettings()
@@ -550,64 +550,64 @@ compareValues:
                     break;
 
                 case IndexType.Smlouvy:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Smlouva>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Firmy:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.FirmaInElastic>(map => map.AutoMap(maxRecursion: 1))
                        );
                     break;
                 case IndexType.KIndex:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<KIndexData>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.KIndexTemp:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<KIndexData>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.KIndexBackup:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Backup>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.KIndexBackupTemp:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Backup>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.KindexFeedback:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<KindexFeedback>(map => map.AutoMap(maxRecursion: 2))
                        );
                     break;
                 case IndexType.Logs:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Logs.ProfilZadavateleDownload>(map => map.AutoMap(maxRecursion: 1))
                        );
                     break;
                 case IndexType.Audit:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(new IndexState()
                            {
                                Settings = new IndexSettings()
@@ -621,8 +621,8 @@ compareValues:
                        );
                     break;
                 case IndexType.VerejneZakazkyNaProfiluRaw:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                             .InitializeUsing(idxSt)
                             .Map<ZakazkaRaw>(map => map
                                     .Properties(p => p
@@ -634,8 +634,8 @@ compareValues:
                        );
                     break;
                 case IndexType.RPP_Kategorie:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(new IndexState()
                            {
                                Settings = new IndexSettings()
@@ -649,8 +649,8 @@ compareValues:
                        );
                     break;
                 case IndexType.RPP_OVM:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(new IndexState()
                            {
                                Settings = new IndexSettings()
@@ -664,8 +664,8 @@ compareValues:
                        );
                     break;
                 case IndexType.RPP_ISVS:
-                    res = client.Indices
-                       .Create(indexName, i => i
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
                            .InitializeUsing(new IndexState()
                            {
                                Settings = new IndexSettings()
@@ -679,15 +679,15 @@ compareValues:
                        );
                     break;
                 case IndexType.InDocTableCells:
-                    res = client.Indices
-                        .Create(indexName, i => i
+                    res = await client.Indices
+                        .CreateAsync(indexName, i => i
                             .InitializeUsing(idxSt)
                             .Map<Entities.InDocTableCells>(map => map.AutoMap().DateDetection(false))
                         );
                     break;
             }
             
-            client.Indices.PutAlias(indexName, aliasName);
+            await client.Indices.PutAliasAsync(indexName, aliasName);
 
         }
 

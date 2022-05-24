@@ -4,6 +4,7 @@ using Newtonsoft.Json.Schema;
 using System;
 using System.Linq;
 using System.Net.Mail;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Datasets
 {
@@ -12,7 +13,7 @@ namespace HlidacStatu.Datasets
     {
         public static class Api
         {
-            public static ApiResponseStatus Update(Registration dataset, ApplicationUser user)
+            public static async Task<ApiResponseStatus> UpdateAsync(Registration dataset, ApplicationUser user)
             {
                 if (user == null) throw new ArgumentNullException(nameof(user));
                 try
@@ -22,11 +23,11 @@ namespace HlidacStatu.Datasets
                     if (string.IsNullOrEmpty(id))
                         return ApiResponseStatus.DatasetNotFound;
 
-                    var oldReg = DataSetDB.Instance.GetRegistration(id);
+                    var oldReg = await DataSetDB.Instance.GetRegistrationAsync(id);
                     if (oldReg == null)
                         return ApiResponseStatus.DatasetNotFound;
 
-                    var oldRegAuditable = oldReg.ToAuditJson();
+                    //var oldRegAuditable = oldReg.ToAuditJson();
 
                     if (string.IsNullOrEmpty(oldReg.createdBy))
                     {
@@ -39,7 +40,7 @@ namespace HlidacStatu.Datasets
                         var m = new MailMessage()
                         {
                             From = new MailAddress("info@hlidacstatu.cz"),
-                            Subject = "update DATASET registrace od " + updatedBy,
+                            Subject = $"update DATASET registrace od " + updatedBy,
                             IsBodyHtml = false,
                             Body = Newtonsoft.Json.JsonConvert.SerializeObject(dataset)
                         };
@@ -52,6 +53,7 @@ namespace HlidacStatu.Datasets
                         }
                         catch (Exception)
                         {
+                            // ignored
                         }
                     }
 
@@ -106,9 +108,7 @@ namespace HlidacStatu.Datasets
                         }
                     }
 
-                    DataSetDB.Instance.AddData(dataset, updatedBy, skipallowWriteAccess: skipallowWriteAccess);
-
-                    //HlidacStatu.Web.Framework.TemplateVirtualFileCacheManager.InvalidateTemplateCache(oldReg.datasetId);
+                    await DataSetDB.Instance.AddDataAsync(dataset, updatedBy, skipallowWriteAccess: skipallowWriteAccess);
 
                     return ApiResponseStatus.Valid(dataset);
 
@@ -124,9 +124,8 @@ namespace HlidacStatu.Datasets
                 }
             }
 
-            public static ApiResponseStatus Create(Registration dataset, string updatedBy, string jsonSchemaInString = null)
+            public static async Task<ApiResponseStatus> CreateAsync(Registration dataset, string updatedBy, string jsonSchemaInString = null)
             {
-
                 try
                 {
                     Registration reg = dataset;
@@ -135,7 +134,6 @@ namespace HlidacStatu.Datasets
                     {
                         reg.jsonSchema = StringToJSchema(jsonSchemaInString).ToString();
                     }
-
 
                     using (SmtpClient smtp = new SmtpClient())
                     {
@@ -156,20 +154,18 @@ namespace HlidacStatu.Datasets
                             smtp.Send(m);
                         }
                         catch (Exception)
-                        { }
+                        {
+                            // ignored
+                        }
                     }
 
                     reg.created = DateTime.Now;
                     reg.createdBy = updatedBy;
                     reg.NormalizeShortName();
 
-                    var newreg = RegisterNew(reg, updatedBy);
-
-                    //HlidacStatu.Web.Framework.TemplateVirtualFileCacheManager.InvalidateTemplateCache(reg.datasetId);
+                    var newreg = await RegisterNewAsync(reg, updatedBy);
 
                     return new ApiResponseStatus() { valid = true, value = newreg };
-
-
                 }
                 catch (Newtonsoft.Json.JsonSerializationException jex)
                 {
@@ -185,7 +181,6 @@ namespace HlidacStatu.Datasets
                 {
                     HlidacStatu.Util.Consts.Logger.Error("Dataset API", ex);
                     return ApiResponseStatus.GeneralExceptionError(ex);
-
                 }
             }
 

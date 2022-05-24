@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.Searching.Rules
 {
@@ -22,11 +23,13 @@ namespace HlidacStatu.Repositories.Searching.Rules
         }
 
 
-        public readonly static Dictionary<int, string[]> AllValues = GetAllValues();
+        public readonly static Dictionary<int, string[]> AllValues = GetAllValuesAsync()
+            .ConfigureAwait(false).GetAwaiter().GetResult();
 
-        private static Dictionary<int, string[]> GetAllValues()
+        private static async Task<Dictionary<int, string[]>> GetAllValuesAsync()
         {
-            var res = Manager.GetESClient_RPP_Kategorie().Search<Lib.Data.External.RPP.KategorieOVM>(
+            var client = await Manager.GetESClient_RPP_KategorieAsync();
+            var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(
                 s => s.Query(q => q.MatchAll()).Size(2000)
                 );
             return res.Hits

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <UserSecretsId>aspnet-HlidacStatu.JobTableEditor-644FAF95-3C71-40FC-9CE8-906A59B06239</UserSecretsId>
     </PropertyGroup>
 

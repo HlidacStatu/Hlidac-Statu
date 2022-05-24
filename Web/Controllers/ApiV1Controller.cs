@@ -236,12 +236,12 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize]
-        public ActionResult VZProfilesList()
+        public async Task<ActionResult> VZProfilesList()
         {
             
             List<VZProfilesListRes> list = new();
-            var res = Manager.GetESClient_VerejneZakazkyNaProfiluRaw()
-                .Search<ZakazkaRaw>(s => s
+            var client = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
+            var res = await client.SearchAsync<ZakazkaRaw>(s => s
                     .Query(q => q.Bool(b => b.MustNot(mn => mn.Term(t => t.Field(f => f.Converted).Value(1)))))
                     .Size(0)
                     .Aggregations(agg => agg
@@ -256,8 +256,8 @@ namespace HlidacStatu.Web.Controllers
             {
                 foreach (KeyedBucket<object> val in ((BucketAggregate)res.Aggregations["profiles"]).Items)
                 {
-                    var resProf = Manager.GetESClient_VZ()
-                        .Get<ProfilZadavatele>((string)val.Key);
+                    var vzClient = await Manager.GetESClient_VZAsync();
+                    var resProf = await client.GetAsync<ProfilZadavatele>((string)val.Key);
                     list.Add(new VZProfilesListRes()
                     { profileId = (string)val.Key, url = resProf?.Source?.Url, count = val.DocCount });
                 }
@@ -268,15 +268,15 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize]
-        public ActionResult VZList(string _id)
+        public async Task<ActionResult> VZList(string _id)
         {
             string id = _id;
 
             if (string.IsNullOrEmpty(id))
                 return new NotFoundResult();
-            
-            var res = Manager.GetESClient_VerejneZakazkyNaProfiluRaw()
-                .Search<ZakazkaRaw>(s => s
+
+            var client = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
+            var res = await client.SearchAsync<ZakazkaRaw>(s => s
                     .Query(q => q
                         .QueryString(qs =>
                             qs.DefaultOperator(Operator.And).Query("NOT(converted:1) AND profil:\"" + id + "\""))
@@ -298,15 +298,15 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpGet()]
         [Authorize]
-        public ActionResult VZDetail(string _id)
+        public async Task<ActionResult> VZDetail(string _id)
         {
             string id = _id;
 
             if (string.IsNullOrEmpty(id))
                 return new NotFoundResult();
 
-            var res = Manager.GetESClient_VerejneZakazkyNaProfiluRaw()
-                .Search<ZakazkaRaw>(s => s
+            var client = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
+            var res = await client.SearchAsync<ZakazkaRaw>(s => s
                     .Query(q => q
                         .QueryString(qs => qs.DefaultOperator(Operator.And).Query("zakazkaId:\"" + id + "\""))
                     )
@@ -333,14 +333,14 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpPost()]
         [Authorize]
-        public ActionResult VZDetail(string _id, [FromBody] VerejnaZakazka content)
+        public async Task<ActionResult> VZDetail(string _id, [FromBody] VerejnaZakazka content)
         {
             string id = _id;
 
             if (string.IsNullOrEmpty(id))
                 return new NotFoundResult();
             
-            var idxConn = Manager.GetESClient_VerejneZakazkyNaProfiluConverted();
+            var idxConn = await Manager.GetESClient_VerejneZakazkyNaProfiluConvertedAsync();
 
             if (!ModelState.IsValid || content is null)
             {
@@ -355,7 +355,7 @@ namespace HlidacStatu.Web.Controllers
                     UserId = HttpContext.User.Identity.Name,
                     //apiCallJson = Newtonsoft.Json.JsonConvert.SerializeObject(authId) ?? null
                 };
-                ErrorEnvelopeRepo.Save(ee, idxConn);
+                await ErrorEnvelopeRepo.SaveAsync(ee, idxConn);
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
                     new { error = "data is empty" }
                 ), "application/json");
@@ -364,7 +364,7 @@ namespace HlidacStatu.Web.Controllers
             VerejnaZakazka? vz = content;
             try
             {
-                VerejnaZakazkaRepo.Save(vz, idxConn);
+                await VerejnaZakazkaRepo.SaveAsync(vz, idxConn);
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
                     new { result = "ok" }
                 ), "application/json");
@@ -378,7 +378,7 @@ namespace HlidacStatu.Web.Controllers
                     UserId = HttpContext.User.Identity.Name,
                     //apiCallJson = Newtonsoft.Json.JsonConvert.SerializeObject(authId) ?? null
                 };
-                ErrorEnvelopeRepo.Save(ee, idxConn);
+                await ErrorEnvelopeRepo.SaveAsync(ee, idxConn);
 
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
                     new { error = "deserialization error", descr = e.ToString() }
@@ -386,8 +386,7 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
-
-        public ActionResult Status()
+        public async Task<ActionResult> Status()
         {
             ClusterHealthResponse res = null;
             int num = 0;
@@ -395,13 +394,13 @@ namespace HlidacStatu.Web.Controllers
             string nodes = "-------------------------\n";
             try
             {
-                res = Manager.GetESClient().Cluster.Health();
+                var client = await Manager.GetESClientAsync(); 
+                res = client.Cluster.Health();
                 num = res?.NumberOfNodes ?? 0;
                 status = res?.Status.ToString() ?? "unknown";
 
                 //GET /_cat/nodes?v&h=m,name,ip,u&s=name
-                var catr = Manager.GetESClient()
-                    .LowLevel.Cat.Nodes<Elasticsearch.Net.StringResponse>(
+                var catr = client.LowLevel.Cat.Nodes<Elasticsearch.Net.StringResponse>(
                         new Elasticsearch.Net.Specification.CatApi.CatNodesRequestParameters()
                         {
                             Headers = new[] { "m", "name", "ip", "u" },
@@ -411,7 +410,6 @@ namespace HlidacStatu.Web.Controllers
                     ).Body
                     ?.Replace("10.10.", "");
 
-                ;
                 nodes = nodes + catr;
             }
             catch (Exception e)
@@ -422,7 +420,6 @@ namespace HlidacStatu.Web.Controllers
 
             return Content(string.Format("{0}-{1}\n\n" + nodes, num, status), "text/plain");
         }
-
 
         public ActionResult Persons(string q)
         {
@@ -445,7 +442,6 @@ namespace HlidacStatu.Web.Controllers
                 )
                     Response.Headers.Add("Access-Control-Allow-Origin", Request.Headers["Origin"]);
             }
-
             return Json(res);
         }
 
@@ -500,7 +496,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "NasiPoliticiAdmin")]
         public ActionResult Companies(string q)
         {
-            Devmasters.Cache.LocalMemory.LocalMemoryCache<Index<Autocomplete>> FullTextSearchCache =
+            Devmasters.Cache.LocalMemory.Cache<Index<Autocomplete>> FullTextSearchCache =
                 new(TimeSpan.FromDays(30),
                     "nasipolitici_firmy_autocomplete",
                     o => { return BuildNPFirmySearchIndex(); });
@@ -528,7 +524,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize]
-        public ActionResult Search(string query, int? page, int? order)
+        public async Task<ActionResult> Search(string query, int? page, int? order)
         {
             page = page ?? 1;
             order = order ?? 0;
@@ -549,11 +545,10 @@ namespace HlidacStatu.Web.Controllers
             )
                 platnyzaznam = null;
 
-            res = SmlouvaRepo.Searching.SimpleSearch(query, page.Value,
+            res = await SmlouvaRepo.Searching.SimpleSearchAsync(query, page.Value,
                 SmlouvaRepo.Searching.DefaultPageSize,
                 (SmlouvaRepo.Searching.OrderResult)order.Value,
                 platnyZaznam: platnyzaznam);
-
 
             if (res.IsValid == false)
             {
@@ -571,18 +566,17 @@ namespace HlidacStatu.Web.Controllers
                     Newtonsoft.Json.JsonConvert.SerializeObject(new { total = res.Total, items = filtered },
                         Newtonsoft.Json.Formatting.None), "application/json");
             }
-           
         }
 
         [Authorize]
-        public ActionResult Detail(string _id)
+        public async Task<ActionResult> Detail(string _id)
         {
             string Id = _id;
            
             if (string.IsNullOrWhiteSpace(Id))
                 return new NotFoundResult();
 
-            var model = SmlouvaRepo.Load(Id);
+            var model = await SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return new NotFoundResult();
@@ -608,14 +602,14 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize]
-        public ActionResult ClassificationList(int pageSize = 200)
+        public async Task<ActionResult> ClassificationList(int pageSize = 200)
         {
             string urlItemTemplate = "https://www.hlidacstatu.cz/api/v1/GetForClassification/{0}";
 
             if (pageSize > 500)
                 pageSize = 500;
 
-            var items = SmlouvaRepo.Searching.SimpleSearch("NOT(_exists_:prilohy.datlClassification)", 0, pageSize,
+            var items = await SmlouvaRepo.Searching.SimpleSearchAsync("NOT(_exists_:prilohy.datlClassification)", 0, pageSize,
                 SmlouvaRepo.Searching.OrderResult.DateAddedDesc, platnyZaznam: true);
 
             if (!items.IsValid)
@@ -641,14 +635,14 @@ namespace HlidacStatu.Web.Controllers
 
         [Obsolete]
         [Authorize]
-        public ActionResult GetForClassification(string _id)
+        public async Task<ActionResult> GetForClassification(string _id)
         {
             string Id = _id;
 
             if (string.IsNullOrWhiteSpace(Id))
                 return new NotFoundResult();
 
-            var model = SmlouvaRepo.Load(Id);
+            var model = await SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return new NotFoundResult();
@@ -665,7 +659,7 @@ namespace HlidacStatu.Web.Controllers
 
             if (model.Prilohy != null)
             {
-                SmlouvaRepo.Save(model);
+                await SmlouvaRepo.SaveAsync(model);
             }
 
 
@@ -730,9 +724,9 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize(Roles = "TeamMember")]
-        public ActionResult PolitikFromText(string text)
+        public async Task<ActionResult> PolitikFromText(string text)
         {
-            var oo = OsobaRepo.Searching.GetFirstPolitikFromText(text);
+            var oo = await OsobaRepo.Searching.GetFirstPolitikFromTextAsync(text);
 
             if (oo != null)
             {
@@ -747,15 +741,14 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize(Roles = "TeamMember")]
-        public ActionResult PoliticiFromText(string text)
+        public async Task<ActionResult> PoliticiFromText(string text)
         {
-            var oo = OsobaRepo.Searching.GetBestPoliticiFromText(text);
+            var oo = await OsobaRepo.Searching.GetBestPoliticiFromTextAsync(text);
 
             if (oo != null)
             {
                 return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    oo
-                        .Select(o => new { osobaid = o.NameId, jmeno = o.Jmeno, prijmeni = o.Prijmeni })
+                    oo.Select(o => new { osobaid = o.NameId, jmeno = o.Jmeno, prijmeni = o.Prijmeni })
                         .ToArray()
                 ), "application/json");
             }
@@ -786,18 +779,18 @@ namespace HlidacStatu.Web.Controllers
             ), "application/json");
         }
 
-        public ActionResult CheckText(string smlouvaid)
+        public async Task<ActionResult> CheckText(string smlouvaid)
         {
             Entities.Issues.IIssueAnalyzer textCheck = new Plugin.IssueAnalyzers.Text();
-            Smlouva s = SmlouvaRepo.Load(smlouvaid);
+            Smlouva s = await SmlouvaRepo.LoadAsync(smlouvaid);
             if (s != null)
             {
                 if (s.Prilohy != null && s.Prilohy.Count() > 0)
                 {
                     var newIss = s.Issues.Where(m => m.IssueTypeId != 200).ToList();
-                    newIss.AddRange(textCheck.FindIssues(s));
+                    newIss.AddRange(await textCheck.FindIssuesAsync(s));
                     s.Issues = newIss.ToArray();
-                    SmlouvaRepo.Save(s);
+                    await SmlouvaRepo.SaveAsync(s);
                 }
             }
 

@@ -30,7 +30,7 @@ namespace HlidacStatu.XLib.Watchdogs
                 {
                     ApplicationUser user = userWatchdog.UnconfirmedUser();
 
-                    var res = Mail.SendWatchdog(userWatchdog, user,
+                    var res = Mail.SendWatchdogAsync(userWatchdog, user,
                         force, specificContacts, fromSpecificDate, toSpecificDate, openingText);
 
                     Util.Consts.Logger.Info($"SingleEmailPerWatchdog watchdog {userWatchdog.Id} sent result {res.ToString()}.");

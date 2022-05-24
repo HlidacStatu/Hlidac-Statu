@@ -238,7 +238,7 @@ else
         <td>Zdroj zakázky</td>
         <td>
             @{
-                var sourceUrls = Model.ZdrojZakazkyUrl();
+                var sourceUrls = await Model.ZdrojZakazkyUrlAsync();
                 if (sourceUrls != null)
                 {
                     if (!string.IsNullOrEmpty(sourceUrls.ZakazkaURL))

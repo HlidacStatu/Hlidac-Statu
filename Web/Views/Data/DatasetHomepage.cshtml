@@ -1,24 +1,20 @@
 ﻿@model HlidacStatu.Datasets.DataSet
 @using System.Linq;
-@using System.Reflection.Metadata
 @using HlidacStatu.Datasets
-@using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.Searching
 @using HlidacStatu.Util;
-@using HlidacStatu.XLib;
 @using HlidacStatu.XLib.Render
 @using Microsoft.AspNetCore.Mvc.ViewEngines
 
 @inject ICompositeViewEngine CompositeVE
 
 @{
-    var reg = Model.Registration();
+    var reg = await Model.RegistrationAsync();
 
-    ViewBag.Title = "Databáze " + Model.Registration().name;
+    ViewBag.Title = "Databáze " + reg.name;
     ViewBag.SubTitle = "Podrobné informace";
 
-    ViewBag.SocialShareTitle = "Databáze " + Model.Registration().name + " na hlidacstatu.cz";
-    ViewBag.SocialShareText = Model.InfoFacts().RenderInfoFacts(2, true, true);
+    ViewBag.SocialShareTitle = "Databáze " + reg.name + " na hlidacstatu.cz";
+    ViewBag.SocialShareText = (await Model.InfoFactsAsync()).RenderInfoFacts(2, true, true);
     ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/dataset?d={DateTime.Now.ToString("d.M.yy")}&v=" + Model.DatasetId;
     ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"
                 + "<meta property=\"og:image:height\" content=\"1080\" />"
@@ -28,7 +24,7 @@
 
     var email = User.Identity?.Name;
 
-    bool showEditBtn = (Model != null && Model.HasAdminAccess(Context.User));
+    bool showEditBtn = (Model != null && await Model.HasAdminAccessAsync(Context.User));
 
     //bool showFrontPromo = System.IO.File.Exists(frontPromoViewFileName);
     string frontPromoViewName = $"~/Views/Data/Promo/front_{reg.datasetId}.cshtml";
@@ -42,7 +38,7 @@
 
     ViewBag.AdditionalForm = new HlidacStatu.Web.Framework.DoubleForm() {
         SecondaryAction = $"/data/Hledat/{Model.DatasetId}",
-        SecondaryActionLabel = $"Hledat pouze v {Devmasters.TextUtil.ShortenText(Model.Registration().name, 40)}"
+        SecondaryActionLabel = $"Hledat pouze v {Devmasters.TextUtil.ShortenText(reg.name, 40)}"
     };
 
 }
@@ -75,8 +71,8 @@
             {
                 <p class="lead">@Html.Raw(Devmasters.TextUtil.FormatPlainTextForArticle(reg.description))</p>
             }
-            <p>@Html.Raw(Model.InfoFacts().RenderInfoFacts(1, true, true, html: true))</p>
-            @if (Model.Registration().betaversion)
+            <p>@Html.Raw((await Model.InfoFactsAsync()).RenderInfoFacts(1, true, true, html: true))</p>
+            @if (reg.betaversion)
             {
                 <p class="bg-warning" style="padding:15px;"><b>Pozor!</b> Tato databáze zatím pracuje v testovací režimu. Může být nefunkční, obsahovat zkušební, neúplná či testovací data</p>
             }
@@ -89,11 +85,11 @@
                 DataSearchRawResult data = null;
                 try
                 {
-                    string order = string.IsNullOrWhiteSpace(Model.Registration().defaultOrderBy) ? "DbCreated desc" : Model.Registration().defaultOrderBy;
+                    string order = string.IsNullOrWhiteSpace(reg.defaultOrderBy) ? "DbCreated desc" : reg.defaultOrderBy;
                     //new HlidacStatu.Connectors.External.DataSets.DataSearchRawResult() { Q="*", Page=1, PageSize = 5, Order = "DbCreated Desc" });
-                    data = Model.SearchDataRaw("*", 1, 5,  order);
+                    data = await Model.SearchDataRawAsync("*", 1, 5,  order);
 
-                    if (Model.Registration()?.searchResultTemplate?.IsFullTemplate() == true)
+                    if (reg?.searchResultTemplate?.IsFullTemplate() == true)
                     {
                         var results = new Registration.Template.SearchTemplateResults();
                         results.Total = data.Total;
@@ -103,7 +99,7 @@
                             .Select(s => { dynamic d = Newtonsoft.Json.Linq.JObject.Parse(s.Item2); return d; })
                             .ToArray();
 
-                        var html = Model.Registration().searchResultTemplate.Render(Model, results, data.Q);
+                        var html = reg.searchResultTemplate.Render(Model, results, data.Q);
                                 @Html.Raw("<h4>Poslední záznamy v databázi</h4><p>" + html + "</p>")
                             }
                             else
@@ -129,7 +125,7 @@
 
                     if (msg != "Interní chyba")
                     {
-                        Model.SendErrorMsgToAuthor(ViewContext.GetDisplayUrl(), msg);
+                        await Model.SendErrorMsgToAuthorAsync(ViewContext.GetDisplayUrl(), msg);
                 }
             }
 

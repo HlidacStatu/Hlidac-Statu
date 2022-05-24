@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Datasets.TransparentniUcty
 {
@@ -69,29 +70,25 @@ namespace HlidacStatu.Datasets.TransparentniUcty
         */
         public string TypUctu { get; set; }
 
-        public void Save(string user)
+        public async Task SaveAsync(string user)
         {
-            _client.AddData(this, Id, user);
+            await _client.AddDataAsync(this, Id, user);
         }
 
-        public static BankovniUcet Get(string cislo)
+        public static async Task<BankovniUcet> GetAsync(string cislo)
         {
-            BankovniUcet bu = _client.GetData<BankovniUcet>(TextUtil.NormalizeToURL(cislo));
+            BankovniUcet bu = await _client.GetDataAsync<BankovniUcet>(TextUtil.NormalizeToURL(cislo));
             return bu;
         }
 
-        public static bool DeleteUcet(BankovniUcet bu)
+        public static async Task<bool> DeleteUcetAsync(BankovniUcet bu)
         {
-            return _client.DeleteData(bu.Id);
+            return await _client.DeleteDataAsync(bu.Id);
         }
 
-        public static IEnumerable<BankovniUcet> GetAll()
+        public static async Task<IEnumerable<BankovniUcet>> GetAllAsync()
         {
-            var items = _client.GetAllData<BankovniUcet>();
-
-            //var data = items
-            //    .Select(m => Newtonsoft.Json.JsonConvert.SerializeObject(m))
-            //    .Select(j => Newtonsoft.Json.JsonConvert.DeserializeObject<BankovniUcet>(j) as BankovniUcet);
+            var items = await _client.GetAllDataAsync<BankovniUcet>();
 
             return items;
         }

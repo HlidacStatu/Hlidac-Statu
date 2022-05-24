@@ -11,7 +11,7 @@
     UptimeSSL webssl = null;
     try
     {
-        webssl = UptimeSSLRepo.LoadLatest(Model.HostDomain());
+        webssl = await UptimeSSLRepo.LoadLatestAsync(Model.HostDomain());
     }
     catch (Exception)
     {

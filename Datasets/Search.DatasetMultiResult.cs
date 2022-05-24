@@ -66,17 +66,14 @@ namespace HlidacStatu.Datasets
                 return agg;
             }
 
-            static object objGeneralSearchLock = new object();
-
-
-            public static DatasetMultiResult GeneralSearch(string query, IEnumerable<DataSet> datasets = null, int page = 1, int pageSize = 20, string sort = null)
+            public static async Task<DatasetMultiResult> GeneralSearchAsync(string query, IEnumerable<DataSet> datasets = null, int page = 1, int pageSize = 20, string sort = null)
             {
                 DatasetMultiResult res = new DatasetMultiResult() { Query = query, DataSource = "DatasetMultiResult.GeneralSearch" };
 
                 if (string.IsNullOrEmpty(query))
                     return res;
 
-                if (!Repositories.Searching.Tools.ValidateQuery(query))
+                if (!(await Repositories.Searching.Tools.ValidateQueryAsync(query)))
                 {
                     res.Exceptions.Add(new Exception($"Invalid Query: {query}"));
                     return res;
@@ -90,15 +87,14 @@ namespace HlidacStatu.Datasets
 
                 Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                 sw.Start();
-                Parallel.ForEach(datasets, po,
-                    ds =>
+                await Parallel.ForEachAsync(datasets, po,
+                    async (ds, _) =>
                     {
                         try
                         {
-                            var rds = ds.SearchData(query, page, pageSize, sort);
+                            var rds = await ds.SearchDataAsync(query, page, pageSize, sort);
                             if (rds.IsValid)
                             {
-
                                 res.Results.Add(rds);
                             }
                         }

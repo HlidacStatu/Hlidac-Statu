@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -16,10 +17,10 @@ namespace HlidacStatu.Repositories
     {
         static string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
 
-        private static void PrepareBeforeSave(Firma firma, bool updateLastUpdateValue = true)
+        private static async Task PrepareBeforeSaveAsync(Firma firma, bool updateLastUpdateValue = true)
         {
             firma.JmenoAscii = TextUtil.RemoveDiacritics(firma.Jmeno);
-            firma.SetTyp();
+            await firma.SetTypAsync();
 
         }
 
@@ -228,10 +229,8 @@ namespace HlidacStatu.Repositories
         public static Firma FromName(string jmeno)
         {
             var res = AllFromExactName(jmeno);
-            if (res.Count() == 0)
-                return Firma.NotFound;
-            else
-                return res.First();
+            return res.FirstOrDefault(Firma.NotFound);
+            
         }
 
         public static IEnumerable<Firma> AllFromExactName(string jmeno)

@@ -5,6 +5,7 @@ using HlidacStatu.Util.Cache;
 using System;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Data.External.Tables
 {
@@ -14,7 +15,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
         private static volatile MinioCacheManager<Lib.Data.External.Tables.Result[],KeyAndId> prilohaTblsMinioCacheManager
         = MinioCacheManager<Lib.Data.External.Tables.Result[],KeyAndId>.GetSafeInstance(
             "SmlouvyPrilohyTbls/",
-            smlouvaKeyId => getTablesFromDocument(smlouvaKeyId),
+            smlouvaKeyId => getTablesFromDocumentAsync(smlouvaKeyId).ConfigureAwait(false).GetAwaiter().GetResult(),
             TimeSpan.Zero,
             new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
             Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
@@ -23,14 +24,12 @@ namespace HlidacStatu.Lib.Data.External.Tables
             key=>key.CacheNameOnDisk
             );
 
-        //Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(
-
-        private static Lib.Data.External.Tables.Result[] getTablesFromDocument(KeyAndId smlouvaKeyId)
+        private static async Task<Result[]> getTablesFromDocumentAsync(KeyAndId smlouvaKeyId)
         {
             var key = smlouvaKeyId.ValueForData.Split("/");
 
 
-            Smlouva s = SmlouvaRepo.Load(key[0]);
+            Smlouva s = await SmlouvaRepo.LoadAsync(key[0]);
 
             Smlouva.Priloha p = s?.Prilohy?.FirstOrDefault(m => (m.UniqueHash()) == key[1]);
 
@@ -89,8 +88,6 @@ namespace HlidacStatu.Lib.Data.External.Tables
             }
 
             return null;
-
-
         }
 
         public static Lib.Data.External.Tables.Result[] GetTablesFromPriloha(Smlouva s, Smlouva.Priloha p, bool forceUpdate = false)

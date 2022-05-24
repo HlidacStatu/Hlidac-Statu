@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace HlidacStatu.Web.Controllers
@@ -29,17 +30,12 @@ namespace HlidacStatu.Web.Controllers
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(n), "text/json");
         }
 
-        public ActionResult KapacitaNemocnic()
+        public async Task<ActionResult> KapacitaNemocnic()
         {
-
-            var client = NemocniceData.Client();
-            List<NemocniceData> days = new();
-
             var ds = DataSet.CachedDatasets.Get("kapacity-nemocnic");
 
 
-            NemocniceData[] nAll = ds
-                .SearchDataRaw("*", 1, 1000).Result
+            NemocniceData[] nAll = (await ds.SearchDataRawAsync("*", 1, 1000)).Result
                 .Select(s => Newtonsoft.Json.JsonConvert.DeserializeObject<NemocniceData>(s.Item2))
                 .OrderByDescending(m => m.lastUpdated)
                 .Take(120)

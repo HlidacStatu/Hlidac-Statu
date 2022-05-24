@@ -1,23 +1,20 @@
 using HlidacStatu.Entities;
-
-using Microsoft.EntityFrameworkCore;
-
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
     public static class UptimeSSLRepo
     {
 
-        private static Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeSSL[]> uptimeSSlCache =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedLocalMemoryCache<UptimeSSL[]>(TimeSpan.FromHours(2),
-                (obj) =>
+        private static Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeSSL[]> uptimeSSlCache =
+            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeSSL[]>(TimeSpan.FromHours(2), (obj) =>
                 {
                     UptimeSSL[] res = new UptimeSSL[] { };
-                    var resX = ES.Manager.GetESClient_UptimeSSL()
-                        .Search<UptimeSSL>(s => s
+                    var client = ES.Manager.GetESClient_UptimeSSLAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                    var resX = client
+                        .SearchAsync<UptimeSSL>(s => s
                             .Query(q => q.MatchAll())
                             .Aggregations(agg => agg
                                 .Terms("domains", t => t
@@ -31,7 +28,7 @@ namespace HlidacStatu.Repositories
                                     )
                                 )
                             )
-                        );
+                        ).ConfigureAwait(false).GetAwaiter().GetResult();
 
                     var latest = ((Nest.BucketAggregate)resX.Aggregations["domains"]).Items
                         .Select(i =>
@@ -52,12 +49,12 @@ namespace HlidacStatu.Repositories
             return uptimeSSlCache.Get();
         }
 
-        public static void Save(UptimeSSL item)
+        public static async Task SaveAsync(UptimeSSL item)
         {
             try
             {
-
-                var res = Repositories.ES.Manager.GetESClient_UptimeSSL().Index<UptimeSSL>(item, m => m.Id(item.Id));
+                var client = await Repositories.ES.Manager.GetESClient_UptimeSSLAsync();
+                await client.IndexAsync<UptimeSSL>(item, m => m.Id(item.Id));
 
             }
             catch (System.Exception e)
@@ -68,11 +65,11 @@ namespace HlidacStatu.Repositories
 
 
         }
-        public static UptimeSSL LoadLatest(string domain)
+        public static async Task<UptimeSSL> LoadLatestAsync(string domain)
         {
-            var cl = Repositories.ES.Manager.GetESClient_UptimeSSL();
+            var cl = await ES.Manager.GetESClient_UptimeSSLAsync();
 
-            var res = cl.Search<UptimeSSL>(s => s
+            var res = await cl.SearchAsync<UptimeSSL>(s => s
                 .Query(q=>q
                         .Term(t=>t.Field(f=>f.Domain).Value(domain))
                     )

@@ -32,7 +32,7 @@
                                     DateTime thisMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
                                     DateTime nextMonth = thisMonth.AddMonths(1);
                                     string query = "-stav:\"MYLNÝ ZÁP.\" OR -stav:\"ZRUŠENO VS\"";
-                                    var res = InsolvenceRepo.Searching.SimpleSearch(
+                                    var res = await InsolvenceRepo.Searching.SimpleSearchAsync(
                                         "( " + query + " ) AND datumZalozeni:[" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO " + HlidacStatu.Util.RenderData.ToElasticDate(nextMonth) + "}",
                                         1, 0, 0, limitedView: false, anyAggregation: aggs);
 
@@ -85,7 +85,7 @@
                                         );
 
                                     query = "(dokumenty.typUdalosti:174 OR dokumenty.typUdalosti:175)";
-                                    res = InsolvenceRepo.Searching.SimpleSearch(
+                                    res = await InsolvenceRepo.Searching.SimpleSearchAsync(
                                         "( " + query + " ) AND datumZalozeni:[" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO " + HlidacStatu.Util.RenderData.ToElasticDate(nextMonth) + "}",
                                         1, 0, 0, limitedView: false, anyAggregation: aggs);
                                     var typ = ((SingleBucketAggregate)res.ElasticResults.Aggregations["typ"])
@@ -127,7 +127,7 @@
                                 @{
                                     minDate = DateTime.Now.Date.AddDays(-29);
                                     query = "dluznici.typ:\"F\" AND (-stav:\"MYLNÝ ZÁP.\" OR -stav:\"ZRUŠENO VS\")";
-                                    res = InsolvenceRepo.Searching.SimpleSearch(
+                                    res = await InsolvenceRepo.Searching.SimpleSearchAsync(
                                         "( " + query + " ) AND datumZalozeni:[" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO " + HlidacStatu.Util.RenderData.ToElasticDate(nextMonth) + "}",
                                         1, 0, 0, limitedView: false);
                                     decimal lastM = res.Total;
@@ -135,7 +135,7 @@
                                     var maxDate = minDate;
                                     minDate = maxDate.AddDays(-28);
                                     query = "dluznici.typ:\"F\" AND (-stav:\"MYLNÝ ZÁP.\" OR -stav:\"ZRUŠENO VS\")";
-                                    res = InsolvenceRepo.Searching.SimpleSearch(
+                                    res = await InsolvenceRepo.Searching.SimpleSearchAsync(
                                         "( " + query + " ) AND datumZalozeni:{" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO " + HlidacStatu.Util.RenderData.ToElasticDate(maxDate) + "}",
                                         1, 0, 0, limitedView: false);
 
@@ -171,7 +171,7 @@
                                 @{
                                     minDate = DateTime.Now.Date.AddDays(-29);
                                     query = "dluznici.typ:\"P\" AND (-stav:\"MYLNÝ ZÁP.\" OR -stav:\"ZRUŠENO VS\")";
-                                    res = InsolvenceRepo.Searching.SimpleSearch(
+                                    res = await InsolvenceRepo.Searching.SimpleSearchAsync(
                                         "( " + query + " ) AND datumZalozeni:{" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO *}",
                                         1, 0, 0, limitedView: false);
                                     lastM = res.Total;
@@ -179,7 +179,7 @@
                                     maxDate = minDate;
                                     minDate = maxDate.AddDays(-28);
                                     query = "dluznici.typ:\"PF\" AND (-stav:\"MYLNÝ ZÁP.\" OR -stav:\"ZRUŠENO VS\")";
-                                    res = InsolvenceRepo.Searching.SimpleSearch(
+                                    res = await InsolvenceRepo.Searching.SimpleSearchAsync(
                                         "( " + query + " ) AND datumZalozeni:{" + HlidacStatu.Util.RenderData.ToElasticDate(minDate) + " TO " + HlidacStatu.Util.RenderData.ToElasticDate(maxDate) + "}",
                                         1, 0, 0, limitedView: false);
 

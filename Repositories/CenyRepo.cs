@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories
 {
-    public partial class CenyRepo
+    public class CenyRepo
     {
 
         public static async Task<List<Cena>> GetAllCenyAsync()

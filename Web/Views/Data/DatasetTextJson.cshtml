@@ -2,9 +2,9 @@
 @using Newtonsoft.Json.Schema;
 
 @{
-    var reg = Model.Registration();
+    var reg = await Model.RegistrationAsync();
 
-    ViewBag.Title = "Datový zdroj " + Model.Registration().name;
+    ViewBag.Title = "Datový zdroj " + reg.name;
     ViewBag.SubTitle = "Testování dat";
 
     string jsonData = ViewBag.jsondata ?? "";
@@ -17,9 +17,9 @@
         valid = false;
     }
     IList<string> errors = new List<string>();
-    if (Model.Registration().jsonSchema != null && !string.IsNullOrEmpty(jsonData))
+    if (reg.jsonSchema != null && !string.IsNullOrEmpty(jsonData))
     {
-        Newtonsoft.Json.Schema.JSchema schema = Model.Registration().GetSchema();
+        Newtonsoft.Json.Schema.JSchema schema = reg.GetSchema();
         Newtonsoft.Json.Linq.JObject obj = null;
         try
         {

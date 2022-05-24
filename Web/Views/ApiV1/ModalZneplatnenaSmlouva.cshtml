@@ -7,7 +7,7 @@
 
     string modalId = Model.Item2;
 
-    var smlouva = SmlouvaRepo.Load(smlouvaId);
+    var smlouva = await SmlouvaRepo.LoadAsync(smlouvaId);
 
     bool? platnyZaznam = null;
 
@@ -22,7 +22,7 @@
     if (platnyZaznam.HasValue)
     {
         zmeneno = smlouva.platnyZaznam != platnyZaznam;
-        SmlouvaRepo.ZmenStavSmlouvyNa(smlouva, platnyZaznam.Value);
+        await SmlouvaRepo.ZmenStavSmlouvyNaAsync(smlouva, platnyZaznam.Value);
     }
 
 }

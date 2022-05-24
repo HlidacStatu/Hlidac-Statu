@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
 
@@ -7,10 +8,10 @@ namespace HlidacStatu.Repositories
 {
     public static class FirmaInElasticRepo
     {
-        public static void Save(FirmaInElastic firmaInElastic)
+        public static async Task SaveAsync(FirmaInElastic firmaInElastic)
         {
-            ElasticClient c = Manager.GetESClient_Firmy();
-            var res = c.Index<FirmaInElastic>(firmaInElastic, m => m.Id(firmaInElastic.Ico));
+            ElasticClient c = await Manager.GetESClient_FirmyAsync();
+            var res = await c.IndexAsync<FirmaInElastic>(firmaInElastic, m => m.Id(firmaInElastic.Ico));
         }
 
     }

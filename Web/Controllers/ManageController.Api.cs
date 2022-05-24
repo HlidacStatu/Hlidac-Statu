@@ -4,8 +4,6 @@ using HlidacStatu.Entities.Insolvence;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
-using HlidacStatu.Web.Framework;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,8 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Threading.Tasks;
 using HlidacStatu.LibCore.Extensions;
-using Schema.NET;
 using Review = HlidacStatu.Entities.Review;
 
 namespace HlidacStatu.Web.Controllers
@@ -60,7 +58,7 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
-        public ActionResult ExportResult(string id, string q, string h, string o, string ct, int? num = null, string ds = null)
+        public async Task<ActionResult> ExportResult(string id, string q, string h, string o, string ct, int? num = null, string ds = null)
         {
             try
             {
@@ -112,7 +110,7 @@ namespace HlidacStatu.Web.Controllers
                 }
                 else if (id == "smlouvy")
                 {
-                    var sres = SmlouvaRepo.Searching.SimpleSearch(q, 0, numOfRecords, o, logError: false);
+                    var sres = await SmlouvaRepo.Searching.SimpleSearchAsync(q, 0, numOfRecords, o, logError: false);
 
                     if (sres.IsValid == false && !string.IsNullOrEmpty(sres.Q))
                     {
@@ -129,7 +127,7 @@ namespace HlidacStatu.Web.Controllers
                 {
 
                     string[] cpvs = Request.Query["cpv"].ToString().Split(',');
-                    var sres = VerejnaZakazkaRepo.Searching.SimpleSearch(q, cpvs, 1, numOfRecords,
+                    var sres = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(q, cpvs, 1, numOfRecords,
                         (Util.ParseTools.ToInt(o) ?? 0).ToString(), (Request.Query["zahajeny"] == "1")
                         );
 
@@ -172,7 +170,7 @@ namespace HlidacStatu.Web.Controllers
                         return File(rawData, contentType, filename);
                     }
 
-                    var sres = datasource.SearchData(q, 1, numOfRecords, (Util.ParseTools.ToInt(o) ?? 0).ToString());
+                    var sres = await datasource.SearchDataAsync(q, 1, numOfRecords, (Util.ParseTools.ToInt(o) ?? 0).ToString());
 
                     if (sres.IsValid == false && !string.IsNullOrEmpty(sres.Q))
                     {
@@ -193,7 +191,7 @@ namespace HlidacStatu.Web.Controllers
                 {
 
                     string[] cpvs = Request.Query["cpv"].ToString().Split(',');
-                    var sres = DotaceRepo.Searching.SimpleSearch(q, 1, numOfRecords,
+                    var sres = await DotaceRepo.Searching.SimpleSearchAsync(q, 1, numOfRecords,
                         (Util.ParseTools.ToInt(o) ?? 0).ToString());
 
                     if (sres.IsValid == false && !string.IsNullOrEmpty(sres.Q))
@@ -254,7 +252,7 @@ namespace HlidacStatu.Web.Controllers
 
         }
         
-        public ActionResult FullExport(string q, string ds = null)
+        public async Task<ActionResult> FullExport(string q, string ds = null)
         {
             if(!User.IsInRole("Admin"))
                 return new UnauthorizedResult();
@@ -291,7 +289,7 @@ namespace HlidacStatu.Web.Controllers
                 }
 
                 //var sres = datasource.SearchData(q, 1, 1000, (Util.ParseTools.ToInt(o) ?? 0).ToString());
-                var res = datasource.GetAllDataForQuery(q).ToList();
+                var res = (await datasource.GetAllDataForQueryAsync(q)).ToList();
 
                 if (!res.Any())
                 {

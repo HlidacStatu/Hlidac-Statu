@@ -105,7 +105,7 @@ namespace HlidacStatu.JobTableEditor.Data
 
         public async Task SaveChanges(SomeTable table, InDocTables.CheckState status)
         {
-            await InDocJobsRepo.Remove(table.InDocTable.Pk);
+            await InDocJobsRepo.RemoveAsync(table.InDocTable.Pk);
 
             if (status == InDocTables.CheckState.Done)
             {
@@ -132,7 +132,7 @@ namespace HlidacStatu.JobTableEditor.Data
                     Date = DateTime.Now,
                     Cells = JsonConvert.SerializeObject(table.Cells)
                 };
-                InDocTableCellsRepo.Add(cells);
+                await InDocTableCellsRepo.AddAsync(cells);
             }
         }
 

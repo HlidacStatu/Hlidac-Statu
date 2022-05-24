@@ -4,9 +4,9 @@
 
 @{
     Layout = null;
-    var Data = VerejnaZakazkaRepo.Searching.GetVZForHolding(Model.ICO);
+    var Data = VerejnaZakazkaRepo.Searching.GetVzForHoldingAsync(Model.ICO);
 
-    var profilyZadavatele = ProfilZadavateleRepo.GetByIco(Model.ICO)
+    var profilyZadavatele = (await ProfilZadavateleRepo.GetByIcoAsync(Model.ICO))
         .GroupBy(k=>k.Url?.Trim(),m=>m, (k,m)=> new { k=k, pz = m.First()})
         .Where(k=> k.k!=null)
         .Select(m=>m.pz);
@@ -18,8 +18,8 @@
     <div>
         <h4>Veřejné zakázky</h4>
         @{
-            var resVZdodav = VerejnaZakazkaRepo.Searching.SimpleSearch("icododavatel:" + Model.ICO, null, 1, 0, "1");
-            var resVZzadav = VerejnaZakazkaRepo.Searching.SimpleSearch("icozadavatel:" + Model.ICO, null, 1, 0, "1");
+            var resVZdodav = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("icododavatel:" + Model.ICO, null, 1, 0, "1");
+            var resVZzadav = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("icozadavatel:" + Model.ICO, null, 1, 0, "1");
             Dictionary<string, long> vzakaz = new();
             vzakaz.Add("dodavatel|dodavatel|dodavatele|dodavatelem", resVZdodav.Total);
             vzakaz.Add("zadavatel|zadavatel|zadavatele|zadavatelem", resVZzadav.Total);

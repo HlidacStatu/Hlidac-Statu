@@ -5,6 +5,7 @@ using HlidacStatu.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
@@ -17,11 +18,11 @@ namespace HlidacStatu.XLib.Watchdogs
             OrigWD = wd;
         }
 
-        public DateTime GetLatestRec(DateTime toDate)
+        public async Task<DateTime> GetLatestRecAsync(DateTime toDate)
         {
             var query = "posledniZmena:" +
                         string.Format("[* TO {0}]", Repositories.Searching.Tools.ToElasticDate(toDate));
-            var res = VerejnaZakazkaRepo.Searching.SimpleSearch(query, null, 0, 1,
+            var res = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(query, null, 0, 1,
                 ((int)Repositories.Searching.VerejnaZakazkaSearchData.VZOrderResult.LastUpdate).ToString());
 
             if (res.IsValid == false)
@@ -33,7 +34,7 @@ namespace HlidacStatu.XLib.Watchdogs
         }
 
 
-        public Results GetResults(DateTime? fromDate = null, DateTime? toDate = null, int? maxItems = null,
+        public async Task<Results> GetResultsAsync(DateTime? fromDate = null, DateTime? toDate = null, int? maxItems = null,
             string order = null)
         {
             maxItems = maxItems ?? 30;
@@ -45,7 +46,7 @@ namespace HlidacStatu.XLib.Watchdogs
                     Repositories.Searching.Tools.ToElasticDate(toDate, "*"));
             }
 
-            var res = VerejnaZakazkaRepo.Searching.SimpleSearch(query, null, 0, 50,
+            var res = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(query, null, 0, 50,
                 order == null
                     ? ((int)Repositories.Searching.VerejnaZakazkaSearchData.VZOrderResult.DateAddedDesc).ToString()
                     : order,
@@ -55,7 +56,7 @@ namespace HlidacStatu.XLib.Watchdogs
                 query, fromDate, toDate, res.IsValid, nameof(VerejnaZakazka));
         }
 
-        public RenderedContent RenderResults(Results data, long numOfListed = 5)
+        public Task<RenderedContent> RenderResultsAsync(Results data, long numOfListed = 5)
         {
             RenderedContent ret = new RenderedContent();
             List<RenderedContent> items = new List<RenderedContent>();
@@ -68,7 +69,7 @@ namespace HlidacStatu.XLib.Watchdogs
             ret.ContentText = renderT.Render(data);
             ret.ContentTitle = "Veřejné zakázky";
 
-            return ret;
+            return Task.FromResult(ret);
         }
 
         static string HtmlTemplate = @"

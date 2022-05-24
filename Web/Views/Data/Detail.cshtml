@@ -5,19 +5,19 @@
 @model HlidacStatu.Web.Models.DataDetailModel
 
 @{
-    var registration = Model.Dataset.Registration();
+    var registration = await Model.Dataset.RegistrationAsync();
 
-    Newtonsoft.Json.Linq.JObject jmodel = Model.Dataset.GetDataObj(Model.Data);
+    Newtonsoft.Json.Linq.JObject jmodel = await Model.Dataset.GetDataObjAsync(Model.Data);
     dynamic model = (dynamic)jmodel;
 
     string itemId = (model.Id ?? model.id) ?? "";
-    ViewBag.Title = Model.Dataset.Registration().name;
+    ViewBag.Title = registration.name;
     ViewBag.SubTitle = itemId ;
 
 
     ViewBag.SocialShareTitle = $"<b>{ViewBag.Title}</b>";
-    ViewBag.SocialShareText = Model.Dataset.GetPreviewTextValueFromItem(jmodel);
-    ViewBag.SocialShareHtml = Model.Dataset.GetPreviewTextValueFromItem(jmodel);
+    ViewBag.SocialShareText = Model.Dataset.GetPreviewTextValueFromItemAsync(jmodel);
+    ViewBag.SocialShareHtml = Model.Dataset.GetPreviewTextValueFromItemAsync(jmodel);
     ViewBag.SocialShareHtmlFooter = Model.Dataset.DatasetItemUrl(itemId,false) ;
     ViewBag.SocialShareHtmlSubFooter = $"<b>Hlídáme je, protože si to zaslouží!</b>";
     ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/page?d={DateTime.Now.ToString("d.M.yy")}&v=" + WebUtility.UrlEncode(ViewContext.GetDisplayUrl());
@@ -51,9 +51,9 @@
     @{
         try
         {
-            if (Model.Dataset.Registration()?.detailTemplate?.IsNewTemplate() == true)
+            if (registration?.detailTemplate?.IsNewTemplate() == true)
             {
-                var html = DatasetsRenderer.Render(Model.Dataset.Registration().detailTemplate, Model.Dataset, model, highlightingData: highlightingData);
+                var html = DatasetsRenderer.Render(registration.detailTemplate, Model.Dataset, model, highlightingData: highlightingData);
                 @Html.Raw(html)
             }
             else
@@ -61,9 +61,9 @@
 
                 var dataId = Model.Data;
                 var dataset = Model.Dataset;
-                var itemInS = dataset.GetData(dataId);
+                var itemInS = await dataset.GetDataAsync(dataId);
                 var newModel = new DataDetailModel() { Dataset = dataset, Data = itemInS };
-                Registration dsReg = DataSetDB.Instance.GetRegistration(model.Dataset.DatasetId);
+                Registration dsReg = DataSetDB.Instance.GetRegistrationAsync(model.Dataset.DatasetId);
                 if (dsReg == null)
                 {
                     <partial name="Partials/_data_noTemplate" model="@(newModel)"/>
@@ -85,7 +85,7 @@
 
             if (msg != "Interní chyba")
             {
-                Model.Dataset.SendErrorMsgToAuthor(ViewContext.GetDisplayUrl(), msg);
+                await Model.Dataset.SendErrorMsgToAuthorAsync(ViewContext.GetDisplayUrl(), msg);
             }
         }
     }

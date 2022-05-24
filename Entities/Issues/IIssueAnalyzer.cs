@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Entities.Issues
 {
@@ -8,7 +9,7 @@ namespace HlidacStatu.Entities.Issues
     {
         string Name { get; }
         string Description { get; }
-        IEnumerable<Issue> FindIssues(Smlouva item);
+        Task<IEnumerable<Issue>> FindIssuesAsync(Smlouva item);
     }
 
 

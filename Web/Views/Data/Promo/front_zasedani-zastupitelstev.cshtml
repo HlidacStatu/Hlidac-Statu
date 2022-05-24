@@ -1,7 +1,7 @@
 ﻿@model object
 @using Nest;
 @using System.Linq;
-@using Devmasters.Collections;
+
 @using HlidacStatu.Datasets
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
@@ -11,9 +11,8 @@
 
     DataSet ds =
         DataSet.CachedDatasets.Get((string)Model);
-    var reg = ds.Registration();
 
-    var mestaVds = ds.ESClient.Search<object>(s => s
+    var mestaVds = await ds.ESClient.SearchAsync<object>(s => s
         .MatchAll()
         .Size(0)
         .Aggregations(a => a

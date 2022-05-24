@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -11,12 +12,12 @@ namespace HlidacStatu.Web.Controllers
     public partial class ManageController : Controller
     {
         [Authorize(Roles = "canEditData")]
-        public ActionResult EditClassification(string id)
+        public async Task<ActionResult> EditClassification(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
                 return NotFound();
 
-            var smlouva = SmlouvaRepo.Load(id);
+            var smlouva = await SmlouvaRepo.LoadAsync(id);
 
             if (smlouva is null)
                 return NotFound();
@@ -28,9 +29,9 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "canEditData")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult EditClassification(string id, string typ1, string typ2)
+        public async Task<ActionResult> EditClassification(string id, string typ1, string typ2)
         {
-            var smlouva = SmlouvaRepo.Load(id);
+            var smlouva = await SmlouvaRepo.LoadAsync(id);
             if (smlouva is null)
                 return NotFound();
 
@@ -43,7 +44,7 @@ namespace HlidacStatu.Web.Controllers
 
             if (typeVals.Count > 0)
             {
-                smlouva.OverrideClassification(typeVals.ToArray(), this.User.Identity.Name);
+                await smlouva.OverrideClassificationAsync(typeVals.ToArray(), this.User.Identity.Name);
             }
 
             return Redirect(smlouva.GetUrl(true));

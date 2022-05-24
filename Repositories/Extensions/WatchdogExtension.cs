@@ -1,5 +1,4 @@
 using HlidacStatu.Entities;
-
 using System.Linq;
 
 namespace HlidacStatu.Extensions
@@ -13,9 +12,5 @@ namespace HlidacStatu.Extensions
                 return db.Users.FirstOrDefault(m => m.EmailConfirmed && m.Id == watchDog.UserId);
             }
         }
-
-
-
-
     }
 }

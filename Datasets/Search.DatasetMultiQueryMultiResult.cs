@@ -53,10 +53,7 @@ namespace HlidacStatu.Datasets
                 return agg;
             }
 
-            static object objGeneralSearchLock = new object();
-
-
-            public static DatasetMultiQueryMultiResult GeneralSearch(Dictionary<DataSet, string> datasetsWithQuery, int page, int pageSize)
+            public static async Task<DatasetMultiQueryMultiResult> GeneralSearchAsync(Dictionary<DataSet, string> datasetsWithQuery, int page, int pageSize)
             {
                 DatasetMultiQueryMultiResult res = new DatasetMultiQueryMultiResult()
                 {
@@ -66,7 +63,7 @@ namespace HlidacStatu.Datasets
                 if (datasetsWithQuery == null || datasetsWithQuery.Count == 0)
                     return res;
 
-                if (!Repositories.Searching.Tools.ValidateQuery(datasetsWithQuery.First().Value))
+                if (!(await Repositories.Searching.Tools.ValidateQueryAsync(datasetsWithQuery.First().Value)))
                 {
                     res.Exceptions.Add(new System.Exception($"Invalid Query: {datasetsWithQuery.First().Value}"));
                     return res;
@@ -75,12 +72,12 @@ namespace HlidacStatu.Datasets
                 ParallelOptions po = new ParallelOptions();
                 po.MaxDegreeOfParallelism = System.Diagnostics.Debugger.IsAttached ? 1 : po.MaxDegreeOfParallelism;
 
-                Parallel.ForEach(datasetsWithQuery, po,
-                    ds =>
+                await Parallel.ForEachAsync(datasetsWithQuery, po,
+                    async (ds, _ ) =>
                     {
                         try
                         {
-                            DataSearchResult rds = ds.Key.SearchData(ds.Value, page, pageSize);
+                            DataSearchResult rds = await ds.Key.SearchDataAsync(ds.Value, page, pageSize);
 
                             if (rds.IsValid)
                                 res.Results.Add(rds);

@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
@@ -66,16 +67,16 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize]
-        public ActionResult NasiPolitici_GetPoliticians()
+        public async Task<ActionResult> NasiPolitici_GetPoliticians()
         {
-            var people = OsobyEsRepo.YieldAllPoliticians();
+            var people = await OsobyEsRepo.YieldAllPoliticiansAsync().ToListAsync();
             string osoby = JsonConvert.SerializeObject(people);
 
             return Content(osoby, "application/json");
         }
 
         [Authorize]
-        public ActionResult NasiPolitici_GetData(string _id)
+        public async Task<ActionResult> NasiPolitici_GetData(string _id)
         {
             string id = _id;
 
@@ -106,13 +107,13 @@ namespace HlidacStatu.Web.Controllers
 
 
             var statDescription =
-                InfoFact.RenderInfoFacts(
-                    o.InfoFacts().Where(i => i.Level != InfoFact.ImportanceLevel.Stat).ToArray()
+                InfoFact.RenderInfoFacts((await o.InfoFactsAsync())
+                    .Where(i => i.Level != InfoFact.ImportanceLevel.Stat).ToArray()
                     , 4, true, true, "", "{0}");
 
             var angazovanost =
-                InfoFact.RenderInfoFacts(
-                    o.InfoFacts().Where(m => m.Level == InfoFact.ImportanceLevel.Stat).ToArray()
+                InfoFact.RenderInfoFacts((await o.InfoFactsAsync())
+                    .Where(m => m.Level == InfoFact.ImportanceLevel.Stat).ToArray()
                     , 4, true, true, "", "{0}");
 
 
@@ -141,21 +142,21 @@ namespace HlidacStatu.Web.Controllers
             string osobaInsQuery = $"{{0}}.osobaId:{o.NameId}";
             //var oinsRes = Insolvence.SimpleSearch("osobaid:" + Model.NameId, 1, 5, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc, false, false);
             //query: dluznici.osobaId:{o.NameId}
-            var oinsDluznik = InsolvenceRepo.Searching.SimpleSearch(string.Format(osobaInsQuery, "dluznici"), 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
+            var oinsDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync(string.Format(osobaInsQuery, "dluznici"), 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
             //query: veritele.osobaId:{o.NameId}
-            var oinsVeritel = InsolvenceRepo.Searching.SimpleSearch(string.Format(osobaInsQuery, "veritele"), 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
-            //query: spravci.osobaId:{o.NameId}
-            var oinsSpravce = InsolvenceRepo.Searching.SimpleSearch(string.Format(osobaInsQuery, "spravci"), 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
+            var oinsVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync(string.Format(osobaInsQuery, "veritele"), 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
+            //query: spravci.await sobaId:{o.NameId}
+            var oinsSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync(string.Format(osobaInsQuery, "spravci"), 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
 
             Dictionary<string, long> oinsolv = new Dictionary<string, long>();
             oinsolv.Add("dluznici|dlužník|dlužníka|dlužníkem", oinsDluznik.Total);
             oinsolv.Add("veritele|věřitel|věřitele|veřitelem", oinsVeritel.Total);
             oinsolv.Add("spravci|insolvenční správce|insolvenčního správce|insolvenčním správcem", oinsSpravce.Total);
 
-            var insRes = InsolvenceRepo.Searching.SimpleSearch("osobaid:" + o.NameId, 1, 5, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc, false, true);
-            var insDluznik = InsolvenceRepo.Searching.SimpleSearch("osobaiddluznik:" + o.NameId, 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
-            var insVeritel = InsolvenceRepo.Searching.SimpleSearch("osobaidveritel:" + o.NameId, 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
-            var insSpravce = InsolvenceRepo.Searching.SimpleSearch("osobaidspravce:" + o.NameId, 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
+            //var insRes = await InsolvenceRepo.Searching.SimpleSearchAsync("osobaid:" + o.NameId, 1, 5, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc, false, true);
+            var insDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("osobaiddluznik:" + o.NameId, 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
+            var insVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("osobaidveritel:" + o.NameId, 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
+            var insSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync("osobaidspravce:" + o.NameId, 1, 1, (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, true);
 
             Dictionary<string, long> insolv = new Dictionary<string, long>();
             insolv.Add("dluznik|dlužník|dlužníka|dlužníkem", insDluznik.Total);
@@ -245,8 +246,6 @@ namespace HlidacStatu.Web.Controllers
                 //? "https://www.hlidacstatu.cz" + "?utm_source=nasipolitici&utm_medium=detail&utm_campaign=osoba"
                 //: $"https://www.hlidacstatu.cz/data/Detail/centralniregistroznameni/{registrOznameni}" + "?utm_source=nasipolitici&utm_medium=detail&utm_campaign=osoba",
                 sourceRoles = $"https://www.hlidacstatu.cz/osoba/{o.NameId}" + "?utm_source=nasipolitici&utm_medium=detail&utm_campaign=osoba",
-
-
             };
 
             return Content(JsonConvert.SerializeObject(result), "application/json");

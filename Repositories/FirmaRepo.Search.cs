@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -21,22 +22,13 @@ namespace HlidacStatu.Repositories
         {
             public const int MaxResultWindow = 10000;
 
-
-            static RegexOptions regexQueryOption =
-                RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline;
-
-            static string[] queryOperators = new string[]
-            {
-                "AND", "OR"
-            };
-
             static string[] ignoredIcos = Config
                 .GetWebConfigValue("DontIndexFirmy")
                 .Split(new string[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => m.ToLower())
                 .ToArray();
 
-            public static Search.GeneralResult<Firma> SimpleSearch(string query, int page, int size)
+            public static async Task<Search.GeneralResult<Firma>> SimpleSearchAsync(string query, int page, int size)
             {
                 List<Firma> found = new List<Firma>();
 
@@ -54,7 +46,7 @@ namespace HlidacStatu.Repositories
                         Firma f = Firmy.Get(ic);
                         if (f.Valid && ignoredIcos.Contains(f.ICO) == false)
                         {
-                            ///nalezene ICO
+                            //nalezene ICO
                             found.Add(f);
                         }
                     }
@@ -64,15 +56,6 @@ namespace HlidacStatu.Repositories
                                 size, true)
                         { Page = page };
                 }
-
-
-                //
-                modifQ = Regex.Replace(modifQ, "(ico:|icoprijemce:|icoplatce:|icododavatel:|icozadavatel:)", "ico:",
-                    regexQueryOption);
-
-                modifQ = Regex.Replace(modifQ, "(jmenoPrijemce:|jmenoPlatce:|jmenododavatel:|jmenozadavatel:)",
-                    "jmeno:",
-                    regexQueryOption);
 
                 page = page - 1;
                 if (page < 0)
@@ -91,8 +74,8 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<FirmaInElastic> res = null;
                 try
                 {
-                    res = Manager.GetESClient_Firmy()
-                        .Search<FirmaInElastic>(s => s
+                    var client = await Manager.GetESClient_FirmyAsync(); 
+                    res = await client.SearchAsync<FirmaInElastic>(s => s
                             .Size(size)
                             .From(page * size)
                             .TrackTotalHits(size == 0 ? true : (bool?)null)
@@ -134,18 +117,11 @@ namespace HlidacStatu.Repositories
             }
 
 
-            public static IEnumerable<Firma> FindAll(string query, int limit)
+            public static async Task<IEnumerable<Firma>> FindAllAsync(string query, int limit)
             {
-                return SimpleSearch(query, 0, limit)
-                    .Result;
+                return (await SimpleSearchAsync(query, 0, limit)).Result;
             }
 
-
-            public static IEnumerable<Firma> FindAllInMemory(string query, int limit)
-            {
-                return SimpleSearch(query, 0, limit)
-                    .Result;
-            }
         }
 
     }

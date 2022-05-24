@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using HlidacStatu.Lib.Data.External.Tables;
 
 namespace HlidacStatu.Web.Controllers
@@ -28,9 +29,9 @@ namespace HlidacStatu.Web.Controllers
 
         [Authorize(Roles = "canEditData,TableEditor")]
         [HttpGet]
-        public ActionResult ShowPrilohaTables(string s, string p)
+        public async Task<ActionResult> ShowPrilohaTables(string s, string p)
         {
-            Smlouva sml = SmlouvaRepo.Load(s);
+            Smlouva sml = await SmlouvaRepo.LoadAsync(s);
             Smlouva.Priloha pr = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == p);
             if (sml == null || pr == null)
                 return NotFound();
@@ -43,9 +44,9 @@ namespace HlidacStatu.Web.Controllers
 
         [Authorize(Roles = "canEditData,TableEditor")]
         [HttpGet]
-        public ActionResult ShowPrilohaTablesOnePage(string s, string p, int page)
+        public async Task<ActionResult> ShowPrilohaTablesOnePage(string s, string p, int page)
         {
-            Smlouva sml = SmlouvaRepo.Load(s);
+            Smlouva sml = await SmlouvaRepo.LoadAsync(s);
             Smlouva.Priloha pr = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == p);
             if (sml == null || pr == null)
                 return NotFound();
@@ -58,9 +59,9 @@ namespace HlidacStatu.Web.Controllers
 
         [Authorize(Roles = "canEditData,TableEditor")]
         [HttpGet]
-        public ActionResult ShowPrilohaTablesOnePageImg(string s, string p, int page)
+        public async Task<ActionResult> ShowPrilohaTablesOnePageImg(string s, string p, int page)
         {
-            Smlouva sml = SmlouvaRepo.Load(s);
+            Smlouva sml = await SmlouvaRepo.LoadAsync(s);
             Smlouva.Priloha pr = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == p);
             if (sml == null || pr == null)
                 return NotFound();
@@ -69,7 +70,7 @@ namespace HlidacStatu.Web.Controllers
             bool weHaveCopy = System.IO.File.Exists(fn);
             byte[] pdfBin = null;
             if (weHaveCopy)
-                pdfBin = System.IO.File.ReadAllBytes(fn);
+                pdfBin = await System.IO.File.ReadAllBytesAsync(fn);
             else
             {
                 using (var wc = new System.Net.WebClient())
@@ -94,7 +95,7 @@ namespace HlidacStatu.Web.Controllers
 
         [Authorize(Roles = "canEditData")]
         [HttpPost]
-        public ActionResult ZmenaSmluvnichStran(string id, IFormCollection form)
+        public async Task<ActionResult> ZmenaSmluvnichStran(string id, IFormCollection form)
         {
             ViewBag.SmlouvaId = id;
             if (string.IsNullOrEmpty(form["platce"])
@@ -104,7 +105,7 @@ namespace HlidacStatu.Web.Controllers
                 ModelState.AddModelError("Check", "Nastav smluvni strany");
                 return View();
             }
-            Smlouva s = SmlouvaRepo.Load(id);
+            Smlouva s = await SmlouvaRepo.LoadAsync(id);
             if (s == null)
             {
                 ModelState.AddModelError("Check", "smlouva neexistuje");
@@ -130,7 +131,7 @@ namespace HlidacStatu.Web.Controllers
                 List<Entities.Issues.Issue> issues = new List<Entities.Issues.Issue>();
                 foreach (var ia in Entities.Issues.Util.GetIssueAnalyzers())
                 {
-                    var iss = ia.FindIssues(s);
+                    var iss = await ia.FindIssuesAsync(s);
 
                     if (iss != null)
                         issues.AddRange(iss);
@@ -139,7 +140,7 @@ namespace HlidacStatu.Web.Controllers
                 s.Issues = issues.ToArray();
 
 
-                SmlouvaRepo.Save(s);
+                await SmlouvaRepo.SaveAsync(s);
                 return Redirect(s.GetUrl(true));
             }
         }

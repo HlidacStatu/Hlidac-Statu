@@ -6,6 +6,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using HlidacStatu.Repositories.Searching;
 
 namespace HlidacStatu.Repositories.ES
@@ -15,9 +16,8 @@ namespace HlidacStatu.Repositories.ES
         public class VZ
         {
 
-            public static Dictionary<int, BasicData> KonecnaCenaPerYear(string query, int[] interestedInYearsOnly)
+            public static async Task<Dictionary<int, BasicData>> KonecnaCenaPerYearAsync(string query, int[] interestedInYearsOnly)
             {
-
                 AggregationContainerDescriptor<VerejnaZakazka> aggYSum =
                     new AggregationContainerDescriptor<VerejnaZakazka>()
                         .DateHistogram("x-agg", h => h
@@ -40,8 +40,7 @@ namespace HlidacStatu.Repositories.ES
                     ExactNumOfResults = false
                 };
 
-                var res = VerejnaZakazkaRepo.Searching.SimpleSearch(q, aggYSum);
-
+                var res = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(q, aggYSum);
 
                 Dictionary<int, BasicData> result = new Dictionary<int, BasicData>();
                 if (interestedInYearsOnly != null)
@@ -73,30 +72,22 @@ namespace HlidacStatu.Repositories.ES
 
                 return result;
             }
-
-            public static Dictionary<int, (List<(string ico, BasicData stat)> topPodlePoctu, List<(string ico, BasicData stat)> topPodleKc)>
-                TopDodavatelePerYear(
+            
+            //todo: Tahle metoda skrývá metodu se stejným názvem z vnější classy
+            public static Task<Dictionary<int, (List<(string ico, BasicData stat)> topPodlePoctu, List<(string ico, BasicData stat)> topPodleKc)>> TopDodavatelePerYearAsync(
                 string query,
                 int[] interestedInYearsOnly,
                 int maxList = 50
-                )
-            {
-                return _topStranyPerYear("dodavatele.iCO", query, interestedInYearsOnly, maxList);
-            }
+                ) => _topStranyPerYearAsync("dodavatele.iCO", query, interestedInYearsOnly, maxList);
 
 
-            public static Dictionary<int, (List<(string ico, BasicData stat)> topPodlePoctu, List<(string ico, BasicData stat)> topPodleKc)>
-                TopZadavatelePerYear(
+            public static Task<Dictionary<int, (List<(string ico, BasicData stat)> topPodlePoctu, List<(string ico, BasicData stat)> topPodleKc)>> TopZadavatelePerYearAsync(
                 string query,
                 int[] interestedInYearsOnly,
                 int maxList = 50
-                )
-            {
-                return _topStranyPerYear("zadavatel.iCO", query, interestedInYearsOnly, maxList);
-            }
+                ) => _topStranyPerYearAsync("zadavatel.iCO", query, interestedInYearsOnly, maxList);
 
-            private static Dictionary<int, (List<(string ico, BasicData stat)> topPodlePoctu, List<(string ico, BasicData stat)> topPodleKc)>
-                _topStranyPerYear(
+            private static async Task<Dictionary<int, (List<(string ico, BasicData stat)> topPodlePoctu, List<(string ico, BasicData stat)> topPodleKc)>> _topStranyPerYearAsync(
                     string property,
                     string query,
                     int[] interestedInYearsOnly,
@@ -140,7 +131,7 @@ namespace HlidacStatu.Repositories.ES
                     ExactNumOfResults = false
                 };
 
-                var res = VerejnaZakazkaRepo.Searching.SimpleSearch(q, aggYSum);
+                var res = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(q, aggYSum);
 
 
                 Dictionary<int, (List<(string ico, BasicData stat)> topPodlePoctu, List<(string ico, BasicData stat)> topPodleKc)> result =
@@ -205,17 +196,6 @@ namespace HlidacStatu.Repositories.ES
 
                 return result;
             }
-
-
-            //public static string ToElasticQuery(IEnumerable<DateTime> dates)
-            //{
-            //    if (dates == null)
-            //        return string.Empty;
-            //    if (dates.Count() == 0)
-            //        return string.Empty;
-
-            //    return "( " + string.Join(" OR ", dates) + " ) ";
-            //}
 
         }
     }

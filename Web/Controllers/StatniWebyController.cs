@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
@@ -118,7 +118,7 @@ namespace HlidacStatu.Web.Controllers
 
         static byte[] EmptyPng = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFhAJ/wlseKgAAAABJRU5ErkJggg==");
         [HlidacCache(2 * 60, "id", false)]
-        public ActionResult Banner(int id, string h)
+        public async Task<ActionResult> Banner(int id, string h)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
                 .FirstOrDefault(w => w.Id == id);
@@ -150,7 +150,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 return File(EmptyPng, "image/png");
             }
-            var webssl = UptimeSSLRepo.LoadLatest(webDay.Host.HostDomain());
+            var webssl = await UptimeSSLRepo.LoadLatestAsync(webDay.Host.HostDomain());
 
             HlidacStatu.KIndexGenerator.WebyLabel img = new HlidacStatu.KIndexGenerator.WebyLabel();
             var rgb = new Devmasters.Imaging.RGB(UptimeSSL.StatusOrigColor(webssl.SSLGrade()).Replace("#", ""));

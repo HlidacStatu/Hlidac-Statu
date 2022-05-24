@@ -6,12 +6,13 @@ using Nest;
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class VerejnaZakazkaRepo
     {
-        public static void UpdatePosledniZmena(VerejnaZakazka verejnaZakazka, bool force = false, bool save = false)
+        public static async Task UpdatePosledniZmenaAsync(VerejnaZakazka verejnaZakazka, bool force = false, bool save = false)
         {
             DateTime? prevVal = verejnaZakazka.PosledniZmena;
             if (verejnaZakazka.PosledniZmena.HasValue && force == false)
@@ -30,10 +31,10 @@ namespace HlidacStatu.Repositories
             }
 
             if (verejnaZakazka.PosledniZmena != prevVal && save)
-                Save(verejnaZakazka);
+                await SaveAsync(verejnaZakazka);
         }
 
-        public static void Save(VerejnaZakazka verejnaZakazka, ElasticClient client = null, DateTime? posledniZmena = null)
+        public static async Task SaveAsync(VerejnaZakazka verejnaZakazka, ElasticClient client = null, DateTime? posledniZmena = null)
         {
             try
             {
@@ -45,8 +46,8 @@ namespace HlidacStatu.Repositories
                     verejnaZakazka.PosledniZmena = posledniZmena;
                 else
                     verejnaZakazka.PosledniZmena = verejnaZakazka.GetPosledniZmena();
-                var es = client ?? Manager.GetESClient_VZ();
-                es.IndexDocument<VerejnaZakazka>(verejnaZakazka);
+                var es = client ??await Manager.GetESClient_VZAsync();
+                await es.IndexDocumentAsync<VerejnaZakazka>(verejnaZakazka);
             }
             catch (Exception e)
             {
@@ -55,25 +56,25 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static VerejnaZakazka LoadFromES(string id, ElasticClient client = null)
+        public static async Task<VerejnaZakazka> LoadFromESAsync(string id, ElasticClient client = null)
         {
-            var es = client ?? Manager.GetESClient_VZ();
-            var res = es.Get<VerejnaZakazka>(id);
+            var es = client ??await Manager.GetESClient_VZAsync();
+            var res = await es.GetAsync<VerejnaZakazka>(id);
             if (res.Found)
                 return res.Source;
             else
                 return null;
         }
 
-        public static bool Exists(VerejnaZakazka vz, ElasticClient client = null)
+        public static Task<bool> ExistsAsync(VerejnaZakazka vz, ElasticClient client = null)
         {
-            return Exists(vz.Id, client);
+            return ExistsAsync(vz.Id, client);
         }
 
-        public static bool Exists(string id, ElasticClient client = null)
+        public static async Task<bool> ExistsAsync(string id, ElasticClient client = null)
         {
-            var es = client ?? Manager.GetESClient_VZ();
-            var res = es.DocumentExists<VerejnaZakazka>(id);
+            var es = client ?? await Manager.GetESClient_VZAsync();
+            var res = await es.DocumentExistsAsync<VerejnaZakazka>(id);
             return res.Exists;
         }
 

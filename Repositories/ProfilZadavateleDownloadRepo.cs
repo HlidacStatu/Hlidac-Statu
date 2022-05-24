@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using HlidacStatu.Entities.Logs;
 using HlidacStatu.Repositories.ES;
 
@@ -7,10 +8,10 @@ namespace HlidacStatu.Repositories
 {
     public static class ProfilZadavateleDownloadRepo
     {
-        public static void Save(ProfilZadavateleDownload profilZadavatele, ElasticClient client = null)
+        public static async Task SaveAsync(ProfilZadavateleDownload profilZadavatele, ElasticClient client = null)
         {
-            var es = (client ?? Manager.GetESClient_Logs())
-                .IndexDocument<ProfilZadavateleDownload>(profilZadavatele);
+            var es = await (client ?? await Manager.GetESClient_LogsAsync())
+                .IndexDocumentAsync<ProfilZadavateleDownload>(profilZadavatele);
         }
 
     }

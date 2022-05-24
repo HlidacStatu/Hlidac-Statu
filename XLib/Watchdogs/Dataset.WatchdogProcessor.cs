@@ -1,11 +1,11 @@
 ﻿using HlidacStatu.Datasets;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-using HlidacStatu.XLib.Render;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using HlidacStatu.XLib.Render;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
@@ -72,10 +72,10 @@ namespace HlidacStatu.XLib.Watchdogs
             DataSet = ds;
         }
 
-        public DateTime GetLatestRec(DateTime toDate)
+        public async Task<DateTime> GetLatestRecAsync(DateTime toDate)
         {
             var query = "DbCreated:" + string.Format("[* TO {0}]", Repositories.Searching.Tools.ToElasticDate(toDate));
-            DataSearchResult res = DataSet.SearchData(query, 1, 1, "DbCreated desc");
+            DataSearchResult res = await DataSet.SearchDataAsync(query, 1, 1, "DbCreated desc");
 
             if (res.IsValid == false)
                 return DateTime.Now.Date.AddYears(-10);
@@ -85,7 +85,7 @@ namespace HlidacStatu.XLib.Watchdogs
         }
 
 
-        public Results GetResults(DateTime? fromDate = null, DateTime? toDate = null, int? maxItems = null,
+        public async Task<Results> GetResultsAsync(DateTime? fromDate = null, DateTime? toDate = null, int? maxItems = null,
             string order = null)
         {
             maxItems = maxItems ?? 30;
@@ -97,13 +97,13 @@ namespace HlidacStatu.XLib.Watchdogs
                     Repositories.Searching.Tools.ToElasticDate(toDate, "*"));
             }
 
-            DataSearchResult res = DataSet.SearchData(query, 1, 50, order);
+            DataSearchResult res = await DataSet.SearchDataAsync(query, 1, 50, order);
 
             return new Results(res.Result, res.Total,
                 query, fromDate, toDate, res.IsValid, WatchDog.AllDbDataType);
         }
 
-        public RenderedContent RenderResults(Results data, long numOfListed = 5)
+        public async Task<RenderedContent> RenderResultsAsync(Results data, long numOfListed = 5)
         {
             RenderedContent ret = new RenderedContent();
             List<RenderedContent> items = new List<RenderedContent>();
@@ -120,7 +120,7 @@ namespace HlidacStatu.XLib.Watchdogs
             resultToRender.Result = dataToRender;
 
             //var renderH = new Lib.Render.ScribanT(HtmlTemplate.Replace("#LIMIT#", numOfListed.ToString()));
-            ret.ContentHtml = DataSet.Registration().searchResultTemplate
+            ret.ContentHtml = (await DataSet.RegistrationAsync()).searchResultTemplate
                 .Render(DataSet, resultToRender, data.SearchQuery);
             if (data.Total > dataToRender.Count())
             {
@@ -137,15 +137,10 @@ namespace HlidacStatu.XLib.Watchdogs
                 ret.ContentHtml += s;
             }
 
-            //var renderT = new Lib.Render.ScribanT(TextTemplate.Replace("#LIMIT#", numOfListed.ToString()));
             ret.ContentText = " ";
-            ret.ContentTitle = DataSet.Registration().name;
+            ret.ContentTitle = (await DataSet.RegistrationAsync()).name;
 
             return ret;
         }
-
-        //            static string HtmlTemplate = @"
-        //";
-        //            static string TextTemplate = @"";
     }
 }

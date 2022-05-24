@@ -5,6 +5,7 @@ using HlidacStatu.Web.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -19,18 +20,18 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        public ActionResult Zakazka(string id)
+        public async Task<ActionResult> Zakazka(string id)
         {
             if (string.IsNullOrEmpty(id))
                 return new NotFoundResult();
 
-            var vz = VerejnaZakazkaRepo.LoadFromES(id);
+            var vz = await VerejnaZakazkaRepo.LoadFromESAsync(id);
             if (vz == null)
                 return new NotFoundResult();
 
             if (!string.IsNullOrEmpty(Request.Query["qs"]))
             {
-                var findSm = VerejnaZakazkaRepo.Searching.SimpleSearch(
+                var findSm = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(
                     $"_id:\"{vz.Id}\" AND ({Request.Query["qs"]})",
                     new string[] { }, 1, 1,
                     ((int)SmlouvaRepo.Searching.OrderResult.FastestForScroll).ToString(), withHighlighting: true);
@@ -41,9 +42,9 @@ namespace HlidacStatu.Web.Controllers
             return View(vz);
         }
 
-        public ActionResult TextDokumentu(string id, string hash)
+        public async Task<ActionResult> TextDokumentu(string id, string hash)
         {
-            var vz = VerejnaZakazkaRepo.LoadFromES(id);
+            var vz = await VerejnaZakazkaRepo.LoadFromESAsync(id);
             if (vz == null)
                 return new NotFoundResult();
             if (vz.Dokumenty?.Any(d => d.StorageId == hash) == false)
@@ -53,14 +54,14 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        public ActionResult Hledat(Repositories.Searching.VerejnaZakazkaSearchData model)
+        public async Task<ActionResult> Hledat(Repositories.Searching.VerejnaZakazkaSearchData model)
         {
             if (ModelState.IsValid == false)
                 return RedirectToAction("Index");
             if (model == null)
                 return View(new Repositories.Searching.VerejnaZakazkaSearchData());
 
-            var res = VerejnaZakazkaRepo.Searching.SimpleSearch(model);
+            var res = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(model);
             AuditRepo.Add(
                     Audit.Operations.UserSearch
                     , User?.Identity?.Name
@@ -71,9 +72,6 @@ namespace HlidacStatu.Web.Controllers
 
             return View(res);
         }
-
-
-
 
         [HlidacCache(60 * 10, "id;h;embed", false)]
         public ActionResult CPVs()

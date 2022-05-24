@@ -5,6 +5,7 @@ using HlidacStatu.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 namespace HlidacStatu.Extensions
@@ -164,7 +165,7 @@ namespace HlidacStatu.Extensions
             return infofacts;
         }
 
-        public static VerejnaZakazka.ZakazkaSource ZdrojZakazkyUrl(this VerejnaZakazka verejnaZakazka)
+        public static async Task<VerejnaZakazka.ZakazkaSource> ZdrojZakazkyUrlAsync(this VerejnaZakazka verejnaZakazka)
         {
             //2006 https://old.vestnikverejnychzakazek.cz/cs/Searching/SearchContractNumber?cococode=847422
             //2016 https://www.vestnikverejnychzakazek.cz/SearchForm/SearchContract?contractNumber=
@@ -172,13 +173,14 @@ namespace HlidacStatu.Extensions
             if (!string.IsNullOrEmpty(verejnaZakazka.EvidencniCisloZakazky))
             {
                 string profilUrl = "";
+                //todo: michale, mrkni na to if else - všude se volá stejné, tak to kdyžtak zjednoduš.
                 if (verejnaZakazka.Dataset == VerejnaZakazka.Post2016Dataset)
-                    profilUrl = ProfilZadavateleRepo.GetById(verejnaZakazka.ZakazkaNaProfiluId)?.Url?.Trim();
+                    profilUrl = (await ProfilZadavateleRepo.GetByIdAsync(verejnaZakazka.ZakazkaNaProfiluId))?.Url?.Trim();
                 else if (verejnaZakazka.Dataset == VerejnaZakazka.Pre2016Dataset)
-                    profilUrl = ProfilZadavateleRepo.GetById(verejnaZakazka.ZakazkaNaProfiluId)?.Url?.Trim();
+                    profilUrl = (await ProfilZadavateleRepo.GetByIdAsync(verejnaZakazka.ZakazkaNaProfiluId))?.Url?.Trim();
                 else if (!verejnaZakazka.Dataset.StartsWith("DatLab-"))
                     profilUrl = verejnaZakazka.Dataset ??
-                                ProfilZadavateleRepo.GetById(verejnaZakazka.ZakazkaNaProfiluId)?.Url?.Trim();
+                                (await ProfilZadavateleRepo.GetByIdAsync(verejnaZakazka.ZakazkaNaProfiluId))?.Url?.Trim();
                 if (Uri.TryCreate(profilUrl, UriKind.Absolute, out var profilUri))
                 {
                     string googlQ = verejnaZakazka.EvidencniCisloZakazky + " site:" + profilUri.Host;
@@ -195,8 +197,8 @@ namespace HlidacStatu.Extensions
                         {
                             ZakazkaURL =
                                 $"https://www.vestnikverejnychzakazek.cz/SearchForm/SearchContract?contractNumber={verejnaZakazka.EvidencniCisloZakazky}",
-                            ProfilZadavatelUrl = ProfilZadavateleRepo.GetById(verejnaZakazka.ZakazkaNaProfiluId)?.Url
-                                ?.Trim(),
+                            ProfilZadavatelUrl = 
+                                (await ProfilZadavateleRepo.GetByIdAsync(verejnaZakazka.ZakazkaNaProfiluId))?.Url?.Trim(),
                             SearchZakazkaUrl = searchUrl
                         };
                 else if (verejnaZakazka.Dataset == VerejnaZakazka.Pre2016Dataset)
@@ -205,7 +207,7 @@ namespace HlidacStatu.Extensions
                         ZakazkaURL =
                             $"https://old.vestnikverejnychzakazek.cz/cs/Searching/SearchContractNumber?cococode={verejnaZakazka.EvidencniCisloZakazky}",
                         ProfilZadavatelUrl =
-                            ProfilZadavateleRepo.GetById(verejnaZakazka.ZakazkaNaProfiluId)?.Url?.Trim(),
+                            (await ProfilZadavateleRepo.GetByIdAsync(verejnaZakazka.ZakazkaNaProfiluId))?.Url?.Trim(),
                         SearchZakazkaUrl = searchUrl
                     };
                 else if (!verejnaZakazka.Dataset.StartsWith("DatLab-"))
@@ -214,8 +216,7 @@ namespace HlidacStatu.Extensions
                     {
                         SearchZakazkaUrl = searchUrl,
                         ProfilZadavatelUrl = verejnaZakazka.Dataset ??
-                                             ProfilZadavateleRepo.GetById(verejnaZakazka.ZakazkaNaProfiluId)?.Url
-                                                 ?.Trim()
+                            (await ProfilZadavateleRepo.GetByIdAsync(verejnaZakazka.ZakazkaNaProfiluId))?.Url?.Trim()
                     };
                 }
             }

@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Repositories;
+﻿using System.Threading.Tasks;
+using HlidacStatu.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +16,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        public ActionResult Hledat(string q, string page, string osobaNamedId)
+        public async Task<ActionResult> Hledat(string q, string page, string osobaNamedId)
         {
             if (string.IsNullOrWhiteSpace(q))
                 return Redirect("/osoby");
@@ -29,7 +30,8 @@ namespace HlidacStatu.Web.Controllers
             
             int pagenum = string.IsNullOrEmpty(page) ? 1 : int.Parse(page); 
 
-            var res = OsobaRepo.Searching.SimpleSearch(q, pagenum, 25, OsobaRepo.Searching.OrderResult.Relevance);
+            var res = await OsobaRepo.Searching
+                .SimpleSearchAsync(q, pagenum, 25, OsobaRepo.Searching.OrderResult.Relevance);
             return View(res);
         }
 

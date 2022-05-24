@@ -117,7 +117,7 @@ namespace HlidacStatu.Repositories
                         lastChecks.First().SimpleStatus()
                         );
 
-                //predchozí se lisí
+                //predchozï¿½ se lisï¿½
                 //z predchoziho 2x delsiho intervalu vezmu ten necastejsi stav co byl
                 preLastChecks = availabilities.Skip(numToChange).Take(numToChange*2).ToArray();
                 var mostDetectedStatus_all = preLastChecks
@@ -128,7 +128,7 @@ namespace HlidacStatu.Repositories
                 UptimeServer.Availability.SimpleStatuses? mostDetectedStatus = null;
                 if (mostDetectedStatus_all.First().count == (numToChange * 2) / mostDetectedStatus_all.Count())
                 {
-                    //stejny pocet, rozhodni podle poslední
+                    //stejny pocet, rozhodni podle poslednï¿½
                     var lastAlertStatus = (Alert.AlertStatus?)UptimeServerRepo.Load(serverId).LastAlertedStatus;
                     switch (lastAlertStatus)
                     {

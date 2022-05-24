@@ -1,9 +1,10 @@
 ﻿using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Nest;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -11,54 +12,58 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
     {
         public class PercInterval
         {
-            public PercInterval() { }
-            public PercInterval(int value) { From = value; To = value; }
-            public PercInterval(int from, int to) { From = from; To = to; }
+            public PercInterval()
+            {
+            }
+
+            public PercInterval(int value)
+            {
+                From = value;
+                To = value;
+            }
+
+            public PercInterval(int from, int to)
+            {
+                From = from;
+                To = to;
+            }
+
             public int From { get; set; }
             public int To { get; set; }
         }
 
 
-
-        public static IEnumerable<Statistics> Calculate(string[] forIcos = null, bool futureKIDX = false)
+        public static async Task<IEnumerable<Statistics>> CalculateAsync(string[] forIcos = null, bool futureKIDX = false)
         {
-            var client = Manager.GetESClient_KIndex();
+            var client = await Manager.GetESClient_KIndexAsync();
             if (futureKIDX)
-                client = Manager.GetESClient_KIndexTemp();
+                client = await Manager.GetESClient_KIndexTempAsync();
 
             int[] calculationYears = Consts.ToCalculationYears;
-            Func<int, int, Nest.ISearchResponse<Lib.Analysis.KorupcniRiziko.KIndexData>> searchfnc = null;
+            Func<int, int, Task<ISearchResponse<KIndexData>>> searchfnc = null;
             if (forIcos != null)
             {
-                searchfnc = (size, page) =>
-                {
-
-
-                    return client.Search<Lib.Analysis.KorupcniRiziko.KIndexData>(a => a
-                                .Size(size)
-                                .From(page * size)
-                                .Query(q => q.Terms(t => t.Field(f => f.Ico).Terms(forIcos)))
-                                .Scroll("10m")
-                                );
-                };
+                searchfnc = (size, page) => client.SearchAsync<KIndexData>(a => a
+                    .Size(size)
+                    .From(page * size)
+                    .Query(q => q.Terms(t => t.Field(f => f.Ico).Terms(forIcos)))
+                    .Scroll("10m")
+                );
             }
             else
             {
-                searchfnc = (size, page) =>
-                {
-                    return client.Search<Lib.Analysis.KorupcniRiziko.KIndexData>(a => a
-                                .Size(size)
-                                .From(page * size)
-                                .Query(q => q.MatchAll())
-                                .Scroll("10m")
-                                );
-                };
-            };
+                searchfnc = (size, page) => client.SearchAsync<KIndexData>(a => a
+                    .Size(size)
+                    .From(page * size)
+                    .Query(q => q.MatchAll())
+                    .Scroll("10m")
+                );
+            }
 
-            List<Lib.Analysis.KorupcniRiziko.KIndexData> data = new List<Analysis.KorupcniRiziko.KIndexData>();
-            Repositories.Searching.Tools.DoActionForQuery<Lib.Analysis.KorupcniRiziko.KIndexData>(client,
+            List<KIndexData> data = new List<KIndexData>();
+            await Repositories.Searching.Tools.DoActionForQueryAsync<KIndexData>(client,
                 searchfnc,
-                (hit, param) =>
+                (hit, _) =>
                 {
                     if (hit.Source.roky.Any(m => m.KIndexReady))
                         data.Add(hit.Source);
@@ -93,6 +98,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     })
                     .OrderBy(m => m.KIndex)
                     .ToList();
+                
                 foreach (KIndexData.KIndexParts part in Enum.GetValues(typeof(KIndexData.KIndexParts)))
                 {
                     stat.SubjektOrderedListPartsAsc.Add(part, datayear
@@ -101,11 +107,12 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                         .Select(m =>
                         {
                             var company = Firmy.Get(m.Key);
-                            return (m.Key, m.Value.KIndexVypocet.Radky.First(r => r.VelicinaPart == part).Hodnota, company.KrajId);
+                            return (m.Key, m.Value.KIndexVypocet.Radky.First(r => r.VelicinaPart == part).Hodnota,
+                                company.KrajId);
                         })
                         .OrderBy(m => m.Hodnota)
                         .ToList()
-                        );
+                    );
                 }
 
                 //prumery
@@ -118,40 +125,40 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     decimal val = datayear
                         .Select(m => m.Value.KIndexVypocet.Radky
                             .FirstOrDefault(r => r.Velicina == (int)part))
-                            .Where(a => a != null)
-                            .Average(a => a.Hodnota);
+                        .Where(a => a != null)
+                        .Average(a => a.Hodnota);
 
-                    KIndexData.VypocetDetail.Radek radek = new KIndexData.VypocetDetail.Radek(part, val, KIndexData.DetailInfo.DefaultKIndexPartKoeficient(part));
+                    KIndexData.VypocetDetail.Radek radek = new KIndexData.VypocetDetail.Radek(part, val,
+                        KIndexData.DetailInfo.DefaultKIndexPartKoeficient(part));
                     radky.Add(radek);
                 }
-                stat.AverageParts = new KIndexData.VypocetDetail() { Radky = radky.ToArray() };
 
+                stat.AverageParts = new KIndexData.VypocetDetail() { Radky = radky.ToArray() };
 
                 //percentily
                 stat.PercentileKIndex = new Dictionary<int, decimal>();
                 stat.PercentileParts = new Dictionary<int, KIndexData.VypocetDetail>();
 
-
                 foreach (var perc in Percentiles)
                 {
-
-
                     stat.PercentileKIndex.Add(perc,
-                        HlidacStatu.Util.MathTools.PercentileCont(perc / 100m, datayear.Select(m => m.Value.KIndex))
-                        );
+                        Util.MathTools.PercentileCont(perc / 100m, datayear.Select(m => m.Value.KIndex))
+                    );
 
                     radky = new List<KIndexData.VypocetDetail.Radek>();
                     foreach (KIndexData.KIndexParts part in Enum.GetValues(typeof(KIndexData.KIndexParts)))
                     {
-                        decimal val = HlidacStatu.Util.MathTools.PercentileCont(perc / 100m,
-                                datayear
+                        decimal val = Util.MathTools.PercentileCont(perc / 100m,
+                            datayear
                                 .Select(m => m.Value.KIndexVypocet.Radky.FirstOrDefault(r => r.Velicina == (int)part))
                                 .Where(m => m != null)
                                 .Select(m => m.Hodnota)
-                            );
-                        KIndexData.VypocetDetail.Radek radek = new KIndexData.VypocetDetail.Radek(part, val, KIndexData.DetailInfo.DefaultKIndexPartKoeficient(part));
+                        );
+                        KIndexData.VypocetDetail.Radek radek = new KIndexData.VypocetDetail.Radek(part, val,
+                            KIndexData.DetailInfo.DefaultKIndexPartKoeficient(part));
                         radky.Add(radek);
                     }
+
                     stat.PercentileParts.Add(perc, new KIndexData.VypocetDetail() { Radky = radky.ToArray() });
                 }
 
@@ -160,9 +167,6 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
             return stats;
         }
-
-
-
 
 
         public static string PercIntervalShortText(PercInterval val)
@@ -184,7 +188,6 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     return $"patří do třetiny nejhorších";
                 else
                     return "průměrné, v horší polovině";
-
             }
         }
     }

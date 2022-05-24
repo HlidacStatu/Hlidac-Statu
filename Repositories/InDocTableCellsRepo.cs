@@ -2,6 +2,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
 
 using System;
+using System.Threading.Tasks;
 using Nest;
 
 namespace HlidacStatu.Repositories
@@ -9,13 +10,13 @@ namespace HlidacStatu.Repositories
     public static class InDocTableCellsRepo
     {
  
-        public static InDocTableCells Add(InDocTableCells cells)
+        public static async Task<InDocTableCells> AddAsync(InDocTableCells cells)
         {
             IndexResponse res; 
             try
             {
-                res = Manager.GetESClient_InDocTableCells()
-                    .Index<InDocTableCells>(cells, m => m.Id(cells.Id));
+                var client = await Manager.GetESClient_InDocTableCellsAsync(); 
+                res = await client.IndexAsync<InDocTableCells>(cells, m => m.Id(cells.Id));
             }
             catch (Exception ex)
             {

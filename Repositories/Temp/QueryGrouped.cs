@@ -1,19 +1,18 @@
 ﻿using HlidacStatu.Entities;
 using HlidacStatu.Lib.Analytics;
-
 using Nest;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.ES
 {
     public partial class QueryGrouped
     {
-        public static Dictionary<int, Dictionary<int, SimpleStat>> OblastiPerYear(string query, int[] interestedInYearsOnly)
+        public static async Task<Dictionary<int, Dictionary<int, SimpleStat>>> OblastiPerYearAsync(string query,
+            int[] interestedInYearsOnly)
         {
-
             AggregationContainerDescriptor<Smlouva> aggYSum =
                 new AggregationContainerDescriptor<Smlouva>()
                     .DateHistogram("x-agg", h => h
@@ -21,18 +20,18 @@ namespace HlidacStatu.Repositories.ES
                         .CalendarInterval(DateInterval.Year)
                         .Aggregations(aggObor => aggObor
                             .Terms("x-obor", oborT => oborT
-                                 .Field("classification.class1.typeValue")
-                                 .Size(150)
-                                 .Aggregations(agg => agg
-                                     .Sum("sumincome", s => s
-                                         .Field(ff => ff.CalculatedPriceWithVATinCZK)
-                                     )
-                                 )
+                                .Field("classification.class1.typeValue")
+                                .Size(150)
+                                .Aggregations(agg => agg
+                                    .Sum("sumincome", s => s
+                                        .Field(ff => ff.CalculatedPriceWithVATinCZK)
+                                    )
+                                )
                             )
                         )
                     );
 
-            var res = SmlouvaRepo.Searching.SimpleSearch(query, 1, 0,
+            var res = await SmlouvaRepo.Searching.SimpleSearchAsync(query, 1, 0,
                 SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggYSum, exactNumOfResults: true);
 
 
@@ -55,7 +54,9 @@ namespace HlidacStatu.Repositories.ES
                                 oblast = Convert.ToInt32(((KeyedBucket<object>)m).Key),
                                 data = new SimpleStat()
                                 {
-                                    CelkemCena = (decimal)((ValueAggregate)((KeyedBucket<object>)m).Values.FirstOrDefault()).Value,
+                                    CelkemCena =
+                                        (decimal)((ValueAggregate)((KeyedBucket<object>)m).Values.FirstOrDefault())
+                                        .Value,
                                     Pocet = ((KeyedBucket<object>)m).DocCount ?? 0
                                 }
                             }
@@ -78,7 +79,9 @@ namespace HlidacStatu.Repositories.ES
                                 oblast = Convert.ToInt32(((KeyedBucket<object>)m).Key),
                                 data = new SimpleStat()
                                 {
-                                    CelkemCena = (decimal)((ValueAggregate)((KeyedBucket<object>)m).Values.FirstOrDefault()).Value,
+                                    CelkemCena =
+                                        (decimal)((ValueAggregate)((KeyedBucket<object>)m).Values.FirstOrDefault())
+                                        .Value,
                                     Pocet = ((KeyedBucket<object>)m).DocCount ?? 0
                                 }
                             }
@@ -87,16 +90,13 @@ namespace HlidacStatu.Repositories.ES
                         result[val.Date.Year] = oblasti.ToDictionary(k => k.oblast, v => v.data);
                     }
                 }
-
             }
 
             return result;
         }
 
-        public static StatisticsPerYear<SimpleStat> SmlouvyPerYear(string query, int[] interestedInYearsOnly)
+        public static async Task<StatisticsPerYear<SimpleStat>> SmlouvyPerYearAsync(string query, int[] interestedInYearsOnly)
         {
-
-
             AggregationContainerDescriptor<Smlouva> aggYSum =
                 new AggregationContainerDescriptor<Smlouva>()
                     .DateHistogram("x-agg", h => h
@@ -109,7 +109,7 @@ namespace HlidacStatu.Repositories.ES
                         )
                     );
 
-            var res = SmlouvaRepo.Searching.SimpleSearch(query, 1, 0,
+            var res = await SmlouvaRepo.Searching.SimpleSearchAsync(query, 1, 0,
                 SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggYSum, exactNumOfResults: true);
 
 
@@ -126,7 +126,8 @@ namespace HlidacStatu.Repositories.ES
                     if (result.ContainsKey(val.Date.Year))
                     {
                         result[val.Date.Year].Pocet = val.DocCount ?? 0;
-                        result[val.Date.Year].CelkemCena = (decimal)(((DateHistogramBucket)val).Sum("sumincome").Value ?? 0);
+                        result[val.Date.Year].CelkemCena =
+                            (decimal)(((DateHistogramBucket)val).Sum("sumincome").Value ?? 0);
                     }
                 }
             }
@@ -136,52 +137,39 @@ namespace HlidacStatu.Repositories.ES
                 {
                     result.Add(val.Date.Year, new SimpleStat());
                     result[val.Date.Year].Pocet = val.DocCount ?? 0;
-                    result[val.Date.Year].CelkemCena = (decimal)(((DateHistogramBucket)val).Sum("sumincome").Value ?? 0);
+                    result[val.Date.Year].CelkemCena =
+                        (decimal)(((DateHistogramBucket)val).Sum("sumincome").Value ?? 0);
                 }
-
             }
 
             return new StatisticsPerYear<SimpleStat>(result);
-
         }
 
-        public static Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>
-            TopOdberatelePerYear(
-            string query,
-            int[] interestedInYearsOnly,
-            int maxList = 50
-            )
-        {
-            return _topSmluvniStranyPerYear("platce.ico", query, interestedInYearsOnly, maxList);
-        }
+        public static Task<Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>> TopOdberatelePerYearAsync(
+                string query,
+                int[] interestedInYearsOnly,
+                int maxList = 50
+            ) => _topSmluvniStranyPerYearAsync("platce.ico", query, interestedInYearsOnly, maxList);
 
 
-        public static Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>
-            TopDodavatelePerYear(
-            string query,
-            int[] interestedInYearsOnly,
-            int maxList = 50
-            )
-        {
-            return _topSmluvniStranyPerYear("prijemce.ico", query, interestedInYearsOnly, maxList);
-        }
-        public static ResultCombined
-            TopDodavatelePerYearStats(
-            string query,
-            int[] interestedInYearsOnly,
-            int maxList = 50
-            )
-        {
-            return _topSmluvniStranyPerYearStats("prijemce.ico", query, interestedInYearsOnly, maxList);
-        }
+        public static Task<Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>> TopDodavatelePerYearAsync(
+                string query,
+                int[] interestedInYearsOnly,
+                int maxList = 50
+            ) => _topSmluvniStranyPerYearAsync("prijemce.ico", query, interestedInYearsOnly, maxList);
 
-        private static Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>
-            _topSmluvniStranyPerYear(
+        public static Task<ResultCombined> TopDodavatelePerYearStatsAsync(
+                string query,
+                int[] interestedInYearsOnly,
+                int maxList = 50
+            ) => _topSmluvniStranyPerYearStatsAsync("prijemce.ico", query, interestedInYearsOnly, maxList);
+
+        private static async Task<Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>> _topSmluvniStranyPerYearAsync(
                 string property,
                 string query,
                 int[] interestedInYearsOnly,
                 int maxList
-                )
+            )
         {
             AggregationContainerDescriptor<Smlouva> aggs = new AggregationContainerDescriptor<Smlouva>();
             aggs
@@ -193,9 +181,9 @@ namespace HlidacStatu.Repositories.ES
                     .Field(property)
                     .Size(maxList)
                     .Aggregations(agg => agg
-                       .Sum("sumincome", s => s
-                           .Field(ff => ff.CalculatedPriceWithVATinCZK)
-                       )
+                        .Sum("sumincome", s => s
+                            .Field(ff => ff.CalculatedPriceWithVATinCZK)
+                        )
                     )
                 );
 
@@ -211,20 +199,22 @@ namespace HlidacStatu.Repositories.ES
                     );
 
 
-            var res = SmlouvaRepo.Searching.SimpleSearch(query, 1, 0,
+            var res = await SmlouvaRepo.Searching.SimpleSearchAsync(query, 1, 0,
                 SmlouvaRepo.Searching.OrderResult.FastestForScroll, aggYSum, exactNumOfResults: true);
 
 
-            Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)> result =
-                new Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>();
+            Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)>
+                topPodleKc)> result =
+                new Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu,
+                    List<(string ico, SimpleStat stat)> topPodleKc)>();
 
             if (interestedInYearsOnly != null)
                 foreach (int year in interestedInYearsOnly)
                 {
                     result.Add(year,
                         (new List<(string ico, SimpleStat stat)>(),
-                        new List<(string ico, SimpleStat stat)>())
-                        );
+                            new List<(string ico, SimpleStat stat)>())
+                    );
                 }
 
             foreach (DateHistogramBucket val in ((BucketAggregate)res.ElasticResults.Aggregations["y-agg"]).Items)
@@ -233,8 +223,8 @@ namespace HlidacStatu.Repositories.ES
                 {
                     result.Add(val.Date.Year,
                         (new List<(string ico, SimpleStat stat)>(),
-                        new List<(string ico, SimpleStat stat)>())
-                        );
+                            new List<(string ico, SimpleStat stat)>())
+                    );
                 }
 
                 if (result.ContainsKey(val.Date.Year))
@@ -255,7 +245,7 @@ namespace HlidacStatu.Repositories.ES
                                 CelkemCena = (decimal)m.cc
                             }))
                             .ToList(),
-                        topPodleKc: ((BucketAggregate)val["perPrice"]).Items
+                            topPodleKc: ((BucketAggregate)val["perPrice"]).Items
                             .Select(m => ((KeyedBucket<object>)m))
                             .Select(m => new
                             {
@@ -270,8 +260,7 @@ namespace HlidacStatu.Repositories.ES
                                 CelkemCena = (decimal)m.cc
                             }))
                             .ToList()
-                           );
-
+                        );
                 }
             }
 
@@ -279,21 +268,20 @@ namespace HlidacStatu.Repositories.ES
         }
 
 
-
-
-        private static ResultCombined
-            _topSmluvniStranyPerYearStats(
+        private static async Task<ResultCombined> _topSmluvniStranyPerYearStatsAsync(
                 string property,
                 string query,
                 int[] interestedInYearsOnly,
                 int maxList
-                )
+            )
         {
             var res = new ResultCombined();
 
-            var r1 = _topSmluvniStranyPerYear(property, query, interestedInYearsOnly, maxList);
-            res.PerYear.TopPodlePoctu = r1.Select(m => new { y = m.Key, v = m.Value.topPodlePoctu }).ToDictionary(k => k.y, v => v.v);
-            res.PerYear.TopPodleKc = r1.Select(m => new { y = m.Key, v = m.Value.topPodleKc }).ToDictionary(k => k.y, v => v.v);
+            var r1 = await _topSmluvniStranyPerYearAsync(property, query, interestedInYearsOnly, maxList);
+            res.PerYear.TopPodlePoctu = r1.Select(m => new { y = m.Key, v = m.Value.topPodlePoctu })
+                .ToDictionary(k => k.y, v => v.v);
+            res.PerYear.TopPodleKc = r1.Select(m => new { y = m.Key, v = m.Value.topPodleKc })
+                .ToDictionary(k => k.y, v => v.v);
 
             //convert to 
             List<HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<SimpleStat>> perIcoStatPodlePoctu
@@ -304,15 +292,15 @@ namespace HlidacStatu.Repositories.ES
                 forIco.ICO = ico;
                 foreach (var y in r1.Keys)
                 {
-
                     if (r1[y].topPodlePoctu.Any(m => m.ico == ico))
                         forIco[y] = r1[y].topPodlePoctu.First(m => m.ico == ico).stat;
                     else
                         forIco[y] = new SimpleStat();
-
                 }
+
                 perIcoStatPodlePoctu.Add(forIco);
             }
+
             List<HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<SimpleStat>> perIcoStatPodleKc
                 = new List<StatisticsSubjectPerYear<SimpleStat>>();
             foreach (string ico in r1.Values.Select(m => m.topPodleKc.SelectMany(s => s.ico)).Distinct())
@@ -321,13 +309,12 @@ namespace HlidacStatu.Repositories.ES
                 forIco.ICO = ico;
                 foreach (var y in r1.Keys)
                 {
-
                     if (r1[y].topPodleKc.Any(m => m.ico == ico))
                         forIco[y] = r1[y].topPodleKc.First(m => m.ico == ico).stat;
                     else
                         forIco[y] = new SimpleStat();
-
                 }
+
                 perIcoStatPodlePoctu.Add(forIco);
             }
 
@@ -335,16 +322,6 @@ namespace HlidacStatu.Repositories.ES
             res.PerIco.TopPodleKc = perIcoStatPodleKc;
             return res;
         }
-
-        //public static string ToElasticQuery(IEnumerable<DateTime> dates)
-        //{
-        //    if (dates == null)
-        //        return string.Empty;
-        //    if (dates.Count() == 0)
-        //        return string.Empty;
-
-        //    return "( " + string.Join(" OR ", dates) + " ) ";
-        //}
 
     }
 }

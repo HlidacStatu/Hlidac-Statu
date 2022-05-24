@@ -1,16 +1,14 @@
 using Devmasters;
 using Devmasters.DT;
-
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Dotace;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
-
 using Nest;
-
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -58,21 +56,18 @@ namespace HlidacStatu.Repositories
                 return qc;
             }
 
-            public static DotaceSearchResult SimpleSearch(string query, int page, int pagesize,
+            public static Task<DotaceSearchResult> SimpleSearchAsync(string query, int page, int pagesize,
                 DotaceSearchResult.DotaceOrderResult order,
                 bool withHighlighting = false,
                 AggregationContainerDescriptor<Dotace> anyAggregation = null, bool exactNumOfResults = false)
-            {
-                return SimpleSearch(query, page, pagesize, ((int)order).ToString(),
+                => SimpleSearchAsync(query, page, pagesize, ((int)order).ToString(),
                     withHighlighting,
                     anyAggregation, exactNumOfResults);
-            }
 
-            public static DotaceSearchResult SimpleSearch(string query, int page, int pagesize, string order,
+            public static Task<DotaceSearchResult> SimpleSearchAsync(string query, int page, int pagesize, string order,
                 bool withHighlighting = false,
                 AggregationContainerDescriptor<Dotace> anyAggregation = null, bool exactNumOfResults = false)
-            {
-                return SimpleSearch(new DotaceSearchResult()
+                => SimpleSearchAsync(new DotaceSearchResult()
                 {
                     Q = query,
                     Page = page,
@@ -80,10 +75,8 @@ namespace HlidacStatu.Repositories
                     Order = TextUtil.NormalizeToNumbersOnly(order),
                     ExactNumOfResults = exactNumOfResults
                 }, withHighlighting, anyAggregation);
-                ;
-            }
 
-            public static DotaceSearchResult SimpleSearch(DotaceSearchResult search,
+            public static async Task<DotaceSearchResult> SimpleSearchAsync(DotaceSearchResult search,
                 bool withHighlighting = false,
                 AggregationContainerDescriptor<Dotace> anyAggregation = null)
             {
@@ -97,8 +90,8 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<Dotace> res = null;
                 try
                 {
-                    res = Manager.GetESClient_Dotace()
-                        .Search<Dotace>(s => s
+                    var client = await Manager.GetESClient_DotaceAsync();
+                    res = await client.SearchAsync<Dotace>(s => s
                             .Size(search.PageSize)
                             .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)
                             .From(page * search.PageSize)
@@ -113,8 +106,7 @@ namespace HlidacStatu.Repositories
                     if (res.IsValid && withHighlighting &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
                     {
-                        res = Manager.GetESClient_Dotace()
-                            .Search<Dotace>(s => s
+                        res = await client.SearchAsync<Dotace>(s => s
                                 .Size(search.PageSize)
                                 .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)
                                 .From(page * search.PageSize)

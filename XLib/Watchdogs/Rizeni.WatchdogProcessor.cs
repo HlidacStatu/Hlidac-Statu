@@ -6,6 +6,7 @@ using HlidacStatu.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
@@ -26,11 +27,11 @@ namespace HlidacStatu.XLib.Watchdogs
             );
         }
 
-        public DateTime GetLatestRec(DateTime toDate)
+        public async Task<DateTime> GetLatestRecAsync(DateTime toDate)
         {
             var query = "posledniZmena:" +
                         string.Format("[* TO {0}]", Repositories.Searching.Tools.ToElasticDate(toDate));
-            var res = InsolvenceRepo.Searching.SimpleSearch(query, 0, 1,
+            var res = await InsolvenceRepo.Searching.SimpleSearchAsync(query, 0, 1,
                 (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc,
                 false, isLimited);
 
@@ -43,7 +44,7 @@ namespace HlidacStatu.XLib.Watchdogs
         }
 
 
-        public Results GetResults(DateTime? fromDate = null, DateTime? toDate = null, int? maxItems = null,
+        public async Task<Results> GetResultsAsync(DateTime? fromDate = null, DateTime? toDate = null, int? maxItems = null,
             string order = null)
         {
             maxItems = maxItems ?? 30;
@@ -55,7 +56,7 @@ namespace HlidacStatu.XLib.Watchdogs
                     Repositories.Searching.Tools.ToElasticDate(toDate, "*"));
             }
 
-            var res = InsolvenceRepo.Searching.SimpleSearch(query, 0, 50,
+            var res = await InsolvenceRepo.Searching.SimpleSearchAsync(query, 0, 50,
                 order == null
                     ? (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc
                     : Convert.ToInt32(order),
@@ -65,7 +66,7 @@ namespace HlidacStatu.XLib.Watchdogs
                 query, fromDate, toDate, res.IsValid, nameof(Rizeni));
         }
 
-        public RenderedContent RenderResults(Results data, long numOfListed = 5)
+        public Task<RenderedContent> RenderResultsAsync(Results data, long numOfListed = 5)
         {
             RenderedContent ret = new RenderedContent();
             List<RenderedContent> items = new List<RenderedContent>();
@@ -79,7 +80,7 @@ namespace HlidacStatu.XLib.Watchdogs
             ret.ContentTitle = "Insolvenční řízení";
 
 
-            return ret;
+            return Task.FromResult(ret);
         }
 
         public static string HtmlTemplate = @"

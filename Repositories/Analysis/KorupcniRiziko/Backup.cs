@@ -1,6 +1,7 @@
 ﻿using HlidacStatu.Repositories.ES;
 
 using System;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -14,14 +15,14 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         public string Comment { get; set; }
         public KIndexData KIndex { get; set; }
 
-        public static void CreateBackup(string comment, string ico, bool useTempDb = false)
+        public static async Task CreateBackupAsync(string comment, string ico, bool useTempDb = false)
         {
-            KIndexData kidx = KIndexData.GetDirect((ico, useTempDb));
+            KIndexData kidx = await KIndexData.GetDirectAsync((ico, useTempDb));
             if (kidx == null)
                 return;
-            CreateBackup(comment, kidx, useTempDb);
+            await CreateBackupAsync(comment, kidx, useTempDb);
         }
-        public static void CreateBackup(string comment, KIndexData kidx, bool useTempDb)
+        public static async Task CreateBackupAsync(string comment, KIndexData kidx, bool useTempDb)
         {
 
             if (kidx == null)
@@ -32,11 +33,11 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             b.Id = $"{kidx.Ico}_{b.Created:s}";
             b.Comment = comment;
             b.KIndex = kidx;
-            var client = Manager.GetESClient_KIndexBackup();
+            var client = await Manager.GetESClient_KIndexBackupAsync();
             if (useTempDb)
-                client = Manager.GetESClient_KIndexBackupTemp();
+                client = await Manager.GetESClient_KIndexBackupTempAsync();
 
-            var res = client.Index<Backup>(b, o => o.Id(b.Id)); //druhy parametr musi byt pole, ktere je unikatni
+            var res = await client.IndexAsync<Backup>(b, o => o.Id(b.Id)); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)
             {
                 Util.Consts.Logger.Error("KIndex backup save error\n" + res.ServerError?.ToString());

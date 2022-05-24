@@ -3,6 +3,9 @@
 @using HlidacStatu.Repositories
 @model HlidacStatu.Entities.Firma
 
+@{
+    var ovmCats = await Model.KategorieOVMAsync();
+}
 <p>
     @if (Model.JsemOVM())
     {
@@ -35,10 +38,10 @@
             </span>
         }
     }
-    @if (Model.KategorieOVM().Any())
+    @if (ovmCats.Any())
     {
         <span>
-            Je součástí <a href="/subjekt/DalsiInformace/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.KategorieOVM().Count(), "jedné kategorie", "{0} kategorií", "{0} kategorií") orgánu veřejné moci.</a>
+            Je součástí <a href="/subjekt/DalsiInformace/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(ovmCats.Count(), "jedné kategorie", "{0} kategorií", "{0} kategorií") orgánu veřejné moci.</a>
         </span>
     }
 </p>

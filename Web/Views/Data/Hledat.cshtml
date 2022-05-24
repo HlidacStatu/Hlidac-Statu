@@ -5,7 +5,7 @@
 @using HlidacStatu.XLib.Render
 
 @{
-    var registration = Model.DataSet.Registration();
+    var registration = await Model.DataSet.RegistrationAsync();
     ViewBag.Title = registration.name;
     ViewBag.SubTitle = Model?.Q;
 }
@@ -36,7 +36,7 @@
 <partial name="Partials/_SearchForm" 
          model="@Model"/>
 
-@if (Model.Q != null && Model.DataSet.Registration().searchResultTemplate?.IsFullTemplate() == true)
+@if (Model.Q != null && registration.searchResultTemplate?.IsFullTemplate() == true)
 {
     <partial name="WebUtil/AddWatchdog" 
              model="@(new WatchdogViewModel(typeof(DataSet), Model.Q, datasetId: Model.DataSet.DatasetId))"/>
@@ -84,7 +84,7 @@
     try
     {
 
-        if (Model.DataSet.Registration()?.searchResultTemplate?.IsFullTemplate() == true)
+        if (registration?.searchResultTemplate?.IsFullTemplate() == true)
         {
             var model = new Registration.Template.SearchTemplateResults();
             model.Total = Model.Total;
@@ -94,7 +94,7 @@
                 .Select(s => { dynamic d = Newtonsoft.Json.Linq.JObject.Parse(s.Item2); return d; })
                 .ToArray();
 
-            var html = Model.DataSet.Registration().searchResultTemplate.Render(Model.DataSet, model, model.Q);
+            var html = registration.searchResultTemplate.Render(Model.DataSet, model, model.Q);
             @Html.Raw(html)
 
         }
@@ -113,7 +113,7 @@
 
         if (msg != "Interní chyba")
         {
-            Model.DataSet.SendErrorMsgToAuthor(ViewContext.GetDisplayUrl(), msg);
+            await Model.DataSet.SendErrorMsgToAuthorAsync(ViewContext.GetDisplayUrl(), msg);
         }
     }
 
@@ -121,6 +121,6 @@
 }
 
 <partial name="SearchResults/Pagination" 
-         model="@(new PaginationViewModel(Model, $"/Data/Hledat/{Model.DataSet.DatasetId}", exportType: Model.DataSet.IsFlatStructure() ? "dataset" : null, exportMoreParams: $"ds={Model.DataSet.Registration().datasetId}"))"/>
+         model="@(new PaginationViewModel(Model, $"/Data/Hledat/{Model.DataSet.DatasetId}", exportType: Model.DataSet.IsFlatStructure() ? "dataset" : null, exportMoreParams: $"ds={registration.datasetId}"))"/>
 
 <partial name="Partials/_new"/>

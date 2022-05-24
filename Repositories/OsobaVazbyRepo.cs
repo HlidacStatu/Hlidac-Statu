@@ -209,16 +209,7 @@ namespace HlidacStatu.Repositories
             return osoba._vazby;
         }
 
-        //public static Osoba Vazby(this Osoba osoba, Datastructures.Graphs.Graph.Edge[] vazby)
-        //{
-        //    if (vazby == null)
-        //        osoba._vazby = new Datastructures.Graphs.Graph.Edge[] { };
-
-        //    osoba._vazby = vazby;
-        //    return osoba;
-        //}
-
-
+        
         public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh=false)
         {
             return Relation.AktualniVazby(osoba.Vazby(refresh), minAktualnost, osoba.VazbyRootEdge());

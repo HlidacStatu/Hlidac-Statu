@@ -9,6 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
@@ -39,7 +40,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns></returns>
         [HttpGet("hledat")]
         [Authorize]
-        public ActionResult<SearchResultDTO<Smlouva>> Hledat([FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
+        public async Task<ActionResult<SearchResultDTO<Smlouva>>> Hledat([FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
         {
             if (strana is null || strana < 1)
                 strana = 1;
@@ -70,7 +71,7 @@ namespace HlidacStatu.Web.Controllers
                 )
                 platnyzaznam = null;
 
-            result = SmlouvaRepo.Searching.SimpleSearch(dotaz, strana.Value,
+            result = await SmlouvaRepo.Searching.SimpleSearchAsync(dotaz, strana.Value,
                 ApiV2Controller.DefaultResultPageSize,
                 (SmlouvaRepo.Searching.OrderResult)razeni.Value,
                 platnyZaznam: platnyzaznam);
@@ -101,14 +102,14 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>detail smlouvy</returns>
         [HttpGet("{id?}")]
         [Authorize]
-        public ActionResult<Smlouva> Detail([FromRoute] string? id = null)
+        public async Task<ActionResult<Smlouva>> Detail([FromRoute] string? id = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
                 return BadRequest($"Hodnota id chybí.");
             }
 
-            var smlouva = SmlouvaRepo.Load(id);
+            var smlouva = await SmlouvaRepo.LoadAsync(id);
             if (smlouva == null)
             {
                 return NotFound($"Smlouva nenalezena");
@@ -133,14 +134,14 @@ namespace HlidacStatu.Web.Controllers
 
         [HttpGet("text/{id?}")]
         [Authorize]
-        public ActionResult<IEnumerable<string>> Text([FromRoute] string? id = null, [FromQuery] int? addPredmet = null)
+        public async Task<ActionResult<IEnumerable<string>>> Text([FromRoute] string? id = null, [FromQuery] int? addPredmet = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
                 return BadRequest($"Hodnota id chybí.");
             }
 
-            var smlouva = SmlouvaRepo.Load(id);
+            var smlouva = await SmlouvaRepo.LoadAsync(id);
             if (smlouva == null)
             {
                 return NotFound($"Smlouva nenalezena");
@@ -158,14 +159,14 @@ namespace HlidacStatu.Web.Controllers
         
         [HttpGet("predmet/{id?}")]
         [Authorize]
-        public ActionResult<string> Predmet([FromRoute] string? id = null)
+        public async Task<ActionResult<string>> Predmet([FromRoute] string? id = null)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
                 return BadRequest($"Hodnota id chybí.");
             }
 
-            var smlouva = SmlouvaRepo.Load(id);
+            var smlouva = await SmlouvaRepo.LoadAsync(id);
             if (smlouva == null)
             {
                 return NotFound($"Smlouva nenalezena");

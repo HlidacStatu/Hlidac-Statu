@@ -5,12 +5,13 @@ using Nest;
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
     public static class ProfilZadavateleRepo
     {
-        public static void Save(ProfilZadavatele profilZadavatele, ElasticClient client = null)
+        public static async Task SaveAsync(ProfilZadavatele profilZadavatele, ElasticClient client = null)
         {
             if (
                 !string.IsNullOrEmpty(profilZadavatele.EvidencniCisloFormulare)
@@ -18,15 +19,15 @@ namespace HlidacStatu.Repositories
                 && !string.IsNullOrEmpty(profilZadavatele.Url)
             )
             {
-                var es = (client ?? Manager.GetESClient_ProfilZadavatele())
-                    .IndexDocument<ProfilZadavatele>(profilZadavatele);
+                await (client ?? await Manager.GetESClient_ProfilZadavateleAsync())
+                    .IndexDocumentAsync<ProfilZadavatele>(profilZadavatele);
             }
         }
 
-        public static ProfilZadavatele GetByUrl(string url, ElasticClient client = null)
+        public static async Task<ProfilZadavatele> GetByUrlAsync(string url, ElasticClient client = null)
         {
-            var f = (client ?? Manager.GetESClient_ProfilZadavatele())
-                .Search<ProfilZadavatele>(s => s
+            var f = await (client ?? await Manager.GetESClient_ProfilZadavateleAsync())
+                .SearchAsync<ProfilZadavatele>(s => s
                     .Query(q => q
                         .Term(t => t.Field(ff => ff.Url).Value(url))
                     )
@@ -42,24 +43,24 @@ namespace HlidacStatu.Repositories
                 throw new ApplicationException("ES error\n\n" + f.ServerError.ToString());
         }
 
-        public static ProfilZadavatele GetById(string profileId, ElasticClient client = null)
+        public static async Task<ProfilZadavatele> GetByIdAsync(string profileId, ElasticClient client = null)
         {
             if (string.IsNullOrEmpty(profileId))
                 return null;
-            var f = (client ?? Manager.GetESClient_ProfilZadavatele())
-                .Get<ProfilZadavatele>(profileId);
+            var f = await (client ?? await Manager.GetESClient_ProfilZadavateleAsync())
+                .GetAsync<ProfilZadavatele>(profileId);
             if (f.Found)
                 return f.Source;
             else
                 return null;
         }
 
-        public static ProfilZadavatele[] GetByIco(string ico, ElasticClient client = null)
+        public static async Task<ProfilZadavatele[]> GetByIcoAsync(string ico, ElasticClient client = null)
         {
             try
             {
-                var f = (client ?? Manager.GetESClient_ProfilZadavatele())
-                    .Search<ProfilZadavatele>(s => s
+                var f = await (client ?? await Manager.GetESClient_ProfilZadavateleAsync())
+                    .SearchAsync<ProfilZadavatele>(s => s
                         .Query(q => q
                             .Term(t => t.Field(ff => ff.Zadavatel.ICO).Value(ico))
                         )
@@ -76,10 +77,10 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static ProfilZadavatele GetByRawId(string datasetname, string profileId, ElasticClient client = null)
+        public static Task<ProfilZadavatele> GetByRawIdAsync(string datasetname, string profileId, ElasticClient client = null)
         {
             var id = datasetname + "-" + profileId;
-            return GetById(id, client);
+            return GetByIdAsync(id, client);
         }
     }
 }

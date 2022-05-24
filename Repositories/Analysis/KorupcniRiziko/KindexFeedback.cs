@@ -7,6 +7,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -28,7 +29,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         [Text]
         public string Author { get; set; }
 
-        public void Save()
+        public async Task SaveAsync()
         {
             if (string.IsNullOrWhiteSpace(Id))
             {
@@ -39,22 +40,23 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 var firma = FirmaRepo.FromIco(Ico);
                 Company = firma.Jmeno;
             }
-            var res = Manager.GetESClient_KindexFeedback().IndexDocument(this); //druhy parametr musi byt pole, ktere je unikatni
+
+            var client = await Manager.GetESClient_KindexFeedbackAsync();
+            var res = await client.IndexDocumentAsync(this); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)
             {
                 throw new ApplicationException(res.ServerError?.ToString());
             }
         }
 
-        public static IEnumerable<KindexFeedback> GetKindexFeedbacks(string ico, int year)
+        public static async Task<IEnumerable<KindexFeedback>> GetKindexFeedbacksAsync(string ico, int year)
         {
-
-            ElasticClient _esClient = Manager.GetESClient_KindexFeedback();
+            ElasticClient esClient = await Manager.GetESClient_KindexFeedbackAsync();
 
             ISearchResponse<KindexFeedback> searchResults = null;
             try
             {
-                searchResults = _esClient.Search<KindexFeedback>(s =>
+                searchResults = await esClient.SearchAsync<KindexFeedback>(s =>
                         s.Query(q =>
                             q.Term(f => f.Ico, ico)
                             && q.Term(f => f.Year, year)
@@ -86,15 +88,15 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             return Enumerable.Empty<KindexFeedback>();
         }
 
-        public static KindexFeedback GetById(string id)
+        public static async Task<KindexFeedback> GetByIdAsync(string id)
         {
 
-            ElasticClient _esClient = Manager.GetESClient_KindexFeedback();
+            ElasticClient esClient = await Manager.GetESClient_KindexFeedbackAsync();
 
             ISearchResponse<KindexFeedback> searchResults = null;
             try
             {
-                searchResults = _esClient.Search<KindexFeedback>(s =>
+                searchResults = await esClient.SearchAsync<KindexFeedback>(s =>
                         s.Query(q =>
                             q.Term(f => f.Id, id)
                             )

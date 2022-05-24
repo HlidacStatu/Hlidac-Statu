@@ -33,7 +33,7 @@ namespace HlidacStatu.Repositories
         public static string[] ObceIII_DS = null;
 
         public static
-            Devmasters.Cache.File.FileCache<System.Collections.Concurrent.ConcurrentDictionary<string, string[]>>
+            Devmasters.Cache.File.Cache<System.Collections.Concurrent.ConcurrentDictionary<string, string[]>>
             FirmyNazvyOnlyAscii = null;
 
         static FirmaRepo()
@@ -88,7 +88,7 @@ namespace HlidacStatu.Repositories
 
 
             Consts.Logger.Info("Static data - MinisterstvaCache");
-            MinisterstvaCache = new LocalMemoryCache<IEnumerable<Firma>>(TimeSpan.FromHours(6), "StatData.Ministerstva",
+            MinisterstvaCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6), "StatData.Ministerstva",
                 (o) =>
                 {
                     return DatoveSchranky
@@ -101,7 +101,7 @@ namespace HlidacStatu.Repositories
                         ;
                 });
 
-            VysokeSkolyCache = new LocalMemoryCache<IEnumerable<Firma>>(TimeSpan.FromHours(6), "StatData.VysokeSkoly",
+            VysokeSkolyCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6), "StatData.VysokeSkoly",
                 (o) =>
                 {
                     string[] icos = new string[]
@@ -118,7 +118,7 @@ namespace HlidacStatu.Repositories
                 });
 
 
-            KrajskeUradyCache = new LocalMemoryCache<IEnumerable<Firma>>(TimeSpan.FromHours(6), "StatData.KrajskeUrady",
+            KrajskeUradyCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6), "StatData.KrajskeUrady",
                 (o) =>
                 {
                     return DatoveSchranky
@@ -129,7 +129,7 @@ namespace HlidacStatu.Repositories
                         .Select(ds => Firmy.GetByDS(ds));
                 });
 
-            ManualChoosenCache = new LocalMemoryCache<IEnumerable<Firma>>(TimeSpan.FromHours(6),
+            ManualChoosenCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6),
                 "StatData.ManualChoosen",
                 (o) =>
                 {
@@ -181,7 +181,7 @@ namespace HlidacStatu.Repositories
                 .Select(m => m.Element(DatoveSchrankyNS + "IdDS").Value)
                 .ToArray();
 
-            StatutarniMestaAllCache = new LocalMemoryCache<IEnumerable<Firma>>(TimeSpan.FromHours(6),
+            StatutarniMestaAllCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6),
                 "StatData.StatutarniMestaAll",
                 (o) =>
                 {
@@ -197,7 +197,7 @@ namespace HlidacStatu.Repositories
                 });
 
 
-            PrahaManualCache = new LocalMemoryCache<IEnumerable<Firma>>(TimeSpan.FromHours(6), "StatData.PrahaManual",
+            PrahaManualCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6), "StatData.PrahaManual",
                 (o) =>
                 {
                     var ds = new string[] { "48ia97h", "ktdeucu" };
@@ -206,7 +206,7 @@ namespace HlidacStatu.Repositories
                         .OrderBy(or => or.Jmeno);
                 });
 
-            OrganizacniSlozkyStatuCache = new LocalMemoryCache<IEnumerable<Firma>>(TimeSpan.FromHours(6),
+            OrganizacniSlozkyStatuCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6),
                 "StatData.OrganizacniSlozkyStatu",
                 (o) =>
                 {
@@ -225,7 +225,7 @@ namespace HlidacStatu.Repositories
             Util.Consts.Logger.Info("Static data - FirmyNazvyOnlyAscii");
 
             FirmyNazvyOnlyAscii =
-                new Devmasters.Cache.File.FileCache<
+                new Devmasters.Cache.File.Cache<
                     System.Collections.Concurrent.ConcurrentDictionary<string, string[]>>
                 (AppDataPath, TimeSpan.Zero, "FirmyNazvyOnlyAscii",
                     (o) =>

@@ -45,16 +45,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 return GetPopis("druhuj", DruhUcetniJednotky.ToString());
             }
 
-
-
-
             //https://monitor.statnipokladna.cz/datovy-katalog/ciselniky/prohlizec/24
 
             public int PodDruhUcetniJednotky { get; set; }
-            //public string PodDruhUcetniJednotkyPopis()
-            //{
-            //    return GetPopis("poddruhuj", this.PodDruhUcetniJednotky);
-            //}
 
             //https://monitor.statnipokladna.cz/datovy-katalog/ciselniky/prohlizec/12
             public int FormaUcetniJednotky { get; set; }
@@ -62,7 +55,6 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             {
                 return GetPopis("forma", FormaUcetniJednotky.ToString());
             }
-
 
             //https://monitor.statnipokladna.cz/datovy-katalog/ciselniky/prohlizec/17
             public int InstitucionalniSektor { get; set; }

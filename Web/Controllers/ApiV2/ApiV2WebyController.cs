@@ -8,6 +8,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
@@ -53,7 +54,7 @@ namespace HlidacStatu.Web.Controllers
         //[GZipOrDeflate()]
         [Authorize]
         [HttpGet("{id?}")]
-        public ActionResult<UptimeServer.WebStatusExport> Status([FromRoute] int? id = null)
+        public async Task<ActionResult<UptimeServer.WebStatusExport>> Status([FromRoute] int? id = null)
         {
             if (id == null)
                 return BadRequest($"Web nenalezen");
@@ -65,7 +66,7 @@ namespace HlidacStatu.Web.Controllers
             try
             {
                 UptimeServer.HostAvailability data = UptimeServerRepo.AvailabilityForWeekById(host.Id);
-                UptimeSSL webssl = UptimeSSLRepo.LoadLatest(host.HostDomain());
+                UptimeSSL webssl = await UptimeSSLRepo.LoadLatestAsync(host.HostDomain());
                 var ssldata = new UptimeServer.WebStatusExport.SslData()
                 {
                     Grade = webssl == null ? null : webssl.SSLGrade().ToNiceDisplayName(),
@@ -82,7 +83,6 @@ namespace HlidacStatu.Web.Controllers
                         Availability = data,
                         SSL = ssldata
                     };
-
             }
             catch (Exception e)
             {

@@ -4,16 +4,17 @@ using HlidacStatu.Repositories.ES;
 using Nest;
 
 using System;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
     public static class ErrorEnvelopeRepo
     {
-        public static void Save(ErrorEnvelope errorEnvelope, ElasticClient client = null)
+        public static async Task SaveAsync(ErrorEnvelope errorEnvelope, ElasticClient client = null)
         {
             errorEnvelope.LastUpdate = DateTime.Now;
-            var es = client ?? Manager.GetESClient_VerejneZakazkyNaProfiluConverted();
-            es.IndexDocument<ErrorEnvelope>(errorEnvelope);
+            var es = client ?? await Manager.GetESClient_VerejneZakazkyNaProfiluConvertedAsync();
+            await es.IndexDocumentAsync<ErrorEnvelope>(errorEnvelope);
         }
     }
 }

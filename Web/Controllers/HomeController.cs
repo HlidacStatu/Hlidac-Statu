@@ -131,66 +131,6 @@ namespace HlidacStatu.Web.Controllers
             return RedirectPermanent("/texty/provoznipodminky");
         }
 
-        //migrace: šílená konstrukce provázání views... 
-        // #if (!DEBUG)
-        //         [OutputCache(VaryByParam = "*", Duration = 60 * 60 * 1)]
-        // #endif
-        //         public ActionResult PorovnatSubjekty(string id, string ico, string ds, string title, int? width, string specialtype, string specialvalue, string part)
-        //         {
-        //             if (id == "special")
-        //             {
-        //                 if (specialtype != null)
-        //                 {
-        //                     var specval = specialvalue;
-        //                     if (!string.IsNullOrEmpty(specval) && StaticData.MestaPodleKraju.ContainsKey(specval))
-        //                     {
-        //                         ds = StaticData.MestaPodleKraju[specval].Aggregate((f, s) => f + "," + s);
-        //                     }
-        //                 }
-        //             }
-        //
-        //
-        //             if (!string.IsNullOrEmpty(ico) || !string.IsNullOrEmpty(ds))
-        //             {
-        //                 List<string> icos = new();
-        //
-        //                 if (!string.IsNullOrEmpty(ico))
-        //                 {
-        //                     foreach (var i in ico.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
-        //                     {
-        //                         var f = Firmy.Get(i);
-        //                         if (f.Valid)
-        //                             icos.Add(f.ICO);
-        //                     }
-        //                 }
-        //                 if (!string.IsNullOrEmpty(ds))
-        //                 {
-        //                     foreach (var i in ds.Split(new char[] { ' ', ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
-        //                     {
-        //                         var f = Firmy.GetByDS(i);
-        //                         if (f.Valid)
-        //                             icos.Add(f.ICO);
-        //                     }
-        //                 }
-        //                 return View(icos.Distinct().ToArray());
-        //             }
-        //             else
-        //                 return Content("<h3>Neplatné parametry stránky</h3>");
-        //         }
-        //
-        //         public ActionResult Porovnat(string id, string ico, string ds, string title, int? width, string specialtype, string specialvalue)
-        //         {
-        //             if (id == "special" || id == "subjekty")
-        //             {
-        //                 ViewBag.NameOfView = "PorovnatSubjekty";
-        //                 return View("Porovnat_child");
-        //             }
-        //
-        //
-        //             return View("Porovnat");
-        //         }
-
-
         public ActionResult Index()
         {
             return View();
@@ -253,7 +193,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        public ActionResult sendFeedbackMail(string typ, string email, string txt, string url, bool? auth, string data)
+        public async Task<ActionResult> sendFeedbackMail(string typ, string email, string txt, string url, bool? auth, string data)
         {
             string to = "podpora@hlidacstatu.cz";
             string subject = "Zprava z HlidacStatu.cz: " + typ;
@@ -265,7 +205,7 @@ namespace HlidacStatu.Web.Controllers
                     try
                     {
                         var ds = DataSet.CachedDatasets.Get(data);
-                        to = ds.Registration().createdBy;
+                        to = (await ds.RegistrationAsync()).createdBy;
                         subject = subject + $" ohledně databáze {ds.DatasetId}";
                     }
                     catch (Exception)
@@ -308,7 +248,7 @@ text zpravy: {txt}";
         public ActionResult ClassificationFeedback(string typ, string email, string txt, string url, string data)
         {
             // create a task, so user doesn't have to wait for anything
-            System.Threading.Tasks.Task.Run(() =>
+            Task.Run(async () =>
             {
 
                 try
@@ -325,7 +265,7 @@ text zpravy: {txt}
 ";
                     Util.SMTPTools.SendSimpleMailToPodpora(subject, body, email);
 
-                    string classificationExplanation = SmlouvaRepo.GetClassificationExplanation(data);
+                    string classificationExplanation = await SmlouvaRepo.GetClassificationExplanationAsync(data);
 
                     string explain = $"explain result: {classificationExplanation} ";
 
@@ -364,12 +304,12 @@ text zpravy: {txt}
             return Content("");
         }
 
-        public ActionResult TextSmlouvy(string Id, string hash, string secret)
+        public async Task<ActionResult> TextSmlouvy(string Id, string hash, string secret)
         {
             if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(hash))
                 return NotFound();
 
-            var model = SmlouvaRepo.Load(Id);
+            var model = await SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return NotFound();
@@ -396,12 +336,12 @@ text zpravy: {txt}
             ViewBag.hashValue = hash;
             return View(model);
         }
-        public ActionResult KopiePrilohy(string Id, string hash, string secret)
+        public async Task<ActionResult> KopiePrilohy(string Id, string hash, string secret)
         {
             if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(hash))
                 return NotFound();
 
-            var model = SmlouvaRepo.Load(Id);
+            var model = await SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return NotFound();
@@ -669,19 +609,20 @@ text zpravy: {txt}
             return RedirectPermanent(Url.Action("Vazby", "Osoba", new { Id = Id, aktualnost = aktualnost }));
         }
 
-        public ActionResult Detail(string Id)
+        public async Task<ActionResult> Detail(string Id)
         {
             if (string.IsNullOrWhiteSpace(Id))
                 return NotFound();
 
-            var model = SmlouvaRepo.Load(Id);
+            var model = await SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return NotFound();
             }
             if (!string.IsNullOrEmpty(HttpContext.Request.Query["qs"]))
             {
-                var findSm = SmlouvaRepo.Searching.SimpleSearch($"_id:\"{model.Id}\" AND ({HttpContext.Request.Query["qs"]})", 1, 1,
+                var findSm = await SmlouvaRepo.Searching
+                    .SimpleSearchAsync($"_id:\"{model.Id}\" AND ({HttpContext.Request.Query["qs"]})", 1, 1,
                     SmlouvaRepo.Searching.OrderResult.FastestForScroll, withHighlighting: true);
                 if (findSm.Total > 0)
                     ViewBag.Highlighting = findSm.ElasticResults.Hits.First().Highlight;
@@ -690,20 +631,20 @@ text zpravy: {txt}
             return View(model);
         }
 
-        public ActionResult HledatFirmy(string q, int? page = 1)
+        public async Task<ActionResult> HledatFirmy(string q, int? page = 1)
         {
-            var model = FirmaRepo.Searching.SimpleSearch(q, page.Value, 50);
+            var model = await FirmaRepo.Searching.SimpleSearchAsync(q, page.Value, 50);
             return View(model);
         }
 
-        public ActionResult HledatSmlouvy(Repositories.Searching.SmlouvaSearchResult model)
+        public async Task<ActionResult> HledatSmlouvy(Repositories.Searching.SmlouvaSearchResult model)
         {
             if (model == null || ModelState.IsValid == false)
                 return View(new Repositories.Searching.SmlouvaSearchResult());
 
 
 
-            var sres = SmlouvaRepo.Searching.SimpleSearch(model.Q, model.Page,
+            var sres = await SmlouvaRepo.Searching.SimpleSearchAsync(model.Q, model.Page,
                 SmlouvaRepo.Searching.DefaultPageSize,
                 (SmlouvaRepo.Searching.OrderResult)(Convert.ToInt32(model.Order)),
                 includeNeplatne: model.IncludeNeplatne,
@@ -726,11 +667,12 @@ text zpravy: {txt}
             return View(sres);
         }
 
-        public ActionResult Hledat(string q, string order)
+        public async Task<ActionResult> Hledat(string q, string order)
         {
             bool showBeta = User.Identity?.IsAuthenticated == true && User.IsInRole("BetaTester");
 
-            var res = XLib.Search.GeneralSearch(q, 1, Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal, showBeta, order);
+            var res = await XLib.Search
+                .GeneralSearchAsync(q, 1, Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal, showBeta, order);
             AuditRepo.Add(
                 Audit.Operations.UserSearch
                 , User?.Identity?.Name
@@ -837,14 +779,14 @@ text zpravy: {txt}
         }
 
         [HlidacCache(60 * 60, "id", false)]
-        public ActionResult Export(string id)
+        public async Task<ActionResult> Export(string id)
         {
             System.Text.StringBuilder sb = new(2048);
 
             if (id == "uohs-ed")
             {
                 var ds = DataSet.CachedDatasets.Get("rozhodnuti-uohs");
-                var res = ds.SearchData("*", 0, 30, "PravniMoc desc");
+                var res = await ds.SearchDataAsync("*", 0, 30, "PravniMoc desc");
                 if (res.Total > 0)
                 {
                     sb.Append(
@@ -941,7 +883,7 @@ text zpravy: {txt}
             return View(viewName, new ImageBannerCoreData() { title = title, subtitle = subtitle, body = body, footer = footer, img = img, color = color });
         }
 
-        public ActionResult SocialBanner(string id, string v, string t, string st, string b, string f, string img, string rat = "16x9", string res = "1200x628", string col = "")
+        public async Task<ActionResult> SocialBanner(string id, string v, string t, string st, string b, string f, string img, string rat = "16x9", string res = "1200x628", string col = "")
         {
             string mainUrl = HttpContext.Request.Scheme + "://" + HttpContext.Request.Host;
 
@@ -962,7 +904,7 @@ text zpravy: {txt}
                 Firma fi = Firmy.Get(v);
                 if (fi.Valid)
                 {
-                    if (!fi.NotInterestingToShow())
+                    if (!(await fi.NotInterestingToShowAsync()))
                     {
                         var social = new ImageBannerCoreData()
                         {
@@ -979,7 +921,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "zakazka")
             {
-                VerejnaZakazka vz = VerejnaZakazkaRepo.LoadFromES(v);
+                VerejnaZakazka vz = await VerejnaZakazkaRepo.LoadFromESAsync(v);
                 if (vz != null)
                     try
                     {
@@ -1013,7 +955,7 @@ text zpravy: {txt}
                 Osoba o = Osoby.GetByNameId.Get(v);
                 if (o != null)
                 {
-                    if (!o.NotInterestingToShow())
+                    if (!(await o.NotInterestingToShowAsync()))
                     {
                         var social = new ImageBannerCoreData()
                         {
@@ -1031,7 +973,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "smlouva")
             {
-                Smlouva s = SmlouvaRepo.Load(v);
+                Smlouva s = await SmlouvaRepo.LoadAsync(v);
                 if (s != null)
                 {
                     if (!s.NotInterestingToShow())
@@ -1051,7 +993,7 @@ text zpravy: {txt}
             }
             else if (id?.ToLower() == "insolvence")
             {
-                var s = InsolvenceRepo.LoadFromES(v, false, true)?.Rizeni;
+                var s = (await InsolvenceRepo.LoadFromEsAsync(v, false, true))?.Rizeni;
                 if (s != null)
                 {
                     if (!s.NotInterestingToShow())
@@ -1079,7 +1021,7 @@ text zpravy: {txt}
                     {
                         var social = new ImageBannerCoreData()
                         {
-                            title = s.SocialInfoTitle(),
+                            title = await s.SocialInfoTitleAsync(),
                             body = s.SocialInfoBody(),
                             footer = s.SocialInfoFooter(),
                             subtitle = s.SocialInfoSubTitle(),

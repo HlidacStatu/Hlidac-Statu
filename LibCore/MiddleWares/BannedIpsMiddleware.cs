@@ -92,14 +92,14 @@ namespace HlidacStatu.LibCore.MiddleWares
             if (AttackerDictionaryService.whitelistedIps.Contains(ipString))
                 return;
 
-            await BannedIpRepoCached.BanIp(ipString, expiration, lastStatusCode, pathList);
+            await BannedIpRepoCached.BanIpAsync(ipString, expiration, lastStatusCode, pathList);
         }
 
         private async Task AllowIp(IPAddress? ipAddress)
         {
             var ipString = ipAddress?.ToString() ?? "_empty";
 
-            await BannedIpRepoCached.AllowIp(ipString);
+            await BannedIpRepoCached.AllowIpAsync(ipString);
         }
 
         private string BannedResponse(string ipAddress)

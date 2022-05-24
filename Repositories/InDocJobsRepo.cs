@@ -17,9 +17,9 @@ namespace HlidacStatu.Repositories
         static InDocJobsRepo()
         {
             if (jobnames == null)
-                loadJobNames();
+                LoadJobNames();
         }
-        static void loadJobNames()
+        static void LoadJobNames()
         {
             using (DbEntities db = new DbEntities())
             {
@@ -84,7 +84,7 @@ namespace HlidacStatu.Repositories
             return null;
         }
 
-        public static async Task<InDocJobs> Load(long jobPk)
+        public static async Task<InDocJobs> LoadAsync(long jobPk)
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -163,7 +163,7 @@ namespace HlidacStatu.Repositories
 
         }
 
-        public static async Task Remove(long tablePk)
+        public static async Task RemoveAsync(long tablePk)
         {
             await using (DbEntities db = new DbEntities())
             {

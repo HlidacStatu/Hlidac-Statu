@@ -61,9 +61,6 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             [NiceDisplayName("Koncentrace zakázek do rukou malého počtu dodavatelů u hlavních oborů činnosti")]
             KoncentraceDodavateluObory = 9,
 
-
-
-
             [SortValue(100)]
             [GroupValue("Bonus")]
             [NiceDisplayName("Bonus za transparentnost")]

@@ -1,6 +1,5 @@
 ﻿using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
 
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
@@ -50,7 +50,7 @@ namespace HlidacStatu.Web.Controllers
 
         [Authorize]
         [HttpGet, Route("hledatFtx")]
-        public ActionResult<List<OsobaDTO>> OsobySearchFtx([FromQuery] string? ftxDotaz = null, [FromQuery] int? strana = null)
+        public async Task<ActionResult<List<OsobaDTO>>> OsobySearchFtx([FromQuery] string? ftxDotaz = null, [FromQuery] int? strana = null)
         {
             if (string.IsNullOrEmpty(ftxDotaz))
             {
@@ -59,7 +59,7 @@ namespace HlidacStatu.Web.Controllers
 
             if (strana is null || strana < 1)
                 strana = 1;
-            var osoby = OsobaRepo.Searching.SimpleSearch(ftxDotaz, strana.Value, 30, OsobaRepo.Searching.OrderResult.Relevance);
+            var osoby = await OsobaRepo.Searching.SimpleSearchAsync(ftxDotaz, strana.Value, 30, OsobaRepo.Searching.OrderResult.Relevance);
 
             var result = osoby.Results.Select(o => new OsobaDTO(o)).ToList();
 

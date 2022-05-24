@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -15,12 +16,12 @@ namespace HlidacStatu.Repositories
     {
         private static volatile FileCacheManager stemCacheManager
             = FileCacheManager.GetSafeInstance("SmlouvyStems",
-                smlouvaKeyId => getRawStemsFromServer(smlouvaKeyId),
+                smlouvaKeyId => GetRawStemsFromServerAsync(smlouvaKeyId).ConfigureAwait(false).GetAwaiter().GetResult(),
                 TimeSpan.FromDays(365 * 10)); //10 years
 
-        private static byte[] getRawStemsFromServer(KeyAndId smlouvaKeyId)
+        private static async Task<byte[]> GetRawStemsFromServerAsync(KeyAndId smlouvaKeyId)
         {
-            Smlouva s = SmlouvaRepo.Load(smlouvaKeyId.ValueForData);
+            Smlouva s = await SmlouvaRepo.LoadAsync(smlouvaKeyId.ValueForData);
 
             if (s == null)
                 return null;
@@ -148,12 +149,12 @@ namespace HlidacStatu.Repositories
         /// </summary>
         /// <param name="idSmlouvy"></param>
         /// <returns>Classification json</returns>
-        public static string GetClassificationExplanation(string idSmlouvy)
+        public static async Task<string> GetClassificationExplanationAsync(string idSmlouvy)
         {
             if (string.IsNullOrWhiteSpace(idSmlouvy))
                 return null;
 
-            Smlouva s = SmlouvaRepo.Load(idSmlouvy);
+            Smlouva s = await SmlouvaRepo.LoadAsync(idSmlouvy);
 
             if (s == null)
                 return null;
@@ -174,7 +175,7 @@ namespace HlidacStatu.Repositories
         /// </summary>
         /// <param name="typeValues">new classification</param>
         /// <param name="username">author</param>
-        public static void OverrideClassification(this Smlouva smlouva, int[] typeValues, string username)
+        public static async Task OverrideClassificationAsync(this Smlouva smlouva, int[] typeValues, string username)
         {
             if (typeValues.Length == 0)
                 throw new ArgumentException($"typeValues is empty");
@@ -201,7 +202,7 @@ namespace HlidacStatu.Repositories
 
             smlouva.Classification.TypesToProperties(newClassification.ToArray());
             smlouva.Classification.LastUpdate = DateTime.Now;
-            SmlouvaRepo.Save(smlouva);
+            await SmlouvaRepo.SaveAsync(smlouva);
         }
 
         private static string CallEndpoint(string endpoint, string content, string id, int timeoutMs)
@@ -293,8 +294,10 @@ namespace HlidacStatu.Repositories
                 //
 
                 var newClassRelevant = smlouva.relevantClassif(newClass);
-                smlouva.Classification = new Smlouva.SClassification(newClassRelevant);
-                smlouva.Classification.LastUpdate = DateTime.Now;
+                smlouva.Classification = new Smlouva.SClassification(newClassRelevant)
+                {
+                    LastUpdate = DateTime.Now
+                };
             }
             return true;
         }

@@ -1,7 +1,6 @@
 ﻿@model object
 @using Nest;
 @using System.Linq;
-@using Devmasters.Collections;
 @using HlidacStatu.Datasets
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories
@@ -11,7 +10,7 @@
 
     DataSet ds =
         DataSet.CachedDatasets.Get((string)Model);
-    var reg = ds.Registration();
+    var reg = ds.RegistrationAsync();
 
     var politiciVds = ds.ESClient.Search<object>(s => s
         .MatchAll()

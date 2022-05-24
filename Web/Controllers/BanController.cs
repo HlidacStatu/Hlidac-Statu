@@ -31,7 +31,7 @@ namespace HlidacStatu.Web.Controllers
             if (LibCore.Services.AttackerDictionaryService.whitelistedIps.Contains(ipAddress))
                 return View();
 
-            await BannedIpRepoCached.BanIp(ipAddress, expirationDate, lastStatusCode, pathList);
+            await BannedIpRepoCached.BanIpAsync(ipAddress, expirationDate, lastStatusCode, pathList);
 
             return View();
         }
@@ -40,7 +40,7 @@ namespace HlidacStatu.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AllowIp(string ipAddress)
         {
-            await BannedIpRepoCached.AllowIp(ipAddress);
+            await BannedIpRepoCached.AllowIpAsync(ipAddress);
 
             return View();
         }

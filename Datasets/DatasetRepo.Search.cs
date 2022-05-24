@@ -9,6 +9,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Datasets
 {
@@ -16,10 +17,10 @@ namespace HlidacStatu.Datasets
     {
         public static class Searching
         {
-            public static string GetSpecificQueriesForDataset(DataSet ds, string mappingProperty, string query,
+            public static async Task<string> GetSpecificQueriesForDatasetAsync(DataSet ds, string mappingProperty, string query,
                 bool addKeyword, string attrNameModif = "")
             {
-                var props = ds.GetMappingList(mappingProperty, attrNameModif).ToArray();
+                var props = (await ds.GetMappingListAsync(mappingProperty, attrNameModif)).ToArray();
                 if (addKeyword)
                     for (int i = 0; i < props.Length; i++)
                     {
@@ -30,13 +31,13 @@ namespace HlidacStatu.Datasets
                 return qSearch;
             }
 
-            public static Dictionary<DataSet, string> GetSpecificQueriesForDatasets(string mappingProperty,
+            public static async Task<Dictionary<DataSet, string>> GetSpecificQueriesForDatasetsAsync(string mappingProperty,
                 string query, bool addKeyword)
             {
                 Dictionary<DataSet, string> queries = new Dictionary<DataSet, string>();
                 foreach (var ds in DataSetDB.ProductionDataSets.Get())
                 {
-                    var qSearch = GetSpecificQueriesForDataset(ds, mappingProperty, query, addKeyword);
+                    var qSearch = await GetSpecificQueriesForDatasetAsync(ds, mappingProperty, query, addKeyword);
                     if (!string.IsNullOrEmpty(qSearch))
                     {
                         queries.Add(ds, qSearch);
@@ -74,7 +75,7 @@ namespace HlidacStatu.Datasets
                 return $"( {q} )";
             }
 
-            public static DataSearchResult SearchData(DataSet ds, string queryString, int page, int pageSize,
+            public static async Task<DataSearchResult> SearchDataAsync(DataSet ds, string queryString, int page, int pageSize,
                 string sort = null, bool excludeBigProperties = true, bool withHighlighting = false,
                 bool exactNumOfResults = false)
             {
@@ -83,7 +84,7 @@ namespace HlidacStatu.Datasets
                 sw.Start();
                 var query = Repositories.Searching.Tools.FixInvalidQuery(queryString, QueryShorcuts, QueryOperators);
 
-                var res = _searchData(ds, query, page, pageSize, sort, excludeBigProperties, withHighlighting,
+                var res = await _searchDataAsync(ds, query, page, pageSize, sort, excludeBigProperties, withHighlighting,
                     exactNumOfResults);
 
                 sw.Stop();
@@ -134,12 +135,12 @@ namespace HlidacStatu.Datasets
                     };
             }
 
-            public static DataSearchRawResult SearchDataRaw(DataSet ds, string queryString, int page, int pageSize,
+            public static async Task<DataSearchRawResult> SearchDataRawAsync(DataSet ds, string queryString, int page, int pageSize,
                 string sort = null, bool excludeBigProperties = true, bool withHighlighting = false,
                 bool exactNumOfResults = false)
             {
                 var query = Repositories.Searching.Tools.FixInvalidQuery(queryString, QueryShorcuts, QueryOperators);
-                var res = _searchData(ds, query, page, pageSize, sort, excludeBigProperties, withHighlighting,
+                var res = await _searchDataAsync(ds, query, page, pageSize, sort, excludeBigProperties, withHighlighting,
                     exactNumOfResults);
                 if (!res.IsValid)
                 {
@@ -179,7 +180,7 @@ namespace HlidacStatu.Datasets
                     };
             }
 
-            public static ISearchResponse<object> _searchData(DataSet ds, string queryString, int page, int pageSize,
+            public static async Task<ISearchResponse<object>> _searchDataAsync(DataSet ds, string queryString, int page, int pageSize,
                 string sort = null,
                 bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false)
             {
@@ -189,8 +190,11 @@ namespace HlidacStatu.Datasets
 
                 if (!string.IsNullOrEmpty(sort))
                 {
-                    var allProps = ds.GetMappingList();
-                    var txtProps = ds.GetTextMappingList();
+                    var allPropsTask = ds.GetMappingListAsync();
+                    var txtPropsTask = ds.GetTextMappingListAsync();
+
+                    var allProps = await allPropsTask;
+                    var txtProps = await txtPropsTask;
 
                     if (sort.EndsWith(DataSearchResult.OrderDesc) ||
                         sort.ToLower().EndsWith(DataSearchResult.OrderDescUrl))
@@ -225,11 +229,9 @@ namespace HlidacStatu.Datasets
 
                 }
 
+                ElasticClient client = await Manager.GetESClientAsync(ds.DatasetId, idxType: Manager.IndexType.DataSource);
 
-                ElasticClient client = Manager.GetESClient(ds.DatasetId, idxType: Manager.IndexType.DataSource);
-
-                QueryContainer qc = GetSimpleQuery(ds, queryString);
-
+                QueryContainer qc = await GetSimpleQueryAsync(ds, queryString);
 
                 page = page - 1;
                 if (page < 0)
@@ -240,11 +242,10 @@ namespace HlidacStatu.Datasets
                 }
 
                 //exclude big properties from result
-                var maps = excludeBigProperties ? ds.GetMappingList("DocumentPlainText").ToArray() : new string[] { };
+                var maps = excludeBigProperties ? (await ds.GetMappingListAsync("DocumentPlainText")).ToArray() : new string[] { };
 
-
-                var res = client
-                    .Search<object>(s => s
+                var res = await client
+                    .SearchAsync<object>(s => s
                         .Size(pageSize)
                         .Source(ss => ss.Excludes(ex => ex.Fields(maps)))
                         .From(page * pageSize)
@@ -259,8 +260,8 @@ namespace HlidacStatu.Datasets
                     && res.Shards != null
                     && res.Shards.Failed > 0) //if some error, do it again without highlighting
                 {
-                    res = client
-                        .Search<object>(s => s
+                    res = await client
+                        .SearchAsync<object>(s => s
                             .Size(pageSize)
                             .Source(ss => ss.Excludes(ex => ex.Fields(maps)))
                             .From(page * pageSize)
@@ -277,31 +278,28 @@ namespace HlidacStatu.Datasets
                 return res;
             }
 
-
-
             //static RegexOptions regexQueryOption = RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline;
-            public static QueryContainer GetSimpleQuery(DataSet ds, string query)
+            public static async Task<QueryContainer> GetSimpleQueryAsync(DataSet ds, string query)
             {
-                var idQuerypath = GetSpecificQueriesForDataset(ds, "id", "${q}", false);
+                var taskId = GetSpecificQueriesForDatasetAsync(ds, "id", "${q}", false);
+                var taskIco = GetSpecificQueriesForDatasetAsync(ds, "ICO", "${q}", false);
+                var taskOsoba = GetSpecificQueriesForDatasetAsync(ds, "OsobaId", "${q}", true);
 
-                var icoQuerypath = GetSpecificQueriesForDataset(ds, "ICO", "${q}", false);
-                //var osobaIdQuerypathToIco = GetSpecificQueriesForDataset(ds, "OsobaId", "${q}", true)
-                //                + " OR ( " + simpleQueryOsobaPrefix + "osobaid" + simpleQueryOsobaPrefix + ":${v} )";
-
-                var osobaIdQuerypath = GetSpecificQueriesForDataset(ds, "OsobaId", "${q}", true);
+                var idQuerypath = await taskId;
+                var icoQuerypath = await taskIco;
+                var osobaIdQuerypath = await taskOsoba;
 
                 List<IRule> irules = new List<IRule>
                 {
                     new TransformPrefixWithValue("id:", idQuerypath, null),
                     new OsobaId("osobaid:", icoQuerypath, addLastCondition: osobaIdQuerypath),
                     new Holding(null, icoQuerypath),
-                    //new TransformPrefix("osobaid","",null,false),
 
                     new TransformPrefixWithValue("ico:", icoQuerypath, null),
                 };
 
                 //datetime rules
-                foreach (var m in ds.GetDatetimeMappingList())
+                foreach (var m in await ds.GetDatetimeMappingListAsync())
                 {
                     //irules.Add(new TransformPrefix(m + ":", m + ":", "[<>]?[{\\[]+"));
                     irules.Add(new TransformPrefixWithValue(m + ":",
@@ -324,8 +322,11 @@ namespace HlidacStatu.Datasets
                 {
                     var pref = fPref.Substring(0, fPref.Length - 1);
 
-                    string qpref = GetSpecificQueriesForDataset(ds, pref, "${q}", false);
-                    string qpref_keyw = GetSpecificQueriesForDataset(ds, pref, "${q}", true);
+                    var t1 = GetSpecificQueriesForDatasetAsync(ds, pref, "${q}", false);
+                    var t2 = GetSpecificQueriesForDatasetAsync(ds, pref, "${q}", true);
+                    
+                    string qpref = await t1;
+                    string qpref_keyw = await t2;
                     string prefPath = "";
                     if (!string.IsNullOrWhiteSpace(qpref)
                         && !string.IsNullOrWhiteSpace(qpref_keyw)

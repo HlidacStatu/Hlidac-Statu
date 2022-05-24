@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 
 namespace HlidacStatu.Web.Controllers
@@ -26,14 +27,14 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>detail veřejné zakázky</returns>
         [Authorize(Roles = "Admin,KomercniLicence")]
         [HttpGet("{id?}")]
-        public ActionResult<VerejnaZakazka> Detail([FromRoute] string? id = null)
+        public async Task<ActionResult<VerejnaZakazka>> Detail([FromRoute] string? id = null)
         {
             if (string.IsNullOrEmpty(id))
             {
                 return BadRequest($"Hodnota id chybí.");
             }
 
-            var zakazka = VerejnaZakazkaRepo.LoadFromES(id);
+            var zakazka = await VerejnaZakazkaRepo.LoadFromESAsync(id);
             if (zakazka == null)
             {
                 return NotFound($"Zakazka nenalezena");
@@ -65,7 +66,7 @@ namespace HlidacStatu.Web.Controllers
         /// <returns>nalezené veřejné zakázky</returns>
         [Authorize(Roles = "Admin,KomercniLicence")]
         [HttpGet("hledat")]
-        public ActionResult<SearchResultDTO<VerejnaZakazka>> Hledat([FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
+        public async Task<ActionResult<SearchResultDTO<VerejnaZakazka>>> Hledat([FromQuery] string? dotaz = null, [FromQuery] int? strana = null, [FromQuery] int? razeni = null)
         {
             strana = strana ?? 1;
             razeni = razeni ?? 0;
@@ -83,7 +84,7 @@ namespace HlidacStatu.Web.Controllers
                 return BadRequest($"Hodnota dotaz chybí.");
             }
 
-            result = VerejnaZakazkaRepo.Searching.SimpleSearch(dotaz, null, strana.Value,
+            result = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(dotaz, null, strana.Value,
                 ApiV2Controller.DefaultResultPageSize,
                 razeni.Value.ToString());
 

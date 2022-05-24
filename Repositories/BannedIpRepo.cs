@@ -19,7 +19,7 @@ namespace HlidacStatu.Repositories
                 .ToList();
         }
 
-        public static async Task BanIp(string ipAddress, DateTime expiration, int lastStatusCode, string pathList)
+        public static async Task BanIpAsync(string ipAddress, DateTime expiration, int lastStatusCode, string pathList)
         {
 
             await using var dbContext = new DbEntities();
@@ -46,7 +46,7 @@ namespace HlidacStatu.Repositories
             await dbContext.SaveChangesAsync();
         }
 
-        public static async Task AllowIp(string ipAddress)
+        public static async Task AllowIpAsync(string ipAddress)
         {
             await using var dbContext = new DbEntities();
 
