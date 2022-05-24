@@ -16,8 +16,8 @@
 
 
     ViewBag.SocialShareTitle = $"<b>{ViewBag.Title}</b>";
-    ViewBag.SocialShareText = Model.Dataset.GetPreviewTextValueFromItemAsync(jmodel);
-    ViewBag.SocialShareHtml = Model.Dataset.GetPreviewTextValueFromItemAsync(jmodel);
+    ViewBag.SocialShareText = await Model.Dataset.GetPreviewTextValueFromItemAsync(jmodel);
+    ViewBag.SocialShareHtml = await Model.Dataset.GetPreviewTextValueFromItemAsync(jmodel);
     ViewBag.SocialShareHtmlFooter = Model.Dataset.DatasetItemUrl(itemId,false) ;
     ViewBag.SocialShareHtmlSubFooter = $"<b>Hlídáme je, protože si to zaslouží!</b>";
     ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/page?d={DateTime.Now.ToString("d.M.yy")}&v=" + WebUtility.UrlEncode(ViewContext.GetDisplayUrl());
