@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 
 namespace HlidacStatu.Util
@@ -8,7 +9,7 @@ namespace HlidacStatu.Util
     public static class ParseTools
     {
 
-
+        private const string DolozkaText = "Doložka konverze do dokumentu obsaženého v datové zprávě";
 
         public static bool EnoughExtractedTextCheck(long words, long lengthChars, long uniqueWordsCount, decimal wordsVariance)
         {
@@ -21,15 +22,38 @@ namespace HlidacStatu.Util
             );
         }
 
-        public static bool EnoughExtractedTextCheck(string plaintext)
+        public static bool EnoughExtractedTextCheck(string plaintext, int pages)
         {
-            var words = Devmasters.TextUtil.CountWords(plaintext);
-            var length = plaintext?.Length ?? 0;
-            var variance = Devmasters.TextUtil.WordsVarianceInText(plaintext);
+            pages = pages - 2;
+
+            if (pages <= 1)
+                pages = 1;
+            
+            
+            string textWithTrimmedSpaces = Regex.Replace(plaintext, @"\s+", " ");
+            var penalization = DolozkaPenalization(textWithTrimmedSpaces);
+            
+            
+            var wordsPerPage = Devmasters.TextUtil.CountWords(textWithTrimmedSpaces);
+            wordsPerPage -= penalization.WordCount;
+            wordsPerPage = wordsPerPage / pages;
+            
+            var lengthPerPage = textWithTrimmedSpaces?.Length ?? 0;
+            lengthPerPage -= penalization.Length;
+            lengthPerPage = lengthPerPage / pages;
+            
+            var variance = Devmasters.TextUtil.WordsVarianceInText(textWithTrimmedSpaces);
             var uniqueWordsCount = variance.Item2;
             var wordsVariance = variance.Item1;
 
-            return EnoughExtractedTextCheck(words, length, uniqueWordsCount, wordsVariance);
+            return EnoughExtractedTextCheck(wordsPerPage, lengthPerPage, uniqueWordsCount, wordsVariance);
+        }
+
+        public static (int Length, int WordCount) DolozkaPenalization(string plaintext)
+        {
+            var matchCount = Regex.Matches(plaintext, DolozkaText,
+                RegexOptions.CultureInvariant | RegexOptions.IgnoreCase).Count;
+            return (matchCount * 470, matchCount * 63);
         }
 
 

@@ -67,7 +67,7 @@ namespace HlidacStatu.Entities
             {
                 get
                 {
-                    return ParseTools.EnoughExtractedTextCheck(WordCount, Lenght, UniqueWordsCount, WordsVariance);
+                    return ParseTools.EnoughExtractedTextCheck(PlainTextContent, Pages);
                 }
             }
 
