@@ -62,7 +62,7 @@ namespace HlidacStatu.Web.Controllers
         private void SetViewbagSelectedYear(ref int? rok, int? maxYear = null)
         {
             rok = Consts.FixKindexYear(rok);
-            if (maxYear == null)
+            if (maxYear == null && !this.User.IsInRole("Admin"))
             {
                 maxYear = Devmasters.ParseText.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear"));
             }

@@ -56,6 +56,11 @@
     }
     ViewBag.HideTitle = true;
 
+    var maxYear = HlidacStatu.Util.ParseTools.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear"));
+    if (this.User.IsInRole("Admin"))
+    {
+        maxYear = null;
+    }
 
 }
 
@@ -65,7 +70,7 @@
     <div class="col-sm-12">
         <h3 class="">
             Žebříček pro další roky:
-            @foreach (int year in Consts.AvailableCalculationYears)
+            @foreach (int year in Consts.AvailableCalculationYears.Where(m=> maxYear==null || m <= maxYear))
             {
                 if (year != selectedYear)
                 {
