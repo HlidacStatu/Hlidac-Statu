@@ -49,7 +49,7 @@
         {
             if (!string.IsNullOrEmpty(ss.ico) && vazbyNaPolitiky.SoukromeFirmy.ContainsKey(ss.ico))
             {
-                List<Osoba> persons = new();
+                List<Osoba?> persons = new();
                 persons = vazbyNaPolitiky.SoukromeFirmy[ss.ico]
                     .Select(pid => OsobaRepo.PolitickyAktivni
                         .Get()

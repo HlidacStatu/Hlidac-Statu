@@ -35,9 +35,6 @@ namespace HlidacStatu.Repositories
         }
         public static void SaveLastCheck(UptimeItem lastCheck)
         {
-            bool triggerScreenshot = false;
-            bool triggerAlert = false;
-
             Devmasters.DT.StopWatchLaps swl = new Devmasters.DT.StopWatchLaps();
 
             try
@@ -179,7 +176,7 @@ namespace HlidacStatu.Repositories
                     return list;
                 }
             }
-            catch (System.Exception e)
+            catch (Exception)
             {
                 return new List<UptimeServer>();
             }

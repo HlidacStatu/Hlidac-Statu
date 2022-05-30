@@ -33,7 +33,7 @@
     Dictionary<string, Nest.StatsAggregate> mesta = ((BucketAggregate)mestaVds.Aggregations["mesta"]).Items
                     .Select(m => new
                     {
-                        key = ((Nest.KeyedBucket<object>)m).Key.ToString(),
+                        key = ((Nest.KeyedBucket<object>)m)?.Key?.ToString() ?? "",
                         num = (Nest.StatsAggregate)(((Nest.KeyedBucket<object>)m).Values.First())
                     })
                     .ToDictionary(k => k.key, v => v.num);

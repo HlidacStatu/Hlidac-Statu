@@ -35,7 +35,7 @@ namespace HlidacStatu.Web.Controllers
             var ds = DataSet.CachedDatasets.Get("kapacity-nemocnic");
 
 
-            NemocniceData[] nAll = (await ds.SearchDataRawAsync("*", 1, 1000)).Result
+            NemocniceData?[] nAll = (await ds.SearchDataRawAsync("*", 1, 1000)).Result
                 .Select(s => Newtonsoft.Json.JsonConvert.DeserializeObject<NemocniceData>(s.Item2))
                 .OrderByDescending(m => m.lastUpdated)
                 .Take(120)

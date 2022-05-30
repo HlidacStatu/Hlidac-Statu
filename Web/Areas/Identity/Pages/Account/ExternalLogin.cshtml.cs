@@ -130,7 +130,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             }
         }
 
-        public async Task<IActionResult> OnPostConfirmationAsync(string? returnUrl = null)
+        public IActionResult OnPostConfirmationAsync(string? returnUrl = null)
         {
             //no confirmation needed
             return NotFound("this action is disabled");

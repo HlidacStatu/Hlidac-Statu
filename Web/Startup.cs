@@ -414,7 +414,7 @@ namespace HlidacStatu.Web
                     options.ClientId = googleAuthSetting["Id"];
                     options.ClientSecret = googleAuthSetting["Secret"];
                 })
-                .AddOpenIdConnect("apple", async options =>  // taken from https://github.com/scottbrady91/AspNetCore-SignInWithApple-Example/blob/main/ScottBrady91.SignInWithApple.Example/Startup.cs
+                .AddOpenIdConnect("apple", options =>  // taken from https://github.com/scottbrady91/AspNetCore-SignInWithApple-Example/blob/main/ScottBrady91.SignInWithApple.Example/Startup.cs
                 {
                     IConfigurationSection appleAuthSetting = Configuration.GetSection("Authentication:Apple");
                     string clientId = appleAuthSetting["Id"];

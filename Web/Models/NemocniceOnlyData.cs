@@ -10,7 +10,6 @@ namespace HlidacStatu.Web.Models
     public class NemocniceOnlyData
     {
         public NemocniceOnlyData() { }
-        string _id = "";
         [CsvHelper.Configuration.Attributes.Ignore]
         public string id
         {

@@ -1,10 +1,7 @@
 ﻿using HlidacStatu.Entities;
 
 using Microsoft.EntityFrameworkCore;
-using Devmasters.Enums;
-using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories
 {

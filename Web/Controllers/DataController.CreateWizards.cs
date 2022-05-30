@@ -156,7 +156,7 @@ namespace HlidacStatu.Web.Controllers
                     model.Headers = csv.HeaderRecord.Where(m => !string.IsNullOrEmpty(m?.Trim())).ToArray();
 
                     //read first lines with data and guest type
-                    List<string[]> lines = new List<string[]>();
+                    List<string?[]> lines = new();
                     for (int row = 0; row < 10; row++)
                     {
                         if (csv.Read())

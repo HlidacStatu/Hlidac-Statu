@@ -48,7 +48,7 @@
     Dictionary<string, Nest.StatsAggregate> politici = ((BucketAggregate)politiciVds.Aggregations["osoby"]).Items
                     .Select(m => new
                     {
-                        key = ((Nest.KeyedBucket<object>)m).Key.ToString(),
+                        key = ((Nest.KeyedBucket<object>)m)?.Key?.ToString() ?? "",
                         num = (Nest.StatsAggregate)(((Nest.KeyedBucket<object>)m).Values.First())
                     })
                     .ToDictionary(k => k.key, v => v.num);
@@ -56,7 +56,7 @@
     Dictionary<string, Nest.StatsAggregate> servery = ((BucketAggregate)serveryVds.Aggregations["servery"]).Items
                 .Select(m => new
                 {
-                    key = ((Nest.KeyedBucket<object>)m).Key.ToString(),
+                    key = ((Nest.KeyedBucket<object>)m)?.Key?.ToString() ?? "",
                     num = (Nest.StatsAggregate)(((Nest.KeyedBucket<object>)m).Values.First())
                 })
                 .ToDictionary(k => k.key, v => v.num);

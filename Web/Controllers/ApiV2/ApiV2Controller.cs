@@ -1,22 +1,14 @@
 ﻿using HlidacStatu.Repositories;
-using HlidacStatu.Web.Filters;
-
 using Microsoft.AspNetCore.Mvc;
 
 using Swashbuckle.AspNetCore.Annotations;
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using FullTextSearch;
-using HlidacStatu.Entities;
 using Microsoft.AspNetCore.Authorization;
 using MimeMapping;
 
@@ -113,7 +105,7 @@ namespace HlidacStatu.Web.Controllers
         
         [Authorize(Roles = "Admin,PrivateApi")]
         [HttpGet("generateAutocompleteData")]
-        public async Task<ActionResult<byte[]>> GenerateAutocompleteData(CancellationToken cancel = default)
+        public ActionResult<byte[]> GenerateAutocompleteData()
         {
             var autocompleteFile = StaticData.Autocomplete_Cache.Get();
 

@@ -45,16 +45,16 @@
     Dictionary<string, string> vyzvyNames = ((BucketAggregate)vyzvy.Aggregations["vyzvy"]).Items
                     .Select(m => new
                     {
-                        key = ((List<object>)((Nest.KeyedBucket<object>)m).Key)[1],
+                        key = ((List<object>)((Nest.KeyedBucket<object>)m)?.Key)[1],
                         name = ((List<object>)((Nest.KeyedBucket<object>)m).Key)[0]
                     })
-                    .ToDictionary(k => k.key.ToString(), v => v.name.ToString());
+                    .ToDictionary(k => k?.key?.ToString() ?? "", v => v?.name?.ToString() ?? "");
 
 
     Dictionary<string, Nest.StatsAggregate> vyzvyStats = ((BucketAggregate)vyzvyVds.Aggregations["vyzvy"]).Items
                     .Select(m => new
                     {
-                        key = ((Nest.KeyedBucket<object>)m).Key.ToString(),
+                        key = ((Nest.KeyedBucket<object>)m)?.Key?.ToString() ?? "",
                         num = (Nest.StatsAggregate)(((Nest.KeyedBucket<object>)m).Values.First())
                     })
                     .ToDictionary(k => k.key, v => v.num);
@@ -101,7 +101,7 @@
                 statPerIco = ((BucketAggregate)icoQ.Aggregations["name"]).Items
                 .Select(m => new
                 {
-                    key = ((Nest.KeyedBucket<object>)m).Key.ToString(),
+                    key = ((Nest.KeyedBucket<object>)m)?.Key?.ToString() ?? "",
                     num = (Nest.StatsAggregate)(((Nest.KeyedBucket<object>)m).Values.First())
                 })
                 .Where(m => m.key != "")

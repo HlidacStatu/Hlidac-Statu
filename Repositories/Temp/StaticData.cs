@@ -664,7 +664,7 @@ namespace HlidacStatu.Repositories
             string path = $"{Connectors.Init.WebAppDataPath}\\ISoSS_Opendata_OSYS_OSSS.xml";
 
             var ser = new XmlSerializer(typeof(organizacni_struktura_sluzebnich_uradu));
-            organizacni_struktura_sluzebnich_uradu ossu;
+            
             using (var streamReader = new StreamReader(path))
             {
                 using (var reader = XmlReader.Create(streamReader))
