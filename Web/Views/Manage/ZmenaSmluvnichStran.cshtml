@@ -3,7 +3,7 @@
 
 @{
     ViewBag.Title = "Zmena smluvnich stran";
-    Smlouva s = SmlouvaRepo.LoadAsync(ViewBag.SmlouvaId);
+    Smlouva s = await SmlouvaRepo.LoadAsync(ViewBag.SmlouvaId);
 
     if (s == null)
     {
