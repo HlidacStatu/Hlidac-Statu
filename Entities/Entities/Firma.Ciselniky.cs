@@ -1,7 +1,6 @@
 ﻿using Devmasters.Enums;
 
 using System.Collections.Generic;
-using System.Data;
 
 namespace HlidacStatu.Entities
 {

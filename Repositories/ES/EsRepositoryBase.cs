@@ -1,12 +1,3 @@
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using HlidacStatu.Repositories.Searching;
-using HlidacStatu.Util;
-using Nest;
-
 namespace HlidacStatu.Repositories.ES
 {
     // public abstract class EsRepositoryBase<T> where T : class

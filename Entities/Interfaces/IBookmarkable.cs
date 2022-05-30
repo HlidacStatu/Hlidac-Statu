@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace HlidacStatu.Entities
+﻿namespace HlidacStatu.Entities
 {
     public interface IBookmarkable
         : IAuditable

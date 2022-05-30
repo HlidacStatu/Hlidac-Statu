@@ -1,10 +1,8 @@
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities.Analysis;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 

@@ -1,4 +1,3 @@
-using Devmasters;
 using Devmasters.Batch;
 using Devmasters.Net.HttpClient;
 
@@ -21,7 +20,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Manager = HlidacStatu.Repositories.ES.Manager;
 

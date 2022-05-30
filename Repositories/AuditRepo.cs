@@ -1,8 +1,5 @@
 using HlidacStatu.Entities;
-using HlidacStatu.Repositories.ES;
-
 using System;
-using Nest;
 using Serilog;
 
 namespace HlidacStatu.Repositories

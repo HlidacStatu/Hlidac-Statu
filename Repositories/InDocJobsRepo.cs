@@ -3,9 +3,7 @@ using HlidacStatu.Entities;
 using Devmasters;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using HlidacStatu.Entities.Views;
 using Microsoft.EntityFrameworkCore;
 
 
