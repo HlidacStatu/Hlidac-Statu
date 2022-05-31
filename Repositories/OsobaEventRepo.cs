@@ -232,7 +232,6 @@ namespace HlidacStatu.Repositories
 
         }
 
-        //migrace: tohle půjde přesunout do extension osoby
         public static OsobaEvent AddOrUpdateEvent(this Osoba osoba, OsobaEvent ev, string user)
         {
             if (ev == null || osoba == null)

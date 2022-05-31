@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Entities.Views
 {
-    //migrace: tahle classa slouží pouze jako view - do nových entit bych dal views asi do vlastní složky (Entities.csproj/Views)
     [Keyless]
     public class FindPersonDTO
     {

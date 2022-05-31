@@ -19,7 +19,6 @@ namespace HlidacStatu.Repositories
 {
     public static partial class Firmy
     {
-        //migrace: Přijde mi, že tohle se už nepoužívá (krom seznamu úřadů, který bychom mohli přestěhovat někam pod firmy)
         //Předtěhovat do tasku?
         public class GlobalStatistics
         {

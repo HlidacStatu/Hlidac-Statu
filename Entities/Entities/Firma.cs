@@ -190,10 +190,6 @@ namespace HlidacStatu.Entities
             }
         }
 
-        //migrace: ošklivej hack
-        public FirmaHint _firmaHint = null;
-
-
         public string JmenoOrderReady()
         {
             string[] prefixes = new string[]

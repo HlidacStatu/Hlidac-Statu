@@ -740,10 +740,15 @@ StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
                     </span>
                 }
             }
-            @if ((await Model.KategorieOVMAsync()).Count() > 0)
+            
+            @{
+                var ovmCats = await Model.KategorieOVMAsync(); 
+            }
+            
+            @if (ovmCats.Count() > 0)
             {
                 <span>
-                    Je součástí <a href="/subjekt/DalsiInformace/@Model.ICO">@Devmasters.Lang.CS.Plural.Get((await Model.KategorieOVMAsync()).Count(), "jedné kategorie", "{0} kategorií", "{0} kategorií") orgánu veřejné moci.</a>
+                    Je součástí <a href="/subjekt/DalsiInformace/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(ovmCats.Count(), "jedné kategorie", "{0} kategorií", "{0} kategorií") orgánu veřejné moci.</a>
                 </span>
             }
         </p>

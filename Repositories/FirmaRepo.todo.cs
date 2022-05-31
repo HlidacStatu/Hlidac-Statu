@@ -10,7 +10,6 @@ using System.Text.RegularExpressions;
 
 namespace HlidacStatu.Repositories
 {
-    //migrace: tohle přijde ještě nějak upravit do pluginů
     public static partial class FirmaRepo
     {
         public class RZP

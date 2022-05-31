@@ -91,26 +91,25 @@ namespace HlidacStatu.Extensions
 
         public static async Task<KategorieOVM[]> KategorieOVMAsync(this Firma firma)
         {
-            Lib.Data.External.RPP.KategorieOVM[] _kategorieOVM = null; //migrace: tohle by šlo zjednodušit + možná cache
-
-            if (_kategorieOVM == null)
-            {
-                var client = await Manager.GetESClient_RPP_KategorieAsync(); 
-                var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(
-                    s => s
-                        .Query(q => q.QueryString(qs => qs.Query($"oVM_v_kategorii.kodOvm:{firma.ICO}")))
-                        .Source(so => so.Excludes(ex => ex.Field("oVM_v_kategorii")))
-                        .Size(150)
-                );
-                if (res.IsValid)
-                    _kategorieOVM = res.Hits
-                        .Select(m => m.Source)
-                        .OrderByDescending(m => m.hlidac_preferred ? 1 : 0)
-                        .ThenBy(m => m.nazev)
-                        .ToArray();
-                else
-                    _kategorieOVM = new Lib.Data.External.RPP.KategorieOVM[] { };
-            }
+            Lib.Data.External.RPP.KategorieOVM[] _kategorieOVM = null;
+            
+            var client = await Manager.GetESClient_RPP_KategorieAsync(); 
+            var res = await client.SearchAsync<Lib.Data.External.RPP.KategorieOVM>(
+                s => s
+                    .Query(q => q.QueryString(qs => qs.Query($"oVM_v_kategorii.kodOvm:{firma.ICO}")))
+                    .Source(so => so.Excludes(ex => ex.Field("oVM_v_kategorii")))
+                    .Size(150)
+            );
+            
+            if (res.IsValid)
+                _kategorieOVM = res.Hits
+                    .Select(m => m.Source)
+                    .OrderByDescending(m => m.hlidac_preferred ? 1 : 0)
+                    .ThenBy(m => m.nazev)
+                    .ToArray();
+            else
+                _kategorieOVM = new Lib.Data.External.RPP.KategorieOVM[] { };
+            
 
             return _kategorieOVM;
         }
@@ -868,17 +867,6 @@ namespace HlidacStatu.Extensions
             var infofacts = f.OrderByDescending(o => o.Level).ToArray();
 
             return infofacts;
-        }
-
-        public static FirmaHint Hint(this Firma firma)
-        {
-
-            if (firma._firmaHint == null)
-            {
-                firma._firmaHint = FirmaHintRepo.Load(firma.ICO);
-
-            }
-            return firma._firmaHint;
         }
 
     }

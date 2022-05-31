@@ -41,7 +41,6 @@ namespace HlidacStatu.Entities
 
         public new virtual void Remove()
         {
-            //migrace: nenašel jsem, kde se používá
             using (var db = new DbEntities())
             {
                 db.Database.ExecuteSqlRaw($@"EXEC UserOption_Add @optionId = {OptionId}, @userid = {UserId}, @languageid = {LanguageId};");

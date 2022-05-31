@@ -3,14 +3,8 @@
 
 namespace HlidacStatu.Connectors
 {
-    //migrace: tohle by mohlo jít do XLibu a vše co je na tom závislý taky, protože to jsou až věci pro web
     public class Init
     {
-        //public static Devmasters.Log.Logger Logger = Devmasters.Log.Logger.CreateLogger("HlidacSmluv");
-        //public static System.Globalization.CultureInfo enCulture = System.Globalization.CultureInfo.InvariantCulture; //new System.Globalization.CultureInfo("en-US");
-        //public static System.Globalization.CultureInfo czCulture = new System.Globalization.CultureInfo("cs-CZ");
-        //public static Random Rnd = new Random();
-
         public static IO.PrilohaFile PrilohaLocalCopy = new IO.PrilohaFile();
         public static IO.OsobaFotkyFile OsobaFotky = new IO.OsobaFotkyFile();
         public static IO.UploadedTmpFile UploadedTmp = new IO.UploadedTmpFile();

@@ -150,7 +150,6 @@ namespace HlidacStatu.Datasets
 
                 if (!Uri.TryCreate(t, UriKind.Absolute, out Uri tmp))
                 {
-                    //migrace: je potřeba při vzniku záznamu naplnit SocialShareText v datasetu
                     texts.Add(t);
                 }
             }
