@@ -1,10 +1,4 @@
 ﻿@model System.Collections.Generic.IEnumerable<string>
-@{
-    //migrace: to je potřeba nastavit pro IIS ve web configu (https://stackoverflow.com/questions/43097433/request-timeout-from-asp-net-core-app-on-iis/43098493#43098493) 
-    //this.Server.ScriptTimeout = 600;
-
-}
-
 <div class="row">
     <div class="col-xs-12">
         @using (Html.BeginForm("AddPersons", "Manage", FormMethod.Post, new { @id = "jsonForm", @class = "form-inline", role = "form" }))

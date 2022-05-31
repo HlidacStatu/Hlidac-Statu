@@ -96,7 +96,7 @@ namespace HlidacStatu.Web
                 .AddMvcOptions(options =>
                     options.Filters.Add<SpamProtectionRazor>());
 
-            services.AddSingleton<AttackerDictionaryService>(); //migrace: Přejmenovat attackerDictionaryService
+            services.AddSingleton<AttackerDictionaryService>();
 
             services.AddApplicationInsightsTelemetry();
 
@@ -131,7 +131,6 @@ namespace HlidacStatu.Web
                 });
                 c.OperationFilter<AddApiAuthHeaderParameter>();
 
-                //migrace: otestovat swagger
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = "HlidacStatu.Web.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

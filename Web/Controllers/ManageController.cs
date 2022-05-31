@@ -272,9 +272,6 @@ namespace HlidacStatu.Web.Controllers
         [HttpPost]
         public ActionResult AddPersons(IFormCollection form)
         {
-            //migrace: scriptTimeout je potřeba nastavit na ReverseProxy serveru (iis)
-            //this.Server.ScriptTimeout = 600;
-
             List<string> newIds = new List<string>();
             string tabdelimited = form["data"];
             foreach (var line in tabdelimited.Split(new string[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))

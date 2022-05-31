@@ -144,8 +144,6 @@
 
 @{ ViewBag.MoreHtml = "<p><b>Tady najdete <a href='/Osoby'>Seznam politiků a jejich vazby na soukromé firmy</a></b></p>"; }
 
-@* //migrace: Tenhle report byl v době migrace nefunkční. Zatím je v akci OtherReports, ale asi by měl být přesunutý do necachovaných. S tím je potřeba opravit action linky dole *@
-
 <p>
     <a href="@Url.Action("OtherReports", new {id = 5, aktualnost = Relation.AktualnostType.Aktualni})"
        class="btn btn-@(aktualnost == Relation.AktualnostType.Aktualni ? "success" : "primary") btn-sm" role="button">

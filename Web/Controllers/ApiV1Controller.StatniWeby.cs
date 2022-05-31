@@ -14,8 +14,6 @@ using HlidacStatu.Repositories;
 namespace HlidacStatu.Web.Controllers
 {
 
-    //migrace: https://docs.microsoft.com/en-us/aspnet/core/performance/response-compression?view=aspnetcore-5.0
-    //migrace: komprese by měla být přenechána modulu na iis
     public partial class ApiV1Controller : Controller
     {
         [Authorize]

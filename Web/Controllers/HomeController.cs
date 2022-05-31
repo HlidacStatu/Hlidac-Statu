@@ -384,15 +384,6 @@ text zpravy: {txt}
 
         }
 
-        //migrace: WebContextInfo - nedokážu opravit, netuším co to má dělat
-        // public ActionResult ZobrazD()
-        // {
-        //     var deb = Framework.WebContextInfo.GetFullInfoString(HttpContext);
-        //     Lib.Watchdogs.Email.SendEmail("michal@michalblaha.cz", "ZobrazD", new Lib.Watchdogs.RenderedContent() { ContentText = deb });
-        //
-        //     return View();
-        // }
-
         public ActionResult PoliticiChybejici()
         {
 
@@ -403,7 +394,6 @@ text zpravy: {txt}
         {
             return RedirectToActionPermanent("Index", "ApiV1");
         }
-
 
         public ActionResult JsonDoc()
         {

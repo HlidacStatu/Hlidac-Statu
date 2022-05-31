@@ -7,7 +7,7 @@ namespace HlidacStatu.Entities
 {
     public partial class Osoba
     {
-        public partial class Statistics
+        public class Statistics
         {
             public class RegistrSmluv
             {

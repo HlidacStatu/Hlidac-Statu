@@ -141,21 +141,3 @@
 
 </body>
 </html>
-
-@* //migrace: problém s WriteTo *@
-@* @functions  *@
-@* { *@
-@*     void IgnoreSection(string name) *@
-@*     { *@
-@*         if (IsSectionDefined(name)) *@
-@*         { *@
-@*             WriteTo(TextWriter.Null, RenderSection(name)); *@
-@*         } *@
-@*     } *@
-@* *@
-@*     void IgnoreBody() *@
-@*     { *@
-@*         WriteTo(TextWriter.Null, RenderBody()); *@
-@*     } *@
-@* *@
-@* } *@
