@@ -1,0 +1,61 @@
+﻿@using System.Linq
+@using HlidacStatu.Entities
+@using HlidacStatu.Extensions
+@using HlidacStatu.XLib.Render
+@using HlidacStatu.Repositories
+
+@{
+        Layout = "_ReportLayout";
+
+    var showList = OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.Senator, DateTime.Now)
+        .OrderBy(o => o.Prijmeni)
+        .ThenBy(o => o.Jmeno)
+        .ToList();
+
+
+    ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
+    {
+        new() { Name="Senátor",
+            HtmlRender = (s) => {
+                Osoba o = (Osoba)s;
+                return string.Format("<a href='{0}'>{1}</a>", o.GetUrl(), o.FullNameWithYear(true))
+                + "<br />"
+                + Devmasters.TextUtil.ShortenText(o.Description(false,m=> true, numOfRecords: 3), 250).Replace("\n", "<br />");
+            },
+            OrderValueRender = (s) => {
+                Osoba o = (Osoba)s;
+                return o.FullName(false);
+            }
+        },
+        new() {
+            Name ="Strana/Hnutí",
+            HtmlRender = (s) => {
+                Osoba o = (Osoba)s;
+                return o.CurrentPoliticalParty();
+            },
+            OrderValueRender = (s) => {
+                Osoba o = (Osoba)s;
+                return o.CurrentPoliticalParty();
+            }
+        }
+    });
+
+
+    foreach (var p in showList)
+    {
+        poslanciTable.AddRow(p);
+    }
+}
+
+<h3 id="tblHead">Aktuální složení senátu</h3>
+@ChartUtil.RenderReport("",ReportModel.QueueItem.types.table, poslanciTable, @"{
+                 'language': {
+                    'url': '//cdn.datatables.net/plug-ins/1.10.19/i18n/Czech.json'
+                },
+                'order': [4,'desc'],
+                'lengthChange': false,
+                'info': false,
+                'paging': true,
+                'pageLength': 50,
+                'columnDefs': [{ 'visible': false, 'targets': 0 }]
+                }", "tbPoslanci")

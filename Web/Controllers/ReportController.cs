@@ -172,6 +172,10 @@ namespace HlidacStatu.Web.Controllers
                             + "<meta property=\"og:image:height\" content=\"1080\" />"
                             + "<meta property=\"og:image:type\" content=\"image/png\" />";
                     return View("26_Classification");
+                case 29:
+                    ViewBag.Title = "Senátoři";
+                    ViewBag.SubTitle = "Seznam senátorů ze Senátu PČR";
+                    return View("29_Senatori");
                 default:
                     return NotFound();
             }

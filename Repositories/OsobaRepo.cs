@@ -566,6 +566,8 @@ namespace HlidacStatu.Repositories
             Poslanec,
             [NiceDisplayName("Vedoucí úřadu")]
             SefUradu,
+            [NiceDisplayName("Senátor")]
+            Senator,
             
         }
         
@@ -620,6 +622,15 @@ namespace HlidacStatu.Repositories
                 case Zatrideni.SefUradu:
                     return GetByEvent(e =>
                             e.Ceo == 1
+                            && (e.DatumDo == null || e.DatumDo >= toDate)
+                            && (e.DatumOd == null || e.DatumOd <= toDate))
+                        .ToList();
+                
+                case Zatrideni.Senator:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.VolenaFunkce
+                            && e.AddInfo.ToLower().StartsWith("senát")
+                            && e.Organizace.ToLower().StartsWith("senát")
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
