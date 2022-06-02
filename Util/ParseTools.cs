@@ -28,7 +28,9 @@ namespace HlidacStatu.Util
 
             if (pages <= 1)
                 pages = 1;
-            
+
+            if (string.IsNullOrEmpty(plaintext))
+                return false;
             
             string textWithTrimmedSpaces = Regex.Replace(plaintext, @"\s+", " ");
             var penalization = DolozkaPenalization(textWithTrimmedSpaces);
