@@ -39,7 +39,7 @@ namespace HlidacStatu.Lib.Data.External
                 {
                     foreach (var point in points)
                     {
-                        writeApi.WritePoint(bucketName, orgName, point);
+                        writeApi.WritePoint(point, bucketName, orgName);
 
                     }
                 }

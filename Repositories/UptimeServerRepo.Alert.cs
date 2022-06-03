@@ -80,9 +80,9 @@ namespace HlidacStatu.Repositories
                 if (avail.Length == 0)
                     return AlertStatus.NoData;
 
-                int numToAnalyze = 2;
+                int numToAnalyze = 15;
 
-                if (avail.Length < numToAnalyze * 3)
+                if (avail.Length < numToAnalyze )
                     return AlertStatus.NoChange;
 
 
@@ -115,9 +115,9 @@ namespace HlidacStatu.Repositories
                         lastChecks.First().SimpleStatus()
                         );
 
-                //predchoz� se lis�
-                //z predchoziho 2x delsiho intervalu vezmu ten necastejsi stav co byl
-                preLastChecks = availabilities.Skip(numToChange).Take(numToChange*2).ToArray();
+                //predchozí se liší
+                //z predchoziho intervalu vezmu ten necastejsi stav co byl
+                preLastChecks = availabilities.Skip(numToChange).Take(numToChange).ToArray();
                 var mostDetectedStatus_all = preLastChecks
                     .GroupBy(k => k.SimpleStatus(), (k, v) => new { status = k, count = v.Count() })
                     .OrderByDescending(o => o.count).ThenByDescending(o => (int)o.status)

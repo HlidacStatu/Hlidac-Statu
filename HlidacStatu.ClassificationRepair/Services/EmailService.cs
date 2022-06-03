@@ -30,13 +30,13 @@ namespace HlidacStatu.ClassificationRepair
             {
 #pragma warning disable CS0618 // Type or member is obsolete
                 var mimeMessage = new MimeMessage();
-                mimeMessage.From.Add(new MailboxAddress(_emailSettings.FromAddress));
+                mimeMessage.From.Add(new MailboxAddress("",_emailSettings.FromAddress));
 
                 foreach (string recipient in recipients)
                 {
-                    mimeMessage.To.Add(new MailboxAddress(recipient));
+                    mimeMessage.To.Add(new MailboxAddress("", recipient));
                 }
-                mimeMessage.ReplyTo.Add(new MailboxAddress(replyTo));
+                mimeMessage.ReplyTo.Add(new MailboxAddress("", replyTo));
                 mimeMessage.Subject = subject;
 
                 mimeMessage.Body = new TextPart("html")
