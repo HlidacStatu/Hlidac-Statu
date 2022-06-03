@@ -49,9 +49,10 @@ namespace HlidacStatu.Web.Controllers
             return string.Join("\n", webs);
         }
 
+
         [Authorize]
         [HttpGet("nedostupnost")]
-        public ActionResult<(UptimeServer Server, UptimeServer.AvailabilityStatistics Statistics)[]> Nedostupnost(int days)
+        public ActionResult<Models.Apiv2.NedostupnostModel[]> TopNedostupnost(int days)
         {
 
             UptimeServer.HostAvailability[] topNedostupnosti1D = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers24hoursStat()
@@ -67,15 +68,15 @@ namespace HlidacStatu.Web.Controllers
                             .Take(60)
                             .ToArray();
 
-            (UptimeServer Server, UptimeServer.AvailabilityStatistics Statistics)[] data = null;
+            Models.Apiv2.NedostupnostModel[] data = null;
             if (days < 7)
                 data = topNedostupnosti1D
-                    .Select(m => (Server: m.Host, Statistics: m.Statistics()))
+                    .Select(m => new Models.Apiv2.NedostupnostModel() { Server = m.Host, Statistics = m.Statistics() })
                     .ToArray();
             else
                 data = topNedostupnosti7D
-                .Select(m => (Server: m.Host, Statistics: m.Statistics()))
-                .ToArray();
+                    .Select(m => new Models.Apiv2.NedostupnostModel() { Server = m.Host, Statistics = m.Statistics() })
+                    .ToArray();
 
             return data; ;
         }
