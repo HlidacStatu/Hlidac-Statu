@@ -3,7 +3,8 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <UserSecretsId>aspnet-HlidacStatu.JobsWeb-13E6255C-B0D5-414D-B3F6-120950C1DA69</UserSecretsId>
-    </PropertyGroup>
+		<GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
+	</PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Devmasters.Core" Version="4.0.0" />
@@ -20,7 +21,8 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.5" />
-    </ItemGroup>
+
+	</ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Entities\Entities.csproj" />

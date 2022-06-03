@@ -3,7 +3,9 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <UserSecretsId>aspnet-HlidacStatu.JobTableEditor-644FAF95-3C71-40FC-9CE8-906A59B06239</UserSecretsId>
-    </PropertyGroup>
+		<GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
+
+	</PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="bootstrap" Version="5.1.3" />
