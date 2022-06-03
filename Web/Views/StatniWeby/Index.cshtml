@@ -143,6 +143,7 @@
 @{
     var topNedostupnosti24H = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers24hoursStat()
                     //.Where(m=>m.Host.Id == 108)
+                    .Where(m=>m.Statistics() != null)
                     .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
                     .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
                     .Take(30)
@@ -167,6 +168,7 @@
     UptimeServer.HostAvailability[] topNedostupnostiW = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServersWeekStat()
                     .Where(m=>m?.Host?.Id != null)
                     .Where(m=>serverWithSomeStrangeError.Contains(m.Host.Id)==false)
+                    .Where(m=>m.Statistics() != null)
                     .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
                     .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
                     .Take(30)
