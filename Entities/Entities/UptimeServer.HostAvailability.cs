@@ -7,7 +7,6 @@ namespace HlidacStatu.Entities
     public partial class UptimeServer
     {
 
-
         public class HostAvailability
         {
             private class IgnoreMissingData

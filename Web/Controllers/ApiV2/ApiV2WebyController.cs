@@ -1,17 +1,16 @@
-﻿using Devmasters.Enums;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 
-using HlidacStatu.Web.Filters;
+using Devmasters.Enums;
 
+using HlidacStatu.Entities;
+using HlidacStatu.Repositories;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Swashbuckle.AspNetCore.Annotations;
-
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -43,13 +42,43 @@ namespace HlidacStatu.Web.Controllers
         {
             var webs = UptimeServerRepo.AllActiveServers()
                 .ToArray()
-                .Select(m=>m.HostDomain())
-                .Where(m=>string.IsNullOrEmpty(m)==false)
+                .Select(m => m.HostDomain())
+                .Where(m => string.IsNullOrEmpty(m) == false)
                 .Distinct()
                 ;
             return string.Join("\n", webs);
         }
 
+        [Authorize]
+        [HttpGet("nedostupnost")]
+        public ActionResult<(UptimeServer Server, UptimeServer.AvailabilityStatistics Statistics)[]> Nedostupnost(int days)
+        {
+
+            UptimeServer.HostAvailability[] topNedostupnosti1D = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers24hoursStat()
+                //.Where(m=>m.Host.Id == 108)
+                .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
+                .Take(60)
+                .ToArray();
+            UptimeServer.HostAvailability[] topNedostupnosti7D = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServersWeekStat()
+                            .Where(m => m?.Host?.Id != null)
+                            .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                            .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
+                            .Take(60)
+                            .ToArray();
+
+            (UptimeServer Server, UptimeServer.AvailabilityStatistics Statistics)[] data = null;
+            if (days < 7)
+                data = topNedostupnosti1D
+                    .Select(m => (Server: m.Host, Statistics: m.Statistics()))
+                    .ToArray();
+            else
+                data = topNedostupnosti7D
+                .Select(m => (Server: m.Host, Statistics: m.Statistics()))
+                .ToArray();
+
+            return data; ;
+        }
 
         //[GZipOrDeflate()]
         [Authorize]
