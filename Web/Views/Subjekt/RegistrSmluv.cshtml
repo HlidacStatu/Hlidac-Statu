@@ -488,7 +488,7 @@
 
                         <h4>Největší dodavatelé  @(Devmasters.TextUtil.ShortenText(Model.Jmeno,30)) v @y</h4>
                         <p>
-                            <partial name="WebUtil/VerticalTabs" 
+                            <partial name="WebUtil/HorizontalTabs" 
                                 model="@(new TabsViewModel(new string[]{"podle hodnoty smluv","podle počtu smluv"}, new string[]{dleHodnoty,dlePoctu} ))" 
                             />
 
@@ -512,7 +512,7 @@
 
                         <h4>Největší odběratelé @(Devmasters.TextUtil.ShortenText(Model.Jmeno,30)) v @y</h4>
                         <p>
-                            <partial name="WebUtil/VerticalTabs" 
+                            <partial name="WebUtil/HorizontalTabs" 
                                 model="@(new TabsViewModel(new string[]{"podle hodnoty smluv","podle počtu smluv"}, new string[]{dleHodnoty,dlePoctu} ))" 
                             />
 
