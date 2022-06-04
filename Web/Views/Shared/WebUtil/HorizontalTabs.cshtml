@@ -9,6 +9,7 @@
 
     bool first = true;
     var arrTabnames = Model.Tabnames?.ToArray();
+    var arrContent = Model.Contents?.ToArray();
 }
 
 <nav>
@@ -18,7 +19,7 @@
             string? s = arrTabnames[i];
             if (s != null)
             {
-                <button class="nav-link @(first ? "active" : "")" id="tab@(tabId + "_" +i.ToString())" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">@Html.Raw(s)</button>
+                <button class="nav-link @(first ? "active" : "")" id="btn@(tabId + "_" +i.ToString())" data-bs-toggle="tab" data-bs-target="#tab@(tabId + "_" +i.ToString())" type="button" role="tab" aria-controls="nav-home" aria-selected="true">@Html.Raw(s)</button>
             }
         }
     </div>
@@ -27,11 +28,10 @@
 <div class="tab-content" id="tabc@(tabId)">
     @for (int i = 0; i < arrTabnames?.Length; i++)
     {
-        string? s = arrTabnames[i];
+        string? s = arrContent[i];
         if (s != null)
         {
-
-            <div class="tab-pane fade @(first ? "show active" : "")" id="tab@(tabId + "_" +i.ToString())" role="tabpanel" aria-labelledby="tab@(tabId + "_" +i.ToString())" tabindex="0">
+            <div class="tab-pane fade @(first ? "show active" : "")" id="tab@(tabId + "_" +i.ToString())" role="tabpanel" tabindex="0">
             @Html.Raw(s)
             </div>
         }
