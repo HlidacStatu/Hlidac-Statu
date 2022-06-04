@@ -710,7 +710,7 @@ else if (Model.HasResults == false)
                                 results.Add(await rds.RenderResultsInHtmlAsync(Model.Query));
                             }
                         }
-                        <partial name="WebUtil/VerticalTabs" model="@(new VerticalTabsViewModel(tabs?.ToList(), results))" />
+                        <partial name="WebUtil/VerticalTabs" model="@(new TabsViewModel(tabs?.ToList(), results))" />
                     </div>
                 }
                 viewRenderTimesInt.Stop();

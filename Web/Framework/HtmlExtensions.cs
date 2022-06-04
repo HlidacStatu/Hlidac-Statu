@@ -592,6 +592,15 @@ namespace HlidacStatu.Web.Framework
             return htmlHelper.Raw(sb.ToString());
         }
 
+        public static string RenderRawHtml(this IHtmlContent content)
+        {
+            using (var writer = new System.IO.StringWriter())
+            {
+                content.WriteTo(writer, System.Text.Encodings.Web.HtmlEncoder.Default);
+                return writer.ToString();
+            }
+        }
+
         public static IHtmlContent DataToHTMLTable<T>(this IHtmlHelper htmlHelper,
             ReportDataSource<T> rds,
             string tableId = "",

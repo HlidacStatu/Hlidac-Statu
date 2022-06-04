@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace HlidacStatu.Web.Models
 {
-    public class VerticalTabsViewModel
+    public class TabsViewModel
     {
         public IEnumerable<string>? Tabnames { get; set; }
         public IEnumerable<string>? Contents { get; set; }
@@ -11,7 +11,7 @@ namespace HlidacStatu.Web.Models
         public string ContentColCss { get; set; }
         public string? GaPageEventId { get; set; }
 
-        public VerticalTabsViewModel(IEnumerable<string>? tabnames,
+        public TabsViewModel(IEnumerable<string>? tabnames,
             IEnumerable<string>? contents,
             string containerCss = "col-xs-12",
             string tabColCss = "col-lg-2 col-md-2 col-sm-2 col-xs-3",

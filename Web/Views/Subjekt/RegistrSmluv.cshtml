@@ -1,5 +1,6 @@
 ﻿@model Firma
 
+@using HlidacStatu.Web.Framework;
 @using HlidacStatu.Lib.Analytics
 @using Nest;
 @using Devmasters.Enums;
@@ -50,6 +51,10 @@
     var currentSeasonYear = statistics.CurrentSeasonYear();
     var zmenaObjemuSmluv = statistics.ChangeBetweenYears(currentSeasonYear - 1, currentSeasonYear, s => s.CelkovaHodnotaSmluv);
 
+    var topDodavateleT = HlidacStatu.Repositories.ES.QueryGrouped.TopDodavatelePerYearAsync($"ico:{Model.ICO}", statistics.YearsAfter2016());
+    var topOdberateleT = HlidacStatu.Repositories.ES.QueryGrouped.TopOdberatelePerYearAsync($"ico:{Model.ICO}", statistics.YearsAfter2016());
+    
+    Task.WaitAll(topDodavateleT, topOdberateleT);
 
     //Graf hodnota smluv
     var hodnotaSmluvGraphData = new Series[]
@@ -422,13 +427,105 @@
                                 CssClass = "number"
                             }
                         );
-                    rds.AddRows(sortedData);
-                <h3>Oblasti uzavřených smluv v @y</h3>
+                    rds.AddRows(sortedData);                    
+                    <h4>Oblasti uzavřených smluv v @y</h4>
                 <p>@Html.DataToHTMLTable(rds, dataTableOptions: dataTableOptions)</p>
-                }
+
+            }
+
+
+
+            ReportDataSource<KeyValuePair<string, SimpleStat>> smluvniPartneriTemplate = new(
+                    new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                            {
+                                Name = "Společnost",
+                                HtmlRender = (m) =>
+                                {
+                                    string t = m.Key;
+                                    return $"<a href='/subjekt/{t}'>"
+                                        +$"{Firmy.GetJmeno(t)}"
+                                        +$"</a>";
+                                }
+                            },
+                            new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                            {
+                                Name = "Počet smluv",
+                                HtmlRender = (m) =>
+                                {
+                                    var query = $"ico:{Model.ICO} AND ico:{m} AND "
+                               + $"{HlidacStatu.Repositories.Searching.Query.Formatted("podepsano",new DateTime(y,1,1),new DateTime(y,12,31))}";
+                                   return $"<a href='/HledatSmlouvy?Q={System.Net.WebUtility.UrlEncode(query)}'>"
+                                       +$"{HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"
+                                       +$"</a>";
+                                },
+                                OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
+                                CssClass = "number"
+                            },
+                            new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                            {
+                                Name = "Hodnota smluv",
+                                HtmlRender = (m) =>
+                                {
+                                    return HlidacStatu.Util.RenderData.NicePrice(m.Value.CelkemCena);
+                                },
+                                OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.CelkemCena),
+                                CssClass = "number"
+                            }
+                        );
+
+            if (topDodavateleT.Result.ContainsKey(y) && topDodavateleT.Result[y].topPodleKc.Count>0)
+            {
+                smluvniPartneriTemplate.AddRows(
+                    topDodavateleT.Result[y].topPodleKc.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
+                        );
+                string dleHodnoty = Html.DataToHTMLTable(smluvniPartneriTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
+
+                smluvniPartneriTemplate.Clear();
+                smluvniPartneriTemplate.AddRows(
+                    topDodavateleT.Result[y].topPodlePoctu.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
+                );
+                string dlePoctu = Html.DataToHTMLTable(smluvniPartneriTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
+
+                        <h4>Největší dodavatelé  @(Devmasters.TextUtil.ShortenText(Model.Jmeno,30)) v @y</h4>
+                        <p>
+                            <partial name="WebUtil/VerticalTabs" 
+                                model="@(new TabsViewModel(new string[]{"podle hodnoty smluv","podle počtu smluv"}, new string[]{dleHodnoty,dlePoctu} ))" 
+                            />
+
+                        </p>
+                    }
+
+
+            if (topOdberateleT.Result.ContainsKey(y) && topOdberateleT.Result[y].topPodleKc.Count>0)
+            {
+                smluvniPartneriTemplate.Clear();
+                smluvniPartneriTemplate.AddRows(
+                    topOdberateleT.Result[y].topPodleKc.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
+                        );
+                string dleHodnoty = Html.DataToHTMLTable(smluvniPartneriTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
+
+                smluvniPartneriTemplate.Clear();
+                smluvniPartneriTemplate.AddRows(
+                    topOdberateleT.Result[y].topPodlePoctu.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
+                );
+                string dlePoctu = Html.DataToHTMLTable(smluvniPartneriTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
+
+                        <h4>Největší odběratelé @(Devmasters.TextUtil.ShortenText(Model.Jmeno,30)) v @y</h4>
+                        <p>
+                            <partial name="WebUtil/VerticalTabs" 
+                                model="@(new TabsViewModel(new string[]{"podle hodnoty smluv","podle počtu smluv"}, new string[]{dleHodnoty,dlePoctu} ))" 
+                            />
+
+                        </p>
+                    }
 
                 <hr />
-            }@*for y*@
+            }
+
+            <hr />
+        }
+
+        @*for y*@
 
 
 
