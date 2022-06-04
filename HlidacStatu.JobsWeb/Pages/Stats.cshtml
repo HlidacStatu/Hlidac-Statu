@@ -11,7 +11,7 @@
 }
 
 @{
-    ViewData["Title"] = "Souhrnné statistiky";
+    ViewData["Title"] = $"Analýza \"{descr.NiceName}\"";
     List<(string ico, string nazev, int pocetCen)> dodavatele = JobService.GetDodavateleList(Model.Key.Value);
     List<(string ico, string nazev, int pocetCen)> zadavatele = JobService.GetOdberateleList(Model.Key.Value);
 
@@ -30,6 +30,12 @@
 
 }
 <h1>Porovnání cen dodavatelů</h1>
+<p>
+    Ceny v tabulkách jsou v pořadí<br/>
+    dolní kvartil <br/>
+    medián<br/>
+    horní kvartil<br/>
+</p>
 <script>
     var tbl;
     $(document).ready(function () {
