@@ -122,7 +122,7 @@
 
                     <div style="padding-top:20px;color:#FFF"><a href="/" style="color:#FFF;text-decoration:none;"><i class="fa-regular fa-house"></i> Cenové analýzy</a> 
                         <sup class="text-warning">@(this.Context.HasAccess("IT", 2020).Result.AnalyzeLevelText)</sup>
-                        &gt;</div>
+                        &gt; @(analyza?.PerSubjectDesc?.NiceName)</div>
                     <!-- desktop menu items only -->
                 <h2 style="padding-top:20px;color:white">@ViewData["Title"]</h2>
 

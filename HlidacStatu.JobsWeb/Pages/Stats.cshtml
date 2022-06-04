@@ -11,7 +11,7 @@
 }
 
 @{
-    ViewData["Title"] = $"Analýza \"{descr.NiceName}\"";
+    ViewData["Title"] = $"Statistiky";
     List<(string ico, string nazev, int pocetCen)> dodavatele = JobService.GetDodavateleList(Model.Key.Value);
     List<(string ico, string nazev, int pocetCen)> zadavatele = JobService.GetOdberateleList(Model.Key.Value);
 
