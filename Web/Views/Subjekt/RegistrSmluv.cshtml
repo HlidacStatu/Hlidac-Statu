@@ -473,20 +473,30 @@
                             }
                         );
 
-            if (topDodavateleT.Result.ContainsKey(y) && topDodavateleT.Result[y].topPodleKc.Count>0)
+
+
+
+            Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)> 
+                first = Model.JsemOVM() ? topDodavateleT.Result : topOdberateleT.Result;
+
+            Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)> 
+                second = Model.JsemOVM() ? topOdberateleT.Result : topDodavateleT.Result;
+
+            if (first.ContainsKey(y) && first[y].topPodleKc.Count>0)
             {
+                smluvniPartneriTemplate.Clear();
                 smluvniPartneriTemplate.AddRows(
-                    topDodavateleT.Result[y].topPodleKc.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
+                    first[y].topPodleKc.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
                         );
                 string dleHodnoty = Html.DataToHTMLTable(smluvniPartneriTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
                 smluvniPartneriTemplate.Clear();
                 smluvniPartneriTemplate.AddRows(
-                    topDodavateleT.Result[y].topPodlePoctu.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
+                    first[y].topPodlePoctu.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
                 );
                 string dlePoctu = Html.DataToHTMLTable(smluvniPartneriTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
-                        <h4>Největší dodavatelé  @(Devmasters.TextUtil.ShortenText(Model.Jmeno,30)) v @y</h4>
+                        <h4>Statistika @(Model.JsemOVM()? "dodavatelů" : "odběratelů" )  @(Model.JsemOVM()? "úřadu" : "subjektu" ) v @y</h4>
                         <p>
                             <partial name="WebUtil/HorizontalTabs" 
                                 model="@(new TabsViewModel(new string[]{"podle hodnoty smluv","podle počtu smluv"}, new string[]{dleHodnoty,dlePoctu} ))" 
@@ -496,21 +506,21 @@
                     }
 
 
-            if (topOdberateleT.Result.ContainsKey(y) && topOdberateleT.Result[y].topPodleKc.Count>0)
+            if (second.ContainsKey(y) && second[y].topPodleKc.Count>0)
             {
                 smluvniPartneriTemplate.Clear();
                 smluvniPartneriTemplate.AddRows(
-                    topOdberateleT.Result[y].topPodleKc.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
+                    second[y].topPodleKc.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
                         );
                 string dleHodnoty = Html.DataToHTMLTable(smluvniPartneriTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
                 smluvniPartneriTemplate.Clear();
                 smluvniPartneriTemplate.AddRows(
-                    topOdberateleT.Result[y].topPodlePoctu.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
+                    second[y].topPodlePoctu.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
                 );
                 string dlePoctu = Html.DataToHTMLTable(smluvniPartneriTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
-                        <h4>Největší odběratelé @(Devmasters.TextUtil.ShortenText(Model.Jmeno,30)) v @y</h4>
+                        <h4>Statistika @(Model.JsemOVM()? "odběratelů" : "dodavatelů" ) @(Model.JsemOVM()? "úřadu" : "subjektu" ) v @y</h4>
                         <p>
                             <partial name="WebUtil/HorizontalTabs" 
                                 model="@(new TabsViewModel(new string[]{"podle hodnoty smluv","podle počtu smluv"}, new string[]{dleHodnoty,dlePoctu} ))" 
