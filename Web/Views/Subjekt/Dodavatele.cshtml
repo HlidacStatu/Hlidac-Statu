@@ -108,8 +108,8 @@
                 );
         }
 
-        rdsPerIco.Title = "Nejčastější dodavatelé (příjemci peněz) podle počtu smluv";
-        rdsPerPrice.Title = "Nejčastější dodavatelé (příjemci peněz) podle celkové hodnoty smluv";
+        rdsPerIco.Title = "";
+        rdsPerPrice.Title = "";
     }
 
     @if (rdsPerIco.Data.Count > 0 || rdsPerPrice.Data.Count > 0)
@@ -118,6 +118,7 @@
 
         <div class="row">
             <div class="col-xs-12">
+                <h4>Nejčastější dodavatelé (příjemci peněz) podle počtu smluv</h4>
                 @Html.Toggleable(
                     Html.SimpleBarChart(
                         false, false,
@@ -131,6 +132,7 @@
                 )
             </div>
             <div class="col-xs-12">
+                <h4>Nejčastější dodavatelé (příjemci peněz) podle celkové hodnoty smluv</h4>
                 @Html.Toggleable(
                     Html.SimpleBarChart(
                         false, false,

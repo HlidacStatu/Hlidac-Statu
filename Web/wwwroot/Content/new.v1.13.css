@@ -3081,3 +3081,66 @@ a.form-search__hint:active:focus {
     50% { opacity: 0.5; }
     100% { opacity: 1;    }
 }
+
+/* TOC */
+.nav-link {
+    font-size: 16px;
+    letter-spacing: .36px;
+    color: #0074e4;
+    text-decoration: none;
+    text-transform: none;
+    margin: 0;
+}
+.navbar-nav {
+    display: inline-block; 
+    flex-direction: inherit;
+    padding: 0 9px 0 9px;
+    font-weight: 600;
+    line-height: 24px;
+}
+
+.navbar-brand {
+    float: none;
+    padding: 0 9px 0 9px;
+    font-weight: 600;
+    line-height: 24px;
+}
+
+    .navbar-brand svg {
+        margin-right: 10px;
+        vertical-align: bottom;
+    }
+
+.navbar-dark .navbar-nav.level2 .nav-link {
+    color: #0a58ca;
+    padding: 2px 12px;
+}
+
+nav {
+    text-align:left;
+}
+
+nav[data-toggle="toc"] {
+    top: 42px;
+}
+
+/* small screens */
+@media (max-width: 768px) {
+    /* override stickyness so that the navigation does not follow scrolling */
+    nav[data-toggle="toc"] {
+        margin-bottom: 42px;
+        position: static;
+    }
+
+        /* PICK ONE */
+        /* don't expand nested items, which pushes down the rest of the page when navigating */
+        nav[data-toggle="toc"] .nav .active .nav {
+            display: none;
+        }
+}
+/* alternatively, if you *do* want the second-level navigation to be shown (as seen on this page on mobile), use this */
+/*
+nav[data-toggle='toc'] .nav .nav {
+  display: block;
+}
+*/

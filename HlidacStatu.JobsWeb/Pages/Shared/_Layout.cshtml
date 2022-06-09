@@ -5,7 +5,7 @@
 
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,7 +16,6 @@
 
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/content/new.v1.11.css" />
-    <link rel="stylesheet" href="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.css"/>
     
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&amp;subset=latin-ext" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Cabin:400,400i,600,700&amp;subset=latin-ext" rel="stylesheet" />
@@ -50,7 +49,10 @@
     <script src="https://code.highcharts.com/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-    <script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script>
+
+    <link rel="stylesheet" href="~/js/bootstrap-toc.min.css"/>
+    <script src="~/js/bootstrap-toc.min.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 
     <!-- Global site tag (gtag.js) - Google Analytics -->

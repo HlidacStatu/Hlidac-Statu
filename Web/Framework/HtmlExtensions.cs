@@ -629,7 +629,10 @@ tbl_" + _tableId + @" = $('#" + _tableId + @"').DataTable(" + dataTableOptions +
 });
 </script>");
 
-            sb.AppendFormat("<h3>{0}</h3>", rds?.Title ?? "");
+            if (!string.IsNullOrEmpty(rds?.Title))
+            {
+                sb.AppendFormat("<h3>{0}</h3>", rds?.Title ?? "");
+            }
             sb.AppendFormat("<table id=\"{0}\" class=\"table-sorted table table-bordered table-striped\">", _tableId);
             if (customTableHeader == null)
             {

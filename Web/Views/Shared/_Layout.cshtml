@@ -177,7 +177,7 @@
         }
     </script>
 
-    @await RenderSectionAsync("Scripts", required: false)
+    @RenderSection("Scripts", required: false)
 
     @Html.Raw(JavaScriptSnippet.FullScript)
 
@@ -453,6 +453,7 @@
     <partial name="_Footer" />
 
     @await RenderSectionAsync("footerscripts", required: false)
+    <!-- render-scripts -->
     <render-scripts></render-scripts>
 
 

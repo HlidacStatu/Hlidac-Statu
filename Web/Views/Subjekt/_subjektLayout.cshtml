@@ -4,6 +4,9 @@
 @model (HlidacStatu.Entities.Firma firma, string viewName, string title)
 
 @{
+    string[] tocOn = new string[] {"registrsmluv" };
+
+
     ViewBag.Title = Model.title;
     ViewBag.HideTitle = true;
 
@@ -31,7 +34,7 @@
 {
     @{
         var items = new List<Schema.NET.IListItem>()
-{
+        {
             new Schema.NET.ListItem()
             {
                 Item = new Schema.NET.WebPage()
@@ -111,6 +114,25 @@
     <script src="/scripts/highcharts-6/modules/treemap.js"></script>
     @* Přidá barevnou paletu ke grafům *@
     @Html.GraphTheme()
+
+    @if (tocOn.Contains(Model.viewName.ToLower()))
+    {
+        <link rel="stylesheet" href="~/js/bootstrap-toc.min.css"/>
+        <script src="~/js/bootstrap-toc.min.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                $("#div_toc > p").show();
+                Toc.init({
+                    $nav: $("#toc"),
+                    $scope: $("#subjcontent_toc h2, #subjcontent_toc h3, #subjcontent_toc h4")
+                });
+                new bootstrap.ScrollSpy(document.body, {
+                    target: '#toc'
+                })
+            });
+        </script>
+    }
 }
 @section onlyembed
 {
@@ -168,8 +190,10 @@
     hr {
         border-top: 3px dotted #E0E6ED;
         margin-top: 24px;
-        margin-bottom: 24px;
+        margin-bottom: 34px;
     }
+
+    h4 { padding-top:30px;}
 </style>
 
 <div class="head">

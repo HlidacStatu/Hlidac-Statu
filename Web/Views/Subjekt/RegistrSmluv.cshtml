@@ -12,6 +12,7 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 
+
 @{
     Layout = null;
     //ViewBag.Title = "" + Model.Jmeno + " v registru smluv.";
@@ -159,97 +160,9 @@
 
 
 @* První sloupec *@
-<div class="col-sm-7 col-xs-12 order-1">
+<div class="col-sm-7 col-xs-12 order-1" id="subjcontent_toc">
     <div>
-        <h4>Závažné nedostatky</h4>
-        <div>
-            @{
-                var currentYear = DateTime.Now.Year;
-                var numFatalIssue = (await SmlouvaRepo.Searching.SimpleSearchAsync($"ico:{Model.ICO} AND chyby:zasadni AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}", 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true))
-                    .ElasticResults.HitsMetadata.Total;
-                var numVazneIssue = (await SmlouvaRepo.Searching.SimpleSearchAsync($"ico:{Model.ICO} AND chyby:vazne AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}", 0, 0, SmlouvaRepo.Searching.OrderResult.FastestForScroll, exactNumOfResults: true))
-                    .ElasticResults.HitsMetadata.Total;
-            }
-            @if (numFatalIssue.Value > 0)
-            {
-                <p>
-                    Zásadní nedostatky za letošní rok v rozporu se zákonem jsme zjistili u
-                    <a class="text-danger" href="/hledatsmlouvy?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND chyby:zasadni AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}")">
-                        @if (numFatalIssue.Relation == TotalHitsRelation.GreaterThanOrEqualTo)
-                        {
-                            @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)numFatalIssue.Value, "<strong>0 </strong>smluv.", "<strong>jedné </strong>smlouvy.", "<strong>{0} </strong>smluv.", "<strong>více než {0:### ### ##0} </strong>smluv.")) }
-                        else
-                        {
-                            @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)numFatalIssue.Value, "<strong>0 </strong>smluv.", "<strong>jedné </strong>smlouvy.", "<strong>{0} </strong>smluv.", "<strong>{0:### ### ##0} </strong>smluv."))
-                        }
-                        Tyto smlouvy jsou velmi pravděpodobně neplatné.
-                    </a>
-                </p>
-            }
-            @if (numVazneIssue.Value > 0)
-            {
-                <p>
-                    @if (numFatalIssue.Value == 0)
-                    {
-                        <span>Vážné nedostatky za letošní rok jsme zjistili u</span>
-                    }
-                    else
-                    {
-                        <span>Zároveň vážné nedostatky za letošní rok jsme zjistili u</span>
-                    }
-
-                    <a class="text-danger" href="/hledatsmlouvy?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND chyby:vazne AND datumUzavreni:[{currentYear}-01-01 TO {currentYear + 1}-01-01}}")">
-                        @if (numFatalIssue.Relation == TotalHitsRelation.GreaterThanOrEqualTo)
-                        {
-                            @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)numVazneIssue.Value, "<strong>0 </strong>smluv.", "<strong>jedné </strong>smlouvy.", "<strong>{0} </strong>smluv.", "<strong>více než {0:### ### ##0} </strong>smluv.")) }
-                        else
-                        {
-                            @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)numVazneIssue.Value, "<strong>0 </strong>smluv.", "<strong>jedné </strong>smlouvy.", "<strong>{0} </strong>smluv.", "<strong>{0:### ### ##0} </strong>smluv."))
-                        }
-                    </a>
-                </p>
-            }
-
-
-            <p>
-                V roce @(currentSeasonYear) uzavřel @(Model.JsemOVM() ? "úřad" : "subjekt")
-                <a href="/hledat?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND datumUzavreni:[{currentSeasonYear}-01-01 TO {currentSeasonYear + 1}-01-01}}")">
-                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)seasonStat.PocetSmluv, "<strong>0 </strong>smluv", "<strong>jednu </strong>smlouvu", "<strong>{0} </strong>smluvy", "<strong>{0:### ### ##0} </strong>smluv"))
-                </a>
-                za <strong>@(Html.Raw(Smlouva.NicePrice(seasonStat.CelkovaHodnotaSmluv, html: true, shortFormat: true)))</strong>
-
-                @if (zmenaObjemuSmluv.percentage.HasValue)
-                {
-                    int predchoziRok = currentSeasonYear - 1;
-                    string baseText = $"o {zmenaObjemuSmluv.percentage?.ToString("P2")} oproti roku {predchoziRok}";
-                    string text;
-                    switch (zmenaObjemuSmluv.percentage)
-                    {
-                        case decimal n when n > 0:
-                            text = $"(nárůst {baseText})";
-                            break;
-                        case decimal n when n < 0:
-                            text = $"(pokles {baseText})";
-                            break;
-                        default:
-                            text = $"(stejný objem smluv jako v roce {predchoziRok})";
-                            break;
-                    }
-
-                    <span>@text</span>
-                }
-
-            </p>
-
-            <p>
-                V @(currentSeasonYear) neuvedl hodnotu smlouvy u
-                <a href="/hledat?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND hint.skrytaCena:1 AND datumUzavreni:[{currentSeasonYear}-01-01 TO {currentSeasonYear + 1}-01-01}}")">
-                    @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)seasonStat.PocetSmluvBezCeny, "<strong>0 </strong>smluv,", "<strong>jedné </strong>smlouvy,", "<strong>{0} </strong>smluv,", "<strong>{0:### ### ##0} </strong>smluv,"))
-                </a>což je celkem @(seasonStat.PercentSmluvBezCeny.ToString("P2")) ze všech.
-            </p>
-        </div>
-
-        <hr />
+   
 
         @* GRAFY *@
         <h4>Souhrnné statistiky pro @Model.Jmeno</h4>
@@ -287,7 +200,7 @@
                 </p>
             }
             <hr />
-
+            @*PER YEAR*@
             @for (int y = statistics.CurrentSeasonYear(); y > 2016; y--)
             {
                 <div>
@@ -381,6 +294,16 @@
                     </ul>
                 }
 
+
+                <h4>Závažné nedostatky v roce @y</h4>
+                <div>
+                    <partial name="_rizikoPart" model="@((firma:Model, rok:y))"/>
+
+                </div>
+
+
+
+
                 if (statistics[y].PoOblastech?.Count > 0)
                 {
                     var sortedData = statistics[y].PoOblastech
@@ -435,7 +358,7 @@
 
 
 
-            ReportDataSource<KeyValuePair<string, SimpleStat>> smluvniPartneriTemplate = new(
+            ReportDataSource<KeyValuePair<string, SimpleStat>> podleHodnotyTemplate = new(
                     new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
                             {
                                 Name = "Společnost",
@@ -484,55 +407,63 @@
 
             if (first.ContainsKey(y) && first[y].topPodleKc.Count>0)
             {
-                smluvniPartneriTemplate.Clear();
-                smluvniPartneriTemplate.AddRows(
+                podleHodnotyTemplate.Clear();
+                podleHodnotyTemplate.AddRows(
                     first[y].topPodleKc.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
                         );
-                string dleHodnoty = Html.DataToHTMLTable(smluvniPartneriTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
+                string dleHodnoty = Html.DataToHTMLTable(podleHodnotyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
-                smluvniPartneriTemplate.Clear();
-                smluvniPartneriTemplate.AddRows(
+                podleHodnotyTemplate.Clear();
+                podleHodnotyTemplate.AddRows(
                     first[y].topPodlePoctu.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
                 );
-                string dlePoctu = Html.DataToHTMLTable(smluvniPartneriTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
+                string dlePoctu = Html.DataToHTMLTable(podleHodnotyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
                         <h4>Statistika @(Model.JsemOVM()? "dodavatelů" : "odběratelů" )  @(Model.JsemOVM()? "úřadu" : "subjektu" ) v @y</h4>
                         <p>
-                            <partial name="WebUtil/HorizontalTabs" 
+                            @Html.Toggleable(
+                                dleHodnoty,"Podle hodnoty smluv",
+                                dlePoctu, "Podle počtu smluv"
+                            )
+@*                            <partial name="WebUtil/HorizontalTabs" 
                                 model="@(new TabsViewModel(new string[]{"podle hodnoty smluv","podle počtu smluv"}, new string[]{dleHodnoty,dlePoctu} ))" 
                             />
-
+*@
                         </p>
                     }
 
 
             if (second.ContainsKey(y) && second[y].topPodleKc.Count>0)
             {
-                smluvniPartneriTemplate.Clear();
-                smluvniPartneriTemplate.AddRows(
+                podleHodnotyTemplate.Clear();
+                podleHodnotyTemplate.AddRows(
                     second[y].topPodleKc.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
                         );
-                string dleHodnoty = Html.DataToHTMLTable(smluvniPartneriTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
+                string dleHodnoty = Html.DataToHTMLTable(podleHodnotyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
-                smluvniPartneriTemplate.Clear();
-                smluvniPartneriTemplate.AddRows(
+                podleHodnotyTemplate.Clear();
+                podleHodnotyTemplate.AddRows(
                     second[y].topPodlePoctu.Select(m => new KeyValuePair<string, SimpleStat>(m.ico, m.stat))
                 );
-                string dlePoctu = Html.DataToHTMLTable(smluvniPartneriTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
+                string dlePoctu = Html.DataToHTMLTable(podleHodnotyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
                         <h4>Statistika @(Model.JsemOVM()? "odběratelů" : "dodavatelů" ) @(Model.JsemOVM()? "úřadu" : "subjektu" ) v @y</h4>
                         <p>
-                            <partial name="WebUtil/HorizontalTabs" 
+                            @Html.Toggleable(
+                                dleHodnoty,"Podle hodnoty smluv",
+                                dlePoctu, "Podle počtu smluv"
+                            )
+@*                            <partial name="WebUtil/HorizontalTabs" 
                                 model="@(new TabsViewModel(new string[]{"podle hodnoty smluv","podle počtu smluv"}, new string[]{dleHodnoty,dlePoctu} ))" 
                             />
-
+*@
                         </p>
                     }
 
                 <hr />
             }
 
-            <hr />
+            <hr style="margin-top:50px" />
         }
 
         @*for y*@

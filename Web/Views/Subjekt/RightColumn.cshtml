@@ -124,7 +124,7 @@
         {
             var aktualniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value == null);
             var vymazaniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value != null);
-            if (aktualniMajitele.Count()>0)
+            if (aktualniMajitele.Count() > 0)
             {
                 <h4>@(aktualniMajitele.Count() >1 ? "Skuteční majitelé" : "Skutečný majitel")</h4>
                 <partial name="_renderSkutecniMajitele" model="@aktualniMajitele" />
@@ -132,7 +132,7 @@
             }
 
 
-            if (vymazaniMajitele.Count()>0)
+            if (vymazaniMajitele.Count() > 0)
             {
                 <h4>@(vymazaniMajitele.Count() >1 ? "Vymazaní majitelé" : "Vymazaný majitel")</h4>
                 <partial name="_renderSkutecniMajitele" model="@vymazaniMajitele" />
@@ -146,11 +146,11 @@
             @{
                 {
                     var wdModel = new WatchdogViewModel(null,
-                        $"ico:{Model.ICO}",
-                        $"Všechny změny o {TextUtil.ShortenText(Model.Jmeno, 30)}",
-                        prefillWDname: "Novinky pro {Model.Jmeno}",
-                        buttonCss: "btn btn-warning btn-xs",
-                        showWdList: false, preButtonText: "");
+                    $"ico:{Model.ICO}",
+                    $"Všechny změny o {TextUtil.ShortenText(Model.Jmeno, 30)}",
+                    prefillWDname: "Novinky pro {Model.Jmeno}",
+                    buttonCss: "btn btn-warning btn-xs",
+                    showWdList: false, preButtonText: "");
 
                     <partial name="WebUtil/AddWatchdog" model="wdModel" />
                 }
@@ -163,11 +163,11 @@
                 {
                     {
                         var wdModel = new WatchdogViewModel(null,
-                            $"holding:{Model.ICO}",
-                            $"Změny i {Devmasters.Lang.CS.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "v jedné podřízené organizaci", "ve {0} podřízených organizacích", "v {0} podřízených organizacích")}",
-                            prefillWDname: "Novinky pro {Model.Jmeno}",
-                            buttonCss: "btn btn-warning btn-xs",
-                            showWdList: false, preButtonText: "");
+                        $"holding:{Model.ICO}",
+                        $"Změny i {Devmasters.Lang.CS.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "v jedné podřízené organizaci", "ve {0} podřízených organizacích", "v {0} podřízených organizacích")}",
+                        prefillWDname: "Novinky pro {Model.Jmeno}",
+                        buttonCss: "btn btn-warning btn-xs",
+                        showWdList: false, preButtonText: "");
 
                         <partial name="WebUtil/AddWatchdog" model="wdModel" />
                     }
@@ -176,11 +176,11 @@
                 {
                     {
                         var wdModel = new WatchdogViewModel(null,
-                            $"holding:{Model.ICO}",
-                            $"Změny i {Devmasters.Lang.CS.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "v jedné dceřiné společnosti", "ve {0} dceřiných společnostech", "v {0} dceřiných společnostech")}",
-                            prefillWDname: "Novinky pro {Model.Jmeno}",
-                            buttonCss: "btn btn-warning btn-xs",
-                            showWdList: false, preButtonText: "");
+                        $"holding:{Model.ICO}",
+                        $"Změny i {Devmasters.Lang.CS.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "v jedné dceřiné společnosti", "ve {0} dceřiných společnostech", "v {0} dceřiných společnostech")}",
+                        prefillWDname: "Novinky pro {Model.Jmeno}",
+                        buttonCss: "btn btn-warning btn-xs",
+                        showWdList: false, preButtonText: "");
 
                         <partial name="WebUtil/AddWatchdog" model="wdModel" />
                     }
@@ -194,13 +194,19 @@
         <span class="text-muted">Chci sdílet s ostatními</span>
         <div>
             @{
-                var linkUrl = $"{ViewContext.GetBaseUrl()}/subjekt/{Model.ICO}"; 
+                var linkUrl = $"{ViewContext.GetBaseUrl()}/subjekt/{Model.ICO}";
             }
             <share-facebook url="@linkUrl"></share-facebook>
             <share-twitter url="@linkUrl" text="@($"{Model.Jmeno} na @HlidacStatu - {Model.InfoFacts().First().Render(false)}")"></share-twitter>
             <share-widget url="@linkUrl"></share-widget>
         </div>
     </div>
+
+    <div id="div_toc" class="sticky-top">
+        <p class="pt-4" style="display:none"><b>Obsah stránky</b></p>
+        <nav id="toc" ></nav>
+    </div>
+
 </div>
 
 
