@@ -176,6 +176,10 @@ namespace HlidacStatu.Web.Controllers
                     ViewBag.Title = "Senátoři";
                     ViewBag.SubTitle = "Seznam senátorů ze Senátu PČR";
                     return View("29_Senatori");
+                case 30:
+                    ViewBag.Title = "Covid podpory firmám a jednotlivcům 2020-2021";
+                    ViewBag.SubTitle = "Kompletní přehled finančních podpor z COVID programů";
+                    return View("30_COVIDPodpory");
                 default:
                     return NotFound();
             }

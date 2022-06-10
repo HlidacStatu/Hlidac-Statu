@@ -1,0 +1,71 @@
+﻿@using Nest;
+@using System.Linq;
+@using System.Threading;
+@using HlidacStatu.Datasets
+
+@using HlidacStatu.Repositories
+@using System.Linq
+@using HlidacStatu.Entities
+@using HlidacStatu.Extensions
+@using HlidacStatu.XLib.Render
+@using HlidacStatu.Repositories
+
+@{
+    Layout = "_ReportLayout";
+
+    DataSet ds = DataSet.CachedDatasets.Get("covid-podpora");
+
+    dynamic[] allData = ds.GetAllDataForQueryAsync("auto")
+        .Result
+        .Select(m => (dynamic)m)
+        .ToArray();
+
+    List<string> programyNames = allData
+        .Select(m => m.nazev_programu_vyzvy as string)
+        .Distinct()
+        .ToList();
+
+
+    var vyzvyStats = allData
+        .GroupBy(k => k.nazev_programu_vyzvy, v => (decimal)v.vyse_podpory, (k, v) => new { key = k, sum = v.Sum(s => s) })
+        .ToDictionary(k => k.key, v => v.sum);
+    var topPrijemciStats = allData
+        .Where(m => !string.IsNullOrEmpty((string)m.ico))
+        .GroupBy(k => k.ico, v => (decimal)v.vyse_podpory, (k, v) => new { key = k, sum = v.Sum(s => s) })
+        .ToDictionary(k => k.key, v => v.sum);
+
+    int pocet = 0;
+}
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <h2>Největší příjemci podpory celkem</h2>
+        <div class="row">
+            @foreach (var chunk in topPrijemciStats
+            .OrderByDescending(m => m.Value)
+            .Take(300)
+            .Chunk(100)
+            )
+            {
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    @foreach (var kvv in chunk)
+                    {
+                        pocet++;
+                        <div>
+                            <span class="number">@(pocet.ToString("000")).</span> <a href="/data/Hledat/covid-podpora?Q=ico.keyword%3A@(kvv.Key)">
+                                @(Firmy.GetJmeno(kvv.Key))
+                            </a>
+                            <b>@(HlidacStatu.Util.RenderData.NicePriceHtml((decimal)kvv.Value,shortFormat:true, showDecimal: HlidacStatu.Util.RenderData.ShowDecimalVal.AsNeeded))</b>
+
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+        <div class="clearfix"></div>
+        <hr />
+
+
+    </div>
+</div>

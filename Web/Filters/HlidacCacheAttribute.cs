@@ -1,10 +1,10 @@
+using System;
+using System.Text;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
-
-using System;
-using System.Text;
 
 namespace HlidacStatu.Web.Filters
 {
@@ -43,7 +43,10 @@ namespace HlidacStatu.Web.Filters
             if (cacheService is null)
                 Util.Consts.Logger.Error("IMemoryCache service was not found - HlidacCacheAttribute.cs:43");
 
-            cacheService.Set(key, context.Result, TimeSpan.FromSeconds(_duration));
+            if (System.Diagnostics.Debugger.IsAttached)
+                cacheService.Set(key, context.Result, TimeSpan.FromSeconds(2));
+            else
+                cacheService.Set(key, context.Result, TimeSpan.FromSeconds(_duration));
         }
 
         private string BuildCacheKey(HttpContext context)
