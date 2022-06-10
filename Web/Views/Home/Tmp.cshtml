@@ -6,6 +6,14 @@
     ViewBag.Title = "";
     
     //int b = 12 / aa;
+
+    
+    var tw = new HlidacStatu.Lib.Data.External.Twitter(HlidacStatu.Lib.Data.External.Twitter.TwAccount.HlidacW);
+
+    var twid = tw.NewThreadAsync("prvni tweet", "nasledovany druhym", "a mozna pribyde i treti", " a ctvrty").Result;
+
+    
+
 }
 @section Scripts
 {
@@ -14,7 +22,8 @@
 <h2>Current time: @(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff"))</h2>
 
 <hr />
-
+<h2>tweet @twid</h2>
+<hr />
 @*<form id="new-search-input2" class="new-search-input" method="get" action="/hledat">
     <div class="select2-wrapper">
         <div class="input-group input-group-lg">
