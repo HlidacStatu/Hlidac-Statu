@@ -54,10 +54,15 @@ namespace HlidacStatu.Repositories
                         break;
                     case AlertStatus.ToFail:
                         loggerAlert.Warning("{server} -> {changedStatus} (fail)", server.PublicUrl, status);
+                        var tw = new HlidacStatu.Lib.Data.External.Twitter(Lib.Data.External.Twitter.TwAccount.HlidacW);
+                        var tweetId = tw.NewTweetAsync($"Server {server.Name} je nedostupný. Více podrobností na {server.pageUrl}.").Result;
                         UptimeServerRepo.SaveAlert(serverId, status);
                         break;
                     case AlertStatus.BackOk:
                         loggerAlert.Warning("{server} -> {changedStatus} (backOk)", server.PublicUrl, status);
+
+                        var tw1 = new HlidacStatu.Lib.Data.External.Twitter(Lib.Data.External.Twitter.TwAccount.HlidacW);
+                        var tweet1Id = tw1.NewTweetAsync($"Server {server.Name} je opět dostupný. Více podrobností na {server.pageUrl}.").Result;
                         UptimeServerRepo.SaveAlert(serverId, status);
                         break;
                     case AlertStatus.BackOkFromSlow:
