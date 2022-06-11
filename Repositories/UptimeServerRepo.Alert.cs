@@ -75,7 +75,8 @@ namespace HlidacStatu.Repositories
                             UptimeServerRepo.SaveAlert(serverId, status);
                             if (lastUptimeStatus == UptimeServer.Availability.SimpleStatuses.Bad)
                             {
-                                twitter.NewTweetAsync($"Server {server.Name} je nedostupný. Více podrobností na {server.pageUrl}.").ConfigureAwait(false).GetAwaiter().GetResult();
+                                twitter.NewTweetAsync($"Server {server.Name} je nedostupný. Více podrobností na {server.pageUrl}.")
+                                    .ConfigureAwait(false).GetAwaiter().GetResult();
                             }
                         }
                         else if ((DateTime.Now - lastAlertSent.Value).TotalHours < 24)
@@ -87,7 +88,11 @@ namespace HlidacStatu.Repositories
                         {
                             //status je stejny vice nez 24 hodin, Bad status znovu Alertuj
                             UptimeServerRepo.SaveAlert(serverId, status);
-                            twitter.NewTweetAsync($"Server {server.Name} je stále nedostupný. Více podrobností na {server.pageUrl}.").ConfigureAwait(false).GetAwaiter().GetResult();
+                            if (lastUptimeStatus == UptimeServer.Availability.SimpleStatuses.Bad)
+                            {
+                                twitter.NewTweetAsync($"Server {server.Name} je stále nedostupný. Více podrobností na {server.pageUrl}.")
+                                        .ConfigureAwait(false).GetAwaiter().GetResult();
+                            }
                         }
 
                         return status;

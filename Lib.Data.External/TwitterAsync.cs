@@ -46,9 +46,13 @@ namespace HlidacStatu.Lib.Data.External
         }
 
 
-        private TwitterContext context = null;
+        private readonly TwitterContext context = null;
+
+        public TwitterContext Context { get => context; }
+
         public Twitter(TwAccount acc)
         {
+            //authHlidacW.Proxy = new System.Net.WebProxy("127.0.0.1", 8888);
             switch (acc)
             {
                 case TwAccount.HlidacStatu:
