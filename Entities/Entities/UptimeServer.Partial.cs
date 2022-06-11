@@ -55,5 +55,17 @@ namespace HlidacStatu.Entities
         public string pageUrlIdParams { get { return this.Id + "?h=" + this.Hash; } }
 
 
+        public UptimeSSL.Statuses? LastUpdateStatusToUptimeStatus()
+        {
+            if (this.LastUptimeStatus.HasValue)
+                return (UptimeSSL.Statuses)this.LastUptimeStatus.Value;
+            else return null;
+        }
+        public Availability.SimpleStatuses LastUptimeStatusToSimpleStatus()
+        {
+            return Availability.ToSimpleStatus(
+                this.LastUpdateStatusToUptimeStatus()
+                );
+        }
     }
 }

@@ -43,36 +43,73 @@ namespace HlidacStatu.Repositories
             {
                 var status = CheckServer(serverId);
                 var server = UptimeServerRepo.Load(serverId);
-                //do alert
+
+                AlertStatus? lastAlertStatus = (AlertStatus?)server.LastAlertedStatus;
+                DateTime? lastAlertSent = server.LastAlertSent;
+                UptimeServer.Availability.SimpleStatuses lastUptimeStatus = server.LastUptimeStatusToSimpleStatus();
+
+
+
+                //no alert necessary
                 switch (status)
                 {
                     case AlertStatus.NoData:
-                    case AlertStatus.NoChange:
-                        break;
                     case AlertStatus.ToSlow:
                         loggerAlert.Info("{server} -> {changedStatus} (slow)", server.PublicUrl, status);
+                        return status;
+                    case AlertStatus.BackOkFromSlow:
+                        loggerAlert.Info("{server} -> {changedStatus} (backOkFromSlow)", server.PublicUrl, status);
+                        return status;
+                    default:
                         break;
+                }
+
+
+                //think more if to alert or not
+                var twitter = new HlidacStatu.Lib.Data.External.Twitter(Lib.Data.External.Twitter.TwAccount.HlidacW);
+                switch (status)
+                {
+                    case AlertStatus.NoChange:
+                        if (lastAlertSent == null)
+                        { //zadny alert nebyl ulozeny, uloz posledni status a pri selhani udelej Alert
+                            UptimeServerRepo.SaveAlert(serverId, status);
+                            if (lastUptimeStatus == UptimeServer.Availability.SimpleStatuses.Bad)
+                            {
+                                twitter.NewTweetAsync($"Server {server.Name} je nedostupný. Více podrobností na {server.pageUrl}.").ConfigureAwait(false).GetAwaiter().GetResult();
+                            }
+                        }
+                        else if ((DateTime.Now - lastAlertSent.Value).TotalHours < 24)
+                        {
+                            //zadna zmena za 24 hodin, nic nedelej
+                            return status;
+                        }
+                        else
+                        {
+                            //status je stejny vice nez 24 hodin, Bad status znovu Alertuj
+                            UptimeServerRepo.SaveAlert(serverId, status);
+                            twitter.NewTweetAsync($"Server {server.Name} je stále nedostupný. Více podrobností na {server.pageUrl}.").ConfigureAwait(false).GetAwaiter().GetResult();
+                        }
+
+                        return status;
                     case AlertStatus.ToFail:
                         loggerAlert.Warning("{server} -> {changedStatus} (fail)", server.PublicUrl, status);
-                        var tw = new HlidacStatu.Lib.Data.External.Twitter(Lib.Data.External.Twitter.TwAccount.HlidacW);
-                        var tweetId = tw.NewTweetAsync($"Server {server.Name} je nedostupný. Více podrobností na {server.pageUrl}.").Result;
+                        
+                        
+                        twitter.NewTweetAsync($"Server {server.Name} je nedostupný. Více podrobností na {server.pageUrl}.").ConfigureAwait(false).GetAwaiter().GetResult();
                         UptimeServerRepo.SaveAlert(serverId, status);
                         break;
                     case AlertStatus.BackOk:
                         loggerAlert.Warning("{server} -> {changedStatus} (backOk)", server.PublicUrl, status);
 
-                        var tw1 = new HlidacStatu.Lib.Data.External.Twitter(Lib.Data.External.Twitter.TwAccount.HlidacW);
-                        var tweet1Id = tw1.NewTweetAsync($"Server {server.Name} je opět dostupný. Více podrobností na {server.pageUrl}.").Result;
+                        twitter.NewTweetAsync($"Server {server.Name} je opět dostupný. Více podrobností na {server.pageUrl}.").ConfigureAwait(false).GetAwaiter().GetResult();
                         UptimeServerRepo.SaveAlert(serverId, status);
-                        break;
-                    case AlertStatus.BackOkFromSlow:
-                        loggerAlert.Info("{server} -> {changedStatus} (backOkFromSlow)", server.PublicUrl, status);
                         break;
                     default:
                         break;
                 }
                 return status;
             }
+
 
             public static AlertStatus CheckServer(int serverId)
             {
@@ -85,7 +122,7 @@ namespace HlidacStatu.Repositories
                 if (avail.Length == 0)
                     return AlertStatus.NoData;
 
-                int numToAnalyze = 15;
+                int numToAnalyze = 10;
 
                 if (avail.Length < numToAnalyze )
                     return AlertStatus.NoChange;

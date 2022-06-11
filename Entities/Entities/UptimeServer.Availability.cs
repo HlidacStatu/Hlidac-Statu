@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System;
 
-using System;
+using Newtonsoft.Json;
 
 namespace HlidacStatu.Entities
 {
@@ -18,9 +18,9 @@ namespace HlidacStatu.Entities
 
             public static UptimeSSL.Statuses GetStatus(decimal responseInMs)
             {
-                if (responseInMs < OKLimit)
+                if (responseInMs < OKLimit*1000m)
                     return UptimeSSL.Statuses.OK;
-                else if (responseInMs < SlowLimit)
+                else if (responseInMs < SlowLimit * 1000m)
                     return UptimeSSL.Statuses.Pomalé;
                 else
                     return UptimeSSL.Statuses.Nedostupné;
@@ -67,14 +67,17 @@ namespace HlidacStatu.Entities
             {
                 return ToSimpleStatus(this.Status());
             }
-            public static SimpleStatuses ToSimpleStatus(UptimeSSL.Statuses status)
+            public static SimpleStatuses ToSimpleStatus(UptimeSSL.Statuses? status)
             {
+                if (status == null)
+                    return SimpleStatuses.Unknown;
+
                 switch (status)
                 {
                     case UptimeSSL.Statuses.OK:
                     case UptimeSSL.Statuses.Pomalé:
                         return SimpleStatuses.OK;
-                        //return SimpleStatuses.Slow;
+                    //return SimpleStatuses.Slow;
                     case UptimeSSL.Statuses.Nedostupné:
                     case UptimeSSL.Statuses.TimeOuted:
                     case UptimeSSL.Statuses.BadHttpCode:
@@ -86,19 +89,23 @@ namespace HlidacStatu.Entities
             }
             public UptimeSSL.Statuses Status()
             {
-                if (Response.HasValue == false)
-                {
-                    if (HttpStatusCode.HasValue)
-                    {
-                        if (HttpStatusCode.Value >= 300)
-                            return UptimeSSL.Statuses.Nedostupné;
-                        if (HttpStatusCode.Value >= 200)
-                            return UptimeSSL.Statuses.OK;
-                    }
-                    return UptimeSSL.Statuses.Unknown;
-                }
-                else
+                if (Response.HasValue)
                     return GetStatus(Response.Value);
+                else
+                    return ToStatus(HttpStatusCode);
+            }
+
+
+            public static UptimeSSL.Statuses ToStatus(int? httpResponseCode)
+            {
+                if (httpResponseCode.HasValue)
+                {
+                    if (httpResponseCode.Value >= 300)
+                        return UptimeSSL.Statuses.Nedostupné;
+                    if (httpResponseCode.Value >= 200)
+                        return UptimeSSL.Statuses.OK;
+                }
+                return UptimeSSL.Statuses.Unknown;
             }
 
             private string DebuggerDisplay
