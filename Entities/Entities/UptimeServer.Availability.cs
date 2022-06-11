@@ -89,6 +89,9 @@ namespace HlidacStatu.Entities
             }
             public UptimeSSL.Statuses Status()
             {
+                if (HttpStatusCode.HasValue && HttpStatusCode.Value >= 400)
+                    return ToStatus(HttpStatusCode);
+
                 if (Response.HasValue)
                     return GetStatus(Response.Value);
                 else
