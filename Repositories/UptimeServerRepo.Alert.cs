@@ -1,9 +1,9 @@
+using System;
+using System.Linq;
+
 using Devmasters.Log;
 
 using HlidacStatu.Entities;
-
-using System;
-using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
@@ -39,9 +39,9 @@ namespace HlidacStatu.Repositories
             }
 
 
-            public static AlertStatus CheckAndAlertServer(int serverId)
+            public static AlertStatus CheckAndAlertServer(int serverId, DateTime? fromD = null, DateTime? toD = null)
             {
-                var alertStatus = CheckAlertStatusForServerFromInflux(serverId);
+                var alertStatus = CheckAlertStatusForServerFromInflux(serverId,fromD, toD);
                 var serverLastSavedStatusInDb = UptimeServerRepo.Load(serverId);
 
                 AlertStatus? lastAlertStatus = (AlertStatus?)serverLastSavedStatusInDb.LastAlertedStatus;
@@ -98,8 +98,8 @@ namespace HlidacStatu.Repositories
                         return alertStatus;
                     case AlertStatus.ToFail:
                         loggerAlert.Warning("{server} -> {changedStatus} (fail)", serverLastSavedStatusInDb.PublicUrl, alertStatus);
-                        
-                        
+
+
                         twitter.NewTweetAsync($"Server {serverLastSavedStatusInDb.Name} je nedostupný. Více podrobností na {serverLastSavedStatusInDb.pageUrl}.")
                             .ConfigureAwait(false).GetAwaiter().GetResult();
                         UptimeServerRepo.SaveAlert(serverId, alertStatus);
@@ -118,11 +118,27 @@ namespace HlidacStatu.Repositories
             }
 
 
-            public static AlertStatus CheckAlertStatusForServerFromInflux(int serverId)
+            public static AlertStatus CheckAlertStatusForServerFromInflux(int serverId, DateTime? fromD = null, DateTime? toD = null)
             {
-                var server = UptimeServerRepo.ShortAvailability(new[] { serverId }, TimeSpan.FromMinutes(30));
+                var timeBack = TimeSpan.FromMinutes(30);
+                if (fromD.HasValue)
+                {
+                    timeBack = (DateTime.Now - fromD.Value).Add(TimeSpan.FromMinutes(10));
+                }
 
-                UptimeServer.Availability[] avail = server.First().Data
+                var serverAvail = UptimeServerRepo.ShortAvailability(new[] { serverId }, timeBack)
+                    .FirstOrDefault();
+                if (fromD.HasValue)
+                {
+                    toD = toD ?? DateTime.Now;
+
+                    serverAvail = new UptimeServer.HostAvailability(serverAvail.Host,
+                        serverAvail.Data.Where(m => m.Time >= fromD.Value && m.Time <= toD.Value)
+                        );
+
+                }
+
+                UptimeServer.Availability[] avail = serverAvail.Data
                     .OrderByDescending(o => o.Time)
                     .ToArray();
 
@@ -131,7 +147,7 @@ namespace HlidacStatu.Repositories
 
                 int numToAnalyze = 10;
 
-                if (avail.Length < numToAnalyze )
+                if (avail.Length < numToAnalyze)
                     return AlertStatus.NoChange;
 
 
@@ -143,7 +159,7 @@ namespace HlidacStatu.Repositories
             public static AlertStatus CheckServerLogic(int serverId, UptimeServer.Availability[] availabilities, int numToChange = 2)
             {
                 UptimeServer.Availability[] lastChecks = availabilities
-                    .OrderByDescending(o=>o.Time)
+                    .OrderByDescending(o => o.Time)
                     .Take(numToChange)
                     .ToArray();
 
@@ -159,8 +175,8 @@ namespace HlidacStatu.Repositories
                 var preLastChecksHaveSameStatus = preLastChecks.All(m => m.SimpleStatus() == lastChecks.First().SimpleStatus());
 
                 if (preLastChecksHaveSameStatus)
-                    return ChangeStatusLogic( 
-                        preLastChecks.First().SimpleStatus(), 
+                    return ChangeStatusLogic(
+                        preLastChecks.First().SimpleStatus(),
                         lastChecks.First().SimpleStatus()
                         );
 
@@ -184,7 +200,7 @@ namespace HlidacStatu.Repositories
                             mostDetectedStatus = null;
                             break;
                         case AlertStatus.ToSlow:
-                            mostDetectedStatus =  UptimeServer.Availability.SimpleStatuses.OK;
+                            mostDetectedStatus = UptimeServer.Availability.SimpleStatuses.OK;
                             break;
                         case AlertStatus.ToFail:
                             mostDetectedStatus = UptimeServer.Availability.SimpleStatuses.Bad;
@@ -201,8 +217,8 @@ namespace HlidacStatu.Repositories
                 }
 
                 //pokud stale nevim, rozhodni podle priorit
-                mostDetectedStatus = mostDetectedStatus  ?? mostDetectedStatus_all
-                                        .Select(m=>m.status)
+                mostDetectedStatus = mostDetectedStatus ?? mostDetectedStatus_all
+                                        .Select(m => m.status)
                                         .First();
 
 

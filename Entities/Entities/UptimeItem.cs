@@ -43,7 +43,7 @@ namespace HlidacStatu.Entities
             UptimeServer.Availability av = new UptimeServer.Availability();
             av.Time = this.CheckStart;
             av.HttpStatusCode = (int) this.ResponseCode;
-            av.Response = this.ResponseTimeInMs;
+            av.ResponseTimeInSec = this.ResponseTimeInMs/1000m; //convert To Sec
             return av;
 
         }

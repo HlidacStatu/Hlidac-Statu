@@ -37,7 +37,7 @@ namespace HlidacStatu.Entities
                         //~2019-08-11T20:10:00~2019-08-11T23:53:00~Zabbix reinstall | hostid~2019-08-11T23:58:00~2019-08-11T23:53:00~Zabbix reinstall |2019-08-11T23:53:00~2019-08-12T10:59:00 enable IP6 
                         try
                         {
-                            
+
 
                         }
                         catch (Exception e)
@@ -57,7 +57,7 @@ namespace HlidacStatu.Entities
                 foreach (var ign in ignoreIt)
                 {
                     if (
-                        (ign.hostid == hostid || ign.hostid==0)
+                        (ign.hostid == hostid || ign.hostid == 0)
                         && (ign.from < time && time < ign.to)
                         )
 
@@ -67,7 +67,11 @@ namespace HlidacStatu.Entities
                 }
                 return false;
             }
-
+            public HostAvailability(UptimeServer host, IEnumerable<Availability> data)
+            {
+                this.Host = host;
+                this.Data = data.ToArray();
+            }
             public HostAvailability(UptimeServer host, IEnumerable<UptimeMeasure> measures, bool fillMissingWithNull = false, DateTime? lastExpectedTime = null)
             {
                 if (lastExpectedTime.HasValue == false)
@@ -76,12 +80,12 @@ namespace HlidacStatu.Entities
                 Host = host;
                 List<Availability> avail = new List<Availability>();
                 UptimeMeasure first = measures.First();
-                Availability prev = new Availability() { Time = first.clock, Response = first.value };
+                Availability prev = new Availability() { Time = first.clock, ResponseTimeInSec = first.value };
                 avail.Add(prev);
                 var data = measures.OrderBy(m => m.clock).ToArray();
                 for (int i = 1; i < data.Length; i++)
                 {
-                    var curr = data[i];
+                    UptimeMeasure curr = data[i];
 
                     if (fillMissingWithNull)
                     {
@@ -93,13 +97,13 @@ namespace HlidacStatu.Entities
                                 DateTime prevTime = prev.Time.AddMinutes(j);
 
                                 if (SkipThisTime(Host.Id, prevTime) == false)
-                                    avail.Add(new Availability() { Time = prevTime, Response = Availability.TimeOuted });
+                                    avail.Add(new Availability() { Time = prevTime, ResponseTimeInSec = Availability.TimeOuted });
                             }
                         }
                     }
 
                     if (SkipThisTime(Host.Id, curr.clock) == false)
-                        avail.Add(new Availability() { Time = curr.clock, Response = curr.value, DownloadSpeed = null, HttpStatusCode = null });
+                        avail.Add(new Availability() { Time = curr.clock, ResponseTimeInSec = curr.value, DownloadSpeed = null, HttpStatusCode = null });
 
                     prev = avail.Last();
 
@@ -116,7 +120,7 @@ namespace HlidacStatu.Entities
                             DateTime prevTime = prev.Time.AddMinutes(j);
 
                             if (SkipThisTime(Host.Id, prevTime) == false)
-                                avail.Add(new Availability() { Time = prevTime, Response = Availability.TimeOuted });
+                                avail.Add(new Availability() { Time = prevTime, ResponseTimeInSec = Availability.TimeOuted });
                         }
                     }
 
@@ -174,7 +178,7 @@ namespace HlidacStatu.Entities
             {
                 var d = Data
                     .Where(m => m.Time > fromDate)
-                    .Select((v, index) => new[] { (long)(ToEpochLocalTime(v.Time)), (int)line, (decimal?)(v.Response) })
+                    .Select((v, index) => new[] { (long)(ToEpochLocalTime(v.Time)), (int)line, (decimal?)(v.ResponseTimeInSec) })
                     .ToArray();
 
                 return d;

@@ -16,11 +16,18 @@ namespace HlidacStatu.Entities
             public static decimal TimeOuted2 = 99.2m;
             public static decimal BadHttpCode = 99.1m;
 
-            public static UptimeSSL.Statuses GetStatus(decimal responseInMs)
+            public static UptimeSSL.Statuses GetStatus(decimal responseInSec)
             {
-                if (responseInMs < OKLimit*1000m)
+                if (responseInSec == TimeOuted)
+                    return UptimeSSL.Statuses.TimeOuted;
+                if (responseInSec == TimeOuted2)
+                    return UptimeSSL.Statuses.TimeOuted;
+                if (responseInSec == BadHttpCode)
+                    return UptimeSSL.Statuses.BadHttpCode;
+
+                if (responseInSec < OKLimit)
                     return UptimeSSL.Statuses.OK;
-                else if (responseInMs < SlowLimit * 1000m)
+                else if (responseInSec < SlowLimit )
                     return UptimeSSL.Statuses.Pomalé;
                 else
                     return UptimeSSL.Statuses.Nedostupné;
@@ -47,7 +54,7 @@ namespace HlidacStatu.Entities
             }
 
             public DateTime Time { get; set; }
-            public decimal? Response { get; set; } = null;
+            public decimal? ResponseTimeInSec { get; set; } = null;
 
             public int? HttpStatusCode { get; set; } = null;
 
@@ -92,8 +99,8 @@ namespace HlidacStatu.Entities
                 if (HttpStatusCode.HasValue && HttpStatusCode.Value >= 400)
                     return ToStatus(HttpStatusCode);
 
-                if (Response.HasValue)
-                    return GetStatus(Response.Value);
+                if (ResponseTimeInSec.HasValue)
+                    return GetStatus(ResponseTimeInSec.Value);
                 else
                     return ToStatus(HttpStatusCode);
             }
@@ -115,7 +122,7 @@ namespace HlidacStatu.Entities
             {
                 get
                 {
-                    return Time.ToString("M.d HH:mm:ss") + " " + (Response?.ToString() ?? "null") + " " + Status().ToString();
+                    return Time.ToString("M.d HH:mm:ss") + " " + (ResponseTimeInSec?.ToString() ?? "null") + " " + Status().ToString();
                 }
             }
         }
