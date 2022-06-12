@@ -164,68 +164,34 @@ namespace HlidacStatu.Repositories
                     .ToArray();
 
 
-                //same status for last 2/numToChange 
-                var lastChecksHaveSameStatus = lastChecks.All(m => m.SimpleStatus() == lastChecks.First().SimpleStatus());
+                var lastChecks_Majority = lastChecks
+                    .GroupBy(k => k.SimpleStatus(), (k, v) => new { status = k, percentage = ((decimal)v.Count()/(decimal)lastChecks.Count()) })
+                    .OrderByDescending(o => o.percentage)
+                    .ToArray();
 
-                if (lastChecksHaveSameStatus == false)
+
+                //zadny status neni majoritni
+                if (lastChecks_Majority.Count(m=>m.percentage>=0.8m) == 0)
                     return AlertStatus.NoChange;
+
+                var lastChecks_MajorityStatus = lastChecks_Majority.First().status;
 
                 UptimeServer.Availability[] preLastChecks = availabilities.Skip(numToChange).Take(numToChange).ToArray();
 
-                var preLastChecksHaveSameStatus = preLastChecks.All(m => m.SimpleStatus() == lastChecks.First().SimpleStatus());
-
-                if (preLastChecksHaveSameStatus)
-                    return ChangeStatusLogic(
-                        preLastChecks.First().SimpleStatus(),
-                        lastChecks.First().SimpleStatus()
-                        );
-
-                //predchozí se liší
-                //z predchoziho intervalu vezmu ten necastejsi stav co byl
-                preLastChecks = availabilities.Skip(numToChange).Take(numToChange).ToArray();
-                var mostDetectedStatus_all = preLastChecks
-                    .GroupBy(k => k.SimpleStatus(), (k, v) => new { status = k, count = v.Count() })
-                    .OrderByDescending(o => o.count).ThenByDescending(o => (int)o.status)
+                var prelastChecks_Majority = preLastChecks
+                    .GroupBy(k => k.SimpleStatus(), (k, v) => new { status = k, percentage = ((decimal)v.Count() / (decimal)lastChecks.Count()) })
+                    .OrderByDescending(o => o.percentage)
                     .ToArray();
 
-                UptimeServer.Availability.SimpleStatuses? mostDetectedStatus = null;
-                if (mostDetectedStatus_all.First().count == (numToChange * 2) / mostDetectedStatus_all.Count())
-                {
-                    //stejny pocet, rozhodni podle posledn�
-                    var lastAlertStatus = (Alert.AlertStatus?)UptimeServerRepo.Load(serverId).LastAlertedStatus;
-                    switch (lastAlertStatus)
-                    {
-                        case AlertStatus.NoData:
-                        case AlertStatus.NoChange:
-                            mostDetectedStatus = null;
-                            break;
-                        case AlertStatus.ToSlow:
-                            mostDetectedStatus = UptimeServer.Availability.SimpleStatuses.OK;
-                            break;
-                        case AlertStatus.ToFail:
-                            mostDetectedStatus = UptimeServer.Availability.SimpleStatuses.Bad;
-                            break;
-                        case AlertStatus.BackOk:
-                            mostDetectedStatus = UptimeServer.Availability.SimpleStatuses.OK;
-                            break;
-                        case AlertStatus.BackOkFromSlow:
-                            mostDetectedStatus = UptimeServer.Availability.SimpleStatuses.OK;
-                            break;
-                        default:
-                            break;
-                    }
-                }
+                if (prelastChecks_Majority.Count(m => m.percentage >= 0.5m) == 0)
+                    return AlertStatus.NoChange;
 
-                //pokud stale nevim, rozhodni podle priorit
-                mostDetectedStatus = mostDetectedStatus ?? mostDetectedStatus_all
-                                        .Select(m => m.status)
-                                        .First();
-
+                var prelastChecks_MajorityStatus = prelastChecks_Majority.First().status;
 
 
                 return ChangeStatusLogic(
-                    mostDetectedStatus.Value,
-                    lastChecks.First().SimpleStatus()
+                    prelastChecks_MajorityStatus,
+                    lastChecks_MajorityStatus
                     );
             }
             private static AlertStatus ChangeStatusLogic(UptimeServer.Availability.SimpleStatuses from, UptimeServer.Availability.SimpleStatuses to)
