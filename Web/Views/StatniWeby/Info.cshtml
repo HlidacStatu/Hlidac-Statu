@@ -22,11 +22,11 @@
     }
 
 
-        ViewBag.SocialShareTitle = $"Dostupnost webu " + Model.Name;
-        ViewBag.SocialShareText = Model.Description;
-        ViewBag.SocialShareType = "article";
-        ViewBag.SocialImage = $"https://www.hlidacstatu.cz/statniweby/banner/{Model.Id}?h={Model.Hash}";
-        ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1000\" />\n"
+    ViewBag.SocialShareTitle = $"Dostupnost webu " + Model.Name;
+    ViewBag.SocialShareText = Model.Description;
+    ViewBag.SocialShareType = "article";
+    ViewBag.SocialImage = Model.socialBannerUrl;
+    ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1000\" />\n"
                     + "<meta property=\"og:image:height\" content=\"1000\" />"
                     + "<meta property=\"og:image:type\" content=\"image/png\" />";
 
@@ -175,16 +175,17 @@ else
     </p>
         <hr />
 
-        <h2>
-            Graf dostupnosti <small>
-                Dostupnost
-                Období od @web.Statistics().MinDate.ToString("dd.MM.yyyy HH:mm")
-                do @web.Statistics().MaxDate.ToString("dd.MM.yyyy HH:mm")
-            </small>
-        </h2>
+        <h2>Dostupnost serveru</h2>
         <div class="row">
             <div class="col-xs-12">
-                @WebyChartUtil.Chart("w" + web.Host.Id, 7 * 24, 190, true, web.Host.Hash)
+                <h4>Za posledních 24 hodin</h4>
+                @WebyChartUtil.Chart("w" + web.Host.Id, 24, 100, true, web.Host.Hash)
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <h4>Za posledních 7 dní</h4>
+                @WebyChartUtil.Chart("w" + web.Host.Id, 7 * 24, 100, true, web.Host.Hash)
             </div>
         </div>
 

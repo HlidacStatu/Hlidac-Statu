@@ -10,8 +10,8 @@ namespace HlidacStatu.Entities
         {
 
 
-            public DateTime MinDate { get; private set; } = DateTime.MinValue;
-            public DateTime MaxDate { get; private set; } = DateTime.MaxValue;
+            public DateTime MinDate { get;  set; } = DateTime.MinValue;
+            public DateTime MaxDate { get; set; } = DateTime.MaxValue;
 
             public MeasureStatus<TimeSpan> DurationTotal { get; private set; } = new MeasureStatus<TimeSpan>(TimeSpan.Zero, TimeSpan.Zero, TimeSpan.Zero);
             public MeasureStatus<TimeSpan> LongestDuration { get; private set; } = new MeasureStatus<TimeSpan>(TimeSpan.Zero, TimeSpan.Zero, TimeSpan.Zero);
@@ -19,6 +19,9 @@ namespace HlidacStatu.Entities
 
 
             IEnumerable<Availability> data;
+            public AvailabilityStatistics()
+            { }
+
             public AvailabilityStatistics(IEnumerable<Availability> availData)
             {
                 if (availData == null)

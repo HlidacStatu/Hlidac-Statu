@@ -100,14 +100,16 @@ namespace HlidacStatu.Repositories
                         loggerAlert.Warning("{server} -> {changedStatus} (fail)", serverLastSavedStatusInDb.PublicUrl, alertStatus);
                         
                         
-                        twitter.NewTweetAsync($"Server {serverLastSavedStatusInDb.Name} je nedostupný. Více podrobností na {serverLastSavedStatusInDb.pageUrl}.").ConfigureAwait(false).GetAwaiter().GetResult();
+                        twitter.NewTweetAsync($"Server {serverLastSavedStatusInDb.Name} je nedostupný. Více podrobností na {serverLastSavedStatusInDb.pageUrl}.")
+                            .ConfigureAwait(false).GetAwaiter().GetResult();
                         UptimeServerRepo.SaveAlert(serverId, alertStatus);
                         break;
                     case AlertStatus.BackOk:
                         loggerAlert.Warning("{server} -> {changedStatus} (backOk)", serverLastSavedStatusInDb.PublicUrl, alertStatus);
-
-                        twitter.NewTweetAsync($"Server {serverLastSavedStatusInDb.Name} je opět dostupný. Více podrobností na {serverLastSavedStatusInDb.pageUrl}.").ConfigureAwait(false).GetAwaiter().GetResult();
                         UptimeServerRepo.SaveAlert(serverId, alertStatus);
+
+                        twitter.NewTweetAsync($"Server {serverLastSavedStatusInDb.Name} je opět dostupný. Více podrobností na {serverLastSavedStatusInDb.pageUrl}.")
+                            .ConfigureAwait(false).GetAwaiter().GetResult();
                         break;
                     default:
                         break;

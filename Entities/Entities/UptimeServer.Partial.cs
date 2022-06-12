@@ -52,6 +52,7 @@ namespace HlidacStatu.Entities
 
         public string opendataUrl { get { return "https://www.hlidacstatu.cz/api/v2/Weby/" + this.Id; } }
         public string pageUrl { get { return "https://www.hlidacstatu.cz/StatniWeby/Info/" + this.pageUrlIdParams; } }
+        public string socialBannerUrl { get { return "https://www.hlidacstatu.cz/StatniWeby/banner/" + this.pageUrlIdParams; } }
         public string pageUrlIdParams { get { return this.Id + "?h=" + this.Hash; } }
 
 
