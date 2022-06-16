@@ -83,6 +83,8 @@ Cookie: _ga=GA1.2.1208733850.1580933391; JSessionID=R3890696782
                     ).Result;
 
                 var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<OVMSimple>>(json);
+                if (res == null)
+                    break;
                 if (res.seznam.Count() == 0)
                     break;
                 ovms.AddRange(res.seznam);
