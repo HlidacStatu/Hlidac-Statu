@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Devmasters.DT" Version="4.0.3" />
+    <PackageReference Include="Devmasters.DT" Version="4.0.4" />
   </ItemGroup>
 
 </Project>
