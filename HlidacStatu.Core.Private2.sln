@@ -152,7 +152,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GlobalTests", "..\Hlidac-St
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UptimerSSLCheck", "..\Hlidac-Statu-Private\Docker\UptimerSSLCheck\UptimerSSLCheck.csproj", "{69D089BC-461A-4A47-AB1B-9CB68EF37CE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FullTextSearchTests", "FullTextSearchTests\FullTextSearchTests.csproj", "{4C8C6620-7243-46C3-B40A-2E460F62B939}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FullTextSearchTests", "FullTextSearchTests\FullTextSearchTests.csproj", "{4C8C6620-7243-46C3-B40A-2E460F62B939}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IPv6Tester", "..\Hlidac-Statu-Private\IPv6Tester\IPv6Tester.csproj", "{90787998-9A85-4E6E-89A4-7E7E81BA01AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -368,6 +370,10 @@ Global
 		{4C8C6620-7243-46C3-B40A-2E460F62B939}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C8C6620-7243-46C3-B40A-2E460F62B939}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C8C6620-7243-46C3-B40A-2E460F62B939}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90787998-9A85-4E6E-89A4-7E7E81BA01AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90787998-9A85-4E6E-89A4-7E7E81BA01AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90787998-9A85-4E6E-89A4-7E7E81BA01AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90787998-9A85-4E6E-89A4-7E7E81BA01AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -407,6 +413,7 @@ Global
 		{4ADFB805-8111-42F1-BA92-F847ED3A2F10} = {1685E375-CA78-4833-9208-4757692F4B5E}
 		{69D089BC-461A-4A47-AB1B-9CB68EF37CE7} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{4C8C6620-7243-46C3-B40A-2E460F62B939} = {1685E375-CA78-4833-9208-4757692F4B5E}
+		{90787998-9A85-4E6E-89A4-7E7E81BA01AF} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
