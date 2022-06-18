@@ -187,6 +187,14 @@ namespace HlidacStatu.Repositories
             };
 
         }
+        public static int PocetPodrizenychSubjektu(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
+        {
+            //firma.UpdateVazbyFromDB(); //nemelo by tu byt.
+            return firma.AktualniVazby(minAktualnost,refresh)?
+                .Select(m=>m.To.UniqId)?
+                .Distinct()?
+                .Count() ?? 0;
+        }
 
         public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
         {

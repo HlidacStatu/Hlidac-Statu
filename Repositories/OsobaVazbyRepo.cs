@@ -209,7 +209,15 @@ namespace HlidacStatu.Repositories
             return osoba._vazby;
         }
 
-        
+        public static int PocetPodrizenychSubjektu(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh = false)
+        {
+            //firma.UpdateVazbyFromDB(); //nemelo by tu byt.
+            return osoba.AktualniVazby(minAktualnost, refresh)?
+                .Select(m => m.To.UniqId)?
+                .Distinct()?
+                .Count() ?? 0;
+        }
+
         public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh=false)
         {
             return Relation.AktualniVazby(osoba.Vazby(refresh), minAktualnost, osoba.VazbyRootEdge());

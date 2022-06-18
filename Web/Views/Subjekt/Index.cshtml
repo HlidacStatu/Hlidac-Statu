@@ -395,7 +395,7 @@
                 {
                     <p>
                         <b>@Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount, "Jedna podřízená organizace", "{0} podřízená organizace", "{0} podřízených organizací")</b>
-                        (z celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Length))
+                        (z celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny)))
                         úřadu @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
                         @Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount,
@@ -418,7 +418,7 @@
                 {
                     <p>
                         <b>@Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount, "Jedna dceřiná společnost", "{0} dceřiné společnosti", "{0} dceřiných společností")</b>
-                        (z celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Length))
+                        (z celkem @HlidacStatu.Util.RenderData.NiceNumber(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny)))
                         firmy @Devmasters.TextUtil.ShortenText(Model.Jmeno, 35)
 
                         @Devmasters.Lang.CS.Plural.Get(subjectsWithSubsidiesCount,
@@ -730,13 +730,13 @@ StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
                 if (Model.PatrimStatu())
                 {
                     <span>
-                        Řídí <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací").</a>
+                        Řídí <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny), "jednu podřízenou organizaci", "{0} podřízené organizace", "{0} podřízených organizací").</a>
                     </span>
                 }
                 else
                 {
                     <span>
-                        Řídí <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů").</a>
+                        Řídí <a href="/subjekt/Vazby/@Model.ICO">@Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny), "jeden podřízený subjekt", "{0} podřízené subjekty", "{0} podřízených subjektů").</a>
                     </span>
                 }
             }

@@ -36,7 +36,7 @@
                     }
                     else if (item.AktualniVazby(Relation.AktualnostType.Nedavny).Length > 2)
                     {
-                        <span>@Devmasters.Lang.CS.Plural.Get(item.Vazby().Length - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb")</span>
+                        <span>@Devmasters.Lang.CS.Plural.Get(item.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny) - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb")</span>
                     }
                 }
             </td>

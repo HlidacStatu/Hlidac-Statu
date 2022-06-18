@@ -112,7 +112,7 @@
                 {
                     {
                         var wdModel = new WatchdogViewModel(null, $"holding:{Model.ICO}",
-                            $"Změny i {Devmasters.Lang.CS.Plural.Get(Model.AktualniVazby(Relation.AktualnostType.Nedavny).Count(), "v jedné dceřiné společnosti", "ve {0} dceřiných společnostech", "v {0} dceřiných společnostech")}",
+                            $"Změny i {Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny), "v jedné dceřiné společnosti", "ve {0} dceřiných společnostech", "v {0} dceřiných společnostech")}",
                             prefillWDname: $"Novinky pro {Model.Jmeno}",
                             buttonCss: "btn btn-warning btn-xs",
                             showWdList: false,

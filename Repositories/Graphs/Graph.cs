@@ -289,8 +289,8 @@ namespace HlidacStatu.Repositories
                             if (relsForIco
                                 .Any(rr =>
                                     rr != r
-                                    && rr.fromDate < r.fromDate
-                                    && (rr.toDate > r.toDate || rr.toDate.HasValue == false)
+                                    && rr.fromDate <= r.fromDate
+                                    && (rr.toDate >= r.toDate || rr.toDate.HasValue == false)
                                 )
                             )
                             {
@@ -301,6 +301,8 @@ namespace HlidacStatu.Repositories
                         }
                     }
                 }
+
+
 
                 foreach (AngazovanostData ang in filteredRels.OrderBy(m => m.kod_ang))
                 {
@@ -333,6 +335,9 @@ namespace HlidacStatu.Repositories
                         relations.Add(rel);
                 }
             }
+
+
+            relations = HlidacStatu.Datastructures.Graphs.Graph.Edge.GetLongestEdges(relations).ToList();
 
             if (goDeep && relations.Count > 0)
             {
