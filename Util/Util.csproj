@@ -25,7 +25,7 @@
 		<PackageReference Include="Devmasters.Lang" Version="4.0.1" />
 		<PackageReference Include="Devmasters.Logging" Version="4.0.1" />
 		<PackageReference Include="Devmasters.Net" Version="4.0.1" />
-		<PackageReference Include="DnsClient" Version="1.6.0" />
+		<PackageReference Include="DnsClient" Version="1.6.1" />
 		<PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
 		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
