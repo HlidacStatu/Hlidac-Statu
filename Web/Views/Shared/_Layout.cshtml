@@ -568,23 +568,25 @@
             string[] colors = new[] {"primary","success","danger","warning","info","dark" };
             string[] txts = new[]
             {
-                "Analýza obvyklých cenových relacích za ICT služby.",
-                "Cenové analýzy Hlídače státu: unikátní nástroj pro státní správu i dodavatele.",
-                "Detailní přehled obvyklých cen za služby v ICT oblasti.",
-                "Kdo, s kým a za kolik v IT? My to víme a nyní můžete i vy!",
+                "Analýza <b>obvyklých cenových relacích za ICT služby</b>. Unikátní analýza opět ke stažení.",
+                "Cenové analýzy Hlídače státu: <b>unikátní nástroj</b> pro státní správu i dodavatele.",
+                "Detailní přehled obvyklých cen za služby v ICT oblasti <b>aktuálně k dispozici</b>.",
+                "Kdo, s kým a za kolik v IT? My to víme a <b>nyní můžete i vy</b>!",
                 "Navazujeme na přehled obvyklých cen ICT prací od Ministerstva vnitra: analýza cen ICT služeb a prací.",
-                "Přehled obvyklých cen IT prací. Chcete znát ceny vašich konkurentů na trhu?",
+                "Přehled obvyklých cen IT prací. <b>Chcete znát ceny vašich konkurentů na trhu?</b>",
                 "Nejrozsáhlejší a nejspolehlivější analýza jednotkových cen ICT prací na českém trhu.",
                 "Pomoc úřadům i dodavatelům ve výběrových řízeních - Přehled obvyklých cen ICT prací.",
-                "Přehled a rozptyl jednotkových cen ICT služeb je na českém trhu",
-                "Přehled obvyklých cen IT prací ve státní správě. Jistota při zadávání veřejných zakázek.",
-                "Přehled obvyklých cen IT prací. Znáte ceny vašich konkurentů? My ano.",
-            };    
+                "Přehled a rozptyl jednotkových cen ICT služeb je na českém trhu.",
+                "Přehled obvyklých cen IT prací ve státní správě. <b>Jistota při zadávání veřejných zakázek.</b>",
+                "Přehled obvyklých cen IT prací. <b>Znáte ceny vašich konkurentů?</b> My ano. Můžete i vy!",
+    };
+            int tipIndex = 0;
+            string tipTxt = txts.TipOfTheDay(out tipIndex);
 
             <div class="fixed-bottom alert alert-@(colors.TipOfTheDay()) adlinemsg " role="alert" style="margin-bottom:0">
                 <div class="text-center center-block adlinemsgtxt " style="">
-                    @Html.Raw(txts.TipOfTheDay())
-                    <a class="btn btn-dark btn-sm" href="https://kristalova.lupa.cz/hlasovani/?setSubjects=1642" role="button"><b>Více 👉</b></a>
+                    @Html.Raw(tipTxt)
+                    <a class="btn btn-dark btn-sm" href="https://ceny.analyzy.hlidacstatu.cz/?utm_source=bottomAd&utm_medium=referral&utm_campaign=ad@(tipIndex)" role="button"><b>Více 👉</b></a>
                 </div>
             </div>
             <div style="margin-bottom:50px">&nbsp;</div>
