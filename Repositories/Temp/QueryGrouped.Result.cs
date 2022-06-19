@@ -12,6 +12,30 @@ namespace HlidacStatu.Repositories.ES
             public List<StatisticsSubjectPerYear<SimpleStat>> TopPodlePoctu { get; set; }
             public List<StatisticsSubjectPerYear<SimpleStat>> TopPodleKc { get; set; }
 
+            public List<StatisticsSubjectPerYear<SimpleStat>> CombinedTop(int count = 10)
+            {
+                List<StatisticsSubjectPerYear<SimpleStat>> res = new List<StatisticsSubjectPerYear<SimpleStat>>();
+                int idx = 0;
+                do
+                {
+                    if (idx < TopPodleKc.Count )
+                    {
+                        if (!res.Any(m => m.ICO == this.TopPodleKc[idx].ICO))
+                            res.Add(this.TopPodleKc[idx]);
+                    }
+                    if (idx < TopPodlePoctu.Count && res.Count < count)
+                    {
+                        if (!res.Any(m => m.ICO == this.TopPodlePoctu[idx].ICO))
+                            res.Add(this.TopPodlePoctu[idx]);
+                    }
+
+                    idx++;
+
+                } while (res.Count < count && (idx < TopPodlePoctu.Count || idx < TopPodleKc.Count));
+
+                return res;
+            }
+
         }
         public class ResultPerYear
         {
@@ -41,8 +65,8 @@ namespace HlidacStatu.Repositories.ES
 
         public class ResultCombined
         {
-            public ResultPerIco PerIco { get; set; }
-            public ResultPerYear PerYear { get; set; }
+            public ResultPerIco PerIco { get; set; } = new ResultPerIco();
+            public ResultPerYear PerYear { get; set; } = new ResultPerYear();
         }
 
     }

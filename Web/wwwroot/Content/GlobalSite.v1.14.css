@@ -1847,6 +1847,22 @@ hr {
     opacity: 1;
 }
 
+    hr.gray {
+        border-top-color: #E0E6ED
+    }
+
+    hr.dotted {
+        border-top: 3px dotted ;
+        margin-top: 24px;
+        margin-bottom: 34px;
+    }
+
+    hr.double {
+        border-top: 3px  double;
+        margin-top: 24px;
+        margin-bottom: 34px;
+    }
+
 td {
     padding-left: 10px;
 }

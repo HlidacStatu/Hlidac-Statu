@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace HlidacStatu.Repositories.Searching
 {
@@ -12,36 +13,39 @@ namespace HlidacStatu.Repositories.Searching
         {
             return $"{property}:{(includefromDate ? "[" : "{")}{fromDate:yyyy-MM-dd} TO {toDate:yyyy-MM-dd}{(includeToDate ? "]" : "}")}";
         }
-
-        public static string ModifyQueryAND(string origQuery, string anotherCondition)
+        public static string ModifyQueryAND(params string[] queryParts)
         {
-            if (string.IsNullOrEmpty(origQuery))
-                return anotherCondition;
-            else
-            {
-                var s1 = origQuery.Trim();
-                var s2 = anotherCondition.Trim();
-                if (!s1.StartsWith("(") && !s1.EndsWith("("))
-                    s1 = $"( {s1} )";
-                if (!s2.StartsWith("(") && !s2.EndsWith("("))
-                    s2 = $"( {s2} )";
-                return $"(  {s1}  AND  {s2}  )";
-            }
+            return ModifyQuery("AND", queryParts);
         }
-        public static string ModifyQueryOR(string origQuery, string anotherCondition)
+        public static string ModifyQueryOR(params string[] queryParts)
         {
-            if (string.IsNullOrEmpty(origQuery))
-                return anotherCondition;
-            else
+            return ModifyQuery("OR", queryParts);
+        }
+        private static string ModifyQuery(string logicOperator, params string[] queryParts)
+        {
+            List<string> q = new List<string>();
+            if (queryParts == null)
+                return string.Empty;
+            if (queryParts.Length == 0)
+                return string.Empty;
+
+            foreach (string part in queryParts)
             {
-                var s1 = origQuery.Trim();
-                var s2 = anotherCondition.Trim();
-                if (!s1.StartsWith("(") && !s1.EndsWith("("))
-                    s1 = $"( {s1} )";
-                if (!s2.StartsWith("(") && !s2.EndsWith("("))
-                    s2 = $"( {s2} )";
-                return string.Format($"(  {s1}  OR  {s2}  )", origQuery, anotherCondition);
+                var nq = part.Trim();
+                if (string.IsNullOrEmpty(nq))
+                    continue;
+
+                if (!nq.StartsWith("(") && !nq.EndsWith(")"))
+                    nq = $"( {nq} )";
+
+                q.Add(nq);
             }
+            if (q.Count == 0)
+                return string.Empty;
+            var res = $"( " + string.Join($" {logicOperator} ", q) + " )";
+
+            return res;
         }
     }
+
 }

@@ -145,30 +145,39 @@ namespace HlidacStatu.Repositories.ES
             return new StatisticsPerYear<SimpleStat>(result);
         }
 
-        public static Task<Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>> TopOdberatelePerYearAsync(
+        public static async Task<Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>> 
+            TopOdberatelePerYearAsync(
                 string query,
                 int[] interestedInYearsOnly,
                 int maxList = 50
-            ) => _topSmluvniStranyPerYearAsync("platce.ico", query, interestedInYearsOnly, maxList);
+            ) => await _topSmluvniStranyPerYearAsync("platce.ico", query, interestedInYearsOnly, maxList);
 
 
-        public static Task<Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>> TopDodavatelePerYearAsync(
+        public static async Task<Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>> 
+            TopDodavatelePerYearAsync(
                 string query,
                 int[] interestedInYearsOnly,
                 int maxList = 50
-            ) => _topSmluvniStranyPerYearAsync("prijemce.ico", query, interestedInYearsOnly, maxList);
+            ) => await _topSmluvniStranyPerYearAsync("prijemce.ico", query, interestedInYearsOnly, maxList);
 
-        public static Task<ResultCombined> TopDodavatelePerYearStatsAsync(
+        public static async Task<ResultCombined> TopDodavatelePerYearStatsAsync(
                 string query,
                 int[] interestedInYearsOnly,
-                int maxList = 50
-            ) => _topSmluvniStranyPerYearStatsAsync("prijemce.ico", query, interestedInYearsOnly, maxList);
+                int maxList = 9000
+            ) => await _topSmluvniStranyPerYearStatsAsync("prijemce.ico", query, interestedInYearsOnly, maxList);
 
-        private static async Task<Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>> _topSmluvniStranyPerYearAsync(
+        public static async Task<ResultCombined> TopOdberatelePerYearStatsAsync(
+            string query,
+            int[] interestedInYearsOnly,
+            int maxList = 9000
+            ) => await _topSmluvniStranyPerYearStatsAsync("platce.ico", query, interestedInYearsOnly, maxList);
+
+        private static async Task<Dictionary<int, (List<(string ico, SimpleStat stat)> topPodlePoctu, List<(string ico, SimpleStat stat)> topPodleKc)>> 
+            _topSmluvniStranyPerYearAsync(
                 string property,
                 string query,
                 int[] interestedInYearsOnly,
-                int maxList
+                int maxList = 9000
             )
         {
             AggregationContainerDescriptor<Smlouva> aggs = new AggregationContainerDescriptor<Smlouva>();
@@ -286,7 +295,7 @@ namespace HlidacStatu.Repositories.ES
             //convert to 
             List<HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<SimpleStat>> perIcoStatPodlePoctu
                 = new List<StatisticsSubjectPerYear<SimpleStat>>();
-            foreach (string ico in r1.Values.Select(m => m.topPodlePoctu.SelectMany(s => s.ico)).Distinct())
+            foreach (string ico in r1.Values.SelectMany(m => m.topPodlePoctu.Select(s => s.ico)).Distinct())
             {
                 StatisticsSubjectPerYear<SimpleStat> forIco = new StatisticsSubjectPerYear<SimpleStat>();
                 forIco.ICO = ico;
@@ -303,7 +312,7 @@ namespace HlidacStatu.Repositories.ES
 
             List<HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<SimpleStat>> perIcoStatPodleKc
                 = new List<StatisticsSubjectPerYear<SimpleStat>>();
-            foreach (string ico in r1.Values.Select(m => m.topPodleKc.SelectMany(s => s.ico)).Distinct())
+            foreach (string ico in r1.Values.SelectMany(m => m.topPodleKc.Select(s => s.ico)).Distinct())
             {
                 StatisticsSubjectPerYear<SimpleStat> forIco = new StatisticsSubjectPerYear<SimpleStat>();
                 forIco.ICO = ico;
@@ -315,7 +324,7 @@ namespace HlidacStatu.Repositories.ES
                         forIco[y] = new SimpleStat();
                 }
 
-                perIcoStatPodlePoctu.Add(forIco);
+                perIcoStatPodleKc.Add(forIco);
             }
 
             res.PerIco.TopPodlePoctu = perIcoStatPodlePoctu;

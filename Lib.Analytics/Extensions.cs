@@ -10,9 +10,12 @@ namespace HlidacStatu.Lib.Analytics
             return StatisticsPerYear<T>.AggregateStats(statistics, onlyYears);
         }
 
-        public static string Formatted(this SimpleStat item, bool html = true, string url = null, bool twoLines = false)
+        public static string Formatted(this SimpleStat item, bool html = true, string url = null, bool twoLines = false, string textIfZero = null)
         {
-
+            if (item.Pocet == 0 && textIfZero != null)
+            {
+                return textIfZero;
+            }
             if (html && !string.IsNullOrEmpty(url))
             {
                 var s = "<a href='" + url + "'>" +

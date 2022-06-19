@@ -1,0 +1,268 @@
+﻿@model HlidacStatu.Lib.Analysis.TemplatedQuery
+@using System.Linq
+@using Devmasters.Enums
+@using HlidacStatu.Entities
+@using HlidacStatu.Lib.Analytics
+@using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Statistics
+@using HlidacStatu.XLib.Render
+
+
+@{
+    int[] Years = HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Where(m => m > 2018).ToArray();
+
+    ViewBag.Title = Model.Text ?? $"Hlídač státu: Analýza příjemců peněz pro dotaz \"{Model.Query}\"";
+
+    HlidacStatu.Lib.Analytics.StatisticsPerYear<Smlouva.Statistics.Data> statistics =
+        new StatisticsPerYear<Smlouva.Statistics.Data>(await SmlouvaStatistics.CalculateAsync(Model.Query));
+
+    var statisticsAfter2016 = statistics
+        .Where(s => statistics.YearsAfter2016().Contains(s.Year))
+        .OrderBy(s => s.Year).ToList();
+
+    //var seasonStat = statistics.CurrentSeasonStatistics();
+    var currentSeasonYear = statistics.CurrentSeasonYear();
+    //var zmenaObjemuSmluv = statistics.ChangeBetweenYears(currentSeasonYear - 1, currentSeasonYear, s => s.CelkovaHodnotaSmluv);
+}
+
+
+@{
+    var topDodavateleFull = await HlidacStatu.Repositories.ES.QueryGrouped.TopDodavatelePerYearStatsAsync(
+                Model.Query, Years);
+    var topDodavatele = topDodavateleFull.PerIco.CombinedTop(50);
+    var topDodavateleCurrSeason = topDodavateleFull.PerYear.CombinedTop(currentSeasonYear, 10);
+
+
+    var topZadavateleFull = await HlidacStatu.Repositories.ES.QueryGrouped.TopOdberatelePerYearStatsAsync(
+                Model.Query, Years);
+
+    var topZadavatele = topZadavateleFull.PerIco.CombinedTop(50);
+    var topZadavateleCurrSeason = topZadavateleFull.PerYear.CombinedTop(currentSeasonYear, 10);
+
+}
+<h1>
+    Analýza dotazu v registru smluv
+    <small>@Model.Query</small>
+</h1>
+@{
+    var res = await HlidacStatu.XLib.Search
+        .GeneralSearchAsync(Model.Query, 1, 1, false, "");
+}
+<p>
+    <a href="/hledatSmlouvy?q=@(System.Net.WebUtility.UrlEncode(Model.Query))" class="btn btn-primary btn-sm">Zobrazit výsledky tohoto dotazu</a>
+    (v registru smluv @Devmasters.Lang.CS.Plural.GetWithZero(res.Smlouvy.Total,"nic nenalezeno","nalezen 1 výsledek","nalezeny {0} výsledky","nalezeno {0} výsledků")).
+</p>
+</p>
+
+<hr class="double" />
+
+@{
+    //Graf hodnota smluv
+    var hodnotaSmluvGraphData = new Series[]
+    {
+        new()
+        {
+            Name = "Hodnota nalezených smluv",
+            Type = Series.SeriesType.column,
+            Data = statisticsAfter2016
+                .Select(x => new SeriesData(x.Year, x.Value.CelkovaHodnotaSmluv)).ToArray(),
+            SeriesTooltip = new SeriesTooltip()
+            {
+                ValueSuffix = " Kč"
+            }
+        },
+        new()
+        {
+            Name = "Hodnota smluv se soukromými subjekty",
+            Type = Series.SeriesType.column,
+            Data = statisticsAfter2016
+                .Select(x => new SeriesData(x.Year, x.Value.CelkovaHodnotaSmluvSeSoukrSubj)).ToArray(),
+            SeriesTooltip = new SeriesTooltip()
+            {
+                ValueSuffix = " Kč"
+            }
+        },
+        new()
+        {
+            Name = "Počet smluv bez ceny",
+            Data = statisticsAfter2016
+                .Select(x => new SeriesData(x.Year, x.Value.PocetSmluvBezCeny)).ToArray(),
+            Type = Series.SeriesType.line,
+
+        }
+    };
+    var procentaSmluvGraphData = new Series[]
+    {
+        new()
+        {
+            Name = "s utajenou cenou",
+            Type = Series.SeriesType.column,
+            Data = statisticsAfter2016
+                .Select(x => new SeriesData(x.Year, x.Value.PercentSmluvBezCeny * 100)).ToArray(),
+            SeriesTooltip = new SeriesTooltip()
+            {
+                ValueSuffix = " %"
+            }
+        },
+        new()
+        {
+            Name = "s vazbou na politiky",
+            Type = Series.SeriesType.column,
+            Data = statisticsAfter2016
+                .Select(x => new SeriesData(x.Year, x.Value.PercentSmluvPolitiky * 100)).ToArray(),
+            SeriesTooltip = new SeriesTooltip()
+            {
+                ValueSuffix = " %"
+            }
+        },
+    };
+
+    var sortedData = statistics.Summary().PoOblastech
+        .OrderByDescending(o => o.Value.CelkemCena)
+        .ThenByDescending(o => o.Value.Pocet)
+        .ToList();
+    var pieOboryData = new SeriesTextValue()
+            {
+                ColorByPoint = true,
+                Name = "Obor",
+                Data = sortedData
+                        .Take(9)
+                        .Select(m => new SeriesDataTextValue()
+                        {
+                            Y = m.Value.CelkemCena,
+                            Name = ((Smlouva.SClassification.ClassificationsTypes)m.Key).ToNiceDisplayName()
+                        })
+                        .ToArray()
+            };
+
+}
+<div class="row">
+    @if (statistics.Summary(statistics.YearsAfter2016()).PocetSmluv > 0)
+    {
+
+        <div class="col-lg-6  col-xs-12">
+            <h5>Rizika</h5>
+            <div>
+                <partial name="Partials/_analyzaRizikoPart" model="@((statistics: statistics, query: Model))" />
+            </div>
+        </div>
+        <div class="col-lg-6 col-xs-12">
+            @Html.ColumnGraph("Hodnota nalezených smluv po letech", hodnotaSmluvGraphData, yTitleRight: "Počet smluv")
+        </div>
+        <div class="col-lg-6 col-xs-12">
+            @Html.ColumnGraph("Smlouvy s utajenou cenou a vazbou na politiky", procentaSmluvGraphData, yTitleLeft: "% smluv")
+        </div>
+        <div class="col-lg-6 col-xs-12">
+            @Html.PieChart("Obory nalezených smluv",pieOboryData, yTitleLeft: "% smluv", tooltipFormat:"{series.name}: <b>{point.y:,.0f} Kč</b>")
+        </div>
+    }
+
+</div>
+
+<hr class="double" />
+
+<div>
+    <h2>Statistika dodavatelů (smluvních partnerů) pro analyzovaný dotaz</h2>
+    <p class="text-muted sub-header-info">
+        Přehledná statistika největších dodavatelů podle smluv v registru smluv.
+    </p>
+
+    <p>
+        Od roku @(HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Min()) byly největšími smluvními dodavateli:
+    <p>
+            @Html.Raw(string.Join(", ", topDodavatele.Take(20).Select(m => $"<a href='/subjekt/{m.ICO}'>{Firmy.GetJmeno(m.ICO)}</a>")))
+    </p>
+    </p>
+
+    <p>
+        V roce @currentSeasonYear byly největšími smluvními dodavateli:
+    <p>
+            @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+    </p>
+    </p>
+
+    <h4>Dodavatelé detailně</h4>
+    <table class="table table-condensed table-striped table-hover">
+        <thead>
+        <td>Subjekt</td>
+            @foreach (var y in Years)
+            {
+            <td>@(y)</td>
+            }
+        </thead>
+        <tbody>
+            @{
+            }
+            @foreach (var ico in topDodavatele.Select(m => m.ICO))
+            {
+                StatisticsSubjectPerYear<SimpleStat> fStat = topDodavatele.First(m => m.ICO == ico);
+
+                <tr>
+                    <td>@(Firmy.GetJmeno(ico))</td>
+                    @foreach (var y in Years)
+                    {
+                        var query = HlidacStatu.Repositories.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");
+                        var urlQ = "/hledat?q=" + System.Net.WebUtility.UrlEncode(query);
+
+                        <td>@Html.Raw(fStat[y].Formatted(true, urlQ, textIfZero:""))</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+<hr class="double" />
+
+<div>
+    <h2>Statistika zadavatelů (obvykle úřadů a státních organizací) pro analyzovaný dotaz</h2>
+    <p class="text-muted sub-header-info">
+        Přehledná statistika největších zadavatelů podle smluv v registru smluv.
+    </p>
+
+    <p>
+        Od roku @(HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Min()) byly největšími smluvními zadavateli:
+    <p>
+            @Html.Raw(string.Join(", ", topZadavatele.Take(20).Select(m => $"<a href='/subjekt/{m.ICO}'>{Firmy.GetJmeno(m.ICO)}</a>")))
+    </p>
+    </p>
+
+    <p>
+        V roce @currentSeasonYear byly největšími smluvními dodavateli:
+    <p>
+            @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+    </p>
+    </p>
+
+    <h4>Zadavatelé detailně</h4>
+    <table class="table table-condensed table-striped table-hover">
+        <thead>
+        <td>Subjekt</td>
+            @foreach (var y in Years)
+            {
+            <td>@(y)</td>
+            }
+        </thead>
+        <tbody>
+            @{
+            }
+            @foreach (var ico in topZadavatele.Select(m => m.ICO))
+            {
+                StatisticsSubjectPerYear<SimpleStat> fStat = topZadavatele.First(m => m.ICO == ico);
+
+                <tr>
+                    <td>@(Firmy.GetJmeno(ico))</td>
+                    @foreach (var y in Years)
+                    {
+                        var query = HlidacStatu.Repositories.Searching.Query.ModifyQueryAND(Model.Query, $"ico:{ico}", $"datumUzavreni:[{y}-01-01 TO {(y + 1)}-01-01}}");
+                        var urlQ = "/hledat?q=" + System.Net.WebUtility.UrlEncode(query);
+
+                        <td>@Html.Raw(fStat[y].Formatted(true, urlQ, textIfZero:""))</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>

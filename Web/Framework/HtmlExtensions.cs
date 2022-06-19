@@ -326,7 +326,9 @@ namespace HlidacStatu.Web.Framework
             int height = 300,
             string xTooltip = "Rok",
             string yTitleLeft = "Hodnota (Kč)",
-            string yTitleRight = "")
+            string yTitleRight = "",
+            string tooltipFormat = null
+            )
         {
             string random = Guid.NewGuid().ToString("N");
             var sb = new System.Text.StringBuilder();
@@ -363,7 +365,11 @@ namespace HlidacStatu.Web.Framework
                     text = $"<span class=\"chart_title\">{title}</span>",
                 },
                 navigation = new { buttonOptions = new { enabled = false } },
-                series = new SeriesTextValue[] { data }
+                series = new SeriesTextValue[] { data },
+                tooltip = new
+                    {
+                        pointFormat = tooltipFormat ?? "{series.name}: <b>{point.y}</b>"
+                }
 
             };
 

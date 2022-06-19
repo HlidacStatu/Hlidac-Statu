@@ -14,17 +14,13 @@
     </ol>
 }
 
-<cache expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@(ViewData[Constants.CacheKeyName])">
-@if (Model.NameOfView.ToLower() == "analyzaplatcu")
+<cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@(ViewData[Constants.CacheKeyName])">
+@if (!string.IsNullOrEmpty( Model?.Query))
 {
-    <partial name="Partials/AnalyzaPlatcu" model="Model"/>
-}
-else if (Model.NameOfView.ToLower() == "analyzaprijemcu")
-{
-    <partial name="Partials/AnalyzaDodavatelu" model="Model"/>
+    <partial name="Partials/_analyzaPage" model="Model"/>
 }
 else
 {
-    <partial name="Partials/AnalyzaStart" model="Model"/>
+    <partial name="Partials/AnalyzaStart" />
 }
 </cache>

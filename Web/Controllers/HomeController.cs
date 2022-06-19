@@ -63,22 +63,17 @@ namespace HlidacStatu.Web.Controllers
 
         }
 
-        public ActionResult Analyza(string id, string p, string q, string title, string description, string moreUrl, int? y)
+        public ActionResult Analyza(string p, string q, string title, string description, string moreUrl, int? y)
         {
             ViewData.Add(Constants.CacheKeyName,
-                WebUtil.GenerateCacheKey(new object[] { id, p, q, title, description, moreUrl, y }));
+                WebUtil.GenerateCacheKey(new object[] { p, q, title, description, moreUrl, y }));
 
             var model = new Lib.Analysis.TemplatedQuery() { Query = q, Text = title, Description = description };
 
-            if (string.IsNullOrEmpty(id))
-            {
-                model.NameOfView = "AnalyzaStart";
-                return View(model);
-            }
 
             if (StaticData.Afery.ContainsKey(p?.ToLower() ?? ""))
                 model = StaticData.Afery[p.ToLower()];
-            else
+            else if (!string.IsNullOrEmpty(q))
             {
                 model = new Lib.Analysis.TemplatedQuery() { Query = q, Text = title, Description = description };
                 if (Uri.TryCreate(moreUrl, UriKind.Absolute, out var uri))
@@ -86,10 +81,6 @@ namespace HlidacStatu.Web.Controllers
                         new(uri.AbsoluteUri,"více informací")
                     };
             }
-            if (string.IsNullOrEmpty(id))
-                id = "platcu";
-
-            model.NameOfView = "Analyza" + id;
 
             return View(model);
         }
