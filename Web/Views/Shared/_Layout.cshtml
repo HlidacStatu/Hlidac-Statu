@@ -1,4 +1,5 @@
 ﻿@using System.Linq
+@using Devmasters.Collections
 @using HlidacStatu.Datasets
 @using HlidacStatu.Entities
 @using Microsoft.AspNetCore.Http.Extensions
@@ -243,8 +244,8 @@
     {
         if (DateTime.Now < new DateTime(2021, 11, 2, 0, 0, 0))
         {
-            <div class="alert alert-warning toplinemsg" role="alert" style="">
-                <div class="text-center center-block toplinemsgtxt " style="">
+            <div class="alert alert-warning adlinemsg" role="alert" style="">
+                <div class="text-center center-block adlinemsgtxt " style="">
                     Fandíte naší práci? Podpořte Hlídače státu v Křišťálové lupě 2021 v kategorii Nástroje a služby! Děkujeme 💙
                     <a class="btn btn-default btn-sm" href="https://kristalova.lupa.cz/hlasovani/?setSubjects=1642" role="button">Hlasování za chvíli končí, <b>neváhejte!</b></a>
                 </div>
@@ -554,13 +555,49 @@
 
         <!-- /.modal -->
     }
-    @{
 
-        if (IsSectionDefined("onlyembed"))
+
+    @if (IsSectionDefined("bottomlinemsg"))
+    {
+        @RenderSection("bottomlinemsg", required: false)
+    }
+    else
+    {
+        if (DateTime.Now < new DateTime(2022, 09, 01, 0, 0, 0))
         {
-            IgnoreSection("onlyembed");
+            string[] colors = new[] {"primary","success","danger","warning","info","dark" };
+            string[] txts = new[]
+            {
+                "Analýza obvyklých cenových relacích za ICT služby.",
+                "Cenové analýzy Hlídače státu: unikátní nástroj pro státní správu i dodavatele.",
+                "Detailní přehled obvyklých cen za služby v ICT oblasti.",
+                "Kdo, s kým a za kolik v IT? My to víme a nyní můžete i vy!",
+                "Navazujeme na přehled obvyklých cen ICT prací od Ministerstva vnitra: analýza cen ICT služeb a prací.",
+                "Přehled obvyklých cen IT prací. Chcete znát ceny vašich konkurentů na trhu?",
+                "Nejrozsáhlejší a nejspolehlivější analýza jednotkových cen ICT prací na českém trhu.",
+                "Pomoc úřadům i dodavatelům ve výběrových řízeních - Přehled obvyklých cen ICT prací.",
+                "Přehled a rozptyl jednotkových cen ICT služeb je na českém trhu",
+                "Přehled obvyklých cen IT prací ve státní správě. Jistota při zadávání veřejných zakázek.",
+                "Přehled obvyklých cen IT prací. Znáte ceny vašich konkurentů? My ano.",
+            };    
+
+            <div class="fixed-bottom alert alert-@(colors.TipOfTheDay()) adlinemsg " role="alert" style="margin-bottom:0">
+                <div class="text-center center-block adlinemsgtxt " style="">
+                    @Html.Raw(txts.TipOfTheDay())
+                    <a class="btn btn-dark btn-sm" href="https://kristalova.lupa.cz/hlasovani/?setSubjects=1642" role="button"><b>Více 👉</b></a>
+                </div>
+            </div>
+            <div style="margin-bottom:50px">&nbsp;</div>
         }
     }
 
+
+
+    @{
+        if (IsSectionDefined("onlyembed"))
+        {
+            IgnoreSection("onlyembed");
+        }    
+    }
 </body>
 </html>

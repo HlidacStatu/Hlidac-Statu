@@ -1711,33 +1711,36 @@ img.kindex {
 }
 
 
-.toplinemsg {
-    padding: 2px;
+.adlinemsg {
+    padding: 5px;
 }
 
-    .toplinemsg .toplinemsgtxt {
+    .adlinemsg .adlinemsgtxt {
         font-size: 115%;
         color: red;
+        width:95%;
     }
 @media (min-width: 768px) and (max-width: 991px) {
-    .toplinemsg {
-        padding: 1px;
+    .adlinemsg {
+        padding: 3px;
     }
 
-        .toplinemsg .toplinemsgtxt {
+        .adlinemsg .adlinemsgtxt {
             font-size: 90%;
             color: red;
+            width: 90%;
         }
 
 }
     @media (max-width: 767px) {
-        .toplinemsg {
-            padding: 1px;
+        .adlinemsg {
+            padding: 2px;
         }
 
-            .toplinemsg .toplinemsgtxt {
+            .adlinemsg .adlinemsgtxt {
                 font-size: 90%;
                 color: red;
+                width: 90%;
             }
     }
 
