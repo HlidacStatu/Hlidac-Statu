@@ -192,14 +192,14 @@ else
                         {
                             <div>
                                 <span class="text-success"><i class="fa-solid fa-circle-check"></i></span>
-                                    Server @(web.Host.HostDomain()) má doménové name servery podporující IPv6 spojení.
+                                    Server @(web.Host.HostDomain()) má doménové name servery dostupné přes IPv6 spojení.
                             </div>
                         }
                         else
                         {
                             <div>
                                 <span class="text-danger"><i class="fa-solid fa-circle-xmark"></i></span>
-                                    Server @(web.Host.HostDomain()) nemá žádné existující IPv6 adresy.
+                                    Server @(web.Host.HostDomain()) nemá doménové name servery dostupné přes IPv6.
                             </div>                                
                         }                            
                         @if (webssl.IP6support?.Site_MX_IPv6Addresses?.Count() > 0)
