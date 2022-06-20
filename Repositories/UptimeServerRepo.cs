@@ -335,8 +335,13 @@ namespace HlidacStatu.Repositories
            "uptimeServersCache7Days",
           (id) =>
           {
+#if DEBUG
+              var res = uptimeServersCache1Day.Get();
+              return res.ToArray();
+#else
               var res = _availability(7 * 24);
               return res.ToArray();
+#endif
           }
           );
 

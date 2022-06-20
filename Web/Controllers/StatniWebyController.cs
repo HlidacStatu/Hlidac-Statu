@@ -207,6 +207,10 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
+        public ActionResult ipv6()
+        {
+            return View();
+        }
 
 
 

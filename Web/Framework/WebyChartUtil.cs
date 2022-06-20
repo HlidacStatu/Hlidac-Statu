@@ -83,14 +83,20 @@ namespace HlidacStatu.Web.Framework
         <div class='col-xs-12 col-sm-6 '>
             <div class='list-group'>
 
+                <a href='/StatniWeby/Index' class='list-group-item {WebUtil.IfExists(groupName == "index" || string.IsNullOrEmpty(groupName), "active disabled")}'>                    
+                    Přehled a statistiky
+                </a>
+
                 <a href='/StatniWeby/Https' class='list-group-item {WebUtil.IfExists(groupName == "https", "active disabled")}'>
                     <span class='badge float-end rounded-pill bg-secondary'>{HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()?.Count() ?? 0}</span>
                     Žebříček státních serverů podle HTTPS Labs hodnocení
                 </a>
 
-                <a href='/StatniWeby/Index' class='list-group-item {WebUtil.IfExists(groupName == "index" || string.IsNullOrEmpty(groupName), "active disabled")}'>                    
-                    Přehled a statistiky
+                <a href='/StatniWeby/ipv6' class='list-group-item {WebUtil.IfExists(groupName == "ipv6", "active disabled")}'>
+                    <span class='badge float-end rounded-pill bg-secondary'>{HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()?.Count() ?? 0}</span>
+                    Servery podporující a ignorující IPv6.
                 </a>
+
             ");
 
             foreach (var item in tabs)

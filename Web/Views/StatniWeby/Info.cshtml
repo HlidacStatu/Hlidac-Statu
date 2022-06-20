@@ -32,7 +32,7 @@
 
 }
 @section scripts
-{
+    {
     <script src="/scripts/highcharts-6/highcharts.js"></script>
     <script src="/scripts/highcharts-6/modules/heatmap.js"></script>
     <script src="/scripts/highcharts-6/modules/data.js"></script>
@@ -56,7 +56,7 @@
 
 
 
-@if (web == null)
+    @if (web == null)
 {
     <div class="card bg-danger">
         <div class="card-header">
@@ -70,14 +70,14 @@
 else
 {
     @section breadcrumb
-{
-        <ol class="breadcrumb">
-            <li><a href="/">Hlídač Státu</a></li>
-            <li><a href="@Url.Action("Index", "StatniWeby")">Hlídač Webů</a></li>
-            <li class="active">@ViewBag.SubTitle</li>
-        </ol>
+    {
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="@Url.Action("Index", "StatniWeby")">Hlídač Webů</a></li>
+        <li class="active">@ViewBag.SubTitle</li>
+    </ol>
 }
-    <partial name="~/Views/StatniWeby/_Info.cshtml" model="@ViewData"/>
+    <partial name="~/Views/StatniWeby/_Info.cshtml" model="@ViewData" />
 
     <h2>
         @(web.Host.Name)
@@ -87,17 +87,17 @@ else
         @UptimeServerRepo.PatriPodUradJmeno(web.Host) @Html.Raw(web.Host.Description)
     </p>
     <hr />
-    if (webssl != null )
+    if (webssl != null)
     {
 
         <h3>Zabezpečení komunikace</h3>
         <div class="row">
             <div class="col-xs-3 col-sm-2  justify-content-center text-center">
                 <div class="d-flex justify-content-center text-center">
-                @Html.Raw(UptimeSSL.StatusHtml(webssl.SSLGrade(), 80))
+                    @Html.Raw(UptimeSSL.StatusHtml(webssl.SSLGrade(), 80))
                 </div>
                 <div class="d-flex justify-content-center text-center mt-3">
-                @Html.Raw(webssl.CertExpirationToString())
+                    @Html.Raw(webssl.CertExpirationToString())
                 </div>
             </div>
             <div class="col-xs-9 col-sm-10">
@@ -113,7 +113,7 @@ else
                     {
                         <p>
                             Tato služba zabezpečenou komunikaci nepodporuje.
-                        </p>                        
+                        </p>
                     }
                     else
                     {
@@ -121,13 +121,111 @@ else
                             @UptimeSSL.StatusDescription(webssl.SSLGrade(), true)
                         </p>
                     }
-                            <div class="text-muted text-center">
-                    <a href="/statniweby/infoHttps/@(Model.pageUrlIdParams)" onclick="return trackOutLink(this,'statniweby/infoHttps');">detailní analýza HTTPs</a>
-                </div>
+                    <div class="text-muted text-center">
+                        <a href="/statniweby/infoHttps/@(Model.pageUrlIdParams)" onclick="return trackOutLink(this,'statniweby/infoHttps');">detailní analýza HTTPs</a>
+                    </div>
                 </div>
             </div>
         </div>
-        <hr />
+        if (webssl.IP6support != null)
+        {
+            <hr class="gray dotted " />
+            <h3>Podpora IPv6</h3>
+            <p>
+                Podpora protokolu IPv6 je pro ústřední orgány státní správy povinné. Vyplývá to z řady usnesení vlády z let
+                <a target="_blank" href="https://kormoran.vlada.cz/usneseni/usneseni_webtest.nsf/0/6BFDE5B071A154C5C12575E5004024F1/$FILE/727%20uv090608.0727.pdf">2009</a>,
+                <a target="_blank" href="https://apps.odok.cz/attachment/-/down/VPRA9EVEBJYC">2013</a> a
+                <a target="_blank" href="https://apps.odok.cz/attachment/-/down/IHOA9ZWF7D8R">2015</a>.
+
+                Proto v <b>testovacím režimu</b> testujeme podporu dostupnosti webových aplikací i prostřednictvím IPv6 protokolu.
+            </p>
+            <div class="row">
+                <div class="col-xs-3 col-sm-2  justify-content-center text-center">
+                    <div class="d-flex justify-content-center text-center">
+                        @{
+                            var ipv6supported = webssl.IP6support.IPv6Working();
+                            var ipv6NS = webssl.IP6support.Site_NS_IPv6Addresses?.Any() ?? false;
+                            var ipv6MX = webssl.IP6support.Site_MX_IPv6Addresses?.Any() ?? false;
+
+                        }
+                        @if (ipv6supported)
+                        {
+                            <span class="text-success" style="font-size:4em;"><i class="fa-solid fa-circle-check"></i></span>
+
+                        }
+                        else
+                        {
+                            <span class="text-danger" style="font-size:4em;"><i class="fa-solid fa-circle-xmark"></i></span>
+                        }
+                    </div>
+                </div>
+                <div class="col-xs-9 col-sm-10">
+                    <div class="bs-callout bs-callout-@(ipv6supported ? "success" : "danger" )" style="margin:0;">
+                        <h4>Výsledek analýzy IPv6 na @web.Host.HostDomain() <small class="text-muted">ze dne @webssl.Created.ToString("dd.MM.yyyy")</small></h4>
+                        @if (ipv6supported)
+                        {
+                            string addrs = string.Join(", ", webssl.IP6support.Site_IPv6Addresses.Select(m => m.IP6Address));
+                            <div>
+                                <span class="text-success"><i class="fa-solid fa-circle-check"></i></span>
+                                Server je dostupný pomocí IPv6 protokolu na
+                                @(Devmasters.Lang.CS.Plural.Get(webssl.IP6support.Site_IPv6Addresses.Count(), $"adrese {addrs}", "adresách  {addrs}", "adresách {addrs}")).
+                            </div>
+                        }
+                        else
+                        {
+                            if (webssl.IP6support?.Site_IPv6Addresses?.Count() > 0)
+                            {
+                                <div>
+                                    <span class="text-danger"><i class="fa-solid fa-circle-xmark"></i></span>
+                                     Server @(web.Host.HostDomain()) má existující IPv6 adresy, ale není možné se na ně připojit.
+                                </div>
+                            }
+                            else
+                            {
+                                <div>
+                                    <span class="text-danger"><i class="fa-solid fa-circle-xmark"></i></span>
+                                     Server @(web.Host.HostDomain()) nemá žádné existující IPv6 adresy.
+                                </div>                                
+                            }
+                        }
+                        @if (webssl.IP6support?.Site_NS_IPv6Addresses?.Count() > 0)
+                        {
+                            <div>
+                                <span class="text-success"><i class="fa-solid fa-circle-check"></i></span>
+                                    Server @(web.Host.HostDomain()) má doménové name servery podporující IPv6 spojení.
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                <span class="text-danger"><i class="fa-solid fa-circle-xmark"></i></span>
+                                    Server @(web.Host.HostDomain()) nemá žádné existující IPv6 adresy.
+                            </div>                                
+                        }                            
+                        @if (webssl.IP6support?.Site_MX_IPv6Addresses?.Count() > 0)
+                        {
+                            <div>
+                                <span class="text-success"><i class="fa-solid fa-circle-check"></i></span>
+                                    Server @(web.Host.HostDomain()) má IPv6 adresy pro příchozí emailové servery.
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                <span class="text-danger"><i class="fa-solid fa-circle-xmark"></i></span>
+                                    Server @(web.Host.HostDomain()) nemá IPv6 adresy pro příchozí emailové servery.
+                            </div>                                
+                        }
+                        
+@*                     <div class="text-muted text-center">
+                        <a href="/statniweby/infoHttps/@(Model.pageUrlIdParams)" onclick="return trackOutLink(this,'statniweby/infoHttps');">detailní analýza HTTPs</a>
+                    </div>
+*@
+                    </div>
+                </div>
+            </div>
+        }
+        <hr class="gray dotted " />
     }
 
     <h3>Dostupnost za poslední týden</h3>
@@ -149,14 +247,14 @@ else
         @if (web.Statistics().PercentOfTime.Nedostupne > 0)
         {
             <text>
-            <p>
-                <span class="avail_Nedostupne">
-                    Nedostupná byla
-                    @web.Statistics().PercentOfTime.Nedostupne.ToString("P2")
-                </span>
-                (tj. celkem @RenderTools.FormatAvailability(web.Statistics().DurationTotal.Nedostupne, RenderTools.DateTimePart.Hour)).
-                Nejdelší výpadek trval @RenderTools.FormatAvailability(web.Statistics().LongestDuration.Nedostupne, RenderTools.DateTimePart.Hour).
-            </p>
+                <p>
+                    <span class="avail_Nedostupne">
+                        Nedostupná byla
+                        @web.Statistics().PercentOfTime.Nedostupne.ToString("P2")
+                    </span>
+                    (tj. celkem @RenderTools.FormatAvailability(web.Statistics().DurationTotal.Nedostupne, RenderTools.DateTimePart.Hour)).
+                    Nejdelší výpadek trval @RenderTools.FormatAvailability(web.Statistics().LongestDuration.Nedostupne, RenderTools.DateTimePart.Hour).
+                </p>
             </text>
         }
         else
@@ -168,66 +266,66 @@ else
         }
         @if (web.Statistics().PercentOfTime.Unknown > 0.1m)
         {
-            <p>
-                V @web.Statistics().PercentOfTime.Unknown.ToString("P2") času se nám nepodařilo odezvu serveru změřit z důvodu neschopnosti připojit se k serveru či z důvodů chybového návratového kódu serveru.
-            </p>
+        <p>
+            V @web.Statistics().PercentOfTime.Unknown.ToString("P2") času se nám nepodařilo odezvu serveru změřit z důvodu neschopnosti připojit se k serveru či z důvodů chybového návratového kódu serveru.
+        </p>
         }
-    </p>
-        <hr />
+            </p>
+    <hr />
 
-        <h2>Dostupnost serveru</h2>
-        <div class="row">
-            <div class="col-xs-12">
-                <h4>Za posledních 24 hodin</h4>
-                @WebyChartUtil.Chart("w" + web.Host.Id, 24, 150, true, web.Host.Hash)
+    <h2>Dostupnost serveru</h2>
+    <div class="row">
+        <div class="col-xs-12">
+            <h4>Za posledních 24 hodin</h4>
+            @WebyChartUtil.Chart("w" + web.Host.Id, 24, 150, true, web.Host.Hash)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <h4>Za posledních 7 dní</h4>
+            @WebyChartUtil.Chart("w" + web.Host.Id, 7 * 24, 150, true, web.Host.Hash)
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="text-end">
+                <a asp-controller="ApiV2Weby" asp-action="Status" asp-route-id="@Model.Id">Stahnout dostupnost v JSON (Open Data)</a>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xs-12">
-                <h4>Za posledních 7 dní</h4>
-                @WebyChartUtil.Chart("w" + web.Host.Id, 7 * 24, 150, true, web.Host.Hash)
-            </div>
-        </div>
 
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="text-end">
-                    <a asp-controller="ApiV2Weby" asp-action="Status" asp-route-id="@Model.Id">Stahnout dostupnost v JSON (Open Data)</a>
-                </div>
-            </div>
+    </div>
 
-        </div>
+    <div class="clearfix"></div>
 
-        <div class="clearfix"></div>
-
-        @WebyChartUtil.TableNextGroups("")
+    @WebyChartUtil.TableNextGroups("")
 
 
 
-        <div class="bs-callout bs-callout-primary">
-            <h4>Hlídání dostupnosti státní webů. Co to vlastně děláme?</h4>
-            <p>
-                Měříme každou minutu, zda důležité weby státu vůbec běží, a pokud ano, tak jak rychle odpovídají. A tomu odpovídají i zobrazené barvy.
-                Pokud služba odpovídá rychle, dáváme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.OK))">zelenou - v pořádku</b>.
-                Pokud odpovídá déle, dáváme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Pomalé))">oranžovou - pomalá odpověď.</b>.
-                Pokud neodpoví nebo odpoví za dlouhou dobu, použijeme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Nedostupné))">červenou za nedostupnost</b>.
-            </p>
-            <p>
-                Systém hodnocení HTTPS je jednoduchý: A+ je nejlepší známka, F nejhorší, M znamená špatné jméno serveru v certifikátu, T znamená špatný certifikát, X že zabezpečený přenos není vůbec podporován.
-            </p>
-            <p>
-                <a href="@Url.Action("JakMerime", "StatniWeby")">Podrobný popis měření a hodnocení</a>.
-            </p>
-        </div>
+    <div class="bs-callout bs-callout-primary">
+        <h4>Hlídání dostupnosti státní webů. Co to vlastně děláme?</h4>
+        <p>
+            Měříme každou minutu, zda důležité weby státu vůbec běží, a pokud ano, tak jak rychle odpovídají. A tomu odpovídají i zobrazené barvy.
+            Pokud služba odpovídá rychle, dáváme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.OK))">zelenou - v pořádku</b>.
+            Pokud odpovídá déle, dáváme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Pomalé))">oranžovou - pomalá odpověď.</b>.
+            Pokud neodpoví nebo odpoví za dlouhou dobu, použijeme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Nedostupné))">červenou za nedostupnost</b>.
+        </p>
+        <p>
+            Systém hodnocení HTTPS je jednoduchý: A+ je nejlepší známka, F nejhorší, M znamená špatné jméno serveru v certifikátu, T znamená špatný certifikát, X že zabezpečený přenos není vůbec podporován.
+        </p>
+        <p>
+            <a href="@Url.Action("JakMerime", "StatniWeby")">Podrobný popis měření a hodnocení</a>.
+        </p>
+    </div>
 
 
 
-        <p class="text-muted">Údaje na této stránce mohou být až 20 minut staré.</p>
+    <p class="text-muted">Údaje na této stránce mohou být až 20 minut staré.</p>
 
 
 
 
-    }
+}
 @section footerscripts{
 }
 

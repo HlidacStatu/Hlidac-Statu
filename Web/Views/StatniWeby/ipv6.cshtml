@@ -1,0 +1,115 @@
+﻿@using System.Linq;
+@using Devmasters.Enums;
+@using HlidacStatu.Entities;
+@{
+    ViewBag.Title = "Hlídač státních webů";
+    ViewBag.SubTitle = "Podpora IPv6 ";
+
+
+    var servers = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers();
+    var data = HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()
+            .Where(m=>m.IP6support != null)
+            .OrderByDescending(m=>m.IP6support.IPv6Working())
+            .ToArray();
+
+
+    string ok = "<span class='text-success' style='font-size:2em;'><i class='fa-solid fa-circle-check'></i></span>";
+    string bad = "<span class='text-danger' style='font-size:2em;'><i class='fa-solid fa-circle-xmark'></i></span>";
+}
+
+@section scripts
+{
+
+
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Index", "StatniWeby")">Hlídač Webů</a>
+        </li>
+        <li class="active">@ViewBag.SubTitle</li>
+    </ol>
+}
+
+@if (data == null)
+{
+    <div class="card bg-danger">
+        <div class="card-header">
+            <h3 class="card-title">Chyba!</h3>
+        </div>
+        <div class="card-body">
+            Data nejsou v tuto chvíli k dispozici. Omlouváme se, zkuste to znovu za pár minut.
+        </div>
+    </div>
+}
+else
+{
+
+    <div class="bs-callout bs-callout-primary">
+        <h4>Podpora IPv6</h4>
+        <p>
+            Podpora protokolu IPv6 je pro ústřední orgány státní správy povinné. Vyplývá to z řady usnesení vlády z let
+            <a target="_blank" href="https://kormoran.vlada.cz/usneseni/usneseni_webtest.nsf/0/6BFDE5B071A154C5C12575E5004024F1/$FILE/727%20uv090608.0727.pdf">2009</a>,
+            <a target="_blank" href="https://apps.odok.cz/attachment/-/down/VPRA9EVEBJYC">2013</a> a
+            <a target="_blank" href="https://apps.odok.cz/attachment/-/down/IHOA9ZWF7D8R">2015</a>.
+
+            Proto v <b>testovacím režimu</b> testujeme podporu dostupnosti webových aplikací i prostřednictvím IPv6 protokolu.
+        </p>
+    </div>
+
+
+    <div class="clearfix"></div>
+    <h3 style="margin-top:50px">IPv6 je podporován</h3>
+    <div class="row">
+
+
+        @foreach(var host in data.Where(m=>m.IP6support.IPv6Working()).OrderBy(o=>o.Domain))
+        {
+            var server = servers.FirstOrDefault(m => m.HostDomain().ToLower() == host.Domain.ToLower());
+            if (server == null)
+                continue;
+
+            <div class="col-xs-6 col-sm-4 col-lg-3"
+                 style="border-top: 1px solid #ddd;padding-top:10px;margin-top:20px;">
+                <a href="/statniweby/info/@(server.Id)?h=@(server.Hash)">
+                
+                    @Html.Raw(ok)
+                    @(server.HostDomain())
+                </a>
+            </div>
+        }
+    </div>
+
+
+    <hr class="gray dotted"/>
+     <div class="clearfix"></div>
+ <h3 style="margin-top:50px">IPv6 není podporován</h3>
+ <div class="row">
+
+
+     @foreach(var host in data.Where(m=>m.IP6support.IPv6Working()==false).OrderBy(o=>o.Domain))
+     {
+         var server = servers.FirstOrDefault(m => m.HostDomain().ToLower() == host.Domain.ToLower());
+         if (server == null)
+             continue;
+
+         <div class="col-xs-6 col-sm-4 col-lg-3"
+              style="border-top: 1px solid #ddd;padding-top:10px;margin-top:20px;">
+             <a href="/statniweby/info/@(server.Id)?h=@(server.Hash)">
+             
+                 @Html.Raw(bad)
+                 @(server.HostDomain())
+             </a>
+         </div>
+     }
+ </div>
+    @WebyChartUtil.TableNextGroups("ipv6")
+}
+
+@section footerscripts{
+}
