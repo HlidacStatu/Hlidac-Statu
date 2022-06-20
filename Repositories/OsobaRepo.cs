@@ -568,6 +568,8 @@ namespace HlidacStatu.Repositories
             SefUradu,
             [NiceDisplayName("Senátor")]
             Senator,
+            [NiceDisplayName("Europoslanec")]
+            Europoslanec,
             
         }
         
@@ -615,6 +617,16 @@ namespace HlidacStatu.Repositories
                             && (e.AddInfo.ToLower().StartsWith("poslanec") ||
                                 e.AddInfo.ToLower().StartsWith("poslankyně"))
                             && e.Organizace.ToLower().StartsWith("poslanecká sněmovna pčr")
+                            && (e.DatumDo == null || e.DatumDo >= toDate)
+                            && (e.DatumOd == null || e.DatumOd <= toDate))
+                        .ToList();
+                
+                case Zatrideni.Europoslanec:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.VolenaFunkce
+                            && (e.AddInfo.ToLower().StartsWith("poslanec ep") ||
+                                e.AddInfo.ToLower().StartsWith("poslankyně ep"))
+                            && e.Organizace.ToLower().StartsWith("evropský parlament")
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();

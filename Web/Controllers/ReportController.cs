@@ -141,16 +141,16 @@ namespace HlidacStatu.Web.Controllers
                     ViewBag.Title = "Report - Úřady nejvíce obchodující s firmami navázanými na politiky";
                     return View("15_UradyObchodujiciSFirmamiCoSVazbouNaPolitiky");
                 case 16:
-                    ViewBag.Title = "Poslanci - členové Poslanecké sněmovny Parlamentu České republiky po volbách 2017";
-                    ViewBag.SubTitle = "Sponzorují noví poslanci politické strany? A mají obchodní vztahy se státem?";
+                    ViewBag.Title = "Poslanci ČR";
+                    ViewBag.SubTitle = "Přehled poslanců ČR";
                     return View("16_Poslanci2017");
                 case 18:
                     ViewBag.Title = "Hejtmani krajů ČR";
-                    ViewBag.SubTitle = "Stav k 1.2.2021";
+                    ViewBag.SubTitle = "Aktuální vedení krajů ČR";
                     return View("18_Hejtmani2018");
                 case 19:
                     ViewBag.Title = "Poradci na úřadu vlády";
-                    ViewBag.SubTitle = "Stav k 5.4.2018";
+                    ViewBag.SubTitle = "Aktuální složení poradního sboru předsedy vlády ČR";
                     return View("19_PoradciVlady");
                 case 20:
                     return RedirectPermanent("/Porovnat");
@@ -174,12 +174,16 @@ namespace HlidacStatu.Web.Controllers
                     return View("26_Classification");
                 case 29:
                     ViewBag.Title = "Senátoři";
-                    ViewBag.SubTitle = "Seznam senátorů ze Senátu PČR";
+                    ViewBag.SubTitle = "Seznam senátorů Senátu Parlamentu ČR";
                     return View("29_Senatori");
                 case 30:
                     ViewBag.Title = "Covid podpory firmám a jednotlivcům 2020-2021";
                     ViewBag.SubTitle = "Kompletní přehled finančních podpor z COVID programů";
                     return View("30_COVIDPodpory");
+                case 31:
+                    ViewBag.Title = "Europoslanci";
+                    ViewBag.SubTitle = "Seznam europoslanců z ČR";
+                    return View("31_Europoslanci");
                 default:
                     return NotFound();
             }
