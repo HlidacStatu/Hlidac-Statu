@@ -1,0 +1,121 @@
+﻿<div style="position:relative">
+    <label for="hsAutocompleteTool">Najděte státní web</label>
+    <input placeholder="Najít státní web" type="text" name="hsAutocompleteTool" id="hsAutocompleteTool" class="form-control companyahead input-lg" oninput="FindFunction(this)" />
+    <div class="loading-spinner" style="display:none">
+    </div>
+    <div id="hsAutocompleteResults">
+    </div>
+
+</div>
+
+<style>
+    .whisp {
+        width: 100%;
+        text-align: left;
+        background-color: white;
+        border-left: 2px grey solid;
+        border-top: 0px;
+        border-bottom: 1px grey dotted;
+        border-right: 2px grey solid;
+        padding-bottom: 2px;
+    }
+
+        .whisp:focus {
+            background-color: lightblue;
+        }
+
+    .loading-spinner {
+        border: 10px solid #f3f3f3; /* Light grey */
+        border-top: 10px solid #3498db; /* Blue */
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 2s linear infinite;
+
+        position: absolute;
+        top: 29px;
+        right: 20px;
+        z-index: 10;
+    }
+
+    @@keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #hsAutocompleteResults {
+        margin-bottom: 10px;
+        position:absolute;
+        z-index: 10;
+    }
+
+</style>
+
+<script>
+
+    function FindFunction(caller) {
+        let req = "/StatniWeby/Autocomplete/?query=" + caller.value;
+        $.get(req, function (data) {
+            EmptyAutocompleteResults();
+            data.forEach(autocompData => {
+                var button = $('<button/>',
+                    {
+                        text: autocompData.name + " (" + autocompData.hostDomain + ")",
+                        class: 'whisp',
+                        click: function () { NavigateToDetail(autocompData.id, autocompData.name); EmptyAutocompleteResults(); }
+                    });
+                $("#hsAutocompleteResults").append(button);
+            });
+        }, "json");
+        Navigate();
+    }
+
+    function EmptyAutocompleteResults() {
+        $('#hsAutocompleteResults').empty();
+    }
+
+    function CleanSearchBox() {
+        $('#hsAutocompleteTool').val("").focus();
+    }
+
+    function NavigateToDetail(ico, name) {
+        $('#hsAutocompleteTool').val(name);
+        $('.loading-spinner').show();
+        window.location.href = `/statniweby/info/${ico}`
+    }
+
+    function Navigate() {
+
+        var index = -1;
+
+        jQuery(parent).on('keydown', function (e) {
+            var checkboxes = $('#hsAutocompleteResults').find('button.whisp');
+            if (e.keyCode == 38) {
+                if (index > 0) {
+                    index = index - 1;
+                }
+                checkboxes[index].focus();
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            else if (e.keyCode == 40) {
+                if (index < checkboxes.length - 1) {
+                    index = index + 1;
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                else {
+                    index = checkboxes.length - 1;
+                }
+                checkboxes[index].focus();
+            }
+            else if (e.keyCode == 27) {
+                EmptyAutocompleteResults();
+                CleanSearchBox();
+            }
+
+        });
+    }
+
+
+</script>

@@ -188,6 +188,12 @@ namespace HlidacStatu.Web.Controllers
         {
             return Json(new { error = "API presunuto. Viz hlidacStatu.cz/api. Omlouvame se." });
         }
+        
+        public IEnumerable<StatniWebyAutocomplete> Autocomplete(string query)
+        {
+            var results = UptimeServerRepo.AutocompleteSearch(query);
+            return results;
+        }
 
         public ActionResult Https()
         {

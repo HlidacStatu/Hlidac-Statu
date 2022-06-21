@@ -50,8 +50,9 @@
     </ol>
 }
     <partial name="~/Views/StatniWeby/_Info.cshtml" model="@ViewData" />
+    <partial name="_AutocompletePartial"/>
 
-    @{
+@{
     var data = HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()
             .OrderByDescending(m => m.SSLGrade())
             .ToArray();
