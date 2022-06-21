@@ -13,7 +13,7 @@ namespace HlidacStatu.Web.Controllers
     public class StatniWebyController : Controller
     {
 
-        [HlidacCache(1 * 60, "id;h;embed", false)]
+        [HlidacCache(1 * 60, "id;embed", false)]
 
         public ActionResult Index()
         {
@@ -45,8 +45,8 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        [HlidacCache(60, "id;hh;f;t;h", false)]
-        public ActionResult ChartData(string id, string hh, long? f, long? t, int? h = 24)
+        [HlidacCache(60, "id;f;t;h", false)]
+        public ActionResult ChartData(string id, long? f, long? t, int? h = 24)
         {
             id = id?.ToLower() ?? "";
             string content = "{}";
@@ -64,10 +64,7 @@ namespace HlidacStatu.Web.Controllers
                 var host = Repositories.UptimeServerRepo.Load(Convert.ToInt32(id));
                 if (host != null)
                 {
-                    if (host.ValidHash(hh))
-                    {
                         data = new UptimeServer.HostAvailability[] { UptimeServerRepo.AvailabilityForWeekById(host.Id) };
-                    }
                 }
             }
             else
@@ -101,7 +98,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        [HlidacCache(2 * 60, "id;h;embed", false)]
+        [HlidacCache(2 * 60, "id;embed", false)]
         public ActionResult Info(int id, string h)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
@@ -109,24 +106,17 @@ namespace HlidacStatu.Web.Controllers
             if (host == null)
                 return RedirectToAction("Index", "StatniWeby");
 
-            if (host.ValidHash(h))
-                return View(host);
-            else
-                return RedirectToAction("Index", "StatniWeby");
+            return View(host);
         }
 
 
         static byte[] EmptyPng = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFhAJ/wlseKgAAAABJRU5ErkJggg==");
         [HlidacCache(2 * 60, "id", false)]
-        public async Task<ActionResult> Banner(int id, string h)
+        public async Task<ActionResult> Banner(int id)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
                 .FirstOrDefault(w => w.Id == id);
             if (host == null)
-            {
-                return File(EmptyPng, "image/png");
-            }
-            if (!host.ValidHash(h))
             {
                 return File(EmptyPng, "image/png");
             }
@@ -182,8 +172,8 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        [HlidacCache(2 * 60, "id;h;embed", false)]
-        public ActionResult InfoHttps(int id, string h)
+        [HlidacCache(2 * 60, "id;embed", false)]
+        public ActionResult InfoHttps(int id)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
                 .FirstOrDefault(w => w.Id == id)
@@ -191,13 +181,10 @@ namespace HlidacStatu.Web.Controllers
             if (host == null)
                 return RedirectToAction("Index", "StatniWeby");
 
-            if (host.ValidHash(h))
-                return View(host);
-            else
-                return RedirectToAction("Index", "StatniWeby");
+            return View(host);
         }
         //[GZipOrDeflate()]
-        public ActionResult Data(int? id, string h)
+        public ActionResult Data(int? id)
         {
             return Json(new { error = "API presunuto. Viz hlidacStatu.cz/api. Omlouvame se." });
         }

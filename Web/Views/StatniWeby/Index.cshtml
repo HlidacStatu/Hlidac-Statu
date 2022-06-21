@@ -215,7 +215,7 @@
                                 .
                             </div>
                             <div class="row collapse chart">
-                                @WebyChartUtil.Chart("w" + item.Host.Id, 24, 30, true, item.Host.Hash,showLegend:false, showYAxisNames:false, showXAxis:false)
+                                @WebyChartUtil.Chart("w" + item.Host.Id, 24, 30, true,showLegend:false, showYAxisNames:false, showXAxis:false)
                             </div>
                         </li>
                     }
@@ -256,7 +256,7 @@
                                 .
                             </div>
                             <div class="row collapse chart">
-                                @WebyChartUtil.Chart("w" + item.Host.Id, 24*7, 30, true, item.Host.Hash,showLegend:false, showYAxisNames:false, showXAxis:false)
+                                @WebyChartUtil.Chart("w" + item.Host.Id, 24*7, 30, true, showLegend:false, showYAxisNames:false, showXAxis:false)
                             </div>
                         </li>
                     }

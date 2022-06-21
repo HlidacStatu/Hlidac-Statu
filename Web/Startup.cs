@@ -279,23 +279,7 @@ namespace HlidacStatu.Web
             });
 
 
-            //force init autocomplete cache
-            new System.Threading.Thread(() =>
-            {
-                try
-                {
-                    using (var net = new Devmasters.Net.HttpClient.URLContent("https://www.hlidacstatu.cz/api/autocomplete/?q=flakan&term=flakan&_type=query&q=flakan"))
-                    {
-                        net.Timeout = 3 * 60000;
-                        var s = net.GetContent();
-                    }
-
-                }
-                catch (Exception)
-                {
-                }
-            }).Start();
-
+           
 
         }
 

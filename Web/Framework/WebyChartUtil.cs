@@ -144,7 +144,7 @@ namespace HlidacStatu.Web.Framework
             return new HtmlString(sb.ToString());
         }
 
-        public static IHtmlContent Chart(string dataName, int hoursBack, int height, bool detail, string hash = "", 
+        public static IHtmlContent Chart(string dataName, int hoursBack, int height, bool detail, 
             string path = "/StatniWeby", bool showLegend = true, bool showYAxisNames = true, bool showXAxis = true)
         {
             var uniqueId = "_chart_" + Devmasters.TextUtil.GenRandomString(8);
@@ -375,7 +375,7 @@ Highcharts.setOptions({
             sb.AppendLine("};");
             //Highcharts options
             sb.AppendLine(@"$('#container" + uniqueId + @"').html('<center><img src=""/content/img/loading.gif"" style=""width:127px;height:auto;""><b>Stahujeme data</b>');
-                        " + $"$.getJSON('{path}/ChartData/{dataName}?o=d&h={hoursBack}&hh={hash}'" + @", function (data) {
+                        " + $"$.getJSON('{path}/ChartData/{dataName}?o=d&h={hoursBack}'" + @", function (data) {
                     chartopt" + uniqueId + @".series[0].data = data.data;
                     chartopt" + uniqueId + @".yAxis[0].categories = data.categories;
                     cats" + uniqueId + @" = data.cats;
