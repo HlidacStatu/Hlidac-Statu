@@ -204,15 +204,15 @@ text zpravy: {txt}";
             return Content("");
         }
 
+        static Devmasters.Cache.LocalMemory.Cache<Index<SubjectNameCache>> FullTextSearchCache =
+            new Devmasters.Cache.LocalMemory.Cache<Index<SubjectNameCache>>(TimeSpan.Zero,
+            o =>
+            {
+                return new Index<SubjectNameCache>(SubjectNameCache.GetCompanies().Values);
+            });
         // Used for searching
         public JsonResult FindCompany(string id)
         {
-            Devmasters.Cache.LocalMemory.Cache<Index<SubjectNameCache>> FullTextSearchCache =
-                new Devmasters.Cache.LocalMemory.Cache<Index<SubjectNameCache>>(TimeSpan.Zero,
-                o =>
-                {
-                    return new Index<SubjectNameCache>(SubjectNameCache.GetCompanies().Values);
-                });
 
             var searchResult = FullTextSearchCache.Get().Search(id, 10);
 
