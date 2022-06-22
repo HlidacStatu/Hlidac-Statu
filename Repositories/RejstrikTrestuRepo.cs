@@ -24,20 +24,17 @@ public static class RejstrikTrestuRepo
                         .Query(ico)
                         )
                     )
-                .Sort(s=>s.Descending(f=>f.DatumPravniMoci))
             );
-
 
             var res = result.Documents.ToList();
             return res;
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            // ignored
         }
 
-        return null;
+        return new List<RejstrikTrestu>();
     }
 }
 
@@ -90,7 +87,7 @@ public class RejstrikTrestu
         [Nest.PropertyName("DruhText")]
         public string DruhText { get; set; }
 
-        public Severity Riziko() => Druh.ToLower() switch
+        public Severity Riziko => Druh.ToLower() switch
         {
             "zpo" => Severity.Fatal,
             "zc" or "zpvzuvs" or "zpvz" or "zpds" => Severity.Critical,
@@ -102,16 +99,16 @@ public class RejstrikTrestu
         public enum Severity
         {
             [Devmasters.Enums.NiceDisplayName("Fatální")]
-            Fatal,
+            Fatal = 3,
 
             [Devmasters.Enums.NiceDisplayName("Vysoké riziko")]
-            Critical,
+            Critical = 2,
 
             [Devmasters.Enums.NiceDisplayName("Nízké riziko")]
-            Normal,
+            Normal = 1,
 
             [Devmasters.Enums.NiceDisplayName("Ostatní")]
-            Others,
+            Others = 0,
         }
     }
 
@@ -144,10 +141,10 @@ public class RejstrikTrestu
             public int Rok { get; set; }
 
             [Nest.PropertyName("ZakonCislo")]
-            public string ZakonCislo { get; set; }
+            public string ZakonCislo { get; set; }   // somewhere is int
 
             [Nest.PropertyName("ParagrafCislo")]
-            public string ParagrafCislo { get; set; }
+            public string ParagrafCislo { get; set; } // somewhere is int
 
             [Nest.PropertyName("OdstavecPismeno")]
             public string OdstavecPismeno { get; set; }
