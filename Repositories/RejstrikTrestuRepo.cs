@@ -14,10 +14,10 @@ public static class RejstrikTrestuRepo
     public static async Task<List<RejstrikTrestu>> FindTrestyAsync(string ico)
     {
         var client = await Manager.GetESClientAsync(_indexName, idxType: _indexType);
-
+        Nest.ISearchResponse<RejstrikTrestu> result;
         try
         {
-            var result = await client.SearchAsync<RejstrikTrestu>(s => s
+            result = await client.SearchAsync<RejstrikTrestu>(s => s
                 .Query(q => q
                     .Match(m=>m
                         .Field(f=>f.ICO)
