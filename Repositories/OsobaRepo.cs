@@ -570,6 +570,8 @@ namespace HlidacStatu.Repositories
             Senator,
             [NiceDisplayName("Europoslanec")]
             Europoslanec,
+            [NiceDisplayName("Poradce předsedy vlády")]
+            PoradcePredsedyVlady,
             
         }
         
@@ -643,6 +645,16 @@ namespace HlidacStatu.Repositories
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
                             && e.AddInfo.ToLower().StartsWith("senát")
                             && e.Organizace.ToLower().StartsWith("senát")
+                            && (e.DatumDo == null || e.DatumDo >= toDate)
+                            && (e.DatumOd == null || e.DatumOd <= toDate))
+                        .ToList();
+                
+                case Zatrideni.PoradcePredsedyVlady:
+                    return GetByEvent(e =>
+                            e.Type == (int)OsobaEvent.Types.PolitickaPracovni
+                            && (e.AddInfo.ToLower().StartsWith("poradce předsedy vlády") ||
+                                e.AddInfo.ToLower().StartsWith("poradkyně předsedy vlády"))
+                            && e.Organizace.ToLower().StartsWith("úřad vlády čr")
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();

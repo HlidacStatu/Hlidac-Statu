@@ -51,7 +51,7 @@ public class RejstrikTrestu
         [Nest.PropertyName("DruhText")]
         public string DruhText { get; set; }
 
-        [Nest.Object(Enabled = false)]
+        [Nest.Ignore]
         public Severity Riziko => Druh.ToLower() switch
         {
             "zpo" => Severity.Fatal,

@@ -28,7 +28,7 @@ namespace HlidacStatu.Repositories
 
         private static DateTime minBigSponzoringDate = new DateTime(DateTime.Now.Year - 10, 1, 1);
         private static DateTime minSmallSponzoringDate = new DateTime(DateTime.Now.Year - 5, 1, 1);
-        private static decimal smallSponzoringThreshold = 10000;
+        private static decimal smallSponzoringThreshold = 5000;
 
         public static Expression<Func<Sponzoring, bool>> SponzoringLimitsPredicate = s =>
             (s.Hodnota > smallSponzoringThreshold && s.DarovanoDne >= minBigSponzoringDate)
