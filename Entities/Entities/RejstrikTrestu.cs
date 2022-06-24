@@ -51,6 +51,7 @@ public class RejstrikTrestu
         [Nest.PropertyName("DruhText")]
         public string DruhText { get; set; }
 
+        [Nest.Object(Enabled = false)]
         public Severity Riziko => Druh.ToLower() switch
         {
             "zpo" => Severity.Fatal,
@@ -74,7 +75,32 @@ public class RejstrikTrestu
             [Devmasters.Enums.NiceDisplayName("Ostatní")]
             Others = 0,
         }
+        public vymera[] vymery { get; set; }
+        public prubeh[] prubehy { get; set; }
+
     }
+    public class vymera
+    {
+        public string SkupinaZkratka { get; set; }
+        public string SkupinaText { get; set; }
+
+        public string PolozkaZkratka { get; set; }
+        public string PolozkaText { get; set; }
+
+        public string Hodnota { get; set; }
+    }
+
+    public class prubeh
+    {
+        public string SkupinaZkratka { get; set; }
+        public string SkupinaText { get; set; }
+
+        public string PolozkaZkratka { get; set; }
+        public string PolozkaText { get; set; }
+
+        public string Hodnota { get; set; }
+    }
+
 
     public class Soud
     {
@@ -105,10 +131,10 @@ public class RejstrikTrestu
             public int Rok { get; set; }
 
             [Nest.PropertyName("ZakonCislo")]
-            public string ZakonCislo { get; set; }   
+            public string ZakonCislo { get; set; }
 
             [Nest.PropertyName("ParagrafCislo")]
-            public string ParagrafCislo { get; set; } 
+            public string ParagrafCislo { get; set; }
 
             [Nest.PropertyName("OdstavecPismeno")]
             public string OdstavecPismeno { get; set; }
