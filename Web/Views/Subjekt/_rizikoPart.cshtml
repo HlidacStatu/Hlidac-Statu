@@ -15,7 +15,7 @@
 
     string query = "";
 
-    var rejstrikTrestu = await RejstrikTrestuRepo.FindTrestyAsync(firma.ICO);
+    
 
 }
 
@@ -132,32 +132,3 @@
     </p>
 }
 
-@if (rejstrikTrestu.Count() > 0)
-{
-    foreach (var trest in rejstrikTrestu)
-    {
-        if (trest.Tresty is not null && trest.Tresty.Count() > 0)
-        {
-            var nejhorsiTrest = trest.Tresty.Max(x => x.Riziko);
-            var severityColor = nejhorsiTrest switch
-            {
-                RejstrikTrestu.Trest.Severity.Critical => "#A7261C",
-                RejstrikTrestu.Trest.Severity.Fatal => "#D85926",
-                RejstrikTrestu.Trest.Severity.Normal => "#F6CA48",
-                _ => "#5CBC3B"
-                };
-            <i class="fas fa-exclamation-circle" style="color:@severityColor;padding-right:20px;"></i>
-            <b>Dne @trest.DatumPravniMoci.ToString("dd.MM.yyyy") nabyl právní moci soudem udělený trest</b>
-            <a href="/data/Detail/rejstrik-trestu-pravnickych-osob/@trest.Id">
-                <i class='fas fa-link'></i>
-            </a>
-            <ul>
-                @foreach (var potrestani in trest.Tresty.OrderByDescending(x => x.Riziko))
-                {
-                    <li>@potrestani.DruhText</li>
-                }
-            </ul>
-            
-        }
-    }
-}
