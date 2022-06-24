@@ -9,31 +9,6 @@
 @{
     Layout = "_ReportLayout";
 
-
-    string[] uradVladyNames = new string[] {
-            "ales-michl",
-            "jiri-steg",
-            "rut-bizkova",
-            "blanka-zanova",
-            "michal-smucr",
-            "josef-havel-11",
-            "martin-fassmann",
-            "jaroslav-ungerman-1",
-            "cyril-svoboda",
-            "martin-holcat",
-            "zdenek-benes-27",
-            "frantisek-konicek",
-            "roman-lenner",
-            "miroslav-toman",
-            };
-
-    List<Osoba> showList = null;
-    showList = OsobaRepo.PolitickyAktivni.Get()
-        .Where(p => uradVladyNames.Contains(p.NameId))
-        .OrderBy(m => m.Prijmeni)
-        .ThenBy(m => m.Jmeno)
-        .ToList();
-
     ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
    {
 new() { Name="Poradci předsedy vlády",
@@ -94,9 +69,10 @@ new() { Name="Sponzor polit.stran",
    });
 
 
-    foreach (var p in showList)
+    foreach (var p in OsobaRepo.GetByZatrideni(OsobaRepo.Zatrideni.PoradcePredsedyVlady, DateTime.Now)
+        .OrderBy(m => m.Prijmeni)
+        .ThenBy(m => m.Jmeno))
     {
-
         poslanciTable.AddRow(p);
     }
 }
