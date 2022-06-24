@@ -8,11 +8,13 @@
 @using HlidacStatu.Datasets
 @using HlidacStatu.Datastructures.Graphs
 @using HlidacStatu.Entities
+@using HlidacStatu.Entities.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 @using HlidacStatu.Repositories
 @using HlidacStatu.Web.Framework
 @using HlidacStatu.Entities.Entities.Analysis;
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
     Layout = null;
@@ -45,6 +47,8 @@
         OnSankcniSeznam = sankcniSeznamRes.Count() > 0;   
     }
     catch {}
+    
+    var rejstrikTrestu = await RejstrikTrestuRepo.FindTrestyAsync(Model.ICO);
  
 }
 
@@ -106,6 +110,36 @@
                     Je velmi pravděpodobné, že společnost je sankčním seznamu EU nebo USA. <a href="/data/Hledat/firmy-na-sankcnim-seznamu?Q=ico:@Model.ICO">Více</a>
                 </span>
             </p>
+        }
+        
+        @if (rejstrikTrestu.Count() > 0)
+        {
+            foreach (var trest in rejstrikTrestu)
+            {
+                if (trest.Tresty is not null && trest.Tresty.Count() > 0)
+                {
+                    var nejhorsiTrest = trest.Tresty.Max(x => x.Riziko);
+                    var severityColor = nejhorsiTrest switch
+                    {
+                        RejstrikTrestu.Trest.Severity.Critical => "#A7261C",
+                        RejstrikTrestu.Trest.Severity.Fatal => "#D85926",
+                        RejstrikTrestu.Trest.Severity.Normal => "#F6CA48",
+                        _ => "#5CBC3B"
+                        };
+                    <i class="fas fa-exclamation-circle" style="color:@severityColor;padding-right:20px;"></i>
+                    <b>Dne @trest.DatumPravniMoci.ToString("dd.MM.yyyy") nabyl právní moci soudem udělený trest</b>
+                    <a href="/data/Detail/rejstrik-trestu-pravnickych-osob/@trest.Id">
+                        <i class='fas fa-link'></i>
+                    </a>
+                    <ul>
+                        @foreach (var potrestani in trest.Tresty.OrderByDescending(x => x.Riziko))
+                        {
+                            <li style="margin-left: 20px">@potrestani.DruhText</li>
+                        }
+                    </ul>
+                    
+                }
+            }
         }
 
         <partial name="_rizikoPart" model="@((firma: Model, rok: rok))" />
