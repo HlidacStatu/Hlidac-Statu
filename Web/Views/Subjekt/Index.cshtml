@@ -134,7 +134,7 @@
                     <ul>
                         @foreach (var potrestani in trest.Tresty.OrderByDescending(x => x.Riziko))
                         {
-                            <li style="margin-left: 20px">@potrestani.DruhText</li>
+                            <li style="margin-left: 20px">@potrestani.DruhText @potrestani.VymeraCitelne()</li>
                         }
                     </ul>
                     
