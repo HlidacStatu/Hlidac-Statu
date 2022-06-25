@@ -39,6 +39,7 @@
     var topZadavatele = topZadavateleFull.PerIco.CombinedTop(50);
     var topZadavateleCurrSeason = topZadavateleFull.PerYear.CombinedTop(currentSeasonYear, 10);
 
+
 }
 <h1>
     Analýza dotazu v registru smluv
@@ -126,13 +127,28 @@
                 ColorByPoint = true,
                 Name = "Obor",
                 Data = sortedData
-                        .Take(9)
-                        .Select(m => new SeriesDataTextValue()
-                        {
-                            Y = m.Value.CelkemCena,
-                            Name = ((Smlouva.SClassification.ClassificationsTypes)m.Key).ToNiceDisplayName()
-                        })
-                        .ToArray()
+                                        .Take(9)
+                                        .Select(m => new SeriesDataTextValue()
+                                        {
+                                            Y = m.Value.CelkemCena,
+                                            Name = ((Smlouva.SClassification.ClassificationsTypes)m.Key).ToNiceDisplayName()
+                                        })
+                                        .ToArray()
+            };
+
+    var pieHodnotySmluv = new SeriesTextValue()
+            {
+                ColorByPoint = true,
+                Name = "Hodnoty smluv",
+                Data = HlidacStatu.Web.Framework.Report.GlobalStatistics.SmlouvyPodleCenyAsync()
+                            .ConfigureAwait(false).GetAwaiter().GetResult()
+                            .Data
+                            .Select(m => new SeriesDataTextValue()
+                            {
+                                Name = m[0].Value.ToString(),
+                                Y = Convert.ToDecimal(m[1].Value)
+                            })
+                            .ToArray()
             };
 
 }
@@ -155,6 +171,9 @@
         <div class="col-lg-6 col-xs-12">
             @Html.PieChart("Obory nalezených smluv",pieOboryData, yTitleLeft: "% smluv", tooltipFormat:"{series.name}: <b>{point.y:,.0f} Kč</b>")
         </div>
+        <div class="col-lg-6 col-xs-12">
+            @Html.PieChart("Smlouvy podle hodnoty", pieHodnotySmluv, tooltipFormat:"{series.name}: <b>{point.y:.1f} %</b>")
+        </div>
     }
 
 </div>
@@ -170,14 +189,36 @@
     <p>
         Od roku @(HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Min()) byly největšími smluvními dodavateli:
     <p>
-            @Html.Raw(string.Join(", ", topDodavatele.Take(20).Select(m => $"<a href='/subjekt/{m.ICO}'>{Firmy.GetJmeno(m.ICO)}</a>")))
+            @if (topDodavatele.Count > 7)
+            {
+                @Html.Raw(string.Join(", ", topDodavatele.Take(7).Select(m => $"<a href='/subjekt/{m.ICO}'>{Firmy.GetJmeno(m.ICO)}</a>")))
+                <span class="collapse" id="topD2016">
+                        @Html.Raw(string.Join(", ", topDodavatele.Skip(7).Take(13).Select(m => $"<a href='/subjekt/{m.ICO}'>{Firmy.GetJmeno(m.ICO)}</a>")))
+                </span>
+                <a data-bs-toggle="collapse" href="#topD2016" style="font-weight:bold">Více... &raquo;</a>
+            }
+            else
+            {
+                @Html.Raw(string.Join(", ", topDodavatele.Take(20).Select(m => $"<a href='/subjekt/{m.ICO}'>{Firmy.GetJmeno(m.ICO)}</a>")))
+            }
     </p>
     </p>
 
     <p>
         V roce @currentSeasonYear byly největšími smluvními dodavateli:
     <p>
-            @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+            @if (topDodavateleCurrSeason.Count() > 7)
+            {
+                @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Take(7).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+                <span class="collapse" id="topDcurr">
+                        @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Skip(7).Take(13).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+                </span>
+                <a data-bs-toggle="collapse"  href="#topDcurr" style="font-weight:bold">Více... &raquo;</a>
+            }
+            else
+            {
+                @Html.Raw(string.Join(", ", topDodavateleCurrSeason.Take(20).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+            }
     </p>
     </p>
 
@@ -224,15 +265,36 @@
     <p>
         Od roku @(HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Min()) byly největšími smluvními zadavateli:
     <p>
-            @Html.Raw(string.Join(", ", topZadavatele.Take(20).Select(m => $"<a href='/subjekt/{m.ICO}'>{Firmy.GetJmeno(m.ICO)}</a>")))
+            @if (topZadavatele.Count > 7)
+            {
+                @Html.Raw(string.Join(", ", topDodavatele.Take(7).Select(m => $"<a href='/subjekt/{m.ICO}'>{Firmy.GetJmeno(m.ICO)}</a>")))
+                <span class="collapse" id="topZ2016">
+                        @Html.Raw(string.Join(", ", topZadavatele.Skip(7).Take(13).Select(m => $"<a href='/subjekt/{m.ICO}'>{Firmy.GetJmeno(m.ICO)}</a>")))
+                </span>
+                <a data-bs-toggle="collapse" href="#topZ2016" style="font-weight:bold">Více... &raquo;</a>
+            }
+            else
+            {
+                @Html.Raw(string.Join(", ", topZadavatele.Take(20).Select(m => $"<a href='/subjekt/{m.ICO}'>{Firmy.GetJmeno(m.ICO)}</a>")))
+            }
     </p>
     </p>
 
     <p>
         V roce @currentSeasonYear byly největšími smluvními dodavateli:
     <p>
-            @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
-    </p>
+            @if (topZadavateleCurrSeason.Count() > 7)
+            {
+                @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Take(7).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+                <span class="collapse" id="topZcurr">
+                        @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Skip(7).Take(13).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+                </span>
+                <a data-bs-toggle="collapse"  href="#topZcurr" style="font-weight:bold">Více... &raquo;</a>
+            }
+            else
+            {
+                @Html.Raw(string.Join(", ", topZadavateleCurrSeason.Take(20).Select(m => $"<a href='/subjekt/{m.ico}'>{Firmy.GetJmeno(m.ico)}</a>")))
+            }    </p>
     </p>
 
     <h4>Zadavatelé detailně</h4>

@@ -14,13 +14,13 @@
     </ol>
 }
 
-<cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@(ViewData[Constants.CacheKeyName])">
 @if (!string.IsNullOrEmpty( Model?.Query))
 {
+<cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@(ViewData[Constants.CacheKeyName])">
     <partial name="Partials/_analyzaPage" model="Model"/>
+</cache>
 }
 else
 {
     <partial name="Partials/AnalyzaStart" />
 }
-</cache>

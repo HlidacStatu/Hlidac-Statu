@@ -1,12 +1,9 @@
-﻿using Nest;
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+
+using Nest;
 
 namespace HlidacStatu.XLib.Render
 {
@@ -177,6 +174,21 @@ namespace HlidacStatu.XLib.Render
             }
             return idxs;
         }
+
+        public Series GetSeries(string seriesName, Func<T,int> convertToX, Func<T, decimal> convertToY, int dataSeriesOrder = 0 )
+        {
+            Series s = new Series();
+
+            foreach (var c in this.Columns)
+            {
+                s.Name = seriesName;
+                s.Data = this.Data[dataSeriesOrder]
+                    .Select(m => new SeriesData(convertToX(m.Value), convertToY(m.Value)))
+                    .ToArray();
+            }
+
+            return s;
+        }
     }
 
 
@@ -281,106 +293,5 @@ namespace HlidacStatu.XLib.Render
     {
         public DateTime Date { get; set; }
         public decimal Value { get; set; }
-    }
-
-    public class Series : Series<SeriesData>
-    {
-        [JsonProperty("color")]
-        public string Color { get; set; }
-
-        public enum SeriesType
-        {
-            column, line
-        }
-        [JsonProperty("type")]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public SeriesType? Type { get; set; } = null;
-
-
-        private int? _yAxis = null;
-        [JsonProperty("yAxis")]
-        public int YAxis
-        {
-            get
-            {
-                if (_yAxis is null)
-                {
-                    switch (Type)
-                    {
-                        case SeriesType.column:
-                            return 0;
-                        case SeriesType.line:
-                            return 1;
-                        default:
-                            return 0;
-                    }
-                }
-                return _yAxis.Value;
-            }
-
-            set
-            {
-                _yAxis = value;
-            }
-        }
-        [JsonProperty("tooltip")]
-        public SeriesTooltip SeriesTooltip { get; set; }
-
-    }
-    public class SeriesTextValue : Series<SeriesDataTextValue>
-    {
-        [JsonProperty("colorByPoint")]
-        public bool ColorByPoint { get; set; }
-
-
-    }
-
-    public class Series<T>
-    {
-
-
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("data")]
-        public T[] Data { get; set; }
-    }
-
-    public class SeriesTooltip
-    {
-        [JsonProperty("valuePrefix")]
-        public string ValuePrefix { get; set; }
-        [JsonProperty("valueSuffix")]
-        public string ValueSuffix { get; set; }
-        [JsonProperty("valueDecimals")]
-        public int ValueDecimals { get; set; }
-    }
-
-    public class SeriesData
-    {
-        public SeriesData() { }
-        public SeriesData(int x, decimal y)
-        {
-            X = x;
-            Y = y;
-        }
-        [JsonProperty("x")]
-        public int X { get; set; }
-        [JsonProperty("y")]
-        public decimal Y { get; set; }
-    }
-    public class SeriesDataTextValue
-    {
-        public SeriesDataTextValue() { }
-        public SeriesDataTextValue(string name, decimal value)
-        {
-            Name = name;
-            Y = value;
-        }
-        [JsonProperty("name")]
-        public string Name { get; set; }
-        [JsonProperty("y")]
-        public decimal Y { get; set; }
     }
 }
