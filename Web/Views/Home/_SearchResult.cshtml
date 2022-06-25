@@ -124,6 +124,10 @@
             double? sum = ((Nest.ValueAggregate)Model?.ElasticResults?.Aggregations["sumKc"])?.Value;
             <h4>
                 Celková cena nalezených smluv @Html.Raw(Smlouva.ShortNicePrice(Convert.ToDecimal(sum.Value), html: true))
+                @if (this.User?.Identity?.IsAuthenticated == true)
+                {
+                    <a class="btn btn-light btn-sm border border-danger" href="/analyza?q=@(System.Net.WebUtility.UrlEncode(Model.OrigQuery))" onclick="return trackOutLink(this,'analyza');"> Hlubší analýza nalezených smluv</a>
+                }
             </h4>
         }
     </div>
