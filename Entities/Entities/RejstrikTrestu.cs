@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace HlidacStatu.Entities.Entities;
 
@@ -75,29 +76,71 @@ public class RejstrikTrestu
             [Devmasters.Enums.NiceDisplayName("Ostatní")]
             Others = 0,
         }
+        [Nest.PropertyName("vymery")]
         public vymera[] vymery { get; set; }
+        [Nest.PropertyName("prubehy")]
         public prubeh[] prubehy { get; set; }
+
+        public string VymeraCitelne()
+        {
+            // zatím parsujeme jen měsíce a roky - u ostatních je to složitější
+            // zdroj https://eservice-po.rejtr.justice.cz/public/odsouzeni_xml
+            foreach (var vymera in vymery)
+            {
+                bool parseResult = int.TryParse(vymera.Hodnota, out int hodnota);
+                
+                if (vymera.SkupinaZkratka == "VYM")
+                {
+                    if (vymera.PolozkaZkratka == "POCROK")
+                    {
+                        var text = "s délkou trvání " +
+                            Devmasters.Lang.CS.Plural.Get(hodnota,
+                                "jeden rok",
+                                "{0} roky",
+                                "{0} roků");
+                        return text;
+                    } 
+                    else if (vymera.PolozkaZkratka == "POCMES")
+                    {
+                        var text = "s délkou trvání " +
+                            Devmasters.Lang.CS.Plural.Get(hodnota,
+                                "jeden měsíc",
+                                "{0} měsíce",
+                                "{0} měsíců");
+                        return text;
+                    }
+                }
+            }
+
+            return "";
+        }
 
     }
     public class vymera
     {
+        [Nest.PropertyName("SkupinaZkratka")]
         public string SkupinaZkratka { get; set; }
+        [Nest.PropertyName("SkupinaText")]
         public string SkupinaText { get; set; }
-
+        [Nest.PropertyName("PolozkaZkratka")]
         public string PolozkaZkratka { get; set; }
+        [Nest.PropertyName("PolozkaText")]
         public string PolozkaText { get; set; }
-
+        [Nest.PropertyName("Hodnota")]
         public string Hodnota { get; set; }
     }
 
     public class prubeh
     {
+        [Nest.PropertyName("SkupinaZkratka")]
         public string SkupinaZkratka { get; set; }
+        [Nest.PropertyName("SkupinaText")]
         public string SkupinaText { get; set; }
-
+        [Nest.PropertyName("PolozkaZkratka")]
         public string PolozkaZkratka { get; set; }
+        [Nest.PropertyName("PolozkaText")]
         public string PolozkaText { get; set; }
-
+        [Nest.PropertyName("Hodnota")]
         public string Hodnota { get; set; }
     }
 
