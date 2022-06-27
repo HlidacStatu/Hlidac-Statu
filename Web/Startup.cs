@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using HlidacStatu.Entities.Entities;
+using HlidacStatu.LibCore.Filters;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
@@ -129,7 +130,7 @@ namespace HlidacStatu.Web
                     In = ParameterLocation.Header,
                     Scheme = "apiKey"
                 });
-                c.OperationFilter<AddApiAuthHeaderParameter>();
+                c.OperationFilter<ApiAuthHeaderParameter>();
 
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = "HlidacStatu.Web.xml";
