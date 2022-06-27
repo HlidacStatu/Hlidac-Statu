@@ -41,7 +41,7 @@ namespace HlidacStatu.Entities
                 PercentOfTime = new MeasureStatus<decimal>(
                     StatusPerData(UptimeSSL.Statuses.OK),
                     StatusPerData(UptimeSSL.Statuses.Pomalé),
-                    StatusPerData(UptimeSSL.Statuses.Nedostupné),
+                    StatusPerData(UptimeSSL.Statuses.Nedostupné, UptimeSSL.Statuses.BadHttpCode, UptimeSSL.Statuses.TimeOuted),
                     StatusPerData(UptimeSSL.Statuses.Unknown)
                     );
                 decimal totalSec = (decimal)(MaxDate - MinDate).TotalSeconds;
@@ -140,12 +140,12 @@ namespace HlidacStatu.Entities
                 return interv;
 
             }
-            private decimal StatusPerData(UptimeSSL.Statuses status)
+            private decimal StatusPerData(params UptimeSSL.Statuses[] statuses)
             {
                 decimal perc100 = data.Count();
                 if (perc100 == 0)
                     return 0;
-                var num = data.Count(d => d.Status() == status);
+                var num = data.Count(d => statuses.Contains(d.Status() ));
 
                 return (decimal)num / perc100;
             }
