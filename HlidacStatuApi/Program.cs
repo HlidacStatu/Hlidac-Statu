@@ -17,14 +17,14 @@ System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.csCulture;
 
 
+// service registration --------------------------------------------------------------------------------------------
 
-// Add services to the container.
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 // for scoped services (mainly for identity)
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<DbEntities>(options =>
     options.UseSqlServer(connectionString));
 
-// Add a DbContext to store your Database Keys
+// Add a DbContext to store your Database Keys (cookie single sign on)
 builder.Services.AddDbContext<HlidacKeysContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDataProtection()
@@ -35,6 +35,11 @@ AddIdentity(builder.Services);
 
 builder.Services.AddSingleton<AttackerDictionaryService>();
 
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(); // this needs to be added, so datasety's Registration string[,] property can be serialized 
+
+//swagger
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v2", new OpenApiInfo
@@ -73,15 +78,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
-
-
-
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+// Pipeline below -------------------------------------------------------------------------------------------------
 var app = builder.Build();
 
 app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
@@ -106,7 +103,7 @@ app.UseSwaggerUI(c =>
 });
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseApiAuthenticationMiddleware();
 
 app.UseAuthorization();
@@ -116,6 +113,7 @@ app.MapControllers();
 app.Run();
 
 
+// Methods below -------------------------------------------------------------------------------------------------
 
 void AddIdentity(IServiceCollection services)
 {
