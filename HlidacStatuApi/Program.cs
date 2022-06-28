@@ -67,7 +67,7 @@ builder.Services.AddSwaggerGen(c =>
     c.OperationFilter<ApiAuthHeaderParameter>();
 
     // Set the comments path for the Swagger JSON and UI.
-    var xmlFile = "HlidacStatu.Web.xml";
+    var xmlFile = "HlidacStatuApi.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
 });
@@ -114,9 +114,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-
-
 
 
 
