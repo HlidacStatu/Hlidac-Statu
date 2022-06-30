@@ -100,6 +100,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{34192F9D-C05
 		..\PrivateDocumentation\Deploy\Web\deployWeb.bat = ..\PrivateDocumentation\Deploy\Web\deployWeb.bat
 		..\PrivateDocumentation\Deploy\Web\Production.logger.serilog.json = ..\PrivateDocumentation\Deploy\Web\Production.logger.serilog.json
 		..\PrivateDocumentation\Deploy\Web\web.Production.config = ..\PrivateDocumentation\Deploy\Web\web.Production.config
+		..\PrivateDocumentation\Deploy\Web\deployApi.bat = ..\PrivateDocumentation\Deploy\Web\deployApi.bat
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Downloader", "Downloader", "{256417D4-C1D7-4747-A227-D860BCC5A2B1}"
