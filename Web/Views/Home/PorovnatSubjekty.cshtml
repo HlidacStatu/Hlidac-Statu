@@ -39,7 +39,7 @@
         Name = "Subjekt",
         HtmlRender = (s) =>
         {
-            return string.Format(Html.KIndexLabelLink(s.ICO) + @"<a title='{1}' href='/subjekt/{0}'>{2}</a>", s.ICO, Firmy.GetJmeno(s.ICO), Devmasters.TextUtil.ShortenText(Firmy.GetJmeno(s.ICO), 50));
+            return string.Format((Html.KIndexLabelLinkAsync(s.ICO).ConfigureAwait(false).GetAwaiter().GetResult()) + @"<a title='{1}' href='/subjekt/{0}'>{2}</a>", s.ICO, Firmy.GetJmeno(s.ICO), Devmasters.TextUtil.ShortenText(Firmy.GetJmeno(s.ICO), 50));
         },
         TextRender = (s) => { return Devmasters.TextUtil.ShortenText(Firmy.GetJmeno(s.ICO), 40); },
         ValueRender = (s) => { return Firmy.GetJmeno(s.ICO); },

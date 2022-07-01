@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -56,17 +57,17 @@ namespace HlidacStatu.Web.Framework
         }
 
 
-        public static IHtmlContent KIndexIcon(this IHtmlHelper htmlHelper, string ico, int heightInPx = 15, string hPadding = "3px", string vPadding = "0", bool showNone = false, bool useTemp = false)
+        public static Task<IHtmlContent> KIndexIconAsync(this IHtmlHelper htmlHelper, string ico, int heightInPx = 15, string hPadding = "3px", string vPadding = "0", bool showNone = false, bool useTemp = false)
         {
-            return htmlHelper.KIndexIcon(ico, $"padding:{vPadding} {hPadding};height:{heightInPx}px;width:auto", showNone, useTemp);
+            return htmlHelper.KIndexIconAsync(ico, $"padding:{vPadding} {hPadding};height:{heightInPx}px;width:auto", showNone, useTemp);
         }
-        public static IHtmlContent KIndexIcon(this IHtmlHelper htmlHelper, string ico, string style, bool showNone = false, bool useTemp = false)
+        public static async Task<IHtmlContent> KIndexIconAsync(this IHtmlHelper htmlHelper, string ico, string style, bool showNone = false, bool useTemp = false)
         {
             if (string.IsNullOrEmpty(ico))
                 return htmlHelper.Raw("");
 
             ico = Util.ParseTools.NormalizeIco(ico);
-            Tuple<int?, Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues> lbl = Lib.Analysis.KorupcniRiziko.KIndex.GetLastLabel(ico, useTemp);
+            Tuple<int?, Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues> lbl = await Lib.Analysis.KorupcniRiziko.KIndex.GetLastLabelAsync(ico, useTemp);
             if (lbl != null)
             {
                 if (showNone || lbl.Item2 != Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues.None)
@@ -83,39 +84,37 @@ namespace HlidacStatu.Web.Framework
         public static IHtmlContent KIndexIcon(this IHtmlHelper htmlHelper, Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues label,
             string style, bool showNone = false, string title = "", bool useTemp = false)
         {
-            var user = htmlHelper.ViewContext.HttpContext.User;
             return htmlHelper.Raw(Lib.Analysis.KorupcniRiziko.KIndexData.KindexImageIcon(label, style, showNone, title));
         }
 
-        public static IHtmlContent KIndexLabelLink(this IHtmlHelper htmlHelper, string ico,
+        public static Task<IHtmlContent> KIndexLabelLinkAsync(this IHtmlHelper htmlHelper, string ico,
             int heightInPx = 15, string hPadding = "3px", string vPadding = "0", bool showNone = false,
             int? rok = null, bool linkToKindex = false)
         {
-            return htmlHelper.KIndexLabelLink(ico, $"padding:{vPadding} {hPadding};height:{heightInPx}px;width:auto", showNone, rok, linkToKindex);
+            return htmlHelper.KIndexLabelLinkAsync(ico, $"padding:{vPadding} {hPadding};height:{heightInPx}px;width:auto", showNone, rok, linkToKindex);
         }
 
-        public static IHtmlContent KIndexLabelLink(this IHtmlHelper htmlHelper, string ico, string style, bool showNone = false, int? rok = null, bool linkToKindex = false)
+        public static async Task<IHtmlContent> KIndexLabelLinkAsync(this IHtmlHelper htmlHelper, string ico, string style, bool showNone = false, int? rok = null, bool linkToKindex = false)
         {
             if (string.IsNullOrEmpty(ico))
                 return htmlHelper.Raw("");
 
             ico = Util.ParseTools.NormalizeIco(ico);
             var user = htmlHelper.ViewContext.HttpContext.User;
-            Tuple<int?, Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues>? kidx = Lib.Analysis.KorupcniRiziko.KIndex.GetLastLabel(ico);
+            Tuple<int?, Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues>? kidx = await Lib.Analysis.KorupcniRiziko.KIndex.GetLastLabelAsync(ico);
             if (kidx == null)
                 return htmlHelper.Raw("");
 
             Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues lbl = kidx.Item2;
-            return htmlHelper.KIndexLabelLink(ico, lbl, style, showNone, rok, linkToKindex: linkToKindex);
+            return htmlHelper.KIndexLabelLinkAsync(ico, lbl, style, showNone, rok, linkToKindex: linkToKindex);
         }
-        public static IHtmlContent KIndexLabelLink(this IHtmlHelper htmlHelper, string ico,
+        public static IHtmlContent KIndexLabelLinkAsync(this IHtmlHelper htmlHelper, string ico,
             Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues label,
             string style, bool showNone = false, int? rok = null, bool linkToKindex = false)
         {
             if (string.IsNullOrEmpty(ico))
                 return htmlHelper.Raw("");
 
-            var user = htmlHelper.ViewContext.HttpContext.User;
             if (linkToKindex)
             {
                 if (label != Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues.None || showNone)

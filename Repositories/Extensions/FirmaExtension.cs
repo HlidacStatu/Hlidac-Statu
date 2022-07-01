@@ -149,9 +149,9 @@ namespace HlidacStatu.Extensions
             return FirmaStatistics.CachedHoldingStatisticsVZ(firma, aktualnost, forceUpdateCache);
         }
 
-        public static Lib.Analysis.KorupcniRiziko.KIndexData Kindex(this Firma firma, bool useTemp = false)
+        public static Task<Lib.Analysis.KorupcniRiziko.KIndexData> KindexAsync(this Firma firma, bool useTemp = false)
         {
-            return Lib.Analysis.KorupcniRiziko.KIndex.Get(firma.ICO, useTemp);
+            return Lib.Analysis.KorupcniRiziko.KIndex.GetAsync(firma.ICO, useTemp);
         }
 
         public static bool MaVazbyNaPolitiky(this Firma firma)

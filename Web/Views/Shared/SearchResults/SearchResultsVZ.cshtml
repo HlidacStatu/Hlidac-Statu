@@ -51,7 +51,7 @@
                 {
                     if (HlidacStatu.Util.DataValidators.CheckCZICO(item.Zadavatel.ICO))
                     {
-                        @Html.KIndexLabelLink(item.Zadavatel.ICO)<a href="/subjekt/@item.Zadavatel.ICO">@item.Zadavatel.Jmeno</a>
+                        @(await Html.KIndexLabelLinkAsync(item.Zadavatel.ICO))<a href="/subjekt/@item.Zadavatel.ICO">@item.Zadavatel.Jmeno</a>
                     }
                     else
                     {
@@ -66,7 +66,7 @@
                     {
                         if (HlidacStatu.Util.DataValidators.CheckCZICO(d.ICO))
                         {
-                            @Html.KIndexLabelLink(d.ICO)<a href="/subjekt/@d.ICO">@d.Jmeno</a>
+                            @(await Html.KIndexLabelLinkAsync(d.ICO))<a href="/subjekt/@d.ICO">@d.Jmeno</a>
                             <br/>
                         }
                         else

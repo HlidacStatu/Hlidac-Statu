@@ -59,7 +59,7 @@
             <td>
                 @if (!string.IsNullOrEmpty(rec.Platce?.ico))
                 {
-                    @Html.KIndexLabelLink(rec.Platce.ico)<a href="/Subjekt/@rec.Platce.ico">@rec.Platce.nazev</a>
+                    @(await Html.KIndexLabelLinkAsync(rec.Platce.ico))<a href="/Subjekt/@rec.Platce.ico">@rec.Platce.nazev</a>
                 }
                 else
                 {
@@ -71,7 +71,7 @@
                 {
                     if (!string.IsNullOrEmpty(rec.Prijemce[0].ico))
                     {
-                        @Html.KIndexLabelLink(rec.Prijemce[0].ico)<a href="/Subjekt/@rec.Prijemce[0].ico">@rec.Prijemce[0].nazev</a>
+                        @(await Html.KIndexLabelLinkAsync(rec.Prijemce[0].ico))<a href="/Subjekt/@rec.Prijemce[0].ico">@rec.Prijemce[0].nazev</a>
                     }
                     else
                     {
@@ -86,7 +86,7 @@
                             if (!string.IsNullOrEmpty(subj.ico))
                             {
                                 <li>
-                                    @Html.KIndexLabelLink(subj.ico)<a href="/Subjekt/@subj.ico">@subj.nazev</a>
+                                    @(await Html.KIndexLabelLinkAsync(subj.ico))<a href="/Subjekt/@subj.ico">@subj.nazev</a>
                                 </li>
                             }
                             else

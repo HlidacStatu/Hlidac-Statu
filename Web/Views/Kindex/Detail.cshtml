@@ -10,20 +10,20 @@
     string schovatTxt = "schovat detail";
 
     ViewBag.SelectedYear = Model.rok.HasValue ?
-                                Math.Min(Model.rok.Value, HtmlExtensions.MaxKIndexYearToShow(this.User)) 
-                                : HtmlExtensions.MaxKIndexYearToShow(this.User);
+                                Math.Min(Model.rok.Value, HtmlExtensions.MaxKIndexYearToShow(User)) 
+                                : HtmlExtensions.MaxKIndexYearToShow(User);
 
     bool futureData = KIndex.PlannedKIndexHash(Model.id, Model.rok ?? 0) == Model.priv;
-    if (!string.IsNullOrEmpty(Model.priv) && this.User.IsInRole("Admin"))
+    if (!string.IsNullOrEmpty(Model.priv) && User.IsInRole("Admin"))
     {
         futureData = true;
     }
 
 
     Firma f = Firmy.Get(Model.id);
-    KIndexData kidx = KIndex.Get(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), futureData);
+    KIndexData kidx = await KIndex.GetAsync(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), futureData);
     kidx.roky = kidx.roky
-        .Where(m => m.Rok <= HtmlExtensions.MaxKIndexYearToShow(this.User))
+        .Where(m => m.Rok <= HtmlExtensions.MaxKIndexYearToShow(User))
         .ToList();
 
     ViewBag.Title = "K-Index";
@@ -128,10 +128,13 @@ $(document).ready(function(){
 }
 
 
-@if (this.User.IsInRole("Admin"))
+@if (User.IsInRole("Admin"))
 {
-    KIndexData kidxPublic = HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndex.Get(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), false);
-    KIndexData kidxFuture = HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndex.Get(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), true);
+    var kIndexPublicTask = KIndex.GetAsync(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), false);
+    var kIndexFutureTask = KIndex.GetAsync(HlidacStatu.Util.ParseTools.NormalizeIco(Model.id), true);
+
+    KIndexData kidxPublic = await kIndexPublicTask;
+    KIndexData kidxFuture = await kIndexFutureTask;
 
     <h3>Info pro adminy</h3>
     <table class="table table-bordered table-condensed table-striped">
@@ -139,7 +142,7 @@ $(document).ready(function(){
             <tr><th>Rok</th><th>Ready 2020?</th><th>Zverejneny KIndex</th><th>Ready 2021?</th><th>Planovany ke zverejneni</th><th>KIndex 2021 v1</th></tr>
         </thead>
         <tbody>
-            @foreach (var rok in HlidacStatu.Lib.Analysis.KorupcniRiziko.Consts.AvailableCalculationYears)
+            @foreach (var rok in Consts.AvailableCalculationYears)
             {
                 var kidxP = kidxPublic?.ForYear(rok);
                 var kidxF = kidxFuture?.ForYear(rok);

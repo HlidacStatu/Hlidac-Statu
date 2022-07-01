@@ -39,7 +39,7 @@
 
             </td>
             <td>
-                @Html.KIndexLabelLink(dotaceItem.Prijemce.Ico)@Devmasters.TextUtil.ShortenText((string.IsNullOrWhiteSpace(dotaceItem.Prijemce.HlidacJmeno) ?
+                @(await Html.KIndexLabelLinkAsync(dotaceItem.Prijemce.Ico))@Devmasters.TextUtil.ShortenText((string.IsNullOrWhiteSpace(dotaceItem.Prijemce.HlidacJmeno) ?
                                                                   dotaceItem.Prijemce.ObchodniJmeno :
                                                                   dotaceItem.Prijemce.HlidacJmeno)
                                                                   , 40)

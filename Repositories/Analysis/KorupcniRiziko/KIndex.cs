@@ -7,63 +7,17 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
     public static class KIndex
     {
-
-        private static AutoUpdateCouchbaseCacheManager<KIndexData, (string ico, bool useTemp)> instanceByIco
-       = AutoUpdateCouchbaseCacheManager<KIndexData, (string ico, bool useTemp)>.GetSafeInstance("kindexByICOv2", 
-           tuple => KIndexData.GetDirectAsync(tuple).ConfigureAwait(false).GetAwaiter().GetResult(),
-#if (!DEBUG)
-                TimeSpan.FromDays(1)
-#else
-                TimeSpan.FromSeconds(120)
-#endif
-                ,
-                Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
-                key => $"{key.ico}{(key.useTemp ? "_useTemp" : "")}"
-           );
-
-        private static AutoUpdateCouchbaseCacheManager<Tuple<int?, KIndexData.KIndexLabelValues>, (string ico, bool useTemp)> instanceLabelByIco
-       = AutoUpdateCouchbaseCacheManager<Tuple<int?, KIndexData.KIndexLabelValues>, (string ico, bool useTemp)>.GetSafeInstance("kindexLabelByICO", getDirectLabel,
-#if (!DEBUG)
-                TimeSpan.FromDays(1)
-#else
-                TimeSpan.FromSeconds(120)
-#endif
-                ,
-                Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
-                key => $"{key.ico}{(key.useTemp?"_useTemp":"")}"
-           );
-        private static Tuple<int?, KIndexData.KIndexLabelValues> getDirectLabel((string ico, bool useTemp) param)
-        {
-            if (Consts.KIndexExceptions.Contains(param.ico) && param.useTemp == false)
-                return new Tuple<int?, KIndexData.KIndexLabelValues>(null, KIndexData.KIndexLabelValues.None);
-
-            var kidx = Get(param.ico, param.useTemp);
-            if (kidx != null)
-            {
-                var lbl = kidx.LastKIndexLabel(out int? rok);
-                return new Tuple<int?, KIndexData.KIndexLabelValues>(rok, lbl);
-            }
-
-            return new Tuple<int?, KIndexData.KIndexLabelValues>(null, KIndexData.KIndexLabelValues.None);
-        }
-
-
-        public static KIndexData Get(string ico, bool useTemp = false)
+        public static async Task<KIndexData> GetAsync(string ico, bool useTemp = false)
         {
             if (string.IsNullOrEmpty(ico))
                 return null;
-            var f = instanceByIco.Get((ico, useTemp));
+            var f = await KIndexData.GetDirectAsync((ico, useTemp));
             if (f == null || f.Ico == "-")
                 return null;
             return f;
@@ -124,9 +78,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         }
 
-        public static bool HasKIndexValue(string ico, bool useTemp)
+        public static async Task<bool> HasKIndexValueAsync(string ico, bool useTemp)
         {
-            var kidx = Get(ico, useTemp);
+            var kidx = await GetAsync(ico, useTemp);
             if (kidx == null)
                 return false;
             else
@@ -135,9 +89,19 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             }
         }
 
-        public static Tuple<int?, KIndexData.KIndexLabelValues> GetLastLabel(string ico, bool useTemp=false)
+        public static async Task<Tuple<int?, KIndexData.KIndexLabelValues>> GetLastLabelAsync(string ico, bool useTemp=false)
         {
-            return instanceLabelByIco.Get((ico, useTemp));
+            if (Consts.KIndexExceptions.Contains(ico) && useTemp == false)
+                return new Tuple<int?, KIndexData.KIndexLabelValues>(null, KIndexData.KIndexLabelValues.None);
+
+            var kidx = await GetAsync(ico, useTemp);
+            if (kidx != null)
+            {
+                var lbl = kidx.LastKIndexLabel(out int? rok);
+                return new Tuple<int?, KIndexData.KIndexLabelValues>(rok, lbl);
+            }
+
+            return new Tuple<int?, KIndexData.KIndexLabelValues>(null, KIndexData.KIndexLabelValues.None);
         }
 
 

@@ -84,7 +84,7 @@ else
         <td>
             @if (HlidacStatu.Util.DataValidators.CheckCZICO(Model.Zadavatel?.ICO))
             {
-                @Html.KIndexLabelLink(Model.Zadavatel.ICO)<a href="/subjekt/@Model.Zadavatel.ICO">@Model.Zadavatel.Jmeno (IČ @Model.Zadavatel.ICO)</a>
+                @(await Html.KIndexLabelLinkAsync(Model.Zadavatel.ICO))<a href="/subjekt/@Model.Zadavatel.ICO">@Model.Zadavatel.Jmeno (IČ @Model.Zadavatel.ICO)</a>
             }
             else
             {
@@ -100,7 +100,7 @@ else
             {
                 if (HlidacStatu.Util.DataValidators.CheckCZICO(od.ICO))
                 {
-                    @Html.KIndexLabelLink(od.ICO)<a href="/subjekt/@od.ICO">@od.Jmeno (IČ @od.ICO)</a>
+                    @(await Html.KIndexLabelLinkAsync(od.ICO))<a href="/subjekt/@od.ICO">@od.Jmeno (IČ @od.ICO)</a>
                 }
                 else
                 {

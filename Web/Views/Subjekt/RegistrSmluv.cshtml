@@ -203,13 +203,15 @@
             @*PER YEAR*@
             @for (int y = statistics.CurrentSeasonYear(); y > 2016; y--)
             {
+                var kindex = await Model.KindexAsync();
+                
                 <div>
                     <h3>Statistiky registru smluv pro @(Model.JsemOVM() ? "úřad" : "subjekt") v @y</h3>
                     <ul>
-                        @if (Model.Kindex()?.ForYear(y)?.KIndexReady == true)
+                        @if (kindex?.ForYear(y)?.KIndexReady == true)
                         {
                             <li>
-                                K-Index v @y má hodnotu @Html.KIndexIcon(Model.Kindex().ForYear(y).KIndexLabel) (<a href="@Model.Kindex().GetUrl(true, y)">více</a>)
+                                K-Index v @y má hodnotu @Html.KIndexIcon(kindex.ForYear(y).KIndexLabel) (<a href="@kindex.GetUrl(true, y)">více</a>)
                             </li>
                         }
                         <li>
@@ -219,8 +221,8 @@
                                 if (Model.PatrimStatu())
                                 {
                                     sentences.Add("z toho "
-                                        + NiceString($"/hledatSmlouvy", $"( hint.vztahSeSoukromymSubjektem:>0+) AND ico:{Model.ICO}", (int)statistics[y].PocetSmluvSeSoukromymSubj, statistics[y].CelkovaHodnotaSmluvSeSoukrSubj, y)
-                                        + " se soukromými subjekty"
+                                                  + NiceString($"/hledatSmlouvy", $"( hint.vztahSeSoukromymSubjektem:>0+) AND ico:{Model.ICO}", (int)statistics[y].PocetSmluvSeSoukromymSubj, statistics[y].CelkovaHodnotaSmluvSeSoukrSubj, y)
+                                                  + " se soukromými subjekty"
                                         );
 
                                 }

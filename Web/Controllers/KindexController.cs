@@ -71,7 +71,7 @@ namespace HlidacStatu.Web.Controllers
             ViewBag.SelectedYear = rok;
         }
 
-        public ActionResult Porovnat(string id, int? rok = null)
+        public async Task<ActionResult> Porovnat(string id, int? rok = null)
         {
 
             SetViewbagSelectedYear(ref rok);
@@ -94,7 +94,7 @@ namespace HlidacStatu.Web.Controllers
                     };
                     try
                     {
-                        data.PopulateWithAnnualData(rok.Value);
+                        await data.PopulateWithAnnualDataAsync(rok.Value);
                     }
                     catch (Exception)
                     {
@@ -219,13 +219,13 @@ text zpravy: {txt}";
             return Json(searchResult.Select(r => r.Original));
         }
 
-        public JsonResult KindexForIco(string id, int? rok = null)
+        public async Task<JsonResult> KindexForIco(string id, int? rok = null)
         {
             rok = Consts.FixKindexYear(rok);
             var f = Firmy.Get(Util.ParseTools.NormalizeIco(id));
             if (f.Valid)
             {
-                var kidx = KIndex.Get(Util.ParseTools.NormalizeIco(id));
+                var kidx = await KIndex.GetAsync(Util.ParseTools.NormalizeIco(id));
 
                 if (kidx != null)
                 {
@@ -274,7 +274,7 @@ text zpravy: {txt}";
         }
 
         //todo: What are we going to do with this?
-        public ActionResult Debug(string id, string ico = "", int? rok = null)
+        public async Task<ActionResult> Debug(string id, string ico = "", int? rok = null)
         {
             if (
                 !(User.IsInRole("Admin") || User.IsInRole("KIndex"))
@@ -290,7 +290,7 @@ text zpravy: {txt}";
 
             if (Util.DataValidators.CheckCZICO(Util.ParseTools.NormalizeIco(id)))
             {
-                KIndexData kdata = KIndex.Get(Util.ParseTools.NormalizeIco(id));
+                KIndexData kdata = await KIndex.GetAsync(Util.ParseTools.NormalizeIco(id));
                 ViewBag.ICO = id;
                 return View("Debug", kdata);
             }
@@ -303,7 +303,7 @@ text zpravy: {txt}";
                     var f = Firmy.Get(Util.ParseTools.NormalizeIco(i));
                     if (f.Valid)
                     {
-                        var kidx = KIndex.Get(Util.ParseTools.NormalizeIco(i));
+                        var kidx = await KIndex.GetAsync(Util.ParseTools.NormalizeIco(i));
                         if (kidx != null)
                             kdata.Add(kidx);
                     }
@@ -316,10 +316,10 @@ text zpravy: {txt}";
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public ActionResult PercentileBanner(string id, int? part = null, int? rok = null)
+        public async Task<ActionResult> PercentileBanner(string id, int? part = null, int? rok = null)
         {
             rok = Consts.FixKindexYear(rok);
-            var kidx = KIndex.Get(id);
+            var kidx = await KIndex.GetAsync(id);
             if (kidx != null)
             {
 
@@ -368,9 +368,9 @@ text zpravy: {txt}";
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public ActionResult Banner(string id, int? rok = null)
+        public async Task<ActionResult> Banner(string id, int? rok = null)
         {
-            var kidx = KIndex.Get(id);
+            var kidx = await KIndex.GetAsync(id);
 
             byte[] data = null;
             if (kidx != null)

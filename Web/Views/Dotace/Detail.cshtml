@@ -67,7 +67,7 @@
         <tr>
             <th>Příjemce dotace - jak je uvedeno v datech</th>
             <td>
-                @Html.KIndexLabelLink(Model.Prijemce.Ico)@Model.Prijemce.ObchodniJmeno
+                @(await Html.KIndexLabelLinkAsync(Model.Prijemce.Ico))@Model.Prijemce.ObchodniJmeno
             </td>
         </tr>
         <tr>

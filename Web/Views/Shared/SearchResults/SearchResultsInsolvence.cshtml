@@ -48,11 +48,11 @@
                 {
                     foreach (var o in item.Dluznici.Take(2))
                     {
-                        <div>@Html.KIndexLabelLink(o.ICO)@Html.Raw(o.ToHtml(!string.IsNullOrEmpty(o.OsobaId)))</div>
+                        <div>@(await Html.KIndexLabelLinkAsync(o.ICO))@Html.Raw(o.ToHtml(!string.IsNullOrEmpty(o.OsobaId)))</div>
                     }
                     if (item.Dluznici.Count == 3)
                     {
-                        <div>@Html.KIndexLabelLink(item.Dluznici[2].ICO)@Html.Raw(item.Dluznici[2].ToHtml(!string.IsNullOrEmpty(item.Dluznici[2].OsobaId)))</div>
+                        <div>@(await Html.KIndexLabelLinkAsync(item.Dluznici[2].ICO))@Html.Raw(item.Dluznici[2].ToHtml(!string.IsNullOrEmpty(item.Dluznici[2].OsobaId)))</div>
                     }
                     else if (item.Dluznici.Count > 3)
                     {
@@ -65,11 +65,11 @@
                 {
                     foreach (var o in item.Veritele.Take(2))
                     {
-                        <div>@Html.KIndexLabelLink(o.ICO)@Html.Raw(o.ToHtml(!string.IsNullOrEmpty(o.OsobaId)))</div>
+                        <div>@(await Html.KIndexLabelLinkAsync(o.ICO))@Html.Raw(o.ToHtml(!string.IsNullOrEmpty(o.OsobaId)))</div>
                     }
                     if (item.Veritele.Count == 3)
                     {
-                        <div>@Html.KIndexLabelLink(item.Veritele[2].ICO)@Html.Raw(item.Veritele[2].ToHtml(!string.IsNullOrEmpty(item.Veritele[2].OsobaId)))</div>
+                        <div>@(await Html.KIndexLabelLinkAsync(item.Veritele[2].ICO))@Html.Raw(item.Veritele[2].ToHtml(!string.IsNullOrEmpty(item.Veritele[2].OsobaId)))</div>
                     }
                     else if (item.Veritele.Count > 3)
                     {

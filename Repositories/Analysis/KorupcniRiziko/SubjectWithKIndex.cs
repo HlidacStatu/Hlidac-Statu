@@ -1,6 +1,7 @@
 ﻿using HlidacStatu.Entities;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -32,13 +33,13 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             KrajId = item.KrajId;
         }
 
-        public void PopulateWithAnnualData(int year)
+        public async Task PopulateWithAnnualDataAsync(int year)
         {
             if (string.IsNullOrWhiteSpace(Ico))
                 throw new Exception("Ico is missing");
 
             year = Consts.FixKindexYear(year);
-            var kindex = KIndex.Get(Ico);
+            var kindex = await KIndex.GetAsync(Ico);
 
             if (kindex != null)
             {

@@ -50,7 +50,7 @@
 </style>
 
 <div class="head">
-    <h3>@Html.KIndexLabelLink(Model.ICO, 30, linkToKindex: true)@Model.Jmeno</h3>
+    <h3>@(await Html.KIndexLabelLinkAsync(Model.ICO, 30, linkToKindex: true))@Model.Jmeno</h3>
     <p>Úřad - orgán veřejné moci. Řídí <a>45 podřízených organizací.</a> Je součástí <a>14 kategorií orgánu veřejné moci.</a></p>
 </div>
 <hr />

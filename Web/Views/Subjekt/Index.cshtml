@@ -32,7 +32,7 @@
     intv.Stop();
 
     intv = laps.AddAndStartLap("KIndex");
-    var kindex = Model.Kindex();
+    var kindex = await Model.KindexAsync();
 
     bool OnSankcniSeznam = false;
     string?[] sankcniSeznamRes = new string[] { };
@@ -74,7 +74,7 @@
                 </div>
             </div>
             <br />
-            <a href="/kindex/detail/@Model.ICO">Jak jsme @Html.KIndexIcon(Model.ICO) spočítali podrobně popisujeme zde</a>
+            <a href="/kindex/detail/@Model.ICO">Jak jsme @(await Html.KIndexIconAsync(Model.ICO)) spočítali podrobně popisujeme zde</a>
             <br />
 
             <a href="/kindex/detail/@Model.ICO" class="moreinfolink text-uppercase"><strong>Zobrazit podrobnosti o K-Indexu</strong></a>

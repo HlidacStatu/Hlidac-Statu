@@ -17,14 +17,14 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("full/{ico}")]
-        public ActionResult<KIndexData> FullDetail([FromRoute] string ico)
+        public async Task<ActionResult<KIndexData>> FullDetail([FromRoute] string ico)
         {
             if (string.IsNullOrEmpty(ico))
             {
                 return BadRequest($"Hodnota ico chybí.");
             }
 
-            var kindex = KIndex.Get(ico);
+            var kindex = await KIndex.GetAsync(ico);
 
             if (kindex == null)
             {
@@ -37,14 +37,14 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [HttpGet("{ico}")]
-        public ActionResult<KIndexDTO> Detail([FromRoute] string ico)
+        public async Task<ActionResult<KIndexDTO>> Detail([FromRoute] string ico)
         {
             if (string.IsNullOrEmpty(ico))
             {
                 return BadRequest($"Hodnota ico chybí.");
             }
 
-            var kindex = KIndex.Get(ico);
+            var kindex = await KIndex.GetAsync(ico);
 
             if (kindex == null)
             {

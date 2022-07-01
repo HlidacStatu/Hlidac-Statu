@@ -197,7 +197,7 @@
     </td>
     <td>
         @{
-            RenderSubjekt(Model.VkladatelDoRejstriku, 3);
+            await RenderSubjektAsync(Model.VkladatelDoRejstriku, 3);
         }
     </td>
 </tr>
@@ -207,7 +207,7 @@
     </td>
     <td>
         @{
-            RenderSubjekt(Model.Platce, 1);
+            await RenderSubjektAsync(Model.Platce, 1);
         }
     </td>
 </tr>
@@ -218,7 +218,7 @@
     <td>
         @for (int i = 0; i < Model.Prijemce.Length; i++)
         {
-            RenderSubjekt(Model.Prijemce[i], 2);
+            await RenderSubjektAsync(Model.Prijemce[i], 2);
             if (i < Model.Prijemce.Length - 1)
             {
                 @Html.Raw("<hr/>")
@@ -533,11 +533,11 @@
 
 @functions 
 {
-    private void RenderSubjekt(Smlouva.Subjekt subjekt, int typSubjektu)
+    private async Task RenderSubjektAsync(Smlouva.Subjekt subjekt, int typSubjektu)
     {
         Firma firma = Firmy.Get(subjekt.ico);
         <p>
-            @Html.KIndexLabelLink(subjekt.ico)
+            @(await Html.KIndexLabelLinkAsync(subjekt.ico))
             <a href="/subjekt/@subjekt.ico">
                 <b>@subjekt.nazev</b>
             </a>

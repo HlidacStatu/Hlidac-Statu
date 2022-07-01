@@ -60,7 +60,7 @@
                 <tr>
                     <td>
                         <h4>
-                            @Html.KIndexLabelLink(firma.ICO, 25)
+                            @(await Html.KIndexLabelLinkAsync(firma.ICO, 25))
                             <a href="/subjekt/@firma.ICO">
                                 @(firma.Jmeno)
                             </a>
@@ -117,7 +117,7 @@
 
 @functions
 {
-    private void SubjectStatistic(Firma firma)
+    private async Task SubjectStatistic(Firma firma)
     {
         HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> item = firma.StatistikaRegistruSmluv();
 
@@ -125,7 +125,7 @@
         string sclass = "ok";
 
         <li class="@sclass">
-            @Html.KIndexLabelLink(firma.ICO)<a href="/subjekt/@firma.ICO">@(firma.Jmeno)</a> (
+            @(await Html.KIndexLabelLinkAsync(firma.ICO))<a href="/subjekt/@firma.ICO">@(firma.Jmeno)</a> (
             @Devmasters.Lang.CS.Plural.Get(item.Summary().PocetSmluv, "{0} smlouva;{0} smlouvy;{0} smluv");
             celkem @Html.Raw(Smlouva.NicePrice(item.Summary().CelkovaHodnotaSmluv, html: true, shortFormat: true))
 

@@ -49,6 +49,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         }
 
         //todo: neměl by tenhle být deprecated a používat se lastReadyKindex
+        [Obsolete("Použij LastReadyKIndex")]
         public Annual LastKIndex(int? maxYear = null)
         {
             maxYear = maxYear ?? HlidacStatu.Util.ParseTools.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear"));
@@ -93,7 +94,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         public KIndexLabelValues LastKIndexLabel(out int? rok, int? maxYear = null)
         {
             maxYear = maxYear ?? HlidacStatu.Util.ParseTools.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear"));
-            var val = LastKIndex(maxYear);
+            var val = LastReadyKIndex(maxYear);
             rok = null;
             if (val == null)
                 return KIndexLabelValues.None;
