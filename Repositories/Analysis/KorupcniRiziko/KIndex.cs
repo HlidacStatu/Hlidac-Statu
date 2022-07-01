@@ -28,8 +28,6 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
                 key => $"{key.ico}{(key.useTemp ? "_useTemp" : "")}"
            );
-        static KIndexData notFoundKIdx = new KIndexData() { Ico = "-" };
-
 
         private static AutoUpdateCouchbaseCacheManager<Tuple<int?, KIndexData.KIndexLabelValues>, (string ico, bool useTemp)> instanceLabelByIco
        = AutoUpdateCouchbaseCacheManager<Tuple<int?, KIndexData.KIndexLabelValues>, (string ico, bool useTemp)>.GetSafeInstance("kindexLabelByICO", getDirectLabel,
@@ -68,12 +66,6 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             var f = instanceByIco.Get((ico, useTemp));
             if (f == null || f.Ico == "-")
                 return null;
-            //fill Annual
-            foreach (var r in f.roky)
-            {
-                if (r != null)
-                    r.Ico = ico;
-            }
             return f;
         }
 
