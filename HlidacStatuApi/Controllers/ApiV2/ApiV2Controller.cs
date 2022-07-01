@@ -99,6 +99,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
         
         // Tenhle endpoint používá autocomplete API pro načtení nových dat do autocomplete
+        [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "Admin,PrivateApi")]
         [HttpGet("generateAutocompleteData")]
         public ActionResult<byte[]> GenerateAutocompleteData()
@@ -110,7 +111,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         
         private static DumpInfoModel[] GetDumps()
         {
-            string baseUrl = "https://www.hlidacstatu.cz/api/v2/";
+            string baseUrl = "https://api.hlidacstatu.cz/api/v2/";
 
             List<DumpInfoModel> data = new List<DumpInfoModel>();
 
