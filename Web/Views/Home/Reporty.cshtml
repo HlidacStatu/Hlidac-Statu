@@ -1,4 +1,6 @@
-﻿@{
+﻿@using HlidacStatu.Entities
+@using HlidacStatu.Repositories
+@{
     ViewBag.Title = "Analytické a souhrnné reporty";
 
 }
@@ -49,6 +51,51 @@
         </div><!-- /.col-lg-4 -->
         
         <div class="col-sm-12 col-md-4">
+            <h3 style="margin-top:0;">Smlouvy</h3>
+            <div class="col-block-shadow">
+                @{
+                    double platnych = StaticData.BasicStatisticData.Get()[0];
+                    double neplatnych = StaticData.BasicStatisticData.Get()[1];
+                    double celkemKc = StaticData.BasicStatisticData.Get()[2];
+                }
+                <h3><a href="/Report/7">Základní statistiky Registru smluv</a></h3>
+                <p>Celkem smlouvy za @Html.Raw(Smlouva.ShortNicePrice(Convert.ToDecimal(celkemKc), html: true)) s DPH, @(platnych.ToString("N0")) platných smluv, @(neplatnych.ToString("N0")) neplatných.</p>
+                <p><a class="btn btn-default" href="/report/7" role="button">Podrobnosti »</a></p>
+            </div>
+            <div class="col-block-shadow">
+                <h3><a href="/Report/2">Smlouvy s nejvíce chybami</a></h3>
+                <p>Každou smlouvu analyzujeme a hledáme v ní chyby. Zde jsou ty nejhorší smlouvy.</p>
+                <p><a class="btn btn-default" href="/Report/2" role="button">Podrobnosti »</a></p>
+            </div>
+            <div class="col-block-shadow">
+                <h3><a href="/Report/3">Smlouvy s chybami nad 5mil Kč </a></h3>
+                <p>Smlouvy s nejvíce chybami a hodnotou alespoň 5mil Kč.</p>
+                <p><a class="btn btn-default" href="/Report/3" role="button">Podrobnosti »</a></p>
+            </div>
+            <div class="col-block-shadow">
+                <h3><a href="/Report/9">Firmy založené kolem data uzavření smlouvy</a></h3>
+                <p>Všechny firmy založené těsně před uzavřením smlouvy nebo až po uzavření smlouvy.</p>
+                <p><a class="btn btn-default" href="/Report/9" role="button">Podrobnosti »</a></p>
+            </div>
+            <div class="col-block-shadow">
+                <h3><a href="/Report/5">Smlouvy soukromých firem s vazbou na politiky</a></h3>
+                <p>Smlouvy se soukromými ekonomickými subjekty, u kterých existuje přímá a nepřímá vazba (majitel, statutární orgán) na politiky.</p>
+                <p><a class="btn btn-default" href="/Report/5" role="button">Podrobnosti »</a></p>
+            </div>
+            <div class="col-block-shadow">
+                <h3><a href="/Report/4">Nejdražší smlouvy</a></h3>
+                <p>Smlouvy uzavřené na nejvyšší částky.</p>
+                <p><a class="btn btn-default" href="/Report/4" role="button">Podrobnosti »</a></p>
+            </div>
+    
+            <div class="col-block-shadow">
+                <h3><a href="/Report/6">Nové úřady a firmy v rejstříku smluv</a></h3>
+                <p>Firmy a úřady, které se nyní objevili v rejstříku poprvé.</p>
+                <p><a class="btn btn-default" href="/Report/6" role="button">Podrobnosti »</a></p>
+            </div>
+        </div>
+    
+        <div class="col-sm-12 col-md-4">
             <h3 style="margin-top:0;">Další</h3>
             <div class="col-block-shadow newbadge top-right">
                 <h3><a href="/Report/27">Pomáhá stát v koronavirové krizi jak slibuje?</a></h3>
@@ -80,12 +127,8 @@
                 </p>
                 <p><a class="btn btn-default" href="/Report/23" role="button">Podrobnosti »</a></p>
             </div>*@
-            
-            
-
         </div>
 
     </div>
-
     
     <div class="clearfix"></div>
