@@ -135,6 +135,19 @@ else
     app.UseExceptionHandler("/Error/500");
 }
 
+// redirect to api key
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.Value;
+    // Redirect to an external URL
+    if (path == "" || path == "/")
+    {
+        context.Response.Redirect("https://www.hlidacstatu.cz/api");
+        return;   // short circuit
+    }
+    await next(context);
+});
+
 #if !DEBUG
     app.UseHttpsRedirection();
 #endif 
@@ -157,22 +170,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-////redirect rules
-//app.Use(async (context, next) =>
-//{
-//    var path = context.Request.PathBase.Value;
-//    // Redirect to an external URL
-//    if (
-//        path == ""
-//        || path == "/"
-//        || path?.Contains("/") == false
-//        )
-//    {
-//        context.Response.Redirect("https://www.hlidacstatu.cz/api");
-//        return;   // short circuit
-//    }
-//    await next();
-//});
 
 
 HlidacStatuApi.Code.Log.Logger.Info("{action} {code}.", "starting", "web API");
