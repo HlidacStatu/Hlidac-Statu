@@ -146,10 +146,12 @@
     {
         var topNedostupnosti24HTask = Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Web.Models.Apiv2.NedostupnostModel[]>(
             HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/weby/nedostupnost?days=1",
+            timeout: TimeSpan.FromSeconds(10),
             headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
         );
         var topNedostupnostiWTask = Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Web.Models.Apiv2.NedostupnostModel[]>(
             HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/weby/nedostupnost?days=7",
+            timeout: TimeSpan.FromSeconds(10),
             headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
         ); 
         

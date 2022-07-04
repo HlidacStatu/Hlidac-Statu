@@ -86,11 +86,13 @@ namespace HlidacStatu.Web.Controllers
                 {
                     webDay = await Devmasters.Net.HttpClient.Simple.GetAsync<UptimeServer.HostAvailability?>(
                         Framework.Constants.ApiURL + $"api/v2/weby/availabilityForDayById?id={id}",
-                        headers: new Dictionary<string, string> { { "Authorization", Framework.Constants.ApiToken } }
+                        timeout: TimeSpan.FromSeconds(3),
+                        headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
                     );
                     webWeek = await Devmasters.Net.HttpClient.Simple.GetAsync<UptimeServer.HostAvailability?>(
                         Framework.Constants.ApiURL + $"api/v2/weby/availabilityForWeekById?id={id}",
-                        headers: new Dictionary<string, string> { { "Authorization", Framework.Constants.ApiToken } }
+                        timeout: TimeSpan.FromSeconds(3),
+                        headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
                     ); 
 
                 }

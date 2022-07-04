@@ -57,7 +57,11 @@ namespace HlidacStatu.Web.Controllers
         {
             try
             {
-                var res = await Devmasters.Net.HttpClient.Simple.GetAsync(Framework.Constants.ApiURL + "api/v2/weby/nedostupnost?days=" + days);
+                var res = await Devmasters.Net.HttpClient.Simple.GetAsync(
+                    Framework.Constants.ApiURL + "api/v2/weby/nedostupnost?days=" + days,
+                    timeout: TimeSpan.FromSeconds(120),
+                    headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
+                    );
 
                 return Content(res, "application/json", System.Text.Encoding.UTF8);
 
@@ -84,7 +88,8 @@ namespace HlidacStatu.Web.Controllers
             try
             {
                 var res = await Devmasters.Net.HttpClient.Simple.GetAsync(Framework.Constants.ApiURL + $"api/v2/weby/{id}",
-                    headers: new Dictionary<string, string> { { "Authorization", Framework.Constants.ApiToken } }
+                    timeout: TimeSpan.FromSeconds(10),
+                    headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
                     );
 
                 return Content(res, "application/json", System.Text.Encoding.UTF8);

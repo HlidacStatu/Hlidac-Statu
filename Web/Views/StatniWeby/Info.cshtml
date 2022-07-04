@@ -16,6 +16,7 @@
     {
         web = await Devmasters.Net.HttpClient.Simple.GetAsync<UptimeServer.HostAvailability?>(
                         HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/weby/AvailabilityForWeekById?id={Model.Id}",
+                        timeout: TimeSpan.FromSeconds(10),
                         headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
                     ); 
 
