@@ -13,7 +13,7 @@ namespace HlidacStatuApi.Code
               sw.Start();
               var res = _availability(24);
               sw.Stop();
-              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} sec.", "updated", "uptimeServersCache1Day", sw.Elapsed.TotalSeconds);
+              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} ms.", "updated", "uptimeServersCache1Day", sw.ElapsedMilliseconds);
               return res.ToArray();
           });
 
@@ -31,7 +31,7 @@ namespace HlidacStatuApi.Code
               var res = _availability(7 * 24);
 #endif
               sw.Stop();
-              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} sec.", "updated", "uptimeServersCache7Days", sw.Elapsed.TotalSeconds);
+              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} ms.", "updated", "uptimeServersCache7Days", sw.ElapsedMilliseconds);
               return res.ToArray();
 
           }
