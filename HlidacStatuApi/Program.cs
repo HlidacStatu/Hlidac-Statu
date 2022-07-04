@@ -59,13 +59,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: CORSPolicy,
         policy =>
         {
-            policy.WithOrigins("https://hlidacstatu.cz",
-                                              "https://www.hlidacstatu.cz",
-                                              "https://stage.hlidacstatu.cz",
-                                              "https://ceny.analyzy.hlidacstatu.cz",
-                                              "https://jobtableeditor.hlidacstatu.cz",
-                                              "https://local.hlidacstatu.cz")
-                ;
+            policy.SetIsOriginAllowedToAllowWildcardSubdomains()
+                  .WithOrigins("https://*.hlidacstatu.cz")
+                  .AllowAnyMethod()
+                  .AllowCredentials()
+                  .AllowAnyHeader()
+                  .Build();
         });
 });
 
