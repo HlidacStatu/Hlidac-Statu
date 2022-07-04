@@ -28,9 +28,6 @@
             color: @(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Nedostupné));
         }
     </style>
-
-
-
 }
 
     @*<div class="card bg-danger">
@@ -147,14 +144,17 @@
 
     try
     {
-        topNedostupnosti24H = await Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Web.Models.Apiv2.NedostupnostModel[]>(
+        var topNedostupnosti24HTask = Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Web.Models.Apiv2.NedostupnostModel[]>(
             HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/weby/nedostupnost?days=1",
             headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
         );
-        topNedostupnostiW = await Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Web.Models.Apiv2.NedostupnostModel[]>(
+        var topNedostupnostiWTask = Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Web.Models.Apiv2.NedostupnostModel[]>(
             HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/weby/nedostupnost?days=7",
             headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
         ); 
+        
+        topNedostupnosti24H = await topNedostupnosti24HTask;  
+        topNedostupnostiW = await topNedostupnostiWTask; 
 
     }
     catch (Exception e)
@@ -278,12 +278,8 @@
     </p>
 </div>
 
-
-
 <div class="clearfix"></div>
 <p class="text-muted">Údaje na této stránce mohou být až 5 minut staré.</p>
-
-
 
 @section footerscripts{
 }
