@@ -32,7 +32,7 @@ namespace HlidacStatu.Lib.Data.External
                         var options = new InfluxDBClientOptions.Builder()
                             .Url(Devmasters.Config.GetWebConfigValue("InfluxDb"))
                             .AuthenticateToken(Devmasters.Config.GetWebConfigValue("InfluxDbToken"))
-                            .ReadWriteTimeOut(TimeSpan.FromMinutes(10))
+                            //.ReadWriteTimeOut(TimeSpan.FromMinutes(10))
                             .TimeOut(TimeSpan.FromMinutes(10))
                             .Build();
 
@@ -59,7 +59,7 @@ namespace HlidacStatu.Lib.Data.External
                 {
                     foreach (var point in points)
                     {
-                        writeApi.WritePoint(bucketName, orgName, point);
+                        writeApi.WritePoint(point, bucketName, orgName);
 
                     }
                 }
@@ -101,7 +101,8 @@ namespace HlidacStatu.Lib.Data.External
 
             try
             {
-                fluxTables = influxDbClient.GetQueryApi().QueryAsync(query, "hlidac").Result;
+                fluxTables = influxDbClient.GetQueryApi().QueryAsync(query, "hlidac")
+                    .ConfigureAwait(false).GetAwaiter().GetResult();
 
             }
             catch (Exception e)

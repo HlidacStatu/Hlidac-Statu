@@ -10,6 +10,7 @@ namespace HlidacStatuApi.Code
           (obj) =>
           {
               Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+              sw.Start();
               var res = _availability(24);
               sw.Stop();
               HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} sec.", "updated", "uptimeServersCache1Day", sw.Elapsed.TotalSeconds);
@@ -22,6 +23,8 @@ namespace HlidacStatuApi.Code
           (id) =>
           {
               Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+              sw.Start();
+
 #if DEBUG
               var res = uptimeServersCache1Day.Get();
 #else

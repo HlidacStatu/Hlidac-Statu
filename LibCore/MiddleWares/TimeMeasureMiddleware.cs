@@ -41,19 +41,25 @@ namespace HlidacStatu.LibCore.MiddleWares
 
             httpContext.Items.TryAdd("timeToProcessRequest", sw.ElapsedMilliseconds);
             
-            if (sw.ElapsedMilliseconds > 2000)
+            if (sw.ElapsedMilliseconds >=1000 && sw.ElapsedMilliseconds < 2000)
             {
-                //_logger.Warning($"Loading time of {url} was {sw.ElapsedMilliseconds} ms");
-                var msg = new Devmasters.Log.LogMessage();
-                //<conversionPattern value="%date|%property{page}|%property{params}|%property{user}|%property{elapsedtime}" />
-                msg.SetCustomKeyValue("web_page", url);
-                msg.SetCustomKeyValue("web_params", query);
-                msg.SetCustomKeyValue("web_elapsedtime", sw.ElapsedMilliseconds);
 
                 if (httpContext.User != null && httpContext.User.Identity != null && httpContext.User.Identity.Name != null)
-                    msg.SetCustomKeyValue("web_user", httpContext.User.Identity.Name);
-                _logger.Warning(msg);
+                    _logger.Debug("{webpage} with {query_params} for {user} done in {elapsed} ms", url, query, httpContext.User.Identity.Name, sw.ElapsedMilliseconds);
+                else
+                    _logger.Debug("{webpage} with {query_params} done in {elapsed} ms", url, query, sw.ElapsedMilliseconds);
+
             }
+            else if (sw.ElapsedMilliseconds >= 2000)
+            {
+
+                if (httpContext.User != null && httpContext.User.Identity != null && httpContext.User.Identity.Name != null)
+                    _logger.Warning("{webpage} with {query_params} for {user} done in {elapsed} ms", url, query, httpContext.User.Identity.Name, sw.ElapsedMilliseconds);
+                else
+                    _logger.Warning("{webpage} with {query_params} done in {elapsed} ms", url, query, sw.ElapsedMilliseconds);
+
+            }
+
         }
 
     }
@@ -61,7 +67,7 @@ namespace HlidacStatu.LibCore.MiddleWares
 
     public static class TimeMeasureMiddlewareExtension
     {
-        public static IApplicationBuilder UseTimeMeasureMiddleware(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseTimeMeasureMiddleware(this IApplicationBuilder builder, Devmasters.Log.Logger log = null)
         {
             return builder.UseMiddleware<TimeMeasureMiddleware>();
         }
