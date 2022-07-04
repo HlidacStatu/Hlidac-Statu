@@ -381,3 +381,5 @@ AutocompleteApi/appsettings.Development.json
 Web/Logger.serilog.json
 /HlidacStatuApi/appsettings.json
 /HlidacStatuApi/appsettings.Development.json
+
+appsettings.*.json
