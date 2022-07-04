@@ -513,7 +513,7 @@ namespace HlidacStatu.Extensions
         public static Sponzoring AddSponsoring(this Firma firma, Sponzoring sponzoring, string user)
         {
             sponzoring.IcoDarce = firma.ICO;
-            var result = SponzoringRepo.CreateOrUpdate(sponzoring, user);
+            var result = SponzoringRepo.Create(sponzoring, user);
             return result;
         }
 

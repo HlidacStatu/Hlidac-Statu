@@ -299,10 +299,10 @@ namespace HlidacStatu.Extensions
             return osoba.AddOrUpdateEvent(oe, user);
         }
 
-        public static Sponzoring AddOrUpdateSponsoring(this Osoba osoba, Sponzoring sponzoring, string user)
+        public static Sponzoring AddSponsoring(this Osoba osoba, Sponzoring sponzoring, string user)
         {
             sponzoring.OsobaIdDarce = osoba.InternalId;
-            var result = SponzoringRepo.CreateOrUpdate(sponzoring, user);
+            var result = SponzoringRepo.Create(sponzoring, user);
             return result;
         }
 

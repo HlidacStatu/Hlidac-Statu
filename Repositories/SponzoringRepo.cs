@@ -93,15 +93,15 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static Sponzoring CreateOrUpdate(Sponzoring sponzoring, string user)
+        public static Sponzoring Create(Sponzoring sponzoring, string user)
         {
             using (DbEntities db = new DbEntities())
             {
-                return CreateSponzoring(sponzoring, user, db);
+                return Create(sponzoring, user, db);
             }
         }
 
-        private static Sponzoring CreateSponzoring(Sponzoring sponzoring, string user, DbEntities db)
+        private static Sponzoring Create(Sponzoring sponzoring, string user, DbEntities db)
         {
             if (sponzoring.OsobaIdDarce == 0
                 && string.IsNullOrWhiteSpace(sponzoring.IcoDarce))
@@ -117,33 +117,6 @@ namespace HlidacStatu.Repositories
 
             AuditRepo.Add(Audit.Operations.Create, user, sponzoring, null);
             return sponzoring;
-        }
-
-        private static Sponzoring UpdateSponzoring(Sponzoring sponzoringToUpdate, Sponzoring sponzoring, string user,
-            DbEntities db)
-        {
-            var sponzoringOriginal = sponzoringToUpdate.ShallowCopy();
-
-            if (!string.IsNullOrWhiteSpace(sponzoring.IcoDarce))
-                sponzoringToUpdate.IcoDarce = sponzoring.IcoDarce;
-            if (sponzoring.OsobaIdDarce > 0)
-                sponzoringToUpdate.OsobaIdDarce = sponzoring.OsobaIdDarce;
-
-            sponzoringToUpdate.Edited = DateTime.Now;
-            sponzoringToUpdate.UpdatedBy = user;
-
-            sponzoringToUpdate.DarovanoDne = sponzoring.DarovanoDne;
-            sponzoringToUpdate.Hodnota = sponzoring.Hodnota;
-            sponzoringToUpdate.IcoPrijemce = sponzoring.IcoPrijemce;
-            sponzoringToUpdate.OsobaIdPrijemce = sponzoring.OsobaIdPrijemce;
-            sponzoringToUpdate.Popis = sponzoring.Popis;
-            sponzoringToUpdate.Typ = sponzoring.Typ;
-            sponzoringToUpdate.Zdroj = sponzoring.Zdroj;
-
-            db.SaveChanges();
-
-            AuditRepo.Add<Sponzoring>(Audit.Operations.Update, user, sponzoringToUpdate, sponzoringOriginal);
-            return sponzoringToUpdate;
         }
 
         public static void MergeDonatingOsoba(int originalOsobaId, int duplicateOsobaId, string user)

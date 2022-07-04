@@ -24,7 +24,8 @@ namespace SponzoriLoader
             // "https://zpravy.udhpsh.cz/export/vfz2017-index.json",
             // "https://zpravy.udhpsh.cz/zpravy/vfz2018.json",
             // "https://zpravy.udhpsh.cz/zpravy/vfz2019.json",
-            "https://zpravy.udhpsh.cz/zpravy/vfz2020.json"
+            // "https://zpravy.udhpsh.cz/zpravy/vfz2020.json"
+            "https://zpravy.udhpsh.cz/zpravy/vfz2021.json"
         };
 
         private static readonly string _user = "sponzorLoader";
@@ -72,7 +73,7 @@ namespace SponzoriLoader
 
             #endregion
 
-            await FixPeopleSponzors();
+            await FixPeopleSponzorsAsync();
         }
 
         public static async Task<dynamic> LoadIndexAsync(string url)
@@ -188,7 +189,7 @@ namespace SponzoriLoader
                         Typ = (int)donation.GiftType
                     };
 
-                    osoba.AddOrUpdateSponsoring(sponzoring, _user);
+                    osoba.AddSponsoring(sponzoring, _user);
                 }
 
             }
@@ -246,7 +247,7 @@ namespace SponzoriLoader
             return 0;
         }
 
-        public static async Task FixPeopleSponzors()
+        public static async Task FixPeopleSponzorsAsync()
         {
             var osoby = await OsobaRepo.PeopleWithAnySponzoringRecordAsync();
 
