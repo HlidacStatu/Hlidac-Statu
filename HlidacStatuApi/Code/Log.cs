@@ -6,6 +6,7 @@ namespace HlidacStatuApi.Code
     {
         public static Devmasters.Log.Logger Logger = Devmasters.Log.Logger.CreateLogger("API.HlidacStatu.cz",
                            Devmasters.Log.Logger.DefaultConfiguration()
+                                .AddLogStash(new Uri("http://10.10.150.203:5000"))
                                .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
                                .AddFileLoggerFilePerLevel("c:/Data/Logs/HlidacStatu/Api", "slog.txt",
                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
