@@ -126,7 +126,7 @@ namespace HlidacStatu.Repositories
                     timeBack = (DateTime.Now - fromD.Value).Add(TimeSpan.FromMinutes(10));
                 }
 
-                var serverAvail = UptimeServerRepo.ShortAvailability(new[] { serverId }, timeBack)
+                var serverAvail = UptimeServerRepo.DirectShortAvailability(new[] { serverId }, timeBack)
                     .FirstOrDefault();
                 if (fromD.HasValue)
                 {

@@ -14,6 +14,7 @@ namespace HlidacStatu.Entities
             }
             public HostAvailability Availability { get; set; }
             public SslData SSL { get; set; }
+            public UptimeSSL.IP6Support IPv6Support { get; set; }
             public string DetailUrl { get; set; }
         }
 

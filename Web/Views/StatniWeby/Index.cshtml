@@ -142,38 +142,29 @@
 <div class="clearfix" style="margin-bottom:30px"></div>
 <hr />
 @{
-    var topNedostupnosti24H = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers24hoursStat()
-                    //.Where(m=>m.Host.Id == 108)
-                    .Where(m=>m.Statistics() != null)
-                    .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
-                    .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
-                    .Take(30)
-                    .ToArray();
+    HlidacStatu.Web.Models.Apiv2.NedostupnostModel[] topNedostupnosti24H = null;
+    HlidacStatu.Web.Models.Apiv2.NedostupnostModel[] topNedostupnostiW = null;
 
-    //debug
-    List<int> serverWithSomeStrangeError = new List<int>();
-    foreach (var item in HlidacStatu.Repositories.UptimeServerRepo.AllActiveServersWeekStat())
+    try
     {
-        try
-        {
-            var i = item.Statistics().DurationTotal.Pomale.TotalSeconds + item.Statistics().DurationTotal.Nedostupne.TotalSeconds;
+        topNedostupnosti24H = await Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Web.Models.Apiv2.NedostupnostModel[]>(
+            HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/weby/nedostupnost?days=1",
+            headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
+        );
+        topNedostupnostiW = await Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Web.Models.Apiv2.NedostupnostModel[]>(
+            HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/weby/nedostupnost?days=7",
+            headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
+        ); 
 
-        }
-        catch (Exception)
-        {
-            serverWithSomeStrangeError.Add((item?.Host?.Id) ?? 0);
-            HlidacStatu.Util.Consts.Logger.Error($"Statistics error for {item?.Host?.Id} - {item?.Host?.Name}");           
-        }
+    }
+    catch (Exception e)
+    {
+        HlidacStatu.Util.Consts.Logger.Error("{page} error {exception}", "/statniweby", e);
+        topNedostupnosti24H = new HlidacStatu.Web.Models.Apiv2.NedostupnostModel[] { };
+        topNedostupnostiW = new HlidacStatu.Web.Models.Apiv2.NedostupnostModel[] { };
     }
 
-    UptimeServer.HostAvailability[] topNedostupnostiW = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServersWeekStat()
-                    .Where(m=>m?.Host?.Id != null)
-                    .Where(m=>serverWithSomeStrangeError.Contains(m.Host.Id)==false)
-                    .Where(m=>m.Statistics() != null)
-                    .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
-                    .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
-                    .Take(30)
-                    .ToArray();
+
 
     int pocetNedostupnost = Math.Max(10, topNedostupnosti24H.Count() / 2);
 }
@@ -191,32 +182,32 @@
                 <h2>za posledních 24 hodin</h2>
                 <ol>
 
-                    @foreach (var item in topNedostupnosti24H)
+                    @foreach (var item in topNedostupnosti24H.Take(30))
                     {
                         <li>
                             <div>
-                                <a href="@item.Host.pageUrl">@(Devmasters.TextUtil.ShortenText( item.Host.Name,38))</a>
-                                @if (item.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                                <a href="@item.Server.pageUrl">@(Devmasters.TextUtil.ShortenText( item.Server.Name,38))</a>
+                                @if (item.Statistics.DurationTotal.Nedostupne.TotalSeconds > 0)
                                 {
                                     <span>
-                                        nedostupná <span class="avail_Nedostupne">@item.Statistics().PercentOfTime.Nedostupne.ToString("P2")</span>
+                                        nedostupná <span class="avail_Nedostupne">@item.Statistics.PercentOfTime.Nedostupne.ToString("P2")</span>
                                     </span>
                                 }
-                                @if (item.Statistics().DurationTotal.Pomale.TotalSeconds > 0 && item.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                                @if (item.Statistics.DurationTotal.Pomale.TotalSeconds > 0 && item.Statistics.DurationTotal.Nedostupne.TotalSeconds > 0)
                                 {
                                     <span> a </span>
 
                                 }
-                                @if (item.Statistics().DurationTotal.Pomale.TotalSeconds > 0)
+                                @if (item.Statistics.DurationTotal.Pomale.TotalSeconds > 0)
                                 {
                                     <span>
-                                        pomalá <span class="avail_Pomale">@item.Statistics().PercentOfTime.Pomale.ToString("P2")</span>
+                                        pomalá <span class="avail_Pomale">@item.Statistics.PercentOfTime.Pomale.ToString("P2")</span>
                                     </span>
                                 }
                                 .
                             </div>
                             <div class="row collapse chart">
-                                @WebyChartUtil.Chart("w" + item.Host.Id, 24, 30, true,showLegend:false, showYAxisNames:false, showXAxis:false)
+                                @WebyChartUtil.Chart("w" + item.Server.Id, 24, 30, true,showLegend:false, showYAxisNames:false, showXAxis:false)
                             </div>
                         </li>
                     }
@@ -232,32 +223,32 @@
                 <h2>za poslední týden</h2>
                 <ol>
 
-                    @foreach (var item in topNedostupnostiW)
+                    @foreach (var item in topNedostupnostiW.Take(30))
                     {
                         <li>
                             <div>
-                                <a href="@item.Host.pageUrl">@(Devmasters.TextUtil.ShortenText( item.Host.Name,38))</a>
-                                @if (item.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                                <a href="@item.Server.pageUrl">@(Devmasters.TextUtil.ShortenText( item.Server.Name,38))</a>
+                                @if (item.Statistics.DurationTotal.Nedostupne.TotalSeconds > 0)
                                 {
                                     <span>
-                                        nedostupná <span class="avail_Nedostupne">@item.Statistics().PercentOfTime.Nedostupne.ToString("P2")</span>
+                                        nedostupná <span class="avail_Nedostupne">@item.Statistics.PercentOfTime.Nedostupne.ToString("P2")</span>
                                     </span>
                                 }
-                                @if (item.Statistics().DurationTotal.Pomale.TotalSeconds > 0 && item.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
+                                @if (item.Statistics.DurationTotal.Pomale.TotalSeconds > 0 && item.Statistics.DurationTotal.Nedostupne.TotalSeconds > 0)
                                 {
                                     <span> a </span>
 
                                 }
-                                @if (item.Statistics().DurationTotal.Pomale.TotalSeconds > 0)
+                                @if (item.Statistics.DurationTotal.Pomale.TotalSeconds > 0)
                                 {
                                     <span>
-                                        pomalá <span class="avail_Pomale">@item.Statistics().PercentOfTime.Pomale.ToString("P2")</span>
+                                        pomalá <span class="avail_Pomale">@item.Statistics.PercentOfTime.Pomale.ToString("P2")</span>
                                     </span>
                                 }
                                 .
                             </div>
                             <div class="row collapse chart">
-                                @WebyChartUtil.Chart("w" + item.Host.Id, 24*7, 30, true, showLegend:false, showYAxisNames:false, showXAxis:false)
+                                @WebyChartUtil.Chart("w" + item.Server.Id, 24*7, 30, true, showLegend:false, showYAxisNames:false, showXAxis:false)
                             </div>
                         </li>
                     }

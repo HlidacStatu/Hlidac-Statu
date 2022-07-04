@@ -3,18 +3,36 @@ using HlidacStatu.Entities.Entities;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
+
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
+string CORSPolicy = "from_hlidacstatu.cz";
+
 var builder = WebApplication.CreateBuilder(args);
 
 //init statics and others
 Devmasters.Config.Init(builder.Configuration);
+//System.Net.Http.HttpClient.DefaultProxy = new System.Net.WebProxy("127.0.0.1", 8888);
 
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.csCulture;
+
+new Thread(
+    () =>
+    {
+        HlidacStatuApi.Code.Log.Logger.Info("{action} {code} for {part} init during start.", "starting","thread","availability cache");
+        Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+        sw.Start();
+        _ = HlidacStatuApi.Code.Availability.AllActiveServers24hoursStat();
+        _ = HlidacStatuApi.Code.Availability.AllActiveServersWeekStat();
+        sw.Stop();
+        HlidacStatuApi.Code.Log.Logger.Info("{action} thread for {part} init during start in {duration} sec.", "ending", "availability cache",sw.Elapsed.TotalSeconds);
+    }
+).Start();
+
 
 
 // service registration --------------------------------------------------------------------------------------------
@@ -31,6 +49,22 @@ builder.Services.AddDataProtection()
     .PersistKeysToDbContext<HlidacKeysContext>()
     .SetApplicationName("HlidacStatu");
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: CORSPolicy,
+                      policy =>
+                      {
+                          policy.SetIsOriginAllowedToAllowWildcardSubdomains();
+                          policy.WithOrigins("https://hlidacstatu.cz",
+                                              "https://www.hlidacstatu.cz",
+                                              "https://stage.hlidacstatu.cz",
+                                              "https://ceny.analyzy.hlidacstatu.cz",
+                                              "https://jobtableeditor.hlidacstatu.cz",
+                                              "https://local.hlidacstatu.cz"
+                                              );
+                      });
+});
+
 AddIdentity(builder.Services);
 
 builder.Services.AddSingleton<AttackerDictionaryService>();
@@ -39,13 +73,14 @@ builder.Services.AddControllers()
     .AddNewtonsoftJson(); // this needs to be added, so datasety's Registration string[,] property can be serialized 
 
 //swagger
-builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v2", new OpenApiInfo
-    {
+    { 
         Version = "v2",
-        Title = "HlidacStatu Api V2.1.1",
+         
+        Title = "HlidacStatu Api " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString(),
         Description = "REST API Hlídače státu",
         TermsOfService = new Uri("https://www.hlidacstatu.cz/texty/provoznipodminky/"),
         Contact = new OpenApiContact
@@ -83,26 +118,38 @@ var app = builder.Build();
 
 app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
 {
-    LimitToPaths = new List<string> {"/api"},
+    LimitToPaths = new List<string> { "/api" },
     ApplicationName = "HlidacstatuApi"
 });
-            
+
 //request time measurement
 app.UseTimeMeasureMiddleware();
 
-app.UseBannedIpsMiddleware(); // tohle nechci při developmentu :) 
-app.UseExceptionHandler("/Error/500");
+if (IsDevelopment(app.Environment))
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseBannedIpsMiddleware(); // tohle nechci při developmentu :) 
+    app.UseExceptionHandler("/Error/500");
+}
+
+#if !DEBUG
+    app.UseHttpsRedirection();
+#endif 
+
+app.UseCors(CORSPolicy);
 
 
 app.UseSwagger();
-            
+
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v2/swagger.json", "API V2");
-    //c.RoutePrefix = "api/v2/swagger";
+    c.EnableTryItOutByDefault();
 });
 
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseApiAuthenticationMiddleware();
 
@@ -110,10 +157,40 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+////redirect rules
+//app.Use(async (context, next) =>
+//{
+//    var path = context.Request.PathBase.Value;
+//    // Redirect to an external URL
+//    if (
+//        path == ""
+//        || path == "/"
+//        || path?.Contains("/") == false
+//        )
+//    {
+//        context.Response.Redirect("https://www.hlidacstatu.cz/api");
+//        return;   // short circuit
+//    }
+//    await next();
+//});
+
+
+HlidacStatuApi.Code.Log.Logger.Info("{action} {code}.", "starting", "web API");
 app.Run();
 
 
 // Methods below -------------------------------------------------------------------------------------------------
+
+static bool IsDevelopment(IHostEnvironment hostEnvironment)
+{
+    if (hostEnvironment == null)
+    {
+        throw new ArgumentNullException(nameof(hostEnvironment));
+    }
+
+    return hostEnvironment.IsEnvironment("Petr") || hostEnvironment.IsEnvironment("Michal");
+}
+
 
 void AddIdentity(IServiceCollection services)
 {
@@ -139,12 +216,12 @@ void AddIdentity(IServiceCollection services)
     services.Configure<PasswordHasherOptions>(options =>
         options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
     );
-            
+
     services.ConfigureApplicationCookie(o =>
     {
-        o.Cookie.Domain = ".hlidacstatu.cz"; 
+        o.Cookie.Domain = ".hlidacstatu.cz";
         o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
-                
+
         o.Cookie.SameSite = SameSiteMode.Lax;
     });
 }

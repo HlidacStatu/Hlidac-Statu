@@ -5,7 +5,13 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    </PropertyGroup>
+        <UserSecretsId>7a3ddc60-02ba-4df4-a642-a69adfa64221</UserSecretsId>
+		<Version>2.2.0</Version>
+	</PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="Controllers\HomeController.cs" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.6" />
@@ -24,6 +30,12 @@
 
     <ItemGroup>
       <Folder Include="Helpers" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="StartFromCmd.bat">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

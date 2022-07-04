@@ -9,7 +9,7 @@ namespace HlidacStatu.Repositories
 
         private static Devmasters.Log.Logger auditLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.AuditLogger",
             new LoggerConfiguration().MinimumLevel.Debug()
-                .WriteTo.Http("http://10.10.150.203:5001",null,
+                .WriteTo.Http("http://10.10.150.203:5001",1024*1024,
                                 textFormatter:new Elastic.CommonSchema.Serilog.EcsTextFormatter(),
                                 batchFormatter:new Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter()
                 )

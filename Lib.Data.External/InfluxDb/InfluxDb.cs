@@ -1,9 +1,9 @@
-﻿using InfluxDB.Client;
-using InfluxDB.Client.Writes;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using InfluxDB.Client;
+using InfluxDB.Client.Writes;
 
 namespace HlidacStatu.Lib.Data.External
 {
@@ -19,10 +19,30 @@ namespace HlidacStatu.Lib.Data.External
             public long ResponseTimeInMs { get; set; }
         }
 
+        static object lockObj = new object();
+        static InfluxDBClient influxDbClient = null;
+        static InfluxDb()
+        {
+            if (influxDbClient == null)
+            {
+                lock (lockObj)
+                {
+                    if (influxDbClient == null)
+                    {
+                        var options = new InfluxDBClientOptions.Builder()
+                            .Url(Devmasters.Config.GetWebConfigValue("InfluxDb"))
+                            .AuthenticateToken(Devmasters.Config.GetWebConfigValue("InfluxDbToken"))
+                            .ReadWriteTimeOut(TimeSpan.FromMinutes(10))
+                            .TimeOut(TimeSpan.FromMinutes(10))
+                            .Build();
 
-        static InfluxDBClient influxDbClient = InfluxDBClientFactory.Create(
-    Devmasters.Config.GetWebConfigValue("InfluxDb"),
-    Devmasters.Config.GetWebConfigValue("InfluxDbToken"));
+                        influxDbClient = InfluxDBClientFactory.Create(options);
+
+                    }
+                }
+            }
+        }
+
 
         public static bool AddPoints(string bucketName, string orgName, params PointData[] points)
         {
@@ -60,7 +80,7 @@ namespace HlidacStatu.Lib.Data.External
             var sTimeBack = "";
             if (timeBack.TotalHours >= 1)
                 sTimeBack = $"-{timeBack.TotalHours:F0}h";
-            else 
+            else
                 sTimeBack = $"-{timeBack.TotalMinutes:F0}m";
 
             string query = "";
@@ -78,7 +98,17 @@ namespace HlidacStatu.Lib.Data.External
                   + "|> yield(name: \"max\")"
                   + "|> duplicate(column: \"_stop\", as: \"_time\")";
 
-            fluxTables = influxDbClient.GetQueryApi().QueryAsync(query, "hlidac").Result;
+
+            try
+            {
+                fluxTables = influxDbClient.GetQueryApi().QueryAsync(query, "hlidac").Result;
+
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
             var allData = fluxTables.SelectMany(m => m.Records)
                 .Select(m => new
                 {

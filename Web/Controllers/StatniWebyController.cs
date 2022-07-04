@@ -45,57 +45,6 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        [HlidacCache(60, "id;f;t;h", false)]
-        public ActionResult ChartData(string id, long? f, long? t, int? h = 24)
-        {
-            id = id?.ToLower() ?? "";
-            string content = "{}";
-            DateTime fromDate = DateTime.Now.AddHours(-1 * h.Value);
-            DateTime toDate = DateTime.Now;
-            if (f.HasValue)
-                fromDate = new DateTime(f.Value);
-            if (t.HasValue)
-                toDate = new DateTime(t.Value);
-
-            IEnumerable<Entities.UptimeServer.HostAvailability> data = null;
-            if (id.StartsWith("w"))
-            {
-                id = id.Replace("w", "");
-                var host = Repositories.UptimeServerRepo.Load(Convert.ToInt32(id));
-                if (host != null)
-                {
-                        data = new UptimeServer.HostAvailability[] { UptimeServerRepo.AvailabilityForWeekById(host.Id) };
-                }
-            }
-            else
-                data = Repositories.UptimeServerRepo.AvailabilityForDayByGroup(id);
-
-            if (data?.Count() > 0)
-            {
-                var dataArr = data.ToArray();
-                for (int i = 0; i < dataArr.Length; i++)
-                {
-                    dataArr[i].Host.Name = Devmasters.TextUtil.ShortenText(dataArr[i].Host.Name, 40);
-                }
-                var dataready = new
-                {
-                    data = dataArr.AsEnumerable()
-                      .Select((x, l) => x.DataForChart(fromDate, toDate, l))
-                      //.Reverse()
-                      .SelectMany(x => x)
-                      .ToArray(),
-                    cats = data
-                        //.Reverse()
-                        .ToDictionary(k => k.Host.Id, d => new { host = d.Host, lastResponse = d.Data.Last() }),
-                    categories = data.Select(m => m.Host.Id)
-                            //.Reverse()
-                            .ToArray(),
-                    colsize = data.Select(d => d.ColSize(fromDate, toDate)).Max(),
-                };
-                content = Newtonsoft.Json.JsonConvert.SerializeObject(dataready);
-            }
-            return Content(content, "application/json");
-        }
 
 
         [HlidacCache(2 * 60, "id;embed", false)]
@@ -123,17 +72,32 @@ namespace HlidacStatu.Web.Controllers
             UptimeServer.HostAvailability? webDay = null;
             UptimeServer.HostAvailability? webWeek = null;
 
-            if (System.Diagnostics.Debugger.IsAttached)
+            //if (System.Diagnostics.Debugger.IsAttached)
+            //{
+            //    webDay = HlidacStatu.Repositories.UptimeServerRepo.GetAvailabilityNoCache(TimeSpan.FromHours(24), id)
+            //        .FirstOrDefault();
+            //    webWeek = HlidacStatu.Repositories.UptimeServerRepo.GetAvailabilityNoCache(TimeSpan.FromHours(24 * 7), id)
+            //        .FirstOrDefault();
+            //}
+            //else
+            if (true)
             {
-                webDay = HlidacStatu.Repositories.UptimeServerRepo.GetAvailabilityNoCache(TimeSpan.FromHours(24), id)
-                    .FirstOrDefault();
-                webWeek = HlidacStatu.Repositories.UptimeServerRepo.GetAvailabilityNoCache(TimeSpan.FromHours(24 * 7), id)
-                    .FirstOrDefault();
-            }
-            else
-            {
-                webDay = HlidacStatu.Repositories.UptimeServerRepo.AvailabilityForDayById(id);
-                webWeek = HlidacStatu.Repositories.UptimeServerRepo.AvailabilityForWeekById(id);
+                try
+                {
+                    webDay = await Devmasters.Net.HttpClient.Simple.GetAsync<UptimeServer.HostAvailability?>(
+                        Framework.Constants.ApiURL + $"api/v2/weby/availabilityForDayById?id={id}",
+                        headers: new Dictionary<string, string> { { "Authorization", Framework.Constants.ApiToken } }
+                    );
+                    webWeek = await Devmasters.Net.HttpClient.Simple.GetAsync<UptimeServer.HostAvailability?>(
+                        Framework.Constants.ApiURL + $"api/v2/weby/availabilityForWeekById?id={id}",
+                        headers: new Dictionary<string, string> { { "Authorization", Framework.Constants.ApiToken } }
+                    ); 
+
+                }
+                catch (Exception e)
+                {
+                }
+
             }
 
             if (webDay == null || webWeek == null)

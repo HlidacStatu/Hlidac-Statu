@@ -41,6 +41,7 @@ namespace HlidacStatu.Connectors
             return GetList<Tuple<T1, T2, T3, T4, T5, T6, T7>>(GetRowValues<T1, T2, T3, T4, T5, T6, T7>, sql, type, param, cnnString);
         }
 
+
         private static IEnumerable<T> GetList<T>(Func<DataRow, T> fillFnc, string sql, CommandType type, IDataParameter[] param, string cnnString)
         {
             //bool isStruct = typeof(T).IsValueType && !typeof(T).IsEnum;

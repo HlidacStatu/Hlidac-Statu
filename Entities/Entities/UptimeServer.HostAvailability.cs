@@ -67,6 +67,10 @@ namespace HlidacStatu.Entities
                 }
                 return false;
             }
+            public HostAvailability()
+            {
+            }
+
             public HostAvailability(UptimeServer host, IEnumerable<Availability> data)
             {
                 this.Host = host;

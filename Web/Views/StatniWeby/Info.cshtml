@@ -14,7 +14,11 @@
     UptimeSSL webssl = null;
     try
     {
-        web = HlidacStatu.Repositories.UptimeServerRepo.AvailabilityForWeekById(Model.Id);
+        web = await Devmasters.Net.HttpClient.Simple.GetAsync<UptimeServer.HostAvailability?>(
+                        HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/weby/AvailabilityForWeekById?id={Model.Id}",
+                        headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
+                    ); 
+
         webssl = await UptimeSSLRepo.LoadLatestAsync(Model.HostDomain());
     }
     catch (Exception)

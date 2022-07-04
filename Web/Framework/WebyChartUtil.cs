@@ -145,8 +145,10 @@ namespace HlidacStatu.Web.Framework
         }
 
         public static IHtmlContent Chart(string dataName, int hoursBack, int height, bool detail, 
-            string path = "/StatniWeby", bool showLegend = true, bool showYAxisNames = true, bool showXAxis = true)
+            string path = null, bool showLegend = true, bool showYAxisNames = true, bool showXAxis = true)
         {
+            path = path ?? $"{Framework.Constants.ApiURL}api/v2/weby";
+
             var uniqueId = "_chart_" + Devmasters.TextUtil.GenRandomString(8);
             var colsize = 0; //data.Select(d => d.ColSize(fromDate, toDate)).Max();
             var colors = new string[] { Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.OK),

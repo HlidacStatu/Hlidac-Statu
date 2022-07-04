@@ -42,6 +42,12 @@ namespace HlidacStatu.Web
         {
             Configuration = configuration;
             WebHostEnvironment = webHostEnvironment;
+
+#if DEBUG
+            //dont check ssl for local debugging with local api
+            System.Net.ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+#endif
+
         }
 
         public IWebHostEnvironment WebHostEnvironment { get; }
@@ -52,6 +58,12 @@ namespace HlidacStatu.Web
         {
             //inicializace statických proměnných
             Devmasters.Config.Init(Configuration);
+            HlidacStatu.Util.Consts.Logger.Info("{action} {code}.", "starting", "web");
+
+#if DEBUG
+            //if (System.Diagnostics.Debugger.IsAttached)
+            //    System.Net.Http.HttpClient.DefaultProxy = new System.Net.WebProxy("127.0.0.1", 8888);
+#endif
 
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;

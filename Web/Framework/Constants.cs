@@ -7,6 +7,10 @@ namespace HlidacStatu.Web.Framework
 {
     public static class Constants
     {
+        public static readonly string ApiURL = "";
+        public static readonly string ApiToken = "";
+
+
         public const string AntispamInputName = "email2";
 
         public const string CacheKeyName = "H_CacheKey";
@@ -37,6 +41,11 @@ namespace HlidacStatu.Web.Framework
                              .Select(m => m.ToLower())
                              .ToArray();
 
+                        ApiURL = Devmasters.Config.GetWebConfigValue("APIUrl");
+                        
+                        ApiToken = Connectors.DirectDB.GetList<string>($"select top 1 cast(token as nvarchar(40)) from AspNetUserApiTokens where id='{Devmasters.Config.GetWebConfigValue("APIKeyFromUser")}'")
+                            .FirstOrDefault();
+
                     }
                 }
         }
@@ -53,6 +62,8 @@ namespace HlidacStatu.Web.Framework
             public static readonly TimeSpan Cache20Min = TimeSpan.FromMinutes(20);
             public static readonly TimeSpan Cache10Sec = TimeSpan.FromSeconds(10);
         }
+
+
 
         public static bool IsDevelopment(IHostEnvironment hostEnvironment)
         {

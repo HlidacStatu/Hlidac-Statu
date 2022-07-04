@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -52,33 +53,20 @@ namespace HlidacStatu.Web.Controllers
 
         [Authorize]
         [HttpGet("nedostupnost")]
-        public ActionResult<Models.Apiv2.NedostupnostModel[]> TopNedostupnost(int days)
+        public async Task<ActionResult<Models.Apiv2.NedostupnostModel[]>> TopNedostupnost(int days)
         {
+            try
+            {
+                var res = await Devmasters.Net.HttpClient.Simple.GetAsync(Framework.Constants.ApiURL + "api/v2/weby/nedostupnost?days=" + days);
 
-            UptimeServer.HostAvailability[] topNedostupnosti1D = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers24hoursStat()
-                //.Where(m=>m.Host.Id == 108)
-                .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
-                .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
-                .Take(60)
-                .ToArray();
-            UptimeServer.HostAvailability[] topNedostupnosti7D = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServersWeekStat()
-                            .Where(m => m?.Host?.Id != null)
-                            .Where(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + o.Statistics().DurationTotal.Nedostupne.TotalSeconds > 0)
-                            .OrderByDescending(o => (o.Statistics().DurationTotal.Pomale.TotalSeconds) + (o.Statistics().DurationTotal.Nedostupne.TotalSeconds * 5.0))
-                            .Take(60)
-                            .ToArray();
+                return Content(res, "application/json", System.Text.Encoding.UTF8);
 
-            Models.Apiv2.NedostupnostModel[] data = null;
-            if (days < 7)
-                data = topNedostupnosti1D
-                    .Select(m => new Models.Apiv2.NedostupnostModel() { Server = m.Host, Statistics = m.Statistics() })
-                    .ToArray();
-            else
-                data = topNedostupnosti7D
-                    .Select(m => new Models.Apiv2.NedostupnostModel() { Server = m.Host, Statistics = m.Statistics() })
-                    .ToArray();
-
-            return data; ;
+            }
+            catch (Exception e)
+            {
+                Util.Consts.Logger.Error($"TopNEdostupnost ${days}", e);
+                return BadRequest($"Interní chyba při načítání systému.");
+            }
         }
 
         //[GZipOrDeflate()]
@@ -95,24 +83,12 @@ namespace HlidacStatu.Web.Controllers
 
             try
             {
-                UptimeServer.HostAvailability data = UptimeServerRepo.AvailabilityForWeekById(host.Id);
-                UptimeSSL webssl = await UptimeSSLRepo.LoadLatestAsync(host.HostDomain());
-                var ssldata = new UptimeServer.WebStatusExport.SslData()
-                {
-                    Grade = webssl == null ? null : webssl.SSLGrade().ToNiceDisplayName(),
-                    LatestCheck = webssl?.Created,
-                    SSLExpiresAt = webssl?.CertExpiration()
-                };
-                if (webssl == null)
-                {
-                    ssldata = null;
-                }
-                return
-                    new UptimeServer.WebStatusExport()
-                    {
-                        Availability = data,
-                        SSL = ssldata
-                    };
+                var res = await Devmasters.Net.HttpClient.Simple.GetAsync(Framework.Constants.ApiURL + $"api/v2/weby/{id}",
+                    headers: new Dictionary<string, string> { { "Authorization", Framework.Constants.ApiToken } }
+                    );
+
+                return Content(res, "application/json", System.Text.Encoding.UTF8);
+
             }
             catch (Exception e)
             {
