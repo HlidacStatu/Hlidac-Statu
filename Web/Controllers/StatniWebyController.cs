@@ -13,13 +13,13 @@ namespace HlidacStatu.Web.Controllers
     public class StatniWebyController : Controller
     {
 
-        [HlidacCache(1 * 60, "id;embed", false)]
-
+        [HlidacCache(60 * 60, "id;embed", false)]
         public ActionResult Index()
         {
             return View();
         }
 
+        [HlidacCache(5 * 60, "id;embed", false)]
         public ActionResult Dalsi(string id)
         {
             ViewBag.ID = id;
@@ -47,7 +47,7 @@ namespace HlidacStatu.Web.Controllers
 
 
 
-        [HlidacCache(2 * 60, "id;embed", false)]
+        [HlidacCache(5 * 60, "id;embed", false)]
         public ActionResult Info(int id, string h)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
@@ -60,7 +60,7 @@ namespace HlidacStatu.Web.Controllers
 
 
         static byte[] EmptyPng = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFhAJ/wlseKgAAAABJRU5ErkJggg==");
-        [HlidacCache(2 * 60, "id", false)]
+        [HlidacCache(5 * 60, "id", false)]
         public async Task<ActionResult> Banner(int id)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
@@ -138,7 +138,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        [HlidacCache(2 * 60, "id;embed", false)]
+        [HlidacCache(60 * 60, "id;embed", false)]
         public ActionResult InfoHttps(int id)
         {
             UptimeServer host = Repositories.UptimeServerRepo.AllActiveServers()
@@ -161,11 +161,13 @@ namespace HlidacStatu.Web.Controllers
             return results;
         }
 
+        [HlidacCache(60 * 60,"", false)]
         public ActionResult Https()
         {
             return View();
         }
 
+        [HlidacCache(60 * 60, "", false)]
         public ActionResult ipv6()
         {
             return View();
