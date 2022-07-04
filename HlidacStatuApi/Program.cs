@@ -3,7 +3,6 @@ using HlidacStatu.Entities.Entities;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
-
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -23,17 +22,23 @@ System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Uti
 new Thread(
     () =>
     {
-        HlidacStatuApi.Code.Log.Logger.Info("{action} {code} for {part} init during start.", "starting","thread","availability cache");
+        HlidacStatuApi.Code.Log.Logger.Info(
+            "{action} {code} for {part} init during start.", 
+            "starting", 
+            "thread",
+            "availability cache");
         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
         sw.Start();
         _ = HlidacStatuApi.Code.Availability.AllActiveServers24hoursStat();
         _ = HlidacStatuApi.Code.Availability.AllActiveServersWeekStat();
         sw.Stop();
-        HlidacStatuApi.Code.Log.Logger.Info("{action} thread for {part} init during start in {duration} sec.", "ending", "availability cache",sw.Elapsed.TotalSeconds);
+        HlidacStatuApi.Code.Log.Logger.Info(
+            "{action} thread for {part} init during start in {duration} sec.", 
+            "ending",
+            "availability cache", 
+            sw.Elapsed.TotalSeconds);
     }
 ).Start();
-
-
 
 // service registration --------------------------------------------------------------------------------------------
 
@@ -52,17 +57,11 @@ builder.Services.AddDataProtection()
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: CORSPolicy,
-                      policy =>
-                      {
-                          policy.SetIsOriginAllowedToAllowWildcardSubdomains();
-                          policy.WithOrigins("https://hlidacstatu.cz",
-                                              "https://www.hlidacstatu.cz",
-                                              "https://stage.hlidacstatu.cz",
-                                              "https://ceny.analyzy.hlidacstatu.cz",
-                                              "https://jobtableeditor.hlidacstatu.cz",
-                                              "https://local.hlidacstatu.cz"
-                                              );
-                      });
+        policy =>
+        {
+            policy.WithOrigins("https://*.hlidacstatu.cz")
+                .SetIsOriginAllowedToAllowWildcardSubdomains();
+        });
 });
 
 AddIdentity(builder.Services);
@@ -73,13 +72,12 @@ builder.Services.AddControllers()
     .AddNewtonsoftJson(); // this needs to be added, so datasety's Registration string[,] property can be serialized 
 
 //swagger
-//builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v2", new OpenApiInfo
-    { 
+    {
         Version = "v2",
-         
+
         Title = "HlidacStatu Api " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString(),
         Description = "REST API Hlídače státu",
         TermsOfService = new Uri("https://www.hlidacstatu.cz/texty/provoznipodminky/"),
@@ -122,7 +120,6 @@ app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
     ApplicationName = "HlidacstatuApi"
 });
 
-//request time measurement
 app.UseTimeMeasureMiddleware();
 
 if (IsDevelopment(app.Environment))
@@ -135,7 +132,7 @@ else
     app.UseExceptionHandler("/Error/500");
 }
 
-// redirect to api key
+// redirect to apikey landing page
 app.Use(async (context, next) =>
 {
     var path = context.Request.Path.Value;
@@ -143,14 +140,15 @@ app.Use(async (context, next) =>
     if (path == "" || path == "/")
     {
         context.Response.Redirect("https://www.hlidacstatu.cz/api");
-        return;   // short circuit
+        return; // short circuit
     }
+
     await next(context);
 });
 
 #if !DEBUG
     app.UseHttpsRedirection();
-#endif 
+#endif
 
 app.UseCors(CORSPolicy);
 
@@ -171,7 +169,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 
-
 HlidacStatuApi.Code.Log.Logger.Info("{action} {code}.", "starting", "web API");
 app.Run();
 
@@ -185,9 +182,10 @@ static bool IsDevelopment(IHostEnvironment hostEnvironment)
         throw new ArgumentNullException(nameof(hostEnvironment));
     }
 
-    return hostEnvironment.IsEnvironment("Petr") || hostEnvironment.IsEnvironment("Michal");
+    return hostEnvironment.IsEnvironment("Petr") ||
+           hostEnvironment.IsEnvironment("Michal") ||
+           hostEnvironment.IsEnvironment("Development");
 }
-
 
 void AddIdentity(IServiceCollection services)
 {
