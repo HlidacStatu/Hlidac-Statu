@@ -235,7 +235,7 @@ namespace HlidacStatu.Web
                 }
                 
 
-                await next();
+                await next(context);
             });
 
             app.UseRouting();
