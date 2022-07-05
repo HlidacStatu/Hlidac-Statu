@@ -58,9 +58,9 @@ namespace HlidacStatu.LibCore.MiddleWares
 
     public static class TimeMeasureMiddlewareExtension
     {
-        public static IApplicationBuilder UseTimeMeasureMiddleware(this IApplicationBuilder builder, Devmasters.Log.Logger log = null)
+        public static IApplicationBuilder UseTimeMeasureMiddleware(this IApplicationBuilder builder, Devmasters.Log.Logger logger = null)
         {
-            return builder.UseMiddleware<TimeMeasureMiddleware>();
+            return builder.UseMiddleware<TimeMeasureMiddleware>(logger);
         }
     }
 }
