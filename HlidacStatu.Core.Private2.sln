@@ -95,6 +95,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.HealthChecks", "Web.Hea
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{34192F9D-C058-47A1-8EEF-88993F679C8D}"
 	ProjectSection(SolutionItems) = preProject
+		..\PrivateDocumentation\Deploy\Web\Api.Production.logger.serilog.json = ..\PrivateDocumentation\Deploy\Web\Api.Production.logger.serilog.json
 		..\PrivateDocumentation\Deploy\Web\appsettings.Production.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production.json
 		..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json
 		..\PrivateDocumentation\Deploy\Web\deployApi.bat = ..\PrivateDocumentation\Deploy\Web\deployApi.bat
