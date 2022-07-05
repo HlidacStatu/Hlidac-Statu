@@ -20,7 +20,7 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Devmasters.Log;
 using HlidacStatu.Entities.Entities;
 using HlidacStatu.LibCore.Filters;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -172,8 +172,19 @@ namespace HlidacStatu.Web
                 ApplicationName = "WEB"
             });
             
+            var timeMeasureLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.PageTimes",
+                Devmasters.Log.Logger.DefaultConfiguration()
+                    .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
+                    .AddFileLoggerFilePerLevel("c:/Data/Logs/HlidacStatu/Web.PageTimes", "slog.txt",
+                        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+                        rollingInterval: Serilog.RollingInterval.Day,
+                        fileSizeLimitBytes: null,
+                        retainedFileCountLimit: 9,
+                        shared: true
+                    ));
+            
             //request time measurement
-            app.UseTimeMeasureMiddleware();
+            app.UseTimeMeasureMiddleware(timeMeasureLogger);
                 
 
             if (Constants.IsDevelopment(env))

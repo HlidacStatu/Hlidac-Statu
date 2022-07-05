@@ -12,22 +12,13 @@ namespace HlidacStatu.LibCore.MiddleWares
 {
     public class TimeMeasureMiddleware
     {
-        public static Devmasters.Log.Logger _logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.PageTimes",
-                            Devmasters.Log.Logger.DefaultConfiguration()
-                                .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
-                                .AddFileLoggerFilePerLevel("c:/Data/Logs/HlidacStatu/Web.PageTimes", "slog.txt",
-                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
-                                    rollingInterval: Serilog.RollingInterval.Day,
-                                    fileSizeLimitBytes: null,
-                                    retainedFileCountLimit: 9,
-                                    shared: true
-                                    ));
-
+        private readonly Logger _logger;
         private readonly RequestDelegate _next;
 
-        public TimeMeasureMiddleware(RequestDelegate next)
+        public TimeMeasureMiddleware(RequestDelegate next, Devmasters.Log.Logger logger)
         {
             _next = next;
+            _logger = logger;
         }
 
         public async Task Invoke(HttpContext httpContext)
