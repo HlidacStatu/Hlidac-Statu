@@ -25,11 +25,11 @@ namespace HlidacStatuApi.Code
               Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
               sw.Start();
 
-#if DEBUG
+            #if DEBUG
               var res = uptimeServersCache1Day.Get();
-#else
+            #else
               var res = _availability(7 * 24);
-#endif
+            #endif
               sw.Stop();
               HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} ms.", "updated", "uptimeServersCache7Days", sw.ElapsedMilliseconds);
               return res.ToArray();
