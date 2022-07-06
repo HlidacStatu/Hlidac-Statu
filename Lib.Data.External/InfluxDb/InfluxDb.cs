@@ -98,6 +98,16 @@ namespace HlidacStatu.Lib.Data.External
                   + "|> yield(name: \"max\")"
                   + "|> duplicate(column: \"_stop\", as: \"_time\")";
 
+            if (false) //another grouping
+                query = query + "\n"
+                    + @"  |> filter(fn: (r) => r[""fieldname""] == ""responseTime"")
+                          |> aggregateWindow(every: 10m,         
+                              fn: (column, tables=<-) => tables |> quantile(q: 0.95, method: ""exact_selector""),
+                              //fn: max,
+                              createEmpty: false)
+                          |> yield(name: ""max"")
+                          |> duplicate(column: ""_stop"", as: ""_time"")
+                        ";
 
             try
             {
