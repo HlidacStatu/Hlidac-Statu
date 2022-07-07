@@ -131,6 +131,7 @@
 
     <ItemGroup>
       <Folder Include="Framework\HealthChecks\" />
+      <Folder Include="NewFolder\" />
     </ItemGroup>
 
 

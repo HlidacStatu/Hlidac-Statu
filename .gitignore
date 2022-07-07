@@ -355,7 +355,6 @@ riderModule.iml
 /_ReSharper.Caches/
 
 # temp files
-3rd/Swashbuckle/
 Web/WebApp.Stage_Release.config.bak
 
 *.filecache.data
