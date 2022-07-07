@@ -1,0 +1,24 @@
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.MachineLearning.xml
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.MachineLearning.deps.json
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.MachineLearning.dll
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.MachineLearning.pdb
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.Math.Core.dll
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.Math.dll
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.Statistics.dll
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.xml
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.Math.Core.pdb
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.Math.Core.xml
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.Math.pdb
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.Math.xml
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.Statistics.pdb
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\bin\Release\netstandard2.1\Accord.Statistics.xml
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\obj\Release\netstandard2.1\Accord.MachineLearning (NETStandard).csproj.AssemblyReference.cache
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\obj\Release\netstandard2.1\Accord.MachineLearning (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\obj\Release\netstandard2.1\Accord.MachineLearning (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\obj\Release\netstandard2.1\Accord.MachineLearning (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\obj\Release\netstandard2.1\Accord.MachineLearning (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\obj\Release\netstandard2.1\Accord.MachineLearning (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\obj\Release\netstandard2.1\Accord.MachineLearning.dll
+C:\Projects\Accord-framework\Sources\Accord.MachineLearning\obj\Release\netstandard2.1\Accord.MachineLearning.pdb

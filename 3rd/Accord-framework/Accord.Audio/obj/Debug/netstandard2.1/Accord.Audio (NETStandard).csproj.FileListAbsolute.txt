@@ -1,0 +1,16 @@
+C:\Projects\Accord-framework\Sources\Accord.Audio\bin\Debug\netstandard2.1\Accord.Audio.deps.json
+C:\Projects\Accord-framework\Sources\Accord.Audio\bin\Debug\netstandard2.1\Accord.Audio.dll
+C:\Projects\Accord-framework\Sources\Accord.Audio\bin\Debug\netstandard2.1\Accord.Audio.pdb
+C:\Projects\Accord-framework\Sources\Accord.Audio\bin\Debug\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Audio\bin\Debug\netstandard2.1\Accord.Math.Core.dll
+C:\Projects\Accord-framework\Sources\Accord.Audio\bin\Debug\netstandard2.1\Accord.Math.dll
+C:\Projects\Accord-framework\Sources\Accord.Audio\bin\Debug\netstandard2.1\Accord.Math.Core.pdb
+C:\Projects\Accord-framework\Sources\Accord.Audio\bin\Debug\netstandard2.1\Accord.Math.pdb
+C:\Projects\Accord-framework\Sources\Accord.Audio\bin\Debug\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Audio\obj\Debug\netstandard2.1\Accord.Audio (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.Audio\obj\Debug\netstandard2.1\Accord.Audio (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Audio\obj\Debug\netstandard2.1\Accord.Audio (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.Audio\obj\Debug\netstandard2.1\Accord.Audio (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Audio\obj\Debug\netstandard2.1\Accord.Audio (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.Audio\obj\Debug\netstandard2.1\Accord.Audio.dll
+C:\Projects\Accord-framework\Sources\Accord.Audio\obj\Debug\netstandard2.1\Accord.Audio.pdb

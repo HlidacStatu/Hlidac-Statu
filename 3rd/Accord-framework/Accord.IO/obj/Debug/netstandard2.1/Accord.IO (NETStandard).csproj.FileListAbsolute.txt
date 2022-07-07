@@ -1,0 +1,15 @@
+C:\Projects\Accord-framework\Sources\Accord.IO\bin\Debug\netstandard2.1\Accord.IO.deps.json
+C:\Projects\Accord-framework\Sources\Accord.IO\bin\Debug\netstandard2.1\Accord.IO.dll
+C:\Projects\Accord-framework\Sources\Accord.IO\bin\Debug\netstandard2.1\Accord.IO.pdb
+C:\Projects\Accord-framework\Sources\Accord.IO\bin\Debug\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.IO\bin\Debug\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.IO\obj\Debug\netstandard2.1\Accord.IO (NETStandard).csproj.AssemblyReference.cache
+C:\Projects\Accord-framework\Sources\Accord.IO\obj\Debug\netstandard2.1\Accord.IO.Resources.ExceptionMessage.resources
+C:\Projects\Accord-framework\Sources\Accord.IO\obj\Debug\netstandard2.1\Accord.IO (NETStandard).csproj.GenerateResource.cache
+C:\Projects\Accord-framework\Sources\Accord.IO\obj\Debug\netstandard2.1\Accord.IO (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.IO\obj\Debug\netstandard2.1\Accord.IO (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.IO\obj\Debug\netstandard2.1\Accord.IO (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.IO\obj\Debug\netstandard2.1\Accord.IO (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.IO\obj\Debug\netstandard2.1\Accord.IO (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.IO\obj\Debug\netstandard2.1\Accord.IO.dll
+C:\Projects\Accord-framework\Sources\Accord.IO\obj\Debug\netstandard2.1\Accord.IO.pdb

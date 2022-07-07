@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Accord.Imaging.Noncommercial</name>
+    </assembly>
+    <members>
+        <member name="T:Accord.Imaging.Filters.FastGuidedFilter">
+            <summary>
+              Fast Guided Filter (non-commercial).
+            </summary>
+            
+            <remarks>
+              <para>This class implements the Fast Guided Filter as described in 
+              "Kaiming He, Jian Sun, and Xiaoou Tang; Guided Image Filtering, ECCV 2010" and
+              in TPAMI 2013. If this code is used or adapted, either as a stand-alone tool or
+              as a component of any algorithm, it is necessary to appropriately cite Kaiming He,
+              Jian Sun, and Xiaoou Tangyou's work.</para>
+              
+              <para>This code is intended for academic purposes only, and <b>cannot be used for 
+              commercial or industrial activities</b>. For this reason, this code is not under 
+              the LGPL license and is only available in the framework's Accord.Imaging.Noncommercial 
+              assembly.</para>
+              
+              <para>The original work can be found in http://kaiminghe.com/eccv10/index.html </para>
+            </remarks>
+            
+        </member>
+        <member name="P:Accord.Imaging.Filters.FastGuidedFilter.FormatTranslations">
+            <summary>
+            Format translations dictionary.
+            </summary>
+        </member>
+        <member name="P:Accord.Imaging.Filters.FastGuidedFilter.KernelSize">
+            <summary>
+            KernelSize between 9 and 99. Default is 9.
+            </summary>
+        </member>
+        <member name="P:Accord.Imaging.Filters.FastGuidedFilter.Epsilon">
+            <summary>
+            Epsilon value between 0.0 and 1.0 . Default is 0.01 .
+            </summary>
+        </member>
+        <member name="P:Accord.Imaging.Filters.FastGuidedFilter.SubSamplingRatio">
+            <summary>
+            SubSamplingRatio value between 0.25 and 1.0 . Default is 0.25 .
+            </summary>
+        </member>
+        <member name="M:Accord.Imaging.Filters.FastGuidedFilter.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Accord.Imaging.Filters.FastGuidedFilter"/> class.
+            </summary>
+        </member>
+        <member name="M:Accord.Imaging.Filters.FastGuidedFilter.#ctor(System.Drawing.Bitmap)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Accord.Imaging.Filters.FastGuidedFilter"/> class.
+            </summary>
+            
+            <param name="overlayImage">Overlay image.</param>
+            
+        </member>
+        <member name="M:Accord.Imaging.Filters.FastGuidedFilter.#ctor(Accord.Imaging.UnmanagedImage)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Accord.Imaging.Filters.FastGuidedFilter"/> class.
+            </summary>
+            
+            <param name="unmanagedOverlayImage">Unmanaged overlay image.</param>
+            
+        </member>
+        <member name="M:Accord.Imaging.Filters.FastGuidedFilter.ProcessFilter(Accord.Imaging.UnmanagedImage,Accord.Imaging.UnmanagedImage)">
+             <summary>
+             Process the filter on the specified image.
+             </summary>
+             
+             <param name="image">Source image data.</param>
+             <param name="overlay">Overlay image data.</param>
+            
+        </member>
+        <member name="M:Accord.Imaging.Filters.FastGuidedFilter.GetFilledImage(System.Int32,System.Int32,System.Drawing.Imaging.PixelFormat,System.Drawing.Color)">
+            <summary>
+            Get a filled image by a color.
+            </summary>
+            <param name="width">Image width.</param>
+            <param name="height">Image height.</param>
+            <param name="pixelFormat">Image pixel format.</param>
+            <param name="color">Image filled color.</param>
+            <returns>An filled image with a color.</returns>
+        </member>
+    </members>
+</doc>

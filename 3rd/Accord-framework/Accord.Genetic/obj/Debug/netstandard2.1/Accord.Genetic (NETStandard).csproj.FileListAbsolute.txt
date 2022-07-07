@@ -1,0 +1,16 @@
+C:\Projects\Accord-framework\Sources\Accord.Genetic\bin\Debug\netstandard2.1\Accord.Genetic.deps.json
+C:\Projects\Accord-framework\Sources\Accord.Genetic\bin\Debug\netstandard2.1\Accord.Genetic.dll
+C:\Projects\Accord-framework\Sources\Accord.Genetic\bin\Debug\netstandard2.1\Accord.Genetic.pdb
+C:\Projects\Accord-framework\Sources\Accord.Genetic\bin\Debug\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Genetic\bin\Debug\netstandard2.1\Accord.Math.Core.dll
+C:\Projects\Accord-framework\Sources\Accord.Genetic\bin\Debug\netstandard2.1\Accord.Math.dll
+C:\Projects\Accord-framework\Sources\Accord.Genetic\bin\Debug\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Genetic\bin\Debug\netstandard2.1\Accord.Math.pdb
+C:\Projects\Accord-framework\Sources\Accord.Genetic\bin\Debug\netstandard2.1\Accord.Math.Core.pdb
+C:\Projects\Accord-framework\Sources\Accord.Genetic\obj\Debug\netstandard2.1\Accord.Genetic (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.Genetic\obj\Debug\netstandard2.1\Accord.Genetic (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Genetic\obj\Debug\netstandard2.1\Accord.Genetic (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.Genetic\obj\Debug\netstandard2.1\Accord.Genetic (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Genetic\obj\Debug\netstandard2.1\Accord.Genetic (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.Genetic\obj\Debug\netstandard2.1\Accord.Genetic.dll
+C:\Projects\Accord-framework\Sources\Accord.Genetic\obj\Debug\netstandard2.1\Accord.Genetic.pdb

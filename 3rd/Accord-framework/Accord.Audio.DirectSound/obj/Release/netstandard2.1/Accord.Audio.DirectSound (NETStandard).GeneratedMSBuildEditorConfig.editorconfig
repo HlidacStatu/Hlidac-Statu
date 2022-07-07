@@ -1,0 +1,3 @@
+is_global = true
+build_property.RootNamespace = Accord.Audio.DirectSound
+build_property.ProjectDir = C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\

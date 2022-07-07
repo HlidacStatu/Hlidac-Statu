@@ -1,0 +1,30 @@
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Vision.xml
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Vision.deps.json
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Vision.dll
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Vision.pdb
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Imaging.dll
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.MachineLearning.dll
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Math.Core.dll
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Math.dll
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Statistics.dll
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.xml
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Imaging.pdb
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Imaging.xml
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.MachineLearning.pdb
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.MachineLearning.xml
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Math.Core.pdb
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Math.Core.xml
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Math.pdb
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Math.xml
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Statistics.pdb
+C:\Projects\Accord-framework\Sources\Accord.Vision\bin\Release\netstandard2.1\Accord.Statistics.xml
+C:\Projects\Accord-framework\Sources\Accord.Vision\obj\Release\netstandard2.1\Accord.Vision (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.Vision\obj\Release\netstandard2.1\Accord.Vision (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Vision\obj\Release\netstandard2.1\Accord.Vision (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.Vision\obj\Release\netstandard2.1\Accord.Vision (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Vision\obj\Release\netstandard2.1\Accord.Vision (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.Vision\obj\Release\netstandard2.1\Accord.Vision.dll
+C:\Projects\Accord-framework\Sources\Accord.Vision\obj\Release\netstandard2.1\Accord.Vision.pdb
+C:\Projects\Accord-framework\Sources\Accord.Vision\obj\Release\netstandard2.1\Accord.Vision (NETStandard).csproj.AssemblyReference.cache

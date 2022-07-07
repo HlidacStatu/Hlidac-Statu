@@ -1,0 +1,13 @@
+C:\Projects\Accord-framework\Sources\Accord.Math.Core\bin\Debug\netstandard2.1\Accord.Math.Core.deps.json
+C:\Projects\Accord-framework\Sources\Accord.Math.Core\bin\Debug\netstandard2.1\Accord.Math.Core.dll
+C:\Projects\Accord-framework\Sources\Accord.Math.Core\bin\Debug\netstandard2.1\Accord.Math.Core.pdb
+C:\Projects\Accord-framework\Sources\Accord.Math.Core\bin\Debug\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Math.Core\bin\Debug\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Math.Core\obj\Debug\netstandard2.1\Accord.Math.Core (NETStandard).csproj.AssemblyReference.cache
+C:\Projects\Accord-framework\Sources\Accord.Math.Core\obj\Debug\netstandard2.1\Accord.Math.Core (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.Math.Core\obj\Debug\netstandard2.1\Accord.Math.Core (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Math.Core\obj\Debug\netstandard2.1\Accord.Math.Core (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.Math.Core\obj\Debug\netstandard2.1\Accord.Math.Core (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Math.Core\obj\Debug\netstandard2.1\Accord.Math.Core (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.Math.Core\obj\Debug\netstandard2.1\Accord.Math.Core.dll
+C:\Projects\Accord-framework\Sources\Accord.Math.Core\obj\Debug\netstandard2.1\Accord.Math.Core.pdb

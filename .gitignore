@@ -382,3 +382,7 @@ Web/Logger.serilog.json
 /HlidacStatuApi/appsettings.Development.json
 
 appsettings.*.json
+
+
+#allow 3rd directory
+!3rd/Accord-framework/**

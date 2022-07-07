@@ -1,0 +1,18 @@
+C:\Projects\Accord-framework\Sources\Accord.DataSets\bin\Release\netstandard2.1\Accord.DataSets.xml
+C:\Projects\Accord-framework\Sources\Accord.DataSets\bin\Release\netstandard2.1\Accord.DataSets.deps.json
+C:\Projects\Accord-framework\Sources\Accord.DataSets\bin\Release\netstandard2.1\Accord.DataSets.dll
+C:\Projects\Accord-framework\Sources\Accord.DataSets\bin\Release\netstandard2.1\Accord.DataSets.pdb
+C:\Projects\Accord-framework\Sources\Accord.DataSets\bin\Release\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.DataSets\bin\Release\netstandard2.1\Accord.IO.dll
+C:\Projects\Accord-framework\Sources\Accord.DataSets\bin\Release\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.DataSets\bin\Release\netstandard2.1\Accord.xml
+C:\Projects\Accord-framework\Sources\Accord.DataSets\bin\Release\netstandard2.1\Accord.IO.pdb
+C:\Projects\Accord-framework\Sources\Accord.DataSets\bin\Release\netstandard2.1\Accord.IO.xml
+C:\Projects\Accord-framework\Sources\Accord.DataSets\obj\Release\netstandard2.1\Accord.DataSets (NETStandard).csproj.AssemblyReference.cache
+C:\Projects\Accord-framework\Sources\Accord.DataSets\obj\Release\netstandard2.1\Accord.DataSets (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.DataSets\obj\Release\netstandard2.1\Accord.DataSets (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.DataSets\obj\Release\netstandard2.1\Accord.DataSets (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.DataSets\obj\Release\netstandard2.1\Accord.DataSets (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.DataSets\obj\Release\netstandard2.1\Accord.DataSets (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.DataSets\obj\Release\netstandard2.1\Accord.DataSets.dll
+C:\Projects\Accord-framework\Sources\Accord.DataSets\obj\Release\netstandard2.1\Accord.DataSets.pdb

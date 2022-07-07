@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Accord.Math.Noncommercial</name>
+    </assembly>
+    <members>
+        <member name="T:Accord.Math.Optimization.NonlinearConjugateGradient">
+            <summary>
+              Non-linear Conjugate Gradient (WARNING: This code <b>can not be used for 
+              commercial purposes</b>. It is MANDATORY to check the accompanying license
+              file for this particular module AND the source code for more details before
+              you use this code).
+            </summary>
+            
+            <remarks>
+            <para>
+              This code has been contributed by Peter Sergio Larsen based on the original
+              from Edward Rasmussen's FminCG. Please note that this code is only available
+              under a special license that specifically <b>denies</b> the use for commercial
+              applications and is thus <b>not compatible with the LGPL and the GPL</b>. For
+              this reason, this class is <b>not</b> included in the default <c>Accord.Math.dll</c>
+              assembly. Instead, it is distributed under a separate assembly that you can use
+              in your projects only if you agree with the license below. At your own risk.</para>
+              
+            <para>
+              To use this class, add a reference to the <c>Accord.Math.Noncommercial.dll</c>
+              assembly through NuGet or by finding it inside the Release/Noncommercial folder 
+              of the framework's installation directory.</para>
+              
+            <para>
+              The copyright license, plus the original documentation for this code, is
+              shown below.</para>
+              
+            <code>
+              function [X, fX, i] = fmincg(f, X, options, P1, P2, P3, P4, P5)
+              % Minimize a continuous differentialble multivariate function. Starting point
+              % is given by "X" (D by 1), and the function named in the string "f", must
+              % return a function value and a vector of partial derivatives. The Polack-
+              % Ribiere flavour of conjugate gradients is used to compute search directions,
+              % and a line search using quadratic and cubic polynomial approximations and the
+              % Wolfe-Powell stopping criteria is used together with the slope ratio method
+              % for guessing initial step sizes. Additionally a bunch of checks are made to
+              % make sure that exploration is taking place and that extrapolation will not
+              % be unboundedly large. The "length" gives the length of the run: if it is
+              % positive, it gives the maximum number of line searches, if negative its
+              % absolute gives the maximum allowed number of function evaluations. You can
+              % (optionally) give "length" a second component, which will indicate the
+              % reduction in function value to be expected in the first line-search (defaults
+              % to 1.0). The function returns when either its length is up, or if no further
+              % progress can be made (ie, we are at a minimum, or so close that due to
+              % numerical problems, we cannot get any closer). If the function terminates
+              % within a few iterations, it could be an indication that the function value
+              % and derivatives are not consistent (ie, there may be a bug in the
+              % implementation of your "f" function). The function returns the found
+              % solution "X", a vector of function values "fX" indicating the progress made
+              % and "i" the number of iterations (line searches or function evaluations,
+              % depending on the sign of "length") used.
+              %
+              % Usage: [X, fX, i] = fmincg(f, X, options, P1, P2, P3, P4, P5)
+              %
+              % See also: checkgrad 
+              %
+              % Copyright (C) 2001 and 2002 by Carl Edward Rasmussen. Date 2002-02-13
+              %
+              %
+              % (C) Copyright 1999, 2000 &amp; 2001, Carl Edward Rasmussen
+              % 
+              % Permission is granted for anyone to copy, use, or modify these
+              % programs and accompanying documents for purposes of research or
+              % education, provided this copyright notice is retained, and note is
+              % made of any changes that have been made.
+              % 
+              % These programs and documents are distributed without any warranty,
+              % express or implied.  As the programs were written for research
+              % purposes only, they have not been tested to the degree that would be
+              % advisable in any important application.  All use of these programs is
+              % entirely at the user's own risk.
+            </code>
+              
+            <para>
+              Modifications have been made so this code could fit under Accord.NET's
+              <see cref="T:Accord.Math.Optimization.IGradientOptimizationMethod"/> interface. Modifications were
+              necessary to port the original code from MATLAB/Octave to C#.</para>
+            </remarks>
+            
+            <example>
+            <para>
+              The following example shows the basic usage of the Nonlinear Conjugate Gradient
+              solver to find the minimum of a function given the function and gradient.</para>
+              
+            <code source="Sources\Extras\Accord.Tests.Math.Noncommercial\Optimization\NonlinearConjugateGradientTest.cs" region="doc_minimize" />
+            </example>
+            
+            <seealso cref="T:Accord.Math.Optimization.ConjugateGradient"/>
+            <seealso cref="T:Accord.Math.Optimization.ResilientBackpropagation"/>
+            <seealso cref="T:Accord.Math.Optimization.BroydenFletcherGoldfarbShanno"/>
+            
+        </member>
+        <member name="P:Accord.Math.Optimization.NonlinearConjugateGradient.MaxIterations">
+            <summary>
+              Gets or sets the maximum number of iterations
+              to be performed. Default is 100.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Math.Optimization.NonlinearConjugateGradient.Evaluations">
+            <summary>
+              Gets the number of calls to the objective 
+              <see cref="P:Accord.Math.Optimization.BaseOptimizationMethod.Function"/> in the last call
+              to <see cref="M:Accord.Math.Optimization.BaseGradientOptimizationMethod.Minimize"/> 
+              or <see cref="M:Accord.Math.Optimization.BaseGradientOptimizationMethod.Maximize"/>.
+            </summary>
+            
+        </member>
+        <member name="P:Accord.Math.Optimization.NonlinearConjugateGradient.Iterations">
+            <summary>
+              Gets the number of iterations done in the last call 
+              to <see cref="M:Accord.Math.Optimization.BaseGradientOptimizationMethod.Minimize"/> 
+              or <see cref="M:Accord.Math.Optimization.BaseGradientOptimizationMethod.Maximize"/>.
+            </summary>
+            
+        </member>
+        <member name="M:Accord.Math.Optimization.NonlinearConjugateGradient.#ctor(System.Int32)">
+            <summary>
+              Constructs a new <see cref="T:Accord.Math.Optimization.NonlinearConjugateGradient"/> algorithm.
+            </summary>
+            
+            <param name="numberOfVariables">The number of free parameters in the optimization problem.</param>
+            
+        </member>
+        <member name="M:Accord.Math.Optimization.NonlinearConjugateGradient.#ctor(System.Int32,System.Func{System.Double[],System.Double},System.Func{System.Double[],System.Double[]})">
+            <summary>
+              Constructs a new <see cref="T:Accord.Math.Optimization.NonlinearConjugateGradient"/> algorithm.
+            </summary>
+            
+            <param name="numberOfVariables">The number of free parameters in the optimization problem.</param>
+            <param name="function">The function to be optimized.</param>
+            <param name="gradient">The gradient of the function.</param>
+            
+        </member>
+        <member name="M:Accord.Math.Optimization.NonlinearConjugateGradient.Optimize">
+            <summary>
+              Implements the actual optimization algorithm. This
+              method should try to minimize the objective function.
+            </summary>
+            
+            <returns>True if the algorithm succeeded; false otherwise.</returns>
+            
+        </member>
+    </members>
+</doc>

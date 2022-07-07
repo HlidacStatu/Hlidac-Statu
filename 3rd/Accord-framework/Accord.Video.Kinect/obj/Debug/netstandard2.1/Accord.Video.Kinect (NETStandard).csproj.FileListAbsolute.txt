@@ -1,0 +1,23 @@
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.Video.Kinect.deps.json
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.Video.Kinect.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.Video.Kinect.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.Imaging.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.Math.Core.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.Math.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.Statistics.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.Video.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.Imaging.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.Video.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.Math.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.Math.Core.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\bin\Debug\netstandard2.1\Accord.Statistics.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\obj\Debug\netstandard2.1\Accord.Video.Kinect (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\obj\Debug\netstandard2.1\Accord.Video.Kinect (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\obj\Debug\netstandard2.1\Accord.Video.Kinect (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\obj\Debug\netstandard2.1\Accord.Video.Kinect (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\obj\Debug\netstandard2.1\Accord.Video.Kinect (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\obj\Debug\netstandard2.1\Accord.Video.Kinect.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\obj\Debug\netstandard2.1\Accord.Video.Kinect.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Kinect\obj\Debug\netstandard2.1\Accord.Video.Kinect (NETStandard).csproj.AssemblyReference.cache

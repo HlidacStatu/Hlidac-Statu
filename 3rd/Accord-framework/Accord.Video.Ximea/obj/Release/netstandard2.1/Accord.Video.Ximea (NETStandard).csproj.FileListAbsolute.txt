@@ -1,0 +1,29 @@
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\obj\Release\netstandard2.1\Accord.Video.Ximea (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\obj\Release\netstandard2.1\Accord.Video.Ximea (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\obj\Release\netstandard2.1\Accord.Video.Ximea (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\obj\Release\netstandard2.1\Accord.Video.Ximea (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Video.Ximea.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Video.Ximea.deps.json
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Video.Ximea.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Video.Ximea.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Imaging.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Math.Core.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Math.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Statistics.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Video.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Imaging.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Imaging.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Video.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Video.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Math.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Math.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Math.Core.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Math.Core.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Statistics.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\bin\Release\netstandard2.1\Accord.Statistics.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\obj\Release\netstandard2.1\Accord.Video.Ximea (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\obj\Release\netstandard2.1\Accord.Video.Ximea.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.Ximea\obj\Release\netstandard2.1\Accord.Video.Ximea.pdb

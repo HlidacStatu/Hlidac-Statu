@@ -1,0 +1,17 @@
+C:\Projects\Accord-framework\Sources\Accord.Statistics\bin\Debug\netstandard2.1\Accord.Statistics.deps.json
+C:\Projects\Accord-framework\Sources\Accord.Statistics\bin\Debug\netstandard2.1\Accord.Statistics.dll
+C:\Projects\Accord-framework\Sources\Accord.Statistics\bin\Debug\netstandard2.1\Accord.Statistics.pdb
+C:\Projects\Accord-framework\Sources\Accord.Statistics\bin\Debug\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Statistics\bin\Debug\netstandard2.1\Accord.Math.Core.dll
+C:\Projects\Accord-framework\Sources\Accord.Statistics\bin\Debug\netstandard2.1\Accord.Math.dll
+C:\Projects\Accord-framework\Sources\Accord.Statistics\bin\Debug\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Statistics\bin\Debug\netstandard2.1\Accord.Math.Core.pdb
+C:\Projects\Accord-framework\Sources\Accord.Statistics\bin\Debug\netstandard2.1\Accord.Math.pdb
+C:\Projects\Accord-framework\Sources\Accord.Statistics\obj\Debug\netstandard2.1\Accord.Statistics (NETStandard).csproj.AssemblyReference.cache
+C:\Projects\Accord-framework\Sources\Accord.Statistics\obj\Debug\netstandard2.1\Accord.Statistics (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.Statistics\obj\Debug\netstandard2.1\Accord.Statistics (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Statistics\obj\Debug\netstandard2.1\Accord.Statistics (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.Statistics\obj\Debug\netstandard2.1\Accord.Statistics (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Statistics\obj\Debug\netstandard2.1\Accord.Statistics (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.Statistics\obj\Debug\netstandard2.1\Accord.Statistics.dll
+C:\Projects\Accord-framework\Sources\Accord.Statistics\obj\Debug\netstandard2.1\Accord.Statistics.pdb

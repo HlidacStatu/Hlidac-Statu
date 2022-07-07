@@ -1,0 +1,19 @@
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\bin\Debug\netstandard2.1\Accord.Audio.DirectSound.deps.json
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\bin\Debug\netstandard2.1\Accord.Audio.DirectSound.dll
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\bin\Debug\netstandard2.1\Accord.Audio.DirectSound.pdb
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\bin\Debug\netstandard2.1\Accord.Audio.dll
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\bin\Debug\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\bin\Debug\netstandard2.1\Accord.Math.Core.dll
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\bin\Debug\netstandard2.1\Accord.Math.dll
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\bin\Debug\netstandard2.1\Accord.Audio.pdb
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\bin\Debug\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\bin\Debug\netstandard2.1\Accord.Math.pdb
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\bin\Debug\netstandard2.1\Accord.Math.Core.pdb
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\obj\Debug\netstandard2.1\Accord.Audio.DirectSound (NETStandard).csproj.AssemblyReference.cache
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\obj\Debug\netstandard2.1\Accord.Audio.DirectSound (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\obj\Debug\netstandard2.1\Accord.Audio.DirectSound (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\obj\Debug\netstandard2.1\Accord.Audio.DirectSound (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\obj\Debug\netstandard2.1\Accord.Audio.DirectSound (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\obj\Debug\netstandard2.1\Accord.Audio.DirectSound (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\obj\Debug\netstandard2.1\Accord.Audio.DirectSound.dll
+C:\Projects\Accord-framework\Sources\Accord.Audio.DirectSound\obj\Debug\netstandard2.1\Accord.Audio.DirectSound.pdb

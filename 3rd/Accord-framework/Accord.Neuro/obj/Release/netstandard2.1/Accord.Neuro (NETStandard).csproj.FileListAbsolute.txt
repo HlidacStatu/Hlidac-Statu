@@ -1,0 +1,27 @@
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Neuro.xml
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Neuro.deps.json
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Neuro.dll
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Neuro.pdb
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Genetic.dll
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Math.Core.dll
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Math.dll
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Statistics.dll
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.xml
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Genetic.pdb
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Genetic.xml
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Math.Core.pdb
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Math.Core.xml
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Math.pdb
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Math.xml
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Statistics.pdb
+C:\Projects\Accord-framework\Sources\Accord.Neuro\bin\Release\netstandard2.1\Accord.Statistics.xml
+C:\Projects\Accord-framework\Sources\Accord.Neuro\obj\Release\netstandard2.1\Accord.Neuro (NETStandard).csproj.AssemblyReference.cache
+C:\Projects\Accord-framework\Sources\Accord.Neuro\obj\Release\netstandard2.1\Accord.Neuro (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.Neuro\obj\Release\netstandard2.1\Accord.Neuro (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Neuro\obj\Release\netstandard2.1\Accord.Neuro (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.Neuro\obj\Release\netstandard2.1\Accord.Neuro (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Neuro\obj\Release\netstandard2.1\Accord.Neuro (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.Neuro\obj\Release\netstandard2.1\Accord.Neuro.dll
+C:\Projects\Accord-framework\Sources\Accord.Neuro\obj\Release\netstandard2.1\Accord.Neuro.pdb

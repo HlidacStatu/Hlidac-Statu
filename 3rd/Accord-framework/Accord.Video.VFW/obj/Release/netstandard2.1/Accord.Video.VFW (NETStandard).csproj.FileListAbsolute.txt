@@ -1,0 +1,29 @@
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\obj\Release\netstandard2.1\Accord.Video.VFW (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\obj\Release\netstandard2.1\Accord.Video.VFW (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\obj\Release\netstandard2.1\Accord.Video.VFW (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\obj\Release\netstandard2.1\Accord.Video.VFW (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Video.VFW.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Video.VFW.deps.json
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Video.VFW.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Video.VFW.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Imaging.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Math.Core.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Math.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Statistics.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Video.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Imaging.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Imaging.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Video.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Video.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Math.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Math.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Math.Core.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Math.Core.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Statistics.pdb
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\bin\Release\netstandard2.1\Accord.Statistics.xml
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\obj\Release\netstandard2.1\Accord.Video.VFW (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\obj\Release\netstandard2.1\Accord.Video.VFW.dll
+C:\Projects\Accord-framework\Sources\Accord.Video.VFW\obj\Release\netstandard2.1\Accord.Video.VFW.pdb

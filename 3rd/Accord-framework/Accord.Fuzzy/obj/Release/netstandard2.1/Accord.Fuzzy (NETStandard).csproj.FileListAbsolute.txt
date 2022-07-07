@@ -1,0 +1,14 @@
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\bin\Release\netstandard2.1\Accord.Fuzzy.xml
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\bin\Release\netstandard2.1\Accord.Fuzzy.deps.json
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\bin\Release\netstandard2.1\Accord.Fuzzy.dll
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\bin\Release\netstandard2.1\Accord.Fuzzy.pdb
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\bin\Release\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\bin\Release\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\bin\Release\netstandard2.1\Accord.xml
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\obj\Release\netstandard2.1\Accord.Fuzzy (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\obj\Release\netstandard2.1\Accord.Fuzzy (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\obj\Release\netstandard2.1\Accord.Fuzzy (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\obj\Release\netstandard2.1\Accord.Fuzzy (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\obj\Release\netstandard2.1\Accord.Fuzzy (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\obj\Release\netstandard2.1\Accord.Fuzzy.dll
+C:\Projects\Accord-framework\Sources\Accord.Fuzzy\obj\Release\netstandard2.1\Accord.Fuzzy.pdb

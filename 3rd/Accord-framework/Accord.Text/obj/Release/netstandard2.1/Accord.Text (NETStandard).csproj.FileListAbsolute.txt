@@ -1,0 +1,20 @@
+C:\Projects\Accord-framework\Sources\Accord.Text\bin\Release\netstandard2.1\Accord.Text.xml
+C:\Projects\Accord-framework\Sources\Accord.Text\bin\Release\netstandard2.1\Accord.Text.deps.json
+C:\Projects\Accord-framework\Sources\Accord.Text\bin\Release\netstandard2.1\Accord.Text.dll
+C:\Projects\Accord-framework\Sources\Accord.Text\bin\Release\netstandard2.1\Accord.Text.pdb
+C:\Projects\Accord-framework\Sources\Accord.Text\bin\Release\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Text\bin\Release\netstandard2.1\Accord.Math.Core.dll
+C:\Projects\Accord-framework\Sources\Accord.Text\bin\Release\netstandard2.1\Accord.Math.dll
+C:\Projects\Accord-framework\Sources\Accord.Text\bin\Release\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Text\bin\Release\netstandard2.1\Accord.xml
+C:\Projects\Accord-framework\Sources\Accord.Text\bin\Release\netstandard2.1\Accord.Math.pdb
+C:\Projects\Accord-framework\Sources\Accord.Text\bin\Release\netstandard2.1\Accord.Math.xml
+C:\Projects\Accord-framework\Sources\Accord.Text\bin\Release\netstandard2.1\Accord.Math.Core.pdb
+C:\Projects\Accord-framework\Sources\Accord.Text\bin\Release\netstandard2.1\Accord.Math.Core.xml
+C:\Projects\Accord-framework\Sources\Accord.Text\obj\Release\netstandard2.1\Accord.Text (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.Text\obj\Release\netstandard2.1\Accord.Text (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Text\obj\Release\netstandard2.1\Accord.Text (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.Text\obj\Release\netstandard2.1\Accord.Text (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Text\obj\Release\netstandard2.1\Accord.Text (NETStandard).csproj.CopyComplete
+C:\Projects\Accord-framework\Sources\Accord.Text\obj\Release\netstandard2.1\Accord.Text.dll
+C:\Projects\Accord-framework\Sources\Accord.Text\obj\Release\netstandard2.1\Accord.Text.pdb

@@ -1,0 +1,13 @@
+C:\Projects\Accord-framework\Sources\Accord.Core\bin\Release\netstandard2.1\Accord.xml
+C:\Projects\Accord-framework\Sources\Accord.Core\bin\Release\netstandard2.1\Accord.deps.json
+C:\Projects\Accord-framework\Sources\Accord.Core\bin\Release\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Core\bin\Release\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Core\obj\Release\netstandard2.1\Accord.Properties.Resources.resources
+C:\Projects\Accord-framework\Sources\Accord.Core\obj\Release\netstandard2.1\Accord.Core (NETStandard).csproj.GenerateResource.cache
+C:\Projects\Accord-framework\Sources\Accord.Core\obj\Release\netstandard2.1\Accord.Core (NETStandard).GeneratedMSBuildEditorConfig.editorconfig
+C:\Projects\Accord-framework\Sources\Accord.Core\obj\Release\netstandard2.1\Accord.Core (NETStandard).AssemblyInfoInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Core\obj\Release\netstandard2.1\Accord.Core (NETStandard).AssemblyInfo.cs
+C:\Projects\Accord-framework\Sources\Accord.Core\obj\Release\netstandard2.1\Accord.Core (NETStandard).csproj.CoreCompileInputs.cache
+C:\Projects\Accord-framework\Sources\Accord.Core\obj\Release\netstandard2.1\Accord.dll
+C:\Projects\Accord-framework\Sources\Accord.Core\obj\Release\netstandard2.1\Accord.pdb
+C:\Projects\Accord-framework\Sources\Accord.Core\obj\Release\netstandard2.1\Accord.Core (NETStandard).csproj.AssemblyReference.cache
