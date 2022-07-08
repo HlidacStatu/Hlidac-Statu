@@ -16,15 +16,33 @@ namespace HlidacStatu.Entities.Entities
         [Nest.Number]
         public int? PageNum { get; set; }
 
-        public Conceal ConcealMetadata { get; set; }
+        public BlurredMetadata Blurred { get; set; }
 
-        public class Conceal
+        public class BlurredMetadata
         {
+            public class Boundary
+            {
+                public Boundary() { }
+                public Boundary(int x, int y, int width, int height) 
+                {
+                    this.X = x;
+                    this.Y = y;
+                    this.Width = width;
+                    this.Height = height;
+                }
+
+                public int X { get; set; }
+                public int Y { get; set; }
+                public int Width { get; set; }
+                public int Height { get; set; }
+
+            }
+
             public int ImageWidth { get; set; }
             public int ImageHeight { get; set; }
 
             public long TextArea { get; set; }
-            public long BlackedArea { get; set; }
+            public long BlackenArea { get; set; }
 
             [Nest.Date]
             public DateTime Created { get; set; }
@@ -32,14 +50,65 @@ namespace HlidacStatu.Entities.Entities
             [Nest.Keyword()]
             public string AnalyzerVersion { get; set; }
 
-            public System.Drawing.RectangleF TextAreaBoundaries { get; set; }
+            public Boundary[] TextAreaBoundaries { get; set; }
 
-            public System.Drawing.RectangleF BlackedAreaBoundaries { get; set; }
+            public Boundary[] BlackenAreaBoundaries { get; set; }
 
-            public decimal BlackedAreaRatio()
+            public decimal BlackenAreaRatio()
             {
-                return (decimal)BlackedArea / (decimal)(BlackedArea + TextArea);
+                return (decimal)BlackenArea / (decimal)(BlackenArea + TextArea);
             }
+
+            public BlurredMetadata GetForAnotherResolution(int anotherWidth, int anotherHeight)
+            {
+
+                float rateWidth = anotherWidth / ImageWidth;
+                float rateHeight = anotherHeight / ImageHeight;
+
+                BlurredMetadata nbm = new BlurredMetadata();
+                nbm.Created = this.Created;
+                nbm.AnalyzerVersion = this.AnalyzerVersion;
+                nbm.ImageWidth = anotherWidth;
+                nbm.ImageHeight = anotherHeight;
+                if (TextAreaBoundaries != null)
+                {
+                    nbm.TextAreaBoundaries = TextAreaBoundaries
+                        .Select(m => new Boundary(
+                            (int)(m.X * rateWidth),
+                            (int)(m.Y * rateHeight),
+                            (int)(m.Width * rateWidth),
+                            (int)(m.Height * rateHeight))
+                        ).ToArray();
+                    nbm.TextArea = GetTotalArea(nbm.TextAreaBoundaries);
+                }
+                if (BlackenAreaBoundaries != null)
+                {
+                    nbm.BlackenAreaBoundaries = BlackenAreaBoundaries
+                        .Select(m => new Boundary(
+                            (int)(m.X * rateWidth),
+                            (int)(m.Y * rateHeight),
+                            (int)(m.Width * rateWidth),
+                            (int)(m.Height * rateHeight))
+                        ).ToArray();
+                    nbm.BlackenArea = GetTotalArea(nbm.BlackenAreaBoundaries);
+                }
+                return nbm;
+            }
+
+
+            public long GetTotalArea(IEnumerable<Boundary> boundaries)
+            {
+                long area = 0;
+                if (boundaries == null)
+                    return area;
+                foreach (var b in boundaries)
+                {
+                    area += (long)(b.Width * b.Height);
+                }
+
+                return area;
+            }
+
         }
     }
 }
