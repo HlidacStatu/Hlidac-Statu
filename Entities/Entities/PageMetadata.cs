@@ -16,7 +16,7 @@ namespace HlidacStatu.Entities.Entities
         [Nest.Number]
         public int? PageNum { get; set; }
 
-
+        public Conceal ConcealMetadata { get; set; }
 
         public class Conceal
         {
