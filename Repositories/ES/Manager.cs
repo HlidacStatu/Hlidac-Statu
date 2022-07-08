@@ -48,6 +48,7 @@ namespace HlidacStatu.Repositories.ES
             Dotace,
             UptimeItem,
             UptimeSSL,
+            PageMetadata,
             Osoby,
             Audit,
             RPP_Kategorie,
@@ -78,6 +79,8 @@ namespace HlidacStatu.Repositories.ES
         public static string defaultIndexName_Dotace = "dotace";
         public static string defaultIndexName_Uptime = "uptime";
         public static string defaultIndexName_UptimeSSL = "uptimessl";
+
+        public static string defaultIndexName_PageMetadata = "pagemetadata";
 
         public static string defaultIndexName_Osoby = "osoby";
         public static string defaultIndexName_Audit = "audit";
@@ -187,6 +190,12 @@ namespace HlidacStatu.Repositories.ES
         //{
         //    return GetESClient(defaultIndexName_Uptime, timeOut, connectionLimit, IndexType.UptimeItem);
         //}
+
+        public static Task<ElasticClient> GetESClient_PageMetadataAsync(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClientAsync(defaultIndexName_PageMetadata, timeOut, connectionLimit, IndexType.PageMetadata);
+        }
+
         public static Task<ElasticClient> GetESClient_UptimeSSLAsync(int timeOut = 60000, int connectionLimit = 80)
         {
             return GetESClientAsync(defaultIndexName_UptimeSSL, timeOut, connectionLimit, IndexType.UptimeSSL);
@@ -491,6 +500,13 @@ namespace HlidacStatu.Repositories.ES
                        .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Dotace.Dotace>(map => map.AutoMap().DateDetection(false))
+                       );
+                    break;
+                case IndexType.PageMetadata:
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
+                           .InitializeUsing(idxSt)
+                           .Map<Entities.PageMetadata>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.UptimeSSL:

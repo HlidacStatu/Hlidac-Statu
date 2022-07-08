@@ -1,20 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HlidacStatu.Entities.Entities
+namespace HlidacStatu.Entities
 {
     public class PageMetadata
     {
+
+        string _id = null;
+
+        [Nest.Keyword()]
+        [Description("Unikátní ID zakázky. Nevyplňujte, ID se vygeneruje samo.")]
+        public string Id
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_id))
+                    _id=GetId();
+                return _id;
+            }
+            set
+            {
+                _id = value;
+            }
+        }
+        public string GetId()
+        {
+            return GetId(this.SmlouvaId, this.PrilohaId, this.PageNum);
+        }
+        public static string GetId(string smlouvaId, string prilohaId, int pageNum)
+        {
+            if (string.IsNullOrEmpty(smlouvaId) || string.IsNullOrEmpty(prilohaId) || pageNum == 0)
+                return null;
+            return $"{smlouvaId}_{prilohaId}_{pageNum}";
+        }
+
+
         [Nest.Keyword()]
         public string SmlouvaId { get; set; }
         [Nest.Keyword()]
         public string PrilohaId { get; set; }
 
         [Nest.Number]
-        public int? PageNum { get; set; }
+        public int PageNum { get; set; }
 
         public BlurredMetadata Blurred { get; set; }
 
@@ -36,6 +67,17 @@ namespace HlidacStatu.Entities.Entities
                 public int Width { get; set; }
                 public int Height { get; set; }
 
+
+                public static explicit operator Boundary(System.Drawing.Rectangle m)
+                {
+                    return new Boundary()
+                    {
+                        X = m.X,
+                        Y = m.Y,
+                        Width = m.Width,
+                        Height = m.Height
+                    };
+                }
             }
 
             public int ImageWidth { get; set; }
@@ -108,6 +150,7 @@ namespace HlidacStatu.Entities.Entities
 
                 return area;
             }
+
 
         }
     }

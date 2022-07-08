@@ -5,9 +5,9 @@ namespace HlidacStatu.Analysis.Page.Area
 {
     public class FoundBoxes
     {
-        public System.Drawing.SizeF ImageSize { get; set; }
-        public IEnumerable<System.Drawing.RectangleF> Boundaries { get; set; }
-        public System.Drawing.PointF RatioFromOriginal { get; set; }
+        public System.Drawing.Size ImageSize { get; set; }
+        public IEnumerable<System.Drawing.Rectangle> Boundaries { get; set; }
+        public System.Drawing.Point RatioFromOriginal { get; set; }
 
         public long GetTotalArea()
         {
@@ -22,7 +22,7 @@ namespace HlidacStatu.Analysis.Page.Area
             return area;
         }
 
-        public FoundBoxes GetForAnotherResolution(System.Drawing.SizeF forAnotherResolution)
+        public FoundBoxes GetForAnotherResolution(System.Drawing.Size forAnotherResolution)
         {
             float rateWidth = forAnotherResolution.Width / ImageSize.Width;
             float rateHeight = forAnotherResolution.Height / ImageSize.Height;
@@ -32,7 +32,7 @@ namespace HlidacStatu.Analysis.Page.Area
             FoundBoxes nfb = new FoundBoxes();
             nfb.ImageSize = forAnotherResolution;
             nfb.Boundaries = Boundaries
-                .Select(m => new System.Drawing.RectangleF(
+                .Select(m => new System.Drawing.Rectangle(
                     (int)(m.X * rateWidth),
                     (int)(m.Y * rateHeight),
                     (int)(m.Width * rateWidth),

@@ -61,7 +61,7 @@ namespace HlidacStatu.Analysis.Page.Area
 
             // check for rectangles
 
-            List<System.Drawing.RectangleF> boxes = new List<System.Drawing.RectangleF>();
+            List<System.Drawing.Rectangle> boxes = new List<System.Drawing.Rectangle>();
 
             SimpleShapeChecker shapeChecker = new SimpleShapeChecker();
             //shapeChecker.AngleError = 15;
@@ -91,7 +91,7 @@ namespace HlidacStatu.Analysis.Page.Area
             result = new FoundBoxes();
             result.Boundaries = boxes;
             result.ImageSize = image.Size;
-            result.RatioFromOriginal = new System.Drawing.PointF(1.0f, 1.0f);
+            result.RatioFromOriginal = new System.Drawing.Point(1, 1);
 
         }
 

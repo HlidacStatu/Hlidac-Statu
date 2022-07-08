@@ -266,15 +266,15 @@ namespace HlidacStatu.Analysis.Page.Area
                 if (res == null)
                 {
                     res = new FoundBoxes();
-                    res.ImageSize = new System.Drawing.SizeF(internalResult.Image.Width, internalResult.Image.Height);
+                    res.ImageSize = new System.Drawing.Size(internalResult.Image.Width, internalResult.Image.Height);
                     res.Boundaries = internalResult.Boundaries
-                                    .Select(b => new System.Drawing.RectangleF(
+                                    .Select(b => new System.Drawing.Rectangle(
                                         b.BoundingRect().X,
                                         b.BoundingRect().Y,
                                         b.BoundingRect().Width,
                                         b.BoundingRect().Height
                                         ));
-                    res.RatioFromOriginal = new System.Drawing.PointF(internalResult.RatioFromOriginal.X, internalResult.RatioFromOriginal.Y);
+                    res.RatioFromOriginal = new System.Drawing.Point((int)internalResult.RatioFromOriginal.X, (int)internalResult.RatioFromOriginal.Y);
                 }
                 return res;
             }
