@@ -8,8 +8,25 @@ using OpenCvSharp.Dnn;
 
 namespace HlidacStatu.Analysis.Page.Area
 {
-    public partial class DetectTextBoundaries : IOnPageDetector
+    public partial class DetectText : IOnPageDetector
     {
+
+        static DetectText()
+        {
+            string modelPath = root + @"\frozen_east_text_detection.pb";
+            SharedModel = CvDnn.ReadNet(modelPath);
+        }
+
+        public static Net SharedModel = null;
+
+        public static Net NewModel(string modelPath = null)
+        {
+            modelPath = modelPath ?? root + @"\frozen_east_text_detection.pb";
+            Net newModel = CvDnn.ReadNet(modelPath);
+            return newModel;
+        }
+
+
         public static readonly string root = new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).Directory.FullName;
 
         Net net = null;
@@ -22,7 +39,7 @@ namespace HlidacStatu.Analysis.Page.Area
 
         private InternalResult internalResult { get; set; } = null;
 
-        public DetectTextBoundaries(Net model, string imageFileName,
+        public DetectText(Net model, string imageFileName,
             int maxSize = 896, float confThreshold = 0.5f, float nmsThreshold = 0.4f)
         {
             net = model;
