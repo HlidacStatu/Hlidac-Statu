@@ -11,8 +11,10 @@
 
   <ItemGroup>
     <PackageReference Include="Devmasters.Imaging" Version="4.0.1" />
+    <PackageReference Include="Devmasters.Logging" Version="4.0.1" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.6.0.20220608" />
     <PackageReference Include="OpenCvSharp4.Windows" Version="4.6.0.20220608" />
+    <PackageReference Include="PDFtoImage" Version="1.2.1" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
     <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
   </ItemGroup>

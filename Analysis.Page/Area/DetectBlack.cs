@@ -72,18 +72,21 @@ namespace HlidacStatu.Analysis.Page.Area
 
                 List<IntPoint> edgePoints = blobCounter.GetBlobsEdgePoints(blob);
                 List<IntPoint> cornerPoints;
-                var shapeType = shapeChecker.CheckShapeType(edgePoints);
-                shapeChecker.IsConvexPolygon(edgePoints, out cornerPoints);
-                var subShapeType = shapeChecker.CheckPolygonSubType(cornerPoints);
-                // use the shape checker to extract the corner points
-                if (
-                    shapeType == ShapeType.Triangle && subShapeType == PolygonSubType.RectangledTriangle
-                    || shapeType == ShapeType.Triangle && subShapeType == PolygonSubType.RectangledIsoscelesTriangle
-                    || shapeType == ShapeType.Quadrilateral && subShapeType == PolygonSubType.Rectangle
-                    || shapeType == ShapeType.Quadrilateral && subShapeType == PolygonSubType.Trapezoid
-                    )
+                if (edgePoints != null && edgePoints.Count > 1)
                 {
-                    boxes.Add(blob.Rectangle);
+                    var shapeType = shapeChecker.CheckShapeType(edgePoints);
+                    shapeChecker.IsConvexPolygon(edgePoints, out cornerPoints);
+                    var subShapeType = shapeChecker.CheckPolygonSubType(cornerPoints);
+                    // use the shape checker to extract the corner points
+                    if (
+                        shapeType == ShapeType.Triangle && subShapeType == PolygonSubType.RectangledTriangle
+                        || shapeType == ShapeType.Triangle && subShapeType == PolygonSubType.RectangledIsoscelesTriangle
+                        || shapeType == ShapeType.Quadrilateral && subShapeType == PolygonSubType.Rectangle
+                        || shapeType == ShapeType.Quadrilateral && subShapeType == PolygonSubType.Trapezoid
+                        )
+                    {
+                        boxes.Add(blob.Rectangle);
+                    }
                 }
             }
 
