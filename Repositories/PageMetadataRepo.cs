@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Devmasters.Collections;
+
 using HlidacStatu.Analysis.Page.Area;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
@@ -89,7 +91,8 @@ namespace HlidacStatu.Repositories
 
         public static void AnalyzePagesInBatch(
             Devmasters.Log.Logger logger, Action<string> logOutputFunc, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc,
-            string[] ids = null, string query = null, int? daysback = null, int? threads = null, bool force = false, bool debug = false)
+            string[] ids = null, string query = null, int? daysback = null, int? threads = null, bool force = false, bool debug = false,
+            bool shuffle = false)
         {
             //default values
             threads = threads ?? 10;
@@ -147,7 +150,8 @@ namespace HlidacStatu.Repositories
 
 
             DetectText.ModelFeeder mf = new DetectText.ModelFeeder(threads.Value + 5);
-
+            if (shuffle)
+                ids2Process = ids2Process.ShuffleMe().ToList();
 
             object lockObj = new object();
             Devmasters.Batch.ThreadManager.DoActionForAll(ids2Process,
@@ -210,9 +214,6 @@ namespace HlidacStatu.Repositories
                                             logger.Debug($"zacernene: Smlouva {s} priloha {p.nazevSouboru} page {page} detecting zacerneni");
                                         var db = new Analysis.Page.Area.DetectBlack(fnJpg);
                                         db.AnalyzeImage();
-                                        sw.Stop();
-                                        if (debug)
-                                            logger.Debug($"zacernene: Smlouva {s} priloha {p.nazevSouboru} page {page} detecting done in {sw.ElapsedMilliseconds}ms");
 
                                         //dt in db resolution
                                         var dtC = dt.Result().GetForAnotherResolution(db.Result().ImageSize);
@@ -236,6 +237,9 @@ namespace HlidacStatu.Repositories
                                             BlackenArea = db.Result().GetTotalArea(),
                                             TextArea = dtC.GetTotalArea()
                                         };
+                                        sw.Stop();
+
+                                        logger.Info($"zacernene: Smlouva {s} priloha {p.nazevSouboru} page {page} detecting done in {sw.ElapsedMilliseconds}ms");
 
                                         if (debug)
                                             logger.Debug($"zacernene: Smlouva {s} priloha {p.nazevSouboru} page {page} saving");
