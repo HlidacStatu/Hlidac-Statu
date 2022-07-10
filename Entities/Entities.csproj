@@ -11,7 +11,7 @@
       <PackageReference Include="Devmasters.Core" Version="4.0.1" />
       <PackageReference Include="Devmasters.DT" Version="4.0.4" />
       <PackageReference Include="Devmasters.Enums" Version="4.0.1" />
-      <PackageReference Include="Devmasters.IO" Version="4.0.1" />
+      <PackageReference Include="Devmasters.IO" Version="4.1.0" />
       <PackageReference Include="Devmasters.Lang" Version="4.0.1" />
       <PackageReference Include="Enums.NET" Version="4.0.0" />
       <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="6.0.5" />

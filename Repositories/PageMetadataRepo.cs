@@ -257,12 +257,12 @@ namespace HlidacStatu.Repositories
                                     {
                                         try
                                         {
-                                            System.IO.File.Delete(fnJpg);
+                                            Devmasters.IO.IOTools.DeleteFile(fnJpg, TimeSpan.FromSeconds(50), TimeSpan.FromSeconds(2),true);
                                         }
                                         catch (Exception ex)
                                         {
                                             logger.Error("zacernene ERROR: {smlouva} priloha {priloha} page {page}  cannot delete {file}.", ex, sml.Id, p.UniqueHash(), page, fnJpg);
-                                            Devmasters.IO.IOTools.DeleteFile(fnJpg);
+                                            //Devmasters.IO.IOTools.DeleteFile(fnJpg);
                                         }
                                     }
                                 }
@@ -277,12 +277,12 @@ namespace HlidacStatu.Repositories
                         {
                             try
                             {
-                                System.IO.File.Delete(tmpPdf);
+                                Devmasters.IO.IOTools.DeleteFile(tmpPdf, TimeSpan.FromSeconds(50), TimeSpan.FromSeconds(2), true);
                             }
                             catch (Exception ex)
                             {
                                 logger.Error("zacernene ERROR: {smlouva} priloha {priloha} cannot delete {file}.", ex, sml.Id, p.UniqueHash(), tmpPdf);
-                                Devmasters.IO.IOTools.DeleteFile(tmpPdf);
+                                //Devmasters.IO.IOTools.DeleteFile(tmpPdf);
                             }
                         }
 
