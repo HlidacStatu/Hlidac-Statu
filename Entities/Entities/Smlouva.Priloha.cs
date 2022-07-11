@@ -18,9 +18,17 @@ namespace HlidacStatu.Entities
                 public string Value { get; set; }
             }
 
+            public class BlurredPagesStats
+            { 
+                public decimal BlurredAreaPerc { get; set; }
+                public int NumOfBlurredPages { get; set; }
+                public int NumOfExtensivelyBlurredPages { get; set; }
+                public int[] ListOfExtensivelyBlurredPages { get; set; }
+            }
 
             public KeyVal[] FileMetadata = new KeyVal[] { };
 
+            public BlurredPagesStats BlurredPages { get; set; }
 
             string _plainTextContent = "";
             [Text()]

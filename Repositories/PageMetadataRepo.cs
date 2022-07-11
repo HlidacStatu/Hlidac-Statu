@@ -158,13 +158,17 @@ namespace HlidacStatu.Repositories
                 (s) =>
                 {
 
-                    Smlouva sml = SmlouvaRepo.LoadAsync(s, includePrilohy: false).Result;
+                    Smlouva sml = SmlouvaRepo.LoadAsync(s).Result;
 
                     if (debug)
                         logger.Debug($"zacernene: Smlouva {s} found {sml.Prilohy?.Count()} priloh");
 
+                    Dictionary<string, Smlouva.Priloha.BlurredPagesStats> prilohyBlurred = new Dictionary<string, Smlouva.Priloha.BlurredPagesStats>();
+                    bool changed = false;
+
                     foreach (var p in sml.Prilohy)
                     {
+                        List<PageMetadata> blurredPages = new List<PageMetadata>();
                         string tmpPdf = "";
                         try
                         {
@@ -245,7 +249,7 @@ namespace HlidacStatu.Repositories
                                             logger.Debug($"zacernene: Smlouva {s} priloha {p.nazevSouboru} page {page} saving");
                                         PageMetadataRepo.SaveAsync(pm)
                                             .ConfigureAwait(false).GetAwaiter().GetResult();
-
+                                        blurredPages.Add(pm);
                                     }
                                     catch (Exception e)
                                     {
@@ -257,7 +261,7 @@ namespace HlidacStatu.Repositories
                                     {
                                         try
                                         {
-                                            Devmasters.IO.IOTools.DeleteFile(fnJpg, TimeSpan.FromSeconds(50), TimeSpan.FromSeconds(2),true);
+                                            Devmasters.IO.IOTools.DeleteFile(fnJpg, TimeSpan.FromSeconds(50), TimeSpan.FromSeconds(2), true);
                                         }
                                         catch (Exception ex)
                                         {
@@ -266,7 +270,25 @@ namespace HlidacStatu.Repositories
                                         }
                                     }
                                 }
-                            }
+
+                                if (blurredPages.Count > 0)
+                                {
+                                    var pb = new Smlouva.Priloha.BlurredPagesStats();
+                                    pb.BlurredAreaPerc = (decimal)blurredPages.Sum(m => m.Blurred.BlackenArea)
+                                        / (decimal)(blurredPages.Sum(m => m.Blurred.BlackenArea) + blurredPages.Sum(m => m.Blurred.TextArea));
+                                    pb.NumOfBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.05m);
+                                    pb.NumOfExtensivelyBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.2m);
+
+                                    pb.ListOfExtensivelyBlurredPages = blurredPages
+                                            .Where(m => m.Blurred.BlackenAreaRatio() >= 0.2m)
+                                            .Select(m=>m.PageNum)
+                                            .ToArray();
+
+                                    p.BlurredPages = pb;
+                                    changed = true;
+                                }
+
+                            }//HasPDFHeader
                         }
                         catch (Exception e)
                         {
@@ -277,7 +299,9 @@ namespace HlidacStatu.Repositories
                         {
                             try
                             {
+
                                 Devmasters.IO.IOTools.DeleteFile(tmpPdf, TimeSpan.FromSeconds(50), TimeSpan.FromSeconds(2), true);
+
                             }
                             catch (Exception ex)
                             {
@@ -286,9 +310,15 @@ namespace HlidacStatu.Repositories
                             }
                         }
 
+                    } //foreach priloha
+
+                    if (changed)
+                    {
+                        logger.Info($"zacernene: Smlouva {s} saved BlurredPagesStat ", sml.Id);
+
+                        SmlouvaRepo.SaveAsync(sml, updateLastUpdateValue: false)
+                            .ConfigureAwait(false).GetAwaiter().GetResult();
                     }
-
-
                     return new Devmasters.Batch.ActionOutputData();
 
                 }, true, maxDegreeOfParallelism: threads, logOutputFunc, progressOutputFunc, prefix: "AnalyzePagesInBatch ");

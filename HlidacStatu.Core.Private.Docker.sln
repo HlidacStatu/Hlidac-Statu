@@ -3,123 +3,123 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web", "Web\Web.csproj", "{FFFDB676-7737-41D8-9325-2CAD49C8DEE0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web", "Hlidac-statu\Web\Web.csproj", "{FFFDB676-7737-41D8-9325-2CAD49C8DEE0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_deploy", "_deploy", "{34338A10-2566-4B27-BE7F-D972FD4CCF01}"
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
-		..\Hlidac-Statu-Private\.gitattributes = ..\Hlidac-Statu-Private\.gitattributes
+		Hlidac-Statu-Private\.gitattributes = Hlidac-Statu-Private\.gitattributes
 		.gitignore = .gitignore
-		..\Hlidac-Statu-Private\.gitignore = ..\Hlidac-Statu-Private\.gitignore
+		Hlidac-Statu-Private\.gitignore = Hlidac-Statu-Private\.gitignore
 		nuget.config = nuget.config
 		README.MD = README.MD
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibCore", "LibCore\LibCore.csproj", "{D2C52FF3-87BF-41E5-965C-120ABB4DED86}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibCore", "Hlidac-Statu\LibCore\LibCore.csproj", "{D2C52FF3-87BF-41E5-965C-120ABB4DED86}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entities", "Entities\Entities.csproj", "{0A7396B2-1D98-4C1E-A56F-E81C1BD2C9EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entities", "Hlidac-Statu\Entities\Entities.csproj", "{0A7396B2-1D98-4C1E-A56F-E81C1BD2C9EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Util", "Util\Util.csproj", "{95DA13FC-768F-4CD1-A38E-F5E6D5B31833}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Util", "Hlidac-Statu\Util\Util.csproj", "{95DA13FC-768F-4CD1-A38E-F5E6D5B31833}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.TransparetniUcty", "Plugin.TransparetniUcty\Plugin.TransparetniUcty.csproj", "{B4B31F50-DA24-4FF9-A82D-3F26FF5D664A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.TransparetniUcty", "Hlidac-Statu\Plugin.TransparetniUcty\Plugin.TransparetniUcty.csproj", "{B4B31F50-DA24-4FF9-A82D-3F26FF5D664A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.OCR.Api.Client", "Lib.OCR.Api.Client\Lib.OCR.Api.Client.csproj", "{C3E3826A-CCC3-4D59-867D-E5846A0D86B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.OCR.Api.Client", "Hlidac-Statu\Lib.OCR.Api.Client\Lib.OCR.Api.Client.csproj", "{C3E3826A-CCC3-4D59-867D-E5846A0D86B7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Data.External", "Lib.Data.External\Lib.Data.External.csproj", "{BC8BCFF6-21C9-4157-8C4C-1AA78020F216}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Data.External", "Hlidac-Statu\Lib.Data.External\Lib.Data.External.csproj", "{BC8BCFF6-21C9-4157-8C4C-1AA78020F216}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Analytics", "Lib.Analytics\Lib.Analytics.csproj", "{CF14DA59-C871-464F-B621-6050B2F48980}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Analytics", "Hlidac-Statu\Lib.Analytics\Lib.Analytics.csproj", "{CF14DA59-C871-464F-B621-6050B2F48980}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Q.Simple", "HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj", "{722060B8-8A64-46E6-A914-02E9B8F8789F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Q.Simple", "Hlidac-Statu\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj", "{722060B8-8A64-46E6-A914-02E9B8F8789F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Lib.Db.Insolvence", "HlidacStatu.Lib.Db.Insolvence\HlidacStatu.Lib.Db.Insolvence.csproj", "{FE05B109-48E9-4C85-A4A8-126CECD0CB07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Lib.Db.Insolvence", "Hlidac-Statu\HlidacStatu.Lib.Db.Insolvence\HlidacStatu.Lib.Db.Insolvence.csproj", "{FE05B109-48E9-4C85-A4A8-126CECD0CB07}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FullTextSearch", "FullTextSearch\FullTextSearch.csproj", "{2D9E6EFE-7E90-428E-83EA-21450E0C40EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FullTextSearch", "Hlidac-Statu\FullTextSearch\FullTextSearch.csproj", "{2D9E6EFE-7E90-428E-83EA-21450E0C40EF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBUpgrader", "DBUpgrader\DBUpgrader.csproj", "{DDFB708E-0D58-4AFA-A160-18199F2231E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBUpgrader", "Hlidac-Statu\DBUpgrader\DBUpgrader.csproj", "{DDFB708E-0D58-4AFA-A160-18199F2231E7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.OCR.TextReadability", "..\Hlidac-Statu-Private\OCR\Lib.OCR.TextReadability\Lib.OCR.TextReadability.csproj", "{B3F13956-BC92-4B49-A375-1882BDA8878C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.OCR.TextReadability", "Hlidac-Statu-Private\OCR\Lib.OCR.TextReadability\Lib.OCR.TextReadability.csproj", "{B3F13956-BC92-4B49-A375-1882BDA8878C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Q.Messages", "HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj", "{A684F864-7C53-4985-939A-B7D2E35F9FFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Q.Messages", "Hlidac-Statu\HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj", "{A684F864-7C53-4985-939A-B7D2E35F9FFB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Q", "HlidacStatu.Q\HlidacStatu.Q.csproj", "{0FD1747B-569B-4381-9262-07640F55FA24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Q", "Hlidac-Statu\HlidacStatu.Q\HlidacStatu.Q.csproj", "{0FD1747B-569B-4381-9262-07640F55FA24}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.IssueAnalyzers", "Plugin.IssueAnalyzers\Plugin.IssueAnalyzers.csproj", "{CCF32623-6D0F-4540-8937-7FFB22F3C652}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.IssueAnalyzers", "Hlidac-Statu\Plugin.IssueAnalyzers\Plugin.IssueAnalyzers.csproj", "{CCF32623-6D0F-4540-8937-7FFB22F3C652}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DetectFaces", "DetectFaces\DetectFaces.csproj", "{0B3B079C-A1EC-4B27-BBF0-FD5F83977A28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DetectFaces", "Hlidac-Statu\DetectFaces\DetectFaces.csproj", "{0B3B079C-A1EC-4B27-BBF0-FD5F83977A28}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Enhancers", "Plugin.Enhancers\Plugin.Enhancers.csproj", "{A1689B05-4591-4EE9-9AA8-A83341FF953E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Enhancers", "Hlidac-Statu\Plugin.Enhancers\Plugin.Enhancers.csproj", "{A1689B05-4591-4EE9-9AA8-A83341FF953E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.ExportData", "HlidacStatu.ExportData\HlidacStatu.ExportData.csproj", "{B34AF1AA-6EC5-4D7F-836F-FDE3AA13ED79}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.ExportData", "Hlidac-Statu\HlidacStatu.ExportData\HlidacStatu.ExportData.csproj", "{B34AF1AA-6EC5-4D7F-836F-FDE3AA13ED79}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KIndexGenerator", "KIndexGenerator\KIndexGenerator.csproj", "{F2185D29-BA0C-4901-8EC2-CBC0E71B9302}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KIndexGenerator", "Hlidac-Statu\KIndexGenerator\KIndexGenerator.csproj", "{F2185D29-BA0C-4901-8EC2-CBC0E71B9302}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Others", "Others", "{C1833D67-B269-41C4-9556-3F9D7511B378}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vybory-PSP", "DatasetParsers\Vybory-PSP\Vybory-PSP.csproj", "{BBC1B0D6-3095-414A-9A60-03A2614F2166}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vybory-PSP", "Hlidac-Statu\DatasetParsers\Vybory-PSP\Vybory-PSP.csproj", "{BBC1B0D6-3095-414A-9A60-03A2614F2166}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mailerlite", "Mailerlite\Mailerlite.csproj", "{3B9E1A42-44F8-438C-86DB-A9D0989C7A78}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mailerlite", "Hlidac-Statu\Mailerlite\Mailerlite.csproj", "{3B9E1A42-44F8-438C-86DB-A9D0989C7A78}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.ClassificationRepair", "HlidacStatu.ClassificationRepair\HlidacStatu.ClassificationRepair.csproj", "{6046918B-AEA8-4B3A-B4BC-1ECB948D3507}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.ClassificationRepair", "Hlidac-Statu\HlidacStatu.ClassificationRepair\HlidacStatu.ClassificationRepair.csproj", "{6046918B-AEA8-4B3A-B4BC-1ECB948D3507}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SponzoriLoader", "SponzoriLoader\SponzoriLoader.csproj", "{C3C768FF-1FA0-4082-9264-5D01551CDEA9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SponzoriLoader", "Hlidac-Statu\SponzoriLoader\SponzoriLoader.csproj", "{C3C768FF-1FA0-4082-9264-5D01551CDEA9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PeopleLoader", "PeopleLoader\PeopleLoader.csproj", "{1A2966FE-E825-44DE-A74E-85EA9F79FCF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PeopleLoader", "Hlidac-Statu\PeopleLoader\PeopleLoader.csproj", "{1A2966FE-E825-44DE-A74E-85EA9F79FCF1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Data.VZ.Import", "..\Hlidac-Statu-Private\Lib.Data.VZ.Import\Lib.Data.VZ.Import.csproj", "{D6A32076-4918-42A0-88E0-8AF58A8C32A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Data.VZ.Import", "Hlidac-Statu-Private\Lib.Data.VZ.Import\Lib.Data.VZ.Import.csproj", "{D6A32076-4918-42A0-88E0-8AF58A8C32A9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Tasks", "..\Hlidac-Statu-Private\Lib.Tasks\Lib.Tasks.csproj", "{2B7237F8-F4E5-455F-B9E1-FA9F2A548FD3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Tasks", "Hlidac-Statu-Private\Lib.Tasks\Lib.Tasks.csproj", "{2B7237F8-F4E5-455F-B9E1-FA9F2A548FD3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Downloader", "..\Hlidac-Statu-Private\Downloader\Downloader.csproj", "{ED3844A4-80B8-4AD1-88A5-FF4C294976F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Downloader", "Hlidac-Statu-Private\Downloader\Downloader.csproj", "{ED3844A4-80B8-4AD1-88A5-FF4C294976F5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repositories", "Repositories\Repositories.csproj", "{8B00D0C8-2129-4A20-AB12-38ADEA2F0395}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Repositories", "Hlidac-Statu\Repositories\Repositories.csproj", "{8B00D0C8-2129-4A20-AB12-38ADEA2F0395}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Datastructures", "Datastructures\Datastructures.csproj", "{80C2DEA8-147E-473D-8FB4-7F98184AF72F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Datastructures", "Hlidac-Statu\Datastructures\Datastructures.csproj", "{80C2DEA8-147E-473D-8FB4-7F98184AF72F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Connectors", "Connectors\Connectors.csproj", "{A031AC4F-5A5F-4D17-8A0B-ABF357FD2950}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Connectors", "Hlidac-Statu\Connectors\Connectors.csproj", "{A031AC4F-5A5F-4D17-8A0B-ABF357FD2950}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XLib", "XLib\XLib.csproj", "{5249C7CB-932E-44DD-9BE7-206296D74BC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XLib", "Hlidac-Statu\XLib\XLib.csproj", "{5249C7CB-932E-44DD-9BE7-206296D74BC5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Datasets", "Datasets\Datasets.csproj", "{26D78ABF-FFB5-47A8-BC99-BB2C2A77AB3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Datasets", "Hlidac-Statu\Datasets\Datasets.csproj", "{26D78ABF-FFB5-47A8-BC99-BB2C2A77AB3B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{944AEC9D-9A67-477D-811D-66DC2142299A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OCR", "OCR", "{584BE7E5-1233-4848-8C24-0A8A1D82ECC6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground", "..\Hlidac-Statu-Private\Playground\Playground.csproj", "{D16EB416-4EC8-4247-B8BF-D20CBE6979EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground", "Hlidac-Statu-Private\Playground\Playground.csproj", "{D16EB416-4EC8-4247-B8BF-D20CBE6979EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OCRQueueManager", "..\Hlidac-Statu-Private\OCRQueueManager\OCRQueueManager.csproj", "{C1F6EC6A-688B-4832-A02A-2F17368C1880}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OCRQueueManager", "Hlidac-Statu-Private\OCRQueueManager\OCRQueueManager.csproj", "{C1F6EC6A-688B-4832-A02A-2F17368C1880}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark", "..\Hlidac-Statu-Private\Benchmark\Benchmark.csproj", "{58E9869B-AFD2-45A8-A005-D5E3F5D2307F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmark", "Hlidac-Statu-Private\Benchmark\Benchmark.csproj", "{58E9869B-AFD2-45A8-A005-D5E3F5D2307F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.HealthChecks", "Web.HealthChecks\Web.HealthChecks.csproj", "{29719100-304E-478A-966A-7A4593843E28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.HealthChecks", "Hlidac-Statu\Web.HealthChecks\Web.HealthChecks.csproj", "{29719100-304E-478A-966A-7A4593843E28}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{34192F9D-C058-47A1-8EEF-88993F679C8D}"
 	ProjectSection(SolutionItems) = preProject
-		..\PrivateDocumentation\Deploy\Web\Api.Production.logger.serilog.json = ..\PrivateDocumentation\Deploy\Web\Api.Production.logger.serilog.json
-		..\PrivateDocumentation\Deploy\Web\appsettings.Production.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production.json
-		..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json
-		..\PrivateDocumentation\Deploy\Web\deployApi.bat = ..\PrivateDocumentation\Deploy\Web\deployApi.bat
-		..\PrivateDocumentation\Deploy\Web\deployWeb.bat = ..\PrivateDocumentation\Deploy\Web\deployWeb.bat
-		..\PrivateDocumentation\Deploy\Web\Production.logger.serilog.json = ..\PrivateDocumentation\Deploy\Web\Production.logger.serilog.json
-		..\PrivateDocumentation\Deploy\Web\web.Production.config = ..\PrivateDocumentation\Deploy\Web\web.Production.config
+		PrivateDocumentation\Deploy\Web\Api.Production.logger.serilog.json = PrivateDocumentation\Deploy\Web\Api.Production.logger.serilog.json
+		PrivateDocumentation\Deploy\Web\appsettings.Production.json = PrivateDocumentation\Deploy\Web\appsettings.Production.json
+		PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json = PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json
+		PrivateDocumentation\Deploy\Web\deployApi.bat = PrivateDocumentation\Deploy\Web\deployApi.bat
+		PrivateDocumentation\Deploy\Web\deployWeb.bat = PrivateDocumentation\Deploy\Web\deployWeb.bat
+		PrivateDocumentation\Deploy\Web\Production.logger.serilog.json = PrivateDocumentation\Deploy\Web\Production.logger.serilog.json
+		PrivateDocumentation\Deploy\Web\web.Production.config = PrivateDocumentation\Deploy\Web\web.Production.config
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Downloader", "Downloader", "{256417D4-C1D7-4747-A227-D860BCC5A2B1}"
 	ProjectSection(SolutionItems) = preProject
-		..\PrivateDocumentation\Deploy\Downloader\appsettings.Production.json = ..\PrivateDocumentation\Deploy\Downloader\appsettings.Production.json
-		..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat.inactive = ..\PrivateDocumentation\Deploy\Downloader\deployDownloader.bat.inactive
-		..\PrivateDocumentation\Deploy\Downloader\Production.logger.serilog.json = ..\PrivateDocumentation\Deploy\Downloader\Production.logger.serilog.json
+		PrivateDocumentation\Deploy\Downloader\appsettings.Production.json = PrivateDocumentation\Deploy\Downloader\appsettings.Production.json
+		PrivateDocumentation\Deploy\Downloader\deployDownloader.bat.inactive = PrivateDocumentation\Deploy\Downloader\deployDownloader.bat.inactive
+		PrivateDocumentation\Deploy\Downloader\Production.logger.serilog.json = PrivateDocumentation\Deploy\Downloader\Production.logger.serilog.json
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Tasks.OCR", "..\Hlidac-Statu-Private\Lib.Tasks.OCR\Lib.Tasks.OCR.csproj", "{08056481-688D-44A9-BC3A-3A5B0FE2BDFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Tasks.OCR", "Hlidac-Statu-Private\Lib.Tasks.OCR\Lib.Tasks.OCR.csproj", "{08056481-688D-44A9-BC3A-3A5B0FE2BDFF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.DetectJobs", "..\Hlidac-Statu-Private\HlidacStatu.DetectJobs\HlidacStatu.DetectJobs.csproj", "{D8D2A560-D515-479B-86A6-D5BED1C094E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.DetectJobs", "Hlidac-Statu-Private\HlidacStatu.DetectJobs\HlidacStatu.DetectJobs.csproj", "{D8D2A560-D515-479B-86A6-D5BED1C094E5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{ACC852FC-5016-48E7-80DF-ABD60A162FB8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.JobTableEditor", "HlidacStatu.JobTableEditor\HlidacStatu.JobTableEditor.csproj", "{EF59CD86-CAF1-439C-A76D-2FECC4897B7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.JobTableEditor", "Hlidac-Statu\HlidacStatu.JobTableEditor\HlidacStatu.JobTableEditor.csproj", "{EF59CD86-CAF1-439C-A76D-2FECC4897B7B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Data.External.Tables", "Lib.Data.External.Tables\Lib.Data.External.Tables.csproj", "{956497F7-9609-442E-8AB1-5F0AEEBF8081}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Data.External.Tables", "Hlidac-Statu\Lib.Data.External.Tables\Lib.Data.External.Tables.csproj", "{956497F7-9609-442E-8AB1-5F0AEEBF8081}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{964DE48E-8813-408B-894D-072689E7005B}"
 	ProjectSection(SolutionItems) = preProject
@@ -128,43 +128,45 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Jobs", "Jobs", "{40841C9C-4BC4-4E32-AC3E-657E4A5FA1A0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Ceny", "HlidacStatu.JobsWeb\HlidacStatu.Ceny.csproj", "{A89C8C53-5F83-4EC8-BB06-F5CBB8BE1C28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Ceny", "Hlidac-Statu\HlidacStatu.JobsWeb\HlidacStatu.Ceny.csproj", "{A89C8C53-5F83-4EC8-BB06-F5CBB8BE1C28}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CamelotDockerAPI", "..\Hlidac-Statu-Private\Docker\CamelotDockerAPI\CamelotDockerAPI.csproj", "{FF971AF6-D7D0-4CFD-826E-4D784CDCEBEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CamelotDockerAPI", "Hlidac-Statu-Private\Docker\CamelotDockerAPI\CamelotDockerAPI.csproj", "{FF971AF6-D7D0-4CFD-826E-4D784CDCEBEA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutocompleteApi", "AutocompleteApi\AutocompleteApi.csproj", "{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutocompleteApi", "Hlidac-Statu\AutocompleteApi\AutocompleteApi.csproj", "{F5E281F4-1CC8-47B5-BF3E-EFB88FE34DCC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Queue", "Queue", "{24E81119-636A-4383-A22D-A371C119E789}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MachineLearning", "MachineLearning", "{AF9C295F-FA98-4C4C-9A87-25F1792C9E3D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitPriceDetector", "..\Hlidac-Statu-Private\UnitPriceDetector\UnitPriceDetector.csproj", "{A9F3D2BF-821E-43DB-BE01-29CF2F44325C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitPriceDetector", "Hlidac-Statu-Private\UnitPriceDetector\UnitPriceDetector.csproj", "{A9F3D2BF-821E-43DB-BE01-29CF2F44325C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MlSharedEntities", "..\Hlidac-Statu-Private\MlSharedEntities\MlSharedEntities.csproj", "{BCD7FBB1-6590-4CDB-BFBB-3988A001FEBF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MlSharedEntities", "Hlidac-Statu-Private\MlSharedEntities\MlSharedEntities.csproj", "{BCD7FBB1-6590-4CDB-BFBB-3988A001FEBF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitPricePenetrationAnalyzer", "..\Hlidac-Statu-Private\UnitPricePenetrationAnalyzer\UnitPricePenetrationAnalyzer.csproj", "{19BA17F9-AC50-4932-ACDD-47312234C1CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitPricePenetrationAnalyzer", "Hlidac-Statu-Private\UnitPricePenetrationAnalyzer\UnitPricePenetrationAnalyzer.csproj", "{19BA17F9-AC50-4932-ACDD-47312234C1CE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Http-Echo-Client", "Http-Echo-Client\Http-Echo-Client.csproj", "{4090F31C-9466-41F1-A892-1B3EA15D505B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Http-Echo-Client", "Hlidac-Statu\Http-Echo-Client\Http-Echo-Client.csproj", "{4090F31C-9466-41F1-A892-1B3EA15D505B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uptimer", "..\Hlidac-Statu-Private\Docker\Uptimer\Uptimer.csproj", "{7FD7EEE4-00E5-4D91-BD16-8D1CDEE4DBF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uptimer", "Hlidac-Statu-Private\Docker\Uptimer\Uptimer.csproj", "{7FD7EEE4-00E5-4D91-BD16-8D1CDEE4DBF1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{1685E375-CA78-4833-9208-4757692F4B5E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GlobalTests", "..\Hlidac-Statu-Private\GlobalTests\GlobalTests.csproj", "{4ADFB805-8111-42F1-BA92-F847ED3A2F10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GlobalTests", "Hlidac-Statu-Private\GlobalTests\GlobalTests.csproj", "{4ADFB805-8111-42F1-BA92-F847ED3A2F10}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UptimerSSLCheck", "..\Hlidac-Statu-Private\Docker\UptimerSSLCheck\UptimerSSLCheck.csproj", "{69D089BC-461A-4A47-AB1B-9CB68EF37CE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UptimerSSLCheck", "Hlidac-Statu-Private\Docker\UptimerSSLCheck\UptimerSSLCheck.csproj", "{69D089BC-461A-4A47-AB1B-9CB68EF37CE7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FullTextSearchTests", "FullTextSearchTests\FullTextSearchTests.csproj", "{4C8C6620-7243-46C3-B40A-2E460F62B939}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FullTextSearchTests", "Hlidac-Statu\FullTextSearchTests\FullTextSearchTests.csproj", "{4C8C6620-7243-46C3-B40A-2E460F62B939}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPv6Tester", "..\Hlidac-Statu-Private\IPv6Tester\IPv6Tester.csproj", "{90787998-9A85-4E6E-89A4-7E7E81BA01AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IPv6Tester", "Hlidac-Statu-Private\IPv6Tester\IPv6Tester.csproj", "{90787998-9A85-4E6E-89A4-7E7E81BA01AF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatuApi", "HlidacStatuApi\HlidacStatuApi.csproj", "{E4292EBF-EA67-4FD5-811F-76D843433A31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatuApi", "Hlidac-Statu\HlidacStatuApi\HlidacStatuApi.csproj", "{E4292EBF-EA67-4FD5-811F-76D843433A31}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Webs", "Webs", "{034892EA-BACB-4BDE-8161-6F8DB0166FB5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Analysis.Page", "Analysis.Page\Analysis.Page.csproj", "{078137D5-8480-430A-B9E4-5D3719098847}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Analysis.Page", "Hlidac-Statu\Analysis.Page\Analysis.Page.csproj", "{078137D5-8480-430A-B9E4-5D3719098847}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnalyzePageArea", "..\Hlidac-Statu-Private\AnalyzePageArea\AnalyzePageArea.csproj", "{57B4976F-B999-4977-86BE-D14D4CCA657A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnalyzePageArea", "Hlidac-Statu-Private\AnalyzePageArea\AnalyzePageArea.csproj", "{57B4976F-B999-4977-86BE-D14D4CCA657A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlurredPageMinion", "Hlidac-Statu-Private\Docker\BlurredPageMinion\BlurredPageMinion.csproj", "{CAA0019C-8E66-4849-81D8-D37906C5AD24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -396,6 +398,10 @@ Global
 		{57B4976F-B999-4977-86BE-D14D4CCA657A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57B4976F-B999-4977-86BE-D14D4CCA657A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57B4976F-B999-4977-86BE-D14D4CCA657A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAA0019C-8E66-4849-81D8-D37906C5AD24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAA0019C-8E66-4849-81D8-D37906C5AD24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAA0019C-8E66-4849-81D8-D37906C5AD24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAA0019C-8E66-4849-81D8-D37906C5AD24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -439,6 +445,7 @@ Global
 		{90787998-9A85-4E6E-89A4-7E7E81BA01AF} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{E4292EBF-EA67-4FD5-811F-76D843433A31} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 		{57B4976F-B999-4977-86BE-D14D4CCA657A} = {944AEC9D-9A67-477D-811D-66DC2142299A}
+		{CAA0019C-8E66-4849-81D8-D37906C5AD24} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}

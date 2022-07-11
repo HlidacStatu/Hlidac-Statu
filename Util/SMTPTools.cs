@@ -39,7 +39,7 @@ namespace HlidacStatu.Util
                     using (SmtpClient smtp = new SmtpClient())
                     {
                         smtp.Host = Devmasters.Config.GetWebConfigValue("SmtpHost");
-                        Consts.Logger.Info("Sending email to " + msg.To);
+                        Consts.Logger.Info("Util.SMTPTools.SendEmail sent email via {smtpserver} to {recipient}", smtp.Host, msg.To);
                         if (bccToAdmin)
                             msg.Bcc.Add("michal@michalblaha.cz");
                         smtp.Send(msg);
@@ -51,7 +51,7 @@ namespace HlidacStatu.Util
             catch (Exception e)
             {
 
-                Consts.Logger.Error("WatchDogs sending email error", e);
+                Consts.Logger.Error("Util.SMTPTools.SendEmail sent email Error via {smtpserver} to {recipient}", e, Devmasters.Config.GetWebConfigValue("SmtpHost"), toEmail);
                 return false;
             }
 
