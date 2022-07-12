@@ -92,7 +92,7 @@ namespace HlidacStatu.Repositories
         public static void AnalyzePagesInBatch(
             Devmasters.Log.Logger logger, Action<string> logOutputFunc, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc,
             string[] ids = null, string query = null, int? daysback = null, int? threads = null, bool force = false, bool debug = false,
-            bool shuffle = false)
+            bool shuffle = false, string prilohaId = null, int? pageOnly = null, string saveImgsPath = null)
         {
             //default values
             threads = threads ?? 10;
@@ -148,8 +148,8 @@ namespace HlidacStatu.Repositories
 
 
 
-
-            DetectText.ModelFeeder mf = new DetectText.ModelFeeder(threads.Value + 5);
+            int modelsCount = Math.Min(ids2Process.Count, threads.Value);
+            DetectText.ModelFeeder mf = new DetectText.ModelFeeder((int)(modelsCount*1.2)+1);
             if (shuffle)
                 ids2Process = ids2Process.ShuffleMe().ToList();
 
@@ -165,8 +165,14 @@ namespace HlidacStatu.Repositories
 
                     Dictionary<string, Smlouva.Priloha.BlurredPagesStats> prilohyBlurred = new Dictionary<string, Smlouva.Priloha.BlurredPagesStats>();
                     bool changed = false;
+                    if (string.IsNullOrEmpty(saveImgsPath) == false)
+                    {
+                        System.IO.Directory.CreateDirectory(saveImgsPath);
+                        if (saveImgsPath.EndsWith("\\") == false)
+                            saveImgsPath += "\\";
+                    }
 
-                    foreach (var p in sml.Prilohy)
+                    foreach (var p in sml.Prilohy.Where(m => m.UniqueHash() == prilohaId || prilohaId == null))
                     {
                         List<PageMetadata> blurredPages = new List<PageMetadata>();
                         string tmpPdf = "";
@@ -185,6 +191,8 @@ namespace HlidacStatu.Repositories
                                 for (int ipage = 0; ipage < numOfPages; ipage++)
                                 {
                                     int page = ipage + 1;
+                                    if (pageOnly.HasValue && page != pageOnly)
+                                        continue;
 
                                     if (PageMetadataRepo.ExistsAsync(sml, p, page).Result && force == false)
                                     {
@@ -202,6 +210,10 @@ namespace HlidacStatu.Repositories
                                         using (var pdfStream = System.IO.File.OpenRead(tmpPdf))
                                         {
                                             Analysis.Page.PdfTools.SaveJpeg(tmpPdf + $"_p{page}.jpg", pdfStream, page: ipage);
+                                            if (!string.IsNullOrEmpty(saveImgsPath))
+                                            {
+                                                System.IO.File.Copy(tmpPdf + $"_p{page}.jpg", saveImgsPath + $"sml{sml.Id}_pril{p.UniqueHash()}_p{page}.jpg",true);
+                                            }
                                         }
 
                                         var model = mf.GetFreeModel();
@@ -213,11 +225,16 @@ namespace HlidacStatu.Repositories
                                             logger.Debug($"zacernene: Smlouva {s} priloha {p.nazevSouboru} page {page} detecting text");
                                         var dt = new Analysis.Page.Area.DetectText(model.LoadedModel, fnJpg);
                                         dt.AnalyzeImage();
+                                        if (!string.IsNullOrEmpty(saveImgsPath))
+                                            dt.RenderBoundariesToImage(saveImgsPath + $"sml{sml.Id}_pril{p.UniqueHash()}_p{page}_texts.jpg");
                                         mf.ReturnModelBack(model);
+
                                         if (debug)
                                             logger.Debug($"zacernene: Smlouva {s} priloha {p.nazevSouboru} page {page} detecting zacerneni");
                                         var db = new Analysis.Page.Area.DetectBlack(fnJpg);
                                         db.AnalyzeImage();
+                                        if (!string.IsNullOrEmpty(saveImgsPath))
+                                            db.RenderBoundariesToImage(saveImgsPath + $"sml{sml.Id}_pril{p.UniqueHash()}_p{page}_blurred.jpg");
 
                                         //dt in db resolution
                                         var dtC = dt.Result().GetForAnotherResolution(db.Result().ImageSize);
@@ -281,7 +298,7 @@ namespace HlidacStatu.Repositories
 
                                     pb.ListOfExtensivelyBlurredPages = blurredPages
                                             .Where(m => m.Blurred.BlackenAreaRatio() >= 0.2m)
-                                            .Select(m=>m.PageNum)
+                                            .Select(m => m.PageNum)
                                             .ToArray();
 
                                     p.BlurredPages = pb;

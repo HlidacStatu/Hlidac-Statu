@@ -13,7 +13,7 @@ namespace HlidacStatu.Entities
         string _id = null;
 
         [Nest.Keyword()]
-        [Description("Unikátní ID zakázky. Nevyplňujte, ID se vygeneruje samo.")]
+        [Description("Unikátní ID zaznamu. Nevyplňujte, ID se vygeneruje samo.")]
         public string Id
         {
             get

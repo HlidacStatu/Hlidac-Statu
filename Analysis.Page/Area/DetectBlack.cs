@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
+﻿
 using System.Drawing;
-using System.Drawing.Imaging;
+using System.Drawing.Drawing2D;
 
 using Accord;
 using Accord.Imaging;
@@ -90,9 +86,51 @@ namespace HlidacStatu.Analysis.Page.Area
                 }
             }
 
+            List<Rectangle> filledBoxesWithBlack = new List<Rectangle>();
+
+
+            if (true)
+            {
+                using (Accord.Imaging.UnmanagedImage ddmp = UnmanagedImage.FromManagedImage(image))
+                {
+
+                    foreach (var box in boxes)
+                    {
+                        int maxNonBlackPixes = (int)(box.Width * box.Height * 0.05m);
+                        //invert color
+                        Color blackColor = Color.FromArgb(255 - blobCounter.BackgroundThreshold.R,
+                            255 - blobCounter.BackgroundThreshold.G, 255 - blobCounter.BackgroundThreshold.B);
+                        int nonBlack = 0;
+                        for (int x = 0; x < box.Width; x++)
+                        {
+                            for (int y = 0; y < box.Height; y++)
+                            {
+                                var pixCol = ddmp.GetPixel(x + box.X, y + box.Y);
+                                if (pixCol.R > blackColor.R
+                                    || pixCol.G > blackColor.G
+                                    || pixCol.B > blackColor.B
+                                    )
+                                    nonBlack++;
+
+                                if (nonBlack > maxNonBlackPixes)
+                                    goto endF;
+
+                            }
+
+                        }
+endF:
+                        if (nonBlack <= maxNonBlackPixes)
+                            filledBoxesWithBlack.Add(box);
+                    }
+
+                }
+
+            }
+            else
+                filledBoxesWithBlack = boxes.ToList();
 
             result = new FoundBoxes();
-            result.Boundaries = boxes;
+            result.Boundaries = filledBoxesWithBlack;
             result.ImageSize = image.Size;
             result.RatioFromOriginal = new System.Drawing.Point(1, 1);
 
@@ -104,17 +142,21 @@ namespace HlidacStatu.Analysis.Page.Area
                 AnalyzeImage();
 
 
-            System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(image);
-
-            foreach (var blob in result.Boundaries)
+            using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(image))
             {
-                var bl = new System.Drawing.Rectangle((int)blob.X, (int)blob.Y, (int)blob.Width, (int)blob.Height);
-                g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Red, 5.0f), bl);
+                int num = 0;
+                foreach (var blob in result.Boundaries)
+                {
+                    num++;
+                    var bl = new System.Drawing.Rectangle((int)blob.X, (int)blob.Y, (int)blob.Width, (int)blob.Height);
+                    g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Red, 5.0f), bl);
+                    //g.DrawString(num.ToString(), SystemFonts.DefaultFont, Brushes.Red, new PointF(blob.X, blob.Y));
+                }
 
+
+                modifiedImageFilename = modifiedImageFilename ?? Path.Combine(Path.GetDirectoryName(imagePath), $"{Path.GetFileNameWithoutExtension(imagePath)}.black.jpg");
+                image.Save(modifiedImageFilename, System.Drawing.Imaging.ImageFormat.Jpeg);
             }
-
-            modifiedImageFilename = modifiedImageFilename ?? Path.Combine(Path.GetDirectoryName(imagePath), $"{Path.GetFileNameWithoutExtension(imagePath)}.black.jpg");
-            image.Save(modifiedImageFilename);
         }
 
         public FoundBoxes Result()
