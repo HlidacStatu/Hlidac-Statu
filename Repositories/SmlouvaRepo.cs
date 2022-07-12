@@ -269,12 +269,14 @@ namespace HlidacStatu.Repositories
                 .Distinct()
         );
 
-        public static async Task<bool> SaveAsync(Smlouva smlouva, ElasticClient client = null, bool updateLastUpdateValue = true)
+        public static async Task<bool> SaveAsync(Smlouva smlouva, ElasticClient client = null, bool updateLastUpdateValue = true, bool skipPrepareBeforeSave = false)
         {
             if (smlouva == null)
                 return false;
 
-            PrepareBeforeSave(smlouva, updateLastUpdateValue);
+            if (skipPrepareBeforeSave == false)
+                PrepareBeforeSave(smlouva, updateLastUpdateValue);
+
             ElasticClient c = client;
             if (c == null)
             {

@@ -333,7 +333,7 @@ namespace HlidacStatu.Repositories
                     {
                         logger.Info($"zacernene: Smlouva {s} saved BlurredPagesStat ", sml.Id);
 
-                        SmlouvaRepo.SaveAsync(sml, updateLastUpdateValue: false)
+                        SmlouvaRepo.SaveAsync(sml, updateLastUpdateValue: false, skipPrepareBeforeSave:true)
                             .ConfigureAwait(false).GetAwaiter().GetResult();
                     }
                     return new Devmasters.Batch.ActionOutputData();
