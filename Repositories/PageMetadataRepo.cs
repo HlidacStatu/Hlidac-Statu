@@ -172,7 +172,7 @@ namespace HlidacStatu.Repositories
                             saveImgsPath += "\\";
                     }
 
-                    foreach (var p in sml.Prilohy.Where(m => m.UniqueHash() == prilohaId || prilohaId == null))
+                    foreach (var p in sml.Prilohy.Where(m => m.UniqueHash() == prilohaId || string.IsNullOrEmpty(prilohaId)))
                     {
                         List<PageMetadata> blurredPages = new List<PageMetadata>();
                         string tmpPdf = "";
