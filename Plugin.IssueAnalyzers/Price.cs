@@ -44,16 +44,36 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
             if (item.navazanyZaznam != null)
             {
                 Smlouva navSm = await SmlouvaRepo.LoadAsync(item.navazanyZaznam);
+                if (navSm == null)
+                {
+                    //zkus podle ID smlouvy (ne verze)
+                    var foundSml = SmlouvaRepo.Searching.SimpleSearchAsync($"idSmlouvy:{item.navazanyZaznam}",1,50, SmlouvaRepo.Searching.OrderResult.DateSignedDesc)
+                        .ConfigureAwait(false).GetAwaiter().GetResult()?.Results;
+                    if (foundSml != null)
+                    {
+                        foundSml = foundSml.Where(m => m.Id != item.Id);
+                        navSm = foundSml
+                                    .Where(m => m.CalculatedPriceWithVATinCZK > 0)
+                                    .OrderByDescending(m => m.datumUzavreni)
+                                    .FirstOrDefault();
+                    }
+                }
                 if (navSm != null)
                 {
                     jeToDodatek = jeToDodatek || item.predmet.ToLower().Contains("dodatek");
+                    jeToDodatek = jeToDodatek || item.predmet.ToLower().RemoveAccents().Contains("ukonceni");
+                    jeToDodatek = jeToDodatek || item.predmet.ToLower().RemoveAccents().Contains("vypoved");
                     jeToDodatek = jeToDodatek || item.Prilohy.Any(m => Devmasters.TextUtil.ShortenText(m.PlainTextContent, 300)?.ToLower()?.Contains("dodatek") == true);
+                    jeToDodatek = jeToDodatek || item.Prilohy.Any(m => Devmasters.TextUtil.ShortenText(m.PlainTextContent, 300)?.ToLower()?.RemoveAccents()?.Contains("ukonceni") == true);
+                    jeToDodatek = jeToDodatek || item.Prilohy.Any(m => Devmasters.TextUtil.ShortenText(m.PlainTextContent, 300)?.ToLower()?.RemoveAccents()?.Contains("vypoved") == true);
                 }
             }
 
             bool ukonceniSmlouvy = false;
-            ukonceniSmlouvy = ukonceniSmlouvy || item.predmet?.ToLower()?.RemoveAccents()?.Contains("dohoda o ukonceni") == true;
-            ukonceniSmlouvy = ukonceniSmlouvy || item.Prilohy.Any(m => Devmasters.TextUtil.ShortenText(m.PlainTextContent, 300)?.ToLower()?.RemoveAccents()?.Contains("dohoda o ukonceni") == true);
+            ukonceniSmlouvy = ukonceniSmlouvy || item.predmet?.ToLower()?.RemoveAccents()?.Contains("vypoved") == true;
+            ukonceniSmlouvy = ukonceniSmlouvy || item.predmet?.ToLower()?.RemoveAccents()?.Contains("ukonceni") == true;
+            ukonceniSmlouvy = ukonceniSmlouvy || item.Prilohy.Any(m => Devmasters.TextUtil.ShortenText(m.PlainTextContent, 300)?.ToLower()?.RemoveAccents()?.Contains("ukonceni") == true);
+            ukonceniSmlouvy = ukonceniSmlouvy || item.Prilohy.Any(m => Devmasters.TextUtil.ShortenText(m.PlainTextContent, 300)?.ToLower()?.RemoveAccents()?.Contains("vypoved") == true);
 
             if (
                 (item.hodnotaBezDph.HasValue == false && item.hodnotaVcetneDph.HasValue == false)
