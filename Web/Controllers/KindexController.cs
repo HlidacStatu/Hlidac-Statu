@@ -139,10 +139,10 @@ namespace HlidacStatu.Web.Controllers
                     break;
 
                 case "celkovy":
-                    return View("NoAvail");
-                //ViewBag.LadderTopic = "Kompletní žebříček úřadů a organizací";
-                //ViewBag.LadderTitle = "Kompletní žebříček úřadů a organizací podle K–Indexu";
-                //break;
+                    //return View("NoAvail");
+                    ViewBag.LadderTopic = "Kompletní žebříček úřadů a organizací";
+                    ViewBag.LadderTitle = "Kompletní žebříček úřadů a organizací podle K–Indexu";
+                    break;
 
                 case "skokani":
                     ViewBag.LadderTitle = "Úřady a organizace, kterým se hodnocení K-Indexu meziročně nejvíce změnilo";
