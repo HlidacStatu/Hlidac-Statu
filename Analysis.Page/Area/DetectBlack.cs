@@ -16,7 +16,7 @@ namespace HlidacStatu.Analysis.Page.Area
         System.Drawing.Bitmap image = null;
 
         FoundBoxes result = null;
-
+        public decimal MaxNonBlackPixesThreshold { get; set; } = 0.1m;
         public DetectBlack(string imagePath)
         {
             this.imagePath = imagePath;
@@ -96,7 +96,7 @@ namespace HlidacStatu.Analysis.Page.Area
 
                     foreach (var box in boxes)
                     {
-                        int maxNonBlackPixes = (int)(box.Width * box.Height * 0.05m);
+                        int maxNonBlackPixes = (int)(box.Width * box.Height * MaxNonBlackPixesThreshold);
                         //invert color
                         Color blackColor = Color.FromArgb(255 - blobCounter.BackgroundThreshold.R,
                             255 - blobCounter.BackgroundThreshold.G, 255 - blobCounter.BackgroundThreshold.B);

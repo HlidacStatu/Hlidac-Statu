@@ -88,14 +88,14 @@ namespace HlidacStatu.Repositories
 
 
 
-
+        const int defaultThreads = 10;
         public static void AnalyzePagesInBatch(
             Devmasters.Log.Logger logger, Action<string> logOutputFunc, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc,
             string[] ids = null, string query = null, int? daysback = null, int? threads = null, bool force = false, bool debug = false,
             bool shuffle = false, string prilohaId = null, int? pageOnly = null, string saveImgsPath = null)
         {
             //default values
-            threads = threads ?? 10;
+            threads = threads ?? defaultThreads;
 
 
 

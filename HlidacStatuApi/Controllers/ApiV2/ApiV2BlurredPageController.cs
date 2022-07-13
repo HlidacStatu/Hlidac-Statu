@@ -24,12 +24,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return new BpGet(); ;
         }
 
-        [ApiExplorerSettings(IgnoreApi = true)]
+        //[ApiExplorerSettings(IgnoreApi = true)]
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<DSCreatedDTO>> Save([FromBody] Registration data)
+        public async Task<ActionResult<DSCreatedDTO>> Save([FromBody] bpSave data)
         {
-            return StatusCode(id ?? 200, $"error {id}");
+            return StatusCode(200);
         }
 
 
