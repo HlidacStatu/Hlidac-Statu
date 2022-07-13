@@ -36,13 +36,13 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         public class BpGet
         {
-            public class priloha
+            public class BpGPriloha
             {
                 public string UniqueId { get; set; }
                 public string Url { get; set; }
             }
             public string SmlouvaId { get; set; }
-            public priloha[] Prilohy { get; set; }
+            public BpGPriloha[] Prilohy { get; set; }
 
         }
 
@@ -50,9 +50,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             public string SmlouvaId { get; set; }
 
-            public Priloha[] Prilohy { get; set; }
+            public BpSPriloha[] Prilohy { get; set; }
 
-            public class Priloha
+            public class BpSPriloha
             {
                 public string UniqueId { get; set; }
                 public PageMetadata[] Pages { get; set; }
