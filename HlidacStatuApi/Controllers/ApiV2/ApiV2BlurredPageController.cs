@@ -27,7 +27,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         //[ApiExplorerSettings(IgnoreApi = true)]
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<DSCreatedDTO>> Save([FromBody] bpSave data)
+        public async Task<ActionResult<DSCreatedDTO>> Save([FromBody] BpSave data)
         {
             return StatusCode(200);
         }
@@ -38,19 +38,19 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             public class priloha
             {
-                public string uniqueId { get; set; }
-                public string url { get; set; }
+                public string UniqueId { get; set; }
+                public string Url { get; set; }
             }
-            public string smlouvaId { get; set; }
-            public priloha[] prilohy { get; set; }
+            public string SmlouvaId { get; set; }
+            public priloha[] Prilohy { get; set; }
 
         }
 
-        public class bpSave
+        public class BpSave
         {
-            public string smlouvaId { get; set; }
+            public string SmlouvaId { get; set; }
 
-            public PageMetadata[] Blurred { get; set; }
+            public Priloha[] Prilohy { get; set; }
 
             public class Priloha
             {
