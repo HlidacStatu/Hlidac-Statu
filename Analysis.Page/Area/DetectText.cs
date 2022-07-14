@@ -135,6 +135,7 @@ namespace HlidacStatu.Analysis.Page.Area
             }
         }
 
+        //https://github.com/shimat/opencvsharp/blob/master/test/OpenCvSharp.Tests/dnn/EastTextDetectionTest.cs
         private InternalResult AnalyzeImg(string fileName, float ConfThreshold, float NmsThreshold)
         {
             // Load network.
