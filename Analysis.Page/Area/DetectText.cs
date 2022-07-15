@@ -13,7 +13,7 @@ namespace HlidacStatu.Analysis.Page.Area
 
         static DetectText()
         {
-            string modelPath = root + @"\frozen_east_text_detection.pb";
+            string modelPath = Path.Combine(root, "frozen_east_text_detection.pb");
             SharedModel = CvDnn.ReadNet(modelPath);
         }
 
@@ -21,7 +21,7 @@ namespace HlidacStatu.Analysis.Page.Area
 
         public static Net NewModel(string modelPath = null)
         {
-            modelPath = modelPath ?? root + @"\frozen_east_text_detection.pb";
+            modelPath = modelPath ?? Path.Combine(root, "frozen_east_text_detection.pb");
             Net newModel = CvDnn.ReadNet(modelPath);
             return newModel;
         }
