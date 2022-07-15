@@ -1,3 +1,4 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
@@ -165,7 +166,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Analysis.Page", "Hlidac-Sta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnalyzePageArea", "Hlidac-Statu-Private\AnalyzePageArea\AnalyzePageArea.csproj", "{57B4976F-B999-4977-86BE-D14D4CCA657A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlurredPageMinion", "Hlidac-Statu-Private\Docker\BlurredPageMinion\BlurredPageMinion.csproj", "{CAA0019C-8E66-4849-81D8-D37906C5AD24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlurredPageMinion", "Hlidac-Statu-Private\Docker\BlurredPageMinion\BlurredPageMinion.csproj", "{CAA0019C-8E66-4849-81D8-D37906C5AD24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -450,5 +451,3 @@ Global
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
 	EndGlobalSection
 EndGlobal
-
-
