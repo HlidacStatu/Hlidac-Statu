@@ -81,7 +81,7 @@ again:
 
         //[ApiExplorerSettings(IgnoreApi = true)]
         [Authorize]
-        [HttpPost]
+        [HttpPost("Save")]
         public async Task<ActionResult<DSCreatedDTO>> Save([FromBody] BpSave data)
         {
             List<Task> tasks = new List<Task>();
@@ -131,6 +131,29 @@ again:
         }
 
 
+        //[ApiExplorerSettings(IgnoreApi = true)]
+        [Authorize]
+        [HttpGet("Stats")]
+        public async Task<ActionResult<Statistics>> Stats()
+        {
+            DateTime now = DateTime.Now;
+
+            var res = new Statistics()
+            {
+                total = idsToProcess.Count,
+                totalTaken = idsToProcess.Count(m=>m.Value != null),
+                totalFailed = idsToProcess.Count(m=>m.Value != null && (now - m.Value.taken).TotalMinutes > 60)
+            };
+
+            return res;
+        }
+
+        public class Statistics
+        {
+            public int total { get;  set; }
+            public int totalTaken { get; set; }
+            public int totalFailed { get; set; }
+        }
 
         public class BpGet
         {
