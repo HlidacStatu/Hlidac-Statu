@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Devmasters.Collections;
+using Devmasters.Log;
 
 using HlidacStatu.Analysis.Page.Area;
 using HlidacStatu.Entities;
@@ -222,60 +223,16 @@ namespace HlidacStatu.Repositories
                                     try
                                     {
                                         fnJpg = tmpPdf + $"_p{page}.jpg";
-                                        using (var pdfStream = System.IO.File.OpenRead(tmpPdf))
-                                        {
-                                            Analysis.Page.PdfTools.SaveJpeg(tmpPdf + $"_p{page}.jpg", pdfStream, page: ipage);
-                                            if (!string.IsNullOrEmpty(saveImgsPath))
-                                            {
-                                                System.IO.File.Copy(tmpPdf + $"_p{page}.jpg", saveImgsPath + $"sml{sml.Id}_pril{p.UniqueHash()}_p{page}.jpg",true);
-                                            }
-                                        }
 
-                                        var model = mf.GetFreeModel();
+                                        SavePageFromJPG(tmpPdf, fnJpg, page);
 
-                                        Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
-                                        sw.Start();
 
-                                        if (debug)
-                                            logger.Debug($"zacernene: Smlouva {s} priloha {p.nazevSouboru} page {page} detecting text");
-                                        var dt = new Analysis.Page.Area.DetectText(model.LoadedModel, fnJpg);
-                                        dt.AnalyzeImage();
-                                        if (!string.IsNullOrEmpty(saveImgsPath))
-                                            dt.RenderBoundariesToImage(saveImgsPath + $"sml{sml.Id}_pril{p.UniqueHash()}_p{page}_texts.jpg");
-                                        mf.ReturnModelBack(model);
-
-                                        if (debug)
-                                            logger.Debug($"zacernene: Smlouva {s} priloha {p.nazevSouboru} page {page} detecting zacerneni");
-                                        var db = new Analysis.Page.Area.DetectBlack(fnJpg);
-                                        db.AnalyzeImage();
-                                        if (!string.IsNullOrEmpty(saveImgsPath))
-                                            db.RenderBoundariesToImage(saveImgsPath + $"sml{sml.Id}_pril{p.UniqueHash()}_p{page}_blurred.jpg");
-
-                                        //dt in db resolution
-                                        var dtC = dt.Result().GetForAnotherResolution(db.Result().ImageSize);
-
-                                        PageMetadata pm = new PageMetadata();
+                                        PageMetadata pm = AnalyzePageInJPG(fnJpg,mf, saveImgsPath, logger, debug);
                                         pm.SmlouvaId = sml.Id;
                                         pm.PrilohaId = p.UniqueHash();
                                         pm.PageNum = page;
-                                        pm.Blurred = new PageMetadata.BlurredMetadata()
-                                        {
-                                            BlackenAreaBoundaries = db.Result().Boundaries
-                                                .Select(m => (PageMetadata.BlurredMetadata.Boundary)m)
-                                                .ToArray(),
-                                            TextAreaBoundaries = dtC.Boundaries
-                                                .Select(m => (PageMetadata.BlurredMetadata.Boundary)m)
-                                                .ToArray(),
-                                            AnalyzerVersion = "1.0",
-                                            Created = DateTime.Now,
-                                            ImageWidth = db.Result().ImageSize.Width,
-                                            ImageHeight = db.Result().ImageSize.Height,
-                                            BlackenArea = db.Result().GetTotalArea(),
-                                            TextArea = dtC.GetTotalArea()
-                                        };
-                                        sw.Stop();
 
-                                        logger.Info($"zacernene: Smlouva {s} priloha {p.nazevSouboru} page {page} detecting done in {sw.ElapsedMilliseconds}ms");
+
 
                                         if (debug)
                                             logger.Debug($"zacernene: Smlouva {s} priloha {p.nazevSouboru} page {page} saving");
@@ -358,8 +315,68 @@ namespace HlidacStatu.Repositories
 
         }
 
+        public static PageMetadata AnalyzePageInJPG(string jpegFile, DetectText.ModelFeeder mf, 
+            string saveDebugImgsPath = null, Logger logger = null, bool debug = false)
+        {
+            var nalez = jpegFile.LastIndexOf('.');
+            var jpegFileNoExt = jpegFile;
+            if (nalez > 1)
+                jpegFileNoExt = jpegFile.Remove(nalez);
+            
+            logger = logger ?? HlidacStatu.Util.Consts.Logger;
 
+            var model = mf.GetFreeModel();
 
+            Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+            sw.Start();
+
+            if (debug)
+                logger.Debug($"zacernene: file {jpegFile} detecting text");
+            var dt = new Analysis.Page.Area.DetectText(model.LoadedModel, jpegFile);
+            dt.AnalyzeImage();
+            if (!string.IsNullOrEmpty(saveDebugImgsPath))
+                dt.RenderBoundariesToImage(saveDebugImgsPath + $"{jpegFileNoExt}.texts.jpg");
+            mf.ReturnModelBack(model);
+
+            if (debug)
+                logger.Debug($"zacernene: file {jpegFile} detecting zacerneni");
+            var db = new Analysis.Page.Area.DetectBlack(jpegFile);
+            db.AnalyzeImage();
+            if (!string.IsNullOrEmpty(saveDebugImgsPath))
+                db.RenderBoundariesToImage(saveDebugImgsPath + $"{jpegFileNoExt}.blurred.jpg");
+
+            //dt in db resolution
+            var dtC = dt.Result().GetForAnotherResolution(db.Result().ImageSize);
+
+            PageMetadata pm = new PageMetadata();
+            pm.Blurred = new PageMetadata.BlurredMetadata()
+            {
+                BlackenAreaBoundaries = db.Result().Boundaries
+                    .Select(m => (PageMetadata.BlurredMetadata.Boundary)m)
+                    .ToArray(),
+                TextAreaBoundaries = dtC.Boundaries
+                    .Select(m => (PageMetadata.BlurredMetadata.Boundary)m)
+                    .ToArray(),
+                AnalyzerVersion = "1.0",
+                Created = DateTime.Now,
+                ImageWidth = db.Result().ImageSize.Width,
+                ImageHeight = db.Result().ImageSize.Height,
+                BlackenArea = db.Result().GetTotalArea(),
+                TextArea = dtC.GetTotalArea()
+            };
+            sw.Stop();
+
+            logger.Info($"zacernene: {jpegFile} detecting done in {sw.ElapsedMilliseconds}ms");
+            return pm;
+        }
+
+        public static void SavePageFromJPG(string pdfFilename, string jpgFilename, int page)
+        {
+            using (var pdfStream = System.IO.File.OpenRead(pdfFilename))
+            {
+                Analysis.Page.PdfTools.SaveJpeg(jpgFilename, pdfStream, page-1);
+            }
+        }
 
         private static bool HasPDFHeader(string filename)
         {
