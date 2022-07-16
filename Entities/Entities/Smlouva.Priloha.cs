@@ -1,8 +1,8 @@
-﻿using HlidacStatu.Util;
+﻿using System;
+
+using HlidacStatu.Util;
 
 using Nest;
-
-using System;
 
 namespace HlidacStatu.Entities
 {
@@ -19,7 +19,7 @@ namespace HlidacStatu.Entities
             }
 
             public class BlurredPagesStats
-            { 
+            {
                 public decimal BlurredAreaPerc { get; set; }
                 public int NumOfBlurredPages { get; set; }
                 public int NumOfExtensivelyBlurredPages { get; set; }
@@ -94,10 +94,17 @@ namespace HlidacStatu.Entities
 
                 //}
             }
-
-            public string LocalCopyUrl(string smlouvaId, string identityName = null, string secret = null)
+            public string GetUrl(string smlouvaId, bool local = true)
             {
-                var url = $"/KopiePrilohy/{smlouvaId}?hash={this.UniqueHash()}";
+                if (local)
+                    return LocalCopyUrl(smlouvaId, local: true);
+                else
+                    return this.odkaz;
+            }
+            public string LocalCopyUrl(string smlouvaId, string identityName = null, string secret = null, bool local = true)
+            {
+                var url = (local ? "" : "https://www.hlidacstatu.cz")
+                    + $"/KopiePrilohy/{smlouvaId}?hash={this.UniqueHash()}";
                 if (identityName != null)
                     url = url + $"&secret={LimitedAccessSecret(identityName)}";
                 else if (secret != null)

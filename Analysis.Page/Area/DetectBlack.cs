@@ -1,6 +1,5 @@
 ﻿
 using System.Drawing;
-using System.Drawing.Drawing2D;
 
 using Accord;
 using Accord.Imaging;
@@ -16,7 +15,7 @@ namespace HlidacStatu.Analysis.Page.Area
         System.Drawing.Bitmap image = null;
 
         FoundBoxes result = null;
-        public decimal MaxNonBlackPixesThreshold { get; set; } = 0.1m;
+        public decimal MaxNonBlackPixesThreshold { get; set; } = 0.25m;
         public DetectBlack(string imagePath)
         {
             this.imagePath = imagePath;
@@ -88,46 +87,41 @@ namespace HlidacStatu.Analysis.Page.Area
 
             List<Rectangle> filledBoxesWithBlack = new List<Rectangle>();
 
+            //check if its really blackenned
 
-            if (true)
+            using (Accord.Imaging.UnmanagedImage ddmp = UnmanagedImage.FromManagedImage(image))
             {
-                using (Accord.Imaging.UnmanagedImage ddmp = UnmanagedImage.FromManagedImage(image))
+
+                foreach (var box in boxes)
                 {
-
-                    foreach (var box in boxes)
+                    int maxNonBlackPixes = (int)(box.Width * box.Height * MaxNonBlackPixesThreshold);
+                    //invert color
+                    Color blackColor = Color.FromArgb(255 - blobCounter.BackgroundThreshold.R,
+                        255 - blobCounter.BackgroundThreshold.G, 255 - blobCounter.BackgroundThreshold.B);
+                    int nonBlack = 0;
+                    for (int x = 0; x < box.Width; x++)
                     {
-                        int maxNonBlackPixes = (int)(box.Width * box.Height * MaxNonBlackPixesThreshold);
-                        //invert color
-                        Color blackColor = Color.FromArgb(255 - blobCounter.BackgroundThreshold.R,
-                            255 - blobCounter.BackgroundThreshold.G, 255 - blobCounter.BackgroundThreshold.B);
-                        int nonBlack = 0;
-                        for (int x = 0; x < box.Width; x++)
+                        for (int y = 0; y < box.Height; y++)
                         {
-                            for (int y = 0; y < box.Height; y++)
-                            {
-                                var pixCol = ddmp.GetPixel(x + box.X, y + box.Y);
-                                if (pixCol.R > blackColor.R
-                                    || pixCol.G > blackColor.G
-                                    || pixCol.B > blackColor.B
-                                    )
-                                    nonBlack++;
+                            var pixCol = ddmp.GetPixel(x + box.X, y + box.Y);
+                            if (pixCol.R > blackColor.R
+                                || pixCol.G > blackColor.G
+                                || pixCol.B > blackColor.B
+                                )
+                                nonBlack++;
 
-                                if (nonBlack > maxNonBlackPixes)
-                                    goto endF;
-
-                            }
+                            if (nonBlack > maxNonBlackPixes)
+                                goto endF;
 
                         }
-endF:
-                        if (nonBlack <= maxNonBlackPixes)
-                            filledBoxesWithBlack.Add(box);
-                    }
 
+                    }
+endF:
+                    if (nonBlack <= maxNonBlackPixes)
+                        filledBoxesWithBlack.Add(box);
                 }
 
             }
-            else
-                filledBoxesWithBlack = boxes.ToList();
 
             result = new FoundBoxes();
             result.Boundaries = filledBoxesWithBlack;
