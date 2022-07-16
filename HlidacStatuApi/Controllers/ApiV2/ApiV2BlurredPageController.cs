@@ -66,12 +66,12 @@ again:
                 return StatusCode(404);
 
             var res = new BpGet();
-            res.SmlouvaId = nextId;
-            res.Prilohy = sml.Prilohy
+            res.smlouvaId = nextId;
+            res.prilohy = sml.Prilohy
                         .Select(m => new BpGet.BpGPriloha()
                         {
-                            UniqueId = m.UniqueHash(),
-                            Url = m.GetUrl(nextId, false)
+                            uniqueId = m.UniqueHash(),
+                            url = m.GetUrl(nextId, false)
                         }
                         )
                         .ToArray();
@@ -85,40 +85,40 @@ again:
         public async Task<ActionResult<DSCreatedDTO>> Save([FromBody] BpSave data)
         {
             List<Task> tasks = new List<Task>();
-            foreach (var p in data.Prilohy)
+            foreach (var p in data.prilohy)
             {
-                foreach (var page in p.Pages)
+                foreach (var page in p.pages)
                 {
                     PageMetadata pm = new PageMetadata();
-                    pm.SmlouvaId = data.SmlouvaId;
-                    pm.PrilohaId = p.UniqueId;
-                    pm.PageNum = page.Page;
+                    pm.SmlouvaId = data.smlouvaId;
+                    pm.PrilohaId = p.uniqueId;
+                    pm.PageNum = page.page;
                     pm.Blurred = new PageMetadata.BlurredMetadata()
                     {
-                        BlackenAreaBoundaries = page.BlackenAreaBoundaries
+                        BlackenAreaBoundaries = page.blackenAreaBoundaries
                             .Select(b => new PageMetadata.BlurredMetadata.Boundary()
                             {
-                                X = b.X,
-                                Y = b.Y,
-                                Width = b.Width,
-                                Height = b.Height
+                                X = b.x,
+                                Y = b.y,
+                                Width = b.width,
+                                Height = b.height
                             }
                             ).ToArray(),
-                        TextAreaBoundaries = page.TextAreaBoundaries
+                        TextAreaBoundaries = page.textAreaBoundaries
                             .Select(b => new PageMetadata.BlurredMetadata.Boundary()
                             {
-                                X = b.X,
-                                Y = b.Y,
-                                Width = b.Width,
-                                Height = b.Height
+                                X = b.x,
+                                Y = b.y,
+                                Width = b.width,
+                                Height = b.height
                             }
                             ).ToArray(),
-                        AnalyzerVersion = page.AnalyzerVersion,
+                        AnalyzerVersion = page.analyzerVersion,
                         Created = DateTime.Now,
-                        ImageWidth = page.ImageWidth,
-                        ImageHeight = page.ImageHeight,
-                        BlackenArea = page.BlackenArea,
-                        TextArea = page.TextArea
+                        ImageWidth = page.imageWidth,
+                        ImageHeight = page.imageHeight,
+                        BlackenArea = page.blackenArea,
+                        TextArea = page.textArea
                     };
                     var t = PageMetadataRepo.SaveAsync(pm);
                     tasks.Add(t);
@@ -126,7 +126,7 @@ again:
                 }
             }
             Task.WaitAll(tasks.ToArray());
-            idsToProcess.Remove(data.SmlouvaId, out var dt);
+            idsToProcess.Remove(data.smlouvaId, out var dt);
             return StatusCode(200);
         }
 
@@ -155,28 +155,29 @@ again:
             public int totalFailed { get; set; }
         }
 
+
         public class BpGet
         {
             public class BpGPriloha
             {
-                public string UniqueId { get; set; }
-                public string Url { get; set; }
+                public string uniqueId { get; set; }
+                public string url { get; set; }
             }
-            public string SmlouvaId { get; set; }
-            public BpGPriloha[] Prilohy { get; set; }
+            public string smlouvaId { get; set; }
+            public BpGPriloha[] prilohy { get; set; }
 
         }
 
         public class BpSave
         {
-            public string SmlouvaId { get; set; }
+            public string smlouvaId { get; set; }
 
-            public BpSPriloha[] Prilohy { get; set; }
+            public BpSPriloha[] prilohy { get; set; }
 
             public class BpSPriloha
             {
-                public string UniqueId { get; set; }
-                public PageMetadata[] Pages { get; set; }
+                public string uniqueId { get; set; }
+                public PageMetadata[] pages { get; set; }
             }
             public class PageMetadata
             {
@@ -185,30 +186,29 @@ again:
                     public Boundary() { }
 
 
-                    public int X { get; set; }
-                    public int Y { get; set; }
-                    public int Width { get; set; }
-                    public int Height { get; set; }
+                    public int x { get; set; }
+                    public int y { get; set; }
+                    public int width { get; set; }
+                    public int height { get; set; }
 
 
                 }
 
-                public int Page { get; set; }
+                public int page { get; set; }
 
-                public int ImageWidth { get; set; }
-                public int ImageHeight { get; set; }
+                public int imageWidth { get; set; }
+                public int imageHeight { get; set; }
 
-                public long TextArea { get; set; }
-                public long BlackenArea { get; set; }
+                public long textArea { get; set; }
+                public long blackenArea { get; set; }
 
-                [Nest.Date]
-                public DateTime Created { get; set; }
+                public DateTime created { get; set; }
 
-                public string AnalyzerVersion { get; set; }
+                public string analyzerVersion { get; set; }
 
-                public Boundary[] TextAreaBoundaries { get; set; }
+                public Boundary[] textAreaBoundaries { get; set; }
 
-                public Boundary[] BlackenAreaBoundaries { get; set; }
+                public Boundary[] blackenAreaBoundaries { get; set; }
 
 
             }
