@@ -60,6 +60,21 @@ namespace HlidacStatu.Repositories
             return res.IsValid;
         }
 
+        public static async Task<bool> ExistsInPageMetadata(string smlouvaId)
+        {
+            var cl = await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync();
+            var res = cl.Search<PageMetadata>(s => s
+                .Query(q => q
+                    .Match(m=>m
+                        .Field(f=>f.SmlouvaId)
+                        .Query(smlouvaId)
+                    )
+                )
+                .Size(0)
+            );
+
+            return res.IsValid && res.Hits.Count > 0;
+        }
 
         public static async Task<PageMetadata> LoadAsync(Smlouva smlouva, Smlouva.Priloha priloha, int stranka)
         {

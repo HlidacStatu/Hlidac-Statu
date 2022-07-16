@@ -19,33 +19,46 @@ namespace HlidacStatuApi.Controllers.ApiV2
     [Route("api/v2/bp")]
     public class ApiV2BlurredPageController : ControllerBase
     {
-
-        static System.Collections.Concurrent.ConcurrentDictionary<string, DateTime?> idsToProcess = null;
+        private class processed
+        {
+            public DateTime taken { get; set; } = DateTime.MinValue;
+            public string takenByUser { get; set; } = null;
+        }
+        static System.Collections.Concurrent.ConcurrentDictionary<string, processed> idsToProcess = null;
         static object lockObj = new object();
         static ApiV2BlurredPageController()
         {
-            idsToProcess = new System.Collections.Concurrent.ConcurrentDictionary<string, DateTime?>(
-                SmlouvaRepo.AllIdsFromDB().Distinct().Select(m => new KeyValuePair<string, DateTime?>(m, null))
+            idsToProcess = new System.Collections.Concurrent.ConcurrentDictionary<string, processed>(
+                SmlouvaRepo.AllIdsFromDB().Distinct().Select(m => new KeyValuePair<string, processed>(m, null))
                 );
         }
 
         // /api/v2/{id}
         [Authorize]
         [HttpGet("Get")]
-        public async Task<ActionResult<BpGet>> Get([FromRoute] string text)
+        public async Task<ActionResult<BpGet>> Get()
         {
             string nextId = null;
             DateTime now = DateTime.Now;
+again:
             lock (lockObj)
             {
                 nextId = idsToProcess.FirstOrDefault(m =>
                     m.Value == null
-                    || (m.Value.HasValue && (now - m.Value.Value).TotalMinutes > 60)
+                    || (m.Value!=null && (now - m.Value.taken).TotalMinutes > 60)
                 ).Key;
                 if (nextId == null)
                     return StatusCode(404);
+                else if (idsToProcess.ContainsKey(nextId))
+                    idsToProcess[nextId] = new processed() { taken = DateTime.Now, takenByUser = HttpContext.User?.Identity?.Name };
                 else
-                    idsToProcess[nextId] = DateTime.Now;
+                    goto again;
+            }
+
+            if (await PageMetadataRepo.ExistsInPageMetadata(nextId))
+            {
+                idsToProcess.Remove(nextId, out var dt);
+                goto again;
             }
 
             var sml = await SmlouvaRepo.LoadAsync(nextId, includePrilohy: false);
@@ -113,6 +126,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 }
             }
             Task.WaitAll(tasks.ToArray());
+            idsToProcess.Remove(data.SmlouvaId, out var dt);
             return StatusCode(200);
         }
 
