@@ -71,7 +71,7 @@ again:
                         .Select(m => new BpGet.BpGPriloha()
                         {
                             UniqueId = m.UniqueHash(),
-                            Url = m.GetUrl(nextId, true)
+                            Url = m.GetUrl(nextId, false)
                         }
                         )
                         .ToArray();
