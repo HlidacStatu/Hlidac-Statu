@@ -97,13 +97,13 @@
             <td>
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <a href="/api/v2/datasety/@(Model.Dataset.DatasetId)/zaznamy/@(itemId)">
-                        https://www.hlidacstatu.cz/api/v2/datasety/@(Model.Dataset.DatasetId)/zaznamy/@(itemId)
+                    <a href="https://api.hlidacstatu.cz/api/v2/datasety/@(Model.Dataset.DatasetId)/zaznamy/@(itemId)">
+                        https://api.hlidacstatu.cz/api/v2/datasety/@(Model.Dataset.DatasetId)/zaznamy/@(itemId)
                     </a>
                 }
                 else
                 {
-                    <code>https://www.hlidacstatu.cz/api/v2/datasety/@(Model.Dataset.DatasetId)/zaznamy/@(itemId)</code>
+                    <code>https://api.hlidacstatu.cz/api/v2/datasety/@(Model.Dataset.DatasetId)/zaznamy/@(itemId)</code>
                 }
                 <br />
                 <a href="/api">Popis API</a>
