@@ -85,6 +85,8 @@ again:
         public async Task<ActionResult<DSCreatedDTO>> Save([FromBody] BpSave data)
         {
             List<Task> tasks = new List<Task>();
+            List<PageMetadata> pagesMD = new List<PageMetadata>();
+
             foreach (var p in data.prilohy)
             {
                 foreach (var page in p.pages)
@@ -120,13 +122,43 @@ again:
                         BlackenArea = page.blackenArea,
                         TextArea = page.textArea
                     };
+                    pagesMD.Add(pm);
                     var t = PageMetadataRepo.SaveAsync(pm);
                     tasks.Add(t);
                     //t.Wait();
                 }
             }
+
+
+            if (pagesMD.Count > 0)
+            {
+                var sml = await SmlouvaRepo.LoadAsync(data.smlouvaId);
+                foreach (var pril in sml.Prilohy)
+                {
+                    var blurredPages = pagesMD.Where(m => m.PrilohaId == pril.UniqueHash());
+
+                    var pb = new Smlouva.Priloha.BlurredPagesStats();
+                    pb.BlurredAreaPerc = (decimal)blurredPages.Sum(m => m.Blurred.BlackenArea)
+                        / (decimal)(blurredPages.Sum(m => m.Blurred.BlackenArea) + blurredPages.Sum(m => m.Blurred.TextArea));
+                    pb.NumOfBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.05m);
+                    pb.NumOfExtensivelyBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.2m);
+
+                    pb.ListOfExtensivelyBlurredPages = blurredPages
+                            .Where(m => m.Blurred.BlackenAreaRatio() >= 0.2m)
+                            .Select(m => m.PageNum)
+                            .ToArray();
+
+                    pril.BlurredPages = pb;
+
+                }
+                await SmlouvaRepo.SaveAsync(sml, updateLastUpdateValue: false, skipPrepareBeforeSave: true);
+
+            }
+
             Task.WaitAll(tasks.ToArray());
             idsToProcess.Remove(data.smlouvaId, out var dt);
+
+
             return StatusCode(200);
         }
 
