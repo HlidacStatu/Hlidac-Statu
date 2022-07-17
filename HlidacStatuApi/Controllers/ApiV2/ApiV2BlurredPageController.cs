@@ -29,7 +29,10 @@ namespace HlidacStatuApi.Controllers.ApiV2
         static ApiV2BlurredPageController()
         {
             idsToProcess = new System.Collections.Concurrent.ConcurrentDictionary<string, processed>(
-                SmlouvaRepo.AllIdsFromDB().Distinct().Select(m => new KeyValuePair<string, processed>(m, null))
+                SmlouvaRepo.AllIdsFromDB()
+                    .Distinct()
+                    .Where(m=>!string.IsNullOrEmpty(m))
+                    .Select(m => new KeyValuePair<string, processed>(m, null))
                 );
         }
 
@@ -65,7 +68,7 @@ again:
             if (sml == null || sml?.Prilohy == null)
             {
                 idsToProcess.Remove(nextId, out var dt);
-                return StatusCode(404);
+                goto again;
             }
             var res = new BpGet();
             res.smlouvaId = nextId;
