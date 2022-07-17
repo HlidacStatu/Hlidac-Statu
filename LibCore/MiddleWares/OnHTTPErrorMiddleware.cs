@@ -1,3 +1,5 @@
+using Devmasters.Log;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
@@ -11,9 +13,13 @@ namespace HlidacStatu.LibCore.MiddleWares
     {
         public const string ItemKeyName = "errorPageCtx";
         private readonly RequestDelegate _next;
-        public OnHTTPErrorMiddleware(RequestDelegate next)
+        private readonly Logger logger;
+
+        public OnHTTPErrorMiddleware(RequestDelegate next, Devmasters.Log.Logger logger)
         {
             _next = next;
+            logger = logger ?? HlidacStatu.Util.Consts.Logger;
+            this.logger = logger;
         }
         public async Task Invoke(HttpContext httpContext)
         {
@@ -32,6 +38,9 @@ namespace HlidacStatu.LibCore.MiddleWares
                 }
                 else
                     httpContext.Items.Add(ItemKeyName, str);
+
+                logger.Error("Unhadled exception {middleware} {path}?{query}\n"+str,e, "OnHTTPErrorMidddleware",httpContext.Request.Path, httpContext.Request.QueryString);
+
                 throw;
             }
 
@@ -48,7 +57,7 @@ namespace HlidacStatu.LibCore.MiddleWares
                     }
                     else
                         httpContext.Items.Add(ItemKeyName, str);
-
+                    logger.Error("Unhadled exception OnHTTPErrorMidddleware.");
                 }
                 catch (Exception e)
                 {
@@ -82,9 +91,9 @@ namespace HlidacStatu.LibCore.MiddleWares
 
     public static class OnHTTPErrorMiddlewareExtension
     {
-        public static IApplicationBuilder UseOnHTTPErrorMiddleware(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseOnHTTPErrorMiddleware(this IApplicationBuilder builder, Devmasters.Log.Logger logger = null)
         {
-            return builder.UseMiddleware<OnHTTPErrorMiddleware>();
+            return builder.UseMiddleware<OnHTTPErrorMiddleware>(logger);
         }
     }
 
