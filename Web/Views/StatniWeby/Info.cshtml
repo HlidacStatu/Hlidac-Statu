@@ -174,7 +174,7 @@ else
                             <div>
                                 <span class="text-success"><i class="fa-solid fa-circle-check"></i></span>
                                 Server je dostupný pomocí IPv6 protokolu na
-                                @Html.Raw(Devmasters.Lang.CS.Plural.Get(webssl.IP6support.Site_IPv6Addresses.Count(), $"adrese <samp>{addrs}</samp>", "adresách <samp>{addrs}</samp>", "adresách <samp>{addrs}</samp>")).
+                                @Html.Raw(Devmasters.Lang.CS.Plural.Get(webssl.IP6support.Site_IPv6Addresses.Count(), $"adrese <samp>{addrs}</samp>", $"adresách <samp>{addrs}</samp>", $"adresách <samp>{addrs}</samp>")).
                             </div>
                         }
                         else
