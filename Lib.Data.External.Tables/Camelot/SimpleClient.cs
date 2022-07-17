@@ -21,7 +21,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         private IApiConnection conn = null;
         public ClientLow cl = null;
 
-        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("Camelot.Simple",
+        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Camelot.Client.Simple",
                             Devmasters.Log.Logger.DefaultConfiguration()
                                 .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
                                 .AddFileLoggerFilePerLevel("c:/Data/Logs/HlidacStatu/Camelot.SimpleClient", "slog.txt",

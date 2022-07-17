@@ -209,7 +209,7 @@ namespace HlidacStatu.Web
             app.UseStatusCodePagesWithReExecute("/error/{0}");
             app.UseHttpsRedirection();
 
-            Devmasters.Log.Logger webExceptionLogger = Devmasters.Log.Logger.CreateLogger("Web.Exceptions",
+            Devmasters.Log.Logger webExceptionLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Web.Exceptions",
                 Devmasters.Log.Logger.DefaultConfiguration()
                     .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
                     //.AddLogStash(new Uri("http://10.10.150.203:5000"))

@@ -125,7 +125,7 @@ app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
     ApplicationName = "HlidacstatuApi"
 });
 
-var timeMeasureLogger = Devmasters.Log.Logger.CreateLogger("Api.PageTimes",
+var timeMeasureLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Api.PageTimes",
     Devmasters.Log.Logger.DefaultConfiguration()
         .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
         //.AddLogStash(new Uri("http://10.10.150.203:5000"))
@@ -168,7 +168,7 @@ app.Use(async (context, next) =>
 #endif
 
 
-Devmasters.Log.Logger apiExceptionLogger = Devmasters.Log.Logger.CreateLogger("Api.Exceptions",
+Devmasters.Log.Logger apiExceptionLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Api.Exceptions",
     Devmasters.Log.Logger.DefaultConfiguration()
         .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
         //.AddLogStash(new Uri("http://10.10.150.203:5000"))
