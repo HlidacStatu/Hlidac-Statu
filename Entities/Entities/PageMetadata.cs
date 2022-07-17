@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HlidacStatu.Entities
 {
@@ -19,7 +17,7 @@ namespace HlidacStatu.Entities
             get
             {
                 if (string.IsNullOrEmpty(_id))
-                    _id=GetId();
+                    _id = GetId();
                 return _id;
             }
             set
@@ -54,7 +52,7 @@ namespace HlidacStatu.Entities
             public class Boundary
             {
                 public Boundary() { }
-                public Boundary(int x, int y, int width, int height) 
+                public Boundary(int x, int y, int width, int height)
                 {
                     this.X = x;
                     this.Y = y;
@@ -98,6 +96,9 @@ namespace HlidacStatu.Entities
 
             public decimal BlackenAreaRatio()
             {
+                if ((BlackenArea + TextArea) == 0)
+                    return 0;
+
                 return (decimal)BlackenArea / (decimal)(BlackenArea + TextArea);
             }
 

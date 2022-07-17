@@ -62,9 +62,11 @@ again:
             }
 
             var sml = await SmlouvaRepo.LoadAsync(nextId, includePrilohy: false);
-            if (sml == null)
+            if (sml == null || sml?.Prilohy == null)
+            {
+                idsToProcess.Remove(nextId, out var dt);
                 return StatusCode(404);
-
+            }
             var res = new BpGet();
             res.smlouvaId = nextId;
             res.prilohy = sml.Prilohy
@@ -138,8 +140,12 @@ again:
                     var blurredPages = pagesMD.Where(m => m.PrilohaId == pril.UniqueHash());
 
                     var pb = new Smlouva.Priloha.BlurredPagesStats();
-                    pb.BlurredAreaPerc = (decimal)blurredPages.Sum(m => m.Blurred.BlackenArea)
-                        / (decimal)(blurredPages.Sum(m => m.Blurred.BlackenArea) + blurredPages.Sum(m => m.Blurred.TextArea));
+                    decimal wholeArea = (decimal)(blurredPages.Sum(m => m.Blurred.BlackenArea) + blurredPages.Sum(m => m.Blurred.TextArea));
+                    if (wholeArea == 0)
+                        pb.BlurredAreaPerc = 0;
+                    else
+                        pb.BlurredAreaPerc = (decimal)blurredPages.Sum(m => m.Blurred.BlackenArea)
+                            / (decimal)(blurredPages.Sum(m => m.Blurred.BlackenArea) + blurredPages.Sum(m => m.Blurred.TextArea));
                     pb.NumOfBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.05m);
                     pb.NumOfExtensivelyBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.2m);
 
