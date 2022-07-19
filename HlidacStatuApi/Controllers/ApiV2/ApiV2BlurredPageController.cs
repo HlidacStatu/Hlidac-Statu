@@ -92,7 +92,7 @@ again:
             if (data.prilohy!=null)
             {
                 int numOfPages = data.prilohy.Sum(m => m.pages.Count());
-                if (numOfPages > 100)
+                if (numOfPages > 300)
                 {
                     new Thread(
                         () =>
@@ -111,10 +111,11 @@ again:
 
                             sw.Stop();
                             HlidacStatuApi.Code.Log.Logger.Info(
-                                "{action} {code} for {part} init during start in {duration} sec.",
+                                "{action} {code} for {part} for {pages} in {duration} sec.",
                                 "ends",
                                 "thread",
                                 "ApiV2BlurredPageController.BpSave",
+                                numOfPages,
                                 sw.Elapsed.TotalSeconds);
                         }
                     ).Start();
