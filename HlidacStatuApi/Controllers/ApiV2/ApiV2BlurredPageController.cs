@@ -89,9 +89,50 @@ again:
         [HttpPost("Save")]
         public async Task<ActionResult<DSCreatedDTO>> Save([FromBody] BpSave data)
         {
+            if (data.prilohy!=null)
+            {
+                int numOfPages = data.prilohy.Sum(m => m.pages.Count());
+                if (numOfPages > 100)
+                {
+                    new Thread(
+                        () =>
+                        {
+                            HlidacStatuApi.Code.Log.Logger.Info(
+                                "{action} {code} for {part} for {pages}.",
+                                "starting",
+                                "thread",
+                                "ApiV2BlurredPageController.BpSave",
+                                numOfPages);
+                            Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+                            sw.Start();
+
+                            SaveData(data)
+                            .ConfigureAwait(false).GetAwaiter().GetResult();
+
+                            sw.Stop();
+                            HlidacStatuApi.Code.Log.Logger.Info(
+                                "{action} {code} for {part} init during start in {duration} sec.",
+                                "ends",
+                                "thread",
+                                "ApiV2BlurredPageController.BpSave",
+                                sw.Elapsed.TotalSeconds);
+                        }
+                    ).Start();
+
+                }
+                else
+                    await SaveData(data);
+
+            }
+
+
+            return StatusCode(200);
+        }
+
+        private static async Task SaveData(BpSave data)
+        {
             List<Task> tasks = new List<Task>();
             List<PageMetadata> pagesMD = new List<PageMetadata>();
-
             foreach (var p in data.prilohy)
             {
                 foreach (var page in p.pages)
@@ -166,9 +207,6 @@ again:
 
             Task.WaitAll(tasks.ToArray());
             idsToProcess.Remove(data.smlouvaId, out var dt);
-
-
-            return StatusCode(200);
         }
 
 

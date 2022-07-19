@@ -35,7 +35,7 @@ new Thread(
         sw.Stop();
         HlidacStatuApi.Code.Log.Logger.Info(
             "{action} thread for {part} init during start in {duration} sec.", 
-            "ending",
+            "ends",
             "availability cache", 
             sw.Elapsed.TotalSeconds);
     }
