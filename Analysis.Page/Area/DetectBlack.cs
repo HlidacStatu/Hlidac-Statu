@@ -24,7 +24,7 @@ namespace HlidacStatu.Analysis.Page.Area
         public void AnalyzeImage()
         {
             image = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(imagePath);
-
+            
             var invImage = new Invert().Apply(image);
 
             var fullArea = image.Width * image.Height;
