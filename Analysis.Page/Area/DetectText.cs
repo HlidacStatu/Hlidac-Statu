@@ -173,9 +173,10 @@ namespace HlidacStatu.Analysis.Page.Area
 
                     img.CopyTo(ret.Image);
                     ret.Boundaries = indices.Select(i => boxes[i]);
+                    blob.Release();
+                    img.Release();
                     return ret;
                 }
-
             }
         }
 
@@ -282,6 +283,10 @@ namespace HlidacStatu.Analysis.Page.Area
             else
                 return null;
         }
+        public void ReleaseResources()
+        {
+            Dispose(disposing: true);
+        }
 
 
         private class InternalResult
@@ -302,7 +307,9 @@ namespace HlidacStatu.Analysis.Page.Area
                     if (internalResult != null)
                     {
                         if (internalResult.Image != null)
+                        {
                             internalResult.Image.Dispose();
+                        }
                     }
                 }
 
@@ -318,6 +325,7 @@ namespace HlidacStatu.Analysis.Page.Area
         //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         //     Dispose(disposing: false);
         // }
+
 
         void IDisposable.Dispose()
         {

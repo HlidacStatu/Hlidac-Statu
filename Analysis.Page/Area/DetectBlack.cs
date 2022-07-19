@@ -157,6 +157,10 @@ endF:
         {
             return result;
         }
+        public void ReleaseResources()
+        {
+            Dispose(disposing: true);
+        }
 
         protected virtual void Dispose(bool disposing)
         {

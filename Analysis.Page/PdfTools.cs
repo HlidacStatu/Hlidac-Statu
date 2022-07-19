@@ -32,6 +32,7 @@ namespace HlidacStatu.Analysis.Page
                 var pagesize = p.GetPageSize();
                 maxSize = Math.Max(pagesize.GetWidth(), pagesize.GetHeight());
                 pdf.Close();
+
             }
             catch (Exception e)
             {
