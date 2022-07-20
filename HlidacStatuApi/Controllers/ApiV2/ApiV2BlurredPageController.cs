@@ -14,6 +14,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 {
 
 
+    [ApiExplorerSettings(IgnoreApi = true)]
     [SwaggerTag("BlurredPage")]
     [ApiController]
     [Route("api/v2/bp")]
@@ -31,12 +32,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
             idsToProcess = new System.Collections.Concurrent.ConcurrentDictionary<string, processed>(
                 SmlouvaRepo.AllIdsFromDB()
                     .Distinct()
-                    .Where(m=>!string.IsNullOrEmpty(m))
+                    .Where(m => !string.IsNullOrEmpty(m))
                     .Select(m => new KeyValuePair<string, processed>(m, null))
                 );
         }
 
-        // /api/v2/{id}
+        [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize]
         [HttpGet("Get")]
         public async Task<ActionResult<BpGet>> Get()
@@ -48,7 +49,7 @@ again:
             {
                 nextId = idsToProcess.FirstOrDefault(m =>
                     m.Value == null
-                    || (m.Value!=null && (now - m.Value.taken).TotalMinutes > 60)
+                    || (m.Value != null && (now - m.Value.taken).TotalMinutes > 60)
                 ).Key;
                 if (nextId == null)
                     return StatusCode(404);
@@ -84,12 +85,12 @@ again:
             return res;
         }
 
-        //[ApiExplorerSettings(IgnoreApi = true)]
+        [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize]
         [HttpPost("Save")]
-        public async Task<ActionResult<DSCreatedDTO>> Save([FromBody] BpSave data)
+        public async Task<ActionResult> Save([FromBody] BpSave data)
         {
-            if (data.prilohy!=null)
+            if (data.prilohy != null)
             {
                 int numOfPages = data.prilohy.Sum(m => m.pages.Count());
                 if (numOfPages > 300)
@@ -130,7 +131,26 @@ again:
             return StatusCode(200);
         }
 
-        private static async Task SaveData(BpSave data)
+
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Authorize]
+        [HttpPost("Log")]
+        public async Task<ActionResult> Log([FromBody] string log)
+        {
+            HlidacStatuApi.Code.Log.Logger.Error(
+                "{action} {code} {user} {message}",
+                "remote log",
+                "BlurredPageMinion",
+                HttpContext?.User?.Identity?.Name,
+                log);
+
+            return StatusCode(200);
+        }
+
+    
+
+
+    private static async Task SaveData(BpSave data)
         {
             List<Task> tasks = new List<Task>();
             List<PageMetadata> pagesMD = new List<PageMetadata>();
