@@ -138,10 +138,11 @@ again:
         public async Task<ActionResult> Log([FromBody] string log)
         {
             HlidacStatuApi.Code.Log.Logger.Error(
-                "{action} {code} {user} {message}",
-                "remote log",
+                "{action} {from} {user} {ip} {message}",
+                "RemoteLog",
                 "BlurredPageMinion",
                 HttpContext?.User?.Identity?.Name,
+                HttpContext.Connection.RemoteIpAddress?.ToString(),
                 log);
 
             return StatusCode(200);
