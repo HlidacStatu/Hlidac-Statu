@@ -60,14 +60,20 @@ namespace HlidacStatu.Analysis.Page.Area
 
             public void ReturnModelBack(Model model)
             {
-                model.LoadedModel.Dispose();
 
+                //model.UsedCount++;
+                //models.Enqueue(model);
+
+                
+                model.LoadedModel.Dispose();
                 models.Enqueue(new Model()
                 {
                     Id = model.Id,
                     UsedCount = ++model.UsedCount,
                     LoadedModel = DetectText.NewModel()
                 });
+                model = null;
+
             }
 
         }

@@ -13,21 +13,35 @@ namespace HlidacStatu.Analysis.Page.Area
 
         static DetectText()
         {
-            string modelPath = Path.Combine(root, "frozen_east_text_detection.pb");
-            SharedModel = CvDnn.ReadNet(modelPath);
+            var loc = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            if (string.IsNullOrEmpty(loc))
+                root = new FileInfo(AppContext.BaseDirectory).Directory.FullName;
+            else 
+                root = new FileInfo(loc).Directory.FullName;
+            
+            //string modelPath = Path.Combine(root, "frozen_east_text_detection.pb");
+            //SharedModel = CvDnn.ReadNet(modelPath);
         }
 
-        public static Net SharedModel = null;
+        //public static Net SharedModel = null;
 
         public static Net NewModel(string modelPath = null)
         {
-            modelPath = modelPath ?? Path.Combine(root, "frozen_east_text_detection.pb");
+            if (modelPath != null)
+                modelPath = modelPath.Trim();
+            else if (string.IsNullOrEmpty(root))
+                modelPath = "frozen_east_text_detection.pb";
+            else
+                modelPath = Path.Combine(root, "frozen_east_text_detection.pb");
+
+
+            Console.WriteLine("model on " + modelPath);
             Net newModel = CvDnn.ReadNet(modelPath);
             return newModel;
         }
 
 
-        public static readonly string root = new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).Directory.FullName;
+        public static readonly string root = null;
 
         Net net = null;
         private readonly string imageFileName;
