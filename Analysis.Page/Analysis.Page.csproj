@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -14,15 +14,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Devmasters.Core" Version="4.1.0" />
     <PackageReference Include="Devmasters.Imaging" Version="4.0.1" />
+    <PackageReference Include="Devmasters.IO" Version="4.1.1" />
     <PackageReference Include="Devmasters.Logging" Version="4.0.1" />
     <PackageReference Include="itext7" Version="7.2.3" />
     <PackageReference Include="OpenCvSharp4" Version="4.6.0.20220608" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.6.0.20220608" />
     <PackageReference Include="OpenCvSharp4.runtime.ubuntu.18.04-x64" Version="4.6.0.20220608" />
-    <PackageReference Include="PDFtoImage" Version="1.2.1" />
     <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
     <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\3rd\PDFtoImage\src\PDFtoImage\PDFtoImage.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -15,9 +15,9 @@ namespace HlidacStatu.Analysis.Page.Area
 
             System.Collections.Concurrent.ConcurrentQueue<Model> models =
                 new System.Collections.Concurrent.ConcurrentQueue<Model>();
+            private readonly bool reUseModels;
 
-
-            public ModelFeeder(int size)
+            public ModelFeeder(int size, bool reUseModels = true)
             {
                 Console.Write("Loading models");
                 for (int i = 0; i < size; i++)
@@ -31,7 +31,7 @@ namespace HlidacStatu.Analysis.Page.Area
                     Console.Write(".");
                 }
                 Console.WriteLine(" done");
-
+                this.reUseModels = reUseModels;
             }
 
             public int FreeModels()
@@ -60,20 +60,22 @@ namespace HlidacStatu.Analysis.Page.Area
 
             public void ReturnModelBack(Model model)
             {
-
-                //model.UsedCount++;
-                //models.Enqueue(model);
-
-                
-                model.LoadedModel.Dispose();
-                models.Enqueue(new Model()
+                if (this.reUseModels)
                 {
-                    Id = model.Id,
-                    UsedCount = ++model.UsedCount,
-                    LoadedModel = DetectText.NewModel()
-                });
-                model = null;
-
+                    model.UsedCount++;
+                    models.Enqueue(model);
+                }
+                else
+                {
+                    model.LoadedModel.Dispose();
+                    models.Enqueue(new Model()
+                    {
+                        Id = model.Id,
+                        UsedCount = ++model.UsedCount,
+                        LoadedModel = DetectText.NewModel()
+                    });
+                    model = null;
+                }
             }
 
         }

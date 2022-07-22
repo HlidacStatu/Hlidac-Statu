@@ -9,8 +9,12 @@ namespace HlidacStatu.Analysis.Page
     public static class PdfTools
     {
         public static int GetPageCount(System.IO.Stream str)
-        {            
-            return PDFtoImage.Conversion.GetPageCount(str);
+        {
+            iText.Kernel.Pdf.PdfDocument pdf = new iText.Kernel.Pdf.PdfDocument(new iText.Kernel.Pdf.PdfReader(str));
+            var numOfPages= pdf.GetNumberOfPages();
+            pdf.Close();
+            return numOfPages;
+            //return PDFtoImage.Conversion.GetPageCount(str);
         }
 
 

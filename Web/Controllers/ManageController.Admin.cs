@@ -87,7 +87,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 using (var stream = new MemoryStream())
                 {
-                    _img.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    _img.Encode(stream, SkiaSharp.SKEncodedImageFormat.Jpeg, 90);
                     return File(stream.ToArray(), "image/jpeg");
                 }
             }
