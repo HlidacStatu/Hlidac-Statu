@@ -16,9 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="frozen_east_text_detection.pb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="linux-x64\Accord.Imaging.pdb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
