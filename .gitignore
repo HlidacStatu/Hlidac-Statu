@@ -386,3 +386,4 @@ appsettings.*.json
 
 #allow 3rd directory
 !3rd/Accord-framework/**
+3rd/PDFtoImage/
