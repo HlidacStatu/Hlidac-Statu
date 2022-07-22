@@ -166,7 +166,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Analysis.Page", "Analysis.P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnalyzePageArea", "..\Hlidac-Statu-Private\AnalyzePageArea\AnalyzePageArea.csproj", "{57B4976F-B999-4977-86BE-D14D4CCA657A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlurredPageMinion", "..\Hlidac-Statu-Private\Docker\BlurredPageMinion\BlurredPageMinion.csproj", "{D6BF984D-68AF-43F8-9632-4521EFF408C8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlurredPageMinion", "Docker\BlurredPageMinion\BlurredPageMinion.csproj", "{D6BF984D-68AF-43F8-9632-4521EFF408C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
