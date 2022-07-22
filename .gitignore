@@ -383,8 +383,6 @@ Web/Logger.serilog.json
 
 appsettings.*.json
 
-3rd/PDFtoImage/
-
 #allow 3rd directory
 !3rd/Accord-framework/**
 

@@ -27,10 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\3rd\PDFtoImage\src\PDFtoImage\PDFtoImage.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="Accord">
       <HintPath>..\3rd\Accord-framework\Accord.Imaging\bin\Release\netstandard2.1\Accord.dll</HintPath>
     </Reference>
@@ -45,6 +41,9 @@
     </Reference>
     <Reference Include="Accord.Statistics">
       <HintPath>..\3rd\Accord-framework\Accord.Imaging\bin\Release\netstandard2.1\Accord.Statistics.dll</HintPath>
+    </Reference>
+    <Reference Include="PDFtoImage">
+      <HintPath>..\3rd\binaries\PDFtoImage\net6.0\PDFtoImage.dll</HintPath>
     </Reference>
   </ItemGroup>
 
