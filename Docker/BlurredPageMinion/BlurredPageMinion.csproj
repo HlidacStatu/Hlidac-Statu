@@ -1,0 +1,74 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>dotnet-BlurredPageMinion-056D39EA-18D2-40BF-9853-4A3CEB1442E8</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<DockerfileContext>..\..\..</DockerfileContext>
+		<Company>Hlidac statu</Company>
+		<Copyright>(c) Hlidac statu</Copyright>
+		<RepositoryUrl>http://github.com/HlidacStatu</RepositoryUrl>
+		<PackageProjectUrl>http://github.com/HlidacStatu</PackageProjectUrl>
+		<AssemblyVersion>1.2.15</AssemblyVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Remove="runtimeconfig.template.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Devmasters.Batch" Version="4.0.1" />
+		<PackageReference Include="Devmasters.Core" Version="4.1.0" />
+		<PackageReference Include="Devmasters.Diags" Version="4.0.2" />
+		<PackageReference Include="Devmasters.IO" Version="4.1.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.7" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.16.1" />
+		<PackageReference Include="NeoSmart.PrettySize" Version="3.1.1" />
+		<PackageReference Include="SkiaSharp" Version="2.88.0" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.0" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.0" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="2.88.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\Hlidac-Statu\Analysis.Page.Cmd\Analysis.Page.Cmd.csproj" />
+	  <ProjectReference Include="..\..\..\Hlidac-Statu\Analysis.Page\Analysis.Page.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="runtimeconfig.template.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Settings.cs">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="BuildPushDocker.bat">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="BuildPushDockerArm.bat">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="BuildPushDockerX64.bat">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="DockerfileFromPublish">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="DockerfileFromPublishArm">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Properties\PublishProfiles\" />
+	</ItemGroup>
+</Project>

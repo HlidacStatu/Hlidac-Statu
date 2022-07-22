@@ -383,7 +383,11 @@ Web/Logger.serilog.json
 
 appsettings.*.json
 
+3rd/PDFtoImage/
 
 #allow 3rd directory
 !3rd/Accord-framework/**
-3rd/PDFtoImage/
+
+#allow binaries for blurred pages
+!Analysis.Page.Cmd/linux-x64/**
+!Analysis.Page.Cmd/win-x64/**
