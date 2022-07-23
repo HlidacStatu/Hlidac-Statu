@@ -368,7 +368,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     case KIndexParts.PercSeZasadnimNedostatkem:
                         return baseQ + " AND " + "chyby:zasadni";
                     case KIndexParts.PercSmlouvySPolitickyAngazovanouFirmou:
-                        return baseQ + " AND " + "hint.smlouvaSPolitickyAngazovanymSubjektem:>0";
+                        return baseQ + " AND " + "(hint.smlouvaSPolitickyAngazovanymSubjektem:>0 OR sVazbouNaPolitikyNedavne:true)";
                     case KIndexParts.CelkovaKoncentraceDodavatelu:
                         q = annual?.CelkovaKoncentraceDodavatelu?.Query ?? "";
                         if (!string.IsNullOrEmpty(q))

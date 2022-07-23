@@ -58,12 +58,12 @@ namespace HlidacStatu.Repositories.Statistics
                     Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_sVazbouNaPolitikyNedavne =
-                await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND ( sVazbouNaPolitikyNedavne:true ) ",
+                await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND ( hint.smlouvaSPolitickyAngazovanymSubjektem:>0 OR sVazbouNaPolitikyNedavne:true  ) ",
                     Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_sVazbouNaPolitikyBezCenyNedavne =
                 await ES.QueryGrouped.SmlouvyPerYearAsync(
-                    $"({query}) AND ( hint.skrytaCena:1 ) AND ( sVazbouNaPolitikyNedavne:true ) ",
+                    $"({query}) AND ( hint.skrytaCena:1 ) AND ( hint.smlouvaSPolitickyAngazovanymSubjektem:>0 OR sVazbouNaPolitikyNedavne:true ) ",
                     Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_soukrome =
