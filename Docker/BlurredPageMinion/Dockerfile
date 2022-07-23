@@ -6,10 +6,10 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0-focal AS build
 WORKDIR /src
-COPY ["Hlidac-Statu-Private/Docker/BlurredPageMinion/BlurredPageMinion.csproj", "Hlidac-Statu-Private/Docker/BlurredPageMinion/"]
-RUN dotnet restore "Hlidac-Statu-Private/Docker/BlurredPageMinion/BlurredPageMinion.csproj"
+COPY ["Hlidac-Statu/Docker/BlurredPageMinion/BlurredPageMinion.csproj", "Hlidac-Statu/Docker/BlurredPageMinion/"]
+RUN dotnet restore "Hlidac-Statu/Docker/BlurredPageMinion/BlurredPageMinion.csproj"
 COPY . .
-WORKDIR "/src/Hlidac-Statu-Private/Docker/BlurredPageMinion"
+WORKDIR "/src/Hlidac-Statu/Docker/BlurredPageMinion"
 RUN dotnet build "BlurredPageMinion.csproj" -c Release -o /app/build
 
 FROM build AS publish
