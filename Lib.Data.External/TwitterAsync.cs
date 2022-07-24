@@ -35,7 +35,8 @@ namespace HlidacStatu.Lib.Data.External
                 ConsumerKey = Devmasters.Config.GetWebConfigValue("hlidacstatu-twitter-api-key"),
                 ConsumerSecret = Devmasters.Config.GetWebConfigValue("hlidacstatu-twitter-api-secret"),
                 AccessToken = Devmasters.Config.GetWebConfigValue("hlidacstatu-twitter-api-accesstoken"),
-                AccessTokenSecret = Devmasters.Config.GetWebConfigValue("hlidacstatu-twitter-api-tokensecret")
+                AccessTokenSecret = Devmasters.Config.GetWebConfigValue("hlidacstatu-twitter-api-tokensecret"), 
+                  
             }
         };
 
