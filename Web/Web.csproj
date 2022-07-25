@@ -26,6 +26,9 @@
         <Content Remove="App_Data\**" />
         <Content Remove="publish\**" />
         <Content Remove="Views\StatniWeby.old\**" />
+        <Compile Remove="NewFolder\**" />
+        <None Remove="NewFolder\**" />
+        <Content Remove="NewFolder\**" />
     </ItemGroup>
 
 <!--    Potom je potřeba nakopírovat obsah složky App_data a soubor _app_offline.htm -->
@@ -37,6 +40,7 @@
       <EmbeddedResource Remove="Views\StatniWeby.old\**" />
       <None Remove="publish\**" />
       <None Remove="Views\StatniWeby.old\**" />
+      <EmbeddedResource Remove="NewFolder\**" />
     </ItemGroup>
     <ItemGroup>
       <Compile Remove="Controllers\StatniWebyOldController.cs" />
@@ -131,7 +135,6 @@
 
     <ItemGroup>
       <Folder Include="Framework\HealthChecks\" />
-      <Folder Include="NewFolder\" />
     </ItemGroup>
 
 

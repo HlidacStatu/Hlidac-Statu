@@ -312,8 +312,8 @@ namespace HlidacStatu.Entities
 
                 [NiceDisplayName("Sociální služby")]
                 social_obecne = 11300,
-                [NiceDisplayName("Vzdělávání a školení")]
-                social_vzdelavani = 11301,
+                // [NiceDisplayName("Vzdělávání a školení")] //přesunuto do 11701
+                // social_vzdelavani = 11301,
                 //[NiceDisplayName("Školení")] // sloučeno se vzděláváním
                 //social_skoleni = 11302,
                 [NiceDisplayName("Zdravotní péče")]
@@ -349,10 +349,11 @@ namespace HlidacStatu.Entities
                 legal_reality = 11501,
                 [NiceDisplayName("Právní služby")]
                 legal_pravni = 11502,
-                [NiceDisplayName("Nájemní smlouvy")]
-                legal_najem = 11503,
-                [NiceDisplayName("Pronájem pozemků")]
-                legal_pozemky = 11504,
+                // tyhle dvě kategorie byly sloučeny do 11505
+                // [NiceDisplayName("Nájemní smlouvy")]
+                // legal_najem = 11503,
+                // [NiceDisplayName("Pronájem pozemků")]
+                // legal_pozemky = 11504,
                 [NiceDisplayName("Nákup, prodej a pronájem nemovitosti (bytové i nebytové)")]
                 legal_nemovitosti = 11505,
 
