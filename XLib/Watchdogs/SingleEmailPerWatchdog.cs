@@ -4,12 +4,13 @@ using HlidacStatu.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
     public class SingleEmailPerWatchdog
     {
-        public static void SendWatchdogs(IEnumerable<WatchDog> watchdogs,
+        public async static Task SendWatchdogsAsync(IEnumerable<WatchDog> watchdogs,
             bool force = false, string[] specificContacts = null,
             DateTime? fromSpecificDate = null, DateTime? toSpecificDate = null,
             string openingText = null,
@@ -25,7 +26,7 @@ namespace HlidacStatu.XLib.Watchdogs
 
             Util.Consts.Logger.Info($"SingleEmailPerWatchdog Start processing {watchdogs.Count()} watchdogs.");
 
-            Devmasters.Batch.Manager.DoActionForAllAsync<WatchDog>(watchdogs,
+            await Devmasters.Batch.Manager.DoActionForAllAsync<WatchDog>(watchdogs,
                 async (userWatchdog) =>
                 {
                     ApplicationUser user = userWatchdog.UnconfirmedUser();
@@ -42,7 +43,7 @@ namespace HlidacStatu.XLib.Watchdogs
                 },
                 logOutputFunc, progressOutputFunc,
                 true, maxDegreeOfParallelism: maxDegreeOfParallelism, prefix: "SingleEmailPerWatchdog "
-                );
+                ); 
 
             Util.Consts.Logger.Info($"SingleEmailPerWatchdog Done processing {watchdogs.Count()} watchdogs.");
 

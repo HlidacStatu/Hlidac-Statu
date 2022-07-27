@@ -86,7 +86,7 @@
         <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="6.0.5" />
         <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.7" />
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.5" />
-        <PackageReference Include="PDFtoImage" Version="2.1.1" />
+        <PackageReference Include="PDFtoImage" Version="2.1.2" />
         <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
         
         <PackageReference Include="Schema.NET" Version="11.0.1" />
