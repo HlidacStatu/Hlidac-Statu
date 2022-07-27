@@ -50,6 +50,9 @@ namespace HlidacStatu.XLib.Watchdogs
                         .FirstOrDefault();
                     }
 
+                    Util.Consts.Logger.Info("SingleEmailPerUser watchdog {userWatchdogId} sending to {email}.",
+                        string.Join(",", userWatchdogs.Select(m => m.Id.ToString())), user.Email);
+
                     var res = await Mail.SendWatchdogsInOneEmailAsync(userWatchdogs, user,
                         force, specificContacts, fromSpecificDate, toSpecificDate, openingText);
 
