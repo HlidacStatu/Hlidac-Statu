@@ -25,15 +25,16 @@ namespace HlidacStatu.XLib.Watchdogs
 
             Util.Consts.Logger.Info($"SingleEmailPerWatchdog Start processing {watchdogs.Count()} watchdogs.");
 
-            Devmasters.Batch.Manager.DoActionForAll<WatchDog>(watchdogs,
-                (userWatchdog) =>
+            Devmasters.Batch.Manager.DoActionForAllAsync<WatchDog>(watchdogs,
+                async (userWatchdog) =>
                 {
                     ApplicationUser user = userWatchdog.UnconfirmedUser();
 
-                    var res = Mail.SendWatchdogAsync(userWatchdog, user,
+                    Mail.SendStatus res = await Mail.SendWatchdogAsync(userWatchdog, user,
                         force, specificContacts, fromSpecificDate, toSpecificDate, openingText);
 
-                    Util.Consts.Logger.Info($"SingleEmailPerWatchdog watchdog {userWatchdog.Id} sent result {res.ToString()}.");
+                    Util.Consts.Logger.Info("SingleEmailPerWatchdog watchdog {userWatchdogId} to {email} sent result {result}.",
+                        userWatchdog.Id, user.Email, res.ToString());
 
                     return new Devmasters.Batch.ActionOutputData();
                 },

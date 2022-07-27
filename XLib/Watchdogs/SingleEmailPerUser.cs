@@ -37,8 +37,8 @@ namespace HlidacStatu.XLib.Watchdogs
             Util.Consts.Logger.Info($"SingleEmailPerUser {groupedByUserNoSpecContact.Count()} emails.");
 
 
-            Devmasters.Batch.Manager.DoActionForAll<KeyValuePair<string, WatchDog[]>>(groupedByUserNoSpecContact,
-                (kv) =>
+            Devmasters.Batch.Manager.DoActionForAllAsync<KeyValuePair<string, WatchDog[]>>(groupedByUserNoSpecContact,
+                async (kv) =>
                 {
                     WatchDog[] userWatchdogs = kv.Value;
 
@@ -50,10 +50,12 @@ namespace HlidacStatu.XLib.Watchdogs
                         .FirstOrDefault();
                     }
 
-                    var res = Mail.SendWatchdogsInOneEmailAsync(userWatchdogs, user,
+                    var res = await Mail.SendWatchdogsInOneEmailAsync(userWatchdogs, user,
                         force, specificContacts, fromSpecificDate, toSpecificDate, openingText);
 
-                    Util.Consts.Logger.Info($"SingleEmailPerUser {kv.Key} sent result {res.ToString()}.");
+                    Util.Consts.Logger.Info("SingleEmailPerUser watchdog {userWatchdogId} to {email} sent result {result}.",
+                        string.Join(",",userWatchdogs.Select(m=>m.Id.ToString())), user.Email, res.ToString());
+                    //Util.Consts.Logger.Info($"SingleEmailPerUser {kv.Key} sent result {res.ToString()}.");
 
                     return new Devmasters.Batch.ActionOutputData();
                 },
