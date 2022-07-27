@@ -168,6 +168,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnalyzePageArea", "..\Hlida
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlurredPageMinion", "Docker\BlurredPageMinion\BlurredPageMinion.csproj", "{D6BF984D-68AF-43F8-9632-4521EFF408C8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsrRunner", "Docker\AsrRunner\AsrRunner.csproj", "{619DF184-2432-466A-883C-C09ABF8C76A1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -402,6 +404,10 @@ Global
 		{D6BF984D-68AF-43F8-9632-4521EFF408C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D6BF984D-68AF-43F8-9632-4521EFF408C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D6BF984D-68AF-43F8-9632-4521EFF408C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{619DF184-2432-466A-883C-C09ABF8C76A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{619DF184-2432-466A-883C-C09ABF8C76A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{619DF184-2432-466A-883C-C09ABF8C76A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{619DF184-2432-466A-883C-C09ABF8C76A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -446,6 +452,7 @@ Global
 		{E4292EBF-EA67-4FD5-811F-76D843433A31} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 		{57B4976F-B999-4977-86BE-D14D4CCA657A} = {944AEC9D-9A67-477D-811D-66DC2142299A}
 		{D6BF984D-68AF-43F8-9632-4521EFF408C8} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
+		{619DF184-2432-466A-883C-C09ABF8C76A1} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
