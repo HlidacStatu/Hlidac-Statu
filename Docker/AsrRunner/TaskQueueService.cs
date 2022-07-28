@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Polly;
@@ -10,9 +11,7 @@ namespace AsrRunner;
 public class TaskQueueService : IDisposable
 {
     private ILogger _logger;
-    
-    // todo: přidat authorization header
-    
+   
     private AsyncRetryPolicy<HttpResponseMessage> _retryPolicy = HttpPolicyExtensions
         .HandleTransientHttpError()
         .WaitAndRetryAsync(Global.HttpRetryCount, attempt => TimeSpan.FromMilliseconds(Global.HttpRetryCount));
@@ -28,6 +27,7 @@ public class TaskQueueService : IDisposable
     public TaskQueueService(ILogger logger)
     {
         _logger = logger.ForContext<TaskQueueService>();
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", Global.ApiKey);
     }
 
     public async Task<QueueItem?> GetNewTaskAsync(CancellationToken cancellationToken)

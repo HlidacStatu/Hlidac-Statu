@@ -1,18 +1,16 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
-WORKDIR /app
+﻿FROM hlidacstatu/czech-asr
+CMD ""
+RUN chmod u+x /opt/app/process.sh
+RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
+    rm packages-microsoft-prod.deb
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
-COPY ["Docker/AsrRunner/AsrRunner.csproj", "AsrRunner/"]
-RUN dotnet restore "Docker/AsrRunner/AsrRunner.csproj"
-COPY . .
-WORKDIR "/src/AsrRunner"
-RUN dotnet build "AsrRunner.csproj" -c Release -o /app/build
+RUN apt-get update && \
+    apt-get install -y apt-transport-https && \
+    apt-get update && \
+    apt-get install -y aspnetcore-runtime-6.0 
 
-FROM build AS publish
-RUN dotnet publish "AsrRunner.csproj" -c Release -o /app/publish
+WORKDIR /Asr
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+COPY ./bin/dockerPublish .
 ENTRYPOINT ["dotnet", "AsrRunner.dll"]

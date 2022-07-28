@@ -5,7 +5,7 @@ namespace AsrRunner;
 public static class Global
 {
     
-    public const string LocalDirectoryPath = $"opt/app/files"; 
+    public const string LocalDirectoryPath = $"/opt/app/files"; 
     
     public static string Hostname =>
         Environment.GetEnvironmentVariable(nameof(Hostname).ToUpper()) ?? 
@@ -13,13 +13,13 @@ public static class Global
     
     public static string TaskQueueUrl =>
         Environment.GetEnvironmentVariable(nameof(TaskQueueUrl)) ??
-        "https://www.hlidacstatu.cz/api/v2/internalq/Voice2TextGetTask";
+        "https://api.hlidacstatu.cz/api/v2/internalq/Voice2TextGetTask";
     public static string ReportSuccessUrl =>
         Environment.GetEnvironmentVariable(nameof(ReportSuccessUrl)) ??
-        "https://www.hlidacstatu.cz/api/v2/internalq/Voice2TextDone";
+        "https://api.hlidacstatu.cz/api/v2/internalq/Voice2TextDone";
     public static string ReportFailureUrl =>
         Environment.GetEnvironmentVariable(nameof(ReportFailureUrl)) ??
-        "https://www.hlidacstatu.cz/api/v2/internalq/Voice2TextFailed/true";
+        "https://api.hlidacstatu.cz/api/v2/internalq/Voice2TextFailed/true";
     public static string ApiKey =>
         Environment.GetEnvironmentVariable(nameof(ApiKey)) ?? 
         throw new ArgumentNullException(nameof(ApiKey));
@@ -62,5 +62,7 @@ public static class Global
         _ => LogEventLevel.Warning
     };
 
-    
+    public static string LogStashUrl =>
+        Environment.GetEnvironmentVariable(nameof(LogStashUrl)) ??
+        "http://10.10.150.203:5000";
 }

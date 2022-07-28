@@ -56,7 +56,6 @@ public static class Helpers
             source.SetException(e);
         }
 
-        logger.Debug("Bash command finished");
         return source.Task;
     }
 }

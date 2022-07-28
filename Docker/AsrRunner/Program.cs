@@ -1,4 +1,5 @@
 ﻿using AsrRunner;
+using Devmasters.Log;
 using FluentFTP;
 using Serilog;
 
@@ -6,7 +7,7 @@ using Serilog;
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Is(Global.MinLogLevel)
     .WriteTo.Console()
-    //todo: WriteTo logstash
+    .AddLogStash(new Uri(Global.LogStashUrl))
     .Enrich.WithProperty("hostname", Global.Hostname)
     .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString())
     .Enrich.WithProperty("application_name", "AsrRunner")
@@ -44,7 +45,7 @@ using var taskQueueService = new TaskQueueService(logger);
 using var ftpClient = new FtpClient(Global.FtpAddress, Global.FtpPort, Global.FtpUserName, Global.FtpPassword);
 ftpClient.RetryAttempts = 5;
 ftpClient.NoopInterval = 30_000;
-ftpClient.EncryptionMode = FtpEncryptionMode.Explicit;
+ftpClient.EncryptionMode = FtpEncryptionMode.Implicit;
 ftpClient.ValidateAnyCertificate = true;
 
 
@@ -55,7 +56,8 @@ while (!applicationCts.IsCancellationRequested)
     // create directory
     Directory.CreateDirectory(Global.LocalDirectoryPath);
 
-    QueueItem? queueItem;
+    QueueItem? queueItem = new QueueItem();
+    
     try
     {
         queueItem = await taskQueueService.GetNewTaskAsync(applicationCts.Token);
@@ -92,7 +94,7 @@ while (!applicationCts.IsCancellationRequested)
         logger.Debug("File downloaded.");
 
         // run ASR
-        var processResult = await "/opt/app/process.sh".Bash(logger);
+        var processResult = await "cd /opt/app/ && ./process.sh".Bash(logger);
         if (processResult != 0)
         {
             logger.Error("ASR resulted with error. Returned {processResult}.", processResult);
