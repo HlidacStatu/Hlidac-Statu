@@ -1,6 +1,8 @@
+using Devmasters.Cache.File;
+
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-using HlidacStatu.Util.Cache;
+
 
 using System;
 using System.Linq;
@@ -12,8 +14,8 @@ namespace HlidacStatu.Lib.Data.External.Tables
     public static class SmlouvaPrilohaExtension
     {
         
-        private static volatile MinioCacheManager<Lib.Data.External.Tables.Result[],KeyAndId> prilohaTblsMinioCacheManager
-        = MinioCacheManager<Lib.Data.External.Tables.Result[],KeyAndId>.GetSafeInstance(
+        private static volatile Devmasters.Cache.AWS_S3.Manager<Lib.Data.External.Tables.Result[],KeyAndId> prilohaTblsMinioCacheManager
+        = Devmasters.Cache.AWS_S3.Manager<Lib.Data.External.Tables.Result[],KeyAndId>.GetSafeInstance(
             "SmlouvyPrilohyTbls/",
             smlouvaKeyId => getTablesFromDocumentAsync(smlouvaKeyId).ConfigureAwait(false).GetAwaiter().GetResult(),
             TimeSpan.Zero,

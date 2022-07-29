@@ -1,7 +1,7 @@
 using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Datastructures.Graphs2;
 using HlidacStatu.Entities;
-using HlidacStatu.Util.Cache;
+
 
 using System;
 using System.Linq;
@@ -236,8 +236,8 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        static private MemoryCacheManager<Datastructures.Graphs.Graph.Edge[], (Osoba o, string ico)> _vazbyProIcoCache
-            = MemoryCacheManager<Datastructures.Graphs.Graph.Edge[], (Osoba o, string ico)>
+        static private Devmasters.Cache.LocalMemory.Manager<Datastructures.Graphs.Graph.Edge[], (Osoba o, string ico)> _vazbyProIcoCache
+            = Devmasters.Cache.LocalMemory.Manager<Datastructures.Graphs.Graph.Edge[], (Osoba o, string ico)>
                 .GetSafeInstance("_vazbyOsobaProIcoCache", f => { return f.o._vazbyProICO(f.ico); },
                     TimeSpan.FromHours(2), k => (k.o.NameId + "-" + k.ico)
                 );

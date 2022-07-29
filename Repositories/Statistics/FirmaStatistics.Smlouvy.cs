@@ -11,9 +11,9 @@ namespace HlidacStatu.Repositories.Statistics
     public static partial class FirmaStatistics
     {
 
-        static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor)> 
+        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor)> 
             _holdingSmlouvaCache
-            = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor)>
+            = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor)>
                 .GetSafeInstance("Holding_SmlouvyStatistics_v1_",
                     (obj) => _holdingCalculateStats(obj.firma, obj.aktualnost, obj.obor),
                     TimeSpan.FromHours(12),
@@ -47,8 +47,8 @@ namespace HlidacStatu.Repositories.Statistics
 
         }
 
-        static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)> _smlouvaCache
-            = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
+        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)> _smlouvaCache
+            = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
                 .GetSafeInstance("Firma_SmlouvyStatistics_v3_",
                     (obj) => _calculateSmlouvyStatsAsync(obj.firma, obj.obor).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(12),

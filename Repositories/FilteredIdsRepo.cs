@@ -1,5 +1,5 @@
 ﻿using HlidacStatu.Entities;
-using HlidacStatu.Util.Cache;
+
 
 using System;
 using System.Collections.Generic;
@@ -23,8 +23,8 @@ namespace HlidacStatu.Repositories
         public static class CachedIds
         {
 
-            private static volatile ElasticCacheManager<string[], QueryBatch> cacheSmlouvy
-                = ElasticCacheManager<string[], QueryBatch>.GetSafeInstance(
+            private static volatile Devmasters.Cache.Elastic.Manager<string[], QueryBatch> cacheSmlouvy
+                = Devmasters.Cache.Elastic.Manager<string[], QueryBatch>.GetSafeManagerInstance(
                     "cachedIdsSmlouvy",
                     q => GetSmlouvyAsync(q).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(24),

@@ -7,8 +7,8 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static class VerejnaZakazkaStatistics
     {
-        static Util.Cache.CouchbaseCacheManager<StatisticsPerYear<Firma.Statistics.VZ>, string> _cache
-            = Util.Cache.CouchbaseCacheManager<StatisticsPerYear<Firma.Statistics.VZ>, string>
+        static Devmasters.Cache.Couchbase.Manager<StatisticsPerYear<Firma.Statistics.VZ>, string> _cache
+            = Devmasters.Cache.Couchbase.Manager<StatisticsPerYear<Firma.Statistics.VZ>, string>
                 .GetSafeInstance("VerejnaZakazkaStatisticsStatistics_Query_v1_",
                     (query) => Calculate(query),
                     TimeSpan.FromHours(12),

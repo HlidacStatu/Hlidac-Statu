@@ -13,10 +13,10 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Devmasters.Batch" Version="4.0.1" />
-		<PackageReference Include="Devmasters.Cache" Version="4.0.1" />
-		<PackageReference Include="Devmasters.Cache.AWS_S3" Version="4.0.1" />
-		<PackageReference Include="Devmasters.Cache.Couchbase" Version="4.0.0" />
-		<PackageReference Include="Devmasters.Cache.Elastic" Version="4.0.1" />
+		<PackageReference Include="Devmasters.Cache" Version="4.1.1" />
+		<PackageReference Include="Devmasters.Cache.AWS_S3" Version="4.1.0" />
+		<PackageReference Include="Devmasters.Cache.Couchbase" Version="4.1.2" />
+		<PackageReference Include="Devmasters.Cache.Elastic" Version="4.1.0" />
 		<PackageReference Include="Devmasters.Collections" Version="4.1.2" />
 		<PackageReference Include="Devmasters.Core" Version="4.1.0" />
 		<PackageReference Include="Devmasters.DT" Version="4.0.4" />

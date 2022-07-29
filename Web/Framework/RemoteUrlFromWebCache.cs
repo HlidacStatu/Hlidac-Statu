@@ -1,5 +1,7 @@
+using Devmasters.Cache.File;
+
 using HlidacStatu.Connectors;
-using HlidacStatu.Util.Cache;
+
 
 using System;
 using System.Linq;
@@ -12,8 +14,8 @@ namespace HlidacStatu.Web.Framework
         {
         }
 
-        public static volatile FileCacheManager Manager
-            = FileCacheManager.GetSafeInstance("RemoteUrlFromWebCache",
+        public static volatile Devmasters.Cache.File.Manager Manager
+            = Devmasters.Cache.File.Manager.GetSafeInstance("RemoteUrlFromWebCache",
                 urlfn => GetBinaryDataFromUrl(urlfn),
                 TimeSpan.FromHours(24 * 4));
 

@@ -1,5 +1,5 @@
 ﻿using HlidacStatu.Entities;
-using HlidacStatu.Util.Cache;
+
 
 using System;
 
@@ -32,22 +32,22 @@ namespace HlidacStatu.Repositories
             return o ?? nullObj;
         }
 
-        public static CouchbaseCacheManager<Firma, string> instanceByIco
-            = CouchbaseCacheManager<Firma, string>.GetSafeInstance("firmyByICO_v2_", getByIco, TimeSpan.FromHours(4),
+        public static Devmasters.Cache.Couchbase.Manager<Firma, string> instanceByIco
+            = Devmasters.Cache.Couchbase.Manager<Firma, string>.GetSafeInstance("firmyByICO_v2_", getByIco, TimeSpan.FromHours(4),
                 Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                 Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                 Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
                 Devmasters.Config.GetWebConfigValue("CouchbasePassword"));
 
-        public static CouchbaseCacheManager<Firma, string> instanceByDS
-            = CouchbaseCacheManager<Firma, string>.GetSafeInstance("firmyByDS_v2_", getByDS, TimeSpan.FromHours(4),
+        public static Devmasters.Cache.Couchbase.Manager<Firma, string> instanceByDS
+            = Devmasters.Cache.Couchbase.Manager<Firma, string>.GetSafeInstance("firmyByDS_v2_", getByDS, TimeSpan.FromHours(4),
                 Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                 Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                 Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
                 Devmasters.Config.GetWebConfigValue("CouchbasePassword"));
 
-        public static CouchbaseCacheManager<string, string> instanceNameOnlyByIco
-            = CouchbaseCacheManager<string, string>.GetSafeInstance("firmaNameOnlyByICO_v2_", getNameByIco, TimeSpan.FromHours(12),
+        public static Devmasters.Cache.Couchbase.Manager<string, string> instanceNameOnlyByIco
+            = Devmasters.Cache.Couchbase.Manager<string, string>.GetSafeInstance("firmaNameOnlyByICO_v2_", getNameByIco, TimeSpan.FromHours(12),
                 Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                 Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                 Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),

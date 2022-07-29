@@ -9,8 +9,8 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static partial class FirmaStatistics
     {
-        static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
-           _VZCache = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
+        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
+           _VZCache = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
                .GetSafeInstance("Firma_VZStatistics",
                    (firma) => CalculateVZStat(firma),
                    TimeSpan.FromHours(12),
@@ -21,8 +21,8 @@ namespace HlidacStatu.Repositories.Statistics
                    f => f.ICO);
 
 
-        static Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)>
-           _holdingVZCache = Util.Cache.CouchbaseCacheManager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)>
+        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)>
+           _holdingVZCache = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)>
                .GetSafeInstance("Holding_VZStatistics",
                    (obj) => CalculateHoldingVZStat(obj.firma, obj.aktualnost),
                    TimeSpan.FromHours(12),

@@ -3,7 +3,7 @@ using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
-using HlidacStatu.Util.Cache;
+
 using Nest;
 using System;
 using System.Collections.Generic;
@@ -599,9 +599,9 @@ namespace HlidacStatu.Repositories
                 return s;
             }
 
-            public static MemoryCacheManager<VerejnaZakazkaSearchData, string>
+            public static Devmasters.Cache.LocalMemory.Manager<VerejnaZakazkaSearchData, string>
                 cachedSearches =
-                    new MemoryCacheManager<VerejnaZakazkaSearchData, string>("VZsearch", 
+                    new Devmasters.Cache.LocalMemory.Manager<VerejnaZakazkaSearchData, string>("VZsearch", 
                         s => CachedFuncSimpleSearchAsync(s).ConfigureAwait(false).GetAwaiter().GetResult(),
                         TimeSpan.FromHours(24));
 

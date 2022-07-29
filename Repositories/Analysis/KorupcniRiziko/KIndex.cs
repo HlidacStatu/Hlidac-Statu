@@ -1,6 +1,6 @@
 ﻿using HlidacStatu.Entities.Entities.Analysis;
 using HlidacStatu.Repositories.ES;
-using HlidacStatu.Util.Cache;
+
 
 using Nest;
 

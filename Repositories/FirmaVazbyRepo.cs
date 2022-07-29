@@ -2,7 +2,7 @@ using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Datastructures.Graphs2;
 using HlidacStatu.Entities;
 using HlidacStatu.Util;
-using HlidacStatu.Util.Cache;
+
 
 using System;
 using System.Collections.Generic;
@@ -208,8 +208,8 @@ namespace HlidacStatu.Repositories
             return _vazbyProIcoCache.Get((firma, ico));
         }
 
-        static private MemoryCacheManager<Datastructures.Graphs.Graph.Edge[], (Firma f, string ico)> _vazbyProIcoCache
-            = MemoryCacheManager<Datastructures.Graphs.Graph.Edge[], (Firma f, string ico)>
+        static private Devmasters.Cache.LocalMemory.Manager<Datastructures.Graphs.Graph.Edge[], (Firma f, string ico)> _vazbyProIcoCache
+            = Devmasters.Cache.LocalMemory.Manager<Datastructures.Graphs.Graph.Edge[], (Firma f, string ico)>
                 .GetSafeInstance("_vazbyFirmaProIcoCache", f => { return f.f._vazbyProICO(f.ico); },
                     TimeSpan.FromHours(2), k => (k.f.ICO + "-" + k.ico)
                 );

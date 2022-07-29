@@ -6,7 +6,7 @@ using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
-using HlidacStatu.Util.Cache;
+
 
 using System;
 using System.Collections.Generic;
@@ -37,8 +37,8 @@ namespace HlidacStatu.Repositories
             return uids;
         }
 
-        private static CouchbaseCacheManager<List<Datastructures.Graphs.Graph.Edge>, string> vazbyIcoCache
-            = CouchbaseCacheManager<List<Datastructures.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazby",
+        private static Devmasters.Cache.Couchbase.Manager<List<Datastructures.Graphs.Graph.Edge>, string> vazbyIcoCache
+            = Devmasters.Cache.Couchbase.Manager<List<Datastructures.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazby",
                 ico => vsechnyDcerineVazbyInternal(ico, 0, true, null),
                 TimeSpan.FromDays(3),
                 Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
@@ -46,8 +46,8 @@ namespace HlidacStatu.Repositories
                 Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
                 Devmasters.Config.GetWebConfigValue("CouchbasePassword"));
 
-        private static CouchbaseCacheManager<List<Datastructures.Graphs.Graph.Edge>, string> vazbyOsobaNameIdCache
-            = CouchbaseCacheManager<List<Datastructures.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazbyOsoba",
+        private static Devmasters.Cache.Couchbase.Manager<List<Datastructures.Graphs.Graph.Edge>, string> vazbyOsobaNameIdCache
+            = Devmasters.Cache.Couchbase.Manager<List<Datastructures.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazbyOsoba",
                 osobaNameId =>
                 {
                     if (string.IsNullOrEmpty(osobaNameId))

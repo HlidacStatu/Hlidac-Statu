@@ -1,5 +1,7 @@
+using Devmasters.Cache.File;
+
 using HlidacStatu.Entities;
-using HlidacStatu.Util.Cache;
+
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,8 +16,8 @@ namespace HlidacStatu.Repositories
 {
     public static partial class SmlouvaRepo
     {
-        private static volatile FileCacheManager stemCacheManager
-            = FileCacheManager.GetSafeInstance("SmlouvyStems",
+        private static volatile Devmasters.Cache.File.Manager stemCacheManager
+            = Devmasters.Cache.File.Manager.GetSafeInstance("SmlouvyStems",
                 smlouvaKeyId => GetRawStemsFromServerAsync(smlouvaKeyId).ConfigureAwait(false).GetAwaiter().GetResult(),
                 TimeSpan.FromDays(365 * 10)); //10 years
 

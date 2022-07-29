@@ -1,5 +1,5 @@
 ﻿using HlidacStatu.Entities;
-using HlidacStatu.Util.Cache;
+
 
 using Microsoft.EntityFrameworkCore;
 
@@ -12,8 +12,8 @@ namespace HlidacStatu.Repositories
 
     public class Osoby
     {
-        public static volatile MemoryCacheManager<IEnumerable<OsobaEvent>, int> CachedEvents
-            = MemoryCacheManager<IEnumerable<OsobaEvent>, int>
+        public static volatile Devmasters.Cache.LocalMemory.Manager<IEnumerable<OsobaEvent>, int> CachedEvents
+            = Devmasters.Cache.LocalMemory.Manager<IEnumerable<OsobaEvent>, int>
                 .GetSafeInstance("osobyEvents",
                 osobaInternalId =>
                 {
@@ -27,8 +27,8 @@ namespace HlidacStatu.Repositories
                 },
                 TimeSpan.FromMinutes(2));
 
-        public static volatile MemoryCacheManager<IEnumerable<Sponzoring>, int> CachedFirmySponzoring
-            = MemoryCacheManager<IEnumerable<Sponzoring>, int>
+        public static volatile Devmasters.Cache.LocalMemory.Manager<IEnumerable<Sponzoring>, int> CachedFirmySponzoring
+            = Devmasters.Cache.LocalMemory.Manager<IEnumerable<Sponzoring>, int>
                 .GetSafeInstance("osobyFirmySponzoring",
                 osobaInternalId =>
                 {
@@ -67,7 +67,7 @@ namespace HlidacStatu.Repositories
 
 
         static Osoba nullObj = new Osoba() { NameId = "____NOTHING____" };
-        private class OsobyMCMById : CouchbaseCacheManager<Osoba, int>
+        private class OsobyMCMById : Devmasters.Cache.Couchbase.Manager<Osoba, int>
         {
             public OsobyMCMById() : base("PersonById", getById, TimeSpan.FromMinutes(10),
                 Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
@@ -96,7 +96,7 @@ namespace HlidacStatu.Repositories
         private static object lockObj = new object();
 
         private static OsobyMCMById instanceById;
-        public static CouchbaseCacheManager<Osoba, int> GetById
+        public static Devmasters.Cache.Couchbase.Manager<Osoba, int> GetById
         {
             get
             {
@@ -114,7 +114,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private class OsobyMCMByNameId : CouchbaseCacheManager<Osoba, string>
+        private class OsobyMCMByNameId : Devmasters.Cache.Couchbase.Manager<Osoba, string>
         {
             public OsobyMCMByNameId() : base("PersonByNameId", getByNameId, TimeSpan.FromMinutes(10),
                 Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
@@ -143,7 +143,7 @@ namespace HlidacStatu.Repositories
         }
 
         private static OsobyMCMByNameId instanceNameId;
-        public static CouchbaseCacheManager<Osoba, string> GetByNameId
+        public static Devmasters.Cache.Couchbase.Manager<Osoba, string> GetByNameId
         {
             get
             {

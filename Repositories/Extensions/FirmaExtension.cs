@@ -585,9 +585,9 @@ namespace HlidacStatu.Extensions
         }
 
 
-        static Util.Cache.CouchbaseCacheManager<InfoFact[], Firma> _infoFactsCache()
+        static Devmasters.Cache.Couchbase.Manager<InfoFact[], Firma> _infoFactsCache()
         {
-            var cache = Util.Cache.CouchbaseCacheManager<InfoFact[], Firma>
+            var cache = Devmasters.Cache.Couchbase.Manager<InfoFact[], Firma>
                 .GetSafeInstance("Firma_InfoFacts",
                     (firma) => GetInfoFactsAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(24),

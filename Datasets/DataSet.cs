@@ -4,7 +4,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Util;
-using HlidacStatu.Util.Cache;
+
 
 using Nest;
 
@@ -27,8 +27,8 @@ namespace HlidacStatu.Datasets
     public partial class DataSet
         : IBookmarkable
     {
-        public static volatile MemoryCacheManager<DataSet, string> CachedDatasets
-            = MemoryCacheManager<DataSet, string>.GetSafeInstance("Datasets",
+        public static volatile Devmasters.Cache.LocalMemory.Manager<DataSet, string> CachedDatasets
+            = Devmasters.Cache.LocalMemory.Manager<DataSet, string>.GetSafeInstance("Datasets",
                 datasetId => { return new DataSet(datasetId); },
                 TimeSpan.FromMinutes(10));
 

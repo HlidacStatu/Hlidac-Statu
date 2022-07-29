@@ -3,7 +3,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Util;
-using HlidacStatu.Util.Cache;
+
 
 using System;
 using System.Linq;
@@ -16,8 +16,8 @@ namespace HlidacStatu.Repositories
     {
         public static class Zatrideni
         {
-            private static CouchbaseCacheManager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory> instanceByZatrideni
-                = CouchbaseCacheManager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory>.GetSafeInstance("oboryByObor", 
+            private static Devmasters.Cache.Couchbase.Manager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory> instanceByZatrideni
+                = Devmasters.Cache.Couchbase.Manager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory>.GetSafeInstance("oboryByObor", 
                     obor => GetSubjektyDirectAsync(obor).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromDays(2),
                     Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),

@@ -7,7 +7,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
-using HlidacStatu.Util.Cache;
+
 
 using Nest;
 
@@ -434,8 +434,8 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                 return h == QueryHash(typ, q);
             }
 
-            public static MemoryCacheManager<SmlouvaSearchResult, (string query, AggregationContainerDescriptor<Smlouva> aggr)> cachedSearches = 
-                new MemoryCacheManager<SmlouvaSearchResult, (string query, AggregationContainerDescriptor<Smlouva> aggr)>(
+            public static Devmasters.Cache.LocalMemory.Manager<SmlouvaSearchResult, (string query, AggregationContainerDescriptor<Smlouva> aggr)> cachedSearches = 
+                new Devmasters.Cache.LocalMemory.Manager<SmlouvaSearchResult, (string query, AggregationContainerDescriptor<Smlouva> aggr)>(
                     "SMLOUVYsearch", 
                     tuple => funcSimpleSearchAsync(tuple).ConfigureAwait(false).GetAwaiter().GetResult(), 
                     TimeSpan.FromHours(24));

@@ -11,9 +11,9 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static class OsobaStatistics
     {
-        static Util.Cache.CouchbaseCacheManager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
+        static Devmasters.Cache.Couchbase.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
             _cache
-                = Util.Cache.CouchbaseCacheManager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
+                = Devmasters.Cache.Couchbase.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
                     .GetSafeInstance("Osoba_SmlouvyStatistics_v1_",
                         (obj) => Calculate(obj.os, (Relation.AktualnostType)obj.aktualnost, obj.obor),
                         TimeSpan.FromHours(12),
