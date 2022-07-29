@@ -43,7 +43,7 @@ namespace HlidacStatu.AutocompleteApi.Services
         {
             //fire and forget
 #pragma warning disable 4014
-            _memoryStoreService.GenerateAll();
+            _ = _memoryStoreService.GenerateAll();
 #pragma warning restore 4014
         }
 

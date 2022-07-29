@@ -239,7 +239,7 @@ text zpravy: {txt}";
         public ActionResult ClassificationFeedback(string typ, string email, string txt, string url, string data)
         {
             // create a task, so user doesn't have to wait for anything
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
 
                 try

@@ -243,8 +243,9 @@ Cookie: _ga=GA1.2.1208733850.1580933391; JSessionID=R3890696782
                     response = await wc.PostAsync(url, content);
                 else if (method == "DELETE")
                     response = await wc.DeleteAsync(url);
-                response.EnsureSuccessStatusCode();
-                string responseBody = await response.Content.ReadAsStringAsync();
+                response?.EnsureSuccessStatusCode();
+                string responseBody = await response?.Content?.ReadAsStringAsync();
+                
                 return responseBody;
             }
             catch (HttpRequestException)

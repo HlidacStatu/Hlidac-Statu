@@ -47,7 +47,7 @@ namespace HlidacStatu.AutocompleteApi.Services
             SmallSampleIndex = LoadFromBackup<Autocomplete>(nameof(SmallSampleIndex));
 
             #pragma warning disable 4014
-            GenerateAll(); // fire and forget - generate data on background
+            _ = GenerateAll(); // fire and forget - generate data on background
             #pragma warning restore 4014
         }
 
