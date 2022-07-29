@@ -223,12 +223,12 @@ again:
                     pril.BlurredPages = pb;
 
                 }
-                await SmlouvaRepo.SaveAsync(sml, updateLastUpdateValue: false, skipPrepareBeforeSave: true);
+                _ = await SmlouvaRepo.SaveAsync(sml, updateLastUpdateValue: false, skipPrepareBeforeSave: true);
 
             }
 
             Task.WaitAll(tasks.ToArray());
-            idsToProcess.Remove(data.smlouvaId, out var dt);
+            _ = idsToProcess.Remove(data.smlouvaId, out var dt);
         }
 
 

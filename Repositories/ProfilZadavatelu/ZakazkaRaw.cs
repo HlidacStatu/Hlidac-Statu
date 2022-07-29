@@ -40,7 +40,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
         public async Task SaveAsync(bool compare = true, ElasticClient client = null)
         {
             bool save = false;
-            var latest = GetLatestAsync(ZakazkaId);
+            var latest = await GetLatestAsync(ZakazkaId);
             if (compare)
             {
                 if (!Validators.AreObjectsEqual(this, latest, false, "LastUpdate"))
