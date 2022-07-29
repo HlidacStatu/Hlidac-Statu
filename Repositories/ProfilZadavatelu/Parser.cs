@@ -167,8 +167,6 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
             }
             if (prof != null)
             {
-                var cli = ES.Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
-
                 foreach (var zak in prof.zakazka)
                 {
                     ZakazkaRaw myZak = new ZakazkaRaw(zak, profil);
@@ -178,7 +176,6 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                 profil.LastAccessResult = ProfilZadavatele.LastAccessResults.OK;
                 profil.LastAccess = DateTime.Now;
                 await ProfilZadavateleRepo.SaveAsync(profil);
-
             }
             return ReqLog;
 

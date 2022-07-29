@@ -335,7 +335,7 @@ namespace HlidacStatu.Web.Controllers
                 if ((await ds.RegistrationAsync()).hidden == true && (User.Identity?.IsAuthenticated == false || User.IsInRole("Admin") == false))
                     return RedirectToAction("index");
 
-                var dataItem = ds.GetDataAsync(dataid);
+                var dataItem = await ds.GetDataAsync(dataid);
                 if (dataItem == null)
                     return RedirectToAction("index", new { id = id });
 

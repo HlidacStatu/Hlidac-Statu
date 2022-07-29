@@ -690,13 +690,13 @@ namespace HlidacStatu.Web.Controllers
             {
 
                 var email = Request?.HttpContext?.User?.Identity?.Name;
-                Devmasters.Batch.Manager.DoActionForAll<Tuple<object, string>>(items,
-                    (item) =>
+                await Devmasters.Batch.Manager.DoActionForAllAsync<Tuple<object, string>>(items,
+                    async (item) =>
                     {
 
                         try
                         {
-                            ds.AddDataAsync(item.Item1, item.Item2, email, true);
+                            _ = await ds.AddDataAsync(item.Item1, item.Item2, email, true);
 
                         }
                         catch (Exception ex)

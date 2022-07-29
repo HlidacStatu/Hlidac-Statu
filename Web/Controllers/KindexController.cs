@@ -160,7 +160,7 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult RecalculateFeedback(string email, string txt, string url, string data)
         {
             // create a task, so user doesn't have to wait for anything
-            System.Threading.Tasks.Task.Run(() =>
+            _ = Task.Run(() =>
             {
                 var f = Firmy.Get(Util.ParseTools.NormalizeIco(data));
                 if (f.Valid)
