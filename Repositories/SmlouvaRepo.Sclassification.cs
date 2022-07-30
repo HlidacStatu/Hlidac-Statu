@@ -1,29 +1,46 @@
-using Devmasters.Cache.File;
-
-using HlidacStatu.Entities;
-
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Devmasters.Cache.File;
+
+using HlidacStatu.Entities;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 namespace HlidacStatu.Repositories
 {
     public static partial class SmlouvaRepo
     {
-        private static volatile Devmasters.Cache.File.Manager stemCacheManager
+        private static volatile Devmasters.Cache.File.Manager oldStemCacheManager
             = Devmasters.Cache.File.Manager.GetSafeInstance("SmlouvyStems",
                 smlouvaKeyId => GetRawStemsFromServerAsync(smlouvaKeyId).ConfigureAwait(false).GetAwaiter().GetResult(),
                 TimeSpan.FromDays(365 * 10)); //10 years
 
+        private static volatile Devmasters.Cache.AWS_S3.Manager<byte[], string> stemCacheManager
+            = Devmasters.Cache.AWS_S3.Manager<byte[], string>.GetSafeInstance(
+                "SmlouvyStems/",
+                key => GetRawStemsFromServerAsync(key).ConfigureAwait(false).GetAwaiter().GetResult(),
+                TimeSpan.Zero,
+                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+                key => $"{key.Substring(0,3)}/stem_smlouva_{key}"
+                );
+
+
         private static async Task<byte[]> GetRawStemsFromServerAsync(KeyAndId smlouvaKeyId)
         {
-            Smlouva s = await SmlouvaRepo.LoadAsync(smlouvaKeyId.ValueForData);
+            return await GetRawStemsFromServerAsync(smlouvaKeyId.ValueForData);
+        }
+
+        private static async Task<byte[]> GetRawStemsFromServerAsync(string smlouvaId)
+        {
+            Smlouva s = await SmlouvaRepo.LoadAsync(smlouvaId);
 
             if (s == null)
                 return null;
@@ -41,24 +58,60 @@ namespace HlidacStatu.Repositories
             }
             catch (JsonReaderException e)
             {
-                Util.Consts.Logger.Error($"Stemmer returned incomplete json for {smlouvaKeyId.ValueForData}", e);
+                Util.Consts.Logger.Error($"Stemmer returned incomplete json for {smlouvaId}", e);
                 throw;
             }
 
             return Encoding.UTF8.GetBytes(stemmerResponse);
         }
 
-        public static string GetRawStems(Smlouva s, bool rewriteStems = false)
+        public static bool MigrateRawStems(string sId)
         {
-            if (s == null)
-                return null;
-            var key = new KeyAndId() { ValueForData = s.Id, CacheNameOnDisk = $"stem_smlouva_{s.Id}" };
-            if (rewriteStems)
+            var key = new KeyAndId() { ValueForData = sId, CacheNameOnDisk = $"stem_smlouva_{sId}" };
+
+            if (oldStemCacheManager.Exists(key) == false)
+                return true;
+            
+            var data = oldStemCacheManager.Get(key);
+
+            if (data == null)
+                return true;
+
+            try
             {
-                InvalidateStemCache(s.Id);
+                stemCacheManager.Set(sId, data);
+                oldStemCacheManager.Delete(key);
+
+            }
+            catch (Exception)
+            {
+                try
+                {
+
+                }
+                catch (Exception e)
+                {
+                    stemCacheManager.Set(sId, data);
+                    oldStemCacheManager.Delete(key);
+                    Util.Consts.Logger.Debug("Deleting stems cache for " + sId);
+
+                    return false;
+                }
             }
 
-            var data = stemCacheManager.Get(key);
+
+            return true;
+        }
+        public static string GetRawStems(string smlouvaId, bool rewriteStems = false)
+        {
+            if (string.IsNullOrEmpty(smlouvaId))
+                return null;
+            if (rewriteStems)
+            {
+                InvalidateStemCache(smlouvaId);
+            }
+
+            var data = stemCacheManager.Get(smlouvaId);
             if (data == null)
                 return null;
 
@@ -67,10 +120,9 @@ namespace HlidacStatu.Repositories
 
         public static void InvalidateStemCache(string smlouvaId)
         {
-            var key = new KeyAndId() { ValueForData = smlouvaId, CacheNameOnDisk = $"stem_smlouva_{smlouvaId}" };
             Util.Consts.Logger.Debug("Deleting stems cache for " + smlouvaId);
 
-            stemCacheManager.Delete(key);
+            stemCacheManager.Delete(smlouvaId);
         }
 
         public static Dictionary<Smlouva.SClassification.ClassificationsTypes, decimal> GetClassificationFromServer(Smlouva s,
@@ -83,7 +135,7 @@ namespace HlidacStatu.Repositories
             var settings = new JsonSerializerSettings();
             settings.ContractResolver = new Util.FirstCaseLowercaseContractResolver();
 
-            var stems = GetRawStems(s, rewriteStems);
+            var stems = GetRawStems(s.Id, rewriteStems);
             if (string.IsNullOrEmpty(stems))
             {
                 return data;
@@ -100,7 +152,7 @@ namespace HlidacStatu.Repositories
             catch
             {
                 //retry once with new stems
-                stems = GetRawStems(s, true);
+                stems = GetRawStems(s.Id, true);
                 classifierResponse = CallEndpoint("classifier",
                     stems,
                     s.Id,
@@ -232,7 +284,7 @@ namespace HlidacStatu.Repositories
                 catch (Exception e)
                 {
                     sw.Stop();
-                    Util.Consts.Logger.Error($"Error classifier endpoint [{endpoint}] for {id} from {url} in {sw.ElapsedMilliseconds}ms, error {e.Message}",e);
+                    Util.Consts.Logger.Error($"Error classifier endpoint [{endpoint}] for {id} from {url} in {sw.ElapsedMilliseconds}ms, error {e.Message}", e);
                     throw;
                 }
             }
@@ -274,11 +326,11 @@ namespace HlidacStatu.Repositories
                     };
 
                 var smluvniStrany = smlouva.Prijemce.Concat(new Smlouva.Subjekt[] { smlouva.Platce })
-                    .Select(m=>Firmy.Get(m.ico))
-                    .Where(m=>m.Valid==true)
+                    .Select(m => Firmy.Get(m.ico))
+                    .Where(m => m.Valid == true)
                     .ToArray();
                 if (types.Count(m => vyjimkyClassif.Contains(m.Key)) > 0
-                    && smluvniStrany.Any(m=>m.ESA2010?.StartsWith("12") == true)==false
+                    && smluvniStrany.Any(m => m.ESA2010?.StartsWith("12") == true) == false
                     )
                 {
                     foreach (var vc in vyjimkyClassif)
