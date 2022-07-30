@@ -291,8 +291,8 @@ namespace HlidacStatu.Datastructures.Graphs
                 if (parent.HasSameEdges(ch) )
                     continue;
 
-                if (ch.Aktualnost > minAktualnost)
-                    ch.Aktualnost = minAktualnost;
+                //if (ch.Aktualnost > minAktualnost)
+                //    ch.Aktualnost = minAktualnost;
                 items.Add(ch);
                 var chVazby = vazby;//.Where(m => ch.To.UniqId == m.From.UniqId && m.Distance == ch.Distance + 1).ToArray();
                 items.AddRange(

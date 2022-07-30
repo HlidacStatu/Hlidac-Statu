@@ -148,17 +148,34 @@
                     }
                     <ul>
                         @foreach (var stat in statistics.SoukromeFirmy
-                            .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)
+                            .OrderByDescending(o => o.Value.Summary().CelkovaHodnotaSmluv)
                             .Take(statistics.SoukromeFirmy.Count <= listingNum + 1 ? listingNum + 1 : listingNum)
                             )
                         {
                             <li>
                                 <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
                                     @Firmy.GetJmeno(stat.Key)
-                                </a> (@stat.Value.CurrentSeasonStatistics().ToNiceString(null, false) v @stat.Value.CurrentSeasonYear())
+                                </a> 
+                                (@Html.Raw(stat.Value.Summary().ToNiceString(null,true)) od 2016
+                                @if (stat.Value.CurrentSeasonStatistics().PocetSmluv>0)
+                               {
+                                    @($", {stat.Value.CurrentSeasonStatistics().ToNiceString(null, false)} v {stat.Value.CurrentSeasonYear()}")   
+                               })
                             </li>
                         }
                     </ul>
+                    @if (statistics.SoukromeFirmy.Count > listingNum+1)
+                    {
+                       <p>
+                           @if ((await Model.NotInterestingToShowAsync()) == false)
+                            {
+                                <a asp-action="Vazby" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
+                                    <strong>Ukázat všechny</strong>
+                                </a>
+                            }
+                       </p>
+                    }
+
                 </p>
             }
             else if (statistics.SoukromeFirmy.Count > 0 && statistics.SoukromeFirmySummary().Summary().PocetSmluv==0)
@@ -176,13 +193,18 @@
                     <ul>
                         @foreach (var stat in statistics.StatniFirmy
                             .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)
-                            .Take(statistics.SoukromeFirmy.Count <= listingNum + 1 ? listingNum + 1 : listingNum)
+                            .Take(statistics.StatniFirmy.Count <= listingNum + 1 ? listingNum + 1 : listingNum)
                             )
                         {
                             <li>
                                 <a asp-controller="Subjekt" asp-action="Index" asp-route-id="@stat.Key">
                                     @Firmy.GetJmeno(stat.Key)
-                                </a> (@stat.Value.CurrentSeasonStatistics().ToNiceString(null, false) v @stat.Value.CurrentSeasonYear())
+                                </a> (@Html.Raw(stat.Value.Summary().ToNiceString(null,true)) od 2016
+                                @if (stat.Value.CurrentSeasonStatistics().PocetSmluv > 0)
+                                {
+                                    @($", {stat.Value.CurrentSeasonStatistics().ToNiceString(null, false)} v {stat.Value.CurrentSeasonYear()}")
+                                }
+                                )
                             </li>
                         }
                     </ul>

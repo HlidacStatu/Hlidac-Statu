@@ -1,17 +1,20 @@
 ﻿@model Firma
 
 @using Nest;
-@using Devmasters.Enums;
 @using System.Linq;
-@using HlidacStatu.XLib.Render;
-@using HlidacStatu.Lib.Analytics;
+@using Devmasters.Enums;
 @using HlidacStatu.Datasets
 @using HlidacStatu.Datastructures.Graphs
 @using HlidacStatu.Entities
-@using HlidacStatu.Entities.Entities
+@using HlidacStatu.Entities.Dotace
 @using HlidacStatu.Extensions
-@using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 @using HlidacStatu.Repositories
+@using HlidacStatu.Repositories.Statistics
+@using HlidacStatu.XLib
+@using HlidacStatu.XLib.Render;
+@using HlidacStatu.Lib.Analytics;
+@using HlidacStatu.Entities.Entities
+@using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 @using HlidacStatu.Web.Framework
 @using HlidacStatu.Entities.Entities.Analysis;
 @using Microsoft.AspNetCore.Mvc.TagHelpers
@@ -215,6 +218,12 @@
             </p>
         }
 
+        @if (statistics.Summary().PocetSmluv>0)
+        {
+        <p>
+            V registru smluv evidujeme @Html.Raw(statistics.Summary().ToNiceString(null,true))
+        </p>
+        }
         <p>
             V roce @(currentSeasonYear) uzavřel @(Model.JsemOVM() ? "úřad" : "subjekt")
             <a href="/hledat?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND datumUzavreni:[{currentSeasonYear}-01-01 TO {currentSeasonYear + 1}-01-01}}")">
@@ -335,26 +344,26 @@
 
             if (resVZdodav.Total + resVZzadav.Total > 0)
             {
-                <p>
-                    @Model.Jmeno se vyskytuje
-                    <ul>
-                        @foreach (var kv in vzakaz.OrderByDescending(m => m.Value).Where(m => m.Value > 0))
+                        <p>
+                            @Model.Jmeno se vyskytuje
+                            <ul>
+                                @foreach (var kv in vzakaz.OrderByDescending(m => m.Value).Where(m => m.Value > 0))
                         {
                             var text = kv.Key.Split('|');
                             string surl = WebUtil.GetSearchUrl("/verejnezakazky/hledat", $"ico{text[0]}:" + Model.ICO);
 
-                            <li>
-                                @Html.Raw(Devmasters.Lang.CS.Plural.Get(kv.Value, $"v <a href='{surl}'><b>jedné</b> veřejné zakázce</a> jako {text[1]}",
+                                    <li>
+                                        @Html.Raw(Devmasters.Lang.CS.Plural.Get(kv.Value, $"v <a href='{surl}'><b>jedné</b> veřejné zakázce</a> jako {text[1]}",
                                     $"v <a href='{surl}'><b>{{0}}</b> veřejných zakázkách</a> jako {text[1]}",
                                     $"v <a href='{surl}'><b>{{0}}</b> veřejných zakázkach</a> jako {text[1]}")).
-                            </li>
+                                    </li>
                         }
-                    </ul>
-                </p>
+                            </ul>
+                        </p>
             }
             if (profilyZadavatele?.Count() > 0)
             {
-                <p>U subjektu registrujeme @Html.Raw(Devmasters.Lang.CS.Plural.Get(profilyZadavatele.Count(),
+                        <p>U subjektu registrujeme @Html.Raw(Devmasters.Lang.CS.Plural.Get(profilyZadavatele.Count(),
                   "jeden profil zadavatele","{0} profily zadavatele","{0} profilů zadavatele"
                 )).</p>
             }
@@ -574,7 +583,7 @@
     </div>
     <hr />
 
-    @if (Model.IsSponzor() || StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO))
+    @if (Model.IsSponzor() || HlidacStatu.Repositories.StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO))
     {
         <div>
             <h4>Sponzoring politických stran</h4>
@@ -586,11 +595,11 @@
                     v celkové výši @HlidacStatu.Util.RenderData.NicePriceHtml(Model.Sponzoring().Sum(m => m.Hodnota) ?? 0).
                 </p>
             }
-            @if (StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO))
+            @if (HlidacStatu.Repositories.StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO))
             {
                 <p>
                     Osoby @Html.Raw(HlidacStatu.Util.RenderData.RenderList(
-StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
+HlidacStatu.Repositories.StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
 .SoukromeFirmy[Model.ICO]
 .Select(m => Osoby.GetById.Get(m).FullNameWithYear()), format: "<b>{0}</b>")
 ),
@@ -609,7 +618,7 @@ StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
         intv.Stop();
         intv = laps.AddAndStartLap("uradSVazbami");
 
-        var uradSVazbami = StaticData.UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache.Get()
+        var uradSVazbami = HlidacStatu.Repositories.StaticData.UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache.Get()
 .SoukromeFirmy.Where(m => m.Ico == Model.ICO && m.Detail != null && m.Detail.Count > 0)
 .FirstOrDefault();
         ;
@@ -709,7 +718,7 @@ StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
     @{
 
         var queries = await DatasetRepo.Searching.GetSpecificQueriesForDatasetsAsync("ICO", Model.ICO, true);
-        var dsSearch = await Search.DatasetMultiQueryMultiResult.GeneralSearchAsync(queries, 1, 5);
+        var dsSearch = await HlidacStatu.Datasets.Search.DatasetMultiQueryMultiResult.GeneralSearchAsync(queries, 1, 5);
 
     }
     @if (dsSearch.IsValid && dsSearch.Total > 0)
@@ -785,7 +794,7 @@ StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
                 </span>
             }
         </p>
-        @if (StaticData.OrganizacniStrukturyUradu.Get().TryGetValue(Model.ICO, out var ossu))
+        @if (HlidacStatu.Repositories.StaticData.OrganizacniStrukturyUradu.Get().TryGetValue(Model.ICO, out var ossu))
         {
             var sum = new HlidacStatu.Entities.OrgStrukturyStatu.Summary(ossu);
             if (sum.Urady > 0)
