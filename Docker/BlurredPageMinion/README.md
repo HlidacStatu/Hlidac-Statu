@@ -14,7 +14,7 @@ Analýza stránek je CPU náročná, doporučujeme instanci povolit alespoň 2 C
 4) *varianta a)* V tuto chvíli (srpen 2022) v rámci testovacího provozu omezujeme množství běžících BlurredPageMinion instancí. 
 Pokud již máte API key, napište žádost o povolení přístupu k API BlurredPageMinion na podpora@hlidacstatu.cz (do předmětu emailu uveďte **BlurredPageMinion** a do těla emailu email, pod kterým jste získali API key)
 
-4) *varianta b)* Variantně nám můžete napsat **Direct message** na twitter účet Hlídače státu (https://twitter.com/hlidacstatu)
+> *varianta b)* Variantně nám můžete napsat **Direct message** na twitter účet Hlídače státu (https://twitter.com/hlidacstatu)
 
 
 5) Pak už stačí jen spustit docker instanci. **Prosím, pokud se nedohodneme jinak, pusťte pouze 1 instanci BlurredPageMinion** Díky.
