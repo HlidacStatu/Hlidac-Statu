@@ -20,7 +20,7 @@ Pokud již máte API key, napište žádost o povolení přístupu k API Blurred
 5) Pak už stačí jen spustit docker instanci. **Prosím, pokud se nedohodneme jinak, pusťte pouze 1 instanci BlurredPageMinion** Díky.
 
 ```  sh
-docker run --name BlurredPageMinion -d -e apikey={váš_apiKey} hlidacstatu/BlurredPageMinion:latestRelease 
+docker run --name blurredpageminion -d -e apikey={váš_apikey} hlidacstatu/blurredpageminion:latestrelease  
 ```
 
 ## Poznámka
