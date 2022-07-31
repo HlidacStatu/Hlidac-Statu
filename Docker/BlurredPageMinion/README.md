@@ -11,10 +11,10 @@ Klient pro analýzu obsahu jednotlivých stránek, identifikaci začerněných o
 3) BlurredPageMinion vyžaduje min 200MB RAM, obvykle potřebuje kolem 600-800 MB RAM.
 Analýza stránek je CPU náročná, doporučujeme instanci povolit alespoň 2 CPU (či 2 vCPU ve Swarm). Je vyžadován Intel/AMD 64bit CPU. ARM balíček v tuto chvíli není k dispozici.
 
-4a) V tuto chvíli (srpen 2022) v rámci testovacího provozu omezujeme množství běžících BlurredPageMinion instancí. 
+4) *varianta a)* V tuto chvíli (srpen 2022) v rámci testovacího provozu omezujeme množství běžících BlurredPageMinion instancí. 
 Pokud již máte API key, napište žádost o povolení přístupu k API BlurredPageMinion na podpora@hlidacstatu.cz (do předmětu emailu uveďte **BlurredPageMinion** a do těla emailu email, pod kterým jste získali API key)
 
-4b) Variantně nám můžete napsat **Direct message** na twitter účet Hlídače státu (https://twitter.com/hlidacstatu)
+4) *varianta b)* Variantně nám můžete napsat **Direct message** na twitter účet Hlídače státu (https://twitter.com/hlidacstatu)
 
 
 5) Pak už stačí jen spustit docker instanci. **Prosím, pokud se nedohodneme jinak, pusťte pouze 1 instanci BlurredPageMinion** Díky.
