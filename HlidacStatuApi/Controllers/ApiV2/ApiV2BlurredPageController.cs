@@ -3,8 +3,6 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
-using HlidacStatuApi.Models;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +14,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
     [ApiExplorerSettings(IgnoreApi = true)]
     [SwaggerTag("BlurredPage")]
-    [ApiController]
+    [ApiController()]
     [Route("api/v2/bp")]
     public class ApiV2BlurredPageController : ControllerBase
     {
@@ -38,7 +36,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        [Authorize]
+        [Authorize(Roles = "blurredAPIAccess")]
         [HttpGet("Get")]
         public async Task<ActionResult<BpGet>> Get()
         {
@@ -86,7 +84,7 @@ again:
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        [Authorize]
+        [Authorize(Roles = "blurredAPIAccess")]
         [HttpPost("Save")]
         public async Task<ActionResult> Save([FromBody] BpSave data)
         {
@@ -133,7 +131,7 @@ again:
 
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        [Authorize]
+        [Authorize(Roles = "blurredAPIAccess")]
         [HttpPost("Log")]
         public async Task<ActionResult> Log([FromBody] string log)
         {
@@ -148,10 +146,10 @@ again:
             return StatusCode(200);
         }
 
-    
 
 
-    private static async Task SaveData(BpSave data)
+
+        private static async Task SaveData(BpSave data)
         {
             List<Task> tasks = new List<Task>();
             List<PageMetadata> pagesMD = new List<PageMetadata>();
@@ -233,7 +231,7 @@ again:
 
 
         //[ApiExplorerSettings(IgnoreApi = true)]
-        [Authorize]
+        [Authorize(Roles = "blurredAPIAccess")]
         [HttpGet("Stats")]
         public async Task<ActionResult<Statistics>> Stats()
         {
@@ -242,8 +240,8 @@ again:
             var res = new Statistics()
             {
                 total = idsToProcess.Count,
-                totalTaken = idsToProcess.Count(m=>m.Value != null),
-                totalFailed = idsToProcess.Count(m=>m.Value != null && (now - m.Value.taken).TotalMinutes > 60)
+                totalTaken = idsToProcess.Count(m => m.Value != null),
+                totalFailed = idsToProcess.Count(m => m.Value != null && (now - m.Value.taken).TotalMinutes > 60)
             };
 
             return res;
@@ -251,7 +249,7 @@ again:
 
         public class Statistics
         {
-            public int total { get;  set; }
+            public int total { get; set; }
             public int totalTaken { get; set; }
             public int totalFailed { get; set; }
         }
