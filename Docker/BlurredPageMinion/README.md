@@ -6,7 +6,8 @@ Klient pro analýzu obsahu jednotlivých stránek, identifikaci začerněných o
 
 1) Mít [nainstalovaný docker](https://docs.docker.com/install/). Pokud používáte Docker ve Windows, je potřeba ho mít přepnutý na [Linuxové kontejnery](https://docs.docker.com/docker-for-windows/#switch-between-windows-and-linux-containers).
 
-2) Ke spuštění budete potřebovat API klíč, který [získáte zdarma po registraci na Hlídači státu](https://www.hlidacstatu.cz/api).
+2) Ke spuštění budete potřebovat API klíč, který [získáte zdarma po registraci na Hlídači státu](https://www.hlidacstatu.cz/api). 
+**Potřebujete API klíč k REST Api**, nikoliv API klíč k OCRMinion. API klíč pro OCRMinion je pouze pro OCRMinion a s BlurredPageMinion nefunguje.
 
 3) BlurredPageMinion vyžaduje min 200MB RAM, obvykle potřebuje kolem 600-800 MB RAM.
 Analýza stránek je CPU náročná, doporučujeme instanci povolit alespoň 2 CPU (či 2 vCPU ve Swarm). Je vyžadován Intel/AMD 64bit CPU. ARM balíček v tuto chvíli není k dispozici.
