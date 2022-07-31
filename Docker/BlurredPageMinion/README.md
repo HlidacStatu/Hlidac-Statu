@@ -2,6 +2,16 @@
 
 Klient pro analýzu obsahu jednotlivých stránek, identifikaci začerněných oblastní a jejich podíl vůči nezačerněnému textu na stránce. 
 
+## Release notes
+
+- 1.3.1 *(1.8.2022)* - do logu vypisuje základní statistiku analýzy stránek.
+  >
+  > příklad: `File with 13 pages parsed in 105.49 sec. It's 0.12 pages/s or 8.11 seconds/page.`
+  > 
+
+- 1.3.0 *(31.7.2022)* - první veřejná verze.
+
+
 ## Jak BlurredPageMinion spustit
 
 1) Mít [nainstalovaný docker](https://docs.docker.com/install/). Pokud používáte Docker ve Windows, je potřeba ho mít přepnutý na [Linuxové kontejnery](https://docs.docker.com/docker-for-windows/#switch-between-windows-and-linux-containers).
