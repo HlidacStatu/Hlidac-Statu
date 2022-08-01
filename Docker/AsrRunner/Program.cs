@@ -3,6 +3,9 @@ using Devmasters.Log;
 using FluentFTP;
 using Serilog;
 
+//todo: test generated logs with specific run option:
+// hostname: "{{.Service.Name}}-{{.Task.Slot}}-{{.Node.Hostname}}"
+//todo: create docker image ASR-runner
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Is(Global.MinLogLevel)
@@ -48,15 +51,14 @@ ftpClient.NoopInterval = 30_000;
 ftpClient.EncryptionMode = FtpEncryptionMode.Implicit;
 ftpClient.ValidateAnyCertificate = true;
 
-
 // Application loop
 logger.Debug("Running main code");
 while (!applicationCts.IsCancellationRequested)
 {
     // create directory
     Directory.CreateDirectory(Global.LocalDirectoryPath);
-
-    QueueItem? queueItem = new QueueItem();
+    
+    QueueItem? queueItem;
     
     try
     {
