@@ -3,7 +3,6 @@ using Devmasters.Log;
 using FluentFTP;
 using Serilog;
 
-
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Is(Global.MinLogLevel)
     .WriteTo.Console()
@@ -48,15 +47,14 @@ ftpClient.NoopInterval = 30_000;
 ftpClient.EncryptionMode = FtpEncryptionMode.Implicit;
 ftpClient.ValidateAnyCertificate = true;
 
-
 // Application loop
 logger.Debug("Running main code");
 while (!applicationCts.IsCancellationRequested)
 {
     // create directory
     Directory.CreateDirectory(Global.LocalDirectoryPath);
-
-    QueueItem? queueItem = new QueueItem();
+    
+    QueueItem? queueItem;
     
     try
     {
@@ -65,11 +63,15 @@ while (!applicationCts.IsCancellationRequested)
     catch (Exception e)
     {
         logger.Error(e, "Error occured in GetNewTaskAsync");
+        await Task.Delay(Global.DelayIfServerHasNoTaskInSec * 1000);
         continue;
     }
-    
+
     if (queueItem is null)
+    {
+        await Task.Delay(Global.DelayIfServerHasNoTaskInSec * 1000);
         continue;
+    }
 
     logger.Information("New task with queue item {queueItem} received.", queueItem);
     string inputFileLocal = $"{Global.LocalDirectoryPath}/{queueItem.ItemId}.{Global.InputFileExtension}";

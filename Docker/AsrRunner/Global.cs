@@ -50,6 +50,8 @@ public static class Global
         int.TryParse(Environment.GetEnvironmentVariable(nameof(HttpRetryCount)), out var val) ? val : 10;
     public static int HttpRetryDelayInMs =>
         int.TryParse(Environment.GetEnvironmentVariable(nameof(HttpRetryDelayInMs)), out var val) ? val : 150;
+    public static int DelayIfServerHasNoTaskInSec =>
+        int.TryParse(Environment.GetEnvironmentVariable(nameof(DelayIfServerHasNoTaskInSec)), out var val) ? val : 60;
 
 
     public static LogEventLevel MinLogLevel => Environment.GetEnvironmentVariable(nameof(MinLogLevel)) switch
@@ -65,4 +67,5 @@ public static class Global
     public static string LogStashUrl =>
         Environment.GetEnvironmentVariable(nameof(LogStashUrl)) ??
         "http://10.10.150.203:5000";
+
 }

@@ -1,4 +1,4 @@
-﻿FROM hlidacstatu/czech-asr
+﻿FROM hlidacstatu/czech-asr:2.0.0
 CMD ""
 RUN chmod u+x /opt/app/process.sh
 RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
@@ -12,5 +12,5 @@ RUN apt-get update && \
 
 WORKDIR /Asr
 
-COPY ./bin/dockerPublish .
+COPY ./bin/dockerPublish/ .
 ENTRYPOINT ["dotnet", "AsrRunner.dll"]
