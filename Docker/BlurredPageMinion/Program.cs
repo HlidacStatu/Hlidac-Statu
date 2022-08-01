@@ -85,6 +85,18 @@ IHttpClientFactory fa = (IHttpClientFactory)host.Services.GetService(typeof(IHtt
 var apiClient = fa?.CreateClient("api");
 ExceptionHandling._httpClient = apiClient;
 
+//check API access
+var checking = apiClient.GetAsync("https://api.hlidacstatu.cz/api/v2/bp/Stats")
+   .ConfigureAwait(false).GetAwaiter().GetResult();
+
+if (checking.StatusCode == System.Net.HttpStatusCode.Forbidden)
+{
+    Console.WriteLine("No access to API. Get API key from www.hlidacstatu.cz/api and ask for access on podpora@hlidacstatu.cz");
+    Console.Error.WriteLine("No access to API. Get API key from www.hlidacstatu.cz/api and ask for access on podpora@hlidacstatu.cz");
+    Environment.ExitCode= 1;
+    return;
+}
+
 if (Settings.Debug)
 {
         string msg = "START INFO\n"

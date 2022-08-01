@@ -24,6 +24,10 @@ namespace HlidacStatuApi.Controllers.ApiV2
             public string takenByUser { get; set; } = null;
         }
         static System.Collections.Concurrent.ConcurrentDictionary<string, processed> idsToProcess = null;
+        static long runningSaveThreads = 0;
+
+        static long savingPagesInThreads = 0;
+
         static object lockObj = new object();
         static ApiV2BlurredPageController()
         {
@@ -91,11 +95,14 @@ again:
             if (data.prilohy != null)
             {
                 int numOfPages = data.prilohy.Sum(m => m.pages.Count());
-                if (numOfPages > 300)
+                if (numOfPages > 200)
                 {
                     new Thread(
                         () =>
                         {
+                            Interlocked.Increment(ref runningSaveThreads);
+                            Interlocked.Add(ref savingPagesInThreads, numOfPages);
+
                             HlidacStatuApi.Code.Log.Logger.Info(
                                 "{action} {code} for {part} for {pages}.",
                                 "starting",
@@ -105,8 +112,9 @@ again:
                             Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                             sw.Start();
 
-                            SaveData(data)
-                            .ConfigureAwait(false).GetAwaiter().GetResult();
+                            var success = SaveData(data).ConfigureAwait(false).GetAwaiter().GetResult();
+                            if (!success)
+                                SaveData(data).ConfigureAwait(false).GetAwaiter().GetResult();
 
                             sw.Stop();
                             HlidacStatuApi.Code.Log.Logger.Info(
@@ -116,13 +124,20 @@ again:
                                 "ApiV2BlurredPageController.BpSave",
                                 numOfPages,
                                 sw.Elapsed.TotalSeconds);
+
+                            Interlocked.Decrement(ref runningSaveThreads);
+                            Interlocked.Add(ref savingPagesInThreads, -1 * numOfPages);
+
                         }
                     ).Start();
 
                 }
                 else
-                    await SaveData(data);
-
+                {
+                    var success = await SaveData(data);
+                    if (!success)
+                        _= await SaveData(data);
+                }
             }
 
 
@@ -149,7 +164,7 @@ again:
 
 
 
-        private static async Task SaveData(BpSave data)
+        private static async Task<bool> SaveData(BpSave data)
         {
             List<Task> tasks = new List<Task>();
             List<PageMetadata> pagesMD = new List<PageMetadata>();
@@ -224,9 +239,23 @@ again:
                 _ = await SmlouvaRepo.SaveAsync(sml, updateLastUpdateValue: false, skipPrepareBeforeSave: true);
 
             }
-
-            Task.WaitAll(tasks.ToArray());
-            _ = idsToProcess.Remove(data.smlouvaId, out var dt);
+            try
+            {
+                Task.WaitAll(tasks.ToArray());
+                _ = idsToProcess.Remove(data.smlouvaId, out var dt);
+                return true;
+            }
+            catch (Exception e)
+            {
+                HlidacStatuApi.Code.Log.Logger.Error(
+                    "{action} {code} for {part} exception.",
+                    e,
+                    "saving",
+                    "thread",
+                    "ApiV2BlurredPageController.BpSave"
+                    );
+                return false;
+            }
         }
 
 
@@ -241,7 +270,9 @@ again:
             {
                 total = idsToProcess.Count,
                 totalTaken = idsToProcess.Count(m => m.Value != null),
-                totalFailed = idsToProcess.Count(m => m.Value != null && (now - m.Value.taken).TotalMinutes > 60)
+                totalFailed = idsToProcess.Count(m => m.Value != null && (now - m.Value.taken).TotalMinutes > 60),
+                RunningSaveThreads = runningSaveThreads,
+                SavingPagesInThreads = savingPagesInThreads
             };
 
             return res;
@@ -249,9 +280,12 @@ again:
 
         public class Statistics
         {
-            public int total { get; set; }
-            public int totalTaken { get; set; }
-            public int totalFailed { get; set; }
+            public long total { get; set; }
+            public long totalTaken { get; set; }
+            public long totalFailed { get; set; }
+
+            public long RunningSaveThreads { get; set; }
+            public long SavingPagesInThreads { get; set; }
         }
 
 

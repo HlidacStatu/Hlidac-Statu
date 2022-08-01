@@ -143,19 +143,27 @@ namespace BlurredPageMinion
                     continue;
                 }
 
+                Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                 try
                 {
 
                     if (HasPDFHeader(tmpPdf))
                     {
 
-
+                        sw.Start();
                         AnalyzedPdf p_done = null;
-
                         p_done = AnalyzePdfFromCmd.AnalyzePDF(tmpPdf, Settings.Debug);
                         p_done.uniqueId = p.uniqueId;
                         hotovePrilohy.Add(p_done);
-
+                        sw.Stop();
+                        if (p_done != null && p_done?.pages?.Length>0)
+                        {
+                            double doneInSec = sw.Elapsed.TotalSeconds;
+                            var stats = $"File with {p_done.pages.Length} pages parsed in {doneInSec:N2} sec. "
+                                + $"It's {p_done.pages.Length / doneInSec:N2} pages/s or {doneInSec / p_done.pages.Length:N2} seconds/page.";
+                            logger.LogInformation(stats);                            
+                            Console.WriteLine(stats);
+                        }
                     }//HasPDFHeader
 
                 }
@@ -166,6 +174,9 @@ namespace BlurredPageMinion
                 }
                 finally
                 {
+                    if (sw.IsRunning)
+                        sw.Stop();
+    
                     try
                     {
 

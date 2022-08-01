@@ -34,19 +34,21 @@ namespace BlurredPageMinion
 
         public static void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
-            var msg = $"Unexpected process exit ({System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}).";
-            msg = msg + "\n\n"
-                + Devmasters.Diags.Render(
-                    Devmasters.Diags.GetOSInfo()
-                        .Concat(Devmasters.Diags.GetProcessInfo())
-                        .Concat(Devmasters.Diags.GetGarbageCollectorInfo())
-                        .Concat(Devmasters.Diags.GetDrivesInfo())
-                );
-            
-            Console.WriteLine(msg);
-            Console.Error.WriteLine(msg);
-            Devmasters.Log.Logger.Root.Fatal(msg);
-            SendLogToServer(msg, _httpClient);
+            if (Settings.Debug)
+            {
+                var msg = $"Expected process exit ({System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()}).";
+                msg = msg + "\n\n"
+                    + Devmasters.Diags.Render(
+                        Devmasters.Diags.GetOSInfo()
+                            .Concat(Devmasters.Diags.GetProcessInfo())
+                            .Concat(Devmasters.Diags.GetGarbageCollectorInfo())
+                            .Concat(Devmasters.Diags.GetDrivesInfo())
+                    );
+
+                Console.WriteLine(msg);
+                Devmasters.Log.Logger.Root.Debug(msg);
+                //SendLogToServer(msg, _httpClient);
+            }
         }
 
         public static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs ex)
