@@ -12,5 +12,5 @@ RUN apt-get update && \
 
 WORKDIR /Asr
 
-COPY ./bin/dockerPublish .
+COPY ./bin/dockerPublish/ .
 ENTRYPOINT ["dotnet", "AsrRunner.dll"]
