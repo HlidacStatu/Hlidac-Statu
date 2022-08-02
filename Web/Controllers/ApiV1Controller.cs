@@ -51,6 +51,12 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
+        [Authorize(Roles ="Admin")]
+        public ActionResult BpStat()
+        {
+            return View();
+        }
+
         // GET: ApiV1
         [Authorize]
         public ActionResult Index()

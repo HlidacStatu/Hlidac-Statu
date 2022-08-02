@@ -273,11 +273,11 @@ again:
         //[ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "blurredAPIAccess")]
         [HttpGet("Stats")]
-        public async Task<ActionResult<Statistics>> Stats()
+        public async Task<ActionResult<BlurredPageStatistics>> Stats()
         {
             DateTime now = DateTime.Now;
             var inProcess = idsToProcess.Where(m => m.Value != null);
-            var res = new Statistics()
+            var res = new BlurredPageStatistics()
             {
                 total = idsToProcess.Count,
                 currTaken = inProcess.Count(),
@@ -287,12 +287,17 @@ again:
             return res;
         }
         //[ApiExplorerSettings(IgnoreApi = true)]
-        [Authorize(Roles = "Admin")]
+        [Authorize()]
         [HttpGet("Stats2")]
-        public async Task<ActionResult<Statistics>> Stats2()
+        public async Task<ActionResult<BlurredPageStatistics>> Stats2()
         {
+            if (!
+                (this.User?.IsInRole("Admin") == true || this.User?.Identity?.Name == "api@hlidacstatu.cz")
+                )
+                return StatusCode(403);
+
             DateTime now = DateTime.Now;
-            var res = new Statistics()
+            var res = new BlurredPageStatistics()
             {
                 total = idsToProcess.Count,
                 currTaken = justInProcess.Count(),
@@ -302,15 +307,15 @@ again:
             res.runningSaveThreads = Interlocked.Read(ref runningSaveThreads);
             res.savingPagesInThreads = Interlocked.Read(ref savingPagesInThreads);
             res.activeTasks = justInProcess
-                    .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new Statistics.perItemStat<long>() { email = k, count = v.Count() })
+                    .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new BlurredPageStatistics.perItemStat<long>() { email = k, count = v.Count() })
                     .ToArray();
 
             res.longestTasks = justInProcess.OrderByDescending(o => (now - o.Value.taken).TotalSeconds)
                             .Take(20)
-                            .Select(m => new Statistics.perItemStat<decimal>() { email = m.Value.takenByUser, count = (decimal)(now - m.Value.taken).TotalSeconds })
+                            .Select(m => new BlurredPageStatistics.perItemStat<decimal>() { email = m.Value.takenByUser, count = (decimal)(now - m.Value.taken).TotalSeconds })
                             .ToArray();
             res.avgTaskLegth = justInProcess
-                    .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new Statistics.perItemStat<decimal>()
+                    .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new BlurredPageStatistics.perItemStat<decimal>()
                     {
                         email = k,
                         count = (decimal)v.Average(a => (now - a.Value.taken).TotalSeconds)
@@ -322,27 +327,7 @@ again:
             return res;
         }
 
-        public class Statistics
-        {
-            public long total { get; set; }
-            public long currTaken { get; set; }
-            public long totalFailed { get; set; }
 
-            public long savedInThread { get; set; }
-            public long runningSaveThreads { get; set; }
-            public long savingPagesInThreads { get; set; }
-
-            public perItemStat<long>[] activeTasks { get; set; }
-            public perItemStat<decimal>[] avgTaskLegth { get; set; }
-            public perItemStat<decimal>[] longestTasks { get; set; }
-            public class perItemStat<T>
-            {
-                public string email { get; set; }
-                public T count { get; set; }
-
-            }
-
-        }
 
 
         public class BpGet

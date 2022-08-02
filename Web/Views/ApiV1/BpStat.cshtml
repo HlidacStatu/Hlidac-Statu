@@ -1,0 +1,58 @@
+﻿@using System.Text.RegularExpressions;
+@using System.Net
+@{
+    /**/
+
+    ViewBag.Title = "Statistika BP serverů";
+    ViewBag.SubTitle = "";
+
+    var stats = await Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Entities.BlurredPageStatistics>(
+            HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/bp/stats2",
+            timeout: TimeSpan.FromSeconds(10),
+            headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
+        );
+
+
+}
+@section scripts
+{
+
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+
+
+<div class="row">
+    <div class="col-xs-12 col-md-6">
+        Total: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats.total,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br/>
+        CurrTake: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats.currTaken,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br/>
+        TotalFailed: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats.totalFailed,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br/>
+
+        savedInThread: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats.savedInThread,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br/>
+        runningSaveThreads: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats.runningSaveThreads,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br/>
+        savingPagesInThreads: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats.savingPagesInThreads,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br/>
+        savedInThread: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats.savedInThread,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br/>
+
+
+        <hr />
+
+        <h3>Active Tasks</h3>
+        @Html.Raw(string.Join("<br/>", stats.activeTasks.OrderByDescending(o=>o.count).Select(s=>s.email + " " + s.count)))
+
+        <h3>Avg. Tasks length</h3>
+        @Html.Raw(string.Join("<br/>", stats.avgTaskLegth.OrderByDescending(o=>o.count).Select(s=>s.email + " " + s.count + " s")))
+
+        <h3>Longest tasks</h3>
+        @Html.Raw(string.Join("<br/>", stats.longestTasks.OrderByDescending(o=>o.count).Select(s=>s.email + " " + s.count + " s")))
+
+    </div>
+</div>
