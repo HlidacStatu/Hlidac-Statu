@@ -30,7 +30,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         static long savingPagesInThreads = 0;
         static long savedInThread = 0;
         static long saved = 0;
-        static System.Collections.Concurrent.ConcurrentDictionary<string, string> inTheProcess = new System.Collections.Concurrent.ConcurrentDictionary<string, string>();
+        static System.Collections.Concurrent.ConcurrentDictionary<string, processed> justInProcess = new();
 
 
         static object lockObj = new object();
@@ -90,7 +90,7 @@ again:
                         }
                         )
                         .ToArray();
-            _ = inTheProcess.TryAdd(nextId, HttpContext.User?.Identity?.Name ?? "unknown");
+            _ = justInProcess.TryAdd(nextId, idsToProcess[nextId]);
             return res;
         }
 
@@ -150,7 +150,7 @@ again:
 
             _ = Interlocked.Increment(ref savedInThread);
             
-            _ = inTheProcess.Remove(data.smlouvaId, out _);
+            _ = justInProcess.Remove(data.smlouvaId, out _);
 
             return StatusCode(200);
         }
@@ -292,29 +292,30 @@ again:
         public async Task<ActionResult<Statistics>> Stats2()
         {
             DateTime now = DateTime.Now;
-            var inProcess = idsToProcess.Where(m => m.Value != null);
             var res = new Statistics()
             {
                 total = idsToProcess.Count,
-                currTaken = inProcess.Count(),
-                totalFailed = inProcess.Count(m => (now - m.Value.taken).TotalMinutes > 60)
+                currTaken = justInProcess.Count(),
+                totalFailed = justInProcess.Count(m => (now - m.Value.taken).TotalMinutes > 60)
             };
 
             res.runningSaveThreads = Interlocked.Read(ref runningSaveThreads);
             res.savingPagesInThreads = Interlocked.Read(ref savingPagesInThreads);
-            res.activeTasks = inProcess
+            res.activeTasks = justInProcess
                     .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new Statistics.perItemStat<long>() { email = k, count = v.Count() })
                     .ToArray();
-            res.longestTasks = inProcess.OrderByDescending(o => (now - o.Value.taken).TotalSeconds)
+
+            res.longestTasks = justInProcess.OrderByDescending(o => (now - o.Value.taken).TotalSeconds)
                             .Take(20)
                             .Select(m => new Statistics.perItemStat<decimal>() { email = m.Value.takenByUser, count = (decimal)(now - m.Value.taken).TotalSeconds })
                             .ToArray();
-            res.avgTaskLegth = inProcess
+            res.avgTaskLegth = justInProcess
                     .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new Statistics.perItemStat<decimal>()
                     {
                         email = k,
                         count = (decimal)v.Average(a => (now - a.Value.taken).TotalSeconds)
                     })
+                    .OrderByDescending(o=>o.count)
                     .ToArray();
             savedInThread = Interlocked.Read(ref savedInThread);
 
