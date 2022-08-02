@@ -24,10 +24,10 @@ namespace HlidacStatuApi.Controllers.ApiV2
             public string takenByUser { get; set; } = null;
         }
         static System.Collections.Concurrent.ConcurrentDictionary<string, processed> idsToProcess = null;
-        static long runningSaveThreads = 0;
-        static long savingPagesInThreads = 0;
-        static long savedInThread = 0;
-        static System.Collections.Concurrent.ConcurrentDictionary<string, string> inTheProcess = null;
+        //static long runningSaveThreads = 0;
+        //static long savingPagesInThreads = 0;
+        //static long savedInThread = 0;
+        //static System.Collections.Concurrent.ConcurrentDictionary<string, string> inTheProcess = null;
 
 
         static object lockObj = new object();
@@ -85,7 +85,7 @@ again:
                         }
                         )
                         .ToArray();
-            inTheProcess.TryAdd(nextId, HttpContext.User?.Identity?.Name);
+            //inTheProcess.TryAdd(nextId, HttpContext.User?.Identity?.Name);
             return res;
         }
 
@@ -102,9 +102,9 @@ again:
                     new Thread(
                         () =>
                         {
-                            Interlocked.Increment(ref savedInThread);
-                            Interlocked.Increment(ref runningSaveThreads);
-                            Interlocked.Add(ref savingPagesInThreads, numOfPages);
+                            //Interlocked.Increment(ref savedInThread);
+                            //Interlocked.Increment(ref runningSaveThreads);
+                            //Interlocked.Add(ref savingPagesInThreads, numOfPages);
 
                             HlidacStatuApi.Code.Log.Logger.Info(
                                 "{action} {code} for {part} for {pages}.",
@@ -128,8 +128,8 @@ again:
                                 numOfPages,
                                 sw.Elapsed.TotalSeconds);
 
-                            Interlocked.Decrement(ref runningSaveThreads);
-                            Interlocked.Add(ref savingPagesInThreads, -1 * numOfPages);
+                            //Interlocked.Decrement(ref runningSaveThreads);
+                            //Interlocked.Add(ref savingPagesInThreads, -1 * numOfPages);
 
                         }
                     ).Start();
@@ -143,7 +143,7 @@ again:
                 }
             }
 
-            _ = inTheProcess.Remove(data.smlouvaId, out _);
+            //_ = inTheProcess.Remove(data.smlouvaId, out _);
 
             return StatusCode(200);
         }
@@ -275,22 +275,22 @@ again:
                 total = idsToProcess.Count,
                 currTaken = inProcess.Count(),
                 totalFailed = inProcess.Count(m => (now - m.Value.taken).TotalMinutes > 60),
-                runningSaveThreads = Interlocked.Read(ref runningSaveThreads),
-                savingPagesInThreads = Interlocked.Read(ref savingPagesInThreads),
-                activeTasks = inProcess
-                        .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new Statistics.perItemStat<long>() { email = k, count = v.Count() })
-                        .ToArray(),
-                longestTasks = inProcess.OrderByDescending(o => (now - o.Value.taken).TotalSeconds)
-                                .Take(20)
-                                .Select(m => new Statistics.perItemStat<decimal>() { email = m.Value.takenByUser, count = (decimal)(now - m.Value.taken).TotalSeconds })
-                                .ToArray(),
-                avgTaskLegth = inProcess
-                        .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new Statistics.perItemStat<decimal>() { 
-                                        email = k, 
-                                        count = (decimal)v.Average(a=> (now - a.Value.taken).TotalSeconds)
-                                    })
-                        .ToArray(),
-                savedInThread = Interlocked.Read(ref savedInThread)
+                //runningSaveThreads = Interlocked.Read(ref runningSaveThreads),
+                //savingPagesInThreads = Interlocked.Read(ref savingPagesInThreads),
+                //activeTasks = inProcess
+                //        .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new Statistics.perItemStat<long>() { email = k, count = v.Count() })
+                //        .ToArray(),
+                //longestTasks = inProcess.OrderByDescending(o => (now - o.Value.taken).TotalSeconds)
+                //                .Take(20)
+                //                .Select(m => new Statistics.perItemStat<decimal>() { email = m.Value.takenByUser, count = (decimal)(now - m.Value.taken).TotalSeconds })
+                //                .ToArray(),
+                //avgTaskLegth = inProcess
+                //        .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new Statistics.perItemStat<decimal>() { 
+                //                        email = k, 
+                //                        count = (decimal)v.Average(a=> (now - a.Value.taken).TotalSeconds)
+                //                    })
+                //        .ToArray(),
+                //savedInThread = Interlocked.Read(ref savedInThread)
             };
 
             return res;
@@ -302,19 +302,19 @@ again:
             public long currTaken { get; set; }
             public long totalFailed { get; set; }
 
-            public long savedInThread { get; set; }
-            public long runningSaveThreads { get; set; }
-            public long savingPagesInThreads { get; set; }
+            //public long savedInThread { get; set; }
+            //public long runningSaveThreads { get; set; }
+            //public long savingPagesInThreads { get; set; }
 
-            public perItemStat<long>[] activeTasks { get; set; }
-            public perItemStat<decimal>[] avgTaskLegth { get; set; }
-            public perItemStat<decimal>[] longestTasks { get; set; }
-            public class perItemStat<T>
-            {
-                public string email { get; set; }
-                public T count { get; set; }
+            //public perItemStat<long>[] activeTasks { get; set; }
+            //public perItemStat<decimal>[] avgTaskLegth { get; set; }
+            //public perItemStat<decimal>[] longestTasks { get; set; }
+            //public class perItemStat<T>
+            //{
+            //    public string email { get; set; }
+            //    public T count { get; set; }
 
-            }
+            //}
 
         }
 
