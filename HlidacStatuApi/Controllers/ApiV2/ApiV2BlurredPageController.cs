@@ -30,7 +30,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         static long savingPagesInThreads = 0;
         static long savedInThread = 0;
         static long saved = 0;
-        static System.Collections.Concurrent.ConcurrentDictionary<string, string> inTheProcess = null;
+        static System.Collections.Concurrent.ConcurrentDictionary<string, string> inTheProcess = new System.Collections.Concurrent.ConcurrentDictionary<string, string>();
 
 
         static object lockObj = new object();
@@ -90,7 +90,7 @@ again:
                         }
                         )
                         .ToArray();
-            _ = inTheProcess.TryAdd(nextId, HttpContext.User?.Identity?.Name);
+            _ = inTheProcess.TryAdd(nextId, HttpContext.User?.Identity?.Name ?? "unknown");
             return res;
         }
 
