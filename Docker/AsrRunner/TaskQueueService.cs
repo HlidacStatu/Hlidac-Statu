@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
@@ -39,6 +40,12 @@ public class TaskQueueService : IDisposable
         {
             _logger.Error("Error during {methodName}. Server responded with [{statusCode}] status code. Reason phrase [{reasonPhrase}].",
                 nameof(GetNewTaskAsync), responseMessage.StatusCode, responseMessage.ReasonPhrase);
+            return null;
+        }
+
+        if (responseMessage.StatusCode == HttpStatusCode.NoContent)
+        {
+            _logger.Information("Queue is empty");
             return null;
         }
         
