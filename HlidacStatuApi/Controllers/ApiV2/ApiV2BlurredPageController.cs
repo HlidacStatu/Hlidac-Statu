@@ -32,6 +32,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         static long saved = 0;
         static System.Collections.Concurrent.ConcurrentDictionary<string, processed> justInProcess = new();
 
+        static readonly TimeSpan MAXDURATION_OF_TASK_IN_MIN = TimeSpan.FromHours(6);
 
         static object lockObj = new object();
         static ApiV2BlurredPageController()
@@ -57,7 +58,7 @@ again:
             {
                 nextId = idsToProcess.FirstOrDefault(m =>
                     m.Value == null
-                    || (m.Value != null && (now - m.Value.taken).TotalMinutes > 60)
+                    || (m.Value != null && (now - m.Value.taken) > MAXDURATION_OF_TASK_IN_MIN)
                 ).Key;
                 if (nextId == null)
                     return StatusCode(404);
@@ -281,7 +282,7 @@ again:
             {
                 total = idsToProcess.Count,
                 currTaken = inProcess.Count(),
-                totalFailed = inProcess.Count(m => (now - m.Value.taken).TotalMinutes > 60)
+                totalFailed = inProcess.Count(m => (now - m.Value.taken) > MAXDURATION_OF_TASK_IN_MIN)
             };
 
             return res;
@@ -301,7 +302,7 @@ again:
             {
                 total = idsToProcess.Count,
                 currTaken = justInProcess.Count(),
-                totalFailed = justInProcess.Count(m => (now - m.Value.taken).TotalMinutes > 60)
+                totalFailed = justInProcess.Count(m => (now - m.Value.taken) > MAXDURATION_OF_TASK_IN_MIN)
             };
 
             res.runningSaveThreads = Interlocked.Read(ref runningSaveThreads);
