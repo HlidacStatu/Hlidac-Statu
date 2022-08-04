@@ -1,13 +1,17 @@
-﻿using Devmasters;
-using Devmasters.Batch;
-using HlidacStatu.Entities;
-using HlidacStatu.Util;
-using Nest;
-using System;
+﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Devmasters;
+using Devmasters.Batch;
+
+using HlidacStatu.Entities;
+using HlidacStatu.Util;
+
+using Nest;
+
 using Manager = HlidacStatu.Repositories.ES.Manager;
 
 namespace HlidacStatu.Repositories.Searching
@@ -435,6 +439,11 @@ namespace HlidacStatu.Repositories.Searching
                 default:
                     return date.Value.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
             }
+        }
+
+        public static string ToElasticDateInterval(DateTime? fromDate, DateTime? toDate)
+        {
+            return $"[{ToElasticDate(fromDate,"*")} TO {ToElasticDate(toDate, "*")} }}";
         }
     }
 }

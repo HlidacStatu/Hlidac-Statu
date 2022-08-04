@@ -1,23 +1,47 @@
 ﻿@using System.Text.RegularExpressions;
 @using System.Net
+@using HlidacStatu.Util;
 @{
     /**/
 
-    ViewBag.Title = "Statistika BP serverů";
-    ViewBag.SubTitle = "";
-
-    var stats = await Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Entities.BlurredPageStatistics>(
-        HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/bp/stats",
-        timeout: TimeSpan.FromSeconds(10),
-        headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
-    );
-
-    var stats2 = await Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Entities.BlurredPageStatistics>(
+    var stats2T = Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Entities.BlurredPageStatistics>(
             HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/bp/stats2",
             timeout: TimeSpan.FromSeconds(10),
             headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
         );
 
+
+    var now = DateTime.Now;
+
+    var pagesCountLast7dT = (await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync())
+                            .CountAsync<HlidacStatu.Entities.PageMetadata>(q => q
+                                .Query(qs=>qs.QueryString(q=>q.Query($"blurred.created:"+HlidacStatu.Repositories.Searching.Tools.ToElasticDateInterval(now.AddDays(-7),now) ))
+                                )
+                            );
+    var pagesCountLast1dT = (await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync())
+                            .CountAsync<HlidacStatu.Entities.PageMetadata>(q => q
+                                .Query(qs=>qs.QueryString(q=>q.Query($"blurred.created:"+HlidacStatu.Repositories.Searching.Tools.ToElasticDateInterval(now.AddDays(-1),now) ))
+                                )
+                            );
+    var pagesCountT = (await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync())
+                            .CountAsync<HlidacStatu.Entities.PageMetadata>();
+
+    var pagesCount = (await pagesCountT).Count;
+    var pagesCountLast1d = (await pagesCountLast1dT).Count;
+    var pagesCountLast7d = (await pagesCountLast7dT).Count;
+    HlidacStatu.Entities.BlurredPageStatistics stats2 = new HlidacStatu.Entities.BlurredPageStatistics();
+    try
+    {
+    stats2 = await stats2T;
+    }
+    catch (Exception ){}
+
+
+    var smluvCelkem =(decimal)(HlidacStatu.Repositories.StaticData.BasicStatisticData.Get()[0] + HlidacStatu.Repositories.StaticData.BasicStatisticData.Get()[1]);
+    ViewBag.Title = "Statistika analýzy začerněných stránek smluv";
+    ViewBag.SubTitle = "";
+
+    
 
 }
 @section scripts
@@ -35,39 +59,38 @@
     </ol>
 }
 
-    <h2>stats</h2>
+    <h2>Souhrny</h2>
     <div class="row">
         <div class="col-xs-12 col-md-6">
-            Total: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats.total,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br />
-            CurrTake: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats.currTaken,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br />
-            TotalFailed: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats.totalFailed,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br />
-        </div>
-    </div>
-
-    <hr class="gray dotted" />
-    <h2>stats2</h2>
-    <div class="row">
-        <div class="col-xs-12 col-md-6">
-            Total: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats2.total,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br />
-            CurrTake: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats2.currTaken,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br />
-            TotalFailed: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats2.totalFailed,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br />
-
-            savedInThread: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats2.savedInThread,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br />
-            runningSaveThreads: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats2.runningSaveThreads,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br />
-            savingPagesInThreads: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats2.savingPagesInThreads,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br />
-            savedInThread: @Html.Raw(HlidacStatu.Util.RenderData.NiceNumber(stats2.savedInThread,true, HlidacStatu.Util.RenderData.ShowDecimalVal.Hide))<br />
-
-
-            <hr />
-
-            <h3>Active Tasks</h3>
-            @Html.Raw(string.Join("<br/>", stats2.activeTasks.OrderByDescending(o=>o.count).Select(s=>$"{s.count:N0} : {s.email}")))
-
-            <h3>Avg. Tasks length</h3>
-            @Html.Raw(string.Join("<br/>", stats2.avgTaskLegth.OrderByDescending(o=>o.count).Select(s=>$"{s.count:N0} s : {s.email}" )))
-
-            <h3>Longest tasks</h3>
-            @Html.Raw(string.Join("<br/>", stats2.longestTasks.OrderByDescending(o=>o.count).Select(s=>$"{s.count:N0} s : {s.email}" )))
-
+            <table class="table">
+                <tr>
+                    <td>Celkový počet smluv</td>
+                    <td class="number">@(RenderData.ShortNiceNumber(smluvCelkem))</td>
+                </tr>
+                <tr>
+                    <td>Počet smluv čekajících na zpracování</td>
+                    <td class="number">@(RenderData.ShortNiceNumber(stats2.total))</td>
+                </tr>
+                <tr>
+                    <td>Hrubý odhad celkový počet stránek ke zpracování</td>
+                    <td class="number">@(RenderData.ShortNiceNumber(smluvCelkem*46m))</td>
+                </tr>
+                <tr>
+                    <td>Celkový počet zpracovaných stránek</td>
+                    <td class="number">@(RenderData.NiceNumber(pagesCount)) (@((pagesCount/(smluvCelkem*46)).ToString("P2")))</td>
+                </tr>
+                <tr>
+                    <td>Počet dobrovolníků poskytujících výpočetní výkon </td>
+                    <td class="number">@(RenderData.NiceNumber(stats2.avgTaskLegth.Count())) Díky <i class="fa-solid fa-heart" style="color:red"></i></td>
+                </tr>
+                <tr>
+                    <td>Počet smluv právě zpracovávaných</td>
+                    <td class="number">@(RenderData.NiceNumber(stats2.currTaken))</td>
+                </tr>
+                <tr>
+                    <td>Průměrná doba zpracování jedné smlouvy</td>
+                    <td class="number">@(RenderData.NiceNumber(stats2.longestTasks.Average(m=>m.count))) s</td>
+                </tr>
+            </table>
         </div>
     </div>

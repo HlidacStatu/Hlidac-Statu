@@ -50,9 +50,13 @@ namespace HlidacStatu.Web.Controllers
         {
             return View();
         }
+        public ActionResult BpStat()
+        {
+            return View();
+        }
 
         [Authorize(Roles ="Admin")]
-        public ActionResult BpStat()
+        public ActionResult BpStat2()
         {
             return View();
         }

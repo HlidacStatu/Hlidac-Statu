@@ -16,9 +16,9 @@ namespace HlidacStatu.Entities
         public long runningSaveThreads { get; set; }
         public long savingPagesInThreads { get; set; }
 
-        public perItemStat<long>[] activeTasks { get; set; }
-        public perItemStat<decimal>[] avgTaskLegth { get; set; }
-        public perItemStat<decimal>[] longestTasks { get; set; }
+        public perItemStat<long>[] activeTasks { get; set; } = new perItemStat<long>[0];
+        public perItemStat<decimal>[] avgTaskLegth { get; set; } = new perItemStat<decimal>[0];
+        public perItemStat<decimal>[] longestTasks { get; set; } = new perItemStat<decimal>[0];
         public class perItemStat<T>
         {
             public string email { get; set; }
