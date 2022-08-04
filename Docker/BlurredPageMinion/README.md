@@ -30,7 +30,7 @@ Pokud již máte API key, napište žádost o povolení přístupu k API Blurred
 > *varianta b)* Variantně nám můžete napsat **Direct message** na twitter účet Hlídače státu (https://twitter.com/hlidacstatu)
 
 
-5) Pak už stačí jen spustit docker instanci. **Prosím, pokud se nedohodneme jinak, pusťte pouze 1 instanci BlurredPageMinion** Díky.
+5) Pak už stačí jen spustit docker instanci. **Prosím, pokud se nedohodneme jinak, pusťte maximálně 10 instancí BlurredPageMinion** Díky.
 
 ```  sh
 docker run --name blurredpageminion -d -e apikey={váš_apikey} hlidacstatu/blurred_page_minion:latestRelease  
