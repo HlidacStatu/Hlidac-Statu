@@ -51,7 +51,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        [Filters.HlidacCache(60*4, "", false)]
+        [Filters.HlidacCache(60, "", false)]
         public ActionResult BpStat()
         {
             return View();
