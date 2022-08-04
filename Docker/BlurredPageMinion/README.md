@@ -4,6 +4,8 @@ Klient pro analýzu obsahu jednotlivých stránek, identifikaci začerněných o
 
 ## Release notes
 
+- 1.3.2 *(4.8.2022)* - v případě problémů s parsováním PDF či jeho stáhnutím nám docker instance pošle Error log.
+
 - 1.3.1 *(1.8.2022)* - do logu vypisuje základní statistiku analýzy stránek.
   >
   > příklad: `File with 13 pages parsed in 105.49 sec. It's 0.12 pages/s or 8.11 seconds/page.`
@@ -33,6 +35,10 @@ Pokud již máte API key, napište žádost o povolení přístupu k API Blurred
 ```  sh
 docker run --name blurredpageminion -d -e apikey={váš_apikey} hlidacstatu/blurred_page_minion:latestRelease  
 ```
+
+## Statistiky
+
+Základní statistiky analýzy začerněných smluv najdete na https://www.hlidacstatu.cz/api/v1/bpstat 
 
 ## Poznámka
 Docker instance může běžet i v interní síti, vyžaduje pouze HTTPS přístup na `api.hlidacstatu.cz`
