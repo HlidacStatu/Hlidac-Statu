@@ -97,7 +97,10 @@ namespace HlidacStatu.Entities
             public string GetUrl(string smlouvaId, bool local = true)
             {
                 if (local)
+                {
+
                     return LocalCopyUrl(smlouvaId, local: true);
+                }
                 else
                     return this.odkaz;
             }

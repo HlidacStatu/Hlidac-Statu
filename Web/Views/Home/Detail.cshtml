@@ -295,7 +295,7 @@
             <ol>
                 @foreach (var priloha in Model.Prilohy)
                 {
-                    bool weHaveCopy = File.Exists(Init.PrilohaLocalCopy.GetFullPath(Model, priloha));
+                    bool weHaveCopy = Init.PrilohaLocalCopy.ExistLocalCopyOfPriloha(Model, priloha);
                     <li>
                         @if (znepristupnena)
                         {

@@ -87,7 +87,7 @@ again:
                         .Select(m => new BpGet.BpGPriloha()
                         {
                             uniqueId = m.UniqueHash(),
-                            url = m.GetUrl(nextId, false)
+                            url = HlidacStatu.Connectors.Init.PrilohaLocalCopy.ExistLocalCopyOfPriloha(sml, m) ?  m.GetUrl(nextId, true) : m.GetUrl(nextId, false)
                         }
                         )
                         .ToArray();
@@ -312,7 +312,6 @@ again:
                     .ToArray();
 
             res.longestTasks = justInProcess.OrderByDescending(o => (now - o.Value.taken).TotalSeconds)
-                            .Take(20)
                             .Select(m => new BlurredPageStatistics.perItemStat<decimal>() { email = m.Value.takenByUser, count = (decimal)(now - m.Value.taken).TotalSeconds })
                             .ToArray();
             res.avgTaskLegth = justInProcess
