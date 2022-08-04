@@ -83,11 +83,12 @@ again:
             var res = new BpGet();
             res.smlouvaId = nextId;
             res.prilohy = sml.Prilohy
-                        .Where(p=>p != null)
+                        .Where(p => p != null)
                         .Select(m => new BpGet.BpGPriloha()
                         {
                             uniqueId = m.UniqueHash(),
-                            url = HlidacStatu.Connectors.Init.PrilohaLocalCopy.ExistLocalCopyOfPriloha(sml, m) ?  m.GetUrl(nextId, true) : m.GetUrl(nextId, false)
+                            url = (HlidacStatu.Connectors.Init.PrilohaLocalCopy.ExistLocalCopyOfPriloha(sml, m) 
+                                        ? $"https://www.hlidacstatu.cz{m.GetUrl(nextId, true)}" : m.GetUrl(nextId, false))
                         }
                         )
                         .ToArray();
