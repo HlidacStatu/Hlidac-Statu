@@ -77,19 +77,31 @@
                 </tr>
                 <tr>
                     <td>Celkový počet zpracovaných stránek</td>
-                    <td class="number">@(RenderData.NiceNumber(pagesCount)) (@((pagesCount/(smluvCelkem*46)).ToString("P2")))</td>
+                    <td class="number">@(RenderData.ShortNiceNumber(pagesCount)) (@((pagesCount/(smluvCelkem*46)).ToString("P2")))</td>
                 </tr>
                 <tr>
-                    <td>Počet dobrovolníků poskytujících výpočetní výkon </td>
+                    <td>Celkový počet zpracovaných stránek za posledních 24 hod</td>
+                    <td class="number">@(RenderData.ShortNiceNumber(pagesCountLast1d))</td>
+                </tr>
+                <tr>
+                    <td>Celkový počet zpracovaných stránek za posledních 7 dní</td>
+                    <td class="number">@(RenderData.ShortNiceNumber(pagesCountLast7d))</td>
+                </tr>
+                <tr>
+                    <td>Počet dobrovolníků v tuto chvíli poskytujících výpočetní výkon </td>
                     <td class="number">@(RenderData.NiceNumber(stats2.avgTaskLegth.Count())) Díky <i class="fa-solid fa-heart" style="color:red"></i></td>
+                </tr>
+                <tr>
+                    <td>Počet zaregistrovaných dobrovolníků</td>
+                    <td class="number">@(RenderData.NiceNumber( HlidacStatu.Connectors.DirectDB.GetList<int>("select count(*) from AspNetUserRoles ur inner join AspNetUsers u on u.id = ur.UserId where ur.RoleId='e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8'").First() )) Díky <i class="fa-solid fa-heart" style="color:red"></i></td>
                 </tr>
                 <tr>
                     <td>Počet smluv právě zpracovávaných</td>
                     <td class="number">@(RenderData.NiceNumber(stats2.currTaken))</td>
                 </tr>
                 <tr>
-                    <td>Průměrná doba zpracování jedné smlouvy</td>
-                    <td class="number">@(RenderData.NiceNumber(stats2.longestTasks.Average(m=>m.count))) s</td>
+                    <td>Průměrná doba zpracování aktuálně zprácovávaných smluv</td>
+                    <td class="number">@(RenderData.NiceNumber(stats2.longestTasks.Average(m=>m.count))) sec</td>
                 </tr>
             </table>
         </div>
