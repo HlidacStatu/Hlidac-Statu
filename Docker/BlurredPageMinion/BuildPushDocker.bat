@@ -2,7 +2,7 @@
 
 if '%1'=='' goto argumentError
 
-call BuildPushDockerX64.bat %1
+call BuildPushDockerX64.bat %1 %2
 
 rem call BuildPushDockerArm.bat %1
 

@@ -129,17 +129,20 @@ namespace BlurredPageMinion
                     if (statusCode >= 500)
                     {
                         logger.LogError(e, $"cannot download priloha from {p.url.ShortenMeInMiddle(60)}. Http code " + statusCode);
+                        ExceptionHandling.SendLogToServer($"cannot download priloha from {p.url}. Http code " + statusCode, apiClient);
                         continue;
                     }
                     else if (statusCode >= 400)
                     {
                         logger.LogError(e, $"cannot download priloha from {p.url.ShortenMeInMiddle(60)}. Http code " + statusCode);
+                        ExceptionHandling.SendLogToServer($"cannot download priloha from {p.url}. Http code " + statusCode, apiClient);
                         continue;
                     }
                 }
                 catch (Exception e)
                 {
                     logger.LogError(e, $"cannot download priloha from {p.url.ShortenMeInMiddle(60)}.");
+                    ExceptionHandling.SendLogToServer($"cannot download priloha from {p.url}.{e.ToString()}", apiClient);
                     continue;
                 }
 
@@ -170,7 +173,8 @@ namespace BlurredPageMinion
                 catch (Exception e)
                 {
                     logger.LogError(e, "ERROR: {smlouva}  cannot get file.", item.smlouvaId);
-                    System.IO.File.Copy(tmpPdf, tmpPdf + ".error", true);
+                    ExceptionHandling.SendLogToServer($"ERROR: smlouva {item} cannot get file for {p.url}. {e.ToString()}", apiClient);
+                    //System.IO.File.Copy(tmpPdf, tmpPdf + ".error", true);
                 }
                 finally
                 {
