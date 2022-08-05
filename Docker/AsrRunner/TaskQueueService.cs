@@ -1,7 +1,11 @@
+using System;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
@@ -73,6 +77,7 @@ public class TaskQueueService : IDisposable
                 $"Request error during {nameof(ReportSuccessAsync)}. Server responded with [{responseMessage.ReasonPhrase}] reason.",
                 null, responseMessage.StatusCode);
         }
+        _logger.Information("Successful task reported.");
     }
     
     public async Task ReportFailureAsync(CancellationToken cancellationToken)
@@ -86,12 +91,13 @@ public class TaskQueueService : IDisposable
         if (!responseMessage.IsSuccessStatusCode)
         {
             _logger.Error("Error during {methodName}. Server responded with [{statusCode}] status code. Reason phrase [{reasonPhrase}].",
-                nameof(ReportSuccessAsync), responseMessage.StatusCode, responseMessage.ReasonPhrase);
+                nameof(ReportFailureAsync), responseMessage.StatusCode, responseMessage.ReasonPhrase);
             
             throw new HttpRequestException(
                 $"Request error during {nameof(ReportFailureAsync)}. Server responded with [{responseMessage.ReasonPhrase}] reason.",
                 null, responseMessage.StatusCode);
         }
+        _logger.Information("Failed task successfully reported.");
     }
     
     private void CurrentQueueItemCheck()

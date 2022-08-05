@@ -1,4 +1,8 @@
-﻿using AsrRunner;
+﻿using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using AsrRunner;
 using Devmasters.Log;
 using FluentFTP;
 using Serilog;
@@ -12,7 +16,8 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.WithProperty("application_name", "AsrRunner")
     .CreateLogger();
     
-var logger = Log.ForContext<Program>();    
+var logger = Log.ForContext<Program>();
+var failSave = new FailSaveCounter(5);
     
 // Graceful shutdown
 logger.Information("Starting up...");
@@ -115,12 +120,13 @@ while (!applicationCts.IsCancellationRequested)
         {
             await taskQueueService.ReportSuccessAsync(applicationCts.Token);
             logger.Information("Task [{fileName}] successfully completed.", outputFileFtp);
+            failSave.ResetCounter(); // everything went right
         }
         else
         {
             logger.Warning("Task [{fileName}] failed. FileSize {fileSize} != UploadedSize {uploadedFileSize}",
                 outputFileFtp, fileSize, uploadedFileSize);
-            await taskQueueService.ReportFailureAsync(applicationCts.Token);
+            throw new Exception("Uploaded size is not equal to the sent size.");
         }
 
     }
@@ -128,14 +134,30 @@ while (!applicationCts.IsCancellationRequested)
     {
         logger.Warning(exception, "Task [{fileName}] failed.", outputFileFtp);
         await taskQueueService.ReportFailureAsync(applicationCts.Token);
+        failSave.ReportFail(); //If too many fails occurs, it throws an exception
     }
     finally
     {
-        //delete everything in directory
         logger.Debug("Cleaning local folder [{folder}]", Global.LocalDirectoryPath);
         Directory.Delete(Global.LocalDirectoryPath, true);
+        
+        Cleanup();
     }
 }
 
 logger.Information("Terminating application.");
 Log.CloseAndFlush();
+
+void Cleanup()
+{
+    logger.Debug("Running cleanup of ASR folders");
+    // this needs to be cleaned up, because if problem occurs in process.sh (from Czech-ASR)
+    // then these commands are not run and it goes to the fail spiral
+    var model_dir= "/opt/app/exp/chain/cnn_tdnn";
+    Directory.Delete("/opt/app/data/test", true);
+    Directory.Delete("/opt/app/tmp", true);
+    Directory.Delete("/opt/app/exp/nnet3/ivectors", true);
+    Directory.Delete($"{model_dir}/decode", true);
+    Directory.Delete($"{model_dir}/rescore", true);
+    logger.Debug("cleanup finished");
+}
