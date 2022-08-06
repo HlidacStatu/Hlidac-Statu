@@ -113,7 +113,7 @@ namespace HlidacStatu.Web.Controllers
                     return View("5_SmlouvySPolitiky");
                 case 6:
                     ViewBag.Title = "Nové smluvní strany";
-                    ViewBag.SubTitle = "Firmy a úřady, které se nyní objevili v rejstříku poprvé.";
+                    ViewBag.SubTitle = "Firmy a úřady, které se nyní objevily v rejstříku poprvé.";
                     return View("6_NejnovejsiFirmy");
                 case 7:
                     ViewBag.Title = "Základní statistiky Registru smluv";
