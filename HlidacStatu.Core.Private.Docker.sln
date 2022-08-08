@@ -174,8 +174,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Analysis.Page.Cmd", "Hlidac
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd", "3rd", "{A05A2F9D-F84E-4C0C-A188-5FA9A0867044}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PDFtoImage", "Hlidac-Statu\3rd\PDFtoImage\src\PDFtoImage\PDFtoImage.csproj", "{1DC95361-9269-4811-8304-49F008B6765A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -537,12 +535,6 @@ Global
 		{FA8F3B3A-F77D-4944-B1B8-483E933FFAFD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FA8F3B3A-F77D-4944-B1B8-483E933FFAFD}.ReleaseSigned|Any CPU.ActiveCfg = Release|Any CPU
 		{FA8F3B3A-F77D-4944-B1B8-483E933FFAFD}.ReleaseSigned|Any CPU.Build.0 = Release|Any CPU
-		{1DC95361-9269-4811-8304-49F008B6765A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1DC95361-9269-4811-8304-49F008B6765A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1DC95361-9269-4811-8304-49F008B6765A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1DC95361-9269-4811-8304-49F008B6765A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1DC95361-9269-4811-8304-49F008B6765A}.ReleaseSigned|Any CPU.ActiveCfg = ReleaseSigned|Any CPU
-		{1DC95361-9269-4811-8304-49F008B6765A}.ReleaseSigned|Any CPU.Build.0 = ReleaseSigned|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -588,7 +580,6 @@ Global
 		{57B4976F-B999-4977-86BE-D14D4CCA657A} = {944AEC9D-9A67-477D-811D-66DC2142299A}
 		{CAA0019C-8E66-4849-81D8-D37906C5AD24} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{4455578E-0726-4360-A0EF-FCB97E5CDFC0} = {944AEC9D-9A67-477D-811D-66DC2142299A}
-		{1DC95361-9269-4811-8304-49F008B6765A} = {A05A2F9D-F84E-4C0C-A188-5FA9A0867044}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
