@@ -32,9 +32,16 @@ Pokud již máte API key, napište žádost o povolení přístupu k API Blurred
 
 5) Pak už stačí jen spustit docker instanci. **Prosím, pokud se nedohodneme jinak, pusťte maximálně 10 instancí BlurredPageMinion** Díky.
 
+Příkaz úro procesory Intel/Amd:
 ```  sh
 docker run --name blurredpageminion -d -e apikey={váš_apikey} hlidacstatu/blurred_page_minion:latestRelease  
 ```
+
+Pro Arm procesory (M1,M2) nemáme Armový build, protože se nám nepodařilo získat veškeré potřebné knihovny ve verzi pro Arm. Proto je potřeba kontejner na armových procesorech spustit s parametrem `--platform linux/amd64`
+```  sh
+docker run --name blurredpageminion -d -e apikey={váš_apikey} --platform linux/amd64 hlidacstatu/blurred_page_minion:latestRelease  
+```
+
 
 ## Statistiky
 

@@ -172,6 +172,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsrRunner", "Docker\AsrRunn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Analysis.Page.Cmd", "Analysis.Page.Cmd\Analysis.Page.Cmd.csproj", "{5BDBF757-39F4-40FF-AEB7-46F07BFB7D51}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnalyzePageAreaCmd", "..\Hlidac-Statu-Private\AnalyzePageAreaCmd\AnalyzePageAreaCmd.csproj", "{E6687971-BA16-4A36-8CFA-218BF0BFA242}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -414,6 +416,10 @@ Global
 		{5BDBF757-39F4-40FF-AEB7-46F07BFB7D51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5BDBF757-39F4-40FF-AEB7-46F07BFB7D51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5BDBF757-39F4-40FF-AEB7-46F07BFB7D51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6687971-BA16-4A36-8CFA-218BF0BFA242}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6687971-BA16-4A36-8CFA-218BF0BFA242}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6687971-BA16-4A36-8CFA-218BF0BFA242}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6687971-BA16-4A36-8CFA-218BF0BFA242}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -459,6 +465,7 @@ Global
 		{57B4976F-B999-4977-86BE-D14D4CCA657A} = {944AEC9D-9A67-477D-811D-66DC2142299A}
 		{D6BF984D-68AF-43F8-9632-4521EFF408C8} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{619DF184-2432-466A-883C-C09ABF8C76A1} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
+		{E6687971-BA16-4A36-8CFA-218BF0BFA242} = {944AEC9D-9A67-477D-811D-66DC2142299A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
