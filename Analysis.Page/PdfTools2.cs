@@ -3,17 +3,17 @@ using System.Reflection;
 
 namespace HlidacStatu.Analysis.Page
 {
-    public static class PdfTools
+    public static class PdfTools2
     {
         static string workingDirectory = "";
-        static PdfTools()
+        static PdfTools2()
         {
              workingDirectory =
                      Assembly.GetExecutingAssembly().GetName(false).CodeBase
                      ?? Process.GetCurrentProcess().MainModule!.FileName!
                      ?? AppContext.BaseDirectory;
         }
-        public static bool CheckEnviroment(bool throwException = true, out System.AggregateException exceptions)
+        public static bool CheckEnviroment(bool throwException, out System.AggregateException exceptions)
         {
             string[] tools = null;
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
