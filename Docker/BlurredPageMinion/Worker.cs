@@ -157,7 +157,7 @@ namespace BlurredPageMinion
 
                         sw.Start();
                         AnalyzedPdf p_done = null;
-                        p_done = AnalyzePdfFromCmd.AnalyzePDF(tmpPdf, Settings.Debug);
+                        p_done = AnalyzePdfFromCmd.AnalyzePDF(tmpPdf, Settings.Debug); //spustit v konzoli kvůli paměti
                         p_done.uniqueId = p.uniqueId;
                         hotovePrilohy.Add(p_done);
                         sw.Stop();
