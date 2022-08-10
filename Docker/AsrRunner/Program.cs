@@ -154,10 +154,20 @@ void Cleanup()
     // this needs to be cleaned up, because if problem occurs in process.sh (from Czech-ASR)
     // then these commands are not run and it goes to the fail spiral
     var model_dir= "/opt/app/exp/chain/cnn_tdnn";
-    Directory.Delete("/opt/app/data/test", true);
-    Directory.Delete("/opt/app/tmp", true);
-    Directory.Delete("/opt/app/exp/nnet3/ivectors", true);
-    Directory.Delete($"{model_dir}/decode", true);
-    Directory.Delete($"{model_dir}/rescore", true);
+
+    var dirsToClean = new List<string>()
+    {
+        "/opt/app/data/test",
+        "/opt/app/tmp",
+        "/opt/app/exp/nnet3/ivectors",
+        $"{model_dir}/decode",
+        $"{model_dir}/rescore"
+    };
+
+    foreach (var directory in dirsToClean)
+    {
+        if(Directory.Exists(directory))
+            Directory.Delete(directory, true);
+    }
     logger.Debug("cleanup finished");
 }
