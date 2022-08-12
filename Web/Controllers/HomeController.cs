@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Devmasters;
 using Devmasters.Enums;
+using Devmasters.Net.HttpClient;
 
 using HlidacStatu.Connectors;
 using HlidacStatu.Datasets;
@@ -364,6 +365,26 @@ text zpravy: {txt}
                 }
             }
             var fn = Init.PrilohaLocalCopy.GetFullPath(model, priloha);
+            if (System.IO.File.Exists(fn) == false)
+            {
+                //download from registr smluv
+                try
+                {
+                    using (URLContent url =
+                        new URLContent(priloha.odkaz))
+                    {
+                        url.Timeout = url.Timeout * 10;
+                        byte[] data = url.GetBinary().Binary;
+                        System.IO.File.WriteAllBytes(fn, data);
+                        //p.LocalCopy = System.Text.UTF8Encoding.UTF8.GetBytes(io.GetRelativePath(item, p));
+                    }
+                }
+                catch (Exception e)
+                {
+                    Util.Consts.Logger.Error(priloha.odkaz, e);
+                }
+
+            }
             if (Lib.OCR.DocTools.HasPDFHeader(fn))
             {
                 return File(System.IO.File.ReadAllBytes(fn), "application/pdf", string.IsNullOrWhiteSpace(priloha.nazevSouboru) ? $"{model.Id}_smlouva.pdf" : priloha.nazevSouboru);
