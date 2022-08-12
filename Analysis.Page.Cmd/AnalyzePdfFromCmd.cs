@@ -16,7 +16,7 @@ namespace HlidacStatu.Analysis.Page.Area
 
 
 
-        public static AnalyzedPdf AnalyzePDF(string fileNameOfPDF, bool debug = false)
+        public static AnalyzedPdf AnalyzePDF(string fileNameOfPDF, bool debug, out string output)
         {
 
             System.Diagnostics.ProcessStartInfo pi = null;
@@ -43,19 +43,24 @@ namespace HlidacStatu.Analysis.Page.Area
                     break;
             }
             Devmasters.ProcessExecutor startProc = new Devmasters.ProcessExecutor(pi, 60 * 60 * 6);//6 hours
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
             startProc.StandardOutputDataReceived += (o, e) =>
             {
+                sb.AppendLine(e.Data);
                 //currentSession.ScriptOutput += e.Data;
                 if (debug)
                     Console.WriteLine(e.Data);
             };
             startProc.ErrorDataReceived += (o, e) =>
             {
+                sb.AppendLine("ERR: "+e.Data);
                 //currentSession.ScriptOutput += e.Data;
                 if (e.Data?.Contains("Fontconfig error") == false)
                     Console.WriteLine(e.Data);
             };
             startProc.Start();
+
+            output = sb.ToString();
             if (System.IO.File.Exists(fileNameOfPDF + ".json"))
             {
                 AnalyzedPdf? ret = System.Text.Json.JsonSerializer.Deserialize<AnalyzedPdf?>(System.IO.File.ReadAllText(fileNameOfPDF + ".json"));

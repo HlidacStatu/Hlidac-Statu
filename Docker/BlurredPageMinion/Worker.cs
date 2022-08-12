@@ -107,7 +107,7 @@ namespace BlurredPageMinion
             List<AnalyzedPdf> hotovePrilohy = new List<AnalyzedPdf>();
 
 
-            foreach (var p in item.prilohy)
+            foreach (var p in item.prilohy.Where(p=>p!=null))
             {
                 string tmpFile = System.IO.Path.GetTempFileName();
                 string tmpPdf = tmpFile + ".pdf";
@@ -149,6 +149,7 @@ namespace BlurredPageMinion
                 }
 
                 Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+                string output = "";
                 try
                 {
 
@@ -157,7 +158,13 @@ namespace BlurredPageMinion
 
                         sw.Start();
                         AnalyzedPdf p_done = null;
-                        p_done = AnalyzePdfFromCmd.AnalyzePDF(tmpPdf, Settings.Debug); //spustit v konzoli kvůli paměti
+                        p_done = AnalyzePdfFromCmd.AnalyzePDF(tmpPdf, Settings.Debug, out output); //spustit v konzoli kvůli paměti
+                        if (p_done == null)
+                        {
+                            logger.LogWarning("WARN: {smlouva}  cannot analyze file {url}, no result from parser.\n{output}", item.smlouvaId, p.url, output);
+                            ExceptionHandling.SendLogToServer($"ERROR: smlouva {item} cannot analyze file for {p.url}, no result from parser.\n{output}", apiClient);
+                            continue;
+                        }
                         p_done.uniqueId = p.uniqueId;
                         hotovePrilohy.Add(p_done);
                         sw.Stop();
@@ -174,8 +181,8 @@ namespace BlurredPageMinion
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e, "ERROR: {smlouva}  cannot analyze file {url}.", item.smlouvaId, p.url);
-                    ExceptionHandling.SendLogToServer($"ERROR: smlouva {item} cannot analyze file for {p.url}. {e.ToString()}", apiClient);
+                    logger.LogError(e, "ERROR: {smlouva}  cannot analyze file {url}.\n{output}", item.smlouvaId, p.url, output);
+                    ExceptionHandling.SendLogToServer($"ERROR: smlouva {item} cannot analyze file for {p.url}.\n{output}\n{e.ToString()}", apiClient);
                     //System.IO.File.Copy(tmpPdf, tmpPdf + ".error", true);
                 }
                 finally

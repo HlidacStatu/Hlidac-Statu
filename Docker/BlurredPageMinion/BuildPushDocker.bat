@@ -12,9 +12,9 @@ goto :EOF
 
 :argumentError
   echo:
-  echo Usage: BuildPushDocker <version>
+  echo Usage: BuildPushDocker <version> [release]
   echo:
   echo    - build version
-  echo:
+  echo:   - with release parameter create latestRelease tag		
 
   goto :EOF

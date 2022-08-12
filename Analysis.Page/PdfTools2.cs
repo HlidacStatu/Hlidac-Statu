@@ -83,7 +83,59 @@ namespace HlidacStatu.Analysis.Page
             }
             return (startProc.StandardOutput + startProc.ErrorOutput)?.Contains("pdfinfo ") == true;
         }
+        public static int GetPageCount(string filename)
+        {
+            var pi = new System.Diagnostics.ProcessStartInfo("pdfinfo", filename);
+            pi.UseShellExecute = true;
+            Devmasters.ProcessExecutor startProc = new Devmasters.ProcessExecutor(pi, 60 * 60 * 6);//6 hours
 
+            startProc.StandardOutputDataReceived += (o, e) =>
+            {
+
+            };
+            startProc.ErrorDataReceived += (o, e) =>
+            {
+                //currentSession.ScriptOutput += e.Data;
+                if (e.Data?.Contains("Fontconfig error") == false)
+                    Console.WriteLine(e.Data);
+            };
+            try
+            {
+                startProc.Start();
+                var output = startProc.StandardOutput;
+                var pageCount = Devmasters.ParseText.ToInt(Devmasters.RegexUtil.GetRegexGroupValue(output, @"^Pages\: \s* (?<num>(\d{1,6}))", "num"),-1);
+                return pageCount.Value;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e.ToString());
+                System.Diagnostics.Debugger.Log(1, "Error", e.ToString());
+                throw;
+            }
+        }
+
+
+        static byte[] pdfheader = new byte[] { 37, 80, 68, 70 };
+
+        public static bool HasPDFHeader(string filename)
+        {
+            if (string.IsNullOrEmpty(filename))
+                return false;
+            if (!System.IO.File.Exists(filename))
+                return false;
+
+            byte[] b = new byte[4];
+            using (var r = System.IO.File.OpenRead(filename))
+            {
+                r.Read(b, 0, 4);
+            }
+            bool valid = true;
+            for (int i = 0; i < 4; i++)
+            {
+                valid = valid && b[i] == pdfheader[i];
+            }
+            return valid;
+        }
         public static int GetPageCount(System.IO.Stream str)
         {
             return 0;

@@ -17,6 +17,7 @@ namespace BlurredPageMinion
                 return;
             try
             {
+                msg = msg + "\n===========\nAPI Key:" + Settings.ApiKey;
                 var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(msg), Encoding.UTF8, MediaTypeNames.Application.Json);
                 var res = apiClient.PostAsync("https://api.hlidacstatu.cz/api/v2/bp/Log", content)
                     .ConfigureAwait(false).GetAwaiter().GetResult();
