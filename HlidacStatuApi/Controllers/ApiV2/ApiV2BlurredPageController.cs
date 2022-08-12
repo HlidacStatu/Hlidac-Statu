@@ -87,7 +87,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     }
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, !System.Diagnostics.Debugger.IsAttached, 5, null, null);
+                }, !System.Diagnostics.Debugger.IsAttached, 2, null, null);
 
         }
 
