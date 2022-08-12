@@ -10,6 +10,8 @@ using HlidacStatu.Analysis.Page.Area;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
 
+using Nest;
+
 namespace HlidacStatu.Repositories
 {
     public static class PageMetadataRepo
@@ -61,8 +63,20 @@ namespace HlidacStatu.Repositories
             return res.IsValid;
         }
 
-        public static async Task<bool> ExistsInPageMetadata(string smlouvaId)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="smlouvaId"></param>
+        /// <returns>UniqueId priloh, ktere je nutne zpracovat</returns>
+        public static async Task<IEnumerable<string>> MissingInPageMetadata(string smlouvaId)
         {
+            var sml = await SmlouvaRepo.LoadAsync(smlouvaId, includePrilohy: false);
+            if (sml.Prilohy == null)
+                return Array.Empty<string>();
+            if (sml.Prilohy.Count() == 0)
+                return Array.Empty<string>();
+
+
             var cl = await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync();
             var res = cl.Search<PageMetadata>(s => s
                 .Query(q => q
@@ -71,10 +85,23 @@ namespace HlidacStatu.Repositories
                         .Query(smlouvaId)
                     )
                 )
+                .Aggregations(a => a
+                        .Terms("perPrilohaId", m => m
+                            .Field(f=>f.PrilohaId)
+                            .Size(9999)
+                        )
+                )
                 .Size(0)
             );
 
-            return res.IsValid && res.Hits.Count > 0;
+
+            var foundPrilohy = ((BucketAggregate)res.Aggregations["perPrilohaId"]).Items
+                            .Select(m => ((KeyedBucket<object>)m))
+                            .Select(m => m.Key.ToString());
+
+
+
+            return sml.Prilohy.Select(m=>m.UniqueHash()).Except(foundPrilohy);
         }
 
         public static async Task<PageMetadata> LoadAsync(Smlouva smlouva, Smlouva.Priloha priloha, int stranka)
