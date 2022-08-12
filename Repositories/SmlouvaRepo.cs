@@ -486,7 +486,7 @@ namespace HlidacStatu.Repositories
             return AllIdsFromDB(null);
         }
 
-        public static IEnumerable<string> AllIdsFromDB(bool? deleted)
+        public static IEnumerable<string> AllIdsFromDB(bool? deleted, DateTime? from = null)
         {
             List<string> ids = null;
             using (DbEntities db = new DbEntities())
@@ -494,6 +494,8 @@ namespace HlidacStatu.Repositories
                 IQueryable<SmlouvyId> q = db.SmlouvyIds;
                 if (deleted.HasValue)
                     q = q.Where(m => m.Active == (deleted.Value ? 0 : 1));
+                if (from.HasValue)
+                    q = q.Where(m => m.Updated > from);
 
                 ids = q.Select(m => m.Id)
                     .ToList();
