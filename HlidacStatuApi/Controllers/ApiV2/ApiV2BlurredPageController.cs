@@ -1,5 +1,8 @@
 ﻿
 
+using System.Data;
+using System.Data.SqlClient;
+
 using Devmasters.Collections;
 
 using HlidacStatu.Entities;
@@ -35,8 +38,13 @@ namespace HlidacStatuApi.Controllers.ApiV2
         static readonly TimeSpan MAXDURATION_OF_TASK_IN_MIN = TimeSpan.FromHours(6);
 
         static object lockObj = new object();
+        static System.Timers.Timer updateQueueTimer = new System.Timers.Timer(TimeSpan.FromHours(1).TotalMilliseconds);
+        static DateTime lastAddedItemsToQueue = DateTime.MinValue;
         static ApiV2BlurredPageController()
         {
+            updateQueueTimer.AutoReset = false;
+            updateQueueTimer.Elapsed += UpdateQueueTimer_Elapsed;
+            lastAddedItemsToQueue = DateTime.Now;
             idsToProcess = new System.Collections.Concurrent.ConcurrentDictionary<string, processed>(
                 SmlouvaRepo.AllIdsFromDB()
                     .Distinct()
@@ -44,13 +52,62 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     .ShuffleMe()
                     .Select(m => new KeyValuePair<string, processed>(m, null))
                 );
+
+            new Thread(() =>
+            {
+                var countOnStart = idsToProcess.Count;
+                HlidacStatuApi.Code.Log.Logger.Info($"Clean queue thread started for {countOnStart} items");
+                CleanQueue(idsToProcess.Keys,
+                    k =>
+                    {
+                        if (idsToProcess.TryGetValue(k, out var val))
+                            return val == null;
+                        else
+                            return false;
+                    },
+                    k => { _ = idsToProcess.TryRemove(k, out _); }
+                    );
+                HlidacStatuApi.Code.Log.Logger.Info($"Clean queue thread done for {countOnStart} items, deleted {countOnStart - idsToProcess.Count}");
+            }).Start();
+            updateQueueTimer.Start();
+        }
+
+        private static void CleanQueue(IEnumerable<string> keysToClean, Func<string, bool> checkKeyAction, Action<string> removeAction)
+        {
+            //clean already processed smlouvy from the queue
+            string[] keys = keysToClean.ToArray();
+            Devmasters.Batch.ThreadManager.DoActionForAll(keys,
+                k =>
+                {
+                    if (checkKeyAction == null || checkKeyAction(k))
+                    {
+                        var miss = PageMetadataRepo.MissingInPageMetadata(k).Result;
+                        if (miss.Any() == false && removeAction != null)
+                            removeAction(k);
+                    }
+
+                    return new Devmasters.Batch.ActionOutputData();
+                }, !System.Diagnostics.Debugger.IsAttached, 5, null, null);
+
+        }
+
+        private static void UpdateQueueTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            
+            var newIds = SmlouvaRepo.AllIdsFromDB(deleted:null, from: lastAddedItemsToQueue).ToList();
+            lastAddedItemsToQueue = DateTime.Now;
+
+            CleanQueue(newIds, null, k => { _ = newIds.Remove(k); });
+            updateQueueTimer.Start();
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        [Authorize(Roles = "blurredAPIAccess")]
+        //[Authorize(Roles = "blurredAPIAccess")]
         [HttpGet("Get")]
         public async Task<ActionResult<BpGet>> Get()
         {
+            CheckRoleRecord(this.User.Identity.Name);
+
             string nextId = null;
             DateTime now = DateTime.Now;
 again:
@@ -68,27 +125,19 @@ again:
                     goto again;
             }
 
-            if (await PageMetadataRepo.ExistsInPageMetadata(nextId))
-            {
-                idsToProcess.Remove(nextId, out var dt);
-                goto again;
-            }
-
-            var sml = await SmlouvaRepo.LoadAsync(nextId, includePrilohy: false);
-            if (sml == null || sml?.Prilohy == null)
+            IEnumerable<string> prilohyToProcess = await PageMetadataRepo.MissingInPageMetadata(nextId);
+            if (prilohyToProcess.Count() == 0)
             {
                 idsToProcess.Remove(nextId, out var dt);
                 goto again;
             }
             var res = new BpGet();
             res.smlouvaId = nextId;
-            res.prilohy = sml.Prilohy
-                        .Where(p => p != null)
+            res.prilohy = prilohyToProcess
                         .Select(m => new BpGet.BpGPriloha()
                         {
-                            uniqueId = m.UniqueHash(),
-                            url = (HlidacStatu.Connectors.Init.PrilohaLocalCopy.ExistLocalCopyOfPriloha(sml, m) 
-                                        ? $"https://www.hlidacstatu.cz{m.GetUrl(nextId, true)}" : m.GetUrl(nextId, false))
+                            uniqueId = m,
+                            url = $"https://www.hlidacstatu.cz{Smlouva.Priloha.GetUrl(nextId, m, "", true)}"
                         }
                         )
                         .ToArray();
@@ -97,10 +146,12 @@ again:
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        [Authorize(Roles = "blurredAPIAccess")]
+        //[Authorize(Roles = "blurredAPIAccess")]
         [HttpPost("Save")]
         public async Task<ActionResult> Save([FromBody] BpSave data)
         {
+            CheckRoleRecord(this.User.Identity.Name);
+
             if (data.prilohy != null)
             {
                 int numOfPages = data.prilohy.Sum(m => m.pages.Count());
@@ -151,7 +202,7 @@ again:
             }
 
             _ = Interlocked.Increment(ref savedInThread);
-            
+
             _ = justInProcess.Remove(data.smlouvaId, out _);
 
             return StatusCode(200);
@@ -159,10 +210,12 @@ again:
 
 
         [ApiExplorerSettings(IgnoreApi = true)]
-        [Authorize(Roles = "blurredAPIAccess")]
+        //[Authorize(Roles = "blurredAPIAccess")]
         [HttpPost("Log")]
         public async Task<ActionResult> Log([FromBody] string log)
         {
+            CheckRoleRecord(this.User.Identity.Name);
+
             HlidacStatuApi.Code.Log.Logger.Error(
                 "{action} {from} {user} {ip} {message}",
                 "RemoteLog",
@@ -174,7 +227,32 @@ again:
             return StatusCode(200);
         }
 
+        private static void CheckRoleRecord(string username)
+        {
+            //check if user is in blurredAPIAccess roles
+            try
+            {
+                var found = HlidacStatu.Connectors.DirectDB.GetList<string, string>(
+                    "select u.Id, ur.UserId from AspNetUsers u left join AspNetUserRoles ur on u.id = ur.UserId and ur.RoleId='e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' where u.UserName = @username",
+                    System.Data.CommandType.Text, new IDataParameter[] { new SqlParameter("username", username) }
+                    );
+                if (found.Count() == 0)
+                    return;
+                if (found.Count() == 1 && found.First().Item2 == null)
+                {
+                    HlidacStatu.Connectors.DirectDB.NoResult(
+                        @"insert into AspNetUserRoles select  (select id from AspNetUsers where Email like @username) as userId,'e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' as roleId",
+                        System.Data.CommandType.Text, new IDataParameter[] { new SqlParameter("username", username) }
+                        );
+                }
 
+            }
+            catch (Exception e)
+            {
+                HlidacStatuApi.Code.Log.Logger.Error("cannot add {username} to the role blurredAPIAccess", e, username);
+            }
+
+        }
 
 
         private static async Task<bool> SaveData(BpSave data)
@@ -229,25 +307,38 @@ again:
                 var sml = await SmlouvaRepo.LoadAsync(data.smlouvaId);
                 foreach (var pril in sml.Prilohy)
                 {
-                    var blurredPages = pagesMD.Where(m => m.PrilohaId == pril.UniqueHash());
+                    IEnumerable<PageMetadata>? blurredPages = pagesMD.Where(m => m.PrilohaId == pril.UniqueHash());
 
-                    var pb = new Smlouva.Priloha.BlurredPagesStats();
-                    decimal wholeArea = (decimal)(blurredPages.Sum(m => m.Blurred.BlackenArea) + blurredPages.Sum(m => m.Blurred.TextArea));
-                    if (wholeArea == 0)
-                        pb.BlurredAreaPerc = 0;
+                    if (blurredPages.Any())
+                    {
+                        var pb = new Smlouva.Priloha.BlurredPagesStats();
+                        decimal wholeArea = (decimal)(blurredPages.Sum(m => m.Blurred.BlackenArea) + blurredPages.Sum(m => m.Blurred.TextArea));
+                        if (wholeArea == 0)
+                            pb.BlurredAreaPerc = 0;
+                        else
+                            pb.BlurredAreaPerc = (decimal)blurredPages.Sum(m => m.Blurred.BlackenArea)
+                                / (decimal)(blurredPages.Sum(m => m.Blurred.BlackenArea) + blurredPages.Sum(m => m.Blurred.TextArea));
+                        pb.NumOfBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.05m);
+                        pb.NumOfExtensivelyBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.2m);
+
+                        pb.ListOfExtensivelyBlurredPages = blurredPages
+                                .Where(m => m.Blurred.BlackenAreaRatio() >= 0.2m)
+                                .Select(m => m.PageNum)
+                                .ToArray();
+                        pb.Created = DateTime.Now;
+                        pril.BlurredPages = pb;
+                    }
                     else
-                        pb.BlurredAreaPerc = (decimal)blurredPages.Sum(m => m.Blurred.BlackenArea)
-                            / (decimal)(blurredPages.Sum(m => m.Blurred.BlackenArea) + blurredPages.Sum(m => m.Blurred.TextArea));
-                    pb.NumOfBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.05m);
-                    pb.NumOfExtensivelyBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.2m);
-
-                    pb.ListOfExtensivelyBlurredPages = blurredPages
-                            .Where(m => m.Blurred.BlackenAreaRatio() >= 0.2m)
-                            .Select(m => m.PageNum)
-                            .ToArray();
-
-                    pril.BlurredPages = pb;
-
+                    {
+                        if (pril.BlurredPages != null)
+                        {
+                            //keep
+                        }
+                        else
+                        {
+                            pril.BlurredPages = null;
+                        }
+                    }
                 }
                 _ = await SmlouvaRepo.SaveAsync(sml, updateLastUpdateValue: false, skipPrepareBeforeSave: true);
 
@@ -321,7 +412,7 @@ again:
                         email = k,
                         count = (decimal)v.Average(a => (now - a.Value.taken).TotalSeconds)
                     })
-                    .OrderByDescending(o=>o.count)
+                    .OrderByDescending(o => o.count)
                     .ToArray();
             savedInThread = Interlocked.Read(ref savedInThread);
 

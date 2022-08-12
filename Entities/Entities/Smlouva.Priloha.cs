@@ -24,6 +24,7 @@ namespace HlidacStatu.Entities
                 public int NumOfBlurredPages { get; set; }
                 public int NumOfExtensivelyBlurredPages { get; set; }
                 public int[] ListOfExtensivelyBlurredPages { get; set; }
+                public DateTime? Created { get; set; }
             }
 
             public KeyVal[] FileMetadata = new KeyVal[] { };
@@ -94,33 +95,47 @@ namespace HlidacStatu.Entities
 
                 //}
             }
-            public string GetUrl(string smlouvaId, bool local = true)
+
+            public static string GetUrl(string smlouvaId, string prilohaUniqueHash, string prilohaOdkaz, bool local = true)
             {
                 if (local)
                 {
 
-                    return LocalCopyUrl(smlouvaId, local: true);
+                    return LocalCopyUrl(smlouvaId, prilohaUniqueHash, local: true);
                 }
                 else
-                    return this.odkaz;
+                    return prilohaOdkaz;
+            }
+
+
+            public string GetUrl(string smlouvaId, bool local = true)
+            {
+                return GetUrl(smlouvaId, this.UniqueHash(), this.odkaz, local);
             }
             public string LocalCopyUrl(string smlouvaId, string identityName = null, string secret = null, bool local = true)
             {
+                return LocalCopyUrl(smlouvaId, this.UniqueHash(), secret, local);
+            }
+            public static string LocalCopyUrl(string smlouvaId, string prilohaUniqueHash, string identityName = null, string secret = null, bool local = true)
+            {
                 var url = (local ? "" : "https://www.hlidacstatu.cz")
-                    + $"/KopiePrilohy/{smlouvaId}?hash={this.UniqueHash()}";
+                    + $"/KopiePrilohy/{smlouvaId}?hash={prilohaUniqueHash}";
                 if (identityName != null)
-                    url = url + $"&secret={LimitedAccessSecret(identityName)}";
+                    url = url + $"&secret={LimitedAccessSecret(identityName, prilohaUniqueHash)}";
                 else if (secret != null)
                     url = url + $"&secret={secret}";
 
                 return url;
             }
-
             public string LimitedAccessSecret(string forEmail)
+            {
+                return LimitedAccessSecret(forEmail, this.UniqueHash());
+            }
+            public static string LimitedAccessSecret(string forEmail, string prilohaUniqueHash)
             {
                 if (string.IsNullOrEmpty(forEmail))
                     throw new ArgumentNullException("forEmail");
-                return Devmasters.Crypto.Hash.ComputeHashToHex(forEmail + hash + "__" + forEmail);
+                return Devmasters.Crypto.Hash.ComputeHashToHex(forEmail + prilohaUniqueHash + "__" + forEmail);
             }
         }
 
