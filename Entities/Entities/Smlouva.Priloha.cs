@@ -105,7 +105,6 @@ namespace HlidacStatu.Entities
                         case UriKind.RelativeOrAbsolute:
                         case UriKind.Absolute:
                             return "https://www.hlidacstatu.cz"+LocalCopyPath(smlouvaId, prilohaUniqueHash);
-                            break;
                         case UriKind.Relative:
                         default:
                             return LocalCopyPath(smlouvaId, prilohaUniqueHash);
