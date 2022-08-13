@@ -382,6 +382,7 @@ text zpravy: {txt}
                 catch (Exception e)
                 {
                     Util.Consts.Logger.Error(priloha.odkaz, e);
+                    return NotFound();
                 }
 
             }
