@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -408,6 +410,111 @@ namespace HlidacStatu.Repositories.Searching
             if (logOutputFunc != null)
                 logOutputFunc("Done");
         }
+
+        public static async Task<IEnumerable<T>> GetAllRecords<T>(ElasticClient sourceESClient, int maxDegreeOfParallelism,
+            string query = null, int batchSize = 100)
+            where T : class
+        {
+            var qs = new QueryContainerDescriptor<T>().MatchAll();
+            if (!string.IsNullOrEmpty(query))
+            {
+                qs = new QueryContainerDescriptor<T>()
+                    .QueryString(qq => qq
+                        .Query(query)
+                        .DefaultOperator(Operator.And)
+                    );
+            }
+
+
+            var scrollAllObservable = sourceESClient.ScrollAll<T>("4m", maxDegreeOfParallelism, sc => sc
+                .MaxDegreeOfParallelism(maxDegreeOfParallelism)
+                .Search(s => s
+                    .Size(batchSize)
+                    .Query(q => qs)
+                )
+            );
+
+            var waitHandle = new ManualResetEvent(false);
+
+            var allRecs = new ConcurrentBag<T>();
+
+            var scrollAllObserver = new ScrollAllObserver<T>(
+                onNext: response =>
+                {
+                    if (!response.SearchResponse.IsValid)
+                    {
+                        HlidacStatu.Util.Consts.Logger.Warning("Invalid response {response}", response.SearchResponse.DebugInformation);
+                    }
+
+                    foreach (var h in response.SearchResponse.Hits)
+                    {
+                        allRecs.Add(h.Source);
+                    }
+                },
+                onError: e => { HlidacStatu.Util.Consts.Logger.Error("Scroll error occured", e); },
+                onCompleted: () => waitHandle.Set()
+            );
+
+            var subscriber = scrollAllObservable.Subscribe(scrollAllObserver);
+            _ = waitHandle.WaitOne();
+            subscriber.Dispose();
+
+            return allRecs;
+        }
+
+
+        public static async Task<IEnumerable<string>> GetAllIds(ElasticClient sourceESClient,int maxDegreeOfParallelism, 
+            string query = null, int batchSize = 100)
+        {
+            var qs = new QueryContainerDescriptor<object>().MatchAll();
+            if (!string.IsNullOrEmpty(query))
+            {
+                qs = new QueryContainerDescriptor<object>()
+                    .QueryString(qq => qq
+                        .Query(query)
+                        .DefaultOperator(Operator.And)
+                    );
+            }
+
+
+            var scrollAllObservable = sourceESClient.ScrollAll<object>("4m", maxDegreeOfParallelism, sc => sc
+                .MaxDegreeOfParallelism(maxDegreeOfParallelism)
+                .Search(s => s
+                    .Size(batchSize)
+                    .Source(false)
+                    .Query(q=>qs)
+                )
+            );
+
+            var waitHandle = new ManualResetEvent(false);
+
+            var allIds = new ConcurrentBag<string>();
+
+            var scrollAllObserver = new ScrollAllObserver<object>(
+                onNext: response =>
+                {
+                    if (!response.SearchResponse.IsValid)
+                    {
+                        HlidacStatu.Util.Consts.Logger.Warning("Invalid response {response}", response.SearchResponse.DebugInformation);
+                    }
+
+                    var ids = response.SearchResponse.Hits.Select(h => h.Id);
+                    foreach (var id in ids)
+                    {
+                        allIds.Add(id);
+                    }
+                },
+                onError: e => { HlidacStatu.Util.Consts.Logger.Error("Scroll error occured",e); },
+                onCompleted: () => waitHandle.Set()
+            );
+
+            var subscriber = scrollAllObservable.Subscribe(scrollAllObserver);
+            _ = waitHandle.WaitOne();
+            subscriber.Dispose();
+
+            return allIds;
+        }
+
 
 
         public static QueryContainer GetRawQuery(string jsonQuery)

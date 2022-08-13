@@ -6,13 +6,13 @@
     ViewBag.Title = "Statistika BP serverů";
     ViewBag.SubTitle = "";
 
-    var stats = await Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Entities.BlurredPageStatistics>(
+    var stats = await Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Entities.BlurredPageAPIStatistics>(
         HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/bp/stats",
         timeout: TimeSpan.FromSeconds(10),
         headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
     );
 
-    var stats2 = await Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Entities.BlurredPageStatistics>(
+    var stats2 = await Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Entities.BlurredPageAPIStatistics>(
             HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/bp/stats2",
             timeout: TimeSpan.FromSeconds(10),
             headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }

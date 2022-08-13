@@ -102,6 +102,18 @@ namespace HlidacStatu.Repositories
             return sml.Prilohy.Where(m => foundPrilohy.Contains(m.UniqueHash()) == false);
         }
 
+        public static async Task<IEnumerable<PageMetadata>> GetDataForDocument(Smlouva smlouva, Smlouva.Priloha priloha)
+        {
+            return await GetDataForDocument(smlouva.Id, priloha.UniqueHash());
+        }
+        public static async Task<IEnumerable<PageMetadata>> GetDataForDocument(string smlouvaId, string prilohaUniqueId)
+        {
+            var cl = await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync();
+            var recs = await Searching.Tools.GetAllRecords<PageMetadata>(cl, 5, $"smlouvaId:{smlouvaId} AND prilohaId:{prilohaUniqueId}");
+
+            return recs;
+        }
+
         public static async Task<PageMetadata> LoadAsync(Smlouva smlouva, Smlouva.Priloha priloha, int stranka)
         {
             var id = PageMetadata.GetId(smlouva.Id, priloha?.UniqueHash(), stranka);

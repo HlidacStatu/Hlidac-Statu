@@ -318,21 +318,7 @@ again:
 
                     if (blurredPages.Any())
                     {
-                        var pb = new Smlouva.Priloha.BlurredPagesStats();
-                        decimal wholeArea = (decimal)(blurredPages.Sum(m => m.Blurred.BlackenArea) + blurredPages.Sum(m => m.Blurred.TextArea));
-                        if (wholeArea == 0)
-                            pb.BlurredAreaPerc = 0;
-                        else
-                            pb.BlurredAreaPerc = (decimal)blurredPages.Sum(m => m.Blurred.BlackenArea)
-                                / (decimal)(blurredPages.Sum(m => m.Blurred.BlackenArea) + blurredPages.Sum(m => m.Blurred.TextArea));
-                        pb.NumOfBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.05m);
-                        pb.NumOfExtensivelyBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.2m);
-
-                        pb.ListOfExtensivelyBlurredPages = blurredPages
-                                .Where(m => m.Blurred.BlackenAreaRatio() >= 0.2m)
-                                .Select(m => m.PageNum)
-                                .ToArray();
-                        pb.Created = DateTime.Now;
+                        var pb = new Smlouva.Priloha.BlurredPagesStats(blurredPages);
                         pril.BlurredPages = pb;
                     }
                     else
@@ -373,11 +359,11 @@ again:
         //[ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "blurredAPIAccess")]
         [HttpGet("Stats")]
-        public async Task<ActionResult<BlurredPageStatistics>> Stats()
+        public async Task<ActionResult<BlurredPageAPIStatistics>> Stats()
         {
             DateTime now = DateTime.Now;
             var inProcess = idsToProcess.Where(m => m.Value.taken != null);
-            var res = new BlurredPageStatistics()
+            var res = new BlurredPageAPIStatistics()
             {
                 total = idsToProcess.Count,
                 currTaken = inProcess.Count(),
@@ -389,7 +375,7 @@ again:
         //[ApiExplorerSettings(IgnoreApi = true)]
         [Authorize()]
         [HttpGet("Stats2")]
-        public async Task<ActionResult<BlurredPageStatistics>> Stats2()
+        public async Task<ActionResult<BlurredPageAPIStatistics>> Stats2()
         {
             if (!
                 (this.User?.IsInRole("Admin") == true || this.User?.Identity?.Name == "api@hlidacstatu.cz")
@@ -397,7 +383,7 @@ again:
                 return StatusCode(403);
 
             DateTime now = DateTime.Now;
-            var res = new BlurredPageStatistics()
+            var res = new BlurredPageAPIStatistics()
             {
                 total = idsToProcess.Count,
                 currTaken = justInProcess.Count(),
@@ -407,14 +393,14 @@ again:
             res.runningSaveThreads = Interlocked.Read(ref runningSaveThreads);
             res.savingPagesInThreads = Interlocked.Read(ref savingPagesInThreads);
             res.activeTasks = justInProcess
-                    .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new BlurredPageStatistics.perItemStat<long>() { email = k, count = v.Count() })
+                    .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new BlurredPageAPIStatistics.perItemStat<long>() { email = k, count = v.Count() })
                     .ToArray();
 
             res.longestTasks = justInProcess.OrderByDescending(o => (now - o.Value.taken.Value).TotalSeconds)
-                            .Select(m => new BlurredPageStatistics.perItemStat<decimal>() { email = m.Value.takenByUser, count = (decimal)(now - m.Value.taken.Value).TotalSeconds })
+                            .Select(m => new BlurredPageAPIStatistics.perItemStat<decimal>() { email = m.Value.takenByUser, count = (decimal)(now - m.Value.taken.Value).TotalSeconds })
                             .ToArray();
             res.avgTaskLegth = justInProcess
-                    .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new BlurredPageStatistics.perItemStat<decimal>()
+                    .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new BlurredPageAPIStatistics.perItemStat<decimal>()
                     {
                         email = k,
                         count = (decimal)v.Average(a => (now - a.Value.taken.Value).TotalSeconds)

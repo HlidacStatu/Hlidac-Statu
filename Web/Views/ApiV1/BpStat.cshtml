@@ -4,7 +4,7 @@
 @{
     /**/
 
-    var stats2T = Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Entities.BlurredPageStatistics>(
+    var stats2T = Devmasters.Net.HttpClient.Simple.GetAsync<HlidacStatu.Entities.BlurredPageAPIStatistics>(
             HlidacStatu.Web.Framework.Constants.ApiURL + $"api/v2/bp/stats2",
             timeout: TimeSpan.FromSeconds(10),
             headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
@@ -29,7 +29,7 @@
     var pagesCount = (await pagesCountT).Count;
     var pagesCountLast1d = (await pagesCountLast1dT).Count;
     var pagesCountLast7d = (await pagesCountLast7dT).Count;
-    HlidacStatu.Entities.BlurredPageStatistics stats2 = new HlidacStatu.Entities.BlurredPageStatistics();
+    HlidacStatu.Entities.BlurredPageAPIStatistics stats2 = new HlidacStatu.Entities.BlurredPageAPIStatistics();
     try
     {
     stats2 = await stats2T;

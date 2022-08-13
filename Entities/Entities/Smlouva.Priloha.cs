@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using HlidacStatu.Util;
 
@@ -20,10 +22,53 @@ namespace HlidacStatu.Entities
 
             public class BlurredPagesStats
             {
+                public BlurredPagesStats() { }
+                public BlurredPagesStats(IEnumerable<PageMetadata> blurredPages)
+                {
+                    if (blurredPages == null)
+                        throw new ArgumentNullException("blurredPages");
+
+                    if (blurredPages.Any())
+                    {
+                        decimal wholeArea = (decimal)(blurredPages.Sum(m => m.Blurred.BlackenArea) + blurredPages.Sum(m => m.Blurred.TextArea));
+                        if (wholeArea == 0)
+                            this.BlurredAreaPerc = 0;
+                        else
+                            this.BlurredAreaPerc = (decimal)blurredPages.Sum(m => m.Blurred.BlackenArea)
+                                / (decimal)(blurredPages.Sum(m => m.Blurred.BlackenArea) + blurredPages.Sum(m => m.Blurred.TextArea));
+                        this.NumOfBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.05m);
+                        this.NumOfExtensivelyBlurredPages = blurredPages.Count(m => m.Blurred.BlackenAreaRatio() >= 0.2m);
+
+                        this.ListOfExtensivelyBlurredPages = blurredPages
+                                .Where(m => m.Blurred.BlackenAreaRatio() >= 0.2m)
+                                .Select(m => m.PageNum)
+                                .ToArray();
+                        this.Created = DateTime.Now;
+                        int maxPageNum = blurredPages.Max(m => m.PageNum);
+                        bool skipedPages = false;
+                        if (blurredPages.Count() == 1 && maxPageNum > 1)
+                            skipedPages = true;
+
+                        if (blurredPages.Count() > 1)
+                            skipedPages = blurredPages
+                                            .Select(m => m.PageNum)
+                                            .OrderBy(o => o)
+                                            .Where((m, i) => m != i + 1)
+                                            .Any(); 
+
+                        this.AllPagesAnalyzed = (blurredPages.Count() == maxPageNum) && !skipedPages;
+                    }
+                    else
+                    {
+                        throw new System.ArgumentOutOfRangeException("blurredPages", "No data");
+                    }
+                }
+
                 public decimal BlurredAreaPerc { get; set; }
                 public int NumOfBlurredPages { get; set; }
                 public int NumOfExtensivelyBlurredPages { get; set; }
                 public int[] ListOfExtensivelyBlurredPages { get; set; }
+                public bool? AllPagesAnalyzed { get; set; } = null;
                 public DateTime? Created { get; set; }
             }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HlidacStatu.Entities
 {
-    public class BlurredPageStatistics
+    public class BlurredPageAPIStatistics
     {
         public long total { get; set; }
         public long currTaken { get; set; }
