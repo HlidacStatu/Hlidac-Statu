@@ -69,7 +69,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                                     .Select(priloha => new BpGet.BpGPriloha()
                                     {
                                         uniqueId = priloha.UniqueHash(),
-                                        url = priloha.GetUrl(k, false)
+                                        url = priloha.GetUrl(k, true)
                                     }
                                     )
                                     .ToArray()

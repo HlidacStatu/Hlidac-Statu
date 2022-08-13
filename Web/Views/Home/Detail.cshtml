@@ -305,7 +305,7 @@
                                 {
                                     if (this.User?.IsInRole("novinar") == true)
                                     {
-                                        <a href="@(priloha.LocalCopyUrl(Model.Id,this.User.Identity.Name))" data-link="kopie">(naše kopie)</a>
+                                        <a href="@(priloha.LocalCopyPath(Model.Id,this.User.Identity.Name))" data-link="kopie">(naše kopie)</a>
                                         <b>!Pozor, tato smlouva byla zneplatněna a tato příloha není veřejně dostupná!</b>
                                     }
                                     else
@@ -330,7 +330,7 @@
                                 @if (weHaveCopy)
                                 {
                                     @Html.Raw(";&nbsp;")
-                                    <a href="@(priloha.LocalCopyUrl(Model.Id))" data-link="kopie">(naše kopie)</a>
+                                    <a href="@(priloha.GetUrl(Model.Id, true, UriKind.Relative))" data-link="kopie">(naše kopie)</a>
                                 }
                                 @if (priloha.WordCount > 10)
                                 {

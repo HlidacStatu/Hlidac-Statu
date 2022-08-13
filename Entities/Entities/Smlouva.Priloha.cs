@@ -96,30 +96,38 @@ namespace HlidacStatu.Entities
                 //}
             }
 
-            public static string GetUrl(string smlouvaId, string prilohaUniqueHash, string prilohaOdkaz, bool local = true)
+            public static string GetUrl(string smlouvaId, string prilohaUniqueHash, string prilohaOdkaz, bool local = true, UriKind uriKind = UriKind.RelativeOrAbsolute)
             {
                 if (local)
                 {
-
-                    return LocalCopyUrl(smlouvaId, prilohaUniqueHash, local: true);
+                    switch (uriKind)
+                    {
+                        case UriKind.RelativeOrAbsolute:
+                        case UriKind.Absolute:
+                            return "https://www.hlidacstatu.cz"+LocalCopyPath(smlouvaId, prilohaUniqueHash);
+                            break;
+                        case UriKind.Relative:
+                        default:
+                            return LocalCopyPath(smlouvaId, prilohaUniqueHash);
+                    }
+                    
                 }
                 else
                     return prilohaOdkaz;
             }
 
 
-            public string GetUrl(string smlouvaId, bool local = true)
+            public string GetUrl(string smlouvaId, bool local = true, UriKind uriKind = UriKind.RelativeOrAbsolute)
             {
-                return GetUrl(smlouvaId, this.UniqueHash(), this.odkaz, local);
+                return GetUrl(smlouvaId, this.UniqueHash(), this.odkaz, local, uriKind);
             }
-            public string LocalCopyUrl(string smlouvaId, string identityName = null, string secret = null, bool local = true)
+            public string LocalCopyPath(string smlouvaId, string identityName = null, string secret = null)
             {
-                return LocalCopyUrl(smlouvaId, this.UniqueHash(), identityName, secret, local);
+                return LocalCopyPath(smlouvaId, this.UniqueHash(), identityName, secret);
             }
-            public static string LocalCopyUrl(string smlouvaId, string prilohaUniqueHash, string identityName = null, string secret = null, bool local = true)
+            public static string LocalCopyPath(string smlouvaId, string prilohaUniqueHash, string identityName = null, string secret = null)
             {
-                var url = (local ? "" : "https://www.hlidacstatu.cz")
-                    + $"/KopiePrilohy/{smlouvaId}?hash={prilohaUniqueHash}";
+                var url = $"/KopiePrilohy/{smlouvaId}?hash={prilohaUniqueHash}";
                 if (identityName != null)
                     url = url + $"&secret={LimitedAccessSecret(identityName, prilohaUniqueHash)}";
                 else if (secret != null)
