@@ -114,7 +114,7 @@ namespace HlidacStatu.Entities
             }
             public string LocalCopyUrl(string smlouvaId, string identityName = null, string secret = null, bool local = true)
             {
-                return LocalCopyUrl(smlouvaId, this.UniqueHash(), secret, local);
+                return LocalCopyUrl(smlouvaId, this.UniqueHash(), identityName, secret, local);
             }
             public static string LocalCopyUrl(string smlouvaId, string prilohaUniqueHash, string identityName = null, string secret = null, bool local = true)
             {
