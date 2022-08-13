@@ -10,6 +10,29 @@
             headers: new Dictionary<string, string> { { "Authorization", HlidacStatu.Web.Framework.Constants.ApiToken } }
         );
 
+    var indexRateUrl = $"http://10.10.100.169:9200/.monitoring-es-7-mb-{DateTime.UtcNow:yyyy.MM.dd}/_search?sort=timestamp:desc&filter_path=**.primaries&size=60&q=index_stats.index:hs-pagemetadata-02";
+    var indexRateEsJson = "";
+    decimal indexRate = -1;
+    try
+    {
+        indexRateEsJson= await Devmasters.Net.HttpClient.Simple.GetAsync(indexRateUrl);
+        var json = Newtonsoft.Json.Linq.JObject.Parse(indexRateEsJson);
+        int recCount = json["hits"]["hits"].Count()-1;
+        //json["hits"]["hits"].First()["_source"]["index_stats"]["primaries"]["indexing"]
+        long time1 = json["hits"]["hits"][0]["_source"]["index_stats"]["primaries"]["indexing"].Value<long>("index_time_in_millis"); //in sec
+        long time2 = json["hits"]["hits"][recCount]["_source"]["index_stats"]["primaries"]["indexing"].Value<long>("index_time_in_millis"); //in sec
+        decimal total1 = json["hits"]["hits"][0]["_source"]["index_stats"]["primaries"]["indexing"].Value<decimal>("index_total");
+        decimal total2 = json["hits"]["hits"][recCount]["_source"]["index_stats"]["primaries"]["indexing"].Value<decimal>("index_total");
+        long shards = json["hits"]["hits"][0]["_source"]["index_stats"]["shards"].Value<long>("primaries");
+        indexRate = (total1 - total2) / ((time1 - time2)/1000);
+        indexRate = indexRate / shards;
+
+    }
+    catch (Exception)
+    {
+    }
+
+
 
     var now = DateTime.Now;
 
@@ -102,6 +125,13 @@
                     <td>Počet smluv právě zpracovávaných</td>
                     <td class="number">@(RenderData.NiceNumber(stats2.currTaken))</td>
                 </tr>
+                @if (indexRate != -1)
+                {
+                    <tr>
+                        <td>Zápisy do DB</td>
+                        <td class="number">@Html.Raw(RenderData.NiceNumber(indexRate,true)) záznamů/sec</td>
+                    </tr>
+                }
                 <tr>
                     <td>Průměrná doba zpracování aktuálně zprácovávaných smluv</td>
                     <td class="number">@(RenderData.NiceNumber(stats2.longestTasks.Average(m=>m.count))) sec</td>
