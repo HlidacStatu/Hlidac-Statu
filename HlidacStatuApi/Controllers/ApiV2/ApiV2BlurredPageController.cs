@@ -137,7 +137,7 @@ again:
                         .Select(m => new BpGet.BpGPriloha()
                         {
                             uniqueId = m,
-                            url = $"https://www.hlidacstatu.cz{Smlouva.Priloha.GetUrl(nextId, m, "", true)}"
+                            url = $"https://www.hlidacstatu.cz{Smlouva.Priloha.GetUrl(nextId, m, "", false)}"
                         }
                         )
                         .ToArray();
