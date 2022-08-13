@@ -3,8 +3,6 @@
 using System.Data;
 using System.Data.SqlClient;
 
-using Devmasters.Collections;
-
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
@@ -25,7 +23,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
     {
         private class processed
         {
-            public DateTime taken { get; set; } = DateTime.MinValue;
+            public BpGet request { get; set; }
+            public DateTime? taken { get; set; } = null;
             public string takenByUser { get; set; } = null;
         }
         static System.Collections.Concurrent.ConcurrentDictionary<string, processed> idsToProcess = null;
@@ -45,31 +44,46 @@ namespace HlidacStatuApi.Controllers.ApiV2
             updateQueueTimer.AutoReset = false;
             updateQueueTimer.Elapsed += UpdateQueueTimer_Elapsed;
             lastAddedItemsToQueue = DateTime.Now;
-            idsToProcess = new System.Collections.Concurrent.ConcurrentDictionary<string, processed>(
-                SmlouvaRepo.AllIdsFromDB()
-                    .Distinct()
-                    .Where(m => !string.IsNullOrEmpty(m))
-                    .ShuffleMe()
-                    .Select(m => new KeyValuePair<string, processed>(m, null))
-                );
+            idsToProcess = new System.Collections.Concurrent.ConcurrentDictionary<string, processed>();
 
             new Thread(() =>
             {
+                var allIds = SmlouvaRepo.AllIdsFromDB()
+                    .Distinct()
+                    .Where(m => !string.IsNullOrEmpty(m));
+
                 var countOnStart = idsToProcess.Count;
-                HlidacStatuApi.Code.Log.Logger.Info($"Clean queue thread started for {countOnStart} items");
-                CleanQueue(idsToProcess.Keys,
-                    k =>
-                    {
-                        if (idsToProcess.TryGetValue(k, out var val))
-                            return val == null;
-                        else
-                            return false;
-                    },
-                    k => { _ = idsToProcess.TryRemove(k, out _); }
-                    );
-                HlidacStatuApi.Code.Log.Logger.Info($"Clean queue thread done for {countOnStart} items, deleted {countOnStart - idsToProcess.Count}");
+                HlidacStatuApi.Code.Log.Logger.Info($"Fill queue thread started for {countOnStart} items");
+
+                Devmasters.Batch.ThreadManager.DoActionForAll(allIds,
+                k =>
+                {
+                    var miss = PageMetadataRepo.MissingInPageMetadata(k).Result;
+                    if (miss.Any())
+                        _ = idsToProcess.TryAdd(k, new processed()
+                        {
+                            request = new BpGet()
+                            {
+                                smlouvaId = k,
+                                prilohy = miss
+                                    .Select(priloha => new BpGet.BpGPriloha()
+                                    {
+                                        uniqueId = priloha.UniqueHash(),
+                                        url = priloha.GetUrl(k, false)
+                                    }
+                                    )
+                                    .ToArray()
+                            }, taken=null, takenByUser=null
+                        });
+
+                    return new Devmasters.Batch.ActionOutputData();
+                }, !System.Diagnostics.Debugger.IsAttached, 2, null, null);
+
+                HlidacStatuApi.Code.Log.Logger.Info($"Fill queue thread done for {countOnStart} items, deleted {countOnStart - idsToProcess.Count}");
             }).Start();
-            updateQueueTimer.Start();
+
+
+            //updateQueueTimer.Start();
         }
 
         private static void CleanQueue(IEnumerable<string> keysToClean, Func<string, bool> checkKeyAction, Action<string> removeAction)
@@ -93,8 +107,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         private static void UpdateQueueTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
-            
-            var newIds = SmlouvaRepo.AllIdsFromDB(deleted:null, from: lastAddedItemsToQueue).ToList();
+
+            var newIds = SmlouvaRepo.AllIdsFromDB(deleted: null, from: lastAddedItemsToQueue).ToList();
             lastAddedItemsToQueue = DateTime.Now;
 
             CleanQueue(newIds, null, k => { _ = newIds.Remove(k); });
@@ -114,35 +128,24 @@ again:
             lock (lockObj)
             {
                 nextId = idsToProcess.FirstOrDefault(m =>
-                    m.Value == null
-                    || (m.Value != null && (now - m.Value.taken) > MAXDURATION_OF_TASK_IN_MIN)
+                    m.Value.takenByUser == null
+                    || (m.Value.taken != null && (now - m.Value.taken.Value) > MAXDURATION_OF_TASK_IN_MIN)
                 ).Key;
+
                 if (nextId == null)
                     return StatusCode(404);
                 else if (idsToProcess.ContainsKey(nextId))
-                    idsToProcess[nextId] = new processed() { taken = DateTime.Now, takenByUser = HttpContext.User?.Identity?.Name };
-                else
-                    goto again;
-            }
+                {
+                    idsToProcess[nextId].taken = DateTime.Now;
+                    idsToProcess[nextId].takenByUser = this.User?.Identity?.Name;
+                    var res = idsToProcess[nextId].request;
 
-            IEnumerable<string> prilohyToProcess = await PageMetadataRepo.MissingInPageMetadata(nextId);
-            if (prilohyToProcess.Count() == 0)
-            {
-                idsToProcess.Remove(nextId, out var dt);
-                goto again;
+                    _ = justInProcess.TryAdd(nextId, idsToProcess[nextId]);
+                    return res;
+                }
+                else
+                    return StatusCode(404);
             }
-            var res = new BpGet();
-            res.smlouvaId = nextId;
-            res.prilohy = prilohyToProcess
-                        .Select(m => new BpGet.BpGPriloha()
-                        {
-                            uniqueId = m,
-                            url = $"https://www.hlidacstatu.cz{Smlouva.Priloha.GetUrl(nextId, m, "", false)}"
-                        }
-                        )
-                        .ToArray();
-            _ = justInProcess.TryAdd(nextId, idsToProcess[nextId]);
-            return res;
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -369,12 +372,12 @@ again:
         public async Task<ActionResult<BlurredPageStatistics>> Stats()
         {
             DateTime now = DateTime.Now;
-            var inProcess = idsToProcess.Where(m => m.Value != null);
+            var inProcess = idsToProcess.Where(m => m.Value.taken != null);
             var res = new BlurredPageStatistics()
             {
                 total = idsToProcess.Count,
                 currTaken = inProcess.Count(),
-                totalFailed = inProcess.Count(m => (now - m.Value.taken) > MAXDURATION_OF_TASK_IN_MIN)
+                totalFailed = inProcess.Count(m => (now - m.Value.taken.Value) > MAXDURATION_OF_TASK_IN_MIN)
             };
 
             return res;
@@ -403,14 +406,14 @@ again:
                     .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new BlurredPageStatistics.perItemStat<long>() { email = k, count = v.Count() })
                     .ToArray();
 
-            res.longestTasks = justInProcess.OrderByDescending(o => (now - o.Value.taken).TotalSeconds)
-                            .Select(m => new BlurredPageStatistics.perItemStat<decimal>() { email = m.Value.takenByUser, count = (decimal)(now - m.Value.taken).TotalSeconds })
+            res.longestTasks = justInProcess.OrderByDescending(o => (now - o.Value.taken.Value).TotalSeconds)
+                            .Select(m => new BlurredPageStatistics.perItemStat<decimal>() { email = m.Value.takenByUser, count = (decimal)(now - m.Value.taken.Value).TotalSeconds })
                             .ToArray();
             res.avgTaskLegth = justInProcess
                     .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new BlurredPageStatistics.perItemStat<decimal>()
                     {
                         email = k,
-                        count = (decimal)v.Average(a => (now - a.Value.taken).TotalSeconds)
+                        count = (decimal)v.Average(a => (now - a.Value.taken.Value).TotalSeconds)
                     })
                     .OrderByDescending(o => o.count)
                     .ToArray();

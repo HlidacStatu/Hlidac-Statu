@@ -30,7 +30,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
 		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Microsoft.Extensions.ObjectPool" Version="6.0.7" />
+		<PackageReference Include="Microsoft.Extensions.ObjectPool" Version="6.0.8" />
 		<PackageReference Include="Microsoft.Net.Http.Headers" Version="2.2.8" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2">
 			<PrivateAssets>all</PrivateAssets>
@@ -41,8 +41,8 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="MimeMapping" Version="1.0.1.37" />
-		<PackageReference Include="NEST" Version="7.17.2" />
-		<PackageReference Include="Scriban" Version="5.4.6" />
+		<PackageReference Include="NEST" Version="7.17.4" />
+		<PackageReference Include="Scriban" Version="5.5.0" />
 		<PackageReference Include="System.ComponentModel.Composition" Version="6.0.0" />
 		<PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
 		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
