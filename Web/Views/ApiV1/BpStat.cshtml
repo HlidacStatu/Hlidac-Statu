@@ -60,6 +60,7 @@
 }
 
     <h2>Souhrny</h2>
+<p class="text-info">Od 13.8.2022 "plníme" frontu ke zpracování jiným způsobem, takže počet smluv čekajících na zpracování se bude v průběhu času měnit.</p>
     <div class="row">
         <div class="col-xs-12 col-md-6">
             <table class="table">
@@ -71,13 +72,15 @@
                     <td>Počet smluv čekajících na zpracování</td>
                     <td class="number">@(RenderData.ShortNiceNumber(stats2.total))</td>
                 </tr>
-                <tr>
+@*                <tr>
                     <td>Hrubý odhad celkový počet stránek ke zpracování</td>
                     <td class="number">@(RenderData.ShortNiceNumber(smluvCelkem*46m))</td>
                 </tr>
-                <tr>
+*@                <tr>
                     <td>Celkový počet zpracovaných stránek</td>
-                    <td class="number">@(RenderData.ShortNiceNumber(pagesCount)) (@((pagesCount/(smluvCelkem*46)).ToString("P2")))</td>
+                    <td class="number">@(RenderData.ShortNiceNumber(pagesCount)) 
+                        @*(@((pagesCount/(smluvCelkem*46)).ToString("P2")))*@
+                        </td>
                 </tr>
                 <tr>
                     <td>Celkový počet zpracovaných stránek za posledních 24 hod</td>
