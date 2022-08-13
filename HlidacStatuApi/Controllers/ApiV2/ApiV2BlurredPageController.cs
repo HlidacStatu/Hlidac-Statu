@@ -3,6 +3,8 @@
 using System.Data;
 using System.Data.SqlClient;
 
+using Devmasters.Collections;
+
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
@@ -48,12 +50,14 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
             new Thread(() =>
             {
+                HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread started loading Ids");
                 var allIds = SmlouvaRepo.AllIdsFromDB()
                     .Distinct()
-                    .Where(m => !string.IsNullOrEmpty(m));
+                    .Where(m => !string.IsNullOrEmpty(m))
+                    .ShuffleMe();
 
                 var countOnStart = idsToProcess.Count;
-                HlidacStatuApi.Code.Log.Logger.Info($"Fill queue thread started for {countOnStart} items");
+                HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread started for {countOnStart} items");
 
                 Devmasters.Batch.ThreadManager.DoActionForAll(allIds,
                 k =>
@@ -79,7 +83,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     return new Devmasters.Batch.ActionOutputData();
                 }, !System.Diagnostics.Debugger.IsAttached, 5, null, new Devmasters.Batch.ActionProgressWriter(0.1f, new Devmasters.Batch.LoggerWriter(HlidacStatuApi.Code.Log.Logger, Devmasters.Log.PriorityLevel.Information).ProgressWriter).Writer, prefix: "BPFillQueue ");
 
-                HlidacStatuApi.Code.Log.Logger.Info($"Fill queue thread done for {countOnStart} items, deleted {countOnStart - idsToProcess.Count}");
+                HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread done for {countOnStart} items, deleted {countOnStart - idsToProcess.Count}");
             }).Start();
 
 
