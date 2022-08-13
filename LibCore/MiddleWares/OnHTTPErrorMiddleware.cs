@@ -57,7 +57,8 @@ namespace HlidacStatu.LibCore.MiddleWares
                     }
                     else
                         httpContext.Items.Add(ItemKeyName, str);
-                    logger.Error("Unhadled exception OnHTTPErrorMidddleware.");
+
+                    logger.Error("Unhadled exception >500 {middleware} {path}?{query}\n" + httpContext.Items[ItemKeyName], "OnHTTPErrorMidddleware", httpContext.Request.Path, httpContext.Request.QueryString);
                 }
                 catch (Exception e)
                 {
