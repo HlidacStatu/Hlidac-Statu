@@ -75,8 +75,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
                 //    return new Devmasters.Batch.ActionOutputData();
                 //}, !System.Diagnostics.Debugger.IsAttached, 9, null, new Devmasters.Batch.ActionProgressWriter(0.1f, new Devmasters.Batch.LoggerWriter(Code.Log.Logger, Devmasters.Log.PriorityLevel.Information).ProgressWriter).Writer, prefix: "BPFillQueue ");
+                //HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread done for {countOnStart} items, added {addedToQ}");
 
-                HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread done for {countOnStart} items, added {addedToQ}");
+                HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread done");
             }).Start();
             
 
