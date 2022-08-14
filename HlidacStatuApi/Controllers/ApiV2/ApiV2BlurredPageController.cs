@@ -48,6 +48,10 @@ namespace HlidacStatuApi.Controllers.ApiV2
             lastAddedItemsToQueue = DateTime.Now.AddDays(-4);
             idsToProcess = new System.Collections.Concurrent.ConcurrentDictionary<string, processed>();
 
+            UpdateQueueTimer_Elapsed(null, null);
+
+
+            /*
             new Thread(() =>
             {
                 HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread started loading Ids");
@@ -72,7 +76,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
                 HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread done for {countOnStart} items, added {addedToQ}");
             }).Start();
-
+            */
 
             updateQueueTimer.Start();
         }
