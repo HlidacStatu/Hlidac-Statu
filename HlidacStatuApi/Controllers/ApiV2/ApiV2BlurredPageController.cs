@@ -48,35 +48,37 @@ namespace HlidacStatuApi.Controllers.ApiV2
             lastAddedItemsToQueue = DateTime.Now.AddDays(-4);
             idsToProcess = new System.Collections.Concurrent.ConcurrentDictionary<string, processed>();
 
-            UpdateQueueTimer_Elapsed(null, null);
 
 
-            /*
+            
             new Thread(() =>
             {
                 HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread started loading Ids");
-                var allIds = HlidacStatu.Repositories.Searching.Tools
-                    .GetAllIdsAsync(HlidacStatu.Repositories.ES.Manager.GetESClientAsync().Result,10, "NOT(_exists_:prilohy.blurredPages)")
-                    .ConfigureAwait(false).GetAwaiter().GetResult()
-                    .Distinct<string>()
-                    .Where(m => !string.IsNullOrEmpty(m))
-                    .ShuffleMe();
 
-                var countOnStart = idsToProcess.Count;
-                HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread started for {countOnStart} items");
-                int addedToQ = 0;
-                Devmasters.Batch.ThreadManager.DoActionForAll(allIds,
-                id =>
-                {
-                    if (AddSmlouvaToQueue(id))
-                        addedToQ++;
+                UpdateQueueTimer_Elapsed(null, null);
 
-                    return new Devmasters.Batch.ActionOutputData();
-                }, !System.Diagnostics.Debugger.IsAttached, 9, null, new Devmasters.Batch.ActionProgressWriter(0.1f, new Devmasters.Batch.LoggerWriter(Code.Log.Logger, Devmasters.Log.PriorityLevel.Information).ProgressWriter).Writer, prefix: "BPFillQueue ");
+                //var allIds = HlidacStatu.Repositories.Searching.Tools
+                //    .GetAllIdsAsync(HlidacStatu.Repositories.ES.Manager.GetESClientAsync().Result,10, "NOT(_exists_:prilohy.blurredPages)")
+                //    .ConfigureAwait(false).GetAwaiter().GetResult()
+                //    .Distinct<string>()
+                //    .Where(m => !string.IsNullOrEmpty(m))
+                //    .ShuffleMe();
+
+                //var countOnStart = idsToProcess.Count;
+                //HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread started for {countOnStart} items");
+                //int addedToQ = 0;
+                //Devmasters.Batch.ThreadManager.DoActionForAll(allIds,
+                //id =>
+                //{
+                //    if (AddSmlouvaToQueue(id))
+                //        addedToQ++;
+
+                //    return new Devmasters.Batch.ActionOutputData();
+                //}, !System.Diagnostics.Debugger.IsAttached, 9, null, new Devmasters.Batch.ActionProgressWriter(0.1f, new Devmasters.Batch.LoggerWriter(Code.Log.Logger, Devmasters.Log.PriorityLevel.Information).ProgressWriter).Writer, prefix: "BPFillQueue ");
 
                 HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread done for {countOnStart} items, added {addedToQ}");
             }).Start();
-            */
+            
 
             updateQueueTimer.Start();
         }
