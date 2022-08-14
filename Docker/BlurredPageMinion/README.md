@@ -4,6 +4,8 @@ Klient pro analýzu obsahu jednotlivých stránek, identifikaci začerněných o
 
 ## Release notes
 
+- 1.3.3 *(12.8.2022)* - podrobnejsi logovani pri problemech s analyzou stranek.
+
 - 1.3.2 *(4.8.2022)* - v případě problémů s parsováním PDF či jeho stáhnutím nám docker instance pošle Error log.
 
 - 1.3.1 *(1.8.2022)* - do logu vypisuje základní statistiku analýzy stránek.
@@ -24,15 +26,13 @@ Klient pro analýzu obsahu jednotlivých stránek, identifikaci začerněných o
 3) BlurredPageMinion vyžaduje min 200MB RAM, obvykle potřebuje kolem 600-800 MB RAM.
 Analýza stránek je CPU náročná, doporučujeme instanci povolit alespoň 2 CPU (či 2 vCPU ve Swarm). Je vyžadován Intel/AMD 64bit CPU. ARM balíček v tuto chvíli není k dispozici.
 
-4) *varianta a)* V tuto chvíli (srpen 2022) v rámci testovacího provozu omezujeme množství běžících BlurredPageMinion instancí. 
-Pokud již máte API key, napište žádost o povolení přístupu k API BlurredPageMinion na podpora@hlidacstatu.cz (do předmětu emailu uveďte **BlurredPageMinion** a do těla emailu email, pod kterým jste získali API key)
+~~4) *varianta a)* V tuto chvíli (srpen 2022) v rámci testovacího provozu omezujeme množství běžících BlurredPageMinion instancí.~~ 
+~~Pokud již máte API key, napište žádost o povolení přístupu k API BlurredPageMinion na podpora@hlidacstatu.cz (do předmětu emailu uveďte **BlurredPageMinion** a do těla emailu email, pod kterým jste získali API key)~~
+~~> *varianta b)* Variantně nám můžete napsat **Direct message** na twitter účet Hlídače státu (https://twitter.com/hlidacstatu)~~
 
-> *varianta b)* Variantně nám můžete napsat **Direct message** na twitter účet Hlídače státu (https://twitter.com/hlidacstatu)
+4) Pak už stačí jen spustit docker instanci. **Prosím, pokud se nedohodneme jinak, pusťte maximálně 10 instancí BlurredPageMinion** Díky.
 
-
-5) Pak už stačí jen spustit docker instanci. **Prosím, pokud se nedohodneme jinak, pusťte maximálně 10 instancí BlurredPageMinion** Díky.
-
-Příkaz úro procesory Intel/Amd:
+Příkaz pro procesory Intel/Amd:
 ```  sh
 docker run --name blurredpageminion -d -e apikey={váš_apikey} hlidacstatu/blurred_page_minion:latestRelease  
 ```
