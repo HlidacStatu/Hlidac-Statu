@@ -85,24 +85,28 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 if (sml.Prilohy != null)
                 {
                     var toProcess = sml.Prilohy.Where(p => p.nazevSouboru.ToLower().EndsWith(".pdf") && p.BlurredPages == null);
-                    _ = idsToProcess.TryAdd(id, new processed()
+                    if (toProcess.Any())
                     {
-                        request = new BpGet()
+                        _ = idsToProcess.TryAdd(id, new processed()
                         {
-                            smlouvaId = id,
-                            prilohy = toProcess
-                                .Select(priloha => new BpGet.BpGPriloha()
-                                {
-                                    uniqueId = priloha.UniqueHash(),
-                                    url = priloha.GetUrl(id, false)
-                                }
-                                )
-                                .ToArray()
-                        },
-                        taken = null,
-                        takenByUser = null
-                    });
-                    return true;
+                            request = new BpGet()
+                            {
+                                smlouvaId = id,
+                                prilohy = toProcess
+                                    .Select(priloha => new BpGet.BpGPriloha()
+                                    {
+                                        uniqueId = priloha.UniqueHash(),
+                                        url = priloha.GetUrl(id, false)
+                                    }
+                                    )
+                                    .ToArray()
+                            },
+                            taken = null,
+                            takenByUser = null
+                        });
+
+                        return true;
+                    }
                 }
             }
             return false;
