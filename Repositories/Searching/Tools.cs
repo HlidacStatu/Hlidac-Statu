@@ -411,7 +411,7 @@ namespace HlidacStatu.Repositories.Searching
                 logOutputFunc("Done");
         }
 
-        public static async Task<IEnumerable<T>> GetAllRecords<T>(ElasticClient sourceESClient, int maxDegreeOfParallelism,
+        public static async Task<IEnumerable<T>> GetAllRecordsAsync<T>(ElasticClient sourceESClient, int maxDegreeOfParallelism,
             string query = null, int batchSize = 100)
             where T : class
         {
@@ -463,7 +463,7 @@ namespace HlidacStatu.Repositories.Searching
         }
 
 
-        public static async Task<IEnumerable<string>> GetAllIds(ElasticClient sourceESClient,int maxDegreeOfParallelism, 
+        public static async Task<IEnumerable<string>> GetAllIdsAsync(ElasticClient sourceESClient,int maxDegreeOfParallelism, 
             string query = null, int batchSize = 100)
         {
             var qs = new QueryContainerDescriptor<object>().MatchAll();

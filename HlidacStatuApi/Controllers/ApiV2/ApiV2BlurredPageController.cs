@@ -45,77 +45,89 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             updateQueueTimer.AutoReset = false;
             updateQueueTimer.Elapsed += UpdateQueueTimer_Elapsed;
-            lastAddedItemsToQueue = DateTime.Now;
+            lastAddedItemsToQueue = DateTime.Now.AddDays(-4);
             idsToProcess = new System.Collections.Concurrent.ConcurrentDictionary<string, processed>();
 
             new Thread(() =>
             {
                 HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread started loading Ids");
-                var allIds = SmlouvaRepo.AllIdsFromDB()
-                    .Distinct()
+                var allIds = HlidacStatu.Repositories.Searching.Tools
+                    .GetAllIdsAsync(HlidacStatu.Repositories.ES.Manager.GetESClientAsync().Result,10, "NOT(_exists_:prilohy.blurredPages)")
+                    .ConfigureAwait(false).GetAwaiter().GetResult()
+                    .Distinct<string>()
                     .Where(m => !string.IsNullOrEmpty(m))
                     .ShuffleMe();
 
                 var countOnStart = idsToProcess.Count;
                 HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread started for {countOnStart} items");
-
+                int addedToQ = 0;
                 Devmasters.Batch.ThreadManager.DoActionForAll(allIds,
-                k =>
+                id =>
                 {
-                    var miss = PageMetadataRepo.MissingInPageMetadata(k).Result;
-                    if (miss.Any())
-                        _ = idsToProcess.TryAdd(k, new processed()
-                        {
-                            request = new BpGet()
-                            {
-                                smlouvaId = k,
-                                prilohy = miss
-                                    .Select(priloha => new BpGet.BpGPriloha()
-                                    {
-                                        uniqueId = priloha.UniqueHash(),
-                                        url = priloha.GetUrl(k, true)
-                                    }
-                                    )
-                                    .ToArray()
-                            }, taken=null, takenByUser=null
-                        });
+                    if (AddSmlouvaToQueue(id))
+                        addedToQ++;
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, !System.Diagnostics.Debugger.IsAttached, 9, null, new Devmasters.Batch.ActionProgressWriter(0.1f, new Devmasters.Batch.LoggerWriter(HlidacStatuApi.Code.Log.Logger, Devmasters.Log.PriorityLevel.Information).ProgressWriter).Writer, prefix: "BPFillQueue ");
+                }, !System.Diagnostics.Debugger.IsAttached, 9, null, new Devmasters.Batch.ActionProgressWriter(0.1f, new Devmasters.Batch.LoggerWriter(Code.Log.Logger, Devmasters.Log.PriorityLevel.Information).ProgressWriter).Writer, prefix: "BPFillQueue ");
 
-                HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread done for {countOnStart} items, deleted {countOnStart - idsToProcess.Count}");
+                HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread done for {countOnStart} items, added {addedToQ}");
             }).Start();
 
 
-            //updateQueueTimer.Start();
+            updateQueueTimer.Start();
         }
 
-        private static void CleanQueue(IEnumerable<string> keysToClean, Func<string, bool> checkKeyAction, Action<string> removeAction)
+        private static bool AddSmlouvaToQueue(string id)
         {
-            //clean already processed smlouvy from the queue
-            string[] keys = keysToClean.ToArray();
-            Devmasters.Batch.ThreadManager.DoActionForAll(keys,
-                k =>
+            var sml = SmlouvaRepo.LoadAsync(id, includePrilohy: false).Result;
+            if (sml != null)
+            {
+                if (sml.Prilohy != null)
                 {
-                    if (checkKeyAction == null || checkKeyAction(k))
+                    var toProcess = sml.Prilohy.Where(p => p.nazevSouboru.ToLower().EndsWith(".pdf") && p.BlurredPages == null);
+                    _ = idsToProcess.TryAdd(id, new processed()
                     {
-                        var miss = PageMetadataRepo.MissingInPageMetadata(k).Result;
-                        if (miss.Any() == false && removeAction != null)
-                            removeAction(k);
-                    }
-
-                    return new Devmasters.Batch.ActionOutputData();
-                }, !System.Diagnostics.Debugger.IsAttached, 2, null, null);
-
+                        request = new BpGet()
+                        {
+                            smlouvaId = id,
+                            prilohy = toProcess
+                                .Select(priloha => new BpGet.BpGPriloha()
+                                {
+                                    uniqueId = priloha.UniqueHash(),
+                                    url = priloha.GetUrl(id, false)
+                                }
+                                )
+                                .ToArray()
+                        },
+                        taken = null,
+                        takenByUser = null
+                    });
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static void UpdateQueueTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
 
+            HlidacStatuApi.Code.Log.Logger.Info($"BP Queue UpdateQueueTimer_Elapsed started");
             var newIds = SmlouvaRepo.AllIdsFromDB(deleted: null, from: lastAddedItemsToQueue).ToList();
             lastAddedItemsToQueue = DateTime.Now;
+            HlidacStatuApi.Code.Log.Logger.Info($"BP Queue UpdateQueueTimer_Elapsed analyzing for {newIds?.Count ?? 0} items");
 
-            CleanQueue(newIds, null, k => { _ = newIds.Remove(k); });
+            int addedToQ = 0;
+            Devmasters.Batch.ThreadManager.DoActionForAll(newIds,
+            id =>
+            {
+                if (AddSmlouvaToQueue(id))
+                    addedToQ++;
+                return new Devmasters.Batch.ActionOutputData();
+            }, !System.Diagnostics.Debugger.IsAttached, 5, null, new Devmasters.Batch.ActionProgressWriter(1f, new Devmasters.Batch.LoggerWriter(Code.Log.Logger, Devmasters.Log.PriorityLevel.Information).ProgressWriter).Writer, prefix: "BPUpdateQueue ");
+
+            HlidacStatuApi.Code.Log.Logger.Info($"BP Queue UpdateQueueTimer_Elapsed done for {newIds?.Count ?? 0} items, added {addedToQ}");
+
+
             updateQueueTimer.Start();
         }
 

@@ -109,7 +109,7 @@ namespace HlidacStatu.Repositories
         public static async Task<IEnumerable<PageMetadata>> GetDataForDocument(string smlouvaId, string prilohaUniqueId)
         {
             var cl = await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync();
-            var recs = await Searching.Tools.GetAllRecords<PageMetadata>(cl, 5, $"smlouvaId:{smlouvaId} AND prilohaId:{prilohaUniqueId}");
+            var recs = await Searching.Tools.GetAllRecordsAsync<PageMetadata>(cl, 5, $"smlouvaId:{smlouvaId} AND prilohaId:{prilohaUniqueId}");
 
             return recs;
         }
