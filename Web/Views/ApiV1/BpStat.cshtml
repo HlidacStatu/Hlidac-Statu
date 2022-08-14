@@ -15,16 +15,16 @@
     decimal indexRate = -1;
     try
     {
-        indexRateEsJson= await Devmasters.Net.HttpClient.Simple.GetAsync(indexRateUrl);
+        indexRateEsJson = await Devmasters.Net.HttpClient.Simple.GetAsync(indexRateUrl);
         var json = Newtonsoft.Json.Linq.JObject.Parse(indexRateEsJson);
-        int recCount = json["hits"]["hits"].Count()-1;
+        int recCount = json["hits"]["hits"].Count() - 1;
         //json["hits"]["hits"].First()["_source"]["index_stats"]["primaries"]["indexing"]
         long time1 = json["hits"]["hits"][0]["_source"]["index_stats"]["primaries"]["indexing"].Value<long>("index_time_in_millis"); //in sec
         long time2 = json["hits"]["hits"][recCount]["_source"]["index_stats"]["primaries"]["indexing"].Value<long>("index_time_in_millis"); //in sec
         decimal total1 = json["hits"]["hits"][0]["_source"]["index_stats"]["primaries"]["indexing"].Value<decimal>("index_total");
         decimal total2 = json["hits"]["hits"][recCount]["_source"]["index_stats"]["primaries"]["indexing"].Value<decimal>("index_total");
         long shards = json["hits"]["hits"][0]["_source"]["index_stats"]["shards"].Value<long>("primaries");
-        indexRate = (total1 - total2) / ((time1 - time2)/1000);
+        indexRate = (total1 - total2) / ((time1 - time2) / 1000);
         indexRate = indexRate / shards;
 
     }
@@ -38,12 +38,12 @@
 
     var pagesCountLast7dT = (await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync())
                             .CountAsync<HlidacStatu.Entities.PageMetadata>(q => q
-                                .Query(qs=>qs.QueryString(q=>q.Query($"blurred.created:"+HlidacStatu.Repositories.Searching.Tools.ToElasticDateInterval(now.AddDays(-7),now) ))
+                                .Query(qs => qs.QueryString(q => q.Query($"blurred.created:" + HlidacStatu.Repositories.Searching.Tools.ToElasticDateInterval(now.AddDays(-7), now)))
                                 )
                             );
     var pagesCountLast1dT = (await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync())
                             .CountAsync<HlidacStatu.Entities.PageMetadata>(q => q
-                                .Query(qs=>qs.QueryString(q=>q.Query($"blurred.created:"+HlidacStatu.Repositories.Searching.Tools.ToElasticDateInterval(now.AddDays(-1),now) ))
+                                .Query(qs => qs.QueryString(q => q.Query($"blurred.created:" + HlidacStatu.Repositories.Searching.Tools.ToElasticDateInterval(now.AddDays(-1), now)))
                                 )
                             );
     var pagesCountT = (await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync())
@@ -55,16 +55,16 @@
     HlidacStatu.Entities.BlurredPageAPIStatistics stats2 = new HlidacStatu.Entities.BlurredPageAPIStatistics();
     try
     {
-    stats2 = await stats2T;
+        stats2 = await stats2T;
     }
-    catch (Exception ){}
+    catch (Exception) { }
 
 
-    var smluvCelkem =(decimal)(HlidacStatu.Repositories.StaticData.BasicStatisticData.Get()[0] + HlidacStatu.Repositories.StaticData.BasicStatisticData.Get()[1]);
+    var smluvCelkem = (decimal)(HlidacStatu.Repositories.StaticData.BasicStatisticData.Get()[0] + HlidacStatu.Repositories.StaticData.BasicStatisticData.Get()[1]);
     ViewBag.Title = "Statistika analýzy začerněných stránek smluv";
     ViewBag.SubTitle = "";
 
-    
+
 
 }
 @section scripts
@@ -83,59 +83,68 @@
 }
 
     <h2>Souhrny</h2>
-<p class="text-info">Od 13.8.2022 "plníme" frontu ke zpracování jiným způsobem, takže počet smluv čekajících na zpracování se bude v průběhu času měnit.</p>
+    <p class="text-info">Od 13.8.2022 "plníme" frontu ke zpracování jiným způsobem, takže počet smluv čekajících na zpracování se bude v průběhu času měnit.</p>
     <div class="row">
         <div class="col-xs-12 col-md-6">
             <table class="table">
                 <tr>
                     <td>Celkový počet smluv</td>
                     <td class="number">@(RenderData.ShortNiceNumber(smluvCelkem))</td>
-                </tr>
+            </tr>
+            <tr>
+                <td>Počet smluv čekajících na zpracování</td>
+                <td class="number">@(RenderData.ShortNiceNumber(stats2.total))</td>
+            </tr>
+            @*                <tr>
+            <td>Hrubý odhad celkový počet stránek ke zpracování</td>
+            <td class="number">@(RenderData.ShortNiceNumber(smluvCelkem*46m))</td>
+            </tr>
+            *@
+            <tr>
+                <td>Celkový počet zpracovaných stránek</td>
+                <td class="number">
+                    @(RenderData.ShortNiceNumber(pagesCount))
+                    @*(@((pagesCount/(smluvCelkem*46)).ToString("P2")))*@
+                </td>
+            </tr>
+            <tr>
+                <td>Celkový počet zpracovaných stránek za posledních 24 hod</td>
+                <td class="number">@(RenderData.ShortNiceNumber(pagesCountLast1d))</td>
+            </tr>
+            <tr>
+                <td>Celkový počet zpracovaných stránek za posledních 7 dní</td>
+                <td class="number">@(RenderData.ShortNiceNumber(pagesCountLast7d))</td>
+            </tr>
+            <tr>
+                <td>Počet dobrovolníků v tuto chvíli poskytujících výpočetní výkon </td>
+                <td class="number">@(RenderData.NiceNumber(stats2.avgTaskLegth.Count())) Díky <i class="fa-solid fa-heart" style="color:red"></i></td>
+            </tr>
+            <tr>
+                <td>Počet zaregistrovaných dobrovolníků</td>
+                <td class="number">@(RenderData.NiceNumber(HlidacStatu.Connectors.DirectDB.GetList<int>("select count(*) from AspNetUserRoles ur inner join AspNetUsers u on u.id = ur.UserId where ur.RoleId='e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8'").First())) Díky <i class="fa-solid fa-heart" style="color:red"></i></td>
+            </tr>
+            <tr>
+                <td>Počet smluv právě zpracovávaných</td>
+                <td class="number">@(RenderData.NiceNumber(stats2.currTaken))</td>
+            </tr>
+            @if (indexRate != -1)
+            {
                 <tr>
-                    <td>Počet smluv čekajících na zpracování</td>
-                    <td class="number">@(RenderData.ShortNiceNumber(stats2.total))</td>
+                    <td>Zápisy do DB</td>
+                    <td class="number">@Html.Raw(RenderData.NiceNumber(indexRate,true)) záznamů/sec</td>
                 </tr>
-@*                <tr>
-                    <td>Hrubý odhad celkový počet stránek ke zpracování</td>
-                    <td class="number">@(RenderData.ShortNiceNumber(smluvCelkem*46m))</td>
-                </tr>
-*@                <tr>
-                    <td>Celkový počet zpracovaných stránek</td>
-                    <td class="number">@(RenderData.ShortNiceNumber(pagesCount)) 
-                        @*(@((pagesCount/(smluvCelkem*46)).ToString("P2")))*@
-                        </td>
-                </tr>
-                <tr>
-                    <td>Celkový počet zpracovaných stránek za posledních 24 hod</td>
-                    <td class="number">@(RenderData.ShortNiceNumber(pagesCountLast1d))</td>
-                </tr>
-                <tr>
-                    <td>Celkový počet zpracovaných stránek za posledních 7 dní</td>
-                    <td class="number">@(RenderData.ShortNiceNumber(pagesCountLast7d))</td>
-                </tr>
-                <tr>
-                    <td>Počet dobrovolníků v tuto chvíli poskytujících výpočetní výkon </td>
-                    <td class="number">@(RenderData.NiceNumber(stats2.avgTaskLegth.Count())) Díky <i class="fa-solid fa-heart" style="color:red"></i></td>
-                </tr>
-                <tr>
-                    <td>Počet zaregistrovaných dobrovolníků</td>
-                    <td class="number">@(RenderData.NiceNumber( HlidacStatu.Connectors.DirectDB.GetList<int>("select count(*) from AspNetUserRoles ur inner join AspNetUsers u on u.id = ur.UserId where ur.RoleId='e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8'").First() )) Díky <i class="fa-solid fa-heart" style="color:red"></i></td>
-                </tr>
-                <tr>
-                    <td>Počet smluv právě zpracovávaných</td>
-                    <td class="number">@(RenderData.NiceNumber(stats2.currTaken))</td>
-                </tr>
-                @if (indexRate != -1)
-                {
-                    <tr>
-                        <td>Zápisy do DB</td>
-                        <td class="number">@Html.Raw(RenderData.NiceNumber(indexRate,true)) záznamů/sec</td>
-                    </tr>
-                }
+            }
+            @if (stats2.longestTasks.Count() > 0)
+            {
                 <tr>
                     <td>Průměrná doba zpracování aktuálně zprácovávaných smluv</td>
-                    <td class="number">@(RenderData.NiceNumber(stats2.longestTasks.Average(m=>m.count))) sec</td>
+                    <td class="number">
+                        @(
+                            RenderData.NiceNumber(stats2.longestTasks.Average(m => m.count))
+                            ) sec
+                    </td>
                 </tr>
-            </table>
-        </div>
+            }
+        </table>
     </div>
+</div>
