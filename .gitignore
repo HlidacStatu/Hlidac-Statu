@@ -389,3 +389,5 @@ appsettings.*.json
 #allow binaries for blurred pages
 !Analysis.Page.Cmd/linux-x64/**
 !Analysis.Page.Cmd/win-x64/**
+
+VolbyDownloader/appsettings.json

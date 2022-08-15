@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Serialization;
 
 namespace HlidacStatu.Entities;
@@ -6,6 +7,7 @@ namespace HlidacStatu.Entities;
 public class AdresaOvm
 {
     [XmlElement(ElementName = "AdresniBod")]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public int Id { get; set; }
 
     [XmlElement(ElementName = "UliceNazev")]
