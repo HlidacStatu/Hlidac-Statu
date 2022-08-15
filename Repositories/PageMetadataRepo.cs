@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,6 +13,8 @@ using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
 
 using Nest;
+
+using static HlidacStatu.Repositories.Searching.Tools;
 
 namespace HlidacStatu.Repositories
 {
@@ -102,14 +106,15 @@ namespace HlidacStatu.Repositories
             return sml.Prilohy.Where(m => foundPrilohy.Contains(m.UniqueHash()) == false);
         }
 
-        public static async Task<IEnumerable<PageMetadata>> GetDataForDocument(Smlouva smlouva, Smlouva.Priloha priloha)
+        public static async Task<DataResultset<PageMetadata>> GetDataForDocument(Smlouva smlouva, Smlouva.Priloha priloha)
         {
             return await GetDataForDocument(smlouva.Id, priloha.UniqueHash());
         }
-        public static async Task<IEnumerable<PageMetadata>> GetDataForDocument(string smlouvaId, string prilohaUniqueId)
+        public static async Task<DataResultset<PageMetadata>> GetDataForDocument(string smlouvaId, string prilohaUniqueId)
         {
             var cl = await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync();
-            var recs = await Searching.Tools.GetAllRecordsAsync<PageMetadata>(cl, 5, $"smlouvaId:{smlouvaId} AND prilohaId:{prilohaUniqueId}");
+            
+            var recs = await Searching.Tools.GetAllRecordsAsync<PageMetadata>(cl, 1, $"smlouvaId:{smlouvaId} AND prilohaId:{prilohaUniqueId}");
 
             return recs;
         }

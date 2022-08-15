@@ -411,8 +411,16 @@ namespace HlidacStatu.Repositories.Searching
                 logOutputFunc("Done");
         }
 
-        public static async Task<IEnumerable<T>> GetAllRecordsAsync<T>(ElasticClient sourceESClient, int maxDegreeOfParallelism,
-            string query = null, int batchSize = 100)
+        public class DataResultset<T>
+            where T : class
+        {
+            public IEnumerable<T> Result { get; set; }
+            public bool ErrorOccurred { get; set; } = false;
+            public Exception Exception { get; set; } = null;
+        }
+
+        public static async Task<DataResultset<T>> GetAllRecordsAsync<T>(ElasticClient sourceESClient, int maxDegreeOfParallelism,
+            string query = null, int batchSize = 10)
             where T : class
         {
             var qs = new QueryContainerDescriptor<T>().MatchAll();
@@ -437,6 +445,7 @@ namespace HlidacStatu.Repositories.Searching
             var waitHandle = new ManualResetEvent(false);
 
             var allRecs = new ConcurrentBag<T>();
+            var res = new DataResultset<T>();
 
             var scrollAllObserver = new ScrollAllObserver<T>(
                 onNext: response =>
@@ -451,7 +460,12 @@ namespace HlidacStatu.Repositories.Searching
                         allRecs.Add(h.Source);
                     }
                 },
-                onError: e => { HlidacStatu.Util.Consts.Logger.Error("Scroll error occured", e); },
+                onError: e => { 
+                    HlidacStatu.Util.Consts.Logger.Error("Scroll error occured", e); 
+                    res.ErrorOccurred = true;
+                    res.Exception = e;
+                    _ = waitHandle.Set();
+                },
                 onCompleted: () => waitHandle.Set()
             );
 
@@ -459,11 +473,13 @@ namespace HlidacStatu.Repositories.Searching
             _ = waitHandle.WaitOne();
             subscriber.Dispose();
 
-            return allRecs;
+            res.Result = allRecs;
+
+            return res;
         }
 
 
-        public static async Task<IEnumerable<string>> GetAllIdsAsync(ElasticClient sourceESClient,int maxDegreeOfParallelism, 
+        public static async Task<DataResultset<string>> GetAllIdsAsync(ElasticClient sourceESClient,int maxDegreeOfParallelism, 
             string query = null, int batchSize = 100)
         {
             var qs = new QueryContainerDescriptor<object>().MatchAll();
@@ -489,6 +505,7 @@ namespace HlidacStatu.Repositories.Searching
             var waitHandle = new ManualResetEvent(false);
 
             var allIds = new ConcurrentBag<string>();
+            var res = new DataResultset<string>();
 
             var scrollAllObserver = new ScrollAllObserver<object>(
                 onNext: response =>
@@ -504,7 +521,12 @@ namespace HlidacStatu.Repositories.Searching
                         allIds.Add(id);
                     }
                 },
-                onError: e => { HlidacStatu.Util.Consts.Logger.Error("Scroll error occured",e); },
+                onError: e => { 
+                    HlidacStatu.Util.Consts.Logger.Error("Scroll error occured",e);
+                    res.ErrorOccurred = true;
+                    res.Exception = e;
+                    waitHandle.Set();
+                },
                 onCompleted: () => waitHandle.Set()
             );
 
@@ -512,7 +534,9 @@ namespace HlidacStatu.Repositories.Searching
             _ = waitHandle.WaitOne();
             subscriber.Dispose();
 
-            return allIds;
+            res.Result = allIds;
+
+            return res;
         }
 
 
