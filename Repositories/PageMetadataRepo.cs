@@ -114,7 +114,7 @@ namespace HlidacStatu.Repositories
         {
             var cl = await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync();
             
-            var recs = await Searching.Tools.GetAllRecordsAsync<PageMetadata>(cl, 1, $"smlouvaId:{smlouvaId} AND prilohaId:{prilohaUniqueId}");
+            var recs = await Searching.Tools.GetAllRecordsAsync<PageMetadata>(cl, 5, $"smlouvaId:{smlouvaId} AND prilohaId:{prilohaUniqueId}");
 
             return recs;
         }

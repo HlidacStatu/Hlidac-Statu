@@ -423,6 +423,9 @@ namespace HlidacStatu.Repositories.Searching
             string query = null, int batchSize = 10)
             where T : class
         {
+            if (maxDegreeOfParallelism < 2)
+                throw new ArgumentOutOfRangeException("maxDegreeOfParallelism", "maxDegreeOfParallelism cannot be smaller than 2");
+
             var qs = new QueryContainerDescriptor<T>().MatchAll();
             if (!string.IsNullOrEmpty(query))
             {
@@ -460,8 +463,8 @@ namespace HlidacStatu.Repositories.Searching
                         allRecs.Add(h.Source);
                     }
                 },
-                onError: e => { 
-                    HlidacStatu.Util.Consts.Logger.Error("Scroll error occured", e); 
+                onError: e => {
+                    HlidacStatu.Util.Consts.Logger.Error("Scroll error occured cl:{client} q:{query}", e, sourceESClient.ConnectionSettings.DefaultIndex, query); 
                     res.ErrorOccurred = true;
                     res.Exception = e;
                     _ = waitHandle.Set();
@@ -522,7 +525,7 @@ namespace HlidacStatu.Repositories.Searching
                     }
                 },
                 onError: e => { 
-                    HlidacStatu.Util.Consts.Logger.Error("Scroll error occured",e);
+                    HlidacStatu.Util.Consts.Logger.Error("Scroll error occured cl:{client} q:{query}",e, sourceESClient.ConnectionSettings.DefaultIndex, query);
                     res.ErrorOccurred = true;
                     res.Exception = e;
                     waitHandle.Set();
