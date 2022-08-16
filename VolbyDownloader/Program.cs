@@ -57,7 +57,7 @@ class Program
         #endregion
 
         //todo: jak to bude s mazáním dat před downloadem??        
-
+        
         // nechci je spouštět najednou, protože habruje připojení k sql :(
         await DownloadOvmsAsync(httpClient, ovmUrl, logger);
         await DownloadCuzkAsync(httpClient, cuzkUrl, logger);
@@ -198,30 +198,27 @@ class Program
             Dictionary<string, PravniFormaOvm> pfOvm = new();
             Dictionary<int, AdresaOvm> adresyOvm = new();
 
-            var chunks = test.Subjekt.Chunk(100);
-            foreach (var chunk in chunks)
+            using (var db = new DbEntities())
             {
-                using (var db = new DbEntities())
+                foreach (var ovm in test.Subjekt)
                 {
-                    foreach (var ovm in chunk)
-                    {
-                        // replace with correct unique record
-                        if (typyOvm.TryAdd(ovm.TypOvm.Id, ovm.TypOvm) == false)
-                            ovm.TypOvm = typyOvm[ovm.TypOvm.Id];
+                    // replace with correct unique record
+                    if (typyOvm.TryAdd(ovm.TypOvm.Id, ovm.TypOvm) == false)
+                        ovm.TypOvm = typyOvm[ovm.TypOvm.Id];
 
-                        if (pfOvm.TryAdd(ovm.PravniFormaOvm.Id, ovm.PravniFormaOvm) == false)
-                            ovm.PravniFormaOvm = pfOvm[ovm.PravniFormaOvm.Id];
+                    if (pfOvm.TryAdd(ovm.PravniFormaOvm.Id, ovm.PravniFormaOvm) == false)
+                        ovm.PravniFormaOvm = pfOvm[ovm.PravniFormaOvm.Id];
 
-                        if (adresyOvm.TryAdd(ovm.AdresaOvm.Id, ovm.AdresaOvm) == false)
-                            ovm.AdresaOvm = adresyOvm[ovm.AdresaOvm.Id];
+                    if (adresyOvm.TryAdd(ovm.AdresaOvm.Id, ovm.AdresaOvm) == false)
+                        ovm.AdresaOvm = adresyOvm[ovm.AdresaOvm.Id];
 
 
-                        db.OrganVerejneMoci.Add(ovm);
-                    }
-
-                    await db.SaveChangesAsync();
+                    db.OrganVerejneMoci.Add(ovm);
                 }
+
+                await db.SaveChangesAsync();
             }
+   
         }
     }
 }
