@@ -115,6 +115,7 @@ class Program
     private static async Task DownloadSestavaAsync(HttpClient httpClient, string url, CultureInfo culture,
         Encoding encoding, string delimiter, ILogger logger)
     {
+        logger.Information("Downloading {url}", url);
         using var responseMessage = await _retryPolicy.ExecuteAsync(() => httpClient.GetAsync(url));
 
         if (!responseMessage.IsSuccessStatusCode)
