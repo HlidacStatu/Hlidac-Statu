@@ -391,3 +391,5 @@ appsettings.*.json
 !Analysis.Page.Cmd/win-x64/**
 
 VolbyDownloader/appsettings.json
+
+VolebniPrukaz/appsettings.json

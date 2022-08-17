@@ -7,6 +7,7 @@ using System.Xml.Serialization;
 using CsvHelper;
 using Devmasters.Log;
 using HlidacStatu.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Polly;
 using Polly.Extensions.Http;
@@ -62,7 +63,38 @@ class Program
         await DownloadOvmsAsync(httpClient, ovmUrl, logger);
         await DownloadCuzkAsync(httpClient, cuzkUrl, logger);
 
+        await FixAddresses(logger);
+
         Console.WriteLine("Done");
+    }
+
+    private static async Task FixAddresses(ILogger logger)
+    {
+        logger.Information("Updating incorrect address references");
+        using (var db = new DbEntities())
+        {
+            //doplnění
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 75701855 where Zkratka = 'Podvihov'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 3134717 where Zkratka = 'Hrabova'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 7530200 where Zkratka = 'PrdbceVIII'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 9401008 where Zkratka = 'Bonkov'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 440434 where Zkratka = 'Bosovice'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 15675912 where Zkratka = 'Svojsin'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 5265967 where Zkratka = 'KrznviceCh'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 16729668 where Zkratka = 'LukavecLi'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 18026834 where Zkratka = 'Lukova'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 18652255 where Zkratka = 'Mastnik'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 6661220 where Zkratka = 'Pohnani'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 3766217 where Zkratka = 'ChlmKrhvce'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 18201831 where Zkratka = 'Charovice'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 14116707 where Zkratka = 'HorniLomna'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 27506908 where Zkratka = 'JrsvNzrkou'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 12105287 where Zkratka = 'JlvDrzkova'");
+            //oprava
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 83068392 where Zkratka = 'Pesvice'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 79245129 where Zkratka = 'Veprova'");
+            await db.Database.ExecuteSqlRawAsync("update dbo.OrganVerejneMoci set AdresaOvmId = 5982341 where Zkratka = 'Kutrovice'");
+        }
     }
 
     public static async Task DownloadCuzkAsync(HttpClient httpClient, string cuzkUrl, ILogger logger)
