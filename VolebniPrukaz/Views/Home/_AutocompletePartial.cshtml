@@ -60,7 +60,7 @@
             data.forEach(autocompData => {
                 var button = $('<button/>',
                     {
-                        text: autocompData.ulice + " " + autocompData.cisloDomovni + "; " + autocompData.psc + " " + autocompData.obec,
+                        text: autocompData.oneLiner,
                         class: 'whisp',
                         click: function () { FillDetail(autocompData); EmptyAutocompleteResults(); }
                     });
@@ -84,7 +84,6 @@
         console.log(autocompData.obecUradu);
         console.log(autocompData.pscUradu);
         console.log(autocompData.uliceUradu);
-        console.log(autocompData.cisloDomovniUradu);
         console.log(autocompData.datovkaUradu);
         
         $('#hsAutocompleteTool').val(autocompData.ulice + " " + autocompData.cisloDomovni + "; " + autocompData.psc + " " + autocompData.obec);

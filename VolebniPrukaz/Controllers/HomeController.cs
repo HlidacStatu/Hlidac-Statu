@@ -29,10 +29,10 @@ public class HomeController : Controller
     }
 
 
-    public JsonResult FindAddress([FromQuery]string query)
+    public JsonResult FindAddress([FromQuery]string query, CancellationToken ctx)
     {
         var index = _autocompleteCache.GetIndex();
-        var result = index.Search(query, 10);
+        var result = index.Search(query, 10, adr => adr.TypOvm );
         return Json(result.Select(x => x.Original).ToList());
     }
 }
