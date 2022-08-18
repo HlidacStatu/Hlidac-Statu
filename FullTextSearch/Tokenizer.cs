@@ -19,8 +19,8 @@ namespace FullTextSearch
             _tokenizePipeline = tokenizePipeline;
         }
 
-        static char[] defaultSplitChars = " ,.?!:;\t-_".ToCharArray();
-        static char[] allowedTokenizerChars = " ,.?!:;\t-_♥️💔".ToCharArray();
+        static char[] defaultSplitChars = " ,.?!:;\t-_/~".ToCharArray();
+        static char[] allowedTokenizerChars = " ,.?!:;\t-_/~♥️💔".ToCharArray();
         public static Tokenizer DefaultTokenizer()
         {
             var defaultPipeline = new List<Func<string, string>>()

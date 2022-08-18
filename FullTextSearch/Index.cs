@@ -25,7 +25,7 @@ namespace FullTextSearch
             BuildIndex(inputObjects);
         }
 
-        //ctor for deserialization        
+        //ctor for deserialization
         private Index(TokenTree<T> sortedTokens, ITokenizer tokenizer, Options options)
         {
             _tokenizer = Tokenizer.DefaultTokenizer();
@@ -40,7 +40,6 @@ namespace FullTextSearch
 
         public static Index<T> Deserialize(byte[] json, ITokenizer tokenizer = null, Options options = null)
         {
-            
             //json to Sentence list
             tokenizer = tokenizer ?? Tokenizer.DefaultTokenizer();
             options = options ?? Options.DefaultOptions();
@@ -136,8 +135,8 @@ namespace FullTextSearch
                             .FirstOrDefault();
                         return chosenResult;
                     })
-                .OrderBy(x => x.Sentence.Text.Length)  // pokud je stejné skóre, kratší jsou první
-                .ThenByDescending(x => x.Score); // seřadí podle skóre
+                .OrderByDescending(x => x.Score);  // seřadí podle skóre
+                 
             intv.Stop();
 
             // pokud existují priority, seřadí ještě pořadí výsledků podle priorit
@@ -148,6 +147,8 @@ namespace FullTextSearch
                 intv.Stop();
             }
 
+            final = final.ThenBy(x => x.Sentence.Text.Length); // pokud je stejné skóre, kratší jsou první
+            
             if (swl.Summary().ExactElapsedMs >= 500d)
             {
                 Log.Logger.Info(swl.ToString());
