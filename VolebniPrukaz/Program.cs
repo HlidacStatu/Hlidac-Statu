@@ -1,9 +1,11 @@
+using HlidacStatu.Entities;
 using VolebniPrukaz.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+//builder.Services.AddDbContext<DbEntities>() - repositories používají vlastní ctor
 builder.Services.AddSingleton<AutocompleteCache>();
 
 Devmasters.Config.Init(builder.Configuration);

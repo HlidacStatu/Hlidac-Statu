@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using FullTextSearch;
 using HlidacStatu.Entities;
@@ -12,6 +13,7 @@ public class AdresyRepo
     {
         using (DbEntities db = new DbEntities())
         {
+            db.Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
             // TypSO se filtruje kvůli číslům evidenčním, na kterých nemůže být trvalý pobyt, proto je nepotřebujeme
             // ovm.zkratka se filtruje kvůli:
             // a) vojenským újezdům,
