@@ -37,7 +37,7 @@ namespace HlidacStatu.Entities.Issues
                 case ImportanceLevel.Formal:
                     return string.Empty;
                 case ImportanceLevel.Minor:
-                    return res + "info";
+                    return res + "warning bg-opacity-25";
                 case ImportanceLevel.Major:
                     return res + "warning";
                 case ImportanceLevel.Fatal:
