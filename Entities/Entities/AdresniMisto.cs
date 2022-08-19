@@ -1,16 +1,20 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using CsvHelper.Configuration.Attributes;
 
 namespace HlidacStatu.Entities;
 
 public class AdresniMisto
 {
-    [Name("Kód ADM")]
+    [Ignore]
     public int Id {get; set;}
+    [Name("Kód ADM")]
+    public int KodAdm {get; set;}
     [Name("Kód obce")]
     public int KodObce {get; set;}
     [Name("Název obce")]
     public string NazevObce {get; set;}
     [Name("Kód MOMC")]
+    [Optional]
     public int? KodMomc {get; set;}
     [Name("Název MOMC")]
     public string NazevMomc {get; set;}
@@ -25,9 +29,9 @@ public class AdresniMisto
     [Name("Typ SO")]
     public string TypSO {get; set;}
     [Name("Číslo domovní")]
-    public int CisloDomovni {get; set;}
+    public int? CisloDomovni {get; set;}
     [Name("Číslo orientační")]
-    public int CisloOrientacni {get; set;}
+    public string CisloOrientacni {get; set;}
     [Name("Znak čísla orientačního")]
     public string ZnakCislaOrientacniho {get; set;}
     [Name("PSČ")]

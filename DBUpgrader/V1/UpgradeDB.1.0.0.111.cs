@@ -13,7 +13,7 @@ namespace HlidacStatu.DBUpgrades
                 string sql = @"
 CREATE TABLE dbo.AdresaOvm
 (
-    Id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    Id int NOT NULL PRIMARY KEY,
     UliceNazev nvarchar(100),
     CisloDomovni int NULL,
     ObecNazev nvarchar(100),
@@ -27,6 +27,7 @@ CREATE TABLE dbo.AdresaOvm
 CREATE TABLE dbo.AdresniMisto
 (
     Id int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    KodAdm int,
     KodObce int,
     NazevObce nvarchar(100),
     KodMomc int NULL,
@@ -37,13 +38,13 @@ CREATE TABLE dbo.AdresniMisto
     NazevUlice nvarchar(100),
     TypSO nvarchar(50),
     CisloDomovni int,
-    CisloOrientacni int,
+    CisloOrientacni nvarchar(20),
     ZnakCislaOrientacniho nvarchar(100),
     Psc nvarchar(8),
     CoordX nvarchar(20),
     CoordY nvarchar(20),
     OneLiner nvarchar(MAX),
-    CisloVolebnihoOkrsku nvarchar(20)
+    CisloVolebnihoOkrsku nvarchar(50)
 );
 CREATE TABLE dbo.OrganVerejneMoci
 (
@@ -51,9 +52,9 @@ CREATE TABLE dbo.OrganVerejneMoci
     Zkratka nvarchar(100),
     ICO nvarchar(20),
     Nazev nvarchar(MAX),
-    IdAdresaOvm int,
-    IdTypOvm int,
-    IdPravniFormaOvm int,
+    AdresaOvmId int,
+    TypOvmId int,
+    PravniFormaOvmId nvarchar(20),
     PrimarniOvm nvarchar(50),
     IdDS nvarchar(20),
     TypDS nvarchar(20),

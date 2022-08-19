@@ -17,13 +17,16 @@ public class OrganVerejneMoci
     public string Nazev { get; set; }
 
     [XmlElement(ElementName = "AdresaUradu")]
-    public AdresaOvm Adresa { get; set; }
+    public AdresaOvm AdresaOvm { get; set; }
+    public int AdresaOvmId { get; set; }
 
     [XmlElement(ElementName = "TypSubjektu")]
     public TypOvm TypOvm { get; set; }
+    public int TypOvmId { get; set; }
 
     [XmlElement(ElementName = "PravniForma", IsNullable = true)]
     public PravniFormaOvm PravniFormaOvm { get; set; }
+    public string PravniFormaOvmId { get; set; }
 
     [XmlElement(ElementName = "PrimarniOvm")]
     public string PrimarniOvm { get; set; }
