@@ -700,15 +700,15 @@ text zpravy: {txt}
 
                 // Set up some properties:
 
-                foreach (var kv in data)
-                {
-                    var metrics = new Dictionary<string, double> { { "web-search-" + kv.Key, kv.Value.TotalMilliseconds } };
-                    var props = new Dictionary<string, string> { { "query", q }, { "database", kv.Key } };
+                //foreach (var kv in data)
+                //{
+                //    var metrics = new Dictionary<string, double> { { "web-search-" + kv.Key, kv.Value.TotalMilliseconds } };
+                //    var props = new Dictionary<string, string> { { "query", q }, { "database", kv.Key } };
 
-                    Metric elaps = _telemetryClient.GetMetric("web-GlobalSearch_Elapsed", "Database");
-                    _telemetryClient.TrackEvent("web-GlobalSearch_Elapsed", props, metrics);
-                    var ok = elaps.TrackValue(kv.Value.TotalMilliseconds, kv.Key);
-                }
+                //    Metric elaps = _telemetryClient.GetMetric("web-GlobalSearch_Elapsed", "Database");
+                //    _telemetryClient.TrackEvent("web-GlobalSearch_Elapsed", props, metrics);
+                //    var ok = elaps.TrackValue(kv.Value.TotalMilliseconds, kv.Key);
+                //}
             }
             string viewName = "Hledat";
             return View(viewName, res);

@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities.Entities.Analysis;
+﻿using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities.Analysis;
 using HlidacStatu.Repositories.ES;
 
 
@@ -13,11 +14,56 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
     public static class KIndex
     {
+        private static volatile Devmasters.Cache.LocalMemory.Manager<KIndexData, (string ico, bool useTempDb)> _cachedKIndexData
+            = Devmasters.Cache.LocalMemory.Manager<KIndexData, (string ico, bool useTempDb)>
+                .GetSafeInstance("KIndexData",
+                param =>
+                {
+                    KIndexData f = KIndexData.GetDirectAsync(param).ConfigureAwait(false).GetAwaiter().GetResult();
+                    if (f == null || f.Ico == "-")
+                        return null;
+                    return f;
+
+                },
+                TimeSpan.FromHours(28), keyValueSelector: kv=>$"{kv.ico}_{kv.useTempDb}");
+
+        static HashSet<string> kindexReadyIcos = null;
+        static System.Timers.Timer refreshTimer = new System.Timers.Timer(TimeSpan.FromHours(12).TotalMilliseconds);
+        static KIndex()
+        {
+            refreshTimer.Elapsed += (o, t) => { refreshCache(); } ;
+
+            new System.Threading.Thread(() => {
+                refreshCache();
+            }).Start();
+        }
+
+
+        private static void refreshCache()
+        {
+            kindexReadyIcos = HlidacStatu.Repositories.Searching.Tools.GetAllIdsAsync(
+                Manager.GetESClient_KIndexAsync().Result,
+                4,
+                "roky.kIndexReady:true"
+                ).Result
+                .Result.ToHashSet();
+
+            foreach (var ico in kindexReadyIcos)
+            {
+                _ = GetAsync(ico, false).Result;
+            }
+        }
+
         public static async Task<KIndexData> GetAsync(string ico, bool useTemp = false)
         {
+            if (kindexReadyIcos != null && kindexReadyIcos.Count > 0)
+            {
+                if (kindexReadyIcos.Contains(ico) == false)
+                    return null;
+            }
             if (string.IsNullOrEmpty(ico))
                 return null;
-            var f = await KIndexData.GetDirectAsync((ico, useTemp));
+            KIndexData f =  _cachedKIndexData.Get((ico,useTemp));
             if (f == null || f.Ico == "-")
                 return null;
             return f;
@@ -93,7 +139,6 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         {
             if (Consts.KIndexExceptions.Contains(ico) && useTemp == false)
                 return new Tuple<int?, KIndexData.KIndexLabelValues>(null, KIndexData.KIndexLabelValues.None);
-
             var kidx = await GetAsync(ico, useTemp);
             if (kidx != null)
             {

@@ -1,6 +1,11 @@
 @using Devmasters.Enums
 @model HlidacStatu.Repositories.Searching.SmlouvaSearchResult
+@{
+    Devmasters.DT.StopWatchLaps viewRenderTimes = new Devmasters.DT.StopWatchLaps();
+    Devmasters.DT.StopWatchLaps.Interval viewRenderTimesInt = null;
+    viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results");
 
+}
 <table class="table table-hover">
     <thead>
     <tr>
@@ -18,6 +23,8 @@
     <tbody>
     @foreach (var item in Model?.ElasticResults.Hits)
     {
+        viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 0 id:"+ item.Id );
+
         var rec = item.Source;
 
         var confLevel = rec.GetConfidenceLevel();
@@ -29,6 +36,7 @@
             bgLevel = HlidacStatu.Entities.Issues.Importance.GetCssClass(confLevel, true);
             iconLevel = HlidacStatu.Entities.Issues.Importance.GetIcon(confLevel);
         }
+        viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 1 id:"+ item.Id );
 
         <tr class="bg@(bgLevel) first">
             <td>
@@ -42,6 +50,9 @@
                     </a>
                 </span>
             </td>
+            @{
+                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 2 id:" + item.Id);
+            }
             <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">@rec.datumUzavreni.ToShortDateString()</td>
             @if (Model.SmallRender == false)
             {
@@ -56,6 +67,9 @@
                     }
                 </td>
             }
+            @{
+                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 3 id:" + item.Id);
+            }
             <td>
                 @if (!string.IsNullOrEmpty(rec.Platce?.ico))
                 {
@@ -66,7 +80,10 @@
                     @(rec.Platce?.nazev)
                 }
             </td>
-            <td>
+                @{
+                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 4 id:" + item.Id);
+                }
+                <td>
                 @if (rec.Prijemce.Count() == 1)
                 {
                     if (!string.IsNullOrEmpty(rec.Prijemce[0].ico))
@@ -98,11 +115,18 @@
                     @(rec.Prijemce.Count() > 2 ? Devmasters.Lang.CS.Plural.Get(rec.Prijemce.Count() - 2, "+{0} dodavatel;+{0} další dodavatelé;+{0} dalších dodavatelů") : "")
                 }
             </td>
+            @{
+                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 5 id:" + item.Id);
+            }
             <td>@Html.Raw(rec.NicePrice(html: true))</td>
 
         </tr>
         <tr class="bg@(bgLevel) last">
             <td></td>
+                @{
+                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 2-1 id:" + item.Id);
+                }
+
             <td colspan="@(Model.SmallRender ? "5" : "6")">
                 @Devmasters.TextUtil.ShortenText(rec.predmet, 200)
                 @if (Model.SmallRender && rec.GetRelevantClassification().Any())
@@ -114,10 +138,14 @@
                     <span class="text-success">&nbsp;|&nbsp;<b>Obor smlouvy</b>: @(string.Join(" / ", rec.GetRelevantClassification().Select(m => m.ClassifTypeName())))</span>
                 }
             </td>
-        </tr>
+                @{
+                    viewRenderTimesInt.Stop(); 
+                }
+            </tr>
 
         if (Model.Chyby)
         {
+            viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 3-1 id:" + item.Id);
             if (rec.Issues != null && rec.Issues.Where(m => m.Public).Count() > 0)
             {
                 <tr class="bg@(bgLevel) last">
@@ -148,13 +176,25 @@
                     <td class="joined">&nbsp;</td>
                 </tr>
             }
+            viewRenderTimesInt.Stop(); 
+
         }
         if (Model.AdditionalRender != null)
         {
+            viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 3-1 id:" + item.Id);
             @Html.Raw(Model.AdditionalRender(rec))
+            viewRenderTimesInt.Stop();
         }
+
     }
     </tbody>
 </table>
-
+@{
+    viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results pagination:" );
+}
 <partial name="SearchResults/Pagination" model="@(new PaginationViewModel(Model, "/HledatSmlouvy", exportType: "smlouvy"))"/>
+
+@{
+    viewRenderTimesInt.Stop();
+}
+@Html.Raw("Smlouvy result times\n"+viewRenderTimes.ToString());
