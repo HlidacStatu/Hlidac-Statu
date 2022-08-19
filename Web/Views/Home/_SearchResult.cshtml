@@ -148,6 +148,6 @@
     viewRenderTimesInt.Stop();
     ;
 }
-@Html.Raw("Smlouvy header result times\n"+viewRenderTimes.ToString());
+@Html.Raw("<!-- Smlouvy header result times\n"+viewRenderTimes.ToString() + " -->");
 
 <partial name="SearchResults/SearchResultsSmlouvy" model="Model"/>
