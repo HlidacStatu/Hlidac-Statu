@@ -1,11 +1,21 @@
 ﻿<div style="position:relative">
     <label for="hsAutocompleteTool">Najděte svoji adresu</label>
-    <input placeholder="Zadejte adresu" type="text" name="hsAutocompleteTool" id="hsAutocompleteTool" class="form-control companyahead input-lg" oninput="FindFunction(this)" />
-    <div class="loading-spinner" style="display:none">
-    </div>
+    <input placeholder="Zadejte adresu" type="text" name="hsAutocompleteTool" id="hsAutocompleteTool" class="form-control companyahead input-lg" oninput="CallAutocompleteApi(this)" />
     <div id="hsAutocompleteResults">
     </div>
-
+</div>
+<div>
+    <h2>Vaše adresa</h2>
+    <input type="text" placeholder="Vyplňte jméno" name="jmeno" class="form-control input-lg"/>
+    <input id="ulice" type="text" placeholder="Ulice + čp" name="ulice" class="form-control input-lg"/>
+    <input id="castobce" type="text" placeholder="Část obce" name="cast" class="form-control input-lg"/>
+    <input id="obec" type="text" placeholder="PSČ + Obec" name="obec" class="form-control input-lg"/>
+    
+    <h2>Adresa úřadu</h2>
+    <input id="uradnazev" type="text" placeholder="Název úřadu" name="uradnazev" class="form-control input-lg"/>
+    <input id="uradulice" type="text" placeholder="Ulice úřadu" name="uradulice" class="form-control input-lg"/>
+    <input id="uradcastobce" type="text" placeholder="Část obce úřadu" name="uradcast" class="form-control input-lg"/>
+    <input id="uradobec" type="text" placeholder="PSČ + Obec úřadu" name="uradobec" class="form-control input-lg"/>
 </div>
 
 <style>
@@ -24,25 +34,6 @@
             background-color: lightblue;
         }
 
-    .loading-spinner {
-        border: 10px solid #f3f3f3; /* Light grey */
-        border-top: 10px solid #3498db; /* Blue */
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 2s linear infinite;
-
-        position: absolute;
-        top: 29px;
-        right: 20px;
-        z-index: 10;
-    }
-
-    @@keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
     #hsAutocompleteResults {
         margin-bottom: 10px;
         position:absolute;
@@ -53,43 +44,70 @@
 
 <script>
 
-    function FindFunction(caller) {
-        let req = "/Home/FindAddress?query=" + caller.value;
-        $.get(req, function (data) {
-            EmptyAutocompleteResults();
-            data.forEach(autocompData => {
-                var button = $('<button/>',
-                    {
-                        text: autocompData.oneLiner,
-                        class: 'whisp',
-                        click: function () { FillDetail(autocompData); EmptyAutocompleteResults(); }
-                    });
-                $("#hsAutocompleteResults").append(button);
-            });
-        }, "json");
-        //Navigate();
-    }
+    var currentRequest = null;
+    
+    function CallAutocompleteApi(caller) {
+        let url = "/Home/FindAddress?query=" + caller.value;
 
+        currentRequest = jQuery.ajax({
+            type: 'GET',
+            url: url,
+            beforeSend: function(){           
+                if(currentRequest != null) {
+                    currentRequest.abort();
+                }
+            },
+            success: function(data) {
+                EmptyAutocompleteResults();
+                data.forEach(autocompData => {
+                    var button = $('<button/>',
+                        {
+                            text: autocompData.adresa.replaceAll('~','; '),
+                            class: 'whisp',
+                            click: function () { FillDetail(autocompData); EmptyAutocompleteResults(); }
+                        });
+                    $("#hsAutocompleteResults").append(button);
+                });
+            },
+            error:function(e){
+                console.log(e);
+            }
+        });
+
+        Navigate();
+    }
+    
+    function FillDetail(autocompData) {
+        $('#hsAutocompleteTool').val(autocompData.adresa.replaceAll('~','; '));
+        let split = autocompData.adresa.split('~');
+        if (split.Length == 2) {
+            $('#ulice').val(split[0]);
+            $('#obec').val(split[1]);
+        } else {
+            $('#ulice').val(split[0]);
+            $('#castobce').val(split[1]);
+            $('#obec').val(split[2]);
+        }
+        let splitUrad = autocompData.adresaUradu.split('~');
+        $('#uradnazev').val(autocompData.nazevUradu);
+        if (splitUrad.Length == 2) {
+            $('#uradulice').val(splitUrad[0]);
+            $('#uradobec').val(splitUrad[1]);
+        } else {
+            $('#uradulice').val(splitUrad[0]);
+            $('#uradcastobce').val(splitUrad[1]);
+            $('#uradobec').val(splitUrad[2]);
+        }
+    }
     
     function EmptyAutocompleteResults() {
         $('#hsAutocompleteResults').empty();
     }
 
-    function CleanSearchBox() {
+    function EraseSearchBox() {
         $('#hsAutocompleteTool').val("").focus();
     }
 
-    function FillDetail(autocompData) {
-        console.log(autocompData.nazevUradu);
-        console.log(autocompData.obecUradu);
-        console.log(autocompData.pscUradu);
-        console.log(autocompData.uliceUradu);
-        console.log(autocompData.datovkaUradu);
-        
-        $('#hsAutocompleteTool').val(autocompData.ulice + " " + autocompData.cisloDomovni + "; " + autocompData.psc + " " + autocompData.obec);
-        //$('.loading-spinner').show();
-        //window.location.href = `/statniweby/info/${ico}`
-    }
 
     function Navigate() {
 
@@ -118,7 +136,7 @@
             }
             else if (e.keyCode == 27) {
                 EmptyAutocompleteResults();
-                CleanSearchBox();
+                EraseSearchBox();
             }
 
         });

@@ -1,20 +1,10 @@
-﻿@using VolebniPrukaz.Components
-@{
+﻿@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     
-    <component type="typeof(CounterComponent)" render-mode="WebAssemblyPrerendered"/>
-    
     <p>Vyhledejte adresu</p>
     <partial name="_AutocompletePartial"/>
 </div>
-
-@section Scripts
-{
-    
-    <script src="_framework/blazor.webassembly.js"></script>
-
-}
