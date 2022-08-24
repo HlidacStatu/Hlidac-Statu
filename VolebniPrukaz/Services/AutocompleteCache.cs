@@ -16,6 +16,11 @@ public class AutocompleteCache
             }
         );
 
+    public AutocompleteCache()
+    {
+        _ = _cache.Get(); //make it load a cache on bkgrnd
+    }
+
     public Index<AdresyKVolbam> GetIndex()
     {
         return _cache.Get();

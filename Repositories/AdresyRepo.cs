@@ -19,10 +19,8 @@ public class AdresyRepo
             // a) vojenským újezdům,
             // b) statutárním městům, kde voličský průkaz vyřizují městské obvody
             var adresy = await db.AdresyKVolbam.FromSqlRaw(
-                @"select ovm.Nazev NazevUradu, amo.NazevObce ObecUradu, amo.Psc PscUradu, ovm.TypOvmId typovm, 
-                         amo.NazevUlice UliceUradu, amo.CisloDomovni CisloDomovniUradu, ovm.IdDS DatovkaUradu,
-                         am.NazevObce Obec, am.Psc, am.NazevUlice Ulice, am.CisloDomovni CisloDomovni, 
-                         am.KodAdm id, am.oneliner oneliner
+                @"select ovm.Nazev NazevUradu, ovm.TypOvmId TypOvm, ovm.IdDS DatovkaUradu, amo.oneliner AdresaUradu, 
+                         am.KodAdm Id, am.oneliner Adresa
                     from dbo.OrganVerejneMoci ovm
                     join dbo.AdresniMisto amo on ovm.AdresaOvmId = amo.KodAdm
                     join dbo.AdresniMisto am on amo.KodObce = am.KodObce 
