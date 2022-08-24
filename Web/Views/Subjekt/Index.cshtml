@@ -227,7 +227,7 @@
         <p>
             V roce @(currentSeasonYear) uzavřel @(Model.JsemOVM() ? "úřad" : "subjekt")
             <a href="/hledat?q=@System.Net.WebUtility.UrlEncode($"ico:{Model.ICO} AND datumUzavreni:[{currentSeasonYear}-01-01 TO {currentSeasonYear + 1}-01-01}}")">
-                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)seasonStat.PocetSmluv, "<strong>0 </strong>smluv", "<strong>jednu </strong>smlouvu", "<strong>{0} </strong>smluvy", "<strong>{0:### ### ##0} </strong>smluv"))
+                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)seasonStat.PocetSmluv, "<strong>0 </strong>smluv", "<strong>jednu </strong>smlouvu", "<strong>{0} </strong>smlouvy", "<strong>{0:### ### ##0} </strong>smluv"))
             </a>
             za <strong>@(Html.Raw(Smlouva.NicePrice(seasonStat.CelkovaHodnotaSmluv, html: true, shortFormat: true)))</strong>
 

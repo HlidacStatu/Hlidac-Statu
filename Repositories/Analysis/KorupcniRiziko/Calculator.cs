@@ -172,7 +172,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     if (ret.CelkovaKoncentraceDodavatelu != null)
                     {
                         //ma cenu koncentraci pocitat?
-                        //musi byt vice ne 7 smluv a nebo jeden dodavatel musi mit vice nez 2 smluvy 
+                        //musi byt vice ne 7 smluv a nebo jeden dodavatel musi mit vice nez 2 smlouvy 
                         if (
                             (allSmlouvy_BezBLACKLIST_Obor.Where(m => m.HodnotaSmlouvy == 0).Count() > 0)
                             &&

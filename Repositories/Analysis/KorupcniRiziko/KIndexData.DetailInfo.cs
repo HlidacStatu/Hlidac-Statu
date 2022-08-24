@@ -429,7 +429,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     case KIndexData.KIndexParts.PercSmluvUlimitu:
                         return "Procentní podíl smluv, jejichž hodnota je pouze o malou částku nižší než je zákonný limit, nad kterým by se zakázka musela soutěžit podle zákona o zadávání veřejných zakázek. " +
                             "Typicky se jedná o limit <b>6 miliónů</b> korun pro stavební zakázky a <b>2 miliony</b> pro ostatní." +
-                            "Hodnota <b>0</b> znamená, že žádná smlouva není u limitu, hodnota <b>1.0</b> znamená všechny smluvy u limitu.";
+                            "Hodnota <b>0</b> znamená, že žádná smlouva není u limitu, hodnota <b>1.0</b> znamená všechny smlouvy u limitu.";
                     case KIndexData.KIndexParts.KoncentraceDodavateluCenyULimitu:
                         return "Koncentrace dodavatelů ukazuje míru nerovnoměrného rozdělení peněz mezi dodavatele. Neboli - zda malé množství dodavatelů dostává většinu peněz." +
                             $"V tomto parametru zkoumáme koncentraci dodavatelů u smluv, které mají cenu u limitu veřejných zakázek. " +
