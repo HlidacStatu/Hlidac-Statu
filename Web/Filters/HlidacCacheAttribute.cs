@@ -10,12 +10,14 @@ namespace HlidacStatu.Web.Filters
 {
     public class HlidacCacheAttribute : Attribute, IResourceFilter
     {
-        private readonly int _duration;
+        private readonly long _duration;
         private readonly string[] _queryKeys;
         private readonly bool _differAuth;
 
-        public HlidacCacheAttribute(int durationInSeconds, string queryKeys, bool differAuth)
+
+        public HlidacCacheAttribute(long durationInSeconds, string queryKeys, bool differAuth)
         {
+            queryKeys = queryKeys ?? "";
             _duration = durationInSeconds;
             _queryKeys = queryKeys.Split(';', StringSplitOptions.RemoveEmptyEntries);
             _differAuth = differAuth;

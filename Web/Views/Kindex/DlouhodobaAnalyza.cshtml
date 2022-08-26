@@ -1,0 +1,253 @@
+﻿@using HlidacStatu.Entities;
+@using System.Linq;
+@using Devmasters.Enums;
+@using Devmasters.Collections;
+@using HlidacStatu.Lib.Analysis.KorupcniRiziko
+@using HlidacStatu.Web.Framework;
+@using HlidacStatu.XLib.Render;
+
+
+@{
+    ViewBag.Title = "K–Index dlouhodobý dopad";
+
+    //KIndexData[] allData = KIndex.KIndexActiveIcos()
+    //    .Select(m => KIndex.GetAsync(m, false).Result)
+    //    .ToArray();
+
+
+    var stat = Statistics.KIndexStatTotal.Get();
+    int[] years = stat.Select(m => m.Rok).Distinct().ToArray();
+
+
+}
+
+
+@section scripts
+    {
+    <script src="/scripts/highcharts-6/highcharts.js"></script>
+
+}
+
+    @section breadcrumb
+    {
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+    <div class="watcher-blocks">
+
+        <div class="watcher-blocks__wrapper">
+            <!-- Štítek -->
+            <div class="watcher-block">
+                <div class="watcher__title">
+                    @*<h2 class="new-title">
+                        K-Index od @years.Min()  do @years.Max()
+                    </h2>*@
+                </div>
+
+                <div class="block-col ">
+                    <div class="muted">
+                    <p>
+                        @{
+                            var dataAvgPerYear = new Series[]
+                            {
+                        new()
+                        {
+                        Name = "Průměr",
+                        Type = Series.SeriesType.column,
+                        Data = stat.Select(x => new SeriesData(x.Rok, x.AverageKindex)).ToArray(),
+                        SeriesTooltip = new SeriesTooltip()
+                        {
+                        ValueSuffix = ""
+                        }
+                        }
+                            };
+                        }
+                        @Html.ColumnGraph("",dataAvgPerYear,yTitleLeft:"Průměrný K-Index", allowDecimals:true)
+                        
+                        průměrná známka se @(stat.OrderBy(m => m.Rok).First().Average() > stat.OrderByDescending(m => m.Rok).First().Average() ? "snížila" : "zvýšila")
+                        z <b>@HlidacStatu.Util.RenderData.NiceNumber(stat.OrderBy(m=>m.Rok).First().Average())</b>
+                        na <b>@HlidacStatu.Util.RenderData.NiceNumber(stat.OrderByDescending(m=>m.Rok).First().Average())</b>
+
+                    </p>
+                    <hr class="gray dotted" />
+                    <p>
+                        
+                        @{
+                            var dataAvgBezCenyPerYear = new Series[]
+                            {
+                        new()
+                        {
+                        Name = "% smluv bez ceny",
+                        Type = Series.SeriesType.column,
+                        Data = stat.Select(x => new SeriesData(x.Rok, x.Average( KIndexData.KIndexParts.PercentBezCeny))).ToArray(),
+                        SeriesTooltip = new SeriesTooltip()
+                        {
+                        ValueSuffix = " %"
+                        }
+                        }
+                            };
+                        }
+                        @Html.ColumnGraph("",dataAvgBezCenyPerYear,yTitleLeft:"% smluv bez ceny", allowDecimals:true)
+
+                        procento utajování cen se @(stat.OrderBy(m => m.Rok).First().Average(KIndexData.KIndexParts.PercentBezCeny) > stat.OrderByDescending(m => m.Rok).First().Average(KIndexData.KIndexParts.PercentBezCeny) ? "snížilo" : "zvýšilo")
+                        z <b>@HlidacStatu.Util.RenderData.NicePercent(stat.OrderBy(m=>m.Rok).First().Average( KIndexData.KIndexParts.PercentBezCeny))</b>
+                        na <b>@HlidacStatu.Util.RenderData.NicePercent(stat.OrderByDescending(m=>m.Rok).First().Average( KIndexData.KIndexParts.PercentBezCeny))</b>
+                    </p>
+                    <hr class="gray dotted" />
+                    <p>
+
+                        @{
+                            var dataAvgNedostPerYear = new Series[]
+                            {
+                        new()
+                        {
+                        Name = "% smluv se zásadním nedostatkem",
+                        Type = Series.SeriesType.column,
+                        Data = stat.Select(x => new SeriesData(x.Rok, x.Average( KIndexData.KIndexParts.PercSeZasadnimNedostatkem))).ToArray(),
+                        SeriesTooltip = new SeriesTooltip()
+                        {
+                        ValueSuffix = " %"
+                        }
+                        }
+                            };
+                        }
+                        @Html.ColumnGraph("",dataAvgNedostPerYear,yTitleLeft:"% smluv", allowDecimals:true)
+
+                        procento smluv se zásadním nedostatkem se @(stat.OrderBy(m => m.Rok).First().Average(KIndexData.KIndexParts.PercSeZasadnimNedostatkem) > stat.OrderByDescending(m => m.Rok).First().Average(KIndexData.KIndexParts.PercSeZasadnimNedostatkem) ? "snížilo" : "zvýšilo")
+                        z <b>@HlidacStatu.Util.RenderData.NicePercent(stat.OrderBy(m=>m.Rok).First().Average( KIndexData.KIndexParts.PercSeZasadnimNedostatkem))</b>
+                        na <b>@HlidacStatu.Util.RenderData.NicePercent(stat.OrderByDescending(m=>m.Rok).First().Average( KIndexData.KIndexParts.PercSeZasadnimNedostatkem))</b>
+                    </p>
+                </div>
+                <p>
+
+                </p>
+                <p>
+                </p>
+            </div>
+            <div class="block-button-wrapper">
+            </div>
+
+        </div>
+
+
+        <!-- Štítek -->
+        <div class="watcher-block">
+            <div class="watcher__title">
+@*                <h2 class="new-title">
+                    K-Index od @years.Min()s do @years.Max()
+                </h2>*@
+            </div>
+
+            <div class="block-col ">
+                <div class="muted">
+                    <p>
+                        @{
+                            var dataNumPerYear = new Series[]
+                            {
+                        new()
+                        {
+                        Name = "Počet",
+                        Type = Series.SeriesType.column,
+                        Data = stat.Select(x => new SeriesData(x.Rok, x.SubjektOrderedListKIndexAsc.Count)).ToArray(),
+                        SeriesTooltip = new SeriesTooltip()
+                        {
+                        ValueSuffix = ""
+                        }
+                        }
+                            };
+                        }
+                        @Html.ColumnGraph("",dataNumPerYear,yTitleLeft:"Počet úřadů v K-Index", allowDecimals:true)
+
+                        Počet státních organizací v K-Indexu se  @(stat.OrderBy(m => m.Rok).First().SubjektOrderedListKIndexAsc.Count > stat.OrderByDescending(m => m.Rok).First().SubjektOrderedListKIndexAsc.Count ? "snížil" : "zvýšil")
+                        z <b>@HlidacStatu.Util.RenderData.NiceNumber(stat.OrderBy(m=>m.Rok).First().SubjektOrderedListKIndexAsc.Count)</b>
+                        na <b>@HlidacStatu.Util.RenderData.NiceNumber(stat.OrderByDescending(m=>m.Rok).First().SubjektOrderedListKIndexAsc.Count)</b>
+
+                    </p>
+                    <hr class="gray dotted" />
+                    <p>
+                        @{
+                            var dataZnamkaPerYear = new Series[]
+                            {
+                        new()
+                        {
+                            Name = "Počet hodnocení F",
+                            Type = Series.SeriesType.column,
+                            Data = stat.Select(x => new SeriesData(x.Rok, x.SubjektOrderedListKIndexAsc.Count(c=>c.kindex>=15))).ToArray(),
+                            SeriesTooltip = new SeriesTooltip() {ValueSuffix = ""}
+                        },
+                        new()
+                        {
+                            Name = "Počet hodnocení E",
+                            Type = Series.SeriesType.column,
+                            Data = stat.Select(x =>new SeriesData(x.Rok, x.SubjektOrderedListKIndexAsc.Count(c=>c.kindex>=12 && c.kindex<15))).ToArray(),
+                            SeriesTooltip = new SeriesTooltip(){ ValueSuffix = ""}
+                        }
+
+                            };
+
+                            var znamkaFminY = dataZnamkaPerYear[0].Data.OrderBy(m => m.X).First().Y;
+                            var znamkaFmaxY = dataZnamkaPerYear[0].Data.OrderByDescending(m => m.X).First().Y;
+                            var znamkaEminY = dataZnamkaPerYear[1].Data.OrderBy(m => m.X).First().Y;
+                            var znamkaEmaxY = dataZnamkaPerYear[1].Data.OrderByDescending(m => m.X).First().Y;
+                            var znamkaminY = znamkaFminY + znamkaEminY;
+                            var znamkamaxY = znamkaFmaxY + znamkaEmaxY;
+                        }
+                        @Html.ColumnGraph("",dataZnamkaPerYear,yTitleLeft:"Počet nejhorších úřadů", allowDecimals:true, stacked:true)
+
+                        Počet nejhůře hodnocených státních organizací v K-Indexu se  @((znamkaminY) > (znamkamaxY) ? "snížil" : "zvýšil")
+                        z <b>@HlidacStatu.Util.RenderData.NiceNumber(znamkaminY)</b>
+                        na <b>@HlidacStatu.Util.RenderData.NiceNumber(znamkamaxY)</b>
+
+                    </p>
+                    <hr class="gray dotted" />
+                    <p>
+                        @{
+                            var dataZnamkaBestPerYear = new Series[]
+                            {
+                        new()
+                        {
+                        Name = "Počet hodnocení A",
+                        Type = Series.SeriesType.column,
+                        Data = stat.Select(x => new SeriesData(x.Rok, x.SubjektOrderedListKIndexAsc.Count(c=>c.kindex<3))).ToArray(),
+                        SeriesTooltip = new SeriesTooltip() {ValueSuffix = ""}
+                        },
+                        new()
+                        {
+                        Name = "Počet hodnocení B",
+                        Type = Series.SeriesType.column,
+                        Data = stat.Select(x =>new SeriesData(x.Rok, x.SubjektOrderedListKIndexAsc.Count(c=>c.kindex>=3 && c.kindex<6))).ToArray(),
+                        SeriesTooltip = new SeriesTooltip(){ ValueSuffix = ""}
+                        }
+
+                            };
+
+                            var znamkaAminY = dataZnamkaBestPerYear[0].Data.OrderBy(m => m.X).First().Y;
+                            var znamkaAmaxY = dataZnamkaBestPerYear[0].Data.OrderByDescending(m => m.X).First().Y;
+                            var znamkaBminY = dataZnamkaBestPerYear[1].Data.OrderBy(m => m.X).First().Y;
+                            var znamkaBmaxY = dataZnamkaBestPerYear[1].Data.OrderByDescending(m => m.X).First().Y;
+                            var znamkaBestminY = znamkaAminY + znamkaBminY;
+                            var znamkaBestmaxY = znamkaAmaxY + znamkaBmaxY;
+                        }
+                        @Html.ColumnGraph("",dataZnamkaBestPerYear,yTitleLeft:"Počet nejlepších úřadů", allowDecimals:true, stacked:true)
+
+                        Počet nejlépe hodnocených státních organizací v K-Indexu se  @((znamkaBestminY) > (znamkaBestmaxY) ? "snížil" : "zvýšil")
+                        z <b>@HlidacStatu.Util.RenderData.NiceNumber(znamkaBestminY)</b>
+                        na <b>@HlidacStatu.Util.RenderData.NiceNumber(znamkaBestmaxY)</b>
+
+                    </p>
+                </div>
+                <p>
+
+                </p>
+                <p>
+                </p>
+            </div>
+            <div class="block-button-wrapper">
+            </div>
+
+        </div>
+    </div>
+</div>

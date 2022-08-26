@@ -54,6 +54,11 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             }
         }
 
+        public static IEnumerable<string> KIndexActiveIcos()
+        {
+            return kindexReadyIcos; 
+        }
+
         public static async Task<KIndexData> GetAsync(string ico, bool useTemp = false)
         {
             if (kindexReadyIcos != null && kindexReadyIcos.Count > 0)

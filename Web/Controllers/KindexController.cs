@@ -5,6 +5,7 @@ using FullTextSearch;
 using HlidacStatu.Entities;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories;
+using HlidacStatu.Web.Filters;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +22,13 @@ namespace HlidacStatu.Web.Controllers
         {
             return View();
         }
+
+        [HlidacCache(60*60*12,null,false)]
+        public ActionResult DlouhodobaAnalyza()
+        {
+            return View();
+        }
+
 
         public ActionResult Detail(string id, int? rok = null, string priv = null)
         {

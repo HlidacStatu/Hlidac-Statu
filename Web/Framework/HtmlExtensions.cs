@@ -2,7 +2,6 @@ using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatu.XLib.Render;
-
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -386,7 +385,10 @@ namespace HlidacStatu.Web.Framework
             int height = 300,
             string xTooltip = "Rok",
             string yTitleLeft = "Hodnota (Kč)",
-            string yTitleRight = "")
+            string yTitleRight = "",
+            bool allowDecimals = false,
+            bool stacked = false
+            )
         {
             string random = Guid.NewGuid().ToString("N");
             var sb = new System.Text.StringBuilder();
@@ -433,6 +435,12 @@ namespace HlidacStatu.Web.Framework
                     footerFormat = "</table>",
 
                 },
+                plotOptions = new {
+                    series = new
+                    {
+                        stacking= stacked ? "normal" : (string)null
+                    }
+                },
                 xAxis = new
                 {
                     labels = new
@@ -448,7 +456,7 @@ namespace HlidacStatu.Web.Framework
                 {
                     new
                     {
-                        allowDecimals = false,
+                        allowDecimals = allowDecimals,
                         min = 0,
                         lineWidth = 0,
                         tickWidth = 1,
@@ -465,7 +473,7 @@ namespace HlidacStatu.Web.Framework
                     new
                     {
                         opposite = true,
-                        allowDecimals = false,
+                        allowDecimals = allowDecimals,
                         min = 0,
                         lineWidth = 0,
                         tickWidth = 1,
