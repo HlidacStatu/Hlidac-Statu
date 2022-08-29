@@ -176,6 +176,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VolbyDownloader", "VolbyDow
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VolebniPrukaz", "VolebniPrukaz\VolebniPrukaz.csproj", "{58CC794F-8DA8-4C86-BCF9-6DBEDA6680DC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VolicskyPrukaz", "VolicskyPrukaz\VolicskyPrukaz.csproj", "{C8D51CC0-7417-418F-89CA-528D9ECB202D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -426,6 +428,10 @@ Global
 		{58CC794F-8DA8-4C86-BCF9-6DBEDA6680DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58CC794F-8DA8-4C86-BCF9-6DBEDA6680DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58CC794F-8DA8-4C86-BCF9-6DBEDA6680DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8D51CC0-7417-418F-89CA-528D9ECB202D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8D51CC0-7417-418F-89CA-528D9ECB202D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8D51CC0-7417-418F-89CA-528D9ECB202D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8D51CC0-7417-418F-89CA-528D9ECB202D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -473,6 +479,7 @@ Global
 		{E6687971-BA16-4A36-8CFA-218BF0BFA242} = {944AEC9D-9A67-477D-811D-66DC2142299A}
 		{E4FEA81C-636D-4B65-B43E-5EB65666FDE9} = {944AEC9D-9A67-477D-811D-66DC2142299A}
 		{58CC794F-8DA8-4C86-BCF9-6DBEDA6680DC} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
+		{C8D51CC0-7417-418F-89CA-528D9ECB202D} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}

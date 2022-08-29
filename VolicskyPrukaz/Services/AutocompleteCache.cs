@@ -2,7 +2,7 @@ using FullTextSearch;
 using HlidacStatu.Entities.Views;
 using HlidacStatu.Repositories;
 
-namespace VolebniPrukaz.Services;
+namespace VolicskyPrukaz.Services;
 
 public class AutocompleteCache
 {
@@ -19,7 +19,6 @@ public class AutocompleteCache
     public AutocompleteCache()
     {
         _ = Task.Factory.StartNew(() => _cache.Get());
-        //_ = _cache.Get(); //make it load a cache on bkgrnd
     }
 
     public Index<AdresyKVolbam> GetIndex()

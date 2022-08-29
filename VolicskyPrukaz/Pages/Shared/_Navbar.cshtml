@@ -1,0 +1,12 @@
+@using VolicskyPrukaz.Helpers
+
+<div id="navigation" class="row">
+    <ul>
+        <li class="col-xs-12 col-md-6">
+            <a class="btn @Html.NavButton(nameof(StrankaJedna))" asp-page="StrankaJedna">Jsem občanem ČR a chci volit ve svém volebním okrsku (Volby do zastupitelstev obcí i do Senátu)</a>
+        </li>
+        <li class="col-xs-12 col-md-6">
+            <a class="btn @Html.NavButton(nameof(StrankaDva))" asp-page="StrankaDva">Jsem občanem ČR a chci volit jinde než ve svém volebním okrsku (Pouze volby do Senátu)</a>
+        </li>
+    </ul>
+</div>

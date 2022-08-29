@@ -314,9 +314,6 @@ namespace HlidacStatu.Web
                 endpoints.MapRazorPages();
             });
 
-
-           
-
         }
 
         private void AddBundling(IServiceCollection services)
