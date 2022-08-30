@@ -1,14 +1,18 @@
-﻿<div style="position:relative">
+﻿<form id="myForm" action="/generatePdf" method="post">
+<div style="position:relative">
     <label for="hsAutocompleteTool">Najděte svoji adresu</label>
     <input placeholder="Zadejte adresu" type="text" name="hsAutocompleteTool" id="hsAutocompleteTool" class="form-control companyahead input-lg" oninput="CallAutocompleteApi(this)" />
     <div id="hsAutocompleteResults">
     </div>
 </div>
 <div>
-    <h2>Vaše adresa</h2>
-    <input type="text" placeholder="Vyplňte jméno" name="jmeno" class="form-control input-lg"/>
+    <h2>Osobní údaje</h2>
+    <input id="jmenoZadatele" type="text" placeholder="Celé jméno" name="jmenoZadatele" class="form-control input-lg"/>
+    <input id="datumNarozeniZadatele" type="text" placeholder="Datum narození" name="datumNarozeniZadatele" class="form-control input-lg"/>
+    <input id="telefonZadatele" type="text" placeholder="Telefon" name="telefonZadatele" class="form-control input-lg"/>
+
     <input id="ulice" type="text" placeholder="Ulice + čp" name="ulice" class="form-control input-lg"/>
-    <input id="castobce" type="text" placeholder="Část obce" name="cast" class="form-control input-lg"/>
+    <input id="castobce" type="text" placeholder="Část obce" name="castobce" class="form-control input-lg"/>
     <input id="obec" type="text" placeholder="PSČ + Obec" name="obec" class="form-control input-lg"/>
     
     <h2>Adresa úřadu</h2>
@@ -16,7 +20,11 @@
     <input id="uradulice" type="text" placeholder="Ulice úřadu" name="uradulice" class="form-control input-lg"/>
     <input id="uradcastobce" type="text" placeholder="Část obce úřadu" name="uradcast" class="form-control input-lg"/>
     <input id="uradobec" type="text" placeholder="PSČ + Obec úřadu" name="uradobec" class="form-control input-lg"/>
+    
 </div>
+
+<button class="btn btn-primary" onclick="SendForm()">Odeslat</button>    
+</form>
 
 <style>
     .whisp {
@@ -80,7 +88,7 @@
     function FillDetail(autocompData) {
         $('#hsAutocompleteTool').val(autocompData.adresa.replaceAll('~','; '));
         let split = autocompData.adresa.split('~');
-        if (split.Length == 2) {
+        if (split.length == 2) {
             $('#ulice').val(split[0]);
             $('#obec').val(split[1]);
         } else {
@@ -90,7 +98,7 @@
         }
         let splitUrad = autocompData.adresaUradu.split('~');
         $('#uradnazev').val(autocompData.nazevUradu);
-        if (splitUrad.Length == 2) {
+        if (splitUrad.length == 2) {
             $('#uradulice').val(splitUrad[0]);
             $('#uradobec').val(splitUrad[1]);
         } else {
@@ -140,6 +148,25 @@
             }
 
         });
+    }
+    
+    function SendForm() {
+        var formData = $("#myForm").serializeArray().reduce(function(obj, item) {
+            obj[item.name] = item.value; 
+            return obj;
+        },{})
+        var json = JSON.stringify(formData);
+        
+        $.ajax({
+          type: "POST",
+          url: "/generatePdf",
+          data: json,
+          success: function(){},
+          dataType: "json",
+          contentType : "application/json"
+        });
+        
+        
     }
 
 

@@ -1,3 +1,4 @@
+using VolicskyPrukaz.Models;
 using VolicskyPrukaz.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,9 +39,9 @@ app.MapGet("/findAddress/{query}", (string query, AutocompleteCache autocomplete
     return Results.Json(result.Select(x => x.Original).ToList());
 });
 
-app.MapGet("/generatePdf", (PdfGenerator pdfGenerator) =>
+app.MapPost("/generatePdf", (Zadost zadost, PdfGenerator pdfGenerator) =>
 {
-    var pdf = pdfGenerator.Create("moje [ěščřžýáíéůĚŠČŘŽÝÁÍÉŮťŤŇň] adresa");
+    var pdf = pdfGenerator.Create(zadost);
     return Results.Bytes(pdf, fileDownloadName: "volicskyPrukaz.pdf");
 });
 

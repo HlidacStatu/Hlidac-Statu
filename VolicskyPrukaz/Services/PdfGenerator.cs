@@ -1,6 +1,7 @@
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using VolicskyPrukaz.Models;
 
 namespace VolicskyPrukaz.Services;
 
@@ -26,7 +27,7 @@ public class PdfGenerator
         _rootPath = environment.ContentRootPath;
     }
 
-    public byte[] Create(string adresa)
+    public byte[] Create(Zadost zadost)
     {
         var logoPath = Path.Combine(_rootPath, "wwwroot", "assets", "images", "hslogo.png");
 
@@ -73,27 +74,27 @@ public class PdfGenerator
                         x.Item().Text(text =>
                         {
                             text.Span(HlavniTextCastPrvni);
-                            text.Span(adresa).Weight(FontWeight.SemiBold);
+                            text.Span(zadost.AdresaUradu).Weight(FontWeight.SemiBold);
                             text.Span(HlavniTextCastDruha);
                         });
 
                         x.Item().Text(text =>
                         {
                             text.Span("Jméno a příjmení žadatele (voliče): ").Weight(FontWeight.SemiBold);
-                            text.Line("Radek dlouhej");
+                            text.Line(zadost.JmenoZadatele);
 
                             text.Span("Datum narození: ").Weight(FontWeight.SemiBold);
-                            text.Line("9. 9. 1999");
+                            text.Line(zadost.DatumNarozeniZadatele);
 
                             text.Span("Trvalý pobyt: ").Weight(FontWeight.SemiBold);
-                            text.Line("Moje tajná adresa 577, 999 09 Nikdálkov");
+                            text.Line(zadost.AdresaZadatele);
 
                             text.Span("Telefonní číslo: ").Weight(FontWeight.SemiBold);
-                            text.Line("721 456 654");
+                            text.Line(zadost.TelefonZadatele);
                         });
 
 
-                        x.Item().Text("K tomu sděluji, že voličský průkaz <placeholder>");
+                        x.Item().Text($"K tomu sděluji, že voličský průkaz {zadost.Prevzeti}.");
                         x.Item().Row(row =>
                         {
                             row.RelativeItem();
