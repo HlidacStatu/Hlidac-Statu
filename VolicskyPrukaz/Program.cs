@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddSingleton<AutocompleteCache>();
+builder.Services.AddSingleton<PdfGenerator>();
 
 //Register hlidac
 Devmasters.Config.Init(builder.Configuration);
@@ -37,9 +38,9 @@ app.MapGet("/findAddress/{query}", (string query, AutocompleteCache autocomplete
     return Results.Json(result.Select(x => x.Original).ToList());
 });
 
-app.MapGet("/generatePdf", () =>
+app.MapGet("/generatePdf", (PdfGenerator pdfGenerator) =>
 {
-    var pdf = PdfGenerator.Create("moje [ěščřžýáíéůĚŠČŘŽÝÁÍÉŮťŤŇň] adresa");
+    var pdf = pdfGenerator.Create("moje [ěščřžýáíéůĚŠČŘŽÝÁÍÉŮťŤŇň] adresa");
     return Results.Bytes(pdf, fileDownloadName: "volicskyPrukaz.pdf");
 });
 
