@@ -74,7 +74,7 @@ public class PdfGenerator
                         x.Item().Text(text =>
                         {
                             text.Span(HlavniTextCastPrvni);
-                            text.Span(zadost.AdresaUradu).Weight(FontWeight.SemiBold);
+                            text.Span($"{zadost.UradNazev}, {zadost.AdresaUradu}").Weight(FontWeight.SemiBold);
                             text.Span(HlavniTextCastDruha);
                         });
 

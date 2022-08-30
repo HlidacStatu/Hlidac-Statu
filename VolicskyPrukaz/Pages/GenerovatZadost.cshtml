@@ -1,4 +1,7 @@
-﻿<form id="myForm" action="/generatePdf" method="post">
+@page
+@model VolicskyPrukaz.Pages.GenerovatZadost
+
+<form id="myForm" asp-page="GenerovatZadost" method="post">
 <div style="position:relative">
     <label for="hsAutocompleteTool">Najděte svoji adresu</label>
     <input placeholder="Zadejte adresu" type="text" name="hsAutocompleteTool" id="hsAutocompleteTool" class="form-control companyahead input-lg" oninput="CallAutocompleteApi(this)" />
@@ -7,23 +10,24 @@
 </div>
 <div>
     <h2>Osobní údaje</h2>
-    <input id="jmenoZadatele" type="text" placeholder="Celé jméno" name="jmenoZadatele" class="form-control input-lg"/>
-    <input id="datumNarozeniZadatele" type="text" placeholder="Datum narození" name="datumNarozeniZadatele" class="form-control input-lg"/>
-    <input id="telefonZadatele" type="text" placeholder="Telefon" name="telefonZadatele" class="form-control input-lg"/>
+    <input asp-for="Zadost.JmenoZadatele" id="jmenoZadatele" type="text" placeholder="Celé jméno" class="form-control input-lg"/>
+    <input asp-for="Zadost.DatumNarozeniZadatele" id="datumNarozeniZadatele" type="text" placeholder="Datum narození" class="form-control input-lg"/>
+    <input asp-for="Zadost.TelefonZadatele" id="telefonZadatele" type="text" placeholder="Telefon" class="form-control input-lg"/>
+    <input asp-for="Zadost.Prevzeti" type="text" placeholder="Převzetí" class="form-control input-lg" />
 
-    <input id="ulice" type="text" placeholder="Ulice + čp" name="ulice" class="form-control input-lg"/>
-    <input id="castobce" type="text" placeholder="Část obce" name="castobce" class="form-control input-lg"/>
-    <input id="obec" type="text" placeholder="PSČ + Obec" name="obec" class="form-control input-lg"/>
+    <input asp-for="Zadost.Ulice" id="ulice" type="text" placeholder="Ulice + čp" class="form-control input-lg"/>
+    <input asp-for="Zadost.CastObce" id="castobce" type="text" placeholder="Část obce" class="form-control input-lg"/>
+    <input asp-for="Zadost.Obec" id="obec" type="text" placeholder="PSČ + Obec" class="form-control input-lg"/>
     
     <h2>Adresa úřadu</h2>
-    <input id="uradnazev" type="text" placeholder="Název úřadu" name="uradnazev" class="form-control input-lg"/>
-    <input id="uradulice" type="text" placeholder="Ulice úřadu" name="uradulice" class="form-control input-lg"/>
-    <input id="uradcastobce" type="text" placeholder="Část obce úřadu" name="uradcast" class="form-control input-lg"/>
-    <input id="uradobec" type="text" placeholder="PSČ + Obec úřadu" name="uradobec" class="form-control input-lg"/>
+    <input asp-for="Zadost.UradNazev" id="uradnazev" type="text" placeholder="Název úřadu" class="form-control input-lg"/>
+    <input asp-for="Zadost.UradUlice" id="uradulice" type="text" placeholder="Ulice úřadu" class="form-control input-lg"/>
+    <input asp-for="Zadost.UradCastObce" id="uradcastobce" type="text" placeholder="Část obce úřadu" class="form-control input-lg"/>
+    <input asp-for="Zadost.UradObec" id="uradobec" type="text" placeholder="PSČ + Obec úřadu" class="form-control input-lg"/>
     
 </div>
 
-<button class="btn btn-primary" onclick="SendForm()">Odeslat</button>    
+<button class="btn btn-primary" type="submit">Odeslat</button>    
 </form>
 
 <style>
@@ -150,24 +154,24 @@
         });
     }
     
-    function SendForm() {
-        var formData = $("#myForm").serializeArray().reduce(function(obj, item) {
-            obj[item.name] = item.value; 
-            return obj;
-        },{})
-        var json = JSON.stringify(formData);
-        
-        $.ajax({
-          type: "POST",
-          url: "/generatePdf",
-          data: json,
-          success: function(){},
-          dataType: "json",
-          contentType : "application/json"
-        });
-        
-        
-    }
+    // function SendForm() {
+    //     var formData = $("#myForm").serializeArray().reduce(function(obj, item) {
+    //         obj[item.name] = item.value; 
+    //         return obj;
+    //     },{})
+    //     var json = JSON.stringify(formData);
+    //    
+    //     $.ajax({
+    //       type: "POST",
+    //       url: "/generatePdf",
+    //       data: json,
+    //       success: function(){},
+    //       dataType: "json",
+    //       contentType : "application/json"
+    //     });
+    //    
+    //    
+    // }
 
 
 </script>
