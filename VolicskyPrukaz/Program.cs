@@ -37,4 +37,10 @@ app.MapGet("/findAddress/{query}", (string query, AutocompleteCache autocomplete
     return Results.Json(result.Select(x => x.Original).ToList());
 });
 
+app.MapGet("/generatePdf", () =>
+{
+    var pdf = PdfGenerator.Create("moje [ěščřžýáíéůĚŠČŘŽÝÁÍÉŮťŤŇň] adresa");
+    return Results.Bytes(pdf, fileDownloadName: "volicskyPrukaz.pdf");
+});
+
 app.Run();
