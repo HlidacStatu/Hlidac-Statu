@@ -20,9 +20,11 @@ public class GenerovatZadost : PageModel
     {
         if (!ModelState.IsValid || Zadost is null)
         {
-            Console.WriteLine("invalid state");
+            return Page();
         }
-        
+
+        //return RedirectToPage(nameof(StazeniZadosti));
+
         var pdf = pdfGenerator.Create(Zadost);
         return File(pdf, MediaTypeNames.Application.Pdf, "volicskyPrukaz.pdf");
     }

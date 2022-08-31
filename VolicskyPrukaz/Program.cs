@@ -5,7 +5,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddSingleton<AutocompleteCache>();
+
+var autocompleteCache = new AutocompleteCache();
+builder.Services.AddSingleton(autocompleteCache);
+
 builder.Services.AddSingleton<PdfGenerator>();
 
 //Register hlidac

@@ -12,13 +12,18 @@ public class AutocompleteCache
     private Devmasters.Cache.LocalMemory.AutoUpdatedCache<Index<AdresyKVolbam>> _cache =
         new(_expiration, CacheKey, _ =>
             {
+                Console.WriteLine("Beru cache");
                 return AdresyRepo.CreateAutocompleteForAdresyAsync().GetAwaiter().GetResult();
             }
         );
 
     public AutocompleteCache()
     {
-        _ = Task.Factory.StartNew(() => _cache.Get());
+        _ = Task.Run(() =>
+        {
+            Console.WriteLine("Začínám generovat cache");
+            return _cache.Get();
+        });
     }
 
     public Index<AdresyKVolbam> GetIndex()
