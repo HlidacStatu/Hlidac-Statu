@@ -18,7 +18,7 @@ namespace HlidacStatu.Web.TagHelpers
                 Name = Framework.Constants.AntispamInputName;
 
             output.TagName = null;
-            output.Content.SetHtmlContent($@"<input type='text' name='{Name}' id='{Name}' value='' placeholder='Your Zip code' />");
+            output.Content.SetHtmlContent($@"<input type='text' name='{Name}' id='{Name}' value='' autocomplete='off' placeholder='Your Zip code' />");
 
 
             RenderScriptsTagHelper.QueueScript(ViewContext,
