@@ -1,3 +1,4 @@
+using QuestPDF.Drawing;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -25,6 +26,16 @@ public class PdfGenerator
     public PdfGenerator(IHostEnvironment environment)
     {
         _rootPath = environment.ContentRootPath;
+        
+        //register fonts
+        var fontFolder = Path.Combine(_rootPath, "wwwroot", "css", "fonts", "cabin");
+        var fonts = Directory.GetFiles(fontFolder, "*.ttf");
+
+        foreach (var font in fonts)
+        {
+            FontManager.RegisterFont(File.OpenRead(font));
+        }
+        
     }
 
     public byte[] Create(Zadost zadost)
@@ -44,7 +55,7 @@ public class PdfGenerator
                 page.DefaultTextStyle(x => x
                     .FontSize(10)
                     .Black()
-                    .FontFamily("Calibri")
+                    .FontFamily("Cabin")
                     .Weight(FontWeight.Normal));
 
                 // Hlavička
@@ -94,8 +105,16 @@ public class PdfGenerator
                         });
 
 
-                        x.Item().Text($"K tomu sděluji, že voličský průkaz {zadost.Prevzeti}.");
-                        x.Item().Row(row =>
+                        x.Item().Text(text =>
+                        {
+                            text.Line($"K tomu sděluji, že voličský průkaz {zadost.Prevzeti}").Weight(FontWeight.SemiBold);
+                            if (zadost.Prevzeti == "žádám zaslat na jinou adresu: ")
+                            {
+                                text.Span(zadost.PrevzetiAdresa);
+                            }
+                        });
+                        
+                        x.Item().PaddingTop(100).Row(row =>
                         {
                             row.RelativeItem();
                             row.RelativeItem();

@@ -6,8 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-var autocompleteCache = new AutocompleteCache();
-builder.Services.AddSingleton(autocompleteCache);
+var cacheSingleton = new AutocompleteCache();
+builder.Services.AddSingleton(cacheSingleton);
 
 builder.Services.AddSingleton<PdfGenerator>();
 
@@ -42,10 +42,10 @@ app.MapGet("/findAddress/{query}", (string query, AutocompleteCache autocomplete
     return Results.Json(result.Select(x => x.Original).ToList());
 });
 
-app.MapPost("/generatePdf", (Zadost zadost, PdfGenerator pdfGenerator) =>
-{
-    var pdf = pdfGenerator.Create(zadost);
-    return Results.Bytes(pdf, fileDownloadName: "volicskyPrukaz.pdf");
-});
+// app.MapGet("/generateAc", (AutocompleteCache autocompleteCache) =>
+// {
+//     autocompleteCache.SerializeAc();
+//     return Results.Ok("hotovo");
+// });
 
 app.Run();

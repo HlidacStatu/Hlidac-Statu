@@ -12,7 +12,10 @@ public class AutocompleteCache
     private Devmasters.Cache.LocalMemory.AutoUpdatedCache<Index<AdresyKVolbam>> _cache =
         new(_expiration, CacheKey, _ =>
             {
-                return AdresyRepo.CreateAutocompleteForAdresyAsync().GetAwaiter().GetResult();
+                var acfile = File.ReadAllBytes("adresy.acf");
+                
+                return Index<AdresyKVolbam>.Deserialize(acfile); //todo: for testing purposes, in prod it needs to be changed to line below 
+                //return AdresyRepo.CreateAutocompleteForAdresyAsync().GetAwaiter().GetResult();
             }
         );
 
@@ -28,5 +31,5 @@ public class AutocompleteCache
     {
         return _cache.Get();
     }
-    
+
 }
