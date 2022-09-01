@@ -33,6 +33,7 @@ public class Zadost
     public string? DatumNarozeniZadatele { get; set; }
     public string? TelefonZadatele { get; set; }
     public string? Prevzeti { get; set; }
+    public string? PrevzetiAdresa { get; set; }
     public string? Ulice {get; set; }
     public string? CastObce {get; set; }
     public string? Obec {get; set; }

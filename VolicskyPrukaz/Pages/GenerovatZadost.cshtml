@@ -1,117 +1,158 @@
 @page
 @model VolicskyPrukaz.Pages.GenerovatZadost
 
-<form id="myForm" asp-page="GenerovatZadost" method="post">
-    <div style="position:relative">
-        <label for="hsAutocompleteTool">Najděte svoji adresu</label>
-        <input placeholder="Zadejte adresu" type="text" name="hsAutocompleteTool" id="hsAutocompleteTool" class="form-control input-lg" autocomplete="off" oninput="CallAutocompleteApi(this)"/>
-        <div id="hsAutocompleteResults">
+<div id="form" class="form pane table">
+    <form id="myForm" asp-page="GenerovatZadost" method="post">
+        <div class="mb-3">
+            <h2><i class="fa-solid fa-shield-halved"></i>&nbsp;Soukromí</h2>
+            <p class="new-p">
+                Vámi vyplněné osobní údaje nikomu neodesíláme, ani je dále nezpracováváme.
+                Pokud chcete mít 100% jistotu, stáhněte si a vyplňte
+                <a href="assets/files/Zadost-Volicsky-Prukaz-Volby2022-CR.pdf">šablonu žádosti </a> ručně sami.
+            </p>
+            <p class="new-p">
+                Pokud se můžete na váš obecní úřad dostavit osobně, nepotřebujete předem žádnou písemnou žádost vytvářet.
+                Stačí, pokud se dostavíte na úřad s platným dokladem totožnosti.
+            </p>
         </div>
-    </div>
-    <div>
-        <h2>Osobní údaje</h2>
-        <label for="jmenoZadatele" class="required">Jméno a příjmení</label>
-        <input asp-for="Zadost.JmenoZadatele" id="jmenoZadatele" type="text" placeholder="Celé jméno" class="form-control input-lg"/>
-        <label for="datumNarozeniZadatele" class="required">Datum narození</label>
-        <input asp-for="Zadost.DatumNarozeniZadatele" id="datumNarozeniZadatele" type="text" placeholder="Datum narození" class="form-control input-lg"/>
-        <label for="telefonZadatele">Telefon</label>
-        <input asp-for="Zadost.TelefonZadatele" id="telefonZadatele" type="text" placeholder="Telefon" class="form-control input-lg"/>
-        
-        <label for="ulice" class="required">Ulice</label>
-        <input asp-for="Zadost.Ulice" id="ulice" type="text" placeholder="Ulice + čp" class="form-control input-lg"/>
-        <label for="castobce">Část obce</label>
-        <input asp-for="Zadost.CastObce" id="castobce" type="text" placeholder="Část obce" class="form-control input-lg"/>
-        <label for="obec" class="required">PSČ a Obec</label>
-        <input asp-for="Zadost.Obec" id="obec" type="text" placeholder="PSČ + Obec" class="form-control input-lg"/>
 
-        <h2>Adresa úřadu</h2>
-        <label for="uradnazev" class="required">Název</label>
-        <input asp-for="Zadost.UradNazev" id="uradnazev" type="text" placeholder="Název úřadu" class="form-control input-lg"/>
-        <label for="uradulice" class="required">Ulice</label>
-        <input asp-for="Zadost.UradUlice" id="uradulice" type="text" placeholder="Ulice úřadu" class="form-control input-lg"/>
-        <label for="uradcastobce">Část obce</label>
-        <input asp-for="Zadost.UradCastObce" id="uradcastobce" type="text" placeholder="Část obce úřadu" class="form-control input-lg"/>
-        <label for="uradobec" class="required">Obec</label>
-        <input asp-for="Zadost.UradObec" id="uradobec" type="text" placeholder="PSČ + Obec úřadu" class="form-control input-lg"/>
-        
-        <label for="uradobec" class="required">Datová schránka</label>
-        <input id="datovka" type="text" class="form-control input-lg" disabled readonly/>
-
-        <h2>Doručení</h2>
-        <div class="button-group" role="group" aria-label="Basic radio toggle button group">
-            <input type="radio" name="doruceni" onclick="SetPrevzeti(this)" value="převezmu osobně" id="in-person"> <label for="in-person">převezmu osobně</label><br>
-            <input type="radio" name="doruceni" onclick="SetPrevzeti(this)" value="převezme osoba, která se prokáže plnou mocí s mým úředně ověřeným podpisem" id="representative"> <label for="representative">převezme osoba, která se prokáže plnou mocí s mým úředně ověřeným podpisem</label><br>
-            <input type="radio" name="doruceni" onclick="SetPrevzeti(this)" value="žádám zaslat na adresu mého trvalého pobytu" id="my-address"> <label for="my-address">žádám zaslat na adresu mého trvalého pobytu</label><br>
-            <input type="radio" name="doruceni" onclick="ShowOtherInputs()" value="žádám zaslat na jinou adresu" id="other-address"> <label for="other-address">žádám zaslat na jinou adresu</label>
+        <div class="mb-3">
+            <h2><i class="fa-solid fa-magnifying-glass"></i>&nbsp;Vyhledat svou adresu</h2>
+            <div style="position:relative">
+                <label for="hsAutocompleteTool">Najděte svoji adresu</label>
+                <input placeholder="Zadejte adresu" type="text" name="hsAutocompleteTool" id="hsAutocompleteTool" class="form-control input-lg" autocomplete="off" oninput="CallAutocompleteApi(this)"/>
+                <div id="hsAutocompleteResults"></div>
+            </div>
         </div>
-        <div style="display: none" id="additionalAddress">
-            <input type="text" placeholder="Jméno"/>
-            <input type="text" placeholder="Adresa"/>
+
+        <div class="mb-3">
+            <h2><i class="fa-regular fa-id-card"></i>&nbsp;Osobní údaje</h2>
+            <label for="jmenoZadatele" class="required">Jméno a příjmení</label>
+            <input asp-for="Zadost.JmenoZadatele" id="jmenoZadatele" type="text" placeholder="Celé jméno" class="form-control input-lg"/>
+            <label for="datumNarozeniZadatele" class="required">Datum narození</label>
+            <input asp-for="Zadost.DatumNarozeniZadatele" id="datumNarozeniZadatele" type="text" placeholder="Datum narození" class="form-control input-lg"/>
+            <label for="telefonZadatele">Telefon</label>
+            <input asp-for="Zadost.TelefonZadatele" id="telefonZadatele" type="text" placeholder="Telefon" class="form-control input-lg"/>
         </div>
-        
-        <input asp-for="Zadost.Prevzeti" id="prevzeti" type="hidden"/>
-        
-    </div>
+        <div class="mb-3">
+            <h2><i class="fa-solid fa-house"></i>&nbsp;Adresa</h2>
+            <label for="ulice" class="required">Ulice</label>
+            <input asp-for="Zadost.Ulice" id="ulice" type="text" placeholder="Ulice + čp" class="form-control input-lg"/>
+            <label for="castobce">Část obce</label>
+            <input asp-for="Zadost.CastObce" id="castobce" type="text" placeholder="Část obce" class="form-control input-lg"/>
+            <label for="obec" class="required">PSČ a Obec</label>
+            <input asp-for="Zadost.Obec" id="obec" type="text" placeholder="PSČ + Obec" class="form-control input-lg"/>
+        </div>
+        <div class="mb-3">
+            <h2><i class="fa-solid fa-building-columns"></i>&nbsp;Adresa úřadu</h2>
+            <label for="uradnazev" class="required">Název</label>
+            <input asp-for="Zadost.UradNazev" id="uradnazev" type="text" placeholder="Název úřadu" class="form-control input-lg"/>
+            <label for="uradulice" class="required">Ulice</label>
+            <input asp-for="Zadost.UradUlice" id="uradulice" type="text" placeholder="Ulice úřadu" class="form-control input-lg"/>
+            <label for="uradcastobce">Část obce</label>
+            <input asp-for="Zadost.UradCastObce" id="uradcastobce" type="text" placeholder="Část obce úřadu" class="form-control input-lg"/>
+            <label for="uradobec" class="required">Obec</label>
+            <input asp-for="Zadost.UradObec" id="uradobec" type="text" placeholder="PSČ + Obec úřadu" class="form-control input-lg"/>
 
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#stahnoutPdfModal" onclick="PrepareModalData()">Připravit žádost</button>
+            <label for="uradobec" class="required">Datová schránka</label>
+            <input id="datovka" type="text" class="form-control input-lg" disabled readonly/>
+        </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="stahnoutPdfModal" tabindex="-1" aria-labelledby="stahnoutPdfModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="stahnoutPdfModalLabel">Žádost je připravena</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="mb-3">
+            <h2><i class="fa-solid fa-envelope"></i>&nbsp;Doručení</h2>
+            <div class="button-group" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" name="doruceni" onclick="SetPrevzeti(this)" value="převezmu osobně" id="in-person"> <label for="in-person">převezmu osobně</label><br>
+                <input type="radio" name="doruceni" onclick="SetPrevzeti(this)" value="převezme osoba, která se prokáže plnou mocí s mým úředně ověřeným podpisem" id="representative"> <label for="representative">převezme osoba, která se prokáže plnou mocí s mým úředně ověřeným podpisem</label><br>
+                <input type="radio" name="doruceni" onclick="SetPrevzeti(this)" value="žádám zaslat na adresu mého trvalého pobytu" id="my-address"> <label for="my-address">žádám zaslat na adresu mého trvalého pobytu</label><br>
+                <input type="radio" name="doruceni" onclick="SetPrevzetiWithAddress(this)" value="žádám zaslat na jinou adresu" id="other-address"> <label for="other-address">žádám zaslat na jinou adresu</label>
+            </div>
+            <div style="display: none" id="additionalAddress">
+                <div class="mb-3">
+
+                    <div style="position:relative">
+                        <label for="prevzetiAutocomplete">vyhledat adresu</label>
+                        <input placeholder="Zadejte adresu" type="text" name="prevzetiAutocomplete" id="prevzetiAutocomplete" class="form-control input-lg" autocomplete="off" oninput="CallPrevzetiAutocompleteApi(this)"/>
+                        <div id="prevzetiAutocompleteResults"></div>
+                    </div>
+
+                    
+                    <label for="prevzetiJmeno" class="required">Jméno a příjmení</label>
+                    <input id="prevzetiJmeno" type="text" placeholder="Celé jméno" class="form-control input-lg"/>
+                    <label for="prevzetiUlice" class="required">Ulice</label>
+                    <input id="prevzetiUlice" type="text" placeholder="Ulice + čp" class="form-control input-lg"/>
+                    <label for="prevzetiCastobce">Část obce</label>
+                    <input id="prevzetiCastobce" type="text" placeholder="Část obce" class="form-control input-lg"/>
+                    <label for="prevzetiObec" class="required">PSČ a Obec</label>
+                    <input id="prevzetiObec" type="text" placeholder="PSČ + Obec" class="form-control input-lg"/>
+                    <label for="prevzetiStat">Stát</label>
+                    <input id="prevzetiStat" type="text" placeholder="Stát" class="form-control input-lg"/>
                 </div>
-                <div class="modal-body">
-                    <h2>
-                        Zkontrolujte žádost
-                    </h2>
-                    <p>
-                        Prosíme, zkontrolujte si údaje ve vygenerované žádosti.
-                        Pokud jsou všechny údaje v pořádku, pročtěte si následující sekci s informacemi o možnostech jejího způsobu doručení.
-                        Pokud není některá z vyplněných informací správná, nic se neděje. Údaje můžete snadno změnit.
-                    </p>
+            </div>
 
-                    <h2>Doručte žádost na váš úřad</h2>
+            <input asp-for="Zadost.Prevzeti" id="prevzeti" type="hidden"/>
+            <input asp-for="Zadost.PrevzetiAdresa" id="prevzetiAdresa" type="hidden"/>
 
-                    <h3>Pomocí datové schránky</h3>
-                    <p>
-                        Pokud máte datovou schránku, stačí odeslat vytvořenou žádost jako přílohu ve formátu PDF do datové schránky vašeho obecního úřadu: <br/>
-                        <span class="text-success" id="modalDatovka"></span><br/>
-                        Žádost nemusí být podepsaná (nebo opatřena elektronickým podpisem) a tím pádem nemusíte podpis ani ověřovat – vaše identita je ověřena přihlášením do datové schránky.
-                        Žádost odešlete nejpozději do 1. 10. 2021.
-                    </p>
-                    <h3>Poštou</h3>
-                    <p>
-                        Vytvořenou žádost vytiskněte, opatřete ji úředně ověřeným podpisem (na libovolném obecním úřadu, u notáře apod.) a odešlete na adresu vašeho úřadu: <br/>
-                        <span class="text-success" id="modalAdresaUradu"></span><br/>
-                        Žádost musí být doručena (doručena, nikoliv odeslána) do 1. 10. 2021.
-                    </p>
-                    <h3>Osobně</h3>
-                    <p>
-                        Dostavte se na váš obecní úřad:<br/>
-                        <span class="text-success" id="modalAdresaUradu2"></span><br/>
-                        s platným dokladem totožnosti. Na úřad můžete přijít podat žádost nejpozději 6. 10. 2021 do 16:00 hodin. Raději si ale předem zkontrolujte úřední hodiny!
-                    </p>
+        </div>
 
-                    <h2>Přejeme dobrou volbu!</h2>
-                    <p>
-                        Pro volby do zastupitelstev obcí a Senátu ČR se dostavte s vaším volebním průkazem a platným průkazem totožnosti 23. 9. 2022 či 24. 9. 2022 do libovolného volebního okrsku.
-                        Upozornění: pokud máte vystaven volební průkaz a chcete volit ve volební místnosti vašeho volebního okrsku, musíte mít volební průkaz také sebou. Bez něj vám volba nebude umožněna!
-                    </p>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#stahnoutPdfModal" onclick="PrepareModalData()">Připravit žádost</button>
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Změnit údaje</button>
-                    <button type="submit" class="btn btn-primary">Vygenerovat žádost</button>
+        <!-- Modal -->
+        <div class="modal fade" id="stahnoutPdfModal" tabindex="-1" aria-labelledby="stahnoutPdfModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="stahnoutPdfModalLabel">Žádost je připravena</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h2>
+                            Zkontrolujte žádost
+                        </h2>
+                        <p>
+                            Prosíme, zkontrolujte si údaje ve vygenerované žádosti.
+                            Pokud jsou všechny údaje v pořádku, pročtěte si následující sekci s informacemi o možnostech jejího způsobu doručení.
+                            Pokud není některá z vyplněných informací správná, nic se neděje. Údaje můžete snadno změnit.
+                        </p>
+
+                        <h2>Doručte žádost na váš úřad</h2>
+
+                        <h3>Pomocí datové schránky</h3>
+                        <p>
+                            Pokud máte datovou schránku, stačí odeslat vytvořenou žádost jako přílohu ve formátu PDF do datové schránky vašeho obecního úřadu: <br/>
+                            <span class="text-success" id="modalDatovka"></span><br/>
+                            Žádost nemusí být podepsaná (nebo opatřena elektronickým podpisem) a tím pádem nemusíte podpis ani ověřovat – vaše identita je ověřena přihlášením do datové schránky.
+                            Žádost odešlete nejpozději do 1. 10. 2021.
+                        </p>
+                        <h3>Poštou</h3>
+                        <p>
+                            Vytvořenou žádost vytiskněte, opatřete ji úředně ověřeným podpisem (na libovolném obecním úřadu, u notáře apod.) a odešlete na adresu vašeho úřadu: <br/>
+                            <span class="text-success" id="modalAdresaUradu"></span><br/>
+                            Žádost musí být doručena (doručena, nikoliv odeslána) do 1. 10. 2021.
+                        </p>
+                        <h3>Osobně</h3>
+                        <p>
+                            Dostavte se na váš obecní úřad:<br/>
+                            <span class="text-success" id="modalAdresaUradu2"></span><br/>
+                            s platným dokladem totožnosti. Na úřad můžete přijít podat žádost nejpozději 6. 10. 2021 do 16:00 hodin. Raději si ale předem zkontrolujte úřední hodiny!
+                        </p>
+
+                        <h2>Přejeme dobrou volbu!</h2>
+                        <p>
+                            Pro volby do zastupitelstev obcí a Senátu ČR se dostavte s vaším volebním průkazem a platným průkazem totožnosti 23. 9. 2022 či 24. 9. 2022 do libovolného volebního okrsku.
+                            Upozornění: pokud máte vystaven volební průkaz a chcete volit ve volební místnosti vašeho volebního okrsku, musíte mít volební průkaz také sebou. Bez něj vám volba nebude umožněna!
+                        </p>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Změnit údaje</button>
+                        <button type="submit" class="btn btn-primary">Vygenerovat žádost</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-</form>
-
+    </form>
+</div>
 
 <style>
     .whisp {
@@ -139,6 +180,73 @@
 
 <script>
 
+    // další fnc
+    function SetPrevzeti(data)
+    {
+        $('#additionalAddress').hide();
+        $('#prevzeti').val(data.value);
+    }
+        
+    function SetPrevzetiWithAddress(data)
+    {
+        $('#additionalAddress').show();
+        $('#prevzeti').val(data.value);
+    }
+    
+    function PrepareModalData()
+    {
+        $('#modalDatovka').text($('#datovka').val());
+        
+        let adresaUradu = $('#uradnazev').val() + '<br>';
+        adresaUradu = adresaUradu + $('#uradulice').val() + '<br>';
+        
+        let uradCastObce = $('#uradcastobce').val();
+        if (uradCastObce.length > 0) 
+        {
+            adresaUradu = adresaUradu + uradCastObce + '<br>';
+        }
+        
+        adresaUradu = adresaUradu + $('#uradobec').val();
+        
+        $('#modalAdresaUradu').html(adresaUradu);
+        $('#modalAdresaUradu2').html(adresaUradu);
+        
+        FillAdditionalPrevzeteti()
+    }
+    
+    function FillAdditionalPrevzeteti()
+    {
+        if ($('#other-address').prop('checked'))
+        {
+            
+            let jmeno = $('#prevzetiJmeno').val();
+            let ulice = $('#prevzetiUlice').val();
+            let cast = $('#prevzetiCastobce').val();
+            let obec = $('#prevzetiObec').val();
+            let stat = $('#prevzetiStat').val();
+            
+            let adresa = [];
+            if (jmeno.length > 1) {
+                adresa.push(jmeno);
+            }
+            if (ulice.length > 1) {
+                adresa.push(ulice);
+            }
+            if (cast.length > 1) {
+                adresa.push(cast);
+            }
+            if (obec.length > 1) {
+                adresa.push(obec);
+            }
+            if (stat.length > 1) {
+                adresa.push(stat);
+            }
+            
+            $('#prevzetiAdresa').val(adresa.join(', '));
+        }
+    }
+
+    // první autocomplete
     var currentRequest = null;
     function CallAutocompleteApi(caller) {
         let url = "/findAddress/" + caller.value;
@@ -235,54 +343,59 @@
         });
     }
     
-    function SetPrevzeti(data)
-    {
-        $('#additionalAddress').hide();
-        $('#prevzeti').val(data.value);
-    }
-        
-    function ShowOtherInputs()
-    {
-        $('#additionalAddress').show();
-    }
+    // Druhý autocomplete (šlo by udělat lépe)
+    var prevzetiRequest = null;
+        function CallPrevzetiAutocompleteApi(caller) {
+            let url = "/findAddress/" + caller.value;
     
-    function PrepareModalData()
-    {
-        $('#modalDatovka').text($('#datovka').val());
-        
-        let adresaUradu = $('#uradnazev').val() + '<br>';
-        adresaUradu = adresaUradu + $('#uradulice').val() + '<br>';
-        
-        let uradCastObce = $('#uradcastobce').val();
-        if (uradCastObce.length > 0) 
-        {
-            adresaUradu = adresaUradu + uradCastObce + '<br>';
+            prevzetiRequest = jQuery.ajax({
+                type: 'GET',
+                url: url,
+                beforeSend: function(){           
+                    if(prevzetiRequest != null) {
+                        prevzetiRequest.abort();
+                    }
+                },
+                success: function(data) {
+                    EmptyPrevzetiAutocompleteResults();
+                    data.forEach(autocompData => {
+                        var button = $('<button/>',
+                            {
+                                text: autocompData.adresa.replaceAll('~','; '),
+                                class: 'whisp',
+                                click: function () { FillPrevzetiDetail(autocompData); EmptyPrevzetiAutocompleteResults(); }
+                            });
+                        $("#prevzetiAutocompleteResults").append(button);
+                    });
+                },
+                error:function(e){
+                    console.log(e);
+                }
+            });
         }
         
-        adresaUradu = adresaUradu + $('#uradobec').val();
+        function FillPrevzetiDetail(autocompData) {
+            $('#prevzetiAutocomplete').val(autocompData.adresa.replaceAll('~','; '));
+            let split = autocompData.adresa.split('~');
+            if (split.length == 2) {
+                $('#prevzetiUlice').val(split[0]);
+                $('#prevzetiObec').val(split[1]);
+                $('#prevzetiCastobce').val('');
+            } else {
+                $('#prevzetiUlice').val(split[0]);
+                $('#prevzetiCastobce').val(split[1]);
+                $('#prevzetiObec').val(split[2]);
+            }
+        }
         
-        $('#modalAdresaUradu').html(adresaUradu);
-        $('#modalAdresaUradu2').html(adresaUradu);
-    }
+        function EmptyPrevzetiAutocompleteResults() {
+            $('#prevzetiAutocompleteResults').empty();
+        }
     
-    // function SendForm() {
-    //     var formData = $("#myForm").serializeArray().reduce(function(obj, item) {
-    //         obj[item.name] = item.value; 
-    //         return obj;
-    //     },{})
-    //     var json = JSON.stringify(formData);
-    //    
-    //     $.ajax({
-    //       type: "POST",
-    //       url: "/generatePdf",
-    //       data: json,
-    //       success: function(){},
-    //       dataType: "json",
-    //       contentType : "application/json"
-    //     });
-    //    
-    //    
-    // }
+        function ErasePrevzetiSearchBox() {
+            $('#prevzetiAutocomplete').val("").focus();
+        }
+    
 
 
 </script>
