@@ -3,8 +3,6 @@
 using System.Data;
 using System.Data.SqlClient;
 
-using Devmasters.Collections;
-
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
@@ -50,7 +48,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
 
 
-            
+
             new Thread(() =>
             {
                 HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread started loading Ids");
@@ -79,7 +77,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
                 HlidacStatuApi.Code.Log.Logger.Info($"BP Fill queue thread done");
             }).Start();
-            
+
 
             updateQueueTimer.Start();
         }
@@ -131,7 +129,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             Devmasters.Batch.ThreadManager.DoActionForAll(newIds,
             id =>
             {
-                if (AddSmlouvaToQueue(id,false))
+                if (AddSmlouvaToQueue(id, false))
                     addedToQ++;
                 return new Devmasters.Batch.ActionOutputData();
             }, !System.Diagnostics.Debugger.IsAttached, 5, null, new Devmasters.Batch.ActionProgressWriter(1f, new Devmasters.Batch.LoggerWriter(Code.Log.Logger, Devmasters.Log.PriorityLevel.Information).ProgressWriter).Writer, prefix: "BPUpdateQueue ");
@@ -381,14 +379,10 @@ again:
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "PrivateApi")]
         [HttpGet("AddSmlouvy")]
-        public async Task<ActionResult<bool>> AddSmlouvy(string[] ids)
+        public async Task<ActionResult<bool>> AddSmlouva(string id)
         {
-            foreach (var id in ids)
-            {
-                AddSmlouvaToQueue(id,true);
-            }
+            return AddSmlouvaToQueue(id, true);
 
-            return true;
         }
 
         //[ApiExplorerSettings(IgnoreApi = true)]
