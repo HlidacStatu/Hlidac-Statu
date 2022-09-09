@@ -84,14 +84,14 @@ namespace HlidacStatuApi.Controllers.ApiV2
             updateQueueTimer.Start();
         }
 
-        private static bool AddSmlouvaToQueue(string id)
+        private static bool AddSmlouvaToQueue(string id, bool force)
         {
             var sml = SmlouvaRepo.LoadAsync(id, includePrilohy: false).Result;
             if (sml != null)
             {
                 if (sml.Prilohy != null)
                 {
-                    var toProcess = sml.Prilohy.Where(p => p.nazevSouboru.ToLower().EndsWith(".pdf") && p.BlurredPages == null);
+                    var toProcess = sml.Prilohy.Where(p => p.nazevSouboru.ToLower().EndsWith(".pdf") && (p.BlurredPages == null || force));
                     if (toProcess.Any())
                     {
                         _ = idsToProcess.TryAdd(id, new processed()
@@ -131,7 +131,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             Devmasters.Batch.ThreadManager.DoActionForAll(newIds,
             id =>
             {
-                if (AddSmlouvaToQueue(id))
+                if (AddSmlouvaToQueue(id,false))
                     addedToQ++;
                 return new Devmasters.Batch.ActionOutputData();
             }, !System.Diagnostics.Debugger.IsAttached, 5, null, new Devmasters.Batch.ActionProgressWriter(1f, new Devmasters.Batch.LoggerWriter(Code.Log.Logger, Devmasters.Log.PriorityLevel.Information).ProgressWriter).Writer, prefix: "BPUpdateQueue ");
@@ -378,6 +378,18 @@ again:
             }
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Authorize(Roles = "PrivateApi")]
+        [HttpGet("AddSmlouvy")]
+        public async Task<ActionResult<bool>> AddSmlouvy(string[] ids)
+        {
+            foreach (var id in ids)
+            {
+                AddSmlouvaToQueue(id,true);
+            }
+
+            return true;
+        }
 
         //[ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "blurredAPIAccess")]
