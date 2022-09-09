@@ -378,8 +378,8 @@ again:
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "PrivateApi")]
-        [HttpGet("AddSmlouvy")]
-        public async Task<ActionResult<bool>> AddSmlouva(string id)
+        [HttpGet("AddTask")]
+        public async Task<ActionResult<bool>> AddTask(string id)
         {
             return AddSmlouvaToQueue(id, true);
 
