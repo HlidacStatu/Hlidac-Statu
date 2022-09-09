@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nest;
+using System.Linq;
 
 namespace HlidacStatu.Repositories
 {
@@ -26,7 +27,7 @@ namespace HlidacStatu.Repositories
             private static volatile Devmasters.Cache.Elastic.Manager<string[], QueryBatch> cacheSmlouvy
                 = Devmasters.Cache.Elastic.Manager<string[], QueryBatch>.GetSafeManagerInstance(
                     "cachedIdsSmlouvy",
-                    q => GetSmlouvyAsync(q).ConfigureAwait(false).GetAwaiter().GetResult(),
+                    q => GetSmlouvyIdAsync(q).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(24),
                     Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
                     "DevmastersCache", null, null,
@@ -47,8 +48,16 @@ namespace HlidacStatu.Repositories
 
             
         }
+        public static async Task<string[]> GetSmlouvyIdAsync(QueryBatch query)
+        {
+            var client = await ES.Manager.GetESClientAsync();
 
-        public static async Task<string[]> GetSmlouvyAsync(QueryBatch query)
+            var ids = await Searching.Tools.GetAllIdsAsync(client, 10, query.Query, 
+                logOutputFunc: query.LogOutputFunc, progressOutputFunc: query.ProgressOutputFunc);
+
+            return ids.Result.ToArray();
+        }
+        public static async Task<string[]> GetSmlouvyIdAsync_old(QueryBatch query)
         {
             var stack = HlidacStatu.Util.StackReport.GetCallingMethod(true);
 

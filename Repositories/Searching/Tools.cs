@@ -463,8 +463,9 @@ namespace HlidacStatu.Repositories.Searching
                         allRecs.Add(h.Source);
                     }
                 },
-                onError: e => {
-                    HlidacStatu.Util.Consts.Logger.Error("Scroll error occured cl:{client} q:{query}", e, sourceESClient.ConnectionSettings.DefaultIndex, query); 
+                onError: e =>
+                {
+                    HlidacStatu.Util.Consts.Logger.Error("Scroll error occured cl:{client} q:{query}", e, sourceESClient.ConnectionSettings.DefaultIndex, query);
                     res.ErrorOccurred = true;
                     res.Exception = e;
                     _ = waitHandle.Set();
@@ -482,9 +483,11 @@ namespace HlidacStatu.Repositories.Searching
         }
 
 
-        public static async Task<DataResultset<string>> GetAllIdsAsync(ElasticClient sourceESClient,int maxDegreeOfParallelism, 
-            string query = null, int batchSize = 100)
+        public static async Task<DataResultset<string>> GetAllIdsAsync(ElasticClient sourceESClient, int maxDegreeOfParallelism,
+            string query = null, int batchSize = 100,
+            Action<string> logOutputFunc = null, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null)
         {
+            long? total = null;
             var qs = new QueryContainerDescriptor<object>().MatchAll();
             if (!string.IsNullOrEmpty(query))
             {
@@ -494,19 +497,30 @@ namespace HlidacStatu.Repositories.Searching
                         .DefaultOperator(Operator.And)
                     );
             }
-
-
+            if (progressOutputFunc != null)
+            {
+                var resCount = await sourceESClient.SearchAsync<object>(a => a
+                    .Source(false)
+                    .Size(0)
+                    .Query(q => qs)
+                    .TrackTotalHits(true)
+                    );
+                if (resCount.IsValid)
+                    total = resCount.Total;
+                else
+                    total = 0;
+            }
             var scrollAllObservable = sourceESClient.ScrollAll<object>("4m", maxDegreeOfParallelism, sc => sc
                 .MaxDegreeOfParallelism(maxDegreeOfParallelism)
                 .Search(s => s
                     .Size(batchSize)
                     .Source(false)
-                    .Query(q=>qs)
+                    .Query(q => qs)
                 )
             );
 
             var waitHandle = new ManualResetEvent(false);
-
+            DateTime started = DateTime.Now;
             var allIds = new ConcurrentBag<string>();
             var res = new DataResultset<string>();
 
@@ -523,17 +537,29 @@ namespace HlidacStatu.Repositories.Searching
                     {
                         allIds.Add(id);
                     }
+                    if (progressOutputFunc != null)
+                    {
+                        progressOutputFunc(new ActionProgressData(total.Value, allIds.Count, started));
+
+                    }
                 },
-                onError: e => { 
-                    HlidacStatu.Util.Consts.Logger.Error("Scroll error occured cl:{client} q:{query}",e, sourceESClient.ConnectionSettings.DefaultIndex, query);
+                onError: e =>
+                {
+                    HlidacStatu.Util.Consts.Logger.Error("Scroll error occured cl:{client} q:{query}", e, sourceESClient.ConnectionSettings.DefaultIndex, query);
                     res.ErrorOccurred = true;
                     res.Exception = e;
-                    waitHandle.Set();
+                    if (logOutputFunc != null)
+                    {
+                        logOutputFunc(e.ToString());
+
+                    }
+
+                    _ = waitHandle.Set();
                 },
                 onCompleted: () => waitHandle.Set()
             );
 
-            var subscriber = scrollAllObservable.Subscribe(scrollAllObserver);
+            var subscriber = scrollAllObservable.SubscribeSafe(scrollAllObserver);
             _ = waitHandle.WaitOne();
             subscriber.Dispose();
 
@@ -577,7 +603,7 @@ namespace HlidacStatu.Repositories.Searching
 
         public static string ToElasticDateInterval(DateTime? fromDate, DateTime? toDate)
         {
-            return $"[{ToElasticDate(fromDate,"*")} TO {ToElasticDate(toDate, "*")} }}";
+            return $"[{ToElasticDate(fromDate, "*")} TO {ToElasticDate(toDate, "*")} }}";
         }
     }
 }
