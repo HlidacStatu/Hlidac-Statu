@@ -9,8 +9,9 @@ public class AdresyKVolbam : IEquatable<AdresyKVolbam>
     public int Id { get; set; }
 
     [FullTextSearch.Search]
+    public string SearchField { get; set; }
+    
     public string Adresa { get; set; }
-
     public int TypOvm { get; set; }
     public string DatovkaUradu { get; set; }
     public string NazevUradu { get; set; }

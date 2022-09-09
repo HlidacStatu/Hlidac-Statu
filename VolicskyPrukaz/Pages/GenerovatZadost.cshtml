@@ -1,6 +1,36 @@
 @page
 @model VolicskyPrukaz.Pages.GenerovatZadost
 
+@{
+    string[] staty = new []
+    {
+        "Afghánistán", "Albánie", "Alžírsko", "Andorra", "Angola", "Anguilla", "Antigua a Barbuda", "Argentina", "Arménie", "Aruba", "Austrálie", "Ázerbájdžán", 
+        "Bahamy", "Bahrajn", "Bangladéš", "Barbados", "Belgie", "Belize", "Bělorusko", "Benin", "Bermudy", "Bhútán", "Bolívie", "Bosna a Hercegovina", "Botswana", 
+        "Brazílie", "Britské indickooceánské území", "Britské Panenské ostrovy", "Brunej", "Bulharsko", "Burkina Faso", "Burundi", 
+        "Cookovy ostrovy", "Curaçao", "Čad", "Černá Hora", "Čína", "Česko", "Dánsko", "Faerské ostrovy", "Grónsko ", "Dominika", 
+        "Dominikánská republika", "Džibutsko", "Egypt", "Ekvádor", "Eritrea", "Estonsko", "Svazijsko", "Etiopie", "Falklandy (Malvíny)", 
+        "Fidži", "Filipíny", "Finsko", "Francie", "Francouzská Guyana", "Francouzská jižní a antarktická území", "Francouzská Polynésie", 
+        "Gabon", "Gambie", "Ghana", "Gibraltar", "Grenada", "Gruzie", "Guadeloupe", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", 
+        "Haiti", "Honduras", "Hongkong", "Chile", "Chorvatsko", "Indie", "Indonésie", "Irák", "Írán", "Irsko", "Island", "Itálie", "Izrael", 
+        "Jamajka", "Japonsko", "Jemen", "Jižní Afrika", "Jižní Súdán", "Jordánsko", "Kajmanské ostrovy", "Kambodža", "Kamerun", "Kanada", "Kapverdy", 
+        "Bonaire, Svatý Eustach a Saba", "Katar", "Kazachstán", "Keňa", "Kiribati", "Kolumbie", "Komory", "Konžská republika", "Konžská demokratická republika", 
+        "Korejská lidově demokratická republika", "Korejská republika", "Kosovo", "Kostarika", "Kuba", "Kuvajt", "Kypr", "Kyrgyzstán", 
+        "Laos", "Lesotho", "Libanon", "Libérie", "Libye", "Lichtenštejnsko", "Litva", "Lotyšsko", "Lucembursko", 
+        "Macao", "Madagaskar", "Maďarsko", "Makedonie - článek zrušen", "Malajsie", "Malawi", "Maledivy", "Mali", "Malta", "Maroko",
+        "Marshallovy ostrovy", "Martinik", "Mauricius", "Mauritánie", "Mexiko", "Mikronésie", "Moldavsko", "Monako", "Mongolsko", "Montserrat", "Mosambik", 
+        "Myanmar", "Namibie", "Nauru", "Německo", "Nepál", "Niger", "Nigérie", "Nikaragua", "Niue", "Nizozemsko", "Norsko", "Nová Kaledonie", "Nový Zéland", 
+        "Tokelau", "Cookovy ostrovy", "Niue ", "Omán", "Pákistán", "Palau", "Panama", "Papua Nová Guinea", "Paraguay", "Peru", "Pitcairn", "Pobřeží slonoviny", 
+        "Polsko", "Portoriko", "Portugalsko", "Rakousko", "Réunion", "Rovníková Guinea", "Rumunsko", "Rusko", "Rwanda", "Řecko", "Svatá Helena", 
+        "Svatý Kryštof a Nevis", "Svatá Lucie", "San Marino", "Svatý Martin (NL)", "Saint Pierre a Miquelon", "Svatý Tomáš a Princův ostrov", 
+        "Svatý Vincenc a Grenadiny", "Salvador", "Samoa", "Saúdská Arábie", "Senegal", "Severní Makedonie", "Seychely", "Sierra Leone", "Singapur", 
+        "Slovensko", "Slovinsko", "Somálsko", "Spojené arabské emiráty", "Spojené státy", "Srbsko", "Šrí Lanka", "Středoafrická republika", "Súdán", "Surinam", 
+        "Sýrie", "Šalomounovy ostrovy", "Španělsko", "Švédsko", "Švýcarsko", "Tádžikistán", "Tchaj-wan", "Tanzanie", "Thajsko", "Togo", "Tonga", "Trinidad a Tobago", 
+        "Tristan da Cunha", "Tunisko", "Turecko", "Turkmenistán", "Turks a Caicos", "Tuvalu", "Uganda", "Ukrajina", "Uruguay", "Uzbekistán", "Vanuatu", "Vatikán", 
+        "Velká Británie", "Guernsey", "Jersey", "Man", "Venezuela", "Vietnam", "Východní Timor", "Wallis a Futuna", "Zambie", "Zimbabwe"
+        
+    };
+}
+
 <div id="form" class="form pane table">
     <form id="myForm" asp-page="GenerovatZadost" method="post">
         <div class="mb-3">
@@ -16,7 +46,7 @@
             </p>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3 w-50">
             <h2><i class="fa-solid fa-magnifying-glass"></i>&nbsp;Vyhledat svou adresu</h2>
             <div style="position:relative">
                 <label for="hsAutocompleteTool">Najděte svoji adresu</label>
@@ -25,7 +55,7 @@
             </div>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3 w-50">
             <h2><i class="fa-regular fa-id-card"></i>&nbsp;Osobní údaje</h2>
             <label for="jmenoZadatele" class="required">Jméno a příjmení</label>
             <input asp-for="Zadost.JmenoZadatele" id="jmenoZadatele" type="text" placeholder="Celé jméno" class="form-control input-lg"/>
@@ -34,7 +64,7 @@
             <label for="telefonZadatele">Telefon</label>
             <input asp-for="Zadost.TelefonZadatele" id="telefonZadatele" type="text" placeholder="Telefon" class="form-control input-lg"/>
         </div>
-        <div class="mb-3">
+        <div class="mb-3 w-50">
             <h2><i class="fa-solid fa-house"></i>&nbsp;Adresa</h2>
             <label for="ulice" class="required">Ulice</label>
             <input asp-for="Zadost.Ulice" id="ulice" type="text" placeholder="Ulice + čp" class="form-control input-lg"/>
@@ -43,7 +73,7 @@
             <label for="obec" class="required">PSČ a Obec</label>
             <input asp-for="Zadost.Obec" id="obec" type="text" placeholder="PSČ + Obec" class="form-control input-lg"/>
         </div>
-        <div class="mb-3">
+        <div class="mb-3 w-50">
             <h2><i class="fa-solid fa-building-columns"></i>&nbsp;Adresa úřadu</h2>
             <label for="uradnazev" class="required">Název</label>
             <input asp-for="Zadost.UradNazev" id="uradnazev" type="text" placeholder="Název úřadu" class="form-control input-lg"/>
@@ -53,12 +83,11 @@
             <input asp-for="Zadost.UradCastObce" id="uradcastobce" type="text" placeholder="Část obce úřadu" class="form-control input-lg"/>
             <label for="uradobec" class="required">Obec</label>
             <input asp-for="Zadost.UradObec" id="uradobec" type="text" placeholder="PSČ + Obec úřadu" class="form-control input-lg"/>
-
             <label for="uradobec" class="required">Datová schránka</label>
             <input id="datovka" type="text" class="form-control input-lg" disabled readonly/>
         </div>
 
-        <div class="mb-3">
+        <div class="mb-3 w-50">
             <h2><i class="fa-solid fa-envelope"></i>&nbsp;Doručení</h2>
             <div class="button-group" role="group" aria-label="Basic radio toggle button group">
                 <input type="radio" name="doruceni" onclick="SetPrevzeti(this)" value="převezmu osobně." id="in-person"> <label for="in-person">převezmu osobně</label><br>
@@ -67,7 +96,7 @@
                 <input type="radio" name="doruceni" onclick="SetPrevzetiWithAddress(this)" value="žádám zaslat na jinou adresu: " id="other-address"> <label for="other-address">žádám zaslat na jinou adresu</label>
             </div>
             <div style="display: none" id="additionalAddress">
-                <div class="mb-3">
+                <div class="mb-3 w-50">
 
                     <div style="position:relative">
                         <label for="prevzetiAutocomplete">vyhledat adresu</label>
@@ -85,7 +114,13 @@
                     <label for="prevzetiObec" class="required">PSČ a Obec</label>
                     <input id="prevzetiObec" type="text" placeholder="PSČ + Obec" class="form-control input-lg"/>
                     <label for="prevzetiStat">Stát</label>
-                    <input id="prevzetiStat" type="text" placeholder="Stát" class="form-control input-lg"/>
+                    <input id="prevzetiStat" type="text" list="datalistOptions" placeholder="Stát" class="form-control input-lg"/>
+                    <datalist id="datalistOptions">
+                    @foreach (var stat in staty)
+                    {
+                        <option value="@stat" />
+                    }
+                    </datalist>
                 </div>
             </div>
 

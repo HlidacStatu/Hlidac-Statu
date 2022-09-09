@@ -20,7 +20,7 @@ public class AdresyRepo
             // b) statutárním městům, kde voličský průkaz vyřizují městské obvody
             var adresy = await db.AdresyKVolbam.FromSqlRaw(
                 @"select ovm.Nazev NazevUradu, ovm.TypOvmId TypOvm, ovm.IdDS DatovkaUradu, amo.oneliner AdresaUradu, 
-                         am.KodAdm Id, am.oneliner Adresa
+                         am.KodAdm Id, am.oneliner Adresa, am.oneliner SearchField
                     from dbo.OrganVerejneMoci ovm
                     join dbo.AdresniMisto amo on ovm.AdresaOvmId = amo.KodAdm
                     join dbo.AdresniMisto am on amo.KodObce = am.KodObce 
@@ -30,6 +30,23 @@ public class AdresyRepo
                      and ovm.Zkratka not in ('LIBAVA','BOLETICE','KPRAHA','Plzen','UstinL','Ostrava',
                                              'HRADISTE','Pardubice','Brno','BREZINA')")
                 .ToListAsync();
+            
+            var bigCities = await db.AdresyKVolbam.FromSqlRaw(
+                    @"select ovm.Nazev NazevUradu, ovm.TypOvmId TypOvm, ovm.IdDS DatovkaUradu, amo.oneliner AdresaUradu, 
+                         am.KodAdm Id, am.oneliner Adresa, 
+                         am.NazevUlice + ' ' + LTRIM(am.CisloDomovni) + ' ' + LTRIM(am.CisloOrientacni) + ' ' + am.NazevObce SearchField
+                    from dbo.OrganVerejneMoci ovm
+                    join dbo.AdresniMisto amo on ovm.AdresaOvmId = amo.KodAdm
+                    join dbo.AdresniMisto am on amo.KodObce = am.KodObce 
+                            and am.NazevObce in ('Praha','Brno','Ostrava',N'Plzeň')
+                            and ISNULL(am.KodMomc, '') = ISNULL(amo.KodMomc,'') and am.TypSO = N'č.p.'
+                   where typovmid in (5,6,7,8)
+                     and stavsubjektu = 1
+                     and ovm.Zkratka not in ('LIBAVA','BOLETICE','KPRAHA','Plzen','UstinL','Ostrava',
+                                             'HRADISTE','Pardubice','Brno','BREZINA')")
+                .ToListAsync();
+            
+            adresy.AddRange(bigCities);
 
             return new FullTextSearch.Index<AdresyKVolbam>(adresy);
         }
