@@ -322,7 +322,7 @@ namespace HlidacStatu.Web
             {
                 string[] cssPaths = new[]
                 {
-                    "wwwroot/Content/GlobalSite.v1.14.css",
+                    "wwwroot/Content/GlobalSite.v1.15.css",
                     "wwwroot/Content/social-share-kit.css",
                     "wwwroot/Content/new.v1.14.css"
                 };
