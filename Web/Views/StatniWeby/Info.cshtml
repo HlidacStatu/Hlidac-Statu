@@ -106,7 +106,7 @@ else
                 </div>
             </div>
             <div class="col-xs-9 col-sm-10">
-                <div class="bs-callout bs-callout-@(UptimeSSL.StatusStyleColor(webssl.SSLGrade()))" style="margin:0;">
+                <div class="bs-callout @(UptimeSSL.StatusStyleColor(webssl.SSLGrade()))" style="margin:0;">
                     <h4>Výsledek analýzy HTTPS na @web.Host.HostDomain() <small class="text-muted">ze dne @webssl.Created.ToString("dd.MM.yyyy")</small></h4>
                     @if (webssl.SSLGrade() == UptimeSSL.SSLGrades.Unknown)
                     {
@@ -166,7 +166,7 @@ else
                     </div>
                 </div>
                 <div class="col-xs-9 col-sm-10">
-                    <div class="bs-callout bs-callout-@(ipv6supported ? "success" : "danger" )" style="margin:0;">
+                    <div class="bs-callout @(ipv6supported ? "success" : "danger" )" style="margin:0;">
                         <h4>Výsledek analýzy IPv6 na @web.Host.HostDomain() <small class="text-muted">ze dne @webssl.Created.ToString("dd.MM.yyyy")</small></h4>
                         @if (ipv6supported)
                         {
@@ -308,7 +308,7 @@ else
 
 
 
-    <div class="bs-callout bs-callout-primary">
+    <div class="bs-callout primary">
         <h4>Hlídání dostupnosti státní webů. Co to vlastně děláme?</h4>
         <p>
             Měříme každou minutu, zda důležité weby státu vůbec běží, a pokud ano, tak jak rychle odpovídají. A tomu odpovídají i zobrazené barvy.

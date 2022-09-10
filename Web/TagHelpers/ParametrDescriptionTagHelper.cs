@@ -11,7 +11,7 @@ namespace HlidacStatu.Web.TagHelpers
         public bool Autohide { get; set; } = true;
         public string CustomStyle { get; set; } = "";
 
-        public string CustomClass { get; set; } = "bs-callout bs-callout-info small";
+        public string CustomClass { get; set; } = "bs-callout info small";
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {

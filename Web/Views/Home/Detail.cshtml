@@ -1,11 +1,13 @@
 ﻿@model HlidacStatu.Entities.Smlouva
-@using Devmasters.Enums;
+
+@using Devmasters.Enums
 @using System.IO
 @using HlidacStatu.Connectors
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using Nest
+@using Devmasters.Collections;
 
 @{
     ViewBag.Title = Devmasters.TextUtil.ShortenText(Model.predmet ?? "", 70);
@@ -292,82 +294,89 @@
             <td>
                 @if (Model.Prilohy != null && Model.Prilohy.Count() > 0)
                 {
-                    <ol>
-                        @foreach (var priloha in Model.Prilohy)
-                        {
-                            bool weHaveCopy = Init.PrilohaLocalCopy.ExistLocalCopyOfPriloha(Model, priloha);
-                            <li>
-                                @if (znepristupnena)
+                    @foreach (var priloha in Model.Prilohy)
+                    {
+                        bool weHaveCopy = Init.PrilohaLocalCopy.ExistLocalCopyOfPriloha(Model, priloha);
+                        string calloutColor = "primary";
+                        calloutColor = znepristupnena ? "gray" : calloutColor;
+                        calloutColor = (this.User?.IsInRole("Admin") == true && priloha.BlurredPages != null) ? "primary" : calloutColor;
+                        calloutColor = (this.User?.IsInRole("Admin") == true && priloha.BlurredPages != null && priloha.BlurredPages.BlurredAreaPerc > 0m) ? "warning" : calloutColor;
+                        calloutColor = (this.User?.IsInRole("Admin") == true && priloha.BlurredPages != null && priloha.BlurredPages.BlurredAreaPerc > 0.1m) ? "danger" : calloutColor;
+
+                        <div class="bs-callout @(calloutColor) small">
+                            @if (znepristupnena)
+                            {
+                                <div>
+                                    <h4 class="font-monospace" title="@priloha.nazevSouboru">@Devmasters.TextUtil.ShortenTextInMiddle(priloha.nazevSouboru,35)</h4>
+                                    @if (weHaveCopy)
+                                    {
+                                        if (this.User?.IsInRole("novinar") == true)
+                                        {
+                                            <a href="@(priloha.LocalCopyPath(Model.Id,this.User.Identity.Name))" data-link="kopie">(naše kopie)</a>
+                                            <b>!Pozor, tato smlouva byla zneplatněna a tato příloha není veřejně dostupná!</b>
+                                        }
+                                        else
+                                        {
+                                            <partial name="WebUtil/FeedbackPriloha" model="@(new FeedbackPrilohaViewModel(priloha.odkaz))" />
+                                        }
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div>
+
+                                    <h4 class="font-monospace" title="@priloha.nazevSouboru">@Devmasters.TextUtil.ShortenTextInMiddle(priloha.nazevSouboru,35)</h4>
+
+                                    <a href="@priloha.odkaz" target="_blank">Originál</a>
+                                    @if (weHaveCopy)
+                                    {
+                                        @Html.Raw(";&nbsp;")
+                                        <a href="@(priloha.GetUrl(Model.Id, true, UriKind.Relative))" data-link="kopie">(naše kopie)</a>
+                                    }
+                                    @if (priloha.WordCount > 10)
+                                    {
+                                        @Html.Raw(";&nbsp;")
+                                        <a href="@Url.Action("TextSmlouvy", new {id = @Model.Id, hash = priloha.hash?.Value, q = Context.Request.Query["Q"]})">zobrazit čistý text přílohy</a>
+                                        <span>(@priloha.WordCount slov)</span>
+                                    }
+
+                                    @*                                <highlight-content
+                        highlights="@highlightingData"
+                        path="prilohy.plainTextContent"
+                        content-to-compare="@priloha.PlainTextContent"
+                        prefix="<blockquote class='small'>"
+                        postfix="</blockquote>"></highlight-content>
+                        *@
+
+                                </div>
+                            }
+
+                            @if (priloha.BlurredPages != null)
+                            {
+                                if (priloha.BlurredPages.BlurredAreaPerc > 0 && priloha.BlurredPages.NumOfBlurredPages > 0)
                                 {
-                                    <div>
-                                        @priloha.nazevSouboru
-                                        @if (weHaveCopy)
-                                        {
-                                            if (this.User?.IsInRole("novinar") == true)
-                                            {
-                                                <a href="@(priloha.LocalCopyPath(Model.Id,this.User.Identity.Name))" data-link="kopie">(naše kopie)</a>
-                                                <b>!Pozor, tato smlouva byla zneplatněna a tato příloha není veřejně dostupná!</b>
-                                            }
-                                            else
-                                            {
-                                                <partial name="WebUtil/FeedbackPriloha" model="@(new FeedbackPrilohaViewModel(priloha.odkaz))" />
-                                            }
-                                        }
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div>
-                                        @if (this.User?.IsInRole("canEditData") == true && priloha.nazevSouboru.ToLower().EndsWith("pdf"))
-                                        {
-                                            <a target="_blank" href="/manage/ShowPrilohaTables?s=@Model.Id&p=@priloha.hash.Value">
-                                                <i class="fal fa-table" style="color:red;"></i>
-                                            </a>
-                                        }
-
-                                        @priloha.nazevSouboru :
-                                        <a href="@priloha.odkaz" target="_blank">Originál</a>
-                                        @if (weHaveCopy)
-                                        {
-                                            @Html.Raw(";&nbsp;")
-                                            <a href="@(priloha.GetUrl(Model.Id, true, UriKind.Relative))" data-link="kopie">(naše kopie)</a>
-                                        }
-                                        @if (priloha.WordCount > 10)
-                                        {
-                                            @Html.Raw(";&nbsp;")
-                                            <a href="@Url.Action("TextSmlouvy", new {id = @Model.Id, hash = priloha.hash?.Value, q = Context.Request.Query["Q"]})">zobrazit čistý text přílohy</a>
-                                            <span>(@priloha.WordCount slov)</span>
-                                        }
-
-                                        @*                                <highlight-content
-                            highlights="@highlightingData"
-                            path="prilohy.plainTextContent"
-                            content-to-compare="@priloha.PlainTextContent"
-                            prefix="<blockquote class='small'>"
-                            postfix="</blockquote>"></highlight-content>
-                            *@
-
-                                    </div>
-                                }
-
-                                @if (this.User?.IsInRole("Admin") == true && priloha.BlurredPages != null)
-                                {
-
-                                    <div><i>
-                                        začerněno @HlidacStatu.Util.RenderData.NicePercent(priloha.BlurredPages.BlurredAreaPerc)
+                                    <div style="margin-top:4px;padding-left:2em">
+                                        Začerněno asi <b>@HlidacStatu.Util.RenderData.NicePercent(priloha.BlurredPages.BlurredAreaPerc)</b> textu.
                                         @if (priloha.BlurredPages.NumOfExtensivelyBlurredPages > 0)
                                         {
-                                            <text>
-                                                , nejvíce stránky @(string.Join(", ", priloha.BlurredPages.ListOfExtensivelyBlurredPages))
-                                            </text>
+                                            @("Nejvíce na str. " + string.Join(", ", priloha.BlurredPages.ListOfExtensivelyBlurredPages.ListToRanges().Select(r => r.NiceRange())) + ".")
                                         }
-                                        </i>
                                     </div>
                                 }
+                            }
+                            @if (this.User?.IsInRole("canEditData") == true && priloha.nazevSouboru.ToLower().EndsWith("pdf"))
+                            {
+                                <div>
+                                    <a target="_blank" href="/manage/ShowPrilohaTables?s=@Model.Id&p=@priloha.hash.Value">
+                                        <i class="fal fa-table" style="color:red;"></i>
+                                    </a>
+                                </div>
+                            }
 
-                            </li>
-                        }
-                    </ol>
+                        </div>
+                    }
+
                 }
                 else
                 {
@@ -613,4 +622,4 @@
             }
         </p>
     }
-}
+                    }

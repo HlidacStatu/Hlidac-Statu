@@ -37,7 +37,7 @@ Query ="\"účtenkovka\" AND ico:00006947", UrlTemplate = "/HledatSmlouvy?Q={0}"
 {
     private async Task QueryStatistics(TemplatedQuery item)
     {
-        <div class="bs-callout @(item.Data.Summary().PocetSmluv==0 ? "bs-callout-success" : "bs-callout-danger"))">
+        <div class="bs-callout @(item.Data.Summary().PocetSmluv==0 ? "success" : "danger"))">
             <h4>
                 <a href="@item.Url()">@Html.Raw(item.Text)</a>
             </h4>

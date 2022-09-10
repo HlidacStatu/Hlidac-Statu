@@ -2,24 +2,24 @@
     padding-left: 3em;
     line-height: 2em;
     display: block;
-    font-size: calc(1.3rem + .6vw)!important;
-    font-weight: lighter!important;
-    color: #6c757d!important;
+    font-size: calc(1.3rem + .6vw) !important;
+    font-weight: lighter !important;
+    color: #6c757d !important;
 }
 
 h2 small, h2 .small {
     padding-left: 2.5em;
     line-height: 1.7em;
     display: block;
-    font-size: calc(1.3rem + .6vw)!important;
-    font-weight: lighter!important;
-    color: #6c757d!important;
+    font-size: calc(1.3rem + .6vw) !important;
+    font-weight: lighter !important;
+    color: #6c757d !important;
 }
 
 h3 small, h3 .small {
-    font-size: calc(0.7rem + .6vw)!important;
-    font-weight: lighter!important;
-    color: #6c757d!important;
+    font-size: calc(0.7rem + .6vw) !important;
+    font-weight: lighter !important;
+    color: #6c757d !important;
 }
 
 .h4, h4 {
@@ -808,7 +808,7 @@ hr.morespace {
 }
 
 hr.middle {
-    width:50%;
+    width: 50%;
 }
 
 hr.dark {
@@ -946,15 +946,25 @@ textarea {
     border-left-width: 5px;
     border-radius: 3px;
 }
-    .bs-callout.small h4 {
-        font-size: 18px;
+
+    .bs-callout.small {
+        padding: 7px;
+        margin: 12px 0;
+        border: 1px solid #eee;
+        border-left-width: 5px;
+        border-radius: 3px;
+        font-size: 1em;
     }
-    .bs-callout.small div, .bs-callout.small p {
-        font-size: 13px;
-        line-height:19px;
+    .bs-callout.small h4 {
+        font-size: 16px;
     }
 
-    .bs-callout.bs-callout-noborder {
+    .bs-callout.small div, .bs-callout.small p {
+        font-size: 1em;
+        line-height: 1em;
+    }
+
+    .bs-callout.noborder {
         margin-left: 30px;
         border-top: none;
         border-right: none;
@@ -962,7 +972,7 @@ textarea {
         border-left-width: 5px;
         border-radius: 3px;
     }
-
+        
     .bs-callout h4 {
         margin-top: 0;
         margin-bottom: 5px;
@@ -980,53 +990,53 @@ textarea {
         margin-top: -5px;
     }
 
-.bs-callout-default {
-    border-left-color: #777;
-}
-
-    .bs-callout-default h4 {
-        color: #777;
+    .bs-callout.default, .bs-callout.gray {
+        border-left-color: #777;
     }
 
-.bs-callout-primary {
-    border-left-color: #428bca;
-}
+        .bs-callout.default h4, .bs-callout.gray h4 {
+            color: #777;
+        }
 
-    .bs-callout-primary h4 {
-        color: #428bca;
+    .bs-callout.primary {
+        border-left-color: #428bca;
     }
 
-.bs-callout-success {
-    border-left-color: #5cb85c;
-}
+        .bs-callout.primary h4 {
+            color: #428bca;
+        }
 
-    .bs-callout-success h4 {
-        color: #5cb85c;
+    .bs-callout.success {
+        border-left-color: #5cb85c;
     }
 
-.bs-callout-danger {
-    border-left-color: #d9534f;
-}
+        .bs-callout.success h4 {
+            color: #5cb85c;
+        }
 
-    .bs-callout-danger h4 {
-        color: #d9534f;
+    .bs-callout.danger {
+        border-left-color: #d9534f;
     }
 
-.bs-callout-warning {
-    border-left-color: #f0ad4e;
-}
+        .bs-callout.danger h4 {
+            color: #d9534f;
+        }
 
-    .bs-callout-warning h4 {
-        color: #f0ad4e;
+    .bs-callout.warning {
+        border-left-color: #f0ad4e;
     }
 
-.bs-callout-info {
-    border-left-color: #5bc0de;
-}
+        .bs-callout.warning h4 {
+            color: #f0ad4e;
+        }
 
-    .bs-callout-info h4 {
-        color: #5bc0de;
+    .bs-callout.info {
+        border-left-color: #5bc0de;
     }
+
+        .bs-callout.info h4 {
+            color: #5bc0de;
+        }
 
 
 
@@ -1718,8 +1728,9 @@ img.kindex {
     .adlinemsg .adlinemsgtxt {
         font-size: 115%;
         color: red;
-        width:95%;
+        width: 95%;
     }
+
 @media (min-width: 768px) and (max-width: 991px) {
     .adlinemsg {
         padding: 3px;
@@ -1730,19 +1741,19 @@ img.kindex {
             color: red;
             width: 90%;
         }
-
 }
-    @media (max-width: 767px) {
-        .adlinemsg {
-            padding: 2px;
-        }
 
-            .adlinemsg .adlinemsgtxt {
-                font-size: 90%;
-                color: red;
-                width: 90%;
-            }
+@media (max-width: 767px) {
+    .adlinemsg {
+        padding: 2px;
     }
+
+        .adlinemsg .adlinemsgtxt {
+            font-size: 90%;
+            color: red;
+            width: 90%;
+        }
+}
 
 pre {
     display: block;
@@ -1757,37 +1768,38 @@ pre {
     border-radius: 4px;
 }
 
-pre.noborder {
-    display: block;
-    padding: 0;
-    margin: 0 ;
-    line-height: 1.1;
-    color: #333;
-    word-break: break-all;
-    word-wrap: break-word;
-    background-color: none;
-    border: none;
-    border-radius: unset;
-}
-
-pre.formatted {
-    white-space: pre-wrap !important;
-    background: none;
-    line-height: 1.6em;
-    word-break: break-word;
-    overflow-x: auto;
-    white-space: -moz-pre-wrap;
-    white-space: -pre-wrap;
-    white-space: -o-pre-wrap;
-    word-wrap: break-word;
-}
-
-pre.formatted.bigger {
-    font-size:115%;
-}
-    pre.formatted.smaller {
-        font-size: 90%;
+    pre.noborder {
+        display: block;
+        padding: 0;
+        margin: 0;
+        line-height: 1.1;
+        color: #333;
+        word-break: break-all;
+        word-wrap: break-word;
+        background-color: none;
+        border: none;
+        border-radius: unset;
     }
+
+    pre.formatted {
+        white-space: pre-wrap !important;
+        background: none;
+        line-height: 1.6em;
+        word-break: break-word;
+        overflow-x: auto;
+        white-space: -moz-pre-wrap;
+        white-space: -pre-wrap;
+        white-space: -o-pre-wrap;
+        word-wrap: break-word;
+    }
+
+        pre.formatted.bigger {
+            font-size: 115%;
+        }
+
+        pre.formatted.smaller {
+            font-size: 90%;
+        }
 
 .chart_small-circle {
     height: 12px;
@@ -1824,7 +1836,7 @@ kbd {
     padding: 0.1rem .3rem;
 }
 
-.input-group-btn:last-child>.btn {
+.input-group-btn:last-child > .btn {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
@@ -1852,13 +1864,13 @@ hr {
     }
 
     hr.dotted {
-        border-top: 3px dotted ;
+        border-top: 3px dotted;
         margin-top: 24px;
         margin-bottom: 34px;
     }
 
     hr.double {
-        border-top: 3px  double;
+        border-top: 3px double;
         margin-top: 24px;
         margin-bottom: 34px;
     }

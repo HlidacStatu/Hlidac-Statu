@@ -90,7 +90,7 @@
         </div>
     </div>
     <div class="col-xs-9 col-sm-10">
-        <div class="bs-callout bs-callout-@(UptimeSSL.StatusStyleColor(webssl.SSLGrade()))" style="margin:0;">
+        <div class="bs-callout @(UptimeSSL.StatusStyleColor(webssl.SSLGrade()))" style="margin:0;">
             <h4>Výsledek analýzy HTTPS na @Model.HostDomain() <small class="text-muted">ze dne @webssl.Created.ToString("dd.MM.yyyy")</small></h4>
             @if (webssl.SSLGrade() == UptimeSSL.SSLGrades.Unknown)
             {

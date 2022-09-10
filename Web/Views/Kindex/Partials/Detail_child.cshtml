@@ -248,7 +248,7 @@ else
 }
 @if (feedbacks.Any())
 {
-    <div class="bs-callout bs-callout-warning" style="padding-bottom:30px;">
+    <div class="bs-callout warning" style="padding-bottom:30px;">
         <h4>Vyjádření subjektu k hodnocení K-Index</h4>
         @foreach (var feedback in feedbacks)
         {
@@ -257,7 +257,7 @@ else
         }
     </div>
 }
-<div class="bs-callout bs-callout-primary" style="padding-bottom:30px;">
+<div class="bs-callout primary" style="padding-bottom:30px;">
     <h4>Rating K–Index</h4>
     <p>
         Veřejná správa a státní firmy hospodaří s prostředky občanů ČR. Každá organizace se chová jinak,
@@ -507,7 +507,7 @@ else
 
     </div>
 </div>
-<div class="bs-callout bs-callout-success" style="margin-bottom:50px;">
+<div class="bs-callout success" style="margin-bottom:50px;">
     <p>
         Obdobně jako u písmenného vyjádření, kde @Html.KIndexIcon(KIndexData.KIndexLabelValues.A) je nejlepší hodnocení,
         v číselném vyjádření je nejlepší hodnota <b>0</b>.
