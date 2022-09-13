@@ -15,8 +15,8 @@ namespace HlidacStatu.Web.TagHelpers
             output.Content.SetHtmlContent($@"
 <button type=""button""
         class=""btn btn-primary btn-sm""
-        data-toggle=""modal""
-        data-target=""#eventModal"">
+        data-bs-toggle=""modal""
+        data-bs-target=""#eventModal"">
     {OpenModalBtnText}
 </button>
 <div class=""modal fade"" id=""eventModal"" tabindex=""-1"" role=""dialog"" aria-labelledby=""eventModalLabel"" aria-hidden=""true"">
