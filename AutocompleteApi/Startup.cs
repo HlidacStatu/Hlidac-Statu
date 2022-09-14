@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using Devmasters.Log;
 using HlidacStatu.AutocompleteApi.Services;
 using HlidacStatu.LibCore.MiddleWares;
 using Microsoft.AspNetCore.Builder;
@@ -64,8 +65,13 @@ namespace HlidacStatu.AutocompleteApi
                 ApplicationName = "AutocompleteApi",
                 MinimumRequestTimeToTrackMs = 900
             });
+
+            var timeMeasureLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.AutocompleteApi.ResponseTimes",
+                Devmasters.Log.Logger.DefaultConfiguration()
+                    .Enrich.WithProperty("codeversion",
+                        System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()));
             
-            app.UseTimeMeasureMiddleware();
+            app.UseTimeMeasureMiddleware(timeMeasureLogger);
             
             if (env.IsDevelopment())
             {
