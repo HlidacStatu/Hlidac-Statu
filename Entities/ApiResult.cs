@@ -1,4 +1,4 @@
-﻿namespace HlidacStatu.Lib.Data.External.Tables.Camelot
+﻿namespace HlidacStatu.Entities
 {
 
     public class ApiResult
