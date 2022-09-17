@@ -377,7 +377,7 @@
                                 Name = "Počet smluv",
                                 HtmlRender = (m) =>
                                 {
-                                    var query = $"ico:{Model.ICO} AND ico:{m} AND "
+                                    var query = $"ico:{Model.ICO} AND ico:{m.Key} AND "
                                + $"{HlidacStatu.Repositories.Searching.Query.Formatted("podepsano",new DateTime(y,1,1),new DateTime(y,12,31))}";
                                    return $"<a href='/HledatSmlouvy?Q={System.Net.WebUtility.UrlEncode(query)}'>"
                                        +$"{HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}"
