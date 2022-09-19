@@ -164,11 +164,15 @@ namespace HlidacStatu.Extensions
 
 
         public static string SponzoringToHtml(this Osoba osoba, int take = int.MaxValue, string template = "{0}",
-            string itemTemplate = "{0}", string itemDelimeter = "<br/>")
+            string itemTemplate = "{0}", string itemDelimeter = "<br/>", Expression<Func<Sponzoring, bool>> sponzoringFilter = null)
         {
+            Expression<Func<Sponzoring, bool>> all = e => true;
+
+            sponzoringFilter = sponzoringFilter ?? all;
             return
                 string.Format(template, string.Join(itemDelimeter,
-                    osoba.Sponzoring()
+                    osoba.Sponzoring().AsQueryable()
+                        .Where(sponzoringFilter)
                         .OrderByDescending(s => s.DarovanoDne)
                         .Select(s => s.ToHtml(itemTemplate))
                         .Take(take))

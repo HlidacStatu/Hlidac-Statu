@@ -81,11 +81,17 @@
                 {
                     var o = Osoby.GetById.Get(os);
                     var sponz = o.Sponzoring().ToList();
-                    <li>
-                        <a href="@o.GetUrl()">@o.FullNameWithYear()</a> sponzoroval @HlidacStatu.Util.RenderData.RenderList(sponz.Select(m => m.JmenoPrijemce()).Distinct(), ending: "")
+
+                    var sponzorOsoba = o.SponzoringToHtml(itemTemplate: $"<li><a href='{o.GetUrl(true)}'>{o.FullName()}</a> {{0}}</li>", itemDelimeter:"", sponzoringFilter: s=>s.OsobaIdDarce == os || s.IcoDarce == Model.ICO);
+
+                    @Html.Raw(sponzorOsoba);
+@*                    <li>
+                        <a href="@o.GetUrl()">@o.FullNameWithYear()</a> sponzoroval 
+                        @HlidacStatu.Util.RenderData.RenderList(sponz.Select(m => m.JmenoPrijemce()).Distinct(), ending: "")
                         v celkové výši <b>@HlidacStatu.Util.RenderData.NicePriceHtml(sponz.Sum(m => m.Hodnota) ?? 0)</b>.
                     </li>
-                }
+*@
+            }
             </ul>
         </div>
     }
