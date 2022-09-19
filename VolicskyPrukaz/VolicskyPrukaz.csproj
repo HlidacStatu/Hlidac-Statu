@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
+      <ProjectReference Include="..\Whisperer\Whisperer.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -19,6 +20,9 @@
 
     <ItemGroup>
       <None Update="adresy.acf">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="adresy.brotli">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
