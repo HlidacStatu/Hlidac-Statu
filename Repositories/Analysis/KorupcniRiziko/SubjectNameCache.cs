@@ -1,6 +1,4 @@
-﻿using FullTextSearch;
-
-using HlidacStatu.Connectors;
+﻿using HlidacStatu.Connectors;
 
 using System;
 using System.Collections.Generic;
@@ -40,9 +38,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             return CachedCompanies.Get();
         }
 
-        [Search]
         public string Name { get; set; }
-        [Search]
         public string Ico { get; set; }
 
         public bool Equals(SubjectNameCache other)

@@ -1,7 +1,5 @@
 ﻿using Devmasters.Enums;
 
-using FullTextSearch;
-
 using HlidacStatu.Entities;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories;
@@ -11,8 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
+using Whisperer;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -212,19 +213,16 @@ text zpravy: {txt}";
             return Content("");
         }
 
-        static Devmasters.Cache.LocalMemory.Cache<Index<SubjectNameCache>> FullTextSearchCache =
-            new Devmasters.Cache.LocalMemory.Cache<Index<SubjectNameCache>>(TimeSpan.Zero,
-            o =>
-            {
-                return new Index<SubjectNameCache>(SubjectNameCache.GetCompanies().Values);
-            });
+        private static Index<SubjectNameCache> FullTextSearchCache = new(
+            Path.Combine(Init.WebAppDataPath, "autocomplete", "kindex"),
+            SubjectNameCache.GetCompanies().Values,
+            ts => $"{ts.Name} {ts.Ico}");
+            
         // Used for searching
         public JsonResult FindCompany(string id)
         {
-
-            var searchResult = FullTextSearchCache.Get().Search(id, 10);
-
-            return Json(searchResult.Select(r => r.Original));
+            var searchResult = FullTextSearchCache.Search(id);
+            return Json(searchResult);
         }
 
         public async Task<JsonResult> KindexForIco(string id, int? rok = null)
