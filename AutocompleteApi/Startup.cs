@@ -1,6 +1,3 @@
-using System;
-using System.Net.Http;
-using Devmasters.Log;
 using HlidacStatu.AutocompleteApi.Services;
 using HlidacStatu.LibCore.MiddleWares;
 using Microsoft.AspNetCore.Builder;
@@ -8,7 +5,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Polly;
 
 namespace HlidacStatu.AutocompleteApi
 {
@@ -31,29 +27,9 @@ namespace HlidacStatu.AutocompleteApi
             
             //start initializing during startup, not after first request
             // after first request call looks like this: services.AddSingleton<MemoryStoreService>();
-            services.AddSingleton<IMemoryStoreService, MemoryStoreService>();
-            services.AddSingleton<HlidacApiService>();
-            
-            //add timer to refresh data once a day
-            services.AddHostedService<TimedHostedService>();
-
+            services.AddSingleton<Caches>(new Caches());
+           
             services.AddControllers();
-
-            
-            services.Configure<HlidacApiOptions>(Configuration.GetSection(nameof(HlidacApiOptions)));
-            var httpClientFactoryBuilder = services.AddHttpClient(AppConstants.HttpClientName)
-                .AddTransientHttpErrorPolicy(policyBuilder =>
-                    policyBuilder.WaitAndRetryAsync(
-                        3, retryNumber => TimeSpan.FromMilliseconds(5000)));
-
-            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
-            {
-                httpClientFactoryBuilder.ConfigurePrimaryHttpMessageHandler(c => new HttpClientHandler()
-                {
-                    ServerCertificateCustomValidationCallback =
-                        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-                });
-            }
 
         }
 

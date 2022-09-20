@@ -16,13 +16,37 @@ public class CachedIndex<T> where T : IEquatable<T>
     private Index<T> _index;
 
     private Func<IEnumerable<T>> _populateFunc;
+    
+    
+    private EventHandler? _onCacheInitStarted;
+    /// <summary>
+    /// Is triggered when cache load is initialized.
+    /// </summary>
+    public event EventHandler CacheInitStarted
+    {
+        add => _onCacheInitStarted += value;
+        remove => _onCacheInitStarted -= value;
+    }
+    
+    /// <summary>
+    /// Is trigered when cache load finishes. Retruns true if finishes successfully, otherwise returns false.
+    /// </summary>
+    private EventHandler<bool>? _onCacheInitFinished;
+    public event EventHandler<bool> CacheInitFinished
+    {
+        add => _onCacheInitFinished += value;
+        remove => _onCacheInitFinished -= value;
+    }
 
-    public CachedIndex(string baseDir, TimeSpan expiration, Func<IEnumerable<T>> populateFunc, IndexingOptions<T> indexingOptions)
+    public CachedIndex(string baseDir,
+        TimeSpan expiration,
+        Func<IEnumerable<T>> populateFunc,
+        IndexingOptions<T> indexingOptions)
     {
         _baseDir = baseDir;
         _populateFunc = populateFunc;
         _indexingOptions = indexingOptions;
-
+        
         InitLatestDirectory();
 
         _index = new Index<T>(CurrentDirectory, _indexingOptions.IndexAnalyzer, _indexingOptions.QueryAnalyzer);
@@ -61,6 +85,9 @@ public class CachedIndex<T> where T : IEquatable<T>
     {
         try
         {
+            if(_onCacheInitStarted != null)
+                _onCacheInitStarted.Invoke(this, EventArgs.Empty);
+            
             var nextIndex = new Index<T>(NextDirectory, _indexingOptions.IndexAnalyzer, _indexingOptions.QueryAnalyzer);
             // prepare other directory
             var newIndex = FillIndex(nextIndex);
@@ -75,10 +102,14 @@ public class CachedIndex<T> where T : IEquatable<T>
             
             await Task.Delay(TimeSpan.FromMinutes(3)); // leave some time for running queries to finish  
             CleanPreviousDirectory(NextDirectory);
+            
+            if(_onCacheInitFinished != null)
+                _onCacheInitFinished.Invoke(this, true);
         }
         catch (Exception e)
         {
-            Console.WriteLine("Couldnt renew cache from repository");
+            if(_onCacheInitFinished != null)
+                _onCacheInitFinished.Invoke(this, false);
             throw;
         }
     }

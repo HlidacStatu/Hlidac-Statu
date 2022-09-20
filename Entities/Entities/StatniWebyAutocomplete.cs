@@ -5,13 +5,9 @@ namespace HlidacStatu.Entities
     public class StatniWebyAutocomplete : IEquatable<StatniWebyAutocomplete>
     {
         public int Id { get; set; }
-        [FullTextSearch.Search]
         public string Name { get; set; }
-        [FullTextSearch.Search]
         public string Description { get; set; }
-        [FullTextSearch.Search]
         public string Ico { get; set; }
-        [FullTextSearch.Search]
         public string Url { get; set; }
         public string HostDomain { get; set; }
 

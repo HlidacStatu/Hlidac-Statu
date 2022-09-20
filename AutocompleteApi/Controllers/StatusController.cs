@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using HlidacStatu.AutocompleteApi.Services;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.AutocompleteApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.AutocompleteApi.Controllers
@@ -10,27 +7,17 @@ namespace HlidacStatu.AutocompleteApi.Controllers
     [Route("[controller]")]
     public class StatusController : ControllerBase
     {
-        private IMemoryStoreService _memoryStore;
+        private Caches _cacheService;
 
-        public StatusController(IMemoryStoreService memoryStore)
+        public StatusController(Caches cacheService)
         {
-            _memoryStore = memoryStore;
+            _cacheService = cacheService;
         }
 
         [HttpGet]
         public JsonResult OverallStatus()
         {
-            var result = new
-            {
-                _memoryStore.IsDataRenewalRunning,
-                _memoryStore.RunningSince,
-                _memoryStore.LastDataRenewalStarted,
-                _memoryStore.LastException?.Message,
-                _memoryStore.LastException?.StackTrace
-            };
-            
-            return new JsonResult(result);
-
+            return new JsonResult(_cacheService.Status);
         }
     
     }

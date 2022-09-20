@@ -15,6 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\LibCore\LibCore.csproj" />
+      <ProjectReference Include="..\Whisperer\Whisperer.csproj" />
     </ItemGroup>
 
 </Project>
