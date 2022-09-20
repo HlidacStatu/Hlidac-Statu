@@ -1,6 +1,4 @@
-﻿using FullTextSearch;
-
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
@@ -21,6 +19,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
+using Whisperer;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -508,14 +508,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize(Roles = "NasiPoliticiAdmin")]
         public ActionResult Companies(string q)
         {
-            Devmasters.Cache.LocalMemory.Cache<Index<Autocomplete>> FullTextSearchCache =
-                new(TimeSpan.FromDays(30),
-                    "nasipolitici_firmy_autocomplete",
-                    o => { return BuildNPFirmySearchIndex(); });
-
-            var searchCache = FullTextSearchCache.Get();
-
-            var searchResult = searchCache.Search(q, 8);
+            var searchResult = CompanyAutocomplete.Search(q, 8);
 
             if (!string.IsNullOrEmpty(Request.Headers["Origin"]))
             {
@@ -523,17 +516,18 @@ namespace HlidacStatu.Web.Controllers
                     Response.Headers.Add("Access-Control-Allow-Origin", Request.Headers["Origin"]);
             }
 
-            return Json(searchResult.Select(r => r.Original));
+            return Json(searchResult);
         }
 
-        private Index<Autocomplete> BuildNPFirmySearchIndex()
-        {
-            var results = StaticData.Autocomplete_Firmy_Cache.Get();
+        private static CachedIndex<Autocomplete> CompanyAutocomplete = new(
+            Path.Combine(Init.WebAppDataPath, "autocomplete", "np_firmy"),
+            TimeSpan.FromDays(30),
+            () => StaticData.Autocomplete_Firmy_Cache.Get(),
+            new IndexingOptions<Autocomplete>()
+            {
+                TextSelector = ts => $"{ts.Text}"
+            });
 
-            var index = new Index<Autocomplete>(results);
-
-            return index;
-        }
 
         [Authorize]
         public async Task<ActionResult> Search(string query, int? page, int? order)

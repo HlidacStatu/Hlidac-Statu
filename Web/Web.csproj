@@ -114,6 +114,7 @@
       <ProjectReference Include="..\Plugin.IssueAnalyzers\Plugin.IssueAnalyzers.csproj" />
       <ProjectReference Include="..\Util\Util.csproj" />
       <ProjectReference Include="..\Web.HealthChecks\Web.HealthChecks.csproj" />
+      <ProjectReference Include="..\Whisperer\Whisperer.csproj" />
       <ProjectReference Include="..\XLib\XLib.csproj" />
     </ItemGroup>
 
