@@ -45,8 +45,6 @@ namespace HlidacStatu.Repositories
 
         public static Devmasters.Cache.File.Cache<byte[]> Autocomplete_Cache = null;
         public static Devmasters.Cache.File.Cache<List<Autocomplete>> Autocomplete_Firmy_Cache = null;
-        public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<FullTextSearch.Index<Autocomplete>> FulltextSearchForAutocomplete = null;
-
 
         public static Devmasters.Cache.File.Cache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]> Insolvence_firem_politiku_Cache = null;
 
@@ -438,29 +436,16 @@ namespace HlidacStatu.Repositories
                    });
 
                 Autocomplete_Cache = new Devmasters.Cache.File.Cache<byte[]>
-                   (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "AutocompleteV3",
+                   (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "AutocompleteV4",
                    (o) =>
                    {
                        Util.Consts.Logger.Info("Starting AutocompleteRepo.GenerateAutocomplete");
                        var autocompleteData = AutocompleteRepo.GenerateAutocomplete();
-                       var index = new FullTextSearch.Index<Autocomplete>(autocompleteData);
-                       var serialized = index.Serialize();
+                       var bytes = ObjectMinifier.Compressor.CompressToByteArr(autocompleteData);
                        Util.Consts.Logger.Info("End AutocompleteRepo.GenerateAutocomplete");
-                       return serialized;
+                       return bytes;
                    });
 
-                FulltextSearchForAutocomplete = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<FullTextSearch.Index<Autocomplete>>(
-                        TimeSpan.FromHours(12),
-                        "FulltextSearchForAutocomplete_main",
-                        o =>
-                        {
-                            Util.Consts.Logger.Info("Loading Autocomplete filecache");
-                            var results = Autocomplete_Cache.Get();
-                            Util.Consts.Logger.Info("Generating Autocomplete memory cache");
-                            var index = FullTextSearch.Index<Autocomplete>.Deserialize(results);
-                            Util.Consts.Logger.Info("Generating Autocomplete memory cache done");
-                            return index;
-                        });
 
                 Autocomplete_Firmy_Cache = new Devmasters.Cache.File.Cache<List<Autocomplete>>
                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "Autocomplete_firmyOnly",

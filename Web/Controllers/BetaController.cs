@@ -31,16 +31,6 @@ namespace HlidacStatu.Web.Controllers
         }
 
 
-        // Used for searching
-        public JsonResult AutocompleteOld(string q)
-        {
-            var searchCache = StaticData.FulltextSearchForAutocomplete.Get();
-
-            var searchResult = searchCache.Search(q, 5, ac => ac.Priority);
-
-            return Json(searchResult.Select(r => r.Original));
-        }
-
         public async Task<IActionResult> Autocomplete(string q, CancellationToken ctx)
         {
             var autocompleteHost = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint");
@@ -55,17 +45,6 @@ namespace HlidacStatu.Web.Controllers
         }
         
         
-
-        
-        public JsonResult Autocomplete2(string q)
-        {
-            var searchCache = StaticData.FulltextSearchForAutocomplete.Get();
-
-            IEnumerable<Entities.Autocomplete> searchResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Entities.Autocomplete[]>(_asdf);
-
-            return Json(searchResult);
-        }
-
         static string _asdf = @"[
   {
     ""id"": ""ico:00006947"",
