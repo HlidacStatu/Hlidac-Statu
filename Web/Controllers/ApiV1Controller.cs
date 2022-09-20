@@ -18,9 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
-using HlidacStatu.Connectors;
-using Whisperer;
+using HlidacStatu.Web.Framework;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -506,27 +507,40 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize(Roles = "NasiPoliticiAdmin")]
-        public ActionResult Companies(string q)
+        public async Task<IActionResult> Companies(
+            [FromServices] IHttpClientFactory _httpClientFactory,
+            string q,
+            CancellationToken ctx)
         {
-            var searchResult = CompanyAutocomplete.Search(q, 8);
+            var autocompleteHost = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint");
+            var autocompletePath = $"/autocomplete/Companies?q={q}";
+            var uri = new Uri($"{autocompleteHost}{autocompletePath}");
+            using var client = _httpClientFactory.CreateClient(Constants.DefaultHttpClient);
 
-            if (!string.IsNullOrEmpty(Request.Headers["Origin"]))
+            try
             {
-                if (Request.Headers["Origin"].Contains(".hlidacstatu.cz"))
-                    Response.Headers.Add("Access-Control-Allow-Origin", Request.Headers["Origin"]);
+                var response = await client.GetAsync(uri, ctx);
+                if (!string.IsNullOrEmpty(Request.Headers["Origin"]))
+                {
+                    if (Request.Headers["Origin"].Contains(".hlidacstatu.cz"))
+                        Response.Headers.Add("Access-Control-Allow-Origin", Request.Headers["Origin"]);
+                }
+                return new HttpResponseMessageResult(response);
             }
-
-            return Json(searchResult);
+            catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
+            {
+                // canceled by user
+                Util.Consts.Logger.Info("Autocomplete canceled by user");
+            }
+            catch (Exception e)
+            {
+                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { q });
+            }
+            
+            return NoContent();
         }
 
-        private static CachedIndex<Autocomplete> CompanyAutocomplete = new(
-            Path.Combine(Init.WebAppDataPath, "autocomplete", "np_firmy"),
-            TimeSpan.FromDays(30),
-            () => StaticData.Autocomplete_Firmy_Cache.Get(),
-            new IndexingOptions<Autocomplete>()
-            {
-                TextSelector = ts => $"{ts.Text}"
-            });
+        
 
 
         [Authorize]

@@ -9,11 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
-using HlidacStatu.Connectors;
-using Whisperer;
+using HlidacStatu.Web.Framework;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -213,16 +213,34 @@ text zpravy: {txt}";
             return Content("");
         }
 
-        private static Index<SubjectNameCache> FullTextSearchCache = new(
-            Path.Combine(Init.WebAppDataPath, "autocomplete", "kindex"),
-            SubjectNameCache.GetCompanies().Values,
-            ts => $"{ts.Name} {ts.Ico}");
-            
         // Used for searching
-        public JsonResult FindCompany(string id)
+        public async Task<IActionResult> FindCompany(
+            [FromServices] IHttpClientFactory _httpClientFactory,
+            string id,
+            CancellationToken ctx)
         {
-            var searchResult = FullTextSearchCache.Search(id);
-            return Json(searchResult);
+            var autocompleteHost = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint");
+            var autocompletePath = $"/autocomplete/Kindex?q={id}";
+            var uri = new Uri($"{autocompleteHost}{autocompletePath}");
+            using var client = _httpClientFactory.CreateClient(Constants.DefaultHttpClient);
+
+            try
+            {
+                var response = await client.GetAsync(uri, ctx);
+
+                return new HttpResponseMessageResult(response);
+            }
+            catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
+            {
+                // canceled by user
+                Util.Consts.Logger.Info("Autocomplete canceled by user");
+            }
+            catch (Exception e)
+            {
+                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { id });
+            }
+            
+            return NoContent();
         }
 
         public async Task<JsonResult> KindexForIco(string id, int? rok = null)
