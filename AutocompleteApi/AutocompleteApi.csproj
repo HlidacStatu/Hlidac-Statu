@@ -18,4 +18,10 @@
       <ProjectReference Include="..\Whisperer\Whisperer.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="DS_OVM.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
@@ -382,13 +383,18 @@ namespace HlidacStatu.Repositories
         }
 
         //lidi
-        static object _loadPlock = new object();
         private static async Task<List<Autocomplete>> LoadPeopleAsync()
         {
+            var excludedInfoFactImportanceLevels = new HashSet<InfoFact.ImportanceLevel>()
+            {
+                InfoFact.ImportanceLevel.Stat
+            };
+            
             List<Autocomplete> results = new List<Autocomplete>();
             using (DbEntities db = new DbEntities())
             {
 
+                SemaphoreSlim semaphoreLock = new SemaphoreSlim(1, 1);
                 await Devmasters.Batch.Manager.DoActionForAllAsync<Osoba>(db.Osoba.AsQueryable()
                     .Where(o => o.Status == (int)Osoba.StatusOsobyEnum.Politik
                         || o.Status == (int)Osoba.StatusOsobyEnum.VysokyUrednik
@@ -410,19 +416,25 @@ namespace HlidacStatu.Repositories
                             Type = o.StatusOsoby().ToNiceDisplayName(),
                             ImageElement = $"<img src='{o.GetPhotoUrl(false)}' />",
                             Description = InfoFact.RenderInfoFacts((await 
-                                o.InfoFactsAsync()).Where(i => i.Level != InfoFact.ImportanceLevel.Stat).ToArray(),
+                                o.InfoFactsAsync(excludedInfoFactImportanceLevels)).ToArray(),
                                 2, true, false, "", "{0}", false),
                             Category = Autocomplete.CategoryEnum.Person
                         };
  
                         synonyms[1] = synonyms[0].Clone();
                         synonyms[1].Text = $"{o.Jmeno} {o.Prijmeni}{AppendTitle(o.TitulPred, o.TitulPo)}";
- 
-                        lock (_loadPlock)
+
+                        await semaphoreLock.WaitAsync();
+                        try
                         {
                             results.Add(synonyms[0]);
                             results.Add(synonyms[1]);
                         }
+                        finally
+                        {
+                            semaphoreLock.Release();
+                        }
+                        
  
                         return new Devmasters.Batch.ActionOutputData();
                     }

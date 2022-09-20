@@ -35,7 +35,7 @@ public class Caches
         //cache setups, Cache Ctor should be fast, triggering data renew on background
         Kindex = new(
             Path.Combine(Init.WebAppDataPath, AutocompleteFolder, "kindex"),
-            TimeSpan.FromDays(30),
+            TimeSpan.FromDays(15),
             () => SubjectNameCache.GetCompanies().Values,
             new IndexingOptions<SubjectNameCache>()
             {
@@ -46,7 +46,7 @@ public class Caches
 
         Company = new(
             Path.Combine(Init.WebAppDataPath, AutocompleteFolder, "np_firmy"),
-            TimeSpan.FromDays(30),
+            TimeSpan.FromDays(15),
             () => AutocompleteRepo.GenerateAutocompleteFirmyOnly(),
             new IndexingOptions<Autocomplete>()
             {
