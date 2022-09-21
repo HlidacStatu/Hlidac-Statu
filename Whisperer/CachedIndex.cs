@@ -58,11 +58,11 @@ public class CachedIndex<T> where T : IEquatable<T>
             Enabled = true,
             AutoReset = true,
         };
-        _timer.Elapsed += (_, _) => _ = RenewCacheAsync();
+        _timer.Elapsed += (_, _) => _ = RefreshCacheAsync();
         _timer.Start();
         
         // try to renewCache
-        _ = RenewCacheAsync();
+        _ = Task.Run(async () => await RefreshCacheAsync() );
     }
 
     private void InitLatestDirectory()
@@ -81,7 +81,10 @@ public class CachedIndex<T> where T : IEquatable<T>
         await File.WriteAllTextAsync(path, _subdirectory.ToString());
     }
 
-    private async Task RenewCacheAsync()
+    /// <summary>
+    /// Forces to refresh cache - use with care
+    /// </summary>
+    public async Task RefreshCacheAsync()
     {
         try
         {

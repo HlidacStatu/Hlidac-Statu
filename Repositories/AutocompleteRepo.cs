@@ -223,7 +223,7 @@ namespace HlidacStatu.Repositories
                         AdditionalHiddenSearchText = f.Item2,
                         Type = ("firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
                         Description = FixKraj(f.Item3),
-                        PriorityMultiplier = (f.Item4 == 1 ) ? 0 : -1,
+                        PriorityMultiplier = (f.Item4 == 1 ) ? 1f : 0.3f,
                         ImageElement = "<i class='fas fa-industry-alt'></i>",
                         Category = Autocomplete.CategoryEnum.Company
                     };
@@ -257,7 +257,7 @@ namespace HlidacStatu.Repositories
                     AdditionalHiddenSearchText = f.Item2,
                     Type = ("státní firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
                     Description = FixKraj(f.Item3),
-                    PriorityMultiplier = 1,
+                    PriorityMultiplier = 1.5f,
                     ImageElement = "<i class='fas fa-industry-alt'></i>",
                     Category = Autocomplete.CategoryEnum.StateCompany
                 }).ToList();
@@ -324,7 +324,7 @@ namespace HlidacStatu.Repositories
                     Text = f.Item1,
                     Type = f.Item3,
                     Description = FixKraj(f.Item6),
-                    PriorityMultiplier = f.Item4,
+                    PriorityMultiplier = f.Item4 == 0 ? 1f : f.Item4,
                     ImageElement = f.Item5,
                     Category = Autocomplete.CategoryEnum.Synonym
                 }).ToList();
@@ -400,11 +400,11 @@ namespace HlidacStatu.Repositories
                         || o.Status == (int)Osoba.StatusOsobyEnum.VysokyUrednik
                         || o.Status == (int)Osoba.StatusOsobyEnum.Sponzor), async o =>
                     {
-                        int priority = o.Status switch
+                        float priority = o.Status switch
                         {
-                            (int)Osoba.StatusOsobyEnum.Politik => 2,
-                            (int)Osoba.StatusOsobyEnum.VysokyUrednik => 1,
-                            _ => 0
+                            (int)Osoba.StatusOsobyEnum.Politik => 2.5f,
+                            (int)Osoba.StatusOsobyEnum.VysokyUrednik => 1.7f,
+                            _ => 1f
                         };
                         
                         var synonyms = new Autocomplete[2];
