@@ -10,9 +10,9 @@ namespace HlidacStatu.AutocompleteApi.Controllers
     [Route("[controller]/[action]")]
     public class AutocompleteController : ControllerBase
     {
-        private readonly Caches _cacheService;
+        private readonly CacheService _cacheService;
 
-        public AutocompleteController(Caches cacheService)
+        public AutocompleteController(CacheService cacheService)
         {
             _cacheService = cacheService;
         }

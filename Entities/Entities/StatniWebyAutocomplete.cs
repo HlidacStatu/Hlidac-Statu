@@ -11,6 +11,9 @@ namespace HlidacStatu.Entities
         public string Url { get; set; }
         public string HostDomain { get; set; }
 
+        public StatniWebyAutocomplete()
+        { }
+        
         public StatniWebyAutocomplete(UptimeServer uptimeServer)
         {
             Id = uptimeServer.Id;

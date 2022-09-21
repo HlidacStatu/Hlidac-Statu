@@ -7,9 +7,9 @@ namespace HlidacStatu.AutocompleteApi.Controllers
     [Route("[controller]")]
     public class StatusController : ControllerBase
     {
-        private Caches _cacheService;
+        private CacheService _cacheService;
 
-        public StatusController(Caches cacheService)
+        public StatusController(CacheService cacheService)
         {
             _cacheService = cacheService;
         }

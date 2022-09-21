@@ -1,3 +1,5 @@
+using Serilog;
+
 namespace Whisperer;
 using Timer = System.Timers.Timer;
 
@@ -10,7 +12,8 @@ public class CachedIndex<T> where T : IEquatable<T>
     private string CurrentDirectory => Path.Combine(_baseDir, _subdirectory.ToString());
     private string NextDirectory => Path.Combine(_baseDir, (!_subdirectory).ToString());
     private IndexingOptions<T> _indexingOptions;
-    
+    private readonly ILogger _logger;
+
     private readonly Timer _timer;
 
     private Index<T> _index;
@@ -41,12 +44,15 @@ public class CachedIndex<T> where T : IEquatable<T>
     public CachedIndex(string baseDir,
         TimeSpan expiration,
         Func<IEnumerable<T>> populateFunc,
-        IndexingOptions<T> indexingOptions)
+        IndexingOptions<T> indexingOptions,
+        ILogger logger)
     {
         _baseDir = baseDir;
         _populateFunc = populateFunc;
         _indexingOptions = indexingOptions;
-        
+        _logger = logger.ForContext<CachedIndex<T>>();
+
+        _logger.Debug("Constructing cached index in {baseDir}", baseDir);
         InitLatestDirectory();
 
         _index = new Index<T>(CurrentDirectory, _indexingOptions.IndexAnalyzer, _indexingOptions.QueryAnalyzer);
@@ -63,6 +69,7 @@ public class CachedIndex<T> where T : IEquatable<T>
         
         // try to renewCache
         _ = Task.Run(async () => await RefreshCacheAsync() );
+        _logger.Debug("{baseDir} cached index created.", baseDir);
     }
 
     private void InitLatestDirectory()
@@ -86,6 +93,7 @@ public class CachedIndex<T> where T : IEquatable<T>
     /// </summary>
     public async Task RefreshCacheAsync()
     {
+        _logger.Debug("Running refresh cache for {baseDir}", _baseDir);
         try
         {
             if(_onCacheInitStarted != null)
@@ -107,12 +115,15 @@ public class CachedIndex<T> where T : IEquatable<T>
             CleanPreviousDirectory(NextDirectory);
             
             if(_onCacheInitFinished != null)
-                _onCacheInitFinished.Invoke(this, true);
+                _onCacheInitFinished.Invoke(this, false);
+            
+            _logger.Debug("Refresh cache for {baseDir} was successful.", _baseDir);
         }
         catch (Exception e)
         {
+            _logger.Warning(e, "Refresh cache for {baseDir} ended up with error.", _baseDir);
             if(_onCacheInitFinished != null)
-                _onCacheInitFinished.Invoke(this, false);
+                _onCacheInitFinished.Invoke(this, true);
             throw;
         }
     }
@@ -124,6 +135,7 @@ public class CachedIndex<T> where T : IEquatable<T>
 
     private void CleanPreviousDirectory(string path)
     {
+        _logger.Debug("Cleaning up {directory}.", path);
         if (Directory.Exists(path))
             Directory.Delete(path, true);
         Directory.CreateDirectory(path);
@@ -131,6 +143,7 @@ public class CachedIndex<T> where T : IEquatable<T>
 
     private Index<T> FillIndex(Index<T> index)
     {
+        _logger.Debug("Adding data to index for {baseDir}.", _baseDir);
         var data = _populateFunc.Invoke();
         index.AddDocuments(data,
             _indexingOptions.TextSelector,

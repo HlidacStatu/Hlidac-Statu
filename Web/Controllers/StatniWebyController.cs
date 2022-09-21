@@ -165,11 +165,11 @@ namespace HlidacStatu.Web.Controllers
         
         public async Task<IActionResult> Autocomplete(
             [FromServices] IHttpClientFactory _httpClientFactory,
-            string q,
+            string query,
             CancellationToken ctx)
         {
             var autocompleteHost = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint");
-            var autocompletePath = $"/autocomplete/UptimeServer?q={q}";
+            var autocompletePath = $"/autocomplete/UptimeServer?q={query}";
             var uri = new Uri($"{autocompleteHost}{autocompletePath}");
             using var client = _httpClientFactory.CreateClient(Constants.DefaultHttpClient);
 
@@ -186,7 +186,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { q });
+                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { query });
             }
             
             return NoContent();

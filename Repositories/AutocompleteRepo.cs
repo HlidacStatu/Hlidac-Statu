@@ -384,7 +384,7 @@ namespace HlidacStatu.Repositories
         }
 
         //lidi
-        private static async Task<List<Autocomplete>> LoadPeopleAsync()
+        private static async Task<List<Autocomplete>> LoadPeopleAsync(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
         {
             var excludedInfoFactImportanceLevels = new HashSet<InfoFact.ImportanceLevel>()
             {

@@ -1,4 +1,6 @@
+using System;
 using System.IO;
+using Devmasters.Log;
 using HlidacStatu.AutocompleteApi.Services;
 using HlidacStatu.Connectors;
 using HlidacStatu.LibCore.MiddleWares;
@@ -7,6 +9,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using Serilog.Events;
 
 namespace HlidacStatu.AutocompleteApi
 {
@@ -19,9 +23,10 @@ namespace HlidacStatu.AutocompleteApi
 
         public IConfiguration Configuration { get; }
 
-
         public void ConfigureServices(IServiceCollection services)
         {
+            var logger = Log.ForContext<Program>();
+            logger.Information("Configuring services");
             //db setup
             Devmasters.Config.Init(Configuration);
             System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
@@ -34,9 +39,10 @@ namespace HlidacStatu.AutocompleteApi
             
             //start initializing during startup, not after first request
             // after first request call looks like this: services.AddSingleton<MemoryStoreService>();
-            services.AddSingleton<Caches>(new Caches());
+            services.AddSingleton<CacheService>(new CacheService(logger));
            
             services.AddControllers();
+            logger.Information("Services configured");
 
         }
 
@@ -45,7 +51,6 @@ namespace HlidacStatu.AutocompleteApi
             //tenhle soubor by šel ve firmarepo.cached nahradit načtením dat z tabulky o ovm: OrganVerejneMoci
             File.Copy("./DS_OVM.xml", Path.Combine(Init.WebAppDataPath, "DS_OVM.xml"), true);
             
-            //
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
