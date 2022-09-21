@@ -1,3 +1,4 @@
+using Devmasters.Batch;
 using Devmasters.Enums;
 
 using HlidacStatu.Connectors;
@@ -18,7 +19,7 @@ namespace HlidacStatu.Repositories
     public static class AutocompleteRepo
     {
 
-        static Devmasters.Batch.ActionProgressWriter progressWriter = new Devmasters.Batch.ActionProgressWriter(0.1f, Devmasters.Batch.ProgressWriters.ConsoleWriter_EndsIn);
+        //static Devmasters.Batch.ActionProgressWriter progressWriter = new Devmasters.Batch.ActionProgressWriter(0.1f, Devmasters.Batch.ProgressWriters.ConsoleWriter_EndsIn);
 
         static bool debug = System.Diagnostics.Debugger.IsAttached;
         /// <summary>
@@ -26,7 +27,7 @@ namespace HlidacStatu.Repositories
         /// ! Slow, long running operation
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<Autocomplete> GenerateAutocomplete(bool debug = false)
+        public static IEnumerable<Autocomplete> GenerateAutocomplete(bool debug = false, Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
         {
             AutocompleteRepo.debug = debug;
             IEnumerable<Autocomplete> companies = new List<Autocomplete>();
@@ -48,7 +49,7 @@ namespace HlidacStatu.Repositories
                     try
                     {
                         Consts.Logger.Info("GenerateAutocomplete Loading cities");
-                        cities = LoadCities();
+                        cities = LoadCities(logOutputFunc,progressOutputFunc);
                         Consts.Logger.Info("GenerateAutocomplete Loading cities done");
                     }
                     catch (Exception e)
@@ -62,7 +63,7 @@ namespace HlidacStatu.Repositories
                     try
                     {
                         Consts.Logger.Info("GenerateAutocomplete Loading companies");
-                        companies = LoadCompanies();
+                        companies = LoadCompanies(logOutputFunc, progressOutputFunc);
                         Consts.Logger.Info("GenerateAutocomplete Loading companies done");
                     }
                     catch (Exception e)
@@ -89,7 +90,7 @@ namespace HlidacStatu.Repositories
                     try
                     {
                         Consts.Logger.Info("GenerateAutocomplete Loading authorities");
-                        authorities = LoadAuthorities();
+                        authorities = LoadAuthorities(logOutputFunc, progressOutputFunc);
                         Consts.Logger.Info("GenerateAutocomplete Loading authorities done");
                     }
                     catch (Exception e)
@@ -104,7 +105,7 @@ namespace HlidacStatu.Repositories
                     try
                     {
                         Consts.Logger.Info("GenerateAutocomplete Loading people");
-                        people = LoadPeopleAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                        people = LoadPeopleAsync(logOutputFunc, progressOutputFunc).ConfigureAwait(false).GetAwaiter().GetResult();
                         Consts.Logger.Info("GenerateAutocomplete Loading people done");
                     }
                     catch (Exception e)
@@ -198,7 +199,7 @@ namespace HlidacStatu.Repositories
         }
 
         //firmy
-        private static List<Autocomplete> LoadCompanies()
+        private static List<Autocomplete> LoadCompanies(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
         {
             // Kod_PF < 110  - cokoliv co nejsou fyzické osoby, podnikatelé
             // Podnikatelé nejsou zařazeni, protože je jich poté moc a vznikají tam duplicity
@@ -232,7 +233,7 @@ namespace HlidacStatu.Repositories
                             results.Add(res);
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, progressWriter.Writer, true, prefix: "LoadSoukrFirmy autocomplete ");
+                }, logOutputFunc, progressOutputFunc, true, prefix: "LoadSoukrFirmy autocomplete ");
 
             return results;
         }
@@ -264,7 +265,7 @@ namespace HlidacStatu.Repositories
         }
 
         //úřady
-        private static List<Autocomplete> LoadAuthorities()
+        private static List<Autocomplete> LoadAuthorities(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
         {
             string sql = $@"select Jmeno, ICO, KrajId , status
                              from Firma 
@@ -307,7 +308,7 @@ namespace HlidacStatu.Repositories
                             results.Add(res);
 
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, progressWriter.Writer, true, prefix: "LoadUrady ");
+                }, logOutputFunc, progressOutputFunc, true, prefix: "LoadUrady ");
 
             return results;
         }
@@ -331,7 +332,7 @@ namespace HlidacStatu.Repositories
         }
 
         //obce
-        private static List<Autocomplete> LoadCities()
+        private static List<Autocomplete> LoadCities(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
         {
 
             var lockObj = new object();
@@ -376,14 +377,14 @@ namespace HlidacStatu.Repositories
                         results.Add(synonyms[1]);
                     }
                     return new Devmasters.Batch.ActionOutputData();
-                }, null, progressWriter.Writer, true, prefix: "LoadObce ");
+                }, logOutputFunc, progressOutputFunc, true, prefix: "LoadObce ");
 
             return results;
         }
 
         //lidi
         static object _loadPlock = new object();
-        private static async Task<List<Autocomplete>> LoadPeopleAsync()
+        private static async Task<List<Autocomplete>> LoadPeopleAsync(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
         {
             List<Autocomplete> results = new List<Autocomplete>();
             using (DbEntities db = new DbEntities())
@@ -427,7 +428,7 @@ namespace HlidacStatu.Repositories
                         return new Devmasters.Batch.ActionOutputData();
                     }
                     // tady nemůže být větší paralelita, protože to pak nezvládá elasticsearch
-                    , null, progressWriter.Writer, true, prefix: "LoadPeople ", maxDegreeOfParallelism:5); 
+                    , logOutputFunc, progressOutputFunc, true, prefix: "LoadPeople ", maxDegreeOfParallelism:5); 
 
             }
             return results;
