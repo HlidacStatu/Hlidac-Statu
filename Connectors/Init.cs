@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 
 namespace HlidacStatu.Connectors
@@ -36,11 +37,12 @@ namespace HlidacStatu.Connectors
 
                 WebAppRoot = Path.Combine(new System.IO.DirectoryInfo(WebAppRoot).FullName, "wwwroot");
 
-                if (!WebAppRoot.EndsWith("\\"))
-                    WebAppRoot = WebAppRoot + "\\";
+                
+                if (!WebAppRoot.EndsWith(Path.DirectorySeparatorChar))
+                    WebAppRoot = WebAppRoot + Path.DirectorySeparatorChar;
 
-                if (!WebAppDataPath.EndsWith("\\"))
-                    WebAppDataPath = WebAppDataPath + "\\";
+                if (!WebAppDataPath.EndsWith(Path.DirectorySeparatorChar))
+                    WebAppDataPath = WebAppDataPath + Path.DirectorySeparatorChar;
 
             }
         }

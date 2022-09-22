@@ -15,27 +15,6 @@ namespace HlidacStatu.Repositories
 {
     public static partial class UptimeServerRepo
     {
-        private static Devmasters.Cache.LocalMemory.AutoUpdatedCache<FullTextSearch.Index<StatniWebyAutocomplete>> _fullTextSearchCache = 
-            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<FullTextSearch.Index<StatniWebyAutocomplete>>(TimeSpan.FromHours(20), "_statniWebyfullTextSearchCache",
-                (o) =>
-                {
-                    var servers = UptimeServerRepo.AllActiveServers()
-                        .Select(uptimeServer => new StatniWebyAutocomplete(uptimeServer))
-                        .ToList();
-
-                    var autocompleteIndex = new FullTextSearch.Index<StatniWebyAutocomplete>(servers);
-                    return autocompleteIndex;
-                }
-            );
-
-        public static IEnumerable<StatniWebyAutocomplete> AutocompleteSearch(string query, int count = 20)
-        {
-            var autocompleteIndex = _fullTextSearchCache.Get();
-            var results = autocompleteIndex.Search(query, count);
-            return results.Select(r => r.Original);
-        }
-
-
         public static string PatriPodUradJmeno(this UptimeServer server)
         {
             if (string.IsNullOrEmpty(server.ICO))

@@ -120,6 +120,9 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
 
     public IEnumerable<T> Search(string query, int numResults = 10, string? filter = null)
     {
+        if (string.IsNullOrWhiteSpace(query))
+            return Enumerable.Empty<T>();
+        
         // It can happen that in results will be synonyms which are going to be filtered out
         // so we need this "buffer"
         var maxResults = numResults * 5;

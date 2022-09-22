@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using HlidacStatu.AutocompleteApi.Services;
 using HlidacStatu.Entities;
+using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.AutocompleteApi.Controllers
@@ -10,54 +10,36 @@ namespace HlidacStatu.AutocompleteApi.Controllers
     [Route("[controller]/[action]")]
     public class AutocompleteController : ControllerBase
     {
-        private readonly IMemoryStoreService _memoryStore;
+        private readonly CacheService _cacheService;
 
-        public AutocompleteController(IMemoryStoreService memoryStore)
+        public AutocompleteController(CacheService cacheService)
         {
-            _memoryStore = memoryStore;
+            _cacheService = cacheService;
         }
 
         [HttpGet]
         public IEnumerable<Autocomplete> Autocomplete(string q)
         {
-            var searchResult = _memoryStore.HlidacFulltextIndex.Search(q, 5, ac => ac.Priority);
-
-            return searchResult.Select(r => r.Original);
+            return _cacheService.FullAutocomplete.Search(q, 5);
         }
 
-        public IEnumerable<> Kindex(string q)
+        public IEnumerable<SubjectNameCache> Kindex(string q)
         {
             //Web/controllers/KindexController
+            return _cacheService.Kindex.Search(q, 10);
         }
         
-        public IEnumerable<> Companies(string q)
+        public IEnumerable<Autocomplete> Companies(string q)
         {
             //Web/controllers/apiv1controller
+            return _cacheService.Company.Search(q, 5);
         }
 
-        public IEnumerable<> UptimeServer(string q)
+        public IEnumerable<StatniWebyAutocomplete> UptimeServer(string q)
         {
             //HlidacStatu.Repositories.uptimeserverrepo
+            return _cacheService.UptimeServer.Search(q, 20);
         }
-
-
-            // private static CachedIndex<Autocomplete> CompanyAutocomplete = new(
-            //     Path.Combine(Init.WebAppDataPath, "autocomplete", "np_firmy"),
-            //     TimeSpan.FromDays(30),
-            //     () => StaticData.Autocomplete_Firmy_Cache.Get(),
-            //     new IndexingOptions<Autocomplete>()
-            //     {
-            //         TextSelector = ts => $"{ts.Text}"
-            //     });
         
-        
-
-        [HttpGet]
-        public IEnumerable<Autocomplete> TestAutocomplete(string q)
-        {
-            var searchResult = _memoryStore.SmallSampleIndex.Search(q, 5, ac => ac.Priority);
-
-            return searchResult.Select(r => r.Original);
-        }
     }
 }

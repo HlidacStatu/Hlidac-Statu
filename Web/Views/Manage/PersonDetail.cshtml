@@ -664,18 +664,18 @@
             },
             // co se zobrazuje v inputboxu při mačkání šipky dolu
             focus: function (event, ui) {
-                $(".compahead").val(ui.item.Text);
+                $(".compahead").val(ui.item.text);
                 return false;
             },
             // co se nakonec do inputboxu vloží po vybrání elementu
             select: function (event, ui) {
-                $(".compahead").val(ui.item.Id);
+                $(".compahead").val(ui.item.id);
                 return false;
             }
             //jak vypadá našeptávací box
         }).autocomplete("instance")._renderItem = function (ul, item) {
             return $("<li>")
-                .append("<div>" +item.Text + " <br /><small> (ičo: " + item.Id + ")</small></div>")
+                .append("<div>" +item.text + " <br /><small> (ičo: " + item.id + ")</small></div>")
                 .appendTo(ul);
         };
 

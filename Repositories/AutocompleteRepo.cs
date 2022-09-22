@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
@@ -223,7 +224,7 @@ namespace HlidacStatu.Repositories
                         AdditionalHiddenSearchText = f.Item2,
                         Type = ("firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
                         Description = FixKraj(f.Item3),
-                        PriorityMultiplier = (f.Item4 == 1 ) ? 0 : -1,
+                        PriorityMultiplier = (f.Item4 == 1 ) ? 1f : 0.3f,
                         ImageElement = "<i class='fas fa-industry-alt'></i>",
                         Category = Autocomplete.CategoryEnum.Company
                     };
@@ -257,7 +258,7 @@ namespace HlidacStatu.Repositories
                     AdditionalHiddenSearchText = f.Item2,
                     Type = ("státní firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
                     Description = FixKraj(f.Item3),
-                    PriorityMultiplier = 1,
+                    PriorityMultiplier = 1.5f,
                     ImageElement = "<i class='fas fa-industry-alt'></i>",
                     Category = Autocomplete.CategoryEnum.StateCompany
                 }).ToList();
@@ -324,7 +325,7 @@ namespace HlidacStatu.Repositories
                     Text = f.Item1,
                     Type = f.Item3,
                     Description = FixKraj(f.Item6),
-                    PriorityMultiplier = f.Item4,
+                    PriorityMultiplier = f.Item4 == 0 ? 1f : f.Item4,
                     ImageElement = f.Item5,
                     Category = Autocomplete.CategoryEnum.Synonym
                 }).ToList();
@@ -383,23 +384,28 @@ namespace HlidacStatu.Repositories
         }
 
         //lidi
-        static object _loadPlock = new object();
         private static async Task<List<Autocomplete>> LoadPeopleAsync(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
         {
+            var excludedInfoFactImportanceLevels = new HashSet<InfoFact.ImportanceLevel>()
+            {
+                InfoFact.ImportanceLevel.Stat
+            };
+            
             List<Autocomplete> results = new List<Autocomplete>();
             using (DbEntities db = new DbEntities())
             {
 
+                SemaphoreSlim semaphoreLock = new SemaphoreSlim(1, 1);
                 await Devmasters.Batch.Manager.DoActionForAllAsync<Osoba>(db.Osoba.AsQueryable()
                     .Where(o => o.Status == (int)Osoba.StatusOsobyEnum.Politik
                         || o.Status == (int)Osoba.StatusOsobyEnum.VysokyUrednik
                         || o.Status == (int)Osoba.StatusOsobyEnum.Sponzor), async o =>
                     {
-                        int priority = o.Status switch
+                        float priority = o.Status switch
                         {
-                            (int)Osoba.StatusOsobyEnum.Politik => 2,
-                            (int)Osoba.StatusOsobyEnum.VysokyUrednik => 1,
-                            _ => 0
+                            (int)Osoba.StatusOsobyEnum.Politik => 2.5f,
+                            (int)Osoba.StatusOsobyEnum.VysokyUrednik => 1.7f,
+                            _ => 1f
                         };
                         
                         var synonyms = new Autocomplete[2];
@@ -411,19 +417,25 @@ namespace HlidacStatu.Repositories
                             Type = o.StatusOsoby().ToNiceDisplayName(),
                             ImageElement = $"<img src='{o.GetPhotoUrl(false)}' />",
                             Description = InfoFact.RenderInfoFacts((await 
-                                o.InfoFactsAsync()).Where(i => i.Level != InfoFact.ImportanceLevel.Stat).ToArray(),
+                                o.InfoFactsAsync(excludedInfoFactImportanceLevels)).ToArray(),
                                 2, true, false, "", "{0}", false),
                             Category = Autocomplete.CategoryEnum.Person
                         };
  
                         synonyms[1] = synonyms[0].Clone();
                         synonyms[1].Text = $"{o.Jmeno} {o.Prijmeni}{AppendTitle(o.TitulPred, o.TitulPo)}";
- 
-                        lock (_loadPlock)
+
+                        await semaphoreLock.WaitAsync();
+                        try
                         {
                             results.Add(synonyms[0]);
                             results.Add(synonyms[1]);
                         }
+                        finally
+                        {
+                            semaphoreLock.Release();
+                        }
+                        
  
                         return new Devmasters.Batch.ActionOutputData();
                     }

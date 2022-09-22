@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
-
+using HlidacStatu.Web.Framework;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers
@@ -155,10 +157,39 @@ namespace HlidacStatu.Web.Controllers
             return Json(new { error = "API presunuto. Viz hlidacStatu.cz/api. Omlouvame se." });
         }
         
-        public IEnumerable<StatniWebyAutocomplete> Autocomplete(string query)
+        // public IEnumerable<StatniWebyAutocomplete> Autocomplete(string query)
+        // {
+        //     var results = UptimeServerRepo.AutocompleteSearch(query);
+        //     return results;
+        // }
+        
+        public async Task<IActionResult> Autocomplete(
+            [FromServices] IHttpClientFactory _httpClientFactory,
+            string query,
+            CancellationToken ctx)
         {
-            var results = UptimeServerRepo.AutocompleteSearch(query);
-            return results;
+            var autocompleteHost = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint");
+            var autocompletePath = $"/autocomplete/UptimeServer?q={query}";
+            var uri = new Uri($"{autocompleteHost}{autocompletePath}");
+            using var client = _httpClientFactory.CreateClient(Constants.DefaultHttpClient);
+
+            try
+            {
+                var response = await client.GetAsync(uri, ctx);
+
+                return new HttpResponseMessageResult(response);
+            }
+            catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
+            {
+                // canceled by user
+                Util.Consts.Logger.Info("Autocomplete canceled by user");
+            }
+            catch (Exception e)
+            {
+                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { query });
+            }
+            
+            return NoContent();
         }
 
         [HlidacCache(60 * 60,"", false)]
