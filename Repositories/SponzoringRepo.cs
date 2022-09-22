@@ -23,7 +23,7 @@ namespace HlidacStatu.Repositories
 
         public static string[] TopStrany = VelkeStrany.Take(9).ToArray();
 
-        public static int DefaultLastSponzoringYear = 2020;
+        public static int DefaultLastSponzoringYear = 2021;
 
 
         private static DateTime minBigSponzoringDate = new DateTime(DateTime.Now.Year - 10, 1, 1);
