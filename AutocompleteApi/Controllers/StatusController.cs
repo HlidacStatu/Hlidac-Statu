@@ -1,4 +1,7 @@
-﻿using HlidacStatu.AutocompleteApi.Services;
+﻿using System.Linq;
+using HlidacStatu.AutocompleteApi.Services;
+using HlidacStatu.Entities;
+using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.AutocompleteApi.Controllers
@@ -17,7 +20,18 @@ namespace HlidacStatu.AutocompleteApi.Controllers
         [HttpGet]
         public JsonResult OverallStatus()
         {
-            return new JsonResult(_cacheService.Status);
+            using DbEntities db = new DbEntities();
+
+            var firstPolitik = db.Osoba.Where(o => o.Status == 3).FirstOrDefault();
+
+
+            var resultObj = new
+            {
+                DbConnection = firstPolitik,
+                CacheService = _cacheService.Status,
+                UptimeServerRepoServerCount = UptimeServerRepo.AllActiveServers().Length,
+            };
+            return new JsonResult(resultObj);
         }
     
     }

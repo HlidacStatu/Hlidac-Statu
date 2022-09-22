@@ -144,11 +144,19 @@ public class CachedIndex<T> where T : IEquatable<T>
     private Index<T> FillIndex(Index<T> index)
     {
         _logger.Debug("Adding data to index for {baseDir}.", _baseDir);
-        var data = _populateFunc.Invoke();
-        index.AddDocuments(data,
-            _indexingOptions.TextSelector,
-            _indexingOptions.BoostSelector,
-            _indexingOptions.FilterSelector);
+        try
+        {
+            var data = _populateFunc.Invoke();
+            index.AddDocuments(data,
+                _indexingOptions.TextSelector,
+                _indexingOptions.BoostSelector,
+                _indexingOptions.FilterSelector);
+        }
+        catch (Exception e)
+        {
+            _logger.Error(e, "Error occurred when filling index for {baseDir}.", _baseDir);
+            throw;
+        }
         return index;
     }
 

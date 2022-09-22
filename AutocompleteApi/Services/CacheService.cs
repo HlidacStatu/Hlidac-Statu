@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Devmasters;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;
-using HlidacStatu.Repositories;
 using Serilog;
 using Whisperer;
 
@@ -36,57 +33,25 @@ public class CacheService
     {
         _logger = logger.ForContext<CacheService>();
         //cache setups, Cache Ctor should be fast, triggering data renew on background
+        string autocompleteFolder = Path.Combine(Init.WebAppDataPath, AutocompleteFolder);
+        
         _logger.Information("Constructing Kindex cache");
-        Kindex = new(
-            Path.Combine(Init.WebAppDataPath, AutocompleteFolder, "kindex"),
-            TimeSpan.FromDays(15),
-            () => SubjectNameCache.GetCompanies().Values,
-            new IndexingOptions<SubjectNameCache>()
-            {
-                TextSelector = ts => $"{ts.Name} {ts.Ico}"
-            },
-            logger);
+        Kindex = CacheIndexFactory.CreateKindexCachedIndex(autocompleteFolder, _logger);
         Kindex.CacheInitStarted += (_, _) => UpdateStatusStartTime(nameof(Kindex));
         Kindex.CacheInitFinished += (_, b) => UpdateStatusEndTime(nameof(Kindex), b);
 
         _logger.Information("Constructing Company cache");
-        Company = new(
-            Path.Combine(Init.WebAppDataPath, AutocompleteFolder, "np_firmy"),
-            TimeSpan.FromDays(15),
-            () => AutocompleteRepo.GenerateAutocompleteFirmyOnly(),
-            new IndexingOptions<Autocomplete>()
-            {
-                TextSelector = ts => $"{ts.Text}"
-            },
-            logger);
+        Company = CacheIndexFactory.CreateCompanyCachedIndex(autocompleteFolder, _logger);
         Company.CacheInitStarted += (_, _) => UpdateStatusStartTime(nameof(Company));
         Company.CacheInitFinished += (_, b) => UpdateStatusEndTime(nameof(Company), b);
 
         _logger.Information("Constructing UptimeServer cache");
-        UptimeServer = new(
-            Path.Combine(Init.WebAppDataPath, AutocompleteFolder, "uptimeServer"),
-            TimeSpan.FromHours(24),
-            () => UptimeServerRepo.AllActiveServers().Select(uptimeServer => new StatniWebyAutocomplete(uptimeServer)),
-            new IndexingOptions<StatniWebyAutocomplete>()
-            {
-                TextSelector = ts => $"{ts.Name} {ts.Description} {ts.Ico} {ts.Url.Replace('.', ' ').Replace('/', ' ')}"
-            },
-            logger);
+        UptimeServer = CacheIndexFactory.CreateUptimeServerCachedIndex(autocompleteFolder, _logger);
         UptimeServer.CacheInitStarted += (_, _) => UpdateStatusStartTime(nameof(UptimeServer));
         UptimeServer.CacheInitFinished += (_, b) => UpdateStatusEndTime(nameof(UptimeServer), b);
         
         _logger.Information("Constructing Full autocomplete cache");
-        FullAutocomplete = new(
-            Path.Combine(Init.WebAppDataPath, AutocompleteFolder, "full"),
-            TimeSpan.FromHours(24),
-            () => AutocompleteRepo.GenerateAutocomplete(),
-            new IndexingOptions<Autocomplete>()
-            {
-                TextSelector = ts => $"{ts.Text} {ts.AdditionalHiddenSearchText}",
-                BoostSelector = bs => bs.PriorityMultiplier,
-                FilterSelector = fs => fs.Type.ToLowerInvariant().RemoveAccents()
-            },
-            logger);
+        FullAutocomplete = CacheIndexFactory.CreateFullAutocompleteCachedIndex(autocompleteFolder, _logger);
         FullAutocomplete.CacheInitStarted += (_, _) => UpdateStatusStartTime(nameof(FullAutocomplete));
         FullAutocomplete.CacheInitFinished += (_, b) => UpdateStatusEndTime(nameof(FullAutocomplete), b);
     }

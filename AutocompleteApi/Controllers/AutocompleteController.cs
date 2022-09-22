@@ -23,18 +23,21 @@ namespace HlidacStatu.AutocompleteApi.Controllers
             return _cacheService.FullAutocomplete.Search(q, 5);
         }
 
+        [HttpGet]
         public IEnumerable<SubjectNameCache> Kindex(string q)
         {
             //Web/controllers/KindexController
             return _cacheService.Kindex.Search(q, 10);
         }
         
+        [HttpGet]
         public IEnumerable<Autocomplete> Companies(string q)
         {
             //Web/controllers/apiv1controller
             return _cacheService.Company.Search(q, 5);
         }
 
+        [HttpGet]
         public IEnumerable<StatniWebyAutocomplete> UptimeServer(string q)
         {
             //HlidacStatu.Repositories.uptimeserverrepo
