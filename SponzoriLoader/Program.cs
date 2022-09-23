@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
@@ -27,6 +28,14 @@ namespace SponzoriLoader
             // "https://zpravy.udhpsh.cz/zpravy/vfz2020.json"
             "https://zpravy.udhpsh.cz/zpravy/vfz2021.json"
         };
+        
+        private static void LoadDataFromFiles(Donations peopleDonations, Donations companyDonations)
+        {
+            LoadSponzoringFromFile.LoadOsoby(peopleDonations, @"d:\Downloads\vfz2021-ano_osoby.xlsx - Lidi.tsv",
+                "71443339", _user, _zdroj);
+            LoadSponzoringFromFile.LoadFirmy(companyDonations, @"d:\Downloads\vfz2021-ano_osoby.xlsx - Firmy.tsv",
+                "71443339", _user, _zdroj);
+        }
 
         private static readonly string _user = "sponzorLoader";
         private static readonly string _zdroj = "https://www.udhpsh.cz/vyrocni-financni-zpravy-stran-a-hnuti";
@@ -35,13 +44,41 @@ namespace SponzoriLoader
 
         static async Task Main(string[] args)
         {
+            //Before running
+            //- update source
+            //- select true or false below
+            bool loadDataFromFiles = true;
+            
+            
             HlidacStatu.Connectors.InitializeConfigServices.Initialize(new[] { "Petr" });
-
-            _partyNames = LoadPartyNames();
+            CultureInfo.DefaultThreadCurrentCulture = Consts.czCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = Consts.csCulture;
             var peopleDonations = new Donations(new DonorEqualityComparer());
             var companyDonations = new Donations(new DonorEqualityComparer());
+            _partyNames = Common.LoadPartyNames();
+            
 
-            #region loading from web
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (loadDataFromFiles)
+            {
+                LoadDataFromFiles(peopleDonations, companyDonations);
+            }
+            else
+            {
+                await LoadDataFromWebAsync(peopleDonations, companyDonations);
+            }
+
+            //Save to DB
+            Common.UploadPeopleDonations(peopleDonations, _user, _zdroj);
+            Common.UploadCompanyDonations(companyDonations, _user, _zdroj);
+
+            await FixPeopleSponzorsAsync();
+        }
+
+        
+
+        private static async Task LoadDataFromWebAsync(Donations peopleDonations, Donations companyDonations)
+        {
             foreach (string indexUrl in _addresses)
             {
                 var index = await LoadIndexAsync(indexUrl);
@@ -62,18 +99,7 @@ namespace SponzoriLoader
                     string nepenizePoUrl = files.Where(f => f.subject == "buppo").Select(f => f.url).FirstOrDefault();
                     await LoadDonationsAsync(nepenizePoUrl, companyDonations, party, year);
                 }
-
-
             }
-            #endregion
-
-            #region saving to db
-            UploadPeopleDonations(peopleDonations);
-            UploadCompanyDonations(companyDonations);
-
-            #endregion
-
-            await FixPeopleSponzorsAsync();
         }
 
         public static async Task<dynamic> LoadIndexAsync(string url)
@@ -83,13 +109,7 @@ namespace SponzoriLoader
             return json;
         }
 
-        public static Dictionary<string, string> LoadPartyNames()
-        {
-            using (DbEntities db = new DbEntities())
-            {
-                return db.ZkratkaStrany.ToDictionary(ks => ks.Ico, es => es.KratkyNazev);
-            }
-        }
+        
 
         public static string NormalizePartyName(string name, string ico)
         {
@@ -120,6 +140,9 @@ namespace SponzoriLoader
                 titlesBefore = MergeTitles(titlesBefore, cleanedName.titulyPred, cleanedLastName.titulyPred);
                 titlesAfter = MergeTitles(titlesAfter, cleanedName.titulyPo, cleanedLastName.titulyPo);
 
+                titlesBefore = CleanTitles(titlesBefore);
+                titlesAfter = CleanTitles(titlesAfter);
+
                 Donor donor = new Donor()
                 {
                     City = record.addrCity,
@@ -144,6 +167,11 @@ namespace SponzoriLoader
             }
         }
 
+        private static string CleanTitles(string titles)
+        {
+            return titles.Replace("\"", "");
+        }
+
         private static string MergeTitles(string titlesBefore, string tituly, string tituly2)
         {
             titlesBefore += " " + tituly + " " + tituly2;
@@ -153,89 +181,7 @@ namespace SponzoriLoader
         }
 
 
-        /// <summary>
-        /// Uploads new donations to OsobaEvent table
-        /// </summary>
-        public static void UploadPeopleDonations(Donations donations)
-        {
-            foreach (var personDonations in donations.GetDonations())
-            {
-                var donor = personDonations.Key;
-
-                Osoba osoba = OsobaRepo.GetOrCreateNew(donor.TitleBefore, donor.Name, donor.Surname, donor.TitleAfter,
-                                                   donor.DateOfBirth, Osoba.StatusOsobyEnum.Sponzor, _user);
-
-                // Výjimka pro Radek Jonke 24.12.1970
-                if (osoba.Jmeno == "Radek"
-                    && osoba.Prijmeni == "Jonke"
-                    && osoba.Narozeni != null
-                    && osoba.Narozeni.Value.Year == 1970
-                    && osoba.Narozeni.Value.Month == 12
-                    && osoba.Narozeni.Value.Day == 24)
-                {
-                    continue;
-                }
-
-                foreach (var donation in personDonations.Value)
-                {
-                    // add event
-                    var sponzoring = new Sponzoring()
-                    {
-                        DarovanoDne = donation.Date,
-                        Hodnota = donation.Amount,
-                        IcoPrijemce = donation.ICO,
-                        Zdroj = _zdroj,
-                        Popis = donation.Description,
-                        Typ = (int)donation.GiftType
-                    };
-
-                    osoba.AddSponsoring(sponzoring, _user);
-                }
-
-            }
-        }
-
-        /// <summary>
-        /// Uploads new donations to FirmaEvent table
-        /// </summary>
-        public static void UploadCompanyDonations(Donations donations)
-        {
-            foreach (var companyDonations in donations.GetDonations())
-            {
-                var donor = companyDonations.Key;
-
-                Firma firma = null;
-                try
-                {
-                    firma = FirmaRepo.FromIco(donor.CompanyId);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-
-                if (firma is null)
-                {
-                    Console.WriteLine($"Chybějící firma v db - ICO: {donor.CompanyId}, nazev: {donor.Name}");
-                    continue;
-                }
-
-                foreach (var donation in companyDonations.Value)
-                {
-                    // add event
-                    var sponzoring = new Sponzoring()
-                    {
-                        DarovanoDne = donation.Date,
-                        Hodnota = donation.Amount,
-                        IcoPrijemce = donation.ICO,
-                        Zdroj = _zdroj,
-                        Popis = donation.Description,
-                        Typ = (int)donation.GiftType
-                    };
-                    firma.AddSponsoring(sponzoring, _user);
-                }
-            }
-        }
+        
 
         public static int GetYearFromText(string text)
         {
