@@ -14,6 +14,8 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
 {
     public const LuceneVersion LuceneVersion = Lucene.Net.Util.LuceneVersion.LUCENE_48;
 
+    private HashSet<char> SearchModifiingChars = new("+-!(){}[]^\"~*?:\\".ToCharArray());
+    
     private const string SearchFieldName = nameof(SearchFieldName);
     private const string DataFieldName = nameof(DataFieldName);
     private const string FilterFieldName = nameof(FilterFieldName);
@@ -122,6 +124,8 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
     {
         if (string.IsNullOrWhiteSpace(query))
             return Enumerable.Empty<T>();
+
+        query = query.ReplaceDisallowedCharsWithSpace(SearchModifiingChars); 
         
         // It can happen that in results will be synonyms which are going to be filtered out
         // so we need this "buffer"
