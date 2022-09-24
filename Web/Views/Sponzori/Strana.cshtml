@@ -49,14 +49,14 @@
 
     (SponzoringSummed sponz, int[] roky)[] osobyTopSponzori = osobySponzori
             .GroupBy(k => k.Id, v => v, (k, v) => (sponz: new SponzoringSummed()
-                {
-                    Id = k,
-                    DarCelkem = v.Sum(x => x.DarCelkem),
-                    IcoStrany = v.First().IcoStrany,
-                    Jmeno = v.First().Jmeno,
-                    NazevStrany = v.First().NazevStrany,
-                    typ = v.First().typ
-                }, roky:  v.Select(r => r.Rok).Distinct().OrderBy(o => o).ToArray())
+                    {
+                        Id = k,
+                        DarCelkem = v.Sum(x => x.DarCelkem),
+                        IcoStrany = v.First().IcoStrany,
+                        Jmeno = v.First().Jmeno,
+                        NazevStrany = v.First().NazevStrany,
+                        typ = v.First().typ
+                    }, roky: v.Select(r => r.Rok).Distinct().OrderBy(o => o).ToArray())
             )
             .OrderByDescending(o => o.sponz.DarCelkem).ThenBy(o => o.sponz.Jmeno)
             .ToArray();
@@ -189,7 +189,8 @@ else
     U strany @stranaZkratka evidujeme celkem @(osobySponzori.Count + firmySponzori.Count) sponzorů, kteří darovali celkem @HlidacStatu.Util.RenderData.ShortNicePrice(suma).
 </p>
 
-<h4>Zobrazit sponzory pouze pro jeden rok:
+<h4>
+    Zobrazit sponzory pouze pro jeden rok:
     @for (int i = SponzoringRepo.DefaultLastSponzoringYear - 10; i <= SponzoringRepo.DefaultLastSponzoringYear; i++)
     {
         if (i == rok)
@@ -200,7 +201,7 @@ else
         {
             @Html.Raw($"<a href='?rok={i}'>{i}</a>&nbsp;&nbsp;")
         }
-    }    
+    }
 </h4>
 
 @{
@@ -210,16 +211,26 @@ else
                 Name = "Osoba",
                 HtmlRender = (m) =>
                 {
-                return $"<a href='/osoba/{m.sponz.Id}'>{m.sponz.Jmeno}</a>";
-            }
-        },
+                    var o = Osoby.GetByNameId.Get(m.sponz.Id);
+                    var ret = $"<a href='/osoba/{m.sponz.Id}'>{m.sponz.Jmeno}</a>";
+                    if (o.StatusOsoby() == Osoba.StatusOsobyEnum.Politik || o.StatusOsoby() == Osoba.StatusOsobyEnum.ByvalyPolitik)
+                    {
+                        ret = ret + " (politik)";
+                    }
+                    else if (o.StatusOsoby() == Osoba.StatusOsobyEnum.VysokyUrednik)
+                    { 
+                                ret = ret + " (vysoký st.úředník)";
+                    }
+                    return ret;
+                }
+            },
         new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
                 {
                     Name = "Částka",
                     HtmlRender = (m) =>
-                    {
-                        return HlidacStatu.Util.RenderData.NicePrice(m.sponz.DarCelkem, html: true);
-                    },
+            {
+                                return HlidacStatu.Util.RenderData.NicePrice(m.sponz.DarCelkem, html: true);
+                            },
                     OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.sponz.DarCelkem),
                     CssClass = "number"
                 },
@@ -227,9 +238,9 @@ else
                 {
                     Name = "Sponzoring v letech",
                     HtmlRender = (m) =>
-                    {
-                                return string.Join(", ",m.roky);
-                    },
+            {
+                                return string.Join(", ", m.roky);
+                            },
                     OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.roky.Max()),
                     CssClass = "number"
                 }
@@ -242,17 +253,17 @@ else
             {
                 Name = "Firma",
                 HtmlRender = (m) =>
-                {
-                return $"<a href='/subjekt/{m.sponz.Id}'>{m.sponz.Jmeno}</a>";
-            }
-        },
+        {
+                            return $"<a href='/subjekt/{m.sponz.Id}'>{m.sponz.Jmeno}</a>";
+                        }
+            },
         new ReportDataSource<(SponzoringSummed sponz, int[] roky)>.Column()
                 {
                     Name = "Částka",
                     HtmlRender = (m) =>
-                    {
-                        return HlidacStatu.Util.RenderData.NicePrice(m.sponz.DarCelkem, html: true);
-                    },
+            {
+                                return HlidacStatu.Util.RenderData.NicePrice(m.sponz.DarCelkem, html: true);
+                            },
                     OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.sponz.DarCelkem),
                     CssClass = "number"
                 },
@@ -260,7 +271,7 @@ else
                 {
                     Name = "Sponzoring v letech",
                     HtmlRender = (m) =>
-                    {
+            {
                                 return string.Join(", ", m.roky);
                             },
                     OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.roky.Max()),

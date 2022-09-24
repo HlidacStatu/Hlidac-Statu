@@ -48,7 +48,7 @@ namespace HlidacStatu.Web.Controllers
             return View(filteredModel);
         }
 
-        [HlidacCache(3600, "", false)]
+        [HlidacCache(3600, "id;r", false)]
         public async Task<ActionResult> Strana(string id, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(id))
