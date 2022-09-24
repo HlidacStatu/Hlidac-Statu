@@ -20,7 +20,6 @@ using HlidacStatu.Repositories.ES;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Framework;
 
-using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -38,13 +37,11 @@ namespace HlidacStatu.Web.Controllers
 
         private readonly UserManager<ApplicationUser> _userManager;
         protected readonly IWebHostEnvironment _hostingEnvironment;
-        private readonly TelemetryClient _telemetryClient;
 
-        public HomeController(IWebHostEnvironment hostingEnvironment, UserManager<ApplicationUser> userManager, TelemetryClient telemetryClient)
+        public HomeController(IWebHostEnvironment hostingEnvironment, UserManager<ApplicationUser> userManager)
         {
             _hostingEnvironment = hostingEnvironment;
             _userManager = userManager;
-            _telemetryClient = telemetryClient;
         }
 
         [Authorize]

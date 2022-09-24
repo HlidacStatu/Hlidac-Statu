@@ -111,8 +111,6 @@ namespace HlidacStatu.Web
 
             services.AddSingleton<AttackerDictionaryService>();
 
-            services.AddApplicationInsightsTelemetry();
-
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v2", new OpenApiInfo

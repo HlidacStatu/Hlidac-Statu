@@ -8,7 +8,6 @@
 	<ItemGroup>
 		<PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="6.0.2" />
 		<PackageReference Include="AspNetCore.HealthChecks.Network" Version="6.0.4" />
-		<PackageReference Include="AspNetCore.HealthChecks.Publisher.ApplicationInsights" Version="6.0.2" />
 		<PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="6.0.2" />
 		<PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="6.0.2" />
 		<PackageReference Include="AspNetCore.HealthChecks.System" Version="6.0.5" />
@@ -22,7 +21,6 @@
 		<PackageReference Include="Docker.DotNet" Version="3.125.10" />
 		<PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.3.0" />
 		<PackageReference Include="IPNetwork2" Version="2.6.437" />
-		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.8" />
