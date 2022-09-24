@@ -68,7 +68,7 @@ namespace HlidacStatu.Repositories
                         break;
                 }
 
-                string lengthOfFailInMin = Devmasters.Lang.CS.Plural.Get((int)alertStatus.FailedTime.TotalMinutes,
+                string lengthOfFailInMin = Devmasters.Lang.CS.Plural.Get((int)alertStatus.FailedTime.TotalMinutes, HlidacStatu.Util.Consts.czCulture,
                     "jednu minutu", "{0} minut", "{0} minut"
                     );
 

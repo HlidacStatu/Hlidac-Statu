@@ -1,14 +1,16 @@
-using HlidacStatu.Entities;
-using HlidacStatu.Entities.Views;
-
-using Microsoft.EntityFrameworkCore;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+
+using HlidacStatu.Connectors;
+using HlidacStatu.Entities;
+using HlidacStatu.Entities.Views;
+using HlidacStatu.Util;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories
 {
@@ -17,13 +19,13 @@ namespace HlidacStatu.Repositories
         public static string[] VelkeStrany = new string[]
         {
             "ANO", "ODS", "ČSSD", "Česká pirátská strana", "KSČM",
-            "SPD", "STAN", "KDU-ČSL", "TOP 09",
-            "Svobodní", "Strana zelených"
+            "SPD", "STAN", "KDU-ČSL", "TOP 09", "Strana zelených"
         };
 
-        public static string[] TopStrany = VelkeStrany.Take(9).ToArray();
+        public static string[] TopStrany = VelkeStrany.ToArray();
 
         public static int DefaultLastSponzoringYear = 2021;
+
 
 
         private static DateTime minBigSponzoringDate = new DateTime(DateTime.Now.Year - 10, 1, 1);
@@ -179,10 +181,44 @@ namespace HlidacStatu.Repositories
                     .ToListAsync(cancellationToken);
             }
         }
+        public static async Task<Dictionary<string, string>> StranyIco()
+        {
+
+            var res = DirectDB.GetList<string, string>(@"SELECT zs.KratkyNazev, IcoPrijemce as IcoStrany
+                      FROM Sponzoring sp
+                      Left Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
+                      group by zs.KratkyNazev, IcoPrijemce");
+            return res.ToDictionary(k => k.Item1 ?? Firmy.GetJmeno(k.Item2), v => v.Item2);
+
+        }
+
+        public static async Task<Dictionary<int, decimal>> SponzoringPerYear(string party, int minYear, int maxYear, bool persons, bool companies)
+        {
+            string icoStrany = DataValidators.CheckCZICO(party) ? party : ZkratkaStranyRepo.IcoStrany(party);
+            using (DbEntities db = new DbEntities())
+            {
+                var dataPerY = db.Sponzoring
+                        .Where(m => m.IcoPrijemce == icoStrany && m.DarovanoDne.Value.Year >= minYear && m.DarovanoDne.Value.Year <= maxYear)
+                        .Where(m => (persons && m.OsobaIdDarce != null) || (companies && m.IcoDarce != null))
+                        .GroupBy(k => k.DarovanoDne.Value.Year, m => m, (k, v) => new { rok = k, sum = v.Sum(m => m.Hodnota ?? 0) })
+                        .ToDictionary(k => k.rok, v => v.sum);
+
+
+                //add missing years
+                for (int year = minYear; year <= maxYear; year++)
+                    if (!dataPerY.ContainsKey(year))
+                        dataPerY.Add(year, 0);
+
+                return dataPerY
+                    .OrderBy(m => m.Key)
+                    .ToDictionary(k => k.Key, m => m.Value);
+
+            }
+        }
 
         public static async Task<List<SponzoringSummed>> PeopleSponsorsAsync(string party, CancellationToken cancellationToken)
         {
-            string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
+            string icoStrany = DataValidators.CheckCZICO(party) ? party : ZkratkaStranyRepo.IcoStrany(party);
             int tenYearsBack = DateTime.Now.Year - 10;
 
             using (DbEntities db = new DbEntities())
@@ -193,7 +229,9 @@ namespace HlidacStatu.Repositories
 	                   ,SUM(Hodnota) as DarCelkem
 	                   ,Year(DarovanoDne) as Rok
 	                   ,os.NameId as Id
+	                   ,sp.icoDarce as IcoDarce
 	                   ,RTRIM(LTRIM(isnull(os.TitulPred,'') + ' ' + os.Jmeno + ' ' + os.Prijmeni + ' ' + isnull(os.TitulPo,''))) as Jmeno
+                       ,1 as typ
                     FROM Sponzoring sp
                     LEFT Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
                     join Osoba os on sp.OsobaIdDarce = os.InternalId
@@ -201,7 +239,7 @@ namespace HlidacStatu.Repositories
                       and sp.IcoPrijemce = {icoStrany}
                       and year(sp.DarovanoDne) >= {tenYearsBack}
                     group by zs.KratkyNazev, IcoPrijemce, Year(DarovanoDne)
-                      , os.NameId, os.TitulPred, os.Jmeno, os.Prijmeni, os.TitulPo")
+                      , os.NameId, os.TitulPred, os.Jmeno, os.Prijmeni, os.TitulPo, sp.icoDarce")
                     .Where(SponzoringSummedLimitsPredicate)
                     .ToListAsync(cancellationToken);
             }
@@ -209,7 +247,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<List<SponzoringSummed>> CompanySponsorsAsync(string party, CancellationToken cancellationToken)
         {
-            string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
+            string icoStrany = DataValidators.CheckCZICO(party) ? party : ZkratkaStranyRepo.IcoStrany(party);
             int tenYearsBack = DateTime.Now.Year - 10;
 
             using (DbEntities db = new DbEntities())
@@ -221,6 +259,7 @@ namespace HlidacStatu.Repositories
 	                           ,Year(DarovanoDne) as Rok
 	                           ,fi.ICO as Id
 	                           ,fi.Jmeno as Jmeno
+                               ,2 as typ
                             FROM Sponzoring sp
                             LEFT Join ZkratkaStrany zs on sp.IcoPrijemce = zs.ICO
                             join Firma fi on sp.IcoDarce = fi.ICO
@@ -252,6 +291,7 @@ namespace HlidacStatu.Repositories
 	                           ,{rok} as Rok
 	                           ,os.NameId as Id
 	                           ,RTRIM(LTRIM(isnull(os.TitulPred,'') + ' ' + os.Jmeno + ' ' + os.Prijmeni + ' ' + isnull(os.TitulPo,''))) as Jmeno
+                                ,1 as typ
                             FROM Sponzoring sp
                             join Osoba os on sp.OsobaIdDarce = os.InternalId
                             where (year(sp.DarovanoDne) = {rok} or 1={yearSwitch}) and OsobaIdDarce > 0
@@ -287,6 +327,7 @@ namespace HlidacStatu.Repositories
 	                           ,{rok} as Rok
 	                           ,fi.ICO as Id
 	                           ,fi.Jmeno as Jmeno
+                               ,2 as typ
                             FROM Sponzoring sp
                             join Firma fi on sp.IcoDarce = fi.ICO
                             where (year(sp.DarovanoDne) = {rok} or 1={yearSwitch}) and IcoDarce is not null

@@ -1,14 +1,15 @@
-using HlidacStatu.Entities;
-using HlidacStatu.Extensions;
-using HlidacStatu.Repositories;
-using HlidacStatu.XLib.Render;
-using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.Rendering;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using HlidacStatu.Entities;
+using HlidacStatu.Extensions;
+using HlidacStatu.Repositories;
+using HlidacStatu.XLib.Render;
+
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -365,8 +366,8 @@ namespace HlidacStatu.Web.Framework
                 navigation = new { buttonOptions = new { enabled = false } },
                 series = new SeriesTextValue[] { data },
                 tooltip = new
-                    {
-                        pointFormat = tooltipFormat ?? "{series.name}: <b>{point.y}</b>"
+                {
+                    pointFormat = tooltipFormat ?? "{series.name}: <b>{point.y}</b>"
                 }
 
             };
@@ -387,7 +388,8 @@ namespace HlidacStatu.Web.Framework
             string yTitleLeft = "Hodnota (Kč)",
             string yTitleRight = "",
             bool allowDecimals = false,
-            bool stacked = false
+            bool stacked = false,
+            string showStackedSummaryFormat = "{total}"
             )
         {
             string random = Guid.NewGuid().ToString("N");
@@ -417,7 +419,6 @@ namespace HlidacStatu.Web.Framework
                     symbolWidth = 15,
                     squareSymbol = true
                 },
-
                 title = new
                 {
                     y = -10,
@@ -435,10 +436,11 @@ namespace HlidacStatu.Web.Framework
                     footerFormat = "</table>",
 
                 },
-                plotOptions = new {
+                plotOptions = new
+                {
                     series = new
                     {
-                        stacking= stacked ? "normal" : (string)null
+                        stacking = stacked ? "normal" : (string)null
                     }
                 },
                 xAxis = new
@@ -456,6 +458,11 @@ namespace HlidacStatu.Web.Framework
                 {
                     new
                     {
+                        stackLabels = new
+                        {
+                            enabled = (stacked && showStackedSummaryFormat != null),
+                            format = showStackedSummaryFormat
+                        },
                         allowDecimals = allowDecimals,
                         min = 0,
                         lineWidth = 0,

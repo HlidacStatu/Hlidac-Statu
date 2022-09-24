@@ -9,6 +9,8 @@
     ViewBag.Title = "Sponzoři politických stran a politiků";
     ViewBag.SubTitle = "Hlídáme je, protože si to zaslouží!";
 
+
+
     int lastYear = SponzoringRepo.DefaultLastSponzoringYear;
 
     var biggestSponsors = SponzoringRepo.BiggestPeopleSponsorsAsync(null, CancellationToken.None, take:7);
@@ -39,7 +41,7 @@
             <div class="watcher__title">
                 <h3>
                     <i class="far fa-hand-holding-usd"></i>
-                    Parlamentní strany
+                    Parlamentní a velké strany
                 </h3>
             </div>
             <div class="block-col ">

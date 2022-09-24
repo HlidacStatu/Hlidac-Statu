@@ -48,18 +48,15 @@ namespace HlidacStatu.Web.Controllers
             return View(filteredModel);
         }
 
+        [HlidacCache(3600, "", false)]
         public async Task<ActionResult> Strana(string id, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(id))
                 return NotFound();
 
             ViewBag.Strana = id;
-            var model = await SponzoringRepo.PeopleSponsorsAsync(id, cancellationToken);
-            var firstRow = model.FirstOrDefault();
-            ViewBag.TopOsoba = OsobaRepo.GetByNameId(firstRow?.Id);
-            ViewBag.TopOsobaAmount = firstRow?.DarCelkem ?? 0;
 
-            return View(model);
+            return View((object)id);
         }
 
         public async Task<ActionResult> OsobniSponzoriStrany(string id, CancellationToken cancellationToken)

@@ -7,7 +7,11 @@ namespace HlidacStatu.Entities.Views
     [Keyless]
     public class SponzoringSummed
     {
-
+        public enum ItemType
+        {
+            osoba = 1,
+            firma = 2
+        }
         public string Id { get; set; }
         public string Jmeno { get; set; }
         public int Rok { get; set; }
@@ -15,5 +19,6 @@ namespace HlidacStatu.Entities.Views
         public decimal DarCelkem { get; set; }
         public string IcoStrany { get; set; }
         public string NazevStrany { get; set; }
+        public ItemType typ { get; set; }
     }
 }
