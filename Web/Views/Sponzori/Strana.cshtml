@@ -57,7 +57,9 @@
                     NazevStrany = v.First().NazevStrany,
                     typ = v.First().typ
                 }, roky:  v.Select(r => r.Rok).Distinct().OrderBy(o => o).ToArray())
-            ).ToArray();
+            )
+            .OrderByDescending(o => o.sponz.DarCelkem).ThenBy(o => o.sponz.Jmeno)
+            .ToArray();
     (SponzoringSummed sponz, int[] roky)[] firmyTopSponzori = firmySponzori
             .GroupBy(k => k.Id, v => v, (k, v) => (sponz: new SponzoringSummed()
                     {
@@ -68,6 +70,7 @@
                         NazevStrany = v.First().NazevStrany,
                         typ = v.First().typ
                     }, roky: v.Select(r => r.Rok).Distinct().OrderBy(o => o).ToArray()))
+            .OrderByDescending(o => o.sponz.DarCelkem).ThenBy(o => o.sponz.Jmeno)
             .ToArray();
 
     Osoba topOsoba = null;
@@ -231,7 +234,7 @@ else
                     CssClass = "number"
                 }
         );
-    osobyTemplate.AddRows(osobyTopSponzori.OrderByDescending(o => o.sponz.DarCelkem).ThenBy(o => o.sponz.Jmeno).Take(rok.HasValue ? int.MaxValue : 50));
+    osobyTemplate.AddRows(osobyTopSponzori.Take(rok.HasValue ? int.MaxValue : 50));
     string topOsoby = Html.DataToHTMLTable(osobyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
     ReportDataSource<(SponzoringSummed sponz, int[] roky)> firmyTemplate = new(
@@ -264,7 +267,7 @@ else
                     CssClass = "number"
                 }
         );
-    firmyTemplate.AddRows(firmyTopSponzori.OrderByDescending(o => o.sponz.DarCelkem).ThenBy(o => o.sponz.Jmeno).Take(rok.HasValue ? int.MaxValue : 50));
+    firmyTemplate.AddRows(firmyTopSponzori.Take(rok.HasValue ? int.MaxValue : 50));
     string topFirmy = Html.DataToHTMLTable(firmyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
 }
