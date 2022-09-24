@@ -174,7 +174,14 @@
     @Html.ColumnGraph("Sponzorské dary za posledních 10 let",dataPerY,yTitleLeft:"Kč",stacked:true, showStackedSummaryFormat:"{total:,.0f}Kč")
 
 </p>
-<h3>Největší sponzoři @stranaZkratka @(rok.HasValue ? $"v roce {rok}": "")</h3>
+@if (rok.HasValue)
+{
+    <h3>Sponzoři @stranaZkratka v roce @rok</h3>
+}
+else
+{
+    <h3>Největší sponzoři @stranaZkratka</h3>
+}
 <p>
     U strany @stranaZkratka evidujeme celkem @(osobySponzori.Count + firmySponzori.Count) sponzorů, kteří darovali celkem @HlidacStatu.Util.RenderData.ShortNicePrice(suma).
 </p>
@@ -182,7 +189,14 @@
 <h4>Zobrazit sponzory pouze pro jeden rok:
     @for (int i = SponzoringRepo.DefaultLastSponzoringYear - 10; i <= SponzoringRepo.DefaultLastSponzoringYear; i++)
     {
-        @Html.Raw($"<a href='?rok={i}'>{i}</a>&nbsp;&nbsp;")
+        if (i == rok)
+        {
+            @Html.Raw($"<b>{i}</b>&nbsp;&nbsp;")
+        }
+        else
+        {
+            @Html.Raw($"<a href='?rok={i}'>{i}</a>&nbsp;&nbsp;")
+        }
     }    
 </h4>
 
@@ -217,7 +231,7 @@
                     CssClass = "number"
                 }
         );
-    osobyTemplate.AddRows(osobyTopSponzori.OrderByDescending(o => o.sponz.DarCelkem).ThenBy(o => o.sponz.Jmeno).Take(50));
+    osobyTemplate.AddRows(osobyTopSponzori.OrderByDescending(o => o.sponz.DarCelkem).ThenBy(o => o.sponz.Jmeno).Take(rok.HasValue ? int.MaxValue : 50));
     string topOsoby = Html.DataToHTMLTable(osobyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
     ReportDataSource<(SponzoringSummed sponz, int[] roky)> firmyTemplate = new(
@@ -250,7 +264,7 @@
                     CssClass = "number"
                 }
         );
-    firmyTemplate.AddRows(firmyTopSponzori.OrderByDescending(o => o.sponz.DarCelkem).ThenBy(o => o.sponz.Jmeno).Take(50));
+    firmyTemplate.AddRows(firmyTopSponzori.OrderByDescending(o => o.sponz.DarCelkem).ThenBy(o => o.sponz.Jmeno).Take(rok.HasValue ? int.MaxValue : 50));
     string topFirmy = Html.DataToHTMLTable(firmyTemplate, dataTableOptions: dataTableOptions).RenderRawHtml();
 
 }
