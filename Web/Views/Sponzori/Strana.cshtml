@@ -99,11 +99,11 @@
     ViewBag.SocialShareText = $"{osobySponzori.Count + firmySponzori.Count} sponzorů, kteří darovali straně {stranaZkratka} v součtu {HlidacStatu.Util.RenderData.ShortNicePrice(suma)}.";
     if (topOsoba != null)
     {
-        ViewBag.SocialShareText += $"<br />Největším osobním sponzorem je {topOsoba.FullNameWithYear()} {HlidacStatu.Util.RenderData.ShortNicePrice(topOsobaAmount.Value)}";
+        ViewBag.SocialShareText += $"\nNejvětším osobním sponzorem je {topOsoba.FullNameWithYear()} {HlidacStatu.Util.RenderData.ShortNicePrice(topOsobaAmount.Value)}";
     }
     if (topFirma != null)
     {
-        ViewBag.SocialShareText += $"<br />Největším firemním sponzorem je {topFirma.Jmeno} {HlidacStatu.Util.RenderData.ShortNicePrice(topFirmaAmount.Value)}";
+        ViewBag.SocialShareText += $"\nNejvětším firemním sponzorem je {topFirma.Jmeno} {HlidacStatu.Util.RenderData.ShortNicePrice(topFirmaAmount.Value)}";
     }
 
 
