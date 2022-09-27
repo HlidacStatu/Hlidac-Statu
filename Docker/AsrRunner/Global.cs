@@ -1,4 +1,3 @@
-using System;
 using Serilog.Events;
 
 namespace AsrRunner;

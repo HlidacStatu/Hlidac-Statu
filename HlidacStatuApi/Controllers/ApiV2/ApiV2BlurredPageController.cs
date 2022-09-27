@@ -1,6 +1,4 @@
-﻿
-
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
 
 using HlidacStatu.Entities;
@@ -13,7 +11,6 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace HlidacStatuApi.Controllers.ApiV2
 {
-
 
     [ApiExplorerSettings(IgnoreApi = true)]
     [SwaggerTag("BlurredPage")]

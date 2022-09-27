@@ -1,4 +1,3 @@
-using VolicskyPrukaz.Models;
 using VolicskyPrukaz.Services;
 
 var builder = WebApplication.CreateBuilder(args);

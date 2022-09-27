@@ -1,6 +1,5 @@
 ﻿using HlidacStatu.Entities.Insolvence;
 using HlidacStatu.Repositories;
-using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
 
 using Microsoft.AspNetCore.Mvc;

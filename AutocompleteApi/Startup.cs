@@ -1,6 +1,4 @@
-using System;
 using System.IO;
-using Devmasters.Log;
 using HlidacStatu.AutocompleteApi.Services;
 using HlidacStatu.Connectors;
 using HlidacStatu.LibCore.MiddleWares;
@@ -10,7 +8,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Events;
 
 namespace HlidacStatu.AutocompleteApi
 {

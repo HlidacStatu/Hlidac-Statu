@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-namespace HlidacStatu.Analysis.Page.Area
+﻿namespace HlidacStatu.Analysis.Page.Area
 {
     public partial class AnalyzePdfFromCmd 
     {

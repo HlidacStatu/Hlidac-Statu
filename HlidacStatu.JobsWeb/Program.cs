@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using HlidacStatu.JobsWeb.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 

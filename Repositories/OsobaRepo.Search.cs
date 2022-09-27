@@ -4,11 +4,8 @@ using Devmasters.Enums;
 using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
-using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
-using HlidacStatu.Util;
-
 using Microsoft.EntityFrameworkCore;
 
 using Nest;

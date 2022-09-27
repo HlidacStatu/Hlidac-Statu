@@ -1,5 +1,4 @@
 ﻿using HlidacStatu.Datasets;
-using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models.Apiv2;
 
 using Microsoft.AspNetCore.Mvc;

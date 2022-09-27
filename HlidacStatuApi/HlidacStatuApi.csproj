@@ -22,6 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Analysis.Page\Analysis.Page.csproj" />
       <ProjectReference Include="..\Datasets\Datasets.csproj" />
       <ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
       <ProjectReference Include="..\LibCore\LibCore.csproj" />

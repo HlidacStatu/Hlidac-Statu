@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using HlidacStatu.DetectJobs;
 using HlidacStatu.Entities;
 
 namespace HlidacStatu.JobTableEditor.Data

@@ -1,13 +1,11 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Corsinvest.ProxmoxVE.Api;
-using Corsinvest.ProxmoxVE.Api.Extension;
 using Newtonsoft.Json;
 
 namespace HlidacStatu.Web.HealthChecks

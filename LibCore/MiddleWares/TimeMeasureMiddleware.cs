@@ -1,10 +1,7 @@
 using System.Collections.Generic;
-using HlidacStatu.LibCore.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using System.Diagnostics;
-using System.Text;
 using System.Threading.Tasks;
 using Devmasters.Log;
 
