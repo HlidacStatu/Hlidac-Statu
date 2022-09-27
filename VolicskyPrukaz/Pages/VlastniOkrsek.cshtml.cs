@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace VolicskyPrukaz.Pages;
 
-public class StrankaDva : PageModel
+public class VlastniOkrsek : PageModel
 {
     public void OnGet()
     {

@@ -2,11 +2,14 @@
 
 <div id="navigation" class="row">
     <ul>
-        <li class="col-xs-12 col-md-6">
-            <a class="btn @Html.NavButton(nameof(StrankaJedna))" asp-page="StrankaJedna">Jsem občanem ČR a chci volit ve svém volebním okrsku (Volby do zastupitelstev obcí i do Senátu)</a>
+        <li class="col-xs-12 col-md-4">
+            <a class="btn @Html.NavButton(nameof(VlastniOkrsek))" asp-page="@nameof(VlastniOkrsek)">Chci volit ve svém volebním okrsku</a>
         </li>
-        <li class="col-xs-12 col-md-6">
-            <a class="btn @Html.NavButton(nameof(StrankaDva))" asp-page="StrankaDva">Jsem občanem ČR a chci volit jinde než ve svém volebním okrsku (Pouze volby do Senátu)</a>
+        <li class="col-xs-12 col-md-4">
+            <a class="btn @Html.NavButton(nameof(JinyOkrsek))" asp-page="@nameof(JinyOkrsek)">Chci volit na voličský průkaz v jiném volebním okrsku</a>
+        </li>
+        <li class="col-xs-12 col-md-4">
+            <a class="btn @Html.NavButton(nameof(Zahranici))" asp-page="@nameof(Zahranici)">Chci volit v zahraničí</a>
         </li>
     </ul>
 </div>
