@@ -21,6 +21,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.LibCore;
 using HlidacStatu.Web.Framework;
 
 namespace HlidacStatu.Web.Controllers
@@ -525,7 +526,7 @@ namespace HlidacStatu.Web.Controllers
                     if (Request.Headers["Origin"].Contains(".hlidacstatu.cz"))
                         Response.Headers.Add("Access-Control-Allow-Origin", Request.Headers["Origin"]);
                 }
-                return new HttpResponseMessageResult(response);
+                return new HttpResponseMessageActionResult(response);
             }
             catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
             {
@@ -540,6 +541,38 @@ namespace HlidacStatu.Web.Controllers
             return NoContent();
         }
 
+        public async Task<IActionResult> Adresy(
+            [FromServices] IHttpClientFactory _httpClientFactory,
+            string q,
+            CancellationToken ctx)
+        {
+            var autocompleteHost = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint");
+            var autocompletePath = $"/autocomplete/Adresy?q={q}";
+            var uri = new Uri($"{autocompleteHost}{autocompletePath}");
+            using var client = _httpClientFactory.CreateClient(Constants.DefaultHttpClient);
+
+            try
+            {
+                var response = await client.GetAsync(uri, ctx);
+                if (!string.IsNullOrEmpty(Request.Headers["Origin"]))
+                {
+                    if (Request.Headers["Origin"].Contains(".hlidacstatu.cz"))
+                        Response.Headers.Add("Access-Control-Allow-Origin", Request.Headers["Origin"]);
+                }
+                return new HttpResponseMessageActionResult(response);
+            }
+            catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
+            {
+                // canceled by user
+                Util.Consts.Logger.Info("Autocomplete canceled by user");
+            }
+            catch (Exception e)
+            {
+                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { q });
+            }
+            
+            return NoContent();
+        }
         
 
 

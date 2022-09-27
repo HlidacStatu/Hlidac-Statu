@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using Devmasters;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Views;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories;
 using Serilog;
@@ -33,7 +34,7 @@ public static class CacheIndexFactory
             () => AutocompleteRepo.GenerateAutocompleteFirmyOnly(),
             new IndexingOptions<Autocomplete>()
             {
-                TextSelector = ts => $"{ts.Text}"
+                TextSelector = ts => ts.Text
             },
             logger);
     }
@@ -62,6 +63,34 @@ public static class CacheIndexFactory
                 TextSelector = ts => $"{ts.Text} {ts.AdditionalHiddenSearchText}",
                 BoostSelector = bs => bs.PriorityMultiplier,
                 FilterSelector = fs => fs.Type.ToLowerInvariant().RemoveAccents()
+            },
+            logger);
+    }
+    
+    public static CachedIndex<AdresyKVolbam> CreateAdresyCachedIndex(string path, ILogger logger)
+    {
+        return new(
+            Path.Combine(path, "adresy"),
+            TimeSpan.FromHours(24),
+            () => AdresyRepo.GetAdresyKVolbamAsync().GetAwaiter().GetResult(),
+            new IndexingOptions<AdresyKVolbam>()
+            {
+                TextSelector = ts => ts.Adresa,
+                BoostSelector = bs =>
+                {
+                    // Velká města mají větší prioritu
+                    if (bs.Obec.Contains("praha", StringComparison.InvariantCultureIgnoreCase))
+                        return 2.6f;
+                    if (bs.Obec.Contains("brno", StringComparison.InvariantCultureIgnoreCase))
+                        return 2.5f;
+                    if (bs.Obec.Contains("plzeň", StringComparison.InvariantCultureIgnoreCase))
+                        return 2.4f;
+                    if (bs.Obec.Contains("ostrava", StringComparison.InvariantCultureIgnoreCase))
+                        return 2.3f;
+
+                    // Typ Ovm má hodnoty = 5, 6, 7, 8 => výsledné číslo je hodnota mezi 1.2 - 1.8
+                    return ((bs.TypOvm - 4) / 5f) + 1f;
+                }
             },
             logger);
     }

@@ -34,8 +34,8 @@ public class CachedIndex<T> where T : IEquatable<T>
     /// <summary>
     /// Is trigered when cache load finishes. Retruns true if finishes successfully, otherwise returns false.
     /// </summary>
-    private EventHandler<bool>? _onCacheInitFinished;
-    public event EventHandler<bool> CacheInitFinished
+    private EventHandler<string>? _onCacheInitFinished;
+    public event EventHandler<string> CacheInitFinished
     {
         add => _onCacheInitFinished += value;
         remove => _onCacheInitFinished -= value;
@@ -115,7 +115,7 @@ public class CachedIndex<T> where T : IEquatable<T>
             CleanPreviousDirectory(NextDirectory);
             
             if(_onCacheInitFinished != null)
-                _onCacheInitFinished.Invoke(this, false);
+                _onCacheInitFinished.Invoke(this, "Finished successfully.");
             
             _logger.Debug("Refresh cache for {baseDir} was successful.", _baseDir);
         }
@@ -123,7 +123,7 @@ public class CachedIndex<T> where T : IEquatable<T>
         {
             _logger.Warning(e, "Refresh cache for {baseDir} ended up with error.", _baseDir);
             if(_onCacheInitFinished != null)
-                _onCacheInitFinished.Invoke(this, true);
+                _onCacheInitFinished.Invoke(this, e.Message);
             throw;
         }
     }
