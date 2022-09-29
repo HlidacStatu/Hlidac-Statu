@@ -89,6 +89,16 @@
 
         <div class="mb-3 w-50">
             <h2><i class="fa-solid fa-envelope"></i>&nbsp;Doručení</h2>
+            <div class="button-group" role="group" aria-label="Basic checkbox button group">
+                <div class="form-check">
+                    <input asp-for="Zadost.PrvniKolo" id="prvnikolo" type="checkbox" placeholder="Název úřadu" class="form-check-input"/>
+                    <label for="prvnikolo" class="form-check-label required">Chci vygenerovat žádost pro 1. kolo - 13. a 14. ledna 2023</label>
+                </div>
+                <div class="form-check">
+                    <input asp-for="Zadost.DruheKolo" id="druhekolo" type="checkbox" placeholder="Název úřadu" class="form-check-input"/>
+                    <label for="druhekolo" class="form-check-label required">Chci vygenerovat žádost pro 2. kolo - 27. a 28. ledna 2023</label>
+                </div>
+            </div>
             <div class="button-group" role="group" aria-label="Basic radio toggle button group">
                 <input type="radio" name="doruceni" onclick="SetPrevzeti(this)" value="převezmu osobně." id="in-person"> <label for="in-person">převezmu osobně</label><br>
                 <input type="radio" name="doruceni" onclick="SetPrevzeti(this)" value="převezme osoba, která se prokáže plnou mocí s mým úředně ověřeným podpisem." id="representative"> <label for="representative">převezme osoba, která se prokáže plnou mocí s mým úředně ověřeným podpisem</label><br>

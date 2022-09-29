@@ -10,18 +10,16 @@ public class PdfGenerator
 {
     private string _rootPath;
 
-    private const string DatumVoleb = "23. a 24. září 2022";
-
+    private const string DatumVoleb = "13. a 14. ledna 2023";
+    private const string DatumVoleb2 = "27. a 28. ledna 2023";
 
     private const string NadpisPrvniRadek = "Žádost o vydání voličského průkazu";
-    private const string NadpisDruhyRadek = "pro hlasování ve volbách do senátu ČR";
-    private const string NadpisTretiRadek = $"konaných dne {DatumVoleb}";
-
+    private const string NadpisDruhyRadek = "pro hlasování ve volbách prezidenta ČR";
+    
+    
     private const string HlavniTextCastPrvni =
-        $"Podle ustanovení § 33 zákona č. 275/2012 Sb., o volbě prezidenta republiky a o změně některých zákonů (zákon o volbě prezidenta republiky),§ 6a zákona č. 247/1995 Sb., o volbách do Parlamentu České republiky a o změně a doplnění některých dalších zákonů, ve znění pozdějších předpisů, § 30 zákona č. 62/2003 Sb., o volbách do Evropského parlamentu a o změně některých zákonů, ve znění pozdějších předpisů, § 26a zákona č. 130/2000 Sb., o volbách do zastupitelstev krajů a o změně některých zákonů, ve znění pozdějších předpisů (dále jen zákon o volbách do EP), žádám ";
+        $"Podle ustanovení § 33 zákona č. 275/2012 Sb., o volbě prezidenta republiky a o změně některých zákonů (zákon o volbě prezidenta republiky), § 6a zákona č. 247/1995 Sb., o volbách do Parlamentu České republiky a o změně a doplnění některých dalších zákonů, ve znění pozdějších předpisů, § 30 zákona č. 62/2003 Sb., o volbách do Evropského parlamentu a o změně některých zákonů, ve znění pozdějších předpisů, § 26a zákona č. 130/2000 Sb., o volbách do zastupitelstev krajů a o změně některých zákonů, ve znění pozdějších předpisů (dále jen zákon o volbách do EP), žádám ";
 
-    private const string HlavniTextCastDruha =
-        $" o vydání voličského průkazu pro hlasování ve volbách do Senátu ČR konaných ve dnech {DatumVoleb}, neboť nebudu moci volit ve volebním okrsku, v jehož seznamu voličů jsem zapsán(a).";
 
     public PdfGenerator(IHostEnvironment environment)
     {
@@ -40,6 +38,26 @@ public class PdfGenerator
 
     public byte[] Create(Zadost zadost)
     {
+        string hlavniTextCastDruha;
+            
+        string nadpisTretiRadek; 
+        if (zadost.PrvniKolo && !zadost.DruheKolo)
+        {
+            nadpisTretiRadek = $"konaných dne {DatumVoleb} (první kolo)";
+            hlavniTextCastDruha = $" o vydání voličského průkazu pro hlasování ve volbách prezidenta ČR konaných:\nve dnech {DatumVoleb} (první kolo),\nneboť nebudu moci volit ve volebním okrsku, v jehož seznamu voličů jsem zapsán(a)."; 
+        }
+        else if (zadost.DruheKolo && !zadost.PrvniKolo)
+        {
+            nadpisTretiRadek = $"konaných dne {DatumVoleb2} (druhé kolo)";
+            hlavniTextCastDruha = $" o vydání voličského průkazu pro hlasování ve volbách prezidenta ČR konaných:\nve dnech {DatumVoleb2} (druhé kolo),\nneboť nebudu moci volit ve volebním okrsku, v jehož seznamu voličů jsem zapsán(a).";
+        }
+        else
+        {
+            nadpisTretiRadek = $"konaných v termínech\n{DatumVoleb} (první kolo),\na {DatumVoleb2} (druhé kolo)";
+            hlavniTextCastDruha = $" o vydání voličského průkazu pro hlasování ve volbách prezidenta ČR konaných:\nve dnech {DatumVoleb} (první kolo)\na ve dnech {DatumVoleb2} (druhé kolo),\nneboť nebudu moci volit ve volebním okrsku, v jehož seznamu voličů jsem zapsán(a).";
+        }
+        
+        
         var logoPath = Path.Combine(_rootPath, "wwwroot", "assets", "images", "hslogo.png");
 
         var document = Document.Create(container =>
@@ -65,7 +83,7 @@ public class PdfGenerator
                     {
                         text.Line(NadpisPrvniRadek).Bold().FontSize(26).LineHeight(0.8f);
                         text.Line(NadpisDruhyRadek).SemiBold().FontSize(20).LineHeight(0.8f);
-                        text.Line(NadpisTretiRadek).SemiBold().FontSize(20).LineHeight(0.8f);
+                        text.Line(nadpisTretiRadek).SemiBold().FontSize(20).LineHeight(0.8f);
                     });
 
                 // Tělo
@@ -86,7 +104,7 @@ public class PdfGenerator
                         {
                             text.Span(HlavniTextCastPrvni);
                             text.Span($"{zadost.UradNazev}, {zadost.AdresaUradu}").Weight(FontWeight.SemiBold);
-                            text.Span(HlavniTextCastDruha);
+                            text.Span(hlavniTextCastDruha);
                         });
 
                         x.Item().Text(text =>

@@ -13,7 +13,6 @@ public class GenerovatZadost : PageModel
     
     public void OnGet()
     {
-        Console.WriteLine("generuju");
     }
 
     public IActionResult OnPost([FromServices]PdfGenerator pdfGenerator)
