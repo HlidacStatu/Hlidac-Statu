@@ -217,7 +217,7 @@
         @if (statistics.Summary().PocetSmluv>0)
         {
         <p>
-            V registru smluv evidujeme @Html.Raw(statistics.Summary().ToNiceString(null,true))
+            V registru smluv evidujeme @Html.Raw(statistics.Summary().ToNiceString(null,true,$"/hledat?q=ico:{Model.ICO}"))
         </p>
         }
         <p>
