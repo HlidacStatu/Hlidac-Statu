@@ -82,8 +82,8 @@ public class PdfGenerator
                     .Text(text =>
                     {
                         text.Line(NadpisPrvniRadek).Bold().FontSize(26).LineHeight(0.8f);
-                        text.Line(NadpisDruhyRadek).SemiBold().FontSize(20).LineHeight(0.8f);
-                        text.Line(nadpisTretiRadek).SemiBold().FontSize(20).LineHeight(0.8f);
+                        text.Line(NadpisDruhyRadek).SemiBold().FontSize(20).LineHeight(0.9f);
+                        text.Line(nadpisTretiRadek).SemiBold().FontSize(20).LineHeight(1.0f);
                     });
 
                 // Tělo
