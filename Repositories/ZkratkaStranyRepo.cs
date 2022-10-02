@@ -1,8 +1,9 @@
-using HlidacStatu.Entities;
-
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+
+using HlidacStatu.Entities;
+using HlidacStatu.Util;
 
 namespace HlidacStatu.Repositories
 {
@@ -20,6 +21,14 @@ namespace HlidacStatu.Repositories
 
         public static string IcoStrany(string zkratka)
         {
+            if (DataValidators.CheckCZICO(Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka)))
+            {
+                var f = Firmy.Get(Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka));
+                if (f.Valid && f.Kod_PF == 711)
+                    return Devmasters.TextUtil.NormalizeToNumbersOnly(zkratka);
+                else
+                    return zkratka; //TODO co delat, kdyz ICO neni politicka strana
+            }
             using (DbEntities db = new DbEntities())
             {
                 return db.ZkratkaStrany

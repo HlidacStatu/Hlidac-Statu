@@ -21,7 +21,7 @@
 {
     <ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
-        <li><a href="/sponzori">Sponzoři</a></li>
+        <li><a href="/sponzori">Sponzoři politických stran</a></li>
         @(!string.IsNullOrEmpty(strana) ? new HtmlString($"<li><a href='{Sponsors.GetStranaUrl(strana)}'>{strana}</a></li>") : "")
         @(rok.HasValue ? new HtmlString($"<li>{rok}</li>") : "")
         <li class="active">@ViewBag.Title</li>
@@ -81,3 +81,8 @@
 </div>
 
 <partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("Upozornit na chybu"))"/>
+
+
+    <p class="small">
+        Zdroj: finační výkazy politických stran ÚDHPSH.
+    </p>

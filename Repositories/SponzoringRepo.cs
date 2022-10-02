@@ -22,9 +22,20 @@ namespace HlidacStatu.Repositories
             "SPD", "STAN", "KDU-ČSL", "TOP 09", "Strana zelených"
         };
 
+        public static string[] ParlamentníStrany = new string[]
+        {
+            "ANO", "ODS", "Česká pirátská strana",
+            "SPD", "STAN", "KDU-ČSL", "TOP 09"
+        };
         public static string[] TopStrany = VelkeStrany.ToArray();
 
-        public static int DefaultLastSponzoringYear = 2021;
+        public static int DefaultLastSponzoringYear()
+        {
+            return HlidacStatu.Connectors.DirectDB
+                .GetList<int?>("select max(DATEPART(yy, Sponzoring.DarovanoDne)) from sponzoring where sponzoring.darovanoDne < GetDate()")
+                .FirstOrDefault()
+                 ?? (DateTime.Now.Year - 1);
+        }
 
 
 
@@ -194,7 +205,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<Dictionary<int, decimal>> SponzoringPerYear(string party, int minYear, int maxYear, bool persons, bool companies)
         {
-            string icoStrany = DataValidators.CheckCZICO(party) ? party : ZkratkaStranyRepo.IcoStrany(party);
+            string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
             using (DbEntities db = new DbEntities())
             {
                 var dataPerY = db.Sponzoring
@@ -218,7 +229,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<List<SponzoringSummed>> PeopleSponsorsAsync(string party, CancellationToken cancellationToken)
         {
-            string icoStrany = DataValidators.CheckCZICO(party) ? party : ZkratkaStranyRepo.IcoStrany(party);
+            string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
             int tenYearsBack = DateTime.Now.Year - 10;
 
             using (DbEntities db = new DbEntities())
@@ -247,7 +258,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<List<SponzoringSummed>> CompanySponsorsAsync(string party, CancellationToken cancellationToken)
         {
-            string icoStrany = DataValidators.CheckCZICO(party) ? party : ZkratkaStranyRepo.IcoStrany(party);
+            string icoStrany = ZkratkaStranyRepo.IcoStrany(party);
             int tenYearsBack = DateTime.Now.Year - 10;
 
             using (DbEntities db = new DbEntities())

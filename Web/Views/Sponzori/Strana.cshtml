@@ -34,8 +34,25 @@
         }
     }
 
-    string stranaZkratka = (string)Model;
-    string icoStrany = ZkratkaStranyRepo.IcoStrany(stranaZkratka);
+    string icoStrany = ZkratkaStranyRepo.IcoStrany((string)Model);
+    string stranaZkratka = "";
+    Firma strana = Firmy.Get(icoStrany);
+    if (strana.Valid == false)
+    {
+        <text>
+        <h2>Strana nenalezena</h2><p>Pokračovat na <a href='/sponzori/strany'>přehledu všech stran</a>.</p>
+        </text>
+        return;
+    }
+
+
+    if (HlidacStatu.Util.DataValidators.CheckCZICO(Devmasters.TextUtil.NormalizeToNumbersOnly((string)Model)))
+    {
+        stranaZkratka = strana.Jmeno;
+    }
+    else
+        stranaZkratka = (string)Model;
+
 
     List<SponzoringSummed> osobySponzori = await SponzoringRepo.PeopleSponsorsAsync(icoStrany, System.Threading.CancellationToken.None);
     List<SponzoringSummed> firmySponzori = await SponzoringRepo.CompanySponsorsAsync(icoStrany, System.Threading.CancellationToken.None);
@@ -92,7 +109,7 @@
     }
     decimal suma = osobySponzori.Sum(m => m.DarCelkem) + firmySponzori.Sum(m => m.DarCelkem);
 
-    ViewBag.Title = $"Politické strana {ViewBag.Strana}";
+    ViewBag.Title = $"Politické strana {stranaZkratka}";
 
 
     ViewBag.SocialShareTitle = ViewBag.Title;
@@ -135,7 +152,7 @@
     {
     <ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
-        <li><a href="/sponzori">Sponzoři</a></li>
+        <li><a href="/sponzori">Sponzoři politických stran</a></li>
         <li class="active">@ViewBag.Title</li>
     </ol>
 }
@@ -145,14 +162,14 @@
     <p>
 
         @{
-        var years = Enumerable.Range(SponzoringRepo.DefaultLastSponzoringYear - 10, 10);
+        var years = Enumerable.Range(SponzoringRepo.DefaultLastSponzoringYear() - 10, 10);
         Series[] dataPerY = new Series[]
         {
     new()
     {
     Name = "Fyzické osoby",
     Type = Series.SeriesType.column,
-    Data = SponzoringRepo.SponzoringPerYear(icoStrany,SponzoringRepo.DefaultLastSponzoringYear-10,SponzoringRepo.DefaultLastSponzoringYear,false,true).Result
+    Data = SponzoringRepo.SponzoringPerYear(icoStrany,SponzoringRepo.DefaultLastSponzoringYear()-10,SponzoringRepo.DefaultLastSponzoringYear(),false,true).Result
     .Select(x=> new SeriesData(x.Key, x.Value) )
     .ToArray(),
     SeriesTooltip = new SeriesTooltip()
@@ -164,7 +181,7 @@
     {
     Name = "Firmy",
     Type = Series.SeriesType.column,
-    Data = SponzoringRepo.SponzoringPerYear(icoStrany,SponzoringRepo.DefaultLastSponzoringYear-10,SponzoringRepo.DefaultLastSponzoringYear,true,false).Result
+    Data = SponzoringRepo.SponzoringPerYear(icoStrany,SponzoringRepo.DefaultLastSponzoringYear()-10,SponzoringRepo.DefaultLastSponzoringYear(),true,false).Result
     .Select(x=> new SeriesData(x.Key, x.Value) )
     .ToArray(),
     SeriesTooltip = new SeriesTooltip()
@@ -191,7 +208,7 @@ else
 
 <h4>
     Zobrazit sponzory pouze pro jeden rok:
-    @for (int i = SponzoringRepo.DefaultLastSponzoringYear - 10; i <= SponzoringRepo.DefaultLastSponzoringYear; i++)
+    @for (int i = SponzoringRepo.DefaultLastSponzoringYear() - 10; i <= SponzoringRepo.DefaultLastSponzoringYear(); i++)
     {
         if (i == rok)
         {
@@ -290,3 +307,7 @@ else
 
 
 <partial name="WebUtil/FeedbackModal" model="@(new FeedbackViewModel("Upozornit na chybu"))" />
+
+<p class="small">
+    Zdroj: finační výkazy politických stran ÚDHPSH.
+</p>

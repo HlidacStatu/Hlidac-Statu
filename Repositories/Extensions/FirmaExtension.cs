@@ -372,6 +372,19 @@ namespace HlidacStatu.Extensions
             else
                 return false;
         }
+        public static string Kod_PF_Popis(this Firma firma)
+        {
+            var kod_pf = (firma.Kod_PF?.ToString() ?? "");
+            using (DbEntities db = new DbEntities())
+            {
+                return db.PravniFormaOvm
+                    .AsNoTracking()
+                    .Where(zs => zs.Id == kod_pf)
+                    .FirstOrDefault()?
+                    .Text;
+            }
+
+        }
 
         public static bool JsemSoukromaFirma(this Firma firma)
         {
@@ -427,6 +440,8 @@ namespace HlidacStatu.Extensions
         /// </summary>
         /// <returns></returns>
         public static bool JsemOVM(this Firma firma) => firma.TypSubjektu == Firma.TypSubjektuEnum.Ovm || firma.TypSubjektu == Firma.TypSubjektuEnum.Obec;
+
+        public static bool JsemPolitickaStrana(this Firma firma) => firma.Kod_PF == 711;
 
         internal static bool _jsemOVM(this Firma firma)
         {

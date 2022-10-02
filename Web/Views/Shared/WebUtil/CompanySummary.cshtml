@@ -9,15 +9,19 @@
 <p>
     @if (Model.JsemOVM())
     {
-        <span>Úřad - orgán veřejné moci.</span>
+        <span>Úřad - orgán veřejné moci. @Model.Kod_PF_Popis().</span>
     }
     else if (Model.JsemStatniFirma())
     {
-        <span>Firma (spolu)vlastněná státem či samosprávou.</span>
+        <span>Firma (spolu)vlastněná státem či samosprávou. @Model.Kod_PF_Popis().</span>
+    }
+    else if (Model.JsemPolitickaStrana())
+    {
+        <span>Politická strana.</span>
     }
     else
     {
-        <span>Soukromá firma.</span>
+        <span>Soukromá firma. @Model.Kod_PF_Popis().</span>
     }
     @if (!string.IsNullOrWhiteSpace(Model.StatusFull()))
     {

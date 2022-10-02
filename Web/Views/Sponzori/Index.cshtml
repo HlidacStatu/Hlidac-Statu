@@ -11,7 +11,7 @@
 
 
 
-    int lastYear = SponzoringRepo.DefaultLastSponzoringYear;
+    int lastYear = SponzoringRepo.DefaultLastSponzoringYear();
 
     var biggestSponsors = SponzoringRepo.BiggestPeopleSponsorsAsync(null, CancellationToken.None, take:7);
     var biggestSponsorsLastYear = SponzoringRepo.BiggestPeopleSponsorsAsync(lastYear, CancellationToken.None, take:7);
@@ -52,7 +52,7 @@
 
             <div class="block-row block-part">
 
-                    @foreach (var chunk in Model.Chunk(5))
+                    @foreach (var chunk in Model.Chunk(Model.Count/2 + (Model.Count % 2)))
                     {
                         <div class="block-col block-col--50">
                             <div class="block-table">
@@ -87,11 +87,7 @@
                 
 
             </div>
-            <div class="block-col block-part">
-                <p class="small">
-                    Zdroj: finační výkazy politických stran ÚDHPSH.
-                </p>
-            </div>
+            <a href="/Sponzori/Strany" class="btn btn-primary btn-sm">Zobrazit všechny politické strany</a>
 
         </div>
 
@@ -118,7 +114,7 @@
                     }
 
                 </div>
-                <a href="/Sponzori/TopSponzori" class="link">Přehled více než 2000 největších sponzorů (osob i firem) politických stran</a>
+                <a href="/Sponzori/TopSponzori" class="btn btn-primary btn-sm">Přehled více než 2000 největších sponzorů (osob i firem) politických stran</a>
             </div>
         </div>
 
@@ -145,7 +141,7 @@
                     }
 
                 </div>
-                <a href="/Sponzori/TopSponzori?rok=@lastYear" class="link">Další sponzoři</a>
+                <a href="/Sponzori/TopSponzori?rok=@lastYear" class="btn btn-primary btn-sm">Další sponzoři</a>
             </div>
         </div>
 
@@ -171,9 +167,13 @@
                     }
 
                 </div>
-                <a href="/Sponzori/TopSponzoriFirmy?rok=@lastYear" class="link">Další sponzoři</a>
+                <a href="/Sponzori/TopSponzoriFirmy?rok=@lastYear" class="btn btn-primary btn-sm">Další sponzoři</a>
             </div>
         </div>
     </div>
 
 </div>
+
+<p class="small">
+    Zdroj: finační výkazy politických stran ÚDHPSH.
+</p>

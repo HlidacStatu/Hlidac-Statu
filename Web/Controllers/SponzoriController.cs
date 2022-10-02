@@ -16,7 +16,7 @@ namespace HlidacStatu.Web.Controllers
         [HlidacCache(3600, "", false)]
         public async Task<ActionResult> Index(CancellationToken cancellationToken)
         {
-            var model = await SponzoringRepo.PartiesPerYearsOverviewAsync(SponzoringRepo.DefaultLastSponzoringYear, cancellationToken);
+            var model = await SponzoringRepo.PartiesPerYearsOverviewAsync(SponzoringRepo.DefaultLastSponzoringYear(), cancellationToken);
             model = model.Where(s => SponzoringRepo.TopStrany
                     .Any(x => string.Equals(x, s.KratkyNazev, StringComparison.InvariantCultureIgnoreCase)))
                 .OrderByDescending(s => s.DaryCelkem)
@@ -54,9 +54,14 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return NotFound();
 
-            ViewBag.Strana = id;
 
             return View((object)id);
+        }
+
+        [HlidacCache(3600, "id;r", false)]
+        public async Task<ActionResult> Strany(CancellationToken cancellationToken)
+        {
+            return View();
         }
 
         public async Task<ActionResult> OsobniSponzoriStrany(string id, CancellationToken cancellationToken)

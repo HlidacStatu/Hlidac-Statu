@@ -1,0 +1,132 @@
+@model object
+
+@using HlidacStatu.Entities
+@using HlidacStatu.Entities.Views
+@using HlidacStatu.Repositories
+@using Microsoft.AspNetCore.Html
+@using System.Linq;
+@using Devmasters.Enums;
+@using Devmasters.Collections;
+@using HlidacStatu.Lib.Analysis.KorupcniRiziko
+@using HlidacStatu.Web.Framework;
+@using HlidacStatu.XLib.Render;
+
+
+
+@{
+    string dataTableOptions = @"{
+        'language': {
+            'url': '//cdn.datatables.net/plug-ins/1.10.19/i18n/Czech.json'
+        },
+        'order': [2,'desc'],
+        'lengthChange': false,
+        'pageLength': 25,
+        'info': false,
+        'filter': true,
+    }";
+
+    string[] parlamentniIcos = SponzoringRepo.ParlamentníStrany.Select(m => ZkratkaStranyRepo.IcoStrany(m)).ToArray();
+
+    var sql = @"
+select ICO, Jmeno,
+	(select SUM(Sponzoring.Hodnota) from Sponzoring where Sponzoring.IcoPrijemce=f.ICO and DATEPART(yy, Sponzoring.DarovanoDne)>=" + (SponzoringRepo.DefaultLastSponzoringYear()-10).ToString() + @") as suma,
+	(select SUM(Sponzoring.Hodnota) from Sponzoring where Sponzoring.IcoPrijemce=f.ICO and DATEPART(yy, Sponzoring.DarovanoDne)=" + SponzoringRepo.DefaultLastSponzoringYear().ToString() + @") as sumaLastY,
+	(select count(distinct(CONCAT( Sponzoring.OsobaIdDarce , Sponzoring.IcoDarce))) from Sponzoring where Sponzoring.IcoPrijemce=f.ICO and DATEPART(yy, Sponzoring.DarovanoDne)>=" + (SponzoringRepo.DefaultLastSponzoringYear() - 10).ToString() + @") as count
+from Firma f
+where KOD_PF = 711
+order by sumaLastY desc, suma desc
+";
+
+    var strany = HlidacStatu.Connectors.DirectDB.GetList<string, string, decimal?, decimal?,int>(sql);
+
+    ViewBag.Title = "Všechny politické strany";
+
+}
+
+@section scripts
+    {
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.css" />
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+    <script src="/scripts/highcharts-6/highcharts.js"></script>
+}
+
+
+    @section breadcrumb
+    {
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="/sponzori">Sponzoři politických stran</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+
+    @{
+    ReportDataSource<Tuple<string, string, decimal?, decimal?,int>> stranyTemplate = new(
+    new ReportDataSource<Tuple<string, string, decimal?, decimal?,int>>.Column()
+            {
+                Name = "Politická strana",
+                HtmlRender = (m) =>
+        {
+                    return $"{m.Item2} <span style='margin-left:10px'><a href='/sponzoring/strana/{m.Item1}/'><i class='fa-solid fa-circle-dollar'></i> o sponzoringu</a> <a href='/subjekt/{m.Item1}/'><i class='fa-solid fa-circle-info'></i> o straně</a></span> ";
+                }
+            },
+    new ReportDataSource<Tuple<string, string, decimal?, decimal?,int>>.Column()
+            {
+                Name = "Počet sponzorů",
+                HtmlRender = (m) =>
+{
+            return $"{m.Item5}";
+                },
+                OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Item5),
+                CssClass="number"
+            },
+    new ReportDataSource<Tuple<string, string, decimal?, decimal?,int>>.Column()
+            {
+                Name = "Obdržené dary za rok " + SponzoringRepo.DefaultLastSponzoringYear(),
+                HtmlRender = (m) =>
+            {
+                        return HlidacStatu.Util.RenderData.NicePrice(m.Item4 ?? 0, html: true);
+                    },
+                OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Item4 ?? 0),
+                CssClass = "number"
+            },
+    new ReportDataSource<Tuple<string, string, decimal?, decimal?,int>>.Column()
+            {
+                Name = "Obdržené dary za posledních 10 let",
+                HtmlRender = (m) =>
+    {
+                return HlidacStatu.Util.RenderData.NicePrice(m.Item3 ?? 0, html: true);
+            },
+                OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Item3 ?? 0),
+                CssClass = "number"
+            }
+
+
+    );
+
+}
+
+    <h2>Politické strany zastoupené v Parlamentu</h2>
+    <p>
+        @{
+            stranyTemplate.Clear();
+            stranyTemplate.AddRows(strany.Where(m=>parlamentniIcos.Contains(m.Item1) ));
+        }
+        @Html.DataToHTMLTable(stranyTemplate, dataTableOptions: dataTableOptions);
+    </p>
+
+    <h2>Ostatní parlamentní strany</h2>
+    <p>
+    @{
+        stranyTemplate.Clear();
+        stranyTemplate.AddRows(strany.Where(m => parlamentniIcos.Contains(m.Item1)==false));
+    }
+    @Html.DataToHTMLTable(stranyTemplate, dataTableOptions: dataTableOptions);
+
+    </p>
+
+
+<p class="small">
+    Zdroj: finační výkazy politických stran ÚDHPSH.
+</p>
