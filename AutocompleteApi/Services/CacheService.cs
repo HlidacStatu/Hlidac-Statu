@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Views;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using Serilog;
 using Whisperer;
@@ -20,6 +21,7 @@ public class CacheService
         [nameof(Company)] = new StatusInfo(),
         [nameof(UptimeServer)] = new StatusInfo(),
         [nameof(FullAutocomplete)] = new StatusInfo(),
+        [nameof(Adresy)] = new StatusInfo(),
     };
 
     // Index caches
@@ -27,6 +29,7 @@ public class CacheService
     public CachedIndex<Autocomplete> Company { get; }
     public CachedIndex<StatniWebyAutocomplete> UptimeServer { get; }
     public CachedIndex<Autocomplete> FullAutocomplete { get; }
+    public CachedIndex<AdresyKVolbam> Adresy { get; }
 
     
     public CacheService(ILogger logger)
@@ -54,6 +57,11 @@ public class CacheService
         FullAutocomplete = CacheIndexFactory.CreateFullAutocompleteCachedIndex(autocompleteFolder, _logger);
         FullAutocomplete.CacheInitStarted += (_, _) => UpdateStatusStartTime(nameof(FullAutocomplete));
         FullAutocomplete.CacheInitFinished += (_, b) => UpdateStatusEndTime(nameof(FullAutocomplete), b);
+        
+        _logger.Information("Constructing Adresy cache");
+        Adresy = CacheIndexFactory.CreateAdresyCachedIndex(autocompleteFolder, _logger);
+        Adresy.CacheInitStarted += (_, _) => UpdateStatusStartTime(nameof(Adresy));
+        Adresy.CacheInitFinished += (_, b) => UpdateStatusEndTime(nameof(Adresy), b);
     }
 
     private void UpdateStatusStartTime(string name)
@@ -61,18 +69,18 @@ public class CacheService
         Status[name].StartTime = DateTime.Now;
     }
     
-    private void UpdateStatusEndTime(string name, bool result)
+    private void UpdateStatusEndTime(string name, string message)
     {
         var si = Status[name];
         si.EndTime = DateTime.Now;
-        si.FinishedWithError = result;
+        si.FinishedWithError = message;
     }
     
     public class StatusInfo
     {
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-        public bool FinishedWithError { get; set; }
+        public string FinishedWithError { get; set; }
     }
 
 }

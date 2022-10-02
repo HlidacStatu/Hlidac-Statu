@@ -1,11 +1,9 @@
 ﻿using System;
-using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.LibCore;
 using HlidacStatu.Web.Framework;
 
 
@@ -41,7 +39,7 @@ namespace HlidacStatu.Web.Controllers
 
             var response = await client.GetAsync(uri, ctx);
 
-            return new HttpResponseMessageResult(response);
+            return new HttpResponseMessageActionResult(response);
         }
         
         

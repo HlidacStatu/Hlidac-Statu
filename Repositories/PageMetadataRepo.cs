@@ -1,14 +1,8 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Devmasters.Collections;
-using Devmasters.Log;
-
-using HlidacStatu.Analysis.Page.Area;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
 

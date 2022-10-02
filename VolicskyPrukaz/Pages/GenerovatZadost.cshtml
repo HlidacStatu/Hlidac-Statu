@@ -89,6 +89,16 @@
 
         <div class="mb-3 w-50">
             <h2><i class="fa-solid fa-envelope"></i>&nbsp;Doručení</h2>
+            <div class="button-group" role="group" aria-label="Basic checkbox button group">
+                <div class="form-check">
+                    <input asp-for="Zadost.PrvniKolo" id="prvnikolo" type="checkbox" placeholder="Název úřadu" class="form-check-input"/>
+                    <label for="prvnikolo" class="form-check-label required">Chci vygenerovat žádost pro 1. kolo - 13. a 14. ledna 2023</label>
+                </div>
+                <div class="form-check">
+                    <input asp-for="Zadost.DruheKolo" id="druhekolo" type="checkbox" placeholder="Název úřadu" class="form-check-input"/>
+                    <label for="druhekolo" class="form-check-label required">Chci vygenerovat žádost pro 2. kolo - 27. a 28. ledna 2023</label>
+                </div>
+            </div>
             <div class="button-group" role="group" aria-label="Basic radio toggle button group">
                 <input type="radio" name="doruceni" onclick="SetPrevzeti(this)" value="převezmu osobně." id="in-person"> <label for="in-person">převezmu osobně</label><br>
                 <input type="radio" name="doruceni" onclick="SetPrevzeti(this)" value="převezme osoba, která se prokáže plnou mocí s mým úředně ověřeným podpisem." id="representative"> <label for="representative">převezme osoba, která se prokáže plnou mocí s mým úředně ověřeným podpisem</label><br>
@@ -144,9 +154,9 @@
                             Zkontrolujte žádost
                         </h2>
                         <p>
-                            Prosíme, zkontrolujte si údaje ve vygenerované žádosti.
-                            Pokud jsou všechny údaje v pořádku, pročtěte si následující sekci s informacemi o možnostech jejího způsobu doručení.
-                            Pokud není některá z vyplněných informací správná, nic se neděje. Údaje můžete snadno změnit.
+                            Prosíme, zkontrolujte si údaje ve vygenerované žádosti. Pokud jsou všechny údaje v pořádku, 
+                            pročtěte si následující sekci s informacemi o možnostech jejího způsobu doručení. Pokud není 
+                            některá z vyplněných informací správná, nic se neděje. Údaje můžete snadno změnit.
                         </p>
 
                         <h2>Doručte žádost na váš úřad</h2>
@@ -156,24 +166,23 @@
                             Pokud máte datovou schránku, stačí odeslat vytvořenou žádost jako přílohu ve formátu PDF do datové schránky vašeho obecního úřadu: <br/>
                             <span class="text-success" id="modalDatovka"></span><br/>
                             Žádost nemusí být podepsaná (nebo opatřena elektronickým podpisem) a tím pádem nemusíte podpis ani ověřovat – vaše identita je ověřena přihlášením do datové schránky.
-                            Žádost odešlete nejpozději do 1. 10. 2021.
+                            Žádost odešlete nejpozději do <span class="text-danger">6. ledna 2023</span> nebo do <span class="text-danger">20. ledna 2023</span>, podle toho pro jaké kolo voleb žádost o průkaz podáváte.
                         </p>
                         <h3>Poštou</h3>
                         <p>
                             Vytvořenou žádost vytiskněte, opatřete ji úředně ověřeným podpisem (na libovolném obecním úřadu, u notáře apod.) a odešlete na adresu vašeho úřadu: <br/>
                             <span class="text-success" id="modalAdresaUradu"></span><br/>
-                            Žádost musí být doručena (doručena, nikoliv odeslána) do 1. 10. 2021.
+                            Žádost musí být doručena (doručena, nikoliv odeslána) do <span class="text-danger">6. ledna 2023</span> nebo do <span class="text-danger">20. ledna 2023</span>, podle toho pro jaké kolo voleb žádost o průkaz podáváte.
                         </p>
                         <h3>Osobně</h3>
                         <p>
                             Dostavte se na váš obecní úřad:<br/>
                             <span class="text-success" id="modalAdresaUradu2"></span><br/>
-                            s platným dokladem totožnosti. Na úřad můžete přijít podat žádost nejpozději 6. 10. 2021 do 16:00 hodin. Raději si ale předem zkontrolujte úřední hodiny!
+                            s platným dokladem totožnosti. Na úřad můžete přijít podat žádost nejpozději do <span class="text-danger">11. ledna 2023 do 16.00 hodin</span> (pro první kolo voleb) a do <span class="text-danger">25. ledna 2023 do 16.00 hodin</span> (pro druhé kolo voleb). Raději si ale předem zkontrolujte úřední hodiny!
                         </p>
 
                         <h2>Přejeme dobrou volbu!</h2>
                         <p>
-                            Pro volby do zastupitelstev obcí a Senátu ČR se dostavte s vaším volebním průkazem a platným průkazem totožnosti 23. 9. 2022 či 24. 9. 2022 do libovolného volebního okrsku.
                             Upozornění: pokud máte vystaven volební průkaz a chcete volit ve volební místnosti vašeho volebního okrsku, musíte mít volební průkaz také sebou. Bez něj vám volba nebude umožněna!
                         </p>
 

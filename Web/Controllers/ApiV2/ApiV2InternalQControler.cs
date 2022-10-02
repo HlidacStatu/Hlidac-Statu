@@ -1,6 +1,4 @@
 ﻿using HlidacStatu.Q.Simple.Tasks;
-using HlidacStatu.Web.Filters;
-
 using Microsoft.AspNetCore.Mvc;
 
 using Swashbuckle.AspNetCore.Annotations;

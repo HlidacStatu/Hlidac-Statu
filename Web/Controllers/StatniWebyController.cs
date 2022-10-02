@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.LibCore;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Framework;
@@ -177,7 +178,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 var response = await client.GetAsync(uri, ctx);
 
-                return new HttpResponseMessageResult(response);
+                return new HttpResponseMessageActionResult(response);
             }
             catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
             {

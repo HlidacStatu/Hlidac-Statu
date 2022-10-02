@@ -1,14 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-using Devmasters.Enums;
-
-using HlidacStatu.Datasets;
-using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
-
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.Web.Controllers

@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 
 using Devmasters;
 using Devmasters.Enums;
-using Devmasters.Net.HttpClient;
-
 using HlidacStatu.Connectors;
 using HlidacStatu.Datasets;
 using HlidacStatu.Datastructures.Graphs;
@@ -22,7 +20,6 @@ using HlidacStatu.Web.Framework;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;

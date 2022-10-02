@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using HlidacStatu.AutocompleteApi.Services;
 using HlidacStatu.Entities;
+using HlidacStatu.Entities.Views;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,6 +43,12 @@ namespace HlidacStatu.AutocompleteApi.Controllers
         {
             //HlidacStatu.Repositories.uptimeserverrepo
             return _cacheService.UptimeServer.Search(q, 20);
+        }
+        
+        [HttpGet]
+        public IEnumerable<AdresyKVolbam> Adresy(string q)
+        {
+            return _cacheService.Adresy.Search(q, 10);
         }
         
     }

@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using CsvHelper.Configuration.Attributes;
 
 namespace HlidacStatu.Entities;

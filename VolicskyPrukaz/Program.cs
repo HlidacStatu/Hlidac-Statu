@@ -1,5 +1,8 @@
-using VolicskyPrukaz.Models;
+using HlidacStatu.LibCore;
+using Microsoft.AspNetCore.Mvc;
 using VolicskyPrukaz.Services;
+using Polly;
+using VolicskyPrukaz;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +14,10 @@ System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Uti
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-var cacheSingleton = new Autocomplete();
-builder.Services.AddSingleton(cacheSingleton);
+builder.Services.AddHttpClient("default")
+    .AddTransientHttpErrorPolicy(policyBuilder =>
+        policyBuilder.WaitAndRetryAsync(
+            3, retryNumber => TimeSpan.FromMilliseconds(10)));
 
 builder.Services.AddSingleton<PdfGenerator>();
 
@@ -36,17 +41,34 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-app.MapGet("/findAddress/{query}", (string query, Autocomplete autocompleteCache) =>
+app.MapGet("/findAddress/{query}", async (string query,
+        [FromServices] IHttpClientFactory httpClientFactory,
+        CancellationToken ctx) =>
 {
-    var result = autocompleteCache.Search(query).ToList();
-    //var result = index.Search(query, 10, adr => adr.TypOvm );
-    return Results.Json(result);
+        var autocompleteHost = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint");
+        var autocompletePath = $"/autocomplete/Adresy?q={query}";
+        var uri = new Uri($"{autocompleteHost}{autocompletePath}");
+        using var client = httpClientFactory.CreateClient(Constants.DefaultHttpClient);
+
+        try
+        {
+            var response = await client.GetAsync(uri, ctx);
+          
+            return new HttpResponseMessageResult(response);
+        }
+        catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
+        {
+            // canceled by user
+            //Util.Consts.Logger.Info("Autocomplete canceled by user");
+        }
+        catch (Exception e)
+        {
+            //Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { query });
+        }
+
+        return Results.NoContent();
+    
 });
 
-// app.MapGet("/generateAc", (AutocompleteCache autocompleteCache) =>
-// {
-//     autocompleteCache.SerializeAc();
-//     return Results.Ok("hotovo");
-// });
 
 app.Run();

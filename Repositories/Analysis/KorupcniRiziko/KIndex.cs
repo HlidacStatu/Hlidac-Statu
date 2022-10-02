@@ -1,5 +1,4 @@
-﻿using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities.Analysis;
+﻿using HlidacStatu.Entities.Entities.Analysis;
 using HlidacStatu.Repositories.ES;
 
 

@@ -4,7 +4,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;

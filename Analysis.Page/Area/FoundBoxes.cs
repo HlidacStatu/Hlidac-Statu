@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace HlidacStatu.Analysis.Page.Area
+﻿namespace HlidacStatu.Analysis.Page.Area
 {
     public class FoundBoxes
     {

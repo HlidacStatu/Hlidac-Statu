@@ -1,6 +1,5 @@
 using HlidacStatu.DetectJobs;
 using HlidacStatu.Entities;
-using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using System;
 using System.Collections.Generic;

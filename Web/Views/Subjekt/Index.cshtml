@@ -6,16 +6,12 @@
 @using HlidacStatu.Datasets
 @using HlidacStatu.Datastructures.Graphs
 @using HlidacStatu.Entities
-@using HlidacStatu.Entities.Dotace
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
-@using HlidacStatu.Repositories.Statistics
 @using HlidacStatu.XLib
 @using HlidacStatu.XLib.Render;
-@using HlidacStatu.Lib.Analytics;
 @using HlidacStatu.Entities.Entities
 @using HlidacStatu.Lib.Analysis.KorupcniRiziko;
-@using HlidacStatu.Web.Framework
 @using HlidacStatu.Entities.Entities.Analysis;
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 
@@ -267,9 +263,9 @@
 
         @if (statistics.Summary().PocetSmluv > 0)
         {
-            <p>
-                V registru smluv evidujeme @Html.Raw(statistics.Summary().ToNiceString(null,true))
-            </p>
+        <p>
+            V registru smluv evidujeme @Html.Raw(statistics.Summary().ToNiceString(null,true,$"/hledat?q=ico:{Model.ICO}"))
+        </p>
         }
         <p>
             V roce @(currentSeasonYear) uzavřel @(Model.JsemOVM() ? "úřad" : "subjekt")

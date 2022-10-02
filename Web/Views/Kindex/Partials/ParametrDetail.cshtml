@@ -1,9 +1,5 @@
 @model KindexDetailsViewModel
-
-@using Devmasters.Enums
-@using HlidacStatu.Entities
 @using HlidacStatu.Lib.Analysis.KorupcniRiziko
-@using HlidacStatu.Repositories
 
 @{
     KIndexData.VypocetDetail.Radek vradek = Model.CurrYear.KIndexVypocet.Radky.Where(m => m.VelicinaPart == Model.Part).First();

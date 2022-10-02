@@ -1,7 +1,6 @@
 @model List<HlidacStatu.Entities.Views.SponzoringSummed>
 
 @using HlidacStatu.Entities
-@using HlidacStatu.Repositories
 @using Microsoft.AspNetCore.Html
 
 
@@ -49,7 +48,7 @@
 
 <h3>Firmy sponzorující @ViewBag.Strana</h3>
 <p>U strany @ViewBag.Strana evidujeme celkem @Model.Count firemních sponzorů, kteří darovali celkem @HlidacStatu.Util.RenderData.ShortNicePrice(suma).</p>
-<a asp-controller="Sponzori" asp-action="SponzoriStrany" asp-route-id="@ViewBag.Strana">Zobrazit sponzorující osoby</a>
+<a asp-controller="Sponzori" asp-action="OsobniSponzoriStrany" asp-route-id="@ViewBag.Strana">Zobrazit sponzorující osoby</a>
 
 <div class="row">
     <div>

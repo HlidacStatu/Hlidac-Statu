@@ -7,8 +7,6 @@ using System;
 using System.ComponentModel;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using MimeMapping;
 

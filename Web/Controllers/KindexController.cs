@@ -9,11 +9,11 @@ using Microsoft.AspNetCore.Mvc;
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.LibCore;
 using HlidacStatu.Web.Framework;
 
 namespace HlidacStatu.Web.Controllers
@@ -229,7 +229,7 @@ text zpravy: {txt}";
             {
                 var response = await client.GetAsync(uri, ctx);
 
-                return new HttpResponseMessageResult(response);
+                return new HttpResponseMessageActionResult(response);
             }
             catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
             {

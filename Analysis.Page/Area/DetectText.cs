@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-using OpenCvSharp;
+﻿using OpenCvSharp;
 using OpenCvSharp.Dnn;
 
 namespace HlidacStatu.Analysis.Page.Area
