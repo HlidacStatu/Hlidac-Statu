@@ -46,7 +46,9 @@
         stranaZkratka = strana.Jmeno;
     }
     else
+    {
         stranaZkratka = (string)Model;
+    }
 
 
     List<SponzoringSummed> osobySponzori = await SponzoringRepo.PeopleSponsorsAsync(icoStrany, System.Threading.CancellationToken.None);
