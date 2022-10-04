@@ -68,7 +68,7 @@ order by sumaLastY desc, suma desc
                 Name = "Politická strana",
                 HtmlRender = (m) =>
         {
-                    return $"{m.Item2} <span style='margin-left:10px'><a href='/sponzoring/strana/{m.Item1}/'><i class='fa-solid fa-circle-dollar'></i> o sponzoringu</a> <a href='/subjekt/{m.Item1}/'><i class='fa-solid fa-circle-info'></i> o straně</a></span> ";
+                    return $"{m.Item2} <span style='margin-left:10px'><a href='/sponzori/strana/{m.Item1}'><i class='fa-solid fa-circle-dollar'></i> o sponzoringu</a> <a href='/subjekt/{m.Item1}/'><i class='fa-solid fa-circle-info'></i> o straně</a></span> ";
                 }
             },
     new ReportDataSource<Tuple<string, string, decimal?, decimal?,int>>.Column()
@@ -113,7 +113,7 @@ order by sumaLastY desc, suma desc
             stranyTemplate.Clear();
             stranyTemplate.AddRows(strany.Where(m=>parlamentniIcos.Contains(m.Item1) ));
         }
-        @Html.DataToHTMLTable(stranyTemplate, dataTableOptions: dataTableOptions);
+        @Html.DataToHTMLTable(stranyTemplate, dataTableOptions: dataTableOptions)
     </p>
 
     <h2>Ostatní parlamentní strany</h2>
@@ -122,7 +122,7 @@ order by sumaLastY desc, suma desc
         stranyTemplate.Clear();
         stranyTemplate.AddRows(strany.Where(m => parlamentniIcos.Contains(m.Item1)==false));
     }
-    @Html.DataToHTMLTable(stranyTemplate, dataTableOptions: dataTableOptions);
+    @Html.DataToHTMLTable(stranyTemplate, dataTableOptions: dataTableOptions)
 
     </p>
 
