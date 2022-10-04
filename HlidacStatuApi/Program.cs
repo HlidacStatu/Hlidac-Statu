@@ -1,6 +1,7 @@
 using Devmasters.Log;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities;
+using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
@@ -14,6 +15,7 @@ using Microsoft.OpenApi.Models;
 string CORSPolicy = "from_hlidacstatu.cz";
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.ConfigureHostForWeb(args);
 
 //init statics and others
 Devmasters.Config.Init(builder.Configuration);

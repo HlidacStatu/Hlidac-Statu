@@ -364,24 +364,9 @@ Web/App_Data/dump/*
 !Web/App_Data/PercentileBanner.svg
 Web/App_Data/autocomplete.json
 
-Web/appsettings.*.json
-
-SponzoriLoader/appsettings.Petr.json
-
-HlidacStatu.JobTableEditor/appsettings.json
-HlidacStatu.JobTableEditor/appsettings.Michal.json
-HlidacStatu.JobTableEditor/appsettings.Development.json
-
-HlidacStatu.JobsWeb/appsettings.json
-
-AutocompleteApi/appsettings.Development.json
-
 *.bak
 Web/Logger.serilog.json
-/HlidacStatuApi/appsettings.json
-/HlidacStatuApi/appsettings.Development.json
 
-appsettings.*.json
 
 #allow 3rd directory
 !3rd/Accord-framework/**
@@ -390,16 +375,18 @@ appsettings.*.json
 !Analysis.Page.Cmd/linux-x64/**
 !Analysis.Page.Cmd/win-x64/**
 
-VolbyDownloader/appsettings.json
-
-VolebniPrukaz/appsettings.json
-
-VolicskyPrukaz/appsettings.json
-
 VolicskyPrukaz/adresy.acf
 
 VolicskyPrukaz/Indexes/adresy/
 
-
 Data/Autocomplete_App_Data
 AutocompleteApi/AutocompleteBasicIndexes
+
+appsettings.*.json
+Web/appsettings.json
+HlidacStatu.JobTableEditor/appsettings.json
+HlidacStatu.JobsWeb/appsettings.json
+/HlidacStatuApi/appsettings.json
+VolbyDownloader/appsettings.json
+VolebniPrukaz/appsettings.json
+VolicskyPrukaz/appsettings.json

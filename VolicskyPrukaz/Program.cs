@@ -1,10 +1,12 @@
 using HlidacStatu.LibCore;
+using HlidacStatu.LibCore.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using VolicskyPrukaz.Services;
 using Polly;
 using VolicskyPrukaz;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.ConfigureHostForWeb(args);
 
 //Register hlidac
 Devmasters.Config.Init(builder.Configuration);
