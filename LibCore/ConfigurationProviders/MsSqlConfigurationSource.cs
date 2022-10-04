@@ -6,9 +6,9 @@ public class MsSqlConfigurationSource : IConfigurationSource
 {
     private readonly string _connectionString;
     private readonly string _environment;
-    private readonly string _tag;
+    private readonly string? _tag;
 
-    public MsSqlConfigurationSource(string connectionString, string environment, string tag)
+    public MsSqlConfigurationSource(string connectionString, string environment, string? tag)
     {
         _connectionString = connectionString;
         _environment = environment;

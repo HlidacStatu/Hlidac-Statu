@@ -31,10 +31,10 @@ namespace SponzoriLoader
         
         private static void LoadDataFromFiles(Donations peopleDonations, Donations companyDonations)
         {
-            LoadSponzoringFromFile.LoadOsoby(peopleDonations, @"d:\Downloads\vfz2021-ano_osoby.xlsx - Lidi.tsv",
-                "71443339", _user, _zdroj);
-            LoadSponzoringFromFile.LoadFirmy(companyDonations, @"d:\Downloads\vfz2021-ano_osoby.xlsx - Firmy.tsv",
-                "71443339", _user, _zdroj);
+            LoadSponzoringFromFile.LoadOsoby(peopleDonations, @"d:\kdu osoby.tsv",
+                "00442704", _user, _zdroj);
+            LoadSponzoringFromFile.LoadFirmy(companyDonations, @"d:\kdu firmy.tsv",
+                "00442704", _user, _zdroj);
         }
 
         private static readonly string _user = "sponzorLoader";
@@ -137,11 +137,11 @@ namespace SponzoriLoader
                 var cleanedName = Validators.SeparateNameFromTitles(firstName);
                 var cleanedLastName = Validators.SeparateNameFromTitles(lastName);
 
-                titlesBefore = MergeTitles(titlesBefore, cleanedName.titulyPred, cleanedLastName.titulyPred);
-                titlesAfter = MergeTitles(titlesAfter, cleanedName.titulyPo, cleanedLastName.titulyPo);
+                titlesBefore = Common.MergeTitles(titlesBefore, cleanedName.titulyPred, cleanedLastName.titulyPred);
+                titlesAfter = Common.MergeTitles(titlesAfter, cleanedName.titulyPo, cleanedLastName.titulyPo);
 
-                titlesBefore = CleanTitles(titlesBefore);
-                titlesAfter = CleanTitles(titlesAfter);
+                titlesBefore = Common.CleanTitles(titlesBefore);
+                titlesAfter = Common.CleanTitles(titlesAfter);
 
                 Donor donor = new Donor()
                 {
@@ -167,22 +167,7 @@ namespace SponzoriLoader
             }
         }
 
-        private static string CleanTitles(string titles)
-        {
-            return titles.Replace("\"", "");
-        }
-
-        private static string MergeTitles(string titlesBefore, string tituly, string tituly2)
-        {
-            titlesBefore += " " + tituly + " " + tituly2;
-            titlesBefore = Regex.Replace(titlesBefore, @"\s{2,}", " ");
-            titlesBefore = titlesBefore.Trim();
-            return titlesBefore;
-        }
-
-
         
-
         public static int GetYearFromText(string text)
         {
             string yearString = Regex.Match(text, @"\d+").Value;

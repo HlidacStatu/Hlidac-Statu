@@ -11,7 +11,7 @@ namespace SponzoriLoader;
 public static class LoadSponzoringFromFile
 {
     //csv
-    // prijmeni, jmeno | datum narozeni | darovano dne | hodnota daru
+    // prijmeni | jmeno | datum narozeni | darovano dne | hodnota daru
     public static void LoadOsoby(Donations peopleDonations, string filename, string icoStrany, string user,
         string zdroj)
     {
@@ -31,6 +31,12 @@ public static class LoadSponzoringFromFile
         {
             var cleanedName = Validators.SeparateNameFromTitles(record.Jmeno);
             var cleanedLastName = Validators.SeparateNameFromTitles(record.Prjimeni);
+            
+            var titlesBefore = Common.MergeTitles("", cleanedName.titulyPred, cleanedLastName.titulyPred);
+            var titlesAfter = Common.MergeTitles("", cleanedName.titulyPo, cleanedLastName.titulyPo);
+
+            titlesBefore = Common.CleanTitles(titlesBefore);
+            titlesAfter = Common.CleanTitles(titlesAfter);
 
             // schvalně neošetřeno. Pokud se objeví chyba, je potřeba soubor opravit
             var narozeni = DateTime.Parse(record.Narozeni, HlidacStatu.Util.Consts.czCulture);
@@ -41,7 +47,10 @@ public static class LoadSponzoringFromFile
             {
                 Name = cleanedName.jmeno,
                 Surname = cleanedLastName.jmeno,
-                DateOfBirth = narozeni
+                DateOfBirth = narozeni,
+                TitleAfter = titlesAfter,
+                TitleBefore = titlesBefore
+                
             };
             Gift gift = new Gift()
             {
