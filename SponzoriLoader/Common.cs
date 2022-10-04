@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
@@ -99,5 +100,18 @@ public static class Common
             {
                 return db.ZkratkaStrany.ToDictionary(ks => ks.Ico, es => es.KratkyNazev);
             }
+        }
+        
+        public static string MergeTitles(string titlesBefore, string tituly, string tituly2)
+        {
+            titlesBefore += " " + tituly + " " + tituly2;
+            titlesBefore = Regex.Replace(titlesBefore, @"\s{2,}", " ");
+            titlesBefore = titlesBefore.Trim();
+            return titlesBefore;
+        }
+        
+        public static string CleanTitles(string titles)
+        {
+            return titles.Replace("\"", "");
         }
 }
