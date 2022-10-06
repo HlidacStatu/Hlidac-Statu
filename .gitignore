@@ -390,3 +390,5 @@ HlidacStatu.JobsWeb/appsettings.json
 VolbyDownloader/appsettings.json
 VolebniPrukaz/appsettings.json
 VolicskyPrukaz/appsettings.json
+
+PeopleLoader/appsettings.json

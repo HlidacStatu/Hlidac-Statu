@@ -74,10 +74,11 @@ public static class HlidacConfigExtensions
     /// Načte hodnotu environment z appsettings.json ("HS_ENV");
     /// Pomocí těchto dvou proměnných načte konfigurační data z SQL (tabulka ConfigurationValues);
     /// Poté načte konfigurační data z appsettings.json (pokud existuje);
+    /// Poté načte konfigurační data z appsettings.Development.json (pokud existuje);
     /// Poté načte konfigurační data z Environment Variables;
     /// Poté načte konfigurační data z args[];
     /// -pozn.: později načtená konfigurační data mají vyšší prioritu;
-    /// (args[] > Environment > appsettings.json > SQL ConfigurationValues)
+    /// (args[] > Environment > appsettings.json > appsettings.Development.json > SQL ConfigurationValues)
     /// </summary>
     public static IConfiguration InitializeConsoleConfiguration(string[] args)
     {
