@@ -18,7 +18,7 @@ public static class HlidacConfigExtensions
     /// -pozn.: později načtená konfigurační data mají vyšší prioritu;
     /// (Environment > appsettings.Development.json > appsettings.json > SQL ConfigurationValues)
     /// </summary>
-    public static IHostBuilder ConfigureHostForDocker(this IHostBuilder hostBuilder)
+    public static IHostBuilder ConfigureHostForDocker(this IHostBuilder hostBuilder, string? tag = null)
     {
         return hostBuilder.ConfigureAppConfiguration((context, config) =>
         {
@@ -30,7 +30,7 @@ public static class HlidacConfigExtensions
                 throw new Exception("HS_ENV environment variable is missing");
 
             config.Sources.Clear();
-            config.AddMsSqlConfiguration(connectionString, environment, null);
+            config.AddMsSqlConfiguration(connectionString, environment, tag);
             config.AddJsonFile("appsettings.json", true);
             config.AddJsonFile("appsettings.Development.json", true);
             config.AddEnvironmentVariables();

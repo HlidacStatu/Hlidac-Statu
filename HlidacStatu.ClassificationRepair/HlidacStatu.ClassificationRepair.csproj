@@ -9,14 +9,12 @@
     <None Remove="appsettings.json.sample" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="appsettings.json.sample" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="MailKit" Version="3.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.8" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj" />
     <ProjectReference Include="..\HlidacStatu.Q\HlidacStatu.Q.csproj" />
+    <ProjectReference Include="..\LibCore\LibCore.csproj" />
   </ItemGroup>
 </Project>
