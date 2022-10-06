@@ -6,8 +6,8 @@ using System.Xml;
 using System.Xml.Serialization;
 using CsvHelper;
 using HlidacStatu.Entities;
+using HlidacStatu.LibCore.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
@@ -21,7 +21,6 @@ class Program
     private static AsyncRetryPolicy<HttpResponseMessage> _retryPolicy = HttpPolicyExtensions
         .HandleTransientHttpError()
         .WaitAndRetryAsync(5, _ => TimeSpan.FromSeconds(1));
-
 
     public static async Task Main(string[] args)
     {
@@ -39,11 +38,8 @@ class Program
 
         var logger = Log.ForContext<Program>();
 
-        IConfiguration configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", false)
-            .Build();
-        Devmasters.Config.Init(configuration); // for db
+        var cfg = HlidacConfigExtensions.InitializeConsoleConfiguration(args);
+        Devmasters.Config.Init(cfg);
         CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
         CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.csCulture;
 
