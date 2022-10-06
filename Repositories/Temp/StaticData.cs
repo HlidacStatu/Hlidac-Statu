@@ -35,16 +35,10 @@ namespace HlidacStatu.Repositories
         public static Devmasters.Cache.File.Cache<Dictionary<string, List<JednotkaOrganizacni>>> OrganizacniStrukturyUradu = null;
         public static DateTime OrganizacniStrukturyUraduExportDate;
 
-
-
-
         public static Devmasters.Cache.File.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>> FirmyCasovePodezreleZalozene = null;
         public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_aktualni_Cache = null;
         public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_nedavne_Cache = null;
         public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_vsechny_Cache = null;
-
-        public static Devmasters.Cache.File.Cache<byte[]> Autocomplete_Cache = null;
-        public static Devmasters.Cache.File.Cache<List<Autocomplete>> Autocomplete_Firmy_Cache = null;
 
         public static Devmasters.Cache.File.Cache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]> Insolvence_firem_politiku_Cache = null;
 
@@ -433,25 +427,6 @@ namespace HlidacStatu.Repositories
                    {
                        return AnalysisCalculation.GetFirmyCasovePodezreleZalozeneAsync()
                            .ConfigureAwait(false).GetAwaiter().GetResult();
-                   });
-
-                Autocomplete_Cache = new Devmasters.Cache.File.Cache<byte[]>
-                   (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "AutocompleteV4",
-                   (o) =>
-                   {
-                       Util.Consts.Logger.Info("Starting AutocompleteRepo.GenerateAutocomplete");
-                       var autocompleteData = AutocompleteRepo.GenerateAutocomplete();
-                       var bytes = ObjectMinifier.Compressor.CompressToByteArr(autocompleteData);
-                       Util.Consts.Logger.Info("End AutocompleteRepo.GenerateAutocomplete");
-                       return bytes;
-                   });
-
-
-                Autocomplete_Firmy_Cache = new Devmasters.Cache.File.Cache<List<Autocomplete>>
-                   (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "Autocomplete_firmyOnly",
-                   (o) =>
-                   {
-                       return AutocompleteRepo.GenerateAutocompleteFirmyOnly().ToList();
                    });
 
                 //migrace: tohle by mělo jít odsud do Repo cache

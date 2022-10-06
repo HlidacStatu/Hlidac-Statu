@@ -101,16 +101,5 @@ namespace HlidacStatu.Web.Controllers
             }
         }
         
-        [Authorize(Roles = "Admin,PrivateApi")]
-        [HttpGet("generateAutocompleteData")]
-        public ActionResult<byte[]> GenerateAutocompleteData()
-        {
-            var autocompleteFile = StaticData.Autocomplete_Cache.Get();
-
-            return File(autocompleteFile, KnownMimeTypes.Bin, "autocomplete.bin", true);
-        }
-        
-        
-        
     }
 }
