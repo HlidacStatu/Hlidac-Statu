@@ -174,6 +174,5 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         }
 
-
     }
 }

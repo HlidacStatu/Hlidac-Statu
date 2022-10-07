@@ -4,6 +4,7 @@ using Devmasters.Log;
 using HlidacStatu.AutocompleteApi;
 using HlidacStatu.AutocompleteApi.Services;
 using HlidacStatu.Connectors;
+using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.MiddleWares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +41,8 @@ var logger = Log.ForContext<Program>();
 
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.ConfigureHostForDocker();
+
 //Register hlidac
 Devmasters.Config.Init(builder.Configuration);
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;

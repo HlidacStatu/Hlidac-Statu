@@ -12,6 +12,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using HlidacStatu.LibCore.Extensions;
+using Microsoft.Extensions.Configuration;
 
 namespace SponzoriLoader
 {
@@ -49,8 +51,8 @@ namespace SponzoriLoader
             //- select true or false below
             bool loadDataFromFiles = true;
             
-            
-            HlidacStatu.Connectors.InitializeConfigServices.Initialize(new[] { "Petr" });
+            IConfiguration configuration = HlidacConfigExtensions.InitializeConsoleConfiguration(args);
+            Devmasters.Config.Init(configuration);
             CultureInfo.DefaultThreadCurrentCulture = Consts.czCulture;
             CultureInfo.DefaultThreadCurrentUICulture = Consts.csCulture;
             var peopleDonations = new Donations(new DonorEqualityComparer());

@@ -23,6 +23,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Hlidac-Statu-Private\HlidacStatu.DetectJobs\HlidacStatu.DetectJobs.csproj" />
+      <ProjectReference Include="..\LibCore\LibCore.csproj" />
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
     </ItemGroup>
 
