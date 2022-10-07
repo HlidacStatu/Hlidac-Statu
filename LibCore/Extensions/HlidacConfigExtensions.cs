@@ -8,6 +8,8 @@ namespace HlidacStatu.LibCore.Extensions;
 
 public static class HlidacConfigExtensions
 {
+    public const string FallbackEnvironment = "Production";
+    
     /// <summary>
     /// Načte sql connection string z Environment variable 'HS_CNN';
     /// Načte hodnotu environment z Environment variable 'HS_ENV';
@@ -27,7 +29,7 @@ public static class HlidacConfigExtensions
             if (string.IsNullOrWhiteSpace(connectionString))
                 throw new Exception("HS_CNN environment variable is missing");
             if (string.IsNullOrWhiteSpace(environment))
-                throw new Exception("HS_ENV environment variable is missing");
+                environment = FallbackEnvironment; 
 
             config.Sources.Clear();
             config.AddMsSqlConfiguration(connectionString, environment, tag);
@@ -58,7 +60,7 @@ public static class HlidacConfigExtensions
         if (string.IsNullOrWhiteSpace(connectionString))
             throw new Exception("ConnectionStrings:DefaultConnection from appsettings.json is missing");
         if (string.IsNullOrWhiteSpace(environment))
-            throw new Exception("HS_ENV from appsettings.json is missing");
+            environment = FallbackEnvironment;
 
         return hostBuilder.ConfigureAppConfiguration((context, configuration) =>
         {
@@ -91,7 +93,7 @@ public static class HlidacConfigExtensions
         if (string.IsNullOrWhiteSpace(connectionString))
             throw new Exception("ConnectionStrings:DefaultConnection from appsettings.json is missing");
         if (string.IsNullOrWhiteSpace(environment))
-            throw new Exception("HS_ENV from appsettings.json is missing");
+            environment = FallbackEnvironment;
 
         return new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
