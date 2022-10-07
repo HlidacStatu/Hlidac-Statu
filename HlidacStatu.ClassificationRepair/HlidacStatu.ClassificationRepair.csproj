@@ -17,4 +17,9 @@
     <ProjectReference Include="..\HlidacStatu.Q\HlidacStatu.Q.csproj" />
     <ProjectReference Include="..\LibCore\LibCore.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

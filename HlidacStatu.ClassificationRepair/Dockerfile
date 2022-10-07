@@ -1,25 +1,8 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 EXPOSE 80
+EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
-WORKDIR /src
-COPY ["HlidacStatu.ClassificationRepair/HlidacStatu.ClassificationRepair.csproj", "HlidacStatu.ClassificationRepair/"]
-COPY ["HlidacStatu.Q.Messages/HlidacStatu.Q.Messages.csproj", "HlidacStatu.Q.Messages/"]
-COPY ["HlidacStatu.Q/HlidacStatu.Q.csproj", "HlidacStatu.Q/"]
-RUN dotnet restore "HlidacStatu.ClassificationRepair/HlidacStatu.ClassificationRepair.csproj"
-COPY "HlidacStatu.Q.Messages" "HlidacStatu.Q.Messages"
-COPY "HlidacStatu.Q" "HlidacStatu.Q"
-COPY "HlidacStatu.ClassificationRepair" "HlidacStatu.ClassificationRepair"
-WORKDIR "/src/HlidacStatu.ClassificationRepair"
-COPY ["HlidacStatu.ClassificationRepair/appsettings.json.sample", "appsettings.json"]
-RUN dotnet build "HlidacStatu.ClassificationRepair.csproj" -c Release -o /app/build
-
-FROM build AS publish
-RUN dotnet publish "HlidacStatu.ClassificationRepair.csproj" -c Release -o /app/publish
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+#folder path from caches
+COPY bin/dockerPublish/ .
 ENTRYPOINT ["dotnet", "HlidacStatu.ClassificationRepair.dll"]

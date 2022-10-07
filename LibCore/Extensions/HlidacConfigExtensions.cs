@@ -49,7 +49,7 @@ public static class HlidacConfigExtensions
     /// -pozn.: později načtená konfigurační data mají vyšší prioritu;
     /// (args[] > Environment > appsettings.json > SQL ConfigurationValues)
     /// </summary>
-    public static IHostBuilder ConfigureHostForWeb(this IHostBuilder hostBuilder, string[] args)
+    public static IHostBuilder ConfigureHostForWeb(this IHostBuilder hostBuilder, string[] args, string? tag = null)
     {
         IConfiguration preConfig = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", false)
@@ -64,7 +64,7 @@ public static class HlidacConfigExtensions
 
         return hostBuilder.ConfigureAppConfiguration((context, configuration) =>
         {
-            configuration.AddMsSqlConfiguration(connectionString, environment, null);
+            configuration.AddMsSqlConfiguration(connectionString, environment, tag);
             configuration.AddJsonFile("appsettings.json", true);
             configuration.AddEnvironmentVariables();
             configuration.AddCommandLine(args);
@@ -82,7 +82,7 @@ public static class HlidacConfigExtensions
     /// -pozn.: později načtená konfigurační data mají vyšší prioritu;
     /// (args[] > Environment > appsettings.json > appsettings.Development.json > SQL ConfigurationValues)
     /// </summary>
-    public static IConfiguration InitializeConsoleConfiguration(string[] args)
+    public static IConfiguration InitializeConsoleConfiguration(string[] args, string? tag = null)
     {
         IConfiguration preConfig = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", false)
@@ -97,7 +97,7 @@ public static class HlidacConfigExtensions
 
         return new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddMsSqlConfiguration(connectionString, environment, null)
+            .AddMsSqlConfiguration(connectionString, environment, tag)
             .AddJsonFile("appsettings.json", true)
             .AddJsonFile("appsettings.Development.json", true)
             .AddEnvironmentVariables()
