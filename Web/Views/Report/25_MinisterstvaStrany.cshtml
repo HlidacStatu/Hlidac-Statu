@@ -152,7 +152,8 @@
                             .OrderBy(o => o.Key)
                             .Select(m => m.Key)
                             .ToList();
-    string[] colors = new[] { "#050F57", "#ED561B", "#F1CE46", "#a0a0a0", "#d0d0d0", "#1A428F", "#75B259", "#DA3732", "#054E0C", "#060606","#000000" };
+    //string[] colors = new[] { "#050F57", "#ED561B", "#F1CE46", "#a0a0a0", "#d0d0d0", "#1A428F", "#75B259", "#DA3732", "#054E0C", "#060606", "#000000", "#f2945a", "#334d37", "#f3d426" };
+        string[] colors = new[] { "#208eb7", "#93e0f0", "#19477d", "#7cee4d", "#8731c2", "#5cdd9f", "#871d32", "#f1cbd5", "#1e7b20", "#f764de", "#c3de9b", "#683c00", "#f2945a", "#334d37", "#f3d426" };
 
     int count = 0;
 
@@ -304,7 +305,7 @@
     <div id="chart_topStrany"></div>
     <script>
         Highcharts.chart('chart_topStrany', {
-            colors: ['#050F57','#ED561B','#F1CE46','#a0a0a0','#d0d0d0' ,'#1A428F','#75B259','#DA3732','#054E0C','#060606'],
+            colors: ['#050F57', '#ED561B', '#F1CE46', '#a0a0a0', '#d0d0d0', '#1A428F', '#75B259', '#DA3732', '#054E0C', '#060606', '#f2945a', '#334d37', '#f3d426'],
             series: [{
                 type: 'treemap',
                 colorByPoint: true,
