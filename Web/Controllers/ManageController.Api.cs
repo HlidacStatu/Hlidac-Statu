@@ -127,8 +127,10 @@ namespace HlidacStatu.Web.Controllers
                 {
 
                     string[] cpvs = Request.Query["cpv"].ToString().Split(',');
+                    string oblast = Request.Query["oblast"].ToString().Split(',').FirstOrDefault();
                     var sres = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(q, cpvs, 1, numOfRecords,
-                        (Util.ParseTools.ToInt(o) ?? 0).ToString(), (Request.Query["zahajeny"] == "1")
+                        (Util.ParseTools.ToInt(o) ?? 0).ToString(), (Request.Query["zahajeny"] == "1"), 
+                        oblast:oblast
                         );
 
                     if (sres.IsValid == false && !string.IsNullOrEmpty(sres.Q))

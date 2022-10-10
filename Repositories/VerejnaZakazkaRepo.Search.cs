@@ -284,7 +284,7 @@ namespace HlidacStatu.Repositories
 
             public static Task<VerejnaZakazkaSearchData> SimpleSearchAsync(string query, string[] cpv,
                 int page, int pageSize, string order, bool Zahajeny = false, bool withHighlighting = false,
-                bool exactNumOfResults = false)
+                bool exactNumOfResults = false, string oblast = "")
                 =>  SimpleSearchAsync(
                         new VerejnaZakazkaSearchData()
                         {
@@ -295,6 +295,7 @@ namespace HlidacStatu.Repositories
                             PageSize = pageSize,
                             Order = Devmasters.TextUtil.NormalizeToNumbersOnly(order),
                             Zahajeny = Zahajeny,
+                            Oblast = oblast,
                             ExactNumOfResults = exactNumOfResults
                         }, withHighlighting: withHighlighting
                     );

@@ -116,4 +116,12 @@
     }
     </tbody >
 </table >
-<partial name="SearchResults/Pagination" model="@(new PaginationViewModel(Model, "/VerejneZakazky/Hledat", exportType: "zakazky"))"/>
+
+@{
+    string emp = "";
+    if (!string.IsNullOrWhiteSpace(Model.Oblast))
+    {
+        emp = $"oblast={Model.Oblast}";
+    }
+}
+<partial name="SearchResults/Pagination" model="@(new PaginationViewModel(Model, "/VerejneZakazky/Hledat", exportType: "zakazky", exportMoreParams:emp))"/>
