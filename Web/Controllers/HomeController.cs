@@ -362,30 +362,6 @@ text zpravy: {txt}
             if (System.IO.File.Exists(fn) == false)
                 return NotFound();
 
-
-            //if (System.IO.File.Exists(fn) == false)
-            //{
-            //    if (Uri.TryCreate(priloha.odkaz, UriKind.Absolute, out _) == false)
-            //        return NotFound();
-
-            //    //download from registr smluv
-            //    try
-            //    {
-            //        using (URLContent url = new URLContent(priloha.odkaz))
-            //        {
-            //            url.Timeout = url.Timeout * 10;
-            //            byte[] data = url.GetBinary().Binary;
-            //            System.IO.File.WriteAllBytes(fn, data);
-            //            //p.LocalCopy = System.Text.UTF8Encoding.UTF8.GetBytes(io.GetRelativePath(item, p));
-            //        }
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        Util.Consts.Logger.Error(priloha.odkaz, e);
-            //        return NotFound();
-            //    }
-
-            //}
             if (Lib.OCR.DocTools.HasPDFHeader(fn))
             {
                 return File(System.IO.File.ReadAllBytes(fn), "application/pdf", string.IsNullOrWhiteSpace(priloha.nazevSouboru) ? $"{model.Id}_smlouva.pdf" : priloha.nazevSouboru);
@@ -399,7 +375,6 @@ text zpravy: {txt}
 
         public ActionResult PoliticiChybejici()
         {
-
             return View();
         }
 
@@ -425,7 +400,6 @@ text zpravy: {txt}
         {
             return View();
         }
-
 
         public ActionResult HledatVice()
         {

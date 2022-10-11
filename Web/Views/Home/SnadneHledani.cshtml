@@ -7,9 +7,7 @@
 
 @section scripts
 {
-    <link rel="stylesheet" type="text/css" href="/content/bootstrap-datetimepicker.min.css"/>
     <script type="text/javascript" charset="utf8" src="~/Scripts/moment.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
 }
 
 @section breadcrumb
@@ -89,32 +87,17 @@
             <div class="form-group">
                 <label for="podepsanoOd" class="col-sm-2 control-label">Smlouva nebo zakázka <br/>zveřejněna od-do data</label>
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" name="zverejnenoOd" id="zverejnenoOd" placeholder="Zveřejneno od data">
-                    <input type="text" class="form-control" name="zverejnenoDo" id="zverejnenoDo" placeholder="Zveřejneno do data">
-                    <script type="text/javascript">
-                    $(function () {
-                        $('#zverejnenoOd,#zverejnenoDo').datetimepicker({
-                            format: 'YYYY-MM-DD'
-                        });
-                    });
-                    </script>
-
+                    <input type="date" class="form-control" name="zverejnenoOd" id="zverejnenoOd" placeholder="Zveřejneno od data">
+                    <input type="date" class="form-control" name="zverejnenoDo" id="zverejnenoDo" placeholder="Zveřejneno do data">
+                    
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="podepsanoOd" class="col-sm-2 control-label">Smlouva nebo zakázka <br/>podepsána od-do data</label>
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" name="podepsanoOd" id="podepsanoOd" placeholder="podepsáno od data">
-                    <input type="text" class="form-control" name="podepsanoDo" id="podepsanoDo" placeholder="podepsáno do data">
-                    <script type="text/javascript">
-                    $(function () {
-                        $('#podepsanoOd,#podepsanoDo').datetimepicker({
-                            format: 'YYYY-MM-DD'
-                        });
-                    });
-                    </script>
-
+                    <input type="date" class="form-control" name="podepsanoOd" id="podepsanoOd" placeholder="podepsáno od data">
+                    <input type="date" class="form-control" name="podepsanoDo" id="podepsanoDo" placeholder="podepsáno do data">
                 </div>
             </div>
 
@@ -122,7 +105,6 @@
                 <label for="politik" class="col-sm-2 control-label">Smlouvy s vazbou na osobu</label>
                 <div class="col-sm-8">
                     <input class="form-control" type="text" placeholder="Jméno osoby">
-                    <input type="hidden" name="osobaNamedId" id="osobaNamedId"/>
                 </div>
             </div>
             <div class="form-group">
