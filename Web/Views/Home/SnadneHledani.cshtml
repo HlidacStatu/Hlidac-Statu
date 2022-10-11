@@ -7,14 +7,9 @@
 
 @section scripts
 {
-    <script src="/Scripts/typeahead.jquery.min.js"></script>
-    <script src="/Scripts/bloodhound.min.js"></script>
-    <link href="/Content/typeaheadjs.css" media="all" rel="stylesheet"/>
-
     <link rel="stylesheet" type="text/css" href="/content/bootstrap-datetimepicker.min.css"/>
     <script type="text/javascript" charset="utf8" src="~/Scripts/moment.min.js"></script>
     <script type="text/javascript" charset="utf8" src="~/Scripts/bootstrap-datetimepicker.min.js"></script>
-
 }
 
 @section breadcrumb
@@ -126,7 +121,7 @@
             <div class="form-group">
                 <label for="politik" class="col-sm-2 control-label">Smlouvy s vazbou na osobu</label>
                 <div class="col-sm-8">
-                    <input class="form-control typeahead" type="text" placeholder="Jméno osoby">
+                    <input class="form-control" type="text" placeholder="Jméno osoby">
                     <input type="hidden" name="osobaNamedId" id="osobaNamedId"/>
                 </div>
             </div>
@@ -186,30 +181,3 @@
     </div>
 </div>
 <div class="clearfix"></div>
-
-
-<script>
-    $(function () {
-        persons = new Bloodhound({
-            datumTokenizer: Bloodhound.tokenizers.whitespace,
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            remote: {
-                url: '/api/v1/persons?q=%QUERY',
-                wildcard: '%QUERY'
-            }
-        });
-
-        $('.typeahead').typeahead(null, {
-            display: 'name',
-            name: "person",
-            source: persons,
-            limit: 30,
-        });
-
-        $('.typeahead').bind('typeahead:select', function (ev, suggestion) {
-            $("#osobaNamedId").val(suggestion.nameId);
-
-        });
-
-    }); //jquery.start
-</script>
