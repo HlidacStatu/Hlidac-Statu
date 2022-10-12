@@ -436,7 +436,6 @@ namespace HlidacStatu.Repositories
                             semaphoreLock.Release();
                         }
                         
- 
                         return new Devmasters.Batch.ActionOutputData();
                     }
                     // tady nemůže být větší paralelita, protože to pak nezvládá elasticsearch

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Devmasters;
@@ -62,7 +63,7 @@ public static class CacheIndexFactory
             {
                 TextSelector = ts => $"{ts.Text} {ts.AdditionalHiddenSearchText}",
                 BoostSelector = bs => bs.PriorityMultiplier,
-                FilterSelector = fs => fs.Type.ToLowerInvariant().RemoveAccents()
+                FilterSelector = fs => fs.Category.ToString("G")
             },
             logger);
     }

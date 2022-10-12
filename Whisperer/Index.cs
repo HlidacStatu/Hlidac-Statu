@@ -97,8 +97,8 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
 
             if (filterSelector is not null)
             {
-                string filter = filterSelector(document).ToLower();
-                doc.Add(new StringField(FilterFieldName, filter, Field.Store.YES));
+                string filter = filterSelector(document);
+                doc.Add(new TextField(FilterFieldName, filter, Field.Store.YES));
             }
 
             iwriter.AddDocument(doc);

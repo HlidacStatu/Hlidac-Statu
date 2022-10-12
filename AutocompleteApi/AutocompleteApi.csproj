@@ -5,6 +5,7 @@
         <AssemblyName>HlidacStatu.AutocompleteApi</AssemblyName>
         <RootNamespace>HlidacStatu.AutocompleteApi</RootNamespace>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>

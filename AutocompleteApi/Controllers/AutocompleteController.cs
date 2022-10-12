@@ -19,9 +19,9 @@ namespace HlidacStatu.AutocompleteApi.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<Autocomplete> Autocomplete(string q)
+        public IEnumerable<Autocomplete> Autocomplete(string q, string? category = null)
         {
-            return _cacheService.FullAutocomplete.Search(q, 5);
+            return _cacheService.FullAutocomplete.Search(q, 5, category);
         }
 
         [HttpGet]
