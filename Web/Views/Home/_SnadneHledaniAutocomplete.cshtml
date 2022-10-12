@@ -1,0 +1,67 @@
+﻿<div style="position:relative">
+    <input autocomplete="off" placeholder="Jméno osoby" type="text" id="personFinder" class="form-control input-lg" oninput="FindPerson(this)"/>
+    <input type="hidden" name="osobaNamedId" id="osobaNamedId"/>
+    <div id="companies" class="container bg-light">
+        
+    </div>
+
+
+</div>
+
+<style>
+   
+    .whisp {
+        text-align: left;
+        background-color: white;
+        border: none;
+    }
+
+        .whisp:focus {
+            background-color: lightblue;
+        }
+
+    #companies {
+        margin-bottom: 10px;
+        position:absolute;
+        z-index: 10;
+    }
+
+</style>
+
+<script>
+const blueprint = `
+<button type="button" class="row overflow-hidden p-1 whisp" style="height: 80px">
+     <div class="col-2 mh-100 px-0">
+         {photolink}
+     </div>
+     <div class="col-10 mh-100">
+         <div class="name fs-6">{name}</div>
+         <div class="description text-muted">{description}</div>
+     </div>
+ </button>`;
+
+    function FindPerson(caller) {
+        let req = "/api/autocomplete/?category=person&q=" + caller.value;
+        $.get(req, function (data) {
+            EmptyCompanies();
+            data.forEach(item => {
+                var button = $(blueprint.replace('{name}', item.text).replace('{description}', item.description).replace('{photolink}', item.imageElement.replace('/>', 'class="img-fluid" />' )));
+                button.click(function () { SetInputs(item.text, item.id); EmptyCompanies();});    
+                $("#companies").append(button);
+            });
+        }, "json");
+    }
+
+    function EmptyCompanies() {
+        $('#companies').empty();
+    }
+
+    function CleanSearchBox() {
+        $('#personFinder').val("").focus();
+    }
+
+    function SetInputs(name, nameid) {
+        $('#personFinder').val(name);
+        $('#osobaNamedId').val(nameid);
+    }
+</script>

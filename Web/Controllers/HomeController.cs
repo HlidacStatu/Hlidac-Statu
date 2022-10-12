@@ -533,7 +533,7 @@ text zpravy: {txt}
 
             if (!string.IsNullOrWhiteSpace(qs["osobaNamedId"]))
             {
-                query += " osobaid:" + qs["osobaNamedId"];
+                query += $" {qs["osobaNamedId"]}";
             }
             if (!string.IsNullOrWhiteSpace(qs["holding"]))
             {

@@ -23,11 +23,12 @@ namespace HlidacStatu.Web.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<IActionResult> Autocomplete(string q, CancellationToken ctx)
+        public async Task<IActionResult> Autocomplete(string q, string category, CancellationToken ctx)
         {
             var autocompleteHost = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint");
             var autocompletePath = $"/autocomplete/autocomplete?q={q}";
-            var uri = new Uri($"{autocompleteHost}{autocompletePath}");
+            var cat = string.IsNullOrWhiteSpace(category) ? "" : $"&category={category}";
+            var uri = new Uri($"{autocompleteHost}{autocompletePath}{cat}");
             using var client = _httpClientFactory.CreateClient(Constants.DefaultHttpClient);
 
             try
