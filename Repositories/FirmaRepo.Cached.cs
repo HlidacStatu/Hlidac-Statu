@@ -26,7 +26,7 @@ namespace HlidacStatu.Repositories
         public static BaseCache<IEnumerable<Firma>> VysokeSkolyCache = null;
         public static BaseCache<IEnumerable<Firma>> KrajskeUradyCache = null;
         public static BaseCache<IEnumerable<Firma>> ManualChoosenCache = null;
-        public static BaseCache<IEnumerable<Firma>> StatutarniMestaAllCache = null;
+        public static BaseCache<IEnumerable<Firma>> ObceSRozsirenouPusobnostiCache = null;
         public static BaseCache<IEnumerable<Firma>> PrahaManualCache = null;
         public static BaseCache<IEnumerable<Firma>> OrganizacniSlozkyStatuCache = null;
         public static Dictionary<string, string[]> MestaPodleKraju = null;
@@ -124,7 +124,7 @@ namespace HlidacStatu.Repositories
 
             ObceIII_DS = OvmRepo.ObceIII().Select(o => o.IdDS).ToArray();
 
-            StatutarniMestaAllCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6),
+            ObceSRozsirenouPusobnostiCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6),
                 "StatData.StatutarniMestaAll",
                 (o) =>
                 {
