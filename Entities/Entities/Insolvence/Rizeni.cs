@@ -10,7 +10,7 @@ namespace HlidacStatu.Entities.Insolvence
         : IBookmarkable
     {
 
-        static DateTime MinSqlDate = new DateTime(1753, 1, 1); // 01/01/1753 
+        public static DateTime MinSqlDate = new DateTime(1753, 1, 1); // 01/01/1753 
         public Rizeni()
         {
             Dokumenty = new List<Dokument>();
