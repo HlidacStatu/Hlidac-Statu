@@ -69,7 +69,7 @@ namespace HlidacStatu.Repositories
                                 "select distinct ico from firma where status =1 and Kod_PF in (301,302,312,313,314,325,331,352,353,361,362,381,382,521,771,801,804,805)")
                         );
 
-                        icos.AddRange(FirmaRepo.StatutarniMestaAllCache.Get().Select(m => m.ICO));
+                        icos.AddRange(FirmaRepo.ObceSRozsirenouPusobnostiCache.Get().Select(m => m.ICO));
                         //velka mesta
                         string velkamesta =
                             "00064581,00081531,00266094,00254657,00262978,44992785,00845451,00274046,00075370,00262978,00299308,00244732,00283924";

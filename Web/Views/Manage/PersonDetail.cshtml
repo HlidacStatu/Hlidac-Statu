@@ -623,17 +623,6 @@
             }
         });
 
-        //companies = new Bloodhound({
-        //    datumTokenizer: Bloodhound.tokenizers.whitespace,
-        //    queryTokenizer: Bloodhound.tokenizers.whitespace,
-        //    remote: {
-        //        url: '/api/v1/companies?',
-        //        replace: function (url, query) {
-        //            return url + 'q=' + query;
-        //        }
-        //    }
-        //});
-
         $('.roleahead').typeahead(null, {
             name: "roles",
             source: roles,
