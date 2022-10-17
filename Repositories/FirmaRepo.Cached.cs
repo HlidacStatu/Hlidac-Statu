@@ -20,8 +20,8 @@ namespace HlidacStatu.Repositories
         public static HashSet<string> VsechnyStatniMestskeFirmy = new HashSet<string>();
         public static HashSet<string> VsechnyStatniMestskeFirmy25percs = new HashSet<string>();
         public static HashSet<string> Urady_OVM = new HashSet<string>();
-        public static XDocument DatoveSchranky = null;
-        public static XNamespace DatoveSchrankyNS = null;
+        //public static XDocument DatoveSchranky = null;
+        //public static XNamespace DatoveSchrankyNS = null;
         public static BaseCache<IEnumerable<Firma>> MinisterstvaCache = null;
         public static BaseCache<IEnumerable<Firma>> VysokeSkolyCache = null;
         public static BaseCache<IEnumerable<Firma>> KrajskeUradyCache = null;
@@ -61,28 +61,14 @@ namespace HlidacStatu.Repositories
                 VsechnyStatniMestskeFirmy.Add(ic); //podrizenky Pražská energetika
 
 
-            string ds_ovm = AppDataPath + "DS_OVM.xml";
-
+            
             //zdroj https://www.czechpoint.cz/public/vyvojari/otevrena-data/
             Consts.Logger.Info("Static data - DatoveSchranky ");
-            using (var xml = File.OpenText(ds_ovm))
+
+            foreach (var urad in OvmRepo.UradyOvm())
             {
-                DatoveSchranky = XDocument.Load(xml);
+                Urady_OVM.Add(urad.ICO);
             }
-
-            DatoveSchrankyNS = DatoveSchranky.Root.Name.Namespace;
-
-            foreach (var ico in DatoveSchranky
-                .Descendants(DatoveSchrankyNS + "Subjekt")
-                .Where(m => m.Element(DatoveSchrankyNS + "TypDS")?.Value?.StartsWith("OVM") == true)
-                .Select(m => m.Element(DatoveSchrankyNS + "ICO")?.Value ?? "")
-                .Where(i => !string.IsNullOrEmpty(i))
-                .Select(i => ParseTools.MerkIcoToICO(i))
-            )
-            {
-                Urady_OVM.Add(ico);
-            }
-
             //dalsi vyjimky
             Urady_OVM.Add("00832227"); //Euroregion Neisse - Nisa - Nysa
 
@@ -91,42 +77,20 @@ namespace HlidacStatu.Repositories
             MinisterstvaCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6), "StatData.Ministerstva",
                 (o) =>
                 {
-                    return DatoveSchranky
-                            .Descendants(DatoveSchrankyNS + "Subjekt")
-                            .Where(m => m.Element(DatoveSchrankyNS + "TypSubjektu")?.Attribute("id").Value == "4")
-                            .OrderBy(m => m.Element(DatoveSchrankyNS + "Nazev").Value)
-                            .Select(m => m.Element(DatoveSchrankyNS + "IdDS").Value)
-                            .Select(ds => Firmy.GetByDS(ds))
-                            .ToArray()
-                        ;
+                    return OvmRepo.Ministerstva().Select(m => Firmy.Get(m.ICO)).ToArray(); 
                 });
 
             VysokeSkolyCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6), "StatData.VysokeSkoly",
                 (o) =>
                 {
-                    string[] icos = new string[]
-                    {
-                        "61384984", "60461446", "60460709", "68407700", "62156462", "60076658", "00216224",
-                        "62156489", "61988987", "47813059", "46747885", "62690094", "44555601", "00216208",
-                        "61989592", "00216275", "70883521", "62157124", "61989100", "61384399", "60461373",
-                        "71226401", "75081431", "60461071", "00216305", "49777513", "48135445"
-                    };
-                    //string[] ds = new string[] { "hkraife" };
-
-                    return icos.Select(i => Firmy.Get(i))
-                        .OrderBy(or => or.Jmeno);
+                    return OvmRepo.VysokeSkoly().Select(m => Firmy.Get(m.ICO)).ToArray();
                 });
 
 
             KrajskeUradyCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6), "StatData.KrajskeUrady",
                 (o) =>
                 {
-                    return DatoveSchranky
-                        .Descendants(DatoveSchrankyNS + "Subjekt")
-                        .Where(m => m.Element(DatoveSchrankyNS + "TypSubjektu")?.Attribute("id").Value == "3")
-                        .OrderBy(m => m.Element(DatoveSchrankyNS + "Nazev").Value)
-                        .Select(m => m.Element(DatoveSchrankyNS + "IdDS").Value)
-                        .Select(ds => Firmy.GetByDS(ds));
+                    return OvmRepo.KrajskeUrady().Select(m => Firmy.GetByDS(m.IdDS)).ToArray();
                 });
 
             ManualChoosenCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6),
@@ -155,45 +119,16 @@ namespace HlidacStatu.Repositories
                         .Union(ds.Select(d => Firmy.GetByDS(d)))
                         .OrderBy(or => or.Jmeno);
                 });
+            
+            MestaPodleKraju = OvmRepo.ObceSRozsirenouPusobnostiPodleKraju();
 
-
-            var obceIII = DatoveSchranky
-                .Descendants(DatoveSchrankyNS + "Subjekt")
-                .Where(m => m.Element(DatoveSchrankyNS + "TypSubjektu")?.Attribute("id").Value == "7")
-                .Where(m => m.Element(DatoveSchrankyNS + "PrimarniOvm")?.Value == "Ano");
-
-            MestaPodleKraju = DatoveSchranky
-                .Descendants(DatoveSchrankyNS + "Subjekt")
-                .Where(m => m.Element(DatoveSchrankyNS + "TypSubjektu")?.Attribute("id").Value == "8")
-                .Where(m => m.Element(DatoveSchrankyNS + "PrimarniOvm")?.Value == "Ano")
-                .Union(obceIII)
-                .GroupBy(k =>
-                        k.Element(DatoveSchrankyNS + "AdresaUradu")?.Element(DatoveSchrankyNS + "KrajNazev")?.Value ??
-                        "Královéhradecký" //chybejici u Dvora kraloveho
-                                          //, v => new { DS = v.Element(DatoveSchrankyNS + "IdDS").Value, Nazev = v.Element(DatoveSchrankyNS + "Nazev").Value }
-                    , v => v.Element(DatoveSchrankyNS + "IdDS").Value
-                )
-                .ToDictionary(k => k.Key, v => v.ToArray());
-
-
-            ObceIII_DS = obceIII
-                .OrderBy(m => m.Element(DatoveSchrankyNS + "Nazev").Value)
-                .Select(m => m.Element(DatoveSchrankyNS + "IdDS").Value)
-                .ToArray();
+            ObceIII_DS = OvmRepo.ObceIII().Select(o => o.IdDS).ToArray();
 
             StatutarniMestaAllCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6),
                 "StatData.StatutarniMestaAll",
                 (o) =>
                 {
-                    return DatoveSchranky
-                        .Descendants(DatoveSchrankyNS + "Subjekt")
-                        .Where(m => m.Element(DatoveSchrankyNS + "TypSubjektu")?.Attribute("id").Value == "8")
-                        .Where(m => m.Element(DatoveSchrankyNS + "PrimarniOvm")?.Value == "Ano")
-                        .OrderBy(m => m.Element(DatoveSchrankyNS + "Nazev").Value)
-                        .Select(m => m.Element(DatoveSchrankyNS + "IdDS").Value)
-                        .Union(ObceIII_DS)
-                        .Select(d => Firmy.GetByDS(d))
-                        .OrderBy(or => or.Jmeno);
+                    return OvmRepo.ObceSRozsirenouPusobnosti().Select(m => Firmy.GetByDS(m.IdDS)).ToArray();
                 });
 
 
@@ -210,16 +145,7 @@ namespace HlidacStatu.Repositories
                 "StatData.OrganizacniSlozkyStatu",
                 (o) =>
                 {
-                    return DatoveSchranky
-                        .Descendants(DatoveSchrankyNS + "Subjekt")
-                        .Where(m => m.Element(DatoveSchrankyNS + "TypSubjektu")?.Attribute("id").Value == "11")
-                        .Where(m => m.Element(DatoveSchrankyNS + "PravniForma")?.Attribute("type").Value == "325")
-                        .Where(m => m.Element(DatoveSchrankyNS + "Nazev") != null)
-                        .Where(m => m.Element(DatoveSchrankyNS + "PrimarniOvm")?.Value == "Ano")
-                        .OrderBy(m => m.Element(DatoveSchrankyNS + "Nazev").Value)
-                        .Select(m => m.Element(DatoveSchrankyNS + "IdDS").Value)
-                        .Select(d => Firmy.GetByDS(d))
-                        .OrderBy(or => or.Jmeno);
+                    return OvmRepo.OrganizacniSlozkyStatu().Select(m => Firmy.GetByDS(m.IdDS)).ToArray();
                 });
 
             Util.Consts.Logger.Info("Static data - FirmyNazvyOnlyAscii");

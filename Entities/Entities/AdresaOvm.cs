@@ -26,7 +26,7 @@ public class AdresaOvm
     public string CastObceNeboKatastralniUzemi { get; set; }
 
     [XmlElement(ElementName = "PSC")]
-    public int PSC { get; set; }
+    public string PSC { get; set; }
 
     [XmlElement(ElementName = "KrajNazev")]
     public string KrajNazev { get; set; }
