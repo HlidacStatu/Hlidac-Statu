@@ -130,7 +130,7 @@ namespace InsolvencniRejstrik.Fixes
 					}
 
 					Repository.SetInsolvencyProceeding(rizeni);
-                    HlidacStatu.Repositories.RizeniRepo.SaveAsync(rizeni).RunSynchronously();
+                    HlidacStatu.Repositories.RizeniRepo.SaveAsync(rizeni).ConfigureAwait(false).GetAwaiter().GetResult();
 				}
 
 				Console.WriteLine("Hotovo");
@@ -140,7 +140,7 @@ namespace InsolvencniRejstrik.Fixes
 
 		private Rizeni LoadRizeni(string spisovaZnacka)
 		{
-			var res = HlidacStatu.Repositories.ES.Manager.GetESClient_InsolvenceAsync().Result.Get<Rizeni>(spisovaZnacka);
+			var res = HlidacStatu.Repositories.ES.Manager.GetESClient_InsolvenceAsync().ConfigureAwait(false).GetAwaiter().GetResult().Get<Rizeni>(spisovaZnacka);
 			return res.Found ? res.Source : null;
 		}
 

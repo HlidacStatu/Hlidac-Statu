@@ -95,13 +95,13 @@ namespace InsolvencniRejstrik.Fixes
 
 		private Rizeni LoadRizeni(string spisovaZnacka)
 		{
-			var res = Manager.GetESClient_InsolvenceAsync().Result.Get<Rizeni>(spisovaZnacka, s => s.SourceExcludes("dokumenty"));
+			var res = Manager.GetESClient_InsolvenceAsync().ConfigureAwait(false).GetAwaiter().GetResult().Get<Rizeni>(spisovaZnacka, s => s.SourceExcludes("dokumenty"));
 			return res.Found ? res.Source : null;
 		}
 
 		private void SaveRizeni(Rizeni rizeni)
 		{
-			var esUrl = Manager.GetESClient_InsolvenceAsync().Result.ConnectionSettings.ConnectionPool.Nodes.First().Uri.ToString();
+			var esUrl = Manager.GetESClient_InsolvenceAsync().ConfigureAwait(false).GetAwaiter().GetResult().ConnectionSettings.ConnectionPool.Nodes.First().Uri.ToString();
 			esUrl += $"insolvencnirestrik/rizeni/{System.Net.WebUtility.UrlEncode(rizeni.SpisovaZnacka)}/_update";
 			try
 			{

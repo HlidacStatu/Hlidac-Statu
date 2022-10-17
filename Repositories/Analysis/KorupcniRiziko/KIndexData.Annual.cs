@@ -149,7 +149,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     {
                         if (_orderedValuesForInfofacts == null)
                         {
-                            Statistics stat = Statistics.GetStatistics(Rok);
+                            Statistics stat = Statistics.GetStatistics(Rok); //todo: může být null, co s tím?
                             if (KIndexVypocet.Radky != null || KIndexVypocet.Radky.Count() > 0)
 
                                 _orderedValuesForInfofacts = KIndexVypocet.Radky

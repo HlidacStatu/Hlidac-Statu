@@ -14,7 +14,9 @@ namespace InsolvencniRejstrik.ByEvents
 			IsirWs.getIsirWsPublicPodnetIdResponse response;
 			do
 			{
-				response = Client.getIsirWsPublicPodnetIdAsync(new IsirWs.getIsirWsPublicPodnetIdRequest { idPodnetu = latestId }).Result;
+				response = Client
+					.getIsirWsPublicPodnetIdAsync(new IsirWs.getIsirWsPublicPodnetIdRequest { idPodnetu = latestId })
+					.ConfigureAwait(false).GetAwaiter().GetResult();
 				if (response.status.stav == IsirWs.stavType.OK)
 				{
 					foreach (var item in response.data)

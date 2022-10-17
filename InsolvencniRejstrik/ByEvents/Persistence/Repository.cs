@@ -17,7 +17,7 @@ namespace InsolvencniRejstrik.ByEvents
 
 		public Rizeni GetInsolvencyProceeding(string spisovaZnacka, Func<string, Rizeni> createNewInsolvencyProceeding)
 		{
-			var res = Manager.GetESClient_InsolvenceAsync().Result
+			var res = Manager.GetESClient_InsolvenceAsync().ConfigureAwait(false).GetAwaiter().GetResult()
 				.Search<Rizeni>(s => s
 					.Size(1)
 					.Query(q => q
@@ -34,12 +34,12 @@ namespace InsolvencniRejstrik.ByEvents
 
 		public void SetInsolvencyProceeding(Rizeni item)
 		{
-			var res = Manager.GetESClient_InsolvenceAsync().Result.Index(item, o => o.Id(item.SpisovaZnacka.ToString())); //druhy parametr musi byt pole, ktere je unikatni
+			var res = Manager.GetESClient_InsolvenceAsync().ConfigureAwait(false).GetAwaiter().GetResult().Index(item, o => o.Id(item.SpisovaZnacka.ToString())); //druhy parametr musi byt pole, ktere je unikatni
 			if (!res.IsValid)
 			{
 				throw new ElasticsearchClientException(res.ServerError?.ToString());
 			}
-			HlidacStatu.Repositories.RizeniRepo.SaveAsync(item).RunSynchronously();
+			HlidacStatu.Repositories.RizeniRepo.SaveAsync(item).ConfigureAwait(false).GetAwaiter().GetResult();
 			Stats.InsolvencyProceedingSet++;
 		}
 	}

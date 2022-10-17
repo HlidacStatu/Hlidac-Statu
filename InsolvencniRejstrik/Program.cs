@@ -5,8 +5,10 @@ using System.IO;
 using Newtonsoft.Json;
 using InsolvencniRejstrik.Fixes;
 using HlidacStatu.Entities.Insolvence;
+ using HlidacStatu.LibCore.Extensions;
+ using Microsoft.Extensions.Configuration;
 
-namespace InsolvencniRejstrik
+ namespace InsolvencniRejstrik
 {
 	class Program
 	{
@@ -14,6 +16,9 @@ namespace InsolvencniRejstrik
 		{
 			System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
 			System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.czCulture;
+			
+			IConfiguration configuration = HlidacConfigExtensions.InitializeConsoleConfiguration(args);
+			Devmasters.Config.Init(configuration);
 
 			Console.WriteLine("HlidacStatu - Insolvencni rejstrik  v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
 			Console.WriteLine("----------------------------------------------");
