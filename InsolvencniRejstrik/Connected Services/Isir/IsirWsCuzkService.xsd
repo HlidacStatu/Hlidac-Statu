@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns="http://isirws.cca.cz/types/" targetNamespace="http://isirws.cca.cz/types/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="getIsirWsCuzkDataRequest">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element minOccurs="0" maxOccurs="1" name="ic" type="xsd:string" />
+        <xsd:element minOccurs="0" maxOccurs="1" name="rc" type="xsd:string" />
+        <xsd:element minOccurs="0" maxOccurs="1" name="druhVec" type="xsd:string" />
+        <xsd:element minOccurs="0" maxOccurs="1" name="bcVec" type="xsd:int" />
+        <xsd:element minOccurs="0" maxOccurs="1" name="rocnik" type="xsd:int" />
+        <xsd:element minOccurs="0" maxOccurs="1" name="nazevOsoby" type="xsd:string" />
+        <xsd:element minOccurs="0" maxOccurs="1" name="jmeno" type="xsd:string" />
+        <xsd:element minOccurs="0" maxOccurs="1" name="datumNarozeni" type="xsd:date" />
+        <xsd:element minOccurs="0" maxOccurs="1" name="maxPocetVysledku" type="xsd:int" />
+        <xsd:element minOccurs="0" maxOccurs="1" name="filtrAktualniRizeni" type="priznakType" />
+        <xsd:element minOccurs="0" maxOccurs="1" name="vyhledatPresnouShoduJmen" type="priznakType" />
+        <xsd:element minOccurs="0" maxOccurs="1" name="vyhledatBezDiakritiky" type="priznakType" />
+        <xsd:element minOccurs="0" maxOccurs="1" name="maxRelevanceVysledku" type="relevanceType" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:element name="getIsirWsCuzkDataResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element minOccurs="0" maxOccurs="unbounded" name="data" nillable="true" type="isirWsCuzkData" />
+        <xsd:element name="stav" type="isirWsCuzkStatus" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="isirWsCuzkData">
+    <xsd:sequence>
+      <xsd:element minOccurs="0" name="ic" type="xsd:string" />
+      <xsd:element minOccurs="0" name="rc" type="xsd:string" />
+      <xsd:element minOccurs="1" name="cisloSenatu" type="xsd:int" />
+      <xsd:element minOccurs="1" name="druhVec" type="xsd:string" />
+      <xsd:element minOccurs="1" name="bcVec" type="xsd:int" />
+      <xsd:element minOccurs="1" name="rocnik" type="xsd:int" />
+      <xsd:element minOccurs="0" name="nazevOrganizace" type="xsd:string" />
+      <xsd:element minOccurs="0" name="datumNarozeni" type="xsd:date" />
+      <xsd:element minOccurs="0" name="titulPred" type="xsd:string" />
+      <xsd:element minOccurs="0" name="titulZa" type="xsd:string" />
+      <xsd:element minOccurs="0" name="jmeno" type="xsd:string" />
+      <xsd:element minOccurs="0" name="nazevOsoby" type="xsd:string" />
+      <xsd:element minOccurs="0" name="druhAdresy" type="xsd:string" />
+      <xsd:element minOccurs="0" name="mesto" type="xsd:string" />
+      <xsd:element minOccurs="0" name="ulice" type="xsd:string" />
+      <xsd:element minOccurs="0" name="cisloPopisne" type="xsd:string" />
+      <xsd:element minOccurs="0" name="okres" type="xsd:string" />
+      <xsd:element minOccurs="0" name="zeme" type="xsd:string" />
+      <xsd:element minOccurs="0" name="psc" type="xsd:string" />
+      <xsd:element minOccurs="0" name="druhStavKonkursu" type="xsd:string" />
+      <xsd:element minOccurs="0" name="urlDetailRizeni" type="xsd:string" />
+      <xsd:element minOccurs="0" name="dalsiDluznikVRizeni" type="priznakType" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="isirWsCuzkStatus">
+    <xsd:sequence>
+      <xsd:element minOccurs="0" name="pocetVysledku" type="xsd:int" />
+      <xsd:element minOccurs="0" name="relevanceVysledku" type="relevanceType" />
+      <xsd:element minOccurs="0" name="casSynchronizace" type="xsd:dateTime" />
+      <xsd:element minOccurs="0" name="kodChyby" type="kodChybyType" />
+      <xsd:element minOccurs="0" name="textChyby" type="xsd:string" />
+      <xsd:element minOccurs="0" name="popisChyby" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:simpleType name="kodChybyType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="WS1" />
+      <xsd:enumeration value="WS2" />
+      <xsd:enumeration value="WS3" />
+      <xsd:enumeration value="WS4" />
+      <xsd:enumeration value="SQL1" />
+      <xsd:enumeration value="SERVER1" />
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="relevanceType">
+    <xsd:restriction base="xsd:int">
+      <xsd:enumeration value="1" />
+      <xsd:enumeration value="2" />
+      <xsd:enumeration value="3" />
+      <xsd:enumeration value="4" />
+      <xsd:enumeration value="5" />
+      <xsd:enumeration value="6" />
+      <xsd:enumeration value="7" />
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="priznakType">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="T" />
+      <xsd:enumeration value="F" />
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

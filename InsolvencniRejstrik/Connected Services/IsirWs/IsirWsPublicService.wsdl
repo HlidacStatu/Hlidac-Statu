@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:tns="http://isirpublicws.cca.cz/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsp1_2="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" name="IsirWsPublicService" targetNamespace="http://isirpublicws.cca.cz/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema>
+      <xsd:import schemaLocation="https://isir.justice.cz:8443/isir_public_ws/IsirWsPublicService?xsd=1" namespace="http://isirpublicws.cca.cz/types/" />
+    </xsd:schema>
+  </types>
+  <message name="getIsirWsPublicPodnetId">
+    <part xmlns:ns1="http://isirpublicws.cca.cz/types/" name="parameters" element="ns1:getIsirWsPublicIdDataRequest" />
+  </message>
+  <message name="getIsirWsPublicPodnetIdResponse">
+    <part xmlns:ns2="http://isirpublicws.cca.cz/types/" name="parameters" element="ns2:getIsirWsPublicDataResponse" />
+  </message>
+  <portType name="IsirWsPublicPortType">
+    <operation name="getIsirWsPublicPodnetId">
+      <input wsam:Action="http://isirpublicws.cca.cz/IsirWsPublicPortType/getIsirWsPublicPodnetIdRequest" message="tns:getIsirWsPublicPodnetId" />
+      <output wsam:Action="http://isirpublicws.cca.cz/IsirWsPublicPortType/getIsirWsPublicPodnetIdResponse" message="tns:getIsirWsPublicPodnetIdResponse" />
+    </operation>
+  </portType>
+  <binding name="IsirWsPublicPortTypeBinding" type="tns:IsirWsPublicPortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="getIsirWsPublicPodnetId">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="IsirWsPublicService">
+    <port name="IsirWsPublicPortType" binding="tns:IsirWsPublicPortTypeBinding">
+      <soap:address location="https://isir.justice.cz:8443/isir_public_ws/IsirWsPublicService" />
+    </port>
+  </service>
+</definitions>

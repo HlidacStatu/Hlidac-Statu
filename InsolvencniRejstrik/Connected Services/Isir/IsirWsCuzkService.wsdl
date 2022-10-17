@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://isirws.cca.cz/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="IsirWsCuzkService" targetNamespace="http://isirws.cca.cz/" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xsd:schema>
+      <xsd:import schemaLocation="https://isir.justice.cz:8443/isir_cuzk_ws/IsirWsCuzkService?xsd=1" namespace="http://isirws.cca.cz/types/" />
+    </xsd:schema>
+  </types>
+  <message name="getIsirWsCuzkData">
+    <part xmlns:ns1="http://isirws.cca.cz/types/" name="parameters" element="ns1:getIsirWsCuzkDataRequest" />
+  </message>
+  <message name="getIsirWsCuzkDataResponse">
+    <part xmlns:ns2="http://isirws.cca.cz/types/" name="parameters" element="ns2:getIsirWsCuzkDataResponse" />
+  </message>
+  <portType name="IsirWsCuzkPortType">
+    <operation name="getIsirWsCuzkData">
+      <input message="tns:getIsirWsCuzkData" />
+      <output message="tns:getIsirWsCuzkDataResponse" />
+    </operation>
+  </portType>
+  <binding name="IsirWsCuzkPortTypeBinding" type="tns:IsirWsCuzkPortType">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="getIsirWsCuzkData">
+      <soap:operation soapAction="" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="IsirWsCuzkService">
+    <port name="IsirWsCuzkPortType" binding="tns:IsirWsCuzkPortTypeBinding">
+      <soap:address location="https://isir.justice.cz:8443/isir_cuzk_ws/IsirWsCuzkService" />
+    </port>
+  </service>
+</definitions>
