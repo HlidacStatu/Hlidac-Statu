@@ -546,6 +546,10 @@ namespace HlidacStatu.Entities
                 ((IDictionary<String, Object>)v).Add($"prijemceJmeno_{i + 1}", Prijemce[i].nazev);
                 ((IDictionary<String, Object>)v).Add($"prijemceIco_{i + 1}", Prijemce[i].ico);
             }
+            for (int i = 0; i < Issues.Count(); i++)
+            {
+                ((IDictionary<String, Object>)v).Add($"chyba_{i + 1}", Issues[i].Title);
+            }
             return v;
         }
 

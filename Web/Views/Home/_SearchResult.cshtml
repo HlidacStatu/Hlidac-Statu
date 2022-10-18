@@ -135,13 +135,42 @@
         }
     </div>
     <div class="col-xs-12 col-sm-6">
-        <br />
-        @if (Model.Chyby)
-        {
-            @Html.CheckBoxFor(m => m.Chyby, new { @onchange = "changeChyby(this);" }) @Html.LabelFor(m => m.Chyby, "Ukázat chyby")
-        }
-        @Html.DropDownListFor(m => m.Order, Model.OrderList, new { @class = "form-control small float-end", @style = "width:50%;max-width:300px", @id = "orderList", @onchange = "changeOrder(this);" })
-    </div>
+        <div class="col-12 d-flex justify-content-end">
+            @{
+                string chybyQuery = " AND (chyby:zasadni OR chyby:vazne)";
+
+                var queryWithoutQ = Context.Request.Query
+                    .Where(kvp => !kvp.Key.Equals("Q", StringComparison.InvariantCultureIgnoreCase))
+                    .Select(kvp => $"{kvp.Key}={System.Net.WebUtility.UrlEncode(kvp.Value)}")
+                    .ToList();
+
+                string queryWithoutQSerialized = string.Empty;
+                if (queryWithoutQ.Any())
+                {
+                    queryWithoutQSerialized = "&" + string.Join("&", queryWithoutQ);
+                }
+
+            }
+            @if (Model.OrigQuery.Contains(chybyQuery, StringComparison.InvariantCultureIgnoreCase))
+            {
+                var qs = $"q={System.Net.WebUtility.UrlEncode(Model.OrigQuery.Replace(chybyQuery, ""))}{queryWithoutQSerialized}";
+                <a class="btn btn-danger btn-sm" href="/hledat?@(qs)">Všechny smlouvy</a>
+            }
+            else
+            {
+                var qs = $"q={System.Net.WebUtility.UrlEncode(Model.OrigQuery + chybyQuery)}{queryWithoutQSerialized}";
+                <a class="btn btn-outline-danger btn-sm" href="/hledat?@(qs)">Pouze chybové smlouvy</a>
+            }
+        </div>
+        <div class="col-12 d-flex justify-content-end">
+            @if (Model.Chyby)
+            {
+                @Html.CheckBoxFor(m => m.Chyby, new { @onchange = "changeChyby(this);" })
+                @Html.LabelFor(m => m.Chyby, "Ukázat chyby")
+            }
+            @Html.DropDownListFor(m => m.Order, Model.OrderList, new { @class = "form-control small float-end", @style = "width:50%;max-width:300px", @id = "orderList", @onchange = "changeOrder(this);" })
+        </div>
+        </div>
 </div>
 <div style="height:32px;"></div>
 @{
