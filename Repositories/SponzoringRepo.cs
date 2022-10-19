@@ -88,21 +88,42 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static IEnumerable<Sponzoring> GetByPrijemce(int osobaId)
+        public static List<Sponzoring> GetByPrijemce(int osobaId)
         {
             using (DbEntities db = new DbEntities())
             {
-                return db.Sponzoring.AsQueryable()
-                    .Where(s => s.OsobaIdPrijemce == osobaId);
+                return db.Sponzoring.AsNoTracking()
+                    .Where(s => s.OsobaIdPrijemce == osobaId)
+                    .Where(SponzoringLimitsPredicate)
+                    .ToList();
             }
         }
 
-        public static IEnumerable<Sponzoring> GetByPrijemce(string icoPrijemce)
+        public static List<Sponzoring> GetByPrijemce(string icoPrijemce)
         {
             using (DbEntities db = new DbEntities())
             {
-                return db.Sponzoring.AsQueryable()
-                    .Where(s => s.IcoPrijemce == icoPrijemce);
+                return db.Sponzoring.AsNoTracking()
+                    .Where(s => s.IcoPrijemce == icoPrijemce)
+                    .Where(SponzoringLimitsPredicate)
+                    .ToList();
+            }
+        }
+        
+        public static async Task<List<SponzoringDetail>> GetByPrijemceWithPersonDetailsAsync(string icoPrijemce, 
+            CancellationToken cancellationToken = default)
+        {
+            
+            using (DbEntities db = new DbEntities())
+            {
+                return await db.SponzoringDetails.FromSqlInterpolated(
+                    $@"SELECT os.NameId NameIdDarce, os.Jmeno JmenoDarce, os.Prijmeni PrijmeniDarce, os.Narozeni DaumNarozeniDarce,
+                              sp.IcoDarce, sp.IcoPrijemce, sp.Typ TypDaru, sp.Hodnota HodnotaDaru, sp.Popis, sp.DarovanoDne
+                        FROM dbo.Sponzoring sp
+                        Left Join dbo.Osoba os on sp.OsobaIdDarce = os.InternalId
+                        WHERE sp.IcoPrijemce = {icoPrijemce}")
+                    .ToListAsync(cancellationToken);
+                
             }
         }
 

@@ -243,6 +243,7 @@ namespace HlidacStatu.Entities
         public DbSet<Ids> IdsView { get; set; }
         public DbSet<UserJobStatistics> UserJobStatistics { get; set; }
         public DbSet<AdresyKVolbam> AdresyKVolbam { get; set; }
+        public DbSet<SponzoringDetail> SponzoringDetails { get; set; }
 
 
     }
