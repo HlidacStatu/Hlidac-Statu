@@ -82,7 +82,7 @@
     <PackageReference Include="System.ServiceModel.Security" Version="4.10.0" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="appsettings.json">
+    <Content Include="appsettings.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Resource Include="Logger.log4net">
