@@ -1,7 +1,9 @@
 ﻿using Elasticsearch.Net;
 using HlidacStatu.Entities.Insolvence;
+using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace InsolvencniRejstrik.ByEvents
@@ -17,6 +19,16 @@ namespace InsolvencniRejstrik.ByEvents
 
 		public Rizeni GetInsolvencyProceeding(string spisovaZnacka, Func<string, Rizeni> createNewInsolvencyProceeding)
 		{
+			var insDet = InsolvenceRepo.LoadFromEsAsync(spisovaZnacka, true, false).ConfigureAwait(false).GetAwaiter().GetResult();
+			if (insDet == null || insDet?.Rizeni == null)
+				return createNewInsolvencyProceeding(spisovaZnacka);
+			else
+				return insDet.Rizeni;
+        }
+
+
+        public Rizeni GetInsolvencyProceeding_old(string spisovaZnacka, Func<string, Rizeni> createNewInsolvencyProceeding)
+		{
 			var res = Manager.GetESClient_InsolvenceAsync().ConfigureAwait(false).GetAwaiter().GetResult()
 				.Search<Rizeni>(s => s
 					.Size(1)
@@ -27,18 +39,22 @@ namespace InsolvencniRejstrik.ByEvents
 			if (res.IsValid)
 			{
 				Stats.InsolvencyProceedingGet++;
-				return res.Hits.FirstOrDefault()?.Source ?? createNewInsolvencyProceeding(spisovaZnacka);
+				var riz = res.Hits.FirstOrDefault()?.Source;
+				if (riz == null)
+					return createNewInsolvencyProceeding(spisovaZnacka);
+				riz.IsFullRecord = true;
+				return riz;
 			}
 			throw new ElasticsearchClientException(res.ServerError?.ToString());
 		}
 
 		public void SetInsolvencyProceeding(Rizeni item)
 		{
-			var res = Manager.GetESClient_InsolvenceAsync().ConfigureAwait(false).GetAwaiter().GetResult().Index(item, o => o.Id(item.SpisovaZnacka.ToString())); //druhy parametr musi byt pole, ktere je unikatni
-			if (!res.IsValid)
-			{
-				throw new ElasticsearchClientException(res.ServerError?.ToString());
-			}
+			//var res = Manager.GetESClient_InsolvenceAsync().ConfigureAwait(false).GetAwaiter().GetResult().Index(item, o => o.Id(item.SpisovaZnacka.ToString())); //druhy parametr musi byt pole, ktere je unikatni
+			//if (!res.IsValid)
+			//{
+			//	throw new ElasticsearchClientException(res.ServerError?.ToString());
+			//}
 			HlidacStatu.Repositories.RizeniRepo.SaveAsync(item).ConfigureAwait(false).GetAwaiter().GetResult();
 			Stats.InsolvencyProceedingSet++;
 		}

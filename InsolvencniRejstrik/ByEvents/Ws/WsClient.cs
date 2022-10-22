@@ -7,7 +7,7 @@ namespace InsolvencniRejstrik.ByEvents
 	class WsClient : IWsClient
 	{
 		private IsirWs.IsirWsPublicPortTypeClient Client = new IsirWs.IsirWsPublicPortTypeClient();
-
+		
 		public IEnumerable<WsResult> Get(long id)
 		{
 			var latestId = id;

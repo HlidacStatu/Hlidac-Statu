@@ -138,7 +138,7 @@ namespace HlidacStatu.Repositories
                 o => o.Id(rizeni.SpisovaZnacka)); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)
             {
-                throw new ApplicationException(res.ServerError?.ToString());
+                throw new ApplicationException(rizeni.SpisovaZnacka + "  err :" +res.ServerError?.ToString());
             }
         }
 

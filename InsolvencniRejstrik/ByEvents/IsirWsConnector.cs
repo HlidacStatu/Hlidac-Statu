@@ -146,9 +146,13 @@ namespace InsolvencniRejstrik.ByEvents
 								var date = Devmasters.DT.Util.ToDateTime(datumVyskrtnuti, "MM/dd/yyyy h:m:s tt");
 								if (date.HasValue == false)
 									date = Devmasters.DT.Util.ToDateTime(datumVyskrtnuti);
-								if (date.HasValue == false)
+                                if (date.HasValue == false)
+                                    date = Devmasters.DT.Util.ToDateTime(datumVyskrtnuti, "yyyy-MM-dd K");
+                                if (date.HasValue == false)
+                                    date = Devmasters.DT.Util.ToDateTime(datumVyskrtnuti, "yyyy-MM-ddK");
+                                if (date.HasValue == false)
 									Console.WriteLine("MessageProcessor datumVyskrtnuti:" + datumVyskrtnuti);
-								rizeni.Vyskrtnuto = date.Value;
+								rizeni.Vyskrtnuto = date;
 								rizeni.PosledniZmena = item.DatumZalozeniUdalosti;
 							}
 
@@ -316,7 +320,7 @@ namespace InsolvencniRejstrik.ByEvents
 		private Rizeni CreateNewInsolvencyProceeding(string spisovaZnacka)
 		{
 			GlobalStats.RizeniCount++;
-			var r = new Rizeni { SpisovaZnacka = spisovaZnacka };
+			var r = new Rizeni { SpisovaZnacka = spisovaZnacka, IsFullRecord = true };
 			LinkRequestsQueue.Enqueue(r);
 			return r;
 		}

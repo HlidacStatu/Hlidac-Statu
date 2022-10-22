@@ -5,21 +5,13 @@
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AssemblyVersion>2.0.14</AssemblyVersion>
-    <FileVersion>2.0.14</FileVersion>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <OutputPath>bin\x64\Debug\</OutputPath>
@@ -30,64 +22,15 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Update="Connected Services\IsirWs\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
+    <Compile Update="Program.cs">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="Connected Services\Isir\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Connected Services\IsirWs\InsolvencniRejstrik.IsirWs.getIsirWsPublicPodnetIdResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Update="Connected Services\IsirWs\InsolvencniRejstrik.IsirWs.isirWsPublicData.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Update="Connected Services\IsirWs\InsolvencniRejstrik.IsirWs.isirWsPublicStatus.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Update="Connected Services\IsirWs\IsirWsPublicService.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Update="Connected Services\Isir\InsolvencniRejstrik.Isir.getIsirWsCuzkDataResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Update="Connected Services\Isir\InsolvencniRejstrik.Isir.isirWsCuzkData.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Update="Connected Services\Isir\InsolvencniRejstrik.Isir.isirWsCuzkStatus.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Update="Connected Services\Isir\IsirWsCuzkService.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Update="Logger.log4net">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadataStorage Include="Connected Services\IsirWs\" />
     <WCFMetadataStorage Include="Connected Services\Isir\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Connected Services\Isir\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Connected Services\IsirWs\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.2">
@@ -117,11 +60,12 @@
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.11.46</Version>
     </PackageReference>
+    <PackageReference Include="log4net" Version="2.0.15" />
     <PackageReference Include="NDesk.Options">
       <Version>0.2.1</Version>
     </PackageReference>
     <PackageReference Include="NEST">
-      <Version>7.17.4</Version>
+      <Version>7.17.5</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
@@ -129,19 +73,35 @@
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.1" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="4.10.0" />
+    <PackageReference Include="System.ServiceModel.Http" Version="4.10.0" />
     <PackageReference Include="System.ServiceModel.NetTcp" Version="4.10.0" />
     <PackageReference Include="System.ServiceModel.Federation" Version="4.10.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.346202">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.ServiceModel.Security" Version="4.10.0" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="appsettings.json" />
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Logger.log4net">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="last_event_id.dat" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Entities\Entities.csproj" />
     <ProjectReference Include="..\LibCore\LibCore.csproj" />
     <ProjectReference Include="..\Repositories\Repositories.csproj" />
     <ProjectReference Include="..\Util\Util.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="last_event_id.dat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Logger.log4net">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
