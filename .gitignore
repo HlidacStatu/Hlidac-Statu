@@ -367,6 +367,18 @@ Web/App_Data/autocomplete.json
 *.bak
 Web/Logger.serilog.json
 
+Web/appsettings.json
+HlidacStatu.JobTableEditor/appsettings.json
+HlidacStatu.JobsWeb/appsettings.json
+HlidacStatuApi/appsettings.json
+VolbyDownloader/appsettings.json
+VolebniPrukaz/appsettings.json
+VolicskyPrukaz/appsettings.json
+PeopleLoader/appsettings.json
+SponzoriLoader/appsettings.json
+InsolvencniRejstrik/appsettings.json
+appsettings.*.json
+
 
 #allow 3rd directory
 !3rd/Accord-framework/**
@@ -382,17 +394,3 @@ VolicskyPrukaz/Indexes/adresy/
 Data/Autocomplete_App_Data
 AutocompleteApi/AutocompleteBasicIndexes
 
-appsettings.*.json
-Web/appsettings.json
-HlidacStatu.JobTableEditor/appsettings.json
-HlidacStatu.JobsWeb/appsettings.json
-/HlidacStatuApi/appsettings.json
-VolbyDownloader/appsettings.json
-VolebniPrukaz/appsettings.json
-VolicskyPrukaz/appsettings.json
-
-PeopleLoader/appsettings.json
-
-SponzoriLoader/appsettings.json
-InsolvencniRejstrik/appsettings.json
-InsolvencniRejstrik/appsettings.json
