@@ -52,7 +52,8 @@ public static class HlidacConfigExtensions
     public static IHostBuilder ConfigureHostForWeb(this IHostBuilder hostBuilder, string[] args, string? tag = null)
     {
         IConfiguration preConfig = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", false)
+            .AddJsonFile("appsettings.json", true)
+            .AddJsonFile("appsettings.develop.json", true)
             .Build();
         var connectionString = preConfig.GetConnectionString("DefaultConnection");
         var environment = preConfig.GetValue<string>("HS_ENV");
@@ -66,6 +67,7 @@ public static class HlidacConfigExtensions
         {
             configuration.AddMsSqlConfiguration(connectionString, environment, tag);
             configuration.AddJsonFile("appsettings.json", true);
+            configuration.AddJsonFile($"appsettings.{environment}.json", true);
             configuration.AddEnvironmentVariables();
             configuration.AddCommandLine(args);
         });
