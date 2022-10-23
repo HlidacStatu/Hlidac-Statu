@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Html;
 
 using System.Linq;
 using System.Text;
+using NPOI.SS.Formula.Functions;
+using static Lucene.Net.Store.Lock;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -145,12 +147,20 @@ namespace HlidacStatu.Web.Framework
         }
 
         public static IHtmlContent Chart(string dataName, int hoursBack, int height, bool detail, 
-            string path = null, bool showLegend = true, bool showYAxisNames = true, bool showXAxis = true)
+            string path = null, bool showLegend = true, bool showYAxisNames = true, bool showXAxis = true, int? widthSpec = null)
         {
             path = path ?? $"{Framework.Constants.ApiURL}api/v2/weby";
 
             var uniqueId = "_chart_" + Devmasters.TextUtil.GenRandomString(8);
             var colsize = 0; //data.Select(d => d.ColSize(fromDate, toDate)).Max();
+            int rowsize = 1;
+            int tickWidth =  1;
+            int minWidth= 310; int maxWidth = 1000;
+            if (widthSpec != null)
+            {
+                minWidth = widthSpec.Value;
+                maxWidth = widthSpec.Value;
+            }
             var colors = new string[] { Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.OK),
         Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.Pomalé),
         Entities.UptimeServer.Availability.GetStatusChartColor(Entities.UptimeSSL.Statuses.Nedostupné),
@@ -175,7 +185,7 @@ namespace HlidacStatu.Web.Framework
                     </div>
                     ");
             }
-            sb.AppendLine($"<div id='container{uniqueId}' style='height:{height}px; min-width: 310px; max-width: 1000px; margin: 0 auto'></div>");
+            sb.AppendLine($"<div id='container{uniqueId}' style='height:{height}px; min-width: {minWidth}px; max-width: {maxWidth}px; margin: 0 auto'></div>");
             sb.AppendLine("<script>");
 
             sb.AppendLine($"var chart{uniqueId};\n"
@@ -331,7 +341,8 @@ Highcharts.setOptions({
                     maxPadding: 0,
                     startOnTick: false,
                     endOnTick: false,
-                    tickWidth: 1,
+                    tickWidth: " + tickWidth + @",
+
                 }");
             sb.AppendLine("], //yAxis");
 
@@ -344,7 +355,7 @@ Highcharts.setOptions({
                     color: '#ff0000',
                     connectNulls: true,
                     colsize: " + colsize + @", 
-                    rowsize: 1,
+                    rowsize: " + rowsize + @",
                     tooltip: {
                         headerFormat: " + (height<50 ? "''" : "'Rychlost odezvy<br/>'") + @",
 

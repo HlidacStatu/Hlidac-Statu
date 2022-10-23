@@ -282,6 +282,12 @@ else
     <h2>Dostupnost serveru</h2>
     <div class="row">
         <div class="col-xs-12">
+            <h4>Za poslední 4 hodiny</h4>
+            @WebyChartUtil.Chart("w" + web.Host.Id, 4, 150, true)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
             <h4>Za posledních 24 hodin</h4>
             @WebyChartUtil.Chart("w" + web.Host.Id, 24, 150, true)
         </div>
