@@ -169,6 +169,15 @@ namespace HlidacStatu.Extensions
         {
             //2006 https://old.vestnikverejnychzakazek.cz/cs/Searching/SearchContractNumber?cococode=847422
             //2016 https://www.vestnikverejnychzakazek.cz/SearchForm/SearchContract?contractNumber=
+
+            if (!string.IsNullOrWhiteSpace(verejnaZakazka.UrlZakazky))
+            {
+                return new VerejnaZakazka.ZakazkaSource()
+                {
+                    ZakazkaURL = verejnaZakazka.UrlZakazky
+                };
+            }
+            
             string searchUrl = null;
             if (!string.IsNullOrEmpty(verejnaZakazka.EvidencniCisloZakazky))
             {

@@ -237,6 +237,10 @@ namespace HlidacStatu.Entities.VZ
         [Date()]
         [Description("Lhůta pro doručení nabídek")]
         public DateTime? LhutaDoruceni { get; set; } = null;
+        
+        [Date()]
+        [Description("Lhůta pro doručení přihlášky k účasti na VZ")]
+        public DateTime? LhutaPrihlaseni { get; set; } = null;
 
         [Date()]
         [Description("Datum uzavření smlouvy u ukončené zakázky")]
@@ -414,6 +418,10 @@ namespace HlidacStatu.Entities.VZ
         [Description("Měna konečné hodnoty zakázky.")]
         [Keyword]
         public string KonecnaHodnotaMena { get; set; }
+        
+        [Description("Url odkaz na umístění zakázky na webu.")]
+        [Keyword]
+        public string UrlZakazky { get; set; }
 
         [Description("Dokumenty příslušející zakázky (typicky zadávací a smluvní dokumentace)")]
         public class Document
@@ -517,6 +525,9 @@ namespace HlidacStatu.Entities.VZ
             [Keyword()]
             [Description("Obchodní jméno")]
             public string Jmeno { get; set; }
+            [Keyword()]
+            [Description("Profil zadavatele")]
+            public string ProfilZadavatele { get; set; }
         }
 
 
