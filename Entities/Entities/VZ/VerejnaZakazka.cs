@@ -426,6 +426,10 @@ namespace HlidacStatu.Entities.VZ
         [Description("Dokumenty příslušející zakázky (typicky zadávací a smluvní dokumentace)")]
         public class Document
         {
+            [Description("Kontrolní součet SHA256 souboru pro ověření unikátnosti")]
+            [Keyword()]
+            public string Sha256Checksum { get; private set; }
+            
             [Description("URL uvedené v profilu zadavatele")]
             [Keyword]
             public string OficialUrl { get; set; }
@@ -496,11 +500,23 @@ namespace HlidacStatu.Entities.VZ
                 WordCount = Devmasters.TextUtil.CountWords(PlainText);
             }
 
-
+            //todo:check on different architectures (endianes)
+            public void SetChecksum(byte[] file)
+            {
+                var hash = System.Security.Cryptography.SHA256.HashData(file);
+                if (BitConverter.IsLittleEndian)
+                {
+                    Sha256Checksum = BitConverter.ToString(hash).Replace("-", "");
+                }
+                else
+                {
+                    Sha256Checksum = BitConverter.ToString(hash.Reverse().ToArray()).Replace("-", "");
+                }
+            }
         }
 
         [Description("Hodnotící kritéria veřejné zakázky")]
-        public class HodnoticiKriteria
+        public class HodnoticiKriteria : IEquatable<HodnoticiKriteria>
         {
             [Description("Pořadí.")]
             public int Poradi { get; set; }
@@ -515,9 +531,46 @@ namespace HlidacStatu.Entities.VZ
             [Description("Váha v hodnocení")]
             public decimal Vaha { get; set; } = 0;
 
+            public bool Equals(HodnoticiKriteria other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return Poradi == other.Poradi &&
+                       string.Equals(Kriterium, other.Kriterium, StringComparison.InvariantCultureIgnoreCase) &&
+                       string.Equals(Nazev, other.Nazev, StringComparison.InvariantCultureIgnoreCase) &&
+                       Vaha == other.Vaha;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((HodnoticiKriteria)obj);
+            }
+
+            public override int GetHashCode()
+            {
+                var hashCode = new HashCode();
+                hashCode.Add(Poradi);
+                hashCode.Add(Kriterium, StringComparer.InvariantCultureIgnoreCase);
+                hashCode.Add(Nazev, StringComparer.InvariantCultureIgnoreCase);
+                hashCode.Add(Vaha);
+                return hashCode.ToHashCode();
+            }
+
+            public static bool operator ==(HodnoticiKriteria left, HodnoticiKriteria right)
+            {
+                return Equals(left, right);
+            }
+
+            public static bool operator !=(HodnoticiKriteria left, HodnoticiKriteria right)
+            {
+                return !Equals(left, right);
+            }
         }
 
-        public class Subject
+        public class Subject : IEquatable<Subject>
         {
             [Keyword()]
             [Description("IC subjektu")]
@@ -528,6 +581,43 @@ namespace HlidacStatu.Entities.VZ
             [Keyword()]
             [Description("Profil zadavatele")]
             public string ProfilZadavatele { get; set; }
+
+            public bool Equals(Subject other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return string.Equals(ICO, other.ICO, StringComparison.InvariantCultureIgnoreCase) &&
+                       string.Equals(Jmeno, other.Jmeno, StringComparison.InvariantCultureIgnoreCase) &&
+                       string.Equals(ProfilZadavatele, other.ProfilZadavatele,
+                           StringComparison.InvariantCultureIgnoreCase);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((Subject)obj);
+            }
+
+            public override int GetHashCode()
+            {
+                var hashCode = new HashCode();
+                hashCode.Add(ICO, StringComparer.InvariantCultureIgnoreCase);
+                hashCode.Add(Jmeno, StringComparer.InvariantCultureIgnoreCase);
+                hashCode.Add(ProfilZadavatele, StringComparer.InvariantCultureIgnoreCase);
+                return hashCode.ToHashCode();
+            }
+
+            public static bool operator ==(Subject left, Subject right)
+            {
+                return Equals(left, right);
+            }
+
+            public static bool operator !=(Subject left, Subject right)
+            {
+                return !Equals(left, right);
+            }
         }
 
 
