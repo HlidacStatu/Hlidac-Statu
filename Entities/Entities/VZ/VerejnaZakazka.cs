@@ -223,7 +223,7 @@ namespace HlidacStatu.Entities.VZ
 
         [Object()]
         [Description("Zadávací dokumentace a další dokumenty spojené se zakázkou")]
-        public Document[] Dokumenty { get; set; } = new Document[] { };
+        public List<Document> Dokumenty { get; set; } = new();
 
 
         [Keyword()]
@@ -479,6 +479,9 @@ namespace HlidacStatu.Entities.VZ
 
             public string GetDocumentUrlToDownload()
             {
+                if (string.IsNullOrWhiteSpace(StorageId))
+                    return DirectUrl;
+                
                 return $"http://bpapi.datlab.eu/document/{StorageId}";
             }
 
@@ -500,9 +503,11 @@ namespace HlidacStatu.Entities.VZ
                 WordCount = Devmasters.TextUtil.CountWords(PlainText);
             }
 
-            //todo:check on different architectures (endianes)
             public void SetChecksum(byte[] file)
             {
+                if (file is null || file.Length == 0)
+                    Sha256Checksum = "nofilefound"; 
+                        
                 var hash = System.Security.Cryptography.SHA256.HashData(file);
                 if (BitConverter.IsLittleEndian)
                 {
@@ -512,6 +517,21 @@ namespace HlidacStatu.Entities.VZ
                 {
                     Sha256Checksum = BitConverter.ToString(hash.Reverse().ToArray()).Replace("-", "");
                 }
+            }
+            
+            /// <summary>
+            /// Use only if you know that this Document has no checksum and should have one, which you know
+            /// </summary>
+            /// <param name="checksum"></param>
+            public void SetChecksum(string checksum)
+            {
+                if (!string.IsNullOrWhiteSpace(checksum) && string.IsNullOrWhiteSpace(Sha256Checksum))
+                    Sha256Checksum = checksum;
+            }
+
+            public bool IsComparable()
+            {
+                return !(string.IsNullOrWhiteSpace(Sha256Checksum) || Sha256Checksum == "nofilefound");
             }
         }
 

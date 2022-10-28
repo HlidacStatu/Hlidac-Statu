@@ -6,12 +6,22 @@ using Nest;
 
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using HlidacStatu.Entities;
+using Polly;
+using Polly.Extensions.Http;
+using Polly.Retry;
+
 
 namespace HlidacStatu.Repositories
 {
     public static partial class VerejnaZakazkaRepo
     {
+        private static AsyncRetryPolicy<HttpResponseMessage> _retryPolicy = HttpPolicyExtensions
+            .HandleTransientHttpError()
+            .WaitAndRetryAsync(5, _ => TimeSpan.FromSeconds(1));
+        
         public static async Task UpdatePosledniZmenaAsync(VerejnaZakazka verejnaZakazka, bool force = false, bool save = false)
         {
             DateTime? prevVal = verejnaZakazka.PosledniZmena;
@@ -61,7 +71,7 @@ namespace HlidacStatu.Repositories
         /// </summary>
         /// <param name="newVZ"></param>
         /// <param name="posledniZmena"></param>
-        public static async Task UpsertAsync(VerejnaZakazka newVZ, DateTime? posledniZmena = null)
+        public static async Task UpsertAsync(VerejnaZakazka newVZ, HttpClient httpClient, DateTime? posledniZmena = null)
         {
             if (newVZ is null)
                 return;
@@ -108,21 +118,124 @@ namespace HlidacStatu.Repositories
                 newVZ.OdhadovanaHodnotaBezDPH ??= originalVZ.OdhadovanaHodnotaBezDPH;
 
                 //todo: question - jak zjistím, jaký dokument už v db je a jaký není?! (především při updatu)
-                foreach (var VARIABLE in COLLECTION)
+                await FillDocumentChecksums(newVZ, httpClient);
+                await FillDocumentChecksums(originalVZ, httpClient);
+
+                
+                var newComparableDocuments = newVZ.Dokumenty.Where(d => d.IsComparable())
+                    .ToDictionary(d => d.Sha256Checksum);
+                foreach (var origDoc in originalVZ.Dokumenty)
                 {
+                    //update document by checksum
+                    if (origDoc.IsComparable())
+                    {
+                        if (newComparableDocuments.TryGetValue(origDoc.Sha256Checksum, out var newComparableDoc))
+                        {
+                            MergeDocuments(newComparableDoc, origDoc);
+                            continue;
+                        }
+                    }
+
+                    // update document by url
+                    var newDoc = newVZ.Dokumenty.FirstOrDefault(d =>
+                        d.DirectUrl == origDoc.DirectUrl || d.StorageId == origDoc.StorageId);
+                    if (newDoc != null)
+                    {
+                        MergeDocuments(newDoc, origDoc);
+                        continue;
+                    }
                     
+                    // add missing one
+                    newVZ.Dokumenty.Add(origDoc);
                 }
-                    
+                
+                // set VZ for OCR
+                if (!newVZ.Dokumenty.Any(d => d.EnoughExtractedText))
+                {
+                    ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
+                        newVZ.Id,
+                        null,
+                        HlidacStatu.Lib.OCR.Api.Client.TaskPriority.Low);
+                }
                 
                 SetupUpdateDates(originalVZ, posledniZmena);
                 
-                //await es.IndexDocumentAsync<VerejnaZakazka>(newVZ);
+                await elasticClient.IndexDocumentAsync<VerejnaZakazka>(newVZ);
             }
             catch (Exception e)
             {
                 Consts.Logger.Error(
-                    $"VZ ERROR Save ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}", e);
+                    $"VZ ERROR Upserting ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}", e);
             }
+        }
+
+        /// <summary>
+        /// Takes newDoc and fill its missing values from originalDoc.
+        /// </summary>
+        /// <param name="newDoc">Document which is going to be updated</param>
+        /// <param name="originalDoc">Document which may contain additional data</param>
+        private static void MergeDocuments(VerejnaZakazka.Document newDoc, VerejnaZakazka.Document originalDoc)
+        {
+            if (string.IsNullOrWhiteSpace(newDoc.Sha256Checksum))
+            {
+                newDoc.SetChecksum(originalDoc.Sha256Checksum);
+            }
+            
+            newDoc.Name = newDoc.Name.SetEmptyString(originalDoc.Name);
+            newDoc.CisloVerze = newDoc.CisloVerze.SetEmptyString(originalDoc.CisloVerze);
+            newDoc.ContentType = newDoc.ContentType.SetEmptyString(originalDoc.ContentType);
+            newDoc.DirectUrl = newDoc.DirectUrl.SetEmptyString(originalDoc.DirectUrl);
+            newDoc.OficialUrl = newDoc.OficialUrl.SetEmptyString(originalDoc.OficialUrl);
+            newDoc.PlainText = newDoc.PlainText.SetEmptyString(originalDoc.PlainText);
+            newDoc.StorageId = newDoc.StorageId.SetEmptyString(originalDoc.StorageId);
+            newDoc.TypDokumentu = newDoc.TypDokumentu.SetEmptyString(originalDoc.TypDokumentu);
+            newDoc.PlainDocumentId = newDoc.PlainDocumentId.SetEmptyString(originalDoc.PlainDocumentId);
+
+            newDoc.LastProcessed ??= originalDoc.LastProcessed;
+            newDoc.LastUpdate ??= originalDoc.LastUpdate;
+            newDoc.VlozenoNaProfil ??= originalDoc.VlozenoNaProfil;
+
+            newDoc.Lenght = newDoc.Lenght == 0 ? originalDoc.Lenght : newDoc.Lenght;
+            newDoc.Pages = newDoc.Pages == 0 ? originalDoc.Pages : newDoc.Pages;
+            newDoc.WordCount = newDoc.WordCount == 0 ? originalDoc.WordCount : newDoc.WordCount;
+
+            newDoc.PlainTextContentQuality = newDoc.PlainTextContentQuality == DataQualityEnum.Unknown
+                ? originalDoc.PlainTextContentQuality
+                : newDoc.PlainTextContentQuality;
+        }
+
+        private static async Task FillDocumentChecksums(VerejnaZakazka vz, HttpClient httpClient)
+        {
+            foreach (var dokument in vz.Dokumenty.Where(d => string.IsNullOrWhiteSpace(d.Sha256Checksum)))
+            {
+                string downloadUrl = dokument.GetDocumentUrlToDownload();
+                
+                var fileContent = await GetFileAsync(httpClient, downloadUrl);
+                dokument.SetChecksum(fileContent);
+            }
+        }
+
+        private static async Task<byte[]> GetFileAsync(HttpClient httpClient, string url)
+        {
+            using var responseMessage = await _retryPolicy.ExecuteAsync(() => httpClient.GetAsync(url));
+
+            if (!responseMessage.IsSuccessStatusCode)
+            {
+                Consts.Logger.Warning($"Couldn't get {url}");
+                return Array.Empty<byte>();
+            }
+
+            // na url není soubor, ale html stránka => nevalidní
+            if (responseMessage.Headers.TryGetValues("content-type", out var ct))
+            {
+                if (ct.Any(t => t.Contains("text/html")))
+                {
+                    Consts.Logger.Error($"Url: {url} contains only HTML, no file downloaded.");
+                    return Array.Empty<byte>();
+                }
+            }
+
+            return await responseMessage.Content.ReadAsByteArrayAsync();
         }
 
         public static string SetEmptyString(this string originalValue, string newValue)
