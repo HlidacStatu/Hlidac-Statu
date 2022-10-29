@@ -87,7 +87,8 @@ public static class HlidacConfigExtensions
     public static IConfiguration InitializeConsoleConfiguration(string[] args, string? tag = null)
     {
         IConfiguration preConfig = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", false)
+            .AddJsonFile("appsettings.json", true)
+            .AddJsonFile("appsettings.Development.json", true)
             .Build();
         var connectionString = preConfig.GetConnectionString("DefaultConnection");
         var environment = preConfig.GetValue<string>("HS_ENV");
