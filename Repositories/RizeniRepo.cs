@@ -122,10 +122,11 @@ namespace HlidacStatu.Repositories
             }
         }
 
+        static object saveLockObj = new object();
         public static async Task SaveAsync(Rizeni rizeni, ElasticClient client = null, bool? forceOnRadarValue = null)
         {
             if (rizeni.IsFullRecord == false)
-                throw new ApplicationException("Cannot save partial Insolvence document");
+                throw new ApplicationException("Cannot save partial Insolvence document ");
 
             if (client == null)
                 client = await Manager.GetESClient_InsolvenceAsync();
@@ -138,7 +139,16 @@ namespace HlidacStatu.Repositories
                 o => o.Id(rizeni.SpisovaZnacka)); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)
             {
-                throw new ApplicationException(rizeni.SpisovaZnacka + "  err :" +res.ServerError?.ToString());
+                lock (saveLockObj)
+                {
+                    System.Threading.Thread.Sleep(100);
+                    res = client.IndexAsync<Rizeni>(rizeni,
+                        o => o.Id(rizeni.SpisovaZnacka)).Result; //druhy parametr musi byt pole, ktere je unikatni
+                }
+                if (!res.IsValid)
+                {
+                    throw new ApplicationException(rizeni.SpisovaZnacka + "  err :" + res.ServerError?.ToString());
+                }
             }
         }
 
