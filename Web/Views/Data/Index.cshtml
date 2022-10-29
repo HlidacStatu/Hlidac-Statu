@@ -5,9 +5,9 @@
 @{
     ViewBag.Title = "Hlídač státu";
     ViewBag.SubTitle = "Další databáze";
-   
+
     List<string> alreadyRendered = new List<string>();
-    
+
     var veklep = DataSet.CachedDatasets.Get("veklep");
     var vyjadreniPolitiku = DataSet.CachedDatasets.Get("vyjadreni-politiku");
     var jednaniVlady = DataSet.CachedDatasets.Get("jednani-vlady");
@@ -27,11 +27,14 @@
     var deMinimis = DataSet.CachedDatasets.Get("de-minimis");
     var seznamPolitickychStran = DataSet.CachedDatasets.Get("seznam-politickych-stran");
     var kvalifikovaniDodavatele = DataSet.CachedDatasets.Get("kvalifikovanidodavatele");
+    var sbirka_pravnich_predpisu = DataSet.CachedDatasets.Get("sbirka-pravnich-predpisu");
+    var ministri = DataSet.CachedDatasets.Get("ministri");
+    var prijemcidotaci = DataSet.CachedDatasets.Get("prijemcidotaci");
 }
 
 
 @section breadcrumb
-{
+    {
     <ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
         <li><a href="/data">Další databáze</a></li>
@@ -40,25 +43,25 @@
     <div class="active float-end"><a href="/data/manage" class="btn btn-primary btn-sm" style="color:whitesmoke;text-decoration:none">Snadné přidání nového datasetu</a></div>
 }
 
-<div class="watcher-blocks">
+    <div class="watcher-blocks">
 
-    <div class="watcher-blocks__wrapper">
+        <div class="watcher-blocks__wrapper">
 
 
-        <div class="watcher-block">
-            <div class="watcher__title">
-                <img src="/Content/img/icon-person-watcher.svg">
-                <h3 class="new-title">
-                    Vyjádření politiků
-                </h3>
-            </div>
-            @{
+            <div class="watcher-block">
+                <div class="watcher__title">
+                    <img src="/Content/img/icon-person-watcher.svg">
+                    <h3 class="new-title">
+                        Vyjádření politiků
+                    </h3>
+                </div>
+                @{
                 alreadyRendered.AddRange(new string[] {
-                    "vyjadreni-politiku",
-                    "jednani-vlady",
-                    "stenozaznamy-psp",
-                    "tiskove-konference-vlady",
-                    "vybory-psp",
+            "vyjadreni-politiku",
+            "jednani-vlady",
+            "stenozaznamy-psp",
+            "tiskove-konference-vlady",
+            "vybory-psp","ministri"
                 });
             }
             <div class="block-col ">
@@ -69,7 +72,7 @@
             </div>
 
             <div class="block-col ">
-                <ul class="block-list">
+                <ul class="block-list" style="width:99%">
                     <li>
                         <span style="white-space:nowrap">
                             <a href="/data/Index/vyjadreni-politiku" class="tag">Vyjádření 100+ politiků na sociálních sítích</a>
@@ -122,8 +125,22 @@
                         <div class="small" style="padding-left:1em;">
                             Kompletní přepis obsahu parlamentních výborů Poslanecké sněmovny Parlamentu ČR.
                             <span style="white-space:nowrap">
-                                <b>@HlidacStatu.Util.RenderData.NiceNumber(vyboryPsp is null? 0 : await vyboryPsp.NumberOfRecordsAsync()) záznamůk</b>,
+                                <b>@HlidacStatu.Util.RenderData.NiceNumber(vyboryPsp is null? 0 : await vyboryPsp.NumberOfRecordsAsync()) záznamů</b>,
                             </span> kompletní fulltextové prohledávání zápisů z jednání a audio záznamů převedených do textu.
+                        </div>
+                    </li>
+                    <li>
+                        <span style="white-space:nowrap">
+                            <a href="/data/Index/ministri" class="tag">Ministři českých vlád</a>
+                        </span>
+                        <div class="small" style="padding-left:1em;">
+                            Jak dlouho zodpovídají jednotlivé politické strany za fungování státu a jednotlivé resorty?
+                            Které strany jsou tradiční a které se jimi stávají?
+                            Zde je seznam ministrů českých vlád od 1992. Zdrojem dat je seznam ministrů vlád ČR z Wikipedie, který jsme vyčistili a znormalizovali pomocí OpenRefine.
+                            Názvy resortů jsme sjednotili či jednodušili tehdy, pokud politická pozice odpovídala za obdobné oblasti, jen se trochu lišili.
+
+
+                            <br>Obsahuje <b>@HlidacStatu.Util.RenderData.NiceNumber(ministri is null? 0 : await ministri.NumberOfRecordsAsync()) členů vlády</b>.
                         </div>
                     </li>
                 </ul>
@@ -131,7 +148,7 @@
             </div>
 
         </div>
-        
+
         <div class="watcher-block">
             <div class="watcher__title">
                 <img src="/Content/img/icon-person-watcher.svg">
@@ -142,23 +159,25 @@
 
             @{
                 alreadyRendered.AddRange(new string[] {
-                    "kvalifikovanidodavatele",
-                    "rejstrik-trestu-pravnickych-osob",
-                    "seznam-politickych-stran",
-                    "de-minimis"
+            "kvalifikovanidodavatele",
+            "rejstrik-trestu-pravnickych-osob",
+            "seznam-politickych-stran",
+            "de-minimis",
+            "sbirka-pravnich-predpisu"
                 });
             }
             <div class="block-col ">
-                <ul class="block-list">
+                <ul class="block-list" style="width:99%">
                     <li>
                         <span style="white-space:nowrap">
-                            <a href="/data/Index/de-minimis" class="tag">Registr podpor de minimis
+                            <a href="/data/Index/de-minimis" class="tag">
+                                Registr podpor de minimis
                             </a> <span class="exclusive small">exkluzivně na <img style="height:12px;color:yellow" src="/Content/HlidacLoga/Hlidac-statu-ctverec%20invert%20transparent%20notext.svg" /></span>
                         </span>
                         <div class="small" style="padding-left:1em;">
-                            Seznam de minimis podpor pro malé a střední firmy od EU na základě pravidel EU. 
-                            <br/>
-                            Registr obsahuje také <a href="/data/Hledat/de-minimis?Q=PoskytovatelIco%3A44848943%20AND%20PodporaDatum%3A%5B2020-04-01%20TO%20%2A%5D&order=PodporaCzk%20desc">záruky bankovních úvěrů a dalších podpor v rámci vládních programů COVID-I a COVID-II</a> a i jiné formy podpor od státní organizací. 
+                            Seznam de minimis podpor pro malé a střední firmy od EU na základě pravidel EU.
+                            <br />
+                            Registr obsahuje také <a href="/data/Hledat/de-minimis?Q=PoskytovatelIco%3A44848943%20AND%20PodporaDatum%3A%5B2020-04-01%20TO%20%2A%5D&order=PodporaCzk%20desc">záruky bankovních úvěrů a dalších podpor v rámci vládních programů COVID-I a COVID-II</a> a i jiné formy podpor od státní organizací.
 
                             Evidujeme <b>@HlidacStatu.Util.RenderData.NiceNumber(deMinimis is null? 0 : await deMinimis.NumberOfRecordsAsync()) záznamů</b> od roku 2006.
                         </div>
@@ -203,6 +222,16 @@
                             Obsahuje <b>@HlidacStatu.Util.RenderData.NiceNumber(kvalifikovaniDodavatele is null? 0 : await kvalifikovaniDodavatele.NumberOfRecordsAsync()) dodavatelů</b>.
                         </div>
                     </li>
+                    <li>
+                        <span style="white-space:nowrap">
+                            <a href="/data/Index/sbirka-pravnich-predpisu" class="tag" style="white-space:normal">Sbírky právních předpisů územních samosprávných celků a některých správních úřadů</a>
+                        </span>
+                        <div class="small" style="padding-left:1em;">
+                            Sbírky právních předpisů územních samosprávných celků a některých správních úřadů slouží k vyhlašování právních předpisů územních samosprávných celků a zákonem stanovených správních úřadů a ke zveřejňování dalších zákonem vymezených aktů.
+
+                            Obsahuje <b>@HlidacStatu.Util.RenderData.NiceNumber(sbirka_pravnich_predpisu is null? 0 : await sbirka_pravnich_predpisu.NumberOfRecordsAsync()) předpisů</b>.
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -218,14 +247,15 @@
 
             @{
                 alreadyRendered.AddRange(new string[] {
-                    "narodni-investicni-plan",
-                    "covid-podpora",
-                    "ministry-invoices",
-                    "covid-podpory-mpo",
+            "narodni-investicni-plan",
+            "covid-podpora",
+            "ministry-invoices",
+            "covid-podpory-mpo",
+            "prijemcidotaci"
                 });
             }
             <div class="block-col ">
-                <ul class="block-list">
+                <ul class="block-list" style="width:99%">
 
                     <li>
                         <span style="white-space:nowrap">
@@ -281,11 +311,22 @@
                             Obsahuje @HlidacStatu.Util.RenderData.NiceNumber(ministryInvoices is null? 0 : await ministryInvoices.NumberOfRecordsAsync()) faktur od roku 2009.
                         </div>
                     </li>
+                    <li>
+                            <span style="white-space:nowrap">
+                                <a href="/data/Index/prijemcidotaci" class="tag">Příjemci dotací</a>
+                            <span class="exclusive small">exkluzivně na <img style="height:12px;color:yellow" src="/Content/HlidacLoga/Hlidac-statu-ctverec%20invert%20transparent%20notext.svg"></span>
+                            </span>
+                            <div class="small" style="padding-left:1em;">
+                                Seznam příjemců dotací z fondů EU a ze státního rozpočtu ČR prostřednictvím administrace Státního zemědělského intervenčního fondu (SZIF)
+
+                                Obsahuje @HlidacStatu.Util.RenderData.NiceNumber(prijemcidotaci is null? 0 : await prijemcidotaci.NumberOfRecordsAsync()) dotačních podpor.
+                            </div>
+                        </li>
                 </ul>
             </div>
         </div>
 
-        
+
         <div class="watcher-block">
             <div class="watcher__title">
                 <img src="/Content/img/icon-person-watcher.svg">
@@ -296,14 +337,14 @@
 
             @{
                 alreadyRendered.AddRange(new string[] {
-                    "fond-hejtmanky-pokorne-jermanove",
-                    "rozhodnuti-uohs",
-                    "veklep",
-                    "zasedani-zastupitelstev"
+            "fond-hejtmanky-pokorne-jermanove",
+            "rozhodnuti-uohs",
+            "veklep",
+            "zasedani-zastupitelstev"
                 });
             }
             <div class="block-col ">
-                <ul class="block-list">
+                <ul class="block-list" style="width:99%">
                     <li>
                         <span style="white-space:nowrap">
                             <a href="/data/Index/veklep" class="tag">VeKLEP</a>
@@ -348,8 +389,8 @@
                             <span class="exclusive small">exkluzivně na <img style="height:12px;color:yellow" src="/Content/HlidacLoga/Hlidac-statu-ctverec%20invert%20transparent%20notext.svg" /></span>
                         </span>
                         <div class="small" style="padding-left:1em;">
-                            Audio záznamy zasedání zastupitelstev, přepis audia do textu, plné fulltextové vyhledávání. 
-                            <br/><b>Obsahuje @HlidacStatu.Util.RenderData.NiceNumber(zasedaniZastupitelstev is null? 0 : await zasedaniZastupitelstev.NumberOfRecordsAsync()) zasedání</b>.
+                            Audio záznamy zasedání zastupitelstev, přepis audia do textu, plné fulltextové vyhledávání.
+                            <br /><b>Obsahuje @HlidacStatu.Util.RenderData.NiceNumber(zasedaniZastupitelstev is null? 0 : await zasedaniZastupitelstev.NumberOfRecordsAsync()) zasedání</b>.
                         </div>
                     </li>
                 </ul>
@@ -365,24 +406,24 @@
                     Další databáze
                 </h3>
             </div>
-            @{ 
-                string[] dsExclusive = new string[] { "prijemci-podpory-covid-programu","narodni-investicni-plan","rada-ceske-televize","kapacity-nemocnic","stav-mostu","transparentni-ucty-transakce","transparentni-ucty" };
+            @{
+                string[] dsExclusive = new string[] { "prijemci-podpory-covid-programu", "narodni-investicni-plan", "rada-ceske-televize", "kapacity-nemocnic", "stav-mostu", "transparentni-ucty-transakce", "transparentni-ucty" };
             }
             <div class="block-col ">
-                <ul class="block-list">
+                <ul class="block-list" style="width:99%">
 
 
                     @foreach (var ds in Model
-                        .Where(m => m.Ds.betaversion == false)
-                        .Where(m => alreadyRendered.Contains(m.Ds.id) == false)
-                        .OrderBy(r => r.Ds.name).ThenBy(r => r.Ds.id))
+                    .Where(m => m.Ds.betaversion == false)
+                    .Where(m => alreadyRendered.Contains(m.Ds.id) == false)
+                    .OrderBy(r => r.Ds.name).ThenBy(r => r.Ds.id))
                     {
 
                         <li>
                             <span style="white-space:nowrap">
                                 <a href="/data/Index/@ds.Ds.id" class="tag">@ds.Ds.name</a>
                                 @if (dsExclusive.Contains(ds.Ds.id))
-                                { 
+                                {
                                     <span class="exclusive small">exkluzivně na <img style="height:12px;color:yellow" src="/Content/HlidacLoga/Hlidac-statu-ctverec%20invert%20transparent%20notext.svg" /></span>
                                 }
                             </span>
@@ -416,11 +457,11 @@
 
 
             <div class="block-col ">
-                <ul class="block-list">
+                <ul class="block-list" style="width:99%">
                     @foreach (var ds in Model
-                        .Where(m => m.Ds.betaversion == true)
-                        .Where(m => alreadyRendered.Contains(m.Ds.id) == false)
-                        .OrderBy(r => r.Ds.name).ThenBy(r => r.Ds.id))
+                    .Where(m => m.Ds.betaversion == true)
+                    .Where(m => alreadyRendered.Contains(m.Ds.id) == false)
+                    .OrderBy(r => r.Ds.name).ThenBy(r => r.Ds.id))
                     {
 
                         <li>
@@ -471,4 +512,4 @@
     </div>
 </div>
 
-<partial name="Partials/_new"/>
+<partial name="Partials/_new" />
