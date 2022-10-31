@@ -24,7 +24,7 @@ namespace HlidacStatu.Entities.VZ
 
 
         [Description("Formuláře spojené s touto zakázkou. Vychazi z XML na VVZ z www.isvz.cz/ISVZ/MetodickaPodpora/Napovedaopendata.pdf")]
-        public class Formular
+        public class Formular : IEquatable<Formular>
         {
             [Description("Číslo formuláře")]
             [Keyword]
@@ -79,6 +79,41 @@ namespace HlidacStatu.Entities.VZ
 
             //[Boolean]
             //public bool 
+            public bool Equals(Formular other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return string.Equals(Cislo, other.Cislo, StringComparison.InvariantCultureIgnoreCase) &&
+                       string.Equals(Druh, other.Druh, StringComparison.InvariantCultureIgnoreCase) &&
+                       string.Equals(TypFormulare, other.TypFormulare, StringComparison.InvariantCultureIgnoreCase) &&
+                       string.Equals(LimitVZ, other.LimitVZ, StringComparison.InvariantCultureIgnoreCase) &&
+                       string.Equals(DruhRizeni, other.DruhRizeni, StringComparison.InvariantCultureIgnoreCase) &&
+                       Nullable.Equals(Zverejnen, other.Zverejnen) &&
+                       string.Equals(URL, other.URL, StringComparison.InvariantCultureIgnoreCase) &&
+                       OnlyOnProfile == other.OnlyOnProfile;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((Formular)obj);
+            }
+
+            public override int GetHashCode()
+            {
+                var hashCode = new HashCode();
+                hashCode.Add(Cislo, StringComparer.InvariantCultureIgnoreCase);
+                hashCode.Add(Druh, StringComparer.InvariantCultureIgnoreCase);
+                hashCode.Add(TypFormulare, StringComparer.InvariantCultureIgnoreCase);
+                hashCode.Add(LimitVZ, StringComparer.InvariantCultureIgnoreCase);
+                hashCode.Add(DruhRizeni, StringComparer.InvariantCultureIgnoreCase);
+                hashCode.Add(Zverejnen);
+                hashCode.Add(URL, StringComparer.InvariantCultureIgnoreCase);
+                hashCode.Add(OnlyOnProfile);
+                return hashCode.ToHashCode();
+            }
         }
 
         [Description("Je zakazka pouze na profilu zadavatele?")]
@@ -671,9 +706,14 @@ namespace HlidacStatu.Entities.VZ
 
         public void InitId()
         {
-            if (string.IsNullOrEmpty(Dataset) || string.IsNullOrEmpty(EvidencniCisloZakazky))
+            Id = GenerateId(Dataset, EvidencniCisloZakazky);
+        }
+
+        public static string GenerateId(string dataset, string evidencniCisloZakazky)
+        {
+            if (string.IsNullOrEmpty(dataset) || string.IsNullOrEmpty(evidencniCisloZakazky))
                 throw new NullReferenceException();
-            Id = Devmasters.Crypto.Hash.ComputeHashToHex(Dataset + "|" + EvidencniCisloZakazky);
+            return Devmasters.Crypto.Hash.ComputeHashToHex(dataset + "|" + evidencniCisloZakazky); 
         }
 
         public string GetUrl(bool local = true)

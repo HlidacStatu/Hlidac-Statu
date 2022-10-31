@@ -5,6 +5,7 @@ using HlidacStatu.Util;
 using Nest;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -80,17 +81,44 @@ namespace HlidacStatu.Repositories
             {
                 var elasticClient = await Manager.GetESClient_VZAsync();
 
-                var originalVZ = await LoadFromESAsync(newVZ.Id, elasticClient);
+                List<Task<VerejnaZakazka>> loadOriginalTasks = new()
+                {
+                    LoadFromESAsync(newVZ.Id, elasticClient)
+                };
+                
+                string alternativeId =
+                    VerejnaZakazka.GenerateId(newVZ.Zadavatel.ProfilZadavatele, newVZ.EvidencniCisloZakazky);
+                if (alternativeId != newVZ.Id)
+                {
+                    loadOriginalTasks.Add(LoadFromESAsync(alternativeId, elasticClient));
+                }
+                
+                var origs = await Task.WhenAll(loadOriginalTasks);
+                 
+                // If we find more documents, then we do not know original and should throw error
+                var originalVZ = origs.Where(r => r != null).SingleOrDefault();
 
                 if (originalVZ is null)
                 {
-                    //todo: OCR dokumentů here
+                    SetForOcr(newVZ);
                     SetupUpdateDates(newVZ, posledniZmena);
                     await elasticClient.IndexDocumentAsync(newVZ);
                     return;
                 }
+                
+                //set proper id, because dataset was not the same
+                if (originalVZ.Id != newVZ.Id  
+                    && newVZ.EvidencniCisloZakazky == originalVZ.EvidencniCisloZakazky) // to make sure both VZ are the same
+                {
+                    newVZ.Dataset = originalVZ.Dataset;
+                    newVZ.InitId(); //fix id
 
-                newVZ.DatumUverejneni ??= originalVZ.DatumUverejneni;
+                }
+                
+
+                // preferujeme datum z datlabu, protože Rozza nemusí mít nejsprávnější údaj (např VZ P21V00004199)
+                newVZ.DatumUverejneni = originalVZ.DatumUverejneni ?? newVZ.DatumUverejneni ;
+                
                 newVZ.DatumUzavreniSmlouvy ??= originalVZ.DatumUzavreniSmlouvy;
                 newVZ.LhutaDoruceni ??= originalVZ.LhutaDoruceni;
                 newVZ.LhutaPrihlaseni ??= originalVZ.LhutaPrihlaseni;
@@ -104,13 +132,13 @@ namespace HlidacStatu.Repositories
                 newVZ.OdhadovanaHodnotaMena = newVZ.OdhadovanaHodnotaMena.SetEmptyString(originalVZ.OdhadovanaHodnotaMena);
                 newVZ.ZakazkaNaProfiluId = newVZ.ZakazkaNaProfiluId.SetEmptyString(originalVZ.ZakazkaNaProfiluId);
                 
-                newVZ.Kriteria = newVZ.Kriteria.Union(originalVZ.Kriteria).ToArray();
                 newVZ.CPV = newVZ.CPV.Union(originalVZ.CPV).ToArray();
+                newVZ.Kriteria = newVZ.Kriteria.Union(originalVZ.Kriteria).ToArray();
                 newVZ.Dodavatele = newVZ.Dodavatele.Union(originalVZ.Dodavatele).ToArray();
                 newVZ.Formulare = newVZ.Formulare.Union(originalVZ.Formulare).ToArray();
                 
                 newVZ.Zadavatel.Jmeno = newVZ.Zadavatel.Jmeno.SetEmptyString(originalVZ.Zadavatel.Jmeno);
-                newVZ.Zadavatel.ICO = newVZ.Zadavatel.ICO.SetEmptyString(originalVZ.Zadavatel.Jmeno);
+                newVZ.Zadavatel.ICO = newVZ.Zadavatel.ICO.SetEmptyString(originalVZ.Zadavatel.ICO);
                 newVZ.Zadavatel.ProfilZadavatele = newVZ.Zadavatel.ProfilZadavatele.SetEmptyString(originalVZ.Zadavatel.ProfilZadavatele);
 
                 newVZ.StavVZ = (newVZ.StavVZ == (int)VerejnaZakazka.StavyZakazky.Jine) ? originalVZ.StavVZ : newVZ.StavVZ;
@@ -149,15 +177,7 @@ namespace HlidacStatu.Repositories
                     newVZ.Dokumenty.Add(origDoc);
                 }
                 
-                // set VZ for OCR
-                if (!newVZ.Dokumenty.Any(d => d.EnoughExtractedText))
-                {
-                    ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
-                        newVZ.Id,
-                        null,
-                        HlidacStatu.Lib.OCR.Api.Client.TaskPriority.Low);
-                }
-                
+                SetForOcr(newVZ);
                 SetupUpdateDates(originalVZ, posledniZmena);
                 
                 await elasticClient.IndexDocumentAsync<VerejnaZakazka>(newVZ);
@@ -166,6 +186,17 @@ namespace HlidacStatu.Repositories
             {
                 Consts.Logger.Error(
                     $"VZ ERROR Upserting ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}", e);
+            }
+        }
+
+        private static void SetForOcr(VerejnaZakazka newVZ)
+        {
+            if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
+            {
+                ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
+                    newVZ.Id,
+                    null,
+                    HlidacStatu.Lib.OCR.Api.Client.TaskPriority.Low);
             }
         }
 
