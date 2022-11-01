@@ -6,30 +6,96 @@
 
 <div class="text-center">
     <h2>Volba prezidenta republiky 2023</h2>
-    
-    <p>
-        <span>Volba prezidenta republiky 2023 se uskuteční <strong>13. a 14. ledna 2023</strong>.</span><br/>
-        <span>Následující druhé kolo prezidentských voleb je naplánováno na <strong>27. a 28. ledna 2023</strong>.</span>
-    </p>
+    <div class="watcher-blocks">
 
-    <p>
-        Volební místnosti budou ve dnech prvního i druhého kola voleb pro voliče v ČR otevřeny:<br/>
-        <span>V pátek <strong>od 14.00 hodin do 22.00 hodin</strong></span><br/>
-        <span>a v sobotu <strong>od 8.00 hodin do 14.00 hodin</strong>.</span>
-    </p>
+        <div class="watcher-blocks__wrapper">
 
-    <p>
-    V ČR obdrží voliči hlasovací lístky (každý kandidát na samostatném lístku) na adresu trvalého pobytu nejpozději 3 dny před dnem prvního kola voleb. V zahraničí obdrží voliči hlasovací lístky až ve volební místnosti. V případě druhého kola budou lístky k dispozici až ve volebních místnostech.
-    </p>
+            <div class="watcher-block">
+                <div class="watcher__title">
+                    <i class="fa-duotone fa-calendar-days fa-2xl" style="font-size:2.5em;padding-right:16px;--fa-primary-color:orangered;"></i>
+                    <h2 class="new-title">
+                        Kdy se volí
+                    </h2>
+                </div>
+                <div class="block-col ">
+                    <p class="muted">
+                        První kolo volby prezidenta  se uskuteční
+                    </p>
+                    <p class="ps-4" style="text-align:left">
+                        <strong>v pátek 13.ledna 2024 od 14 do 22 hod</strong>
+                        <br />
+                        a
+                        <br />
+                        <strong>v sobotu 14. ledna 2023 od 8 do 14 hodin</strong>.
+                    </p>
+                    <hr class="dotted gray" style="width:100%" />
+                    <p>
+                        Následující druhé kolo prezidentských voleb je naplánováno na
+                    </p><p class="ps-4" style="text-align:left">
+                        <strong>pátek 27. a sobotu 28. ledna 2023</strong>
+                    </p><p>
+                        volební místnosti budou otevřeny stejně.
+                    </p>
+                </div>
+            </div>
 
-    <p>
-        Nejste rozhodnuti kterého z kandidátů zvolit? Můžete se podívat na jednotlivé osobnosti, které kandidují na post prezidenta republiky na webu <a href="https://kohonevolit.cz/Volby_Prezident/VolbyPrez23.html">KOHO (NE)VOLIT</a>.
-    </p>
+            <div class="watcher-block">
+                <div class="watcher__title">
+                    <i class="fa-duotone fa-square-question fa-2xl" style="font-size:2.5em;padding-right:16px;--fa-primary-color:orangered;"></i>
+                    <h2 class="new-title">
+                        Jak se volí?
+                    </h2>
+                </div>
+                <div class="block-col ">
+                    <p class="muted">
+                        V ČR obdrží voliči hlasovací lístky (každý kandidát na samostatném lístku) na adresu trvalého pobytu nejpozději 3 dny před dnem prvního kola voleb. V zahraničí obdrží voliči hlasovací lístky až ve volební místnosti.
+                        V případě druhého kola budou lístky k dispozici až ve volebních místnostech.
+                    </p>
+
+                    <p>
+                        <a class="btn btn-primary me-2" asp-page="@nameof(VlastniOkrsek)">Chci volit ve svém volebním okrsku</a>
+                        <a class="btn btn-primary me-2" asp-page="@nameof(JinyOkrsek)">Chci volit v jiném volebním okrsku</a>
+                        <a class="btn btn-primary" asp-page="@nameof(Zahranici)">Chci volit v zahraničí</a>
+                    </p>
+                </div>
+            </div>
 
 
-    <p>
-    Volbu prezidenta republiky upravuje Ústava ČR (čl. 54 a 61), zákon č. 275/2012 Sb. a prováděcí vyhláška č. 294/2012 Sb.. Prezident republiky je volen v přímých volbách podle zásad většinového systému na dobu 5 let a nemůže být zvolen více jak dvakrát za sebou. Volba provádí oprávnění voliči v ČR nebo na zastupitelských nebo konzulárních úřadech ČR v zahraničí.
-    </p>
+            <div class="watcher-block">
+                <div class="watcher__title">
+                    <i class="fa-duotone fa-people fa-2xl" style="font-size:2.5em;padding-right:16px;--fa-primary-color:orangered;"></i>
+                    <h2 class="new-title">
+                        Koho volit?
+                    </h2>
+                </div>
+                <div class="block-col ">
+                    <p class="muted text-start">
+                        Nejste rozhodnuti kterého z kandidátů zvolit? Můžete se podívat na jednotlivé osobnosti, které kandidují na post prezidenta republiky na webu <a href="https://kohonevolit.cz/Volby_Prezident/VolbyPrez23.html">KOHO (NE)VOLIT</a>.
+                    </p>
 
+                    <p class="text-center" style="width:100%">
+                        <a class="btn btn-secondary" href="https://kohonevolit.cz/Volby_Prezident/VolbyPrez23.html">KOHO (NE)VOLIT</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="watcher-block">
+                <div class="watcher__title">
+                    <i class="fa-duotone fa-scale-balanced" style="font-size:2.5em;padding-right:16px;--fa-primary-color:orangered;"></i>
+                    <h2 class="new-title">
+                        Legislativa
+                    </h2>
+                </div>
+                <div class="block-col ">
+                    <p class="muted text-start">
+                        Volbu prezidenta republiky upravuje Ústava ČR (čl. 54 a 61), zákon č. 275/2012 Sb. a prováděcí vyhláška č. 294/2012 Sb.. Prezident republiky je volen v přímých volbách podle zásad většinového systému na dobu 5 let a nemůže být zvolen více jak dvakrát za sebou. Volba provádí oprávnění voliči v ČR nebo na zastupitelských nebo konzulárních úřadech ČR v zahraničí.
+                    </p>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
 
 </div>

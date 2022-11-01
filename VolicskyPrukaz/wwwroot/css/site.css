@@ -1,69 +1,123 @@
-.logo strong {
-    font-weight: 700;
-    color: #266cae;
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* Provide sufficient contrast against white background */
+a {
+  color: #0366d6;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.border-top {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px; /* Vertically center the text there */
 }
 
 
-.table.bankovnivypis td.small {
-    font-size: 80%;
-    color: #777;
-    border-top-width: 0 !important;
-}
-
-.bookmark, .bookmark:active, .bookmark:visited, .bookmark:focus, .bookmark:hover { /* z glyphicon glyphicon-star */
-    position: relative;
-    top: 1px;
-    display: inline-block;
-    font-family: 'Glyphicons Halflings';
-    font-style: normal;
-    font-weight: 600;
-    line-height: 1;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-size: 120%;
+/* TOC */
+.nav-link {
+    font-size: 16px;
+    letter-spacing: .36px;
+    color: #0074e4;
     text-decoration: none;
+    text-transform: none;
+    margin: 0;
 }
-    .bookmark:hover {
-        filter: brightness(85%);
-    }
-    .bookmark.bookmarkOn {
-        color: #c9302c;
+
+.navbar-brand {
+    float: none;
+    padding: 0 45px 0 16px;
+    font-weight: 600;
+    line-height: 44px;
+}
+
+    .navbar-brand svg {
+        margin-right: 10px;
+        vertical-align: bottom;
     }
 
-        .bookmark.bookmarkOn:before {
-            content: "\e044";
+.navbar-dark .navbar-nav.level2 .nav-link {
+    color: #0a58ca;
+    padding: 2px 12px;
+}
+
+nav[data-toggle="toc"] {
+    top: 42px;
+}
+
+/* small screens */
+@media (max-width: 768px) {
+    /* override stickyness so that the navigation does not follow scrolling */
+    nav[data-toggle="toc"] {
+        margin-bottom: 42px;
+        position: static;
+    }
+
+        /* PICK ONE */
+        /* don't expand nested items, which pushes down the rest of the page when navigating */
+        nav[data-toggle="toc"] .nav .active .nav {
+            display: none;
         }
-
-    .bookmark.bookmarkOff {
-        color: #96C0E5;
-    }
-
-        .bookmark.bookmarkOff:before {
-            content: "\e044";
-        }
-
-.btn-mojeid {
-    background-image: url("images/mojeid.svg");
-    background-repeat: no-repeat;
-    background-size: 1.5em;
-    background-position: 0.5em center;
-    margin-left: 15px;
-    padding: 0.25em 0.5em 0.25em 2.5em;
-    border-radius: 4px;
-    border: 0;
-    background-color: #4c4d4e;
-    color: #fff;
-    transition: 0.3s;
-    font-size: 1em;
 }
-
-.btn-mojeid:hover {
-    color: #fff;
-    background-color: #575858;
-    box-shadow: 0 2px 12px rgba(0, 116, 228, 0.32);
+/* alternatively, if you *do* want the second-level navigation to be shown (as seen on this page on mobile), use this */
+/*
+nav[data-toggle='toc'] .nav .nav {
+  display: block;
 }
-
-.btn-mojeid:focus {
-    color: #fff;
-    background-color: #575858;
-}
+*/

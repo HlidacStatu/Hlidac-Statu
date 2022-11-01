@@ -41,19 +41,23 @@
     <meta name="twitter:description" content="Nemůžete volit v místě svého bydliště? Požádejte si o voličský průkaz hned teď. Stačí Vám adresa a datum narození."/>
     <meta name="twitter:image" content="https://volby.hlidacstatu.cz/assets/images/sharing-banner-2021.jpg"/>
 
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&amp;subset=latin-ext" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/css/bootstrap.min.css">
+    <script src="~/js/bootstrap.bundle.min.js"></script>
+
+    <link href="~/css/GlobalSite.v1.15.css" rel="stylesheet">
+    <link href="~/css/social-share-kit.css" rel="stylesheet">
+    <link href="~/css/new.v1.14.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+
+
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&amp;subset=latin-ext" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Cabin:400,400i,600,700&amp;subset=latin-ext" rel="stylesheet" />
 
     <script src="https://kit.fontawesome.com/a0fc082c81.js" crossorigin="anonymous"></script>
-    
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link href="~/css/globalsite.css" rel="stylesheet">
-    <link href="~/css/social-share-kit.css" rel="stylesheet">
-    <link href="~/css/hlidac.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/VolicskyPrukaz.styles.css" asp-append-version="true"/>
+@*    <link rel="stylesheet" href="~/VolicskyPrukaz.styles.css" asp-append-version="true"/>*@
 </head>
 <body class="new-body">
 <div class="header__navbar">
@@ -125,10 +129,7 @@
     </div>
     <div class="header__title">
         <h1>Volba prezidenta republiky 2023</h1>
-        <p>
-            <span>Volba prezidenta republiky 2023 se uskuteční <strong>13. a 14. ledna 2023</strong>.</span>
-            <span>Následující druhé kolo prezidentských voleb je naplánováno na <strong>27. a 28. ledna 2023</strong>.</span>
-        </p>
+        <p style="margin:30px">&nbsp;</p>
         @* <p> *@
         @*     <span>Nejste rozhodnuti koho volit? Můžete si nastudovat <a class="link" href="https://programydovoleb.cz/" title="Volebni programy" target="_blank">volební programy stran a kandidátů</a>.</span> *@
         @*     <!-- <span>Nejste rozhodnuti koho volit? Můžete vyzkoušet <a class="link" href="https://volebnikalkulacka.cz/" title="Volební kalkulačka" target="_blank">Volební kalkulačku</a> nebo si nastudovat <a class="link" href="https://programydovoleb.cz/" title="Volebni programy" target="_blank">volební programy stran a kandidátů</a>.</span> --> *@
@@ -137,41 +138,14 @@
     <!-- desktop menu items only -->
     <partial name="_Navbar"/>
 </div>
-<div class="body container">
+<div class="container" style="padding-top:40px">
     @RenderBody()
 </div>
 
-<footer>
-    <div class="container">
-        <ul class="list-inline">
-            <li>
-                <a href="https://www.hlidacstatu.cz/texty/vize">Vize Hlídače Státu</a>
-            </li>
-            <li>
-                <a href="https://www.hlidacstatu.cz/texty/O-Registru">O registru smluv</a>
-            </li>
-            <li>
-                <a href="https://www.hlidacstatu.cz/texty/kontakt">Kontakt</a>
-            </li>
-            <li>
-                <a href="https://www.darujme.cz/projekt/1200384" onclick="return trackOutLink(this,'footer');">
-                    <span style="color:red;">Finanční podpora</span>
-                </a>
-            </li>
-            <li>
-                <a href="https://www.HlidacStatu.cz/api">API a opendata pro vývojáře</a>
-            </li>
-        </ul>
-        <p>
-            &copy; Hlídač Státu z.ú. ve spolupráci a s pomocí <a href="https://cesko.digital">Česko.Digital</a>♥️.
-            Převzetí údajů a použití dat možné pod <a href="https://www.hlidacstatu.cz/texty/licence">licencí CC BY 3.0</a> anebo po vzájemné <a href="https://www.hlidacstatu.cz/texty/kontakt/">písemné dohodě</a>.
-            <a href="https://www.HlidacStatu.cz/texty/provoznipodminky">Podmínky užívání</a>
-        </p>
-    </div>
-</footer>
+    <partial name="_Footer" />
 
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/jquery-1.11.3.min.js"></script>
+<script src="~/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 <script src="~/js/html2pdf.bundle.min.js"></script>
 <script src="~/js/mojeid_connect.2.0.0.js" id="mojeid-connect-script" data-jsrsasign="assets/jsrsasign-all-min.js"></script>
