@@ -1,12 +1,11 @@
 using HlidacStatu.LibCore;
-using HlidacStatu.LibCore.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using VolicskyPrukaz.Services;
 using Polly;
 using VolicskyPrukaz;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Host.ConfigureHostForWeb(args);
+//builder.Host.ConfigureHostForWeb(args); --cant use here since it doesnt need keys from hs
 
 //Register hlidac
 Devmasters.Config.Init(builder.Configuration);
@@ -48,8 +47,8 @@ app.MapGet("/findAddress/{query}", async (string query,
         CancellationToken ctx) =>
 {
         var autocompleteHost = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint");
-        var autocompletePath = $"/autocomplete/Adresy?q={query}";
-        var uri = new Uri($"{autocompleteHost}{autocompletePath}");
+        var autocompleteQuery = $"?q={query}";
+        var uri = new Uri($"{autocompleteHost}{autocompleteQuery}");
         using var client = httpClientFactory.CreateClient(Constants.DefaultHttpClient);
 
         try
