@@ -6,6 +6,7 @@ using Nest;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -81,23 +82,17 @@ namespace HlidacStatu.Repositories
             {
                 var elasticClient = await Manager.GetESClient_VZAsync();
 
-                List<Task<VerejnaZakazka>> loadOriginalTasks = new()
-                {
-                    LoadFromESAsync(newVZ.Id, elasticClient)
-                };
-                
-                string alternativeId =
-                    VerejnaZakazka.GenerateId(newVZ.Zadavatel.ProfilZadavatele, newVZ.EvidencniCisloZakazky);
-                if (alternativeId != newVZ.Id)
-                {
-                    loadOriginalTasks.Add(LoadFromESAsync(alternativeId, elasticClient));
-                }
-                
-                var origs = await Task.WhenAll(loadOriginalTasks);
-                 
-                // If we find more documents, then we do not know original and should throw error
-                var originalVZ = origs.Where(r => r != null).SingleOrDefault();
+                var originalVZ = await FindOriginalDocumentFromESAsync(newVZ);
 
+                if (originalVZ is null)
+                {
+                    var line =
+                        $"{newVZ.Dataset}\t{newVZ.EvidencniCisloZakazky}\t{newVZ.Zadavatel.ICO}\t{newVZ.DatumUverejneni}\t{newVZ.NazevZakazky}\t{newVZ.UrlZakazky}";
+                    await File.AppendAllLinesAsync(@"d:\missingVzHs.tsv", new[] { line });
+                }
+
+return;
+                
                 if (originalVZ is null)
                 {
                     SetForOcr(newVZ);
@@ -111,6 +106,7 @@ namespace HlidacStatu.Repositories
                     && newVZ.EvidencniCisloZakazky == originalVZ.EvidencniCisloZakazky) // to make sure both VZ are the same
                 {
                     newVZ.Dataset = originalVZ.Dataset;
+                    newVZ.EvidencniCisloZakazky = originalVZ.EvidencniCisloZakazky;
                     newVZ.InitId(); //fix id
 
                 }
@@ -122,12 +118,10 @@ namespace HlidacStatu.Repositories
                 newVZ.DatumUzavreniSmlouvy ??= originalVZ.DatumUzavreniSmlouvy;
                 newVZ.LhutaDoruceni ??= originalVZ.LhutaDoruceni;
                 newVZ.LhutaPrihlaseni ??= originalVZ.LhutaPrihlaseni;
-                
                 newVZ.NazevZakazky = newVZ.NazevZakazky.SetEmptyString(originalVZ.NazevZakazky);
                 newVZ.PopisZakazky = newVZ.PopisZakazky.SetEmptyString(originalVZ.PopisZakazky);
                 newVZ.RawHtml = newVZ.RawHtml.SetEmptyString(originalVZ.RawHtml);
                 newVZ.UrlZakazky = newVZ.UrlZakazky.SetEmptyString(originalVZ.UrlZakazky);
-                newVZ.EvidencniCisloZakazky = newVZ.EvidencniCisloZakazky.SetEmptyString(originalVZ.EvidencniCisloZakazky);
                 newVZ.KonecnaHodnotaMena = newVZ.KonecnaHodnotaMena.SetEmptyString(originalVZ.KonecnaHodnotaMena);
                 newVZ.OdhadovanaHodnotaMena = newVZ.OdhadovanaHodnotaMena.SetEmptyString(originalVZ.OdhadovanaHodnotaMena);
                 newVZ.ZakazkaNaProfiluId = newVZ.ZakazkaNaProfiluId.SetEmptyString(originalVZ.ZakazkaNaProfiluId);
@@ -294,6 +288,66 @@ namespace HlidacStatu.Repositories
                 return res.Source;
             else
                 return null;
+        }
+        
+        public static async Task<VerejnaZakazka> FindOriginalDocumentFromESAsync(VerejnaZakazka zakazka)
+        {
+            string[] hardDatasets = new[] {"tenderarena", "nen.nipez", "gemin.cz" };
+            var es = await Manager.GetESClient_VZAsync();
+
+            // je potřeba zjistit o jaký dataset konkrétně se jedná, abychom mohli najít správný originál
+            string hardDatasetFragment = hardDatasets.FirstOrDefault(hd =>
+                zakazka.Dataset.Contains(hd, StringComparison.InvariantCultureIgnoreCase)); 
+            
+            if (!string.IsNullOrEmpty(hardDatasetFragment))
+            {
+                int? year = zakazka.DatumUverejneni?.Year
+                            ?? zakazka.LhutaDoruceni?.Year
+                            ?? zakazka.LhutaPrihlaseni?.Year
+                            ?? zakazka.Dokumenty.FirstOrDefault(d => d.VlozenoNaProfil != null)?.VlozenoNaProfil?.Year;
+
+                if (year is null)
+                    return null;
+                
+                var res = await es.SearchAsync<VerejnaZakazka>(s => s
+                    .Query(q => q
+                        .Bool(b => b
+                            .Must(bm =>
+                                bm.Term(t => t.Field(f => f.Zadavatel.ICO).Value(zakazka.Zadavatel.ICO)) &&
+                                bm.Term(t => t.Field(f => f.EvidencniCisloZakazky).Value(zakazka.EvidencniCisloZakazky)))
+                            .Filter(bf => bf
+                                .DateRange(r => r
+                                    .Field(f => f.DatumUverejneni)
+                                    .GreaterThanOrEquals(new DateTime(year.Value, 1, 1))
+                                    .LessThanOrEquals(new DateTime(year.Value, 12, 31)))))));
+            
+                if (res.IsValid && res.Hits.Count() > 0 )
+                    return res.Documents.SingleOrDefault(d => d.Dataset.Contains(hardDatasetFragment));
+                else
+                    return null;
+            }
+            
+                
+            var loadOriginalTasks = new List<Task<GetResponse<VerejnaZakazka>>>()
+            {
+                es.GetAsync<VerejnaZakazka>(zakazka.Id)
+            };
+
+            if (!string.IsNullOrEmpty(zakazka.Zadavatel.ProfilZadavatele) &&
+                !string.IsNullOrEmpty(zakazka.EvidencniCisloZakazky))
+            {
+                string alternativeId =
+                    VerejnaZakazka.GenerateId(zakazka.Zadavatel.ProfilZadavatele, zakazka.EvidencniCisloZakazky);
+                if (alternativeId != zakazka.Id)
+                {
+                    loadOriginalTasks.Add(es.GetAsync<VerejnaZakazka>(alternativeId));
+                }
+            }
+
+            var origs = await Task.WhenAll(loadOriginalTasks);
+                 
+            // If we find more documents, then we do not know original and should throw error
+            return origs.Where(r => r != null && r.IsValid).SingleOrDefault()?.Source;
         }
 
         public static Task<bool> ExistsAsync(VerejnaZakazka vz, ElasticClient client = null)
