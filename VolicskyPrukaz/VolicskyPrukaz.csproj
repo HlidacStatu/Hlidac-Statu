@@ -22,12 +22,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="adresy.acf">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
-    <ItemGroup>
       <Content Update="appsettings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
