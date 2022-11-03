@@ -83,12 +83,12 @@ public class PdfGenerator
                     {
                         text.Line(NadpisPrvniRadek).Bold().FontSize(26).LineHeight(0.8f);
                         text.Line(NadpisDruhyRadek).SemiBold().FontSize(20).LineHeight(0.9f);
-                        text.Line(nadpisTretiRadek).SemiBold().FontSize(20).LineHeight(1.0f);
+                        text.Line(nadpisTretiRadek).SemiBold().FontSize(20).LineHeight(0.9f);
                     });
 
                 // Tělo
                 page.Content()
-                    .PaddingVertical(1, Unit.Centimetre)
+                    .PaddingVertical(0.3f, Unit.Centimetre)
                     .Column(x =>
                     {
                         x.Spacing(20);
@@ -132,7 +132,7 @@ public class PdfGenerator
                             }
                         });
                         
-                        x.Item().PaddingTop(100).Row(row =>
+                        x.Item().PaddingTop(50).Row(row =>
                         {
                             row.RelativeItem();
                             row.RelativeItem();
