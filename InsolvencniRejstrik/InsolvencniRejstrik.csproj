@@ -46,10 +46,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Devmasters.Core">
-      <Version>4.1.0</Version>
+      <Version>4.1.1</Version>
     </PackageReference>
     <PackageReference Include="Devmasters.Net">
-      <Version>4.1.0</Version>
+      <Version>4.2.1</Version>
     </PackageReference>
     <PackageReference Include="EntityFramework">
       <Version>6.4.4</Version>

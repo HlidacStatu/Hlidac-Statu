@@ -85,7 +85,8 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 var httpreq = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, url);
                 httpreq.Headers.Add("Authorization", apiKey);
                 var res = await Devmasters.Net.HttpClient.Simple.SendAsync<ApiResult<CamelotResult>>(
-                    httpreq, timeout: TimeSpan.FromMinutes(5));
+                    Devmasters.Net.HttpClient.Simple.SharedClient(TimeSpan.FromMinutes(5)),
+                    httpreq );
 
                 return res;
 

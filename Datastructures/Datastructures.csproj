@@ -8,8 +8,8 @@
 
     <ItemGroup>
       <PackageReference Include="DeepCloner" Version="0.10.4" />
-      <PackageReference Include="Devmasters.DT" Version="4.0.4" />
-      <PackageReference Include="Devmasters.Enums" Version="4.0.1" />
+      <PackageReference Include="Devmasters.DT" Version="4.0.5" />
+      <PackageReference Include="Devmasters.Enums" Version="4.0.2" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     </ItemGroup>
 

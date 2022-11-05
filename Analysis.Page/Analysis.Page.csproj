@@ -18,11 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Devmasters.Core" Version="4.1.0" />
-    <PackageReference Include="Devmasters.Imaging" Version="4.0.1" />
-    <PackageReference Include="Devmasters.IO" Version="4.1.1" />
-    <PackageReference Include="Devmasters.Logging" Version="4.0.1" />
-    <PackageReference Include="itext7" Version="7.2.3" />
+    <PackageReference Include="Devmasters.Core" Version="4.1.1" />
+    <PackageReference Include="Devmasters.Imaging" Version="4.0.2" />
+    <PackageReference Include="Devmasters.IO" Version="4.1.2" />
+    <PackageReference Include="Devmasters.Logging" Version="4.0.2" />
+    <PackageReference Include="itext7" Version="7.2.4" />
     <PackageReference Include="OpenCvSharp4" Version="4.6.0.20220608" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.6.0.20220608" />
     <PackageReference Include="OpenCvSharp4.runtime.linux-arm" Version="4.6.0.20220608" />

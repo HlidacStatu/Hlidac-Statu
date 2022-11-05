@@ -8,17 +8,17 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Batch" Version="4.0.1" />
+    <PackageReference Include="Devmasters.Batch" Version="4.0.3" />
     <PackageReference Include="Devmasters.Collections" Version="4.1.6" />
-    <PackageReference Include="Devmasters.Core" Version="4.1.0" />
-    <PackageReference Include="Devmasters.DT" Version="4.0.4" />
-    <PackageReference Include="Devmasters.Lang" Version="4.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.8" />
+    <PackageReference Include="Devmasters.Core" Version="4.1.1" />
+    <PackageReference Include="Devmasters.DT" Version="4.0.5" />
+    <PackageReference Include="Devmasters.Lang" Version="4.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.10" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.336902">
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.346202">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
