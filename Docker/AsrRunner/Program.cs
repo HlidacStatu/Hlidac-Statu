@@ -42,11 +42,11 @@ AppDomain.CurrentDomain.ProcessExit += (_, _) =>
 logger.Debug("Setting up services");
 using var taskQueueService = new TaskQueueService(logger);
 
-using var ftpClient = new FtpClient(Global.FtpAddress, Global.FtpPort, Global.FtpUserName, Global.FtpPassword);
-ftpClient.RetryAttempts = 5;
-ftpClient.NoopInterval = 30_000;
-ftpClient.EncryptionMode = FtpEncryptionMode.Implicit;
-ftpClient.ValidateAnyCertificate = true;
+using var ftpClient = new FtpClient(Global.FtpAddress,  Global.FtpUserName, Global.FtpPassword, Global.FtpPort);
+ftpClient.Config.RetryAttempts= 5;
+ftpClient.Config.NoopInterval = 30_000;
+ftpClient.Config.EncryptionMode = FtpEncryptionMode.Implicit;
+ftpClient.Config.ValidateAnyCertificate = true;
 
 // Application loop
 logger.Debug("Running main code");
@@ -83,8 +83,8 @@ while (!applicationCts.IsCancellationRequested)
     try
     {
         logger.Debug("Checking ftp if task [{fileName}] was completed before.", outputFileFtp);
-        await ftpClient.ConnectAsync(applicationCts.Token);
-        if (await ftpClient.FileExistsAsync(outputFileFtp))
+        ftpClient.Connect();
+        if (ftpClient.FileExists(outputFileFtp))
         {
             logger.Information("This task [{fileName}] was already completed before.", outputFileFtp);
             await taskQueueService.ReportSuccessAsync(applicationCts.Token);
@@ -92,8 +92,8 @@ while (!applicationCts.IsCancellationRequested)
         }
 
         logger.Debug("Downloading [{fileName}] file from ftp", inputFileFtp);
-        await ftpClient.DownloadFileAsync(inputFileLocal, inputFileFtp);
-        await ftpClient.DisconnectAsync(applicationCts.Token);
+        ftpClient.DownloadFile(inputFileLocal, inputFileFtp);
+        ftpClient.Disconnect();
         logger.Debug("File downloaded.");
 
         // run ASR
@@ -104,13 +104,13 @@ while (!applicationCts.IsCancellationRequested)
         }
 
         logger.Debug("Uploading [{fileName}] file to ftp", outputFileLocal);
-        await ftpClient.ConnectAsync(applicationCts.Token);
-        await ftpClient.UploadFileAsync(outputFileLocal, outputFileFtp);
+        ftpClient.Connect();
+        ftpClient.UploadFile(outputFileLocal, outputFileFtp);
 
         logger.Debug("File [{fileName}] uploaded to ftp", outputFileLocal);
         long fileSize = (new FileInfo(outputFileLocal)).Length;
-        long uploadedFileSize = await ftpClient.GetFileSizeAsync(outputFileFtp);
-        await ftpClient.DisconnectAsync(applicationCts.Token);
+        long uploadedFileSize = ftpClient.GetFileSize(outputFileFtp);
+        ftpClient.Disconnect();
         
         if (fileSize == uploadedFileSize)
         {
