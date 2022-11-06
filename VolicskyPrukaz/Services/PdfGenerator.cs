@@ -103,29 +103,29 @@ public class PdfGenerator
                         x.Item().Text(text =>
                         {
                             text.Span(HlavniTextCastPrvni);
-                            text.Span($"{zadost.UradNazev}, {zadost.AdresaUradu}").Weight(FontWeight.SemiBold);
+                            text.Span($"{zadost.UradNazev}, {zadost.AdresaUradu}").SemiBold();
                             text.Span(hlavniTextCastDruha);
                         });
 
                         x.Item().Text(text =>
                         {
-                            text.Span("Jméno a příjmení žadatele (voliče): ").Weight(FontWeight.SemiBold);
+                            text.Span("Jméno a příjmení žadatele (voliče): ").SemiBold();
                             text.Line(zadost.JmenoZadatele);
 
-                            text.Span("Datum narození: ").Weight(FontWeight.SemiBold);
+                            text.Span("Datum narození: ").SemiBold();
                             text.Line(zadost.DatumNarozeniZadatele);
 
-                            text.Span("Trvalý pobyt: ").Weight(FontWeight.SemiBold);
+                            text.Span("Trvalý pobyt: ").SemiBold();
                             text.Line(zadost.AdresaZadatele);
 
-                            text.Span("Telefonní číslo: ").Weight(FontWeight.SemiBold);
+                            text.Span("Telefonní číslo: ").SemiBold();
                             text.Line(zadost.TelefonZadatele);
                         });
 
 
                         x.Item().Text(text =>
                         {
-                            text.Line($"K tomu sděluji, že voličský průkaz {zadost.Prevzeti}").Weight(FontWeight.SemiBold);
+                            text.Line($"K tomu sděluji, že voličský průkaz {zadost.Prevzeti}").SemiBold();
                             if (zadost.Prevzeti == "žádám zaslat na jinou adresu: ")
                             {
                                 text.Span(zadost.PrevzetiAdresa);

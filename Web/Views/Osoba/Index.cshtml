@@ -34,7 +34,7 @@
 @* První sloupec *@
 <div class="col-sm-7 col-xs-12 order-1">
     @{
-        intv = laps.AddAndStartLap("RegistrSmluv");
+        laps.AddAndStartLap("funkce");
     }
     @{
         int[] types = {
@@ -78,6 +78,7 @@
         <hr />
     }
     @{
+        laps.AddAndStartLap("sponzoring");
         var sponzorOsobaNum = Model.Sponzoring().Count();
         var sponzorOsoba = Model.SponzoringToHtml(
                (sponzorOsobaNum <= listingNum + 1 ? listingNum + 1 : listingNum),
@@ -110,6 +111,9 @@
         </div>
         <hr />
     }
+    @{
+        laps.AddAndStartLap("registr smluv");
+    }
     @if (statistics.SoukromeFirmySummary().Summary().PocetSmluv + statistics.NeziskovkySummary().Summary().PocetSmluv > 0)
     {
         <div>
@@ -127,6 +131,9 @@
             </a>
         </div>
         <hr />
+    }
+    @{
+        laps.AddAndStartLap("angazovanost");
     }
     @if (statistics.SoukromeFirmy.Count > 0 || statistics.StatniFirmy.Count > 0)
     {
@@ -221,6 +228,9 @@
     }
     
     @*dotace*@
+    @{
+        laps.AddAndStartLap("dotace");
+    }
 
     @{
         //var dotaceStat = Model.
@@ -276,6 +286,10 @@
 
 
     @* ----- Insolvence -----*@
+    @*dotace*@
+    @{
+        laps.AddAndStartLap("insolvence");
+    }
     @{
         var oinsDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("dluznici.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
         var oinsVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("veritele.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
@@ -355,6 +369,9 @@
 
     @* ----- Veřejné zakázky -----*@
     @{
+        laps.AddAndStartLap("verejne zakazky");
+    }
+    @{
         var resVZdodav = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaiddodavatel:" + Model.NameId, null, 1, 0, "1");
         var resVZzadav = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaidzadavatel:" + Model.NameId, null, 1, 0, "1");
         Dictionary<string, long> vzakaz = new();
@@ -393,6 +410,10 @@
 
         </div>
         <hr />
+    }
+
+        @{
+        laps.AddAndStartLap("datasety");
     }
 
     @{
@@ -444,6 +465,9 @@
         <hr />
     }
 
+    @{
+        laps.StopAll();
+    }
 
     <!--
         

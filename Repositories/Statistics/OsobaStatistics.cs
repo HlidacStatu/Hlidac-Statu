@@ -16,7 +16,7 @@ namespace HlidacStatu.Repositories.Statistics
                 = Devmasters.Cache.Couchbase.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
                     .GetSafeInstance("Osoba_SmlouvyStatistics_v1_",
                         (obj) => Calculate(obj.os, (Relation.AktualnostType)obj.aktualnost, obj.obor),
-                        TimeSpan.FromHours(12),
+                        TimeSpan.FromHours(18),
                         Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
                         Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
                         Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
