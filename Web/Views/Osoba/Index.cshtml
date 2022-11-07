@@ -124,7 +124,7 @@
                 Detailní informace o smlouvách uzavřených firmami, ve kterých se angažuje či angažoval @Model.FullName().
             </p>
             <p>
-                @Html.Raw((await Model.InfoFactsAsync()).Where(m => m.Level == HlidacStatu.Util.InfoFact.ImportanceLevel.Stat).FirstOrDefault()?.Render(true) ?? (await Model.InfoFactsAsync()).First().Render(true))
+                @Html.Raw((await Model.InfoFactsCachedAsync()).Where(m => m.Level == HlidacStatu.Util.InfoFact.ImportanceLevel.Stat).FirstOrDefault()?.Render(true) ?? (await Model.InfoFactsCachedAsync()).First().Render(true))
             </p>
             <a asp-action="RegistrSmluv" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
                 <strong>Zobrazit podrobnosti</strong>

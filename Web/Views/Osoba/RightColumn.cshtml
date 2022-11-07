@@ -76,7 +76,7 @@
                     var linkUrl = $"{ViewContext.GetBaseUrl()}/osoba/{Model.NameId}";
                 }
                 <share-facebook url="@linkUrl"></share-facebook>
-                <share-twitter url="@linkUrl" text="@($"{Model.FullName()} na @HlidacStatu - {(await Model.InfoFactsAsync()).First().Render(false)}")"></share-twitter>
+                <share-twitter url="@linkUrl" text="@($"{Model.FullName()} na @HlidacStatu - {(await Model.InfoFactsCachedAsync()).First().Render(false)}")"></share-twitter>
                 <share-widget url="@linkUrl"></share-widget>
             </div>
         </div>
