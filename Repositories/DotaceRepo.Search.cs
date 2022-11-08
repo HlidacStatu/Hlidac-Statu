@@ -8,6 +8,7 @@ using HlidacStatu.Repositories.Searching.Rules;
 using Nest;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
@@ -66,7 +67,7 @@ namespace HlidacStatu.Repositories
 
             public static Task<DotaceSearchResult> SimpleSearchAsync(string query, int page, int pagesize, string order,
                 bool withHighlighting = false,
-                AggregationContainerDescriptor<Dotace> anyAggregation = null, bool exactNumOfResults = false)
+                AggregationContainerDescriptor<Dotace> anyAggregation = null, bool exactNumOfResults = false, CancellationToken cancellationToken = default)
                 => SimpleSearchAsync(new DotaceSearchResult()
                 {
                     Q = query,
@@ -78,7 +79,7 @@ namespace HlidacStatu.Repositories
 
             public static async Task<DotaceSearchResult> SimpleSearchAsync(DotaceSearchResult search,
                 bool withHighlighting = false,
-                AggregationContainerDescriptor<Dotace> anyAggregation = null)
+                AggregationContainerDescriptor<Dotace> anyAggregation = null, CancellationToken cancellationToken = default)
             {
                 var page = search.Page - 1 < 0 ? 0 : search.Page - 1;
 
@@ -102,6 +103,7 @@ namespace HlidacStatu.Repositories
                             .TrackTotalHits((search.ExactNumOfResults || page * search.PageSize == 0)
                                 ? true
                                 : (bool?)null)
+                            ,cancellationToken
                         );
                     if (res.IsValid && withHighlighting &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
@@ -116,12 +118,15 @@ namespace HlidacStatu.Repositories
                                 .Aggregations(aggr => anyAggregation)
                                 .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                     ? true
-                                    : (bool?)null)
+                                    : (bool?)null), cancellationToken
                             );
                     }
                 }
                 catch (Exception e)
                 {
+                    if (e.Message == "A task was canceled.")
+                        throw;
+                    
                     AuditRepo.Add(Audit.Operations.Search, "", "", "Dotace", "error", search.Q, null);
                     if (res != null && res.ServerError != null)
                     {
