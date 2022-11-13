@@ -8,6 +8,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
@@ -284,7 +285,7 @@ namespace HlidacStatu.Repositories
 
             public static Task<VerejnaZakazkaSearchData> SimpleSearchAsync(string query, string[] cpv,
                 int page, int pageSize, string order, bool Zahajeny = false, bool withHighlighting = false,
-                bool exactNumOfResults = false, string oblast = "")
+                bool exactNumOfResults = false, string oblast = "", CancellationToken cancellationToken = default)
                 =>  SimpleSearchAsync(
                         new VerejnaZakazkaSearchData()
                         {
@@ -298,13 +299,14 @@ namespace HlidacStatu.Repositories
                             Oblast = oblast,
                             ExactNumOfResults = exactNumOfResults
                         }, withHighlighting: withHighlighting
+                        ,cancellationToken: cancellationToken
                     );
 
             public static async Task<VerejnaZakazkaSearchData> SimpleSearchAsync(
                 VerejnaZakazkaSearchData search,
                 AggregationContainerDescriptor<VerejnaZakazka> anyAggregation = null,
                 bool logError = true, bool fixQuery = true, ElasticClient client = null,
-                bool withHighlighting = false)
+                bool withHighlighting = false, CancellationToken cancellationToken = default)
             {
                 if (client == null)
                     client = await Manager.GetESClient_VZAsync();
@@ -348,7 +350,8 @@ namespace HlidacStatu.Repositories
                             .Highlight(h => Tools.GetHighlight<VerejnaZakazka>(withHighlighting))
                             .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                 ? true
-                                : (bool?)null)
+                                : (bool?)null),
+                            cancellationToken
                         );
                     if (withHighlighting && res.Shards != null &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
@@ -364,12 +367,16 @@ namespace HlidacStatu.Repositories
                                 .Highlight(h => Tools.GetHighlight<VerejnaZakazka>(false))
                                 .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                     ? true
-                                    : (bool?)null)
+                                    : (bool?)null),
+                                cancellationToken
                             );
                     }
                 }
                 catch (Exception e)
                 {
+                    if (e.Message == "A task was canceled.")
+                        throw;
+                    
                     AuditRepo.Add(Audit.Operations.Search, "", "", "VerejnaZakazka", "error", search.Q, null);
                     if (res != null && res.ServerError != null)
                         Manager.LogQueryError<VerejnaZakazka>(res, "Exception, Orig query:"

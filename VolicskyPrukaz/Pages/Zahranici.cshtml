@@ -1,5 +1,9 @@
 @page
 @model VolicskyPrukaz.Pages.Zahranici
+@section breadcrumb
+{
+    <li class="breadcrumb-item active" aria-current="page">Chci volit v zahraničí</li>
+}
 
 <h2>V zahraničí</h2>
 <p>
@@ -21,10 +25,6 @@ Termíny voleb na zastupitelských úřadech jsou následující:<br/>
 <p>
     O voličský průkaz je potřeba zažádat u zastupitelského úřadu, v jehož územním obvodě má volič bydliště. <a asp-page="@nameof(JinyOkrsek)">Postup, termíny a lhůty podání žádosti o voličský průkaz jsou shodné pro zahraničí i ČR.</a> 
 </p>
-
-
-
-    
 
     
 <a class="btn btn-primary" asp-page="GenerovatZadost">Chci vygenerovat žádost o voličský průkaz</a>

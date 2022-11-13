@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Devmasters;
@@ -12,6 +13,7 @@ using HlidacStatu.Datastructures.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories;
+using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Statistics;
 using HlidacStatu.Util;
 
@@ -23,12 +25,36 @@ namespace HlidacStatu.Extensions
 
         public static async Task<bool> MaVztahySeStatemAsync(this Osoba osoba)
         {
-            //todo: jde zlepšit tak, že zavoláme všechny dotazy naráz a pokud jeden z nich něco najde,
-            // tak nastavíme cancellation token
-            return osoba.IsSponzor()
-               || (await SmlouvaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, 0)).Total > 0
-               || (await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, null, 1, 1, "0")).Total > 0
-               || (await DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, "0")).Total > 0;
+            if (osoba.IsSponzor())
+                return true;
+            
+            var cts = new CancellationTokenSource();
+
+            List<Task<Search.ISearchResult>> tasks = new()
+            {
+                Helper.GeneralizeTask<Search.ISearchResult, SmlouvaSearchResult>(
+                    SmlouvaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, 0, cancellationToken: cts.Token)),
+                Helper.GeneralizeTask<Search.ISearchResult, VerejnaZakazkaSearchData>(
+                    VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, null, 1, 1, "0", cancellationToken: cts.Token)),
+                Helper.GeneralizeTask<Search.ISearchResult, DotaceSearchResult>(
+                    DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, "0", cancellationToken: cts.Token)),
+            };
+
+            
+            while (tasks.Any())
+            {
+                var completedTask = await Task.WhenAny(tasks);
+                tasks.Remove(completedTask);
+                Search.ISearchResult result = await completedTask;
+                if (result.Total > 0)
+                {
+                    cts.Cancel();
+                    return true;
+                }
+            }
+
+            return false;
+            
         }
 
         public static bool IsPolitikBasedOnEvents(this Osoba osoba)

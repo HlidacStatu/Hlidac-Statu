@@ -8,7 +8,7 @@ using System.Linq;
 namespace HlidacStatu.Repositories.Searching
 {
     public class SmlouvaSearchResult
-        : SearchDataResult<Smlouva>
+        : SearchDataResult<Smlouva>, Search.ISearchResult
     {
 
         public bool Chyby { get; set; } = false;

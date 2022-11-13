@@ -138,7 +138,14 @@
     <!-- desktop menu items only -->
     <partial name="_Navbar"/>
 </div>
-<div class="container" style="padding-top:40px">
+<div class="container">
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+      <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Volby</a></li>
+          @await RenderSectionAsync("breadcrumb", required: false)
+      </ol>
+    </nav>
+
     @RenderBody()
 </div>
 

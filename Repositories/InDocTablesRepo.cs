@@ -60,7 +60,7 @@ namespace HlidacStatu.Repositories
                     .AsQueryable()
                     .Where(m => m.Status == (int)InDocTables.CheckState.WaitingInQueue
                         && m.Klasifikace.StartsWith(obor))
-                    //.Where(m => m.Year == 2018) // tohle pak smazat, až doděláme demodata
+                    .Where(m => m.Year == 2022) // 2022 priorita, později můžeme smazat
                     .OrderByDescending(m => m.PrecalculatedScore)
                     .FirstOrDefaultAsync(cancellationToken);
 

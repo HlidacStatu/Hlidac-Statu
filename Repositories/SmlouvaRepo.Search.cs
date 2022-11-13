@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
@@ -128,7 +129,7 @@ namespace HlidacStatu.Repositories
             public static async Task<SmlouvaSearchResult> SearchRawAsync(QueryContainer query, int page, int pageSize, OrderResult order,
                 AggregationContainerDescriptor<Smlouva> anyAggregation = null,
                 bool? platnyZaznam = null, bool includeNeplatne = false, bool logError = true, bool fixQuery = true,
-                bool withHighlighting = false)
+                bool withHighlighting = false, CancellationToken cancellationToken = default)
             {
 
                 var result = new SmlouvaSearchResult()
@@ -141,7 +142,7 @@ namespace HlidacStatu.Repositories
                 };
 
                 ISearchResponse<Smlouva> res = await _coreSearchAsync(query, page, pageSize, order, anyAggregation, platnyZaznam,
-                    includeNeplatne, logError, withHighlighting);
+                    includeNeplatne, logError, withHighlighting, cancellationToken: cancellationToken);
 
 
                 if (res.IsValid == false && logError)
@@ -174,7 +175,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
             public static async Task<SmlouvaSearchResult> SimpleSearchAsync(string query, int page, int pageSize, OrderResult order,
         AggregationContainerDescriptor<Smlouva> anyAggregation = null,
         bool? platnyZaznam = null, bool includeNeplatne = false, bool logError = true, bool fixQuery = true,
-        bool withHighlighting = false, bool exactNumOfResults = false)
+        bool withHighlighting = false, bool exactNumOfResults = false, CancellationToken cancellationToken = default)
             {
 
                 var result = new SmlouvaSearchResult()
@@ -209,7 +210,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
 
                 ISearchResponse<Smlouva> res =
                     await _coreSearchAsync(GetSimpleQuery(query), page, pageSize, order, anyAggregation, platnyZaznam,
-                    includeNeplatne, logError, withHighlighting, exactNumOfResults);
+                    includeNeplatne, logError, withHighlighting, exactNumOfResults, cancellationToken: cancellationToken);
 
                 AuditRepo.Add(Audit.Operations.Search, "", "", "Smlouva", res.IsValid ? "valid" : "invalid", query, null);
 
@@ -238,7 +239,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                 OrderResult order,
                 AggregationContainerDescriptor<Smlouva> anyAggregation = null,
                 bool? platnyZaznam = null, bool includeNeplatne = false, bool logError = true,
-                bool withHighlighting = false, bool exactNumOfResults = false)
+                bool withHighlighting = false, bool exactNumOfResults = false, CancellationToken cancellationToken = default)
             {
                 page = page - 1;
                 if (page < 0)
@@ -279,7 +280,8 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                             .Sort(ss => GetSort(order))
                             .Aggregations(aggrFunc)
                             .Highlight(h => Tools.GetHighlight<Smlouva>(withHighlighting))
-                            .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null)
+                            .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null),
+                            cancellationToken
                     );
                     if (res != null && res.IsValid == false && res.ServerError?.Status == 429)
                     {
@@ -294,7 +296,8 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                                 .Sort(ss => GetSort(order))
                                 .Aggregations(aggrFunc)
                                 .Highlight(h => Tools.GetHighlight<Smlouva>(withHighlighting))
-                                .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null)
+                                .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null),
+                                cancellationToken
                         );
                         if (res.IsValid == false && res.ServerError?.Status == 429)
                         {
@@ -309,7 +312,8 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                                     .Sort(ss => GetSort(order))
                                     .Aggregations(aggrFunc)
                                     .Highlight(h => Tools.GetHighlight<Smlouva>(withHighlighting))
-                                    .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null)
+                                    .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null),
+                                    cancellationToken
                             );
 
                         }
@@ -328,12 +332,15 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                                 .Sort(ss => GetSort(order))
                                 .Aggregations(aggrFunc)
                                 .Highlight(h => Tools.GetHighlight<Smlouva>(false))
-                                .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null)
+                                .TrackTotalHits(exactNumOfResults || page * pageSize == 0 ? true : (bool?)null),
+                                cancellationToken
                         );
                     }
                 }
                 catch (Exception e)
                 {
+                    if (e.Message == "A task was canceled.")
+                        throw;
 
                     if (res != null && res.ServerError != null)
                         Manager.LogQueryError<Smlouva>(res);

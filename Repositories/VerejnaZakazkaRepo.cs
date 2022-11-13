@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
@@ -22,6 +23,8 @@ namespace HlidacStatu.Repositories
     {
         private static AsyncRetryPolicy<HttpResponseMessage> _retryPolicy = HttpPolicyExtensions
             .HandleTransientHttpError()
+            .OrResult(r => r.RequestMessage.RequestUri.Host.Contains("bpapi.datlab.eu") &&
+                           r.StatusCode == HttpStatusCode.Forbidden)
             .WaitAndRetryAsync(5, _ => TimeSpan.FromSeconds(1));
         
         public static async Task UpdatePosledniZmenaAsync(VerejnaZakazka verejnaZakazka, bool force = false, bool save = false)
@@ -229,7 +232,7 @@ return;
                 : newDoc.PlainTextContentQuality;
         }
 
-        private static async Task FillDocumentChecksums(VerejnaZakazka vz, HttpClient httpClient)
+        public static async Task FillDocumentChecksums(VerejnaZakazka vz, HttpClient httpClient)
         {
             foreach (var dokument in vz.Dokumenty.Where(d => string.IsNullOrWhiteSpace(d.Sha256Checksum)))
             {

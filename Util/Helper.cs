@@ -1,4 +1,6 @@
-﻿namespace HlidacStatu.Util
+﻿using System.Threading.Tasks;
+
+namespace HlidacStatu.Util
 {
     public static class Helper
     {
@@ -24,6 +26,15 @@
             int flagValue = (int)(object)flag;
 
             flags = (T)(object)(flagsValue & (~flagValue));
+        }
+        
+        /// <summary>
+        /// Makes Task return its base class 
+        /// </summary>
+        public static async Task<TBase> GeneralizeTask<TBase, TDerived>(Task<TDerived> task) 
+            where TDerived : TBase 
+        {
+            return (TBase) await task;
         }
     }
 }
