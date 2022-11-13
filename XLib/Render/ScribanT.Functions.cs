@@ -142,7 +142,7 @@ namespace HlidacStatu.XLib.Render
                 if (!string.IsNullOrEmpty(ico))
                 {
                     Firma o = Firmy.instanceByIco.Get(ico);
-                    if (o.Valid)
+                    if (o?.Valid == true)
                     {
                         return $"<span>{o.Jmeno}</span>";
                     }
@@ -157,7 +157,7 @@ namespace HlidacStatu.XLib.Render
                 if (!string.IsNullOrEmpty(ico))
                 {
                     Firma o = Firmy.instanceByIco.Get(ico);
-                    if (o.Valid)
+                    if (o?.Valid == true)
                     {
                         //var lbl = Lib.Analysis.KorupcniRiziko.KIndex.GetLastLabel(ico);
                         //string skidx = "";
@@ -207,7 +207,7 @@ namespace HlidacStatu.XLib.Render
                 if (!string.IsNullOrEmpty(ico))
                 {
                     var o = Firmy.instanceByIco.Get(ico);
-                    if (o.Valid)
+                    if (o?.Valid == true)
                     {
                         string niceString = HlidacStatu.Util.InfoFact.RenderInfoFacts(o.InfoFacts(), numberOfInfos, true, false, delimiterBetweenInfos);
 

@@ -79,13 +79,24 @@ namespace HlidacStatu.Repositories
         public static Dictionary<string, string[]> ObceSRozsirenouPusobnostiPodleKraju()
         {
             using var dbContext = new DbEntities();
-            return dbContext.OrganVerejneMoci.
-                Include(adr => adr.AdresaOvm).AsNoTracking()
-                .Where(o => o.TypOvmId == 8 || o.TypOvmId == 7)
-                .Where(o => o.PrimarniOvm == "Ano")
-                .ToList()
-                .GroupBy(o => o.AdresaOvm.KrajNazev, o => o.IdDS)
-                .ToDictionary(g => g.Key, g=> g.ToArray() );
+            {
+                var deb2 = dbContext.OrganVerejneMoci.
+                    Include(adr => adr.AdresaOvm)
+                    .AsNoTracking()
+                    .Where(m=>m != null)
+                    ;
+                var deb3 = deb2
+                    .Where(o => o.TypOvmId == 8 || o.TypOvmId == 7);
+
+                var deb4 = deb3
+                    .Where(o => o.PrimarniOvm == "Ano")
+                    .ToList();
+                var deb5 = deb4
+                    .GroupBy(o => o.AdresaOvm.KrajNazev, o => o.IdDS ?? "");
+                var deb6 = deb5
+                    .ToDictionary(g => g.Key, g => g.ToArray());
+                return deb6;
+            }
         }
 
         public static List<string> AllIcos()
