@@ -1,5 +1,6 @@
 ﻿@model HlidacStatu.XLib.Search.MultiResult
 @using System.Linq;
+@using HlidacStatu.Datasets
 @using HlidacStatu.Entities;
 @using HlidacStatu.Repositories.Searching;
 @using HlidacStatu.Repositories
@@ -372,6 +373,32 @@ else if (Model.HasResults == false)
     viewRenderTimesInt.Stop();
 }
 
+@* box s výpisem datasetů *@
+@if (Model.DatasetRegistrations.Any())
+{
+    <div class="col-xs-12 col-sm-12">
+        <div class="row">
+            <h4>
+                <span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> se také vyskytuje v popisu, nebo názvu těchto datasetů
+            </h4>
+             @foreach (var chunks in Model.DatasetRegistrations.Chunk((int)Math.Ceiling((Model.DatasetRegistrations.Count / 3d))))
+             {
+                 <div class="col-xs-6 col-sm-3">
+                     <ul>
+                         @foreach (var item in chunks)
+                         {
+                             var url = $"/data/Index/{item.datasetId}";
+                             <li>
+                                 <a href="@url"><i class="far fa-angle-double-right"></i>&nbsp;@Html.Raw(item.name)</a>
+                             </li>
+                         }
+                     </ul>
+                 </div>
+             }
+        </div>
+    </div>
+    <hr />
+}
 
 
 

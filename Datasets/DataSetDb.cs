@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace HlidacStatu.Datasets
 {
@@ -229,6 +230,30 @@ namespace HlidacStatu.Datasets
                 return resData;
 
             return resData;
+        }
+
+        public async Task<List<Registration>> SearchInDatasetsAsync(string query, int page, int pageSize)
+        {
+            var resData = await base.SearchDataRawAsync($"NOT(id:{DataSourcesDbName}) AND ({query})", page, pageSize);
+            if (resData == null || resData?.Result == null)
+                return null;
+
+            var results = new List<Registration>();
+            
+            foreach (var res in resData.Result)
+            {
+                try
+                {
+                    results.Add(JsonConvert.DeserializeObject<Registration>(res.Item2, DefaultDeserializationSettings));
+                }
+                catch (Exception e)
+                {
+                    HlidacStatu.Util.Consts.Logger.Info($"Current result is not serializable into {nameof(Registration)} class. Query [{query}]", e);
+                }
+            }
+
+            return results;
+
         }
     }
 }
