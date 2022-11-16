@@ -20,12 +20,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="DS_OVM.xml">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
-    <ItemGroup>
       <Folder Include="AutocompleteBasicIndexes" />
     </ItemGroup>
 
