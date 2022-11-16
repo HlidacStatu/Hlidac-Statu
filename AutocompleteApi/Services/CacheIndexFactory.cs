@@ -48,7 +48,7 @@ public static class CacheIndexFactory
             () => UptimeServerRepo.AllActiveServers().Select(uptimeServer => new StatniWebyAutocomplete(uptimeServer)),
             new IndexingOptions<StatniWebyAutocomplete>()
             {
-                TextSelector = ts => $"{ts.Name} {ts.Description} {ts.Ico} {ts.Url.Replace('.', ' ').Replace('/', ' ')}"
+                TextSelector = ts => $"{ts.Name} {ts.Description} {ts.Ico} {ts.Url.Replace('/', ' ')}"
             },
             logger);
     }
