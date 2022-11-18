@@ -25,7 +25,7 @@ namespace HlidacStatu.Entities.Issues
             if (sb.Count == 0)
                 return string.Empty;
             else
-                return "( " + sb.Aggregate((f, s) => f + logical + s) + " )";
+                return "( " + string.Join(logical,sb) + " )";
         }
 
         public static List<IIssueAnalyzer> GetIssueAnalyzers(string moreFromPath = null)

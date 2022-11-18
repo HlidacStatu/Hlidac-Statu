@@ -51,7 +51,7 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
                     issues.Add(
                         new Issue(this, (int)IssueType.IssueTypes.NecitelnostSmlouvy, "Nečitelnost smlouvy",
                         string.Format("Text příloh {0} není strojově čitelný, ze zákona být musí",
-                        files.Aggregate((f, s) => f + ", " + s)
+                        string.Join(", ",files) 
                         ))
                         );
                 else if (files.Count == 1)

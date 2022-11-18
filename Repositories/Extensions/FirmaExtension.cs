@@ -558,14 +558,12 @@ namespace HlidacStatu.Extensions
 
                 if (html && evs.Count > 0)
                 {
-                    return string.Format(template,
-                        evs.Aggregate((f, s) => f + itemDelimeter + s)
-                    );
+                    return string.Format(template, string.Join(itemDelimeter, evs));
                 }
                 else if (evs.Count > 0)
                 {
                     return string.Format(template,
-                        evs.Aggregate((f, s) => f + "\n" + s)
+                        string.Join("\n",evs)
                     );
                 }
                 else return string.Empty;

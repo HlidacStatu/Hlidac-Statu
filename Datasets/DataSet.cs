@@ -56,7 +56,7 @@ namespace HlidacStatu.Datasets
                 if (errors.Count > 0)
                 {
                     var err = ApiResponseStatus.DatasetSearchTemplateError;
-                    err.error.errorDetail = errors.Aggregate((f, s) => f + "\n" + s);
+                    err.error.errorDetail = string.Join("\n", errors);
                     throw new DataSetException(reg.datasetId, err);
                 }
             }
@@ -67,7 +67,7 @@ namespace HlidacStatu.Datasets
                 if (errors.Count > 0)
                 {
                     var err = ApiResponseStatus.DatasetDetailTemplateError;
-                    err.error.errorDetail = errors.Aggregate((f, s) => f + "\n" + s);
+                    err.error.errorDetail = string.Join("\n", errors);
                     throw new DataSetException(reg.datasetId, err);
                 }
             }
@@ -831,7 +831,7 @@ namespace HlidacStatu.Datasets
                     throw DataSetException.GetExc(datasetId,
                         ApiResponseStatus.DatasetItemInvalidFormat.error.number,
                         ApiResponseStatus.DatasetItemInvalidFormat.error.description,
-                        errors.Aggregate((f, s) => f + ";" + s)
+                        string.Join(";", errors)
                     );
                 }
             }

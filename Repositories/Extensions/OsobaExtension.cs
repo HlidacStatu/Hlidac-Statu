@@ -391,13 +391,13 @@ namespace HlidacStatu.Extensions
             if (html)
             {
                 return string.Format(template,
-                    evs.Aggregate((f, s) => f + itemDelimeter + s)
+                    string.Join(itemDelimeter, evs)
                 );
             }
             else
             {
                 return string.Format(template,
-                    evs.Aggregate((f, s) => f + itemDelimeter + s)
+                    string.Join(itemDelimeter, evs)
                 );
             }
         }

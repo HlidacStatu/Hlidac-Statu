@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using HlidacStatu.Entities;
+
 namespace HlidacStatu.Datasets.TransparentniUcty
 {
     public class BankovniPolozka : IEqualityComparer<BankovniPolozka>, Plugin.TransparetniUcty.IBankovniPolozka
@@ -39,9 +41,9 @@ namespace HlidacStatu.Datasets.TransparentniUcty
                     CisloUctu,
                     CisloProtiuctu,
                     Datum.ToString("dd.MM.yyyy", HlidacStatu.Util.Consts.czCulture),
-                    VS };
+                VS };
 
-            Id = Devmasters.Crypto.Hash.ComputeHashToHex(data.Aggregate((f, s) => f + "|" + s));
+            Id = Devmasters.Crypto.Hash.ComputeHashToHex(string.Join("|", data));
 
         }
 
