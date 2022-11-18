@@ -193,7 +193,7 @@ namespace HlidacStatu.Entities
             }
 
             //reset normalizedText after titulPred, titulPo
-            normalizedText = lWords.Aggregate((f, s) => f + " " + s).Trim();
+            normalizedText = String.Join(" ", lWords).Trim();
             normalizedText = TextUtil
                 .ReplaceDuplicates(normalizedText.Replace(".", ". "), ' ');
             normalizedText = TextUtil
