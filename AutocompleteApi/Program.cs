@@ -69,12 +69,6 @@ if (args.Length > 0 && args[0] == "gen")
 logger.Information("Starting application");
 try
 {
-    //todo: hodil by se refactoring
-    // Aktuálně je FirmaRepo.Cached závislá na určitých souborech
-    // podle mě by se tato závislost měla odstranit
-    // tenhle soubor by šel ve firmarepo.cached nahradit načtením dat z tabulky o ovm: OrganVerejneMoci
-    File.Copy("./DS_OVM.xml", Path.Combine(Init.WebAppDataPath, "DS_OVM.xml"), true);
-
     logger.Information("Configuring services");
     builder.Services.AddSingleton<CacheService>(new CacheService(logger));
     builder.Services.AddControllers();

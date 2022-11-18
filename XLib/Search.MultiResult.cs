@@ -5,6 +5,7 @@ using HlidacStatu.Repositories.Searching;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Datasets;
 
 namespace HlidacStatu.XLib
 {
@@ -24,6 +25,8 @@ namespace HlidacStatu.XLib
             public Datasets.Search.DatasetMultiResult Datasets { get; set; }
             public InsolvenceSearchResult Insolvence { get; set; } = null;
             public DotaceSearchResult Dotace { get; set; } = null;
+
+            public List<Registration> DatasetRegistrations { get; set; } = new();
 
             public bool HasSmlouvy { get { return (Smlouvy != null && Smlouvy.HasResult); } }
             public bool HasVZ { get { return (VZ != null && VZ.HasResult); } }
@@ -272,6 +275,20 @@ namespace HlidacStatu.XLib
                     catch (System.Exception e)
                     {
                         Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetMulti query " + query, e);
+                    }
+                }));
+            
+            //hledání v názvech datasetů
+            taskList.Add(
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        res.DatasetRegistrations = await DataSetDB.Instance.SearchInDatasetsAsync(query, 1, 500);
+                    }
+                    catch (System.Exception e)
+                    {
+                        Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetRegistrations query " + query, e);
                     }
                 }));
 
