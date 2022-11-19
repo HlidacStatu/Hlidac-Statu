@@ -286,7 +286,7 @@ namespace HlidacStatu.Repositories
 
                     Save(osobaToUpdate);
                     
-                    AuditRepo.Add(Audit.Operations.Update, user, osobaToUpdate, osobaOriginal);
+                    AuditRepo.Add<Osoba>(Audit.Operations.Update, user, osobaToUpdate, osobaOriginal);
 
                     return osobaToUpdate;
                 }
