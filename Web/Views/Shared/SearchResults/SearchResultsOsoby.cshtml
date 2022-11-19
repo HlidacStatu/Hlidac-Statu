@@ -5,44 +5,57 @@
 
 <table class="table table-hover">
     <thead>
-    <tr>
-        <th>Osoba</th>
-        <th>Popis</th>
-        <th>Vazby</th>
-    </tr>
+        <tr>
+            <th>Osoba</th>
+            <th>Popis</th>
+            <th>Vazby</th>
+        </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model.Results)
-    {
-        <tr>
-            <td style="white-space: nowrap;">
-                <span style='white-space:nowrap'>
-                    <add-bookmark item="item"></add-bookmark>&nbsp;<a href="@item.GetUrl()"><b>@Html.Raw(item.FullNameWithYear(true))</b></a>
-                </span>
-            </td>
-            <td>
-                @Html.Raw(item.Description(true, m => true, 3, withSponzoring: true))
-            </td>
-            <td>
-                @if (item.Vazby() != null)
-                {
-                    foreach (var v in item.AktualniVazby(Relation.AktualnostType.Nedavny).Take(2))
+        @foreach (var item in Model.Results)
+        {
+            <tr>
+                <td style="white-space: nowrap;">
+                    <span style='white-space:nowrap'>
+                        <add-bookmark item="item"></add-bookmark>&nbsp;<a href="@item.GetUrl()"><b>@Html.Raw(item.FullNameWithYear(true))</b></a>
+                    </span>
+                </td>
+                <td>
+                    @if (item.StatusOsoby() == HlidacStatu.Entities.Osoba.StatusOsobyEnum.NeniPolitik)
                     {
-                        WebUtil.RenderOsobaVazba(v);
+                        <span>Má přímé či nepřímé právní či obchodní vztahy se státem.</span>
                     }
-                    if (item.AktualniVazby(Relation.AktualnostType.Nedavny).Length == 3)
+                    else
                     {
-                        WebUtil.RenderOsobaVazba(item.Vazby()[2]);
+                        @Html.Raw(item.Description(true, m => true, 3, withSponzoring: true))
                     }
-                    else if (item.AktualniVazby(Relation.AktualnostType.Nedavny).Length > 2)
+                </td>
+                <td>
+                    @if (item.Vazby() != null)
                     {
-                        <span>@Devmasters.Lang.CS.Plural.Get(item.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny) - 2, "+další vazba;+ další {0} vazby;+ dalších {0} vazeb")</span>
+                        @Html.Raw("<ul>")
+                        
+                        foreach (var v in item.AktualniVazby(Relation.AktualnostType.Nedavny).Take(2))
+                        {
+                            @Html.Raw( WebUtil.RenderOsobaVazba(v,"<li>{0}</li>"))
+                            
+                        }
+                        if (item.AktualniVazby(Relation.AktualnostType.Nedavny).Length == 3)
+                        {
+                            @Html.Raw(WebUtil.RenderOsobaVazba(item.Vazby()[2],"<li>{0}</li>"))
+                            
+                        }
+                        else if (item.AktualniVazby(Relation.AktualnostType.Nedavny).Length > 2)
+                        {
+                            <span>+ <a href="@(item.GetUrl())/vazby">@Devmasters.Lang.CS.Plural.Get(item.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny) - 2, "další vazba;další {0} vazby;dalších {0} vazeb")</a></span>
+                        }
+                        @Html.Raw("</ul>")
+                        
                     }
-                }
-            </td>
-        </tr>
-    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
-<partial name="SearchResults/Pagination" model="@(new PaginationViewModel(Model, "/Osoby/Hledat"))"/>
+<partial name="SearchResults/Pagination" model="@(new PaginationViewModel(Model, "/Osoby/Hledat"))" />

@@ -1,3 +1,4 @@
+using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
 using Microsoft.AspNetCore.Html;
@@ -91,14 +92,14 @@ namespace HlidacStatu.Web.Framework
             return new HtmlString($"<span style='white-space:nowrap'>{s}</span>");
         }
 
-        public static IHtmlContent RenderOsobaVazba(Datastructures.Graphs.Graph.Edge v)
+        public static IHtmlContent RenderOsobaVazba(Datastructures.Graphs.Graph.Edge v, string blockFormat = "<div>{0}</div>")
         {
-            var fname = v.To.PrintName();
-            var sb = new StringBuilder("<div>");
+            var sb = new StringBuilder();
 
-            if (string.IsNullOrEmpty(fname))
+            var fname = $"<a href='{Firma.GetUrl(v.To.Id, true)}'>{v.To.PrintName()}</a>"; ;
+            if (string.IsNullOrEmpty(v.To.PrintName()))
             {
-                fname = FirmaRepo.NameFromIco(v.To.Id, true);
+                fname = $"<a href='{Firma.GetUrl(v.To.Id,true)}'>{FirmaRepo.NameFromIco(v.To.Id, true)}</a>";
             }
 
             sb.Append(fname).Append(" - ").Append(v.Descr).Append("&nbsp;");
@@ -116,8 +117,7 @@ namespace HlidacStatu.Web.Framework
                 sb.Append($"(od {v.RelFrom.Value.ToShortDateString()})");
             }
 
-            sb.Append("</div>");
-            return new HtmlString(sb.ToString());
+            return new HtmlString(string.Format(blockFormat, sb.ToString()));
         }
 
         public static string GenerateCacheKey(object[] objects)

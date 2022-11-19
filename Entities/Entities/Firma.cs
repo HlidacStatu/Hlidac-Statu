@@ -337,7 +337,11 @@ namespace HlidacStatu.Entities
 
         public string GetUrl(bool local, string foundWithQuery)
         {
-            string url = "/subjekt/" + ICO;
+            return GetUrl(this.ICO,local,foundWithQuery);
+        }
+        public static string GetUrl(string ico, bool local, string foundWithQuery = "")
+        {
+            string url = "/subjekt/" + ico;
             if (!string.IsNullOrEmpty(foundWithQuery))
                 url = url + "?qs=" + System.Net.WebUtility.UrlEncode(foundWithQuery);
             if (!local)
