@@ -9,6 +9,11 @@ namespace HlidacStatu.Lib.Analytics
         {
             return StatisticsPerYear<T>.AggregateStats(statistics, onlyYears);
         }
+        public static StatisticsPerYear<T> SubtractFromStats<T>(this IEnumerable<StatisticsPerYear<T>> statistics, int[] onlyYears = null)
+            where T : CoreStat, IAddable<T>, new()
+        {
+            return StatisticsPerYear<T>.SubtractFromStats(statistics, onlyYears);
+        }
 
         public static string Formatted(this SimpleStat item, bool html = true, string url = null, bool twoLines = false, string textIfZero = null)
         {

@@ -11,6 +11,11 @@
             Pocet = Pocet + pocet;
             CelkemCena = CelkemCena + cena;
         }
+        public void Subtract(long pocet, decimal cena)
+        {
+            Pocet = Pocet - pocet;
+            CelkemCena = CelkemCena - cena;
+        }
 
         public SimpleStat Add(SimpleStat other)
         {
@@ -18,6 +23,14 @@
             {
                 CelkemCena = CelkemCena + other?.CelkemCena ?? 0,
                 Pocet = Pocet + other?.Pocet ?? 0
+            };
+        }
+        public SimpleStat Subtract(SimpleStat other)
+        {
+            return new SimpleStat()
+            {
+                CelkemCena = CelkemCena - other?.CelkemCena ?? 0,
+                Pocet = Pocet - other?.Pocet ?? 0
             };
         }
 

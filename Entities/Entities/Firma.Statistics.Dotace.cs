@@ -29,6 +29,15 @@ namespace HlidacStatu.Entities
                         PocetDotaci = PocetDotaci + (other?.PocetDotaci ?? 0)
                     };
                 }
+                public Dotace Subtract(Dotace other)
+                {
+                    return new Dotace()
+                    {
+                        CelkemCerpano = CelkemCerpano - (other?.CelkemCerpano ?? 0),
+                        PocetCerpani = PocetCerpani - (other?.PocetCerpani ?? 0),
+                        PocetDotaci = PocetDotaci - (other?.PocetDotaci ?? 0)
+                    };
+                }
 
                 public override int NewSeasonStartMonth()
                 {

@@ -25,6 +25,17 @@ namespace HlidacStatu.Entities
                         CelkoveHodnotaVZsUcasti = CelkoveHodnotaVZsUcasti + (other?.CelkoveHodnotaVZsUcasti ?? 0),
                     };
                 }
+                public VZ Subtract(VZ other)
+                {
+                    return new VZ()
+                    {
+                        PocetUcastiVeVZ = PocetUcastiVeVZ - (other?.PocetUcastiVeVZ ?? 0),
+                        PocetVyherVeVZ = PocetVyherVeVZ - (other?.PocetVyherVeVZ ?? 0),
+                        PocetVypsanychVZ = PocetVypsanychVZ - (other?.PocetVypsanychVZ ?? 0),
+                        CelkovaHodnotaVypsanychVZ = CelkovaHodnotaVypsanychVZ - (other?.CelkovaHodnotaVypsanychVZ ?? 0),
+                        CelkoveHodnotaVZsUcasti = CelkoveHodnotaVZsUcasti - (other?.CelkoveHodnotaVZsUcasti ?? 0),
+                    };
+                }
 
                 public override int NewSeasonStartMonth()
                 {

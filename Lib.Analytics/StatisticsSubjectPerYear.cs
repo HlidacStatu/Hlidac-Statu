@@ -47,11 +47,24 @@ namespace HlidacStatu.Lib.Analytics
                 return new StatisticsSubjectPerYear<T>();
 
             var aggregatedStatistics = new StatisticsSubjectPerYear<T>(
-                $"aggregated for {statistics.FirstOrDefault().ICO}",
+                $"{statistics.FirstOrDefault().ICO}",
                 AggregateStats(statistics));
 
             return aggregatedStatistics;
         }
+
+        public static StatisticsSubjectPerYear<T> Subtract(IEnumerable<StatisticsSubjectPerYear<T>> statistics)
+        {
+            if (statistics is null)
+                return new StatisticsSubjectPerYear<T>();
+
+            var aggregatedStatistics = new StatisticsSubjectPerYear<T>(
+                $"{statistics.FirstOrDefault().ICO}",
+                SubtractFromStats(statistics));
+
+            return aggregatedStatistics;
+        }
+        
 
     }
 }

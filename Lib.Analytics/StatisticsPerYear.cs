@@ -213,6 +213,25 @@ namespace HlidacStatu.Lib.Analytics
             return aggregatedStatistics;
         }
 
+        public static StatisticsPerYear<T> SubtractFromStats(IEnumerable<StatisticsPerYear<T>> statistics, int[] onlyYears = null)
+        {
+            var aggregatedStatistics = new StatisticsPerYear<T>();
+            if (statistics is null)
+                return aggregatedStatistics;
+
+            var years = statistics.Where(x => x != null).SelectMany(x => x.Years.Keys.Select(k => k)).Distinct();
+            if (onlyYears != null && onlyYears.Count() > 0)
+                years = years.Where(y => onlyYears.Contains(y));
+            foreach (var year in years)
+            {
+                var statsForYear = statistics.Where(s => s != null).Select(s => s[year]);
+                var val = statsForYear.Aggregate(new T(), (acc, s) => acc.Subtract(s));
+
+                aggregatedStatistics.Years.Add(year, val);
+            }
+
+            return aggregatedStatistics;
+        }
         /// <summary>
         /// Summarize all selected years to one - Good if you need global percentage stats.
         /// </summary>

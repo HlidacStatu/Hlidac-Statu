@@ -71,12 +71,12 @@ namespace HlidacStatu.Repositories.Statistics
             if (obor.HasValue && obor != 0)
                 res = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(
                     f.ICO,
-                    await SmlouvaStatistics.CalculateAsync($"ico:{f.ICO} AND oblast:{Smlouva.SClassification.Classification.ClassifSearchQuery(obor.Value)}")
+                    await SmlouvyStatistics.CalculateAsync($"ico:{f.ICO} AND oblast:{Smlouva.SClassification.Classification.ClassifSearchQuery(obor.Value)}")
                 );
             else
                 res = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>(
                     f.ICO,
-                    await SmlouvaStatistics.CalculateAsync($"ico:{f.ICO}")
+                    await SmlouvyStatistics.CalculateAsync($"ico:{f.ICO}")
                 );
 
             return res;

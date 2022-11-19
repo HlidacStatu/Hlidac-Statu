@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using static HlidacStatu.Datastructures.Graphs.Graph;
+
 namespace HlidacStatu.Repositories
 {
     public static class FirmaVazbyRepo
@@ -103,41 +105,57 @@ namespace HlidacStatu.Repositories
         {
             if (firma._parents == null)
             {
-                firma._parents = firma._getAllParents(firma.ICO, minAktualnost).ToArray();
+                firma._parents = _getAllParents(firma.ICO, minAktualnost)
+                    .Select(m=> Firmy.Get(m))
+                    .Where(m=> m!=null || m?.Valid == true)
+                    .ToArray();
             }
 
             return firma._parents;
         }
 
-        public static List<Firma> _getAllParents(this Firma firma, string ico, Relation.AktualnostType minAktualnost,
-            List<Firma> currList = null)
+        public static HashSet<string> _getAllParents( string ico, Relation.AktualnostType minAktualnost,
+            HashSet<string> currList = null)
         {
-            currList = currList ?? new List<Firma>();
+            currList = currList ?? new HashSet<string>();
 
-            var _parentVazbaFirma = Relation
-                .AktualniVazby(Graph.GetDirectParentRelationsFirmy(ico).ToArray(), minAktualnost, firma.VazbyRootEdge())
-                .Select(m => Firmy.Get(m.From.Id))
-                .Where(m => m != null)
+            Datastructures.Graphs.Graph.Edge[] _parentF = Graph.GetDirectParentRelationsFirmy(ico).ToArray();
+            var _parentVazby = _parentF.Where(m => m.Aktualnost >= minAktualnost);
+
+            //List<Datastructures.Graphs.Graph.Edge> _parentVazby = new List<Datastructures.Graphs.Graph.Edge>();
+            //foreach (var p in _parentF)
+            //{
+            //    if (Util.DataValidators.CheckCZICO(p.From.Id))
+            //    {
+            //        var parentFirma = Firmy.Get(p.From.Id);
+            //        _parentVazby.AddRange(Relation.AktualniVazby(new Edge[] { p }, minAktualnost, parentFirma.VazbyRootEdge()));
+            //    }
+            //}
+
+            
+            var _parentVazbyIco = _parentVazby
+                .Select(m => m.From.Id)
+                .Where(m => Util.DataValidators.CheckCZICO(m))
                 .ToArray();
-            if (_parentVazbaFirma.Count() > 0)
+            if (_parentVazbyIco.Count() > 0)
             {
-                bool addedNew = false;
-                foreach (var f in _parentVazbaFirma)
+                foreach (var f in _parentVazbyIco)
                 {
-                    if (currList.Any(m => m.ICO == f.ICO))
+                    if (currList.Contains(f))
                     {
                         //skip
                     }
                     else
                     {
-                        currList.Insert(0, f);
-                        addedNew = true;
+                        currList.Add(f);
+                        var newParents = _getAllParents(f, minAktualnost, currList);
+                        foreach (var np in newParents)
+                        {
+                            currList.Add(np);
+                        }
                     }
                 }
-                if (addedNew)
-                    return firma._getAllParents(currList[0].ICO, minAktualnost, currList);
-                else
-                    return currList;
+                return currList;
             }
             else
                 return currList;
@@ -147,7 +165,7 @@ namespace HlidacStatu.Repositories
         {
             if (firma._parentVazbyFirmy == null)
                 firma._parentVazbyFirmy = Graph.GetDirectParentRelationsFirmy(firma.ICO).ToArray();
-            return Relation.AktualniVazby(firma._parentVazbyFirmy, minAktualnost, firma.VazbyRootEdge());
+            return firma._parentVazbyFirmy.Where(m => m.Aktualnost >= minAktualnost).ToArray(); 
         }
 
 

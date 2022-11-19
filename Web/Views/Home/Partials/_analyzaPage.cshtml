@@ -14,7 +14,7 @@
     ViewBag.Title = Model.Text ?? $"Hlídač státu: Analýza příjemců peněz pro dotaz \"{Model.Query}\"";
 
     HlidacStatu.Lib.Analytics.StatisticsPerYear<Smlouva.Statistics.Data> statistics =
-        new StatisticsPerYear<Smlouva.Statistics.Data>(await SmlouvaStatistics.CalculateAsync(Model.Query));
+        new StatisticsPerYear<Smlouva.Statistics.Data>(await SmlouvyStatistics.CalculateAsync(Model.Query));
 
     var statisticsAfter2016 = statistics
         .Where(s => statistics.YearsAfter2016().Contains(s.Year))

@@ -34,9 +34,9 @@ namespace HlidacStatu.Lib.Analysis
             get
             {
                 if (Year.HasValue)
-                    return Repositories.Statistics.SmlouvaStatistics.CachedStatisticsForQuery(Query);
+                    return Repositories.Statistics.SmlouvyStatistics.CachedStatisticsForQuery(Query);
                 else
-                    return Repositories.Statistics.SmlouvaStatistics.CachedStatisticsForQuery(Query);
+                    return Repositories.Statistics.SmlouvyStatistics.CachedStatisticsForQuery(Query);
             }
         }
 

@@ -83,7 +83,42 @@ namespace HlidacStatu.Entities
 
                     return d;
                 }
+                public Data Subtract(Data other)
+                {
+                    var d = new Data()
+                    {
+                        PocetSmluv = PocetSmluv - (other?.PocetSmluv ?? 0),
+                        CelkovaHodnotaSmluv = CelkovaHodnotaSmluv - (other?.CelkovaHodnotaSmluv ?? 0),
+                        PocetSmluvSeSoukromymSubj = PocetSmluvSeSoukromymSubj - (other?.PocetSmluvSeSoukromymSubj ?? 0),
+                        CelkovaHodnotaSmluvSeSoukrSubj = CelkovaHodnotaSmluvSeSoukrSubj - (other?.CelkovaHodnotaSmluvSeSoukrSubj ?? 0),
+                        PocetSmluvBezCenySeSoukrSubj = PocetSmluvBezCenySeSoukrSubj - (other?.PocetSmluvBezCenySeSoukrSubj ?? 0),
+                        PocetSmluvBezCeny = PocetSmluvBezCeny - (other?.PocetSmluvBezCeny ?? 0),
+                        PocetSmluvBezSmluvniStrany = PocetSmluvBezSmluvniStrany - (other?.PocetSmluvBezSmluvniStrany ?? 0),
+                        SumKcSmluvBezSmluvniStrany = SumKcSmluvBezSmluvniStrany - (other?.SumKcSmluvBezSmluvniStrany ?? 0),
+                        PocetSmluvSponzorujiciFirmy = PocetSmluvSponzorujiciFirmy - (other?.PocetSmluvSponzorujiciFirmy ?? 0),
+                        SumKcSmluvSponzorujiciFirmy = SumKcSmluvSponzorujiciFirmy - (other?.SumKcSmluvSponzorujiciFirmy ?? 0),
+                        PocetSmluvSeZasadnimNedostatkem = PocetSmluvSeZasadnimNedostatkem - (other?.PocetSmluvSeZasadnimNedostatkem ?? 0),
+                        PocetSmluvULimitu = PocetSmluvULimitu - (other?.PocetSmluvULimitu ?? 0),
+                        PocetSmluvOVikendu = PocetSmluvOVikendu - (other?.PocetSmluvOVikendu ?? 0),
+                        PocetSmluvNovaFirma = PocetSmluvNovaFirma - (other?.PocetSmluvNovaFirma ?? 0),
+                        PoOblastech = PoOblastech.ToDictionary(entry => entry.Key,
+                            entry => entry.Value)
+                    };
 
+                    if (other.PoOblastech != null)
+                        foreach (var o in other.PoOblastech)
+                        {
+                            if (d.PoOblastech.ContainsKey(o.Key))
+                            {
+                                d.PoOblastech[o.Key].Pocet = d.PoOblastech[o.Key].Pocet - o.Value.Pocet;
+                                d.PoOblastech[o.Key].CelkemCena = d.PoOblastech[o.Key].CelkemCena - o.Value.CelkemCena;
+                            }
+                            //else
+                            //    d.PoOblastech.Add(o.Key, o.Value);
+                        }
+
+                    return d;
+                }
                 public override int NewSeasonStartMonth()
                 {
                     return 4;

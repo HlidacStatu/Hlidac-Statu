@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories.Statistics
 {
-    public static class SmlouvaStatistics
+    public static class SmlouvyStatistics
     {
         static Devmasters.Cache.Couchbase.Manager<StatisticsPerYear<Smlouva.Statistics.Data>, string> _cache
             = Devmasters.Cache.Couchbase.Manager<StatisticsPerYear<Smlouva.Statistics.Data>, string>
