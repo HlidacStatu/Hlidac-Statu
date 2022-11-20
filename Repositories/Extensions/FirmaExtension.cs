@@ -124,7 +124,7 @@ namespace HlidacStatu.Extensions
         public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> StatistikaRegistruSmluv(
             this Firma firma, int? iclassif = null, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedStatistics(firma, iclassif, forceUpdateCache);
+            return FirmaStatistics.GetStatistics(firma, iclassif, forceUpdateCache);
         }
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace> StatistikaDotaci(this Firma firma, bool forceUpdateCache = false)

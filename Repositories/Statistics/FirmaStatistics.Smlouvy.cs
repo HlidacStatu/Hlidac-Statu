@@ -58,12 +58,17 @@ namespace HlidacStatu.Repositories.Statistics
                     Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
                     obj => obj.firma.ICO + "-" + (obj.obor ?? 0));
 
-        public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> CachedStatistics(Firma firma, int? obor, bool forceUpdateCache = false)
+        public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> GetStatistics(Firma firma, int? obor, bool forceUpdateCache = false)
         {
             if (forceUpdateCache)
                 _smlouvaCache.Delete((firma, obor));
 
             return _smlouvaCache.Get((firma, obor));
+        }
+        public static void SetStatistics(Firma firma, int? obor, StatisticsSubjectPerYear<Smlouva.Statistics.Data> data)
+        {
+
+            _smlouvaCache.Set((firma, obor),data);
         }
         private static async Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> _calculateSmlouvyStatsAsync(Firma f, int? obor)
         {
