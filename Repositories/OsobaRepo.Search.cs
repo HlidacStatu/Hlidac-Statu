@@ -71,8 +71,8 @@ namespace HlidacStatu.Repositories
                 .Select(m => m.ToLower())
                 .ToArray();
 
-            public static async Task<OsobaSearchResult> SimpleSearchAsync(string query, int page, int pageSize, OrderResult order
-                , bool exactNumOfResults = false)
+            public static async Task<OsobaSearchResult> SimpleSearchAsync(string query, int page, int pageSize, 
+                OrderResult order, bool exactNumOfResults = false, int? osobaStatus = null)
             {
                 //fix without elastic
                 if (page < 1)
@@ -90,7 +90,7 @@ namespace HlidacStatu.Repositories
 
                 if (peopleIds is null || peopleIds.Count == 0)
                 {
-                    var people = await OsobyEsRepo.Searching.FulltextSearchAsync(query, page, pageSize);
+                    var people = await OsobyEsRepo.Searching.FulltextSearchAsync(query, page, pageSize, osobaStatus);
                     peopleIds = people.Results
                         .Where(r => r.Status != (int)Osoba.StatusOsobyEnum.Duplicita)
                         .Select(r => r.NameId).ToList();

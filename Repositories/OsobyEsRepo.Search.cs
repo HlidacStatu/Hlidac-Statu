@@ -46,6 +46,15 @@ namespace HlidacStatu.Repositories
                     int fuzzyDistance = 1;
                     if (status.HasValue)
                     {
+                        QueryContainer qc = null;
+                        
+                        if (status.Value < 0) //vsechny > 0
+                            qc = new QueryContainerDescriptor<OsobaES>()
+                                .Range(r=>r.Field(f=>f.Status).GreaterThanOrEquals(1));
+                        else
+                            qc = new QueryContainerDescriptor<OsobaES>()
+                                .Term(r => r.Status, status.Value);
+
                         res = await _esClient
                             .SearchAsync<OsobaES>(s => s
                                 .Size(pageSize)
@@ -53,32 +62,17 @@ namespace HlidacStatu.Repositories
                                 .Query(_query => _query
                                     .Bool(_bool => _bool
                                         .Must(_must => _must
-                                            .Fuzzy(_fuzzy => _fuzzy
-                                                .Field(_field => _field.FullName)
-                                                .Value(modifQ)
-                                                .Fuzziness(Fuzziness.EditDistance(fuzzyDistance))
-                                            )
-                                            && _must.Term(_field => _field.Status, status.Value)
-                                        )
-                                        .Should(
-                                            _boostWomen => _boostWomen
-                                            .Match(_match => _match
-                                                .Field(_field => _field.FullName)
-                                                .Query(modifQ)
-                                                .Operator(Operator.And)
-                                            ),
-                                            _boostExact => _boostExact
-                                            .Match(_match => _match
-                                                .Field("fullName.lower")
-                                                .Query(modifQ)
-                                                .Operator(Operator.And)
-                                            ),
-                                            _boostAscii => _boostAscii
-                                            .Match(_match => _match
-                                                .Field("fullName.lowerascii")
-                                                .Query(modifQ)
-                                                .Operator(Operator.And)
-                                            )
+                                            .MultiMatch(c => c
+                                                .Fields(f => f
+                                                    .Field(p => p.FullName)
+                                                    .Field("fullName.lower", 2)
+                                                    .Field("fullName.lowerascii", 1.5)
+                                                    )
+                                            .Type(TextQueryType.MostFields)
+                                            .Fuzziness(Fuzziness.EditDistance(fuzzyDistance))
+                                            .Query(modifQ)
+                                            .Operator(Operator.And)
+                                            ),q=> qc
                                         )
                                     )
                                 )
@@ -93,12 +87,12 @@ namespace HlidacStatu.Repositories
                             .Size(pageSize)
                             .From(page * pageSize)
                             .Query(_query => _query
-                                    .MultiMatch(c => c
-                                .Fields(f => f
-                                    .Field(p => p.FullName)
-                                    .Field("fullName.lower", 2)
-                                    .Field("fullName.lowerascii", 1.5)
-                                    )
+                                .MultiMatch(c => c
+                                    .Fields(f => f
+                                        .Field(p => p.FullName)
+                                        .Field("fullName.lower", 2)
+                                        .Field("fullName.lowerascii", 1.5)
+                                        )
                                 .Type(TextQueryType.MostFields)
                                 .Fuzziness(Fuzziness.EditDistance(fuzzyDistance))
                                 .Query(modifQ)

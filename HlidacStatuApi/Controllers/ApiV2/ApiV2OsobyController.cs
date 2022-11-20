@@ -41,9 +41,19 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return OsobaDetail;
         }
 
+        /// <summary>
+        /// Vyhledání osoby podle jména v textu
+        /// </summary>
+        /// <param name="ftxDotaz">Jméno osoby</param>
+        /// <param name="status"> 
+        /// 0 - nepolitická osoba (dostupné pouze pro uživatele s komerční licencí)
+        /// 1 - sponzoři polit.stran, politici, úředníci
+        /// </param>
+        /// <param name="strana"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpGet, Route("hledatFtx")]
-        public async Task<ActionResult<List<OsobaDTO>>> OsobySearchFtx([FromQuery] string? ftxDotaz = null, [FromQuery] int? strana = null)
+        public async Task<ActionResult<List<OsobaDTO>>> OsobySearchFtx([FromQuery] string? ftxDotaz = null, [FromQuery] int status = 1, [FromQuery] int? strana = null)
         {
             if (string.IsNullOrEmpty(ftxDotaz))
             {
@@ -52,7 +62,10 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
             if (strana is null || strana < 1)
                 strana = 1;
-            var osoby = await OsobaRepo.Searching.SimpleSearchAsync(ftxDotaz, strana.Value, 30, OsobaRepo.Searching.OrderResult.Relevance);
+            if (status == 1)
+                status = -1;
+            var osoby = await OsobaRepo.Searching.SimpleSearchAsync(ftxDotaz, 
+                strana.Value, 30, OsobaRepo.Searching.OrderResult.Relevance, osobaStatus:status);
 
             var result = osoby.Results.Select(o => new OsobaDTO(o)).ToList();
 
