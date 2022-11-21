@@ -388,18 +388,11 @@ namespace HlidacStatu.Extensions
             if (!evs.Any())
                 return string.Empty;
 
-            if (html)
-            {
-                return string.Format(template,
-                    string.Join(itemDelimeter, evs)
-                );
-            }
-            else
-            {
-                return string.Format(template,
-                    string.Join(itemDelimeter, evs)
-                );
-            }
+            
+            return string.Format(template,
+                string.Join(itemDelimeter, evs)
+            );
+        
         }
 
 
