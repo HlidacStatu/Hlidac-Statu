@@ -255,6 +255,7 @@ namespace HlidacStatu.Datastructures.Graphs
             //AktualnostType akt = parent.Aktualnost;
             //if (minAktualnost >= parent.Aktualnost)
 
+            //Console.WriteLine($"{callDeep} - {parent.UniqId}");
 
             List<Graph.Edge> items = new List<Graph.Edge>();
 
@@ -266,15 +267,17 @@ namespace HlidacStatu.Datastructures.Graphs
                 return items.ToArray();
             }
 
-            var fVazby = vazby
-                    .Where(m =>
-                            parent.To.UniqId == m.From.UniqId
-                            //&& m.Distance == parent.Distance + 1
-                            && m.Aktualnost >= parent.Aktualnost
-                            && m.Aktualnost >= minAktualnost
-                        )
-                    .ToArray();
-            //var fVazby2 = vazby
+            var fVazby2a = vazby
+        .Where(m =>
+                parent.To.UniqId == m.From.UniqId);
+            var fVazby2b = fVazby2a
+                .Where(m=> m.Aktualnost >= minAktualnost);
+            var fVazby2c = fVazby2b 
+                .Where(m=> Devmasters.DT.Util.IsOverlappingIntervals(parent.RelFrom, parent.RelTo, m.RelFrom, m.RelTo))
+                .ToArray();
+
+            var fVazby = fVazby2c;
+            //var fVazby = vazby
             //        .Where(m =>
             //                parent.To.UniqId == m.From.UniqId
             //                //&& m.Distance == parent.Distance + 1
