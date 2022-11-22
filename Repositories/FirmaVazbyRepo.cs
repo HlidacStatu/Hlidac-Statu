@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using static HlidacStatu.Datastructures.Graphs.Graph;
+using static Nest.JoinField;
 
 namespace HlidacStatu.Repositories
 {
@@ -120,7 +121,10 @@ namespace HlidacStatu.Repositories
             currList = currList ?? new HashSet<string>();
 
             Datastructures.Graphs.Graph.Edge[] _parentF = Graph.GetDirectParentRelationsFirmy(ico).ToArray();
-            var _parentVazby = _parentF.Where(m => m.Aktualnost >= minAktualnost);
+            var _parentVazby = _parentF
+                .Where(m => m.Aktualnost >= minAktualnost)
+                //.Where(m => Devmasters.DT.Util.IsOverlappingIntervals(parentF.RelFrom, parent.RelTo, m.RelFrom, m.RelTo))
+            ;
 
             //List<Datastructures.Graphs.Graph.Edge> _parentVazby = new List<Datastructures.Graphs.Graph.Edge>();
             //foreach (var p in _parentF)
@@ -132,7 +136,7 @@ namespace HlidacStatu.Repositories
             //    }
             //}
 
-            
+
             var _parentVazbyIco = _parentVazby
                 .Select(m => m.From.Id)
                 .Where(m => Util.DataValidators.CheckCZICO(m))
@@ -217,7 +221,8 @@ namespace HlidacStatu.Repositories
         public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
         {
             //firma.UpdateVazbyFromDB(); //nemelo by tu byt.
-            return Relation.AktualniVazby(firma.Vazby(refresh), minAktualnost, firma.VazbyRootEdge());
+            var vsechnyVazby = firma.Vazby(refresh);
+            return Relation.AktualniVazby(vsechnyVazby, minAktualnost, firma.VazbyRootEdge());
         }
 
 
