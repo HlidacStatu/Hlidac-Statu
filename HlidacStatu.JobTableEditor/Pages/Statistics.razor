@@ -67,7 +67,7 @@ else
                     @row.Count.ToString("N0")
                 </th>
                 <th>
-                    @Math.Round(row.AverageTime / 1000d, 0).ToString("N0")
+                    @Math.Round(row.AverageTimeInMs / 1000d, 0).ToString("N0")
                 </th>
             </tr>
         }

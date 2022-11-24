@@ -42,6 +42,9 @@ namespace HlidacStatu.Entities
             set => _priceVat = value;
         }
 
+        /// <summary>
+        /// Price per given unit
+        /// </summary>
         public decimal? PriceVATCalculated
         {
             get => RoundToWholeNumber(
@@ -157,16 +160,28 @@ namespace HlidacStatu.Entities
             {
                 if (taxAndPriceAreKnown || priceWithTaxIsKnown)
                 {
-                    decimal minimalHourPriceVat = 100 * 1.21m;
+                    decimal minimalAllowedHourPriceVat = 400 * 1.21m;
+                    decimal maximalAllowedHourPriceVat = 2000 * 1.21m;
 
                     CalculateFinalVatPrice(); // je potřeba si nejprve spočíst jednotkovou cenu
 
-                    bool lowHourPrice = Unit == MeasureUnit.Hour && PriceVATCalculated < minimalHourPriceVat;
-                    bool lowMandayPrice = Unit == MeasureUnit.Day && PriceVATCalculated < minimalHourPriceVat;
+                    bool isHourPriceTooLow =
+                        Unit == MeasureUnit.Hour && PriceVATCalculated < minimalAllowedHourPriceVat;
+                    bool isMandayPriceTooLow =
+                        Unit == MeasureUnit.Day && PriceVATCalculated < minimalAllowedHourPriceVat * 8;
 
-                    if (lowHourPrice || lowMandayPrice)
+                    if (isHourPriceTooLow || isMandayPriceTooLow)
                     {
                         errors.Add("Cena se nám zdá nízká.", Errors.MessageSeverity.Warning);
+                    }
+                    
+                    bool isHourPriceTooHigh = 
+                        Unit == MeasureUnit.Hour && PriceVATCalculated > maximalAllowedHourPriceVat;
+                    bool isMandayPriceTooHigh = 
+                        Unit == MeasureUnit.Day && PriceVATCalculated > maximalAllowedHourPriceVat * 8;
+                    if (isHourPriceTooHigh || isMandayPriceTooHigh)
+                    {
+                        errors.Add("Cena se nám zdá vyoká.", Errors.MessageSeverity.Warning);
                     }
                 }
             }

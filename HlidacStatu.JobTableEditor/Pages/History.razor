@@ -1,8 +1,10 @@
 ﻿@page "/history"
 @using HlidacStatu.Entities
 @using System.Threading
+@using HlidacStatu.Entities.Views
 
 @inject JobService JobService
+@inject StatisticsService StatisticsService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 
@@ -25,15 +27,54 @@ else
                 </a>
             </li>
         }
-        
     </ul>
 }
 
+<label for="statisticsDate">Vyberte datum od kdy chcete zobrazit statistiku</label>
+<Input id="statisticsDate" type="date" class="form-control-sm" @onchange="ChooseNewDate" autocomplete="off"/>
+@if (UserStatistics is not null)
+{
+    <h2>Zobrazuji statistiky od data @StatisticsDate.ToString("dd. MM. yyyy")</h2>
+    <div class="col-3">
+        <ul class="list-group">
+            @foreach (var stat in UserStatistics)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">@stat.GetStatusName()</div>
+                        <i class="fa-regular fa-watch-smart"></i> @Math.Round(stat.AverageTimeInMs / 1000d, 0).ToString("N0")
+                    </div>
+                    <span class="badge bg-success rounded-pill">
+                        @stat.Count <i class="fa-duotone fa-badge-check"></i>
+                    </span>
+                </li>
+            }
+        </ul>
+    </div>
+}
 
 @code {
-    
+
     private List<InDocTables> TablesCompleted { get; set; }
-    
+
+    public DateTime StatisticsDate = DateTime.Today;
+    public IEnumerable<UserJobStatistics> UserStatistics { get; set; }
+
+    public async Task ChooseNewDate(ChangeEventArgs args)
+    {
+        if (!DateTime.TryParse(args?.Value?.ToString(), out var date))
+            return;
+
+        StatisticsDate = date;
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userName = authState?.User?.Identity?.Name;
+
+        var stats = await StatisticsService.UserStatisticsAsync(StatisticsDate);
+        UserStatistics = stats.Where(x => x.User == userName);
+    }
+
+
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -46,4 +87,3 @@ else
     }
 
 }
-
