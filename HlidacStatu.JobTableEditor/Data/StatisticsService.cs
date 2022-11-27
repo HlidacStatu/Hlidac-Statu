@@ -26,7 +26,7 @@ namespace HlidacStatu.JobTableEditor.Data
             
             await using var db = new DbEntities();
             var result = await db.UserJobStatistics.FromSqlInterpolated($@"
-                SELECT t.checkedBy 'user', t.status, COUNT(t.pk) 'count', AVG(t.checkElapsedInMs) 'averageTime'
+                SELECT t.checkedBy 'user', t.status, COUNT(t.pk) 'count', AVG(t.checkElapsedInMs) 'averageTimeInMs'
                 FROM InDocTables t
                 where checkedDate >= {date.ToString("yyyy-MM-dd")}
                 and t.status >= 2

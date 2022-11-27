@@ -8,7 +8,7 @@ namespace HlidacStatu.Entities.Views
         public string User { get; set; }
         public int Status { get; set; }
         public int Count { get; set; }
-        public int AverageTime { get; set; }
+        public int AverageTimeInMs { get; set; }
 
         public string GetStatusName()
         {
