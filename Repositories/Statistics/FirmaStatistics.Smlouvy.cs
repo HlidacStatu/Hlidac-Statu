@@ -11,9 +11,9 @@ namespace HlidacStatu.Repositories.Statistics
     public static partial class FirmaStatistics
     {
 
-        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor)> 
+        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)> 
             _holdingSmlouvaCache
-            = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor)>
+            = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)>
                 .GetSafeInstance("Holding_SmlouvyStatistics_v1_",
                     (obj) => _holdingCalculateStats(obj.firma, obj.aktualnost, obj.obor),
                     TimeSpan.FromHours(12),
@@ -24,7 +24,7 @@ namespace HlidacStatu.Repositories.Statistics
                     obj => obj.firma.ICO + "-" + obj.aktualnost.ToString() + "-" + (obj.obor ?? 0));
 
         public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> CachedHoldingStatisticsSmlouvy(
-            Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor = null, 
+            Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor = null, 
             bool forceUpdateCache = false)
         {
             if (forceUpdateCache)
@@ -34,7 +34,7 @@ namespace HlidacStatu.Repositories.Statistics
         }
 
         private static StatisticsSubjectPerYear<Smlouva.Statistics.Data> _holdingCalculateStats(
-            Firma f, Datastructures.Graphs.Relation.AktualnostType aktualnost, int? obor)
+            Firma f, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)
         {
             var firmy = f.Holding(aktualnost).ToArray();
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HlidacStatu.Datastructures.Graphs2
+namespace HlidacStatu.DS.Graphs2
 {
     public interface IVertex
     {

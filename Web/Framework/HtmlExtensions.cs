@@ -730,7 +730,7 @@ tbl_" + _tableId + @" = $('#" + _tableId + @"').DataTable(" + dataTableOptions +
             }
         }
 
-        public static IHtmlContent RenderVazby(this IHtmlHelper self, Datastructures.Graphs.Graph.Edge[] vazbyToRender)
+        public static IHtmlContent RenderVazby(this IHtmlHelper self, HlidacStatu.DS.Graphs.Graph.Edge[] vazbyToRender)
         {
             if (vazbyToRender == null)
             {

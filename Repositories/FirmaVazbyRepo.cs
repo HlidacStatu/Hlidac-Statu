@@ -1,5 +1,5 @@
-using HlidacStatu.Datastructures.Graphs;
-using HlidacStatu.Datastructures.Graphs2;
+using HlidacStatu.DS.Graphs;
+using HlidacStatu.DS.Graphs2;
 using HlidacStatu.Entities;
 using HlidacStatu.Util;
 
@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using static HlidacStatu.Datastructures.Graphs.Graph;
+using static HlidacStatu.DS.Graphs.Graph;
 using static Nest.JoinField;
 
 namespace HlidacStatu.Repositories
@@ -79,13 +79,13 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception)
             {
-                firma._vazby = new Datastructures.Graphs.Graph.Edge[] { };
+                firma._vazby = new HlidacStatu.DS.Graphs.Graph.Edge[] { };
             }
         }
 
 
 
-        public static Datastructures.Graphs.Graph.Edge[] Vazby(this Firma firma, bool refresh = false)
+        public static DS.Graphs.Graph.Edge[] Vazby(this Firma firma, bool refresh = false)
         {
             if (firma._vazby == null || refresh == true)
             {
@@ -95,7 +95,7 @@ namespace HlidacStatu.Repositories
             return firma._vazby;
         }
 
-        public static void Vazby(this Firma firma, IEnumerable<Datastructures.Graphs.Graph.Edge> value)
+        public static void Vazby(this Firma firma, IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> value)
         {
             firma._vazby = value.ToArray();
         }
@@ -120,13 +120,13 @@ namespace HlidacStatu.Repositories
         {
             currList = currList ?? new HashSet<string>();
 
-            Datastructures.Graphs.Graph.Edge[] _parentF = Graph.GetDirectParentRelationsFirmy(ico).ToArray();
+            HlidacStatu.DS.Graphs.Graph.Edge[] _parentF = Graph.GetDirectParentRelationsFirmy(ico).ToArray();
             var _parentVazby = _parentF
                 .Where(m => m.Aktualnost >= minAktualnost)
                 //.Where(m => Devmasters.DT.Util.IsOverlappingIntervals(parentF.RelFrom, parent.RelTo, m.RelFrom, m.RelTo))
             ;
 
-            //List<Datastructures.Graphs.Graph.Edge> _parentVazby = new List<Datastructures.Graphs.Graph.Edge>();
+            //List<HlidacStatu.DS.Graphs.Graph.Edge> _parentVazby = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
             //foreach (var p in _parentF)
             //{
             //    if (Util.DataValidators.CheckCZICO(p.From.Id))
@@ -165,7 +165,7 @@ namespace HlidacStatu.Repositories
                 return currList;
         }
 
-        public static Datastructures.Graphs.Graph.Edge[] ParentVazbaFirmy(this Firma firma, Relation.AktualnostType minAktualnost)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] ParentVazbaFirmy(this Firma firma, Relation.AktualnostType minAktualnost)
         {
             if (firma._parentVazbyFirmy == null)
                 firma._parentVazbyFirmy = Graph.GetDirectParentRelationsFirmy(firma.ICO).ToArray();
@@ -174,7 +174,7 @@ namespace HlidacStatu.Repositories
 
 
 
-        public static Datastructures.Graphs.Graph.Edge[] ParentVazbyOsoby(this Firma firma, Relation.AktualnostType minAktualnost)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] ParentVazbyOsoby(this Firma firma, Relation.AktualnostType minAktualnost)
         {
             if (firma._parentVazbyOsoby == null)
                 firma._parentVazbyOsoby = Graph.GetDirectParentRelationsOsoby(firma.ICO).ToArray();
@@ -186,7 +186,7 @@ namespace HlidacStatu.Repositories
             var vazby = firma.AktualniVazby(minAktualnost, refresh);
 
             var data = vazby
-                .Where(v => v.To != null && v.To.Type == HlidacStatu.Datastructures.Graphs.Graph.Node.NodeType.Company)
+                .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                         .GroupBy(f => f.To.Id, v => v, (ico, v) => new
                         {
                             ICO = ico,
@@ -195,13 +195,13 @@ namespace HlidacStatu.Repositories
             return data.Select(m => m.Firma).ToArray();
         }
 
-        public static Datastructures.Graphs.Graph.Edge VazbyRootEdge(this Firma firma)
+        public static HlidacStatu.DS.Graphs.Graph.Edge VazbyRootEdge(this Firma firma)
         {
-            return new Datastructures.Graphs.Graph.Edge()
+            return new HlidacStatu.DS.Graphs.Graph.Edge()
             {
                 From = null,
                 Root = true,
-                To = new Datastructures.Graphs.Graph.Node() { Id = firma.ICO, Type = Datastructures.Graphs.Graph.Node.NodeType.Company },
+                To = new HlidacStatu.DS.Graphs.Graph.Node() { Id = firma.ICO, Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company },
                 RelFrom = null,
                 RelTo = null,
                 Distance = 0,
@@ -218,7 +218,7 @@ namespace HlidacStatu.Repositories
                 .Count() ?? 0;
         }
 
-        public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] AktualniVazby(this Firma firma, Relation.AktualnostType minAktualnost, bool refresh = false)
         {
             //firma.UpdateVazbyFromDB(); //nemelo by tu byt.
             var vsechnyVazby = firma.Vazby(refresh);
@@ -226,13 +226,13 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static Datastructures.Graphs.Graph.Edge[] VazbyProICO(this Firma firma, string ico)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] VazbyProICO(this Firma firma, string ico)
         {
             return _vazbyProIcoCache.Get((firma, ico));
         }
 
-        static private Devmasters.Cache.LocalMemory.Manager<Datastructures.Graphs.Graph.Edge[], (Firma f, string ico)> _vazbyProIcoCache
-            = Devmasters.Cache.LocalMemory.Manager<Datastructures.Graphs.Graph.Edge[], (Firma f, string ico)>
+        static private Devmasters.Cache.LocalMemory.Manager<HlidacStatu.DS.Graphs.Graph.Edge[], (Firma f, string ico)> _vazbyProIcoCache
+            = Devmasters.Cache.LocalMemory.Manager<HlidacStatu.DS.Graphs.Graph.Edge[], (Firma f, string ico)>
                 .GetSafeInstance("_vazbyFirmaProIcoCache", f => { return f.f._vazbyProICO(f.ico); },
                     TimeSpan.FromHours(2), k => (k.f.ICO + "-" + k.ico)
                 );
@@ -261,41 +261,41 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private static Datastructures.Graphs.Graph.Edge[] _vazbyProICO(this Firma firma, string ico)
+        private static HlidacStatu.DS.Graphs.Graph.Edge[] _vazbyProICO(this Firma firma, string ico)
         {
             if (firma._graph is null || firma._graph.Vertices.Count == 0)
                 firma.InitializeGraph();
 
             if (firma._startingVertex is null)
-                firma._startingVertex = new Vertex<string>(HlidacStatu.Datastructures.Graphs.Graph.Node.Prefix_NodeType_Company + firma.ICO);
+                firma._startingVertex = new Vertex<string>(HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company + firma.ICO);
 
             try
             {
                 var shortestPath = firma._graph.ShortestPath(firma._startingVertex, CreateVertexFromIco(ico));
                 if (shortestPath == null)
-                    return Array.Empty<Datastructures.Graphs.Graph.Edge>();
-                var result = shortestPath.Select(x => ((Edge<Datastructures.Graphs.Graph.Edge>)x).BindingPayload).ToArray();
+                    return Array.Empty<HlidacStatu.DS.Graphs.Graph.Edge>();
+                var result = shortestPath.Select(x => ((Edge<HlidacStatu.DS.Graphs.Graph.Edge>)x).BindingPayload).ToArray();
                 return result; // shortestGraph.ShortestTo(ico).ToArray();
             }
             catch (Exception e)
             {
                 Consts.Logger.Error("Vazby ERROR for " + firma.ICO, e);
-                return Array.Empty<Datastructures.Graphs.Graph.Edge>();
+                return Array.Empty<HlidacStatu.DS.Graphs.Graph.Edge>();
             }
         }
 
         private static Vertex<string> CreateVertexFromIco(string ico)
         {
-            return new Vertex<string>($"{HlidacStatu.Datastructures.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}");
+            return new Vertex<string>($"{HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}");
         }
 
         public static void UpdateVazbyFromDb(this Firma firma)
         {
-            List<Datastructures.Graphs.Graph.Edge> oldRel = new List<Datastructures.Graphs.Graph.Edge>();
+            List<HlidacStatu.DS.Graphs.Graph.Edge> oldRel = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
 
             var firstRel = Graph.VsechnyDcerineVazby(firma.ICO, true);
 
-            firma.Vazby(Datastructures.Graphs.Graph.Edge.Merge(oldRel, firstRel).ToArray());
+            firma.Vazby(HlidacStatu.DS.Graphs.Graph.Edge.Merge(oldRel, firstRel).ToArray());
         }
     }
 }

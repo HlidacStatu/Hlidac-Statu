@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HlidacStatu.Datastructures.Graphs
+namespace HlidacStatu.DS.Graphs
 {
     public partial class Graph
     {

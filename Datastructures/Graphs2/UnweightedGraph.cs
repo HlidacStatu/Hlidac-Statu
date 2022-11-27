@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace HlidacStatu.Datastructures.Graphs2
+namespace HlidacStatu.DS.Graphs2
 {
     public class UnweightedGraph
     {

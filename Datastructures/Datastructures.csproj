@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <AssemblyName>HlidacStatu.Datastructures</AssemblyName>
-        <RootNamespace>HlidacStatu.Datastructures</RootNamespace>
+        <RootNamespace>HlidacStatu.DS</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

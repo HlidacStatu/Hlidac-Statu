@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace HlidacStatu.Datastructures.Graphs
+namespace HlidacStatu.DS.Graphs
 {
     public class Relation
     {

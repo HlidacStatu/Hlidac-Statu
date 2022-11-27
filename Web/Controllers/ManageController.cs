@@ -1,6 +1,6 @@
 ﻿using HlidacStatu.Connectors;
 using HlidacStatu.Datasets;
-using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Extensions;

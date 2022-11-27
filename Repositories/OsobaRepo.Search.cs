@@ -1,7 +1,7 @@
 using Devmasters;
 using Devmasters.Enums;
 
-using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories.Searching;
@@ -288,7 +288,7 @@ namespace HlidacStatu.Repositories
                             var fvazby = f.AktualniVazby(Relation.AktualnostType.Nedavny);
                             foreach (var fv in fvazby)
                             {
-                                if (fv.To.Type == Datastructures.Graphs.Graph.Node.NodeType.Company)
+                                if (fv.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                                 {
                                     int osobaId = Convert.ToInt32(fv.To.Id);
                                     if (osoby.ContainsKey(osobaId))

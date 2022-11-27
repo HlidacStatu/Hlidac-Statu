@@ -21,8 +21,8 @@ namespace HlidacStatu.Repositories.Statistics
                    f => f.ICO);
 
 
-        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)>
-           _holdingVZCache = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)>
+        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
+           _holdingVZCache = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
                .GetSafeInstance("Holding_VZStatistics",
                    (obj) => CalculateHoldingVZStat(obj.firma, obj.aktualnost),
                    TimeSpan.FromHours(12),
@@ -33,7 +33,7 @@ namespace HlidacStatu.Repositories.Statistics
                    obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
 
         public static StatisticsSubjectPerYear<Firma.Statistics.VZ> CachedHoldingStatisticsVZ(
-    Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost,
+    Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost,
     bool forceUpdateCache = false)
         {
             if (forceUpdateCache)
@@ -52,7 +52,7 @@ namespace HlidacStatu.Repositories.Statistics
             return _VZCache.Get(firma);
         }
 
-        private static StatisticsSubjectPerYear<Firma.Statistics.VZ> CalculateHoldingVZStat(Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost)
+        private static StatisticsSubjectPerYear<Firma.Statistics.VZ> CalculateHoldingVZStat(Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)
         {
             var firmy = firma.Holding(aktualnost).ToArray();
 

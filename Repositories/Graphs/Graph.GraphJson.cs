@@ -27,7 +27,7 @@
         [Newtonsoft.Json.JsonObject(ItemNullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public class GraphJson
         {
-            public GraphJson(Datastructures.Graphs.Graph.Node n, int distance, bool isRoot = false)
+            public GraphJson(HlidacStatu.DS.Graphs.Graph.Node n, int distance, bool isRoot = false)
             {
                 group = "nodes";
                 data.id = n.UniqId;
@@ -35,7 +35,7 @@
                 data.caption = n.PrintName();
                 data.root = isRoot ? true : (bool?)null;
             }
-            public GraphJson(Datastructures.Graphs.Graph.Edge e)
+            public GraphJson(HlidacStatu.DS.Graphs.Graph.Edge e)
             {
                 group = "edges";
 

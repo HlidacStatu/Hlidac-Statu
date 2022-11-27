@@ -92,7 +92,7 @@ namespace HlidacStatu.Web.Framework
             return new HtmlString($"<span style='white-space:nowrap'>{s}</span>");
         }
 
-        public static IHtmlContent RenderOsobaVazba(Datastructures.Graphs.Graph.Edge v, string blockFormat = "<div>{0}</div>")
+        public static IHtmlContent RenderOsobaVazba(HlidacStatu.DS.Graphs.Graph.Edge v, string blockFormat = "<div>{0}</div>")
         {
             var sb = new StringBuilder();
 

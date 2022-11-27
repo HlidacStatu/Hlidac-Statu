@@ -2,7 +2,7 @@
 using Devmasters.Enums;
 
 using HlidacStatu.Connectors;
-using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
@@ -22,7 +22,7 @@ namespace HlidacStatu.Repositories
     {
         static DateTime minDate = new DateTime(1950, 1, 1);
 
-        public static IEnumerable<string> UniqIds(IEnumerable<Datastructures.Graphs.Graph.Edge> edges)
+        public static IEnumerable<string> UniqIds(IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> edges)
         {
             if (edges == null)
                 return new string[] { };
@@ -37,8 +37,8 @@ namespace HlidacStatu.Repositories
             return uids;
         }
 
-        private static Devmasters.Cache.Couchbase.Manager<List<Datastructures.Graphs.Graph.Edge>, string> vazbyIcoCache
-            = Devmasters.Cache.Couchbase.Manager<List<Datastructures.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazby",
+        private static Devmasters.Cache.Couchbase.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string> vazbyIcoCache
+            = Devmasters.Cache.Couchbase.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazby",
                 ico => vsechnyDcerineVazbyInternal(ico, 0, true, null),
                 TimeSpan.FromDays(3),
                 Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
@@ -46,12 +46,12 @@ namespace HlidacStatu.Repositories
                 Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
                 Devmasters.Config.GetWebConfigValue("CouchbasePassword"));
 
-        private static Devmasters.Cache.Couchbase.Manager<List<Datastructures.Graphs.Graph.Edge>, string> vazbyOsobaNameIdCache
-            = Devmasters.Cache.Couchbase.Manager<List<Datastructures.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazbyOsoba",
+        private static Devmasters.Cache.Couchbase.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string> vazbyOsobaNameIdCache
+            = Devmasters.Cache.Couchbase.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazbyOsoba",
                 osobaNameId =>
                 {
                     if (string.IsNullOrEmpty(osobaNameId))
-                        return new List<Datastructures.Graphs.Graph.Edge>();
+                        return new List<HlidacStatu.DS.Graphs.Graph.Edge>();
                     Osoba o = Osoby.GetByNameId.Get(osobaNameId);
                     return vsechnyDcerineVazbyInternal(o, 0, true, null);
                 },
@@ -60,21 +60,21 @@ namespace HlidacStatu.Repositories
                 Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
                 Devmasters.Config.GetWebConfigValue("CouchbasePassword"));
 
-        public static List<Datastructures.Graphs.Graph.Edge> VsechnyDcerineVazby(string ico, bool refresh = false)
+        public static List<HlidacStatu.DS.Graphs.Graph.Edge> VsechnyDcerineVazby(string ico, bool refresh = false)
         {
             if (refresh)
                 vazbyIcoCache.Delete(ico);
             return vazbyIcoCache.Get(ico);
         }
 
-        public static List<Datastructures.Graphs.Graph.Edge> VsechnyDcerineVazby(Osoba person, bool refresh = false)
+        public static List<HlidacStatu.DS.Graphs.Graph.Edge> VsechnyDcerineVazby(Osoba person, bool refresh = false)
         {
             if (refresh)
                 vazbyOsobaNameIdCache.Delete(person?.NameId);
             return vazbyOsobaNameIdCache.Get(person?.NameId);
         }
 
-        public static List<Datastructures.Graphs.Graph.Edge> vsechnyDcerineVazbyInternal(string ico, int level, bool goDeep, Datastructures.Graphs.Graph.Edge parent,
+        public static List<HlidacStatu.DS.Graphs.Graph.Edge> vsechnyDcerineVazbyInternal(string ico, int level, bool goDeep, HlidacStatu.DS.Graphs.Graph.Edge parent,
             ExcludeDataCol excludeICO = null, DateTime? datumOd = null, DateTime? datumDo = null, decimal minPodil = 0,
             Relation.AktualnostType aktualnost = Relation.AktualnostType.Libovolny)
         {
@@ -90,13 +90,13 @@ namespace HlidacStatu.Repositories
                 new SqlParameter("datumDo", datumDo),
             };
 
-            var rel = GetChildrenRelations(sql, Datastructures.Graphs.Graph.Node.NodeType.Company, ico, datumOd, datumDo,
+            var rel = GetChildrenRelations(sql, HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company, ico, datumOd, datumDo,
                 p, level, goDeep, parent, excludeICO, minPodil, aktualnost);
             return rel;
         }
 
 
-        public static List<Datastructures.Graphs.Graph.Edge> vsechnyDcerineVazbyInternal(Osoba person, int level, bool goDeep, Datastructures.Graphs.Graph.Edge parent,
+        public static List<HlidacStatu.DS.Graphs.Graph.Edge> vsechnyDcerineVazbyInternal(Osoba person, int level, bool goDeep, HlidacStatu.DS.Graphs.Graph.Edge parent,
             ExcludeDataCol excludeICO = null, IEnumerable<int> excludeOsobaId = null,
             DateTime? datumOd = null, DateTime? datumDo = null, decimal minPodil = 0,
             Relation.AktualnostType aktualnost = Relation.AktualnostType.Libovolny)
@@ -117,11 +117,11 @@ namespace HlidacStatu.Repositories
                 new SqlParameter("datumDo", datumDo),
             };
 
-            var relForPerson = GetChildrenRelations(sql, Datastructures.Graphs.Graph.Node.NodeType.Person, person.InternalId.ToString(),
+            var relForPerson = GetChildrenRelations(sql, HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, person.InternalId.ToString(),
                 datumOd, datumDo,
                 p, level, goDeep, parent, excludeICO, minPodil, aktualnost);
 
-            var relForConnectedPersons = new List<Datastructures.Graphs.Graph.Edge>();
+            var relForConnectedPersons = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
             using (DbEntities db = new DbEntities())
             {
                 var navazaneOsoby = db.OsobaVazby.AsQueryable()
@@ -129,8 +129,8 @@ namespace HlidacStatu.Repositories
                 if (navazaneOsoby.Count > 0)
                     foreach (var ov in navazaneOsoby)
                     {
-                        Datastructures.Graphs.Graph.Edge parentRelFound = relForPerson
-                            .Where(r => r.To.Type == Datastructures.Graphs.Graph.Node.NodeType.Person
+                        HlidacStatu.DS.Graphs.Graph.Edge parentRelFound = relForPerson
+                            .Where(r => r.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person
                                         && r.To.Id == ov.VazbakOsobaId.Value.ToString())
                             .FirstOrDefault();
 
@@ -140,16 +140,16 @@ namespace HlidacStatu.Repositories
                             excludeOsobaId = excludeOsobaId.Union(new int[] { ov.VazbakOsobaId.Value });
                             var rel = vsechnyDcerineVazbyInternal(o, level + 1, true, parentRelFound,
                                 excludeOsobaId: excludeOsobaId, aktualnost: aktualnost);
-                            relForConnectedPersons = Datastructures.Graphs.Graph.Edge.Merge(relForConnectedPersons, rel);
+                            relForConnectedPersons = HlidacStatu.DS.Graphs.Graph.Edge.Merge(relForConnectedPersons, rel);
                         }
                     }
             }
 
-            var finalRel = Datastructures.Graphs.Graph.Edge.Merge(relForConnectedPersons, relForPerson);
+            var finalRel = HlidacStatu.DS.Graphs.Graph.Edge.Merge(relForConnectedPersons, relForPerson);
             return finalRel;
         }
 
-        public static List<Datastructures.Graphs.Graph.Edge> Holding(string ico, Relation.AktualnostType aktualnost)
+        public static List<HlidacStatu.DS.Graphs.Graph.Edge> Holding(string ico, Relation.AktualnostType aktualnost)
         {
             DateTime? from = null;
             DateTime to = DateTime.Now.Date.AddDays(1);
@@ -172,12 +172,12 @@ namespace HlidacStatu.Repositories
             return Holding(ico, from.Value, to, aktualnost);
         }
 
-        public static List<Datastructures.Graphs.Graph.Edge> Holding(string ico, DateTime datumOd, DateTime datumDo,
+        public static List<HlidacStatu.DS.Graphs.Graph.Edge> Holding(string ico, DateTime datumOd, DateTime datumDo,
             Relation.AktualnostType aktualnost)
         {
             var vazby = vsechnyDcerineVazbyInternal(ico, 9, true, null, datumOd: datumOd, datumDo: datumDo);
             var parents = GetParentRelations(ico, vazby, 0, datumOd, datumDo);
-            var rootNode = new Datastructures.Graphs.Graph.Node() { Id = ico, Type = Datastructures.Graphs.Graph.Node.NodeType.Company };
+            var rootNode = new HlidacStatu.DS.Graphs.Graph.Node() { Id = ico, Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company };
             if (parents?.Count() > 0)
             {
                 if (vazby.Any(m => m.Root))
@@ -189,30 +189,30 @@ namespace HlidacStatu.Repositories
                     }
             }
 
-            var finalRel = Datastructures.Graphs.Graph.Edge.Merge(parents.ToList(), vazby);
+            var finalRel = HlidacStatu.DS.Graphs.Graph.Edge.Merge(parents.ToList(), vazby);
             return finalRel;
         }
 
-        public static List<Datastructures.Graphs.Graph.Edge> GetChildrenRelations(string sql,
-            Datastructures.Graphs.Graph.Node.NodeType nodeType, string nodeId, DateTime? datumOd, DateTime? datumDo,
+        public static List<HlidacStatu.DS.Graphs.Graph.Edge> GetChildrenRelations(string sql,
+            HlidacStatu.DS.Graphs.Graph.Node.NodeType nodeType, string nodeId, DateTime? datumOd, DateTime? datumDo,
             IDataParameter[] parameters, int level, bool goDeep,
-            Datastructures.Graphs.Graph.Edge parent, ExcludeDataCol excludeICO, decimal minPodil, Relation.AktualnostType aktualnost)
+            HlidacStatu.DS.Graphs.Graph.Edge parent, ExcludeDataCol excludeICO, decimal minPodil, Relation.AktualnostType aktualnost)
         {
             if (excludeICO == null)
                 excludeICO = new ExcludeDataCol();
 
             string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
 
-            List<Datastructures.Graphs.Graph.Edge> relations = new List<Datastructures.Graphs.Graph.Edge>();
+            List<HlidacStatu.DS.Graphs.Graph.Edge> relations = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
             if (level == 0 && parent == null)
             {
                 //add root node / edge
                 relations.Add(
-                    new Datastructures.Graphs.Graph.Edge()
+                    new HlidacStatu.DS.Graphs.Graph.Edge()
                     {
                         From = null,
                         Root = true,
-                        To = new Datastructures.Graphs.Graph.Node() { Id = nodeId, Type = nodeType },
+                        To = new HlidacStatu.DS.Graphs.Graph.Node() { Id = nodeId, Type = nodeType },
                         RelFrom = datumOd,
                         RelTo = datumDo,
                         Distance = 0,
@@ -247,7 +247,7 @@ namespace HlidacStatu.Repositories
                                 angaz = new AngazovanostData()
                                 {
                                     subjId = vazbakOsobaId.Value.ToString(),
-                                    NodeType = Datastructures.Graphs.Graph.Node.NodeType.Person,
+                                    NodeType = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person,
                                     fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
                                     toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
                                     kod_ang = Convert.ToInt32(dr["typVazby"]),
@@ -263,7 +263,7 @@ namespace HlidacStatu.Repositories
                         {
                             subjId = ico,
                             subjname = "",
-                            NodeType = Datastructures.Graphs.Graph.Node.NodeType.Company,
+                            NodeType = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company,
                             fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
                             toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
                             kod_ang = Convert.ToInt32(dr["typVazby"]),
@@ -322,8 +322,8 @@ namespace HlidacStatu.Repositories
                     }
 
                     var rel = AngazovanostDataToEdge(ang,
-                        new Datastructures.Graphs.Graph.Node() { Type = nodeType, Id = nodeId },
-                        new Datastructures.Graphs.Graph.Node() { Type = ang.NodeType, Id = ang.subjId },
+                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = nodeType, Id = nodeId },
+                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = ang.NodeType, Id = ang.subjId },
                         level + 1
                     );
 
@@ -337,13 +337,13 @@ namespace HlidacStatu.Repositories
             }
 
 
-            relations = HlidacStatu.Datastructures.Graphs.Graph.Edge.GetLongestEdges(relations).ToList();
+            relations = HlidacStatu.DS.Graphs.Graph.Edge.GetLongestEdges(relations).ToList();
 
             if (goDeep && relations.Count > 0)
             {
                 level++;
-                List<Datastructures.Graphs.Graph.Edge> deeperRels = new List<Datastructures.Graphs.Graph.Edge>();
-                List<Datastructures.Graphs.Graph.Edge> excludeMore = new List<Datastructures.Graphs.Graph.Edge>();
+                List<HlidacStatu.DS.Graphs.Graph.Edge> deeperRels = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
+                List<HlidacStatu.DS.Graphs.Graph.Edge> excludeMore = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
                 if (parent != null)
                 {
                     excludeMore = relations.ToList();
@@ -389,9 +389,9 @@ namespace HlidacStatu.Repositories
             return relations;
         }
 
-        private static Datastructures.Graphs.Graph.Edge AngazovanostDataToEdge(AngazovanostData ang, Datastructures.Graphs.Graph.Node fromNode, Datastructures.Graphs.Graph.Node toNode, int distance)
+        private static HlidacStatu.DS.Graphs.Graph.Edge AngazovanostDataToEdge(AngazovanostData ang, HlidacStatu.DS.Graphs.Graph.Node fromNode, HlidacStatu.DS.Graphs.Graph.Node toNode, int distance)
         {
-            var rel = new Datastructures.Graphs.Graph.Edge();
+            var rel = new HlidacStatu.DS.Graphs.Graph.Edge();
             rel.From = fromNode;
             rel.To = toNode;
             rel.Distance = distance;
@@ -412,9 +412,9 @@ namespace HlidacStatu.Repositories
             return rel;
         }
 
-        private static Tuple<HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum, string> AngazovanostDataToRelationSimple(AngazovanostData ang)
+        private static Tuple<HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum, string> AngazovanostDataToRelationSimple(AngazovanostData ang)
         {
-            HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Jiny;
+            HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum relRelationship = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Jiny;
             string descr = ang.descr;
             /*
        3  - prokura
@@ -428,14 +428,14 @@ namespace HlidacStatu.Repositories
             switch (ang.kod_ang)
             {
                 case 1:
-                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Statutarni_organ;
+                    relRelationship = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Statutarni_organ;
                     if (string.IsNullOrEmpty(descr))
-                        descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Jednatel.ToNiceDisplayName();
+                        descr = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Jednatel.ToNiceDisplayName();
                     break;
                 case 3:
-                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Statutarni_organ;
+                    relRelationship = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Statutarni_organ;
                     if (string.IsNullOrEmpty(descr))
-                        descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Prokura.ToNiceDisplayName();
+                        descr = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Prokura.ToNiceDisplayName();
                     break;
                 case 4:
                 case 7:
@@ -445,16 +445,16 @@ namespace HlidacStatu.Repositories
                 case 26:
                 case 28:
                 case 31:
-                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Statutarni_organ;
+                    relRelationship = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Statutarni_organ;
                     if (string.IsNullOrEmpty(descr))
-                        descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Dozorci_rada.ToNiceDisplayName();
+                        descr = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Dozorci_rada.ToNiceDisplayName();
                     break;
                 case 33:
                 case 34:
                 case 35:
-                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Zakladatel;
+                    relRelationship = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Zakladatel;
                     if (string.IsNullOrEmpty(descr))
-                        descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Dozorci_rada.ToNiceDisplayName();
+                        descr = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Dozorci_rada.ToNiceDisplayName();
                     break;
                 case 5:
                 case 9:
@@ -462,14 +462,14 @@ namespace HlidacStatu.Repositories
                 case 15:
                 case 19:
                 case 24:
-                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Spolecnik;
+                    relRelationship = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Spolecnik;
                     if (string.IsNullOrEmpty(descr))
-                        descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Spolecnik.ToNiceDisplayName();
+                        descr = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Spolecnik.ToNiceDisplayName();
                     break;
                 case 100:
-                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Souhrnny;
+                    relRelationship = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Souhrnny;
                     if (string.IsNullOrEmpty(descr))
-                        descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Jednatel.ToNiceDisplayName();
+                        descr = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Jednatel.ToNiceDisplayName();
                     break;
                 case 23: //
                 case 29: //
@@ -483,30 +483,30 @@ namespace HlidacStatu.Repositories
                 case 41: //
                 case 42: //
                 case 99:
-                    relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Jiny;
+                    relRelationship = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Jiny;
                     break;
                 default:
 
                     if (ang.kod_ang < 0)
                     {
-                        relRelationship = (HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum)ang.kod_ang;
+                        relRelationship = (HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum)ang.kod_ang;
                         descr = relRelationship.ToNiceDisplayName();
                     }
                     else
                     {
                         //rel.Relationship = Relation.RelationDescriptionEnum.Jednatel;
-                        relRelationship = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Jiny;
+                        relRelationship = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Jiny;
                         if (string.IsNullOrEmpty(descr))
-                            descr = HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum.Jednatel.ToNiceDisplayName();
+                            descr = HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum.Jednatel.ToNiceDisplayName();
                     }
 
                     break;
             }
 
-            return new Tuple<HlidacStatu.Datastructures.Graphs.Relation.RelationSimpleEnum, string>(relRelationship, descr);
+            return new Tuple<HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum, string>(relRelationship, descr);
         }
 
-        public static IEnumerable<Datastructures.Graphs.Graph.Edge> GetDirectParentRelationsFirmy(string ico)
+        public static IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> GetDirectParentRelationsFirmy(string ico)
         {
             string sql = @"select ICO, vazbakIco, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from FirmaVazby 
             where vazbakico=@ico 
@@ -514,7 +514,7 @@ namespace HlidacStatu.Repositories
 
             string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
 
-            List<Datastructures.Graphs.Graph.Edge> relations = new List<Datastructures.Graphs.Graph.Edge>();
+            List<HlidacStatu.DS.Graphs.Graph.Edge> relations = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
             //get zakladni informace o subj.
 
             //find politician in the DB
@@ -535,7 +535,7 @@ namespace HlidacStatu.Repositories
                     {
                         subjId = (string)dr["ico"],
                         subjname = "",
-                        NodeType = Datastructures.Graphs.Graph.Node.NodeType.Company,
+                        NodeType = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company,
                         fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
                         toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
                         kod_ang = Convert.ToInt32(dr["typVazby"]),
@@ -543,25 +543,25 @@ namespace HlidacStatu.Repositories
                         podil = (decimal?)PersistLib.IsNull(dr["podil"], null)
                     })
                     .ToArray();
-                var ret = new List<Datastructures.Graphs.Graph.Edge>();
+                var ret = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
                 for (int i = 0; i < parents.Length; i++)
                 {
                     AngazovanostData ang = parents[i];
                     var rel = AngazovanostDataToEdge(ang,
-                        new Datastructures.Graphs.Graph.Node() { Type = Datastructures.Graphs.Graph.Node.NodeType.Company, Id = ang.subjId },
-                        new Datastructures.Graphs.Graph.Node() { Type = Datastructures.Graphs.Graph.Node.NodeType.Company, Id = ico },
+                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company, Id = ang.subjId },
+                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company, Id = ico },
                         -1
                     );
                     ret.Add(rel);
                 }
 
-                return Datastructures.Graphs.Graph.Edge.GetLongestEdges(ret);
+                return HlidacStatu.DS.Graphs.Graph.Edge.GetLongestEdges(ret);
             }
 
-            return new Datastructures.Graphs.Graph.Edge[] { };
+            return new HlidacStatu.DS.Graphs.Graph.Edge[] { };
         }
 
-        public static IEnumerable<Datastructures.Graphs.Graph.Edge> GetDirectParentRelationsOsoby(string ico)
+        public static IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> GetDirectParentRelationsOsoby(string ico)
         {
             string sql = @"select OsobaID, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from osobavazby 
                         where vazbakico=@ico 
@@ -569,7 +569,7 @@ namespace HlidacStatu.Repositories
 
             string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
 
-            List<Datastructures.Graphs.Graph.Edge> relations = new List<Datastructures.Graphs.Graph.Edge>();
+            List<HlidacStatu.DS.Graphs.Graph.Edge> relations = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
             //get zakladni informace o subj.
 
             //find politician in the DB
@@ -589,7 +589,7 @@ namespace HlidacStatu.Repositories
                     {
                         subjId = ((int)dr["osobaId"]).ToString(),
                         subjname = "",
-                        NodeType = Datastructures.Graphs.Graph.Node.NodeType.Company,
+                        NodeType = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company,
                         fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
                         toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
                         kod_ang = Convert.ToInt32(dr["typVazby"]),
@@ -597,27 +597,27 @@ namespace HlidacStatu.Repositories
                         podil = (decimal?)PersistLib.IsNull(dr["podil"], null)
                     })
                     .ToArray();
-                var ret = new List<Datastructures.Graphs.Graph.Edge>();
+                var ret = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
                 for (int i = 0; i < parents.Length; i++)
                 {
                     AngazovanostData ang = parents[i];
                     var rel = AngazovanostDataToEdge(ang,
-                        new Datastructures.Graphs.Graph.Node() { Type = Datastructures.Graphs.Graph.Node.NodeType.Person, Id = ang.subjId },
-                        new Datastructures.Graphs.Graph.Node() { Type = Datastructures.Graphs.Graph.Node.NodeType.Person, Id = ico },
+                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, Id = ang.subjId },
+                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, Id = ico },
                         -1
                     );
 
                     ret.Add(rel);
                 }
 
-                return Datastructures.Graphs.Graph.Edge.GetLongestEdges(ret);
+                return HlidacStatu.DS.Graphs.Graph.Edge.GetLongestEdges(ret);
             }
 
-            return new Datastructures.Graphs.Graph.Edge[] { };
+            return new HlidacStatu.DS.Graphs.Graph.Edge[] { };
         }
 
-        public static IEnumerable<Datastructures.Graphs.Graph.Edge> GetParentRelations(string ico,
-            IEnumerable<Datastructures.Graphs.Graph.Edge> currRelations, int distance,
+        public static IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> GetParentRelations(string ico,
+            IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> currRelations, int distance,
             DateTime datumOd, DateTime datumDo)
         {
             string sql = @"select ico, vazbakIco, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from Firmavazby 
@@ -627,7 +627,7 @@ namespace HlidacStatu.Repositories
 
             string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
 
-            List<Datastructures.Graphs.Graph.Edge> relations = currRelations?.ToList() ?? new List<Datastructures.Graphs.Graph.Edge>();
+            List<HlidacStatu.DS.Graphs.Graph.Edge> relations = currRelations?.ToList() ?? new List<HlidacStatu.DS.Graphs.Graph.Edge>();
             //get zakladni informace o subj.
 
             //find politician in the DB
@@ -658,10 +658,10 @@ namespace HlidacStatu.Repositories
                     //move
 
                     //add edge with parent 
-                    var currEdge = new Datastructures.Graphs.Graph.Edge()
+                    var currEdge = new HlidacStatu.DS.Graphs.Graph.Edge()
                     {
-                        From = new Datastructures.Graphs.Graph.Node() { },
-                        To = new Datastructures.Graphs.Graph.Node() { },
+                        From = new HlidacStatu.DS.Graphs.Graph.Node() { },
+                        To = new HlidacStatu.DS.Graphs.Graph.Node() { },
                         RelFrom = datumOd,
                         RelTo = datumDo,
                     };
@@ -683,7 +683,7 @@ namespace HlidacStatu.Repositories
                 return relations;
             }
 
-            return new Datastructures.Graphs.Graph.Edge[] { };
+            return new HlidacStatu.DS.Graphs.Graph.Edge[] { };
         }
 
 
@@ -697,7 +697,7 @@ namespace HlidacStatu.Repositories
             public string descr { get; set; }
             public int kod_ang { get; set; }
             public decimal? podil { get; set; }
-            public Datastructures.Graphs.Graph.Node.NodeType NodeType { get; set; }
+            public HlidacStatu.DS.Graphs.Graph.Node.NodeType NodeType { get; set; }
         }
 
         public class ExcludeData
@@ -706,7 +706,7 @@ namespace HlidacStatu.Repositories
             {
             }
 
-            public ExcludeData(Datastructures.Graphs.Graph.Edge r)
+            public ExcludeData(HlidacStatu.DS.Graphs.Graph.Edge r)
             {
                 parent = r.From;
                 child = r.To;
@@ -714,8 +714,8 @@ namespace HlidacStatu.Repositories
                 to = r.RelTo;
             }
 
-            public Datastructures.Graphs.Graph.Node parent { get; set; }
-            public Datastructures.Graphs.Graph.Node child { get; set; }
+            public HlidacStatu.DS.Graphs.Graph.Node parent { get; set; }
+            public HlidacStatu.DS.Graphs.Graph.Node child { get; set; }
             public DateTime? from { get; set; }
             public DateTime? to { get; set; }
 
@@ -810,7 +810,7 @@ namespace HlidacStatu.Repositories
                 return this;
             }
 
-            public bool Contains(Datastructures.Graphs.Graph.Edge r)
+            public bool Contains(HlidacStatu.DS.Graphs.Graph.Edge r)
             {
                 var ex = new ExcludeData(r);
                 return items
@@ -820,7 +820,7 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static string TiskVazeb(string rootName, Datastructures.Graphs.Graph.Edge origRoot, IEnumerable<Datastructures.Graphs.Graph.Edge> vazby, Relation.TiskEnum typ, bool withStats = true)
+        public static string TiskVazeb(string rootName, HlidacStatu.DS.Graphs.Graph.Edge origRoot, IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> vazby, Relation.TiskEnum typ, bool withStats = true)
         {
             string htmlTemplate = "<ul id='nestedlist'><li>{0}</li>{1}</ul>";
             string textTemplate = "{0}\n|\n{1}";
@@ -829,32 +829,32 @@ namespace HlidacStatu.Repositories
             switch (typ)
             {
                 case Relation.TiskEnum.Text:
-                    return string.Format(textTemplate, rootName, PrintFlatRelations(origRoot, (Datastructures.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(textTemplate, rootName, PrintFlatRelations(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
                 case Relation.TiskEnum.Html:
-                    return string.Format(htmlTemplate, rootName, PrintFlatRelations(origRoot, (Datastructures.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(htmlTemplate, rootName, PrintFlatRelations(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
                 case Relation.TiskEnum.Json:
-                    return string.Format(jsonTemplate, rootName, PrintFlatRelations(origRoot, (Datastructures.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(jsonTemplate, rootName, PrintFlatRelations(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
                 case Relation.TiskEnum.Checkbox:
-                    return string.Format(checkboxTemplate, rootName, PrintFlatRelations(origRoot, (Datastructures.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
+                    return string.Format(checkboxTemplate, rootName, PrintFlatRelations(origRoot, (HlidacStatu.DS.Graphs.Graph.Edge)null, 0, vazby, typ, null, withStats));
                 default:
                     return string.Empty;
             }
 
         }
 
-        private static string PrintFlatRelations(Datastructures.Graphs.Graph.Edge origRoot, Datastructures.Graphs.Graph.Edge parent, int level, IEnumerable<Datastructures.Graphs.Graph.Edge> relations, Relation.TiskEnum typ,
+        private static string PrintFlatRelations(HlidacStatu.DS.Graphs.Graph.Edge origRoot, HlidacStatu.DS.Graphs.Graph.Edge parent, int level, IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> relations, Relation.TiskEnum typ,
            List<string> renderedIds, bool withStats = true, string highlightSubjId = null)
         {
             if (parent == null)
-                return PrintFlatRelations(origRoot, (Datastructures.Graphs.Graph.MergedEdge)null, level, relations, typ,
+                return PrintFlatRelations(origRoot, (HlidacStatu.DS.Graphs.Graph.MergedEdge)null, level, relations, typ,
                     renderedIds, withStats, highlightSubjId);
             else
-                return PrintFlatRelations(origRoot, new Datastructures.Graphs.Graph.MergedEdge(parent), level, relations, typ,
+                return PrintFlatRelations(origRoot, new HlidacStatu.DS.Graphs.Graph.MergedEdge(parent), level, relations, typ,
                 renderedIds, withStats, highlightSubjId);
         }
 
-        private static string PrintFlatRelations(Datastructures.Graphs.Graph.Edge origRoot, Datastructures.Graphs.Graph.MergedEdge parent, int level,
-            IEnumerable<Datastructures.Graphs.Graph.Edge> relations, Relation.TiskEnum typ,
+        private static string PrintFlatRelations(HlidacStatu.DS.Graphs.Graph.Edge origRoot, HlidacStatu.DS.Graphs.Graph.MergedEdge parent, int level,
+            IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> relations, Relation.TiskEnum typ,
        List<string> renderedIds, bool withStats = true, string highlightSubjId = null)
         {
             int space = 2;
@@ -865,7 +865,7 @@ namespace HlidacStatu.Repositories
             if (renderedIds == null)
                 renderedIds = new List<string>();
 
-            IEnumerable<Datastructures.Graphs.Graph.Edge> firstBatch = null;
+            IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> firstBatch = null;
             if (parent == null)
                 firstBatch = relations.Where(m => 
                     !relations.Any(r => r.To?.UniqId == m.From?.UniqId)
@@ -878,9 +878,9 @@ namespace HlidacStatu.Repositories
                 .Distinct()
                 .GroupBy(k => new { id = k.To.UniqId, type = k.To.Type }, (k, v) =>
                 {
-                    Datastructures.Graphs.Graph.MergedEdge withChildren = Datastructures.Graphs.Graph.Edge.MergeSameEdges(v);
+                    HlidacStatu.DS.Graphs.Graph.MergedEdge withChildren = HlidacStatu.DS.Graphs.Graph.Edge.MergeSameEdges(v);
                     if (withChildren == null)
-                        withChildren = new Datastructures.Graphs.Graph.MergedEdge(v.First());
+                        withChildren = new HlidacStatu.DS.Graphs.Graph.MergedEdge(v.First());
 
                     return withChildren;
                 })
@@ -891,7 +891,7 @@ namespace HlidacStatu.Repositories
                 return string.Empty;
 
             StringBuilder sb = new StringBuilder(512);
-            List<Datastructures.Graphs.Graph.Edge> deepRels = new List<Datastructures.Graphs.Graph.Edge>();
+            List<HlidacStatu.DS.Graphs.Graph.Edge> deepRels = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
             switch (typ)
             {
                 case Relation.TiskEnum.Text:
@@ -911,10 +911,10 @@ namespace HlidacStatu.Repositories
 
                 var last = i == (rels.Count() - 1);
                 StatisticsSubjectPerYear<Smlouva.Statistics.Data> stat = null;
-                if (withStats && rel.To.Type == Datastructures.Graphs.Graph.Node.NodeType.Company)
+                if (withStats && rel.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                     stat = Firmy.Get(rel.To.Id).StatistikaRegistruSmluv(); //new Analysis.SubjectStatistic(rel.To.Id);
 
-                string subjId = rel.To.Type == Datastructures.Graphs.Graph.Node.NodeType.Company ? rel.To.Id : "Osoba";
+                string subjId = rel.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company ? rel.To.Id : "Osoba";
                 string subjName = rel.To.PrintName();
                 renderedIds.Add(rel.To.UniqId);
                 switch (typ)
@@ -992,19 +992,19 @@ namespace HlidacStatu.Repositories
             return sb.ToString();
         }
 
-        public static string PrintName(this Datastructures.Graphs.Graph.Node node, bool html = false)
+        public static string PrintName(this HlidacStatu.DS.Graphs.Graph.Node node, bool html = false)
         {
             switch (node.Type)
             {
-                case Datastructures.Graphs.Graph.Node.NodeType.Person:
+                case HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person:
                     return Osoby.GetById.Get(Convert.ToInt32(node.Id))?.FullNameWithYear(html) ?? "(neznámá osoba)";
-                case Datastructures.Graphs.Graph.Node.NodeType.Company:
+                case HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company:
                 default:
                     return Firmy.GetJmeno(node.Id);
             }
         }
 
-        public static string ExportTabData(IEnumerable<Datastructures.Graphs.Graph.Edge> data)
+        public static string ExportTabData(IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> data)
         {
             if (data == null)
                 return "";
@@ -1020,7 +1020,7 @@ namespace HlidacStatu.Repositories
             return sb.ToString();
         }
 
-        public static string ExportGraphJsonData(IEnumerable<Datastructures.Graphs.Graph.Edge> data)
+        public static string ExportGraphJsonData(IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> data)
         {
             if (data == null)
                 return "{\"nodes\": [],\"edges\": []}";

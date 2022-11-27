@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HlidacStatu.Datastructures.Graphs2
+namespace HlidacStatu.DS.Graphs2
 {
     public interface IEdge
     {

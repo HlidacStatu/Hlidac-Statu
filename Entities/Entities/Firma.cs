@@ -1,7 +1,7 @@
 ﻿using Devmasters;
 
-using HlidacStatu.Datastructures.Graphs;
-using HlidacStatu.Datastructures.Graphs2;
+using HlidacStatu.DS.Graphs;
+using HlidacStatu.DS.Graphs2;
 
 using System;
 using System.ComponentModel.DataAnnotations;

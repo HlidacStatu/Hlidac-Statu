@@ -1,4 +1,4 @@
-﻿using HlidacStatu.Datastructures.Graphs;
+﻿using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.OrgStrukturyStatu;
 using HlidacStatu.Extensions;

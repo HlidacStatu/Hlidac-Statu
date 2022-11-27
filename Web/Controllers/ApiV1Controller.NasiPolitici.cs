@@ -1,5 +1,5 @@
 ﻿using HlidacStatu.Datasets;
-using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
@@ -93,7 +93,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
             var vazby = o.AktualniVazby(Relation.AktualnostType.Nedavny)
-                .Where(v => v.Distance == 1 && v.To?.Type == Datastructures.Graphs.Graph.Node.NodeType.Company)
+                .Where(v => v.Distance == 1 && v.To?.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                 .Take(10)
                 .Select(v => new
                 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HlidacStatu.Datastructures.Graphs
+namespace HlidacStatu.DS.Graphs
 {
     public partial class Graph
     {

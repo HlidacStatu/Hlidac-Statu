@@ -1,5 +1,5 @@
-using HlidacStatu.Datastructures.Graphs;
-using HlidacStatu.Datastructures.Graphs2;
+using HlidacStatu.DS.Graphs;
+using HlidacStatu.DS.Graphs2;
 using HlidacStatu.Entities;
 
 
@@ -130,13 +130,13 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static Datastructures.Graphs.Graph.Edge VazbyRootEdge(this Osoba osoba)
+        public static HlidacStatu.DS.Graphs.Graph.Edge VazbyRootEdge(this Osoba osoba)
         {
-            return new Datastructures.Graphs.Graph.Edge()
+            return new HlidacStatu.DS.Graphs.Graph.Edge()
             {
                 From = null,
                 Root = true,
-                To = new Datastructures.Graphs.Graph.Node() { Id = osoba.InternalId.ToString(), Type = Datastructures.Graphs.Graph.Node.NodeType.Person },
+                To = new HlidacStatu.DS.Graphs.Graph.Node() { Id = osoba.InternalId.ToString(), Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person },
                 RelFrom = null,
                 RelTo = null,
                 Distance = 0,
@@ -144,32 +144,32 @@ namespace HlidacStatu.Repositories
             };
 
         }
-        public static Datastructures.Graphs.Graph.Edge[] VazbyProICO(this Osoba osoba, string ico)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] VazbyProICO(this Osoba osoba, string ico)
         {
             return _vazbyProIcoCache.Get((osoba, ico));
         }
 
-        private static Datastructures.Graphs.Graph.Edge[] _vazbyProICO(this Osoba osoba, string ico)
+        private static HlidacStatu.DS.Graphs.Graph.Edge[] _vazbyProICO(this Osoba osoba, string ico)
         {
             if (osoba._graph is null || osoba._graph.Vertices.Count == 0)
                 osoba.InitializeGraph();
 
             if (osoba._startingVertex is null)
-                osoba._startingVertex = new Vertex<string>(HlidacStatu.Datastructures.Graphs.Graph.Node.Prefix_NodeType_Person + osoba.InternalId);
+                osoba._startingVertex = new Vertex<string>(HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Person + osoba.InternalId);
 
             try
             {
                 var shortestPath = osoba._graph.ShortestPath(osoba._startingVertex, CreateVertexFromIco(ico));
                 if (shortestPath == null)
-                    return Array.Empty<Datastructures.Graphs.Graph.Edge>();
+                    return Array.Empty<HlidacStatu.DS.Graphs.Graph.Edge>();
 
-                var result = shortestPath.Select(x => ((Edge<Datastructures.Graphs.Graph.Edge>)x).BindingPayload).ToArray();
+                var result = shortestPath.Select(x => ((Edge<HlidacStatu.DS.Graphs.Graph.Edge>)x).BindingPayload).ToArray();
                 return result; // shortestGraph.ShortestTo(ico).ToArray();
             }
             catch (Exception e)
             {
                 Util.Consts.Logger.Error("Vazby ERROR for " + osoba.NameId, e);
-                return Array.Empty<Datastructures.Graphs.Graph.Edge>();
+                return Array.Empty<HlidacStatu.DS.Graphs.Graph.Edge>();
             }
         }
 
@@ -196,10 +196,10 @@ namespace HlidacStatu.Repositories
 
         private static Vertex<string> CreateVertexFromIco(string ico)
         {
-            return new Vertex<string>($"{HlidacStatu.Datastructures.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}");
+            return new Vertex<string>($"{HlidacStatu.DS.Graphs.Graph.Node.Prefix_NodeType_Company}{ico}");
         }
 
-        public static Datastructures.Graphs.Graph.Edge[] Vazby(this Osoba osoba, bool refresh = false)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] Vazby(this Osoba osoba, bool refresh = false)
         {
             if (refresh || osoba._vazby == null)
             {
@@ -218,7 +218,7 @@ namespace HlidacStatu.Repositories
                 .Count() ?? 0;
         }
 
-        public static Datastructures.Graphs.Graph.Edge[] AktualniVazby(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh=false)
+        public static HlidacStatu.DS.Graphs.Graph.Edge[] AktualniVazby(this Osoba osoba, Relation.AktualnostType minAktualnost, bool refresh=false)
         {
             return Relation.AktualniVazby(osoba.Vazby(refresh), minAktualnost, osoba.VazbyRootEdge());
         }
@@ -232,12 +232,12 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception)
             {
-                osoba._vazby = new Datastructures.Graphs.Graph.Edge[] { };
+                osoba._vazby = new HlidacStatu.DS.Graphs.Graph.Edge[] { };
             }
         }
 
-        static private Devmasters.Cache.LocalMemory.Manager<Datastructures.Graphs.Graph.Edge[], (Osoba o, string ico)> _vazbyProIcoCache
-            = Devmasters.Cache.LocalMemory.Manager<Datastructures.Graphs.Graph.Edge[], (Osoba o, string ico)>
+        static private Devmasters.Cache.LocalMemory.Manager<HlidacStatu.DS.Graphs.Graph.Edge[], (Osoba o, string ico)> _vazbyProIcoCache
+            = Devmasters.Cache.LocalMemory.Manager<HlidacStatu.DS.Graphs.Graph.Edge[], (Osoba o, string ico)>
                 .GetSafeInstance("_vazbyOsobaProIcoCache", f => { return f.o._vazbyProICO(f.ico); },
                     TimeSpan.FromHours(2), k => (k.o.NameId + "-" + k.ico)
                 );

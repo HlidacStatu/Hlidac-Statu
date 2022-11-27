@@ -1,4 +1,4 @@
-﻿using HlidacStatu.Datastructures.Graphs;
+﻿using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 
 using System;
@@ -70,7 +70,7 @@ namespace HlidacStatu.Repositories.Searching.Rules
                         .Distinct();
                     string icosQuery = "";
                     var icosPresLidi = f.AktualniVazby(aktualnost)
-                            .Where(o => o.To.Type == Datastructures.Graphs.Graph.Node.NodeType.Person)
+                            .Where(o => o.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person)
                             .Select(o => Osoby.GetById.Get(Convert.ToInt32(o.To.Id)))
                             .Where(o => o != null)
                             .SelectMany(o => o.AktualniVazby(aktualnost))

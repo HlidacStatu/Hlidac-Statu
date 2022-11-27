@@ -2,7 +2,7 @@ using Devmasters.Batch;
 using Devmasters.Net.HttpClient;
 
 using HlidacStatu.Connectors;
-using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Issues;
 using HlidacStatu.Entities.XSD;

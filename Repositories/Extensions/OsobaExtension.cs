@@ -9,7 +9,7 @@ using Devmasters;
 using Devmasters.Enums;
 using Devmasters.Lang.CS;
 
-using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories;

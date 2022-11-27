@@ -1,4 +1,4 @@
-using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
@@ -45,9 +45,9 @@ namespace HlidacStatu.Repositories.Statistics
 
             var perIcoStat = o.AktualniVazby(aktualnost)
                 .Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
-                            && v.To.Type == Datastructures.Graphs.Graph.Node.NodeType.Company)
+                            && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                 .Select(v => v.To)
-                .Distinct(new Datastructures.Graphs.Graph.NodeComparer())
+                .Distinct(new HlidacStatu.DS.Graphs.Graph.NodeComparer())
                 .Select(f => Firmy.Get(f.Id))
                 .Where(f => f.Valid == true)
                 .Select(f => new { f = f, ss = f.StatistikaRegistruSmluv(obor) });

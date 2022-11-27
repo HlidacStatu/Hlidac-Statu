@@ -1,4 +1,4 @@
-﻿using HlidacStatu.Datastructures.Graphs;
+﻿using HlidacStatu.DS.Graphs;
 using HlidacStatu.Lib.Analytics;
 
 using System.Collections.Generic;

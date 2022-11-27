@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
+      <ProjectReference Include="..\Datastructures\DataStructures.csproj" />
       <ProjectReference Include="..\Connectors\Connectors.csproj" />
       <ProjectReference Include="..\Entities\Entities.csproj" />
       <ProjectReference Include="..\HlidacStatu.Lib.Db.Insolvence\HlidacStatu.Lib.Db.Insolvence.csproj" />
@@ -20,6 +20,7 @@
 
     <ItemGroup>
       <PackageReference Include="Devmasters.Cache.AWS_S3" Version="4.1.1" />
+      <PackageReference Include="Devmasters.Cache.Couchbase" Version="4.1.3" />
       <PackageReference Include="Devmasters.Cache.Elastic" Version="4.2.0" />
       <PackageReference Include="InfluxDB.Client" Version="4.7.0" />
       <PackageReference Include="NEST" Version="7.17.5" />

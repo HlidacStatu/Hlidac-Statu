@@ -1,6 +1,6 @@
 using Devmasters;
 
-using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities.Analysis;
 using HlidacStatu.Repositories;
@@ -320,9 +320,9 @@ namespace HlidacStatu.Extensions
         {
             return firma.AktualniVazby(aktualnost)
                 .Where(v => !string.IsNullOrEmpty(v.To?.UniqId)
-                            && v.To.Type == Datastructures.Graphs.Graph.Node.NodeType.Company)
+                            && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
                 .Select(v => v.To)
-                .Distinct(new Datastructures.Graphs.Graph.NodeComparer())
+                .Distinct(new HlidacStatu.DS.Graphs.Graph.NodeComparer())
                 .Select(m => m.Id);
         }
 

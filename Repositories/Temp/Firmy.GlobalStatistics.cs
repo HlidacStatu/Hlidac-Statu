@@ -1,7 +1,7 @@
 ﻿using Devmasters.Batch;
 
 using HlidacStatu.Connectors;
-using HlidacStatu.Datastructures.Graphs;
+using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;

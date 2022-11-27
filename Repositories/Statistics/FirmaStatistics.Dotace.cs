@@ -23,9 +23,9 @@ namespace HlidacStatu.Repositories.Statistics
 
 
         static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
-                Datastructures.Graphs.Relation.AktualnostType aktualnost)>
+                HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
             _holdingDotaceCache = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
-                    Datastructures.Graphs.Relation.AktualnostType aktualnost)>
+                    HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
                 .GetSafeInstance("Holding_DotaceStatistics_v3",
                     (obj) => CalculateHoldingDotaceStat(obj.firma, obj.aktualnost),
                     TimeSpan.FromDays(7),
@@ -36,7 +36,7 @@ namespace HlidacStatu.Repositories.Statistics
                     obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
 
         public static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CachedHoldingStatisticsDotace(
-            Firma firma, Datastructures.Graphs.Relation.AktualnostType aktualnost,
+            Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost,
             bool forceUpdateCache = false)
         {
             if (forceUpdateCache)
@@ -56,7 +56,7 @@ namespace HlidacStatu.Repositories.Statistics
         }
 
         private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateHoldingDotaceStat(Firma firma,
-            Datastructures.Graphs.Relation.AktualnostType aktualnost)
+            HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)
         {
             var statistiky = firma.Holding(aktualnost)
                 .Append(firma)
