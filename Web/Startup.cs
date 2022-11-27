@@ -517,7 +517,7 @@ namespace HlidacStatu.Web
         {
             var conf = Configuration.GetSection("HealthChecks");
 
-            services
+            _ = services
                 .AddHealthChecks()
                 .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000,
                     name: "Web server využitá pamět",
@@ -527,8 +527,8 @@ namespace HlidacStatu.Web
                     "SQL server", HealthStatus.Unhealthy, tags: new[] { "DB", "db" }
                 )
                 .AddHealthCheckWithOptions<Web.HealthChecks.ProcessOpenPorts>(
-                    "Open TCP ports", 
-                    tags: new[] {"Web server" }
+                    "Open TCP ports",
+                    tags: new[] { "Web server" }
                     )
                 .AddHealthCheckWithOptions<Web.HealthChecks.ElasticSearchClusterStatus, Web.HealthChecks.ElasticSearchClusterStatus.Options>(
                     new Web.HealthChecks.ElasticSearchClusterStatus.Options()
@@ -614,28 +614,28 @@ namespace HlidacStatu.Web
                         Exclude = new string[] { "rozhodnuti-uohs", "veklep", "vyjadreni-politiku" },
                         Interval = HealthChecks.DatasetyStatistika.IntervalEnum.Month
                     }, "Statistiky malých databází", HealthStatus.Unhealthy, tags: new[] { "Data" })
-                .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
-                    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.100.145").ConfigData,
-                    "Docker .145", HealthStatus.Unhealthy, tags: new[] { "Docker" })
-                .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
-                    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.100.146").ConfigData,
-                    "Docker .146", HealthStatus.Unhealthy, tags: new[] { "Docker" })
-                .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(                    
-                    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.200").ConfigData,
-                    "Docker .200", HealthStatus.Unhealthy, tags: new[] { "Docker" })
-                .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
-                    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.201").ConfigData,
-                    "Docker .201", HealthStatus.Unhealthy, tags: new[] { "Docker" })
-                .AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
-                    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.204").ConfigData,
-                    "Docker .204", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+                //.AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
+                //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.100.145").ConfigData,
+                //    "Docker .145", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+                //.AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
+                //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.100.146").ConfigData,
+                //    "Docker .146", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+                //.AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
+                //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.200").ConfigData,
+                //    "Docker .200", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+                //.AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
+                //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.201").ConfigData,
+                //    "Docker .201", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+                //.AddHealthCheckWithOptions<Web.HealthChecks.DockerContainer, Web.HealthChecks.DockerContainer.Options>(
+                //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.204").ConfigData,
+                //    "Docker .204", HealthStatus.Unhealthy, tags: new[] { "Docker" })
 
                 .AddHealthCheckWithOptions<Web.HealthChecks.CamelotApis, Web.HealthChecks.CamelotApis.Options>(
                     new HealthChecks.HCConfig<HealthChecks.CamelotApis.Options>(conf).ConfigData,
                     "Camelot APIs", HealthStatus.Unhealthy, tags: new[] { "Docker" })
 
                 .AddHealthCheckWithOptions<Web.HealthChecks.ProxmoxVMs, Web.HealthChecks.ProxmoxVMs.Options>(
-                    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf,"Proxmox.VM.100.100").ConfigData,
+                    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.100.100").ConfigData,
                     "Proxmox 100.100", HealthStatus.Unhealthy, tags: new[] { "VMs" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.ProxmoxVMs, Web.HealthChecks.ProxmoxVMs.Options>(
                     new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.100.101").ConfigData,
