@@ -153,6 +153,8 @@
 
     <div class="watcher-blocks__wrapper">
 
+    @if (false)
+    {
         <!-- K-Index -->
         <div class="watcher-block">
             <div class="watcher__title">
@@ -186,6 +188,27 @@
                 *@
             </div>
         </div>
+        
+    }
+    else
+    {
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <img src="/Content/img/icon-person-watcher.svg">
+                <h2 class="new-title">
+                    <a href="https://volby.hlidacstatu.cz/" class="newbadge top-right">Prezidentské volby 2023&nbsp;</a>
+                </h2>
+            </div>
+            <div class="block-col ">
+                <p class="muted">
+                    Nemůžete volit v místě svého trvalého bydliště? Pomůžeme vám s žádostí o voličský průkaz!
+                </p>
+                <p>
+                    <a href="https://volby.hlidacstatu.cz/" class="btn btn-warning">Voličský průkaz</a>
+                </p>
+            </div>
+        </div>
+    }
     
         
     @if(true)
