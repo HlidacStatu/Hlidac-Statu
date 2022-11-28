@@ -250,12 +250,23 @@
     }
     else
     {
-        if (DateTime.Now < new DateTime(2021, 11, 2, 0, 0, 0))
+        if (DateTime.Now < new DateTime(2023, 1, 25, 0, 0, 0))
         {
-            <div class="alert alert-warning adlinemsg" role="alert" style="">
-                <div class="text-center center-block adlinemsgtxt " style="">
-                    Fandíte naší práci? Podpořte Hlídače státu v Křišťálové lupě 2021 v kategorii Nástroje a služby! Děkujeme 💙
-                    <a class="btn btn-default btn-sm" href="https://kristalova.lupa.cz/hlasovani/?setSubjects=1642" role="button">Hlasování za chvíli končí, <b>neváhejte!</b></a>
+            string[] hlasky = new string[]
+            {
+                "Vše podstatné o organizaci prezidentských voleb!",
+                "Pomoc s žádostí o voličský průkaz",
+                "Prezidentské volby 2023",
+                "To nejdůležitější k lednovým volbám",
+                "Voličský průkaz snadno a rychle"
+            };
+            
+            <div class="alert alert-dark adlinemsg" role="alert">
+                <div class="text-center center-block fs-4">
+                    <a href="https://volby.hlidacstatu.cz/">
+                        <img src="Content/Img/vlajka_small.png" height="39px" alt="česká vlajka"/>
+                        <span>@(hlasky[DateTime.Now.Second % hlasky.Length ])</span>
+                    </a>
                 </div>
             </div>
         }
