@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 
 namespace HlidacStatu.Connectors
@@ -50,23 +49,13 @@ namespace HlidacStatu.Connectors
 
         public static void Initialise(string webAppDataPath = null)
         {
-
-            try
+            lock (lockObj)
             {
-                lock (lockObj)
+                if (initialised == false)
                 {
-                    if (initialised == false)
-                    {
 
-                        initialised = true;
-                    }
+                    initialised = true;
                 }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Ex {e.Message}");
-                Console.WriteLine(e);
-                throw;
             }
 
         }
