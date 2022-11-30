@@ -105,7 +105,7 @@ namespace HlidacStatu.Lib.OCR.Api
                     net.Timeout = 60000;
                     net.Tries = 5;
                     net.IgnoreHttpErrors = true;
-                    System.IO.File.WriteAllBytes(tmpFile, net.GetBinary().Binary);
+                    await System.IO.File.WriteAllBytesAsync(tmpFile, net.GetBinary().Binary);
                 }
                 return await TextFromFileAsync(apikey, tmpFile, client, priority,
                     intensity, origFilename, maxWaitingTime, restartTaskAfterTime);
