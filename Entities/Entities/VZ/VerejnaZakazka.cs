@@ -538,22 +538,6 @@ namespace HlidacStatu.Entities.VZ
                 WordCount = Devmasters.TextUtil.CountWords(PlainText);
             }
 
-            public void SetChecksum(byte[] file)
-            {
-                if (file is null || file.Length == 0)
-                    Sha256Checksum = "nofilefound"; 
-                        
-                var hash = System.Security.Cryptography.SHA256.HashData(file);
-                if (BitConverter.IsLittleEndian)
-                {
-                    Sha256Checksum = BitConverter.ToString(hash).Replace("-", "");
-                }
-                else
-                {
-                    Sha256Checksum = BitConverter.ToString(hash.Reverse().ToArray()).Replace("-", "");
-                }
-            }
-            
             /// <summary>
             /// Use only if you know that this Document has no checksum and should have one, which you know
             /// </summary>

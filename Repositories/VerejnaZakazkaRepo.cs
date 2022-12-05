@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using Polly;
@@ -238,19 +239,24 @@ return;
             {
                 string downloadUrl = dokument.GetDocumentUrlToDownload();
                 
-                var fileContent = await GetFileAsync(httpClient, downloadUrl);
-                dokument.SetChecksum(fileContent);
+                var checksum = await ProcessHttpFileStreamAsync(httpClient, downloadUrl, DoChecksumAsync);
+                
+                dokument.SetChecksum(checksum);
             }
         }
 
-        private static async Task<byte[]> GetFileAsync(HttpClient httpClient, string url)
+        private static async Task<T> ProcessHttpFileStreamAsync<T>(HttpClient httpClient,
+            string url,
+            Func<Stream, Task<T>> asyncProcessingMethod) 
         {
-            using var responseMessage = await _retryPolicy.ExecuteAsync(() => httpClient.GetAsync(url));
+            if (asyncProcessingMethod == null) throw new ArgumentNullException(nameof(asyncProcessingMethod));
+
+            using var responseMessage = await _retryPolicy.ExecuteAsync(() => httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
 
             if (!responseMessage.IsSuccessStatusCode)
             {
                 Consts.Logger.Warning($"Couldn't get {url}");
-                return Array.Empty<byte>();
+                return default;
             }
 
             // na url není soubor, ale html stránka => nevalidní
@@ -259,11 +265,41 @@ return;
                 if (ct.Any(t => t.Contains("text/html")))
                 {
                     Consts.Logger.Error($"Url: {url} contains only HTML, no file downloaded.");
-                    return Array.Empty<byte>();
+                    return default;
                 }
             }
 
-            return await responseMessage.Content.ReadAsByteArrayAsync();
+            try
+            {
+                var stream = await responseMessage.Content.ReadAsStreamAsync();
+                var result = await asyncProcessingMethod(stream);
+                return result;
+            }
+            catch (Exception e)
+            {
+                Consts.Logger.Error($"Url: {url} can not process stream properly.", e);
+                throw;
+            }
+        }
+        
+        private static async Task<string> DoChecksumAsync(Stream stream)
+        {
+            if (stream is null)
+            {
+                return "nofilefound"; 
+            }
+                        
+            using var sha256 = SHA256.Create();
+            var hash = await sha256.ComputeHashAsync(stream);
+                
+            if (BitConverter.IsLittleEndian)
+            {
+                return BitConverter.ToString(hash).Replace("-", "");
+            }
+            else
+            {
+                return BitConverter.ToString(hash.Reverse().ToArray()).Replace("-", "");
+            }
         }
 
         public static string SetEmptyString(this string originalValue, string newValue)
