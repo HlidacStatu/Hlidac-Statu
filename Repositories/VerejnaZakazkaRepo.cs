@@ -239,7 +239,7 @@ return;
             {
                 string downloadUrl = dokument.GetDocumentUrlToDownload();
                 
-                var checksum = await ProcessHttpFileStreamAsync(httpClient, downloadUrl, DoChecksumAsync);
+                var checksum = await ProcessHttpFileStreamAsync(httpClient, downloadUrl, Util.Checksum.DoChecksumAsync);
                 
                 dokument.SetChecksum(checksum);
             }
@@ -282,26 +282,6 @@ return;
             }
         }
         
-        private static async Task<string> DoChecksumAsync(Stream stream)
-        {
-            if (stream is null)
-            {
-                return "nofilefound"; 
-            }
-                        
-            using var sha256 = SHA256.Create();
-            var hash = await sha256.ComputeHashAsync(stream);
-                
-            if (BitConverter.IsLittleEndian)
-            {
-                return BitConverter.ToString(hash).Replace("-", "");
-            }
-            else
-            {
-                return BitConverter.ToString(hash.Reverse().ToArray()).Replace("-", "");
-            }
-        }
-
         public static string SetEmptyString(this string originalValue, string newValue)
         {
             if (string.IsNullOrWhiteSpace(originalValue))
