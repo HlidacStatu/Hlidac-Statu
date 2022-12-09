@@ -53,8 +53,9 @@ namespace HlidacStatu.Repositories
         {
             try
             {
-                if (string.IsNullOrEmpty(verejnaZakazka.Id))
-                    verejnaZakazka.InitId();
+                //todo: přidat kontrolu duplicity sem!
+                //todo: + nastavit jeden typ idčka společně pro:
+                //datlab, vvz, rozza
                 verejnaZakazka.SetStavZakazky();
                 verejnaZakazka.LastUpdated = DateTime.Now;
                 if (posledniZmena.HasValue)
@@ -380,6 +381,25 @@ return;
             return res.Exists;
         }
 
+        public static Dictionary<string,string> UniformDatasetValues(Dictionary<string, string> input)
+        {
+            return input.ToDictionary(kvp => 
+                UniformDatasetName(kvp.Key), 
+                kvp => kvp.Value);
+        }
+
+        private static string UniformDatasetName(string input)
+        {
+            // Url
+            if(Uri.TryCreate(input, UriKind.Absolute, out var uri))
+            {
+                return uri.Host;
+            }
+
+            return string.Empty;
+        }
+        
+        
 
     }
 }

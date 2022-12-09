@@ -1,4 +1,4 @@
-﻿using Devmasters.Enums;
+using Devmasters.Enums;
 
 using HlidacStatu.Util;
 
@@ -73,9 +73,6 @@ namespace HlidacStatu.Entities.VZ
             [Keyword(Index = false)]
             public String URL { get; set; } = string.Empty;
 
-            [Description("Je zakazka pouze na profilu zadavatele?")]
-            [Boolean]
-            public bool OnlyOnProfile { get; set; }
 
             //[Boolean]
             //public bool 
@@ -89,8 +86,7 @@ namespace HlidacStatu.Entities.VZ
                        string.Equals(LimitVZ, other.LimitVZ, StringComparison.InvariantCultureIgnoreCase) &&
                        string.Equals(DruhRizeni, other.DruhRizeni, StringComparison.InvariantCultureIgnoreCase) &&
                        Nullable.Equals(Zverejnen, other.Zverejnen) &&
-                       string.Equals(URL, other.URL, StringComparison.InvariantCultureIgnoreCase) &&
-                       OnlyOnProfile == other.OnlyOnProfile;
+                       string.Equals(URL, other.URL, StringComparison.InvariantCultureIgnoreCase);
             }
 
             public override bool Equals(object obj)
@@ -111,14 +107,9 @@ namespace HlidacStatu.Entities.VZ
                 hashCode.Add(DruhRizeni, StringComparer.InvariantCultureIgnoreCase);
                 hashCode.Add(Zverejnen);
                 hashCode.Add(URL, StringComparer.InvariantCultureIgnoreCase);
-                hashCode.Add(OnlyOnProfile);
                 return hashCode.ToHashCode();
             }
         }
-
-        [Description("Je zakazka pouze na profilu zadavatele?")]
-        [Boolean]
-        public bool OnlyOnProfile { get; set; }
 
         [Description("Druh formuláře - mezinárodní (F*) i české (CZ*).")]
         [ShowNiceDisplayName]
@@ -204,26 +195,26 @@ namespace HlidacStatu.Entities.VZ
             [NiceDisplayName("Nejasný stav")] Jine = 0,
         }
 
-        string _id = null;
-
         [Description("Unikátní ID zakázky. Nevyplňujte, ID vygeneruje Hlídač Státu.")]
-        public string Id
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_id))
-                    InitId();
-                return _id;
-            }
-            set
-            {
-                _id = value;
-            }
-        }
-
+        public string Id { get; init; } = Guid.NewGuid().ToString("N");
+        
         [Keyword()]
-        [Description("Evidenční číslo zakázky ve VVZ")]
-        public string EvidencniCisloZakazky { get; set; } = null;
+        [Description("Interní ID na věstníku veřejných zakázek")]
+        public string VvzInternalId { get; set; } = null;
+
+        [Nested()]
+        [Description("Seznam datasetů a evidenčních čísel v datasetech, kde se VZ vyskytuje." +
+                     " Hodnota 'VVZ-2006' pro zakázky z VVZ od 2006-2016, 'VVZ-2016' pro nové dle zákona o VZ z 2016")]
+        public Dictionary<string,string> Datasety { get; set; } = new();// "VVZ-2016";
+
+        public string DatasetyPrehled(string separator = "\n")
+        {
+            return string.Join(separator, Datasety.Select(ds => $"{ds.Key}: {ds.Value}"));
+        }
+        
+        [Object()]
+        [Description("Externí ID. Seznam dalších různých ID, např. ze systému Rozza")]
+        public HashSet<string> ExternalIds { get; set; } = new();
 
         [Description("ID profilu zadavatele, na kterém tato zakázka.")]
         [Keyword()]
@@ -239,9 +230,6 @@ namespace HlidacStatu.Entities.VZ
         [Keyword()]
         public int DisplayId { get; set; }
 
-        [Keyword()]
-        [Description("Hodnota 'VVZ-2006' pro zakázky z VVZ od 2006-2016, 'VVZ-2016' pro nové dle zákona o VZ z 2016")]
-        public string Dataset { get; set; } = "VVZ-2016";
 
         [Object()]
         [Description("Zadavatel")]
@@ -453,10 +441,10 @@ namespace HlidacStatu.Entities.VZ
         [Description("Měna konečné hodnoty zakázky.")]
         [Keyword]
         public string KonecnaHodnotaMena { get; set; }
-        
-        [Description("Url odkaz na umístění zakázky na webu.")]
-        [Keyword]
-        public string UrlZakazky { get; set; }
+
+        [Description("Seznam známých url odkazů na umístění zakázky na webu.")]
+        [Object()]
+        public HashSet<string> UrlZakazky { get; set; } = new();
 
         [Description("Dokumenty příslušející zakázky (typicky zadávací a smluvní dokumentace)")]
         public class Document
@@ -688,18 +676,6 @@ namespace HlidacStatu.Entities.VZ
 
         }
 
-        public void InitId()
-        {
-            Id = GenerateId(Dataset, EvidencniCisloZakazky);
-        }
-
-        public static string GenerateId(string dataset, string evidencniCisloZakazky)
-        {
-            if (string.IsNullOrEmpty(dataset) || string.IsNullOrEmpty(evidencniCisloZakazky))
-                throw new NullReferenceException();
-            return Devmasters.Crypto.Hash.ComputeHashToHex(dataset + "|" + evidencniCisloZakazky); 
-        }
-
         public string GetUrl(bool local = true)
         {
             return GetUrl(local, string.Empty);
@@ -725,7 +701,6 @@ namespace HlidacStatu.Entities.VZ
             else
                 return null;
         }
-
 
         static string cisloZakazkyRegex = @"Evidenční \s* číslo \s* zakázky: \s*(?<zakazka>(Z?)\d{1,8}([-]*\d{1,7})?)\s+";
         static string cisloConnectedFormRegex = @"Evidenční \s* číslo \s* souvisejícího \s* formuláře: \s*(?<zakazka>(F?)\d{1,8}([-]*\d{1,7})?)\s+";
@@ -864,12 +839,12 @@ namespace HlidacStatu.Entities.VZ
             vz.RawHtml = "";
             return vz;
         }
-
+//todo: dořešit exporty
         public ExpandoObject FlatExport()
         {
             dynamic v = new ExpandoObject();
             v.Url = GetUrl(false);
-            v.CisloZakazky = EvidencniCisloZakazky;
+            v.datasety = Datasety;
 
             v.PosledniZmena = PosledniZmena;
             v.LhutaDoruceni = LhutaDoruceni;
