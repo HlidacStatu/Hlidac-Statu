@@ -62,9 +62,6 @@ namespace HlidacStatu.Entities.VZ
                     return DruhFormulare().ToNiceDisplayName().Trim();
             }
 
-            //[Object(Ignore =true)]
-            //public string P
-
             [Description("Datum zveřejnění.")]
             [Date]
             public DateTime? Zverejnen { get; set; }
@@ -216,9 +213,9 @@ namespace HlidacStatu.Entities.VZ
         [Description("Externí ID. Seznam dalších různých ID, např. ze systému Rozza")]
         public HashSet<string> ExternalIds { get; set; } = new();
 
-        [Description("ID profilu zadavatele, na kterém tato zakázka.")]
-        [Keyword()]
-        public string ZakazkaNaProfiluId { get; set; } = null;
+        // [Description("ID profilu zadavatele, na kterém tato zakázka.")]
+        // [Keyword()]
+        // public string ZakazkaNaProfiluId { get; set; } = null;
 
         [Description("Všechny formuláře spojené se zakázkou")]
         public Formular[] Formulare { get; set; } = new Formular[] { };
@@ -293,6 +290,7 @@ namespace HlidacStatu.Entities.VZ
         //return true if changed
         public bool SetStavZakazky()
         {
+            //todo: tahle kalkulace stavu musí brát v úvahu i jiné zdroje, než je VVZ
             var stav = CalculateStavVZ();
             if (stav.HasValue == false)
                 return false;
