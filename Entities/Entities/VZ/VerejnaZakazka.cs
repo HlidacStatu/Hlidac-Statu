@@ -18,6 +18,13 @@ namespace HlidacStatu.Entities.VZ
     public partial class VerejnaZakazka
         : IBookmarkable, IFlattenedExport
     {
+        public class Sources
+        {
+            public const string VestnikVerejnychZakazek = "https://vestnikverejnychzakazek.cz/";
+            public const string Datlab = "https://datlab.eu/";
+            public const string Rozza = "https://rozza.cz/";
+        }
+        
         public const string Pre2016Dataset = "VVZ-2006";
         public const string Post2016Dataset = "VVZ-2016";
         public const string ProfileOnlyDataset = "VVZ-Profil";
@@ -207,6 +214,29 @@ namespace HlidacStatu.Entities.VZ
         public string DatasetyPrehled(string separator = "\n")
         {
             return string.Join(separator, Datasety.Select(ds => $"{ds.Key}: {ds.Value}"));
+        }
+
+        /// <summary>
+        /// Vrátí jedno ID z datasetů. Pořadí je následující:
+        /// <br>1. Public id z profilu zadavatele (pokud je více profilů, vybere se libovolný) </br>
+        /// <br>2. Pokud není profil zadavatele, pak bereme id z věstníku veř. zakázek</br>
+        /// <br>3. Pokud není nic z výše uvedených, bereme první libovolné id</br>
+        /// </summary>
+        /// <returns></returns>
+        public string ShowPrimaryId()
+        {
+            var id = Datasety.Where(kvp => kvp.Value.StartsWith("P", StringComparison.InvariantCultureIgnoreCase))
+                .Select(kvp => kvp.Value)
+                .FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(id))
+                return id;
+
+            id = Datasety[Sources.VestnikVerejnychZakazek];
+            if (!string.IsNullOrWhiteSpace(id))
+                return id;
+
+            return Datasety.FirstOrDefault().Value;
+
         }
         
         [Object()]

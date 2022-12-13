@@ -10,7 +10,7 @@
     /**/
 
     ViewBag.Title = "Hlídač veřejných zakázek";
-    ViewBag.SubTitle = "Zakázka " + Model.EvidencniCisloZakazky;
+    ViewBag.SubTitle = "Zakázka " + Model.ShowPrimaryId();
 
     ViewBag.SocialShareTitle = Model.NazevZakazky;
     ViewBag.SocialShareText = Devmasters.TextUtil.FormatPlainTextForArticle(Devmasters.TextUtil.ShortenText(Model.PopisZakazky, 200));
@@ -68,8 +68,8 @@ else
     <table class="table table-hover">
     <tbody>
     <tr>
-        <td>Číslo zakázky</td>
-        <td>@Model.EvidencniCisloZakazky</td>
+        <td>Zdroje dat</td>
+        <td>@Model.DatasetyPrehled("<br/>")</td>
     </tr>
     <tr>
         <td>Název zakázky</td>
