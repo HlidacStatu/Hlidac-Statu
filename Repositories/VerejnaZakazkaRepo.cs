@@ -49,6 +49,7 @@ namespace HlidacStatu.Repositories
                 await SaveAsync(verejnaZakazka);
         }
 
+        [Obsolete]
         public static async Task SaveAsync(VerejnaZakazka verejnaZakazka, ElasticClient client = null, DateTime? posledniZmena = null)
         {
             try

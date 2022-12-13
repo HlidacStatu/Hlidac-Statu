@@ -23,7 +23,7 @@
                     @if (LimitedAccess.IsAuthenticatedOrSearchCrawler(Context.Request))
                     {
                         <a href="@item.GetUrl(true, Model.Q)">                            
-                            <span class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">@item.ShowPrimaryId()</span>
+                            <span class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">@item.ZobrazPrimarniIdZdroje()</span>
                             <span class="d-visible d-sm-none d-md-none d-lg-none d-lx-none">
                                 <i class="far fa-file-alt"></i>
                             </span>
@@ -33,7 +33,7 @@
                     else
                     {
                         <a href='#' data-bs-toggle='modal' data-bs-target='#VZInfoAnon' data-url='@item.GetUrl(true, Model.Q)'>                          
-                            <span class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">@item.ShowPrimaryId()</span>
+                            <span class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">@item.ZobrazPrimarniIdZdroje()</span>
                             <span class="d-visible d-sm-none d-md-none d-lg-none d-lx-none">
                                 <i class="far fa-file-alt"></i>
                             </span>                        </a>

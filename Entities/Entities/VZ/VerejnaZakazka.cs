@@ -206,36 +206,89 @@ namespace HlidacStatu.Entities.VZ
         [Description("Interní ID na věstníku veřejných zakázek")]
         public string VvzInternalId { get; set; } = null;
 
-        [Nested()]
+        [Object()]
         [Description("Seznam datasetů a evidenčních čísel v datasetech, kde se VZ vyskytuje." +
                      " Hodnota 'VVZ-2006' pro zakázky z VVZ od 2006-2016, 'VVZ-2016' pro nové dle zákona o VZ z 2016")]
-        public Dictionary<string,string> Datasety { get; set; } = new();// "VVZ-2016";
+        public HashSet<Zdroj> Zdroje { get; set; } = new();
 
-        public string DatasetyPrehled(string separator = "\n")
+        public class Zdroj : IEquatable<Zdroj>
         {
-            return string.Join(separator, Datasety.Select(ds => $"{ds.Key}: {ds.Value}"));
+            [Keyword()]
+            public string Domena { get; set; }
+            [Keyword()]
+            public string IdVDomene { get; set; }
+            [Boolean]
+            public bool IsPre2016 { get; set; } = false;
+            [Date()]
+            public DateTime PosledniZmenaZdroje { get; set; }
+            [Date()]
+            public DateTime Modified { get; set; }
+
+            public bool Equals(Zdroj other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return string.Equals(Domena, other.Domena, StringComparison.InvariantCultureIgnoreCase) 
+                       && string.Equals(IdVDomene, other.IdVDomene, StringComparison.InvariantCultureIgnoreCase)
+                       && IsPre2016 == other.IsPre2016;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((Zdroj)obj);
+            }
+
+            public override int GetHashCode()
+            {
+                var hashCode = new HashCode();
+                hashCode.Add(Domena, StringComparer.InvariantCultureIgnoreCase);
+                hashCode.Add(IdVDomene, StringComparer.InvariantCultureIgnoreCase);
+                hashCode.Add(IsPre2016);
+                return hashCode.ToHashCode();
+            }
+        }
+
+        public string EvidencniCisloZVestniku(bool isPre2016 = false)
+        {
+            string evidencniCilo = Zdroje.Where(zdroj =>
+                    zdroj.IsPre2016 = isPre2016 && zdroj.Domena == Sources.VestnikVerejnychZakazek)
+                .Select(zdroj => zdroj.IdVDomene)
+                .FirstOrDefault();
+
+            return evidencniCilo;
+        }
+
+        public string VypisZdroju(string separator = "\n")
+        {
+            return string.Join(separator, Zdroje.Select(zdroj => $"{zdroj.Domena}: {zdroj.IdVDomene}"));
         }
 
         /// <summary>
-        /// Vrátí jedno ID z datasetů. Pořadí je následující:
+        /// Vrátí jedno ID ze zdrojů. Pořadí je následující:
         /// <br>1. Public id z profilu zadavatele (pokud je více profilů, vybere se libovolný) </br>
         /// <br>2. Pokud není profil zadavatele, pak bereme id z věstníku veř. zakázek</br>
         /// <br>3. Pokud není nic z výše uvedených, bereme první libovolné id</br>
         /// </summary>
         /// <returns></returns>
-        public string ShowPrimaryId()
+        public string ZobrazPrimarniIdZdroje()
         {
-            var id = Datasety.Where(kvp => kvp.Value.StartsWith("P", StringComparison.InvariantCultureIgnoreCase))
-                .Select(kvp => kvp.Value)
+            var id = Zdroje.Where(zdroj => zdroj.IdVDomene.StartsWith("P", StringComparison.InvariantCultureIgnoreCase))
+                .Select(zdroj => zdroj.IdVDomene)
                 .FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(id))
                 return id;
 
-            id = Datasety[Sources.VestnikVerejnychZakazek];
+            id = Zdroje.Where(zdroj =>
+                    zdroj.Domena.Equals(Sources.VestnikVerejnychZakazek, StringComparison.InvariantCultureIgnoreCase))
+                .Select(zdroj => zdroj.IdVDomene)
+                .FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(id))
                 return id;
 
-            return Datasety.FirstOrDefault().Value;
+            return Zdroje.FirstOrDefault()?.IdVDomene;
 
         }
         
@@ -872,7 +925,7 @@ namespace HlidacStatu.Entities.VZ
         {
             dynamic v = new ExpandoObject();
             v.Url = GetUrl(false);
-            v.datasety = Datasety;
+            v.datasety = Zdroje;
 
             v.PosledniZmena = PosledniZmena;
             v.LhutaDoruceni = LhutaDoruceni;
