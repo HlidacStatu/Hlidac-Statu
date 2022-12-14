@@ -83,6 +83,12 @@ namespace HlidacStatu.Repositories
             if (newVZ is null)
                 return;
             
+            //1. udělat potřebné fixy dat
+            //2. najít jestli už existuje
+            //3. pokud neexistuje, tak uložit
+            //4. pokud existuje, tak mergovat
+            //5. při mergi zapsat historii
+            
             try
             {
                 var elasticClient = await Manager.GetESClient_VZAsync();
@@ -310,64 +316,38 @@ return;
                 return null;
         }
         
+        //todo: test it!
         public static async Task<VerejnaZakazka> FindOriginalDocumentFromESAsync(VerejnaZakazka zakazka)
         {
-            string[] hardDatasets = new[] {"tenderarena", "nen.nipez", "gemin.cz" };
             var es = await Manager.GetESClient_VZAsync();
+            // find possible candidates
+            var res = await es.SearchAsync<VerejnaZakazka>(s => s
+                .Query(q => q
+                    .Bool(b => b
+                        .Must(bm =>
+                            bm.Term(t => t.Field(f => f.Zadavatel.ICO).Value(zakazka.Zadavatel.ICO)) &&
+                            bm.Terms(t => t.Field("zdroje.uniqueId").Terms(zakazka.Zdroje.Select(z => z.UniqueId)))
+                        ))));
 
-            // je potřeba zjistit o jaký dataset konkrétně se jedná, abychom mohli najít správný originál
-            string hardDatasetFragment = hardDatasets.FirstOrDefault(hd =>
-                zakazka.Dataset.Contains(hd, StringComparison.InvariantCultureIgnoreCase)); 
-            
-            if (!string.IsNullOrEmpty(hardDatasetFragment))
+            if (!res.IsValid)
             {
-                int? year = zakazka.DatumUverejneni?.Year
-                            ?? zakazka.LhutaDoruceni?.Year
-                            ?? zakazka.LhutaPrihlaseni?.Year
-                            ?? zakazka.Dokumenty.FirstOrDefault(d => d.VlozenoNaProfil != null)?.VlozenoNaProfil?.Year;
-
-                if (year is null)
-                    return null;
-                
-                var res = await es.SearchAsync<VerejnaZakazka>(s => s
-                    .Query(q => q
-                        .Bool(b => b
-                            .Must(bm =>
-                                bm.Term(t => t.Field(f => f.Zadavatel.ICO).Value(zakazka.Zadavatel.ICO)) &&
-                                bm.Term(t => t.Field(f => f.EvidencniCisloZakazky).Value(zakazka.EvidencniCisloZakazky)))
-                            .Filter(bf => bf
-                                .DateRange(r => r
-                                    .Field(f => f.DatumUverejneni)
-                                    .GreaterThanOrEquals(new DateTime(year.Value, 1, 1))
-                                    .LessThanOrEquals(new DateTime(year.Value, 12, 31)))))));
-            
-                if (res.IsValid && res.Hits.Count() > 0 )
-                    return res.Documents.SingleOrDefault(d => d.Dataset.Contains(hardDatasetFragment));
-                else
-                    return null;
+                Consts.Logger.Warning($"VZ problems with query. {res.DebugInformation}");
+                return null;
             }
             
-                
-            var loadOriginalTasks = new List<Task<GetResponse<VerejnaZakazka>>>()
-            {
-                es.GetAsync<VerejnaZakazka>(zakazka.Id)
-            };
+            if (res.Hits.Count() <= 0)
+                return null;
 
-            if (!string.IsNullOrEmpty(zakazka.Zadavatel.ProfilZadavatele) &&
-                !string.IsNullOrEmpty(zakazka.EvidencniCisloZakazky))
+            if (res.Hits.Count > 1)
             {
-                string alternativeId =
-                    VerejnaZakazka.GenerateId(zakazka.Zadavatel.ProfilZadavatele, zakazka.EvidencniCisloZakazky);
-                if (alternativeId != zakazka.Id)
-                {
-                    loadOriginalTasks.Add(es.GetAsync<VerejnaZakazka>(alternativeId));
-                }
+                Consts.Logger.Warning($"VZ Too many matches found. Only one is allowed. \n" +
+                                      $"Ico: {zakazka.Zadavatel.ICO}\n" +
+                                      $"Zdroje:{zakazka.VypisZdroju()}");
+                return null;
             }
 
-            var origs = await Task.WhenAll(loadOriginalTasks);
-                 
-            // If we find more documents, then we do not know original and should throw error
-            return origs.Where(r => r != null && r.IsValid).SingleOrDefault()?.Source;
+            
+            return res.Documents.SingleOrDefault();
         }
 
         public static Task<bool> ExistsAsync(VerejnaZakazka vz, ElasticClient client = null)
@@ -382,23 +362,23 @@ return;
             return res.Exists;
         }
 
-        public static Dictionary<string,string> UniformDatasetValues(Dictionary<string, string> input)
-        {
-            return input.ToDictionary(kvp => 
-                UniformDatasetName(kvp.Key), 
-                kvp => kvp.Value);
-        }
-
-        private static string UniformDatasetName(string input)
-        {
-            // Url
-            if(Uri.TryCreate(input, UriKind.Absolute, out var uri))
-            {
-                return uri.Host;
-            }
-
-            return string.Empty;
-        }
+        // public static Dictionary<string,string> UniformDatasetValues(Dictionary<string, string> input)
+        // {
+        //     return input.ToDictionary(kvp => 
+        //         UniformDatasetName(kvp.Key), 
+        //         kvp => kvp.Value);
+        // }
+        //
+        // private static string UniformDatasetName(string input)
+        // {
+        //     // Url
+        //     if(Uri.TryCreate(input, UriKind.Absolute, out var uri))
+        //     {
+        //         return uri.Host;
+        //     }
+        //
+        //     return string.Empty;
+        // }
         
         
 

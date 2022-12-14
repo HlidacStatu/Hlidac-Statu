@@ -1,4 +1,4 @@
-using Devmasters.Enums;
+﻿using Devmasters.Enums;
 
 using HlidacStatu.Util;
 
@@ -213,8 +213,28 @@ namespace HlidacStatu.Entities.VZ
 
         public class Zdroj : IEquatable<Zdroj>
         {
+            private string _domena;
+
             [Keyword()]
-            public string Domena { get; set; }
+            public string UniqueId => $"{Domena}_{IdVDomene}_{IsPre2016}";
+
+            [Keyword()]
+            public string Domena
+            {
+                get => _domena;
+                set
+                {
+                    if(Uri.TryCreate(value, UriKind.Absolute, out var uri))
+                    {
+                        _domena = uri.Host;
+                    }
+                    else
+                    {
+                        _domena = string.Empty;
+                    }
+                }
+            }
+
             [Keyword()]
             public string IdVDomene { get; set; }
             [Boolean]
@@ -228,9 +248,7 @@ namespace HlidacStatu.Entities.VZ
             {
                 if (ReferenceEquals(null, other)) return false;
                 if (ReferenceEquals(this, other)) return true;
-                return string.Equals(Domena, other.Domena, StringComparison.InvariantCultureIgnoreCase) 
-                       && string.Equals(IdVDomene, other.IdVDomene, StringComparison.InvariantCultureIgnoreCase)
-                       && IsPre2016 == other.IsPre2016;
+                return string.Equals(UniqueId, other.UniqueId, StringComparison.InvariantCultureIgnoreCase);
             }
 
             public override bool Equals(object obj)
@@ -243,11 +261,7 @@ namespace HlidacStatu.Entities.VZ
 
             public override int GetHashCode()
             {
-                var hashCode = new HashCode();
-                hashCode.Add(Domena, StringComparer.InvariantCultureIgnoreCase);
-                hashCode.Add(IdVDomene, StringComparer.InvariantCultureIgnoreCase);
-                hashCode.Add(IsPre2016);
-                return hashCode.ToHashCode();
+                return UniqueId.GetHashCode(StringComparison.InvariantCultureIgnoreCase);
             }
         }
 
