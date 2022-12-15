@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
 using System.Xml.Linq;
+using Result = HlidacStatu.Lib.OCR.Api.Result;
 
 namespace HlidacStatu.Entities.VZ
 
@@ -264,6 +265,9 @@ namespace HlidacStatu.Entities.VZ
                 return UniqueId.GetHashCode(StringComparison.InvariantCultureIgnoreCase);
             }
         }
+        
+        [Object(Enabled = false)] //tady prohledávat nebudeme, index zatěžovat nepotřebujeme
+        public List<string> Changelog { get; set; } = new();
 
         public string EvidencniCisloZVestniku(bool isPre2016 = false)
         {
@@ -315,10 +319,10 @@ namespace HlidacStatu.Entities.VZ
         // public string ZakazkaNaProfiluId { get; set; } = null;
 
         [Description("Všechny formuláře spojené se zakázkou")]
-        public Formular[] Formulare { get; set; } = new Formular[] { };
+        public HashSet<Formular> Formulare { get; set; } = new();
 
         [Description("Hodnotící kritéria zakázky")]
-        public HodnoticiKriteria[] Kriteria { get; set; } = new HodnoticiKriteria[] { };
+        public HashSet<HodnoticiKriteria> Kriteria { get; set; } = new();
 
         [Description("Nepouzito")]
         [Keyword()]
@@ -345,7 +349,7 @@ namespace HlidacStatu.Entities.VZ
 
         [Keyword()]
         [Description("CPV kódy určující oblast VZ")]
-        public string[] CPV { get; set; } = new string[] { };
+        public HashSet<string> CPV { get; set; } = new();
 
         [Date()]
         [Description("Datum uveřejnění")]
@@ -542,7 +546,7 @@ namespace HlidacStatu.Entities.VZ
         public HashSet<string> UrlZakazky { get; set; } = new();
 
         [Description("Dokumenty příslušející zakázky (typicky zadávací a smluvní dokumentace)")]
-        public class Document
+        public class Document : IEquatable<Document>
         {
             [Description("Kontrolní součet SHA256 souboru pro ověření unikátnosti")]
             [Keyword()]
@@ -631,10 +635,39 @@ namespace HlidacStatu.Entities.VZ
                     Sha256Checksum = checksum;
             }
 
-            public bool IsComparable()
+            public bool EqualsLowPriority(Document other)
             {
-                return !(string.IsNullOrWhiteSpace(Sha256Checksum) || Sha256Checksum == "nofilefound");
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+
+                
+                var directUrlEquals = !string.IsNullOrWhiteSpace(DirectUrl) 
+                                      && !string.IsNullOrWhiteSpace(other.DirectUrl)
+                                      && DirectUrl == other.DirectUrl;
+                var storageIdEquals = !string.IsNullOrWhiteSpace(StorageId) 
+                                      && !string.IsNullOrWhiteSpace(other.StorageId)
+                                      && StorageId == other.StorageId;
+                
+                return directUrlEquals || storageIdEquals;
+
             }
+            
+            public bool Equals(Document other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+
+                return !string.IsNullOrWhiteSpace(Sha256Checksum) && Sha256Checksum == other.Sha256Checksum; 
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((Document)obj);
+            }
+
         }
 
         [Description("Hodnotící kritéria veřejné zakázky")]
@@ -708,10 +741,7 @@ namespace HlidacStatu.Entities.VZ
             {
                 if (ReferenceEquals(null, other)) return false;
                 if (ReferenceEquals(this, other)) return true;
-                return string.Equals(ICO, other.ICO, StringComparison.InvariantCultureIgnoreCase) &&
-                       string.Equals(Jmeno, other.Jmeno, StringComparison.InvariantCultureIgnoreCase) &&
-                       string.Equals(ProfilZadavatele, other.ProfilZadavatele,
-                           StringComparison.InvariantCultureIgnoreCase);
+                return string.Equals(ICO, other.ICO, StringComparison.InvariantCultureIgnoreCase);
             }
 
             public override bool Equals(object obj)
@@ -724,11 +754,7 @@ namespace HlidacStatu.Entities.VZ
 
             public override int GetHashCode()
             {
-                var hashCode = new HashCode();
-                hashCode.Add(ICO, StringComparer.InvariantCultureIgnoreCase);
-                hashCode.Add(Jmeno, StringComparer.InvariantCultureIgnoreCase);
-                hashCode.Add(ProfilZadavatele, StringComparer.InvariantCultureIgnoreCase);
-                return hashCode.ToHashCode();
+                return ICO.GetHashCode();
             }
 
             public static bool operator ==(Subject left, Subject right)

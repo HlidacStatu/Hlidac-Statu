@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Devmasters.Collections;
 using HlidacStatu.Entities;
 using Polly;
 using Polly.Extensions.Http;
@@ -84,6 +85,7 @@ namespace HlidacStatu.Repositories
                 return;
             
             //1. udělat potřebné fixy dat
+            //+ spočítat sha dokumentů
             //2. najít jestli už existuje
             //3. pokud neexistuje, tak uložit
             //4. pokud existuje, tak mergovat
@@ -91,99 +93,67 @@ namespace HlidacStatu.Repositories
             
             try
             {
+                var newDocChecksumTask = FillDocumentChecksums(newVZ, httpClient);
+                SetupUpdateDates(newVZ, posledniZmena);
+                
                 var elasticClient = await Manager.GetESClient_VZAsync();
 
                 var originalVZ = await FindOriginalDocumentFromESAsync(newVZ);
 
-                if (originalVZ is null)
-                {
-                    var line =
-                        $"{newVZ.Dataset}\t{newVZ.EvidencniCisloZakazky}\t{newVZ.Zadavatel.ICO}\t{newVZ.DatumUverejneni}\t{newVZ.NazevZakazky}\t{newVZ.UrlZakazky}";
-                    await File.AppendAllLinesAsync(@"d:\missingVzHs.tsv", new[] { line });
-                }
-
-return;
-                
+                await newDocChecksumTask;
                 if (originalVZ is null)
                 {
                     SetForOcr(newVZ);
-                    SetupUpdateDates(newVZ, posledniZmena);
                     await elasticClient.IndexDocumentAsync(newVZ);
                     return;
                 }
                 
-                //set proper id, because dataset was not the same
-                if (originalVZ.Id != newVZ.Id  
-                    && newVZ.EvidencniCisloZakazky == originalVZ.EvidencniCisloZakazky) // to make sure both VZ are the same
+                var origDocChecksumTask = FillDocumentChecksums(originalVZ, httpClient);
+                
+                MergeSimpleProperties(ref originalVZ, newVZ);
+
+                // merge dodavatele
+                foreach (var newDodavatel in newVZ.Dodavatele)
                 {
-                    newVZ.Dataset = originalVZ.Dataset;
-                    newVZ.EvidencniCisloZakazky = originalVZ.EvidencniCisloZakazky;
-                    newVZ.InitId(); //fix id
+                    var origDodavatel = originalVZ.Dodavatele.Where(d => d.Equals(newDodavatel)).FirstOrDefault();
 
-                }
-                
-
-                // preferujeme datum z datlabu, protože Rozza nemusí mít nejsprávnější údaj (např VZ P21V00004199)
-                newVZ.DatumUverejneni = originalVZ.DatumUverejneni ?? newVZ.DatumUverejneni ;
-                
-                newVZ.DatumUzavreniSmlouvy ??= originalVZ.DatumUzavreniSmlouvy;
-                newVZ.LhutaDoruceni ??= originalVZ.LhutaDoruceni;
-                newVZ.LhutaPrihlaseni ??= originalVZ.LhutaPrihlaseni;
-                newVZ.NazevZakazky = newVZ.NazevZakazky.SetEmptyString(originalVZ.NazevZakazky);
-                newVZ.PopisZakazky = newVZ.PopisZakazky.SetEmptyString(originalVZ.PopisZakazky);
-                newVZ.RawHtml = newVZ.RawHtml.SetEmptyString(originalVZ.RawHtml);
-                newVZ.UrlZakazky = newVZ.UrlZakazky.SetEmptyString(originalVZ.UrlZakazky);
-                newVZ.KonecnaHodnotaMena = newVZ.KonecnaHodnotaMena.SetEmptyString(originalVZ.KonecnaHodnotaMena);
-                newVZ.OdhadovanaHodnotaMena = newVZ.OdhadovanaHodnotaMena.SetEmptyString(originalVZ.OdhadovanaHodnotaMena);
-                newVZ.ZakazkaNaProfiluId = newVZ.ZakazkaNaProfiluId.SetEmptyString(originalVZ.ZakazkaNaProfiluId);
-                
-                newVZ.CPV = newVZ.CPV.Union(originalVZ.CPV).ToArray();
-                newVZ.Kriteria = newVZ.Kriteria.Union(originalVZ.Kriteria).ToArray();
-                newVZ.Dodavatele = newVZ.Dodavatele.Union(originalVZ.Dodavatele).ToArray();
-                newVZ.Formulare = newVZ.Formulare.Union(originalVZ.Formulare).ToArray();
-                
-                newVZ.Zadavatel.Jmeno = newVZ.Zadavatel.Jmeno.SetEmptyString(originalVZ.Zadavatel.Jmeno);
-                newVZ.Zadavatel.ICO = newVZ.Zadavatel.ICO.SetEmptyString(originalVZ.Zadavatel.ICO);
-                newVZ.Zadavatel.ProfilZadavatele = newVZ.Zadavatel.ProfilZadavatele.SetEmptyString(originalVZ.Zadavatel.ProfilZadavatele);
-
-                newVZ.StavVZ = (newVZ.StavVZ == (int)VerejnaZakazka.StavyZakazky.Jine) ? originalVZ.StavVZ : newVZ.StavVZ;
-                newVZ.KonecnaHodnotaBezDPH ??= originalVZ.KonecnaHodnotaBezDPH;
-                newVZ.OdhadovanaHodnotaBezDPH ??= originalVZ.OdhadovanaHodnotaBezDPH;
-
-                //todo: question - jak zjistím, jaký dokument už v db je a jaký není?! (především při updatu)
-                await FillDocumentChecksums(newVZ, httpClient);
-                await FillDocumentChecksums(originalVZ, httpClient);
-
-                
-                var newComparableDocuments = newVZ.Dokumenty.Where(d => d.IsComparable())
-                    .ToDictionary(d => d.Sha256Checksum);
-                foreach (var origDoc in originalVZ.Dokumenty)
-                {
-                    //update document by checksum
-                    if (origDoc.IsComparable())
+                    if (origDodavatel is not null)
                     {
-                        if (newComparableDocuments.TryGetValue(origDoc.Sha256Checksum, out var newComparableDoc))
-                        {
-                            MergeDocuments(newComparableDoc, origDoc);
-                            continue;
-                        }
+                        origDodavatel.Jmeno = SetProperty(origDodavatel.Jmeno, newDodavatel.Jmeno, "Dodavatel.Jmeno", originalVZ.Changelog);
+                    }
+                    else
+                    {
+                        originalVZ.Dodavatele.Add(newDodavatel);
+                    }
+                }    
+                
+                //merge dokumenty
+                //todo: potřebuju zrevidovat OCR, aby se používal stejný update, jinak se to celé rozbije
+                await origDocChecksumTask;
+                foreach (var newDoc in newVZ.Dokumenty)
+                {
+
+                    var origDoc = originalVZ.Dokumenty.FirstOrDefault(d => d.Equals(newDoc));
+                    // update document by checksum
+                    if (origDoc is not null)
+                    {
+                        MergeDocuments(origDoc, newDoc, originalVZ.Changelog);
+                        continue;
                     }
 
                     // update document by url
-                    var newDoc = newVZ.Dokumenty.FirstOrDefault(d =>
-                        d.DirectUrl == origDoc.DirectUrl || d.StorageId == origDoc.StorageId);
-                    if (newDoc != null)
+                    var origDocLowPrio = originalVZ.Dokumenty.FirstOrDefault(d => d.EqualsLowPriority(newDoc));
+                    if (origDocLowPrio != null)
                     {
-                        MergeDocuments(newDoc, origDoc);
+                        MergeDocuments(origDocLowPrio, newDoc, originalVZ.Changelog);
                         continue;
                     }
                     
                     // add missing one
-                    newVZ.Dokumenty.Add(origDoc);
+                    originalVZ.Dokumenty.Add(newDoc);
                 }
                 
                 SetForOcr(newVZ);
-                SetupUpdateDates(originalVZ, posledniZmena);
                 
                 await elasticClient.IndexDocumentAsync<VerejnaZakazka>(newVZ);
             }
@@ -192,6 +162,78 @@ return;
                 Consts.Logger.Error(
                     $"VZ ERROR Upserting ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}", e);
             }
+        }
+
+        private static void MergeSimpleProperties(ref VerejnaZakazka originalVZ, VerejnaZakazka newVZ)
+        {
+            // preferujeme nové informace před starými
+            originalVZ.PosledniZmena = SetProperty(originalVZ.PosledniZmena, newVZ.PosledniZmena,
+                nameof(originalVZ.PosledniZmena), originalVZ.Changelog);
+            originalVZ.LastUpdated = SetProperty(originalVZ.LastUpdated, newVZ.LastUpdated,
+                nameof(originalVZ.LastUpdated), originalVZ.Changelog);
+            
+            originalVZ.DatumUverejneni = SetProperty(originalVZ.DatumUverejneni, newVZ.DatumUverejneni,
+                nameof(originalVZ.DatumUverejneni), originalVZ.Changelog);
+            originalVZ.DatumUzavreniSmlouvy = SetProperty(originalVZ.DatumUzavreniSmlouvy, newVZ.DatumUzavreniSmlouvy,
+                nameof(originalVZ.DatumUzavreniSmlouvy), originalVZ.Changelog);
+            originalVZ.LhutaDoruceni = SetProperty(originalVZ.LhutaDoruceni, newVZ.LhutaDoruceni,
+                nameof(originalVZ.LhutaDoruceni), originalVZ.Changelog);
+            originalVZ.LhutaPrihlaseni = SetProperty(originalVZ.LhutaPrihlaseni, newVZ.LhutaPrihlaseni,
+                nameof(originalVZ.LhutaPrihlaseni), originalVZ.Changelog);
+            originalVZ.NazevZakazky = SetProperty(originalVZ.NazevZakazky, newVZ.NazevZakazky,
+                nameof(originalVZ.NazevZakazky), originalVZ.Changelog);
+            originalVZ.PopisZakazky = SetProperty(originalVZ.PopisZakazky, newVZ.PopisZakazky,
+                nameof(originalVZ.PopisZakazky), originalVZ.Changelog);
+            originalVZ.RawHtml = SetProperty(originalVZ.RawHtml, newVZ.RawHtml,
+                nameof(originalVZ.RawHtml), originalVZ.Changelog);
+            originalVZ.KonecnaHodnotaMena = SetProperty(originalVZ.KonecnaHodnotaMena, newVZ.KonecnaHodnotaMena,
+                nameof(originalVZ.KonecnaHodnotaMena), originalVZ.Changelog);
+            originalVZ.OdhadovanaHodnotaMena = SetProperty(originalVZ.OdhadovanaHodnotaMena, newVZ.OdhadovanaHodnotaMena,
+                nameof(originalVZ.OdhadovanaHodnotaMena), originalVZ.Changelog);
+            originalVZ.StavVZ = SetProperty(originalVZ.StavVZ, newVZ.StavVZ,
+                nameof(originalVZ.StavVZ), originalVZ.Changelog);
+            originalVZ.KonecnaHodnotaBezDPH = SetProperty(originalVZ.KonecnaHodnotaBezDPH, newVZ.KonecnaHodnotaBezDPH,
+                nameof(originalVZ.KonecnaHodnotaBezDPH), originalVZ.Changelog);
+            originalVZ.OdhadovanaHodnotaBezDPH = SetProperty(originalVZ.OdhadovanaHodnotaBezDPH, newVZ.OdhadovanaHodnotaBezDPH,
+                nameof(originalVZ.OdhadovanaHodnotaBezDPH), originalVZ.Changelog);
+            
+            originalVZ.Zadavatel.ProfilZadavatele = SetProperty(originalVZ.Zadavatel.ProfilZadavatele,
+                newVZ.Zadavatel.ProfilZadavatele,
+                "Zadavatel.ProfilZadavatele",
+                originalVZ.Changelog);
+            originalVZ.Zadavatel.ICO = SetProperty(originalVZ.Zadavatel.ICO,
+                newVZ.Zadavatel.ICO,
+                "Zadavatel.ICO",
+                originalVZ.Changelog);
+            originalVZ.Zadavatel.Jmeno = SetProperty(originalVZ.Zadavatel.Jmeno,
+                newVZ.Zadavatel.Jmeno,
+                "Zadavatel.Jmeno",
+                originalVZ.Changelog);
+            
+
+            originalVZ.CPV.UnionWith(newVZ.CPV);
+            originalVZ.UrlZakazky.UnionWith(newVZ.UrlZakazky);
+            originalVZ.Formulare.UnionWith(newVZ.Formulare);
+            originalVZ.Kriteria.UnionWith(newVZ.Kriteria);
+        }
+
+        private static T SetProperty<T>(T oldProp, T newProp, string propName, List<string> changelog)
+        {
+            //There are no changes at all
+            if(newProp is null)
+                return oldProp;
+            if (newProp is string stringProp && string.IsNullOrWhiteSpace(stringProp))
+                return oldProp;
+            if (oldProp is not null && oldProp.Equals(newProp))
+                return oldProp;
+            if (newProp is int and 0 && oldProp is int and not 0) //default integers shouldnt overwrite value
+                return oldProp;
+            if (newProp is decimal and 0m && oldProp is decimal and not 0m) //default decimals shouldnt overwrite value
+                return oldProp;
+  
+            changelog?.Add($"{DateTime.Now:yyyy-MM-dd} {propName}:[{oldProp}]=>[{newProp}]");
+            
+            return newProp;
         }
 
         private static void SetForOcr(VerejnaZakazka newVZ)
@@ -208,34 +250,33 @@ return;
         /// <summary>
         /// Takes newDoc and fill its missing values from originalDoc.
         /// </summary>
-        /// <param name="newDoc">Document which is going to be updated</param>
-        /// <param name="originalDoc">Document which may contain additional data</param>
-        private static void MergeDocuments(VerejnaZakazka.Document newDoc, VerejnaZakazka.Document originalDoc)
+        /// <param name="originalDoc">Document which is going to be updated</param>
+        /// <param name="newDoc">Document which may contain additional data</param>
+        private static void MergeDocuments(VerejnaZakazka.Document originalDoc, VerejnaZakazka.Document newDoc,
+            List<string> changelog)
         {
             if (string.IsNullOrWhiteSpace(newDoc.Sha256Checksum))
             {
                 newDoc.SetChecksum(originalDoc.Sha256Checksum);
             }
             
-            newDoc.Name = newDoc.Name.SetEmptyString(originalDoc.Name);
-            newDoc.CisloVerze = newDoc.CisloVerze.SetEmptyString(originalDoc.CisloVerze);
-            newDoc.ContentType = newDoc.ContentType.SetEmptyString(originalDoc.ContentType);
-            newDoc.DirectUrl = newDoc.DirectUrl.SetEmptyString(originalDoc.DirectUrl);
-            newDoc.OficialUrl = newDoc.OficialUrl.SetEmptyString(originalDoc.OficialUrl);
-            newDoc.PlainText = newDoc.PlainText.SetEmptyString(originalDoc.PlainText);
-            newDoc.StorageId = newDoc.StorageId.SetEmptyString(originalDoc.StorageId);
-            newDoc.TypDokumentu = newDoc.TypDokumentu.SetEmptyString(originalDoc.TypDokumentu);
-            newDoc.PlainDocumentId = newDoc.PlainDocumentId.SetEmptyString(originalDoc.PlainDocumentId);
+            originalDoc.Name = SetProperty(originalDoc.Name, newDoc.Name, "Document.Name", changelog);
+            originalDoc.CisloVerze = SetProperty(originalDoc.CisloVerze, newDoc.CisloVerze, "Document.CisloVerze", changelog);
+            originalDoc.ContentType = SetProperty(originalDoc.ContentType, newDoc.ContentType, "Document.ContentType", changelog);
+            originalDoc.DirectUrl = SetProperty(originalDoc.DirectUrl, newDoc.DirectUrl, "Document.DirectUrl", changelog);
+            originalDoc.OficialUrl = SetProperty(originalDoc.OficialUrl, newDoc.OficialUrl, "Document.OficialUrl", changelog);
+            originalDoc.PlainText = SetProperty(originalDoc.PlainText, newDoc.PlainText, "Document.PlainText", changelog);
+            originalDoc.StorageId = SetProperty(originalDoc.StorageId, newDoc.StorageId, "Document.StorageId", changelog);
+            originalDoc.TypDokumentu = SetProperty(originalDoc.TypDokumentu, newDoc.TypDokumentu, "Document.TypDokumentu", changelog);
+            originalDoc.PlainDocumentId = SetProperty(originalDoc.PlainDocumentId, newDoc.PlainDocumentId, "Document.PlainDocumentId", changelog);
+            originalDoc.LastProcessed = SetProperty(originalDoc.LastProcessed, newDoc.LastProcessed, "Document.LastProcessed", changelog);
+            originalDoc.LastUpdate = SetProperty(originalDoc.LastUpdate, newDoc.LastUpdate, "Document.LastUpdate", changelog);
+            originalDoc.VlozenoNaProfil = SetProperty(originalDoc.VlozenoNaProfil, newDoc.VlozenoNaProfil, "Document.VlozenoNaProfil", changelog);
+            originalDoc.Lenght = SetProperty(originalDoc.Lenght, newDoc.Lenght, "Document.Lenght", changelog);
+            originalDoc.Pages = SetProperty(originalDoc.Pages, newDoc.Pages, "Document.Pages", changelog);
+            originalDoc.WordCount = SetProperty(originalDoc.WordCount, newDoc.WordCount, "Document.WordCount", changelog);
 
-            newDoc.LastProcessed ??= originalDoc.LastProcessed;
-            newDoc.LastUpdate ??= originalDoc.LastUpdate;
-            newDoc.VlozenoNaProfil ??= originalDoc.VlozenoNaProfil;
-
-            newDoc.Lenght = newDoc.Lenght == 0 ? originalDoc.Lenght : newDoc.Lenght;
-            newDoc.Pages = newDoc.Pages == 0 ? originalDoc.Pages : newDoc.Pages;
-            newDoc.WordCount = newDoc.WordCount == 0 ? originalDoc.WordCount : newDoc.WordCount;
-
-            newDoc.PlainTextContentQuality = newDoc.PlainTextContentQuality == DataQualityEnum.Unknown
+            originalDoc.PlainTextContentQuality = newDoc.PlainTextContentQuality == DataQualityEnum.Unknown
                 ? originalDoc.PlainTextContentQuality
                 : newDoc.PlainTextContentQuality;
         }
@@ -289,21 +330,23 @@ return;
             }
         }
         
-        public static string SetEmptyString(this string originalValue, string newValue)
-        {
-            if (string.IsNullOrWhiteSpace(originalValue))
-                return newValue;
-
-            return originalValue;
-        }
-
-        private static void SetupUpdateDates(VerejnaZakazka newVerejnaZakazka, DateTime? posledniZmena)
+        private static void SetupUpdateDates(VerejnaZakazka verejnaZakazka, DateTime? posledniZmena)
         {
             if (posledniZmena.HasValue)
-                newVerejnaZakazka.PosledniZmena = posledniZmena;
+                verejnaZakazka.PosledniZmena = posledniZmena;
             else
-                newVerejnaZakazka.PosledniZmena = newVerejnaZakazka.GetPosledniZmena();
-            newVerejnaZakazka.LastUpdated = DateTime.Now;
+                verejnaZakazka.PosledniZmena = verejnaZakazka.GetPosledniZmena();
+            verejnaZakazka.LastUpdated = DateTime.Now;
+
+            foreach (var zdroj in verejnaZakazka.Zdroje)
+            {
+                zdroj.Modified = DateTime.Now;
+            }
+            
+            foreach (var dokument in verejnaZakazka.Dokumenty)
+            {
+                dokument.LastUpdate = DateTime.Now;
+            }
         }
 
         public static async Task<VerejnaZakazka> LoadFromESAsync(string id, ElasticClient client = null)
