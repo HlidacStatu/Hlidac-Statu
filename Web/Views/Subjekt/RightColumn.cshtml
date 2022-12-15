@@ -111,6 +111,8 @@
         </table>
     </div>
     <hr />
+    Data firem nám poskytuje <a href="https://www.merk.cz" target="_blank" onclick="return trackOutLink(this,'Merk.cz');">Merk.cz</a>. Moc děkujeme<i class="fa-solid fa-heart" style="color:darkred"></i>
+    <hr />
 
     @{
         HlidacStatu.Datasets.DataSet skutMajitDS = HlidacStatu.Datasets.DataSet.CachedDatasets.Get("skutecni-majitele");
@@ -137,8 +139,8 @@
                 <partial name="_renderSkutecniMajitele" model="@vymazaniMajitele" />
             }
         }
+        <hr />
     }
-    <hr />
     <div class="watcher">
         <h4>Chci hlídat</h4>
         <div>
