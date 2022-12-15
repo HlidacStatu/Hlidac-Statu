@@ -26,7 +26,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Net" Version="4.2.1" />
+    <PackageReference Include="Devmasters.Net" Version="4.2.5" />
     <PackageReference Include="EPPlus" Version="6.1.0" />
     <PackageReference Include="ExcelDataReader" Version="3.6.0" />
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.2.1" />
