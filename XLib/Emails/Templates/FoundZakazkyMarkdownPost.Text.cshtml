@@ -8,7 +8,7 @@ Content-Type: text/html; charset=utf-8
 {
 <text>
 ---
-**[@(Devmasters.TextUtil.NormalizeToBlockText(item.NazevZakazky ?? "")) (@(item.EvidencniCisloZakazky))](@(item.GetUrl(false))?utm_source=hlidac&utm_medium=platforma&utm_campaign=detail)**
+**[@(Devmasters.TextUtil.NormalizeToBlockText(item.NazevZakazky ?? "")) (@(item.ZobrazPrimarniIdZdroje()))](@(item.GetUrl(false))?utm_source=hlidac&utm_medium=platforma&utm_campaign=detail)**
 *@(item.DatumUverejneni == null ? "" : item.DatumUverejneni.Value.ToShortDateString() + " - ")
 @(item.LastestFormular() == null ? "" : item.LastestFormular().DruhFormulareName())*
 

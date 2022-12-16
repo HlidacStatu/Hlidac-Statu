@@ -339,8 +339,10 @@ namespace HlidacStatu.Entities.VZ
 
         [Description("Název zakázky")]
         public string NazevZakazky { get; set; }
-        [Description("Popis zakázky")]
+        [Description("Popis zakázky z VVZ")]
         public string PopisZakazky { get; set; }
+        [Description("Popis zakázky z Rozza")]
+        public string PopisZakazkyRozza { get; set; }
 
         [Object()]
         [Description("Zadávací dokumentace a další dokumenty spojené se zakázkou")]
@@ -375,6 +377,7 @@ namespace HlidacStatu.Entities.VZ
 
         [Description("Číselná hodnota odvozeného stavu zakázky z enumerace 'StavyZakazky'.")]
         public int StavVZ { get; set; } = 0;
+        
         [Object(Ignore = true)]
         public StavyZakazky StavZakazky
         {
@@ -386,108 +389,6 @@ namespace HlidacStatu.Entities.VZ
             {
                 StavVZ = (int)value;
             }
-        }
-
-        //return true if changed
-        public bool SetStavZakazky()
-        {
-            //todo: tahle kalkulace stavu musí brát v úvahu i jiné zdroje, než je VVZ
-            var stav = CalculateStavVZ();
-            if (stav.HasValue == false)
-                return false;
-            if (stav.Value != StavZakazky)
-            {
-                StavZakazky = stav.Value;
-                return true;
-            }
-            else
-                return false;
-        }
-
-
-        //podle http://portal-vz.cz/getmedia/0d646e5f-d960-4743-b5b3-e885dcab7b1c/Metodika-k-vyhlasce-o-uverejnovani-a-profilu-zadavatele_v4-bez-registrace_duben-2017.pdf
-        //Zahajeny
-        static string[,] umysl = new string[,] {
-                { "F01","" },
-                { "CZ01","" },
-                { "F04","Toto oznámení je pouze pravidelným předběžným oznámením" },
-                { "F16","" } // v oblasti obrany nebo bezpečnosti z
-            };
-
-
-        static string[,] Zahajeny = new string[,] {
-                { "F02","" },
-                { "CZ02","" },
-                { "F05","" },
-                { "F07","" },
-                { "F12","" },
-                { "F15","" },//dobrovolné oznámení o záměru uzavřít smlouvu v případě veřejné zakázky v nadlimitním režimu
-                { "F24","" },
-                { "F17","" },
-            };
-
-        //vyhodnocovani - je v Zahajeny, ale urcim to podle casu odevzdani nabidek
-
-
-        //ukonceni
-        static string[,] ukonceni = new string[,] {
-                { "F03","" },
-                { "CZ03","" },
-                { "F06","" },
-                { "F13","" },
-                { "F18","" },
-                { "F19","" },
-                { "F25","" },
-            };
-
-        //jine - neda se zatim urcit
-        static string[,] jine = new string[,] {
-                { "F21","" },
-                { "F22","" },
-                { "F23","" },
-            };
-        public StavyZakazky? CalculateStavVZ()
-        {
-
-            if (HasForm(jine))
-                if (LhutaDoruceni.HasValue && LhutaDoruceni.Value < DateTime.Now)
-                    return StavyZakazky.Vyhodnocovani;
-                else
-                    return StavyZakazky.Jine;
-
-            if (HasForm(ukonceni))
-                return StavyZakazky.Ukonceno;
-
-            if (HasForm(Zahajeny))
-            {
-                //vyhodnocovani - je v Zahajeny, ale urcim to podle casu odevzdani nabidek
-                if (LhutaDoruceni.HasValue && LhutaDoruceni.Value < DateTime.Now)
-                    return StavyZakazky.Vyhodnocovani;
-                else
-                    return StavyZakazky.Zahajeno;
-            }
-
-            if (HasForm(umysl))
-                if (LhutaDoruceni.HasValue && LhutaDoruceni.Value < DateTime.Now)
-                    return StavyZakazky.Vyhodnocovani;
-                else
-                    return StavyZakazky.Umysl;
-
-
-
-            return null;
-        }
-        private bool HasForm(string[,] forms)
-        {
-            for (int i = 0; i < forms.GetLength(0); i++)
-            {
-                foreach (var f in Formulare.OrderBy(o => o.Zverejnen))
-                {
-                    if (f.Druh.ToUpper() == forms[i, 0])
-                        return true;
-                }
-            }
-            return false;
         }
 
 

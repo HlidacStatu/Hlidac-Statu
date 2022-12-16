@@ -33,7 +33,7 @@ Content-Type: text/html; charset=utf-8
         <text>
             <tr>
                 <td style="white-space: nowrap;">
-                    <a href="@(item.GetUrl(true))">@(item.EvidencniCisloZakazky)</a>
+                    <a href="@(item.GetUrl(true))">@(item.ZobrazPrimarniIdZdroje())</a>
                 </td>
                 <td>
                     @(item.DatumUverejneni == null ? "" : item.DatumUverejneni.Value.ToShortDateString())
