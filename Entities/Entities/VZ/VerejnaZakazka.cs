@@ -773,10 +773,6 @@ namespace HlidacStatu.Entities.VZ
         [Description("HTML stránky zakázky, pokud bylo parsováno z HTML")]
         public string RawHtml { get; set; }
 
-        public string CPVText(string cpv)
-        {
-            return CPVToText(cpv);
-        }
         public static string CPVToText(string cpv)
         {
             if (string.IsNullOrEmpty(cpv))

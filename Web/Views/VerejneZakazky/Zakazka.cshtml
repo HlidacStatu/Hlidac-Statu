@@ -130,7 +130,7 @@ else
             @foreach (var cpv in Model.CPV)
             {
                 <div>
-                    @Model.CPVText(cpv) -
+                    @VerejnaZakazka.CPVToText(cpv) -
                     <i>
                         <a href="/VerejneZakazky/Hledat?q=cpv:@cpv">@cpv</a>
                     </i>
