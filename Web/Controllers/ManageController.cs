@@ -71,7 +71,10 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult Firmy2ICO()
         {
             List<Firma> res = null;
-            string jmena = Request.Form["names"];
+            string jmena = "";
+            if (Request.HasFormContentType)
+                jmena = Request.Form["names"];
+
             if (!string.IsNullOrWhiteSpace(jmena))
             {
                 string[] names = jmena.Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
