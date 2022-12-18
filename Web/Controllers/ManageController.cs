@@ -7,6 +7,7 @@ using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories;
 using HlidacStatu.Util;
+using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models;
 
 using Microsoft.AspNetCore.Authorization;
@@ -701,6 +702,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
+        [HlidacCache(60*10,null,false)]
         public ActionResult AllOsobaPhotos()
         {
             return View();

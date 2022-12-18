@@ -18,7 +18,7 @@
             {
                 sb.Append($"<tr style='border-bottom:1px gray solid'><td><a href='https://www.hlidacstatu.cz/osoba/{o.NameId}'>{o.FullNameWithYear()}</a></td>");
                 sb.Append($"<td><div class=\"person-profile-thumb\"><div class=\"photo\"><div class=\"profile-picture\" style=\"background-image: url('{o.GetPhotoUrl(local: false)}')\"></div></div></div></td>");
-                sb.Append($"<td><div class=\"person-profile-thumb\"><div class=\"photo\"><div class=\"profile-picture\" style=\"background-image: url('{o.GetPhotoUrl(local: false, "small.nobackground.jpg")}')\"></div></div></div></td>");
+                sb.Append($"<td><div class=\"person-profile-thumb\"><div class=\"photo\"><div class=\"profile-picture border\" style=\"background-image: url('{o.GetPhotoUrl(local: false, "small.nobackground.jpg")}')\"></div></div></div></td>");
                 sb.AppendLine("</tr>");
             }
         }
