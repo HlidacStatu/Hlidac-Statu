@@ -22,11 +22,15 @@
                         <a href="@Model.GetUrl()">
                             @if (User.IsInRole("Admin"))
                             {
-                                <div class="profile-picture" style="background-image: url('@Model.GetPhotoUrl(local: true,"small.nobackground.jpg")')"></div>
+                                <div class="profile-picture" style="background-image: url('@Model.GetPhotoUrl(local: true,"small.nobackground.jpg")')">
+
+                                </div>
                             }
                             else
                             {
-                                <div class="profile-picture" style="background-image: url('@Model.GetPhotoUrl(local: true)')"></div>                                
+                                <div class="profile-picture" style="background-image: url('@Model.GetPhotoUrl(local: true)')">
+
+                                </div>
                             }
                         </a>
                         <div style="padding-right: 16px; position: relative;" class="text-muted small text-center">

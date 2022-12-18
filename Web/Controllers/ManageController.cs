@@ -543,6 +543,9 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
+
+
+
         [AllowAnonymous]
         [HttpPost]
         public ActionResult ChangePhoto(string id, IFormCollection form, IFormFile file1)
@@ -698,7 +701,12 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        public ActionResult Zalozky()
+        public ActionResult AllOsobaPhotos()
+        {
+            return View();
+        }
+
+            public ActionResult Zalozky()
         {
             using (DbEntities db = new DbEntities())
             {
