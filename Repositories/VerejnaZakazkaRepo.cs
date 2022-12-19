@@ -27,69 +27,22 @@ namespace HlidacStatu.Repositories
             .OrResult(r => r.RequestMessage.RequestUri.Host.Contains("bpapi.datlab.eu") &&
                            r.StatusCode == HttpStatusCode.Forbidden)
             .WaitAndRetryAsync(5, _ => TimeSpan.FromSeconds(1));
-        
-        public static async Task UpdatePosledniZmenaAsync(VerejnaZakazka verejnaZakazka, bool force = false, bool save = false)
-        {
-            DateTime? prevVal = verejnaZakazka.PosledniZmena;
-            if (verejnaZakazka.PosledniZmena.HasValue && force == false)
-                return;
-            else if (verejnaZakazka.LastestFormular() != null)
-            {
-                verejnaZakazka.PosledniZmena = verejnaZakazka.LastestFormular().Zverejnen;
-            }
-            else if (verejnaZakazka.DatumUverejneni.HasValue)
-            {
-                verejnaZakazka.PosledniZmena = verejnaZakazka.DatumUverejneni;
-            }
-            else
-            {
-                return;
-            }
 
-            if (verejnaZakazka.PosledniZmena != prevVal && save)
-                await SaveAsync(verejnaZakazka);
-        }
-
-        [Obsolete]
-        public static async Task SaveAsync(VerejnaZakazka verejnaZakazka, ElasticClient client = null, DateTime? posledniZmena = null)
-        {
-            try
-            {
-                //todo: přidat kontrolu duplicity sem!
-                //todo: + nastavit jeden typ idčka společně pro:
-                //datlab, vvz, rozza
-                verejnaZakazka.SetStavZakazky();
-                verejnaZakazka.LastUpdated = DateTime.Now;
-                if (posledniZmena.HasValue)
-                    verejnaZakazka.PosledniZmena = posledniZmena;
-                else
-                    verejnaZakazka.PosledniZmena = verejnaZakazka.GetPosledniZmena();
-                var es = client ??await Manager.GetESClient_VZAsync();
-                await es.IndexDocumentAsync<VerejnaZakazka>(verejnaZakazka);
-            }
-            catch (Exception e)
-            {
-                Consts.Logger.Error(
-                    $"VZ ERROR Save ID:{verejnaZakazka.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(verejnaZakazka).Length}", e);
-            }
-        }
+        // Emergency HttpClient for cases where it is not convinient to inject HttpClient.
+        private static Lazy<HttpClient> _lazyHttpClient = new();
         
         /// <summary>
         /// Update or insert new
         /// </summary>
         /// <param name="newVZ"></param>
         /// <param name="posledniZmena"></param>
-        public static async Task UpsertAsync(VerejnaZakazka newVZ, HttpClient httpClient, DateTime? posledniZmena = null)
+        public static async Task UpsertAsync(VerejnaZakazka newVZ, HttpClient httpClient = null, DateTime? posledniZmena = null)
         {
             if (newVZ is null)
                 return;
-            
-            //1. udělat potřebné fixy dat
-            //+ spočítat sha dokumentů
-            //2. najít jestli už existuje
-            //3. pokud neexistuje, tak uložit
-            //4. pokud existuje, tak mergovat
-            //5. při mergi zapsat historii
+
+            if (httpClient is null)
+                httpClient = _lazyHttpClient.Value;
             
             try
             {
@@ -101,6 +54,8 @@ namespace HlidacStatu.Repositories
                 var originalVZ = await FindOriginalDocumentFromESAsync(newVZ);
 
                 await newDocChecksumTask;
+                
+                // VZ neexistuje => ukládáme
                 if (originalVZ is null)
                 {
                     SetForOcr(newVZ);
@@ -108,6 +63,7 @@ namespace HlidacStatu.Repositories
                     return;
                 }
                 
+                //VZ existuje => mergujeme
                 var origDocChecksumTask = FillDocumentChecksums(originalVZ, httpClient);
                 
                 MergeSimpleProperties(ref originalVZ, newVZ);
@@ -217,6 +173,9 @@ namespace HlidacStatu.Repositories
             originalVZ.Kriteria.UnionWith(newVZ.Kriteria);
         }
 
+        /// <summary>
+        /// Sets a property if it should be set. Also if old value is rewritten, then updates changelog.
+        /// </summary>
         private static T SetProperty<T>(T oldProp, T newProp, string propName, List<string> changelog)
         {
             //There are no changes at all
@@ -405,25 +364,6 @@ namespace HlidacStatu.Repositories
             return res.Exists;
         }
 
-        // public static Dictionary<string,string> UniformDatasetValues(Dictionary<string, string> input)
-        // {
-        //     return input.ToDictionary(kvp => 
-        //         UniformDatasetName(kvp.Key), 
-        //         kvp => kvp.Value);
-        // }
-        //
-        // private static string UniformDatasetName(string input)
-        // {
-        //     // Url
-        //     if(Uri.TryCreate(input, UriKind.Absolute, out var uri))
-        //     {
-        //         return uri.Host;
-        //     }
-        //
-        //     return string.Empty;
-        // }
-        
-        
 
     }
 }
