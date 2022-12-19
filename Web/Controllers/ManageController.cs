@@ -702,13 +702,15 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        [HlidacCache(60*10,null,false)]
+        [HlidacCache(60 * 10, null, false)]
         public ActionResult AllOsobaPhotos()
         {
             return View();
         }
 
-            public ActionResult Zalozky()
+
+
+        public ActionResult Zalozky()
         {
             using (DbEntities db = new DbEntities())
             {
@@ -723,7 +725,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         #region Helpers
-        
+
         private async Task<bool> HasPassword()
         {
             var user = await _userManager.GetUserAsync(User);

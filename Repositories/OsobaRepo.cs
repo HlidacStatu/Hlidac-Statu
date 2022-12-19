@@ -434,11 +434,14 @@ namespace HlidacStatu.Repositories
             return null;
         }
 
-        public static string GetPhotoPath(this Osoba osoba, string anotherName = null)
+        public static string GetPhotoPath(this Osoba osoba, string anotherName = null, bool force = false)
         {
             if (osoba.HasPhoto())
             {
-                if (!string.IsNullOrEmpty(anotherName) && System.IO.File.Exists(Init.OsobaFotky.GetFullPath(osoba, anotherName)))
+                if (!string.IsNullOrEmpty(anotherName) 
+                    && (System.IO.File.Exists(Init.OsobaFotky.GetFullPath(osoba, anotherName)) || force)
+                    
+                    )
                 { 
                     return Init.OsobaFotky.GetFullPath(osoba, anotherName);
                 }    

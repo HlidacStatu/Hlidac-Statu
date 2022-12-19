@@ -2,31 +2,102 @@
 @using HlidacStatu.Repositories
 
 
-@{ ViewBag.Title = "Debug data"; }
+@{
+    ViewBag.Title = "Osoby s fotkama";
+}
 
 @{
-    var osoby = await HlidacStatu.Repositories.OsobyEsRepo.YieldAllPoliticiansAsync()
-            .Select(m => m.NameId).ToListAsync();
-    StringBuilder sb = new StringBuilder(10000);
-    sb.AppendLine("<table>");
-    foreach (var nid in osoby)
-    {
-        var o = Osoby.GetByNameId.Get(nid);
-        if (o != null)
-        {
-            if (o.HasPhoto())
-            {
-                sb.Append($"<tr style='border-bottom:1px gray solid'><td><a href='https://www.hlidacstatu.cz/osoba/{o.NameId}'>{o.FullNameWithYear()}</a></td>");
-                sb.Append($"<td><div class=\"person-profile-thumb\"><div class=\"photo\"><div class=\"profile-picture\" style=\"background-image: url('{o.GetPhotoUrl(local: false)}')\"></div></div></div></td>");
-                sb.Append($"<td><div class=\"person-profile-thumb\"><div class=\"photo\"><div class=\"profile-picture border\" style=\"background-image: url('{o.GetPhotoUrl(local: false, "small.nobackground.jpg")}')\"></div></div></div></td>");
-                sb.AppendLine("</tr>");
-            }
-        }
-    }
-    sb.AppendLine("</table>");
+    var osoby = HlidacStatu.Repositories.OsobaRepo.PolitickyAktivni.Get()
+                .Take(100)
+                .AsParallel().Where(o => o?.HasPhoto() == true)
+                .ToList();
+
 
 }
-<div class="row">
 
-    @Html.Raw(sb.ToString())
+<script>
+
+    function doRemovePhoto(btn, nameid, img, option) {
+        var prevColor = btn.css('color');
+        btn.css('cursor', 'wait');
+        btn.css('color', 'gray');
+        img.css({ 'opacity': 0.2 });
+        var imgUrl = img.css('background-image');
+        var jqxhr = $.ajax('/manage/RemovePhoto/' + nameid + '?option='+option)
+            .done(function (data, textStatus, jqXHR) {
+                btn.css('color', prevColor);
+                btn.css('cursor', 'pointer');
+                console.log('imgUrl ' + imgUrl);
+                console.log('done status ' + data);
+                if (data == true) {
+                    img.css({ 'opacity': 1.0, 'background-image': 'url("/photo/unknown")' });
+                }
+                else {
+                    img.css({ 'opacity': 1.0});
+                }
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                alert("chyba volani");
+            });
+    }
+
+
+    function doPhotoRemoveBackgr(btn, nameid, img) {
+        var prevColor = btn.css('color');
+        btn.css('cursor', 'wait');
+        btn.css('color', 'gray');
+        img.css({ 'opacity': 0.2 });
+        d = new Date();
+        var imgUrl = img.css('background-image');
+        var newImgUrl = 'url("https://www.hlidacstatu.cz/Photo/' + nameid + '?option=small.nobackground.jpg&tt=' + d.getTime() + '")';
+        var jqxhr = $.ajax('/manage/DoPhotoRemoveBackground/' + nameid)
+            .done(function (data, textStatus, jqXHR) {
+                btn.css('color', prevColor);
+                btn.css('cursor', 'pointer');
+                console.log('done status ' + data);
+                console.log(imgUrl + " -> " + newImgUrl);
+                img.css({ 'opacity': 1.0, 'background-image': newImgUrl });
+
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                alert("chyba volani");
+            });
+    }
+</script>
+<div class="row">
+    <table>
+        @foreach (var o in osoby.OrderBy(o => o.Jmeno))
+        {
+            <tr style='border-bottom:1px gray solid'>
+                <td><a href="@o.GetUrl(true)">@o.FullNameWithNarozeni()</a></td>
+                <td>
+                    <div class="person-profile-thumb">
+                        <div class="photo">
+                            <div id="@(o.NameId)" class="profile-picture" style="background-image: url('@(o.GetPhotoUrl(local: true))')"></div>
+                        </div>
+                    </div>
+                    <div style="padding-left:50px;">
+                        <i class="fa-solid fa-trash" style="color:red;cursor:pointer"
+                       onclick="javascript:doRemovePhoto($(this),'@(o.NameId)',$('#@(o.NameId)',''))"></i>
+                        
+                        <i class="fa-solid fa-arrow-right" style="padding-left:100px;color:blue;cursor:pointer"
+                       onclick="javascript:doPhotoRemoveBackgr($(this),'@(o.NameId)',$('#@(o.NameId)_bg'))"></i>
+                    </div>
+                </td>
+                <td style="width:20px;">&nbsp;</td>
+                <td>
+                    <div class="person-profile-thumb">
+                        <div class="photo">
+                            <div id="@(o.NameId)_bg" class="profile-picture border" style="background-image: url('@(o.GetPhotoUrl(local: true,"small.nobackground.jpg"))')"></div>
+                        </div>
+                    </div>
+                    <div style="padding-left:50px;">
+                        <i class="fa-solid fa-trash" style="color:red;cursor:pointer"
+                       onclick="javascript:doRemovePhoto($(this),'@(o.NameId)',$('#@(o.NameId)_bg'),'small.nobackground.jpg')"></i>
+                    </div>
+                </td>
+            </tr>
+
+        }
+    </table>
 </div>
