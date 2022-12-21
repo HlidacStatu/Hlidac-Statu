@@ -235,42 +235,29 @@ else
         </td>
     </tr>
     <tr>
-        <td>Zdroj zakázky</td>
+        <td>Zdroje zakázky</td>
         <td>
-            @{
-                var sourceUrls = await Model.ZdrojZakazkyUrlAsync();
-                if (sourceUrls != null)
+            @if (Model.Zdroje.Any())
+            {
+                <strong>Doména - <i>Id</i></strong>
+                foreach (var zdroj in Model.Zdroje)
                 {
-                    if (!string.IsNullOrEmpty(sourceUrls.ZakazkaURL))
-                    {
-                        <a href="@sourceUrls.ZakazkaURL" target="_blank">
-                            <code>@sourceUrls.ZakazkaURL</code>
-                        </a>
-                    }
-                    else if (!string.IsNullOrEmpty(sourceUrls.ProfilZadavatelUrl)
-                             &&
-                             !string.IsNullOrEmpty(sourceUrls.ProfilZadavatelUrl)
-                        )
-                    {
-                        <div>
-
-                            <a href="@sourceUrls.ProfilZadavatelUrl" target="_blank">
-                                <code>@sourceUrls.ProfilZadavatelUrl</code>
-                            </a> (zkusit <a href="@sourceUrls.SearchZakazkaUrl" target="_blank">najít zakázku Googlem</a>)
-                        </div>
-                        <div class="bs-callout primary small">
-                            <h4><span class="fas fa-info-circle"></span> Veřejná zakázka z profilu zadavatele</h4>
-                            <p>
-                                Některé profily zadavatelů nemají možnost přímo odkazovat jednotlivé zakázky a musíte je tam pracně hledat.
-                                Výše uvedené URL je odkaz na celý profil zadavatele (a když budete mít štěstí, bude ješte fungovat), a zde musíte použadovanou zakázku hledat podle evidenčního čísla
-                                <code>@Model.EvidencniCisloZakazky</code>.
-                            </p>
-                        </div>
-                    }
+                    <p>
+                        @zdroj.Domena - <i>@zdroj.IdVDomene</i>
+                    </p>
                 }
             }
         </td>
     </tr>
+    <tr>
+        <td>Další známé url</td>
+        <td>
+            @foreach (var url in Model.UrlZakazky)
+            {
+                <a href="@url">@url</a>
+            }
+        </td>
+        </tr>
     </tbody>
     </table>
 }
