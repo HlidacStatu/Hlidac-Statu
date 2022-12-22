@@ -450,15 +450,17 @@ namespace HlidacStatu.Entities.VZ
         public class Document : IEquatable<Document>
         {
             [Description("Kontrolní součet SHA256 souboru pro ověření unikátnosti")]
-            [Keyword()]
-            public string Sha256Checksum { get; private set; }
-            
-            [Description("URL uvedené v profilu zadavatele")]
+            [Text]
+            public string Sha256Checksum { get; set; }
+
+            [Description("URL odkazy uvedené v profilu zadavatele")]
             [Keyword]
-            public string OficialUrl { get; set; }
+            public HashSet<string> OficialUrls { get; set; } = new();
+            
             [Description("Přímé URL na tento dokument.")]
             [Keyword]
-            public string DirectUrl { get; set; }
+            public HashSet<string> DirectUrls { get; set; } = new();
+            
             [Description("Popis obsahu dokumentu, z XML na profilu z pole dokument/typ_dokumentu.")]
             [Keyword]
             public string TypDokumentu { get; set; }
@@ -466,6 +468,7 @@ namespace HlidacStatu.Entities.VZ
             [Description("Datum vložení, uveřejnění dokumentu.")]
             [Date]
             public DateTime? VlozenoNaProfil { get; set; }
+            
             [Description("Číslo verze")]
             [Keyword]
             public string CisloVerze { get; set; }
@@ -473,6 +476,7 @@ namespace HlidacStatu.Entities.VZ
             [Description("Neuvádět, obsah dokumentu v plain textu pro ftx vyhledávání")]
             [Text()]
             public string PlainText { get; set; }
+            
             [Description("Neuvádět.")]
             public DataQualityEnum PlainTextContentQuality { get; set; } = DataQualityEnum.Unknown;
 
@@ -495,17 +499,17 @@ namespace HlidacStatu.Entities.VZ
             public int Pages { get; set; }
 
             [Keyword()]
-            public string StorageId { get; set; }
+            public HashSet<string> StorageIds { get; set; } = new();
 
             [Keyword()]
-            public string PlainDocumentId { get; set; }
+            public HashSet<string> PlainDocumentIds { get; set; } = new();
 
             public string GetDocumentUrlToDownload()
             {
-                if (string.IsNullOrWhiteSpace(StorageId))
-                    return DirectUrl;
+                if (StorageIds.Count == 0 || string.IsNullOrWhiteSpace(StorageIds.FirstOrDefault()))
+                    return DirectUrls.FirstOrDefault();
                 
-                return $"http://bpapi.datlab.eu/document/{StorageId}";
+                return $"http://bpapi.datlab.eu/document/{StorageIds.FirstOrDefault()}";
             }
 
             [Keyword()]
@@ -526,39 +530,13 @@ namespace HlidacStatu.Entities.VZ
                 WordCount = Devmasters.TextUtil.CountWords(PlainText);
             }
 
-            /// <summary>
-            /// Use only if you know that this Document has no checksum and should have one, which you know
-            /// </summary>
-            /// <param name="checksum"></param>
-            public void SetChecksum(string checksum)
-            {
-                if (!string.IsNullOrWhiteSpace(checksum) && string.IsNullOrWhiteSpace(Sha256Checksum))
-                    Sha256Checksum = checksum;
-            }
-
-            public bool EqualsLowPriority(Document other)
-            {
-                if (ReferenceEquals(null, other)) return false;
-                if (ReferenceEquals(this, other)) return true;
-
-                
-                var directUrlEquals = !string.IsNullOrWhiteSpace(DirectUrl) 
-                                      && !string.IsNullOrWhiteSpace(other.DirectUrl)
-                                      && DirectUrl == other.DirectUrl;
-                var storageIdEquals = !string.IsNullOrWhiteSpace(StorageId) 
-                                      && !string.IsNullOrWhiteSpace(other.StorageId)
-                                      && StorageId == other.StorageId;
-                
-                return directUrlEquals || storageIdEquals;
-
-            }
-            
             public bool Equals(Document other)
             {
                 if (ReferenceEquals(null, other)) return false;
                 if (ReferenceEquals(this, other)) return true;
+                if (string.IsNullOrWhiteSpace(Sha256Checksum)) return false;
 
-                return !string.IsNullOrWhiteSpace(Sha256Checksum) && Sha256Checksum == other.Sha256Checksum; 
+                return Sha256Checksum == other.Sha256Checksum; 
             }
 
             public override bool Equals(object obj)
@@ -839,6 +817,8 @@ namespace HlidacStatu.Entities.VZ
             public string UrlProfiluZadavatele { get; set; }
             public ZakazkaSource ZdrojZakazky { get; set; }
         }
+        
+        //todo: odstranit nepoužívané
         public VerejnaZakazka Export(bool allData = false)
         {
             VerejnaZakazka vz = (VerejnaZakazka)MemberwiseClone();
@@ -848,8 +828,8 @@ namespace HlidacStatu.Entities.VZ
                 {
                     foreach (var vzd in vz.Dokumenty)
                     {
-                        vzd.DirectUrl = "";
-                        vzd.PlainDocumentId = "";
+                        vzd.DirectUrls = new HashSet<string>();
+                        vzd.PlainDocumentIds = new HashSet<string>();
                         vzd.PlainText = "-- Tato data jsou dostupná pouze v komerční nebo speciální licenci. Kontaktujte nás. --";
                     }
                 }

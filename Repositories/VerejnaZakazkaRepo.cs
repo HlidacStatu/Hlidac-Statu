@@ -54,11 +54,14 @@ namespace HlidacStatu.Repositories
                 var originalVZ = await FindOriginalDocumentFromESAsync(newVZ);
 
                 await newDocChecksumTask;
-                
+                // Merge possible document duplicates
+                MergeDuplicateDocuments(newVZ);
+
+
                 // VZ neexistuje => ukládáme
                 if (originalVZ is null)
                 {
-                    SetForOcr(newVZ);
+                    SendToOcrQueue(newVZ);
                     await elasticClient.IndexDocumentAsync(newVZ);
                     return;
                 }
@@ -97,27 +100,39 @@ namespace HlidacStatu.Repositories
                         continue;
                     }
 
-                    // update document by url
-                    var origDocLowPrio = originalVZ.Dokumenty.FirstOrDefault(d => d.EqualsLowPriority(newDoc));
-                    if (origDocLowPrio != null)
-                    {
-                        MergeDocuments(origDocLowPrio, newDoc, originalVZ.Changelog);
-                        continue;
-                    }
-                    
                     // add missing one
                     originalVZ.Dokumenty.Add(newDoc);
                 }
                 
-                SetForOcr(newVZ);
+                SendToOcrQueue(originalVZ);
                 
-                await elasticClient.IndexDocumentAsync<VerejnaZakazka>(newVZ);
+                await elasticClient.IndexDocumentAsync<VerejnaZakazka>(originalVZ);
             }
             catch (Exception e)
             {
                 Consts.Logger.Error(
                     $"VZ ERROR Upserting ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}", e);
             }
+        }
+
+        private static void MergeDuplicateDocuments(VerejnaZakazka newVZ)
+        {
+            var groups = newVZ.Dokumenty
+                .GroupBy(d => d.Sha256Checksum)
+                .Where(g => g.Count() > 1);
+            foreach (var group in groups)
+            {
+                var main = group.FirstOrDefault();
+                foreach (var duplicate in group.Skip(1))
+                {
+                    MergeDocuments(main, duplicate, newVZ.Changelog);
+                }
+            }
+        }
+
+        public static async Task UpdateDocumentsInVz(string Id, List<VerejnaZakazka.Document> dokumenty)
+        {
+            
         }
 
         private static void MergeSimpleProperties(ref VerejnaZakazka originalVZ, VerejnaZakazka newVZ)
@@ -195,7 +210,7 @@ namespace HlidacStatu.Repositories
             return newProp;
         }
 
-        private static void SetForOcr(VerejnaZakazka newVZ)
+        private static void SendToOcrQueue(VerejnaZakazka newVZ)
         {
             if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
             {
@@ -214,20 +229,11 @@ namespace HlidacStatu.Repositories
         private static void MergeDocuments(VerejnaZakazka.Document originalDoc, VerejnaZakazka.Document newDoc,
             List<string> changelog)
         {
-            if (string.IsNullOrWhiteSpace(newDoc.Sha256Checksum))
-            {
-                newDoc.SetChecksum(originalDoc.Sha256Checksum);
-            }
-            
             originalDoc.Name = SetProperty(originalDoc.Name, newDoc.Name, "Document.Name", changelog);
             originalDoc.CisloVerze = SetProperty(originalDoc.CisloVerze, newDoc.CisloVerze, "Document.CisloVerze", changelog);
             originalDoc.ContentType = SetProperty(originalDoc.ContentType, newDoc.ContentType, "Document.ContentType", changelog);
-            originalDoc.DirectUrl = SetProperty(originalDoc.DirectUrl, newDoc.DirectUrl, "Document.DirectUrl", changelog);
-            originalDoc.OficialUrl = SetProperty(originalDoc.OficialUrl, newDoc.OficialUrl, "Document.OficialUrl", changelog);
             originalDoc.PlainText = SetProperty(originalDoc.PlainText, newDoc.PlainText, "Document.PlainText", changelog);
-            originalDoc.StorageId = SetProperty(originalDoc.StorageId, newDoc.StorageId, "Document.StorageId", changelog);
             originalDoc.TypDokumentu = SetProperty(originalDoc.TypDokumentu, newDoc.TypDokumentu, "Document.TypDokumentu", changelog);
-            originalDoc.PlainDocumentId = SetProperty(originalDoc.PlainDocumentId, newDoc.PlainDocumentId, "Document.PlainDocumentId", changelog);
             originalDoc.LastProcessed = SetProperty(originalDoc.LastProcessed, newDoc.LastProcessed, "Document.LastProcessed", changelog);
             originalDoc.LastUpdate = SetProperty(originalDoc.LastUpdate, newDoc.LastUpdate, "Document.LastUpdate", changelog);
             originalDoc.VlozenoNaProfil = SetProperty(originalDoc.VlozenoNaProfil, newDoc.VlozenoNaProfil, "Document.VlozenoNaProfil", changelog);
@@ -235,6 +241,12 @@ namespace HlidacStatu.Repositories
             originalDoc.Pages = SetProperty(originalDoc.Pages, newDoc.Pages, "Document.Pages", changelog);
             originalDoc.WordCount = SetProperty(originalDoc.WordCount, newDoc.WordCount, "Document.WordCount", changelog);
 
+            originalDoc.DirectUrls.UnionWith(newDoc.DirectUrls);
+            originalDoc.OficialUrls.UnionWith(newDoc.OficialUrls);
+            originalDoc.StorageIds.UnionWith(newDoc.StorageIds);
+            originalDoc.PlainDocumentIds.UnionWith(newDoc.PlainDocumentIds);
+            
+            
             originalDoc.PlainTextContentQuality = newDoc.PlainTextContentQuality == DataQualityEnum.Unknown
                 ? originalDoc.PlainTextContentQuality
                 : newDoc.PlainTextContentQuality;
@@ -245,10 +257,18 @@ namespace HlidacStatu.Repositories
             foreach (var dokument in vz.Dokumenty.Where(d => string.IsNullOrWhiteSpace(d.Sha256Checksum)))
             {
                 string downloadUrl = dokument.GetDocumentUrlToDownload();
+
+                string checksum;
+                try
+                {
+                    checksum = await ProcessHttpFileStreamAsync(httpClient, downloadUrl, Checksum.DoChecksumAsync);
+                }
+                catch (Exception e)
+                {
+                    checksum = Checksum.GenerateInvalidChecksum();
+                }
                 
-                var checksum = await ProcessHttpFileStreamAsync(httpClient, downloadUrl, Util.Checksum.DoChecksumAsync);
-                
-                dokument.SetChecksum(checksum);
+                dokument.Sha256Checksum = checksum;
             }
         }
 
@@ -264,16 +284,6 @@ namespace HlidacStatu.Repositories
             {
                 Consts.Logger.Warning($"Couldn't get {url}");
                 return default;
-            }
-
-            // na url není soubor, ale html stránka => nevalidní
-            if (responseMessage.Headers.TryGetValues("content-type", out var ct))
-            {
-                if (ct.Any(t => t.Contains("text/html")))
-                {
-                    Consts.Logger.Error($"Url: {url} contains only HTML, no file downloaded.");
-                    return default;
-                }
             }
 
             try

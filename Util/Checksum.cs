@@ -15,7 +15,7 @@ namespace HlidacStatu.Util;
 
 public class Checksum
 {
-    private const string InvalidChecksum = "nofilefound";
+    private const string InvalidChecksum = "Invalid_";
 
     private static AsyncRetryPolicy<HttpResponseMessage> _retryPolicy = HttpPolicyExtensions
         .HandleTransientHttpError()
@@ -44,11 +44,16 @@ public class Checksum
             throw;
         }
     }
+
+    public static string GenerateInvalidChecksum()
+    {
+        return InvalidChecksum + Guid.NewGuid().ToString("N");
+    }
     
     public static string DoChecksum(byte[] file)
     {
         if (file is null || file.Length == 0)
-            return InvalidChecksum;
+            return GenerateInvalidChecksum();
 
         var hash = SHA256.HashData(file);
         return ConvertToCorrectEndiannessFormat(hash);
@@ -58,7 +63,7 @@ public class Checksum
     {
         if (stream is null)
         {
-            return InvalidChecksum;
+            return GenerateInvalidChecksum();
         }
 
         using var sha256 = SHA256.Create();

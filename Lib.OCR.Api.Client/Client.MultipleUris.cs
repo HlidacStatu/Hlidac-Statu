@@ -51,7 +51,7 @@ namespace HlidacStatu.Lib.OCR.Api
 
             }
 
-            public async Task<Dictionary<Uri, Result>> Go()
+            public async Task<Dictionary<Uri, Result>> GoAsync()
             {
                 List<Task<Tuple<Uri, Result>>> tas = new List<Task<Tuple<Uri, Result>>>();
 

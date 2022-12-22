@@ -10,7 +10,7 @@
     string hash = Context.Request.Query["hash"];
     string plainText = string.Empty;
 
-    VerejnaZakazka.Document doc = Model.Dokumenty.Where(m => m.StorageId == hash).FirstOrDefault();
+    VerejnaZakazka.Document doc = Model.Dokumenty.Where(m => m.StorageIds.Contains(hash)).FirstOrDefault();
     plainText = doc?.PlainText ?? "";
 
 

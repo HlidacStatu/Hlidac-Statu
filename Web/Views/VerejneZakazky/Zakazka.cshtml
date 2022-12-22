@@ -188,7 +188,7 @@ else
                                 @if (priloha.WordCount > 2)
                                 {
                                     @Html.Raw(";&nbsp;")
-                                    <a href="@Url.Action("TextDokumentu", new {id = @Model.Id, hash = priloha.StorageId})">zobrazit čistý text dokumentu</a>
+                                    <a href="@Url.Action("TextDokumentu", new {id = @Model.Id, sha = priloha.Sha256Checksum})">zobrazit čistý text dokumentu</a>
                                     <span>(@priloha.WordCount slov)</span>
                                 }
                                 <highlight-content highlights="highlightingData"
