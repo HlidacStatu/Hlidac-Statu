@@ -46,6 +46,12 @@ namespace HlidacStatu.Repositories
             
             try
             {
+                //todo: změnit na:
+                //1) stáhnout soubor
+                //2) spočítat jeho checksum a velikost
+                //3) uložit soubor do Hlídač úložiště
+                //4) !pozor - je potřeba to celé zabalit do FillDocumentChecksums a přejmenovat
+                
                 var newDocChecksumTask = FillDocumentChecksums(newVZ, httpClient);
                 SetupUpdateDates(newVZ, posledniZmena);
                 
@@ -67,6 +73,7 @@ namespace HlidacStatu.Repositories
                 }
                 
                 //VZ existuje => mergujeme
+                // zajistit, že budeme mít checksum všude
                 var origDocChecksumTask = FillDocumentChecksums(originalVZ, httpClient);
                 
                 MergeSimpleProperties(ref originalVZ, newVZ);
@@ -137,6 +144,14 @@ namespace HlidacStatu.Repositories
 
         private static void MergeSimpleProperties(ref VerejnaZakazka originalVZ, VerejnaZakazka newVZ)
         {
+            if (newVZ.Changelog.Count > 0)
+            {
+                originalVZ.Changelog.Add("Merging changelogs {{");
+                originalVZ.Changelog.AddRange(newVZ.Changelog);
+                originalVZ.Changelog.Add("}} Merging changelogs");
+                
+            }
+            
             // preferujeme nové informace před starými
             originalVZ.PosledniZmena = SetProperty(originalVZ.PosledniZmena, newVZ.PosledniZmena,
                 nameof(originalVZ.PosledniZmena), originalVZ.Changelog);
@@ -232,7 +247,6 @@ namespace HlidacStatu.Repositories
             originalDoc.Name = SetProperty(originalDoc.Name, newDoc.Name, "Document.Name", changelog);
             originalDoc.CisloVerze = SetProperty(originalDoc.CisloVerze, newDoc.CisloVerze, "Document.CisloVerze", changelog);
             originalDoc.ContentType = SetProperty(originalDoc.ContentType, newDoc.ContentType, "Document.ContentType", changelog);
-            originalDoc.PlainText = SetProperty(originalDoc.PlainText, newDoc.PlainText, "Document.PlainText", changelog);
             originalDoc.TypDokumentu = SetProperty(originalDoc.TypDokumentu, newDoc.TypDokumentu, "Document.TypDokumentu", changelog);
             originalDoc.LastProcessed = SetProperty(originalDoc.LastProcessed, newDoc.LastProcessed, "Document.LastProcessed", changelog);
             originalDoc.LastUpdate = SetProperty(originalDoc.LastUpdate, newDoc.LastUpdate, "Document.LastUpdate", changelog);
@@ -240,6 +254,9 @@ namespace HlidacStatu.Repositories
             originalDoc.Lenght = SetProperty(originalDoc.Lenght, newDoc.Lenght, "Document.Lenght", changelog);
             originalDoc.Pages = SetProperty(originalDoc.Pages, newDoc.Pages, "Document.Pages", changelog);
             originalDoc.WordCount = SetProperty(originalDoc.WordCount, newDoc.WordCount, "Document.WordCount", changelog);
+            
+            // text dokumentu do changelogu dávat nechceme, protože by to bylo hodně velké
+            originalDoc.PlainText = SetProperty(originalDoc.PlainText, newDoc.PlainText, "Document.PlainText", null);
 
             originalDoc.DirectUrls.UnionWith(newDoc.DirectUrls);
             originalDoc.OficialUrls.UnionWith(newDoc.OficialUrls);

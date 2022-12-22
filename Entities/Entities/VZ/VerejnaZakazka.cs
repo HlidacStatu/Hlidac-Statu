@@ -452,6 +452,9 @@ namespace HlidacStatu.Entities.VZ
             [Description("Kontrolní součet SHA256 souboru pro ověření unikátnosti")]
             [Text]
             public string Sha256Checksum { get; set; }
+            
+            [Description("Velikost souboru v Bytech")]
+            public long SizeInBytes { get; set; }
 
             [Description("URL odkazy uvedené v profilu zadavatele")]
             [Keyword]
@@ -510,6 +513,11 @@ namespace HlidacStatu.Entities.VZ
                     return DirectUrls.FirstOrDefault();
                 
                 return $"http://bpapi.datlab.eu/document/{StorageIds.FirstOrDefault()}";
+            }
+
+            public string GetHlidacStorageId()
+            {
+                return Sha256Checksum + "_" + SizeInBytes;
             }
 
             [Keyword()]

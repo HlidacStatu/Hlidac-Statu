@@ -42,6 +42,11 @@ namespace HlidacStatu.Extensions
                        "+ {0} oborů");
         }
 
+        public static string GetHlidacUrl(this VerejnaZakazka.Document document)
+        {
+            return $"https://www.hlidacstatu.cz/verejnezakazky/priloha/{document.GetHlidacStorageId()}";
+        }
+
 
         public static string SocialInfoBody(this VerejnaZakazka verejnaZakazka)
         {

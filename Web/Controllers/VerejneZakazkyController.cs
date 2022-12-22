@@ -51,6 +51,11 @@ namespace HlidacStatu.Web.Controllers
             return View(vz);
         }
 
+        public async Task<ActionResult> Priloha(string id)
+        {
+            //todo: sem přidat načtení souboru z té složky
+        }
+
 
         public async Task<ActionResult> Hledat(Repositories.Searching.VerejnaZakazkaSearchData model)
         {
