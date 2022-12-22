@@ -19,7 +19,7 @@ namespace HlidacStatu.Connectors.IO
         }
         public string GetFullPath(string prilohaId)
         {
-            return GetFullPath(prilohaId);
+            return GetFullPath(prilohaId, prilohaId);
         }
 
         public override string GetFullPath(string prilohaId, string filename)
@@ -29,11 +29,6 @@ namespace HlidacStatu.Connectors.IO
             return GetFullDir(prilohaId) + prilohaId;
         }
 
-        public bool ExistLocalCopyOfPriloha(Smlouva obj, Smlouva.Priloha priloha)
-        {
-            bool weHaveCopy = System.IO.File.Exists(Init.PrilohaLocalCopy.GetFullPath(obj, priloha));
-            return weHaveCopy;
-        }
 
         public override string GetRelativeDir(string prilohaId)
         {
