@@ -27,10 +27,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Devmasters.Net" Version="4.3.0" />
-    <PackageReference Include="EPPlus" Version="6.1.0" />
+    <PackageReference Include="EPPlus" Version="6.1.1" />
     <PackageReference Include="ExcelDataReader" Version="3.6.0" />
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.2.1" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.346202">
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.355802">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Polly" Version="7.2.3" />
