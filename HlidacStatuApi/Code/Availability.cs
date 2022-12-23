@@ -88,8 +88,9 @@ namespace HlidacStatuApi.Code
 
             List<UptimeServer.HostAvailability> choosen = new List<UptimeServer.HostAvailability>();
             choosen = allData
+                .Where(m=>m?.Host?.Id != null)
                 .Where(m => serverIds.Contains(m.Host.Id))
-                .OrderByDescending(o => o.Host.Name)
+                .OrderByDescending(o => o?.Host?.Name)
                 .ToList();
             return choosen;
         }
