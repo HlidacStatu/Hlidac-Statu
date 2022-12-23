@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities;
+﻿using Devmasters.DT;
+using HlidacStatu.Entities;
 
 namespace HlidacStatuApi.Code
 {
@@ -54,7 +55,17 @@ namespace HlidacStatuApi.Code
         {
             UptimeServer[] allServers = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers();
 
-            var items = HlidacStatu.Lib.Data.External.InfluxDb.GetAvailbility(serverIds, intervalBack);
+
+            IEnumerable<HlidacStatu.Lib.Data.External.InfluxDb.ResponseItem> items = 
+                new HlidacStatu.Lib.Data.External.InfluxDb.ResponseItem[] { };
+            try
+            {
+                items = HlidacStatu.Lib.Data.External.InfluxDb.GetAvailbility(serverIds, intervalBack);
+            }
+            catch (Exception e)
+            {
+                HlidacStatu.Util.Consts.Logger.Error("Cannot read data from InfluxDb", e);
+            }
 
             var zabList = items
                 .GroupBy(k => k.ServerId, v => v)

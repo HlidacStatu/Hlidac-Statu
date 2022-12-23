@@ -67,7 +67,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="InfluxDB.Client" Version="4.7.0" />
+    <PackageReference Include="InfluxDB.Client" Version="4.9.0" />
     <PackageReference Include="linqtotwitter" Version="6.15.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="4.10.0" />
@@ -85,7 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autofac" Version="6.4.0" />
-    <PackageReference Include="CsvHelper" Version="30.0.0" />
+    <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Devmasters.Imaging" Version="4.0.2" />
     <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="Enums.NET" Version="4.0.0" />
