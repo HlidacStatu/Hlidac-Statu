@@ -434,10 +434,17 @@ namespace HlidacStatu.Repositories
             return null;
         }
 
-        public static string GetPhotoPath(this Osoba osoba)
+        public static string GetPhotoPath(this Osoba osoba, string anotherName = null, bool force = false)
         {
             if (osoba.HasPhoto())
             {
+                if (!string.IsNullOrEmpty(anotherName) 
+                    && (System.IO.File.Exists(Init.OsobaFotky.GetFullPath(osoba, anotherName)) || force)
+                    
+                    )
+                { 
+                    return Init.OsobaFotky.GetFullPath(osoba, anotherName);
+                }    
                 var path = Init.OsobaFotky.GetFullPath(osoba, "small.jpg");
                 return path;
             }
@@ -445,15 +452,15 @@ namespace HlidacStatu.Repositories
                 return Init.WebAppRoot + @"Content\Img\personNoPhoto.png";
         }
 
-        public static string GetPhotoUrl(this Osoba osoba, bool local = false)
+        public static string GetPhotoUrl(this Osoba osoba, bool local = false, string option = "")
         {
             if (local)
             {
-                return "/Photo/" + osoba.NameId;
+                return "/Photo/" + osoba.NameId + (string.IsNullOrEmpty(option)? "" : $"?option={option}");
             }
             else
             {
-                return "https://www.hlidacstatu.cz/Photo/" + osoba.NameId;
+                return "https://www.hlidacstatu.cz/Photo/" + osoba.NameId + (string.IsNullOrEmpty(option) ? "" : $"?option={option}");
             }
         }
 

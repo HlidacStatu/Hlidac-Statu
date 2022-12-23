@@ -80,7 +80,7 @@ namespace HlidacStatu.Web.Controllers
             return View(model);
         }
 
-        public ActionResult Photo(string id)
+        public ActionResult Photo(string id, [FromQuery] string option)
         {
             if (string.IsNullOrEmpty(id))
             {
@@ -100,7 +100,7 @@ namespace HlidacStatu.Web.Controllers
             else
             {
                 if (o.HasPhoto())
-                    return File(System.IO.File.ReadAllBytes(o.GetPhotoPath()), "image/jpg");
+                    return File(System.IO.File.ReadAllBytes(o.GetPhotoPath(option)), "image/jpg");
                 else
                     return File(System.IO.File.ReadAllBytes(Init.WebAppRoot + @"Content\Img\personNoPhoto.png"), "image/png");
             }

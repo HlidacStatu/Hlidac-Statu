@@ -330,7 +330,48 @@ namespace HlidacStatu.Web.Controllers
 
         }
 
+        [Authorize(Roles = "canEditData")]
+        public JsonResult RemovePhoto(string id, string option)
+        {
+            var o = Osoby.GetByNameId.Get(id);
+            if (o == null)
+            {
+                return new JsonResult(false);
+            }
+            if (o.HasPhoto())
+            {
+                var path = o.GetPhotoPath(option,true);
+                if (System.IO.File.Exists(path))
+                    Devmasters.IO.IOTools.DeleteFile(path, TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(500), false);
+            }
+            return new JsonResult(true);
+        }
 
+        [Authorize(Roles = "canEditData")]
+        public JsonResult DoPhotoRemoveBackground(string id)
+        {
+
+            var o = Osoby.GetByNameId.Get(id);
+            if (o == null)
+            {
+                return new JsonResult(false);
+            }
+            if (o.HasPhoto())
+            {
+                var path = o.GetPhotoPath();
+                if (System.IO.File.Exists(path))
+                {
+                    var noBackGr = Codeproject.AI.Client.ImageRemoveBackground(System.IO.File.ReadAllBytes(o.GetPhotoPath()), true).Result;
+                    if (noBackGr != null)
+                    {
+                        System.IO.File.WriteAllBytes(o.GetPhotoPath("small.nobackground.jpg",true), noBackGr);
+                        return new JsonResult(true);
+                    }
+                    return new JsonResult(false);
+                }
+            }
+            return new JsonResult(false);
+        }
         public ActionResult RemoveBookmark(string id, int type)
         {
             try

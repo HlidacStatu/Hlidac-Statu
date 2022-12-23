@@ -53,8 +53,10 @@ Cookie: _ga=GA1.2.1208733850.1580933391; JSessionID=R3890696782
         public ResultList<KategorieOVM> KategorieOVM()
         {
 
+            string payload = "{\"stav\":[\"SCHVALENO\",\"UKONCENO\"],\"primarni\":true}";
+
             var json = CallAsync(root + "/AISP/rest/verejne/katovm?start=0&pocet=1000&razeni=-datumPosledniZmeny,-id",
-                "{\"primarni\":true}",
+                payload,
                 "PUT"
                 ).Result;
 

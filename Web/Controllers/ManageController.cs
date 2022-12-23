@@ -7,6 +7,7 @@ using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories;
 using HlidacStatu.Util;
+using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Models;
 
 using Microsoft.AspNetCore.Authorization;
@@ -71,7 +72,10 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult Firmy2ICO()
         {
             List<Firma> res = null;
-            string jmena = Request.Form["names"];
+            string jmena = "";
+            if (Request.HasFormContentType)
+                jmena = Request.Form["names"];
+
             if (!string.IsNullOrWhiteSpace(jmena))
             {
                 string[] names = jmena.Split(new string[] { "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
@@ -540,6 +544,9 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
+
+
+
         [AllowAnonymous]
         [HttpPost]
         public ActionResult ChangePhoto(string id, IFormCollection form, IFormFile file1)
@@ -695,6 +702,14 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
+        [HlidacCache(60 * 10, null, false)]
+        public ActionResult AllOsobaPhotos()
+        {
+            return View();
+        }
+
+
+
         public ActionResult Zalozky()
         {
             using (DbEntities db = new DbEntities())
@@ -710,7 +725,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         #region Helpers
-        
+
         private async Task<bool> HasPassword()
         {
             var user = await _userManager.GetUserAsync(User);
