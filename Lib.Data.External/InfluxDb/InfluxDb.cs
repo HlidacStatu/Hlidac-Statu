@@ -117,6 +117,8 @@ namespace HlidacStatu.Lib.Data.External
 
                 try
                 {
+                    HlidacStatu.Util.Consts.Logger.Debug("Calling InfluxDB query {query} from time {timeBack}", query, timeBack);
+
                     List<InfluxDB.Client.Core.Flux.Domain.FluxTable> res =
                         influxDbClient.GetQueryApi().QueryAsync(query, "hlidac")
                         .ConfigureAwait(false).GetAwaiter().GetResult();

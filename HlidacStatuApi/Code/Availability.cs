@@ -14,7 +14,7 @@ namespace HlidacStatuApi.Code
               sw.Start();
               var res = _availability(24);
               sw.Stop();
-              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} ms.", "updated", "uptimeServersCache1Day", sw.ElapsedMilliseconds);
+              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} sec. Last record {date}", "updated", "uptimeServersCache1Day", sw.Elapsed.TotalSeconds, res.FirstOrDefault()?.Data?.Max(m=>m.Time));
               return res.ToArray();
           });
 
@@ -32,7 +32,7 @@ namespace HlidacStatuApi.Code
               var res = _availability(7 * 24);
             #endif
               sw.Stop();
-              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} ms.", "updated", "uptimeServersCache7Days", sw.ElapsedMilliseconds);
+              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} sec. Last record {date}.", "updated", "uptimeServersCache7Days", sw.Elapsed.TotalSeconds, res.FirstOrDefault()?.Data?.Max(m => m.Time));
               return res.ToArray();
 
           }
@@ -64,7 +64,7 @@ namespace HlidacStatuApi.Code
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Cannot read data from InfluxDb", e);
+                HlidacStatuApi.Code.Log.Logger.Error("Cannot read data from InfluxDb", e);
             }
 
             var zabList = items
