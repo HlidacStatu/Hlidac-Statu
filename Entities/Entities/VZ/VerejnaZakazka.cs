@@ -449,10 +449,16 @@ namespace HlidacStatu.Entities.VZ
         [Description("Dokumenty příslušející zakázky (typicky zadávací a smluvní dokumentace)")]
         public class Document : IEquatable<Document>
         {
-            [Description("Kontrolní součet SHA256 souboru pro ověření unikátnosti")]
+            /// <summary>
+            /// Do not set anywhere except Repo
+            /// </summary>
+            [Description("Kontrolní součet SHA256 souboru pro ověření unikátnosti.")]
             [Text]
             public string Sha256Checksum { get; set; }
             
+            /// <summary>
+            /// Do not set anywhere except Repo
+            /// </summary>
             [Description("Velikost souboru v Bytech")]
             public long SizeInBytes { get; set; }
 
@@ -517,6 +523,9 @@ namespace HlidacStatu.Entities.VZ
 
             public string GetHlidacStorageId()
             {
+                if (string.IsNullOrWhiteSpace(Sha256Checksum) || SizeInBytes == 0)
+                    return "";
+                
                 return Sha256Checksum + "_" + SizeInBytes;
             }
 

@@ -5,9 +5,10 @@ namespace HlidacStatu.Connectors
 {
     public class Init
     {
-        public static IO.PrilohaFile PrilohaLocalCopy = new IO.PrilohaFile();
-        public static IO.OsobaFotkyFile OsobaFotky = new IO.OsobaFotkyFile();
-        public static IO.UploadedTmpFile UploadedTmp = new IO.UploadedTmpFile();
+        public static IO.PrilohaFile PrilohaLocalCopy = new();
+        public static IO.VZPrilohaFile VzPrilohaLocalCopy = new();
+        public static IO.OsobaFotkyFile OsobaFotky = new();
+        public static IO.UploadedTmpFile UploadedTmp = new();
 
         public static string WebAppDataPath = null;
         public static string WebAppRoot = null;

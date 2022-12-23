@@ -11,7 +11,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Devmasters;
 using Devmasters.Collections;
+using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using Polly;
 using Polly.Extensions.Http;
@@ -46,13 +48,7 @@ namespace HlidacStatu.Repositories
             
             try
             {
-                //todo: změnit na:
-                //1) stáhnout soubor
-                //2) spočítat jeho checksum a velikost
-                //3) uložit soubor do Hlídač úložiště
-                //4) !pozor - je potřeba to celé zabalit do FillDocumentChecksums a přejmenovat
-                
-                var newDocChecksumTask = FillDocumentChecksums(newVZ, httpClient);
+                var newDocChecksumTask = StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
                 SetupUpdateDates(newVZ, posledniZmena);
                 
                 var elasticClient = await Manager.GetESClient_VZAsync();
@@ -74,7 +70,7 @@ namespace HlidacStatu.Repositories
                 
                 //VZ existuje => mergujeme
                 // zajistit, že budeme mít checksum všude
-                var origDocChecksumTask = FillDocumentChecksums(originalVZ, httpClient);
+                var origDocChecksumTask = StoreDocumentCopyToHlidacStorageAsync(originalVZ, httpClient);
                 
                 MergeSimpleProperties(ref originalVZ, newVZ);
 
@@ -94,23 +90,8 @@ namespace HlidacStatu.Repositories
                 }    
                 
                 //merge dokumenty
-                //todo: potřebuju zrevidovat OCR, aby se používal stejný update, jinak se to celé rozbije
                 await origDocChecksumTask;
-                foreach (var newDoc in newVZ.Dokumenty)
-                {
-
-                    var origDoc = originalVZ.Dokumenty.FirstOrDefault(d => d.Equals(newDoc));
-                    // update document by checksum
-                    if (origDoc is not null)
-                    {
-                        MergeDocuments(origDoc, newDoc, originalVZ.Changelog);
-                        continue;
-                    }
-
-                    // add missing one
-                    originalVZ.Dokumenty.Add(newDoc);
-                }
-                
+                MergeDocuments(originalVZ, newVZ.Dokumenty);
                 SendToOcrQueue(originalVZ);
                 
                 await elasticClient.IndexDocumentAsync<VerejnaZakazka>(originalVZ);
@@ -119,6 +100,28 @@ namespace HlidacStatu.Repositories
             {
                 Consts.Logger.Error(
                     $"VZ ERROR Upserting ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}", e);
+            }
+        }
+
+        /// <summary>
+        /// Merge newDocuments into originalVZ.Dokumenty
+        /// </summary>
+        /// <param name="originalVZ"></param>
+        /// <param name="newDocuments"></param>
+        private static void MergeDocuments(VerejnaZakazka originalVZ, List<VerejnaZakazka.Document> newDocuments)
+        {
+            foreach (var newDoc in newDocuments)
+            {
+                var origDoc = originalVZ.Dokumenty.FirstOrDefault(d => d.Equals(newDoc));
+                // update document by checksum
+                if (origDoc is not null)
+                {
+                    MergeDocumentProperties(origDoc, newDoc, originalVZ.Changelog);
+                    continue;
+                }
+
+                // add missing one
+                originalVZ.Dokumenty.Add(newDoc);
             }
         }
 
@@ -132,14 +135,17 @@ namespace HlidacStatu.Repositories
                 var main = group.FirstOrDefault();
                 foreach (var duplicate in group.Skip(1))
                 {
-                    MergeDocuments(main, duplicate, newVZ.Changelog);
+                    MergeDocumentProperties(main, duplicate, newVZ.Changelog);
                 }
             }
         }
 
-        public static async Task UpdateDocumentsInVz(string Id, List<VerejnaZakazka.Document> dokumenty)
+        public static async Task UpdateDocumentsInVz(string id, List<VerejnaZakazka.Document> dokumenty)
         {
-            
+            var elasticClient = await Manager.GetESClient_VZAsync();
+            var zakazka = await LoadFromESAsync(id, elasticClient);
+            MergeDocuments(zakazka, dokumenty);
+            await elasticClient.IndexDocumentAsync<VerejnaZakazka>(zakazka);
         }
 
         private static void MergeSimpleProperties(ref VerejnaZakazka originalVZ, VerejnaZakazka newVZ)
@@ -241,7 +247,7 @@ namespace HlidacStatu.Repositories
         /// </summary>
         /// <param name="originalDoc">Document which is going to be updated</param>
         /// <param name="newDoc">Document which may contain additional data</param>
-        private static void MergeDocuments(VerejnaZakazka.Document originalDoc, VerejnaZakazka.Document newDoc,
+        private static void MergeDocumentProperties(VerejnaZakazka.Document originalDoc, VerejnaZakazka.Document newDoc,
             List<string> changelog)
         {
             originalDoc.Name = SetProperty(originalDoc.Name, newDoc.Name, "Document.Name", changelog);
@@ -269,45 +275,59 @@ namespace HlidacStatu.Repositories
                 : newDoc.PlainTextContentQuality;
         }
 
-        public static async Task FillDocumentChecksums(VerejnaZakazka vz, HttpClient httpClient)
+        public static async Task StoreDocumentCopyToHlidacStorageAsync(VerejnaZakazka vz, HttpClient httpClient)
         {
             foreach (var dokument in vz.Dokumenty.Where(d => string.IsNullOrWhiteSpace(d.Sha256Checksum)))
             {
-                string downloadUrl = dokument.GetDocumentUrlToDownload();
-
-                string checksum;
                 try
                 {
-                    checksum = await ProcessHttpFileStreamAsync(httpClient, downloadUrl, Checksum.DoChecksumAsync);
+                    // download file from web and save it to temporaryPath
+                    string temporaryPath = Path.Combine(Config.GetWebConfigValue("VZPrilohyDataPath"),
+                        "_temp_",
+                        Guid.NewGuid().ToString("N"));
+                     
+                    string downloadUrl = dokument.GetDocumentUrlToDownload();
+                    await DownloadFileAsync(httpClient, downloadUrl, temporaryPath);
+
+                    // calculate checksum first and get length so we can create hlidacStorageId
+                    using (var fileStream = File.Open(temporaryPath, FileMode.Open, FileAccess.Read))
+                    {
+                        dokument.SizeInBytes = fileStream.Length;
+                        dokument.Sha256Checksum = await Checksum.DoChecksumAsync(fileStream);
+                    }
+
+                    // move file to final destination
+                    var hlidacStorageId = dokument.GetHlidacStorageId();
+                    var destination = Init.VzPrilohaLocalCopy.GetFullPath(hlidacStorageId);
+                
+                    File.Move(temporaryPath, destination);
                 }
                 catch (Exception e)
                 {
-                    checksum = Checksum.GenerateInvalidChecksum();
+                    Consts.Logger.Error("VZ - problem with storing file to hlidac storage");
                 }
                 
-                dokument.Sha256Checksum = checksum;
             }
         }
 
-        private static async Task<T> ProcessHttpFileStreamAsync<T>(HttpClient httpClient,
+        private static async Task DownloadFileAsync(HttpClient httpClient,
             string url,
-            Func<Stream, Task<T>> asyncProcessingMethod) 
+            string path) 
         {
-            if (asyncProcessingMethod == null) throw new ArgumentNullException(nameof(asyncProcessingMethod));
-
-            using var responseMessage = await _retryPolicy.ExecuteAsync(() => httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
-
-            if (!responseMessage.IsSuccessStatusCode)
-            {
-                Consts.Logger.Warning($"Couldn't get {url}");
-                return default;
-            }
+            using var responseMessage = await _retryPolicy.ExecuteAsync(() =>
+                httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
 
             try
             {
+                #pragma warning disable CSE007
+                responseMessage.EnsureSuccessStatusCode();
+                #pragma warning restore CSE007
+                
                 var stream = await responseMessage.Content.ReadAsStreamAsync();
-                var result = await asyncProcessingMethod(stream);
-                return result;
+                using var fileStream = File.Open(path, FileMode.Create);
+                
+                await stream.CopyToAsync(fileStream);
+                await fileStream.FlushAsync();
             }
             catch (Exception e)
             {
@@ -337,7 +357,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<VerejnaZakazka> LoadFromESAsync(string id, ElasticClient client = null)
         {
-            var es = client ??await Manager.GetESClient_VZAsync();
+            var es = client ?? await Manager.GetESClient_VZAsync();
             var res = await es.GetAsync<VerejnaZakazka>(id);
             if (res.Found)
                 return res.Source;
@@ -390,7 +410,5 @@ namespace HlidacStatu.Repositories
             var res = await es.DocumentExistsAsync<VerejnaZakazka>(id);
             return res.Exists;
         }
-
-
     }
 }
