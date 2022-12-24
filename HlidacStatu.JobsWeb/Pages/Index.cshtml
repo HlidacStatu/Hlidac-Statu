@@ -20,9 +20,9 @@
         <div class="col">
             <h2 class="fw-bold lh-2 mb-3">Analýzy</h2>
             <p class="col-lg-10">
-                Navazujeme na <a href="https://www.mvcr.cz/clanek/prehled-obvyklych-cen-ict-praci.aspx" target="_blank">Přehled obvyklých cen ICT prací</a> 
+                Navazujeme na <a href="https://www.mvcr.cz/clanek/prehled-obvyklych-cen-ict-praci.aspx" target="_blank">Přehled obvyklých cen ICT prací</a>
                 od Ministerstva vnitra a nabízíme aktuální <b>analýzy IT za rok 2020 a 2021</b>.
-                Pomocí AI, machine learning technologií a pokročilého zpracování obsahu smluv a důkladné osobní kontroly každého údaje, jsme zanalyzovali smluvní podmínky a nasmlouvané ceny v různých oblastech. 
+                Pomocí AI, machine learning technologií a pokročilého zpracování obsahu smluv a důkladné osobní kontroly každého údaje, jsme zanalyzovali smluvní podmínky a nasmlouvané ceny v různých oblastech.
 
                 <table class="table ">
                     @{
@@ -107,6 +107,62 @@
                             </td>
                         </tr>
                     }
+
+                    @{
+                        var a_it22 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2022 });
+                    }
+                    @if (HttpContext.HasAccess("IT", 2022).Result.Access == false)
+                    {
+                        <tr @Html.Raw(Request.Query["accent"].Equals("it2021") ? "class=\"table-warning\"" : "")>
+                            <td width="60%">
+                                <div class="fs-6 fw-bolder text-decoration-none text-muted">
+                                    Přehled obvyklých cen IT prací ve státní správě za rok 2022
+                                </div>
+                            </td>
+                            <td width="20%">
+                                <a class="btn btn-success btn-sm" href="#">Přípravujeme!!</a>
+                            </td>
+                            <td width="20%">
+                                <div class="text-muted small">
+
+                                    <span class="text-danger fw-bold">
+                                        Pracujeme na reportu. Ve statistice vidíte, kolik smluv jsme zatím zpracovali.
+                                    </span>
+                                    <br />
+                                    <br />
+
+                                    Údaje z @a_it22.PocetSmluv smluv od <b class="text-black">@a_it22.PocetZadavatelu</b> zadavatelů,
+                                    <b class="text-black">@a_it22.PocetDodavatelu</b> dodavatelů,
+                                    zahrnuje <b class="text-black">@a_it22.PocetCen cen</b>.
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr @Html.Raw(Request.Query["accent"].Equals("it2022") ? "class=\"table-warning\"" : "")>
+                            <td>
+                                <a class="fs-6 fw-bolder" href="/Souhrn?obor=IT&rok=2022">Přehled obvyklých cen IT prací ve státní správě za rok 2022</a>
+                            </td>
+                            <td>
+                                <a class="btn btn-success btn-sm" href="/Souhrn?obor=IT&rok=2022">Otevřít analýzu</a>
+                            </td>
+                            <td>
+                                <div class="text-muted small">
+                                    <span class="text-danger fw-bold">
+                                        Pracujeme na reportu. Ve statistice vidíte, kolik smluv jsme zatím zpracovali.
+                                    </span>
+                                    <br />
+                                    <br />
+                                    Údaje z @a_it22.PocetSmluv smluv od <b class="text-black">@a_it22.PocetZadavatelu</b> zadavatelů,
+                                    <b class="text-black">@a_it22.PocetDodavatelu</b> dodavatelů,
+                                    zahrnuje <b class="text-black">@a_it22.PocetCen cen</b>.
+                                </div>
+                            </td>
+                        </tr>
+                    }
+
+
                     <tr @Html.Raw(Request.Query["accent"].Equals("demo") ? "class=\"table-warning\"" : "")>
                         @{
                             var a_demo18 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "DEMO", Rok = 2018 });
@@ -144,8 +200,8 @@
 <div class="pricing-header p-3 pb-md-4 mx-auto">
     <h2 class="fw-normal">Ceník</h2>
     <p class="fs-5 text-muted">
-Analýzy jsou dostupné pro jednotlivé kalendářní roky v oblasti IT.
-</p>
+        Analýzy jsou dostupné pro jednotlivé kalendářní roky v oblasti IT.
+    </p>
 </div>
 
 <div class="row row-cols-1 row-cols-md-3 mb-4 text-center">
@@ -382,19 +438,19 @@ Analýzy jsou dostupné pro jednotlivé kalendářní roky v oblasti IT.
         </div>
     </div>
     @*    <div class="accordion-item">
-        <h2 class="accordion-header" id="heading05">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse05" aria-expanded="false" aria-controls="collapse05">
-        Je možné licenci přeprodat na jiné fyzické či právnické osobě?
-        </button>
-        </h2>
-        <div id="collapse05" class="accordion-collapse collapse" aria-labelledby="heading05" data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-        <p>
-        Ne. V situacích jako prodej podniku či právním nástupnictví je možné převést na novou společnost licence v minimální hodnotě 200 000 Kč bez DPH a to se souhlasem Hlídač státu z.ú.
-        </p>
-        </div>
-        </div>
-        </div>
+    <h2 class="accordion-header" id="heading05">
+    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse05" aria-expanded="false" aria-controls="collapse05">
+    Je možné licenci přeprodat na jiné fyzické či právnické osobě?
+    </button>
+    </h2>
+    <div id="collapse05" class="accordion-collapse collapse" aria-labelledby="heading05" data-bs-parent="#accordionExample">
+    <div class="accordion-body">
+    <p>
+    Ne. V situacích jako prodej podniku či právním nástupnictví je možné převést na novou společnost licence v minimální hodnotě 200 000 Kč bez DPH a to se souhlasem Hlídač státu z.ú.
+    </p>
+    </div>
+    </div>
+    </div>
     *@
 </div>
 <!--Section: FAQ-->
