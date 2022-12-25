@@ -322,7 +322,7 @@ text zpravy: {txt}
             ViewBag.hashValue = hash;
             return View(model);
         }
-        public async Task<ActionResult> KopiePrilohy(string Id, string hash, string secret)
+        public async Task<ActionResult> KopiePrilohy(string Id, string hash, string secret, bool forcePDF = false)
         {
             if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(hash))
                 return NotFound();
@@ -358,8 +358,11 @@ text zpravy: {txt}
                     }
                 }
             }
-            var fn = Init.PrilohaLocalCopy.GetFullPath(model, priloha);
-            if (System.IO.File.Exists(fn) == false)
+            var fn = SmlouvaRepo.GetFilePathFromPrilohaRepository(priloha,model, 
+                forcePDF ? SmlouvaRepo.RequestedFileType.PDF : SmlouvaRepo.RequestedFileType.Original );
+
+            if (string.IsNullOrEmpty(fn)
+                || System.IO.File.Exists(fn) == false)
                 return NotFound();
 
             if (Lib.OCR.DocTools.HasPDFHeader(fn))

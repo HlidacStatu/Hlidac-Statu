@@ -28,11 +28,6 @@ namespace HlidacStatu.Connectors.IO
             return GetFullDir(obj) + Encode(prilohaUrl);
         }
 
-        public bool ExistLocalCopyOfPriloha(Smlouva obj, Smlouva.Priloha priloha)
-        {
-            bool weHaveCopy = System.IO.File.Exists(Init.PrilohaLocalCopy.GetFullPath(obj, priloha));
-            return weHaveCopy;
-        }
 
         public override string GetRelativeDir(Smlouva obj)
         {

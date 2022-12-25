@@ -86,7 +86,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 if (sml.Prilohy != null)
                 {
-                    var toProcess = sml.Prilohy.Where(p => p.nazevSouboru.ToLower().EndsWith(".pdf") && (p.BlurredPages == null || force));
+                    var toProcess = sml.Prilohy.Where(p => (p.BlurredPages == null || force));
                     if (toProcess.Any())
                     {
                         _ = idsToProcess.TryAdd(id, new processed()
@@ -98,7 +98,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                                     .Select(priloha => new BpGet.BpGPriloha()
                                     {
                                         uniqueId = priloha.UniqueHash(),
-                                        url = priloha.GetUrl(id, false)
+                                        url = priloha.LocalCopyUrl(id,true)
                                     }
                                     )
                                     .ToArray()

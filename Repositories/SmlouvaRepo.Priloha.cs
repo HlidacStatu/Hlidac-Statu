@@ -16,9 +16,18 @@ namespace HlidacStatu.Repositories
 {
     public partial class SmlouvaRepo
     {
+
+        private static Connectors.IO.PrilohaFile PrilohaLocalCopy = new Connectors.IO.PrilohaFile();
+
+        public static bool ExistLocalCopyOfPriloha(Smlouva obj, Smlouva.Priloha priloha)
+        {
+            bool weHaveCopy = System.IO.File.Exists(PrilohaLocalCopy.GetFullPath(obj, priloha));
+            return weHaveCopy;
+        }
+
         public static void SaveAttachmentsToDisk(Smlouva smlouva, bool rewriteExisting = false)
         {
-            var io = Init.PrilohaLocalCopy;
+            var io = PrilohaLocalCopy;
 
             int count = 0;
             string listing = "";
@@ -87,12 +96,18 @@ namespace HlidacStatu.Repositories
         }.Build();
 
 
+        public static string GetPathFromPrilohaRepository(Smlouva smlouva)
+        { 
+            return PrilohaLocalCopy.GetFullDir(smlouva);
+        }
+
+
         public enum RequestedFileType
         {
             Original,
             PDF
         }
-        public static string GetFileFromPrilohaRepository(Smlouva.Priloha att,
+        public static string GetFilePathFromPrilohaRepository(Smlouva.Priloha att,
     Smlouva smlouva, RequestedFileType filetype = RequestedFileType.Original)
         {
             var ext = ".pdf";
@@ -106,11 +121,11 @@ namespace HlidacStatu.Repositories
             }
 
 
-            string localDir = Init.PrilohaLocalCopy.GetFullDir(smlouva);
+            string localDir = PrilohaLocalCopy.GetFullDir(smlouva);
             if (!System.IO.Directory.Exists(localDir)) 
                 System.IO.Directory.CreateDirectory(localDir);
 
-            string localFile = Init.PrilohaLocalCopy.GetFullPath(smlouva, att);
+            string localFile = PrilohaLocalCopy.GetFullPath(smlouva, att);
 
             //System.IO.File.Delete(fn);
             if (!System.IO.File.Exists(localFile))
@@ -168,6 +183,9 @@ namespace HlidacStatu.Repositories
 
             if (filetype == RequestedFileType.PDF)
             {
+                if (System.IO.File.Exists($"{localFile}.pdf"))
+                    return $"{localFile}.pdf";
+
                 System.Collections.Immutable.ImmutableArray<MimeDetective.Engine.FileExtensionMatch> types = MimeInspector.Inspect(localFile).ByFileExtension();
                 if (types.Any(m => m.Extension == "pdf") == false)
                 {
@@ -179,11 +197,12 @@ namespace HlidacStatu.Repositories
                         else
                             System.IO.File.WriteAllBytes($"{localFile}.pdf", pdfdata);
 
-                        return localFile + ".pdf";
+                        return $"{localFile}.pdf";
                     }
                     catch (Exception e)
                     {
-                        throw;
+                        HlidacStatu.Util.Consts.Logger.Error("Cannot convert into PDF {localfile}", e, localFile);
+                        return localFile;
                     }
                 }
 
@@ -193,16 +212,17 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static string GetCopyOfFileFromPrilohaRepository(Smlouva.Priloha att,
+
+        public static string GetCopyPathOfFileFromPrilohaRepository(Smlouva.Priloha att,
     Smlouva smlouva, RequestedFileType filetype = RequestedFileType.Original)
         {
 
-            var origFile = GetFileFromPrilohaRepository(att, smlouva, filetype);
+            var origFile = GetFilePathFromPrilohaRepository(att, smlouva, filetype);
 
             if (string.IsNullOrEmpty(origFile))
                 return null;
 
-            string localFile = Init.PrilohaLocalCopy.GetFullPath(smlouva, att);
+            string localFile = PrilohaLocalCopy.GetFullPath(smlouva, att);
             var tmpPath = System.IO.Path.GetTempPath();
             //Devmasters.IO.IOTools.DeleteFile(tmpPath);
             if (!System.IO.Directory.Exists(tmpPath))

@@ -294,7 +294,7 @@
                 {
                     @foreach (var priloha in Model.Prilohy)
                     {
-                        bool weHaveCopy = Init.PrilohaLocalCopy.ExistLocalCopyOfPriloha(Model, priloha);
+                        bool weHaveCopy = SmlouvaRepo.ExistLocalCopyOfPriloha(Model, priloha);
                         string calloutColor = "primary";
                         calloutColor = znepristupnena ? "gray" : calloutColor;
                         calloutColor = (this.User?.IsInRole("Admin") == true && priloha.BlurredPages != null) ? "primary" : calloutColor;

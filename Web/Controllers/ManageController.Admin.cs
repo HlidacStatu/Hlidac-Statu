@@ -66,8 +66,8 @@ namespace HlidacStatu.Web.Controllers
             if (sml == null || pr == null)
                 return NotFound();
 
-            string fn = Connectors.Init.PrilohaLocalCopy.GetFullPath(sml, pr);
-            bool weHaveCopy = System.IO.File.Exists(fn);
+            string fn = SmlouvaRepo.GetFilePathFromPrilohaRepository(pr,sml, SmlouvaRepo.RequestedFileType.PDF);
+            bool weHaveCopy = string.IsNullOrEmpty(fn)==false && System.IO.File.Exists(fn);
             byte[] pdfBin = null;
             if (weHaveCopy)
                 pdfBin = await System.IO.File.ReadAllBytesAsync(fn);

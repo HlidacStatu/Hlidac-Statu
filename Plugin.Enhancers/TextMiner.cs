@@ -115,7 +115,7 @@ namespace HlidacStatu.Plugin.Enhancers
                         continue;
 
                     Base.Logger.Debug($"Getting priloha {att.nazevSouboru} for smlouva {item.Id}");
-                    string downloadedFile = SmlouvaRepo.GetCopyOfFileFromPrilohaRepository(att, item);
+                    string downloadedFile = SmlouvaRepo.GetCopyPathOfFileFromPrilohaRepository(att, item);
                     Base.Logger.Debug($"Getdone priloha {att.nazevSouboru} for smlouva {item.Id} done.");
                     if (downloadedFile != null)
                     {

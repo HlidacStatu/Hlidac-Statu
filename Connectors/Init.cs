@@ -5,7 +5,6 @@ namespace HlidacStatu.Connectors
 {
     public class Init
     {
-        public static IO.PrilohaFile PrilohaLocalCopy = new IO.PrilohaFile();
         public static IO.OsobaFotkyFile OsobaFotky = new IO.OsobaFotkyFile();
         public static IO.UploadedTmpFile UploadedTmp = new IO.UploadedTmpFile();
 
