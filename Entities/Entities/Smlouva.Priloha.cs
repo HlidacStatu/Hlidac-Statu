@@ -161,9 +161,9 @@ namespace HlidacStatu.Entities
             }
 
 
-            public string GetUrl(string smlouvaId, bool local = true, UriKind uriKind = UriKind.RelativeOrAbsolute)
+            public string GetUrl(string smlouvaId, bool local = true, UriKind uriKind = UriKind.RelativeOrAbsolute, bool pdfFormat = false)
             {
-                return GetUrl(smlouvaId, this.UniqueHash(), this.odkaz, local, uriKind);
+                return GetUrl(smlouvaId, this.UniqueHash(), this.odkaz, local, uriKind, pdfFormat);
             }
             public string LocalCopyUrl(string smlouvaId, bool pdfFormat, string identityName = null, string secret = null)
             {
