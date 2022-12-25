@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using HlidacStatu.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace HlidacStatu.Lib.Data.External
 {
@@ -17,17 +18,52 @@ namespace HlidacStatu.Lib.Data.External
             Dictionary<string, string> headers = new Dictionary<string, string>() {
                 { "Authorization",Devmasters.Config.GetWebConfigValue("LibreOffice.Service.Api.Key") }
             };
-            var res = Devmasters.Net.HttpClient.Simple.PostAsync<ApiResult<byte[]>>(
-                Devmasters.Config.GetWebConfigValue("LibreOffice.Service.Api") + "/LibreOffice/ConvertFromFile",
-                form,
-                headers: headers)
-                .ConfigureAwait(false).GetAwaiter().GetResult();
+            int tries = 0;
+        call:
+            try
+            {
+                tries++;
+                var res = Devmasters.Net.HttpClient.Simple.PostAsync<ApiResult<byte[]>>(
+                    Devmasters.Config.GetWebConfigValue("LibreOffice.Service.Api") + "/LibreOffice/ConvertFromFile",
+                    form,
+                    headers: headers, timeout: TimeSpan.FromMinutes(2))
+                    .ConfigureAwait(false).GetAwaiter().GetResult();
 
-            if (res.Success)
-                return res.Data;
-            else
-                throw new ApplicationException($"{res.ErrorCode} {res.ErrorDescription}");
+                if (res.Success)
+                    return res.Data;
+                else
+                    throw new ApplicationException($"{res.ErrorCode} {res.ErrorDescription}");
 
+
+            }
+            catch (System.Net.Http.HttpRequestException e)
+            {
+                int statusCode = (int)e.StatusCode;
+                if (statusCode >= 500)
+                {
+                    //logger.LogError(e, "cannot read JSON from API. API error " + statusCode);
+                    System.Threading.Thread.Sleep(1000 * tries);
+                }
+                else if (statusCode >= 400)
+                {
+                    //logger.LogError(e, "No more data from API. Probably no more tasks to do." + statusCode);
+                    System.Threading.Thread.Sleep(1000 * tries);
+
+                }
+
+                if (tries < 5)
+                    goto call;
+
+                return null;
+            }
+            catch (Exception e)
+            {
+                System.Threading.Thread.Sleep(1000 * tries);
+                if (tries < 5)
+                    goto call;
+
+                return null;
+            }
 
         }
 

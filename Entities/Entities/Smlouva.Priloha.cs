@@ -149,10 +149,10 @@ namespace HlidacStatu.Entities
                     {
                         case UriKind.RelativeOrAbsolute:
                         case UriKind.Absolute:
-                            return "https://www.hlidacstatu.cz"+LocalCopyPath(smlouvaId, prilohaUniqueHash);
+                            return "https://www.hlidacstatu.cz"+LocalCopyUrl(smlouvaId, prilohaUniqueHash);
                         case UriKind.Relative:
                         default:
-                            return LocalCopyPath(smlouvaId, prilohaUniqueHash);
+                            return LocalCopyUrl(smlouvaId, prilohaUniqueHash);
                     }
                     
                 }
@@ -165,11 +165,11 @@ namespace HlidacStatu.Entities
             {
                 return GetUrl(smlouvaId, this.UniqueHash(), this.odkaz, local, uriKind);
             }
-            public string LocalCopyPath(string smlouvaId, string identityName = null, string secret = null)
+            public string LocalCopyUrl(string smlouvaId, string identityName = null, string secret = null)
             {
-                return LocalCopyPath(smlouvaId, this.UniqueHash(), identityName, secret);
+                return LocalCopyUrl(smlouvaId, this.UniqueHash(), identityName, secret);
             }
-            public static string LocalCopyPath(string smlouvaId, string prilohaUniqueHash, string identityName = null, string secret = null)
+            public static string LocalCopyUrl(string smlouvaId, string prilohaUniqueHash, string identityName = null, string secret = null)
             {
                 var url = $"/KopiePrilohy/{smlouvaId}?hash={prilohaUniqueHash}";
                 if (identityName != null)

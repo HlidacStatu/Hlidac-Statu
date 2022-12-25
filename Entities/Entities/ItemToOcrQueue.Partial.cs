@@ -8,6 +8,38 @@ namespace HlidacStatu.Entities
 {
     public partial class ItemToOcrQueue
     {
+        public void SetOptions(ItemOption option)
+        {
+            if (option == null)
+                this.Options = null;
+            else
+                this.Options = Newtonsoft.Json.JsonConvert.SerializeObject(option);
+
+            _options = option;
+        }
+
+        ItemOption _options = null;
+        public ItemOption GetOptions()
+        {
+            if (_options == null)
+            {
+                var itemOptions = ItemOption.Default;
+                try
+                {
+                    if (string.IsNullOrEmpty(this.Options))
+                        return ItemOption.Default;
+
+                    itemOptions = Newtonsoft.Json.JsonConvert.DeserializeObject<ItemOption>(this.Options);
+
+                }
+                catch (Exception)
+                {
+                }
+                _options = itemOptions;
+            }
+            return _options;
+        }
+
         public enum ItemToOcrType
         {
             Smlouva,
@@ -76,12 +108,33 @@ namespace HlidacStatu.Entities
             }
         }
 
-        public static Lib.OCR.Api.Result AddNewTask(ItemToOcrType itemType, string itemId, string itemSubType = null, Lib.OCR.Api.Client.TaskPriority priority = Lib.OCR.Api.Client.TaskPriority.Standard)
+
+        public class ItemOption
         {
-            return AddNewTask(itemType, itemId, itemSubType, (int)priority);
+            public bool force { get; set; } = false;
+            public bool missingOnly { get; set; } = true;
+            public int? lengthLessThan { get; set; } = null;
+
+            private static ItemOption _default = new ItemOption();
+            public static ItemOption Default { get => _default; }
+
         }
-        public static Lib.OCR.Api.Result AddNewTask(ItemToOcrType itemType, string itemId, string itemSubType = null, int priority = 5)
+
+
+        public static Lib.OCR.Api.Result AddNewTask(ItemToOcrType itemType, string itemId, string itemSubType = null,
+            Lib.OCR.Api.Client.TaskPriority priority = Lib.OCR.Api.Client.TaskPriority.Standard,
+            ItemOption options = null
+            )
         {
+            return AddNewTask(itemType, itemId, itemSubType, (int)priority, options);
+        }
+        public static Lib.OCR.Api.Result AddNewTask(ItemToOcrType itemType, string itemId,
+            string itemSubType = null, int priority = 5,
+            ItemOption options = null
+            )
+        {
+            options = options ?? ItemOption.Default;
+
             using (DbEntities db = new DbEntities())
             {
                 IQueryable<ItemToOcrQueue> sql = CreateQuery(db, itemType, itemSubType);
@@ -100,6 +153,7 @@ namespace HlidacStatu.Entities
                 i.ItemType = itemType.ToString();
                 i.ItemSubType = itemSubType;
                 i.Priority = priority;
+                i.SetOptions(options);
                 db.ItemToOcrQueue.Add(i);
                 db.SaveChanges();
                 return new Lib.OCR.Api.Result()

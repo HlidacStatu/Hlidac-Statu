@@ -51,7 +51,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
                         p.odkaz, HlidacStatu.Lib.Data.External.Tables.Camelot.CamelotResult.Formats.JSON).Result;
                     if (myRes==null)
                         myRes = HlidacStatu.Lib.Data.External.Tables.PDF.GetMaxTablesFromPDFAsync(
-                            p.LocalCopyPath(s.Id,secret: Devmasters.Config.GetWebConfigValue("LocalPrilohaUniversalSecret")), 
+                            p.LocalCopyUrl(s.Id,secret: Devmasters.Config.GetWebConfigValue("LocalPrilohaUniversalSecret")), 
                             Camelot.CamelotResult.Formats.JSON).Result;
 
                     sw.Stop();
