@@ -98,15 +98,15 @@ namespace HlidacStatu.Plugin.Enhancers
                     else
                         doOcr = true;
 
-                    if (this.lengthLess.HasValue && att.Lenght > this.lengthLess)
-                        doOcr = doOcr || false;
-                    else
+                    if (this.lengthLess.HasValue && att.Lenght < this.lengthLess)
                         doOcr = true;
+                    else
+                        doOcr = doOcr || false;
 
-                    if (this.missingOnly && att.EnoughExtractedText==false)
-                        doOcr = doOcr || false;
-                    else
+                    if (this.missingOnly && att.Lenght<2)
                         doOcr = true;
+                    else
+                        doOcr = doOcr || false;
 
                     if (this.forceAlreadyMined)
                         doOcr = true;

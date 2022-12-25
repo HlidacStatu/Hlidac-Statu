@@ -199,6 +199,9 @@ namespace HlidacStatu.Repositories
 
             var origFile = GetFileFromPrilohaRepository(att, smlouva, filetype);
 
+            if (string.IsNullOrEmpty(origFile))
+                return null;
+
             string localFile = Init.PrilohaLocalCopy.GetFullPath(smlouva, att);
             var tmpPath = System.IO.Path.GetTempPath();
             //Devmasters.IO.IOTools.DeleteFile(tmpPath);

@@ -79,32 +79,41 @@ namespace HlidacStatu.Entities
             {
                 lock (lockTakeFromQueue)
                 {
-                    using (var dbTran = db.Database.BeginTransaction())
+                    var strategy = db.Database.CreateExecutionStrategy();
+                    ItemToOcrQueue[] res = strategy.Execute(() =>
                     {
-                        try
-                        {
-                            IQueryable<ItemToOcrQueue> sql = CreateQuery(db, itemType, itemSubType);
 
-                            sql = sql
-                                .OrderByDescending(m => m.Priority)
-                                .ThenBy(m => m.Created)
-                                .Take(maxItems);
-                            var res = sql.ToArray();
-                            foreach (var i in res)
-                            {
-                                i.Started = DateTime.Now;
-                            }
-                            db.SaveChanges();
-                            dbTran.Commit();
-                            return res;
-                        }
-                        catch (Exception)
+                        using (var dbTran = db.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead))
                         {
-                            dbTran.Rollback();
-                            throw;
+
+                            try
+                            {
+                                IQueryable<ItemToOcrQueue> sql = CreateQuery(db, itemType, itemSubType);
+
+                                sql = sql
+                                    .OrderByDescending(m => m.Priority)
+                                    .ThenBy(m => m.Created)
+                                    .Take(maxItems);
+                                var res = sql.ToArray();
+                                foreach (var i in res)
+                                {
+                                    i.Started = DateTime.Now;
+                                }
+                                db.SaveChanges();
+                                dbTran.Commit();
+                                return res;
+                            }
+                            catch (Exception)
+                            {
+                                dbTran.Rollback();
+                                throw;
+                            }
                         }
-                    }
+                    });
+
+                    return res;
                 }
+
             }
         }
 
