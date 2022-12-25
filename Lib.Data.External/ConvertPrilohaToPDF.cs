@@ -41,12 +41,12 @@ namespace HlidacStatu.Lib.Data.External
                 int statusCode = (int)e.StatusCode;
                 if (statusCode >= 500)
                 {
-                    //logger.LogError(e, "cannot read JSON from API. API error " + statusCode);
+                    HlidacStatu.Util.Consts.Logger.Error("Code {statuscode}. Cannot convert into PDF", e, statusCode);
                     System.Threading.Thread.Sleep(1000 * tries);
                 }
                 else if (statusCode >= 400)
                 {
-                    //logger.LogError(e, "No more data from API. Probably no more tasks to do." + statusCode);
+                    HlidacStatu.Util.Consts.Logger.Error("Code {statuscode}. Cannot convert into PDF", e);
                     System.Threading.Thread.Sleep(1000 * tries);
 
                 }

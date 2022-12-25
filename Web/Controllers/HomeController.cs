@@ -367,12 +367,14 @@ text zpravy: {txt}
 
             if (Lib.OCR.DocTools.HasPDFHeader(fn))
             {
-                return File(System.IO.File.ReadAllBytes(fn), "application/pdf", string.IsNullOrWhiteSpace(priloha.nazevSouboru) ? $"{model.Id}_smlouva.pdf" : priloha.nazevSouboru);
+                return File(System.IO.File.ReadAllBytes(fn), "application/pdf", string.IsNullOrWhiteSpace(priloha.nazevSouboru) ? $"{model.Id}_smlouva.pdf" : priloha.nazevSouboru + ".pdf");
             }
             else
                 return File(System.IO.File.ReadAllBytes(fn),
                     string.IsNullOrWhiteSpace(priloha.ContentType) ? "application/octet-stream" : priloha.ContentType,
-                    string.IsNullOrWhiteSpace(priloha.nazevSouboru) ? "priloha" : priloha.nazevSouboru);
+                    (string.IsNullOrWhiteSpace(priloha.nazevSouboru) ? "priloha" : priloha.nazevSouboru) 
+                        + (forcePDF ? ".pdf" : "")
+                    );
 
         }
 
