@@ -9,7 +9,7 @@ namespace HlidacStatu.Lib.Data.External
     public class ConvertPrilohaToPDF
     {
 
-        public static byte[] PrilohaToPDFfromFile(byte[] content)
+        public static byte[] PrilohaToPDFfromFile(byte[] content, int maxTries = 10)
         {
             var form = new MultipartFormDataContent();
             form.Add(new ByteArrayContent(content), "file", "somefile");
@@ -32,8 +32,15 @@ namespace HlidacStatu.Lib.Data.External
                 if (res.Success)
                     return res.Data;
                 else
-                    throw new ApplicationException($"{res.ErrorCode} {res.ErrorDescription}");
-
+                {
+                    if (tries < maxTries)
+                    {
+                        System.Threading.Thread.Sleep(1000 * tries);
+                        goto call;
+                    }
+                    else
+                        throw new ApplicationException($"{res.ErrorCode} {res.ErrorDescription}");
+                }
 
             }
             catch (System.Net.Http.HttpRequestException e)
@@ -51,7 +58,7 @@ namespace HlidacStatu.Lib.Data.External
 
                 }
 
-                if (tries < 5)
+                if (tries < maxTries)
                     goto call;
 
                 return null;
@@ -59,7 +66,7 @@ namespace HlidacStatu.Lib.Data.External
             catch (Exception e)
             {
                 System.Threading.Thread.Sleep(1000 * tries);
-                if (tries < 5)
+                if (tries < maxTries)
                     goto call;
 
                 return null;
