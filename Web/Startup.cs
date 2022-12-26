@@ -168,7 +168,7 @@ namespace HlidacStatu.Web
                 ApplicationName = "WEB"
             });
             
-            var logpath = Path.Combine(Devmasters.Config.GetWebConfigValue("SerilogBasePath"), "/HlidacStatu/Web.PageTimes");
+            var logpath = Path.Combine(Devmasters.Config.GetWebConfigValue("SerilogBasePath"), "HlidacStatu/Web.PageTimes");
             var timeMeasureLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.PageTimes",
                 Devmasters.Log.Logger.DefaultConfiguration()
                     .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
@@ -206,7 +206,7 @@ namespace HlidacStatu.Web
             app.UseStatusCodePagesWithReExecute("/error/{0}");
             app.UseHttpsRedirection();
 
-            var logpath2 = Path.Combine(Devmasters.Config.GetWebConfigValue("SerilogBasePath"), "/HlidacStatu/Web");
+            var logpath2 = Path.Combine(Devmasters.Config.GetWebConfigValue("SerilogBasePath"), "HlidacStatu/Web");
             Devmasters.Log.Logger webExceptionLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Web.Exceptions",
                 Devmasters.Log.Logger.DefaultConfiguration()
                     .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())

@@ -131,7 +131,7 @@ app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
     ApplicationName = "HlidacstatuApi"
 });
 
-var logpath = Path.Combine(Devmasters.Config.GetWebConfigValue("SerilogBasePath"), "/HlidacStatu/Web.PageTimes");
+var logpath = Path.Combine(Devmasters.Config.GetWebConfigValue("SerilogBasePath"), "HlidacStatu/Web.PageTimes");
 var timeMeasureLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Api.PageTimes",
     Devmasters.Log.Logger.DefaultConfiguration()
         .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
@@ -174,7 +174,7 @@ app.Use(async (context, next) =>
     app.UseHttpsRedirection();
 #endif
 
-var logpath2 = Path.Combine(Devmasters.Config.GetWebConfigValue("SerilogBasePath"), "/HlidacStatu/api");
+var logpath2 = Path.Combine(Devmasters.Config.GetWebConfigValue("SerilogBasePath"), "HlidacStatu/api");
 Devmasters.Log.Logger apiExceptionLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Api.Exceptions",
     Devmasters.Log.Logger.DefaultConfiguration()
         .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
