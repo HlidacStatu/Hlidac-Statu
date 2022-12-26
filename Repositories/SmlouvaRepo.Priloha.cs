@@ -6,16 +6,19 @@ using HlidacStatu.Lib.Data.External;
 using HlidacStatu.Lib.OCR;
 using MimeDetective;
 using System;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
+using static HlidacStatu.Entities.Smlouva;
 
 
 namespace HlidacStatu.Repositories
 {
     public partial class SmlouvaRepo
     {
+
 
         private static Connectors.IO.PrilohaFile PrilohaLocalCopy = new Connectors.IO.PrilohaFile();
 
@@ -87,18 +90,18 @@ namespace HlidacStatu.Repositories
         }
 
 
-        static ContentInspector MimeInspector = new ContentInspectorBuilder()
-        {
-            Definitions = new MimeDetective.Definitions.CondensedBuilder()
-            {
-                UsageType = MimeDetective.Definitions.Licensing.UsageType.PersonalNonCommercial
-            }.Build()
-        }.Build();
 
 
         public static string GetPathFromPrilohaRepository(Smlouva smlouva)
         { 
             return PrilohaLocalCopy.GetFullDir(smlouva);
+        }
+        public static string GetFullFilePathFromPrilohaRepository(Smlouva smlouva, Priloha priloha, RequestedFileType filetype = RequestedFileType.Original)
+        {
+            var fn = PrilohaLocalCopy.GetFullPath(smlouva, priloha);
+            if (filetype == RequestedFileType.PDF)
+                fn = fn + ".pdf";
+            return fn;
         }
 
 
@@ -107,7 +110,10 @@ namespace HlidacStatu.Repositories
             Original,
             PDF
         }
-        public static string GetFilePathFromPrilohaRepository(Smlouva.Priloha att,
+
+
+
+        public static string GetDownloadedPriloha(Smlouva.Priloha att,
     Smlouva smlouva, RequestedFileType filetype = RequestedFileType.Original)
         {
             var ext = ".pdf";
@@ -186,8 +192,7 @@ namespace HlidacStatu.Repositories
                 if (System.IO.File.Exists($"{localFile}.pdf"))
                     return $"{localFile}.pdf";
 
-                System.Collections.Immutable.ImmutableArray<MimeDetective.Engine.FileExtensionMatch> types = MimeInspector.Inspect(localFile).ByFileExtension();
-                if (types.Any(m => m.Extension == "pdf") == false)
+                if (HlidacStatu.Util.FileMime.HasPdfHeader(localFile))
                 {
                     try
                     {
@@ -213,11 +218,11 @@ namespace HlidacStatu.Repositories
 
 
 
-        public static string GetCopyPathOfFileFromPrilohaRepository(Smlouva.Priloha att,
+        public static string GetCopyOfDownloadedPriloha(Smlouva.Priloha att,
     Smlouva smlouva, RequestedFileType filetype = RequestedFileType.Original)
         {
 
-            var origFile = GetFilePathFromPrilohaRepository(att, smlouva, filetype);
+            var origFile = GetDownloadedPriloha(att, smlouva, filetype);
 
             if (string.IsNullOrEmpty(origFile))
                 return null;

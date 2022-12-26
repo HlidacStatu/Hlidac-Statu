@@ -27,6 +27,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Mime-Detective.Definitions.Condensed" Version="22.12.14" />
 		<PackageReference Include="MimeMapping" Version="1.0.1.50" />
 		<PackageReference Include="NEST" Version="7.17.5" />
 		<PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />

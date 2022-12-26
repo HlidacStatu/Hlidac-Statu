@@ -358,7 +358,7 @@ text zpravy: {txt}
                     }
                 }
             }
-            var fn = SmlouvaRepo.GetFilePathFromPrilohaRepository(priloha,model, 
+            var fn = SmlouvaRepo.GetDownloadedPriloha(priloha,model, 
                 forcePDF ? SmlouvaRepo.RequestedFileType.PDF : SmlouvaRepo.RequestedFileType.Original );
 
             if (string.IsNullOrEmpty(fn)

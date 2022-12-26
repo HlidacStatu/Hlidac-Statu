@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using Devmasters.Log;
+using HlidacStatu.DS.Api;
 using HlidacStatu.Entities;
 using Microsoft.AspNetCore.Http;
 
@@ -42,7 +43,10 @@ namespace HlidacStatu.Lib.Data.External
                     .ConfigureAwait(false).GetAwaiter().GetResult();
 
                 if (res.Success)
+                {
+                    logger.Info("Successfull conversion from {server}", res.Server);
                     return res.Data;
+                }
                 else
                 {
                     logger.Error("Code {errorcode}. Cannot convert into PDF. Try {try}", res.ErrorCode, tries);
