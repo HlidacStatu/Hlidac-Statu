@@ -38,5 +38,28 @@ namespace HlidacStatu.Util
             System.Collections.Immutable.ImmutableArray<MimeDetective.Engine.FileExtensionMatch> types = pdfInspector.Inspect(filename).ByFileExtension();
             return (types.Any(m => m.Extension == "pdf")) ;
         }
+
+        public static bool HasPDFHeaderFast(string filename)
+        {
+            if (string.IsNullOrEmpty(filename))
+                return false;
+            if (!System.IO.File.Exists(filename))
+                return false;
+
+            byte[] b = new byte[4];
+            using (var r = System.IO.File.OpenRead(filename))
+            {
+                r.Read(b, 0, 4);
+            }
+            byte[] pdfheader = new byte[] { 37, 80, 68, 70 };
+            bool valid = true;
+            for (int i = 0; i < 4; i++)
+            {
+                valid = valid && b[i] == pdfheader[i];
+            }
+            return valid;
+        }
+
+
     }
 }
