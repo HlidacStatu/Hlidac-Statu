@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using HlidacStatu.DS.Api;
 using HlidacStatu.Entities;
 
 namespace HlidacStatu.Lib.Data.External.Tables.Camelot

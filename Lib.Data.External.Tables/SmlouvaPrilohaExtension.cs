@@ -12,9 +12,9 @@ namespace HlidacStatu.Lib.Data.External.Tables
 {
     public static class SmlouvaPrilohaExtension
     {
-        
-        private static volatile Devmasters.Cache.AWS_S3.Manager<Lib.Data.External.Tables.Result[],KeyAndId> prilohaTblsMinioCacheManager
-        = Devmasters.Cache.AWS_S3.Manager<Lib.Data.External.Tables.Result[],KeyAndId>.GetSafeInstance(
+
+        private static volatile Devmasters.Cache.AWS_S3.Manager<Lib.Data.External.Tables.Result[], KeyAndId> prilohaTblsMinioCacheManager
+        = Devmasters.Cache.AWS_S3.Manager<Lib.Data.External.Tables.Result[], KeyAndId>.GetSafeInstance(
             "SmlouvyPrilohyTbls/",
             smlouvaKeyId => getTablesFromDocumentAsync(smlouvaKeyId).ConfigureAwait(false).GetAwaiter().GetResult(),
             TimeSpan.Zero,
@@ -22,7 +22,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
             Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
             Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
             Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-            key=>key.CacheNameOnDisk
+            key => key.CacheNameOnDisk
             );
 
         private static async Task<Result[]> getTablesFromDocumentAsync(KeyAndId smlouvaKeyId)
@@ -41,51 +41,47 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 Util.Consts.Logger.Warning($"smlouva {key[0]} soubor {p.UniqueHash()} doesn't have nazevSouboru");
                 return null;
             }
-            if (p.nazevSouboru.ToLower().EndsWith("pdf"))
+            Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+            sw.Start();
+            try
             {
-                Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
-                sw.Start();
-                try
-                {
-                    Lib.Data.External.Tables.Result[] myRes = HlidacStatu.Lib.Data.External.Tables.PDF.GetMaxTablesFromPDFAsync(
-                        p.odkaz, HlidacStatu.Lib.Data.External.Tables.Camelot.CamelotResult.Formats.JSON).Result;
-                    if (myRes==null)
-                        myRes = HlidacStatu.Lib.Data.External.Tables.PDF.GetMaxTablesFromPDFAsync(
-                            p.LocalCopyPath(s.Id,secret: Devmasters.Config.GetWebConfigValue("LocalPrilohaUniversalSecret")), 
-                            Camelot.CamelotResult.Formats.JSON).Result;
+                Lib.Data.External.Tables.Result[] myRes = null;
+                if (s.znepristupnenaSmlouva()==false)
+                    myRes = HlidacStatu.Lib.Data.External.Tables.PDF.GetMaxTablesFromPDFAsync(
+                        p.LocalCopyUrl(s.Id, true,null, null), HlidacStatu.Lib.Data.External.Tables.Camelot.CamelotResult.Formats.JSON).Result;
 
-                    sw.Stop();
-                    Util.Consts.Logger.Debug($"smlouva {key[0]} soubor {p.UniqueHash()} done in {sw.ElapsedMilliseconds}ms, found {myRes?.Sum(m => m.Tables?.Length ?? 0)} tables");
+                if (myRes == null)
+                    myRes = HlidacStatu.Lib.Data.External.Tables.PDF.GetMaxTablesFromPDFAsync(
+                        p.LocalCopyUrl(s.Id, true, secret: Devmasters.Config.GetWebConfigValue("LocalPrilohaUniversalSecret")),
+                        Camelot.CamelotResult.Formats.JSON).Result;
 
-                    return myRes;
+                sw.Stop();
+                Util.Consts.Logger.Debug($"smlouva {key[0]} soubor {p.UniqueHash()} done in {sw.ElapsedMilliseconds}ms, found {myRes?.Sum(m => m.Tables?.Length ?? 0)} tables");
 
-                }
-                catch (AggregateException age)
-                {
-                    sw.Stop();
-                    if (age.InnerExceptions?.Count >0)
-                    {
-                        foreach (var e in age.InnerExceptions)
-                        {
-                            Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms  {e.ToString()}", e);
-                        }
-                    }
-                    else
-                        Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms {age.ToString()}", age);
+                return myRes;
 
-                    throw;
-
-                }
-                catch (Exception e)
-                {
-                    sw.Stop();
-                    Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} error GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms, {e.ToString()}", e);
-                    throw;
-                }
             }
-            else
+            catch (AggregateException age)
             {
+                sw.Stop();
+                if (age.InnerExceptions?.Count > 0)
+                {
+                    foreach (var e in age.InnerExceptions)
+                    {
+                        Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms  {e.ToString()}", e);
+                    }
+                }
+                else
+                    Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms {age.ToString()}", age);
 
+                throw;
+
+            }
+            catch (Exception e)
+            {
+                sw.Stop();
+                Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} error GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms, {e.ToString()}", e);
+                throw;
             }
 
             return null;

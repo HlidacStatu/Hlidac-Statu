@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities;
+﻿using Devmasters.DT;
+using HlidacStatu.Entities;
 
 namespace HlidacStatuApi.Code
 {
@@ -13,7 +14,7 @@ namespace HlidacStatuApi.Code
               sw.Start();
               var res = _availability(24);
               sw.Stop();
-              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} ms.", "updated", "uptimeServersCache1Day", sw.ElapsedMilliseconds);
+              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} sec. Last record {date}", "updated", "uptimeServersCache1Day", sw.Elapsed.TotalSeconds, res.FirstOrDefault()?.Data?.Max(m=>m.Time));
               return res.ToArray();
           });
 
@@ -31,7 +32,7 @@ namespace HlidacStatuApi.Code
               var res = _availability(7 * 24);
             #endif
               sw.Stop();
-              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} ms.", "updated", "uptimeServersCache7Days", sw.ElapsedMilliseconds);
+              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} sec. Last record {date}.", "updated", "uptimeServersCache7Days", sw.Elapsed.TotalSeconds, res.FirstOrDefault()?.Data?.Max(m => m.Time));
               return res.ToArray();
 
           }
@@ -54,7 +55,17 @@ namespace HlidacStatuApi.Code
         {
             UptimeServer[] allServers = HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers();
 
-            var items = HlidacStatu.Lib.Data.External.InfluxDb.GetAvailbility(serverIds, intervalBack);
+
+            IEnumerable<HlidacStatu.Lib.Data.External.InfluxDb.ResponseItem> items = 
+                new HlidacStatu.Lib.Data.External.InfluxDb.ResponseItem[] { };
+            try
+            {
+                items = HlidacStatu.Lib.Data.External.InfluxDb.GetAvailbility(serverIds, intervalBack);
+            }
+            catch (Exception e)
+            {
+                HlidacStatuApi.Code.Log.Logger.Error("Cannot read data from InfluxDb", e);
+            }
 
             var zabList = items
                 .GroupBy(k => k.ServerId, v => v)
@@ -88,8 +99,9 @@ namespace HlidacStatuApi.Code
 
             List<UptimeServer.HostAvailability> choosen = new List<UptimeServer.HostAvailability>();
             choosen = allData
+                .Where(m=>m?.Host?.Id != null)
                 .Where(m => serverIds.Contains(m.Host.Id))
-                .OrderByDescending(o => o.Host.Name)
+                .OrderByDescending(o => o?.Host?.Name)
                 .ToList();
             return choosen;
         }

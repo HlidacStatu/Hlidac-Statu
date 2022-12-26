@@ -19,7 +19,6 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Manager = HlidacStatu.Repositories.ES.Manager;
 
@@ -365,63 +364,6 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static void SaveAttachmentsToDisk(Smlouva smlouva, bool rewriteExisting = false)
-        {
-            var io = Init.PrilohaLocalCopy;
-
-            int count = 0;
-            string listing = "";
-            if (smlouva.Prilohy != null)
-            {
-                if (!Directory.Exists(io.GetFullDir(smlouva)))
-                    Directory.CreateDirectory(io.GetFullDir(smlouva));
-
-                foreach (var p in smlouva.Prilohy)
-                {
-                    string attUrl = p.odkaz;
-                    if (string.IsNullOrEmpty(attUrl))
-                        continue;
-                    count++;
-                    string fullPath = io.GetFullPath(smlouva, p);
-                    listing = listing + string.Format("{0} : {1} \n", count, WebUtility.UrlDecode(attUrl));
-                    if (!File.Exists(fullPath) || rewriteExisting)
-                    {
-                        try
-                        {
-                            using (URLContent url =
-                                new URLContent(attUrl))
-                            {
-                                url.Timeout = url.Timeout * 10;
-                                byte[] data = url.GetBinary().Binary;
-                                File.WriteAllBytes(fullPath, data);
-                                //p.LocalCopy = System.Text.UTF8Encoding.UTF8.GetBytes(io.GetRelativePath(item, p));
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Util.Consts.Logger.Error(attUrl, e);
-                        }
-                    }
-
-                    if (p.hash == null)
-                    {
-                        using (FileStream filestream = new FileStream(fullPath, FileMode.Open))
-                        {
-                            using (SHA256 mySHA256 = SHA256.Create())
-                            {
-                                filestream.Position = 0;
-                                byte[] hashValue = mySHA256.ComputeHash(filestream);
-                                p.hash = new tHash()
-                                {
-                                    algoritmus = "sha256",
-                                    Value = BitConverter.ToString(hashValue).Replace("-", String.Empty)
-                                };
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         public static async Task ZmenStavSmlouvyNaAsync(Smlouva smlouva, bool platnyZaznam)
         {
@@ -620,110 +562,5 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static string GetFileFromPrilohaRepository(Smlouva.Priloha att,
-            Smlouva smlouva)
-        {
-            var ext = ".pdf";
-            try
-            {
-                ext = new System.IO.FileInfo(att.nazevSouboru).Extension;
-            }
-            catch (Exception)
-            {
-                Util.Consts.Logger.Warning("invalid file name " + (att?.nazevSouboru ?? "(null)"));
-            }
-
-
-            string localFile = Init.PrilohaLocalCopy.GetFullPath(smlouva, att);
-            var tmpPath = System.IO.Path.GetTempPath();
-            Devmasters.IO.IOTools.DeleteFile(tmpPath);
-            if (!System.IO.Directory.Exists(tmpPath))
-            {
-                try
-                {
-                    System.IO.Directory.CreateDirectory(tmpPath);
-                }
-                catch
-                {
-                }
-            }
-
-            string tmpFnSystem = System.IO.Path.GetTempFileName();
-            string tmpFn = tmpFnSystem + DocTools.PrepareFilenameForOCR(att.nazevSouboru);
-            try
-            {
-                //System.IO.File.Delete(fn);
-                if (System.IO.File.Exists(localFile))
-                {
-                    //do local copy
-                    Util.Consts.Logger.Debug(
-                        $"Copying priloha {att.nazevSouboru} for smlouva {smlouva.Id} from local disk {localFile}");
-                    System.IO.File.Copy(localFile, tmpFn, true);
-                }
-                else
-                {
-                    try
-                    {
-                        Util.Consts.Logger.Debug(
-                            $"Downloading priloha {att.nazevSouboru} for smlouva {smlouva.Id} from URL {att.odkaz}");
-                        byte[] data = null;
-                        using (Devmasters.Net.HttpClient.URLContent web =
-                            new Devmasters.Net.HttpClient.URLContent(att.odkaz))
-                        {
-                            web.Timeout = web.Timeout * 10;
-                            data = web.GetBinary().Binary;
-                            System.IO.File.WriteAllBytes(tmpFn, data);
-                        }
-
-                        Util.Consts.Logger.Debug(
-                            $"Downloaded priloha {att.nazevSouboru} for smlouva {smlouva.Id} from URL {att.odkaz}");
-                    }
-                    catch (Exception)
-                    {
-                        try
-                        {
-                            if (Uri.TryCreate(att.odkaz, UriKind.Absolute, out var urlTmp))
-                            {
-                                byte[] data = null;
-                                Util.Consts.Logger.Debug(
-                                    $"Second try: Downloading priloha {att.nazevSouboru} for smlouva {smlouva.Id} from URL {att.odkaz}");
-                                using (Devmasters.Net.HttpClient.URLContent web =
-                                    new Devmasters.Net.HttpClient.URLContent(att.odkaz))
-                                {
-                                    web.Tries = 5;
-                                    web.IgnoreHttpErrors = true;
-                                    web.TimeInMsBetweenTries = 1000;
-                                    web.Timeout = web.Timeout * 20;
-                                    data = web.GetBinary().Binary;
-                                    System.IO.File.WriteAllBytes(tmpFn, data);
-                                }
-
-                                Util.Consts.Logger.Debug(
-                                    $"Second try: Downloaded priloha {att.nazevSouboru} for smlouva {smlouva.Id} from URL {att.odkaz}");
-                                return tmpFn;
-                            }
-
-                            return null;
-                        }
-                        catch (Exception e)
-                        {
-                            Util.Consts.Logger.Error(att.odkaz, e);
-                            return null;
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Util.Consts.Logger.Error(att.odkaz, e);
-                throw;
-            }
-            finally
-            {
-                Devmasters.IO.IOTools.DeleteFile(tmpFnSystem);
-            }
-
-            return tmpFn;
-        }
     }
 }

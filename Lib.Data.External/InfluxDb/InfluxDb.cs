@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
+﻿using Devmasters.Collections;
 using InfluxDB.Client;
 using InfluxDB.Client.Writes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace HlidacStatu.Lib.Data.External
 {
@@ -84,23 +84,29 @@ namespace HlidacStatu.Lib.Data.External
                 sTimeBack = $"-{timeBack.TotalMinutes:F0}m";
 
             string query = "";
-            List<InfluxDB.Client.Core.Flux.Domain.FluxTable> fluxTables = null;
+            List<InfluxDB.Client.Core.Flux.Domain.FluxTable> fluxTables = new ();
 
-            query = "from(bucket:\"uptimer\")"
-                + $" |> range(start: {sTimeBack})"
-                + "  |> filter(fn: (r) => r[\"_measurement\"] == \"uptime\")"
-                + "  |> filter(fn: (r) => " + serverIds.Select(m => $"r[\"serverid\"] == \"{m}\"").Aggregate((f, s) => f + " or " + s) + " )"
-                + "  |> filter(fn: (r) => r[\"_field\"] == \"value\")"
-            ;
-            if (false && timeBack.TotalHours > 25)
-                query = query + "\n"
-                    + "|> aggregateWindow(every: 10m, fn: max, createEmpty: false)"
-                  + "|> yield(name: \"max\")"
-                  + "|> duplicate(column: \"_stop\", as: \"_time\")";
+            var serverParts = serverIds.Split(50);
 
-            if (false) //another grouping
-                query = query + "\n"
-                    + @"  |> filter(fn: (r) => r[""fieldname""] == ""responseTime"")
+            foreach (var serverPart in serverParts)
+            {
+
+                query = "from(bucket:\"uptimer\") \n"
+                    + $" |> range(start: {sTimeBack}) \n"
+                    + "  |> filter(fn: (r) => r[\"_measurement\"] == \"uptime\") \n"
+                    + "  |> filter(fn: (r) => " + serverPart.Select(m => $"r[\"serverid\"] == \"{m}\"").Aggregate((f, s) => f + " or " + s) + " ) \n"
+                    + "  |> filter(fn: (r) => r[\"fieldname\"] == \"responseCode\" or r[\"fieldname\"] == \"responseSize\" or r[\"fieldname\"] == \"responseTime\")  \n"
+                ;
+
+                if (false && timeBack.TotalHours > 25)
+                    query = query + "\n"
+                        + "|> aggregateWindow(every: 10m, fn: max, createEmpty: false)"
+                      + "|> yield(name: \"max\")"
+                      + "|> duplicate(column: \"_stop\", as: \"_time\")";
+
+                if (false) //another grouping
+                    query = query + "\n"
+                        + @"  |> filter(fn: (r) => r[""fieldname""] == ""responseTime"")
                           |> aggregateWindow(every: 10m,         
                               fn: (column, tables=<-) => tables |> quantile(q: 0.95, method: ""exact_selector""),
                               //fn: max,
@@ -109,16 +115,21 @@ namespace HlidacStatu.Lib.Data.External
                           |> duplicate(column: ""_stop"", as: ""_time"")
                         ";
 
-            try
-            {
-                fluxTables = influxDbClient.GetQueryApi().QueryAsync(query, "hlidac")
-                    .ConfigureAwait(false).GetAwaiter().GetResult();
+                try
+                {
+                    HlidacStatu.Util.Consts.Logger.Debug("Calling InfluxDB query {query} from time {timeBack}", query, timeBack);
 
-            }
-            catch (Exception e)
-            {
+                    List<InfluxDB.Client.Core.Flux.Domain.FluxTable> res =
+                        influxDbClient.GetQueryApi().QueryAsync(query, "hlidac")
+                        .ConfigureAwait(false).GetAwaiter().GetResult();
 
-                throw;
+                    fluxTables.AddRange(res);
+                }
+                catch (Exception e)
+                {
+                    HlidacStatu.Util.Consts.Logger.Error("InfluxDB query error\n{query}", e, query);
+                    //throw;
+                }
             }
             var allData = fluxTables.SelectMany(m => m.Records)
                 .Select(m => new
