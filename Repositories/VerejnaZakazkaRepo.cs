@@ -51,7 +51,7 @@ namespace HlidacStatu.Repositories
                 var newDocChecksumTask = StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
                 SetupUpdateDates(newVZ, posledniZmena);
                 
-                var elasticClient = await Manager.GetESClient_VZAsync();
+                var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
 
                 var originalVZ = await FindOriginalDocumentFromESAsync(newVZ);
 
@@ -142,7 +142,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task UpdateDocumentsInVz(string id, List<VerejnaZakazka.Document> dokumenty)
         {
-            var elasticClient = await Manager.GetESClient_VZAsync();
+            var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
             var zakazka = await LoadFromESAsync(id, elasticClient);
             MergeDocuments(zakazka, dokumenty);
             await elasticClient.IndexDocumentAsync<VerejnaZakazka>(zakazka);
@@ -233,13 +233,14 @@ namespace HlidacStatu.Repositories
 
         private static void SendToOcrQueue(VerejnaZakazka newVZ)
         {
-            if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
-            {
-                ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
-                    newVZ.Id,
-                    null,
-                    HlidacStatu.Lib.OCR.Api.Client.TaskPriority.Low);
-            }
+            // veze: odkomentovat 
+            // if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
+            // {
+            //     ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
+            //         newVZ.Id,
+            //         null,
+            //         HlidacStatu.Lib.OCR.Api.Client.TaskPriority.Low);
+            // }
         }
 
         /// <summary>
@@ -357,7 +358,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<VerejnaZakazka> LoadFromESAsync(string id, ElasticClient client = null)
         {
-            var es = client ?? await Manager.GetESClient_VZAsync();
+            var es = client ?? await Manager.GetESClient_VerejneZakazkyAsync();
             var res = await es.GetAsync<VerejnaZakazka>(id);
             if (res.Found)
                 return res.Source;
@@ -368,7 +369,7 @@ namespace HlidacStatu.Repositories
         //todo: test it!
         public static async Task<VerejnaZakazka> FindOriginalDocumentFromESAsync(VerejnaZakazka zakazka)
         {
-            var es = await Manager.GetESClient_VZAsync();
+            var es = await Manager.GetESClient_VerejneZakazkyAsync();
             // find possible candidates
             var res = await es.SearchAsync<VerejnaZakazka>(s => s
                 .Query(q => q
@@ -406,7 +407,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<bool> ExistsAsync(string id, ElasticClient client = null)
         {
-            var es = client ?? await Manager.GetESClient_VZAsync();
+            var es = client ?? await Manager.GetESClient_VerejneZakazkyAsync();
             var res = await es.DocumentExistsAsync<VerejnaZakazka>(id);
             return res.Exists;
         }

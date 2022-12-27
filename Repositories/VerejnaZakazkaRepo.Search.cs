@@ -309,7 +309,7 @@ namespace HlidacStatu.Repositories
                 bool withHighlighting = false, CancellationToken cancellationToken = default)
             {
                 if (client == null)
-                    client = await Manager.GetESClient_VZAsync();
+                    client = await Manager.GetESClient_VerejneZakazkyAsync();
 
                 string query = search.Q ?? "";
 
@@ -463,7 +463,7 @@ namespace HlidacStatu.Repositories
                     return null;
 
                 if (client == null)
-                    client = await Manager.GetESClient_VZAsync();
+                    client = await Manager.GetESClient_VerejneZakazkyAsync();
 
                 AggregationContainerDescriptor<VerejnaZakazka> baseAggrDesc = null;
                 baseAggrDesc = anyAggregation == null
@@ -655,7 +655,7 @@ namespace HlidacStatu.Repositories
                 string scrollTimeout = "2m",
                 int scrollSize = 300)
             {
-                var client = await Manager.GetESClient_VZAsync();
+                var client = await Manager.GetESClient_VerejneZakazkyAsync();
                 ISearchResponse<VerejnaZakazka> initialResponse = null;
                 if (query is null)
                 {

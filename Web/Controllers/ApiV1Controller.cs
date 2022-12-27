@@ -249,6 +249,7 @@ namespace HlidacStatu.Web.Controllers
             public long? count { get; set; }
         }
 
+        //todo: k čemu se používá? Kandidát na promazání
         [Authorize]
         public async Task<ActionResult> VZProfilesList()
         {
@@ -270,7 +271,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 foreach (KeyedBucket<object> val in ((BucketAggregate)res.Aggregations["profiles"]).Items)
                 {
-                    var vzClient = await Manager.GetESClient_VZAsync();
+                    var vzClient = await Manager.GetESClient_VerejneZakazkyAsync();
                     var resProf = await client.GetAsync<ProfilZadavatele>((string)val.Key);
                     list.Add(new VZProfilesListRes()
                     { profileId = (string)val.Key, url = resProf?.Source?.Url, count = val.DocCount });
