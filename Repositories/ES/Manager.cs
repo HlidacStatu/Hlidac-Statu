@@ -61,7 +61,7 @@ namespace HlidacStatu.Repositories.ES
         public static string defaultIndexName_Sneplatne = "hlidacsmluvneplatne";
         public static string defaultIndexName_SAll = defaultIndexName + "," + defaultIndexName_Sneplatne;
 
-        public static string defaultIndexName_VerejneZakazky = "verejnezakazky";
+        public static string defaultIndexName_VerejneZakazky = "verejnezakazky_new";
         public static string defaultIndexName_ProfilZadavatele = "profilzadavatele";
         public static string defaultIndexName_VerejneZakazkyRaw2006 = "verejnezakazkyraw2006";
         public static string defaultIndexName_VerejneZakazkyRaw = "verejnezakazkyraw";
