@@ -320,12 +320,10 @@ namespace HlidacStatu.Repositories
 
             try
             {
-                #pragma warning disable CSE007
-                responseMessage.EnsureSuccessStatusCode();
-                #pragma warning restore CSE007
+                _ = responseMessage.EnsureSuccessStatusCode();
                 
                 var stream = await responseMessage.Content.ReadAsStreamAsync();
-                using var fileStream = File.Open(path, FileMode.Create);
+                await using var fileStream = File.Open(path, FileMode.Create);
                 
                 await stream.CopyToAsync(fileStream);
                 await fileStream.FlushAsync();
