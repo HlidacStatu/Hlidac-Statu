@@ -21,6 +21,9 @@ namespace HlidacStatu.Plugin.Enhancers
         int priority = 5;
         private bool forceOCR;
         int? lengthLess = null;
+
+        public bool missingOnly = true;
+
         public enum OCREngines
         {
             IrisOnly,
@@ -35,7 +38,8 @@ namespace HlidacStatu.Plugin.Enhancers
                 pathToOcr += "\\";
         }
 
-        public TextMiner(bool skipOCR, bool forceAlreadyMined, bool asyncOCR = false, int priority = 5, bool forceOCR = false, int? lengthLess = null)
+        public TextMiner(bool skipOCR, bool forceAlreadyMined, bool asyncOCR = false, int priority = 5, 
+            bool forceOCR = false, int? lengthLess = null, bool missingOnly = true)
             : this()
         {
             this.skipOCR = skipOCR;
@@ -44,6 +48,7 @@ namespace HlidacStatu.Plugin.Enhancers
             this.priority = priority;
             this.forceOCR = forceOCR;
             this.lengthLess = lengthLess;
+            this.missingOnly = missingOnly;
         }
         public void SetInstanceData(object data)
         {
@@ -78,20 +83,39 @@ namespace HlidacStatu.Plugin.Enhancers
                 List<Smlouva.Priloha> newPrilohy = new List<Smlouva.Priloha>();
                 for (int i = 0; i < item.Prilohy.Count(); i++)
                 {
-
+                    bool doOcr = false;
                     var att = item.Prilohy[i];
                     if (!this.forceAlreadyMined && att.LastUpdate > history)
-                        continue;
+                        doOcr = doOcr || false;
+                    else
+                        doOcr = true;
+
                     if (!this.forceAlreadyMined && att.PlainTextContentQuality != DataQualityEnum.Unknown) //already parsed
                     {
                         //att.LastUpdate = DateTime.Now.AddDays(-7);
-                        continue;
+                        doOcr = doOcr || false;
                     }
-                    if (this.lengthLess.HasValue && att.Lenght > this.lengthLess)
+                    else
+                        doOcr = true;
+
+                    if (this.lengthLess.HasValue && att.Lenght < this.lengthLess)
+                        doOcr = true;
+                    else
+                        doOcr = doOcr || false;
+
+                    if (this.missingOnly && att.Lenght<2)
+                        doOcr = true;
+                    else
+                        doOcr = doOcr || false;
+
+                    if (this.forceAlreadyMined)
+                        doOcr = true;
+
+                    if (doOcr == false)
                         continue;
 
                     Base.Logger.Debug($"Getting priloha {att.nazevSouboru} for smlouva {item.Id}");
-                    string downloadedFile = SmlouvaRepo.GetFileFromPrilohaRepository(att, item);
+                    string downloadedFile = SmlouvaRepo.GetCopyOfDownloadedPriloha(att, item);
                     Base.Logger.Debug($"Getdone priloha {att.nazevSouboru} for smlouva {item.Id} done.");
                     if (downloadedFile != null)
                     {

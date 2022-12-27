@@ -1,5 +1,5 @@
 ﻿using Devmasters.Log;
-
+using HlidacStatu.DS.Api;
 using HlidacStatu.Entities;
 
 using System;
@@ -9,7 +9,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
     public class Client
     {
-
+        
         public static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Camelot.Api",
                             Devmasters.Log.Logger.DefaultConfiguration()
                                 .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())

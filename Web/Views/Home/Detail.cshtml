@@ -294,7 +294,7 @@
                 {
                     @foreach (var priloha in Model.Prilohy)
                     {
-                        bool weHaveCopy = Init.PrilohaLocalCopy.ExistLocalCopyOfPriloha(Model, priloha);
+                        bool weHaveCopy = SmlouvaRepo.ExistLocalCopyOfPriloha(Model, priloha);
                         string calloutColor = "primary";
                         calloutColor = znepristupnena ? "gray" : calloutColor;
                         calloutColor = (this.User?.IsInRole("Admin") == true && priloha.BlurredPages != null) ? "primary" : calloutColor;
@@ -310,7 +310,7 @@
                                     {
                                         if (this.User?.IsInRole("novinar") == true)
                                         {
-                                            <a href="@(priloha.LocalCopyPath(Model.Id,this.User.Identity.Name))" data-link="kopie">(naše kopie)</a>
+                                            <a href="@(priloha.LocalCopyUrl(Model.Id,false,this.User.Identity.Name))" data-link="kopie">(naše kopie)</a>
                                             <b>!Pozor, tato smlouva byla zneplatněna a tato příloha není veřejně dostupná!</b>
                                         }
                                         else

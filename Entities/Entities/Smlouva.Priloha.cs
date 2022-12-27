@@ -141,7 +141,7 @@ namespace HlidacStatu.Entities
                 //}
             }
 
-            public static string GetUrl(string smlouvaId, string prilohaUniqueHash, string prilohaOdkaz, bool local = true, UriKind uriKind = UriKind.RelativeOrAbsolute)
+            public static string GetUrl(string smlouvaId, string prilohaUniqueHash, string prilohaOdkaz, bool local = true, UriKind uriKind = UriKind.RelativeOrAbsolute, bool pdfFormat = false)
             {
                 if (local)
                 {
@@ -149,10 +149,10 @@ namespace HlidacStatu.Entities
                     {
                         case UriKind.RelativeOrAbsolute:
                         case UriKind.Absolute:
-                            return "https://www.hlidacstatu.cz"+LocalCopyPath(smlouvaId, prilohaUniqueHash);
+                            return LocalCopyUrl(smlouvaId, prilohaUniqueHash, pdfFormat);
                         case UriKind.Relative:
                         default:
-                            return LocalCopyPath(smlouvaId, prilohaUniqueHash);
+                            return LocalCopyUrl(smlouvaId, prilohaUniqueHash, pdfFormat).Replace("https://www.hlidacstatu.cz","");
                     }
                     
                 }
@@ -161,22 +161,23 @@ namespace HlidacStatu.Entities
             }
 
 
-            public string GetUrl(string smlouvaId, bool local = true, UriKind uriKind = UriKind.RelativeOrAbsolute)
+            public string GetUrl(string smlouvaId, bool local = true, UriKind uriKind = UriKind.RelativeOrAbsolute, bool pdfFormat = false)
             {
-                return GetUrl(smlouvaId, this.UniqueHash(), this.odkaz, local, uriKind);
+                return GetUrl(smlouvaId, this.UniqueHash(), this.odkaz, local, uriKind, pdfFormat);
             }
-            public string LocalCopyPath(string smlouvaId, string identityName = null, string secret = null)
+            public string LocalCopyUrl(string smlouvaId, bool pdfFormat, string identityName = null, string secret = null)
             {
-                return LocalCopyPath(smlouvaId, this.UniqueHash(), identityName, secret);
+                return LocalCopyUrl(smlouvaId, this.UniqueHash(), pdfFormat, identityName, secret);
             }
-            public static string LocalCopyPath(string smlouvaId, string prilohaUniqueHash, string identityName = null, string secret = null)
+            public static string LocalCopyUrl(string smlouvaId, string prilohaUniqueHash, bool pdfFormat, string identityName = null, string secret = null)
             {
-                var url = $"/KopiePrilohy/{smlouvaId}?hash={prilohaUniqueHash}";
+                var url = "https://www.hlidacstatu.cz" + $"/KopiePrilohy/{smlouvaId}?hash={prilohaUniqueHash}";
                 if (identityName != null)
                     url = url + $"&secret={LimitedAccessSecret(identityName, prilohaUniqueHash)}";
                 else if (secret != null)
                     url = url + $"&secret={secret}";
-
+                if (pdfFormat)
+                    url = url + "&forcePDF=true";
                 return url;
             }
             public string LimitedAccessSecret(string forEmail)

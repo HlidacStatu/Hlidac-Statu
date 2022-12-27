@@ -10,7 +10,7 @@
       <PackageReference Include="DeepCloner" Version="0.10.4" />
       <PackageReference Include="Devmasters.DT" Version="4.1.0" />
       <PackageReference Include="Devmasters.Enums" Version="4.0.2" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     </ItemGroup>
 
     <ItemGroup>

@@ -14,6 +14,7 @@ namespace HlidacStatu.Entities
         [Key]
         [Column("pk")]
         public int Pk { get; set; }
+
         [Required]
         [Column("itemType")]
         [StringLength(100)]
@@ -37,5 +38,12 @@ namespace HlidacStatu.Entities
         public int? Success { get; set; }
         [Column("priority")]
         public int? Priority { get; set; }
+
+        
+        [Column("Options")]        
+        public string Options { get; set; }
+
+        
+
     }
 }
