@@ -115,7 +115,7 @@ namespace HlidacStatu.Plugin.Enhancers
                         continue;
 
                     Base.Logger.Debug($"Getting priloha {att.nazevSouboru} for smlouva {item.Id}");
-                    string downloadedFile = SmlouvaRepo.GetCopyOfDownloadedPriloha(att, item);
+                    string downloadedFile = SmlouvaRepo.GetCopyOfDownloadedPrilohaPath(att, item);
                     Base.Logger.Debug($"Getdone priloha {att.nazevSouboru} for smlouva {item.Id} done.");
                     if (downloadedFile != null)
                     {
@@ -173,7 +173,7 @@ namespace HlidacStatu.Plugin.Enhancers
                                         att.PlainTextContentQuality = DataQualityEnum.Estimated;
                                     else
                                         att.PlainTextContentQuality = DataQualityEnum.Parsed;
-                                    att.UpdateStatistics();
+                                    att.UpdateStatistics(item);
 
                                     att.LastUpdate = DateTime.Now;
 
@@ -196,7 +196,7 @@ namespace HlidacStatu.Plugin.Enhancers
                                             att1.PlainTextContentQuality = DataQualityEnum.Estimated;
                                         else
                                             att1.PlainTextContentQuality = DataQualityEnum.Parsed;
-                                        att1.UpdateStatistics();
+                                        att1.UpdateStatistics(item);
 
                                         att1.LastUpdate = DateTime.Now;
 
@@ -221,7 +221,7 @@ namespace HlidacStatu.Plugin.Enhancers
                                     else
                                         att.PlainTextContentQuality = DataQualityEnum.Parsed;
 
-                                    att.UpdateStatistics();
+                                    att.UpdateStatistics(item);
 
                                     att.LastUpdate = DateTime.Now;
 

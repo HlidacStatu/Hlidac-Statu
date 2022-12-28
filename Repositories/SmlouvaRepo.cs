@@ -194,7 +194,7 @@ namespace HlidacStatu.Repositories
             if (smlouva.Prilohy != null)
             {
                 foreach (var p in smlouva.Prilohy)
-                    p.UpdateStatistics();
+                    p.UpdateStatistics(smlouva);
             }
 
             if (ClassificationOverrideRepo.TryGetOverridenClassification(smlouva.Id, out var classificationOverride))
@@ -216,6 +216,8 @@ namespace HlidacStatu.Repositories
                 smlouva.Classification = new Smlouva.SClassification(types.ToArray());
             }
         }
+
+
 
         public static bool JeSmlouva_S_VazbouNaPolitiky(this Smlouva smlouva, Relation.AktualnostType aktualnost)
         {

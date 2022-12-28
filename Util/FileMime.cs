@@ -22,7 +22,6 @@ namespace HlidacStatu.Util
                 .ScopeExtensions(pdfExt) //Limit results to only the extensions provided
                 .TrimMeta() //If you don't care about the meta information (definition author, creation date, etc)
                 .TrimDescription() //If you don't care about the description
-                                   //.TrimMimeType() //If you don't care about the mime type
                 .ToImmutableArray()
                 ;
 
@@ -30,13 +29,68 @@ namespace HlidacStatu.Util
             {
                 Definitions = pdfScopedDef,
             }.Build();
+
+            fileTypeInspector = new ContentInspectorBuilder()
+            {
+                Definitions = allDef
+            }.Build();
+
+
         }
         static ContentInspector pdfInspector = null;
+        static ContentInspector fileTypeInspector = null;
 
+        public static MimeDetective.Storage.FileType[] GetFileTypes(string filename)
+        {
+            if (string.IsNullOrEmpty(filename))
+                return null;
+
+            if (System.IO.File.Exists(filename) == false) { return null; }
+
+            try
+            {
+                var inspect = fileTypeInspector.Inspect(filename);
+                //var res =  inspect.ByMimeType();
+                return inspect
+                    .OrderByDescending(o => o.Points)
+                    .Select(m => m.Definition.File)
+                    .ToArray();
+
+            }
+            catch (Exception e)
+            {
+                HlidacStatu.Util.Consts.Logger.Error("Cannost Inspect {filename}", e, filename);
+                return null;
+            }
+
+        }
+        public static MimeDetective.Storage.FileType GetTopFileType(string filename)
+        {
+            var res = GetFileTypes(filename);
+            if (res == null)
+                return null;
+            if (res.Count() == 0)
+                return null;
+            return res.First();
+        }
         public static bool HasPdfHeader(string filename)
         {
-            System.Collections.Immutable.ImmutableArray<MimeDetective.Engine.FileExtensionMatch> types = pdfInspector.Inspect(filename).ByFileExtension();
-            return (types.Any(m => m.Extension == "pdf")) ;
+            if (string.IsNullOrEmpty(filename))
+                return false;
+
+            if (System.IO.File.Exists(filename) == false) { return false; }
+
+            try
+            {
+                System.Collections.Immutable.ImmutableArray<MimeDetective.Engine.FileExtensionMatch> types = pdfInspector.Inspect(filename).ByFileExtension();
+                return (types.Any(m => m.Extension == "pdf"));
+            }
+            catch (Exception e)
+            {
+                HlidacStatu.Util.Consts.Logger.Error("Cannost Inspect Pdf {filename}", e, filename);
+                return false;
+            }
+
         }
 
         public static bool HasPDFHeaderFast(string filename)

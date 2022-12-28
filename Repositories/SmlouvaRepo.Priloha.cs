@@ -1,12 +1,9 @@
 ﻿using Devmasters.Net.HttpClient;
-using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.XSD;
 using HlidacStatu.Lib.Data.External;
 using HlidacStatu.Lib.OCR;
-using MimeDetective;
 using System;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -93,7 +90,7 @@ namespace HlidacStatu.Repositories
 
 
         public static string GetPathFromPrilohaRepository(Smlouva smlouva)
-        { 
+        {
             return PrilohaLocalCopy.GetFullDir(smlouva);
         }
         public static string GetFullFilePathFromPrilohaRepository(Smlouva smlouva, Priloha priloha, RequestedFileType filetype = RequestedFileType.Original)
@@ -113,7 +110,7 @@ namespace HlidacStatu.Repositories
 
 
 
-        public static string GetDownloadedPriloha(Smlouva.Priloha att,
+        public static string GetDownloadedPrilohaPath(Smlouva.Priloha att,
     Smlouva smlouva, RequestedFileType filetype = RequestedFileType.Original)
         {
             var ext = ".pdf";
@@ -128,7 +125,7 @@ namespace HlidacStatu.Repositories
 
 
             string localDir = PrilohaLocalCopy.GetFullDir(smlouva);
-            if (!System.IO.Directory.Exists(localDir)) 
+            if (!System.IO.Directory.Exists(localDir))
                 System.IO.Directory.CreateDirectory(localDir);
 
             string localFile = PrilohaLocalCopy.GetFullPath(smlouva, att);
@@ -218,11 +215,11 @@ namespace HlidacStatu.Repositories
 
 
 
-        public static string GetCopyOfDownloadedPriloha(Smlouva.Priloha att,
+        public static string GetCopyOfDownloadedPrilohaPath(Smlouva.Priloha att,
     Smlouva smlouva, RequestedFileType filetype = RequestedFileType.Original)
         {
 
-            var origFile = GetDownloadedPriloha(att, smlouva, filetype);
+            var origFile = GetDownloadedPrilohaPath(att, smlouva, filetype);
 
             if (string.IsNullOrEmpty(origFile))
                 return null;
@@ -247,5 +244,36 @@ namespace HlidacStatu.Repositories
             return tmpFn;
         }
 
+
+
+        public static void UpdateStatistics(this Priloha p, Smlouva s)
+        {
+            p.Lenght = p.PlainTextContent?.Length ?? 0;
+            p.WordCount = Devmasters.TextUtil.CountWords(p.PlainTextContent);
+            var variance = Devmasters.TextUtil.WordsVarianceInText(p.PlainTextContent);
+            p.UniqueWordsCount = variance.Item2;
+            p.WordsVariance = variance.Item1;
+
+            //find content type
+            //first check in already exists
+            if (string.IsNullOrEmpty(p.ContentType))
+            {
+                string contentType = "";
+                //scan metadata
+                if (p.FileMetadata.Any(m => m.Key.ToLower() == "content-type"))
+                    contentType = p.FileMetadata.First(m => m.Key.ToLower() == "content-type").Value;
+                else
+                {
+                    var fnType = HlidacStatu.Util.FileMime.GetTopFileType(
+                        GetDownloadedPrilohaPath(p, s, RequestedFileType.PDF)
+                        );
+                    if (fnType != null)
+                        contentType = fnType.MimeType;
+                }
+                p.ContentType = contentType;
+            }
+
+
+        }
     }
 }
