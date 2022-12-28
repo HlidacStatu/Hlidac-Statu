@@ -30,10 +30,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Helpers" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Update="StartFromCmd.bat">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
