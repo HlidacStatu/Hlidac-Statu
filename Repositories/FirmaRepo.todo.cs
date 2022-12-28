@@ -730,8 +730,8 @@ namespace HlidacStatu.Repositories
                         .Reverse().Skip(skipWord).Reverse() // a ubirej od konce
                         .ToArray();
                     string wordCombination = cutWords.Aggregate((f, s) => f + " " + s);
-                    string koncovka;
-                    string firmaBezKoncovky = Firma.JmenoBezKoncovkyFull(wordCombination, out koncovka);
+                    
+                    string firmaBezKoncovky = Firma.JmenoBezKoncovkyFull(wordCombination, out _);
                     string simpleName = TextUtil.RemoveDiacritics(firmaBezKoncovky).ToLower().Trim();
                     //+ "|" + koncovka;
 

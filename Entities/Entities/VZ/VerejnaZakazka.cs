@@ -206,6 +206,10 @@ namespace HlidacStatu.Entities.VZ
         [Keyword()]
         [Description("Interní ID na věstníku veřejných zakázek")]
         public string VvzInternalId { get; set; } = null;
+        
+        [Boolean]
+        [Description("Označuje problematickou VZ. Tyto zakázky nezobrazovat. Chyby je potřeba opravit")]
+        public bool HasIssues { get; set; } = false;
 
         [Object()]
         [Description("Seznam datasetů a evidenčních čísel v datasetech, kde se VZ vyskytuje." +
@@ -227,7 +231,7 @@ namespace HlidacStatu.Entities.VZ
                 {
                     if(Uri.TryCreate(value, UriKind.Absolute, out var uri))
                     {
-                        _domena = uri.Host;
+                        _domena = uri.GetLeftPart(UriPartial.Authority);
                     }
                     else
                     {
@@ -310,7 +314,7 @@ namespace HlidacStatu.Entities.VZ
 
         }
         
-        [Object()]
+        [Keyword()]
         [Description("Externí ID. Seznam dalších různých ID, např. ze systému Rozza")]
         public HashSet<string> ExternalIds { get; set; } = new();
 
@@ -443,7 +447,7 @@ namespace HlidacStatu.Entities.VZ
         public string KonecnaHodnotaMena { get; set; }
 
         [Description("Seznam známých url odkazů na umístění zakázky na webu.")]
-        [Object()]
+        [Keyword]
         public HashSet<string> UrlZakazky { get; set; } = new();
 
         [Description("Dokumenty příslušející zakázky (typicky zadávací a smluvní dokumentace)")]

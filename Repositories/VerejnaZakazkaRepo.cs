@@ -32,7 +32,27 @@ namespace HlidacStatu.Repositories
 
         // Emergency HttpClient for cases where it is not convinient to inject HttpClient.
         private static Lazy<HttpClient> _lazyHttpClient = new();
+
+        public static async Task SaveIncompleteVzAsync(VerejnaZakazka incompleteVz)
+        {
+            try
+            {
+                //teoreticky můžeme použít incompleteVz.Changelog na zapsání nalezených chyb
+                var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
+                incompleteVz.HasIssues = true;
+                await elasticClient.IndexDocumentAsync<VerejnaZakazka>(incompleteVz);
+
+            }
+            catch (Exception e)
+            {
+                Consts.Logger.Error(
+                    $"VZ ERROR Upserting ID:{incompleteVz.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(incompleteVz).Length}", e);
+                
+            }
+            
         
+        }
+
         /// <summary>
         /// Update or insert new
         /// </summary>
@@ -48,14 +68,14 @@ namespace HlidacStatu.Repositories
             
             try
             {
-                var newDocChecksumTask = StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
+                var storeNewDocumentsTask = StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
                 SetupUpdateDates(newVZ, posledniZmena);
                 
                 var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
 
                 var originalVZ = await FindOriginalDocumentFromESAsync(newVZ);
 
-                await newDocChecksumTask;
+                await storeNewDocumentsTask;
                 // Merge possible document duplicates
                 MergeDuplicateDocuments(newVZ);
 
@@ -70,7 +90,7 @@ namespace HlidacStatu.Repositories
                 
                 //VZ existuje => mergujeme
                 // zajistit, že budeme mít checksum všude
-                var origDocChecksumTask = StoreDocumentCopyToHlidacStorageAsync(originalVZ, httpClient);
+                var storeOriginalDocumentsTask = StoreDocumentCopyToHlidacStorageAsync(originalVZ, httpClient);
                 
                 MergeSimpleProperties(ref originalVZ, newVZ);
 
@@ -90,7 +110,7 @@ namespace HlidacStatu.Repositories
                 }    
                 
                 //merge dokumenty
-                await origDocChecksumTask;
+                await storeOriginalDocumentsTask;
                 MergeDocuments(originalVZ, newVZ.Dokumenty);
                 SendToOcrQueue(originalVZ);
                 
