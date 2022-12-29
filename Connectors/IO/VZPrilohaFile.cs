@@ -9,13 +9,10 @@ namespace HlidacStatu.Connectors.IO
         { }
 
         public VZPrilohaFile(string root)
-        : base(3, root, (prilohaId) => { return Devmasters.Crypto.Hash.ComputeHashToHex(prilohaId).Substring(0, 3) ; })
+        : base(3, root, (prilohaId) => { return Devmasters.Crypto.Hash.ComputeHashToHex(prilohaId).Substring(0, 3); })
         {
         }
-        public override string GetFullDir(string prilohaId)
-        {
-            return base.GetFullDir(prilohaId) + prilohaId + Path.DirectorySeparatorChar;
-        }
+        
         public string GetFullPath(string prilohaId)
         {
             return GetFullPath(prilohaId, prilohaId);
@@ -28,11 +25,7 @@ namespace HlidacStatu.Connectors.IO
             return GetFullDir(prilohaId) + prilohaId;
         }
 
-
-        public override string GetRelativeDir(string prilohaId)
-        {
-            return base.GetRelativeDir(prilohaId) + Path.DirectorySeparatorChar;
-        }
+        
         public string GetRelativePath(string prilohaId)
         {
             return GetRelativePath(prilohaId, prilohaId);
