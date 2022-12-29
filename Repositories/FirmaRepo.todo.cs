@@ -693,6 +693,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
+        //todo: Upravit + přidat státní firma/organizace in text.
         public static Firma FirmaInText(string text)
         {
             if (string.IsNullOrEmpty(text))

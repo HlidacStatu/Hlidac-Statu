@@ -77,7 +77,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [HttpGet("dump/{datatype}/{date?}")]
         public ActionResult<HttpResponseMessage> Dump([FromRoute] string datatype, [FromRoute(Name = "date")][DefaultValue("")] string? date = "null")
         {
-            if (datatype.Contains("..") || datatype.Contains("\\"))
+            if (datatype.Contains("..") || datatype.Contains(Path.DirectorySeparatorChar))
             {
                 HlidacStatu.Util.Consts.Logger.Error("Wrong datatype name");
                 return StatusCode(466);

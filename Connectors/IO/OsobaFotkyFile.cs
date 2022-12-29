@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities;
+﻿using System.IO;
+using HlidacStatu.Entities;
 
 namespace HlidacStatu.Connectors.IO
 {
@@ -9,7 +10,7 @@ namespace HlidacStatu.Connectors.IO
         { }
 
         public OsobaFotkyFile(string root)
-        : base(2, root, (s) => { return Devmasters.Crypto.Hash.ComputeHashToHex(s.NameId).Substring(0, 2) + "\\" + s.NameId; })
+        : base(2, root, (s) => { return Devmasters.Crypto.Hash.ComputeHashToHex(s.NameId).Substring(0, 2) + Path.DirectorySeparatorChar + s.NameId; })
         {
             InitPaths();
         }

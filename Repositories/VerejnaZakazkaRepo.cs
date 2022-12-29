@@ -304,14 +304,16 @@ namespace HlidacStatu.Repositories
                 {
                     // download file from web and save it to temporaryPath
                     string temporaryPath = Path.Combine(Config.GetWebConfigValue("VZPrilohyDataPath"),
-                        "_temp_",
-                        Guid.NewGuid().ToString("N"));
-                     
+                        "_temp_");
+                    string filename = Guid.NewGuid().ToString("N"); 
+                    Directory.CreateDirectory(temporaryPath);
+                    string fullTempPath = Path.Combine(temporaryPath, filename);
+                    
                     string downloadUrl = dokument.GetDocumentUrlToDownload();
-                    await DownloadFileAsync(httpClient, downloadUrl, temporaryPath);
+                    await DownloadFileAsync(httpClient, downloadUrl, fullTempPath);
 
                     // calculate checksum first and get length so we can create hlidacStorageId
-                    using (var fileStream = File.Open(temporaryPath, FileMode.Open, FileAccess.Read))
+                    using (var fileStream = File.Open(fullTempPath, FileMode.Open, FileAccess.Read))
                     {
                         dokument.SizeInBytes = fileStream.Length;
                         dokument.Sha256Checksum = await Checksum.DoChecksumAsync(fileStream);
@@ -321,7 +323,7 @@ namespace HlidacStatu.Repositories
                     var hlidacStorageId = dokument.GetHlidacStorageId();
                     var destination = Init.VzPrilohaLocalCopy.GetFullPath(hlidacStorageId);
                 
-                    File.Move(temporaryPath, destination);
+                    File.Move(fullTempPath, destination);
                 }
                 catch (Exception e)
                 {

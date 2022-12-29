@@ -1,5 +1,4 @@
-﻿using HlidacStatu.Entities;
-using static HlidacStatu.Entities.Smlouva;
+﻿using System.IO;
 
 namespace HlidacStatu.Connectors.IO
 {
@@ -15,7 +14,7 @@ namespace HlidacStatu.Connectors.IO
         }
         public override string GetFullDir(string prilohaId)
         {
-            return base.GetFullDir(prilohaId) + prilohaId + "\\";
+            return base.GetFullDir(prilohaId) + prilohaId + Path.DirectorySeparatorChar;
         }
         public string GetFullPath(string prilohaId)
         {
@@ -32,7 +31,7 @@ namespace HlidacStatu.Connectors.IO
 
         public override string GetRelativeDir(string prilohaId)
         {
-            return base.GetRelativeDir(prilohaId) + "\\";
+            return base.GetRelativeDir(prilohaId) + Path.DirectorySeparatorChar;
         }
         public string GetRelativePath(string prilohaId)
         {
@@ -44,19 +43,7 @@ namespace HlidacStatu.Connectors.IO
                 return string.Empty;
             return GetRelativeDir(prilohaId) + prilohaId;
 
-            //return base.GetRelativePath(obj, Devmasters.Crypto.Hash.ComputeHash(prilohaUrl));
         }
-
-
-        //public static string Encode(string prilohaUrl)
-        //{
-        //    return Devmasters.Crypto.Hash.ComputeHashToHex(prilohaUrl);
-        //    //using (MD5 md5Hash = MD5.Create())
-        //    //{
-        //    //    byte[] md5= md5Hash.ComputeHash(Encoding.UTF8.GetBytes(prilohaUrl));
-        //    //    return System.Convert.ToBase64String(md5.ToString("X")).Replace("=","-");
-        //    //}
-        //}
 
 
 
