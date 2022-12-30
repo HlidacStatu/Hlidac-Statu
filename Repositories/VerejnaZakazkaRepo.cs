@@ -19,7 +19,6 @@ using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
 
-
 namespace HlidacStatu.Repositories
 {
     public static partial class VerejnaZakazkaRepo
@@ -33,7 +32,7 @@ namespace HlidacStatu.Repositories
         // Emergency HttpClient for cases where it is not convinient to inject HttpClient.
         private static Lazy<HttpClient> _lazyHttpClient = new();
 
-        public static async Task SaveIncompleteVzAsync(VerejnaZakazka incompleteVz)
+        private static async Task SaveIncompleteVzAsync(VerejnaZakazka incompleteVz)
         {
             try
             {
@@ -47,10 +46,7 @@ namespace HlidacStatu.Repositories
             {
                 Consts.Logger.Error(
                     $"VZ ERROR Upserting ID:{incompleteVz.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(incompleteVz).Length}", e);
-                
             }
-            
-        
         }
 
         /// <summary>
@@ -68,6 +64,9 @@ namespace HlidacStatu.Repositories
             
             try
             {
+                if (string.IsNullOrWhiteSpace(newVZ.Zadavatel?.ICO))
+                    await SaveIncompleteVzAsync(newVZ);
+                
                 var storeNewDocumentsTask = StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
                 SetupUpdateDates(newVZ, posledniZmena);
                 
@@ -252,15 +251,14 @@ namespace HlidacStatu.Repositories
         }
 
         private static void SendToOcrQueue(VerejnaZakazka newVZ)
-        {
-            // veze: odkomentovat 
-            // if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
-            // {
-            //     ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
-            //         newVZ.Id,
-            //         null,
-            //         HlidacStatu.Lib.OCR.Api.Client.TaskPriority.Low);
-            // }
+        { 
+            if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
+            {
+                ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
+                    newVZ.Id,
+                    null,
+                    HlidacStatu.Lib.OCR.Api.Client.TaskPriority.Low);
+            }
         }
 
         /// <summary>
@@ -321,8 +319,10 @@ namespace HlidacStatu.Repositories
 
                     // move file to final destination
                     var hlidacStorageId = dokument.GetHlidacStorageId();
+                    var destinationFolder = Init.VzPrilohaLocalCopy.GetFullDir(hlidacStorageId);
+                    Directory.CreateDirectory(destinationFolder);
                     var destination = Init.VzPrilohaLocalCopy.GetFullPath(hlidacStorageId);
-                
+                    
                     File.Move(fullTempPath, destination);
                 }
                 catch (Exception e)
