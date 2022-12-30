@@ -64,6 +64,13 @@ namespace HlidacStatu.Repositories
             
             try
             {
+                // try to find Ico
+                if (newVZ.Zadavatel.ICO is null)
+                {
+                    var firma = FirmaRepo.FromName(newVZ.Zadavatel.Jmeno);
+                    if(firma is not null)
+                        newVZ.Zadavatel.ICO = firma.ICO;
+                }
                 if (string.IsNullOrWhiteSpace(newVZ.Zadavatel?.ICO))
                     await SaveIncompleteVzAsync(newVZ);
                 
