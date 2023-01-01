@@ -408,133 +408,7 @@ namespace HlidacStatu.Repositories
                 search.ElapsedTime = sw.Elapsed;
                 return search;
             }
-
-            public static Task<ISearchResponse<VerejnaZakazka>> RawSearchAsync(string jsonQuery, int page, int pageSize,
-                VerejnaZakazkaSearchData.VZOrderResult order = VerejnaZakazkaSearchData.VZOrderResult.Relevance,
-                AggregationContainerDescriptor<VerejnaZakazka> anyAggregation = null)
-                => RawSearchAsync(GetRawQuery(jsonQuery), page, pageSize, order, anyAggregation);
-
-            public static async Task<ISearchResponse<VerejnaZakazka>> RawSearchAsync(QueryContainer query, int page,
-                int pageSize,
-                VerejnaZakazkaSearchData.VZOrderResult order = VerejnaZakazkaSearchData.VZOrderResult.Relevance,
-                AggregationContainerDescriptor<VerejnaZakazka> anyAggregation = null
-            )
-            {
-                page -= 1;
-                if (page < 0)
-                    page = 0;
-
-                AggregationContainerDescriptor<VerejnaZakazka> baseAggrDesc = null;
-                baseAggrDesc = anyAggregation == null
-                    ? null //new AggregationContainerDescriptor<VerejnaZakazka>().Sum("sumKc", m => m.Field(f => f.Castka))
-                    : anyAggregation;
-
-                Func<AggregationContainerDescriptor<VerejnaZakazka>, AggregationContainerDescriptor<VerejnaZakazka>>
-                    aggrFunc
-                        = (aggr) => { return baseAggrDesc; };
-
-                var client = await Manager.GetESClientAsync();
-                Indices indexes = client.ConnectionSettings.DefaultIndex;
-
-                var res = await client
-                    .SearchAsync<VerejnaZakazka>(s => s
-                        .Index(indexes)
-                        .Size(pageSize)
-                        .From(page * pageSize)
-                        .Query(q => query)
-                        //.Source(m => m.Excludes(e => e.Field(o => o.Prilohy)))
-                        .Sort(ss => GetSort(order))
-                        .Aggregations(aggrFunc)
-                        .TrackTotalHits(page * pageSize == 0 ? true : (bool?)null)
-                    );
-                if (res.IsValid == false)
-                    Manager.LogQueryError<VerejnaZakazka>(res);
-
-                //AuditRepo.Add(Audit.Operations.Search, "", "", "VerejnaZakazka", res.IsValid ? "valid" : "invalid", query., null);
-
-                return res;
-            }
-
-            public static async Task<VerejnaZakazkaSearchData> _SearchAsync(
-                VerejnaZakazkaSearchData search,
-                AggregationContainerDescriptor<VerejnaZakazka> anyAggregation, ElasticClient client)
-            {
-                if (string.IsNullOrEmpty(search.Q) && (search.CPV == null || search.CPV.Length == 0))
-                    return null;
-
-                if (client == null)
-                    client = await Manager.GetESClient_VerejneZakazkyAsync();
-
-                AggregationContainerDescriptor<VerejnaZakazka> baseAggrDesc = null;
-                baseAggrDesc = anyAggregation == null
-                    ? null //new AggregationContainerDescriptor<VerejnaZakazka>().Sum("sumKc", m => m.Field(f => f.Castka))
-                    : anyAggregation;
-
-                Func<AggregationContainerDescriptor<VerejnaZakazka>, AggregationContainerDescriptor<VerejnaZakazka>>
-                    aggrFunc
-                        = (aggr) => { return baseAggrDesc; };
-
-                string queryString = search.Q;
-                ISearchResponse<VerejnaZakazka> res = null;
-                if (search.CPV != null && search.CPV.Length > 0)
-                {
-                    string cpvs = search.CPV.Select(c => c + "*").Aggregate((f, s) => f + " OR " + s);
-                    if (!string.IsNullOrEmpty(queryString))
-                        queryString = queryString + " AND (cPV:(" + cpvs + "))";
-                    else
-                        queryString = "cPV:(" + cpvs + ")";
-                }
-
-                int page = search.Page - 1;
-                if (page < 0)
-                    page = 0;
-                try
-                {
-                    res = await client
-                        .SearchAsync<VerejnaZakazka>(a => a
-                            .Size(search.PageSize)
-                            .From(search.PageSize * page)
-                            .Aggregations(aggrFunc)
-                            .Query(qq => qq.QueryString(qs => qs
-                                    .Query(queryString)
-                                    .DefaultOperator(Operator.And)
-                                )
-                            )
-                            .Sort(ss => GetSort(search.Order))
-                            .Aggregations(aggrFunc)
-                            .TrackTotalHits(page * search.PageSize == 0 ? true : (bool?)null)
-                        );
-                }
-                catch (Exception e)
-                {
-                    AuditRepo.Add(Audit.Operations.Search, "", "", "VerejnaZakazka", "error", search.Q, null);
-                    if (res != null && res.ServerError != null)
-                    {
-                        Manager.LogQueryError<VerejnaZakazka>(res, "Exception, Orig query:"
-                                                                   + search.OrigQuery + "   query:"
-                                                                   + search.Q
-                                                                   + "\n\n res:" +
-                                                                   search.ElasticResults.ToString()
-                            , ex: e);
-                    }
-                    else
-                    {
-                        Util.Consts.Logger.Error("", e);
-                    }
-
-                    throw;
-                }
-
-                AuditRepo.Add(Audit.Operations.Search, "", "", "VerejnaZakazka", res.IsValid ? "valid" : "invalid",
-                    search.Q, null);
-
-                search.IsValid = res.IsValid;
-                search.ElasticResults = res;
-                search.Total = res.Total;
-
-                return search;
-            }
-
+            
             public static SortDescriptor<VerejnaZakazka> GetSort(string sorder)
             {
                 VerejnaZakazkaSearchData.VZOrderResult order = VerejnaZakazkaSearchData.VZOrderResult.Relevance;
@@ -609,7 +483,7 @@ namespace HlidacStatu.Repositories
 
             public static Devmasters.Cache.LocalMemory.Manager<VerejnaZakazkaSearchData, string>
                 cachedSearches =
-                    new Devmasters.Cache.LocalMemory.Manager<VerejnaZakazkaSearchData, string>("VZsearch", 
+                    new("VZsearch", 
                         s => CachedFuncSimpleSearchAsync(s).ConfigureAwait(false).GetAwaiter().GetResult(),
                         TimeSpan.FromHours(24));
 
