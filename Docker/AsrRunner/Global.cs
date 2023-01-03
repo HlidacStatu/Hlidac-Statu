@@ -27,7 +27,7 @@ public static class Global
     
     public static string FtpAddress =>
         Environment.GetEnvironmentVariable(nameof(FtpAddress)) ??
-        "dm3.devmasters.cz";
+        "10.10.100.103";
     public static string FtpUserName =>
         Environment.GetEnvironmentVariable(nameof(FtpUserName)) ??
         throw new ArgumentNullException(nameof(FtpUserName));
@@ -35,7 +35,7 @@ public static class Global
         Environment.GetEnvironmentVariable(nameof(FtpPassword)) ??
         throw new ArgumentNullException(nameof(FtpPassword));
     public static int FtpPort =>
-        int.TryParse(Environment.GetEnvironmentVariable(nameof(FtpPort)), out var val) ? val : 990;
+        int.TryParse(Environment.GetEnvironmentVariable(nameof(FtpPort)), out var val) ? val : 21;
     
     
     public static string OutputFileExtension =>
@@ -68,4 +68,7 @@ public static class Global
         Environment.GetEnvironmentVariable(nameof(LogStashUrl)) ??
         "http://10.10.150.203:5000";
 
+    public static string Debugme =>
+        Environment.GetEnvironmentVariable(nameof(Debugme)) ??
+        "false";
 }
