@@ -46,11 +46,11 @@ using var taskQueueService = new TaskQueueService(logger);
 using var ftpClient = new FtpClient(Global.FtpAddress, Global.FtpUserName, Global.FtpPassword, Global.FtpPort);
 ftpClient.Config.RetryAttempts = 5;
 ftpClient.Config.NoopInterval = 30_000;
-ftpClient.Config.EncryptionMode = FtpEncryptionMode.Implicit;
-ftpClient.Config.ValidateAnyCertificate = true;
-ftpClient.ValidateCertificate += (control, e) => {
-    e.Accept = true;
-};
+ftpClient.Config.EncryptionMode = FtpEncryptionMode.None;
+//ftpClient.Config.ValidateAnyCertificate = true;
+//ftpClient.ValidateCertificate += (control, e) => {
+//    e.Accept = true;
+//};
 
 // Application loop
 logger.Debug("Running main code");
