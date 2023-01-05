@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities.Views;
+﻿using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities.Views;
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -235,6 +236,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<OrganVerejneMoci> OrganVerejneMoci { get; set; }
         public virtual DbSet<PravniFormaOvm> PravniFormaOvm { get; set; }
         public virtual DbSet<TypOvm> TypOvm { get; set; }
+        public virtual DbSet<ConfigurationValue> ConfigurationValues { get; set; }
 
         //views
         public DbSet<FindPersonDTO> FindPersonView { get; set; }

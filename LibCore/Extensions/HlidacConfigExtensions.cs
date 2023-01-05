@@ -54,6 +54,7 @@ public static class HlidacConfigExtensions
         IConfiguration preConfig = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", true)
             .AddJsonFile("appsettings.develop.json", true)
+            .AddJsonFile("appsettings.Development.json", true)
             .Build();
         var connectionString = preConfig.GetConnectionString("DefaultConnection");
         var environment = preConfig.GetValue<string>("HS_ENV");
