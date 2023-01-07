@@ -6,7 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <AssemblyVersion>2.2.0</AssemblyVersion>
+        <AssemblyVersion>2.2.1</AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
