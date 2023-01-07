@@ -23,16 +23,18 @@ public static class Helpers
             },
             EnableRaisingEvents = true
         };
-        
+        process.OutputDataReceived += (sender, args) => { logger.Debug("bash: {msg}", args.Data); };
+        process.ErrorDataReceived+= (sender, args) => { logger.Warning("bash err: {msg}", args.Data); };
+
         process.Exited += (sender, args) =>
         {
-            string standardError = process.StandardError.ReadToEnd(); 
-            if (!string.IsNullOrWhiteSpace(standardError))
-                logger.Warning(standardError);
+            //string standardError = process.StandardError.ReadToEnd(); 
+            //if (!string.IsNullOrWhiteSpace(standardError))
+            //    logger.Warning(standardError);
 
-            string standardOutput = process.StandardOutput.ReadToEnd();
-            if (!string.IsNullOrWhiteSpace(standardOutput))
-                logger.Information(standardOutput);
+            //string standardOutput = process.StandardOutput.ReadToEnd();
+            //if (!string.IsNullOrWhiteSpace(standardOutput))
+            //    logger.Information(standardOutput);
             
             if (process.ExitCode == 0)
             {
