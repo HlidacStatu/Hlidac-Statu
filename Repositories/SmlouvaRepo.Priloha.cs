@@ -218,6 +218,10 @@ namespace HlidacStatu.Repositories
         public static string GetCopyOfDownloadedPrilohaPath(Smlouva.Priloha att,
     Smlouva smlouva, RequestedFileType filetype = RequestedFileType.Original)
         {
+            string tmpFnSystem = null;
+            string tmpFn = null;
+            try
+            {
 
             var origFile = GetDownloadedPrilohaPath(att, smlouva, filetype);
 
@@ -238,10 +242,23 @@ namespace HlidacStatu.Repositories
                 }
             }
 
-            string tmpFnSystem = System.IO.Path.GetTempFileName();
-            string tmpFn = tmpFnSystem + DocTools.PrepareFilenameForOCR(att.nazevSouboru);
+             tmpFnSystem = System.IO.Path.GetTempFileName();
+            tmpFn = tmpFnSystem + DocTools.PrepareFilenameForOCR(att.nazevSouboru);
             System.IO.File.Copy(origFile, tmpFn, true);
             return tmpFn;
+            }
+            catch (Exception e)
+            {
+                HlidacStatu.Util.Consts.Logger.Error("Error in GetCopyOfDownloadedPrilohaPath {smlouvaId} {prilohaHash}", e, smlouva.Id, att.UniqueHash());
+                throw;
+            }
+            finally
+            {
+                if (tmpFnSystem != null && System.IO.File.Exists(tmpFnSystem))
+                {
+                    _=Devmasters.IO.IOTools.DeleteFile(tmpFnSystem);
+                }
+            }
         }
 
 
