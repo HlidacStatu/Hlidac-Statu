@@ -189,7 +189,7 @@ namespace HlidacStatu.Repositories
                 if (System.IO.File.Exists($"{localFile}.pdf"))
                     return $"{localFile}.pdf";
 
-                if (HlidacStatu.Util.FileMime.HasPdfHeader(localFile))
+                if (HlidacStatu.Util.FileMime.HasPdfHeader(localFile) == false)
                 {
                     try
                     {
@@ -207,6 +207,8 @@ namespace HlidacStatu.Repositories
                         return localFile;
                     }
                 }
+                else //this is PDF
+                    return localFile;
 
             }
 
@@ -282,7 +284,7 @@ namespace HlidacStatu.Repositories
                 else
                 {
                     var fnType = HlidacStatu.Util.FileMime.GetTopFileType(
-                        GetDownloadedPrilohaPath(p, s, RequestedFileType.PDF)
+                        GetDownloadedPrilohaPath(p, s, RequestedFileType.Original)
                         );
                     if (fnType != null)
                         contentType = fnType.MimeType;
