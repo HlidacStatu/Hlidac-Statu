@@ -41,7 +41,7 @@ namespace HlidacStatu.Entities
 
 
         [Nest.Date]
-        public DateTime Updated { get; set; }
+        public DateTime Updated { get; set; } = DateTime.Now;
         [Nest.Keyword]
         public string SmlouvaId { get; set; }
         [Nest.Keyword]

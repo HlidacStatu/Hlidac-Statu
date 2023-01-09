@@ -81,7 +81,8 @@ namespace HlidacStatu.Repositories.ES
         public static string defaultIndexName_UptimeSSL = "uptimessl";
 
         public static string defaultIndexName_PageMetadata = "pagemetadata";
-
+        public static string defaultIndexName_Audit = "audit";
+        
         public static string defaultIndexName_Osoby = "osoby";
         public static string defaultIndexName_DocTables = "doctables";
         public static string defaultIndexName_InDocTableCells = "indoctablecells";
@@ -241,7 +242,7 @@ namespace HlidacStatu.Repositories.ES
         {
             if (idxType == IndexType.DataSource)
                 indexName = dataSourceIndexNamePrefix + indexName;
-            else if (indexName == defaultIndexName_DocTables)
+            else if (indexName == defaultIndexName_Audit)
             {
                 //audit_Year-weekInYear
                 DateTime d = DateTime.Now;
@@ -456,7 +457,9 @@ namespace HlidacStatu.Repositories.ES
             IndexSettings set = new IndexSettings();
             set.NumberOfReplicas = 1;
             set.NumberOfShards = 1;
-            
+            set.RefreshInterval = new Time(TimeSpan.FromSeconds(1));
+
+
             // Add the Analyzer with a name
             set.Analysis = new Nest.Analysis()
             {
@@ -629,7 +632,8 @@ namespace HlidacStatu.Repositories.ES
                                Settings = new IndexSettings()
                                {
                                    NumberOfReplicas = 1,
-                                   NumberOfShards = 1
+                                   NumberOfShards = 8,
+                                   RefreshInterval = new Time(TimeSpan.FromSeconds(1))
                                }
                            }
                            )

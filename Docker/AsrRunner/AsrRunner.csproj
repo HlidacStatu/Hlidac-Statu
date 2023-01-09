@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Logging" Version="4.0.2" />
+      <PackageReference Include="Devmasters.Logging" Version="4.0.3" />
       <PackageReference Include="FluentFTP" Version="43.0.1" />
       <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
       <PackageReference Include="Serilog" Version="2.12.0" />
