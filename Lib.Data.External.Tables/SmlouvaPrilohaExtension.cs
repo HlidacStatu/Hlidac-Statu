@@ -13,8 +13,8 @@ namespace HlidacStatu.Lib.Data.External.Tables
     public static class SmlouvaPrilohaExtension
     {
 
-        private static volatile Devmasters.Cache.AWS_S3.Manager<Lib.Data.External.Tables.Result[], KeyAndId> prilohaTblsMinioCacheManager
-        = Devmasters.Cache.AWS_S3.Manager<Lib.Data.External.Tables.Result[], KeyAndId>.GetSafeInstance(
+        private static volatile Devmasters.Cache.AWS_S3.Manager<DocTables.Result[], KeyAndId> prilohaTblsMinioCacheManager
+        = Devmasters.Cache.AWS_S3.Manager<DocTables.Result[], KeyAndId>.GetSafeInstance(
             "SmlouvyPrilohyTbls/",
             smlouvaKeyId => getTablesFromDocumentAsync(smlouvaKeyId).ConfigureAwait(false).GetAwaiter().GetResult(),
             TimeSpan.Zero,
@@ -25,7 +25,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
             key => key.CacheNameOnDisk
             );
 
-        private static async Task<Result[]> getTablesFromDocumentAsync(KeyAndId smlouvaKeyId)
+        private static async Task<DocTables.Result[]> getTablesFromDocumentAsync(KeyAndId smlouvaKeyId)
         {
             var key = smlouvaKeyId.ValueForData.Split("/");
 
@@ -45,7 +45,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
             sw.Start();
             try
             {
-                Lib.Data.External.Tables.Result[] myRes = null;
+                DocTables.Result[] myRes = null;
                 if (s.znepristupnenaSmlouva()==false)
                     myRes = HlidacStatu.Lib.Data.External.Tables.PDF.GetMaxTablesFromPDFAsync(
                         p.LocalCopyUrl(s.Id, true,null, null), HlidacStatu.Lib.Data.External.Tables.Camelot.CamelotResult.Formats.JSON).Result;
@@ -87,7 +87,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
             return null;
         }
 
-        public static Lib.Data.External.Tables.Result[] GetTablesFromPriloha(Smlouva s, Smlouva.Priloha p, bool forceUpdate = false)
+        public static DocTables.Result[] GetTablesFromPriloha(Smlouva s, Smlouva.Priloha p, bool forceUpdate = false)
         {
             if (s == null || p == null)
                 return null;

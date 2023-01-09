@@ -36,7 +36,7 @@ namespace HlidacStatu.Web.Controllers
             if (sml == null || pr == null)
                 return NotFound();
 
-            Lib.Data.External.Tables.Result[] res = SmlouvaPrilohaExtension.GetTablesFromPriloha(sml, pr);
+            HlidacStatu.Entities.DocTables.Result[] res = SmlouvaPrilohaExtension.GetTablesFromPriloha(sml, pr);
 
             return View(res);
         }

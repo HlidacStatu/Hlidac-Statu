@@ -1,6 +1,6 @@
 ﻿namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
-    public class CamelotResult : Result
+    public class CamelotResult : HlidacStatu.Entities.DocTables.Result
     {
         public enum Formats
         {

@@ -50,7 +50,7 @@ namespace HlidacStatu.Repositories.ES
             UptimeSSL,
             PageMetadata,
             Osoby,
-            Audit,
+            DocTables,
             RPP_Kategorie,
             RPP_OVM,
             RPP_ISVS,
@@ -83,7 +83,7 @@ namespace HlidacStatu.Repositories.ES
         public static string defaultIndexName_PageMetadata = "pagemetadata";
 
         public static string defaultIndexName_Osoby = "osoby";
-        public static string defaultIndexName_Audit = "audit";
+        public static string defaultIndexName_DocTables = "doctables";
         public static string defaultIndexName_InDocTableCells = "indoctablecells";
 
         public static string defaultIndexName_RPP_Kategorie = "rpp_kategorie";
@@ -156,9 +156,9 @@ namespace HlidacStatu.Repositories.ES
             return GetESClientAsync(defaultIndexName_Logs, timeOut, connectionLimit, IndexType.Logs
                 );
         }
-        public static Task<ElasticClient> GetESClient_AuditAsync(int timeOut = 1000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_DocTablesAsync(int timeOut = 1000, int connectionLimit = 80)
         {
-            return GetESClientAsync(defaultIndexName_Audit, timeOut, connectionLimit, IndexType.Audit
+            return GetESClientAsync(defaultIndexName_DocTables, timeOut, connectionLimit, IndexType.DocTables
                 );
         }
         public static Task<ElasticClient> GetESClient_InDocTableCellsAsync(int timeOut = 1000, int connectionLimit = 80)
@@ -241,7 +241,7 @@ namespace HlidacStatu.Repositories.ES
         {
             if (idxType == IndexType.DataSource)
                 indexName = dataSourceIndexNamePrefix + indexName;
-            else if (indexName == defaultIndexName_Audit)
+            else if (indexName == defaultIndexName_DocTables)
             {
                 //audit_Year-weekInYear
                 DateTime d = DateTime.Now;
@@ -621,7 +621,7 @@ namespace HlidacStatu.Repositories.ES
                            .Map<Entities.Logs.ProfilZadavateleDownload>(map => map.AutoMap(maxRecursion: 1))
                        );
                     break;
-                case IndexType.Audit:
+                case IndexType.DocTables:
                     res = await client.Indices
                        .CreateAsync(indexName, i => i
                            .InitializeUsing(new IndexState()
@@ -633,7 +633,7 @@ namespace HlidacStatu.Repositories.ES
                                }
                            }
                            )
-                           .Map<Entities.Audit>(map => map.AutoMap(maxRecursion: 1))
+                           .Map<Entities.DocTables>(map => map.AutoMap(maxRecursion: 1))
                        );
                     break;
                 case IndexType.VerejneZakazkyNaProfiluRaw:

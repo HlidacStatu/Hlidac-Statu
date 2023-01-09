@@ -10,7 +10,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             HlidacStatu.DetectJobs.IT.Keywords, HlidacStatu.DetectJobs.IT.OtherWords, HlidacStatu.DetectJobs.IT.BlacklistedWords
             );
 
-        public CamelotResultWithJobs(Result cr)
+        public CamelotResultWithJobs(HlidacStatu.Entities.DocTables.Result cr)
         {
             if (cr == null)
                 throw new ArgumentNullException("cr");

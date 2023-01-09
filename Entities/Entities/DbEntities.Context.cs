@@ -40,11 +40,6 @@ namespace HlidacStatu.Entities
                 u.Rok
             });
 
-            modelBuilder.Entity<Audit>(entity =>
-            {
-                entity.Property(e => e.date).HasDefaultValueSql("(getdate())");
-            });
-
             modelBuilder.Entity<AutocompleteSynonym>(entity =>
             {
                 entity.Property(e => e.Active).HasDefaultValueSql("((1))");
