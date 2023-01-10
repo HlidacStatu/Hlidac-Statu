@@ -71,20 +71,20 @@ namespace HlidacStatu.Repositories
                     if(firma is not null)
                         newVZ.Zadavatel.ICO = firma.ICO;
                 }
-                if (string.IsNullOrWhiteSpace(newVZ.Zadavatel?.ICO))
-                    await SaveIncompleteVzAsync(newVZ);
                 
-                var storeNewDocumentsTask = StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
+                await StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
                 SetupUpdateDates(newVZ, posledniZmena);
-                
-                var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
-
-                var originalVZ = await FindOriginalDocumentFromESAsync(newVZ);
-
-                await storeNewDocumentsTask;
-                // Merge possible document duplicates
                 MergeDuplicateDocuments(newVZ);
 
+                // there might be issues to find proper ICO, so we have to save half-complete VZ
+                if (string.IsNullOrWhiteSpace(newVZ.Zadavatel?.ICO))
+                {
+                    await SaveIncompleteVzAsync(newVZ);
+                    return;
+                }
+                
+                var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
+                var originalVZ = await FindOriginalDocumentFromESAsync(newVZ);
 
                 // VZ neexistuje => ukládáme
                 if (originalVZ is null)
@@ -96,7 +96,8 @@ namespace HlidacStatu.Repositories
                 
                 //VZ existuje => mergujeme
                 // zajistit, že budeme mít checksum všude
-                var storeOriginalDocumentsTask = StoreDocumentCopyToHlidacStorageAsync(originalVZ, httpClient);
+                // zakomentováno, protože to stahuje data zbytečně 2x u stejných VZ. 
+                //var storeOriginalDocumentsTask = StoreDocumentCopyToHlidacStorageAsync(originalVZ, httpClient);
                 
                 MergeSimpleProperties(ref originalVZ, newVZ);
 
@@ -116,7 +117,7 @@ namespace HlidacStatu.Repositories
                 }    
                 
                 //merge dokumenty
-                await storeOriginalDocumentsTask;
+                //await storeOriginalDocumentsTask;
                 MergeDocuments(originalVZ, newVZ.Dokumenty);
                 SendToOcrQueue(originalVZ);
                 
@@ -305,15 +306,16 @@ namespace HlidacStatu.Repositories
         {
             foreach (var dokument in vz.Dokumenty.Where(d => string.IsNullOrWhiteSpace(d.Sha256Checksum)))
             {
+                string fullTempPath = string.Empty;
                 try
                 {
                     // download file from web and save it to temporaryPath
                     string temporaryPath = Path.Combine(Config.GetWebConfigValue("VZPrilohyDataPath"),
                         "_temp_");
-                    string filename = Guid.NewGuid().ToString("N"); 
+                    string filename = Guid.NewGuid().ToString("N");
                     Directory.CreateDirectory(temporaryPath);
-                    string fullTempPath = Path.Combine(temporaryPath, filename);
-                    
+                    fullTempPath = Path.Combine(temporaryPath, filename);
+
                     string downloadUrl = dokument.GetDocumentUrlToDownload();
                     await DownloadFileAsync(httpClient, downloadUrl, fullTempPath);
 
@@ -329,14 +331,18 @@ namespace HlidacStatu.Repositories
                     var destinationFolder = Init.VzPrilohaLocalCopy.GetFullDir(hlidacStorageId);
                     Directory.CreateDirectory(destinationFolder);
                     var destination = Init.VzPrilohaLocalCopy.GetFullPath(hlidacStorageId);
-                    
+
                     File.Move(fullTempPath, destination);
                 }
                 catch (Exception e)
                 {
-                    Consts.Logger.Error("VZ - problem with storing file to hlidac storage");
+                    Consts.Logger.Error("VZ - problem with storing file to hlidac storage", e);
                 }
-                
+                finally
+                {
+                    if(!string.IsNullOrWhiteSpace(fullTempPath) && File.Exists(fullTempPath))
+                        File.Delete(fullTempPath);
+                }
             }
         }
 
