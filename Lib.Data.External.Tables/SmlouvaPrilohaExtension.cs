@@ -31,7 +31,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
             return await ParseTablesFromDocumentAsync(s, p);
         }
 
-        public static async Task<DocTables.Result[]> ParseTablesFromDocumentAsync(Smlouva smlouva, Smlouva.Priloha priloha)
+        public static async Task<DocTables.Result[]> ParseTablesFromDocumentAsync(Smlouva smlouva, Smlouva.Priloha priloha, bool throwException = false)
         {
             Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
             sw.Start();
@@ -66,15 +66,19 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 }
                 else
                     Util.Consts.Logger.Error($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms {age.ToString()}", age);
-
-                throw;
-
+                if (throwException)
+                    throw;
+                else
+                    return null;
             }
             catch (Exception e)
             {
                 sw.Stop();
                 Util.Consts.Logger.Error($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} error GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms, {e.ToString()}", e);
-                throw;
+                if (throwException)
+                    throw;
+                else
+                    return null;
             }
 
             return null;
