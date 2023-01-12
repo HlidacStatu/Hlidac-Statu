@@ -150,7 +150,9 @@ namespace Vybory_PSP
                     Console.WriteLine($"Saved vybor {jednani.vybor} jednani {jednani.Id} id {id}");
                     return new Devmasters.Batch.ActionOutputData();
 
-                }, null, null, !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 5, prefix: "cisloJednani: ");
+                }, null, null, 
+                    !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 5, 
+                    prefix: "cisloJednani: ");
             }
 
         }

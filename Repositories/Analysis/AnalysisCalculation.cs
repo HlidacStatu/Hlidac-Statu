@@ -422,6 +422,7 @@ namespace HlidacStatu.Repositories
             showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null,
             false
             , prefix: "LoadFirmySVazbamiNaPolitiky " + aktualnostVztahu.ToNiceDisplayName()
+            , monitor: showProgress ? new MonitoredTaskRepo.ForBatch() : null
             );
 
             return new VazbyFiremNaPolitiky() { SoukromeFirmy = pol_SVazbami, StatniFirmy = pol_SVazbami_StatniFirmy };

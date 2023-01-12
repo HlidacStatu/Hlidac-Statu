@@ -129,7 +129,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 if (AddSmlouvaToQueue(id, false))
                     addedToQ++;
                 return new Devmasters.Batch.ActionOutputData();
-            }, !System.Diagnostics.Debugger.IsAttached, 5, null, new Devmasters.Batch.ActionProgressWriter(1f, new Devmasters.Batch.LoggerWriter(Code.Log.Logger, Devmasters.Log.PriorityLevel.Information).ProgressWriter).Writer, prefix: "BPUpdateQueue ");
+            }, !System.Diagnostics.Debugger.IsAttached, 5, null, 
+            new Devmasters.Batch.ActionProgressWriter(1f, new Devmasters.Batch.LoggerWriter(Code.Log.Logger, Devmasters.Log.PriorityLevel.Information).ProgressWriter).Writer, 
+            prefix: "BPUpdateQueue ", monitor: new MonitoredTaskRepo.ForBatch());
 
             HlidacStatuApi.Code.Log.Logger.Info($"BP Queue UpdateQueueTimer_Elapsed done for {newIds?.Count ?? 0} items, added {addedToQ}");
 

@@ -278,7 +278,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                             return new Devmasters.Batch.ActionOutputData();
                         }, null, null, !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 10
                         , prefix: "kindex calc4year "
-                        // 
+                        , monitor: new MonitoredTaskRepo.ForBatch()
                     );
                 } // if (ret.CelkovaKoncentraceDodavatelu != null)
             }

@@ -58,7 +58,7 @@ public static class RejstrikTrestuRepo
         return null;
     }
     
-    // public static async Task SaveAsync(RejstrikTrestu rejstrikTrestu)
+    // public static async MonitoredTask SaveAsync(RejstrikTrestu rejstrikTrestu)
     // {
     //     if (rejstrikTrestu == null) throw new ArgumentNullException(nameof(rejstrikTrestu));
     //     
