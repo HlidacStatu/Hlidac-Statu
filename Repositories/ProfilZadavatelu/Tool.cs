@@ -30,7 +30,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                         return new ActionOutputData();
                     }, null,
                     outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter,
-                    false, elasticClient: await ES.Manager.GetESClient_VZAsync(), prefix: "profil zadavatelu ");
+                    false, elasticClient: await ES.Manager.GetESClient_VZAsync(), prefix: "profil zadavatelu ", monitor: new MonitoredTaskRepo.ForBatch());
 
                 Console.WriteLine("Let's go mining");
 
