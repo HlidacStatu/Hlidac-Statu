@@ -76,7 +76,8 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                 {
                     await parser.ProcessProfileZadavateluAsync(p, from);
                     return new ActionOutputData();
-                }, outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter, true, prefix: "profil zadav 3 ");
+                }, outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter, true, 
+                prefix: "profil zadav 3 ", monitor: new MonitoredTaskRepo.ForBatch());
 
 
         }
