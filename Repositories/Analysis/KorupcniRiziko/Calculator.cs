@@ -618,7 +618,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         {
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
             {
-                var client = await Manager.GetESClientAsync();
+                var client = await Repositories.ES.Manager.GetESClientAsync();
                 return await client.SearchAsync<Smlouva>(a => a
                     .Size(size)
                     .Source(ss => ss.Excludes(sml => sml.Field(ff => ff.Prilohy)))
@@ -630,7 +630,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 
 
             List<smlouvaStat> smlStat = new List<smlouvaStat>();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(),
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Repositories.ES.Manager.GetESClientAsync(),
                 searchFunc,
                 (h, o) =>
                 {
@@ -668,7 +668,8 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     return new Devmasters.Batch.ActionOutputData();
                 }, null,
                 null, null,
-                false, blockSize: 100);
+                false, blockSize: 100,
+                monitor: new MonitoredTaskRepo.ForBatch());
 
             IEnumerable<SmlouvyForIndex> smlouvy = smlStat
                 .Select(m => new SmlouvyForIndex(m.Id, m.IcoDodavatele, m.CastkaSDPH, m.ULimitu, m.Obor))

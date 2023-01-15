@@ -11,7 +11,7 @@ namespace HlidacStatu.Repositories
 
 
             public ForBatch(
-                string application = null, 
+                string application = null,
                 string part = null,
                 [CallerMemberName] string callerMemberName = "",
                 [CallerFilePath] string sourceFilePath = "",
@@ -43,6 +43,11 @@ namespace HlidacStatu.Repositories
                 _ = MonitoredTaskRepo.Finish(this, success, exception);
             }
 
+            public void Finish(params Exception[] exceptions)
+            {
+                bool success = exceptions == null || exceptions.Length == 0;
+                _ = MonitoredTaskRepo.Finish(this, success , success ? null : new AggregateException(exceptions));
+            }
         }
 
     }
