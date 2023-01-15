@@ -131,7 +131,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 return new Devmasters.Batch.ActionOutputData();
             }, !System.Diagnostics.Debugger.IsAttached, 5, null, 
             new Devmasters.Batch.ActionProgressWriter(1f, new Devmasters.Batch.LoggerWriter(Code.Log.Logger, Devmasters.Log.PriorityLevel.Information).ProgressWriter).Writer, 
-            prefix: "BPUpdateQueue ", monitor: new MonitoredTaskRepo.ForBatch());
+            prefix: "BPUpdateQueue ");
 
             HlidacStatuApi.Code.Log.Logger.Info($"BP Queue UpdateQueueTimer_Elapsed done for {newIds?.Count ?? 0} items, added {addedToQ}");
 
