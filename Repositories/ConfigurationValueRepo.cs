@@ -20,7 +20,6 @@ public static class ConfigurationValueRepo
 
     public static async Task UpsertAsync(ConfigurationValue configurationValue)
     {
-        // todo: zařídit unikátnost na kombinaci KeyName, Environment, Tag
         await using var dbContext = new DbEntities();
 
         if (configurationValue.Id == 0)
