@@ -260,13 +260,13 @@ namespace HlidacStatu.Repositories
 
         private static void SendToOcrQueue(VerejnaZakazka newVZ)
         { 
-            if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
-            {
-                ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
-                    newVZ.Id,
-                    null,
-                    HlidacStatu.Lib.OCR.Api.Client.TaskPriority.Low);
-            }
+            // if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
+            // {
+            //     ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
+            //         newVZ.Id,
+            //         null,
+            //         HlidacStatu.Lib.OCR.Api.Client.TaskPriority.Low);
+            // }
         }
 
         /// <summary>
