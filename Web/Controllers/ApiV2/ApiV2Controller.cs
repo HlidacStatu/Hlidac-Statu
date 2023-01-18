@@ -8,7 +8,6 @@ using System.ComponentModel;
 using System.Net;
 using System.Net.Http;
 using Microsoft.AspNetCore.Authorization;
-using MimeMapping;
 
 namespace HlidacStatu.Web.Controllers
 {

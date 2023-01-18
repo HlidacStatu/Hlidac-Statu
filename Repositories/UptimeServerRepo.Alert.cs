@@ -5,8 +5,6 @@ using Devmasters.Log;
 
 using HlidacStatu.Entities;
 
-using Nest;
-
 namespace HlidacStatu.Repositories
 {
     public static partial class UptimeServerRepo

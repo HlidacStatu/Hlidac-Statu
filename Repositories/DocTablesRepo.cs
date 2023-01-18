@@ -1,8 +1,6 @@
 using HlidacStatu.Repositories.ES;
-using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Entities;
 using System;
-using Serilog;
 using Nest;
 using System.Threading.Tasks;
 

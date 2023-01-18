@@ -3,7 +3,6 @@ using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.ES;
 using System;
 using System.Collections.Generic;
 using System.Linq;

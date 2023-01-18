@@ -1,9 +1,7 @@
 using System;
-using System.IO;
 using Devmasters.Log;
 using HlidacStatu.AutocompleteApi;
 using HlidacStatu.AutocompleteApi.Services;
-using HlidacStatu.Connectors;
 using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.MiddleWares;
 using Microsoft.AspNetCore.Builder;

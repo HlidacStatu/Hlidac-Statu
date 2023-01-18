@@ -1,5 +1,4 @@
-﻿using Devmasters.DT;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 
 namespace HlidacStatuApi.Code
 {

@@ -8,9 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using static HlidacStatu.DS.Graphs.Graph;
-using static Nest.JoinField;
-
 namespace HlidacStatu.Repositories
 {
     public static class FirmaVazbyRepo
