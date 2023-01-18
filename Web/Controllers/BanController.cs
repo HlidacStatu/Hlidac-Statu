@@ -28,7 +28,7 @@ namespace HlidacStatu.Web.Controllers
             DateTime.TryParseExact(expiration, "d.M.yyyy", CultureInfo.CurrentCulture,
                 DateTimeStyles.AllowWhiteSpaces, out var expirationDate);
 
-            if (LibCore.Services.AttackerDictionaryService.whitelistedIps.Contains(ipAddress))
+            if (Devmasters.Config.GetWebConfigValue("BanWhitelist").Contains(ipAddress, StringComparison.InvariantCultureIgnoreCase))
                 return View();
 
             await BannedIpRepoCached.BanIpAsync(ipAddress, expirationDate, lastStatusCode, pathList);

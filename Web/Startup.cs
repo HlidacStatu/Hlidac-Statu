@@ -196,7 +196,18 @@ namespace HlidacStatu.Web
             }
             else
             {
-                app.UseBannedIpsMiddleware(); // tohle nechci při developmentu :) 
+                var whitelistIps = Devmasters.Config.GetWebConfigValue("BanWhitelist")?.Split(',',
+                    StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+                BannedIpsMiddleware.Whitelist whitelist = new BannedIpsMiddleware.Whitelist();
+                if (whitelistIps != null && whitelistIps.Length > 0)
+                {
+                    foreach (var ip in whitelistIps)
+                    {
+                        whitelist.IpAddresses.Add(ip);
+                    }
+                }
+                
+                app.UseBannedIpsMiddleware(whitelist); // tohle nechci při developmentu :) 
                 app.UseExceptionHandler("/Error/500");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();

@@ -152,7 +152,17 @@ if (IsDevelopment(app.Environment))
 }
 else
 {
-    app.UseBannedIpsMiddleware(); // tohle nechci při developmentu :) 
+    var whitelistIps = Devmasters.Config.GetWebConfigValue("BanWhitelist")?.Split(',',
+        StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+    BannedIpsMiddleware.Whitelist whitelist = new BannedIpsMiddleware.Whitelist();
+    if (whitelistIps != null && whitelistIps.Length > 0)
+    {
+        foreach (var ip in whitelistIps)
+        {
+            whitelist.IpAddresses.Add(ip);
+        }
+    }
+    app.UseBannedIpsMiddleware(whitelist); // tohle nechci při developmentu :) 
     app.UseExceptionHandler("/Error/500");
 }
 
