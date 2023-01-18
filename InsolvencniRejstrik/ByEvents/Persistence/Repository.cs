@@ -3,7 +3,6 @@ using HlidacStatu.Entities.Insolvence;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace InsolvencniRejstrik.ByEvents

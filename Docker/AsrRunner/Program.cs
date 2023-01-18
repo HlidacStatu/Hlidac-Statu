@@ -2,7 +2,6 @@
 using Devmasters.Log;
 using FluentFTP;
 using Serilog;
-using System.Net.Security;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Is(Global.MinLogLevel)

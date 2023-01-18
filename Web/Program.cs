@@ -1,7 +1,5 @@
-using HlidacStatu.LibCore.ConfigurationProviders;
 using HlidacStatu.LibCore.Extensions;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace HlidacStatu.Web

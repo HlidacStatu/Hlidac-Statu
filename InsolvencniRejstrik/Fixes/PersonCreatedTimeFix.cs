@@ -1,13 +1,10 @@
 ﻿using HlidacStatu.Entities.Insolvence;
-using HlidacStatu.Repositories.ES;
 using InsolvencniRejstrik.ByEvents;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace InsolvencniRejstrik.Fixes

@@ -4,7 +4,6 @@ using HlidacStatu.Repositories;
 using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MimeMapping;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace HlidacStatuApi.Controllers.ApiV2

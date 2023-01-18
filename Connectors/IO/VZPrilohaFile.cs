@@ -1,7 +1,4 @@
-﻿using HlidacStatu.Entities;
-using static HlidacStatu.Entities.Smlouva;
-
-namespace HlidacStatu.Connectors.IO
+﻿namespace HlidacStatu.Connectors.IO
 {
     public class VZPrilohaFile : DistributedFilePath<string>
     {

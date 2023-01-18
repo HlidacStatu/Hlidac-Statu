@@ -1,14 +1,10 @@
 using Devmasters.Batch;
-using Devmasters.Net.HttpClient;
-
 using HlidacStatu.Connectors;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Issues;
-using HlidacStatu.Entities.XSD;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;
-using HlidacStatu.Lib.OCR;
 using HlidacStatu.Repositories.Searching;
 
 using Nest;
@@ -16,9 +12,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Manager = HlidacStatu.Repositories.ES.Manager;
 

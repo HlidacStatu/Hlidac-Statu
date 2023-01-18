@@ -1,5 +1,4 @@
 using HlidacStatu.Entities.Insolvence;
-using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 
 using Microsoft.EntityFrameworkCore;

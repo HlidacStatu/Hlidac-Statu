@@ -1,6 +1,5 @@
 ﻿using HlidacStatu.Entities.Insolvence;
 using log4net;
-using log4net.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
