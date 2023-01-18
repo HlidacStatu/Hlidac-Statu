@@ -264,6 +264,47 @@ namespace HlidacStatu.Repositories
                 .Distinct()
         );
 
+        public static string SmlouvaProcessingQueueName = "smlouvy2Process";
+        public static bool AddToProcessingQueue(this Smlouva smlouva,
+                bool forceOCR = false,
+                bool forceClassification = false,
+                bool forceTablesMining = false,
+                bool forceBlurredPages = false
+            )
+        {
+
+            using HlidacStatu.Q.Simple.Queue<Smlouva.Queued> q = new Q.Simple.Queue<Smlouva.Queued>(
+                SmlouvaProcessingQueueName,
+                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                );
+
+            var sq = new Smlouva.Queued()
+            {
+                ForceBlurredPages = forceBlurredPages,
+                ForceClassification = forceClassification,
+                ForceOCR = forceOCR,
+                ForceTablesMining = forceTablesMining
+            };
+            q.Send(sq);
+
+            return true;
+        }
+        public static Smlouva.Queued GetSmlouvaFromProcessingQueue()
+        {
+            using HlidacStatu.Q.Simple.Queue<Smlouva.Queued> q = new Q.Simple.Queue<Smlouva.Queued>(
+                SmlouvaProcessingQueueName,
+                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                );
+
+            ulong? id = null;
+            var sq = q.GetAndAck(out id);
+            if (sq != null)
+            {
+                sq.ItemIdInQueue = id;
+            }
+            return sq;
+        }
+
         public static async Task<bool> SaveAsync(Smlouva smlouva, ElasticClient client = null, bool updateLastUpdateValue = true, bool skipPrepareBeforeSave = false)
         {
             if (smlouva == null)

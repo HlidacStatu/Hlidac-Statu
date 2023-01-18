@@ -49,13 +49,19 @@ namespace HlidacStatu.Q.Simple
 
         public T GetAndAck()
         {
+            return GetAndAck(out _);
+        }
+        public T GetAndAck(out ulong? responseId)
+        {
+            responseId = null;
             var res = Get();
             if (res == null)
                 return default(T);
 
+            responseId = res.ResponseId;
+
             if (res.ResponseId.HasValue)
                 AckMessage(res.ResponseId.Value);
-
             return res.Value;
 
         }
