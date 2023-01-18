@@ -59,7 +59,7 @@ namespace HlidacStatu.Web.HealthChecks
 
                 client.ApiToken = this.options.ApiToken;
 
-                var resp = client.Nodes[this.options.NodeName].Qemu.Vmlist();
+                var resp = client.Nodes[this.options.NodeName].Qemu.Vmlist()?.Result;
                 if (resp.ResponseInError == false && resp.IsSuccessStatusCode)
                 {
                     VM[] allVMs = JsonConvert.DeserializeObject<VM[]>(JsonConvert.SerializeObject(resp.Response.data));
