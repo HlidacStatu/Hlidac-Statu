@@ -362,7 +362,7 @@
                                     </div>
                                 }
                             }
-                            @if (this.User?.IsInRole("canEditData") == true && priloha.nazevSouboru.ToLower().EndsWith("pdf"))
+                            @if (this.User?.IsInRole("canEditData") == true && priloha?.nazevSouboru?.ToLower().EndsWith("pdf")==true)
                             {
                                 <div>
                                     <a target="_blank" href="/manage/ShowPrilohaTables?s=@Model.Id&p=@priloha.hash.Value">
