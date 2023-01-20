@@ -173,6 +173,9 @@ namespace HlidacStatu.Plugin.Enhancers
                                         att.PlainTextContentQuality = DataQualityEnum.Estimated;
                                     else
                                         att.PlainTextContentQuality = DataQualityEnum.Parsed;
+
+                                    att.ContentType = res.Documents[0].ContentType;
+
                                     att.UpdateStatistics(item);
 
                                     att.LastUpdate = DateTime.Now;
@@ -196,6 +199,9 @@ namespace HlidacStatu.Plugin.Enhancers
                                             att1.PlainTextContentQuality = DataQualityEnum.Estimated;
                                         else
                                             att1.PlainTextContentQuality = DataQualityEnum.Parsed;
+
+                                        att.ContentType = res.Documents[ii].ContentType;
+
                                         att1.UpdateStatistics(item);
 
                                         att1.LastUpdate = DateTime.Now;
@@ -220,7 +226,7 @@ namespace HlidacStatu.Plugin.Enhancers
                                         att.PlainTextContentQuality = DataQualityEnum.Estimated;
                                     else
                                         att.PlainTextContentQuality = DataQualityEnum.Parsed;
-
+                                    att.ContentType = res.Documents[0].ContentType;
                                     att.UpdateStatistics(item);
 
                                     att.LastUpdate = DateTime.Now;

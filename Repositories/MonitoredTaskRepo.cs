@@ -37,7 +37,7 @@ namespace HlidacStatu.Repositories
             task.Progress = SetProgress(progress);
             if ((now - task.LastTimeProgressUpdated) > task.MinIntervalBetweenUpdates)
             {
-                Console.WriteLine($"{now:mm.ss} in db");
+                //Console.WriteLine($"{now:mm.ss} in db");
                 DirectDB.NoResult("update MonitoredTasks set ItemUpdated = @now, progress=@progress where pk = @pk",
                     new System.Data.SqlClient.SqlParameter("now", task.ItemUpdated),
                     new System.Data.SqlClient.SqlParameter("progress", task.Progress),

@@ -272,6 +272,16 @@ namespace HlidacStatu.Repositories
                 bool forceBlurredPages = false
             )
         {
+            return AddToProcessingQueue(smlouva.Id, forceOCR, forceClassification, forceTablesMining, forceBlurredPages);
+
+        }
+        public static bool AddToProcessingQueue(this string smlouvaId,
+        bool forceOCR = false,
+        bool forceClassification = false,
+        bool forceTablesMining = false,
+        bool forceBlurredPages = false
+    )
+        {
 
             using HlidacStatu.Q.Simple.Queue<Smlouva.Queued> q = new Q.Simple.Queue<Smlouva.Queued>(
                 SmlouvaProcessingQueueName,
@@ -280,6 +290,7 @@ namespace HlidacStatu.Repositories
 
             var sq = new Smlouva.Queued()
             {
+                SmlouvaId = smlouvaId,                 
                 ForceBlurredPages = forceBlurredPages,
                 ForceClassification = forceClassification,
                 ForceOCR = forceOCR,

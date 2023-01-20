@@ -225,29 +225,29 @@ namespace HlidacStatu.Repositories
             try
             {
 
-            var origFile = GetDownloadedPrilohaPath(att, smlouva, filetype);
+                var origFile = GetDownloadedPrilohaPath(att, smlouva, filetype);
 
-            if (string.IsNullOrEmpty(origFile))
-                return null;
+                if (string.IsNullOrEmpty(origFile))
+                    return null;
 
-            string localFile = PrilohaLocalCopy.GetFullPath(smlouva, att);
-            var tmpPath = System.IO.Path.GetTempPath();
-            //Devmasters.IO.IOTools.DeleteFile(tmpPath);
-            if (!System.IO.Directory.Exists(tmpPath))
-            {
-                try
+                string localFile = PrilohaLocalCopy.GetFullPath(smlouva, att);
+                var tmpPath = System.IO.Path.GetTempPath();
+                //Devmasters.IO.IOTools.DeleteFile(tmpPath);
+                if (!System.IO.Directory.Exists(tmpPath))
                 {
-                    System.IO.Directory.CreateDirectory(tmpPath);
+                    try
+                    {
+                        System.IO.Directory.CreateDirectory(tmpPath);
+                    }
+                    catch
+                    {
+                    }
                 }
-                catch
-                {
-                }
-            }
 
-             tmpFnSystem = System.IO.Path.GetTempFileName();
-            tmpFn = tmpFnSystem + DocTools.PrepareFilenameForOCR(att.nazevSouboru);
-            System.IO.File.Copy(origFile, tmpFn, true);
-            return tmpFn;
+                tmpFnSystem = System.IO.Path.GetTempFileName();
+                tmpFn = tmpFnSystem + DocTools.PrepareFilenameForOCR(att.nazevSouboru);
+                System.IO.File.Copy(origFile, tmpFn, true);
+                return tmpFn;
             }
             catch (Exception e)
             {
@@ -258,7 +258,7 @@ namespace HlidacStatu.Repositories
             {
                 if (tmpFnSystem != null && System.IO.File.Exists(tmpFnSystem))
                 {
-                    _=Devmasters.IO.IOTools.DeleteFile(tmpFnSystem);
+                    _ = Devmasters.IO.IOTools.DeleteFile(tmpFnSystem);
                 }
             }
         }
@@ -288,6 +288,27 @@ namespace HlidacStatu.Repositories
                         );
                     if (fnType != null)
                         contentType = fnType.MimeType;
+                    else
+                    {
+                        if (fnType == null &&
+                            (
+                                p.nazevSouboru?.EndsWith(".txt") == true
+                                || p.nazevSouboru?.EndsWith(".csv") == true
+                                || p.nazevSouboru?.EndsWith(".tab") == true
+                            )
+                            )//probably text file
+                        {
+                            contentType = "text/plain";
+                        }
+                        if (string.IsNullOrEmpty(contentType))
+                        {
+                            var tikaRes = Lib.Data.External.TikaClient.GetText(GetDownloadedPrilohaPath(p, s, RequestedFileType.Original));
+
+                            if (tikaRes != null)
+                                contentType = tikaRes.ContentType;
+
+                        }
+                    }
                 }
                 p.ContentType = contentType;
             }
