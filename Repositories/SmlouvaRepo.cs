@@ -297,7 +297,31 @@ namespace HlidacStatu.Repositories
                 ForceTablesMining = forceTablesMining
             };
             q.Send(sq);
+            return true;
+        }
+        public static bool AddToProcessingQueue(IEnumerable<string> smlouvyIds,
+            bool forceOCR = false,
+            bool forceClassification = false,
+            bool forceTablesMining = false,
+            bool forceBlurredPages = false
+            )
+        {
 
+            using HlidacStatu.Q.Simple.Queue<Smlouva.Queued> q = new Q.Simple.Queue<Smlouva.Queued>(
+                SmlouvaProcessingQueueName,
+                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                );
+
+            q.Send(
+                smlouvyIds.Select(m=> new Smlouva.Queued()
+                {
+                    SmlouvaId = m,
+                    ForceBlurredPages = forceBlurredPages,
+                    ForceClassification = forceClassification,
+                    ForceOCR = forceOCR,
+                    ForceTablesMining = forceTablesMining
+                })                
+                );
             return true;
         }
         public static Smlouva.Queued GetSmlouvaFromProcessingQueue()

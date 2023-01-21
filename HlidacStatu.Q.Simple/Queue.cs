@@ -1,6 +1,7 @@
 ﻿using RabbitMQ.Client;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -45,6 +46,17 @@ namespace HlidacStatu.Q.Simple
         {
             var body = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(message));
             channel.BasicPublish(exchange: "", routingKey: QueueName, basicProperties: null, body: body);
+        }
+        public void Send(IEnumerable<T> messages)
+        {
+            var batch = channel.CreateBasicPublishBatch();
+
+            foreach (var m in messages)
+            {
+                var body = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(m));
+                batch.Add(exchange: "", routingKey: QueueName, false, null, body);
+            }
+            batch.Publish();
         }
 
         public T GetAndAck()
