@@ -31,7 +31,7 @@ namespace Codeproject.AI
             var form = new MultipartFormDataContent();
             form.Add(new ByteArrayContent(bytesContent), "image", "anyfile.jpg");
             form.Add(new StringContent(strength.ToString(HlidacStatu.Util.Consts.enCulture).ToLower()), "strength");
-            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<PortraitFilterResponse>("http://10.10.100.111:32168/v1/image/portraitfilter",
+            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<PortraitFilterResponse>("http://10.10.100.103:32168/v1/image/portraitfilter",
                 form);
 
             if (res?.success == true)
@@ -48,7 +48,7 @@ namespace Codeproject.AI
             var form = new MultipartFormDataContent();
             form.Add(new ByteArrayContent(bytesContent), "image", "anyfile.jpg");
             form.Add(new StringContent(use_alphamatting.ToString().ToLower()), "use_alphamatting");
-            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<Base64ImageDataResponse>("http://10.10.100.111:32168/v1/image/removebackground",
+            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<Base64ImageDataResponse>("http://10.10.100.103:32168/v1/image/removebackground",
                 form);
 
             if (res?.success == true)
@@ -64,7 +64,7 @@ namespace Codeproject.AI
         {
             var form = new MultipartFormDataContent();
             form.Add(new ByteArrayContent(bytesContent), "image", "anyfile.jpg");
-            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<Base64ImageDataResponse>("http://10.10.100.111:32168/v1/image/superresolution",
+            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<Base64ImageDataResponse>("http://10.10.100.103:32168/v1/image/superresolution",
                 form);
 
             if (res?.success == true)
@@ -81,7 +81,7 @@ namespace Codeproject.AI
             var form = new MultipartFormDataContent();
             form.Add(new ByteArrayContent(bytesContent), "imageN", "anyfile.jpg");
             form.Add(new StringContent(userid), "userid");
-            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<VisionFaceRegisterResponse>("http://10.10.100.111:32168/v1/vision/face/register",
+            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<VisionFaceRegisterResponse>("http://10.10.100.103:32168/v1/vision/face/register",
                 form);
             Console.WriteLine("S");
 
@@ -96,7 +96,7 @@ namespace Codeproject.AI
 
         public static async Task<string[]> VisionFaceList()
         {
-            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<VisionFaceListResponse>("http://10.10.100.111:32168/v1/vision/face/list");
+            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<VisionFaceListResponse>("http://10.10.100.103:32168/v1/vision/face/list");
             if (res?.success == true)
             {
                 return res.faces;
