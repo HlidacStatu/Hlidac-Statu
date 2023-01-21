@@ -12,7 +12,7 @@
 		<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Devmasters.Batch" Version="4.1.5" />
+		<PackageReference Include="Devmasters.Batch" Version="4.2.0" />
 		<PackageReference Include="Devmasters.Collections" Version="4.1.7" />
 		<PackageReference Include="Devmasters.DT" Version="4.1.1" />
 		<PackageReference Include="Devmasters.Enums" Version="4.0.3" />

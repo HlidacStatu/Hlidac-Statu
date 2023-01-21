@@ -316,6 +316,7 @@ namespace HlidacStatu.Repositories
             return sq;
         }
 
+
         public static async Task<bool> SaveAsync(Smlouva smlouva, ElasticClient client = null, bool updateLastUpdateValue = true, bool skipPrepareBeforeSave = false)
         {
             if (smlouva == null)

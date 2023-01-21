@@ -8,7 +8,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Batch" Version="4.1.5" />
+    <PackageReference Include="Devmasters.Batch" Version="4.2.0" />
     <PackageReference Include="Devmasters.Collections" Version="4.1.7" />
     <PackageReference Include="Devmasters.Core" Version="4.1.2" />
     <PackageReference Include="Devmasters.DT" Version="4.1.1" />
