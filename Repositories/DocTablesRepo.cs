@@ -84,5 +84,15 @@ namespace HlidacStatu.Repositories
 
             await SaveAsync(smlouvaId, prilohaId, data);
         }
+        public static async Task DeleteFromMinioAsync(string smlouvaId, string prilohaId)
+        {
+
+            string key = $"SmlouvyPrilohyTbls/{smlouvaId}/{prilohaId}";
+            DocTables.Result[] data = awsClient.Get(key);
+            if (data == null)
+                return;
+
+            awsClient.Remove(key);
+        }
     }
 }
