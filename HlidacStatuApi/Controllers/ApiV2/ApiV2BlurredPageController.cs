@@ -267,7 +267,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [HttpGet("AddTask")]
         public async Task<ActionResult<bool>> AddTask(string id, bool force =true)
         {
-            var sml = SmlouvaRepo.LoadAsync(id, includePrilohy: false).Result;
+            var sml = await SmlouvaRepo.LoadAsync(id, includePrilohy: false);
             if (sml != null)
             {
                 if (sml.Prilohy != null)
