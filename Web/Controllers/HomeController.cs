@@ -359,7 +359,7 @@ text zpravy: {txt}
                 }
             }
             var fn = SmlouvaRepo.GetDownloadedPrilohaPath(priloha,model, 
-                forcePDF ? SmlouvaRepo.RequestedFileType.PDF : SmlouvaRepo.RequestedFileType.Original );
+                forcePDF ? Connectors.IO.PrilohaFile.RequestedFileType.PDF : Connectors.IO.PrilohaFile.RequestedFileType.Original );
 
             if (string.IsNullOrEmpty(fn)
                 || System.IO.File.Exists(fn) == false)

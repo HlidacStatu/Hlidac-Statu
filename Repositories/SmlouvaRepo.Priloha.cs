@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
+using static HlidacStatu.Connectors.IO.PrilohaFile;
 using static HlidacStatu.Entities.Smlouva;
 
 
@@ -19,9 +20,9 @@ namespace HlidacStatu.Repositories
 
         private static Connectors.IO.PrilohaFile PrilohaLocalCopy = new Connectors.IO.PrilohaFile();
 
-        public static bool ExistLocalCopyOfPriloha(Smlouva obj, Smlouva.Priloha priloha)
+        public static bool ExistLocalCopyOfPriloha(Smlouva obj, Smlouva.Priloha priloha, RequestedFileType filetype = RequestedFileType.Original)
         {
-            bool weHaveCopy = System.IO.File.Exists(PrilohaLocalCopy.GetFullPath(obj, priloha));
+            bool weHaveCopy = System.IO.File.Exists(PrilohaLocalCopy.GetFullPath(obj, priloha, filetype));
             return weHaveCopy;
         }
 
@@ -102,11 +103,6 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public enum RequestedFileType
-        {
-            Original,
-            PDF
-        }
 
 
 
