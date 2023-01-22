@@ -44,6 +44,30 @@ namespace HlidacStatu.Q.Simple
 
         }
 
+        public long ConsumerCount()
+        {
+            try
+            {
+                return channel.ConsumerCount(this.QueueName);
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
+
+        public long MessageCount()
+        {
+            try
+            {
+                return channel.MessageCount(this.QueueName);
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
+
         public void Send(T message)
         {
             var body = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(message));
