@@ -332,7 +332,7 @@
                                         @Html.Raw(";&nbsp;")
                                         <a href="@(priloha.GetUrl(Model.Id, true, UriKind.Relative))" data-link="kopie">(naše kopie)</a>
                                     }
-                                    @if (weHaveCopyPdf)
+                                    @if (weHaveCopyPdf && this.User?.Identity?.IsAuthenticated == true)
                                     {
                                         @Html.Raw(";&nbsp;")
                                         <a href="@(priloha.GetUrl(Model.Id, true, UriKind.Relative))&forcePDF=true" data-link="kopie">(PDF)</a>
