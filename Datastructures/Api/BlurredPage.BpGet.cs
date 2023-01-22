@@ -1,9 +1,7 @@
-﻿namespace BlurredPageMinion
+﻿namespace HlidacStatu.DS.Api
 {
-    internal class Models
+    public partial class BlurredPage
     {
-
-
 
         public class BpGet
         {
@@ -17,13 +15,5 @@
 
         }
 
-        public class BpSave
-        {
-            public string smlouvaId { get; set; }
-
-            public HlidacStatu.DS.Api.BlurredPage.AnalyzedPdf[] prilohy { get; set; }
-
-
-        }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace HlidacStatu.Analysis.Page.Area
+﻿using static HlidacStatu.DS.Api.BlurredPage;
+
+namespace HlidacStatu.Analysis.Page.Area
 {
     public partial class AnalyzePdfFromCmd 
     {

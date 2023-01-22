@@ -38,6 +38,8 @@ namespace HlidacStatu.Q.Simple
             factory = new ConnectionFactory() { HostName = host, UserName = usrn, Password = pswd };
             connection = factory.CreateConnection();
             channel = connection.CreateModel();
+            var props = channel.CreateBasicProperties();
+            props.Persistent = true;
             channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
 
         }
@@ -66,21 +68,20 @@ namespace HlidacStatu.Q.Simple
         public T GetAndAck(out ulong? responseId)
         {
             responseId = null;
-            var res = Get();
+            Response<T> res = Get(true);
             if (res == null)
                 return default(T);
 
             responseId = res.ResponseId;
 
-            if (res.ResponseId.HasValue)
-                AckMessage(res.ResponseId.Value);
             return res.Value;
 
         }
-        public Response<T> Get()
+        public Response<T> Get(bool autoack = false)
         {
+            
             //var body = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(message));
-            var res = channel.BasicGet(QueueName, false);
+            var res = channel.BasicGet(QueueName, autoack);
             if (res == null)
                 return null;
 

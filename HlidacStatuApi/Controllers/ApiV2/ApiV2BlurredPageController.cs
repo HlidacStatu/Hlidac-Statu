@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using Swashbuckle.AspNetCore.Annotations;
+using static HlidacStatu.DS.Api.BlurredPage;
 
 namespace HlidacStatuApi.Controllers.ApiV2
 {
@@ -31,9 +32,6 @@ namespace HlidacStatuApi.Controllers.ApiV2
         static long savedInThread = 0;
         static long saved = 0;
 
-        public static string BlurredPageProcessingQueueName = "blurredPage2Process";
-
-
         static object lockObj = new object();
         static ApiV2BlurredPageController()
         {
@@ -48,7 +46,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             CheckRoleRecord(this.User.Identity.Name);
 
             using HlidacStatu.Q.Simple.Queue<BpGet> q = new HlidacStatu.Q.Simple.Queue<BpGet>(
-                BlurredPageProcessingQueueName,
+                HlidacStatu.DS.Api.BlurredPage.BlurredPageProcessingQueueName,
                 Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
                 );
 
@@ -365,25 +363,6 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
 
 
-        public class BpGet
-        {
-            public class BpGPriloha
-            {
-                public string uniqueId { get; set; }
-                public string url { get; set; }
-            }
-            public string smlouvaId { get; set; }
-            public BpGPriloha[] prilohy { get; set; }
-
-        }
-
-        public class BpSave
-        {
-            public string smlouvaId { get; set; }
-
-            public HlidacStatu.Analysis.Page.Area.AnalyzedPdf[] prilohy { get; set; }
-
-        }
 
     }
 }
