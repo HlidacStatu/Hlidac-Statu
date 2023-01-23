@@ -233,7 +233,6 @@ namespace HlidacStatu.Repositories
             originalVZ.CPV.UnionWith(newVZ.CPV);
             originalVZ.UrlZakazky.UnionWith(newVZ.UrlZakazky);
             originalVZ.Formulare.UnionWith(newVZ.Formulare);
-            originalVZ.Kriteria.UnionWith(newVZ.Kriteria);
         }
 
         /// <summary>

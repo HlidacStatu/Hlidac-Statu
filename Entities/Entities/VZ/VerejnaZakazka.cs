@@ -1,7 +1,5 @@
 ﻿using Devmasters.Enums;
-
 using HlidacStatu.Util;
-
 using Nest;
 
 using System;
@@ -10,7 +8,6 @@ using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
 using System.Xml.Linq;
-using Result = HlidacStatu.Lib.OCR.Api.Result;
 
 namespace HlidacStatu.Entities.VZ
 
@@ -325,9 +322,6 @@ namespace HlidacStatu.Entities.VZ
         [Description("Všechny formuláře spojené se zakázkou")]
         public HashSet<Formular> Formulare { get; set; } = new();
 
-        [Description("Hodnotící kritéria zakázky")]
-        public HashSet<HodnoticiKriteria> Kriteria { get; set; } = new();
-
         [Description("Nepouzito")]
         [Keyword()]
         public int DisplayId { get; set; }
@@ -568,61 +562,6 @@ namespace HlidacStatu.Entities.VZ
                 return Equals((Document)obj);
             }
 
-        }
-
-        [Description("Hodnotící kritéria veřejné zakázky")]
-        public class HodnoticiKriteria : IEquatable<HodnoticiKriteria>
-        {
-            [Description("Pořadí.")]
-            public int Poradi { get; set; }
-            [Keyword]
-            [Description("Popis kritéria")]
-            public string Kriterium { get; set; }
-            [Text]
-            [Description("Název kritéria")]
-            public string Nazev { get; set; }
-
-            [Number]
-            [Description("Váha v hodnocení")]
-            public decimal Vaha { get; set; } = 0;
-
-            public bool Equals(HodnoticiKriteria other)
-            {
-                if (ReferenceEquals(null, other)) return false;
-                if (ReferenceEquals(this, other)) return true;
-                return Poradi == other.Poradi &&
-                       string.Equals(Kriterium, other.Kriterium, StringComparison.InvariantCultureIgnoreCase) &&
-                       string.Equals(Nazev, other.Nazev, StringComparison.InvariantCultureIgnoreCase) &&
-                       Vaha == other.Vaha;
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
-                return Equals((HodnoticiKriteria)obj);
-            }
-
-            public override int GetHashCode()
-            {
-                var hashCode = new HashCode();
-                hashCode.Add(Poradi);
-                hashCode.Add(Kriterium, StringComparer.InvariantCultureIgnoreCase);
-                hashCode.Add(Nazev, StringComparer.InvariantCultureIgnoreCase);
-                hashCode.Add(Vaha);
-                return hashCode.ToHashCode();
-            }
-
-            public static bool operator ==(HodnoticiKriteria left, HodnoticiKriteria right)
-            {
-                return Equals(left, right);
-            }
-
-            public static bool operator !=(HodnoticiKriteria left, HodnoticiKriteria right)
-            {
-                return !Equals(left, right);
-            }
         }
 
         public class Subject : IEquatable<Subject>
