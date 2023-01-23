@@ -19,6 +19,7 @@ namespace HlidacStatu.Entities.VZ
         public class Sources
         {
             public const string VestnikVerejnychZakazek = "https://vestnikverejnychzakazek.cz/";
+            public const string VestnikVerejnychZakazekOld ="https://old.vestnikverejnychzakazek.cz/";
             public const string Datlab = "https://datlab.eu/";
             public const string Rozza = "https://rozza.cz/";
         }
