@@ -35,7 +35,7 @@ namespace HlidacStatu.Repositories
                 {
                     Ip = ipAddress
                 };
-                await dbContext.BannedIps.AddAsync(bannedIp);
+                dbContext.BannedIps.Add(bannedIp);
             }
 
             bannedIp.Expiration = expiration;
