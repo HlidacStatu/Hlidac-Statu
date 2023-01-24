@@ -49,4 +49,17 @@ public static class ConfigurationValueRepo
         await dbContext.SaveChangesAsync();
 
     }
+
+    public static async Task<(int productionKeyCount, int stageKeyCount)> GetStatistics()
+    {
+        await using var dbContext = new DbEntities();
+        var productionKeyCount =
+            await dbContext.ConfigurationValues.CountAsync(cv =>
+                cv.Environment == ConfigurationValue.Environments.Production);
+        var stageKeyCount =
+            await dbContext.ConfigurationValues.CountAsync(cv =>
+                cv.Environment == ConfigurationValue.Environments.Stage);
+
+        return (productionKeyCount, stageKeyCount);
+    }
 }
