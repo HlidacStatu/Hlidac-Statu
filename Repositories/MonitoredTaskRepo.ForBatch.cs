@@ -6,9 +6,9 @@ namespace HlidacStatu.Repositories
 {
     public static partial class MonitoredTaskRepo
     {
-        public class ForBatch : MonitoredTask, Devmasters.Batch.IMonitor
+        public class ForBatch : MonitoredTask, Devmasters.Batch.IMonitor, IDisposable
         {
-
+            private bool disposedValue;
 
             public ForBatch(
                 string application = null,
@@ -47,6 +47,40 @@ namespace HlidacStatu.Repositories
             {
                 bool success = exceptions == null || exceptions.Length == 0;
                 _ = MonitoredTaskRepo.Finish(this, success , success ? null : new AggregateException(exceptions));
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!disposedValue)
+                {
+                    if (disposing)
+                    {
+                        // TODO: dispose managed state (managed objects)
+                        this.Finished = this.Finished ?? DateTime.Now;
+                        this.Success = this.Progress < 100 ?  false : true;
+                        if (this.Success == false)
+                            this.Exception = new ApplicationException("Canceled before end").ToString();
+                        _= MonitoredTaskRepo.Update(this);
+                    }
+
+                    // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                    // TODO: set large fields to null
+                    disposedValue = true;
+                }
+            }
+
+            // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+            // ~ForBatch()
+            // {
+            //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            //     Dispose(disposing: false);
+            // }
+
+            public void Dispose()
+            {
+                // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+                Dispose(disposing: true);
+                GC.SuppressFinalize(this);
             }
         }
 
