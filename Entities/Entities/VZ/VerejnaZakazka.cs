@@ -242,8 +242,8 @@ namespace HlidacStatu.Entities.VZ
             public string IdVDomene { get; set; }
             [Boolean]
             public bool IsPre2016 { get; set; } = false;
-            [Date()]
-            public DateTime PosledniZmenaZdroje { get; set; }
+            // [Date()]
+            // public DateTime PosledniZmenaZdroje { get; set; }
             [Date()]
             public DateTime Modified { get; set; }
 
