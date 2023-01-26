@@ -251,6 +251,8 @@ namespace HlidacStatu.Repositories
                 return oldProp;
             if (newProp is decimal and 0m && oldProp is decimal and not 0m) //default decimals shouldnt overwrite value
                 return oldProp;
+            if (newProp is DateTime np && np < new DateTime(1900, 1, 1)) //fix for some cases where we do not get correct date
+                return oldProp;
   
             changelog?.Add($"{DateTime.Now:yyyy-MM-dd} {propName}:[{oldProp}]=>[{newProp}]");
             
