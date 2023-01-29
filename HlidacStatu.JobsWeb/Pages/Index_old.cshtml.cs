@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HlidacStatu.JobsWeb.Pages
 {
-    public class Index1Model : PageModel
+    public class Index_oldModel : PageModel
     {
         
         public YearlyStatisticsGroup.Key? Key { get; set; }
