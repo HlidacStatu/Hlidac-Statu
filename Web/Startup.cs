@@ -648,26 +648,26 @@ namespace HlidacStatu.Web
                     "Camelot APIs", HealthStatus.Unhealthy, tags: new[] { "Docker" })
 
                 .AddHealthCheckWithOptions<Web.HealthChecks.ProxmoxVMs, Web.HealthChecks.ProxmoxVMs.Options>(
-                    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.100.100").ConfigData,
-                    "Proxmox 100.100", HealthStatus.Unhealthy, tags: new[] { "VMs" })
+                    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.100.99").ConfigData,
+                    "Proxmox 100.99", HealthStatus.Unhealthy, tags: new[] { "VMs" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.ProxmoxVMs, Web.HealthChecks.ProxmoxVMs.Options>(
-                    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.100.101").ConfigData,
-                    "Proxmox 100.101", HealthStatus.Unhealthy, tags: new[] { "VMs" })
+                    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.100.97").ConfigData,
+                    "Proxmox 100.97", HealthStatus.Unhealthy, tags: new[] { "VMs" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.ProxmoxVMs, Web.HealthChecks.ProxmoxVMs.Options>(
-                    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.100.102").ConfigData,
-                    "Proxmox 100.102", HealthStatus.Unhealthy, tags: new[] { "VMs" })
+                    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.100.95").ConfigData,
+                    "Proxmox 100.95", HealthStatus.Unhealthy, tags: new[] { "VMs" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.ProxmoxVMs, Web.HealthChecks.ProxmoxVMs.Options>(
                     new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.pve-hs-01-r540").ConfigData,
                     "Proxmox pve-hs-01-r540 (02.161)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
                 .AddHealthCheckWithOptions<Web.HealthChecks.ProxmoxVMs, Web.HealthChecks.ProxmoxVMs.Options>(
                     new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.pve-hs-02-r720xd").ConfigData,
                     "Proxmox pve-hs-02-r720xd (02.167)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
-                .AddHealthCheckWithOptions<Web.HealthChecks.ProxmoxVMs, Web.HealthChecks.ProxmoxVMs.Options>(
-                    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.pve-nic-168").ConfigData,
-                    "Proxmox pve-nic-168 (02.168)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
                 //.AddHealthCheckWithOptions<Web.HealthChecks.ProxmoxVMs, Web.HealthChecks.ProxmoxVMs.Options>(
-                //    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.hs-h-01").ConfigData,
-                //    "Proxmox hs-h-01 (02.160)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
+                //    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.pve-nic-168").ConfigData,
+                //    "Proxmox pve-nic-168 (02.168)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
+                //.AddHealthCheckWithOptions<Web.HealthChecks.ProxmoxVMs, Web.HealthChecks.ProxmoxVMs.Options>(
+                    //new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.hs-h-01").ConfigData,
+                    //"Proxmox hs-h-01 (02.160)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
                 ;
         }
 
