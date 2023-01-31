@@ -1,87 +1,79 @@
 ﻿@page
-@model KontaktModel
 @{
     ViewData["Title"] = "Otázky a odpovědi";
 }
 
+<div class="col-lg-10 position-relative zindex-5">
 
-<section class="overflow-hidden">
-    <div class="container pt-2 pt-sm-4 pb-sm-2 pb-md-4 py-xl-5 mt-5">
-        <div class="row pt-5 pb-2 pb-sm-3">
-            <div class="col-lg-10 position-relative zindex-5">
-                <h1>@ViewData["Title"]</h1>
+    <h1>@ViewData["Title"]</h1>
 
-                <!-- Alternative accordion -->
-                <div class="accordion accordion-alt" id="accordionAlternative">
+    <!-- Alternative accordion -->
+    <div class="accordion accordion-alt" id="accordionAlternative">
 
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading01">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse01" aria-expanded="true" aria-controls="collapse01">
-                                Kdo může data využívat?
-                            </button>
-                        </h2>
-                        <div id="collapse01" class="accordion-collapse collapse show" aria-labelledby="heading01" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <p>
-                                    Přístup k datům a licenci k používání má pouze fyzická nebo právnická osoba, která si licenci zakoupila.
-                                    Jakákoliv data z analýzy <strong><u>nesmí</u></strong> bezplatně či za úplatu poskytnout jiné fyzické či právnické osobě.
-                                    Současně musí zajistit, že nedojde ke zveřejnění dat z analýzy.
-                                    V případě zveřejnění dat z analyzy je povinností držitele licence dokoupení <strong>Veřejné licence</strong> s možností data zveřejnit.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading02">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse02" aria-expanded="false" aria-controls="collapse02">
-                                Jaké informace z analýzy může zveřejnit držitel&nbsp;<strong> Veřejné licence</strong>
-                            </button>
-                        </h2>
-                        <div id="collapse02" class="accordion-collapse collapse" aria-labelledby="heading02" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <p>
-                                    Držitel <strong>Veřejné licence</strong> může zveřejnit jednotlivé údaje z licence,
-                                    pokud je to nutné pro soudní či správní spor, řádný výkon úřadu či správního úkonu.
-                                    Smí zveřejnit údaje pouze týkající se držitele licence a jeho dodavatelů či odběratelů.
-                                    Pro marketingové a PR účely je možné využít údaje o max. 3 jiných subjektech.
-                                    V žádném případě <strong><u>není oprávněn zveřejnit</u></strong> celou analýzu.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading03">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse03" aria-expanded="false" aria-controls="collapse03">
-                                Mohou analýzu používat dceřiné či podřízené organizace držitele licence?
-                            </button>
-                        </h2>
-                        <div id="collapse03" class="accordion-collapse collapse" aria-labelledby="heading03" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <p>
-                                    Nemohou, licence je vázaná pouze na konkrétní právnickou či fyzickou osobu.
-                                    Poskytujeme však <strong><u>množstevní slevy až ve výši 50 %</u></strong>, vhodné pro skupinu firem, holdingy nebo podřízené organizace apod.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading04">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse04" aria-expanded="false" aria-controls="collapse04">
-                                Je možné licenci přeprodat na jiné fyzické či právnické osobě?
-                            </button>
-                        </h2>
-                        <div id="collapse04" class="accordion-collapse collapse" aria-labelledby="heading04" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <p>
-                                    Ne. V situacích jako prodej podniku či právním nástupnictví je možné převést na novou společnost licence v minimální hodnotě 200 000 Kč bez DPH a to se souhlasem Hlídač státu z.ú.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading01">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse01" aria-expanded="true" aria-controls="collapse01">
+                    Kdo může data využívat?
+                </button>
+            </h2>
+            <div id="collapse01" class="accordion-collapse collapse show" aria-labelledby="heading01" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <p>
+                        Přístup k datům a licenci k používání má pouze fyzická nebo právnická osoba, která si licenci zakoupila.
+                        Jakákoliv data z analýzy <strong><u>nesmí</u></strong> bezplatně či za úplatu poskytnout jiné fyzické či právnické osobě.
+                        Současně musí zajistit, že nedojde ke zveřejnění dat z analýzy.
+                        V případě zveřejnění dat z analyzy je povinností držitele licence dokoupení <strong>Veřejné licence</strong> s možností data zveřejnit.
+                    </p>
                 </div>
-
             </div>
         </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading02">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse02" aria-expanded="false" aria-controls="collapse02">
+                    Jaké informace z analýzy může zveřejnit držitel&nbsp;<strong> Veřejné licence</strong>
+                </button>
+            </h2>
+            <div id="collapse02" class="accordion-collapse collapse" aria-labelledby="heading02" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <p>
+                        Držitel <strong>Veřejné licence</strong> může zveřejnit jednotlivé údaje z licence,
+                        pokud je to nutné pro soudní či správní spor, řádný výkon úřadu či správního úkonu.
+                        Smí zveřejnit údaje pouze týkající se držitele licence a jeho dodavatelů či odběratelů.
+                        Pro marketingové a PR účely je možné využít údaje o max. 3 jiných subjektech.
+                        V žádném případě <strong><u>není oprávněn zveřejnit</u></strong> celou analýzu.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading03">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse03" aria-expanded="false" aria-controls="collapse03">
+                    Mohou analýzu používat dceřiné či podřízené organizace držitele licence?
+                </button>
+            </h2>
+            <div id="collapse03" class="accordion-collapse collapse" aria-labelledby="heading03" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <p>
+                        Nemohou, licence je vázaná pouze na konkrétní právnickou či fyzickou osobu.
+                        Poskytujeme však <strong><u>množstevní slevy až ve výši 50 %</u></strong>, vhodné pro skupinu firem, holdingy nebo podřízené organizace apod.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading04">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse04" aria-expanded="false" aria-controls="collapse04">
+                    Je možné licenci přeprodat na jiné fyzické či právnické osobě?
+                </button>
+            </h2>
+            <div id="collapse04" class="accordion-collapse collapse" aria-labelledby="heading04" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <p>
+                        Ne. V situacích jako prodej podniku či právním nástupnictví je možné převést na novou společnost licence v minimální hodnotě 200 000 Kč bez DPH a to se souhlasem Hlídač státu z.ú.
+                    </p>
+                </div>
+            </div>
+        </div>
+
     </div>
-</section>
+</div>

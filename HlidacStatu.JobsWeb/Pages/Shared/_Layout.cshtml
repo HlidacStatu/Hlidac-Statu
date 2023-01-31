@@ -162,13 +162,28 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" id="google-font">
     <!-- Vendor styles-->
-    <link rel="stylesheet" media="screen" href="assets/vendor/swiper/swiper-bundle.min.css" />
-    <link rel="stylesheet" media="screen" href="assets/vendor/aos/dist/aos.css" />
+    <link rel="stylesheet" media="screen" href="/assets/vendor/swiper/swiper-bundle.min.css" />
+    <link rel="stylesheet" media="screen" href="/assets/vendor/aos/dist/aos.css" />
     <!-- Main Theme Styles + Bootstrap-->
-    <link rel="stylesheet" media="screen" href="assets/css/theme.min.css">
+    <link rel="stylesheet" media="screen" href="/assets/css/theme.min.css">
+
+    <script src="~/js/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
 
     <script src="https://kit.fontawesome.com/a0fc082c81.js" crossorigin="anonymous"></script>
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+
+    <link rel="stylesheet" href="~/js/bootstrap-toc.min.css" />
+    <script src="~/js/bootstrap-toc.1.0.2.min.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-CS12JWPEFS"></script>
@@ -193,46 +208,87 @@
     <!-- Page wrapper-->
     <main class="page-wrapper">
         <!-- Navbar. Remove 'fixed-top' class to make the navigation bar scrollable with the page-->
-        <header class="navbar navbar-expand-lg fixed-top">
-            <div class="container">
-                <a class="navbar-brand pe-sm-3" href="index">
-                    <svg version="1.1" width="290" height="62" viewBox="0 0 291 63" xmlns="http://www.w3.org/2000/svg">
-                        <use href="assets/img/logo.svg#logo"></use>
-                    </svg>
+        <div class="fixed-top">
+            <header class="navbar navbar-expand-lg fixed-top">
+                <div class="container">
+                    <a class="navbar-brand pe-sm-3" href="index">
+                        <svg version="1.1" width="290" height="62" viewBox="0 0 291 63" xmlns="http://www.w3.org/2000/svg">
+                            <use href="/assets/img/logo.svg#logo"></use>
+                        </svg>
 
-                    @*                    <span class="text-nav">Watchdog <i class="fa-solid fa-lightbulb-on" style="color:rgb(68,140,116)"></i> Analytics</span>
-                    *@
-                </a>
-                @*                <div class="form-check form-switch mode-switch order-lg-2 me-3 me-lg-4 ms-auto" data-bs-toggle="mode">
-                <input class="form-check-input" type="checkbox" id="theme-mode">
-                <label class="form-check-label" for="theme-mode"><i class="ai-sun fs-lg"></i></label>
-                <label class="form-check-label" for="theme-mode"><i class="ai-moon fs-lg"></i></label>
-                </div>*@
-                <div class="order-lg-3 d-none d-sm-inline-flex">
-                    <partial name="_LoginPartial" />
-                </div>
-                @*                <a class="btn btn-success btn-sm fs-sm order-lg-3 d-none d-sm-inline-flex me-2" href="https://themes.getbootstrap.com/product/around-multipurpose-template-ui-kit/" target="_blank" rel="noopener"><i class="ai-cart fs-xl me-2 ms-n1"></i>Login</a>
-                <a class="btn btn-primary btn-sm fs-sm order-lg-3 d-none d-sm-inline-flex" href="https://themes.getbootstrap.com/product/around-multipurpose-template-ui-kit/" target="_blank" rel="noopener"><i class="ai-cart fs-xl me-2 ms-n1"></i>Buy now</a>
-                *@
-                <button class="navbar-toggler ms-sm-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
-                <nav class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav navbar-nav-scroll me-auto" style="--ar-scroll-height: 520px;">
-                        <li class="nav-item"><a class="nav-link" href="#detail">Detailní informace</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#obory">Obory</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#priceList">Ceník</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/otazkyodpovedi">Otázky a odpovědi</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/kontakt">Kontakt</a></li>
-                    </ul>
-                    <div class="d-sm-none p-3 mt-n3">
-                        <a class="btn btn-primary w-100  mb-1" href="https://themes.getbootstrap.com/product/around-multipurpose-template-ui-kit/" target="_blank" rel="noopener">
-                            <i class="ai-cart fs-xl me-2 ms-n1"></i>Buy now
-                        </a>
+                        @*                    <span class="text-nav">Watchdog <i class="fa-solid fa-lightbulb-on" style="color:rgb(68,140,116)"></i> Analytics</span>
+                        *@
+                    </a>
+                    @*                <div class="form-check form-switch mode-switch order-lg-2 me-3 me-lg-4 ms-auto" data-bs-toggle="mode">
+                    <input class="form-check-input" type="checkbox" id="theme-mode">
+                    <label class="form-check-label" for="theme-mode"><i class="ai-sun fs-lg"></i></label>
+                    <label class="form-check-label" for="theme-mode"><i class="ai-moon fs-lg"></i></label>
+                    </div>*@
+                    <div class="order-lg-3 d-none d-sm-inline-flex">
+                        <partial name="_LoginPartial" />
                     </div>
-                </nav>
-            </div>
-        </header>
+                    @*                <a class="btn btn-success btn-sm fs-sm order-lg-3 d-none d-sm-inline-flex me-2" href="https://themes.getbootstrap.com/product/around-multipurpose-template-ui-kit/" target="_blank" rel="noopener"><i class="ai-cart fs-xl me-2 ms-n1"></i>Login</a>
+                    <a class="btn btn-primary btn-sm fs-sm order-lg-3 d-none d-sm-inline-flex" href="https://themes.getbootstrap.com/product/around-multipurpose-template-ui-kit/" target="_blank" rel="noopener"><i class="ai-cart fs-xl me-2 ms-n1"></i>Buy now</a>
+                    *@
+                    <button class="navbar-toggler ms-sm-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+                    <nav class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav navbar-nav-scroll me-auto" style="--ar-scroll-height: 520px;">
+                            <li class="nav-item"><a class="nav-link" href="/analyzy"><b>Analýzy</b></a></li>
+                            <li class="nav-item"><a class="nav-link" href="/index#detail">Popis</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/index#priceList">Ceník</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/otazkyodpovedi">Otázky a odpovědi</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/kontakt">Kontakt</a></li>
+                        </ul>
+                        <div class="d-sm-none p-3 mt-n3">
+                            <a class="btn btn-primary w-100  mb-1" href="https://themes.getbootstrap.com/product/around-multipurpose-template-ui-kit/" target="_blank" rel="noopener">
+                                <i class="ai-cart fs-xl me-2 ms-n1"></i>Buy now
+                            </a>
+                        </div>
+                    </nav>
+                </div>
+            </header>
+        </div>
         <!-- Page content-->
-        @RenderBody()
+
+        <section>
+            <div class="container pt-2 pt-sm-4 pb-sm-2 pb-md-4 py-xl-5 mt-5">
+                <div class="row pt-5 pb-2 pb-sm-3">
+                    @{
+                        Context.Items.TryGetValue("obor", out var obor);
+                        Context.Items.TryGetValue("rok", out var rok);
+
+                        bool choosenAnal = false;
+                        if (string.IsNullOrEmpty(obor?.ToString()) == false && string.IsNullOrEmpty(rok?.ToString()) == false)
+                        {
+                            choosenAnal = true;
+                        }
+                    }
+
+                    @if (choosenAnal)
+                    {
+                        <div class="btn-toolbar mb-4" role="toolbar">
+                            <div class="btn-group me-2" role="group" aria-label="First group">
+
+                                <a class="btn btn-outline-primary" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">Souhrn</a>
+                                <a class="btn btn-outline-primary" asp-page="/BenchmarkUradu" asp-route-obor="@obor" asp-route-rok="@rok">Analýza zadavatele</a>
+                                <a class="btn btn-outline-primary" asp-page="/BenchmarkDodavatelu" asp-route-obor="@obor" asp-route-rok="@rok">Porovnání dodavatelů</a>
+                                <a class="btn btn-outline-primary" asp-page="/Pdf" asp-route-obor="@obor" asp-route-rok="@rok">Celá zpráva</a>
+                            </div>
+                            @if (this.User.IsInRole("Admin") )
+                            {
+                                <div class="btn-group me-2" role="group" aria-label="First group">
+                                    <a class="btn btn-outline-secondary" asp-page="/JedenJob" asp-route-obor="@obor" asp-route-rok="@rok">▸ Experiment</a>
+                                    <a class="btn btn-outline-secondary" asp-page="/Stats" asp-route-obor="@obor" asp-route-rok="@rok">▸ Zebricek</a>
+                                </div>
+                            }
+                        </div>
+                    }
+
+
+                    @RenderBody()
+                </div>
+            </div>
+        </section>
 
     </main>
     <!-- Footer-->
@@ -242,7 +298,7 @@
                 <div class="col-lg-3">
                     <a class="navbar-brand d-inline-flex align-items-center mb-lg-4 mb-3" href="index.html">
                         <svg version="1.1" width="290" height="62" viewBox="0 0 291 63" xmlns="http://www.w3.org/2000/svg">
-                            <use href="assets/img/logo.svg#logo"></use>
+                            <use href="/assets/img/logo.svg#logo"></use>
                         </svg>
 
                         @*                        <span class="text-nav">Watchdog <i class="fa-solid fa-lightbulb-on" style="color:rgb(68,140,116)"></i> Analytics</span>*@
@@ -255,36 +311,28 @@
                         <a class="btn btn-secondary btn-icon btn-sm btn-linkedin rounded-circle mt-3 ms-3" href="https://www.linkedin.com/company/80328355/"><i class="ai-linkedin"></i></a>
                     </div>
                 </div>
-                <div class="col-xl-8 offset-xl-1 col-lg-9">
+                <div class="col-lg-9">
                     <div class="row row-cols-sm-4 row-cols-1">
                         <div class="col">
                             <ul class="nav flex-column mb-0">
-                                <li class="nav-item mb-2"><a class="nav-link p-0" href="#">Services</a></li>
-                                <li class="nav-item mb-2"><a class="nav-link p-0" href="#">Industries</a></li>
-                                <li class="nav-item mb-2"><a class="nav-link p-0" href="#">Clients</a></li>
-                                <li class="nav-item mb-2"><a class="nav-link p-0" href="#">Reviews</a></li>
-                                <li class="nav-item mb-2"><a class="nav-link p-0" href="#">Case studies</a></li>
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/analyzy"><b>Ceny ICT prací pro rok 2020</b></a></li>
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/analyzy"><b>Ceny ICT prací pro rok 2021</b></a></li>
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/analyzy"><b>Ceny ICT prací pro rok 2022</b></a></li>
                             </ul>
                         </div>
                         <div class="col">
                             <ul class="nav flex-column mb-0">
-                                <li class="nav-item mb-2"><a class="nav-link p-0" href="#">Contacts</a></li>
-                                <li class="nav-item mb-2"><a class="nav-link p-0" href="#">Help center</a></li>
-                                <li class="nav-item mb-2"><a class="nav-link p-0" href="#">Privacy policy</a></li>
-                            </ul>
-                        </div>
-                        <div class="col">
-                            <ul class="nav flex-column mb-0">
-                                <li class="nav-item mb-2"><a class="nav-link p-0" href="#">About</a></li>
-                                <li class="nav-item mb-2"><a class="nav-link p-0" href="#">Careers</a></li>
-                                <li class="nav-item mb-2"><a class="nav-link p-0" href="#">News &amp; insights</a></li>
-                                <li class="nav-item mb-2"><a class="nav-link p-0" href="#">Industry forecasts</a></li>
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/index#detail">Popis</a></li>
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/index#obory">Obory</a></li>
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/index#pricelist">Ceník</a></li>
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/kontakt">Kontakt</a></li>
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/otazkyodpovedi">Otázky a odpovědi</a></li>
                             </ul>
                         </div>
                         <div class="col">
                             <ul class="nav flex-column mb-0">
                                 <li class="nav-item mb-2"><a class="nav-link p-0" href="tel:+420777737810">+420 777 737 810</a></li>
-                                <li class="nav-item mb-2"><a class="text-primary fw-semibold p-0" href="mailto:obchod@watchdogAnalytics.com">obchod@watchdogAnalytics.com</a></li>
+                                <li class="nav-item mb-2"><a class="text-primary fw-semibold p-0" href="mailto:obchod@watchdogAnalytics.com">obchod@@ watchdogAnalytics.com</a></li>
                             </ul>
                         </div>
                     </div>
@@ -300,13 +348,13 @@
         </svg><i class="ai-arrow-up"></i>
     </a>
     <!-- Vendor scripts: js libraries and plugins-->
-    <script src="assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
-    <script src="assets/vendor/simplebar/dist/simplebar.min.js"></script>
-    <script src="assets/vendor/parallax-js/dist/parallax.min.js"></script>
-    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="assets/vendor/aos/dist/aos.js"></script>
+    <script src="/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
+    <script src="/assets/vendor/simplebar/dist/simplebar.min.js"></script>
+    <script src="/assets/vendor/parallax-js/dist/parallax.min.js"></script>
+    <script src="/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="/assets/vendor/aos/dist/aos.js"></script>
     <!-- Main theme script-->
-    <script src="assets/js/theme.min.js"></script>
+    <script src="/assets/js/theme.min.js"></script>
 </body>
 </html>

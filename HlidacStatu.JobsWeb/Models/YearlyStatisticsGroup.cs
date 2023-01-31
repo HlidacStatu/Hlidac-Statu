@@ -13,9 +13,13 @@ namespace HlidacStatu.JobsWeb.Models
             public string Obor { get; set; }
             public int Rok { get; set; }
 
-            public bool IsDemo { get => this.Obor?.ToLower() == "demo"; }
+            public bool IsDemo { get =>
+                    (this.Obor?.ToLower() == "demo")
+                    || (this.Obor?.ToLower() == "it" && this.Rok == 2020)
 
-            public string ProObdobi { get => IsDemo ? "leden až březen 2018" : $"leden až prosinec {Rok}"; }
+                    ; }
+
+            public string ProObdobi { get =>  $"leden až prosinec {Rok}"; }
 
             private string _platnostK;
             public string PlatnostK

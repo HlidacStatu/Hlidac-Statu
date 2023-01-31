@@ -10,7 +10,7 @@
 
 }
 
-<section class="container py-5 mt-5 mb-lg-3 mb-xl-4 mb-xxl-5" id="priceList">
+<section class="container mb-lg-3 mb-xl-4 mb-xxl-5" id="priceList">
     <!-- Page title-->
     <div class="text-center pb-3 pt-lg-2 pt-xl-4 my-1 my-sm-3 my-lg-4">
         <h1 class="display-2">Ceník</h1>
@@ -24,14 +24,14 @@
                 <div class="card-body w-100 mx-auto text-center" style="max-width: 23rem;">
                     <h3>Základní</h3>
                     <div class="display-2 text-primary">49&nbsp;900</div>
-                    <div class="mb-4">41&nbsp;240 bez DPH</div>
+                    <div class="mb-4">41&nbsp;240 Kč bez DPH</div>
                     <p class="mb-4 pb-4">
                         PDF souhrnná analýza,
                         webová analytická aplikace,
                         uživatelská a analytická podpora
                         <br />&nbsp;
                     </p>
-                    <button class="btn btn-primary w-100" type="button">Objednat</button>
+                    <a href="/objednat" class="btn btn-primary w-100" type="button">Objednat</a>
                 </div>
             </div>
         </div>
@@ -47,7 +47,7 @@
                         navíc srovnávací analýzy dodavatelů a zadavatelů,
                         provázání na jednotlivé smlouvy, zdrojová data
                     </p>
-                    <button class="btn btn-light w-100" type="button">Objednat Pro</button>
+                    <a href="/objednat" class="btn btn-light w-100" type="button">Objednat Pro</a>
                 </div>
             </div>
         </div>
@@ -63,7 +63,7 @@
                         samostatná licence, kompletní přístup ke zdrojovým datům
                         <br />&nbsp;
                     </p>
-                    <button class="btn btn-primary w-100" type="button">Kontaktovat nás</button>
+                    <a href="/kontakt" class="btn btn-primary w-100" type="button">Kontaktovat nás</a>
                 </div>
             </div>
         </div>
@@ -279,6 +279,22 @@
                         </td>
                     </tr>
                     <tr>
+                        <th class="border-0 text-start py-3 ps-4">
+                            <span class="d-flex align-items-center text-body fw-medium">
+                                Multilicence se slevou
+                                <i class="ai-circle-info fs-lg ms-2" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="right" data-bs-html="true" data-bs-content="Množstevní slevy pro subjekty ze stejného holdingu, organizační složky či majetkově propojené. Sleva až 50 %. Kontaktujte nás."></i>
+                            </span>
+                        </th>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-x fa-lg fw-bold text-danger"></i></span>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>                            
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                    </tr>                    <tr>
                         <th class="border-0 text-start pt-4 pb-3 ps-4">
                             <div class="h5 pt-1 mb-0">Integrace a data</div>
                         </th>
@@ -348,7 +364,20 @@
                         </td>
                     </tr>
 
-
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                        </th>
+                        <td class="border-0 py-3">
+                            <a href="/objednat" class="btn btn-primary " type="button">Objednat</a>
+                        </td>
+                        <td class="border-0 py-3">
+                            <a href="/objednat" class="btn btn-primary " type="button">Objednat</a>
+                        </td>
+                        <td class="border-0 py-3">
+                            <a href="/kontakt" class="btn btn-primary " type="button">Kontaktovat</a>
+                        </td>
+                    </tr>
+                    
                 </tbody>
             </table>
 

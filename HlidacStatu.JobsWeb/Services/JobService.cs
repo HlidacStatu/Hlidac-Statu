@@ -297,7 +297,7 @@ namespace HlidacStatu.JobsWeb.Services
         public static async Task<CenyCustomer.AccessDetail> HasAccess(this HttpContext context)
         {
             var key = TryFindKey(context);
-            if (key?.Obor == "DEMO" && key?.Rok == 2018)
+            if (key?.IsDemo == true)
             {
                 return new CenyCustomer.AccessDetail(CenyCustomer.AccessDetail.AccessDetailLevel.PRO);
             }
