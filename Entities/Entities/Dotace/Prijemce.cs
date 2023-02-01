@@ -21,5 +21,8 @@
         public string PSC { get; set; }
         [Nest.Text]
         public string Ulice { get; set; }
+
+        [Nest.Ignore]
+        public string DisplayName => string.IsNullOrWhiteSpace(ObchodniJmeno) ? Jmeno : ObchodniJmeno;
     }
 }
