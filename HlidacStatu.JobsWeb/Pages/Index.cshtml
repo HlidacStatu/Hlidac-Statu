@@ -10,7 +10,7 @@
 
 
 @{
-    ViewData["Title"] = "Cenové analýzy Hlídače státu";
+    ViewData["Title"] = "Cenové analýzy z Hlídače státu";
     ViewBag.HideYearSelector = true;
     ViewBag.BigBanner = true;
 }
@@ -30,11 +30,21 @@
                 </div>
             </div>
             <div class="col-lg-5 order-lg-1">
-                <h1 class="display-3 text-center text-lg-start pb-sm-2 pb-md-3">
-                    Přehled o cenách Vaší konkurence
+                @if (this.Request.Query["p"] == "1")
+                {
+                    <h1 class="display-3 text-center text-lg-start pb-sm-2 pb-md-3">
+                        Přehled o cenách vaší konkurence
+                    </h1>
+                }
+                else
+                {
+                    <h1 class="display-5 text-center text-lg-start pb-sm-2 pb-md-3">
+                        Pomůžeme vám s cenotvorbou ICT služeb ve výběrových řízení státu
+                    </h1>
+                }
                 </h1>
                 <p class="fs-lg text-center text-lg-start pb-xl-2 mx-auto mx-lg-0 mb-5" style="max-width: 420px;">
-                    Nejrozsáhlejší analýza <b>cen ICT služeb</b> na českém trhu za poslední roky.
+                    Nejrozsáhlejší analýza <b>cen ICT služeb</b> na českém trhu.
                     Přesná a aktuální, pouze <b>ze skutečně uzavřených smluv</b>.
                 </p>
                 <div class="input-group mx-auto mx-lg-0" style="max-width: 420px;">
@@ -56,7 +66,7 @@
             <div class="col d-md-flex justify-content-center text-center text-md-start position-relative">
                 <div class="position-absolute top-50 end-0 translate-middle-y border-end" style="height: 60px;"></div>
                 <div class="p-3 px-sm-0 py-sm-4">
-                    <div class="h2 display-5 text-primary mb-0">10000+</div><span>zanalyzovaných cen za ICT služby</span>
+                    <div class="h2 display-5 text-primary mb-0">10 000+</div><span>zanalyzovaných cen za ICT služby</span>
                 </div>
             </div>
             <div class="col d-md-flex justify-content-center text-center text-md-start position-relative">
@@ -73,7 +83,7 @@
             </div>
             <div class="col d-md-flex justify-content-center text-center text-md-start position-relative">
                 <div class="p-3 px-sm-0 py-sm-4">
-                    <div class="h2 display-5 text-primary mb-0">6+</div><span>let zkušeností v oboru</span>
+                    <div class="h2 display-5 text-primary mb-0">@(DateTime.Now.Year-2016) let</div><span>zkušeností v oboru</span>
                 </div>
             </div>
         </div>
@@ -85,7 +95,7 @@
     <p class="text-center pb-4 mb-2 mb-lg-3">
         Navazujeme na <a href="https://www.mvcr.cz/clanek/prehled-obvyklych-cen-ict-praci.aspx" target="_blank">Přehled obvyklých cen ICT prací</a>
         od Ministerstva vnitra a nabízíme aktuální <b>analýzy IT za rok 2020 a 2021</b>.
-        Pomocí AI, machine learning technologií a pokročilého zpracování obsahu smluv a důkladné osobní kontroly každého údaje, jsme zanalyzovali smluvní podmínky a nasmlouvané ceny v různých oblastech.
+        Vznikla využitím AI a machine learning technologií, pokročilému zpracování obsahu a důsledné ruční kontroly každého údaje.
     </p>
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
         <!-- Item-->
@@ -103,7 +113,7 @@
                     </p>
                 </div>
                 <div class="card-footer border-0 py-3 my-3 mb-sm-4">
-                <div class="btn btn-lg btn-icon btn-outline-primary rounded-circle pe-none"><i class="ai-arrow-right"></i></div>
+                    <div class="btn btn-lg btn-icon btn-outline-primary rounded-circle pe-none"><i class="ai-arrow-right"></i></div>
                 </div>
             </a>
         </div>
@@ -116,19 +126,19 @@
                     </svg>
                     <h3 class="h4 card-title mt-0">Souhrnně i do detailu</h3>
                     <p class="card-text">
-                        Analýzy dostanete k dispozici
+                        Analýzy dostanete k dispozici:
                         <ul>
                             <li>
-                                v souhrnných přehledech (HTML i PDF)
+                                V souhrnných přehledech (HTML i PDF).
                             </li>
-                            <li>podle dodavatelů i zadavatelů a jejich srovnání</li>
-                            <li>podle 20 oborů</li>
-                            <li>kombinací dle potřeby</li>
+                            <li>Podle dodavatelů i zadavatelů a jejich srovnání.</li>
+                            <li>Podle 20 oborů.</li>
+                            <li>Kombinací dle potřeby.</li>
                         </ul>
                     </p>
                 </div>
                 <div class="card-footer border-0 py-3 my-3 mb-sm-4">
-                <div class="btn btn-lg btn-icon btn-outline-primary rounded-circle pe-none"><i class="ai-arrow-right"></i></div>
+                    <div class="btn btn-lg btn-icon btn-outline-primary rounded-circle pe-none"><i class="ai-arrow-right"></i></div>
                 </div>
             </a>
         </div>
@@ -140,12 +150,13 @@
 
                     <h3 class="h4 card-title mt-0">Odkazy na primární zdroje</h3>
                     <p class="card-text">
-                        V balíčku <b>Pro</b> je součástí analýz i odkaz na konkrétní smlouvy a jejich plné texty včetně cen.
+                        <a href="#cenik">V b
+            alíčku <b>Pro</b></a> je součástí analýz i odkaz na konkrétní smlouvy a jejich plné texty včetně cen.
                         Stejně tak dostanete kompletní zdrojová data v XML, JSON a Excelu pro vlastní analýzy.
                     </p>
                 </div>
                 <div class="card-footer border-0 py-3 my-3 mb-sm-4">
-                <div class="btn btn-lg btn-icon btn-outline-primary rounded-circle pe-none"><i class="ai-arrow-right"></i></div>
+                    <div class="btn btn-lg btn-icon btn-outline-primary rounded-circle pe-none"><i class="ai-arrow-right"></i></div>
                 </div>
             </a>
         </div>
@@ -164,11 +175,11 @@
                         zvolit nejlepší cenu.
                     </p>
                     <p>
-                        Pracujte s cenami konkurentů napříč celý trhem i srovnáním u jednotlivých zadavatelů.
+                        Pracujte s cenami konkurentů napříč celým trhem i srovnáním u jednotlivých zadavatelů.
                     </p>
                 </div>
                 <div class="card-footer border-0 py-3 my-3 mb-sm-4">
-                <div class="btn btn-lg btn-icon btn-outline-primary rounded-circle pe-none"><i class="ai-arrow-right"></i></div>
+                    <div class="btn btn-lg btn-icon btn-outline-primary rounded-circle pe-none"><i class="ai-arrow-right"></i></div>
                 </div>
             </a>
         </div>
@@ -184,12 +195,12 @@
                         Řádně uskutečnit výběrové řízení není ve veřejné správě jednoduché.
                         Minimalizujte riziko negativních kontrolních závěrů i sporů u ÚOHS.
                         Minimalizujte neúspěšná výběrová řízení stanoveným cenových hladin obvyklých v jednotlivých oborech i profesích.
-                        Porovnejte Vaše ceny s jinými úřady a minimalizujte negativní publicitu.
+                        Porovnejte Vaše ceny s jinými úřady a zabraňte negativní publicitě.
 
                     </p>
                 </div>
                 <div class="card-footer border-0 py-3 my-3 mb-sm-4">
-                <div class="btn btn-lg btn-icon btn-outline-primary rounded-circle pe-none"><i class="ai-arrow-right"></i></div>
+                    <div class="btn btn-lg btn-icon btn-outline-primary rounded-circle pe-none"><i class="ai-arrow-right"></i></div>
                 </div>
             </a>
         </div>
@@ -202,7 +213,7 @@
                         <path d="M38.3838 10.3662L34.6338 6.61623C34.3993 6.38189 34.0815 6.25024 33.75 6.25024C33.4185 6.25024 33.1007 6.38189 32.8662 6.61623L30.625 8.85748L36.1425 14.375L38.3838 12.1337C38.6181 11.8993 38.7497 11.5814 38.7497 11.25C38.7497 10.9185 38.6181 10.6006 38.3838 10.3662Z"></path>
                         <path d="M20 32.5H16.25C15.2554 32.5 14.3016 32.1049 13.5983 31.4017C12.8951 30.6984 12.5 29.7446 12.5 28.75V25C12.4986 24.5074 12.595 24.0193 12.7836 23.5642C12.9722 23.1091 13.2493 22.696 13.5987 22.3487L28.75 7.1975V2.5C28.75 2.16848 28.6183 1.85054 28.3839 1.61612C28.1495 1.3817 27.8315 1.25 27.5 1.25H2.5C2.16848 1.25 1.85054 1.3817 1.61612 1.61612C1.3817 1.85054 1.25 2.16848 1.25 2.5V37.5C1.25 37.8315 1.3817 38.1495 1.61612 38.3839C1.85054 38.6183 2.16848 38.75 2.5 38.75H27.5C27.8315 38.75 28.1495 38.6183 28.3839 38.3839C28.6183 38.1495 28.75 37.8315 28.75 37.5V25.3025L22.6513 31.4013C22.304 31.7507 21.8909 32.0278 21.4358 32.2164C20.9807 32.405 20.4926 32.5014 20 32.5ZM7.5 7.5H22.5C22.8315 7.5 23.1495 7.6317 23.3839 7.86612C23.6183 8.10054 23.75 8.41848 23.75 8.75C23.75 9.08152 23.6183 9.39946 23.3839 9.63388C23.1495 9.8683 22.8315 10 22.5 10H7.5C7.16848 10 6.85054 9.8683 6.61612 9.63388C6.3817 9.39946 6.25 9.08152 6.25 8.75C6.25 8.41848 6.3817 8.10054 6.61612 7.86612C6.85054 7.6317 7.16848 7.5 7.5 7.5ZM6.25 15C6.25 14.6685 6.3817 14.3505 6.61612 14.1161C6.85054 13.8817 7.16848 13.75 7.5 13.75H15C15.3315 13.75 15.6495 13.8817 15.8839 14.1161C16.1183 14.3505 16.25 14.6685 16.25 15C16.25 15.3315 16.1183 15.6495 15.8839 15.8839C15.6495 16.1183 15.3315 16.25 15 16.25H7.5C7.16848 16.25 6.85054 16.1183 6.61612 15.8839C6.3817 15.6495 6.25 15.3315 6.25 15Z"></path>
                     </svg>
-                    <h3 class="h4 card-title mt-0">Vyzkoušejte bez rizika</h3>
+                    <h3 class="h4 card-title mt-0">Vyzkoušejte zdarma</h3>
                     <p class="card-text">
                         Cenovou analýzu pro ICT profese za rok 2020 máte k dispozici zadarmo volně dostupnou.
                         Ověřte si na vlastní oči, zda detailnost i šíře informací pokrývá Vaše potřeby.
@@ -245,8 +256,8 @@
                     <div class="card-body">
                         <h3 class="h4 card-title">IT technologie</h3>
                         <ul class="ps-4 mb-n2">
-                            <li class="mb-2">Hodinové sazby 20 IT profesí</li>
-                            <li class="mb-2">Profese jsou často děleny detailněji (senior, junior, dle technologie či zaměření)</li>
+                            <li class="mb-2">Hodinové sazby 20 IT profesí.</li>
+                            <li class="mb-2">Profese jsou často děleny detailněji (senior, junior, dle technologie či zaměření).</li>
                             <li class="mb-2">Struktura profesí i analýz vychází z <a href="https://www.mvcr.cz/clanek/prehled-obvyklych-cen-ict-praci.aspx">Přehledu obvyklých cen ICT prací od Ministerstva vnitra</a> z roku 2018.</li>
                         </ul>
                     </div>
@@ -259,9 +270,9 @@
                     <div class="card-body">
                         <h3 class="h4 card-title">Právní služby</h3>
                         <ul class="ps-4 mb-n2">
-                            <li class="mb-2">Připravujeme analýzy za roky 2021 a 2022</li>
-                            <li class="mb-2">Budou k dispozici během roku 2023</li>
-                            <li class="mb-2">Předobjednávku můžete uskutečnit již nýní, se slevou 25 %</li>
+                            <li class="mb-2">Připravujeme analýzy za roky 2021 a 2022.</li>
+                            <li class="mb-2">Budou k dispozici během roku 2023.</li>
+                            <li class="mb-2">Předobjednávku můžete uskutečnit již nýní, se slevou 25 %.</li>
                         </ul>
                     </div>
                 </div>
@@ -273,9 +284,9 @@
                     <div class="card-body">
                         <h3 class="h4 card-title">Analýzy na míru</h3>
                         <ul class="ps-4 mb-n2">
-                            <li class="mb-2">Provádíme investigaci a analýzy na míru pro soukromé společnosti, média i státní organizace</li>
-                            <li class="mb-2">Spolupracujeme a jsme otevřeni spolupráci na akademických a neziskových projektech</li>
-                            <li class="mb-2">Analýzy vytváříme ve spolupráci s <a href="https://www.hlidacstatu.cz">Hlídačem státu</a></li>
+                            <li class="mb-2">Provádíme investigaci a analýzy na míru pro soukromé společnosti, média i státní organizace.</li>
+                            <li class="mb-2">Spolupracujeme a jsme otevřeni spolupráci na akademických a neziskových projektech.</li>
+                            <li class="mb-2">Analýzy vytváříme ve spolupráci s <a href="https://www.hlidacstatu.cz">Hlídačem státu</a>.</li>
                         </ul>
                     </div>
                 </div>
