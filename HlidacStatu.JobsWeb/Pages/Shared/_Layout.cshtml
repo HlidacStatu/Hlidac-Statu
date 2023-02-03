@@ -266,8 +266,10 @@
 
                     @if (choosenAnal)
                     {
-                        <div class="btn-toolbar mb-4" role="toolbar">
-                            <div class="btn-group me-2" role="group" aria-label="First group">
+                        <div class="btn-toolbar mb-5" role="toolbar" style="position:fixed;top:93px;z-index:10000;">
+                            <div class="btn-group me-2" role="group" aria-label="Sub menu" style="background-color:white;box-shadow:rgb(0 0 0 / 35%) 0px 5px 15px;">
+
+                                <a class="btn btn-secondary disabled" style="color:black;" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">Části analýzy&nbsp;<i class="fa-regular fa-angles-right"></i></a>
 
                                 <a class="btn btn-outline-primary" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">Souhrn</a>
                                 <a class="btn btn-outline-primary" asp-page="/BenchmarkUradu" asp-route-obor="@obor" asp-route-rok="@rok">Analýza zadavatele</a>
@@ -282,9 +284,10 @@
                                 </div>
                             }
                         </div>
+                        <div class="" style="margin-bottom:4em;"></div>
                     }
 
-
+                    
                     @RenderBody()
                 </div>
             </div>
