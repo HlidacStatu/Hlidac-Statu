@@ -495,7 +495,7 @@ select::-ms-expand {
 }
 
 select {
-    background-image: url("/Content/img/chevron.svg") !important;
+    background-image: url("/content/img/chevron.svg") !important;
     background-repeat: no-repeat;
     background-position: calc(100% - 10px);
     -webkit-appearance: none;
@@ -1054,7 +1054,7 @@ select {
 .header__content {
     background: #003688;
     background-size: cover;
-    background-image: url("/Content/img/header-bg.jpg");
+    background-image: url("/content/img/header-bg.jpg");
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -2104,7 +2104,7 @@ select {
     }
 
     .breadcrumb > li:not(.no-chevron):after {
-        content: url("/Content/img/chevron-breadcrumb.svg");
+        content: url("/content/img/chevron-breadcrumb.svg");
         pointer-events: none;
         padding: 0 5px 0 9px;
         top: 2px;
@@ -2919,7 +2919,7 @@ a.form-search__hint:active:focus {
         left: calc(40% + 190px);
         pointer-events: none;
         width: 500px;
-        background-image: url("/Content/img/box-cta-bg.svg");
+        background-image: url("/content/img/box-cta-bg.svg");
         background-repeat: no-repeat;
         background-size: cover;
     }

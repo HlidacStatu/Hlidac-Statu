@@ -8,11 +8,11 @@
     @if (SignInManager.IsSignedIn(User))
     {
         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Nastavení účtu"><i class="fas fa-user"></i></a>
-        <a class="nav-link btn btn-link text-dark" href="/Identity/Account/Logout?returnUrl=/cenypracehlidac" title="Odhlášení">Odhlásit</a>
+        <a class="nav-link btn btn-link text-dark" href="/Identity/Account/Logout?returnUrl=/" title="Odhlášení">Odhlásit</a>
     }
     else
     {
-        <a class="nav-link" href="/Identity/Account/Login?returnUrl=/cenypracehlidac"><img src="/Content/img/icon-user.svg" style="padding-right: 8px;">Přihlášení</a>
-        <a class="nav-link" href="/Identity/Account/Register?returnUrl=/cenypracehlidac">Registrace</a>
+        <a class="nav-link" href="/Identity/Account/Login?returnUrl=/"><img src="/content/img/icon-user.svg" style="padding-right: 8px;">Přihlášení</a>
+        <a class="nav-link" href="/Identity/Account/Register?returnUrl=/">Registrace</a>
     }
 </div>

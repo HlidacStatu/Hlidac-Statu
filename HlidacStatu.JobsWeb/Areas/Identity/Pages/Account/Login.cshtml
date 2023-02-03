@@ -28,7 +28,7 @@
                 <div>
                     @foreach (var provider in Model.ExternalLogins)
                     {
-                        string imgPath = $"/Content/Img/{provider.Name}Signin.png"; 
+                        string imgPath = $"/content/img/{provider.Name}Signin.png"; 
                         <button type="submit" class="btn btn-link"
                                 name="provider" value="@provider.Name"
                                 title="Přihlásit pomocí @provider.DisplayName účtu">
