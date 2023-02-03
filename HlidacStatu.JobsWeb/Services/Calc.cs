@@ -1,4 +1,4 @@
-﻿namespace HlidacStatu.JobsWeb.Services
+﻿namespace HlidacStatu.Ceny.Services
 {
     public class Calc
     {

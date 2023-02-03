@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HlidacStatu.JobsWeb.Areas.Identity.Pages.Account
+namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
 {
     public class AccessDeniedModel : PageModel
     {

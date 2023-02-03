@@ -1,8 +1,8 @@
-﻿using HlidacStatu.JobsWeb.Models;
-using HlidacStatu.JobsWeb.Services;
+﻿using HlidacStatu.Ceny.Models;
+using HlidacStatu.Ceny.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HlidacStatu.JobsWeb.Pages
+namespace HlidacStatu.Ceny.Pages
 {
     public class Index_oldModel : PageModel
     {

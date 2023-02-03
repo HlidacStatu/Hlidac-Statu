@@ -1,8 +1,8 @@
-﻿@model (List<JobStatistics> statistics, Firma dodavatel, YearlyStatisticsGroup.Key? Key)
+﻿@model (List<HlidacStatu.Ceny.Models.JobStatistics> statistics, Firma dodavatel, HlidacStatu.Ceny.Models.YearlyStatisticsGroup.Key? Key)
 
 @using HlidacStatu.Entities
-@using HlidacStatu.JobsWeb.Models;
-@using HlidacStatu.JobsWeb.Services;
+@using HlidacStatu.Ceny.Models
+@using HlidacStatu.Ceny.Services
 
 
 
@@ -129,23 +129,23 @@
                         <td class="text-end border-start number">
                             @upolozka.stat.Minimum.ToString("N0")
                             <br />
-                            @Html.Raw(Services.Calc.PercentChangeHtml(dodavatelStatisticsPolozka.Minimum, upolozka.stat.Minimum,"procentní rozdíl oproti obvyklé ceně zadavatele"))
+                            @Html.Raw(Calc.PercentChangeHtml(dodavatelStatisticsPolozka.Minimum, upolozka.stat.Minimum,"procentní rozdíl oproti obvyklé ceně zadavatele"))
                         </td>
                         <td class="text-end number">
                             <b>@upolozka.stat.DolniKvartil.ToString("N0")</b>                            <br />
-                            @Html.Raw(Services.Calc.PercentChangeHtml(dodavatelStatisticsPolozka.DolniKvartil, upolozka.stat.DolniKvartil,"procentní rozdíl oproti obvyklé ceně zadavatele"))
+                            @Html.Raw(Calc.PercentChangeHtml(dodavatelStatisticsPolozka.DolniKvartil, upolozka.stat.DolniKvartil,"procentní rozdíl oproti obvyklé ceně zadavatele"))
                         </td>
                         <td class="text-end number">
                             <b>@upolozka.stat.Median.ToString("N0")</b>                            <br />
-                            @Html.Raw(Services.Calc.PercentChangeHtml(dodavatelStatisticsPolozka.Median, upolozka.stat.Median,"procentní rozdíl oproti obvyklé ceně zadavatele"))
+                            @Html.Raw(Calc.PercentChangeHtml(dodavatelStatisticsPolozka.Median, upolozka.stat.Median,"procentní rozdíl oproti obvyklé ceně zadavatele"))
                         </td>
                         <td class="text-end number">
                             <b>@upolozka.stat.HorniKvartil.ToString("N0")</b>                            <br />
-                            @Html.Raw(Services.Calc.PercentChangeHtml(dodavatelStatisticsPolozka.HorniKvartil, upolozka.stat.HorniKvartil,"procentní rozdíl oproti obvyklé ceně zadavatele"))
+                            @Html.Raw(Calc.PercentChangeHtml(dodavatelStatisticsPolozka.HorniKvartil, upolozka.stat.HorniKvartil,"procentní rozdíl oproti obvyklé ceně zadavatele"))
                         </td>
                         <td class="text-end number ">
                             @upolozka.stat.Maximum.ToString("N0")                            <br />
-                            @Html.Raw(Services.Calc.PercentChangeHtml(dodavatelStatisticsPolozka.Maximum, upolozka.stat.Maximum,"procentní rozdíl oproti obvyklé ceně zadavatele"))
+                            @Html.Raw(Calc.PercentChangeHtml(dodavatelStatisticsPolozka.Maximum, upolozka.stat.Maximum,"procentní rozdíl oproti obvyklé ceně zadavatele"))
                         </td>
                         <td class="text-end number ">@upolozka.stat.PriceCount</td>
                     </tr>

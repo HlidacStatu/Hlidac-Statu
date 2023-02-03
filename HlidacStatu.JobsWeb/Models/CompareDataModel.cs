@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HlidacStatu.JobsWeb.Models
+namespace HlidacStatu.Ceny.Models
 {
     public class CompareDataModel
     {

@@ -1,6 +1,6 @@
 @page
 @using Microsoft.Extensions.Primitives
-@model HlidacStatu.JobsWeb.Areas.Identity.Pages.Account.LoginModel
+@model HlidacStatu.Ceny.Areas.Identity.Pages.Account.LoginModel
 
 @{
     ViewData["Title"] = "Přihlášení";
@@ -19,7 +19,7 @@
         }
     </div>
         <hr class="bg-dark"/>
-    <div class="col-sm-12 d-none">
+    <div class="col-sm-12">
         <h4>Přihlášení účtem jiné služby</h4>
         <p>Nemusíte se bát, my se váš login a heslo k jiné službě nedozvíme. Jediné, co se dozvíme je váš email. Stejně jako při registraci níže.</p>
         
@@ -79,12 +79,11 @@
                     <div class="col-sm-offset-2 col-sm-8">
                         <button type="submit" class="btn btn-primary">Přihlásit se do Hlídače státu</button>
                         <p>
-                            <a id="forgot-password" href="https://www.hlidacstatu.cz/Identity/Account/ForgotPassword">Zapomenuté heslo?</a>
+                            <a id="forgot-password" asp-page="./ForgotPassword">Zapomenuté heslo?</a>
                         </p>
                         <p>
                             <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Odeslat potvrzení e-mailem</a>
                         </p>
-                        @*<honeypot></honeypot>*@
                     </div>
                 </div>
             </form>

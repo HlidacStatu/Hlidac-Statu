@@ -1,20 +1,17 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Ceny.Services;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities;
-using HlidacStatu.JobsWeb.Services;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace HlidacStatu.JobsWeb
+namespace HlidacStatu.Ceny
 {
     public class Startup
     {
@@ -35,19 +32,18 @@ namespace HlidacStatu.JobsWeb
 
             Task.Run(async () => await JobService.RecalculateAsync()).GetAwaiter().GetResult();
 
-            string connectionString = Configuration.GetConnectionString("DefaultConnection");
+            string usersConnection = Devmasters.Config.GetWebConfigValue("WdAnalyt");
             // for scoped services (mainly for identity)
             services.AddDbContext<DbEntities>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlServer(usersConnection));
             
+            // Pro subdoménový login pomocí cookie
             // Add a DbContext to store your Database Keys
-            services.AddDbContext<HlidacKeysContext>(options =>
-                options.UseSqlServer(connectionString));
-            
-            // using Microsoft.AspNetCore.DataProtection;
-            services.AddDataProtection()
-                .PersistKeysToDbContext<HlidacKeysContext>()
-                .SetApplicationName("HlidacStatu");
+            // services.AddDbContext<HlidacKeysContext>(options =>
+            //     options.UseSqlServer(connectionString));
+            // services.AddDataProtection()
+            //     .PersistKeysToDbContext<HlidacKeysContext>()
+            //     .SetApplicationName("HlidacStatu");
 
             AddIdentity(services);
             services.AddDatabaseDeveloperPageExceptionFilter();
@@ -82,7 +78,6 @@ namespace HlidacStatu.JobsWeb
             app.Use(async (context, next) =>
             {
                 var req = context.Request.Query;
-                var reqStr = context.Request.QueryString;
 
                 if (req.TryGetValue("obor", out var oborValues))
                 {
@@ -123,18 +118,18 @@ namespace HlidacStatu.JobsWeb
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DbEntities>();
 
-            // this is needed because passwords are stored with old hashes
-            services.Configure<PasswordHasherOptions>(options =>
-                options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
-            );
+            // Pro napojení na hs
+            // services.Configure<PasswordHasherOptions>(options =>
+            //     options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
+            // );
             
-            services.ConfigureApplicationCookie(o =>
-            {
-                o.Cookie.Domain = ".hlidacstatu.cz"; 
-                o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
-                
-                o.Cookie.SameSite = SameSiteMode.Lax;
-            });
+            // services.ConfigureApplicationCookie(o =>
+            // {
+            //     o.Cookie.Domain = ".hlidacstatu.cz"; 
+            //     o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
+            //     
+            //     o.Cookie.SameSite = SameSiteMode.Lax;
+            // });
         }
     }
 }

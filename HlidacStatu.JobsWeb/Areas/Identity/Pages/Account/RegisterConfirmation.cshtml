@@ -1,0 +1,29 @@
+@page
+@model HlidacStatu.Ceny.Areas.Identity.Pages.Account.RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Dokončení registrace v e-mailu";
+}
+
+@{
+    if (@Model.DisplayConfirmAccountLink)
+    {
+<p>
+    This app does not currently have a real email sender registered, see <a href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
+    Normally this would be emailed: <a id="confirm-link" href="@Model.EmailConfirmationUrl">Click here to confirm your account</a>
+</p>
+    }
+    else
+    {
+        <p>
+            Poslali jsme vám zprávu na uvedený e-mail pro potvrzení registrace. V e-mailu je uvedený link, na který musíte kliknout.
+        </p>
+
+        <div class="bs-callout warning">
+            <h4>Žádný e-mail nepřišel?</h4>
+            <p>
+                E-mail je odeslán z adresy <b>podpora@hlidacstatu.cz</b>.
+                Může se stát, že e-mail je doručen do složky "Spam", "Junk mail", "Nevyžádaná pošta" apod. Zkontrolujte i tyto složky.
+            </p>
+        </div>
+    }
+}

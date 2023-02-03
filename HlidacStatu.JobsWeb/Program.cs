@@ -3,7 +3,7 @@ using HlidacStatu.LibCore.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace HlidacStatu.JobsWeb
+namespace HlidacStatu.Ceny
 {
     public class Program
     {

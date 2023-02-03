@@ -1,4 +1,5 @@
-@model Models.CompareDataModel
+@using HlidacStatu.Ceny.Services
+@model HlidacStatu.Ceny.Models.CompareDataModel
 
 <style>
 
@@ -55,17 +56,17 @@
                 <td class="text-end number border-start">
                     <b>@row.DolniKvartil.ToString("N0")</b>
                     <br />
-                    @Html.Raw(Services.Calc.PercentChangeHtml(compRow.DolniKvartil, row.DolniKvartil))
+                    @Html.Raw(Calc.PercentChangeHtml(compRow.DolniKvartil, row.DolniKvartil))
                 </td>
                 <td class="text-end number">
                     <b>@row.Median.ToString("N0")</b>
                     <br />
-                    @Html.Raw(Services.Calc.PercentChangeHtml(compRow.Median, row.Median))
+                    @Html.Raw(Calc.PercentChangeHtml(compRow.Median, row.Median))
                 </td>
                 <td class="text-end number">
                     <b>@row.HorniKvartil.ToString("N0")</b>
                     <br />
-                    @Html.Raw(Services.Calc.PercentChangeHtml(compRow.HorniKvartil, row.HorniKvartil))
+                    @Html.Raw(Calc.PercentChangeHtml(compRow.HorniKvartil, row.HorniKvartil))
                 </td>
                 <td class="text-end number">
                     @if (Model.ShowPocetSmluv)

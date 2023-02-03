@@ -1,10 +1,9 @@
-﻿using HlidacStatu.JobsWeb.Services;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HlidacStatu.Ceny.Services;
 
-namespace HlidacStatu.JobsWeb.Models
+namespace HlidacStatu.Ceny.Models
 {
     public class YearlyStatisticsGroup
     {
@@ -40,7 +39,7 @@ namespace HlidacStatu.JobsWeb.Models
             }
             public Services.JobService.SubjectYearDescription PerSubjectDesc
             {
-                get => HlidacStatu.JobsWeb.Services.JobService.PerSubjectQuery(this.Obor, this.Rok);
+                get => JobService.PerSubjectQuery(this.Obor, this.Rok);
             }
 
             public bool Equals(Key other)

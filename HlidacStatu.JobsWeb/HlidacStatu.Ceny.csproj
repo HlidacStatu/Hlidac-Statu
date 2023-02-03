@@ -30,5 +30,4 @@
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
       <ProjectReference Include="..\Util\Util.csproj" />
     </ItemGroup>
-
 </Project>

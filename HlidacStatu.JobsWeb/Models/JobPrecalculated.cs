@@ -1,5 +1,6 @@
 using System;
-namespace HlidacStatu.JobsWeb.Models
+
+namespace HlidacStatu.Ceny.Models
 {
     public class JobPrecalculated
     {
