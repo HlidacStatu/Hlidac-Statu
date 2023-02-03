@@ -65,7 +65,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
+                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email, EmailConfirmed = true; };
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
@@ -73,37 +73,41 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
 
                     AspNetUserApiToken.CreateNew(user);
 
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
+                //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                //var callbackUrl = Url.Page(
+                //    "/Account/ConfirmEmail",
+                //    pageHandler: null,
+                //    values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
+                //    protocol: Request.Scheme);
 
-                    var email = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
-                    email.Model.CallbackUrl = callbackUrl;
-                    email.To = user.Email;
-                    email.SendMe();
-
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
-                    {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        if (returnUrl == "/cenypracehlidac")
-                        {
-                            return Redirect("cenyprace.hlidacstatu.cz");
-                        }
-                        return LocalRedirect(returnUrl);
-                    }
-                }
+                //var email = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
+                //email.Model.CallbackUrl = callbackUrl;
+                //email.To = user.Email;
+                //email.SendMe();
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
+
+
+                //if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                //    {
+                //        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                //    }
+                //    else
+                //    {
+                //        await _signInManager.SignInAsync(user, isPersistent: false);
+                //        if (returnUrl == "/cenypracehlidac")
+                //        {
+                //            return Redirect("https://www.watchdoganalytics.cz");
+                //        }
+                //        return LocalRedirect(returnUrl);
+                //    }
+                //}
+
+                return Redirect("https://www.watchdoganalytics.cz");
+
             }
 
             // If we got this far, something failed, redisplay form
