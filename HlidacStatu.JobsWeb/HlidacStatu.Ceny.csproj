@@ -29,5 +29,6 @@
       <ProjectReference Include="..\LibCore\LibCore.csproj" />
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
       <ProjectReference Include="..\Util\Util.csproj" />
+      <ProjectReference Include="..\XLib\XLib.csproj" />
     </ItemGroup>
 </Project>

@@ -57,7 +57,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
                 values: new { userId = userId, code = code },
                 protocol: Request.Scheme);
 
-            var email = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
+            var email = HlidacStatu.XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
             email.Model.CallbackUrl = callbackUrl;
             email.To = user.Email;
             email.SendMe();
