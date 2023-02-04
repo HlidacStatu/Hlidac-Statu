@@ -287,7 +287,7 @@
                     <a href="/smlouvy">Smlouvy</a>
                     <a href="/VerejneZakazky">Veřejné zakázky</a>
                     <a href="/Dotace">Dotace</a>
-                    <a class="text-danger fw-bolder" href="https://ceny.analyzy.hlidacstatu.cz/?utm_source=header&utm_medium=referral&utm_campaign=start&utm_content=topheader">Cenové analýzy</a>
+                    <a class="text-danger fw-bolder" href="https://www.WatchdogAnalytics.cz/?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=blockHeader">Ceny ICT prací</a>
                     <a href="/sponzori">Sponzoři</a>
                     <a href="/StatniWeby">Weby státu<sup style="top:0;text-decoration:none;color:#777;">@(HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers()?.Count().ToString() ?? "")</sup></a>
                 </li>
@@ -582,7 +582,7 @@
     }
     else
     {
-        if (DateTime.Now < new DateTime(2022, 09, 01, 0, 0, 0))
+        if (DateTime.Now < new DateTime(2023, 09, 01, 0, 0, 0))
         {
             string[] colors = new[] {"primary","success","danger","warning","info","dark" };
             string[] txts = new[]
@@ -605,7 +605,7 @@
             <div class="fixed-bottom alert alert-@(colors.TipOfTheDay()) adlinemsg " role="alert" style="margin-bottom:0">
                 <div class="text-center center-block adlinemsgtxt " style="">
                     @Html.Raw(tipTxt)
-                    <a class="btn btn-dark btn-sm" href="https://ceny.analyzy.hlidacstatu.cz/?utm_source=bottomAd&utm_medium=referral&utm_campaign=ad@(tipIndex)" role="button"><b>Více 👉</b></a>
+                    <a class="btn btn-dark btn-sm" href="https://www.WatchdogAnalytics.cz/?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=stickyFooter_ad@(tipIndex)" role="button"><b>Více 👉</b></a>
                 </div>
             </div>
             <div style="margin-bottom:50px">&nbsp;</div>
