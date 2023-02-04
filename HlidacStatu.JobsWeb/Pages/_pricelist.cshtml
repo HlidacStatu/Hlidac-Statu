@@ -24,14 +24,14 @@
                 <div class="card-body w-100 mx-auto text-center" style="max-width: 23rem;">
                     <h3>Základní</h3>
                     <div class="display-2 text-primary">49&nbsp;900</div>
-                    <div class="mb-4">41&nbsp;240 Kč bez DPH</div>
+                    <div class="mb-4 fw-bold fs-5">41&nbsp;240 Kč bez DPH</div>
                     <p class="mb-4 pb-4">
                         PDF souhrnná analýza,
                         webová analytická aplikace,
                         uživatelská a analytická podpora
                         <br />&nbsp;
                     </p>
-                    <a href="/objednat" class="btn btn-primary w-100" type="button">Objednat</a>
+                    <a href="/objednat" onclick="inCart(49900,'zakladni');" class="btn btn-primary w-100" type="button">Objednat</a>
                 </div>
             </div>
         </div>
@@ -41,13 +41,13 @@
                 <div class="card-body w-100 mx-auto text-center" style="max-width: 23rem;">
                     <h3 class="text-light">Pro</h3>
                     <div class="display-2 text-light">99&nbsp;900</div>
-                    <div class="text-light opacity-70 mb-4">82&nbsp;562&nbsp;Kč&nbsp;bez&nbsp;DPH</div>
+                    <div class="text-light opacity-70 mb-4 fw-bold fs-5">82&nbsp;562&nbsp;Kč&nbsp;bez&nbsp;DPH</div>
                     <p class="text-light opacity-70 mb-4 pb-4">
                         Vše co v základní verzi,
                         navíc srovnávací analýzy dodavatelů a zadavatelů,
                         provázání na jednotlivé smlouvy, zdrojová data
                     </p>
-                    <a href="/objednat" class="btn btn-light w-100" type="button">Objednat Pro</a>
+                    <a href="/objednat" onclick="inCart(99900,'pro');" class="btn btn-light w-100" type="button">Objednat Pro</a>
                 </div>
             </div>
         </div>
@@ -57,13 +57,13 @@
                 <div class="card-body w-100 mx-auto text-center" style="max-width: 23rem;">
                     <h3>Na míru</h3>
                     <div class="display-3 text-primary" style="margin-bottom:10px">na dotaz</div>
-                    <div class="mb-4">individuální cena</div>
+                    <div class="mb-4 fw-bold fs-5">individuální cena</div>
                     <p class="mb-4 pb-4">
                         Individuální analýzy podle zadání,
                         samostatná licence, kompletní přístup ke zdrojovým datům
                         <br />&nbsp;
                     </p>
-                    <a href="/kontakt" class="btn btn-primary w-100" type="button">Kontaktovat nás</a>
+                    <a href="/kontakt" onclick="inCart(1,'na_miru');" class="btn btn-primary w-100" type="button">Kontaktovat nás</a>
                 </div>
             </div>
         </div>
@@ -386,13 +386,13 @@
                         <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
                         </th>
                         <td class="border-0 py-3">
-                            <a href="/objednat" class="btn btn-primary " type="button">Objednat</a>
+                            <a href="/objednat" class="btn btn-primary " onclick="inCart(49900,'zakladni');" type="button">Objednat</a>
                         </td>
                         <td class="border-0 py-3">
-                            <a href="/objednat" class="btn btn-primary " type="button">Objednat</a>
+                            <a href="/objednat" class="btn btn-primary " onclick="inCart(99900,'pro');" type="button">Objednat</a>
                         </td>
                         <td class="border-0 py-3">
-                            <a href="/kontakt" class="btn btn-primary " type="button">Kontaktovat</a>
+                            <a href="/kontakt" class="btn btn-primary" onclick="inCart(1,'na_miru');" type="button">Kontaktovat</a>
                         </td>
                     </tr>
                     
@@ -402,3 +402,21 @@
         </div>
     </div>
 </section>
+
+<script>
+    function inCart (price, product) {
+        gtag("event", "add_to_cart", {
+            value: price,
+            currency: "CZK",
+            items: [
+                {
+                    item_id: product,
+                    item_name: product,
+                    price: price,
+                    quantity: 1
+                }]
+        });
+    };
+
+</script>
+
