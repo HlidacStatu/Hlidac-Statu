@@ -256,7 +256,7 @@ namespace HlidacStatu.Web
                 
                 if (url?.ToLower()?.StartsWith("/cenypracehlidac") == true)
                 {
-                    context.Response.Redirect("https://www.ceny.analyzy.hlidacstatu.cz/");
+                    context.Response.Redirect("https://www.WatchdogAnalytics.cz/?"+context.Request.QueryString);
                     return;   // short circuit
                 }
                 
