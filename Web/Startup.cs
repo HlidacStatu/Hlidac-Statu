@@ -261,7 +261,7 @@ namespace HlidacStatu.Web
 
                 if (url?.ToLower()?.StartsWith("/health") == true)
                 {
-                    await context.Response.WriteAsync(Framework.HealthChecks.HealthStatusCache.healthStatusCache.Get());
+                    await context.Response.WriteAsync(Framework.HealthChecks.HealthStatusCache.healthStatusCache.Get() ?? "no data");
                     return;
                 }
 
