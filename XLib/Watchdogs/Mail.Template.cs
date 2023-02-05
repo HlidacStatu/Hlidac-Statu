@@ -1,9 +1,43 @@
-﻿namespace HlidacStatu.XLib.Watchdogs
+﻿using HlidacStatu.Util;
+using System.Collections.Generic;
+
+namespace HlidacStatu.XLib.Watchdogs
 {
     public partial class Mail
     {
         public static class Template
         {
+
+            /// <summary>
+            /// - width - {0} 
+            /// - background color {1}
+            /// - foreground color {2}
+            /// - content {3}
+            /// </summary>
+            static string adInBoxTemplateHtml = @"
+<div style='text-align:center;padding-top:20px;padding-bottom:20px;width:{0}'>
+<table style='width:100%;border:2px solid {1};font-family: Cabin, sans-serif;' cellspacing=0 cellpadding=0 border=0>
+<tr><td bgcolor='{1}' color='{2}' style='background:{1};color:{2}'>
+{3}
+</td></tr>
+</table>
+</div>
+";
+
+            public static RenderedContent AdInBox(string width, string backgroundColor, string foregroundColor,
+                IEnumerable<SMTPTools.EmbeddedImage> images,string content
+                )
+            {
+                return new RenderedContent()
+                {
+                    ContentHtml = string.Format(adInBoxTemplateHtml, width, backgroundColor,foregroundColor,content),
+                    ContentText = null,
+                    Images = images
+
+                };
+            }
+
+
             static string topHeaderTemplateHtml = @"
 <table style='width:100%;border:2px solid #FFC76D;font-family: Cabin, sans-serif;' cellspacing=0 cellpadding=0 border=0>
 <tr><td bgcolor='#FFC76D' color='black' style='background:#FFC76D;color:black'>

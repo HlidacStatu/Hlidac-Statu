@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Mail;
+using System.Net.Mime;
 using System.Text;
 
 namespace HlidacStatu.Util
@@ -7,11 +10,32 @@ namespace HlidacStatu.Util
     public static class SMTPTools
     {
 
+        public class EmbeddedImage
+        {
+            public string ContentId { get; set; } = Guid.NewGuid().ToString("N");
+            public string ImageHtmlCode => @$"<img src='cid:{this.ContentId}'/>";
+            public string FilePath { get; set; }
+            public string ContentType { get; set; }
+            public string ReplacementInMail { get; set; }
+
+            LinkedResource _res = null;
+            public LinkedResource GetEmbeddedImage()
+            {
+                if (_res == null)
+                {
+                    _res = new LinkedResource(this.FilePath, this.ContentType);
+                    _res.ContentId = this.ContentId;
+                }
+                return _res;
+            }
+        }
 
         public static bool SendEmail(string subject,
             string htmlContent, string textContent,
             string toEmail,
-            string fromEmail = "podpora@hlidacstatu.cz", bool bccToAdmin = false)
+            string fromEmail = "podpora@hlidacstatu.cz", bool bccToAdmin = false,
+            IEnumerable<EmbeddedImage> images = null
+            )
         {
             try
             {
@@ -26,8 +50,26 @@ namespace HlidacStatu.Util
                     }
                     if (!string.IsNullOrEmpty(htmlContent))
                     {
+                        if (images?.Count() > 0)
+                        {
+                            foreach (var img in images)
+                            {
+                                htmlContent = htmlContent.Replace(img.ReplacementInMail, img.ImageHtmlCode);
+                            }
+                        }
+
                         var view = AlternateView.CreateAlternateViewFromString(htmlContent, new System.Net.Mime.ContentType("text/html"));
                         view.ContentType.CharSet = Encoding.UTF8.WebName;
+
+                        if (images?.Count() > 0)
+                        {
+                            foreach (var img in images)
+                            {
+                                view.LinkedResources.Add(img.GetEmbeddedImage());
+                            }
+                        }
+
+
                         msg.AlternateViews.Add(view);
                     }
 
