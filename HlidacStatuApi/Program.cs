@@ -5,11 +5,11 @@ using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 
 string CORSPolicy = "from_hlidacstatu.cz";
@@ -28,8 +28,8 @@ new Thread(
     () =>
     {
         HlidacStatuApi.Code.Log.Logger.Info(
-            "{action} {code} for {part} init during start.", 
-            "starting", 
+            "{action} {code} for {part} init during start.",
+            "starting",
             "thread",
             "availability cache");
         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
@@ -38,9 +38,9 @@ new Thread(
         _ = HlidacStatuApi.Code.Availability.AllActiveServersWeekStat();
         sw.Stop();
         HlidacStatuApi.Code.Log.Logger.Info(
-            "{action} thread for {part} init during start in {duration} sec.", 
+            "{action} thread for {part} init during start in {duration} sec.",
             "ends",
-            "availability cache", 
+            "availability cache",
             sw.Elapsed.TotalSeconds);
     }
 ).Start();
@@ -121,6 +121,17 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, HlidacStatuApi.Code.SpecificApiAuthorizationMiddlewareResultHandler>();
 
+
+bool _shouldRunHealthcheckFeature = false;
+string healthcheckFeatureOption = Devmasters.Config.GetWebConfigValue("RunHealthcheckFeature");
+_shouldRunHealthcheckFeature = !string.IsNullOrWhiteSpace(healthcheckFeatureOption) &&
+                               healthcheckFeatureOption == "true";
+
+if (_shouldRunHealthcheckFeature)
+{
+    AddAllHealtChecks(builder.Services, builder.Configuration);
+
+}
 
 // Pipeline below -------------------------------------------------------------------------------------------------
 var app = builder.Build();
@@ -218,11 +229,181 @@ app.UseAuthorization();
 app.MapControllers();
 
 
+if (_shouldRunHealthcheckFeature)
+{
+    app.UseHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+    {
+        Predicate = _ => true,
+        ResponseWriter = global::HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
+    }).UseHealthChecks("/_health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+    {
+        Predicate = _ => true,
+    });
+    //app.UseHealthChecksUI(set =>
+    //    {
+    //        set.UIPath = "/status";
+    //        set.AsideMenuOpened = false;
+    //        set.AddCustomStylesheet("wwwroot\\content\\CustomHealthCheckUI.css");
+    //    }
+    //);
+
+
+}
+
 HlidacStatuApi.Code.Log.Logger.Info("{action} {code}.", "starting", "web API");
 app.Run();
 
 
+
+
+
+
 // Methods below -------------------------------------------------------------------------------------------------
+
+void AddAllHealtChecks(IServiceCollection services, IConfiguration Configuration)
+{
+    var conf = Configuration.GetSection("HealthChecks");
+
+    _ = services
+        .AddHealthChecks()
+        .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 20000,
+            name: "Web server využitá pamět",
+            tags: new[] { "Web server", "process", "memory" })
+        .AddHealthCheckWithResponseTime(
+            new global::HealthChecks.SqlServer.SqlServerHealthCheck(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 username from AspNetUsers"),
+            "SQL server", HealthStatus.Unhealthy, tags: new[] { "DB", "db" }
+        )
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ProcessOpenPorts>(
+            "Open TCP ports",
+            tags: new[] { "Web server" }
+            )
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ElasticSearchClusterStatus, HlidacStatu.Web.HealthChecks.ElasticSearchClusterStatus.Options>(
+            new HlidacStatu.Web.HealthChecks.ElasticSearchClusterStatus.Options()
+            {
+                ExpectedNumberOfNodes = 16,
+                ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';')
+            },
+            "Elastic cluster", tags: new[] { "DB", "elastic" })
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ElasticSearchNodesFreeDisk, HlidacStatu.Web.HealthChecks.ElasticSearchNodesFreeDisk.Options>(
+            new HlidacStatu.Web.HealthChecks.ElasticSearchNodesFreeDisk.Options()
+            {
+                ExpectedNumberOfNodes = 16,
+                ElasticServerUris = Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
+                MinimumFreeSpaceInMegabytes = 5000
+            },
+            "Elastic nodes disk space", tags: new[] { "DB", "elastic" })
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.NetworkDiskStorage, HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options>(
+            new HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options()
+            {
+                UNCPath = "c:\\",
+                DegradedMinimumFreeMegabytes = 10 * 1024, //10G 
+                UnHealthtMinimumFreeMegabytes = 1 * 1024 //1GB
+            },
+            "System disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
+        )
+
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.NetworkDiskStorage, HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options>(
+            new HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options()
+            {
+                UNCPath = Devmasters.Config.GetWebConfigValue("FileCachePath"),
+                DegradedMinimumFreeMegabytes = 10 * 1024, //10G 
+                UnHealthtMinimumFreeMegabytes = 1 * 1024 //1GB
+            },
+            "Cache disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
+        )
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.Couchbase, HlidacStatu.Web.HealthChecks.Couchbase.Options>(
+            new HlidacStatu.Web.HealthChecks.Couchbase.Options()
+            {
+                ServerUris = Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                Bucket = Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                Username = Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                Password = Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                Service = HlidacStatu.Web.HealthChecks.Couchbase.Service.KeyValue
+            },
+            "Couchbase", tags: new[] { "Cache" })
+        .AddHealthCheckWithResponseTime(
+            new global::HealthChecks.Network.SmtpHealthCheck(new global::HealthChecks.Network.SmtpHealthCheckOptions()
+            {
+                Host = "10.10.100.147",
+                Port = 25,
+                ConnectionType = global::HealthChecks.Network.Core.SmtpConnectionType.PLAIN
+            }),
+            "SMTP", HealthStatus.Degraded, tags: new[] { "Web server" }
+        )
+        .AddCheck<HlidacStatu.Web.HealthChecks.OCRServer>("OCR servers", tags: new[] { "OCR cloud" })
+        .AddCheck<HlidacStatu.Web.HealthChecks.OCRQueue>("OCR queues", tags: new[] { "OCR cloud" })
+        .AddCheck<HlidacStatu.Web.HealthChecks.SmlouvyZpracovane>("Zpracované smlouvy", tags: new[] { "Data" })
+        .AddCheck<HlidacStatu.Web.HealthChecks.VerejneZakazkyZpracovane>("Zpracované VZ", tags: new[] { "Data" })
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DatasetZpracovane, HlidacStatu.Web.HealthChecks.DatasetZpracovane.Options>(
+            new HlidacStatu.Web.HealthChecks.DatasetZpracovane.Options()
+            {
+                DatasetId = "vyjadreni-politiku",
+                MinRecordsInInterval = 100,
+                Interval = HlidacStatu.Web.HealthChecks.DatasetZpracovane.IntervalEnum.Day
+            }, "Dataset Vyjadření politiků", HealthStatus.Unhealthy, tags: new[] { "Data" })
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DatasetZpracovane, HlidacStatu.Web.HealthChecks.DatasetZpracovane.Options>(
+            new HlidacStatu.Web.HealthChecks.DatasetZpracovane.Options()
+            {
+                DatasetId = "veklep",
+                MinRecordsInInterval = 30,
+                Interval = HlidacStatu.Web.HealthChecks.DatasetZpracovane.IntervalEnum.Week
+            }, "Dataset VEKLEP", HealthStatus.Unhealthy, tags: new[] { "Data" })
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DatasetZpracovane, HlidacStatu.Web.HealthChecks.DatasetZpracovane.Options>(
+            new HlidacStatu.Web.HealthChecks.DatasetZpracovane.Options()
+            {
+                DatasetId = "rozhodnuti-uohs",
+                MinRecordsInInterval = 10,
+                Interval = HlidacStatu.Web.HealthChecks.DatasetZpracovane.IntervalEnum.Week
+            }, "Dataset Rozhodnuti UOHS", HealthStatus.Unhealthy, tags: new[] { "Data" })
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DatasetyStatistika, HlidacStatu.Web.HealthChecks.DatasetyStatistika.Options>(
+            new HlidacStatu.Web.HealthChecks.DatasetyStatistika.Options()
+            {
+                Exclude = new string[] { "rozhodnuti-uohs", "veklep", "vyjadreni-politiku" },
+                Interval = HlidacStatu.Web.HealthChecks.DatasetyStatistika.IntervalEnum.Month
+            }, "Statistiky malých databází", HealthStatus.Unhealthy, tags: new[] { "Data" })
+        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DockerContainer, HlidacStatu.Web.HealthChecks.DockerContainer.Options>(
+        //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.100.145").ConfigData,
+        //    "Docker .145", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DockerContainer, HlidacStatu.Web.HealthChecks.DockerContainer.Options>(
+        //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.100.146").ConfigData,
+        //    "Docker .146", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DockerContainer, HlidacStatu.Web.HealthChecks.DockerContainer.Options>(
+        //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.200").ConfigData,
+        //    "Docker .200", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DockerContainer, HlidacStatu.Web.HealthChecks.DockerContainer.Options>(
+        //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.201").ConfigData,
+        //    "Docker .201", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DockerContainer, HlidacStatu.Web.HealthChecks.DockerContainer.Options>(
+        //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.204").ConfigData,
+        //    "Docker .204", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.CamelotApis, HlidacStatu.Web.HealthChecks.CamelotApis.Options>(
+            new HlidacStatu.Web.HealthChecks.HCConfig<HlidacStatu.Web.HealthChecks.CamelotApis.Options>(conf).ConfigData,
+            "Camelot APIs", HealthStatus.Unhealthy, tags: new[] { "Docker" })
+
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ProxmoxVMs, HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(
+            new HlidacStatu.Web.HealthChecks.HCConfig<HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.100.99").ConfigData,
+            "Proxmox 100.99", HealthStatus.Unhealthy, tags: new[] { "VMs" })
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ProxmoxVMs, HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(
+            new HlidacStatu.Web.HealthChecks.HCConfig<HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.100.97").ConfigData,
+            "Proxmox 100.97", HealthStatus.Unhealthy, tags: new[] { "VMs" })
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ProxmoxVMs, HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(
+            new HlidacStatu.Web.HealthChecks.HCConfig<HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.100.95").ConfigData,
+            "Proxmox 100.95", HealthStatus.Unhealthy, tags: new[] { "VMs" })
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ProxmoxVMs, HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(
+            new HlidacStatu.Web.HealthChecks.HCConfig<HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.pve-hs-01-r540").ConfigData,
+            "Proxmox pve-hs-01-r540 (02.161)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
+        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ProxmoxVMs, HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(
+            new HlidacStatu.Web.HealthChecks.HCConfig<HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.pve-hs-02-r720xd").ConfigData,
+            "Proxmox pve-hs-02-r720xd (02.167)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
+        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ProxmoxVMs, HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(
+        //    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.pve-nic-168").ConfigData,
+        //    "Proxmox pve-nic-168 (02.168)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
+        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ProxmoxVMs, HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(
+        //new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.hs-h-01").ConfigData,
+        //"Proxmox hs-h-01 (02.160)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
+        ;
+}
 
 static bool IsDevelopment(IHostEnvironment hostEnvironment)
 {
