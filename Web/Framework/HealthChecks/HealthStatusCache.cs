@@ -10,11 +10,15 @@ namespace HlidacStatu.Web.Framework.HealthChecks
           {
               try
               {
-                  var res = Devmasters.Net.HttpClient.Simple.SharedClient(TimeSpan.FromSeconds(30))
-                          .GetStringAsync("https://api.hlidacstatu.cz/health")
-                          .ConfigureAwait(false)
-                          .GetAwaiter().GetResult();
-                  return res;
+                  using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent("https://api.hlidacstatu.cz/health"))
+                  {
+                      net.IgnoreHttpErrors = true;
+                      net.Timeout = 60000;
+                      net.TimeInMsBetweenTries = 50;
+                      net.Tries = 3;
+                      var res = net.GetContent();
+                      return res.Text;
+                  }
 
               }
               catch (Exception e)
