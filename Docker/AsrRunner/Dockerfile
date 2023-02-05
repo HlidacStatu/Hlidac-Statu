@@ -1,16 +1,21 @@
-﻿FROM hlidacstatu/czech-asr:2.0.0
-CMD ""
-RUN chmod u+x /opt/app/process.sh
-RUN wget https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
-    dpkg -i packages-microsoft-prod.deb && \
-    rm packages-microsoft-prod.deb
+#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-RUN apt-get update && \
-    apt-get install -y apt-transport-https && \
-    apt-get update && \
-    apt-get install -y aspnetcore-runtime-6.0 
+FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
+WORKDIR /app
 
-WORKDIR /Asr
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
+COPY ["Hlidac-Statu/nuget.config", "Hlidac-Statu/"]
+COPY ["Hlidac-Statu/Docker/AsrRunner/AsrRunner.csproj", "Hlidac-Statu/Docker/AsrRunner/"]
+RUN dotnet restore "Hlidac-Statu/Docker/AsrRunner/AsrRunner.csproj"
+COPY . .
+WORKDIR "/src/Hlidac-Statu/Docker/AsrRunner"
+RUN dotnet build "AsrRunner.csproj" -c Release -o /app/build
 
-COPY ./bin/dockerPublish/ .
+FROM build AS publish
+RUN dotnet publish "AsrRunner.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "AsrRunner.dll"]

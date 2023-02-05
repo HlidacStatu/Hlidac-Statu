@@ -68,10 +68,15 @@ while (!applicationCts.IsCancellationRequested)
             queueItem = await taskQueueService.GetNewTaskAsync(applicationCts.Token);
 
         if (queueItem == null)
+        {
+            await Task.Delay(Global.DelayIfServerHasNoTaskInSec * 3000);
             continue;
+        }
         if (string.IsNullOrEmpty(queueItem.Dataset) || string.IsNullOrEmpty(queueItem.ItemId))
+        {
+            await Task.Delay(Global.DelayIfServerHasNoTaskInSec * 1000);
             continue;
-
+        }
     }
     catch (Exception e)
     {
