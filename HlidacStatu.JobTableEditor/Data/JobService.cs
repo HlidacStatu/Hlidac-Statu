@@ -13,7 +13,7 @@ namespace HlidacStatu.JobTableEditor.Data
 {
     public class JobService
     {
-        static readonly InTables it_inTables = new("IT", IT.Keywords, IT.OtherWords, IT.BlacklistedWords);
+        //static readonly InTables it_inTables = new("IT", IT.Keywords, IT.OtherWords, IT.BlacklistedWords);
         
         ILogger<JobService> _logger;
 
@@ -39,9 +39,6 @@ namespace HlidacStatu.JobTableEditor.Data
             sw.Stop();
             var tableToCellsTime = sw.ElapsedMilliseconds;
             
-            sw.Restart();
-            var score = it_inTables.CellsWithWordsAndNumbers(cells, out var foundJobs);
-            sw.Stop();
             var cellsWithWordsAndNumbersTime = sw.ElapsedMilliseconds;
             
             sw.Restart();
@@ -63,7 +60,6 @@ namespace HlidacStatu.JobTableEditor.Data
         {
             var table = await InDocTablesRepo.GetSpecific(pk, user, cancellationToken);
             var cells = InTables.TableToCells(table.ParsedContent());
-            var score = it_inTables.CellsWithWordsAndNumbers(cells, out var foundJobs);
 
             var st = new SomeTable
             {

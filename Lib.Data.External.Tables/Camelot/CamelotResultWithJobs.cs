@@ -6,9 +6,9 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
     public class CamelotResultWithJobs : CamelotResult
     {
-        static HlidacStatu.DetectJobs.InTables it_inTables = new DetectJobs.InTables("IT",
-            HlidacStatu.DetectJobs.IT.Keywords, HlidacStatu.DetectJobs.IT.OtherWords, HlidacStatu.DetectJobs.IT.BlacklistedWords
-            );
+        //static HlidacStatu.DetectJobs.InTables it_inTables = new DetectJobs.InTables("IT",
+        //    HlidacStatu.DetectJobs.IT.Keywords, HlidacStatu.DetectJobs.IT.OtherWords, HlidacStatu.DetectJobs.IT.BlacklistedWords
+        //    );
 
         public CamelotResultWithJobs(HlidacStatu.Entities.DocTables.Result cr)
         {
@@ -25,11 +25,11 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     tbl.TableInPage = crT.TableInPage;
 
                     var cells = InTables.TableToCells(tbl.ParsedContent());
-                    var score = it_inTables.CellsWithWordsAndNumbers(cells, out var foundJobs);
+                    //var score = it_inTables.CellsWithWordsAndNumbers(cells, out var foundJobs);
 
-                    if (foundJobs != null)
-                        tbl.FoundJobs = foundJobs.ToArray();
-                    else
+                    //if (foundJobs != null)
+                    //    tbl.FoundJobs = foundJobs.ToArray();
+                    //else
                         tbl.FoundJobs = new DetectJobs.InTables.Job[] { };
                     tbls.Add(tbl);
                 }
