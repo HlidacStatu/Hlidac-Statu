@@ -183,8 +183,8 @@ namespace HlidacStatu.Repositories
                 Dumps_Path = Devmasters.Config.GetWebConfigValue("DumpsPath");
                 if (string.IsNullOrEmpty(Dumps_Path))
                     throw new ArgumentNullException(".config param DumpsPath missing");
-                if (!Dumps_Path.EndsWith(@"\"))
-                    Dumps_Path = Dumps_Path + @"\";
+                if (!Dumps_Path.EndsWith(Path.DirectorySeparatorChar))
+                    Dumps_Path = Dumps_Path + Path.DirectorySeparatorChar;
                 Directory.CreateDirectory(Dumps_Path);
 
 
