@@ -18,10 +18,10 @@ namespace HlidacStatu.Entities.VZ
     {
         public class Sources
         {
-            public const string VestnikVerejnychZakazek = "https://vestnikverejnychzakazek.cz/";
-            public const string VestnikVerejnychZakazekOld ="https://old.vestnikverejnychzakazek.cz/";
-            public const string Datlab = "https://datlab.eu/";
-            public const string Rozza = "https://rozza.cz/";
+            public const string VestnikVerejnychZakazek = "https://vestnikverejnychzakazek.cz";
+            public const string VestnikVerejnychZakazekOld ="https://old.vestnikverejnychzakazek.cz";
+            public const string Datlab = "https://datlab.eu";
+            public const string Rozza = "https://rozza.cz";
         }
         
         public const string Pre2016Dataset = "VVZ-2006";
@@ -245,7 +245,7 @@ namespace HlidacStatu.Entities.VZ
             // [Date()]
             // public DateTime PosledniZmenaZdroje { get; set; }
             [Date()]
-            public DateTime Modified { get; set; }
+            public DateTime? Modified { get; set; }
 
             public bool Equals(Zdroj other)
             {
