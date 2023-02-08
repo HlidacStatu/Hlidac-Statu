@@ -96,7 +96,7 @@ else
             {
                 if (HlidacStatu.Util.DataValidators.CheckCZICO(od.ICO))
                 {
-                    @(await Html.KIndexLabelLinkAsync(od.ICO))<a href="/subjekt/@od.ICO">@od.Jmeno (IČ @od.ICO)</a>
+                    @(await Html.KIndexLabelLinkAsync(od.ICO))<a href="/subjekt/@od.ICO">@od.Jmeno (IČ @od.ICO)</a><br/>
                 }
                 else
                 {
@@ -251,7 +251,7 @@ else
         <td>
             @foreach (var url in Model.UrlZakazky)
             {
-                <a href="@url">@url</a>
+                <a href="@url">@url</a><br/>
             }
         </td>
         </tr>
