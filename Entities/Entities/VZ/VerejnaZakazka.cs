@@ -274,7 +274,7 @@ namespace HlidacStatu.Entities.VZ
         public string EvidencniCisloZVestniku(bool isPre2016 = false)
         {
             string evidencniCilo = Zdroje.Where(zdroj =>
-                    zdroj.IsPre2016 = isPre2016 && zdroj.Domena == Sources.VestnikVerejnychZakazek)
+                    zdroj.IsPre2016 == isPre2016 && zdroj.Domena == Sources.VestnikVerejnychZakazek)
                 .Select(zdroj => zdroj.IdVDomene)
                 .FirstOrDefault();
 
