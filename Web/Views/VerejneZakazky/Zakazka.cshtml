@@ -68,10 +68,6 @@ else
     <table class="table table-hover">
     <tbody>
     <tr>
-        <td>Zdroje dat</td>
-        <td>@Model.VypisZdroju("<br/>")</td>
-    </tr>
-    <tr>
         <td>Název zakázky</td>
         <td>@Model.NazevZakazky</td>
     </tr>
@@ -240,6 +236,7 @@ else
             @if (Model.Zdroje.Any())
             {
                 <strong>Doména - <i>Id</i></strong>
+                <hr style="border-top-color: #dee2e6"/>
                 foreach (var zdroj in Model.Zdroje)
                 {
                     <p>

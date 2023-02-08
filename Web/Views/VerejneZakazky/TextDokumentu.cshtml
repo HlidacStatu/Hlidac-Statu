@@ -7,10 +7,10 @@
     ViewBag.Title = "Text dokumentu";
 
 
-    string hash = Context.Request.Query["hash"];
+    string hash = Context.Request.Query["sha"];
     string plainText = string.Empty;
 
-    VerejnaZakazka.Document doc = Model.Dokumenty.Where(m => m.StorageIds.Contains(hash)).FirstOrDefault();
+    VerejnaZakazka.Document doc = Model.Dokumenty.FirstOrDefault(m => m.Sha256Checksum.Contains(hash));
     plainText = doc?.PlainText ?? "";
 
 
