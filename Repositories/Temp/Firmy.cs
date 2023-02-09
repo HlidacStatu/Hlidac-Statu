@@ -32,26 +32,26 @@ namespace HlidacStatu.Repositories
             return o ?? nullObj;
         }
 
-        public static Devmasters.Cache.Hazelcast.Manager<Firma, string> instanceByIco
-            = Devmasters.Cache.Hazelcast.Manager<Firma, string>.GetSafeInstance("firmyByICO_v2_", getByIco, TimeSpan.FromHours(4),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000);
+        public static Devmasters.Cache.Couchbase.Manager<Firma, string> instanceByIco
+            = Devmasters.Cache.Couchbase.Manager<Firma, string>.GetSafeInstance("firmyByICO_v2_", getByIco, TimeSpan.FromHours(4),
+                Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                Devmasters.Config.GetWebConfigValue("CouchbasePassword"));
 
-        public static Devmasters.Cache.Hazelcast.Manager<Firma, string> instanceByDS
-            = Devmasters.Cache.Hazelcast.Manager<Firma, string>.GetSafeInstance("firmyByDS_v2_", getByDS, TimeSpan.FromHours(4),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000);
+        public static Devmasters.Cache.Couchbase.Manager<Firma, string> instanceByDS
+            = Devmasters.Cache.Couchbase.Manager<Firma, string>.GetSafeInstance("firmyByDS_v2_", getByDS, TimeSpan.FromHours(4),
+                Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                Devmasters.Config.GetWebConfigValue("CouchbasePassword"));
 
-        public static Devmasters.Cache.Hazelcast.Manager<string, string> instanceNameOnlyByIco
-            = Devmasters.Cache.Hazelcast.Manager<string, string>.GetSafeInstance("firmaNameOnlyByICO_v2_", getNameByIco, TimeSpan.FromHours(12),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000);
+        public static Devmasters.Cache.Couchbase.Manager<string, string> instanceNameOnlyByIco
+            = Devmasters.Cache.Couchbase.Manager<string, string>.GetSafeInstance("firmaNameOnlyByICO_v2_", getNameByIco, TimeSpan.FromHours(12),
+                Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                Devmasters.Config.GetWebConfigValue("CouchbasePassword"));
 
         public static string GetJmeno(int ICO)
         {

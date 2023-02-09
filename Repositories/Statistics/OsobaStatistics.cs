@@ -11,16 +11,16 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static class OsobaStatistics
     {
-        static Devmasters.Cache.Hazelcast.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
+        static Devmasters.Cache.Couchbase.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
             _cache
-                = Devmasters.Cache.Hazelcast.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
+                = Devmasters.Cache.Couchbase.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
                     .GetSafeInstance("Osoba_SmlouvyStatistics_v1_",
                         (obj) => Calculate(obj.os, (Relation.AktualnostType)obj.aktualnost, obj.obor),
                         TimeSpan.FromHours(18),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000,
+                        Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
+                        Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
+                        Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
+                        Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
                         obj => $"{obj.os.NameId}/{obj.aktualnost}/{(obj.obor ?? 0)}");
 
 
