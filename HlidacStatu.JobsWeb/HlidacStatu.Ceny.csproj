@@ -23,6 +23,7 @@
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.11" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.12" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.12" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
 
     </ItemGroup>
 

@@ -16,15 +16,14 @@ namespace HlidacStatu.Repositories
     {
         public static class Zatrideni
         {
-            private static Devmasters.Cache.Couchbase.Manager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory> instanceByZatrideni
-                = Devmasters.Cache.Couchbase.Manager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory>.GetSafeInstance("oboryByObor", 
+            private static Devmasters.Cache.Hazelcast.Manager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory> instanceByZatrideni
+                = Devmasters.Cache.Hazelcast.Manager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory>.GetSafeInstance("oboryByObor", 
                     obor => GetSubjektyDirectAsync(obor).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromDays(2),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                    Devmasters.Config.GetWebConfigValue("CouchbasePassword")
-                );
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
+                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000);
             private static async Task<Firma.Zatrideni.Item[]> GetSubjektyDirectAsync(Firma.Zatrideni.SubjektyObory obor)
             {
                 string[] icos = null;
