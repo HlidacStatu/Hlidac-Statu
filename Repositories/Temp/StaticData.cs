@@ -621,7 +621,7 @@ namespace HlidacStatu.Repositories
 
         private static organizacni_struktura_sluzebnich_uradu ParseOssu()
         {
-            string path = $"{Connectors.Init.WebAppDataPath}\\ISoSS_Opendata_OSYS_OSSS.xml";
+            string path = $"{Connectors.Init.WebAppDataPath}{Path.DirectorySeparatorChar}ISoSS_Opendata_OSYS_OSSS.xml";
 
             var ser = new XmlSerializer(typeof(organizacni_struktura_sluzebnich_uradu));
             

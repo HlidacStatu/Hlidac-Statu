@@ -736,40 +736,11 @@ namespace HlidacStatu.Entities.VZ
         }
         public bool NotInterestingToShow() { return false; }
 
-
-
-
-
-
-        
-        
-        
-        //todo: odstranit nepoužívané
-        public VerejnaZakazka Export(bool allData = false)
-        {
-            VerejnaZakazka vz = (VerejnaZakazka)MemberwiseClone();
-            if (allData == false)
-            {
-                if (vz.Dokumenty != null)
-                {
-                    foreach (var vzd in vz.Dokumenty)
-                    {
-                        vzd.DirectUrls = new HashSet<string>();
-                        vzd.PlainDocumentIds = new HashSet<string>();
-                        vzd.PlainText = "-- Tato data jsou dostupná pouze v komerční nebo speciální licenci. Kontaktujte nás. --";
-                    }
-                }
-            }
-            vz.RawHtml = "";
-            return vz;
-        }
-//todo: dořešit exporty
         public ExpandoObject FlatExport()
         {
             dynamic v = new ExpandoObject();
             v.Url = GetUrl(false);
-            v.datasety = Zdroje;
-
+            v.datasety = VypisZdroju();
             v.PosledniZmena = PosledniZmena;
             v.LhutaDoruceni = LhutaDoruceni;
             v.KonecnaHodnotaBezDPH = KonecnaHodnotaBezDPH;
