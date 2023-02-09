@@ -58,7 +58,6 @@
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="6.0.5" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="6.0.5" />
         <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="6.0.3" />
-        <PackageReference Include="CouchbaseNetClient" Version="2.7.26" />
         <PackageReference Include="Devmasters.Core" Version="4.1.2" />
         <PackageReference Include="Devmasters.Lang" Version="4.0.3" />
         
@@ -90,6 +89,7 @@
         <PackageReference Include="Schema.NET" Version="11.0.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
         <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>

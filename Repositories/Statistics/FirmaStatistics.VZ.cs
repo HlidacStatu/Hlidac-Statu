@@ -9,27 +9,27 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static partial class FirmaStatistics
     {
-        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
-           _VZCache = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
+        static Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
+           _VZCache = Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
                .GetSafeInstance("Firma_VZStatistics",
                    (firma) => CalculateVZStat(firma),
                    TimeSpan.FromHours(12),
-                   Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                   Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                   Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                   Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
+                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000,
                    f => f.ICO);
 
 
-        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
-           _holdingVZCache = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
+        static Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
+           _holdingVZCache = Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
                .GetSafeInstance("Holding_VZStatistics",
                    (obj) => CalculateHoldingVZStat(obj.firma, obj.aktualnost),
                    TimeSpan.FromHours(12),
-                   Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                   Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                   Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                   Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
+                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000,
                    obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
 
         public static StatisticsSubjectPerYear<Firma.Statistics.VZ> CachedHoldingStatisticsVZ(
