@@ -741,43 +741,8 @@ namespace HlidacStatu.Entities.VZ
 
 
 
-        public class ZakazkaSource
-        {
-            public string ZakazkaURL { get; set; }
-            public string ProfilZadavatelUrl { get; set; }
-            public string SearchZakazkaUrl { get; set; }
-
-        }
-        public class ExportedVZ
-        {
-            public class SubjectExport
-            {
-                public SubjectExport() { }
-
-                public string ICO { get; set; }
-                public string Jmeno { get; set; }
-                public string KrajId { get; set; }
-                public string OkresId { get; set; }
-            }
-            public string Id { get; set; }
-            public string EvidencniCisloZakazky { get; set; }
-            public SubjectExport Zadavatel { get; set; }
-            public Subject[] Dodavatele { get; set; }
-            public string NazevZakazky { get; set; }
-            public string PopisZakazky { get; set; }
-            public string[] CPV { get; set; }
-            public DateTime? DatumUverejneni { get; set; }
-            public DateTime? LhutaDoruceni { get; set; }
-            public DateTime? DatumUzavreniSmlouvy { get; set; }
-            public DateTime? PosledniZmena { get; set; }
-            public StavyZakazky StavZakazky { get; set; }
-            public decimal? OdhadovanaHodnotaBezDPH { get; set; } = null;
-            public decimal? KonecnaHodnotaBezDPH { get; set; } = null;
-            public string OdhadovanaHodnotaMena { get; set; }
-            public string KonecnaHodnotaMena { get; set; }
-            public string UrlProfiluZadavatele { get; set; }
-            public ZakazkaSource ZdrojZakazky { get; set; }
-        }
+        
+        
         
         //todo: odstranit nepoužívané
         public VerejnaZakazka Export(bool allData = false)

@@ -172,26 +172,6 @@ namespace HlidacStatu.Extensions
             return infofacts;
         }
 
-        public static VerejnaZakazka.ExportedVZ.SubjectExport SubjectExport(
-            VerejnaZakazka.Subject s)
-        {
-            VerejnaZakazka.ExportedVZ.SubjectExport subjectExport = new();
-            if (s != null)
-            {
-                subjectExport.ICO = s.ICO;
-                subjectExport.Jmeno = s.Jmeno;
-            }
-            if (!string.IsNullOrEmpty(s?.ICO))
-            {
-                var f = FirmaRepo.FromIco(s.ICO);
-                if (f != null && f.Valid)
-                {
-                    subjectExport.KrajId = f.KrajId;
-                    subjectExport.OkresId = f.OkresId;
-                }
-            }
-
-            return subjectExport;
-        }
+        
     }
 }
