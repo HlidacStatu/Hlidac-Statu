@@ -18,9 +18,6 @@ namespace HlidacStatu.Repositories.Statistics
                         (obj) => Calculate(obj.os, (Relation.AktualnostType)obj.aktualnost, obj.obor),
                         TimeSpan.FromHours(18),
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000,
                         obj => $"{obj.os.NameId}/{obj.aktualnost}/{(obj.obor ?? 0)}");
 
 

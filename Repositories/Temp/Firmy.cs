@@ -34,24 +34,18 @@ namespace HlidacStatu.Repositories
 
         public static Devmasters.Cache.Hazelcast.Manager<Firma, string> instanceByIco
             = Devmasters.Cache.Hazelcast.Manager<Firma, string>.GetSafeInstance("firmyByICO_v2_", getByIco, TimeSpan.FromHours(4),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000);
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
+                   );
 
         public static Devmasters.Cache.Hazelcast.Manager<Firma, string> instanceByDS
             = Devmasters.Cache.Hazelcast.Manager<Firma, string>.GetSafeInstance("firmyByDS_v2_", getByDS, TimeSpan.FromHours(4),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000);
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
+                    );
 
         public static Devmasters.Cache.Hazelcast.Manager<string, string> instanceNameOnlyByIco
             = Devmasters.Cache.Hazelcast.Manager<string, string>.GetSafeInstance("firmaNameOnlyByICO_v2_", getNameByIco, TimeSpan.FromHours(12),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000);
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
+                    );
 
         public static string GetJmeno(int ICO)
         {

@@ -70,10 +70,7 @@ namespace HlidacStatu.Repositories
         private class OsobyMCMById : Devmasters.Cache.Hazelcast.Manager<Osoba, int>
         {
             public OsobyMCMById() : base("PersonById", getById, TimeSpan.FromMinutes(10),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000)
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','))
             { }
 
             public override Osoba Get(int key)
@@ -117,10 +114,7 @@ namespace HlidacStatu.Repositories
         private class OsobyMCMByNameId : Devmasters.Cache.Hazelcast.Manager<Osoba, string>
         {
             public OsobyMCMByNameId() : base("PersonByNameId", getByNameId, TimeSpan.FromMinutes(10),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000)
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','))
             { }
 
             public override Osoba Get(string key)

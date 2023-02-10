@@ -14,10 +14,8 @@ namespace HlidacStatu.Repositories.Statistics
                 .GetSafeInstance("SmlouvyStatistics_Query_v3_",
                     (query) => CalculateAsync(query).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(12),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClusterName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastDbName"),
-                    Devmasters.Config.GetWebConfigValue("HazelcastClientName"), 10000);
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
+                    );
 
         static object _cachesLock = new object();
 
