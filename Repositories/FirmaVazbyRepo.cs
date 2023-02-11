@@ -99,7 +99,7 @@ namespace HlidacStatu.Repositories
 
 
 
-        public static Firma[] ParentVazbyFirmy(this Firma firma, Relation.AktualnostType minAktualnost)
+        public static Firma[] ParentFirmy(this Firma firma, Relation.AktualnostType minAktualnost)
         {
             if (firma._parents == null)
             {
@@ -173,6 +173,7 @@ namespace HlidacStatu.Repositories
 
         public static HlidacStatu.DS.Graphs.Graph.Edge[] ParentVazbyOsoby(this Firma firma, Relation.AktualnostType minAktualnost)
         {
+            throw new NotImplementedException(); //funguje blbe, dobre funguje firma.Osoby_v_OR
             if (firma._parentVazbyOsoby == null)
                 firma._parentVazbyOsoby = Graph.GetDirectParentRelationsOsoby(firma.ICO).ToArray();
             return Relation.AktualniVazby(firma._parentVazbyOsoby, minAktualnost, firma.VazbyRootEdge());

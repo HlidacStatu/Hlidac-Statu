@@ -5,7 +5,7 @@ using System;
 
 namespace HlidacStatu.Repositories.Statistics
 {
-    public static class VerejnaZakazkaStatistics
+    public static class VerejneZakazkyStatistics
     {
         static Devmasters.Cache.Hazelcast.Manager<StatisticsPerYear<Firma.Statistics.VZ>, string> _cache
             = Devmasters.Cache.Hazelcast.Manager<StatisticsPerYear<Firma.Statistics.VZ>, string>

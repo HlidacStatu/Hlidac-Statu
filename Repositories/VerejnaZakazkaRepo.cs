@@ -15,6 +15,7 @@ using HlidacStatu.Entities;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
+using HlidacStatu.Entities.XSD;
 
 
 namespace HlidacStatu.Repositories
@@ -63,6 +64,11 @@ namespace HlidacStatu.Repositories
                     verejnaZakazka.PosledniZmena = verejnaZakazka.GetPosledniZmena();
                 var es = client ??await Manager.GetESClient_VZAsync();
                 await es.IndexDocumentAsync<VerejnaZakazka>(verejnaZakazka);
+
+                Statistics.Recalculate.AddFirmaToProcessingQueue(verejnaZakazka.Zadavatel.ICO, Statistics.RecalculateItem.StatisticsTypeEnum.VZ , $"VZ {verejnaZakazka.Id}");
+                foreach (var dod in verejnaZakazka.Dodavatele)
+                    Statistics.Recalculate.AddFirmaToProcessingQueue(dod.ICO, Statistics.RecalculateItem.StatisticsTypeEnum.VZ, $"VZ {verejnaZakazka.Id}");
+
             }
             catch (Exception e)
             {

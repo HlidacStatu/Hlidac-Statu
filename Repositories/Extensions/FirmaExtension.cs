@@ -78,7 +78,7 @@ namespace HlidacStatu.Extensions
             }
             else if (firma.JsemStatniFirma())
             {
-                var parentOVM = firma.ParentVazbyFirmy(Relation.AktualnostType.Aktualni)
+                var parentOVM = firma.ParentFirmy(Relation.AktualnostType.Aktualni)
                     .ToArray();
 
                 musi = parentOVM
@@ -246,7 +246,7 @@ namespace HlidacStatu.Extensions
                     .AsQueryable()
                     .Join(osv, o => o.InternalId, ov => ov.OsobaId, (o, ov) => new Tuple<Osoba, OsobaVazby>(o, ov))
                     .Select<Tuple<Osoba, OsobaVazby>, (Osoba o, OsobaVazby ov)>(m => new(m.Item1, m.Item2));
-                //var res = from os in db.Osoba
+                //var res = from os in db.Person
                 //          join ov in db.OsobaVazby on new { id = os.InternalId }  equals new { id = ov.OsobaId }
                 //          select new(os, ov);
                 //var sql = res.ToQueryString();

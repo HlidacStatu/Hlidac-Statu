@@ -1,4 +1,5 @@
 using HlidacStatu.Entities.Dotace;
+using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 
@@ -42,9 +43,14 @@ namespace HlidacStatu.Repositories
             dotace.CalculateCerpaniYears();
 
             var res = await _dotaceClient.IndexAsync(dotace, o => o.Id(dotace.IdDotace)); //druhy parametr musi byt pole, ktere je unikatni
+
             if (!res.IsValid)
             {
                 throw new ApplicationException(res.ServerError?.ToString());
+            }
+            else
+            {
+                Statistics.Recalculate.AddFirmaToProcessingQueue(dotace.Prijemce.Ico, Statistics.RecalculateItem.StatisticsTypeEnum.Dotace, $"VZ {dotace.IdDotace}");
             }
         }
 

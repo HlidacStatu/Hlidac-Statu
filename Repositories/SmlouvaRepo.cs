@@ -6,7 +6,7 @@ using HlidacStatu.Entities.Issues;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories.Searching;
-
+using HlidacStatu.Repositories.Statistics;
 using Nest;
 
 using System;
@@ -346,8 +346,33 @@ namespace HlidacStatu.Repositories
             if (smlouva == null)
                 return false;
 
+
             if (skipPrepareBeforeSave == false)
                 PrepareBeforeSave(smlouva, updateLastUpdateValue);
+
+            //update statistics of subjects
+            bool updateStat = false;
+            var preSml = await LoadAsync(smlouva.Id, includePrilohy: false);
+            if (preSml == null) //nova smlouva
+                updateStat = true;
+            else
+            {
+                updateStat = updateStat || preSml.Platce.ico != smlouva.Platce.ico;
+                updateStat = updateStat || preSml.Prijemce.Length != smlouva.Prijemce.Length;
+                updateStat = updateStat || preSml.CalculatedPriceWithVATinCZK != smlouva.CalculatedPriceWithVATinCZK;
+                if (updateStat == false)
+                {
+                    foreach (var pr in preSml.Prijemce)
+                    {
+                        updateStat = updateStat || smlouva.Prijemce.Any(p => p.ico == pr.ico)==false;
+                    }
+                    foreach (var pr in smlouva.Prijemce)
+                    {
+                        updateStat = updateStat || preSml.Prijemce.Any(p => p.ico == pr.ico) == false;
+                    }
+                }
+            }
+
 
             ElasticClient c = client;
             if (c == null)
@@ -366,13 +391,21 @@ namespace HlidacStatu.Repositories
                 var cExist = await Repositories.ES.Manager.GetESClientAsync();
                 var s = await LoadAsync(smlouva.Id, cExist);
                 if (s != null)
-                    await DeleteAsync(smlouva.Id, cExist);
+                    _ = await DeleteAsync(smlouva.Id, cExist);
             }
 
             if (res.IsValid)
             {
                 SaveSmlouvaDataIntoDB(smlouva);
             }
+
+            if (updateStat)
+            {
+                Recalculate.AddFirmaToProcessingQueue(smlouva.Platce.ico, RecalculateItem.StatisticsTypeEnum.Smlouva, $"smlouva {smlouva.Id}");
+                foreach (var pr in smlouva.Prijemce)
+                    Recalculate.AddFirmaToProcessingQueue(pr.ico, RecalculateItem.StatisticsTypeEnum.Smlouva, $"smlouva {smlouva.Id}");
+            }
+
 
             return res.IsValid;
         }
