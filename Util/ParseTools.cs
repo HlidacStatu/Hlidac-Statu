@@ -119,6 +119,9 @@ namespace HlidacStatu.Util
                 return string.Empty;
 
             ico = ico.Trim();
+            if (string.IsNullOrEmpty(ico))
+                return string.Empty;
+
             if (ico.Contains("cz-"))
                 return MerkIcoToICO(ico);
             else
