@@ -350,9 +350,9 @@ namespace HlidacStatu.Extensions
             HoldingStatisticsRegistrSmluvProObor(
                 this Firma firma,
                 Relation.AktualnostType aktualnost,
-                Smlouva.SClassification.ClassificationsTypes classification)
+                Smlouva.SClassification.ClassificationsTypes classification, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, (int)classification);
+            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, (int)classification, forceUpdateCache);
         }
 
         public static bool PatrimStatuAlespon25procent(this Firma firma) => (firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu25perc);
@@ -610,8 +610,11 @@ namespace HlidacStatu.Extensions
             return cache;
         }
 
-        public static InfoFact[] InfoFacts(this Firma firma) //otázka jestli tohle nebrat z cachce
+        public static InfoFact[] InfoFacts(this Firma firma, bool forceUpdateCache = false) //otázka jestli tohle nebrat z cachce
         {
+            if (forceUpdateCache)
+                _infoFactsCache().Delete(firma);
+
             var inf = _infoFactsCache().Get(firma);
             return inf;
         }
