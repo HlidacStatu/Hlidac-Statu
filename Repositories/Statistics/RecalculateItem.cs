@@ -23,12 +23,12 @@ namespace HlidacStatu.Repositories.Statistics
                 return false;
             }
 
-            return x.Id == y.Id && x.ItemType == y.ItemType;
+            return x.UniqueKey == y.UniqueKey;
         }
 
         public int GetHashCode([DisallowNull] RecalculateItem obj)
         {
-            return $"{obj.ItemType}_{obj.Id}".GetHashCode();
+            return obj.UniqueKey.GetHashCode();
         }
     }
     public class RecalculateItem
@@ -65,5 +65,14 @@ namespace HlidacStatu.Repositories.Statistics
         public StatisticsTypeEnum StatisticsType { get; set; }
         public DateTime Created { get; set; } = DateTime.Now;
         public string ProvokedBy { get; set; }
+
+        [Newtonsoft.Json.JsonIgnore]
+        public string UniqueKey
+        {
+            get
+            {
+                return $"{ItemType}_{Id}_{StatisticsType}";
+            }
+        }
     }
 }

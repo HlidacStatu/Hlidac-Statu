@@ -22,8 +22,11 @@ namespace HlidacStatu.Repositories.Statistics
 
 
         public static Osoba.Statistics.RegistrSmluv CachedStatistics(Osoba os, Relation.AktualnostType aktualnost,
-            int? obor)
+            int? obor, bool forceUpdateCache = false)
         {
+            if (forceUpdateCache)
+                _cache.Delete((os, (int)aktualnost, obor));
+
             return _cache.Get((os, (int)aktualnost, obor));
         }
 

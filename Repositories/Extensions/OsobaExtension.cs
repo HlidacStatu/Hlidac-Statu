@@ -398,10 +398,10 @@ namespace HlidacStatu.Extensions
 
         //tohle do repositories
         public static Osoba.Statistics.RegistrSmluv StatistikaRegistrSmluv(this Osoba osoba,
-            Relation.AktualnostType minAktualnost, int? obor = null)
+            Relation.AktualnostType minAktualnost, int? obor = null, bool forceUpdateCache = false)
         {
-            return OsobaStatistics.CachedStatistics(osoba, minAktualnost, obor);
-        }
+            return OsobaStatistics.CachedStatistics(osoba, minAktualnost, obor,forceUpdateCache);
+        }   
 
         static Devmasters.Cache.LocalMemory.Manager<InfoFact[], Osoba> _cacheInfoFacts = 
             Devmasters.Cache.LocalMemory.Manager<InfoFact[], Osoba>

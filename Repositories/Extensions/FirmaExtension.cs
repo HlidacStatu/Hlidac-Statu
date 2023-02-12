@@ -341,9 +341,9 @@ namespace HlidacStatu.Extensions
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> HoldingStatisticsRegistrSmluv(
             this Firma firma,
-            Relation.AktualnostType aktualnost, int? obor = null)
+            Relation.AktualnostType aktualnost, int? obor = null, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor);
+            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor, forceUpdateCache);
         }
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>
@@ -625,7 +625,7 @@ namespace HlidacStatu.Extensions
             var stat = firma.StatistikaRegistruSmluv();
             var statHolding = firma.HoldingStatisticsRegistrSmluv(Relation.AktualnostType.Aktualni);
             int rok = DateTime.Now.Year;
-            if (DateTime.Now.Month < 2)
+            if (DateTime.Now.Month < 3)
                 rok = rok - 1;
 
             if (stat.Sum(stat.YearsAfter2016(), s => s.PocetSmluv) == 0)
