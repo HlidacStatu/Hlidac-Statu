@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -51,9 +52,12 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
 
-                var email = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("ResetPassword");
+                var email = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("ResetPassword_WatchdogAnalytics");
                 email.Model.CallbackUrl = callbackUrl;
                 email.To = user.Email;
+                email.EmailFooterText = "";
+                email.EmailFooterHtml = new HtmlString("");
+                email.From = "info@WatchdogAnalytics.cz";
                 email.SendMe();
 
                 return RedirectToPage("./ForgotPasswordConfirmation");

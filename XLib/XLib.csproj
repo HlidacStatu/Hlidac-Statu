@@ -38,6 +38,9 @@
       <EmbeddedResource Include="Emails\Templates\Register.cshtml" />
       <EmbeddedResource Include="Emails\Templates\Register.Html.cshtml" />
       <EmbeddedResource Include="Emails\Templates\Register.Text.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\ResetPassword_WatchdogAnalytics.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\ResetPassword_WatchdogAnalytics.Html.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\ResetPassword_WatchdogAnalytics.Text.cshtml" />
       <EmbeddedResource Include="Emails\Templates\ResetPassword.cshtml" />
       <EmbeddedResource Include="Emails\Templates\ResetPassword.Html.cshtml" />
       <EmbeddedResource Include="Emails\Templates\ResetPassword.Text.cshtml" />
@@ -52,6 +55,12 @@
 
     <ItemGroup>
       <Compile Remove="Watchdogs\DotaceService.Watchdog.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Emails\Templates\ResetPassword_WatchdogAnalytics.cshtml" />
+      <None Remove="Emails\Templates\ResetPassword_WatchdogAnalytics.Html.cshtml" />
+      <None Remove="Emails\Templates\ResetPassword_WatchdogAnalytics.Text.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
