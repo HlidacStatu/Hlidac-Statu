@@ -740,7 +740,7 @@ namespace HlidacStatu.Entities.VZ
         {
             dynamic v = new ExpandoObject();
             v.Url = GetUrl(false);
-            v.datasety = VypisZdroju();
+            v.datasety = VypisZdroju(";");
             v.PosledniZmena = PosledniZmena;
             v.LhutaDoruceni = LhutaDoruceni;
             v.KonecnaHodnotaBezDPH = KonecnaHodnotaBezDPH;
