@@ -25,13 +25,13 @@ namespace HlidacStatu.Repositories
         {
 
             private static volatile Devmasters.Cache.Elastic.Manager<string[], QueryBatch> cacheSmlouvy
-                = Devmasters.Cache.Elastic.Manager<string[], QueryBatch>.GetSafeManagerInstance(
+                = Devmasters.Cache.Elastic.Manager<string[], QueryBatch>.GetSafeInstance(
                     "cachedIdsSmlouvy",
                     q => GetSmlouvyIdAsync(q).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(24),
                     Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-                    "DevmastersCache", null, null,
-                    key => key.TaskPrefix + Devmasters.Crypto.Hash.ComputeHashToHex(key.Query)
+                    Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"), 
+                    keyValueSelector: key => key.TaskPrefix + Devmasters.Crypto.Hash.ComputeHashToHex(key.Query)
                     );
 
             public static string[] Smlouvy(QueryBatch query, bool forceUpdate = false)

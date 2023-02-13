@@ -401,12 +401,14 @@ namespace HlidacStatu.Extensions
             return OsobaStatistics.CachedStatistics(osoba, minAktualnost, obor, forceUpdateCache);
         }
 
-        static Devmasters.Cache.LocalMemory.Manager<InfoFact[], Osoba> _cacheInfoFacts =
-            Devmasters.Cache.LocalMemory.Manager<InfoFact[], Osoba>
+        static Devmasters.Cache.Elastic.Manager<InfoFact[], Osoba> _cacheInfoFacts =
+            Devmasters.Cache.Elastic.Manager<InfoFact[], Osoba>
             .GetSafeInstance("Osoba_InfoFacts_v1_",
                 (obj) => InfoFactsAsync(obj).GetAwaiter().GetResult(),
-                TimeSpan.FromHours(12),
-                obj => $"_infofacts_{obj.NameId}");
+                TimeSpan.Zero,
+                Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
+                Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+                keyValueSelector: obj => $"_infofacts_{obj.NameId}");
 
         public static InfoFact[] InfoFactsCached(this Osoba osoba, bool forceUpdateCache = false)
         {

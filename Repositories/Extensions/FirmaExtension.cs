@@ -598,14 +598,15 @@ namespace HlidacStatu.Extensions
         }
 
 
-        static Devmasters.Cache.Hazelcast.Manager<InfoFact[], Firma> _infoFactsCache()
+        static Devmasters.Cache.Elastic.Manager<InfoFact[], Firma> _infoFactsCache()
         {
-            var cache = Devmasters.Cache.Hazelcast.Manager<InfoFact[], Firma>
+            var cache = Devmasters.Cache.Elastic.Manager<InfoFact[], Firma>
                 .GetSafeInstance("Firma_InfoFacts",
                     (firma) => GetInfoFactsAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult(),
-                    TimeSpan.FromHours(24),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                    f => f.ICO);
+                    TimeSpan.Zero,
+                    Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+                    keyValueSelector: f => f.ICO);
 
             return cache;
         }
