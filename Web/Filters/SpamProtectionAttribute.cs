@@ -56,7 +56,7 @@ namespace HlidacStatu.Web.Filters
 
             // limitation: doesnt check for nested json objects. Checks only for properties in root
             // limitation: currently doesnt work
-            // private async Task<bool> IsInBodyJson(HttpRequest request)
+            // private async MonitoredTask<bool> IsInBodyJson(HttpRequest request)
             // {
             //     if (request.HasFormContentType)
             //         return false;

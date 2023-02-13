@@ -19,10 +19,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Devmasters.Batch" Version="4.0.4" />
-		<PackageReference Include="Devmasters.Core" Version="4.1.1" />
-		<PackageReference Include="Devmasters.Diags" Version="4.0.2" />
-		<PackageReference Include="Devmasters.IO" Version="4.1.2" />
+		<PackageReference Include="Devmasters.Batch" Version="4.2.0" />
+		<PackageReference Include="Devmasters.Core" Version="4.1.2" />
+		<PackageReference Include="Devmasters.Diags" Version="4.0.3" />
+		<PackageReference Include="Devmasters.IO" Version="4.1.4" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />

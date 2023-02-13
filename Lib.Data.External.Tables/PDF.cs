@@ -9,7 +9,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
 {
     public static class PDF
     {
-        public static async Task<Result[]> GetMaxTablesFromPDFAsync(
+        public static async Task<HlidacStatu.Entities.DocTables.Result[]> GetMaxTablesFromPDFAsync(
             string pdfUrl, CamelotResult.Formats format = CamelotResult.Formats.JSON, string pages = "all", 
             TimeSpan? executionTimeout = null,
             IApiConnection conn = null
@@ -51,7 +51,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 //    Status = m.Status,
                 //    Tables = m.Tables
                 //})
-                .Select(m => (Result)m)
+                .Select(m => (HlidacStatu.Entities.DocTables.Result)m)
                 .ToArray()
                 ;
         }

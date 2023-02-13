@@ -77,13 +77,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.HealthChecks", "Hlidac-
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{34192F9D-C058-47A1-8EEF-88993F679C8D}"
 	ProjectSection(SolutionItems) = preProject
-		..\PrivateDocumentation\Deploy\Web\Api.Production.logger.serilog.json = ..\PrivateDocumentation\Deploy\Web\Api.Production.logger.serilog.json
-		..\PrivateDocumentation\Deploy\Web\appsettings.Production.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production.json
-		..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json = ..\PrivateDocumentation\Deploy\Web\appsettings.Production_stage.json
-		..\PrivateDocumentation\Deploy\Web\deployApi.bat = ..\PrivateDocumentation\Deploy\Web\deployApi.bat
-		..\PrivateDocumentation\Deploy\Web\deployWeb.bat = ..\PrivateDocumentation\Deploy\Web\deployWeb.bat
-		..\PrivateDocumentation\Deploy\Web\Production.logger.serilog.json = ..\PrivateDocumentation\Deploy\Web\Production.logger.serilog.json
-		..\PrivateDocumentation\Deploy\Web\web.Production.config = ..\PrivateDocumentation\Deploy\Web\web.Production.config
+		PrivateDocumentation\Deploy\Web\Api.Production.logger.serilog.json = PrivateDocumentation\Deploy\Web\Api.Production.logger.serilog.json
+		PrivateDocumentation\Deploy\Web\appsettings.Production.json = PrivateDocumentation\Deploy\Web\appsettings.Production.json
+		PrivateDocumentation\Deploy\Web\Production.logger.serilog.json = PrivateDocumentation\Deploy\Web\Production.logger.serilog.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Downloader", "Downloader", "{256417D4-C1D7-4747-A227-D860BCC5A2B1}"
@@ -184,7 +180,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DockerSwarmHealthCheckAgent
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreOfficeDockerAPI", "Hlidac-Statu-Private\Docker\LibreOfficeDockerAPI\LibreOfficeDockerAPI.csproj", "{594CF81F-CFE4-40C4-94E9-E500E4847C20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanUpLogsInElastic", "Hlidac-Statu-Private\CleanUpLogsInElastic\CleanUpLogsInElastic.csproj", "{183EE094-AF83-421A-94D6-6315EF0A0BD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CleanUpLogsInElastic", "Hlidac-Statu-Private\CleanUpLogsInElastic\CleanUpLogsInElastic.csproj", "{183EE094-AF83-421A-94D6-6315EF0A0BD1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacAdmin", "Hlidac-Statu-Private\HlidacAdmin\HlidacAdmin.csproj", "{71C901F5-95EF-4731-B504-D5F5FFE96B62}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebPlayground", "Hlidac-Statu-Private\WebPlayground\WebPlayground.csproj", "{298C5C6F-E442-48C1-BD5B-8DB800C6244E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -444,6 +444,14 @@ Global
 		{183EE094-AF83-421A-94D6-6315EF0A0BD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{183EE094-AF83-421A-94D6-6315EF0A0BD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{183EE094-AF83-421A-94D6-6315EF0A0BD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71C901F5-95EF-4731-B504-D5F5FFE96B62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71C901F5-95EF-4731-B504-D5F5FFE96B62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71C901F5-95EF-4731-B504-D5F5FFE96B62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71C901F5-95EF-4731-B504-D5F5FFE96B62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{298C5C6F-E442-48C1-BD5B-8DB800C6244E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{298C5C6F-E442-48C1-BD5B-8DB800C6244E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{298C5C6F-E442-48C1-BD5B-8DB800C6244E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{298C5C6F-E442-48C1-BD5B-8DB800C6244E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -524,6 +532,8 @@ Global
 		{2DF850D3-702D-4107-86A5-B2FF60909C3B} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{594CF81F-CFE4-40C4-94E9-E500E4847C20} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{183EE094-AF83-421A-94D6-6315EF0A0BD1} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
+		{71C901F5-95EF-4731-B504-D5F5FFE96B62} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
+		{298C5C6F-E442-48C1-BD5B-8DB800C6244E} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}

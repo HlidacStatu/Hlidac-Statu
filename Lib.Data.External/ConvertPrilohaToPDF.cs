@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using Devmasters.Log;
 using HlidacStatu.DS.Api;
-using HlidacStatu.Entities;
-using Microsoft.AspNetCore.Http;
 
 namespace HlidacStatu.Lib.Data.External
 {

@@ -18,6 +18,7 @@ using HlidacStatu.Entities;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
+using HlidacStatu.Entities.XSD;
 
 namespace HlidacStatu.Repositories
 {

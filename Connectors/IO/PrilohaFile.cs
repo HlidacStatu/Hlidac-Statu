@@ -1,10 +1,17 @@
-﻿using System.IO;
+using System.IO;
 using HlidacStatu.Entities;
+using MimeDetective.Storage;
 
 namespace HlidacStatu.Connectors.IO
 {
     public class PrilohaFile : DistributedFilePath<Smlouva>
     {
+        public enum RequestedFileType
+        {
+            Original,
+            PDF
+        }
+
         public PrilohaFile()
             : this(Devmasters.Config.GetWebConfigValue("PrilohyDataPath"))
         { }
@@ -17,16 +24,22 @@ namespace HlidacStatu.Connectors.IO
         {
             return base.GetFullDir(obj) + obj.Id + Path.DirectorySeparatorChar;
         }
-        public string GetFullPath(Smlouva obj, Smlouva.Priloha priloha)
+        public string GetFullPath(Smlouva obj, Smlouva.Priloha priloha, RequestedFileType filetype = RequestedFileType.Original)
         {
-            return GetFullPath(obj, priloha.odkaz);
+            return GetFullPath(obj, priloha.odkaz, filetype);
         }
-
         public override string GetFullPath(Smlouva obj, string prilohaUrl)
+        {
+            throw new System.NotImplementedException("Use GetFullPath(Smlouva obj, string prilohaUrl, RequestedFileType filetype = RequestedFileType.Original)");
+        }
+        public string GetFullPath(Smlouva obj, string prilohaUrl, RequestedFileType filetype = RequestedFileType.Original)
         {
             if (string.IsNullOrEmpty(prilohaUrl) || obj == null)
                 return string.Empty;
-            return GetFullDir(obj) + Encode(prilohaUrl);
+            var fn = GetFullDir(obj) + Encode(prilohaUrl);
+            if (filetype == RequestedFileType.PDF)
+                fn = fn + ".pdf";
+            return fn;
         }
 
 
@@ -34,19 +47,26 @@ namespace HlidacStatu.Connectors.IO
         {
             return base.GetRelativeDir(obj) + obj.Id + Path.DirectorySeparatorChar;
         }
-        public string GetRelativePath(Smlouva obj, Smlouva.Priloha priloha)
+        public string GetRelativePath(Smlouva obj, Smlouva.Priloha priloha, RequestedFileType filetype = RequestedFileType.Original)
         {
             return GetRelativePath(obj, priloha.odkaz);
         }
-        public override string GetRelativePath(Smlouva obj, string prilohaUrl)
+        public string GetRelativePath(Smlouva obj, string prilohaUrl, RequestedFileType filetype = RequestedFileType.Original)
         {
             if (string.IsNullOrEmpty(prilohaUrl) || obj == null)
                 return string.Empty;
-            return GetRelativeDir(obj) + Encode(prilohaUrl);
+            var fn = GetRelativeDir(obj) + Encode(prilohaUrl);
+            if (filetype == RequestedFileType.PDF)
+                fn = fn + ".pdf";
+            return fn;
 
             //return base.GetRelativePath(obj, Devmasters.Crypto.Hash.ComputeHash(prilohaUrl));
         }
+        public override string GetRelativePath(Smlouva obj, string prilohaUrl)
+        {
+            throw new System.NotImplementedException("Use GetRelativePath(Smlouva obj, string prilohaUrl, RequestedFileType filetype = RequestedFileType.Original)");
 
+        }
 
         public static string Encode(string prilohaUrl)
         {

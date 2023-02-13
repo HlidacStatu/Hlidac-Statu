@@ -1,9 +1,8 @@
-using MathNet.Numerics.Statistics;
-
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics.Statistics;
 
-namespace HlidacStatu.JobsWeb.Models
+namespace HlidacStatu.Ceny.Models
 {
     public class JobStatistics
     {

@@ -177,7 +177,7 @@ namespace HlidacStatu.Repositories.Searching
 
         public static async Task<ValidateQueryResponse> ValidateQueryRawAsync(string query)
         {
-            return await ValidateSpecificQueryRawAsync<Smlouva>(await Manager.GetESClientAsync(),
+            return await ValidateSpecificQueryRawAsync<Smlouva>(await Repositories.ES.Manager.GetESClientAsync(),
                 SmlouvaRepo.Searching.GetSimpleQuery(query));
         }
 
@@ -206,13 +206,13 @@ namespace HlidacStatu.Repositories.Searching
             bool IdOnly = false,
             ElasticClient elasticClient = null,
             string query = null,
-            Indices indexes = null, string prefix = null
+            Indices indexes = null, string prefix = null, IMonitor monitor = null
         )
             where T : class
         {
             prefix = prefix ?? HlidacStatu.Util.StackReport.GetCallingMethod(false, skipFrames: 1);
 
-            var client = elasticClient ?? await Manager.GetESClientAsync();
+            var client = elasticClient ?? await Repositories.ES.Manager.GetESClientAsync();
 
             Func<int, int, Task<ISearchResponse<T>>> searchFunc = null;
 
@@ -251,7 +251,7 @@ namespace HlidacStatu.Repositories.Searching
                 logOutputFunc,
                 progressOutputFunc,
                 parallel,
-                blockSize, maxDegreeOfParallelism, prefix
+                blockSize, maxDegreeOfParallelism, prefix, monitor
             );
         }
 
@@ -261,7 +261,8 @@ namespace HlidacStatu.Repositories.Searching
             Action<string> logOutputFunc,
             Action<ActionProgressData> progressOutputFunc,
             bool parallel,
-            int blockSize = 500, int? maxDegreeOfParallelism = null, string prefix = null
+            int blockSize = 500, int? maxDegreeOfParallelism = null, string prefix = null,
+            IMonitor monitor = null
         )
             where T : class
         {
@@ -316,6 +317,8 @@ namespace HlidacStatu.Repositories.Searching
                 if (firstResult)
                 {
                     firstResult = false;
+                    if (monitor != null)
+                        monitor.Start();
                 }
                 else
                 {
@@ -341,7 +344,7 @@ namespace HlidacStatu.Repositories.Searching
                         if (maxDegreeOfParallelism.HasValue)
                             pOptions.MaxDegreeOfParallelism = maxDegreeOfParallelism.Value;
                         pOptions.CancellationToken = cts.Token;
-                        Parallel.ForEach(result.Hits, (hit) =>
+                        _ = Parallel.ForEach(result.Hits, (hit) =>
                         {
                             if (action != null)
                             {
@@ -350,6 +353,8 @@ namespace HlidacStatu.Repositories.Searching
                                 {
                                     cancel = action(hit, actionParameters);
                                     Interlocked.Increment(ref processedCount);
+
+
                                     if (logOutputFunc != null && !string.IsNullOrEmpty(cancel.Log))
                                         logOutputFunc(cancel.Log);
 
@@ -360,6 +365,12 @@ namespace HlidacStatu.Repositories.Searching
                                 {
                                     Consts.Logger.Error("DoActionForAll action error", e);
                                     cts.Cancel();
+                                }
+                                finally
+                                {
+                                    if (monitor != null)
+                                        monitor.SetProgress((decimal)ActionProgressData.SimplePercentDone(total, processedCount));
+
                                 }
                             }
 
@@ -382,6 +393,9 @@ namespace HlidacStatu.Repositories.Searching
                         if (action != null)
                         {
                             ActionOutputData cancel = action(hit, actionParameters);
+                            try
+                            {
+
                             Interlocked.Increment(ref processedCount);
                             if (logOutputFunc != null && !string.IsNullOrEmpty(cancel.Log))
                                 logOutputFunc(cancel.Log);
@@ -391,19 +405,36 @@ namespace HlidacStatu.Repositories.Searching
                                 canceled = true;
                                 break;
                             }
+                            }
+                            catch (Exception e)
+                            {
+                                Devmasters.Log.Logger.Root.Error("DoActionForQueryAsync action error", e);
+                                if (canceled)
+                                    break;
+
+                            }
+                            finally
+                            {
+                                if (monitor != null)
+                                    monitor.SetProgress((decimal)ActionProgressData.SimplePercentDone(total, processedCount));
+
+                                if (progressOutputFunc != null)
+                                {
+                                    ActionProgressData apd = new ActionProgressData(total, processedCount, started, prefix);
+                                    progressOutputFunc(apd);
+                                }
+
+                            }
                         }
 
-                        if (progressOutputFunc != null)
-                        {
-                            ActionProgressData apd = new ActionProgressData(total, processedCount, started, prefix);
-                            progressOutputFunc(apd);
-                        }
                     }
 
 
                 if (canceled)
                     break;
             } while (result.Hits.Count() > 0);
+            if (monitor != null)
+                monitor.Finish(true,null);
 
             await client.ClearScrollAsync(c => c.ScrollId(scrollId));
 
@@ -420,7 +451,10 @@ namespace HlidacStatu.Repositories.Searching
         }
 
         public static async Task<DataResultset<T>> GetAllRecordsAsync<T>(ElasticClient sourceESClient, int maxDegreeOfParallelism,
-            string query = null, int batchSize = 10)
+            string query = null, int batchSize = 10,
+            Action<string> logOutputFunc = null, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null,
+            IMonitor monitor = null)
+
             where T : class
         {
             if (maxDegreeOfParallelism < 2)
@@ -436,6 +470,18 @@ namespace HlidacStatu.Repositories.Searching
                     );
             }
 
+            long total = 0;
+            var resCount = await sourceESClient.SearchAsync<object>(a => a
+                .Source(false)
+                .Size(0)
+                .Query(q => qs)
+                .TrackTotalHits(true)
+                );
+            if (resCount.IsValid)
+                total = resCount.Total;
+            else
+                total = 0;
+
 
             var scrollAllObservable = sourceESClient.ScrollAll<T>("4m", maxDegreeOfParallelism, sc => sc
                 .MaxDegreeOfParallelism(maxDegreeOfParallelism)
@@ -449,6 +495,12 @@ namespace HlidacStatu.Repositories.Searching
 
             var allRecs = new ConcurrentBag<T>();
             var res = new DataResultset<T>();
+            System.Collections.Concurrent.ConcurrentBag<Exception> exceptions = new();
+
+            DateTime started = DateTime.Now;
+
+            if (monitor != null)
+                monitor.Start();
 
             var scrollAllObserver = new ScrollAllObserver<T>(
                 onNext: response =>
@@ -462,12 +514,23 @@ namespace HlidacStatu.Repositories.Searching
                     {
                         allRecs.Add(h.Source);
                     }
+                    if (progressOutputFunc != null)
+                    {
+                        progressOutputFunc(new ActionProgressData(total, allRecs.Count, started));
+                    }
+                    if (monitor != null)
+                        monitor.SetProgress((decimal)ActionProgressData.SimplePercentDone(total, allRecs.Count));
                 },
                 onError: e =>
                 {
                     HlidacStatu.Util.Consts.Logger.Error("Scroll error occured cl:{client} q:{query}", e, sourceESClient.ConnectionSettings.DefaultIndex, query);
                     res.ErrorOccurred = true;
                     res.Exception = e;
+                    exceptions.Add(e);
+                    if (logOutputFunc != null)
+                    {
+                        logOutputFunc(e.ToString());
+                    }
                     _ = waitHandle.Set();
                 },
                 onCompleted: () => waitHandle.Set()
@@ -477,6 +540,9 @@ namespace HlidacStatu.Repositories.Searching
             _ = waitHandle.WaitOne();
             subscriber.Dispose();
 
+            if (monitor != null)
+                monitor.Finish(exceptions.ToArray());
+
             res.Result = allRecs;
 
             return res;
@@ -485,9 +551,13 @@ namespace HlidacStatu.Repositories.Searching
 
         public static async Task<DataResultset<string>> GetAllIdsAsync(ElasticClient sourceESClient, int maxDegreeOfParallelism,
             string query = null, int batchSize = 100,
-            Action<string> logOutputFunc = null, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null)
+            Action<string> logOutputFunc = null, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null,
+            IMonitor monitor = null)
         {
-            long? total = null;
+            if (maxDegreeOfParallelism < 2)
+                throw new ArgumentOutOfRangeException("maxDegreeOfParallelism", "maxDegreeOfParallelism cannot be smaller than 2");
+
+            long total = 0;
             var qs = new QueryContainerDescriptor<object>().MatchAll();
             if (!string.IsNullOrEmpty(query))
             {
@@ -497,19 +567,17 @@ namespace HlidacStatu.Repositories.Searching
                         .DefaultOperator(Operator.And)
                     );
             }
-            if (progressOutputFunc != null)
-            {
-                var resCount = await sourceESClient.SearchAsync<object>(a => a
-                    .Source(false)
-                    .Size(0)
-                    .Query(q => qs)
-                    .TrackTotalHits(true)
-                    );
-                if (resCount.IsValid)
-                    total = resCount.Total;
-                else
-                    total = 0;
-            }
+            var resCount = await sourceESClient.SearchAsync<object>(a => a
+                .Source(false)
+                .Size(0)
+                .Query(q => qs)
+                .TrackTotalHits(true)
+                );
+            if (resCount.IsValid)
+                total = resCount.Total;
+            else
+                total = 0;
+
             var scrollAllObservable = sourceESClient.ScrollAll<object>("4m", maxDegreeOfParallelism, sc => sc
                 .MaxDegreeOfParallelism(maxDegreeOfParallelism)
                 .Search(s => s
@@ -523,6 +591,10 @@ namespace HlidacStatu.Repositories.Searching
             DateTime started = DateTime.Now;
             var allIds = new ConcurrentBag<string>();
             var res = new DataResultset<string>();
+            System.Collections.Concurrent.ConcurrentBag<Exception> exceptions = new ();
+
+            if (monitor != null)
+                monitor.Start();
 
             var scrollAllObserver = new ScrollAllObserver<object>(
                 onNext: response =>
@@ -539,9 +611,11 @@ namespace HlidacStatu.Repositories.Searching
                     }
                     if (progressOutputFunc != null)
                     {
-                        progressOutputFunc(new ActionProgressData(total.Value, allIds.Count, started));
-
+                        progressOutputFunc(new ActionProgressData(total, allIds.Count, started));
                     }
+                    if (monitor != null)
+                        monitor.SetProgress((decimal)ActionProgressData.SimplePercentDone(total, allIds.Count));
+
                 },
                 onError: e =>
                 {
@@ -551,17 +625,22 @@ namespace HlidacStatu.Repositories.Searching
                     if (logOutputFunc != null)
                     {
                         logOutputFunc(e.ToString());
-
                     }
+                    exceptions.Add(e);
 
                     _ = waitHandle.Set();
                 },
-                onCompleted: () => waitHandle.Set()
+                onCompleted: () => {
+
+                    waitHandle.Set();
+                    }
             );
 
             var subscriber = scrollAllObservable.SubscribeSafe(scrollAllObserver);
             _ = waitHandle.WaitOne();
             subscriber.Dispose();
+            if (monitor != null)
+                monitor.Finish(exceptions.ToArray());
 
             res.Result = allIds;
 

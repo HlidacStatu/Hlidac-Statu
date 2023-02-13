@@ -1,5 +1,3 @@
-using Devmasters.Cache.File;
-
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
@@ -13,50 +11,43 @@ namespace HlidacStatu.Lib.Data.External.Tables
     public static class SmlouvaPrilohaExtension
     {
 
-        private static volatile Devmasters.Cache.AWS_S3.Manager<Lib.Data.External.Tables.Result[], KeyAndId> prilohaTblsMinioCacheManager
-        = Devmasters.Cache.AWS_S3.Manager<Lib.Data.External.Tables.Result[], KeyAndId>.GetSafeInstance(
-            "SmlouvyPrilohyTbls/",
-            smlouvaKeyId => getTablesFromDocumentAsync(smlouvaKeyId).ConfigureAwait(false).GetAwaiter().GetResult(),
-            TimeSpan.Zero,
-            new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-            Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
-            key => key.CacheNameOnDisk
-            );
 
-        private static async Task<Result[]> getTablesFromDocumentAsync(KeyAndId smlouvaKeyId)
+        public static async Task<DocTables.Result[]> ParseTablesFromDocumentAsync(string smlouvaId, string prilohaId)
         {
-            var key = smlouvaKeyId.ValueForData.Split("/");
 
+            Smlouva s = await SmlouvaRepo.LoadAsync(smlouvaId);
 
-            Smlouva s = await SmlouvaRepo.LoadAsync(key[0]);
-
-            Smlouva.Priloha p = s?.Prilohy?.FirstOrDefault(m => (m.UniqueHash()) == key[1]);
+            Smlouva.Priloha p = s?.Prilohy?.FirstOrDefault(m => m.UniqueHash() == prilohaId);
 
             if (p == null)
                 return null;
             if (string.IsNullOrEmpty(p.nazevSouboru))
             {
-                Util.Consts.Logger.Warning($"smlouva {key[0]} soubor {p.UniqueHash()} doesn't have nazevSouboru");
+                Util.Consts.Logger.Warning($"smlouva {smlouvaId} soubor {p.UniqueHash()} doesn't have nazevSouboru");
                 return null;
             }
+            return await ParseTablesFromDocumentAsync(s, p);
+        }
+
+        public static async Task<DocTables.Result[]> ParseTablesFromDocumentAsync(Smlouva smlouva, Smlouva.Priloha priloha, bool throwException = false)
+        {
             Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
             sw.Start();
             try
             {
-                Lib.Data.External.Tables.Result[] myRes = null;
-                if (s.znepristupnenaSmlouva()==false)
-                    myRes = HlidacStatu.Lib.Data.External.Tables.PDF.GetMaxTablesFromPDFAsync(
-                        p.LocalCopyUrl(s.Id, true,null, null), HlidacStatu.Lib.Data.External.Tables.Camelot.CamelotResult.Formats.JSON).Result;
+                DocTables.Result[] myRes = null;
+                if (smlouva.znepristupnenaSmlouva()==false)
+                    myRes = PDF.GetMaxTablesFromPDFAsync(
+                        priloha.LocalCopyUrl(smlouva.Id, true,null, null), 
+                            Camelot.CamelotResult.Formats.JSON).Result;
 
                 if (myRes == null)
-                    myRes = HlidacStatu.Lib.Data.External.Tables.PDF.GetMaxTablesFromPDFAsync(
-                        p.LocalCopyUrl(s.Id, true, secret: Devmasters.Config.GetWebConfigValue("LocalPrilohaUniversalSecret")),
+                    myRes = PDF.GetMaxTablesFromPDFAsync(
+                        priloha.LocalCopyUrl(smlouva.Id, true, secret: Devmasters.Config.GetWebConfigValue("LocalPrilohaUniversalSecret")),
                         Camelot.CamelotResult.Formats.JSON).Result;
 
                 sw.Stop();
-                Util.Consts.Logger.Debug($"smlouva {key[0]} soubor {p.UniqueHash()} done in {sw.ElapsedMilliseconds}ms, found {myRes?.Sum(m => m.Tables?.Length ?? 0)} tables");
+                Util.Consts.Logger.Debug($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} done in {sw.ElapsedMilliseconds}ms, found {myRes?.Sum(m => m.Tables?.Length ?? 0)} tables");
 
                 return myRes;
 
@@ -68,44 +59,41 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 {
                     foreach (var e in age.InnerExceptions)
                     {
-                        Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms  {e.ToString()}", e);
+                        Util.Consts.Logger.Error($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms  {e.ToString()}", e);
                     }
                 }
                 else
-                    Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms {age.ToString()}", age);
-
-                throw;
-
+                    Util.Consts.Logger.Error($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms {age.ToString()}", age);
+                if (throwException)
+                    throw;
+                else
+                    return null;
             }
             catch (Exception e)
             {
                 sw.Stop();
-                Util.Consts.Logger.Error($"smlouva {key[0]} soubor {p.UniqueHash()} error GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms, {e.ToString()}", e);
-                throw;
+                Util.Consts.Logger.Error($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} error GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms, {e.ToString()}", e);
+                if (throwException)
+                    throw;
+                else
+                    return null;
             }
 
             return null;
         }
 
-        public static Lib.Data.External.Tables.Result[] GetTablesFromPriloha(Smlouva s, Smlouva.Priloha p, bool forceUpdate = false)
+        public static DocTables.Result[] GetTablesFromPriloha(Smlouva s, Smlouva.Priloha p)
         {
             if (s == null || p == null)
                 return null;
 
+            DocTables data = DocTablesRepo.GetAsync(s.Id,p.UniqueHash())
+                    .ConfigureAwait(false).GetAwaiter().GetResult();
 
-            string hash = p.UniqueHash();
-            var keyval = s.Id + "/" + hash;
-            var key = new KeyAndId() { ValueForData = keyval, CacheNameOnDisk = $"{keyval}" };
-            if (forceUpdate)
-            {
-                prilohaTblsMinioCacheManager.Delete(key);
-            }
-
-            var data = prilohaTblsMinioCacheManager.Get(key);
             if (data == null)
                 return null;
 
-            return data;
+            return data.Tables;
         }
     }
 }

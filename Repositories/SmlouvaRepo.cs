@@ -1,24 +1,18 @@
 using Devmasters.Batch;
-using Devmasters.Net.HttpClient;
-
 using HlidacStatu.Connectors;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Issues;
-using HlidacStatu.Entities.XSD;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;
-using HlidacStatu.Lib.OCR;
 using HlidacStatu.Repositories.Searching;
-
+using HlidacStatu.Repositories.Statistics;
 using Nest;
 
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Manager = HlidacStatu.Repositories.ES.Manager;
 
@@ -194,7 +188,7 @@ namespace HlidacStatu.Repositories
             if (smlouva.Prilohy != null)
             {
                 foreach (var p in smlouva.Prilohy)
-                    p.UpdateStatistics();
+                    p.UpdateStatistics(smlouva);
             }
 
             if (ClassificationOverrideRepo.TryGetOverridenClassification(smlouva.Id, out var classificationOverride))
@@ -216,6 +210,8 @@ namespace HlidacStatu.Repositories
                 smlouva.Classification = new Smlouva.SClassification(types.ToArray());
             }
         }
+
+
 
         public static bool JeSmlouva_S_VazbouNaPolitiky(this Smlouva smlouva, Relation.AktualnostType aktualnost)
         {
@@ -268,21 +264,123 @@ namespace HlidacStatu.Repositories
                 .Distinct()
         );
 
+        public static string SmlouvaProcessingQueueName = "smlouvy2Process";
+        public static bool AddToProcessingQueue(this Smlouva smlouva,
+                bool forceOCR = false,
+                bool forceClassification = false,
+                bool forceTablesMining = false,
+                bool forceBlurredPages = false
+            )
+        {
+            return AddToProcessingQueue(smlouva.Id, forceOCR, forceClassification, forceTablesMining, forceBlurredPages);
+
+        }
+        public static bool AddToProcessingQueue(this string smlouvaId,
+        bool forceOCR = false,
+        bool forceClassification = false,
+        bool forceTablesMining = false,
+        bool forceBlurredPages = false
+    )
+        {
+
+            using HlidacStatu.Q.Simple.Queue<Smlouva.Queued> q = new Q.Simple.Queue<Smlouva.Queued>(
+                SmlouvaProcessingQueueName,
+                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                );
+
+            var sq = new Smlouva.Queued()
+            {
+                SmlouvaId = smlouvaId,                 
+                ForceBlurredPages = forceBlurredPages,
+                ForceClassification = forceClassification,
+                ForceOCR = forceOCR,
+                ForceTablesMining = forceTablesMining
+            };
+            q.Send(sq);
+            return true;
+        }
+        public static bool AddToProcessingQueue(IEnumerable<string> smlouvyIds,
+            bool forceOCR = false,
+            bool forceClassification = false,
+            bool forceTablesMining = false,
+            bool forceBlurredPages = false
+            )
+        {
+
+            using HlidacStatu.Q.Simple.Queue<Smlouva.Queued> q = new Q.Simple.Queue<Smlouva.Queued>(
+                SmlouvaProcessingQueueName,
+                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                );
+
+            q.Send(
+                smlouvyIds.Select(m=> new Smlouva.Queued()
+                {
+                    SmlouvaId = m,
+                    ForceBlurredPages = forceBlurredPages,
+                    ForceClassification = forceClassification,
+                    ForceOCR = forceOCR,
+                    ForceTablesMining = forceTablesMining
+                })                
+                );
+            return true;
+        }
+        public static Smlouva.Queued GetSmlouvaFromProcessingQueue()
+        {
+            using HlidacStatu.Q.Simple.Queue<Smlouva.Queued> q = new Q.Simple.Queue<Smlouva.Queued>(
+                SmlouvaProcessingQueueName,
+                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                );
+
+            ulong? id = null;
+            var sq = q.GetAndAck(out id);
+            if (sq != null)
+            {
+                sq.ItemIdInQueue = id;
+            }
+            return sq;
+        }
+
+
         public static async Task<bool> SaveAsync(Smlouva smlouva, ElasticClient client = null, bool updateLastUpdateValue = true, bool skipPrepareBeforeSave = false)
         {
             if (smlouva == null)
                 return false;
 
+
             if (skipPrepareBeforeSave == false)
                 PrepareBeforeSave(smlouva, updateLastUpdateValue);
+
+            //update statistics of subjects
+            bool updateStat = false;
+            var preSml = await LoadAsync(smlouva.Id, includePrilohy: false);
+            if (preSml == null) //nova smlouva
+                updateStat = true;
+            else
+            {
+                updateStat = updateStat || preSml.Platce.ico != smlouva.Platce.ico;
+                updateStat = updateStat || preSml.Prijemce.Length != smlouva.Prijemce.Length;
+                updateStat = updateStat || preSml.CalculatedPriceWithVATinCZK != smlouva.CalculatedPriceWithVATinCZK;
+                if (updateStat == false)
+                {
+                    foreach (var pr in preSml.Prijemce)
+                    {
+                        updateStat = updateStat || smlouva.Prijemce.Any(p => p.ico == pr.ico)==false;
+                    }
+                    foreach (var pr in smlouva.Prijemce)
+                    {
+                        updateStat = updateStat || preSml.Prijemce.Any(p => p.ico == pr.ico) == false;
+                    }
+                }
+            }
+
 
             ElasticClient c = client;
             if (c == null)
             {
                 if (smlouva.platnyZaznam)
-                    c = await Manager.GetESClientAsync();
+                    c = await Repositories.ES.Manager.GetESClientAsync();
                 else
-                    c = await Manager.GetESClient_SneplatneAsync();
+                    c = await Repositories.ES.Manager.GetESClient_SneplatneAsync();
             }
 
             var res = await c.IndexAsync<Smlouva>(smlouva, m => m.Id(smlouva.Id));
@@ -290,16 +388,24 @@ namespace HlidacStatu.Repositories
             if (smlouva.platnyZaznam == false && res.IsValid)
             {
                 //zkontroluj zda neni v indexu s platnymi. pokud ano, smaz ho tam
-                var cExist = await Manager.GetESClientAsync();
+                var cExist = await Repositories.ES.Manager.GetESClientAsync();
                 var s = await LoadAsync(smlouva.Id, cExist);
                 if (s != null)
-                    await DeleteAsync(smlouva.Id, cExist);
+                    _ = await DeleteAsync(smlouva.Id, cExist);
             }
 
             if (res.IsValid)
             {
                 SaveSmlouvaDataIntoDB(smlouva);
             }
+
+            if (updateStat)
+            {
+                Recalculate.AddFirmaToProcessingQueue(smlouva.Platce.ico, RecalculateItem.StatisticsTypeEnum.Smlouva, $"smlouva {smlouva.Id}");
+                foreach (var pr in smlouva.Prijemce)
+                    Recalculate.AddFirmaToProcessingQueue(pr.ico, RecalculateItem.StatisticsTypeEnum.Smlouva, $"smlouva {smlouva.Id}");
+            }
+
 
             return res.IsValid;
         }
@@ -398,7 +504,7 @@ namespace HlidacStatu.Repositories
             Action<ActionProgressData> progressWriter = null)
         {
             List<string> ids = new List<string>();
-            var client = deleted ? await Manager.GetESClient_SneplatneAsync() : await Manager.GetESClientAsync();
+            var client = deleted ? await Repositories.ES.Manager.GetESClient_SneplatneAsync() : await Repositories.ES.Manager.GetESClientAsync();
 
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc =
                 searchFunc = async (size, page) =>
@@ -464,7 +570,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<bool> DeleteAsync(string Id, ElasticClient client = null)
         {
-            client ??= await Manager.GetESClientAsync();
+            client ??= await Repositories.ES.Manager.GetESClientAsync();
             var res = await client.DeleteAsync<Smlouva>(Id);
             return res.IsValid;
         }
@@ -472,13 +578,13 @@ namespace HlidacStatu.Repositories
         public static async Task<bool> ExistsZaznamAsync(string id, ElasticClient client = null)
         {
             bool noSetClient = client == null;
-            client ??= await Manager.GetESClientAsync();
+            client ??= await Repositories.ES.Manager.GetESClientAsync();
             var res = await client.DocumentExistsAsync<Smlouva>(id);
             if (noSetClient)
             {
                 if (res.Exists)
                     return true;
-                client = await Manager.GetESClient_SneplatneAsync();
+                client = await Repositories.ES.Manager.GetESClient_SneplatneAsync();
                 res = await client.DocumentExistsAsync<Smlouva>(id);
                 return res.Exists;
             }
@@ -511,7 +617,7 @@ namespace HlidacStatu.Repositories
                 if (specClient)
                     c = client;
                 else
-                    c = await Manager.GetESClientAsync();
+                    c = await Repositories.ES.Manager.GetESClientAsync();
 
                 //var res = c.Get<Smlouva>(idVerze);
 
@@ -526,7 +632,7 @@ namespace HlidacStatu.Repositories
                 {
                     if (specClient == false)
                     {
-                        var c1 = await Manager.GetESClient_SneplatneAsync();
+                        var c1 = await Repositories.ES.Manager.GetESClient_SneplatneAsync();
 
                         res = includePrilohy
                             ? await c1.GetAsync<Smlouva>(idVerze)

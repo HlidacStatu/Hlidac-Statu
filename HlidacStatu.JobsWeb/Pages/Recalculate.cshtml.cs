@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using HlidacStatu.JobsWeb.Services;
+using HlidacStatu.Ceny.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HlidacStatu.JobsWeb.Pages
+namespace HlidacStatu.Ceny.Pages
 {
     [Authorize(Roles = "Admin")]
     public class RecalculateModel : PageModel

@@ -7,8 +7,8 @@
 	</PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Devmasters.Core" Version="4.1.1" />
-        <PackageReference Include="Devmasters.Imaging" Version="4.0.2" />
+        <PackageReference Include="Devmasters.Core" Version="4.1.2" />
+        <PackageReference Include="Devmasters.Imaging" Version="4.0.3" />
         <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="6.0.12" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.12" />
@@ -21,18 +21,17 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.12" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.12" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
 
-	</ItemGroup>
+    </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Entities\Entities.csproj" />
       <ProjectReference Include="..\LibCore\LibCore.csproj" />
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
       <ProjectReference Include="..\Util\Util.csproj" />
+      <ProjectReference Include="..\XLib\XLib.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Middlewares" />
-    </ItemGroup>
-
 </Project>

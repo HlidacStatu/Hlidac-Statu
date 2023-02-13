@@ -1,6 +1,6 @@
 @page
-@using HlidacStatu.JobsWeb.Services
-@model StatsModel
+@using HlidacStatu.Ceny.Services
+@model HlidacStatu.Ceny.Pages.StatsModel
 
 @section scripts
 {
@@ -74,11 +74,11 @@
                         var marketVal = marketStat.First(m => m.Name == j);
                         var firmaVal = fStat.First(m => m.Name == j);
                         <td class="align-top" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(firmaVal.Median))">
-                            @firmaVal.DolniKvartil.ToString("######")&nbsp;@Html.Raw(Services.Calc.PercentChangeHtml(marketVal.DolniKvartil, firmaVal.DolniKvartil))
+                            @firmaVal.DolniKvartil.ToString("######")&nbsp;@Html.Raw(Calc.PercentChangeHtml(marketVal.DolniKvartil, firmaVal.DolniKvartil))
                             <br />
-                            <b>@firmaVal.Median.ToString("######")&nbsp;@Html.Raw(Services.Calc.PercentChangeHtml(marketVal.Median, firmaVal.Median))</b>
+                            <b>@firmaVal.Median.ToString("######")&nbsp;@Html.Raw(Calc.PercentChangeHtml(marketVal.Median, firmaVal.Median))</b>
                             <br />
-                            @firmaVal.HorniKvartil.ToString("######")&nbsp;@Html.Raw(Services.Calc.PercentChangeHtml(marketVal.HorniKvartil, firmaVal.HorniKvartil))
+                            @firmaVal.HorniKvartil.ToString("######")&nbsp;@Html.Raw(Calc.PercentChangeHtml(marketVal.HorniKvartil, firmaVal.HorniKvartil))
                         </td>
                     }
                     else
@@ -122,11 +122,11 @@
                         var marketVal = marketStat.First(m => m.Name == j);
                         var firmaVal = fStat.First(m => m.Name == j);
                         <td class="align-top" data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(firmaVal.Median))">
-                            @firmaVal.DolniKvartil.ToString("######")&nbsp;@Html.Raw(Services.Calc.PercentChangeHtml(marketVal.DolniKvartil, firmaVal.DolniKvartil))
+                            @firmaVal.DolniKvartil.ToString("######")&nbsp;@Html.Raw(Calc.PercentChangeHtml(marketVal.DolniKvartil, firmaVal.DolniKvartil))
                             <br />
-                            <b>@firmaVal.Median.ToString("######")&nbsp;@Html.Raw(Services.Calc.PercentChangeHtml(marketVal.Median, firmaVal.Median))</b>
+                            <b>@firmaVal.Median.ToString("######")&nbsp;@Html.Raw(Calc.PercentChangeHtml(marketVal.Median, firmaVal.Median))</b>
                             <br />
-                            @firmaVal.HorniKvartil.ToString("######")&nbsp;@Html.Raw(Services.Calc.PercentChangeHtml(marketVal.HorniKvartil, firmaVal.HorniKvartil))
+                            @firmaVal.HorniKvartil.ToString("######")&nbsp;@Html.Raw(Calc.PercentChangeHtml(marketVal.HorniKvartil, firmaVal.HorniKvartil))
                         </td>
                     }
                     else

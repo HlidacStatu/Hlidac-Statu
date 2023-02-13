@@ -87,15 +87,6 @@ namespace HlidacStatu.Entities
                 }
             }
 
-            public void UpdateStatistics()
-            {
-                Lenght = PlainTextContent?.Length ?? 0;
-                WordCount = Devmasters.TextUtil.CountWords(PlainTextContent);
-                var variance = Devmasters.TextUtil.WordsVarianceInText(PlainTextContent);
-                UniqueWordsCount = variance.Item2;
-                WordsVariance = variance.Item1;
-
-            }
 
             public DataQualityEnum PlainTextContentQuality { get; set; } = DataQualityEnum.Unknown;
 

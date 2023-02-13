@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Html;
 
 using System.Linq;
 using System.Text;
-using NPOI.SS.Formula.Functions;
-using static Lucene.Net.Store.Lock;
 
 namespace HlidacStatu.Web.Framework
 {

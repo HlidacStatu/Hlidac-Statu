@@ -1,16 +1,14 @@
 ﻿using Devmasters.Net.HttpClient;
-using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.XSD;
 using HlidacStatu.Lib.Data.External;
 using HlidacStatu.Lib.OCR;
-using MimeDetective;
 using System;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
+using static HlidacStatu.Connectors.IO.PrilohaFile;
 using static HlidacStatu.Entities.Smlouva;
 
 
@@ -22,9 +20,9 @@ namespace HlidacStatu.Repositories
 
         private static Connectors.IO.PrilohaFile PrilohaLocalCopy = new Connectors.IO.PrilohaFile();
 
-        public static bool ExistLocalCopyOfPriloha(Smlouva obj, Smlouva.Priloha priloha)
+        public static bool ExistLocalCopyOfPriloha(Smlouva obj, Smlouva.Priloha priloha, RequestedFileType filetype = RequestedFileType.Original)
         {
-            bool weHaveCopy = System.IO.File.Exists(PrilohaLocalCopy.GetFullPath(obj, priloha));
+            bool weHaveCopy = System.IO.File.Exists(PrilohaLocalCopy.GetFullPath(obj, priloha, filetype));
             return weHaveCopy;
         }
 
@@ -93,7 +91,7 @@ namespace HlidacStatu.Repositories
 
 
         public static string GetPathFromPrilohaRepository(Smlouva smlouva)
-        { 
+        {
             return PrilohaLocalCopy.GetFullDir(smlouva);
         }
         public static string GetFullFilePathFromPrilohaRepository(Smlouva smlouva, Priloha priloha, RequestedFileType filetype = RequestedFileType.Original)
@@ -105,15 +103,10 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public enum RequestedFileType
-        {
-            Original,
-            PDF
-        }
 
 
 
-        public static string GetDownloadedPriloha(Smlouva.Priloha att,
+        public static string GetDownloadedPrilohaPath(Smlouva.Priloha att,
     Smlouva smlouva, RequestedFileType filetype = RequestedFileType.Original)
         {
             var ext = ".pdf";
@@ -128,7 +121,7 @@ namespace HlidacStatu.Repositories
 
 
             string localDir = PrilohaLocalCopy.GetFullDir(smlouva);
-            if (!System.IO.Directory.Exists(localDir)) 
+            if (!System.IO.Directory.Exists(localDir))
                 System.IO.Directory.CreateDirectory(localDir);
 
             string localFile = PrilohaLocalCopy.GetFullPath(smlouva, att);
@@ -192,7 +185,7 @@ namespace HlidacStatu.Repositories
                 if (System.IO.File.Exists($"{localFile}.pdf"))
                     return $"{localFile}.pdf";
 
-                if (HlidacStatu.Util.FileMime.HasPdfHeader(localFile))
+                if (HlidacStatu.Util.FileMime.HasPdfHeader(localFile) == false)
                 {
                     try
                     {
@@ -210,6 +203,8 @@ namespace HlidacStatu.Repositories
                         return localFile;
                     }
                 }
+                else //this is PDF
+                    return localFile;
 
             }
 
@@ -218,34 +213,103 @@ namespace HlidacStatu.Repositories
 
 
 
-        public static string GetCopyOfDownloadedPriloha(Smlouva.Priloha att,
+        public static string GetCopyOfDownloadedPrilohaPath(Smlouva.Priloha att,
     Smlouva smlouva, RequestedFileType filetype = RequestedFileType.Original)
         {
-
-            var origFile = GetDownloadedPriloha(att, smlouva, filetype);
-
-            if (string.IsNullOrEmpty(origFile))
-                return null;
-
-            string localFile = PrilohaLocalCopy.GetFullPath(smlouva, att);
-            var tmpPath = System.IO.Path.GetTempPath();
-            //Devmasters.IO.IOTools.DeleteFile(tmpPath);
-            if (!System.IO.Directory.Exists(tmpPath))
+            string tmpFnSystem = null;
+            string tmpFn = null;
+            try
             {
-                try
+
+                var origFile = GetDownloadedPrilohaPath(att, smlouva, filetype);
+
+                if (string.IsNullOrEmpty(origFile))
+                    return null;
+
+                string localFile = PrilohaLocalCopy.GetFullPath(smlouva, att);
+                var tmpPath = System.IO.Path.GetTempPath();
+                //Devmasters.IO.IOTools.DeleteFile(tmpPath);
+                if (!System.IO.Directory.Exists(tmpPath))
                 {
-                    System.IO.Directory.CreateDirectory(tmpPath);
+                    try
+                    {
+                        System.IO.Directory.CreateDirectory(tmpPath);
+                    }
+                    catch
+                    {
+                    }
                 }
-                catch
+
+                tmpFnSystem = System.IO.Path.GetTempFileName();
+                tmpFn = tmpFnSystem + DocTools.PrepareFilenameForOCR(att.nazevSouboru);
+                System.IO.File.Copy(origFile, tmpFn, true);
+                return tmpFn;
+            }
+            catch (Exception e)
+            {
+                HlidacStatu.Util.Consts.Logger.Error("Error in GetCopyOfDownloadedPrilohaPath {smlouvaId} {prilohaHash}", e, smlouva.Id, att.UniqueHash());
+                throw;
+            }
+            finally
+            {
+                if (tmpFnSystem != null && System.IO.File.Exists(tmpFnSystem))
                 {
+                    _ = Devmasters.IO.IOTools.DeleteFile(tmpFnSystem);
                 }
             }
-
-            string tmpFnSystem = System.IO.Path.GetTempFileName();
-            string tmpFn = tmpFnSystem + DocTools.PrepareFilenameForOCR(att.nazevSouboru);
-            System.IO.File.Copy(origFile, tmpFn, true);
-            return tmpFn;
         }
 
+
+
+        public static void UpdateStatistics(this Priloha p, Smlouva s)
+        {
+            p.Lenght = p.PlainTextContent?.Length ?? 0;
+            p.WordCount = Devmasters.TextUtil.CountWords(p.PlainTextContent);
+            var variance = Devmasters.TextUtil.WordsVarianceInText(p.PlainTextContent);
+            p.UniqueWordsCount = variance.Item2;
+            p.WordsVariance = variance.Item1;
+
+            //find content type
+            //first check in already exists
+            if (string.IsNullOrEmpty(p.ContentType))
+            {
+                string contentType = "";
+                //scan metadata
+                if (p.FileMetadata.Any(m => m.Key.ToLower() == "content-type"))
+                    contentType = p.FileMetadata.First(m => m.Key.ToLower() == "content-type").Value;
+                else
+                {
+                    var fnType = HlidacStatu.Util.FileMime.GetTopFileType(
+                        GetDownloadedPrilohaPath(p, s, RequestedFileType.Original)
+                        );
+                    if (fnType != null)
+                        contentType = fnType.MimeType;
+                    else
+                    {
+                        if (fnType == null &&
+                            (
+                                p.nazevSouboru?.EndsWith(".txt") == true
+                                || p.nazevSouboru?.EndsWith(".csv") == true
+                                || p.nazevSouboru?.EndsWith(".tab") == true
+                            )
+                            )//probably text file
+                        {
+                            contentType = "text/plain";
+                        }
+                        if (string.IsNullOrEmpty(contentType))
+                        {
+                            var tikaRes = Lib.Data.External.TikaClient.GetText(GetDownloadedPrilohaPath(p, s, RequestedFileType.Original));
+
+                            if (tikaRes != null)
+                                contentType = tikaRes.ContentType;
+
+                        }
+                    }
+                }
+                p.ContentType = contentType;
+            }
+
+
+        }
     }
 }

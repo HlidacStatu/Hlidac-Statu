@@ -11,22 +11,22 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static class OsobaStatistics
     {
-        static Devmasters.Cache.Couchbase.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
+        static Devmasters.Cache.Hazelcast.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
             _cache
-                = Devmasters.Cache.Couchbase.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
+                = Devmasters.Cache.Hazelcast.Manager<Osoba.Statistics.RegistrSmluv, (Osoba os, int aktualnost, int? obor)>
                     .GetSafeInstance("Osoba_SmlouvyStatistics_v1_",
                         (obj) => Calculate(obj.os, (Relation.AktualnostType)obj.aktualnost, obj.obor),
                         TimeSpan.FromHours(18),
-                        Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                        Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                        Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                        Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
                         obj => $"{obj.os.NameId}/{obj.aktualnost}/{(obj.obor ?? 0)}");
 
 
         public static Osoba.Statistics.RegistrSmluv CachedStatistics(Osoba os, Relation.AktualnostType aktualnost,
-            int? obor)
+            int? obor, bool forceUpdateCache = false)
         {
+            if (forceUpdateCache)
+                _cache.Delete((os, (int)aktualnost, obor));
+
             return _cache.Get((os, (int)aktualnost, obor));
         }
 

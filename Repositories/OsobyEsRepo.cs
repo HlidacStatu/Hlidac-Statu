@@ -22,15 +22,6 @@ namespace HlidacStatu.Repositories
             return response.IsValid;
         }
 
-        public static async Task<OsobaES> GetAsync(string idOsoby)
-        {
-            var response = await _esClient.GetAsync<OsobaES>(idOsoby);
-
-            return response.IsValid
-                ? response.Source
-                : null;
-        }
-
         public static async Task BulkSaveAsync(IEnumerable<OsobaES> osoby)
         {
             var result = await _esClient.IndexManyAsync<OsobaES>(osoby);

@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Devmasters;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Views;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;

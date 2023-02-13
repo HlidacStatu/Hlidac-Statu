@@ -36,7 +36,7 @@ namespace HlidacStatu.Web.Controllers
             if (sml == null || pr == null)
                 return NotFound();
 
-            Lib.Data.External.Tables.Result[] res = SmlouvaPrilohaExtension.GetTablesFromPriloha(sml, pr);
+            HlidacStatu.Entities.DocTables.Result[] res = SmlouvaPrilohaExtension.GetTablesFromPriloha(sml, pr);
 
             return View(res);
         }
@@ -66,7 +66,7 @@ namespace HlidacStatu.Web.Controllers
             if (sml == null || pr == null)
                 return NotFound();
 
-            string fn = SmlouvaRepo.GetDownloadedPriloha(pr,sml, SmlouvaRepo.RequestedFileType.PDF);
+            string fn = SmlouvaRepo.GetDownloadedPrilohaPath(pr,sml, Connectors.IO.PrilohaFile.RequestedFileType.PDF);
             bool weHaveCopy = string.IsNullOrEmpty(fn)==false && System.IO.File.Exists(fn);
             byte[] pdfBin = null;
             if (weHaveCopy)

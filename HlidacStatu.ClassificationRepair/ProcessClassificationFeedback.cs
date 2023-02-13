@@ -46,7 +46,7 @@ namespace HlidacStatu.ClassificationRepair
                 var allNgramsTask = _stemmer.GetAllStems();
 
                 await Task.WhenAll(explainTask, documentNgramTask, bullshitNgramsTask, allNgramsTask);
-                //await Task.WhenAll(documentNgramTask, bullshitNgramsTask, allNgramsTask);
+                //await MonitoredTask.WhenAll(documentNgramTask, bullshitNgramsTask, allNgramsTask);
 
                 var missingNgrams = documentNgramTask.Result
                     .Except(bullshitNgramsTask.Result)

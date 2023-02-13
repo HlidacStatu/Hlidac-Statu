@@ -12,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Manager = HlidacStatu.Repositories.ES.Manager;
 
 namespace HlidacStatu.Repositories
 {
@@ -87,7 +86,7 @@ namespace HlidacStatu.Repositories
                 if (from.HasValue)
                     sdate = $" AND podepsano:[{from?.ToString("yyyy-MM-dd") ?? "*"} TO {from?.ToString("yyyy-MM-dd") ?? DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")}]"; //podepsano:[2016-01-01 TO 2016-12-31]
 
-                var client = await Manager.GetESClientAsync();
+                var client = await Repositories.ES.Manager.GetESClientAsync();
                 return await client.SearchAsync<Smlouva>(a => a
                     .TrackTotalHits(page * size == 0)
                     .Size(size)
@@ -99,7 +98,7 @@ namespace HlidacStatu.Repositories
             };
 
             List<Smlouva> smlouvy = new List<Smlouva>();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(), searchFunc,
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Repositories.ES.Manager.GetESClientAsync(), searchFunc,
                   (hit, o) =>
                   {
                       smlouvy.Add(hit.Source);
@@ -181,7 +180,8 @@ namespace HlidacStatu.Repositories
                 },
                 showProgress ? Devmasters.Batch.Manager.DefaultOutputWriter : (Action<string>)null,
                 showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null,
-                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 5, prefix: "UradyObchodujiciSFirmami_NespolehlivymiPlatciDPH ");
+                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: 5, 
+                prefix: "UradyObchodujiciSFirmami_NespolehlivymiPlatciDPH ", monitor: new MonitoredTaskRepo.ForBatch());
 
             VazbyFiremNaUradyStat ret = new VazbyFiremNaUradyStat();
             ret.StatniFirmy = uradyData
@@ -232,7 +232,7 @@ namespace HlidacStatu.Repositories
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = null;
             searchFunc = async (size, page) =>
             {
-                var client = await Manager.GetESClientAsync();
+                var client = await Repositories.ES.Manager.GetESClientAsync();
                 return await client.SearchAsync<Smlouva>(a => a
                             .TrackTotalHits(page * size == 0)
                             .Size(size)
@@ -249,7 +249,7 @@ namespace HlidacStatu.Repositories
             Dictionary<string, BasicDataForSubject<List<BasicData<string>>>> uradyStatni = new Dictionary<string, BasicDataForSubject<List<BasicData<string>>>>();
             Dictionary<string, BasicDataForSubject<List<BasicData<string>>>> uradySoukr = new Dictionary<string, BasicDataForSubject<List<BasicData<string>>>>();
             object lockObj = new object();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(), searchFunc,
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Repositories.ES.Manager.GetESClientAsync(), searchFunc,
                   (hit, param) =>
                   {
                       Smlouva s = hit.Source;
@@ -327,6 +327,7 @@ namespace HlidacStatu.Repositories
                     showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null
                     , true
                     , prefix: "UradyObchodujiciSFirmami_s_vazbouNaPolitiky " + aktualnost.ToNiceDisplayName()
+                    , monitor: new MonitoredTaskRepo.ForBatch()
             );
 
 
@@ -422,6 +423,7 @@ namespace HlidacStatu.Repositories
             showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null,
             false
             , prefix: "LoadFirmySVazbamiNaPolitiky " + aktualnostVztahu.ToNiceDisplayName()
+            , monitor: showProgress ? new MonitoredTaskRepo.ForBatch() : null
             );
 
             return new VazbyFiremNaPolitiky() { SoukromeFirmy = pol_SVazbami, StatniFirmy = pol_SVazbami_StatniFirmy };
@@ -436,7 +438,7 @@ namespace HlidacStatu.Repositories
             //smlouvy s politikama
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
             {
-                var client = await Manager.GetESClientAsync();
+                var client = await Repositories.ES.Manager.GetESClientAsync();
                 return await client.SearchAsync<Smlouva>(a => a
                     .TrackTotalHits(page * size == 0)
                     .Size(size)
@@ -449,7 +451,7 @@ namespace HlidacStatu.Repositories
 
 
             List<string> smlouvyIds = new List<string>();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(), searchFunc,
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Repositories.ES.Manager.GetESClientAsync(), searchFunc,
                   (hit, param) =>
                   {
 
@@ -478,6 +480,7 @@ namespace HlidacStatu.Repositories
                     showProgress ? new ActionProgressWriter().Writer : (Action<ActionProgressData>)null
                 , false
                 , prefix: "SmlouvyIdSPolitiky "
+                , monitor: new MonitoredTaskRepo.ForBatch()
             );
 
             return smlouvyIds.ToArray();
@@ -552,7 +555,7 @@ namespace HlidacStatu.Repositories
             null,
             logOutputFunc ?? Devmasters.Batch.Manager.DefaultOutputWriter,
             progressOutputFunc ?? new ActionProgressWriter(0.1f).Writer,
-            true, prefix: "GetFirmyCasovePodezreleZalozene "
+            true, prefix: "GetFirmyCasovePodezreleZalozene ", monitor: new MonitoredTaskRepo.ForBatch()
             );
 
             Util.Consts.Logger.Debug("GetFirmyCasovePodezreleZalozene - filter with close dates");

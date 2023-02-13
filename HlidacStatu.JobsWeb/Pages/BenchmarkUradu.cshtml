@@ -1,9 +1,9 @@
 @page "{id?}"
-@model BenchmarkUraduModel
+@model HlidacStatu.Ceny.Pages.BenchmarkUraduModel
 
 @using HlidacStatu.Entities
-@using HlidacStatu.JobsWeb.Services
-@using HlidacStatu.JobsWeb.Models
+@using HlidacStatu.Ceny.Models
+@using HlidacStatu.Ceny.Services
 
 @{
     ViewData["Title"] = "Benchmark zadavatelů";
@@ -51,7 +51,7 @@
 
 <h2>
     Benchmark cen vybraného zadavatele
-    <small class="text-muted">oproti souhrným obvyklým cenám</small>
+    <small class="text-muted">oproti souhrnným obvyklým cenám</small>
 </h2>
 
 <div class="row">

@@ -1,16 +1,14 @@
-using HlidacStatu.Entities;
-using HlidacStatu.JobsWeb.Models;
-using HlidacStatu.Repositories;
-
-using Microsoft.AspNetCore.Http;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Ceny.Models;
+using HlidacStatu.Entities;
+using HlidacStatu.Repositories;
+using Microsoft.AspNetCore.Http;
 
-namespace HlidacStatu.JobsWeb.Services
+namespace HlidacStatu.Ceny.Services
 {
     public static partial class JobService
     {
@@ -297,7 +295,7 @@ namespace HlidacStatu.JobsWeb.Services
         public static async Task<CenyCustomer.AccessDetail> HasAccess(this HttpContext context)
         {
             var key = TryFindKey(context);
-            if (key?.Obor == "DEMO" && key?.Rok == 2018)
+            if (key?.IsDemo == true)
             {
                 return new CenyCustomer.AccessDetail(CenyCustomer.AccessDetail.AccessDetailLevel.PRO);
             }

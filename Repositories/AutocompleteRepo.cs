@@ -439,7 +439,7 @@ namespace HlidacStatu.Repositories
                         return new Devmasters.Batch.ActionOutputData();
                     }
                     // tady nemůže být větší paralelita, protože to pak nezvládá elasticsearch
-                    , logOutputFunc, progressOutputFunc, true, prefix: "LoadPeople ", maxDegreeOfParallelism:5); 
+                    , logOutputFunc, progressOutputFunc, true, prefix: "LoadPeople ", maxDegreeOfParallelism:5, monitor: new MonitoredTaskRepo.ForBatch()); 
 
             }
             return results;

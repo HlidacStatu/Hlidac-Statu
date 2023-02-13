@@ -37,17 +37,14 @@ namespace HlidacStatu.Repositories
             return uids;
         }
 
-        private static Devmasters.Cache.Couchbase.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string> vazbyIcoCache
-            = Devmasters.Cache.Couchbase.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazby",
+        private static Devmasters.Cache.Hazelcast.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string> vazbyIcoCache
+            = Devmasters.Cache.Hazelcast.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazby",
                 ico => vsechnyDcerineVazbyInternal(ico, 0, true, null),
                 TimeSpan.FromDays(3),
-                Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                Devmasters.Config.GetWebConfigValue("CouchbasePassword"));
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','));
 
-        private static Devmasters.Cache.Couchbase.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string> vazbyOsobaNameIdCache
-            = Devmasters.Cache.Couchbase.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazbyOsoba",
+        private static Devmasters.Cache.Hazelcast.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string> vazbyOsobaNameIdCache
+            = Devmasters.Cache.Hazelcast.Manager<List<HlidacStatu.DS.Graphs.Graph.Edge>, string>.GetSafeInstance("VsechnyDcerineVazbyOsoba",
                 osobaNameId =>
                 {
                     if (string.IsNullOrEmpty(osobaNameId))
@@ -55,10 +52,8 @@ namespace HlidacStatu.Repositories
                     Osoba o = Osoby.GetByNameId.Get(osobaNameId);
                     return vsechnyDcerineVazbyInternal(o, 0, true, null);
                 },
-                TimeSpan.FromDays(3), Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                Devmasters.Config.GetWebConfigValue("CouchbasePassword"));
+                TimeSpan.FromDays(3),
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','));
 
         public static List<HlidacStatu.DS.Graphs.Graph.Edge> VsechnyDcerineVazby(string ico, bool refresh = false)
         {

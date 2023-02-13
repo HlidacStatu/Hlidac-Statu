@@ -17,16 +17,19 @@
         <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.12" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.12" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.4.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Analysis.Page\Analysis.Page.csproj" />
       <ProjectReference Include="..\Datasets\Datasets.csproj" />
+      <ProjectReference Include="..\Datastructures\DataStructures.csproj" />
       <ProjectReference Include="..\HlidacStatu.Q.Simple\HlidacStatu.Q.Simple.csproj" />
       <ProjectReference Include="..\LibCore\LibCore.csproj" />
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
+      <ProjectReference Include="..\Web.HealthChecks\Web.HealthChecks.csproj" />
     </ItemGroup>
 
     <ItemGroup>

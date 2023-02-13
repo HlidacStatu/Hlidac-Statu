@@ -11,16 +11,13 @@ namespace HlidacStatu.Repositories.Statistics
     public static partial class FirmaStatistics
     {
 
-        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)> 
+        static Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)> 
             _holdingSmlouvaCache
-            = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)>
+            = Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost, int? obor)>
                 .GetSafeInstance("Holding_SmlouvyStatistics_v1_",
                     (obj) => _holdingCalculateStats(obj.firma, obj.aktualnost, obj.obor),
                     TimeSpan.FromHours(12),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                    Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
                     obj => obj.firma.ICO + "-" + obj.aktualnost.ToString() + "-" + (obj.obor ?? 0));
 
         public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> CachedHoldingStatisticsSmlouvy(
@@ -47,15 +44,12 @@ namespace HlidacStatu.Repositories.Statistics
 
         }
 
-        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)> _smlouvaCache
-            = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
+        static Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)> _smlouvaCache
+            = Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
                 .GetSafeInstance("Firma_SmlouvyStatistics_v3_",
                     (obj) => _calculateSmlouvyStatsAsync(obj.firma, obj.obor).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(12),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                    Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
                     obj => obj.firma.ICO + "-" + (obj.obor ?? 0));
 
         public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> GetStatistics(Firma firma, int? obor, bool forceUpdateCache = false)

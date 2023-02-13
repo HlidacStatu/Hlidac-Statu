@@ -1,4 +1,4 @@
-@model HlidacStatu.JobsWeb.Models.CompareDataModel
+@model HlidacStatu.Ceny.Models.CompareDataModel
 
 @{
     string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
@@ -53,7 +53,7 @@
         pomocí vousů a teček nedoporučujeme považovat za obvyklé ceny.
     </p>
 }
-<figure class="highcharts-figure" style="max-width: @(100 + jobCount * pixelsPerJob)px">
+<figure class="highcharts-figure" style="max-width: @(200 + jobCount * pixelsPerJob)px">
     <div id="chart-container-@chartId"></div>
 
     <div class="text-muted">Ceny s DPH</div>

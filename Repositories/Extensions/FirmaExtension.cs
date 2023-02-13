@@ -78,7 +78,7 @@ namespace HlidacStatu.Extensions
             }
             else if (firma.JsemStatniFirma())
             {
-                var parentOVM = firma.ParentVazbyFirmy(Relation.AktualnostType.Aktualni)
+                var parentOVM = firma.ParentFirmy(Relation.AktualnostType.Aktualni)
                     .ToArray();
 
                 musi = parentOVM
@@ -246,7 +246,7 @@ namespace HlidacStatu.Extensions
                     .AsQueryable()
                     .Join(osv, o => o.InternalId, ov => ov.OsobaId, (o, ov) => new Tuple<Osoba, OsobaVazby>(o, ov))
                     .Select<Tuple<Osoba, OsobaVazby>, (Osoba o, OsobaVazby ov)>(m => new(m.Item1, m.Item2));
-                //var res = from os in db.Osoba
+                //var res = from os in db.Person
                 //          join ov in db.OsobaVazby on new { id = os.InternalId }  equals new { id = ov.OsobaId }
                 //          select new(os, ov);
                 //var sql = res.ToQueryString();
@@ -341,18 +341,18 @@ namespace HlidacStatu.Extensions
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> HoldingStatisticsRegistrSmluv(
             this Firma firma,
-            Relation.AktualnostType aktualnost, int? obor = null)
+            Relation.AktualnostType aktualnost, int? obor = null, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor);
+            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor, forceUpdateCache);
         }
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>
             HoldingStatisticsRegistrSmluvProObor(
                 this Firma firma,
                 Relation.AktualnostType aktualnost,
-                Smlouva.SClassification.ClassificationsTypes classification)
+                Smlouva.SClassification.ClassificationsTypes classification, bool forceUpdateCache = false)
         {
-            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, (int)classification);
+            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, (int)classification, forceUpdateCache);
         }
 
         public static bool PatrimStatuAlespon25procent(this Firma firma) => (firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu25perc);
@@ -598,23 +598,23 @@ namespace HlidacStatu.Extensions
         }
 
 
-        static Devmasters.Cache.Couchbase.Manager<InfoFact[], Firma> _infoFactsCache()
+        static Devmasters.Cache.Hazelcast.Manager<InfoFact[], Firma> _infoFactsCache()
         {
-            var cache = Devmasters.Cache.Couchbase.Manager<InfoFact[], Firma>
+            var cache = Devmasters.Cache.Hazelcast.Manager<InfoFact[], Firma>
                 .GetSafeInstance("Firma_InfoFacts",
                     (firma) => GetInfoFactsAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(24),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                    Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
                     f => f.ICO);
 
             return cache;
         }
 
-        public static InfoFact[] InfoFacts(this Firma firma) //otázka jestli tohle nebrat z cachce
+        public static InfoFact[] InfoFacts(this Firma firma, bool forceUpdateCache = false) //otázka jestli tohle nebrat z cachce
         {
+            if (forceUpdateCache)
+                _infoFactsCache().Delete(firma);
+
             var inf = _infoFactsCache().Get(firma);
             return inf;
         }
@@ -628,7 +628,7 @@ namespace HlidacStatu.Extensions
             var stat = firma.StatistikaRegistruSmluv();
             var statHolding = firma.HoldingStatisticsRegistrSmluv(Relation.AktualnostType.Aktualni);
             int rok = DateTime.Now.Year;
-            if (DateTime.Now.Month < 2)
+            if (DateTime.Now.Month < 3)
                 rok = rok - 1;
 
             if (stat.Sum(stat.YearsAfter2016(), s => s.PocetSmluv) == 0)

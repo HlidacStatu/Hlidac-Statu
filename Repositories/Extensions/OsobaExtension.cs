@@ -1,14 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
-
 using Devmasters;
 using Devmasters.Enums;
 using Devmasters.Lang.CS;
-
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Lib.Analytics;
@@ -16,6 +8,12 @@ using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Statistics;
 using HlidacStatu.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Extensions
 {
@@ -27,7 +25,7 @@ namespace HlidacStatu.Extensions
         {
             if (osoba.IsSponzor())
                 return true;
-            
+
             var cts = new CancellationTokenSource();
 
             List<Task<Search.ISearchResult>> tasks = new()
@@ -40,7 +38,7 @@ namespace HlidacStatu.Extensions
                     DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, "0", cancellationToken: cts.Token)),
             };
 
-            
+
             while (tasks.Any())
             {
                 var completedTask = await Task.WhenAny(tasks);
@@ -54,7 +52,7 @@ namespace HlidacStatu.Extensions
             }
 
             return false;
-            
+
         }
 
         public static bool IsPolitikBasedOnEvents(this Osoba osoba)
@@ -388,34 +386,37 @@ namespace HlidacStatu.Extensions
             if (!evs.Any())
                 return string.Empty;
 
-            
+
             return string.Format(template,
                 string.Join(itemDelimeter, evs)
             );
-        
+
         }
 
 
         //tohle do repositories
         public static Osoba.Statistics.RegistrSmluv StatistikaRegistrSmluv(this Osoba osoba,
-            Relation.AktualnostType minAktualnost, int? obor = null)
+            Relation.AktualnostType minAktualnost, int? obor = null, bool forceUpdateCache = false)
         {
-            return OsobaStatistics.CachedStatistics(osoba, minAktualnost, obor);
+            return OsobaStatistics.CachedStatistics(osoba, minAktualnost, obor, forceUpdateCache);
         }
 
-        static Devmasters.Cache.LocalMemory.Manager<InfoFact[], Osoba> _cacheInfoFacts = 
+        static Devmasters.Cache.LocalMemory.Manager<InfoFact[], Osoba> _cacheInfoFacts =
             Devmasters.Cache.LocalMemory.Manager<InfoFact[], Osoba>
             .GetSafeInstance("Osoba_InfoFacts_v1_",
                 (obj) => InfoFactsAsync(obj).GetAwaiter().GetResult(),
                 TimeSpan.FromHours(12),
                 obj => $"_infofacts_{obj.NameId}");
 
-        public static async Task<InfoFact[]> InfoFactsCachedAsync(this Osoba osoba)
+        public static InfoFact[] InfoFactsCached(this Osoba osoba, bool forceUpdateCache = false)
         {
+            if (forceUpdateCache)
+                _cacheInfoFacts.Delete(osoba);
+
             var _infof = _cacheInfoFacts.Get(osoba);
             return _infof;
         }
-        
+
         public static async Task<InfoFact[]> InfoFactsAsync(this Osoba osoba,
             HashSet<InfoFact.ImportanceLevel> excludedImportanceLevels = null)
         {
@@ -442,7 +443,7 @@ namespace HlidacStatu.Extensions
                 m => types.Contains(m.Type),
                 2, itemDelimeter: ", ");
 
-            if (excludedImportanceLevels is null || 
+            if (excludedImportanceLevels is null ||
                 !excludedImportanceLevels.Contains(InfoFact.ImportanceLevel.Summary))
             {
                 var descr = "";
@@ -453,7 +454,7 @@ namespace HlidacStatu.Extensions
                 if (!string.IsNullOrEmpty(kdoje))
                     descr += ", " + kdoje + (kdoje.EndsWith(". ") ? "" : ". ");
                 f.Add(new InfoFact(descr, InfoFact.ImportanceLevel.Summary));
-                
+
             }
 
             if (excludedImportanceLevels is null ||
@@ -606,7 +607,7 @@ namespace HlidacStatu.Extensions
         public static string SocialInfoBody(this Osoba osoba)
         {
             return "<ul>"
-                   + InfoFact.RenderInfoFacts(osoba.InfoFactsCachedAsync().ConfigureAwait(false).GetAwaiter().GetResult(),
+                   + InfoFact.RenderInfoFacts(osoba.InfoFactsCached(),
                        4, true, true, "", "<li>{0}</li>", true)
                    + "</ul>";
         }

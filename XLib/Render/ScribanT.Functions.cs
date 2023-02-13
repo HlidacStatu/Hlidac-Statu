@@ -139,6 +139,7 @@ namespace HlidacStatu.XLib.Render
 
             public static string fn_RenderCompanyName(string ico, string missingCompanyName = "")
             {
+                ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
                     Firma o = Firmy.instanceByIco.Get(ico);
@@ -154,6 +155,7 @@ namespace HlidacStatu.XLib.Render
 
             public static string fn_RenderCompanyWithLink(string ico, string missingCompanyName = "")
             {
+                ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
                     Firma o = Firmy.instanceByIco.Get(ico);
@@ -180,6 +182,7 @@ namespace HlidacStatu.XLib.Render
 
             public static string fn_RenderCompanyStatistic(string ico, bool twoLines = false, string prefix = "", string postfix = "")
             {
+                ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
                     var firma = Firmy.instanceByIco.Get(ico);
@@ -204,6 +207,7 @@ namespace HlidacStatu.XLib.Render
             public static string fn_RenderCompanyInformations(string ico, int numberOfInfos = 3, string prefix = "", string postfix = "",
                 string delimiterBetweenInfos = "")
             {
+                ico = HlidacStatu.Util.ParseTools.NormalizeIco(ico);
                 if (!string.IsNullOrEmpty(ico))
                 {
                     var o = Firmy.instanceByIco.Get(ico);

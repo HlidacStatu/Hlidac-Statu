@@ -1,7 +1,5 @@
 ﻿using Devmasters.Log;
 using HlidacStatu.DS.Api;
-using HlidacStatu.Entities;
-
 using System;
 using System.Threading.Tasks;
 

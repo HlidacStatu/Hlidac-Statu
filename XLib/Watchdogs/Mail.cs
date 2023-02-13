@@ -1,6 +1,6 @@
 ﻿using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-
+using HlidacStatu.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +24,7 @@ namespace HlidacStatu.XLib.Watchdogs
             string openingText = null,
             int maxDegreeOfParallelism = 20,
             Action<string> logOutputFunc = null,
-            Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null) 
+            Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null)
             => SendWatchdogsInOneEmailAsync(new WatchDog[] { watchdog },
                 aspnetUser,
                 force, specificContacts,
@@ -144,30 +144,36 @@ namespace HlidacStatu.XLib.Watchdogs
                 if (!string.IsNullOrEmpty(openingText))
                     parts.Insert(0, Template.Paragraph(openingText));
 
-                if (DateTime.Now < new DateTime(2020, 4, 2))
+                //add advertisement
+                if (DateTime.Now < new DateTime(2023, 9, 2))
                 {
                     parts.Insert(0, Template.Margin());
-                    parts.Insert(0, Template.Paragraph(
-                    "<b style='color:red'>NOVINKA!</b> "
-                    + "Pokud máte na Hlídači státu nastaveno více hlídačů nových informací, nebudeme Vám je už posílat v jednotlivých mailech. "
-                    + "Místo toho obdržíte jeden souhrnný, ve kterém najdete vše najednou!  "
-                    + "Pokud vám vyhovuje každý hlídač v samostatném mailu, snadno to změníte přes odkaz v patičce."
-                    ,
-                    "NOVINKA! "
-                    + "Pokud máte na Hlídači státu nastaveno více hlídačů nových informací, nebudeme Vám je už posílat v jednotlivých mailech. "
-                    + "Místo toho obdržíte jeden souhrnný, ve kterém najdete vše najednou!  "
-                    + "Pokud vám vyhovuje každý hlídač v samostatném mailu, snadno to změníte přes odkaz v patičce."
-                    ));
+                    parts.Insert(0, Template.AdInBox("500px",
+                        "lightblue", "black",
+                        new SMTPTools.EmbeddedImage[] { new SMTPTools.EmbeddedImage() {
+                             ContentType= "image/png",
+                             FilePath=HlidacStatu.Connectors.Init.WebAppRoot+@"ad\300x300\square_3.png",
+                             ReplacementInMail="#ADIMG1#"
+                        } },
+                    "<div style=\"margin:10px\">"
+                    + "<a style='color:black' href='https://www.WatchdogAnalytics.cz/?utm_source=watchdoginfomail&utm_medium=email&utm_campaign=start&utm_content=adplace'>"
+                    + "<div style='text-align:center;margin-bottom:10px;'>Nejrozsáhlejší analýza <b>cen ICT služeb</b> na českém trhu. Přesná a aktuální, pouze ze <b>skutečně uzavřených smluv</b>.</div>"
+                    + "<div style='text-align:center;margin-bottom:10px;'>#ADIMG1#</div>"
+                    + "<div style='text-align: center;'>Klikněte sem pro více informací!</div>"
+                    + "</a>"
+                    + "</div>"
+                    )
+                        );
                 }
-                else
-                {
-                    parts.Insert(0, Template.Margin());
-                    parts.Insert(0, Template.Paragraph(
-                    "Seznam nalezených nových informací, které vás zajímají, pěkně pohromadě v jednom souhrnném mailu."
-                    ,
-                    "Seznam nalezených nových informací, které vás zajímají, pěkně pohromadě v jednom souhrnném mailu."
-                    ));
-                }
+
+
+                parts.Insert(0, Template.Margin());
+                parts.Insert(0, Template.Paragraph(
+                "Seznam nalezených nových informací, které vás zajímají, pěkně pohromadě v jednom souhrnném mailu."
+                ,
+                "Seznam nalezených nových informací, které vás zajímají, pěkně pohromadě v jednom souhrnném mailu."
+                ));
+
                 parts.Insert(0, Template.Margin());
 
                 var content = RenderedContent.Merge(parts);

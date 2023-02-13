@@ -67,13 +67,10 @@ namespace HlidacStatu.Repositories
 
 
         static Osoba nullObj = new Osoba() { NameId = "____NOTHING____" };
-        private class OsobyMCMById : Devmasters.Cache.Couchbase.Manager<Osoba, int>
+        private class OsobyMCMById : Devmasters.Cache.Hazelcast.Manager<Osoba, int>
         {
             public OsobyMCMById() : base("PersonById", getById, TimeSpan.FromMinutes(10),
-                Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                Devmasters.Config.GetWebConfigValue("CouchbasePassword"))
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','))
             { }
 
             public override Osoba Get(int key)
@@ -96,7 +93,7 @@ namespace HlidacStatu.Repositories
         private static object lockObj = new object();
 
         private static OsobyMCMById instanceById;
-        public static Devmasters.Cache.Couchbase.Manager<Osoba, int> GetById
+        public static Devmasters.Cache.Hazelcast.Manager<Osoba, int> GetById
         {
             get
             {
@@ -114,13 +111,10 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private class OsobyMCMByNameId : Devmasters.Cache.Couchbase.Manager<Osoba, string>
+        private class OsobyMCMByNameId : Devmasters.Cache.Hazelcast.Manager<Osoba, string>
         {
             public OsobyMCMByNameId() : base("PersonByNameId", getByNameId, TimeSpan.FromMinutes(10),
-                Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                Devmasters.Config.GetWebConfigValue("CouchbasePassword"))
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','))
             { }
 
             public override Osoba Get(string key)
@@ -143,7 +137,7 @@ namespace HlidacStatu.Repositories
         }
 
         private static OsobyMCMByNameId instanceNameId;
-        public static Devmasters.Cache.Couchbase.Manager<Osoba, string> GetByNameId
+        public static Devmasters.Cache.Hazelcast.Manager<Osoba, string> GetByNameId
         {
             get
             {

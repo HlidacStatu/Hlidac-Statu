@@ -118,11 +118,19 @@ namespace HlidacStatu.Util
             if (ico == null)
                 return string.Empty;
 
-            ico = ico.Trim();
-            if (ico.Contains("cz-"))
+            ico = ico.Trim().ToLower();
+            if (string.IsNullOrEmpty(ico))
+                return string.Empty;
+
+            if (ico.StartsWith("cz-"))
                 return MerkIcoToICO(ico);
-            else
-                return ico.PadLeft(8, '0');
+
+            ico = Devmasters.TextUtil.NormalizeToNumbersOnly(ico);
+            if (string.IsNullOrEmpty(ico))
+                return string.Empty;
+
+            return ico.PadLeft(8, '0');
+            
         }
 
 

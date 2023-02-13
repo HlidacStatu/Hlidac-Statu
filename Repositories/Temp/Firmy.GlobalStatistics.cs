@@ -234,6 +234,7 @@ namespace HlidacStatu.Repositories
                 object lockObj = new object();
                 List<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> data =
                     new List<StatisticsSubjectPerYear<Smlouva.Statistics.Data>>();
+
                 Manager.DoActionForAll<string>(icos,
                     (Func<string, ActionOutputData>)(
                     ico =>
@@ -245,7 +246,10 @@ namespace HlidacStatu.Repositories
                                 data.Add(stat);
                             }
                         return new ActionOutputData();
-                    }), logOutputFunc, progressOutputFunc, true, maxDegreeOfParallelism: threads, prefix: $"CalculateGlobalRankPerYear_UradySmlouvy_{obor.Value} ");
+                    }), logOutputFunc, progressOutputFunc, true, maxDegreeOfParallelism: threads
+                    ,prefix: $"CalculateGlobalRankPerYear_UradySmlouvy_{obor.Value} "
+                    , monitor: progressOutputFunc != null ? new MonitoredTaskRepo.ForBatch() : null
+                    );
 
                 return new GlobalStatisticsPerYear<Smlouva.Statistics.Data>(
                     Consts.RegistrSmluvYearsList,

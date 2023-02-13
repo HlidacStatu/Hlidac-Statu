@@ -12,14 +12,9 @@ namespace HlidacStatu.Util
             if (httpContext?.Request?.Headers == null)
                 return null;
 
-            IPAddress? remoteIp = null;
-            IPAddress.TryParse(httpContext.Request.Headers["X-Forwarded-For"], out remoteIp);
+            IPAddress.TryParse(httpContext.Request.Headers["X-Forwarded-For"], out var remoteIp);
 
-            if (remoteIp == null)
-            {
-                remoteIp = httpContext.Connection?.RemoteIpAddress;
-            }
-            return remoteIp;
+            return remoteIp ?? httpContext.Connection?.RemoteIpAddress;
         }
 
     }

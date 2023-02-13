@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace HlidacStatu.JobsWeb.Models
+namespace HlidacStatu.Ceny.Models
 {
     public class BarGraph
     {

@@ -15,7 +15,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         //[Authorize]
-        //public async Task<ActionResult> WebStatus(string _id)
+        //public async MonitoredTask<ActionResult> WebStatus(string _id)
         //{
         //    string id = _id;
 
@@ -25,7 +25,7 @@ namespace HlidacStatu.Web.Controllers
         //        return Json(ApiResponseStatus.StatniWebNotFound);
         //}
 
-        //private async Task<ActionResult> DataHostAsync(int id)
+        //private async MonitoredTask<ActionResult> DataHostAsync(int id)
         //{
         //    UptimeServer host = UptimeServerRepo.AllActiveServers().Where(w => w.Id == id).FirstOrDefault();
         //    if (host == null)

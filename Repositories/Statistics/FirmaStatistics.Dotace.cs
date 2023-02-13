@@ -10,29 +10,24 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static partial class FirmaStatistics
     {
-        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
-            _dotaceCache = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
+        static Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
+            _dotaceCache = Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
                 .GetSafeInstance("Firma_DotaceStatistics_v2",
                     (firma) => CalculateDotaceStatAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromDays(7),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                    Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
+                    
                     f => f.ICO);
 
 
-        static Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
+        static Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
                 HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
-            _holdingDotaceCache = Devmasters.Cache.Couchbase.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
+            _holdingDotaceCache = Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, (Firma firma,
                     HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
                 .GetSafeInstance("Holding_DotaceStatistics_v3",
                     (obj) => CalculateHoldingDotaceStat(obj.firma, obj.aktualnost),
                     TimeSpan.FromDays(7),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                    Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                    Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
+                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
                     obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
 
         public static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CachedHoldingStatisticsDotace(

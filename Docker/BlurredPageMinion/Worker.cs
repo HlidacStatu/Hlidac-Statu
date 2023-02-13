@@ -7,6 +7,7 @@ using Devmasters;
 using HlidacStatu.Analysis.Page.Area;
 
 using NeoSmart.PrettySize;
+using static HlidacStatu.DS.Api.BlurredPage;
 
 namespace BlurredPageMinion
 {

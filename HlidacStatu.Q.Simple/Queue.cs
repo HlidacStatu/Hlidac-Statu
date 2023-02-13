@@ -1,6 +1,7 @@
 ﻿using RabbitMQ.Client;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -37,8 +38,34 @@ namespace HlidacStatu.Q.Simple
             factory = new ConnectionFactory() { HostName = host, UserName = usrn, Password = pswd };
             connection = factory.CreateConnection();
             channel = connection.CreateModel();
+            var props = channel.CreateBasicProperties();
+            props.Persistent = true;
             channel.QueueDeclare(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
 
+        }
+
+        public long ConsumerCount()
+        {
+            try
+            {
+                return channel.ConsumerCount(this.QueueName);
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
+
+        public long MessageCount()
+        {
+            try
+            {
+                return channel.MessageCount(this.QueueName);
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
         }
 
         public void Send(T message)
@@ -46,23 +73,39 @@ namespace HlidacStatu.Q.Simple
             var body = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(message));
             channel.BasicPublish(exchange: "", routingKey: QueueName, basicProperties: null, body: body);
         }
+        public void Send(IEnumerable<T> messages)
+        {
+            var batch = channel.CreateBasicPublishBatch();
+
+            foreach (var m in messages)
+            {
+                var body = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(m));
+                batch.Add(exchange: "", routingKey: QueueName, false, null, body);
+            }
+            batch.Publish();
+        }
 
         public T GetAndAck()
         {
-            var res = Get();
+            return GetAndAck(out _);
+        }
+        public T GetAndAck(out ulong? responseId)
+        {
+            responseId = null;
+            Response<T> res = Get(true);
             if (res == null)
                 return default(T);
 
-            if (res.ResponseId.HasValue)
-                AckMessage(res.ResponseId.Value);
+            responseId = res.ResponseId;
 
             return res.Value;
 
         }
-        public Response<T> Get()
+        public Response<T> Get(bool autoack = false)
         {
+            
             //var body = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(message));
-            var res = channel.BasicGet(QueueName, false);
+            var res = channel.BasicGet(QueueName, autoack);
             if (res == null)
                 return null;
 

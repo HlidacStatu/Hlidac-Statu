@@ -48,7 +48,7 @@ namespace HlidacStatu.Datasets
 
 
             reg.NormalizeShortName();
-            var client = await Manager.GetESClientAsync(reg.datasetId, idxType: Manager.IndexType.DataSource);
+            var client = await Repositories.ES.Manager.GetESClientAsync(reg.datasetId, idxType: Manager.IndexType.DataSource);
 
             if (reg.searchResultTemplate != null && !string.IsNullOrEmpty(reg.searchResultTemplate?.body))
             {
@@ -90,7 +90,7 @@ namespace HlidacStatu.Datasets
         private async Task<IEnumerable<string>> _getPreviewTopValueFromItemAsync(JObject item, bool fromAllTopValues = false)
         {
             List<string> topTxts = new List<string>();
-            
+
             var props = await GetMappingListAsync("ICO");
             foreach (var prop in props)
             {
@@ -98,7 +98,7 @@ namespace HlidacStatu.Datasets
                 string t = "";
                 if (o != null && o.GetType() == typeof(JValue))
                     t = o.Value<string>() ?? "";
-                
+
                 if (DataValidators.CheckCZICO(t))
                 {
                     Firma f = Firmy.Get(t);
@@ -118,7 +118,7 @@ namespace HlidacStatu.Datasets
                 string t = "";
                 if (o != null && o.GetType() == typeof(JValue))
                     t = o.Value<string>() ?? "";
-                
+
                 if (!string.IsNullOrEmpty(t))
                 {
                     Osoba os = Osoby.GetByNameId.Get(t);
@@ -181,7 +181,7 @@ namespace HlidacStatu.Datasets
         protected DataSet(string datasourceName, bool fireException)
         {
             datasetId = datasourceName.ToLower();
-            client = Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource)
+            client = Repositories.ES.Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource)
                 .ConfigureAwait(false).GetAwaiter().GetResult();
 
             var ret = client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex)
@@ -207,7 +207,7 @@ namespace HlidacStatu.Datasets
             if (_mapping == null)
             {
                 var getIndexResponse = await client.Indices.GetAsync(client.ConnectionSettings.DefaultIndex);
-                IIndexState remote = getIndexResponse.Indices.Count>0 ? getIndexResponse.Indices.FirstOrDefault().Value : null;
+                IIndexState remote = getIndexResponse.Indices.Count > 0 ? getIndexResponse.Indices.FirstOrDefault().Value : null;
                 var dataMapping = remote?.Mappings?.Properties;
                 if (dataMapping == null)
                     return new CorePropertyBase[] { };
@@ -229,13 +229,13 @@ namespace HlidacStatu.Datasets
         }
 
         public virtual Task<DataSearchResult> SearchDataAsync(string queryString, int page, int pageSize, string sort = null,
-            bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false) 
+            bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false)
             => DatasetRepo.Searching.SearchDataAsync(this, queryString, page, pageSize, sort, excludeBigProperties,
                 withHighlighting, exactNumOfResults);
 
         public virtual Task<DataSearchRawResult> SearchDataRawAsync(string queryString, int page, int pageSize,
             string sort = null,
-            bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false) 
+            bool excludeBigProperties = true, bool withHighlighting = false, bool exactNumOfResults = false)
             => DatasetRepo.Searching.SearchDataRawAsync(this, queryString, page, pageSize, sort, excludeBigProperties,
                 withHighlighting, exactNumOfResults);
 
@@ -275,7 +275,7 @@ namespace HlidacStatu.Datasets
             return true;
         }
 
-        public async Task<bool> IsMappedPropertyDatetimeAsync(string mappedProperty) 
+        public async Task<bool> IsMappedPropertyDatetimeAsync(string mappedProperty)
             => (await GetDatetimeMappingListAsync()).Contains(mappedProperty);
 
         protected IEnumerable<string> GetMappingType(string prefix, Type mappingType,
@@ -575,7 +575,7 @@ namespace HlidacStatu.Datasets
         }
 
         public virtual Task<string> AddDataAsync(object data, string id, string createdBy, bool validateSchema = true,
-            bool skipallowWriteAccess = false) 
+            bool skipallowWriteAccess = false)
             => AddDataAsync(JsonConvert.SerializeObject(data), id, createdBy, validateSchema,
                 skipallowWriteAccess: skipallowWriteAccess);
 
@@ -1001,9 +1001,9 @@ namespace HlidacStatu.Datasets
             var fixedQuery = Repositories.Searching.Tools.FixInvalidQuery(queryString,
                 DatasetRepo.Searching.QueryShorcuts,
                 DatasetRepo.Searching.QueryOperators);
-            
+
             QueryContainer qc = await DatasetRepo.Searching.GetSimpleQueryAsync(this, fixedQuery);
-            
+
             ISearchResponse<dynamic> initialResponse = await client.SearchAsync<dynamic>
             (scr => scr.From(0)
                 .Take(scrollSize)
@@ -1042,7 +1042,7 @@ namespace HlidacStatu.Datasets
 
             return data;
         }
-        
+
         public async Task<IEnumerable<T>> GetAllDataAsync<T>(string scrollTimeout = "2m", int scrollSize = 1000) where T : class
         {
             ISearchResponse<dynamic> initialResponse = await client.SearchAsync<dynamic>
@@ -1079,7 +1079,7 @@ namespace HlidacStatu.Datasets
                 .Select(m => JsonConvert.SerializeObject(m))
                 .Select(j => JsonConvert.DeserializeObject<T>(j))
                 .Cast<T>();
-            
+
             return data;
         }
 
@@ -1196,20 +1196,29 @@ namespace HlidacStatu.Datasets
 
         public async Task<long> NumberOfRecordsAsync()
         {
-            if (_numberOfRecords == -1)
+            try
             {
-                var last = await SearchDataAsync("*", 1, 1, "DbCreated desc", exactNumOfResults: true);
-                _numberOfRecords = last.Total;
-                var lRec = last.Result.FirstOrDefault();
-                _lastRecordUpdated = DateTime.Now.AddYears(-10);
-                if (((IDictionary<String, object>)lRec).ContainsKey("DbCreated"))
+
+                if (_numberOfRecords == -1)
                 {
-                    if (lRec != null)
-                        _lastRecordUpdated = lRec?.DbCreated ?? DateTime.Now.AddYears(-10);
+                    var last = await SearchDataAsync("*", 1, 1, "DbCreated desc", exactNumOfResults: true);
+                    _numberOfRecords = last.Total;
+                    var lRec = last.Result.FirstOrDefault();
+                    _lastRecordUpdated = DateTime.Now.AddYears(-10);
+                    if (((IDictionary<String, object>)lRec).ContainsKey("DbCreated"))
+                    {
+                        if (lRec != null)
+                            _lastRecordUpdated = lRec?.DbCreated ?? DateTime.Now.AddYears(-10);
+                    }
                 }
+                return _numberOfRecords;
+            }
+            catch (Exception e)
+            {
+                HlidacStatu.Util.Consts.Logger.Error("Dataset.NumberOfRecordsAsync", e);
+                return 0;
             }
 
-            return _numberOfRecords;
         }
 
         DateTime _lastRecordUpdated = DateTime.MinValue;
@@ -1227,7 +1236,7 @@ namespace HlidacStatu.Datasets
         }
 
         InfoFact[] _infofacts = null;
-        
+
         private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
         public async Task<InfoFact[]> InfoFactsAsync()

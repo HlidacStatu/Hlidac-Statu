@@ -32,207 +32,236 @@
 
 }
 @section scripts
-{
-<script>
-    _showFAD = false;
-    _showTrackJS = false;
-</script>
-
-<!-- tagify -->
-<script src="@Html.Raw("/scripts/tagify/tagify.4.8.1.min.js")"></script>
-<script src="@Html.Raw("/scripts/tagify/tagify.polyfills.4.8.1.min.js")"></script>
-<link href="@Html.Raw("/scripts/tagify/tagify.4.8.1.css")" rel="stylesheet" type="text/css" />
-<script src="/scripts/autocomplete.v1.2.js"></script>
-<script type="text/javascript">
-    if (_showTrackJS)
     {
-    window.smartlook || (function (d) {
-        var o = smartlook = function () { o.api.push(arguments) }, h = d.getElementsByTagName('head')[0];
-        var c = d.createElement('script'); o.api = new Array(); c.async = true; c.type = 'text/javascript';
-        c.charset = 'utf-8'; c.src = 'https://rec.smartlook.com/recorder.js'; h.appendChild(c);
-    })(document);
-    smartlook('init', '344e291cbee0b3c87748a78b80faf81d6e8628b1');
-    }
-</script>
+    <script>
+        _showFAD = false;
+        _showTrackJS = false;
+    </script>
+
+    <!-- tagify -->
+    <script src="@Html.Raw("/scripts/tagify/tagify.4.17.7.min.js")"></script>
+    <script src="@Html.Raw("/scripts/tagify/tagify.polyfills.4.17.7.min.js")"></script>
+    <link href="@Html.Raw("/scripts/tagify/tagify.4.17.7.css")" rel="stylesheet" type="text/css" />
+    <script src="/scripts/autocomplete.v1.2.js"></script>
+    <script type="text/javascript">
+        if (_showTrackJS) {
+            window.smartlook || (function (d) {
+                var o = smartlook = function () { o.api.push(arguments) }, h = d.getElementsByTagName('head')[0];
+                var c = d.createElement('script'); o.api = new Array(); c.async = true; c.type = 'text/javascript';
+                c.charset = 'utf-8'; c.src = 'https://rec.smartlook.com/recorder.js'; h.appendChild(c);
+            })(document);
+            smartlook('init', '344e291cbee0b3c87748a78b80faf81d6e8628b1');
+        }
+    </script>
 
     @WebUtil.SetAutofocusOnId("Q")
 }
 
 @section title
-{
-<div class="header__content ">
-    <!-- desktop menu items only -->
-    <div class="navbar__level2">
-        <ul>
-            <li class=""><a href="/data">Další databáze<sup style="top:0;text-decoration:none;color:yellow;">@(DataSetDB.AllDataSets.Get()?.Count().ToString() ?? "")</sup></a></li>
-            <li class=""><a href="/reporty">Analýzy a reporty<sup style="top:0;text-decoration:none;color:yellow;">@(PocetReportu)</sup></a></li>
-            <li class=""><a @Html.GAClick() style="font-weight:bold;color:yellow;" href="/texty">Zjistili jsme</a></li>
-            <li class=""><a href="https://www.hlidacstatu.cz/texty/series/tipy/">Tipy „Jak používat Hlídače“</a></li>
-        </ul>
-        <ul>
-            <li>
-                <a href="/pridatse">Přidat se</a>
-                @*<a href="https://github.com/HlidacStatu/Web/issues" target="_blank" style="color:orange"><span class="fas fa-exclamation-triangle"></span>&nbsp;Nahlásit chybu</a>*@
-                <a onclick="return trackOutLink(this,'Index.title');" href="https://www.darujme.cz/projekt/1204683">Podpořit nás</a>
-            </li>
-        </ul>
-    </div>
-    <div class="header__title">
-        <h1>Hlídač státu</h1>
-        <span>Hlídáme je, protože si to zaslouží!</span>
-    </div>
-    <!-- desktop menu items only -->
-
-    <div class="header__search">
-        <label class="label" for="Q">Prohledat všechny Hlídače státu:</label>
-        <form class="header__search__input-wrapper old-search-input" action="/hledat" id="old-search-input" method="get" style="visibility:visible">
-            <input value="" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
-            <button class="header__search__btn">Hledat</button>
-        </form>
-
-        @if (false) //newsearch
-        {
-        <form id="new-search-input" class="new-search-input" action="/hledat" method="get" style="visibility:hidden">
-            <div class="select2-wrapper">
-                <div class="input-group input-group-lg">
-                    <select class="form-control input-lg select2-multiple" id="autocomsearch" multiple="multiple">
-                        @if (!string.IsNullOrWhiteSpace(ViewBag.Query))
-                        {
-                        foreach (string option in ViewBag.Query.ToString().Split(' '))
-                        {
-                        <option value="@option" selected="selected">@option</option>
-                        }
-                        }
-                    </select>
-                    <span class="input-group-btn">
-                        <button class="btn btn-primary" data-select2-open="autocomsearch" style="left:-7px"> hledat</button>
-                    </span>
-                    <input id="search-result-query-data" name="q" type="hidden" />
-                </div>
-            </div>
-        </form>
-        }
-        else //newsearch2
-        {
-        <form id="new-search-input" class="new-search-input " method="get" action="/hledat" style="visibility:hidden">
-            <div class="new-search-wrapper">
-                <div class="input-group">
-                    <input class="form-control nopadding " name="q" value="@(ViewBag.Query)" id="new-search-input-q" />
-                    <span class="input-group-btn">
-                        <button id="new-search-input-btn" class="btn btn-primary" style="left:-7px;top:-5px"> hledat</button>
-                    </span>
-                </div>
-            </div>
-        </form>
-        <script>
-            MakeAutocomplete('#new-search-input');
-        </script>
-
-        }
-
-        <div>
-            <button class="header__search__hint btn btn-link new-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
-                <i class="fas fa-blind"></i> Staré hledání
-            </button>
-            <button class="header__search__hint btn btn-link old-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
-                <i class="fas fa-baby"></i> Nové hledání
-            </button>
-            <a class="header__search__hint" style="padding-top:2px;font-size:15px;text-decoration:none;padding-top:2px;font-size:15px;text-decoration:none" href="/napoveda">
-                <i class="far fa-question-square" style=""></i> Nápověda jak vyhledávat
-            </a>
-            <a class="header__search__hint float-end" style="" href="/snadnehledani">
-                Snadné hledání
-            </a>
+    {
+    <div class="header__content ">
+        <!-- desktop menu items only -->
+        <div class="navbar__level2">
+            <ul>
+                <li class=""><a href="/data">Další databáze<sup style="top:0;text-decoration:none;color:yellow;">@(DataSetDB.AllDataSets.Get()?.Count().ToString() ?? "")</sup></a></li>
+                <li class=""><a href="/reporty">Analýzy a reporty<sup style="top:0;text-decoration:none;color:yellow;">@(PocetReportu)</sup></a></li>
+                <li class=""><a @Html.GAClick() style="font-weight:bold;color:yellow;" href="/texty">Zjistili jsme</a></li>
+                <li class=""><a href="https://www.hlidacstatu.cz/texty/series/tipy/">Tipy „Jak používat Hlídače“</a></li>
+            </ul>
+            <ul>
+                <li>
+                    <a href="/pridatse">Přidat se</a>
+                    @*<a href="https://github.com/HlidacStatu/Web/issues" target="_blank" style="color:orange"><span class="fas fa-exclamation-triangle"></span>&nbsp;Nahlásit chybu</a>*@
+                    <a onclick="return trackOutLink(this,'Index.title');" href="https://www.darujme.cz/projekt/1204683">Podpořit nás</a>
+                </li>
+            </ul>
         </div>
-    </div>
+        <div class="header__title">
+            <h1>Hlídač státu</h1>
+            <span>Hlídáme je, protože si to zaslouží!</span>
+        </div>
+        <!-- desktop menu items only -->
 
-</div>
+        <div class="header__search">
+            <label class="label" for="Q">Prohledat všechny Hlídače státu:</label>
+            <form class="header__search__input-wrapper old-search-input" action="/hledat" id="old-search-input" method="get" style="visibility:visible">
+                <input value="" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
+                <button class="header__search__btn">Hledat</button>
+            </form>
+
+            @if (false) //newsearch
+            {
+                <form id="new-search-input" class="new-search-input" action="/hledat" method="get" style="visibility:hidden">
+                    <div class="select2-wrapper">
+                        <div class="input-group input-group-lg">
+                            <select class="form-control input-lg select2-multiple" id="autocomsearch" multiple="multiple">
+                                @if (!string.IsNullOrWhiteSpace(ViewBag.Query))
+                                {
+                                    foreach (string option in ViewBag.Query.ToString().Split(' '))
+                                    {
+                                        <option value="@option" selected="selected">@option</option>
+                                    }
+                                }
+                            </select>
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" data-select2-open="autocomsearch" style="left:-7px"> hledat</button>
+                            </span>
+                            <input id="search-result-query-data" name="q" type="hidden" />
+                        </div>
+                    </div>
+                </form>
+            }
+            else //newsearch2
+            {
+                <form id="new-search-input" class="new-search-input " method="get" action="/hledat" style="visibility:hidden">
+                    <div class="new-search-wrapper">
+                        <div class="input-group">
+                            <input class="form-control nopadding " name="q" value="@(ViewBag.Query)" id="new-search-input-q" />
+                            <span class="input-group-btn">
+                                <button id="new-search-input-btn" class="btn btn-primary" style="left:-7px;top:-5px"> hledat</button>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+                <script>
+                    MakeAutocomplete('#new-search-input');
+                </script>
+
+            }
+
+            <div>
+                <button class="header__search__hint btn btn-link new-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
+                    <i class="fas fa-blind"></i> Staré hledání
+                </button>
+                <button class="header__search__hint btn btn-link old-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
+                    <i class="fas fa-baby"></i> Nové hledání
+                </button>
+                <a class="header__search__hint" style="padding-top:2px;font-size:15px;text-decoration:none;padding-top:2px;font-size:15px;text-decoration:none" href="/napoveda">
+                    <i class="far fa-question-square" style=""></i> Nápověda jak vyhledávat
+                </a>
+                <a class="header__search__hint float-end" style="" href="/snadnehledani">
+                    Snadné hledání
+                </a>
+            </div>
+        </div>
+
+    </div>
 }
 
 <div class="watcher-blocks">
 
     <div class="watcher-blocks__wrapper">
 
-    @if (false)
-    {
-        <!-- K-Index -->
-        <div class="watcher-block">
-            <div class="watcher__title">
-                <img src="/Content/img/icon-person-watcher.svg">
-                <h2 class="new-title">
-                    <a href="/kindex">K-Index</a>
-                </h2>
-            </div>
-            <partial name="~/Views/Kindex/_SearchForm.cshtml" />
-            <div class="block-col ">
-                <p class="muted">
-                    <a href="/kindex">Index klíčových rizik</a> - zkráceně K–Index, je ukazatel míry rizikových faktorů. Tyto faktory jsou spojovány s rizikem korupce a nehospodárným nakládáním veřejných peněz.
+        @if (true)
+        {
+            <!-- K-Index -->
+            <div class="watcher-block">
+                <div class="watcher__title">
+                    <img src="/Content/img/icon-person-watcher.svg">
+                    <h2 class="new-title">
+                        <a href="/kindex">K-Index</a>
+                    </h2>
+                </div>
+                <partial name="~/Views/Kindex/_SearchForm.cshtml" />
+                <div class="block-col ">
+                    <p class="muted">
+                        <a href="/kindex">Index klíčových rizik</a> - zkráceně K–Index, je ukazatel míry rizikových faktorů. Tyto faktory jsou spojovány s rizikem korupce a nehospodárným nakládáním veřejných peněz.
+                    </p>
+                    @*                <p>
+                <a href="/kindex">
+                <img src="/content/Img/kindex-info.png" style="width:80%;" title="Popis K-Indexu" />
+                </a>
                 </p>
-                @*                <p>
-                    <a href="/kindex">
-                    <img src="/content/Img/kindex-info.png" style="width:80%;" title="Popis K-Indexu" />
-                    </a>
-                    </p>
-                    <div class="row">
-                    <div class="col-6">
-                    <a href="@HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndexData.GetKratkaMetodikaURL()" class="btn btn-default" style="white-space: nowrap;">Co je K-Index</a>
-                    </div>
-                    <div class="col-6">
-                    <a href="@HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndexData.GetMetodikaURL()" class="btn btn-default" style="margin-left:10px">Metodika</a>
-                    </div>
-                    </div>
-                    <p>
-                    <a href="https://texty.hlidacstatu.cz/k-index/">S podporou Active Citizens Fund a Norských fondů.</a><a href="https://texty.hlidacstatu.cz/k-index-watchdog-bravely-monitors-public-corruption/"><img src="/Content/Img/en.png" style="height:13px;width:20px;vertical-align:baseline" /></a>
-                    <a href="https://texty.hlidacstatu.cz/k-index/"><img src="/Content/Img/acf.jpg" style="width:80%;height:auto;" /></a>
-                    </p>
+                <div class="row">
+                <div class="col-6">
+                <a href="@HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndexData.GetKratkaMetodikaURL()" class="btn btn-default" style="white-space: nowrap;">Co je K-Index</a>
+                </div>
+                <div class="col-6">
+                <a href="@HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndexData.GetMetodikaURL()" class="btn btn-default" style="margin-left:10px">Metodika</a>
+                </div>
+                </div>
+                <p>
+                <a href="https://texty.hlidacstatu.cz/k-index/">S podporou Active Citizens Fund a Norských fondů.</a><a href="https://texty.hlidacstatu.cz/k-index-watchdog-bravely-monitors-public-corruption/"><img src="/Content/Img/en.png" style="height:13px;width:20px;vertical-align:baseline" /></a>
+                <a href="https://texty.hlidacstatu.cz/k-index/"><img src="/Content/Img/acf.jpg" style="width:80%;height:auto;" /></a>
+                </p>
                 *@
+                </div>
             </div>
-        </div>
-        
-    }
-    else
-    {
-        <div class="watcher-block">
-            <div class="watcher__title">
-                <img src="/Content/img/icon-person-watcher.svg">
-                <h2 class="new-title">
-                    <a href="https://volby.hlidacstatu.cz/" class="newbadge top-right">Prezidentské volby 2023&nbsp;</a>
-                </h2>
+
+        }
+        else
+        {
+            <div class="watcher-block">
+                <div class="watcher__title">
+                    <img src="/Content/img/icon-person-watcher.svg">
+                    <h2 class="new-title">
+                        <a href="https://volby.hlidacstatu.cz/" class="newbadge top-right">Prezidentské volby 2023&nbsp;</a>
+                    </h2>
+                </div>
+                <div class="block-col ">
+                    <p class="muted">
+                        Nemůžete volit v místě svého trvalého bydliště? Pomůžeme vám s žádostí o voličský průkaz!
+                    </p>
+                    <p>
+                        <a href="https://volby.hlidacstatu.cz/" class="btn btn-warning">Voličský průkaz</a>
+                    </p>
+                </div>
             </div>
-            <div class="block-col ">
-                <p class="muted">
-                    Nemůžete volit v místě svého trvalého bydliště? Pomůžeme vám s žádostí o voličský průkaz!
-                </p>
-                <p>
-                    <a href="https://volby.hlidacstatu.cz/" class="btn btn-warning">Voličský průkaz</a>
-                </p>
+        }
+
+
+        @* Promo v sudý den pro úřady, v lichý pro firmy *@
+        @if (DateTime.Now.Day % 2 == 0) //sudy
+        {
+            <div class="watcher-block">
+                <div class="watcher__title">
+                    <i class="fa-duotone fa-chart-waterfall fa-2xl" style="font-size:2.5em;padding-right:16px;--fa-primary-color:orangered;"></i>
+                    <h2 class="new-title">
+                        <a href="https://www.WatchdogAnalytics.cz/?p=1?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=hpBox" class="newbadge top-right" style="padding-right:15px">
+                            Obvyklé ceny ICT prací
+                        </a>
+                    </h2>
+                </div>
+                <div class="block-col ">
+                    <p class="text-black">
+                        Nejrozsáhlejší analýza cen ICT služeb na českém trhu. Přesná a aktuální, pouze ze skutečně uzavřených smluv.
+                        <br/>
+                        Minimalizujte neúspěšná výběrová řízení <b>stanoveným obvyklých cenových hladin</b>.
+                        Porovnejte Vaše ceny s jinými úřady, nastavte správné limity. Zabraňte <b>negativní publicitě</b>.
+                    </p>
+                    <p>
+                        <a href="https://www.WatchdogAnalytics.cz/?p=1?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=hpBoxUrad" class="btn btn-warning">Ukázat data za <span style="color:black;font-weight:bolder">2020-2022</span></a>
+                    </p>
+                </div>
             </div>
-        </div>
-    }
-    
-        
-    @if(true)
-    {
-        <div class="watcher-block">
-            <div class="watcher__title">
-                <i class="fa-duotone fa-chart-waterfall fa-2xl" style="font-size:2.5em;padding-right:16px;--fa-primary-color:orangered;"></i>
-                <h2 class="new-title">
-                    <a href="https://ceny.analyzy.hlidacstatu.cz/?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=blockHeader" class="newbadge top-right" style="padding-right:15px">Cenové analýzy</a>
-                </h2>
+        }
+        else
+        {
+            <div class="watcher-block">
+                <div class="watcher__title">
+                    <i class="fa-duotone fa-chart-waterfall fa-2xl" style="font-size:2.5em;padding-right:16px;--fa-primary-color:orangered;"></i>
+                    <h2 class="new-title">
+                        <a href="https://www.WatchdogAnalytics.cz/?p=1?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=hpBox" class="newbadge top-right" style="padding-right:15px">
+                            Obvyklé ceny ICT prací
+                        </a>
+                    </h2>
+                </div>
+                <div class="block-col ">
+                    <p class="text-black">
+                        Nejrozsáhlejší analýza cen ICT služeb na českém trhu. Přesná a aktuální, pouze ze skutečně uzavřených smluv.
+                        <br/>
+                        Znalost obvyklé cenové hladiny zadavatele i předchozích nabídkových cen konkurentů vám umožní
+                        zvolit nejlepší cenu.<br />
+                        <b>Nepodbízejte se</b> příliš nízkou cenou a <b>nepropásněte</b> obchodní příležitost příliš drahou nabídkou.
+                    </p>
+                    <p>
+                        <a href="https://www.WatchdogAnalytics.cz/?p=1?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=hpBoxFirma" class="btn btn-warning">Ukázat data za <span style="color:black;font-weight:bolder">2020-2022</span></a>
+
+                    </p>
+                </div>
             </div>
-            <div class="block-col ">
-                <p class="muted">
-                    Detailní analýzy obvyklých <b style="color:black">cen IT služeb</b> na českém trhu.<br/>
-                    Zpracovali jsme desetitisíce cen uvedených ve smlouvách v registru smluv a 
-                    přinášíme vám <b style="color:black">nejrozsáhlejší a nejspolehlivější</b> detailní analýzy jednotkových cen v Česku.
-                </p>
-                <p>
-                    <a href="https://ceny.analyzy.hlidacstatu.cz/?accent=demo&utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=blockDemo" class="btn btn-warning">Ukázat data <span style="color:black;font-weight:bolder">zdarma</span></a>
-                    
-                </p>
-            </div>
-        </div>
-    }
+
+        }
 
         @if (false)
         {
@@ -305,20 +334,20 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
         <div class="watcher-block">
 
             @*            <div class="watcher__title">
-                <img src="/Content/img/logoUA.png" style="height:40px">
-                <h2 class="new-title">
-                <a href="https://docs.google.com/spreadsheets/d/1oNo6jhtvFY6cPy85Tdv8t3XFUySC8mikdFE22yR-eTs/edit#gid=0">
-                <span style="font-weight:bold;font-size:inherit;color:rgb(0, 87, 183)">Pomáháme</span>
-                <span style="font-weight:bold;font-size:inherit;color:rgb(255, 215, 0)">Ukrajině</span></a>
-                </h2>
-                </div>
-                <div class="block-col block-part">
-                <b>Souhrnnou tabulku s informacemi, pomocí, <a style="display: contents;" href="https://docs.google.com/spreadsheets/d/1oNo6jhtvFY6cPy85Tdv8t3XFUySC8mikdFE22yR-eTs/edit#gid=0">nabídkou i poptávkou najdete
-                ZDE</a>.
-                Aktualizujeme neustále, přidávejte komentáře nebo zažádejte o editorský přístup. Další informace najdete i na <a target="_blank" href="https://www.pomahejukrajine.cz">Pomáhej Ukrajině</a> a <a target="_blank" href="https://www.nasiukrajinci.cz/">Naši Ukrajinci</a>
-                </b>
-                </div>
-                <div style="margin-top:40px;"></div>
+            <img src="/Content/img/logoUA.png" style="height:40px">
+            <h2 class="new-title">
+            <a href="https://docs.google.com/spreadsheets/d/1oNo6jhtvFY6cPy85Tdv8t3XFUySC8mikdFE22yR-eTs/edit#gid=0">
+            <span style="font-weight:bold;font-size:inherit;color:rgb(0, 87, 183)">Pomáháme</span>
+            <span style="font-weight:bold;font-size:inherit;color:rgb(255, 215, 0)">Ukrajině</span></a>
+            </h2>
+            </div>
+            <div class="block-col block-part">
+            <b>Souhrnnou tabulku s informacemi, pomocí, <a style="display: contents;" href="https://docs.google.com/spreadsheets/d/1oNo6jhtvFY6cPy85Tdv8t3XFUySC8mikdFE22yR-eTs/edit#gid=0">nabídkou i poptávkou najdete
+            ZDE</a>.
+            Aktualizujeme neustále, přidávejte komentáře nebo zažádejte o editorský přístup. Další informace najdete i na <a target="_blank" href="https://www.pomahejukrajine.cz">Pomáhej Ukrajině</a> a <a target="_blank" href="https://www.nasiukrajinci.cz/">Naši Ukrajinci</a>
+            </b>
+            </div>
+            <div style="margin-top:40px;"></div>
             *@
             <div class="watcher__title">
                 <img src="/Content/img/icon-contracts.svg">
@@ -430,7 +459,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
                         var stavMostu = DataSet.CachedDatasets.Get("stav-mostu");
                         var narodniInvesticniPlan = DataSet.CachedDatasets.Get("narodni-investicni-plan");
                     }
-                    
+
                     <a href="/data/Index/veklep" class="tag">
                         Elektronická knihovna legislativního procesu
                         (@RenderData.NiceNumber(veklep is null? 0 : await veklep.NumberOfRecordsAsync()))
@@ -479,7 +508,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
             </div>
         </div>
 
-                @if (false)
+        @if (false)
         {
 
             <!-- block 2 -->
@@ -520,7 +549,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
                         <a href="/osoby" class="link">Další politici</a>
                     </div>
                     <!-- right col -->
-                <div class="block-col block-col--50">
+                    <div class="block-col block-col--50">
                         <div class="block-subtitle">
                             Sponzoři s nej vazbou na stát
                         </div>
@@ -536,17 +565,17 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
                                 </li>
                             }
                         </ul>
-                    <a href="/osoby" class="link">Další sponzoři</a>
+                        <a href="/osoby" class="link">Další sponzoři</a>
+                    </div>
+                </div>
+
+                <div class="block-button-wrapper">
+                    <a href="/osoby" class="btn btn-default btn-default-new">zobrazit Více v Hlídači osob</a>
                 </div>
             </div>
-
-            <div class="block-button-wrapper">
-                <a href="/osoby" class="btn btn-default btn-default-new">zobrazit Více v Hlídači osob</a>
-            </div>
-        </div>
         }
 
-                @if (false)
+        @if (false)
         {
 
             <!-- block Verejne zakazky -->
@@ -607,23 +636,23 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
                             <a href="@item.Item1" class="tag">@item.Item2</a>
                         }
                     </div>
-            </div>
-
-            <div class="block-col block-part">
-                <div class="block-subtitle">
-                    Nejvyhledávanější výrazy
                 </div>
-                <div class="block-tags">
-                    <a href="/verejnezakazky/hledat?Q=zverejneno%3A%5B@(DateTime.Now.Date.ToString("yyyy-MM-dd"))+TO+*%5D&Zahajeny=false&Oblast=&Order=4" class="tag">Největší zakázky za poslední měsíc</a>
-                    <a href="/verejnezakazky/hledat?Q=*%20oblast:IT&order=1" class="tag">Poslední  zakázky v oblasti IT</a>
-                    <a href="/verejnezakazky/hledat?Q=*&order=1" class="tag">Poslední veřejné zakázky</a>
+
+                <div class="block-col block-part">
+                    <div class="block-subtitle">
+                        Nejvyhledávanější výrazy
+                    </div>
+                    <div class="block-tags">
+                        <a href="/verejnezakazky/hledat?Q=zverejneno%3A%5B@(DateTime.Now.Date.ToString("yyyy-MM-dd"))+TO+*%5D&Zahajeny=false&Oblast=&Order=4" class="tag">Největší zakázky za poslední měsíc</a>
+                        <a href="/verejnezakazky/hledat?Q=*%20oblast:IT&order=1" class="tag">Poslední  zakázky v oblasti IT</a>
+                        <a href="/verejnezakazky/hledat?Q=*&order=1" class="tag">Poslední veřejné zakázky</a>
+                    </div>
+                </div>
+
+                <div class="block-button-wrapper">
+                    <a href="/verejnezakazky" class="btn btn-default btn-default-new">zobrazit více v hlídači veřejných zakázek</a>
                 </div>
             </div>
-
-            <div class="block-button-wrapper">
-                <a href="/verejnezakazky" class="btn btn-default btn-default-new">zobrazit více v hlídači veřejných zakázek</a>
-            </div>
-        </div>
         }
     </div>
 </div>

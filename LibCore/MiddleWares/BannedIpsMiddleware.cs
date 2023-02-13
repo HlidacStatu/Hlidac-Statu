@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -17,30 +18,33 @@ namespace HlidacStatu.LibCore.MiddleWares
     {
        
         private readonly RequestDelegate _next;
+        private readonly Whitelist _whitelist;
 
         private readonly string[] _badWords = new[]
         {
             "wp-login.php"
         };
 
-        public BannedIpsMiddleware(RequestDelegate next)
+        public BannedIpsMiddleware(RequestDelegate next, Whitelist whitelist)
         {
             _next = next;
+            _whitelist = whitelist;
         }
 
 
         // IMyScopedService is injected into Invoke
         public async Task Invoke(HttpContext httpContext, AttackerDictionaryService attackerDictionary)
         {
-            //if on Radware, use header X-Forwarded-For
-
+            //if on Radware, it uses header X-Forwarded-For
             IPAddress? remoteIp = HlidacStatu.Util.RealIpAddress.GetIp(httpContext);
-            IPAddress.TryParse(httpContext.Request.Headers["X-Forwarded-For"], out remoteIp);
 
-            if (remoteIp == null)
-                remoteIp = HlidacStatu.Util.RealIpAddress.GetIp(httpContext);
-
-
+            //short circuit for whitelisted ips
+            if (_whitelist.IsOnWhitelist(remoteIp))
+            {
+                await _next(httpContext);
+                return;
+            }
+            
             var requestedUrl = httpContext.Request.GetDisplayUrl();
 
             // autoban for robots
@@ -88,10 +92,7 @@ namespace HlidacStatu.LibCore.MiddleWares
         {
             var ipString = ipAddress?.ToString() ?? "_empty";
             Util.Consts.Logger.Info($"Adding IP [{ipString}] to ban list.");
-
-            if (AttackerDictionaryService.whitelistedIps.Contains(ipString))
-                return;
-
+            
             await BannedIpRepoCached.BanIpAsync(ipString, expiration, lastStatusCode, pathList);
         }
 
@@ -152,14 +153,27 @@ namespace HlidacStatu.LibCore.MiddleWares
 </body>
 </html>";
         }
+        
+        public class Whitelist
+        {
+            public HashSet<string> IpAddresses { get; set; } = new();
+
+            public bool IsOnWhitelist(IPAddress ipAddress)
+            {
+                var ipString = ipAddress?.ToString() ?? "_empty";   
+                return IpAddresses.Contains(ipString);
+            }
+
+        }
+        
     }
-
-
+    
     public static class BannedIpsMiddlewareExtension
     {
-        public static IApplicationBuilder UseBannedIpsMiddleware(this IApplicationBuilder builder)
+        public static IApplicationBuilder UseBannedIpsMiddleware(this IApplicationBuilder builder,
+            BannedIpsMiddleware.Whitelist whitelist)
         {
-            return builder.UseMiddleware<BannedIpsMiddleware>();
+            return builder.UseMiddleware<BannedIpsMiddleware>(whitelist);
         }
     }
 }

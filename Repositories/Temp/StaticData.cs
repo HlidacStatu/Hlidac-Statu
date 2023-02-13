@@ -268,7 +268,7 @@ namespace HlidacStatu.Repositories
                              Util.Consts.outputWriter.OutputWriter,
                              Util.Consts.progressWriter.ProgressWriter,
                              true, //!System.Diagnostics.Debugger.IsAttached,
-                             maxDegreeOfParallelism: 6, prefix:"Insolvence politiku ")
+                             maxDegreeOfParallelism: 6, prefix:"Insolvence politiku ", monitor: new MonitoredTaskRepo.ForBatch())
                              .ConfigureAwait(false).GetAwaiter().GetResult();
 
                          return ret.ToArray();

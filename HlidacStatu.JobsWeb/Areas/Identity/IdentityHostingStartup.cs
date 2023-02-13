@@ -1,7 +1,8 @@
+using HlidacStatu.Ceny.Areas.Identity;
 using Microsoft.AspNetCore.Hosting;
 
-[assembly: HostingStartup(typeof(HlidacStatu.JobsWeb.Areas.Identity.IdentityHostingStartup))]
-namespace HlidacStatu.JobsWeb.Areas.Identity
+[assembly: HostingStartup(typeof(IdentityHostingStartup))]
+namespace HlidacStatu.Ceny.Areas.Identity
 {
     public class IdentityHostingStartup : IHostingStartup
     {

@@ -8,7 +8,7 @@ namespace HlidacStatu.Web.Models
     {
 
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<HealthCheckStatusModel> CurrentData =
-            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<HealthCheckStatusModel>(TimeSpan.FromSeconds(5),
+            new Devmasters.Cache.LocalMemory.AutoUpdatedCache<HealthCheckStatusModel>(TimeSpan.FromSeconds(10),
                 "HealthCheckStatusModel.CurrentData",
                 _ =>
                 {
@@ -20,7 +20,7 @@ namespace HlidacStatu.Web.Models
                         )
                         {
 
-                            net.Timeout = 10 * 1000;
+                            net.Timeout = 30 * 1000;
                             net.Tries = 2;
                             var json = net.GetContent(System.Text.Encoding.UTF8).Text;
                             var data = Newtonsoft.Json.JsonConvert.DeserializeObject<HealthCheckStatusModel[]>(json);

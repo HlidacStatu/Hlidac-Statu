@@ -1,0 +1,423 @@
+﻿@using HlidacStatu.Ceny.Models
+@using HlidacStatu.Ceny.Services
+@{
+    Layout = null;
+
+
+    var a_it20 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 });
+    var a_it21 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2021 });
+    var a_it22 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2022 });
+
+}
+
+<section class="container mb-lg-3 mb-xl-4 mb-xxl-5" id="cenik">
+    <!-- Page title-->
+    <div class="text-center pb-3 pt-lg-2 pt-xl-4 my-1 my-sm-3 my-lg-4">
+        <h1 class="display-2">Ceník</h1>
+        <p class="fs-lg mb-0">Vyberte se produkt, který vám nejvíce vyhovuje</p>
+    </div>
+    <!-- Plans-->
+    <div class="row row-cols-3 flex-nowrap pb-4 overflow-auto">
+        <!-- Plan-->
+        <div class="col" style="min-width: 19rem;">
+            <div class="card h-100 py-lg-4">
+                <div class="card-body w-100 mx-auto text-center" style="max-width: 23rem;">
+                    <h3>Základní</h3>
+                    <div class="display-2 text-primary">49&nbsp;900</div>
+                    <div class="mb-4 fw-bold fs-5">41&nbsp;240 Kč bez DPH</div>
+                    <p class="mb-4 pb-4">
+                        PDF souhrnná analýza,
+                        webová analytická aplikace,
+                        uživatelská a analytická podpora
+                        <br />&nbsp;
+                    </p>
+                    <button action="/objednat" onclick="inCart(49900,'zakladni');location.href='/objednat';return true;" class="btn btn-primary w-100" type="button">Objednat</button>
+                </div>
+            </div>
+        </div>
+        <!-- Plan-->
+        <div class="col" style="min-width: 19rem;">
+            <div class="card border-primary bg-primary h-100 py-lg-4">
+                <div class="card-body w-100 mx-auto text-center" style="max-width: 23rem;">
+                    <h3 class="text-light">Pro</h3>
+                    <div class="display-2 text-light">99&nbsp;900</div>
+                    <div class="text-light opacity-70 mb-4 fw-bold fs-5">82&nbsp;562&nbsp;Kč&nbsp;bez&nbsp;DPH</div>
+                    <p class="text-light opacity-70 mb-4 pb-4">
+                        Vše, co v základní verzi,
+                        navíc srovnávací analýzy dodavatelů a zadavatelů,
+                        provázání na jednotlivé smlouvy, zdrojová data
+                    </p>
+                    <button action="/objednat" onclick="inCart(99900,'pro');location.href='/objednat';return true;" class="btn btn-light w-100" type="submit">Objednat Pro</button>
+                </div>
+            </div>
+        </div>
+        <!-- Plan-->
+        <div class="col" style="min-width: 19rem;">
+            <div class="card h-100 py-lg-4">
+                <div class="card-body w-100 mx-auto text-center" style="max-width: 23rem;">
+                    <h3>Na míru</h3>
+                    <div class="display-3 text-primary" style="margin-bottom:10px">na dotaz</div>
+                    <div class="mb-4 fw-bold fs-5">individuální cena</div>
+                    <p class="mb-4 pb-4">
+                        Individuální analýzy podle zadání,
+                        samostatná licence, kompletní přístup ke zdrojovým datům
+                        <br />&nbsp;
+                    </p>
+                    <button action="/kontakt" onclick="inCart(99900,'pro');location.href='/kontakt';return true;" class="btn btn-primary w-100" type="submit">Kontaktovat nás</button>
+@*                    <a href="/kontakt" onclick="inCart(1,'na_miru');" class="btn btn-primary w-100" type="button">Kontaktovat nás</a>
+*@                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Comparison table-->
+    <div class="text-center pt-md-1 pt-lg-2">
+        <button class="btn btn-more btn-link fs-4" type="button" data-show-label="Porovnání produktů" data-hide-label="Porovnání produktů" data-bs-toggle="collapse" data-bs-target="#comparePlans"></button>
+    </div>
+    <div class="collapse show" id="comparePlans">
+        <div class="table-responsive pt-sm-2 pt-lg-3">
+
+            <table class="table text-center">
+                <thead>
+                    <tr>
+                        <th class="border-0 py-3">&nbsp;</th>
+                        <th class="border-0 py-3">
+                            <span class="h5 mb-0">Základní</span>
+                        </th>
+                        <th class="border-0 py-3">
+                            <span class="h5 mb-0">Pro</span>
+                        </th>
+                        <th class="border-0 py-3">
+                            <span class="h5 mb-0">Individuální</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="d-flex align-items-center text-body fw-medium">
+                                Doporučeno pro
+                                <i class="ai-circle-info fs-lg ms-2" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="right" data-bs-html="true" data-bs-content="Produkt je vhodný pro uvedené typu subjektů, nikoliv však výhradně"></i>
+                            </span>
+                        </th>
+                        <td class="border-0 bg-secondary py-3">
+                            <span class="text-dark">Soukromé firmy, veřejnosprávní subjekty</span>
+                        </td>
+                        <td class="border-0 bg-secondary py-3">
+                            <span class="text-dark">Soukromé firmy, veřejnosprávní subjekty</span>
+                        </td>
+                        <td class="border-0 rounded-3 rounded-start-0 bg-secondary py-3">
+                            <span class="text-dark">Akademická sféra, neziskové organizace, individuální dohody s firmami a státem</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="text-body fw-medium">PDF se souhrnou analýzou</span>
+                        </th>
+                        <td class="border-0 bg-secondary py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                        <td class="border-0 bg-secondary py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                        <td class="border-0 rounded-3 rounded-start-0 bg-secondary py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="text-body fw-medium">
+                                Cena analýzy za rok 2020
+                                <i class="ai-circle-info fs-lg ms-2" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="right" data-bs-html="true" data-bs-content="Analýza pro tento rok je ověřena a zveřejňena."></i>
+                            </span>
+                        </th>
+                        <td class="border-0 bg-secondary py-3">
+                            <span class="text-dark">Zdarma</span>
+                        </td>
+                        <td class="border-0 bg-secondary py-3">
+                            <span class="text-dark">Zdarma</span>
+                        </td>
+                        <td class="border-0 rounded-3 rounded-start-0 bg-secondary py-3">
+                            <span class="text-dark">Zdarma</span>
+                        </td>
+                    </tr>
+
+                    
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="text-body fw-medium">
+                                Cena analýzy za rok 2021
+                                <i class="ai-circle-info fs-lg ms-2" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="right" data-bs-html="true" data-bs-content="Analýza pro tento rok je ověřena a zveřejňena."></i>
+                            </span>
+                        </th>
+                        <td class="border-0 bg-secondary py-3">
+                            <span class="text-dark">49&nbsp;900 Kč s DPH</span>
+                        </td>
+                        <td class="border-0 bg-secondary py-3">
+                            <span class="text-dark">99&nbsp;900 Kč s DPH</span>
+                        </td>
+                        <td class="border-0 rounded-3 rounded-start-0 bg-secondary py-3">
+                            <span class="text-dark">individuálně</span>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="text-body fw-medium">
+                                Cena analýzy 2022
+                                <i class="ai-circle-info fs-lg ms-2" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="right" data-bs-html="true" data-bs-content="Analýzu pro tento rok připravujeme, čekáme na zákonný limit pro zveřejnění smluv do registru smluv, který uplyne k 1.4.2023."></i>
+                            </span>
+                        </th>
+                        <td class="border-0 bg-secondary py-3">
+                            <span class="text-dark">49&nbsp;900 Kč s DPH</span>
+                        </td>
+                        <td class="border-0 bg-secondary py-3">
+                            <span class="text-dark">99&nbsp;900 Kč s DPH</span>
+                        </td>
+                        <td class="border-0 rounded-3 rounded-start-0 bg-secondary py-3">
+                            <span class="text-dark">individuálně</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="d-flex align-items-center text-body fw-medium">
+                                Neomezený přístup k analytickému webu
+                                <i class="ai-circle-info fs-lg ms-2" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="right" data-bs-html="true" data-bs-content="Přístup k analytickému webu není omezen ani počtem přístupů ani časově."></i>
+                            </span>
+                        </th>
+                        <td class="border-0 bg-secondary py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                        <td class="border-0 bg-secondary py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                        <td class="border-0 rounded-3 rounded-start-0 bg-secondary py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="d-flex align-items-center text-body fw-medium">
+                                Provázání cen až na konkrétní smlouvy
+                                <i class="ai-circle-info fs-lg ms-2" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="right" data-bs-html="true" data-bs-content="Pokud je možné, u každé analytické hodnoty zobrazíme zdroj dat v Hlídaci státu až na úroveň jednotlivé smlouvy."></i>
+                            </span>
+                        </th>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-x fa-lg fw-bold text-danger"></i></span>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <th class="border-0 text-start pt-4 pb-3 ps-4">
+                            <div class="h5 pt-1 mb-0">Statistika analýz</div>
+                        </th>
+                        <th class="border-0 py-3">&nbsp;</th>
+                        <th class="border-0 py-3">&nbsp;</th>
+                        <th class="border-0 py-3">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="text-body fw-medium">Analýza za rok 2020
+                        </span></th>
+                        <td colspan="3" class="border-0 bg-secondary py-3 font-monospace">
+                            Údaje z @a_it20.PocetSmluv smluv od <b class="text-black">@a_it20.PocetZadavatelu</b> zadavatelů,
+                            <b class="text-black">@a_it20.PocetDodavatelu</b> dodavatelů,
+                            zahrnuje <b class="text-black">@a_it20.PocetCen cen</b>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="text-body fw-medium">Analýza za rok 2021</span>
+                        </th>
+                        <td colspan="3" class="border-0 bg-secondary py-3 font-monospace">
+                            Údaje z @a_it21.PocetSmluv smluv od <b class="text-black">@a_it21.PocetZadavatelu</b> zadavatelů,
+                            <b class="text-black">@a_it21.PocetDodavatelu</b> dodavatelů,
+                            zahrnuje <b class="text-black">@a_it21.PocetCen cen</b>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="text-body fw-medium">Analýza za rok 2022</span>
+                        </th>
+                        <td colspan="3" class="border-0 bg-secondary py-3 font-monospace">
+                            Údaje z @a_it22.PocetSmluv smluv od <b class="text-black">@a_it22.PocetZadavatelu</b> zadavatelů,
+                            <b class="text-black">@a_it22.PocetDodavatelu</b> dodavatelů,
+                            zahrnuje <b class="text-black">@a_it22.PocetCen cen</b>.
+@*                            <br /><span class="text-danger">Průběžný stav, analýza bude dokončena v během února 2023</span>*@
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <th class="border-0 text-start pt-4 pb-3 ps-4">
+                            <div class="h5 pt-1 mb-0">Licence</div>
+                        </th>
+                        <th class="border-0 py-3">&nbsp;</th>
+                        <th class="border-0 py-3">&nbsp;</th>
+                        <th class="border-0 py-3">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="text-body fw-medium">Použití pro vnitřní potřebu organizace</span>
+                            <i class="ai-circle-info fs-lg ms-2" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="right" data-bs-html="true" data-bs-content="Licence umožňuje sdílení analýzy a dat z ní všem zaměstnancům a spolupracovníkům subjektu, který licenci zakoupil. Není možné licenci poskytnou podřízeným organizacím či jinak provázaným.."></i>
+
+                        </th>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="border-0 text-start py-3 ps-4">
+                            <span class="d-flex align-items-center text-body fw-medium">
+                                Zveřejnění části analýzy
+                                <i class="ai-circle-info fs-lg ms-2" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="right" data-bs-html="true" data-bs-content="Přístup k datům a licenci k používání má pouze fyzická nebo právnická osoba, která si licenci zakoupila. Jakákoliv data z analýzy nesmí bezplatně či za úplatu poskytnout jiné fyzické či právnické osobě. Současně musí zajistit, že nedojde ke zveřejnění dat z analýzy. V případě zveřejnění dat z analyzy je povinností držitele licence dokoupení Veřejné licence s možností data zveřejnit."></i>
+                            </span>
+                        </th>
+                        <td class="border-0 py-3">
+                            <div class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></div>
+                            <small>při dokoupení Veřejné licence</small>
+                        </td>
+                        <td class="border-0 py-3">
+                            <div class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></div>
+                            <small>při dokoupení Veřejné licence</small>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="border-0 text-start py-3 ps-4">
+                            <span class="d-flex align-items-center text-body fw-medium">
+                                Multilicence se slevou
+                                <i class="ai-circle-info fs-lg ms-2" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-placement="right" data-bs-html="true" data-bs-content="Množstevní slevy pro subjekty ze stejného holdingu, organizační složky či majetkově propojené. Sleva až 50 %. Kontaktujte nás."></i>
+                            </span>
+                        </th>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-x fa-lg fw-bold text-danger"></i></span>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>                            
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                    </tr>                    <tr>
+                        <th class="border-0 text-start pt-4 pb-3 ps-4">
+                            <div class="h5 pt-1 mb-0">Integrace a data</div>
+                        </th>
+                        <th class="border-0 py-3">&nbsp;</th>
+                        <th class="border-0 py-3">&nbsp;</th>
+                        <th class="border-0 py-3">&nbsp;</th>
+                    </tr>
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="text-body fw-medium">Emailová podpora</span>
+                        </th>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="text-body fw-medium">Prioritní mail a tel. podpora</span>
+                        </th>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-x fa-lg fw-bold text-danger"></i></span>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="text-body fw-medium">API pro získání analytických dat</span>
+                        </th>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-x fa-lg fw-bold text-danger"></i></span>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                            <br/><small>Připravujeme</small>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                            <br /><small>Připravujeme</small>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                            <span class="text-body fw-medium">Kompletní data ve formě JSON/XML	</span>
+                        </th>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-x fa-lg fw-bold text-danger"></i></span>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                            <br /><small>Připravujeme</small>
+                        </td>
+                        <td class="border-0 py-3">
+                            <span class="text-dark"><i class="fa-solid fa-check fa-xl fw-bold" style="color:#448c74"></i></span>
+                            <br /><small>Připravujeme</small>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th class="border-0 bg-secondary rounded-3 rounded-end-0 text-start py-3 ps-4">
+                        </th>
+                        <td class="border-0 py-3">
+                            <button action="/objednat" onclick="inCart(49900,'zakladni');location.href='/objednat';return true;" class="btn btn-primary w-100" type="button">Objednat</button>
+                        </td>
+                        <td class="border-0 py-3">
+                            <button action="/objednat" onclick="inCart(99900,'pro');location.href='/objednat';return true;" class="btn btn-light w-100" type="submit">Objednat Pro</button>
+                        </td>
+                        <td class="border-0 py-3">
+                            <button action="/kontakt" onclick="inCart(99900,'pro');location.href='/kontakt';return true;" class="btn btn-primary w-100" type="submit">Kontaktovat nás</button>
+                        </td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    function inCart (price, product) {
+        gtag("event", "add_to_cart", {
+            value: price,
+            currency: "CZK",
+            items: [
+                {
+                    item_id: product,
+                    item_name: product,
+                    price: price,
+                    quantity: 1
+                }]
+        });
+    };
+
+</script>
+

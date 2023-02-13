@@ -23,23 +23,29 @@ public static class Helpers
             },
             EnableRaisingEvents = true
         };
-        
+        //process.OutputDataReceived += (sender, args) => { logger.Debug("bash: {msg}", args.Data); };
+        //process.ErrorDataReceived+= (sender, args) => { logger.Warning("bash err: {msg}", args.Data); };
+
         process.Exited += (sender, args) =>
         {
             string standardError = process.StandardError.ReadToEnd(); 
             if (!string.IsNullOrWhiteSpace(standardError))
-                logger.Warning(standardError);
+                logger.Warning("bash standartError: {standardError}", standardError);
 
             string standardOutput = process.StandardOutput.ReadToEnd();
             if (!string.IsNullOrWhiteSpace(standardOutput))
-                logger.Information(standardOutput);
+                logger.Information("bash standartOutput: {standardOutput}", standardOutput);
             
             if (process.ExitCode == 0)
             {
+                logger.Warning("Command `{cmd}` succeded\nconsole:{standardOutput}\nerrors:{standardError}",
+                    cmd, standardOutput, standardError);
                 source.SetResult(0);
             }
             else
             {
+                logger.Warning("Command `{cmd}` failed with exit code `{exitCode}`\nconsole:{standardOutput}\nerrors:{standardError}", 
+                    cmd, process.ExitCode, standardOutput, standardError);
                 source.SetException(new Exception($"Command `{cmd}` failed with exit code `{process.ExitCode}`"));
             }
 
@@ -52,7 +58,7 @@ public static class Helpers
         }
         catch (Exception e)
         {
-            logger.Error(e, "Command {command} failed", cmd);
+            logger.Error(e, "Command {command} failed with exception", cmd);
             source.SetException(e);
         }
 

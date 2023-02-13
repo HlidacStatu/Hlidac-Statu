@@ -32,20 +32,21 @@
 }
 
 <div id="form" class="form pane table">
-    <form id="myForm" asp-page="GenerovatZadost" method="post">
+    <form id="emptyForm" asp-page="GenerovatZadost" method="post">
         <div class="mb-3">
             <h2><i class="fa-solid fa-shield-halved"></i>&nbsp;Soukromí</h2>
             <p class="new-p">
                 Vámi vyplněné osobní údaje nikomu neodesíláme, ani je dále nezpracováváme.
                 Pokud chcete mít 100% jistotu, stáhněte si a vyplňte
-                <a href="assets/files/Zadost-Volicsky-Prukaz-Volby2022-CR.pdf">šablonu žádosti </a> ručně sami.
+                <a class="csub" onclick="document.getElementById('emptyForm').submit();">šablonu žádosti </a> ručně sami.
             </p>
             <p class="new-p">
                 Pokud se můžete na váš obecní úřad dostavit osobně, nepotřebujete předem žádnou písemnou žádost vytvářet.
                 Stačí, pokud se dostavíte na úřad s platným dokladem totožnosti.
             </p>
         </div>
-
+    </form>
+    <form id="myForm" asp-page="GenerovatZadost" method="post">
         <div class="mb-3 w-50">
             <h2><i class="fa-solid fa-magnifying-glass"></i>&nbsp;Vyhledat svou adresu</h2>
             <div style="position:relative">

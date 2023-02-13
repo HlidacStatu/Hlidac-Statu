@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities.Views;
+﻿using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities.Views;
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -30,21 +31,21 @@ namespace HlidacStatu.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+            _ = modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
-            modelBuilder.Entity<CenyCustomer>().HasKey(u => new
+            _ = modelBuilder.Entity<CenyCustomer>().HasKey(u => new
             {
                 u.Username,
                 u.Analyza,
                 u.Rok
             });
 
-            modelBuilder.Entity<Audit>(entity =>
+            _ = modelBuilder.Entity<MonitoredTask>().HasKey(u => new
             {
-                entity.Property(e => e.date).HasDefaultValueSql("(getdate())");
+                u.Pk
             });
 
-            modelBuilder.Entity<AutocompleteSynonym>(entity =>
+            _ = modelBuilder.Entity<AutocompleteSynonym>(entity =>
             {
                 entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
@@ -53,12 +54,12 @@ namespace HlidacStatu.Entities
                 entity.Property(e => e.Type).HasDefaultValueSql("('')");
             });
 
-            modelBuilder.Entity<BannedIp>(entity =>
+            _ = modelBuilder.Entity<BannedIp>(entity =>
             {
                 entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
             });
 
-            modelBuilder.Entity<Bookmark>(entity =>
+            _ = modelBuilder.Entity<Bookmark>(entity =>
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
@@ -67,114 +68,115 @@ namespace HlidacStatu.Entities
                 entity.Property(e => e.Url).IsUnicode(false);
             });
 
-            modelBuilder.Entity<EventType>(entity =>
+            _ = modelBuilder.Entity<EventType>(entity =>
             {
                 entity.Property(e => e.Id).ValueGeneratedNever();
             });
 
-            modelBuilder.Entity<FirmaNace>(entity =>
+            _ = modelBuilder.Entity<FirmaNace>(entity =>
             {
                 entity.HasKey(e => new { e.Ico, e.Nace });
             });
 
-            modelBuilder.Entity<FirmaVazby>(entity =>
+            _ = modelBuilder.Entity<FirmaVazby>(entity =>
             {
                 entity.Property(e => e.LastUpdate).HasDefaultValueSql("(getdate())");
             });
 
-            modelBuilder.Entity<ItemToOcrQueue>(entity =>
+            _ = modelBuilder.Entity<ItemToOcrQueue>(entity =>
             {
                 entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
             });
 
-            modelBuilder.Entity<KodPf>(entity =>
+            _ = modelBuilder.Entity<KodPf>(entity =>
             {
                 entity.Property(e => e.Kod).ValueGeneratedNever();
             });
 
-            modelBuilder.Entity<Osoba>(entity =>
+            _ = modelBuilder.Entity<Osoba>(entity =>
             {
-                entity.HasKey(e => e.InternalId)
+                _ = entity.HasKey(e => e.InternalId)
                     .HasName("PK_Osoba_2");
 
-                entity.Property(e => e.LastUpdate).HasDefaultValueSql("(getdate())");
+                _ = entity.Property(e => e.LastUpdate).HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Pohlavi)
+                _ = entity.Property(e => e.Pohlavi)
                     .IsUnicode(false)
                     .IsFixedLength(true);
             });
 
-            modelBuilder.Entity<Firma>(entity =>
+            _ = modelBuilder.Entity<Firma>(entity =>
             {
-                entity.HasKey(e => e.ICO)
+                _ = entity.HasKey(e => e.ICO)
                     .HasName("PK_Firma");
 
-                entity.Property(e => e.VersionUpdate).HasDefaultValue<int>(0);
-                entity.Property(e => e.PocetZam).HasDefaultValue<int>(0);
+                _ = entity.Property(e => e.VersionUpdate).HasDefaultValue<int>(0);
+                _ = entity.Property(e => e.PocetZam).HasDefaultValue<int>(0);
 
             });
 
-            modelBuilder.Entity<OsobaEvent>(entity =>
+            _ = modelBuilder.Entity<OsobaEvent>(entity =>
             {
-                entity.HasKey(e => e.Pk)
+                _ = entity.HasKey(e => e.Pk)
                     .HasName("PK_OsobaEvent_1");
 
-                entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
+                _ = entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
             });
 
 
-            modelBuilder.Entity<OsobaExternalId>(entity =>
+            _ = modelBuilder.Entity<OsobaExternalId>(entity =>
             {
-                entity.HasKey(e => new { e.OsobaId, e.ExternalId, e.ExternalSource });
+                _ = entity.HasKey(e => new { e.OsobaId, e.ExternalId, e.ExternalSource });
             });
 
-            modelBuilder.Entity<OsobaVazby>(entity =>
+            _ = modelBuilder.Entity<OsobaVazby>(entity =>
             {
-                entity.Property(e => e.LastUpdate).HasDefaultValueSql("(getdate())");
+                _ = entity.Property(e => e.LastUpdate).HasDefaultValueSql("(getdate())");
             });
 
-            modelBuilder.Entity<Review>(entity =>
+            _ = modelBuilder.Entity<Review>(entity =>
             {
-                entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
+                _ = entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
             });
 
-            modelBuilder.Entity<SmlouvyId>(entity =>
+            _ = modelBuilder.Entity<SmlouvyId>(entity =>
             {
-                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+                _ = entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
-                entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Updated).HasDefaultValueSql("(getdate())");
+                _ = entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
+
+                _ = entity.Property(e => e.Updated).HasDefaultValueSql("(getdate())");
             });
 
-            modelBuilder.Entity<Ssmq>(entity =>
+            _ = modelBuilder.Entity<Ssmq>(entity =>
             {
-                entity.Property(e => e.Pk).ValueGeneratedNever();
+                _ = entity.Property(e => e.Pk).ValueGeneratedNever();
 
-                entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
+                _ = entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Priority).HasDefaultValueSql("((1))");
+                _ = entity.Property(e => e.Priority).HasDefaultValueSql("((1))");
             });
 
-            modelBuilder.Entity<TipUrl>(entity =>
+            _ = modelBuilder.Entity<TipUrl>(entity =>
             {
-                entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
+                _ = entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
             });
 
-            modelBuilder.Entity<UserOptions>(entity =>
+            _ = modelBuilder.Entity<UserOptions>(entity =>
             {
-                entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
+                _ = entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
             });
 
 
-            modelBuilder.Entity<WatchDog>(entity =>
+            _ = modelBuilder.Entity<WatchDog>(entity =>
             {
-                entity.Property(e => e.ToEmail).HasDefaultValueSql("((1))");
+                _ = entity.Property(e => e.ToEmail).HasDefaultValueSql("((1))");
             });
 
-            modelBuilder.Entity<ZkratkaStrany>(entity =>
+            _ = modelBuilder.Entity<ZkratkaStrany>(entity =>
             {
-                entity.HasKey(e => e.Ico)
+                _ = entity.HasKey(e => e.Ico)
                     .HasName("PK__ZkratkaS__C497141E3346B980");
             });
 
@@ -195,6 +197,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<UptimeServer> UptimeServers { get; set; }
 
         public virtual DbSet<Cena> Ceny { get; set; }
+        public virtual DbSet<MonitoredTask> MonitoredTasks { get; set; }
 
         public virtual DbSet<CenyCustomer> CenyCustomer { get; set; }
 
@@ -235,6 +238,7 @@ namespace HlidacStatu.Entities
         public virtual DbSet<OrganVerejneMoci> OrganVerejneMoci { get; set; }
         public virtual DbSet<PravniFormaOvm> PravniFormaOvm { get; set; }
         public virtual DbSet<TypOvm> TypOvm { get; set; }
+        public virtual DbSet<ConfigurationValue> ConfigurationValues { get; set; }
 
         //views
         public DbSet<FindPersonDTO> FindPersonView { get; set; }

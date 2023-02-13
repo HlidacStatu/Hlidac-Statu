@@ -21,7 +21,7 @@
         {
             public string smlouvaId { get; set; }
 
-            public HlidacStatu.Analysis.Page.Area.AnalyzedPdf[] prilohy { get; set; }
+            public HlidacStatu.DS.Api.BlurredPage.AnalyzedPdf[] prilohy { get; set; }
 
 
         }

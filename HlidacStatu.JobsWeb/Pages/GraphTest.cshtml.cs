@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HlidacStatu.JobsWeb.Pages
+namespace HlidacStatu.Ceny.Pages
 {
     [Authorize(Roles = "Admin")]
     public class GraphTestModel : PageModel

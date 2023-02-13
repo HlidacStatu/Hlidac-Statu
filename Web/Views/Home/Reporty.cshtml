@@ -62,6 +62,24 @@
                 <p>Celkem smlouvy za @Html.Raw(Smlouva.ShortNicePrice(Convert.ToDecimal(celkemKc), html: true)) s DPH, @(platnych.ToString("N0")) platných smluv, @(neplatnych.ToString("N0")) neplatných.</p>
                 <p><a class="btn btn-default" href="/report/7" role="button">Podrobnosti »</a></p>
             </div>
+
+        <div class="col-block-shadow">
+            <h3><a href="/HledatSmlouvy?Q=*&order=1">Nejnovější smlouvy</a></h3>
+            <p>
+                Naposledy uveřejněné smlouvy v registru smluv.
+                Smlouvy uveřejněné <a href="/HledatSmlouvy?Q=zverejneno:@(DateTime.Now.ToString("yyyy-MM-dd"))">dnes</a>,
+                Smlouvy uveřejněné <a href="/HledatSmlouvy?Q=zverejneno:@(DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"))">včera</a>,
+                @for (int i = 2; i < 8; i++)
+                {
+                    <a href="/HledatSmlouvy?Q=zverejneno:@(DateTime.Now.AddDays(-1*i).ToString("yyyy-MM-dd"))">@(DateTime.Now.AddDays(-1 * i).ToString("d.M"))</a>
+                    @(i < 7 ? ", " : ".")
+
+                }
+            </p>
+        </div>
+
+
+
             <div class="col-block-shadow">
                 <h3><a href="/Report/2">Smlouvy s nejvíce chybami</a></h3>
                 <p>Každou smlouvu analyzujeme a hledáme v ní chyby. Zde jsou ty nejhorší smlouvy.</p>

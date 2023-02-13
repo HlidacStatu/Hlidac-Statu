@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -38,12 +38,16 @@
       <EmbeddedResource Include="Emails\Templates\Register.cshtml" />
       <EmbeddedResource Include="Emails\Templates\Register.Html.cshtml" />
       <EmbeddedResource Include="Emails\Templates\Register.Text.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\ResetPassword_WatchdogAnalytics.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\ResetPassword_WatchdogAnalytics.Html.cshtml" />
+      <EmbeddedResource Include="Emails\Templates\ResetPassword_WatchdogAnalytics.Text.cshtml" />
       <EmbeddedResource Include="Emails\Templates\ResetPassword.cshtml" />
       <EmbeddedResource Include="Emails\Templates\ResetPassword.Html.cshtml" />
       <EmbeddedResource Include="Emails\Templates\ResetPassword.Text.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Connectors\Connectors.csproj" />
       <ProjectReference Include="..\Datasets\Datasets.csproj" />
       <ProjectReference Include="..\Entities\Entities.csproj" />
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
@@ -54,8 +58,15 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Emails\Templates\ResetPassword_WatchdogAnalytics.cshtml" />
+      <None Remove="Emails\Templates\ResetPassword_WatchdogAnalytics.Html.cshtml" />
+      <None Remove="Emails\Templates\ResetPassword_WatchdogAnalytics.Text.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
       <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
-      <PackageReference Include="Scriban" Version="5.5.1" />
+      <PackageReference Include="Scriban" Version="5.5.2" />
+      <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
     </ItemGroup>
 
 </Project>

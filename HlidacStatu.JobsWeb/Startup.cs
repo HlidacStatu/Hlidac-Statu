@@ -1,20 +1,21 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
+using HlidacStatu.Ceny.Services;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities;
-using HlidacStatu.JobsWeb.Services;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 
-namespace HlidacStatu.JobsWeb
+namespace HlidacStatu.Ceny
 {
     public class Startup
     {
@@ -35,19 +36,18 @@ namespace HlidacStatu.JobsWeb
 
             Task.Run(async () => await JobService.RecalculateAsync()).GetAwaiter().GetResult();
 
-            string connectionString = Configuration.GetConnectionString("DefaultConnection");
+            string usersConnection = Devmasters.Config.GetWebConfigValue("WdAnalyt");
             // for scoped services (mainly for identity)
             services.AddDbContext<DbEntities>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlServer(usersConnection));
             
+            // Pro subdoménový login pomocí cookie
             // Add a DbContext to store your Database Keys
-            services.AddDbContext<HlidacKeysContext>(options =>
-                options.UseSqlServer(connectionString));
-            
-            // using Microsoft.AspNetCore.DataProtection;
-            services.AddDataProtection()
-                .PersistKeysToDbContext<HlidacKeysContext>()
-                .SetApplicationName("HlidacStatu");
+            // services.AddDbContext<HlidacKeysContext>(options =>
+            //     options.UseSqlServer(connectionString));
+            // services.AddDataProtection()
+            //     .PersistKeysToDbContext<HlidacKeysContext>()
+            //     .SetApplicationName("HlidacStatu");
 
             AddIdentity(services);
             services.AddDatabaseDeveloperPageExceptionFilter();
@@ -82,7 +82,6 @@ namespace HlidacStatu.JobsWeb
             app.Use(async (context, next) =>
             {
                 var req = context.Request.Query;
-                var reqStr = context.Request.QueryString;
 
                 if (req.TryGetValue("obor", out var oborValues))
                 {
@@ -123,18 +122,111 @@ namespace HlidacStatu.JobsWeb
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<DbEntities>();
 
-            // this is needed because passwords are stored with old hashes
-            services.Configure<PasswordHasherOptions>(options =>
-                options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
-            );
+            // Pro napojení na hs
+            // services.Configure<PasswordHasherOptions>(options =>
+            //     options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
+            // );
             
-            services.ConfigureApplicationCookie(o =>
+            // services.ConfigureApplicationCookie(o =>
+            // {
+            //     o.Cookie.Domain = ".hlidacstatu.cz"; 
+            //     o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
+            //     
+            //     o.Cookie.SameSite = SameSiteMode.Lax;
+            // });
+            
+            //add third party authentication
+            services.AddAuthentication()
+                .AddGoogle(options => //https://learn.microsoft.com/en-us/aspnet/core/security/authentication/social/google-logins?view=aspnetcore-7.0
+                {
+                    IConfigurationSection googleAuthSetting = Configuration.GetSection("Authentication:Google");
+                    options.ClientId = googleAuthSetting["Id"];
+                    options.ClientSecret = googleAuthSetting["Secret"];
+                })
+                .AddOpenIdConnect("apple", options =>  // taken from https://github.com/scottbrady91/AspNetCore-SignInWithApple-Example/blob/main/ScottBrady91.SignInWithApple.Example/Startup.cs
+                {
+                    IConfigurationSection appleAuthSetting = Configuration.GetSection("Authentication:Apple");
+                    string clientId = appleAuthSetting["Id"];
+                    string secret = appleAuthSetting["Secret"];
+                    string teamId = appleAuthSetting["TeamId"];
+                    
+                    options.ClientId = clientId; // Service ID
+                    
+                    options.Authority = "https://appleid.apple.com"; // disco doc: https://appleid.apple.com/.well-known/openid-configuration
+ 
+                    options.CallbackPath = "/signin-apple"; // corresponding to your redirect URI
+
+                    options.ResponseType = "code id_token"; // hybrid flow due to lack of PKCE support
+                    options.ResponseMode = "form_post"; // form post due to prevent PII in the URL
+                    options.DisableTelemetry = true;
+
+                    options.Scope.Clear(); // apple does not support the profile scope
+                    options.Scope.Add("openid");
+                    options.Scope.Add("email");
+                    options.Scope.Add("name");
+
+                    // custom client secret generation - secret can be re-used for up to 6 months
+                    options.Events.OnAuthorizationCodeReceived = context =>
+                    {
+                        context.TokenEndpointRequest.ClientSecret = TokenGenerator.CreateNewToken(clientId, secret, teamId);
+                        return Task.CompletedTask;
+                    };
+
+                    options.UsePkce = false; // apple does not currently support PKCE (April 2021)
+                });
+                // .AddOpenIdConnect("mojeid", options =>
+                // {
+                //     IConfigurationSection mojeidAuthSetting = Configuration.GetSection("Authentication:MojeId");
+                //     options.ClientId = mojeidAuthSetting["Id"]; // id, které dostaneme po registraci
+                //     options.ClientSecret = mojeidAuthSetting["Secret"]; // heslo, které dostaneme po registraci
+                //     
+                //     options.Authority = "https://mojeid.cz/oidc/"; // issuer
+                //     //options.Authority = "https://mojeid.regtest.nic.cz/oidc/"; // issuer
+                //     
+                //     options.CallbackPath = "/signin-mojeid"; //unikátní endpoint na hlídači - zatím nevím k čemu
+                //     
+                //     options.ResponseType = "code"; // typ flow (https://www.scottbrady91.com/openid-connect/openid-connect-flows)
+                //     options.ResponseMode = "form_post"; // form post due to prevent PII in the URL
+                //     
+                //     options.DisableTelemetry = true;
+                //
+                //     options.SaveTokens = true; // ? upřímně nevím
+                //     options.UsePkce = true; // ? upřímně nevím
+                //     
+                //     // claimy, které chceme získat z userinfoendpointu
+                //     options.Scope.Clear();
+                //     options.Scope.Add("openid");
+                //     options.Scope.Add("email");
+                //     //options.Scope.Add("name");
+                //     
+                //     options.GetClaimsFromUserInfoEndpoint = true; // získá data o jménu, emailu - věcech ze scope
+                //     
+                // });
+        }
+        
+        private static class TokenGenerator
+        {
+            public static string CreateNewToken(string clientId, string secret, string teamId)
             {
-                o.Cookie.Domain = ".hlidacstatu.cz"; 
-                o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
+                const string aud = "https://appleid.apple.com";
                 
-                o.Cookie.SameSite = SameSiteMode.Lax;
-            });
+                var now = DateTime.UtcNow;
+            
+                var ecdsa = ECDsa.Create();
+                ecdsa?.ImportPkcs8PrivateKey(Convert.FromBase64String(secret), out _);
+
+                var handler = new JsonWebTokenHandler();
+                return handler.CreateToken(new SecurityTokenDescriptor
+                {
+                    Issuer = teamId,
+                    Audience = aud,
+                    Claims = new Dictionary<string, object> {{"sub", clientId}},
+                    Expires = now.AddMinutes(5), // expiry can be a maximum of 6 months - generate one per request or re-use until expiration
+                    IssuedAt = now,
+                    NotBefore = now,
+                    SigningCredentials = new SigningCredentials(new ECDsaSecurityKey(ecdsa), SecurityAlgorithms.EcdsaSha256)
+                });
+            }
         }
     }
 }

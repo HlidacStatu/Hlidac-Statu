@@ -184,6 +184,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DockerSwarmHealthCheckAgent
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreOfficeDockerAPI", "..\Hlidac-Statu-Private\Docker\LibreOfficeDockerAPI\LibreOfficeDockerAPI.csproj", "{592769A0-9EFE-4815-9E38-5AC2B5F01473}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HlidacAdmin", "..\Hlidac-Statu-Private\HlidacAdmin\HlidacAdmin.csproj", "{C9A7309C-D64A-4387-91A3-46C04CDDF0EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -438,6 +440,10 @@ Global
 		{592769A0-9EFE-4815-9E38-5AC2B5F01473}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{592769A0-9EFE-4815-9E38-5AC2B5F01473}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{592769A0-9EFE-4815-9E38-5AC2B5F01473}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9A7309C-D64A-4387-91A3-46C04CDDF0EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9A7309C-D64A-4387-91A3-46C04CDDF0EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9A7309C-D64A-4387-91A3-46C04CDDF0EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9A7309C-D64A-4387-91A3-46C04CDDF0EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -517,6 +523,7 @@ Global
 		{DCBE08C3-3F8C-4CA6-B85F-B1490679D960} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
 		{0940D1FD-C579-4B90-88CF-8D75738346F4} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{592769A0-9EFE-4815-9E38-5AC2B5F01473} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
+		{C9A7309C-D64A-4387-91A3-46C04CDDF0EC} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}

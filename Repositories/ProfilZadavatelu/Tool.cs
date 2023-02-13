@@ -1,4 +1,4 @@
-﻿using Devmasters.Batch;
+using Devmasters.Batch;
 
 using HlidacStatu.Entities.VZ;
 
@@ -65,7 +65,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                         return new ActionOutputData();
                     }, null,
                     outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter
-                    , false, prefix: "profil zadav 2 ");
+                    , false, prefix: "profil zadav 2 ", monitor: new MonitoredTaskRepo.ForBatch());
 
 
             }
@@ -76,7 +76,8 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
                 {
                     await parser.ProcessProfileZadavateluAsync(p, from);
                     return new ActionOutputData();
-                }, outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter, true, prefix: "profil zadav 3 ");
+                }, outputWriter ?? Manager.DefaultOutputWriter, progressWriter ?? Manager.DefaultProgressWriter, true, 
+                prefix: "profil zadav 3 ", monitor: new MonitoredTaskRepo.ForBatch());
 
 
         }

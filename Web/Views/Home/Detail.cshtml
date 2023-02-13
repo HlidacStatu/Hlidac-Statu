@@ -1,7 +1,6 @@
 ﻿@model HlidacStatu.Entities.Smlouva
 
 @using Devmasters.Enums
-@using HlidacStatu.Connectors
 @using HlidacStatu.Entities
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
@@ -294,7 +293,8 @@
                 {
                     @foreach (var priloha in Model.Prilohy)
                     {
-                        bool weHaveCopy = SmlouvaRepo.ExistLocalCopyOfPriloha(Model, priloha);
+                        bool weHaveCopy = SmlouvaRepo.ExistLocalCopyOfPriloha(Model, priloha, HlidacStatu.Connectors.IO.PrilohaFile.RequestedFileType.Original);
+                        bool weHaveCopyPdf = SmlouvaRepo.ExistLocalCopyOfPriloha(Model, priloha, HlidacStatu.Connectors.IO.PrilohaFile.RequestedFileType.PDF);
                         string calloutColor = "primary";
                         calloutColor = znepristupnena ? "gray" : calloutColor;
                         calloutColor = (this.User?.IsInRole("Admin") == true && priloha.BlurredPages != null) ? "primary" : calloutColor;
@@ -332,6 +332,11 @@
                                         @Html.Raw(";&nbsp;")
                                         <a href="@(priloha.GetUrl(Model.Id, true, UriKind.Relative))" data-link="kopie">(naše kopie)</a>
                                     }
+                                    @if (weHaveCopyPdf && this.User?.Identity?.IsAuthenticated == true)
+                                    {
+                                        @Html.Raw(";&nbsp;")
+                                        <a href="@(priloha.GetUrl(Model.Id, true, UriKind.Relative))&forcePDF=true" data-link="kopie">(PDF)</a>
+                                    }
                                     @if (priloha.WordCount > 10)
                                     {
                                         @Html.Raw(";&nbsp;")
@@ -363,7 +368,7 @@
                                     </div>
                                 }
                             }
-                            @if (this.User?.IsInRole("canEditData") == true && priloha.nazevSouboru.ToLower().EndsWith("pdf"))
+                            @if (this.User?.IsInRole("canEditData") == true && priloha?.nazevSouboru?.ToLower().EndsWith("pdf")==true)
                             {
                                 <div>
                                     <a target="_blank" href="/manage/ShowPrilohaTables?s=@Model.Id&p=@priloha.hash.Value">

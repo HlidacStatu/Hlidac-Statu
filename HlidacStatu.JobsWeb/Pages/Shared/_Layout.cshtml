@@ -1,24 +1,14 @@
-﻿@using HlidacStatu.JobsWeb.Services
+﻿@using HlidacStatu.Ceny.Services
 @{
     var analyza = this.Context.TryFindKey();
 }
 
-
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Hlídač státu</title>
+    <meta charset="utf-8">
+    <title>@ViewData["Title"] - Watchdog Analytics</title>
 
-    <link rel="stylesheet" href="~/css/bootstrap.min.css">
-
-
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link rel="stylesheet" href="~/content/new.v1.15.css" />
-    
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&amp;subset=latin-ext" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css?family=Cabin:400,400i,600,700&amp;subset=latin-ext" rel="stylesheet" />
 
     <link rel="shortcut icon" href="/content/icons/favicon.ico" type="image/x-icon" />
     <link rel="apple-touch-icon" sizes="57x57" href="/content/icons/apple-touch-icon-57x57.png">
@@ -39,10 +29,148 @@
     <meta name="msapplication-wide310x150logo" content="/content/icons/widetile.png" />
     <meta name="msapplication-square310x310logo" content="/content/icons/largetile.png" />
 
-    <script src="https://kit.fontawesome.com/a0fc082c81.js" crossorigin="anonymous"></script>
+    <!-- Viewport-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Theme mode-->
+    <script>
+        let mode = window.localStorage.getItem('mode'),
+            root = document.getElementsByTagName('html')[0];
+        if (mode !== undefined && mode === 'dark') {
+            root.classList.add('dark-mode');
+        } else {
+            root.classList.remove('dark-mode');
+        }
+
+
+    </script>
+    <!-- Page loading styles-->
+    <style>
+        .page-loading {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            -webkit-transition: all .4s .2s ease-in-out;
+            transition: all .4s .2s ease-in-out;
+            background-color: #fff;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 9999;
+        }
+
+        .dark-mode .page-loading {
+            background-color: #121519;
+        }
+
+        .page-loading.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .page-loading-inner {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            -webkit-transform: translateY(-50%);
+            transform: translateY(-50%);
+            -webkit-transition: opacity .2s ease-in-out;
+            transition: opacity .2s ease-in-out;
+            opacity: 0;
+        }
+
+        .page-loading.active > .page-loading-inner {
+            opacity: 1;
+        }
+
+        .page-loading-inner > span {
+            display: block;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: normal;
+            color: #6f788b;
+        }
+
+        .dark-mode .page-loading-inner > span {
+            color: #fff;
+            opacity: .6;
+        }
+
+        .page-spinner {
+            display: inline-block;
+            width: 2.75rem;
+            height: 2.75rem;
+            margin-bottom: .75rem;
+            vertical-align: text-bottom;
+            background-color: #d7dde2;
+            border-radius: 50%;
+            opacity: 0;
+            -webkit-animation: spinner .75s linear infinite;
+            animation: spinner .75s linear infinite;
+        }
+
+        .dark-mode .page-spinner {
+            background-color: rgba(255,255,255,.25);
+        }
+
+        @@-webkit-keyframes spinner {
+            0% {
+                -webkit-transform: scale(0);
+                transform: scale(0);
+            }
+
+            50% {
+                opacity: 1;
+                -webkit-transform: none;
+                transform: none;
+            }
+        }
+
+        @@keyframes spinner {
+            0% {
+                -webkit-transform: scale(0);
+                transform: scale(0);
+            }
+
+            50% {
+                opacity: 1;
+                -webkit-transform: none;
+                transform: none;
+            }
+        }
+    </style>
+    <!-- Page loading scripts-->
+    <script>
+        (function () {
+            window.onload = function () {
+                const preloader = document.querySelector('.page-loading');
+                preloader.classList.remove('active');
+                setTimeout(function () {
+                    preloader.remove();
+                }, 1500);
+            };
+        })();
+
+    </script>
+    <!-- Import Google Font-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" id="google-font">
+    <!-- Vendor styles-->
+    <link rel="stylesheet" media="screen" href="/assets/vendor/swiper/swiper-bundle.min.css" />
+    <link rel="stylesheet" media="screen" href="/assets/vendor/aos/dist/aos.css" />
+    <!-- Main Theme Styles + Bootstrap-->
+    <link rel="stylesheet" media="screen" href="/assets/css/theme.min.css">
+
     <script src="~/js/jquery.min.js"></script>
-    <script src="~/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="https://kit.fontawesome.com/a0fc082c81.js" crossorigin="anonymous"></script>
 
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-more.js"></script>
@@ -50,178 +178,199 @@
     <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
-    <link rel="stylesheet" href="~/js/bootstrap-toc.min.css"/>
+
+    <link rel="stylesheet" href="~/js/bootstrap-toc.min.css" />
     <script src="~/js/bootstrap-toc.1.0.2.min.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-CS12JWPEFS"></script>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6V6GN0CJ0N"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', 'G-CS12JWPEFS');
+  gtag('config', 'G-6V6GN0CJ0N');
 </script>
-
+    <!-- Google Tag Manager -->
+    <script>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-TVBXBBT');</script>
+    <!-- End Google Tag Manager -->
 </head>
-<body class="new-body">
-    <header>
-        <nav class="navbar navbar-expand-lg">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="https://www.hlidacstatu.cz">
-                    <svg width="46" height="46" viewBox="0 0 46 46">
-                        <use xlink:href="/content/img/defs.svg#logo"></use>
-                    </svg>
-                    <span style="color:#25272d">Hlídač</span>&nbsp;<strong>státu</strong>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
 
-                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                    <div class="navbar-nav">
-                        <!-- aligned left -->
-                        <a class="nav-link" style="font-size:75%" href="/">Zpět na titulku<br/>cenových analýz</a>
-                        <a class="nav-link" href="https://www.hlidacstatu.cz/smlouvy">Smlouvy</a>
-                        <a class="nav-link" href="https://www.hlidacstatu.cz/VerejneZakazky">Veřejné zakázky</a>
-                        <a class="nav-link" href="https://www.hlidacstatu.cz/Dotace">Dotace</a>
-                        <a class="nav-link" href="https://www.hlidacstatu.cz/Insolvence">Insolvence</a>
-                        <a class="nav-link" href="https://www.hlidacstatu.cz/sponzori">Sponzoři</a>
-                        <a class="nav-link" href="https://www.hlidacstatu.cz/StatniWeby">Weby státu</a>
+<!-- Body-->
+<body class="bg-secondary">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+        <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TVBXBBT"
+                height="0" width="0" style="display:none;visibility:hidden"></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+    <!-- Page loading spinner-->
+    <div class="page-loading active">
+        <div class="page-loading-inner">
+            <div class="page-spinner"></div><span>Loading...</span>
+        </div>
+    </div>
+    <!-- Page wrapper-->
+    <main class="page-wrapper">
+        <!-- Navbar. Remove 'fixed-top' class to make the navigation bar scrollable with the page-->
+        <div class="fixed-top">
+            <header class="navbar navbar-expand-lg fixed-top">
+                <div class="container">
+                    <a class="navbar-brand pe-sm-3" href="/index">
+                        <svg version="1.1" width="290" height="62" viewBox="0 0 291 63" xmlns="http://www.w3.org/2000/svg">
+                            <use href="/assets/img/logo.svg#logo"></use>
+                        </svg>
+
+                        @*                    <span class="text-nav">Watchdog <i class="fa-solid fa-lightbulb-on" style="color:rgb(68,140,116)"></i> Analytics</span>
+                        *@
+                    </a>
+                    @*                <div class="form-check form-switch mode-switch order-lg-2 me-3 me-lg-4 ms-auto" data-bs-toggle="mode">
+                    <input class="form-check-input" type="checkbox" id="theme-mode">
+                    <label class="form-check-label" for="theme-mode"><i class="ai-sun fs-lg"></i></label>
+                    <label class="form-check-label" for="theme-mode"><i class="ai-moon fs-lg"></i></label>
+                    </div>*@
+                    <div class="order-lg-3 d-none d-sm-inline-flex">
+                        <partial name="_LoginPartial" />
                     </div>
-                    <partial name="_LoginPartial" /> <!-- aligned right -->
+                    @*                <a class="btn btn-success btn-sm fs-sm order-lg-3 d-none d-sm-inline-flex me-2" href="https://themes.getbootstrap.com/product/around-multipurpose-template-ui-kit/" target="_blank" rel="noopener"><i class="ai-cart fs-xl me-2 ms-n1"></i>Login</a>
+                    <a class="btn btn-primary btn-sm fs-sm order-lg-3 d-none d-sm-inline-flex" href="https://themes.getbootstrap.com/product/around-multipurpose-template-ui-kit/" target="_blank" rel="noopener"><i class="ai-cart fs-xl me-2 ms-n1"></i>Buy now</a>
+                    *@
+                    <button class="navbar-toggler ms-sm-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+                    <nav class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav navbar-nav-scroll me-auto" style="--ar-scroll-height: 520px;">
+                            <li class="nav-item"><a class="nav-link" href="/analyzy"><b>Analýzy</b></a></li>
+                            <li class="nav-item"><a class="nav-link" href="/index#detail">Popis</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/index#cenik">Ceník</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/otazkyodpovedi">Otázky a odpovědi</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/kontakt">Kontakt</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </header>
+        </div>
+        <!-- Page content-->
+
+        <section>
+            <div class="container pt-2 pt-sm-4 pb-sm-2 pb-md-4 py-xl-5 mt-5">
+                <div class="row pt-5 pb-2 pb-sm-3">
+                    @{
+                        Context.Items.TryGetValue("obor", out var obor);
+                        Context.Items.TryGetValue("rok", out var rok);
+
+                        bool choosenAnal = false;
+                        if (string.IsNullOrEmpty(obor?.ToString()) == false && string.IsNullOrEmpty(rok?.ToString()) == false)
+                        {
+                            choosenAnal = true;
+                        }
+                    }
+
+                    @if (choosenAnal)
+                    {
+                        <div class="btn-toolbar mb-5" role="toolbar" style="position:fixed;top:93px;z-index:10000;">
+                            <div class="btn-group me-2" role="group" aria-label="Sub menu" style="background-color:white;box-shadow:rgb(0 0 0 / 35%) 0px 5px 15px;">
+
+                                <a class="btn btn-secondary disabled" style="color:black;" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">Části analýzy&nbsp;<i class="fa-regular fa-angles-right"></i></a>
+
+                                <a class="btn btn-outline-primary" asp-page="/Souhrn" asp-route-obor="@obor" asp-route-rok="@rok">Souhrn</a>
+                                <a class="btn btn-outline-primary" asp-page="/BenchmarkUradu" asp-route-obor="@obor" asp-route-rok="@rok">Analýza zadavatele</a>
+                                <a class="btn btn-outline-primary" asp-page="/BenchmarkDodavatelu" asp-route-obor="@obor" asp-route-rok="@rok">Porovnání dodavatelů</a>
+                                <a class="btn btn-outline-primary" asp-page="/Pdf" asp-route-obor="@obor" asp-route-rok="@rok">Celá zpráva</a>
+                            </div>
+                            @if (this.User.IsInRole("Admin") )
+                            {
+                                <div class="btn-group me-2" role="group" aria-label="First group">
+                                    <a class="btn btn-outline-secondary" asp-page="/JedenJob" asp-route-obor="@obor" asp-route-rok="@rok">▸ Experiment</a>
+                                    <a class="btn btn-outline-secondary" asp-page="/Stats" asp-route-obor="@obor" asp-route-rok="@rok">▸ Zebricek</a>
+                                </div>
+                            }
+                        </div>
+                        <div class="" style="margin-bottom:4em;"></div>
+                    }
+
+                    
+                    @RenderBody()
                 </div>
             </div>
-        </nav>
+        </section>
 
+    </main>
+    <!-- Footer-->
+    <footer class="footer pt-lg-5 pt-4 pb-5">
+        <div class="container pt-3 mt-md-2 mt-lg-3">
+            <div class="row gy-md-5 gy-4 mb-md-5 mb-4 pb-lg-2">
+                <div class="col-lg-3">
+                    <a class="navbar-brand d-inline-flex align-items-center mb-lg-4 mb-3" href="/index.html">
+                        <svg version="1.1" width="290" height="62" viewBox="0 0 291 63" xmlns="http://www.w3.org/2000/svg">
+                            <use href="/assets/img/logo.svg#logo"></use>
+                        </svg>
 
-        <div class="d-print-none">
-
-            @if (ViewBag.BigBanner == true)
-            {
-                <div class="header__content ">
-
-                    <div class="header__title">
-                        <h1>Cenové analýzy</h1>
-                        <div class="header__text">
-                            Analýzy nabízí detailní přehled obvyklých cen IT služeb na českém trhu. 
-                            Jde o <b style="color:yellow">nejrozsáhlejší</b> a <b style="color:yellow">nejspolehlivější přehled</b> jednotkových cen, 
-                            který je státní správě i veřejnosti k dispozici. 
-                            Největším přínosem analýzy je pomoc úřadům s <b style="color:yellow">orientací v obvyklých cenových relacích</b>, a dodavatelům se zvýšením šance ve výběrovém řízení.
-
-                            <br />
-                            <a style="margin-top:20px" href="/objednat" class="btn btn-primary">Objednat</a>
+                        @*                        <span class="text-nav">Watchdog <i class="fa-solid fa-lightbulb-on" style="color:rgb(68,140,116)"></i> Analytics</span>*@
+                    </a>
+                    <p class="mb-4 pb-lg-1 fs-xs text-muted" style="max-width: 306px;">Analýza smluv, registr smluv, veřejné zakázky. Ve spoluprácí s <a href="https://www.hlidacstatu.cz">Hlídač státu</a>.</p>
+                    <div class="mt-n3 ms-n3">
+                        <a class="btn btn-secondary btn-icon btn-sm btn-twitter rounded-circle mt-3 ms-3" href="https://www.twitter.com/hlidacstatu/"><i class="ai-twitter"></i></a>
+                        <a class="btn btn-secondary btn-icon btn-sm btn-instagram rounded-circle mt-3 ms-3" href="https://www.instagram.com/hlidacstatu/"><i class="ai-instagram"></i></a>
+                        <a class="btn btn-secondary btn-icon btn-sm btn-facebook rounded-circle mt-3 ms-3" href="https://www.facebook.com/hlidacstatu/"><i class="ai-facebook"></i></a>
+                        <a class="btn btn-secondary btn-icon btn-sm btn-linkedin rounded-circle mt-3 ms-3" href="https://www.linkedin.com/company/80328355/"><i class="ai-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="row row-cols-sm-4 row-cols-1">
+                        <div class="col">
+                            <ul class="nav flex-column mb-0">
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/analyzy"><b>Ceny ICT prací pro rok 2020</b></a></li>
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/analyzy"><b>Ceny ICT prací pro rok 2021</b></a></li>
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/analyzy"><b>Ceny ICT prací pro rok 2022</b></a></li>
+                            </ul>
+                        </div>
+                        <div class="col">
+                        </div>
+                        <div class="col">
+                            <ul class="nav flex-column mb-0">
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/index#detail">Popis</a></li>
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/index#obory">Obory</a></li>
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/index#cenik">Ceník</a></li>
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="/otazkyodpovedi">Otázky a odpovědi</a></li>
+                            </ul>
+                        </div>
+                        <div class="col">
+                            <ul class="nav flex-column mb-0">
+                                <li class="nav-item mb-2"><a class="nav-link p-0" href="tel:+420777737810">+420 777 737 810</a></li>
+                                <li class="nav-item mb-2"><a class="text-primary fw-semibold p-0" href="mailto:obchod@watchdoganalytics.com">obchod@watchdoganalytics.com</a></li>
+                            </ul>
                         </div>
                     </div>
-
-                </div>
-
-            }
-            else
-            {
-                <div class="header__content ">
-
-                    <div style="padding-top:20px;color:#FFF"><a href="/" style="color:#FFF;text-decoration:none;"><i class="fa-regular fa-house"></i> Cenové analýzy</a> 
-                        <sup class="text-warning">@(this.Context.HasAccess("IT", 2020).Result.AnalyzeLevelText)</sup>
-                        &gt; @(analyza?.PerSubjectDesc?.NiceName)</div>
-                    <!-- desktop menu items only -->
-                <h2 style="padding-top:20px;color:white">@ViewData["Title"]</h2>
-
-                    @if (!string.IsNullOrEmpty(ViewData["Description"] as string))
-                    {
-                        <small>@ViewData["Description"]</small>
-                    }
-                    else if (analyza?.IsDemo == true)
-                    {
-                        <small class="text-warning">Toto je ukázková, volně dostupná analáza za období leden-březen 2018. Ostatní analýzy vždy pokrývají celý kalendářní rok.</small>
-
-                    }
-                    <!-- desktop menu items only -->
-
-            </div>
-            }
-        </div>
-
-    </header>
-<div class="bg-light">
-    <div class="container pt-2">
-        <partial name="_NavBar" />
-    </div>
-</div>
-
-<div class="container mt-2">
-@*    <div class="col-sm-3">
-        <nav id="toc" data-toggle="toc" class="sticky-top"></nav>
-    </div>
-*@
-    <main role="main" class="pb-3">
-
-        <div class="pt-5">
-            @RenderBody()
-        </div>
-        @if (analyza != null && analyza.HasValue)
-        {
-            var data = JobService.DistinctJobsForYearAndSubject(analyza.Value);
-            <div style="margin-top:50px;" class="alert alert-secondary">
-                Data jsou platná k @(analyza.Value.PlatnostK), za období <b>@analyza.Value.ProObdobi</b>
-                    @if (this.Context.HasAccess("IT", 2020).Result.Access)
-                    {
-                        <span>@(this.Context.User?.Identity?.Name)</span>
-                    }
-            </div>
-        }
-    </main>
-
-</div>
-
-
-
-    <footer style="margin-top:50px;" >
-
-        <div style="background:#f2f5f7;" class="d-print-none">
-            <div class="footer__content">
-                <div class="footer__content__col">
-                    <a href="https://texty.hlidacstatu.cz/o-serveru">O nás</a>
-                    <a href="https://texty.hlidacstatu.cz/vize">Naše vize</a>
-                    <a href="https://texty.hlidacstatu.cz/kodex">Náš kodex</a>
-                    <a href="https://texty.hlidacstatu.cz/kontakt">Kontakt</a>
-                    <a href="https://texty.hlidacstatu.cz/pro-media">Pro média, loga</a>
-                </div>
-                <div class="footer__content__gap"></div>
-                <div class="footer__content__col">
-                    <a href="https://texty.hlidacstatu.cz/team">Team</a>
-                    <a href="https://texty.hlidacstatu.cz/pomohu-spravnemu-fungovani-cr/" style="color:#3c763d;font-weight:bold">Podpořte nás!<i class="fas fa-heart" style="color:red"></i></a>
-                    <a href="/api">API a Open data pro vývojáře</a>
-                    <a href="https://texty.hlidacstatu.cz/provoznipodminky/">Podmínky užívání a ochrana soukromí</a>
-                    <a href="https://texty.hlidacstatu.cz/series/tipy/">Tipy, nápověda</a>
-                </div>
-                <div class="footer__content__gap"></div>
-                <div class="footer__content__col">
-                    <div style="padding: 7px 5px">
-                        <a href="https://texty.hlidacstatu.cz/kontakt/" target="_blank" style="color:orange"><span style="color:orange" class="fas fa-exclamation-triangle"></span>&nbsp;Nahlásit chybu</a>/ <a href="/status">Běží nám servery?</a>
-                    </div>
-                    <div style="padding: 7px 5px"><a href="https://texty.hlidacstatu.cz/k-index/">K-index: Hlídáme stát s odvahou!</a>/<a href="https://texty.hlidacstatu.cz/k-index-watchdog-bravely-monitors-public-corruption/">EN</a></div>
-                    <div style="padding: 7px 5px">
-                        <span>Sledujte nás</span>
-                        <a href="https://www.facebook.com/hlidacstatu">
-                            <i class="fab fa-facebook-square fa-2x"></i>
-                        </a>
-                        <a href="https://twitter.com/hlidacstatu">
-                            <i class="fab fa-twitter-square fa-2x"></i>
-                        </a>
-                        <a href="https://www.instagram.com/hlidacstatu/">
-                            <i class="fab fa-instagram-square fa-2x"></i>
-                        </a>
-                    </div>
                 </div>
             </div>
+            <div class="fs-sm text-muted">&copy; Devmasters s.r.o. </div>
         </div>
     </footer>
-    <footer class="d-none d-print-block">
-        (c) 2022 Hlídač státu z.ú.
-
-    </footer>
+    <!-- Back to top button-->
+    <a class="btn-scroll-top" href="#top" data-scroll>
+        <svg viewBox="0 0 40 40" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"></circle>
+        </svg><i class="ai-arrow-up"></i>
+    </a>
+    <!-- Vendor scripts: js libraries and plugins-->
+    <script src="/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js"></script>
+    <script src="/assets/vendor/simplebar/dist/simplebar.min.js"></script>
+    <script src="/assets/vendor/parallax-js/dist/parallax.min.js"></script>
+    <script src="/assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="/assets/vendor/aos/dist/aos.js"></script>
+    <!-- Main theme script-->
+    <script src="/assets/js/theme.min.js"></script>
 </body>
 </html>

@@ -1,8 +1,7 @@
-﻿using HlidacStatu.JobsWeb.Models;
+﻿using System.Linq;
+using HlidacStatu.Ceny.Models;
 
-using System.Linq;
-
-namespace HlidacStatu.JobsWeb.Services
+namespace HlidacStatu.Ceny.Services
 {
     public static partial class JobService
     {

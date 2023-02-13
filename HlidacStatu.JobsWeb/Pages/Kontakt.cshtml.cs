@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace HlidacStatu.JobsWeb.Pages
+namespace HlidacStatu.Ceny.Pages
 {
     public class KontaktModel : PageModel
     {
