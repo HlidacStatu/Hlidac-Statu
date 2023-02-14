@@ -117,6 +117,7 @@ builder.Services.AddSwaggerGen(c =>
     var xmlFile = "HlidacStatuApi.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
+    c.CustomSchemaIds(x => x.FullName);
 });
 
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, HlidacStatuApi.Code.SpecificApiAuthorizationMiddlewareResultHandler>();
