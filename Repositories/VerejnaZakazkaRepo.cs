@@ -32,6 +32,13 @@ namespace HlidacStatu.Repositories
         // Emergency HttpClient for cases where it is not convinient to inject HttpClient.
         private static Lazy<HttpClient> _lazyHttpClient = new();
 
+        private static void AfterSave(VerejnaZakazka vz)
+        {
+            Statistics.Recalculate.AddFirmaToProcessingQueue(vz.Zadavatel.ICO, Statistics.RecalculateItem.StatisticsTypeEnum.VZ , $"VZ {vz.Id}");
+            foreach (var dod in vz.Dodavatele)
+                Statistics.Recalculate.AddFirmaToProcessingQueue(dod.ICO, Statistics.RecalculateItem.StatisticsTypeEnum.VZ, $"VZ {vz.Id}");
+        }
+
         private static async Task SaveIncompleteVzAsync(VerejnaZakazka incompleteVz)
         {
             try
@@ -40,6 +47,7 @@ namespace HlidacStatu.Repositories
                 var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
                 incompleteVz.HasIssues = true;
                 await elasticClient.IndexDocumentAsync<VerejnaZakazka>(incompleteVz);
+                AfterSave(incompleteVz);
 
             }
             catch (Exception e)
@@ -91,6 +99,7 @@ namespace HlidacStatu.Repositories
                 {
                     SendToOcrQueue(newVZ);
                     await elasticClient.IndexDocumentAsync(newVZ);
+                    AfterSave(newVZ);
                     return;
                 }
                 
@@ -122,6 +131,7 @@ namespace HlidacStatu.Repositories
                 SendToOcrQueue(originalVZ);
                 
                 await elasticClient.IndexDocumentAsync<VerejnaZakazka>(originalVZ);
+                AfterSave(originalVZ);
             }
             catch (Exception e)
             {
