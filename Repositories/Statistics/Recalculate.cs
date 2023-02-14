@@ -1,23 +1,30 @@
-﻿using HlidacStatu.Entities;
+﻿using Amazon.Runtime.Internal.Util;
+using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace HlidacStatu.Repositories.Statistics
 {
     public class Recalculate
     {
+        static Devmasters.Log.Logger log = Devmasters.Log.Logger.CreateLogger<Recalculate>();
+
         private const string RECALCULATIONQUEUENAME = "recalculation2Process";
         static RecalculateItemEqComparer comparer = new RecalculateItemEqComparer();
 
         static Devmasters.Batch.ActionProgressWriter debugProgressWr = new Devmasters.Batch.ActionProgressWriter(0.1f);
 
         public static void RecalculateTasks(int? threads = null,
-            Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null)
+            Action<string> outputWriter = null, 
+            Action<Devmasters.Batch.ActionProgressData> progressWriter = null
+            )
         {
             threads = threads ?? 20;
 
+            log.Info("{method} Starting with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, threads.Value);
             var queueItems = GetFromProcessingQueue(threads.Value*50, threads.Value);
 
             while (queueItems.Count() > 0)
@@ -102,6 +109,8 @@ namespace HlidacStatu.Repositories.Statistics
 
                 queueItems = GetFromProcessingQueue(100000, threads.Value);
             }
+
+            log.Info("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
 
         }
 
@@ -204,6 +213,8 @@ namespace HlidacStatu.Repositories.Statistics
         public static IEnumerable<RecalculateItem> GetFromProcessingQueue(int count, int threads,
             Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null)
         {
+            log.Debug("{method} Starting for {records} records with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, count, threads);
+
             System.Collections.Concurrent.ConcurrentQueue<RecalculateItem> res = new();
             Devmasters.Batch.Manager.DoActionForAll<int>(Enumerable.Range(0, count),
                 _ =>
@@ -220,6 +231,8 @@ namespace HlidacStatu.Repositories.Statistics
                 !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: Math.Min(threads, 10), monitor: new MonitoredTaskRepo.ForBatch()
             );
 
+            log.Debug("{method} get {records} records from ProcessingQueue", MethodBase.GetCurrentMethod().Name, count);
+
             System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new();
 
             Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(res,
@@ -234,9 +247,10 @@ namespace HlidacStatu.Repositories.Statistics
                 },
                 outputWriter, progressWriter,
                 !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
-                monitor: new MonitoredTaskRepo.ForBatch()
+                monitor: new MonitoredTaskRepo.ForBatch(logger:log)
                 );
 
+            log.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
 
             return list.OrderBy(o => o.Created)
                 .Distinct()

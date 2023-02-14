@@ -1,6 +1,8 @@
-﻿using HlidacStatu.Entities;
+﻿using Devmasters.Log;
+using HlidacStatu.Entities;
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
 {
@@ -9,10 +11,12 @@ namespace HlidacStatu.Repositories
         public class ForBatch : MonitoredTask, Devmasters.Batch.IMonitor, IDisposable
         {
             private bool disposedValue;
+            private readonly Logger logger;
 
             public ForBatch(
                 string application = null,
                 string part = null,
+                Devmasters.Log.Logger logger = null,
                 [CallerMemberName] string callerMemberName = "",
                 [CallerFilePath] string sourceFilePath = "",
                 [CallerLineNumber] int sourceLineNumber = 0
@@ -24,29 +28,42 @@ namespace HlidacStatu.Repositories
                     var fn = System.IO.Path.GetFileName(sourceFilePath);
                     this.Part = Devmasters.TextUtil.ShortenText($"{fn}: {callerMemberName} ({sourceLineNumber})", 500, "", "");
                 }
+
+                this.logger = logger;
             }
 
             public void Start()
             {
                 this.Started = DateTime.Now;
                 _ = MonitoredTaskRepo.Create(this);
+                if (logger != null)
+                    logger.Debug("Starting MonitoredTask in {application} {part}", this.Application, this.Part);
             }
 
             public void SetProgress(decimal inPercent)
             {
                 _ = MonitoredTaskRepo.SetProgress(this, inPercent);
+                if ((DateTime.Now - this.LastTimeProgressUpdated) > this.MinIntervalBetweenUpdates)
+                {
+                    if (logger != null)
+                        logger.Debug("MonitoredTask in {application} {part} task {progress} % completed", this.Application, this.Part, inPercent);
+                }
             }
 
 
             public void Finish(bool success, Exception exception)
             {
                 _ = MonitoredTaskRepo.Finish(this, success, exception);
+                if (logger != null)
+                    logger.Debug("MonitoredTask in {application} {part} finished", this.Application, this.Part);
             }
 
             public void Finish(params Exception[] exceptions)
             {
                 bool success = exceptions == null || exceptions.Length == 0;
                 _ = MonitoredTaskRepo.Finish(this, success , success ? null : new AggregateException(exceptions));
+                if (logger != null)
+                    logger.Debug("MonitoredTask in {application} {part} finished", this.Application, this.Part);
             }
 
             protected virtual void Dispose(bool disposing)
