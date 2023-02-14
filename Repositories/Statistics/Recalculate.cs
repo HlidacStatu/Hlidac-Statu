@@ -18,7 +18,7 @@ namespace HlidacStatu.Repositories.Statistics
         {
             threads = threads ?? 20;
 
-            var queueItems = GetFromProcessingQueue(100000, threads.Value);
+            var queueItems = GetFromProcessingQueue(threads.Value*50, threads.Value);
 
             while (queueItems.Count() > 0)
             {
