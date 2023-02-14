@@ -62,11 +62,9 @@ namespace HlidacStatu.Repositories.ES
         public static string defaultIndexName_SAll = defaultIndexName + "," + defaultIndexName_Sneplatne;
 
         public static string defaultIndexName_VerejneZakazky = "verejnezakazky";
+        public static string defaultIndexName_VerejneZakazkyNew = "verejnezakazky_new";
         public static string defaultIndexName_ProfilZadavatele = "profilzadavatele";
-        public static string defaultIndexName_VerejneZakazkyRaw2006 = "verejnezakazkyraw2006";
-        public static string defaultIndexName_VerejneZakazkyRaw = "verejnezakazkyraw";
         public static string defaultIndexName_VerejneZakazkyNaProfiluRaw = "verejnezakazkyprofilraw";
-        public static string defaultIndexName_VerejneZakazkyNaProfiluConverted = "verejnezakazkyprofilconverted";
         public static string defaultIndexName_Firmy = "firmy";
         public static string defaultIndexName_KIndex = "kindex";
         public static string defaultIndexName_KIndexTemp = "kindex_temp";
@@ -126,32 +124,31 @@ namespace HlidacStatu.Repositories.ES
         {
             return GetESClientAsync(defaultIndexName_Sneplatne, timeOut, connectionLimit);
         }
-
+        
+        [Obsolete(message: "Použij GetESClient_VerejneZakazkyAsync")]
         public static Task<ElasticClient> GetESClient_VZAsync(int timeOut = 60000, int connectionLimit = 80)
         {
             return GetESClientAsync(defaultIndexName_VerejneZakazky, timeOut, connectionLimit, IndexType.VerejneZakazky);
         }
+        public static Task<ElasticClient> GetESClient_VerejneZakazkyAsync(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClientAsync(defaultIndexName_VerejneZakazkyNew, timeOut, connectionLimit, IndexType.VerejneZakazky);
+        }
+        
+        public static Task<ElasticClient> GetESClient_VerejneZakazkyOldAsync(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClientAsync(defaultIndexName_VerejneZakazky, timeOut, connectionLimit, IndexType.VerejneZakazky);
+        }
+        
         public static Task<ElasticClient> GetESClient_ProfilZadavateleAsync(int timeOut = 60000, int connectionLimit = 80)
         {
             return GetESClientAsync(defaultIndexName_ProfilZadavatele, timeOut, connectionLimit, IndexType.ProfilZadavatele);
-        }
-        public static Task<ElasticClient> GetESClient_VerejneZakazkyRaw2006Async(int timeOut = 60000, int connectionLimit = 80)
-        {
-            return GetESClientAsync(defaultIndexName_VerejneZakazkyRaw2006, timeOut, connectionLimit, IndexType.VerejneZakazkyRaw2006);
         }
         public static Task<ElasticClient> GetESClient_VerejneZakazkyNaProfiluRawAsync(int timeOut = 60000, int connectionLimit = 80)
         {
             return GetESClientAsync(defaultIndexName_VerejneZakazkyNaProfiluRaw, timeOut, connectionLimit, IndexType.VerejneZakazkyNaProfiluRaw);
         }
-        public static Task<ElasticClient> GetESClient_VerejneZakazkyNaProfiluConvertedAsync(int timeOut = 60000, int connectionLimit = 80)
-        {
-            return GetESClientAsync(defaultIndexName_VerejneZakazkyNaProfiluConverted, timeOut, connectionLimit, IndexType.VerejneZakazky);
-        }
-        public static Task<ElasticClient> GetESClient_VerejneZakazkyRawAsync(int timeOut = 60000, int connectionLimit = 80)
-        {
-            return GetESClientAsync(defaultIndexName_VerejneZakazkyRaw, timeOut, connectionLimit, IndexType.VerejneZakazkyRaw
-                );
-        }
+        
         public static Task<ElasticClient> GetESClient_LogsAsync(int timeOut = 60000, int connectionLimit = 80)
         {
             return GetESClientAsync(defaultIndexName_Logs, timeOut, connectionLimit, IndexType.Logs

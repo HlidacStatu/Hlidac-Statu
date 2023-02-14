@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 
 namespace HlidacStatu.Connectors.IO
@@ -6,7 +7,6 @@ namespace HlidacStatu.Connectors.IO
     public abstract class DistributedFilePath<T>
          where T : class
     {
-
         int hashLen = 0;
         string root = "";
         protected Func<T, string> funcToGetId = null;
@@ -14,8 +14,8 @@ namespace HlidacStatu.Connectors.IO
         {
             hashLen = hashLength;
             this.root = root.Trim();
-            if (!root.EndsWith("\\"))
-                this.root = root + "\\";
+            if (!root.EndsWith(Path.DirectorySeparatorChar))
+                this.root = root + Path.DirectorySeparatorChar;
             funcToGetId = getId;
         }
 
@@ -34,7 +34,6 @@ namespace HlidacStatu.Connectors.IO
                         System.IO.Directory.CreateDirectory(root + hash);
                 }
             }
-
         }
 
         public virtual string GetFullPath(T obj, string filename)
@@ -44,33 +43,26 @@ namespace HlidacStatu.Connectors.IO
 
         public virtual string GetFullDir(T obj)
         {
-            return string.Format("{0}{1}\\"
-                , root, GetHash(obj));
+            return string.Format("{0}{1}{2}"
+                , root, GetHash(obj),Path.DirectorySeparatorChar);
         }
 
         public virtual string GetRelativeDir(T obj)
         {
-            return GetHash(obj) + "\\";
+            return GetHash(obj) + Path.DirectorySeparatorChar;
 
         }
-
-
+        
         public virtual string GetRelativePath(T obj, string filename)
         {
             return GetRelativeDir(obj) + filename;
 
         }
-
-
+        
         protected virtual string GetHash(T obj)
         {
             return Devmasters.Crypto.Hash.ComputeHashToHex(funcToGetId(obj)).Substring(0, hashLen);
         }
-
-
-
-
-
     }
 }
 

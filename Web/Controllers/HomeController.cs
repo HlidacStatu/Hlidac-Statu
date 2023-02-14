@@ -815,7 +815,7 @@ text zpravy: {txt}
                                 Cena = h.Source.FormattedCena(false),
                                 CPVkody = h.Source.CPV.Count() == 0
                                         ? "" :
-                                        h.Source.CPV.Select(c => h.Source.CPVText(c)).Aggregate((f, s) => f + ", " + s),
+                                        h.Source.CPV.Select(c => VerejnaZakazka.CPVToText(c)).Aggregate((f, s) => f + ", " + s),
                                 Stav = h.Source.StavZakazky.ToNiceDisplayName(),
                                 DatumUverejneni = h.Source.DatumUverejneni
                             })

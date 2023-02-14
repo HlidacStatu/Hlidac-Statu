@@ -249,6 +249,7 @@ namespace HlidacStatu.Web.Controllers
             public long? count { get; set; }
         }
 
+        //todo: k čemu se používá? Kandidát na promazání
         [Authorize]
         public async Task<ActionResult> VZProfilesList()
         {
@@ -270,7 +271,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 foreach (KeyedBucket<object> val in ((BucketAggregate)res.Aggregations["profiles"]).Items)
                 {
-                    var vzClient = await Manager.GetESClient_VZAsync();
+                    var vzClient = await Manager.GetESClient_VerejneZakazkyAsync();
                     var resProf = await client.GetAsync<ProfilZadavatele>((string)val.Key);
                     list.Add(new VZProfilesListRes()
                     { profileId = (string)val.Key, url = resProf?.Source?.Url, count = val.DocCount });
@@ -343,61 +344,6 @@ namespace HlidacStatu.Web.Controllers
             }
 
             return ret;
-        }
-
-        [HttpPost()]
-        [Authorize]
-        public async Task<ActionResult> VZDetail(string _id, [FromBody] VerejnaZakazka content)
-        {
-            string id = _id;
-
-            if (string.IsNullOrEmpty(id))
-                return new NotFoundResult();
-            
-            var idxConn = await Manager.GetESClient_VerejneZakazkyNaProfiluConvertedAsync();
-
-            if (!ModelState.IsValid || content is null)
-            {
-                var errors = ModelState.Values.SelectMany(v => v.Errors);
-                var errorsStringified = string.Join(";\n", errors);
-                Util.Consts.Logger.Error($"VZDetail API:\n {errorsStringified}");
-
-                ErrorEnvelope ee = new()
-                {
-                    Data = errorsStringified,
-                    Error = "invalid data",
-                    UserId = HttpContext.User.Identity.Name,
-                    //apiCallJson = Newtonsoft.Json.JsonConvert.SerializeObject(authId) ?? null
-                };
-                await ErrorEnvelopeRepo.SaveAsync(ee, idxConn);
-                return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    new { error = "data is empty" }
-                ), "application/json");
-            }
-
-            VerejnaZakazka? vz = content;
-            try
-            {
-                await VerejnaZakazkaRepo.SaveAsync(vz, idxConn);
-                return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    new { result = "ok" }
-                ), "application/json");
-            }
-            catch (Exception e)
-            {
-                ErrorEnvelope ee = new()
-                {
-                    Data = content.ToString(),
-                    Error = e.ToString(),
-                    UserId = HttpContext.User.Identity.Name,
-                    //apiCallJson = Newtonsoft.Json.JsonConvert.SerializeObject(authId) ?? null
-                };
-                await ErrorEnvelopeRepo.SaveAsync(ee, idxConn);
-
-                return Content(Newtonsoft.Json.JsonConvert.SerializeObject(
-                    new { error = "deserialization error", descr = e.ToString() }
-                ), "application/json");
-            }
         }
 
         public async Task<ActionResult> Status()

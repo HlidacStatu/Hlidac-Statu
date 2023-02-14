@@ -6,6 +6,7 @@ using HlidacStatu.Repositories;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace HlidacStatu.Plugin.Enhancers
@@ -34,8 +35,8 @@ namespace HlidacStatu.Plugin.Enhancers
         string pathToOcr = Devmasters.Config.GetWebConfigValue("ReadIrisMonitorPath");
         public TextMiner()
         {
-            if (!pathToOcr.EndsWith("\\"))
-                pathToOcr += "\\";
+            if (!pathToOcr.EndsWith(Path.DirectorySeparatorChar))
+                pathToOcr += Path.DirectorySeparatorChar;
         }
 
         public TextMiner(bool skipOCR, bool forceAlreadyMined, bool asyncOCR = false, int priority = 5, 

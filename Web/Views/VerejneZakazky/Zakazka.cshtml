@@ -10,7 +10,7 @@
     /**/
 
     ViewBag.Title = "Hlídač veřejných zakázek";
-    ViewBag.SubTitle = "Zakázka " + Model.EvidencniCisloZakazky;
+    ViewBag.SubTitle = "Zakázka " + Model.ZobrazPrimarniIdZdroje();
 
     ViewBag.SocialShareTitle = Model.NazevZakazky;
     ViewBag.SocialShareText = Devmasters.TextUtil.FormatPlainTextForArticle(Devmasters.TextUtil.ShortenText(Model.PopisZakazky, 200));
@@ -68,10 +68,6 @@ else
     <table class="table table-hover">
     <tbody>
     <tr>
-        <td>Číslo zakázky</td>
-        <td>@Model.EvidencniCisloZakazky</td>
-    </tr>
-    <tr>
         <td>Název zakázky</td>
         <td>@Model.NazevZakazky</td>
     </tr>
@@ -100,7 +96,7 @@ else
             {
                 if (HlidacStatu.Util.DataValidators.CheckCZICO(od.ICO))
                 {
-                    @(await Html.KIndexLabelLinkAsync(od.ICO))<a href="/subjekt/@od.ICO">@od.Jmeno (IČ @od.ICO)</a>
+                    @(await Html.KIndexLabelLinkAsync(od.ICO))<a href="/subjekt/@od.ICO">@od.Jmeno (IČ @od.ICO)</a><br/>
                 }
                 else
                 {
@@ -130,7 +126,7 @@ else
             @foreach (var cpv in Model.CPV)
             {
                 <div>
-                    @Model.CPVText(cpv) -
+                    @VerejnaZakazka.CPVToText(cpv) -
                     <i>
                         <a href="/VerejneZakazky/Hledat?q=cpv:@cpv">@cpv</a>
                     </i>
@@ -188,7 +184,7 @@ else
                                 @if (priloha.WordCount > 2)
                                 {
                                     @Html.Raw(";&nbsp;")
-                                    <a href="@Url.Action("TextDokumentu", new {id = @Model.Id, hash = priloha.StorageId})">zobrazit čistý text dokumentu</a>
+                                    <a href="@Url.Action("TextDokumentu", new {id = @Model.Id, sha = priloha.Sha256Checksum})">zobrazit čistý text dokumentu</a>
                                     <span>(@priloha.WordCount slov)</span>
                                 }
                                 <highlight-content highlights="highlightingData"
@@ -235,42 +231,30 @@ else
         </td>
     </tr>
     <tr>
-        <td>Zdroj zakázky</td>
+        <td>Zdroje zakázky</td>
         <td>
-            @{
-                var sourceUrls = await Model.ZdrojZakazkyUrlAsync();
-                if (sourceUrls != null)
+            @if (Model.Zdroje.Any())
+            {
+                <strong>Doména - <i>Id</i></strong>
+                <hr style="border-top-color: #dee2e6"/>
+                foreach (var zdroj in Model.Zdroje)
                 {
-                    if (!string.IsNullOrEmpty(sourceUrls.ZakazkaURL))
-                    {
-                        <a href="@sourceUrls.ZakazkaURL" target="_blank">
-                            <code>@sourceUrls.ZakazkaURL</code>
-                        </a>
-                    }
-                    else if (!string.IsNullOrEmpty(sourceUrls.ProfilZadavatelUrl)
-                             &&
-                             !string.IsNullOrEmpty(sourceUrls.ProfilZadavatelUrl)
-                        )
-                    {
-                        <div>
-
-                            <a href="@sourceUrls.ProfilZadavatelUrl" target="_blank">
-                                <code>@sourceUrls.ProfilZadavatelUrl</code>
-                            </a> (zkusit <a href="@sourceUrls.SearchZakazkaUrl" target="_blank">najít zakázku Googlem</a>)
-                        </div>
-                        <div class="bs-callout primary small">
-                            <h4><span class="fas fa-info-circle"></span> Veřejná zakázka z profilu zadavatele</h4>
-                            <p>
-                                Některé profily zadavatelů nemají možnost přímo odkazovat jednotlivé zakázky a musíte je tam pracně hledat.
-                                Výše uvedené URL je odkaz na celý profil zadavatele (a když budete mít štěstí, bude ješte fungovat), a zde musíte použadovanou zakázku hledat podle evidenčního čísla
-                                <code>@Model.EvidencniCisloZakazky</code>.
-                            </p>
-                        </div>
-                    }
+                    <p>
+                        @zdroj.Domena - <i>@zdroj.IdVDomene</i>
+                    </p>
                 }
             }
         </td>
     </tr>
+    <tr>
+        <td>Další známé url</td>
+        <td>
+            @foreach (var url in Model.UrlZakazky)
+            {
+                <a href="@url">@url</a><br/>
+            }
+        </td>
+        </tr>
     </tbody>
     </table>
 }

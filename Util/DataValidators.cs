@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -26,8 +27,8 @@ namespace HlidacStatu.Util
             else
                 root = Devmasters.IO.IOTools.GetExecutingDirectoryName(true);
 
-            if (!root.EndsWith(@"\"))
-                root = root + @"\";
+            if (!root.EndsWith(Path.DirectorySeparatorChar))
+                root = root + Path.DirectorySeparatorChar;
 
 
             var tmp = System.IO.File.ReadLines(root + "staty.txt")

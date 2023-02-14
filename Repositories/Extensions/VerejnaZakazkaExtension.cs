@@ -19,25 +19,32 @@ namespace HlidacStatu.Extensions
 
         public static string SocialInfoSubTitle(this VerejnaZakazka verejnaZakazka)
         {
-            if ((verejnaZakazka.CPV?.Length ?? 0) == 0)
+            if ((verejnaZakazka.CPV?.Count ?? 0) == 0)
             {
                 return "";
             }
-            else if (verejnaZakazka.CPV?.Length == 1)
+            
+            if (verejnaZakazka.CPV?.Count == 1)
             {
-                return $"{verejnaZakazka.CPVText(verejnaZakazka.CPV[0])} ({verejnaZakazka.CPV[0]})";
+                var cpv = verejnaZakazka.CPV.First();
+                return $"{VerejnaZakazka.CPVToText(cpv)} ({cpv})";
             }
-            else if (verejnaZakazka.CPV?.Length == 2)
+            
+            if (verejnaZakazka.CPV?.Count == 2)
             {
-                return $"{verejnaZakazka.CPVText(verejnaZakazka.CPV[0])} ({verejnaZakazka.CPV[0]})"
-                       + $"{verejnaZakazka.CPVText(verejnaZakazka.CPV[1])} ({verejnaZakazka.CPV[1]})";
+                return string.Join("",verejnaZakazka.CPV.Select(cpv => $"{VerejnaZakazka.CPVToText(cpv)} ({cpv})"));
             }
-            else
-                return $"{verejnaZakazka.CPVText(verejnaZakazka.CPV[0])} ({verejnaZakazka.CPV[0]})"
-                       + $"{verejnaZakazka.CPVText(verejnaZakazka.CPV[1])} ({verejnaZakazka.CPV[1]}) "
-                       + Devmasters.Lang.CS.Plural.Get(verejnaZakazka.CPV.Length - 2, "a další obor", "+ {0} obory",
-                           "+ {0} oborů")
-                    ;
+
+            var cpvs = verejnaZakazka.CPV.ToArray();
+            return $"{VerejnaZakazka.CPVToText(cpvs[0])} ({cpvs[0]})"
+                   + $"{VerejnaZakazka.CPVToText(cpvs[1])} ({cpvs[1]}) "
+                   + Devmasters.Lang.CS.Plural.Get(cpvs.Length - 2, "a další obor", "+ {0} obory",
+                       "+ {0} oborů");
+        }
+
+        public static string GetHlidacUrl(this VerejnaZakazka.Document document)
+        {
+            return $"https://www.hlidacstatu.cz/verejnezakazky/priloha/{document.GetHlidacStorageId()}";
         }
 
 
@@ -165,94 +172,6 @@ namespace HlidacStatu.Extensions
             return infofacts;
         }
 
-        public static async Task<VerejnaZakazka.ZakazkaSource> ZdrojZakazkyUrlAsync(this VerejnaZakazka verejnaZakazka)
-        {
-            //2006 https://old.vestnikverejnychzakazek.cz/cs/Searching/SearchContractNumber?cococode=847422
-            //2016 https://www.vestnikverejnychzakazek.cz/SearchForm/SearchContract?contractNumber=
-
-            if (!string.IsNullOrWhiteSpace(verejnaZakazka.UrlZakazky))
-            {
-                return new VerejnaZakazka.ZakazkaSource()
-                {
-                    ZakazkaURL = verejnaZakazka.UrlZakazky
-                };
-            }
-            
-            string searchUrl = null;
-            if (!string.IsNullOrEmpty(verejnaZakazka.EvidencniCisloZakazky))
-            {
-                string profilUrl = "";
-                //todo: michale, mrkni na to if else - všude se volá stejné, tak to kdyžtak zjednoduš.
-                if (verejnaZakazka.Dataset == VerejnaZakazka.Post2016Dataset)
-                    profilUrl = (await ProfilZadavateleRepo.GetByIdAsync(verejnaZakazka.ZakazkaNaProfiluId))?.Url?.Trim();
-                else if (verejnaZakazka.Dataset == VerejnaZakazka.Pre2016Dataset)
-                    profilUrl = (await ProfilZadavateleRepo.GetByIdAsync(verejnaZakazka.ZakazkaNaProfiluId))?.Url?.Trim();
-                else if (!verejnaZakazka.Dataset.StartsWith("DatLab-"))
-                    profilUrl = verejnaZakazka.Dataset ??
-                                (await ProfilZadavateleRepo.GetByIdAsync(verejnaZakazka.ZakazkaNaProfiluId))?.Url?.Trim();
-                if (Uri.TryCreate(profilUrl, UriKind.Absolute, out var profilUri))
-                {
-                    string googlQ = verejnaZakazka.EvidencniCisloZakazky + " site:" + profilUri.Host;
-                    searchUrl =
-                        $"https://www.google.cz/search?client=safari&rls=en&q={(System.Net.WebUtility.UrlEncode(googlQ))}&ie=UTF-8&oe=UTF-8";
-                }
-            }
-
-            if (!string.IsNullOrEmpty(verejnaZakazka.EvidencniCisloZakazky))
-            {
-                if (verejnaZakazka.Dataset == VerejnaZakazka.Post2016Dataset)
-                    return
-                        new VerejnaZakazka.ZakazkaSource()
-                        {
-                            ZakazkaURL =
-                                $"https://www.vestnikverejnychzakazek.cz/SearchForm/SearchContract?contractNumber={verejnaZakazka.EvidencniCisloZakazky}",
-                            ProfilZadavatelUrl = 
-                                (await ProfilZadavateleRepo.GetByIdAsync(verejnaZakazka.ZakazkaNaProfiluId))?.Url?.Trim(),
-                            SearchZakazkaUrl = searchUrl
-                        };
-                else if (verejnaZakazka.Dataset == VerejnaZakazka.Pre2016Dataset)
-                    return new VerejnaZakazka.ZakazkaSource()
-                    {
-                        ZakazkaURL =
-                            $"https://old.vestnikverejnychzakazek.cz/cs/Searching/SearchContractNumber?cococode={verejnaZakazka.EvidencniCisloZakazky}",
-                        ProfilZadavatelUrl =
-                            (await ProfilZadavateleRepo.GetByIdAsync(verejnaZakazka.ZakazkaNaProfiluId))?.Url?.Trim(),
-                        SearchZakazkaUrl = searchUrl
-                    };
-                else if (!verejnaZakazka.Dataset.StartsWith("DatLab-"))
-                {
-                    return new VerejnaZakazka.ZakazkaSource()
-                    {
-                        SearchZakazkaUrl = searchUrl,
-                        ProfilZadavatelUrl = verejnaZakazka.Dataset ??
-                            (await ProfilZadavateleRepo.GetByIdAsync(verejnaZakazka.ZakazkaNaProfiluId))?.Url?.Trim()
-                    };
-                }
-            }
-
-            return null;
-        }
-
-        public static VerejnaZakazka.ExportedVZ.SubjectExport SubjectExport(
-            VerejnaZakazka.Subject s)
-        {
-            VerejnaZakazka.ExportedVZ.SubjectExport subjectExport = new();
-            if (s != null)
-            {
-                subjectExport.ICO = s.ICO;
-                subjectExport.Jmeno = s.Jmeno;
-            }
-            if (!string.IsNullOrEmpty(s?.ICO))
-            {
-                var f = FirmaRepo.FromIco(s.ICO);
-                if (f != null && f.Valid)
-                {
-                    subjectExport.KrajId = f.KrajId;
-                    subjectExport.OkresId = f.OkresId;
-                }
-            }
-
-            return subjectExport;
-        }
+        
     }
 }

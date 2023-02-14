@@ -11,12 +11,13 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Devmasters;
+using Devmasters.Collections;
+using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
-using HlidacStatu.Entities.XSD;
-
 
 namespace HlidacStatu.Repositories
 {
@@ -27,163 +28,100 @@ namespace HlidacStatu.Repositories
             .OrResult(r => r.RequestMessage.RequestUri.Host.Contains("bpapi.datlab.eu") &&
                            r.StatusCode == HttpStatusCode.Forbidden)
             .WaitAndRetryAsync(5, _ => TimeSpan.FromSeconds(1));
-        
-        public static async Task UpdatePosledniZmenaAsync(VerejnaZakazka verejnaZakazka, bool force = false, bool save = false)
-        {
-            DateTime? prevVal = verejnaZakazka.PosledniZmena;
-            if (verejnaZakazka.PosledniZmena.HasValue && force == false)
-                return;
-            else if (verejnaZakazka.LastestFormular() != null)
-            {
-                verejnaZakazka.PosledniZmena = verejnaZakazka.LastestFormular().Zverejnen;
-            }
-            else if (verejnaZakazka.DatumUverejneni.HasValue)
-            {
-                verejnaZakazka.PosledniZmena = verejnaZakazka.DatumUverejneni;
-            }
-            else
-            {
-                return;
-            }
 
-            if (verejnaZakazka.PosledniZmena != prevVal && save)
-                await SaveAsync(verejnaZakazka);
-        }
+        // Emergency HttpClient for cases where it is not convinient to inject HttpClient.
+        private static Lazy<HttpClient> _lazyHttpClient = new();
 
-        public static async Task SaveAsync(VerejnaZakazka verejnaZakazka, ElasticClient client = null, DateTime? posledniZmena = null)
+        private static async Task SaveIncompleteVzAsync(VerejnaZakazka incompleteVz)
         {
             try
             {
-                if (string.IsNullOrEmpty(verejnaZakazka.Id))
-                    verejnaZakazka.InitId();
-                verejnaZakazka.SetStavZakazky();
-                verejnaZakazka.LastUpdated = DateTime.Now;
-                if (posledniZmena.HasValue)
-                    verejnaZakazka.PosledniZmena = posledniZmena;
-                else
-                    verejnaZakazka.PosledniZmena = verejnaZakazka.GetPosledniZmena();
-                var es = client ??await Manager.GetESClient_VZAsync();
-                await es.IndexDocumentAsync<VerejnaZakazka>(verejnaZakazka);
-
-                Statistics.Recalculate.AddFirmaToProcessingQueue(verejnaZakazka.Zadavatel.ICO, Statistics.RecalculateItem.StatisticsTypeEnum.VZ , $"VZ {verejnaZakazka.Id}");
-                foreach (var dod in verejnaZakazka.Dodavatele)
-                    Statistics.Recalculate.AddFirmaToProcessingQueue(dod.ICO, Statistics.RecalculateItem.StatisticsTypeEnum.VZ, $"VZ {verejnaZakazka.Id}");
+                //teoreticky můžeme použít incompleteVz.Changelog na zapsání nalezených chyb
+                var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
+                incompleteVz.HasIssues = true;
+                await elasticClient.IndexDocumentAsync<VerejnaZakazka>(incompleteVz);
 
             }
             catch (Exception e)
             {
                 Consts.Logger.Error(
-                    $"VZ ERROR Save ID:{verejnaZakazka.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(verejnaZakazka).Length}", e);
+                    $"VZ ERROR Upserting ID:{incompleteVz.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(incompleteVz).Length}", e);
             }
         }
-        
+
         /// <summary>
         /// Update or insert new
         /// </summary>
         /// <param name="newVZ"></param>
         /// <param name="posledniZmena"></param>
-        public static async Task UpsertAsync(VerejnaZakazka newVZ, HttpClient httpClient, DateTime? posledniZmena = null)
+        public static async Task UpsertAsync(VerejnaZakazka newVZ, HttpClient httpClient = null, DateTime? posledniZmena = null)
         {
             if (newVZ is null)
                 return;
+
+            if (httpClient is null)
+                httpClient = _lazyHttpClient.Value;
             
             try
             {
-                var elasticClient = await Manager.GetESClient_VZAsync();
+                // try to find Ico
+                if (newVZ.Zadavatel.ICO is null)
+                {
+                    var firma = FirmaRepo.FromName(newVZ.Zadavatel.Jmeno);
+                    if(firma is not null)
+                        newVZ.Zadavatel.ICO = firma.ICO;
+                }
+                
+                await StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
+                SetupUpdateDates(newVZ, posledniZmena);
+                MergeDuplicateDocuments(newVZ);
 
+                // there might be issues to find proper ICO, so we have to save half-complete VZ
+                if (string.IsNullOrWhiteSpace(newVZ.Zadavatel?.ICO))
+                {
+                    await SaveIncompleteVzAsync(newVZ);
+                    return;
+                }
+                
+                var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
                 var originalVZ = await FindOriginalDocumentFromESAsync(newVZ);
 
+                // VZ neexistuje => ukládáme
                 if (originalVZ is null)
                 {
-                    var line =
-                        $"{newVZ.Dataset}\t{newVZ.EvidencniCisloZakazky}\t{newVZ.Zadavatel.ICO}\t{newVZ.DatumUverejneni}\t{newVZ.NazevZakazky}\t{newVZ.UrlZakazky}";
-                    await File.AppendAllLinesAsync(@"d:\missingVzHs.tsv", new[] { line });
-                }
-
-return;
-                
-                if (originalVZ is null)
-                {
-                    SetForOcr(newVZ);
-                    SetupUpdateDates(newVZ, posledniZmena);
+                    SendToOcrQueue(newVZ);
                     await elasticClient.IndexDocumentAsync(newVZ);
                     return;
                 }
                 
-                //set proper id, because dataset was not the same
-                if (originalVZ.Id != newVZ.Id  
-                    && newVZ.EvidencniCisloZakazky == originalVZ.EvidencniCisloZakazky) // to make sure both VZ are the same
+                //VZ existuje => mergujeme
+                // zajistit, že budeme mít checksum všude
+                // zakomentováno, protože to stahuje data zbytečně 2x u stejných VZ. 
+                //var storeOriginalDocumentsTask = StoreDocumentCopyToHlidacStorageAsync(originalVZ, httpClient);
+                
+                MergeSimpleProperties(ref originalVZ, newVZ);
+
+                // merge dodavatele
+                foreach (var newDodavatel in newVZ.Dodavatele)
                 {
-                    newVZ.Dataset = originalVZ.Dataset;
-                    newVZ.EvidencniCisloZakazky = originalVZ.EvidencniCisloZakazky;
-                    newVZ.InitId(); //fix id
+                    var origDodavatel = originalVZ.Dodavatele.Where(d => d.Equals(newDodavatel)).FirstOrDefault();
 
-                }
-                
-
-                // preferujeme datum z datlabu, protože Rozza nemusí mít nejsprávnější údaj (např VZ P21V00004199)
-                newVZ.DatumUverejneni = originalVZ.DatumUverejneni ?? newVZ.DatumUverejneni ;
-                
-                newVZ.DatumUzavreniSmlouvy ??= originalVZ.DatumUzavreniSmlouvy;
-                newVZ.LhutaDoruceni ??= originalVZ.LhutaDoruceni;
-                newVZ.LhutaPrihlaseni ??= originalVZ.LhutaPrihlaseni;
-                newVZ.NazevZakazky = newVZ.NazevZakazky.SetEmptyString(originalVZ.NazevZakazky);
-                newVZ.PopisZakazky = newVZ.PopisZakazky.SetEmptyString(originalVZ.PopisZakazky);
-                newVZ.RawHtml = newVZ.RawHtml.SetEmptyString(originalVZ.RawHtml);
-                newVZ.UrlZakazky = newVZ.UrlZakazky.SetEmptyString(originalVZ.UrlZakazky);
-                newVZ.KonecnaHodnotaMena = newVZ.KonecnaHodnotaMena.SetEmptyString(originalVZ.KonecnaHodnotaMena);
-                newVZ.OdhadovanaHodnotaMena = newVZ.OdhadovanaHodnotaMena.SetEmptyString(originalVZ.OdhadovanaHodnotaMena);
-                newVZ.ZakazkaNaProfiluId = newVZ.ZakazkaNaProfiluId.SetEmptyString(originalVZ.ZakazkaNaProfiluId);
-                
-                newVZ.CPV = newVZ.CPV.Union(originalVZ.CPV).ToArray();
-                newVZ.Kriteria = newVZ.Kriteria.Union(originalVZ.Kriteria).ToArray();
-                newVZ.Dodavatele = newVZ.Dodavatele.Union(originalVZ.Dodavatele).ToArray();
-                newVZ.Formulare = newVZ.Formulare.Union(originalVZ.Formulare).ToArray();
-                
-                newVZ.Zadavatel.Jmeno = newVZ.Zadavatel.Jmeno.SetEmptyString(originalVZ.Zadavatel.Jmeno);
-                newVZ.Zadavatel.ICO = newVZ.Zadavatel.ICO.SetEmptyString(originalVZ.Zadavatel.ICO);
-                newVZ.Zadavatel.ProfilZadavatele = newVZ.Zadavatel.ProfilZadavatele.SetEmptyString(originalVZ.Zadavatel.ProfilZadavatele);
-
-                newVZ.StavVZ = (newVZ.StavVZ == (int)VerejnaZakazka.StavyZakazky.Jine) ? originalVZ.StavVZ : newVZ.StavVZ;
-                newVZ.KonecnaHodnotaBezDPH ??= originalVZ.KonecnaHodnotaBezDPH;
-                newVZ.OdhadovanaHodnotaBezDPH ??= originalVZ.OdhadovanaHodnotaBezDPH;
-
-                //todo: question - jak zjistím, jaký dokument už v db je a jaký není?! (především při updatu)
-                await FillDocumentChecksums(newVZ, httpClient);
-                await FillDocumentChecksums(originalVZ, httpClient);
-
-                
-                var newComparableDocuments = newVZ.Dokumenty.Where(d => d.IsComparable())
-                    .ToDictionary(d => d.Sha256Checksum);
-                foreach (var origDoc in originalVZ.Dokumenty)
-                {
-                    //update document by checksum
-                    if (origDoc.IsComparable())
+                    if (origDodavatel is not null)
                     {
-                        if (newComparableDocuments.TryGetValue(origDoc.Sha256Checksum, out var newComparableDoc))
-                        {
-                            MergeDocuments(newComparableDoc, origDoc);
-                            continue;
-                        }
+                        origDodavatel.Jmeno = SetProperty(origDodavatel.Jmeno, newDodavatel.Jmeno, "Dodavatel.Jmeno", originalVZ.Changelog);
                     }
-
-                    // update document by url
-                    var newDoc = newVZ.Dokumenty.FirstOrDefault(d =>
-                        d.DirectUrl == origDoc.DirectUrl || d.StorageId == origDoc.StorageId);
-                    if (newDoc != null)
+                    else
                     {
-                        MergeDocuments(newDoc, origDoc);
-                        continue;
+                        originalVZ.Dodavatele.Add(newDodavatel);
                     }
-                    
-                    // add missing one
-                    newVZ.Dokumenty.Add(origDoc);
-                }
+                }    
                 
-                SetForOcr(newVZ);
-                SetupUpdateDates(originalVZ, posledniZmena);
+                //merge dokumenty
+                //await storeOriginalDocumentsTask;
+                MergeDocuments(originalVZ, newVZ.Dokumenty);
+                SendToOcrQueue(originalVZ);
                 
-                await elasticClient.IndexDocumentAsync<VerejnaZakazka>(newVZ);
+                await elasticClient.IndexDocumentAsync<VerejnaZakazka>(originalVZ);
             }
             catch (Exception e)
             {
@@ -192,8 +130,136 @@ return;
             }
         }
 
-        private static void SetForOcr(VerejnaZakazka newVZ)
+        /// <summary>
+        /// Merge newDocuments into originalVZ.Dokumenty
+        /// </summary>
+        /// <param name="originalVZ"></param>
+        /// <param name="newDocuments"></param>
+        private static void MergeDocuments(VerejnaZakazka originalVZ, List<VerejnaZakazka.Document> newDocuments)
         {
+            foreach (var newDoc in newDocuments)
+            {
+                var origDoc = originalVZ.Dokumenty.FirstOrDefault(d => d.Equals(newDoc));
+                // update document by checksum
+                if (origDoc is not null)
+                {
+                    MergeDocumentProperties(origDoc, newDoc, originalVZ.Changelog);
+                    continue;
+                }
+
+                // add missing one
+                originalVZ.Dokumenty.Add(newDoc);
+            }
+        }
+
+        private static void MergeDuplicateDocuments(VerejnaZakazka newVZ)
+        {
+            var groups = newVZ.Dokumenty
+                .GroupBy(d => d.Sha256Checksum)
+                .Where(g => g.Count() > 1);
+            foreach (var group in groups)
+            {
+                var main = group.FirstOrDefault();
+                foreach (var duplicate in group.Skip(1))
+                {
+                    MergeDocumentProperties(main, duplicate, newVZ.Changelog);
+                }
+            }
+        }
+
+        public static async Task UpdateDocumentsInVz(string id, List<VerejnaZakazka.Document> dokumenty)
+        {
+            var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
+            var zakazka = await LoadFromESAsync(id, elasticClient);
+            MergeDocuments(zakazka, dokumenty);
+            await elasticClient.IndexDocumentAsync<VerejnaZakazka>(zakazka);
+        }
+
+        private static void MergeSimpleProperties(ref VerejnaZakazka originalVZ, VerejnaZakazka newVZ)
+        {
+            if (newVZ.Changelog.Count > 0)
+            {
+                originalVZ.Changelog.Add("Merging changelogs {{");
+                originalVZ.Changelog.AddRange(newVZ.Changelog);
+                originalVZ.Changelog.Add("}} Merging changelogs");
+            }
+            
+            // preferujeme nové informace před starými
+            originalVZ.PosledniZmena = SetProperty(originalVZ.PosledniZmena, newVZ.PosledniZmena,
+                nameof(originalVZ.PosledniZmena), originalVZ.Changelog);
+            originalVZ.LastUpdated = SetProperty(originalVZ.LastUpdated, newVZ.LastUpdated,
+                nameof(originalVZ.LastUpdated), originalVZ.Changelog);
+            
+            originalVZ.DatumUverejneni = SetProperty(originalVZ.DatumUverejneni, newVZ.DatumUverejneni,
+                nameof(originalVZ.DatumUverejneni), originalVZ.Changelog);
+            originalVZ.DatumUzavreniSmlouvy = SetProperty(originalVZ.DatumUzavreniSmlouvy, newVZ.DatumUzavreniSmlouvy,
+                nameof(originalVZ.DatumUzavreniSmlouvy), originalVZ.Changelog);
+            originalVZ.LhutaDoruceni = SetProperty(originalVZ.LhutaDoruceni, newVZ.LhutaDoruceni,
+                nameof(originalVZ.LhutaDoruceni), originalVZ.Changelog);
+            originalVZ.LhutaPrihlaseni = SetProperty(originalVZ.LhutaPrihlaseni, newVZ.LhutaPrihlaseni,
+                nameof(originalVZ.LhutaPrihlaseni), originalVZ.Changelog);
+            originalVZ.NazevZakazky = SetProperty(originalVZ.NazevZakazky, newVZ.NazevZakazky,
+                nameof(originalVZ.NazevZakazky), originalVZ.Changelog);
+            originalVZ.PopisZakazky = SetProperty(originalVZ.PopisZakazky, newVZ.PopisZakazky,
+                nameof(originalVZ.PopisZakazky), originalVZ.Changelog);
+            originalVZ.RawHtml = SetProperty(originalVZ.RawHtml, newVZ.RawHtml,
+                nameof(originalVZ.RawHtml), originalVZ.Changelog);
+            originalVZ.KonecnaHodnotaMena = SetProperty(originalVZ.KonecnaHodnotaMena, newVZ.KonecnaHodnotaMena,
+                nameof(originalVZ.KonecnaHodnotaMena), originalVZ.Changelog);
+            originalVZ.OdhadovanaHodnotaMena = SetProperty(originalVZ.OdhadovanaHodnotaMena, newVZ.OdhadovanaHodnotaMena,
+                nameof(originalVZ.OdhadovanaHodnotaMena), originalVZ.Changelog);
+            originalVZ.StavVZ = SetProperty(originalVZ.StavVZ, newVZ.StavVZ,
+                nameof(originalVZ.StavVZ), originalVZ.Changelog);
+            originalVZ.KonecnaHodnotaBezDPH = SetProperty(originalVZ.KonecnaHodnotaBezDPH, newVZ.KonecnaHodnotaBezDPH,
+                nameof(originalVZ.KonecnaHodnotaBezDPH), originalVZ.Changelog);
+            originalVZ.OdhadovanaHodnotaBezDPH = SetProperty(originalVZ.OdhadovanaHodnotaBezDPH, newVZ.OdhadovanaHodnotaBezDPH,
+                nameof(originalVZ.OdhadovanaHodnotaBezDPH), originalVZ.Changelog);
+            
+            originalVZ.Zadavatel.ProfilZadavatele = SetProperty(originalVZ.Zadavatel.ProfilZadavatele,
+                newVZ.Zadavatel.ProfilZadavatele,
+                "Zadavatel.ProfilZadavatele",
+                originalVZ.Changelog);
+            originalVZ.Zadavatel.ICO = SetProperty(originalVZ.Zadavatel.ICO,
+                newVZ.Zadavatel.ICO,
+                "Zadavatel.ICO",
+                originalVZ.Changelog);
+            originalVZ.Zadavatel.Jmeno = SetProperty(originalVZ.Zadavatel.Jmeno,
+                newVZ.Zadavatel.Jmeno,
+                "Zadavatel.Jmeno",
+                originalVZ.Changelog);
+            
+
+            originalVZ.CPV.UnionWith(newVZ.CPV);
+            originalVZ.UrlZakazky.UnionWith(newVZ.UrlZakazky);
+            originalVZ.Formulare.UnionWith(newVZ.Formulare);
+        }
+
+        /// <summary>
+        /// Sets a property if it should be set. Also if old value is rewritten, then updates changelog.
+        /// </summary>
+        private static T SetProperty<T>(T oldProp, T newProp, string propName, List<string> changelog)
+        {
+            //There are no changes at all
+            if(newProp is null)
+                return oldProp;
+            if (newProp is string stringProp && string.IsNullOrWhiteSpace(stringProp))
+                return oldProp;
+            if (oldProp is not null && oldProp.Equals(newProp))
+                return oldProp;
+            if (newProp is 0 && oldProp is int and not 0) //default integers shouldnt overwrite value
+                return oldProp;
+            if (newProp is 0m && oldProp is decimal and not 0m) //default decimals shouldnt overwrite value
+                return oldProp;
+            if (newProp is DateTime np && np < new DateTime(1900, 1, 1)) //fix for some cases where we do not get correct date
+                return oldProp;
+  
+            changelog?.Add($"{DateTime.Now:yyyy-MM-dd} {propName}:[{oldProp}]=>[{newProp}]");
+            
+            return newProp;
+        }
+
+        private static void SendToOcrQueue(VerejnaZakazka newVZ)
+        { 
             if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
             {
                 ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
@@ -206,79 +272,96 @@ return;
         /// <summary>
         /// Takes newDoc and fill its missing values from originalDoc.
         /// </summary>
-        /// <param name="newDoc">Document which is going to be updated</param>
-        /// <param name="originalDoc">Document which may contain additional data</param>
-        private static void MergeDocuments(VerejnaZakazka.Document newDoc, VerejnaZakazka.Document originalDoc)
+        /// <param name="originalDoc">Document which is going to be updated</param>
+        /// <param name="newDoc">Document which may contain additional data</param>
+        private static void MergeDocumentProperties(VerejnaZakazka.Document originalDoc, VerejnaZakazka.Document newDoc,
+            List<string> changelog)
         {
-            if (string.IsNullOrWhiteSpace(newDoc.Sha256Checksum))
-            {
-                newDoc.SetChecksum(originalDoc.Sha256Checksum);
-            }
+            originalDoc.Name = SetProperty(originalDoc.Name, newDoc.Name, "Document.Name", changelog);
+            originalDoc.CisloVerze = SetProperty(originalDoc.CisloVerze, newDoc.CisloVerze, "Document.CisloVerze", changelog);
+            originalDoc.ContentType = SetProperty(originalDoc.ContentType, newDoc.ContentType, "Document.ContentType", changelog);
+            originalDoc.TypDokumentu = SetProperty(originalDoc.TypDokumentu, newDoc.TypDokumentu, "Document.TypDokumentu", changelog);
+            originalDoc.LastProcessed = SetProperty(originalDoc.LastProcessed, newDoc.LastProcessed, "Document.LastProcessed", changelog);
+            originalDoc.LastUpdate = SetProperty(originalDoc.LastUpdate, newDoc.LastUpdate, "Document.LastUpdate", changelog);
+            originalDoc.VlozenoNaProfil = SetProperty(originalDoc.VlozenoNaProfil, newDoc.VlozenoNaProfil, "Document.VlozenoNaProfil", changelog);
+            originalDoc.Lenght = SetProperty(originalDoc.Lenght, newDoc.Lenght, "Document.Lenght", changelog);
+            originalDoc.Pages = SetProperty(originalDoc.Pages, newDoc.Pages, "Document.Pages", changelog);
+            originalDoc.WordCount = SetProperty(originalDoc.WordCount, newDoc.WordCount, "Document.WordCount", changelog);
             
-            newDoc.Name = newDoc.Name.SetEmptyString(originalDoc.Name);
-            newDoc.CisloVerze = newDoc.CisloVerze.SetEmptyString(originalDoc.CisloVerze);
-            newDoc.ContentType = newDoc.ContentType.SetEmptyString(originalDoc.ContentType);
-            newDoc.DirectUrl = newDoc.DirectUrl.SetEmptyString(originalDoc.DirectUrl);
-            newDoc.OficialUrl = newDoc.OficialUrl.SetEmptyString(originalDoc.OficialUrl);
-            newDoc.PlainText = newDoc.PlainText.SetEmptyString(originalDoc.PlainText);
-            newDoc.StorageId = newDoc.StorageId.SetEmptyString(originalDoc.StorageId);
-            newDoc.TypDokumentu = newDoc.TypDokumentu.SetEmptyString(originalDoc.TypDokumentu);
-            newDoc.PlainDocumentId = newDoc.PlainDocumentId.SetEmptyString(originalDoc.PlainDocumentId);
+            // text dokumentu do changelogu dávat nechceme, protože by to bylo hodně velké
+            originalDoc.PlainText = SetProperty(originalDoc.PlainText, newDoc.PlainText, "Document.PlainText", null);
 
-            newDoc.LastProcessed ??= originalDoc.LastProcessed;
-            newDoc.LastUpdate ??= originalDoc.LastUpdate;
-            newDoc.VlozenoNaProfil ??= originalDoc.VlozenoNaProfil;
-
-            newDoc.Lenght = newDoc.Lenght == 0 ? originalDoc.Lenght : newDoc.Lenght;
-            newDoc.Pages = newDoc.Pages == 0 ? originalDoc.Pages : newDoc.Pages;
-            newDoc.WordCount = newDoc.WordCount == 0 ? originalDoc.WordCount : newDoc.WordCount;
-
-            newDoc.PlainTextContentQuality = newDoc.PlainTextContentQuality == DataQualityEnum.Unknown
+            originalDoc.DirectUrls.UnionWith(newDoc.DirectUrls);
+            originalDoc.OficialUrls.UnionWith(newDoc.OficialUrls);
+            originalDoc.StorageIds.UnionWith(newDoc.StorageIds);
+            originalDoc.PlainDocumentIds.UnionWith(newDoc.PlainDocumentIds);
+            
+            
+            originalDoc.PlainTextContentQuality = newDoc.PlainTextContentQuality == DataQualityEnum.Unknown
                 ? originalDoc.PlainTextContentQuality
                 : newDoc.PlainTextContentQuality;
         }
 
-        public static async Task FillDocumentChecksums(VerejnaZakazka vz, HttpClient httpClient)
+        public static async Task StoreDocumentCopyToHlidacStorageAsync(VerejnaZakazka vz, HttpClient httpClient)
         {
             foreach (var dokument in vz.Dokumenty.Where(d => string.IsNullOrWhiteSpace(d.Sha256Checksum)))
             {
-                string downloadUrl = dokument.GetDocumentUrlToDownload();
-                
-                var checksum = await ProcessHttpFileStreamAsync(httpClient, downloadUrl, Util.Checksum.DoChecksumAsync);
-                
-                dokument.SetChecksum(checksum);
+                string fullTempPath = string.Empty;
+                try
+                {
+                    // download file from web and save it to temporaryPath
+                    string temporaryPath = Path.Combine(Config.GetWebConfigValue("VZPrilohyDataPath"),
+                        "_temp_");
+                    string filename = Guid.NewGuid().ToString("N");
+                    Directory.CreateDirectory(temporaryPath);
+                    fullTempPath = Path.Combine(temporaryPath, filename);
+
+                    string downloadUrl = dokument.GetDocumentUrlToDownload();
+                    await DownloadFileAsync(httpClient, downloadUrl, fullTempPath);
+
+                    // calculate checksum first and get length so we can create hlidacStorageId
+                    using (var fileStream = File.Open(fullTempPath, FileMode.Open, FileAccess.Read))
+                    {
+                        dokument.SizeInBytes = fileStream.Length;
+                        dokument.Sha256Checksum = await Checksum.DoChecksumAsync(fileStream);
+                    }
+
+                    // move file to final destination
+                    var hlidacStorageId = dokument.GetHlidacStorageId();
+                    var destinationFolder = Init.VzPrilohaLocalCopy.GetFullDir(hlidacStorageId);
+                    Directory.CreateDirectory(destinationFolder);
+                    var destination = Init.VzPrilohaLocalCopy.GetFullPath(hlidacStorageId);
+
+                    File.Move(fullTempPath, destination);
+                }
+                catch (Exception e)
+                {
+                    Consts.Logger.Error("VZ - problem with storing file to hlidac storage", e);
+                }
+                finally
+                {
+                    if(!string.IsNullOrWhiteSpace(fullTempPath) && File.Exists(fullTempPath))
+                        File.Delete(fullTempPath);
+                }
             }
         }
 
-        private static async Task<T> ProcessHttpFileStreamAsync<T>(HttpClient httpClient,
+        private static async Task DownloadFileAsync(HttpClient httpClient,
             string url,
-            Func<Stream, Task<T>> asyncProcessingMethod) 
+            string path) 
         {
-            if (asyncProcessingMethod == null) throw new ArgumentNullException(nameof(asyncProcessingMethod));
-
-            using var responseMessage = await _retryPolicy.ExecuteAsync(() => httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
-
-            if (!responseMessage.IsSuccessStatusCode)
-            {
-                Consts.Logger.Warning($"Couldn't get {url}");
-                return default;
-            }
-
-            // na url není soubor, ale html stránka => nevalidní
-            if (responseMessage.Headers.TryGetValues("content-type", out var ct))
-            {
-                if (ct.Any(t => t.Contains("text/html")))
-                {
-                    Consts.Logger.Error($"Url: {url} contains only HTML, no file downloaded.");
-                    return default;
-                }
-            }
+            using var responseMessage = await _retryPolicy.ExecuteAsync(() =>
+                httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
 
             try
             {
+                _ = responseMessage.EnsureSuccessStatusCode();
+                
                 var stream = await responseMessage.Content.ReadAsStreamAsync();
-                var result = await asyncProcessingMethod(stream);
-                return result;
+                await using var fileStream = File.Open(path, FileMode.Create);
+                
+                await stream.CopyToAsync(fileStream);
+                await fileStream.FlushAsync();
             }
             catch (Exception e)
             {
@@ -287,26 +370,28 @@ return;
             }
         }
         
-        public static string SetEmptyString(this string originalValue, string newValue)
-        {
-            if (string.IsNullOrWhiteSpace(originalValue))
-                return newValue;
-
-            return originalValue;
-        }
-
-        private static void SetupUpdateDates(VerejnaZakazka newVerejnaZakazka, DateTime? posledniZmena)
+        private static void SetupUpdateDates(VerejnaZakazka verejnaZakazka, DateTime? posledniZmena)
         {
             if (posledniZmena.HasValue)
-                newVerejnaZakazka.PosledniZmena = posledniZmena;
+                verejnaZakazka.PosledniZmena = posledniZmena;
             else
-                newVerejnaZakazka.PosledniZmena = newVerejnaZakazka.GetPosledniZmena();
-            newVerejnaZakazka.LastUpdated = DateTime.Now;
+                verejnaZakazka.PosledniZmena = verejnaZakazka.GetPosledniZmena();
+            verejnaZakazka.LastUpdated = DateTime.Now;
+
+            foreach (var zdroj in verejnaZakazka.Zdroje)
+            {
+                zdroj.Modified = DateTime.Now;
+            }
+            
+            foreach (var dokument in verejnaZakazka.Dokumenty)
+            {
+                dokument.LastUpdate = DateTime.Now;
+            }
         }
 
         public static async Task<VerejnaZakazka> LoadFromESAsync(string id, ElasticClient client = null)
         {
-            var es = client ??await Manager.GetESClient_VZAsync();
+            var es = client ?? await Manager.GetESClient_VerejneZakazkyAsync();
             var res = await es.GetAsync<VerejnaZakazka>(id);
             if (res.Found)
                 return res.Source;
@@ -316,76 +401,41 @@ return;
         
         public static async Task<VerejnaZakazka> FindOriginalDocumentFromESAsync(VerejnaZakazka zakazka)
         {
-            string[] hardDatasets = new[] {"tenderarena", "nen.nipez", "gemin.cz" };
-            var es = await Manager.GetESClient_VZAsync();
+            var es = await Manager.GetESClient_VerejneZakazkyAsync();
+            // find possible candidates
+            var res = await es.SearchAsync<VerejnaZakazka>(s => s
+                .Query(q => q
+                    .Bool(b => b
+                        .Must(bm =>
+                            bm.Term(t => t.Field(f => f.Zadavatel.ICO).Value(zakazka.Zadavatel.ICO)) &&
+                            bm.Terms(t => t.Field("zdroje.uniqueId").Terms(zakazka.Zdroje.Select(z => z.UniqueId)))
+                        ))));
 
-            // je potřeba zjistit o jaký dataset konkrétně se jedná, abychom mohli najít správný originál
-            string hardDatasetFragment = hardDatasets.FirstOrDefault(hd =>
-                zakazka.Dataset.Contains(hd, StringComparison.InvariantCultureIgnoreCase)); 
-            
-            if (!string.IsNullOrEmpty(hardDatasetFragment))
+            if (!res.IsValid)
             {
-                int? year = zakazka.DatumUverejneni?.Year
-                            ?? zakazka.LhutaDoruceni?.Year
-                            ?? zakazka.LhutaPrihlaseni?.Year
-                            ?? zakazka.Dokumenty.FirstOrDefault(d => d.VlozenoNaProfil != null)?.VlozenoNaProfil?.Year;
-
-                if (year is null)
-                    return null;
-                
-                var res = await es.SearchAsync<VerejnaZakazka>(s => s
-                    .Query(q => q
-                        .Bool(b => b
-                            .Must(bm =>
-                                bm.Term(t => t.Field(f => f.Zadavatel.ICO).Value(zakazka.Zadavatel.ICO)) &&
-                                bm.Term(t => t.Field(f => f.EvidencniCisloZakazky).Value(zakazka.EvidencniCisloZakazky)))
-                            .Filter(bf => bf
-                                .DateRange(r => r
-                                    .Field(f => f.DatumUverejneni)
-                                    .GreaterThanOrEquals(new DateTime(year.Value, 1, 1))
-                                    .LessThanOrEquals(new DateTime(year.Value, 12, 31)))))));
-            
-                if (res.IsValid && res.Hits.Count() > 0 )
-                    return res.Documents.SingleOrDefault(d => d.Dataset.Contains(hardDatasetFragment));
-                else
-                    return null;
+                Consts.Logger.Warning($"VZ problems with query. {res.DebugInformation}");
+                return null;
             }
             
-                
-            var loadOriginalTasks = new List<Task<GetResponse<VerejnaZakazka>>>()
-            {
-                es.GetAsync<VerejnaZakazka>(zakazka.Id)
-            };
+            if (res.Hits.Count() <= 0)
+                return null;
 
-            if (!string.IsNullOrEmpty(zakazka.Zadavatel.ProfilZadavatele) &&
-                !string.IsNullOrEmpty(zakazka.EvidencniCisloZakazky))
+            if (res.Hits.Count > 1)
             {
-                string alternativeId =
-                    VerejnaZakazka.GenerateId(zakazka.Zadavatel.ProfilZadavatele, zakazka.EvidencniCisloZakazky);
-                if (alternativeId != zakazka.Id)
-                {
-                    loadOriginalTasks.Add(es.GetAsync<VerejnaZakazka>(alternativeId));
-                }
+                Consts.Logger.Warning($"VZ Too many matches found. Only one is allowed. \n" +
+                                      $"Ico: {zakazka.Zadavatel.ICO}\n" +
+                                      $"Zdroje:{zakazka.VypisZdroju()}");
+                return null;
             }
 
-            var origs = await Task.WhenAll(loadOriginalTasks);
-                 
-            // If we find more documents, then we do not know original and should throw error
-            return origs.Where(r => r != null && r.IsValid).SingleOrDefault()?.Source;
-        }
-
-        public static Task<bool> ExistsAsync(VerejnaZakazka vz, ElasticClient client = null)
-        {
-            return ExistsAsync(vz.Id, client);
+            return res.Documents.SingleOrDefault();
         }
 
         public static async Task<bool> ExistsAsync(string id, ElasticClient client = null)
         {
-            var es = client ?? await Manager.GetESClient_VZAsync();
+            var es = client ?? await Manager.GetESClient_VerejneZakazkyAsync();
             var res = await es.DocumentExistsAsync<VerejnaZakazka>(id);
             return res.Exists;
         }
-
-
     }
 }

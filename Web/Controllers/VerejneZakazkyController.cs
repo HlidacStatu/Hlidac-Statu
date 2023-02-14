@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -42,15 +43,44 @@ namespace HlidacStatu.Web.Controllers
             return View(vz);
         }
 
-        public async Task<ActionResult> TextDokumentu(string id, string hash)
+        public async Task<ActionResult> TextDokumentu(string id, string sha)
         {
             var vz = await VerejnaZakazkaRepo.LoadFromESAsync(id);
-            if (vz == null)
+            if (vz is null || vz.Dokumenty?.Any(d => d.Sha256Checksum == sha) == false)
                 return new NotFoundResult();
-            if (vz.Dokumenty?.Any(d => d.StorageId == hash) == false)
-                return new NotFoundResult();
-
+            
             return View(vz);
+        }
+
+        public async Task<ActionResult> Priloha(string id, string storageId)
+        {
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(storageId))
+                return NotFound();
+            
+            
+            var zakazka = await VerejnaZakazkaRepo.LoadFromESAsync(id);
+            if (zakazka is null)
+                return NotFound();
+
+            var document = zakazka.Dokumenty.FirstOrDefault(d => d.GetHlidacStorageId() == storageId);
+
+            if (document is null)
+                return NotFound();
+            
+            //todo: sem přidat načtení souboru z té složky
+            var destination = Init.VzPrilohaLocalCopy.GetFullPath(storageId);
+            if (System.IO.File.Exists(destination) == false)
+                return NotFound();
+
+            if (Lib.OCR.DocTools.HasPDFHeader(destination))
+            {
+                return File(System.IO.File.ReadAllBytes(destination), "application/pdf", string.IsNullOrWhiteSpace(document.Name) ? $"{document.Sha256Checksum}_smlouva.pdf" : document.Name);
+            }
+            else
+                return File(System.IO.File.ReadAllBytes(destination),
+                    string.IsNullOrWhiteSpace(document.ContentType) ? "application/octet-stream" : document.ContentType,
+                    string.IsNullOrWhiteSpace(document.Name) ? "priloha" : document.Name);
+            
         }
 
 

@@ -1,7 +1,5 @@
 ﻿using Devmasters.Enums;
-
 using HlidacStatu.Util;
-
 using Nest;
 
 using System;
@@ -18,6 +16,14 @@ namespace HlidacStatu.Entities.VZ
     public partial class VerejnaZakazka
         : IBookmarkable, IFlattenedExport
     {
+        public class Sources
+        {
+            public const string VestnikVerejnychZakazek = "https://vestnikverejnychzakazek.cz";
+            public const string VestnikVerejnychZakazekOld ="https://old.vestnikverejnychzakazek.cz";
+            public const string Datlab = "https://datlab.eu";
+            public const string Rozza = "https://rozza.cz";
+        }
+        
         public const string Pre2016Dataset = "VVZ-2006";
         public const string Post2016Dataset = "VVZ-2016";
         public const string ProfileOnlyDataset = "VVZ-Profil";
@@ -62,9 +68,6 @@ namespace HlidacStatu.Entities.VZ
                     return DruhFormulare().ToNiceDisplayName().Trim();
             }
 
-            //[Object(Ignore =true)]
-            //public string P
-
             [Description("Datum zveřejnění.")]
             [Date]
             public DateTime? Zverejnen { get; set; }
@@ -73,9 +76,6 @@ namespace HlidacStatu.Entities.VZ
             [Keyword(Index = false)]
             public String URL { get; set; } = string.Empty;
 
-            [Description("Je zakazka pouze na profilu zadavatele?")]
-            [Boolean]
-            public bool OnlyOnProfile { get; set; }
 
             //[Boolean]
             //public bool 
@@ -89,8 +89,7 @@ namespace HlidacStatu.Entities.VZ
                        string.Equals(LimitVZ, other.LimitVZ, StringComparison.InvariantCultureIgnoreCase) &&
                        string.Equals(DruhRizeni, other.DruhRizeni, StringComparison.InvariantCultureIgnoreCase) &&
                        Nullable.Equals(Zverejnen, other.Zverejnen) &&
-                       string.Equals(URL, other.URL, StringComparison.InvariantCultureIgnoreCase) &&
-                       OnlyOnProfile == other.OnlyOnProfile;
+                       string.Equals(URL, other.URL, StringComparison.InvariantCultureIgnoreCase);
             }
 
             public override bool Equals(object obj)
@@ -111,14 +110,9 @@ namespace HlidacStatu.Entities.VZ
                 hashCode.Add(DruhRizeni, StringComparer.InvariantCultureIgnoreCase);
                 hashCode.Add(Zverejnen);
                 hashCode.Add(URL, StringComparer.InvariantCultureIgnoreCase);
-                hashCode.Add(OnlyOnProfile);
                 return hashCode.ToHashCode();
             }
         }
-
-        [Description("Je zakazka pouze na profilu zadavatele?")]
-        [Boolean]
-        public bool OnlyOnProfile { get; set; }
 
         [Description("Druh formuláře - mezinárodní (F*) i české (CZ*).")]
         [ShowNiceDisplayName]
@@ -204,44 +198,135 @@ namespace HlidacStatu.Entities.VZ
             [NiceDisplayName("Nejasný stav")] Jine = 0,
         }
 
-        string _id = null;
-
         [Description("Unikátní ID zakázky. Nevyplňujte, ID vygeneruje Hlídač Státu.")]
-        public string Id
+        public string Id { get; init; } = Guid.NewGuid().ToString("N");
+        
+        [Keyword()]
+        [Description("Interní ID na věstníku veřejných zakázek")]
+        public string VvzInternalId { get; set; } = null;
+        
+        [Boolean]
+        [Description("Označuje problematickou VZ. Tyto zakázky nezobrazovat. Chyby je potřeba opravit")]
+        public bool HasIssues { get; set; } = false;
+
+        [Object()]
+        [Description("Seznam datasetů a evidenčních čísel v datasetech, kde se VZ vyskytuje." +
+                     " Hodnota 'VVZ-2006' pro zakázky z VVZ od 2006-2016, 'VVZ-2016' pro nové dle zákona o VZ z 2016")]
+        public HashSet<Zdroj> Zdroje { get; set; } = new();
+
+        public class Zdroj : IEquatable<Zdroj>
         {
-            get
+            private string _domena;
+
+            [Keyword()]
+            public string UniqueId => $"{Domena}_{IdVDomene}_{IsPre2016}";
+
+            [Keyword()]
+            public string Domena
             {
-                if (string.IsNullOrEmpty(_id))
-                    InitId();
-                return _id;
+                get => _domena;
+                set
+                {
+                    if(Uri.TryCreate(value, UriKind.Absolute, out var uri))
+                    {
+                        _domena = uri.GetLeftPart(UriPartial.Authority);
+                    }
+                    else
+                    {
+                        _domena = string.Empty;
+                    }
+                }
             }
-            set
+
+            [Keyword()]
+            public string IdVDomene { get; set; }
+            [Boolean]
+            public bool IsPre2016 { get; set; } = false;
+            // [Date()]
+            // public DateTime PosledniZmenaZdroje { get; set; }
+            [Date()]
+            public DateTime? Modified { get; set; }
+
+            public bool Equals(Zdroj other)
             {
-                _id = value;
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return string.Equals(UniqueId, other.UniqueId, StringComparison.InvariantCultureIgnoreCase);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((Zdroj)obj);
+            }
+
+            public override int GetHashCode()
+            {
+                return UniqueId.GetHashCode(StringComparison.InvariantCultureIgnoreCase);
             }
         }
+        
+        [Object(Enabled = false)] //tady prohledávat nebudeme, index zatěžovat nepotřebujeme
+        public List<string> Changelog { get; set; } = new();
 
-        [Keyword()]
-        [Description("Evidenční číslo zakázky ve VVZ")]
-        public string EvidencniCisloZakazky { get; set; } = null;
+        public string EvidencniCisloZVestniku(bool isPre2016 = false)
+        {
+            string evidencniCilo = Zdroje.Where(zdroj =>
+                    zdroj.IsPre2016 == isPre2016 && zdroj.Domena == Sources.VestnikVerejnychZakazek)
+                .Select(zdroj => zdroj.IdVDomene)
+                .FirstOrDefault();
 
-        [Description("ID profilu zadavatele, na kterém tato zakázka.")]
+            return evidencniCilo;
+        }
+
+        public string VypisZdroju(string separator = "\n")
+        {
+            return string.Join(separator, Zdroje.Select(zdroj => $"{zdroj.Domena}: {zdroj.IdVDomene}"));
+        }
+
+        /// <summary>
+        /// Vrátí jedno ID ze zdrojů. Pořadí je následující:
+        /// <br>1. Public id z profilu zadavatele (pokud je více profilů, vybere se libovolný) </br>
+        /// <br>2. Pokud není profil zadavatele, pak bereme id z věstníku veř. zakázek</br>
+        /// <br>3. Pokud není nic z výše uvedených, bereme první libovolné id</br>
+        /// </summary>
+        /// <returns></returns>
+        public string ZobrazPrimarniIdZdroje()
+        {
+            var id = Zdroje.Where(zdroj => zdroj.IdVDomene.StartsWith("P", StringComparison.InvariantCultureIgnoreCase))
+                .Select(zdroj => zdroj.IdVDomene)
+                .FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(id))
+                return id;
+
+            id = Zdroje.Where(zdroj =>
+                    zdroj.Domena.Equals(Sources.VestnikVerejnychZakazek, StringComparison.InvariantCultureIgnoreCase))
+                .Select(zdroj => zdroj.IdVDomene)
+                .FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(id))
+                return id;
+
+            return Zdroje.FirstOrDefault()?.IdVDomene;
+
+        }
+        
         [Keyword()]
-        public string ZakazkaNaProfiluId { get; set; } = null;
+        [Description("Externí ID. Seznam dalších různých ID, např. ze systému Rozza")]
+        public HashSet<string> ExternalIds { get; set; } = new();
+
+        // [Description("ID profilu zadavatele, na kterém tato zakázka.")]
+        // [Keyword()]
+        // public string ZakazkaNaProfiluId { get; set; } = null;
 
         [Description("Všechny formuláře spojené se zakázkou")]
-        public Formular[] Formulare { get; set; } = new Formular[] { };
-
-        [Description("Hodnotící kritéria zakázky")]
-        public HodnoticiKriteria[] Kriteria { get; set; } = new HodnoticiKriteria[] { };
+        public HashSet<Formular> Formulare { get; set; } = new();
 
         [Description("Nepouzito")]
         [Keyword()]
         public int DisplayId { get; set; }
 
-        [Keyword()]
-        [Description("Hodnota 'VVZ-2006' pro zakázky z VVZ od 2006-2016, 'VVZ-2016' pro nové dle zákona o VZ z 2016")]
-        public string Dataset { get; set; } = "VVZ-2016";
 
         [Object()]
         [Description("Zadavatel")]
@@ -253,8 +338,10 @@ namespace HlidacStatu.Entities.VZ
 
         [Description("Název zakázky")]
         public string NazevZakazky { get; set; }
-        [Description("Popis zakázky")]
+        [Description("Popis zakázky z VVZ")]
         public string PopisZakazky { get; set; }
+        [Description("Popis zakázky z Rozza")]
+        public string PopisZakazkyRozza { get; set; }
 
         [Object()]
         [Description("Zadávací dokumentace a další dokumenty spojené se zakázkou")]
@@ -263,7 +350,7 @@ namespace HlidacStatu.Entities.VZ
 
         [Keyword()]
         [Description("CPV kódy určující oblast VZ")]
-        public string[] CPV { get; set; } = new string[] { };
+        public HashSet<string> CPV { get; set; } = new();
 
         [Date()]
         [Description("Datum uveřejnění")]
@@ -289,6 +376,7 @@ namespace HlidacStatu.Entities.VZ
 
         [Description("Číselná hodnota odvozeného stavu zakázky z enumerace 'StavyZakazky'.")]
         public int StavVZ { get; set; } = 0;
+        
         [Object(Ignore = true)]
         public StavyZakazky StavZakazky
         {
@@ -300,107 +388,6 @@ namespace HlidacStatu.Entities.VZ
             {
                 StavVZ = (int)value;
             }
-        }
-
-        //return true if changed
-        public bool SetStavZakazky()
-        {
-            var stav = CalculateStavVZ();
-            if (stav.HasValue == false)
-                return false;
-            if (stav.Value != StavZakazky)
-            {
-                StavZakazky = stav.Value;
-                return true;
-            }
-            else
-                return false;
-        }
-
-
-        //podle http://portal-vz.cz/getmedia/0d646e5f-d960-4743-b5b3-e885dcab7b1c/Metodika-k-vyhlasce-o-uverejnovani-a-profilu-zadavatele_v4-bez-registrace_duben-2017.pdf
-        //Zahajeny
-        static string[,] umysl = new string[,] {
-                { "F01","" },
-                { "CZ01","" },
-                { "F04","Toto oznámení je pouze pravidelným předběžným oznámením" },
-                { "F16","" } // v oblasti obrany nebo bezpečnosti z
-            };
-
-
-        static string[,] Zahajeny = new string[,] {
-                { "F02","" },
-                { "CZ02","" },
-                { "F05","" },
-                { "F07","" },
-                { "F12","" },
-                { "F15","" },//dobrovolné oznámení o záměru uzavřít smlouvu v případě veřejné zakázky v nadlimitním režimu
-                { "F24","" },
-                { "F17","" },
-            };
-
-        //vyhodnocovani - je v Zahajeny, ale urcim to podle casu odevzdani nabidek
-
-
-        //ukonceni
-        static string[,] ukonceni = new string[,] {
-                { "F03","" },
-                { "CZ03","" },
-                { "F06","" },
-                { "F13","" },
-                { "F18","" },
-                { "F19","" },
-                { "F25","" },
-            };
-
-        //jine - neda se zatim urcit
-        static string[,] jine = new string[,] {
-                { "F21","" },
-                { "F22","" },
-                { "F23","" },
-            };
-        public StavyZakazky? CalculateStavVZ()
-        {
-
-            if (HasForm(jine))
-                if (LhutaDoruceni.HasValue && LhutaDoruceni.Value < DateTime.Now)
-                    return StavyZakazky.Vyhodnocovani;
-                else
-                    return StavyZakazky.Jine;
-
-            if (HasForm(ukonceni))
-                return StavyZakazky.Ukonceno;
-
-            if (HasForm(Zahajeny))
-            {
-                //vyhodnocovani - je v Zahajeny, ale urcim to podle casu odevzdani nabidek
-                if (LhutaDoruceni.HasValue && LhutaDoruceni.Value < DateTime.Now)
-                    return StavyZakazky.Vyhodnocovani;
-                else
-                    return StavyZakazky.Zahajeno;
-            }
-
-            if (HasForm(umysl))
-                if (LhutaDoruceni.HasValue && LhutaDoruceni.Value < DateTime.Now)
-                    return StavyZakazky.Vyhodnocovani;
-                else
-                    return StavyZakazky.Umysl;
-
-
-
-            return null;
-        }
-        private bool HasForm(string[,] forms)
-        {
-            for (int i = 0; i < forms.GetLength(0); i++)
-            {
-                foreach (var f in Formulare.OrderBy(o => o.Zverejnen))
-                {
-                    if (f.Druh.ToUpper() == forms[i, 0])
-                        return true;
-                }
-            }
-            return false;
         }
 
 
@@ -453,24 +440,35 @@ namespace HlidacStatu.Entities.VZ
         [Description("Měna konečné hodnoty zakázky.")]
         [Keyword]
         public string KonecnaHodnotaMena { get; set; }
-        
-        [Description("Url odkaz na umístění zakázky na webu.")]
+
+        [Description("Seznam známých url odkazů na umístění zakázky na webu.")]
         [Keyword]
-        public string UrlZakazky { get; set; }
+        public HashSet<string> UrlZakazky { get; set; } = new();
 
         [Description("Dokumenty příslušející zakázky (typicky zadávací a smluvní dokumentace)")]
-        public class Document
+        public class Document : IEquatable<Document>
         {
-            [Description("Kontrolní součet SHA256 souboru pro ověření unikátnosti")]
-            [Keyword()]
-            public string Sha256Checksum { get; private set; }
+            /// <summary>
+            /// Do not set anywhere except Repo
+            /// </summary>
+            [Description("Kontrolní součet SHA256 souboru pro ověření unikátnosti.")]
+            [Text]
+            public string Sha256Checksum { get; set; }
             
-            [Description("URL uvedené v profilu zadavatele")]
+            /// <summary>
+            /// Do not set anywhere except Repo
+            /// </summary>
+            [Description("Velikost souboru v Bytech")]
+            public long SizeInBytes { get; set; }
+
+            [Description("URL odkazy uvedené v profilu zadavatele")]
             [Keyword]
-            public string OficialUrl { get; set; }
+            public HashSet<string> OficialUrls { get; set; } = new();
+            
             [Description("Přímé URL na tento dokument.")]
             [Keyword]
-            public string DirectUrl { get; set; }
+            public HashSet<string> DirectUrls { get; set; } = new();
+            
             [Description("Popis obsahu dokumentu, z XML na profilu z pole dokument/typ_dokumentu.")]
             [Keyword]
             public string TypDokumentu { get; set; }
@@ -478,6 +476,7 @@ namespace HlidacStatu.Entities.VZ
             [Description("Datum vložení, uveřejnění dokumentu.")]
             [Date]
             public DateTime? VlozenoNaProfil { get; set; }
+            
             [Description("Číslo verze")]
             [Keyword]
             public string CisloVerze { get; set; }
@@ -485,6 +484,7 @@ namespace HlidacStatu.Entities.VZ
             [Description("Neuvádět, obsah dokumentu v plain textu pro ftx vyhledávání")]
             [Text()]
             public string PlainText { get; set; }
+            
             [Description("Neuvádět.")]
             public DataQualityEnum PlainTextContentQuality { get; set; } = DataQualityEnum.Unknown;
 
@@ -507,17 +507,25 @@ namespace HlidacStatu.Entities.VZ
             public int Pages { get; set; }
 
             [Keyword()]
-            public string StorageId { get; set; }
+            public HashSet<string> StorageIds { get; set; } = new();
 
             [Keyword()]
-            public string PlainDocumentId { get; set; }
+            public HashSet<string> PlainDocumentIds { get; set; } = new();
 
             public string GetDocumentUrlToDownload()
             {
-                if (string.IsNullOrWhiteSpace(StorageId))
-                    return DirectUrl;
+                if (StorageIds.Count == 0 || string.IsNullOrWhiteSpace(StorageIds.FirstOrDefault()))
+                    return DirectUrls.FirstOrDefault();
                 
-                return $"http://bpapi.datlab.eu/document/{StorageId}";
+                return $"http://bpapi.datlab.eu/document/{StorageIds.FirstOrDefault()}";
+            }
+
+            public string GetHlidacStorageId()
+            {
+                if (string.IsNullOrWhiteSpace(Sha256Checksum) || SizeInBytes == 0)
+                    return "";
+                
+                return Sha256Checksum + "_" + SizeInBytes;
             }
 
             [Keyword()]
@@ -538,46 +546,13 @@ namespace HlidacStatu.Entities.VZ
                 WordCount = Devmasters.TextUtil.CountWords(PlainText);
             }
 
-            /// <summary>
-            /// Use only if you know that this Document has no checksum and should have one, which you know
-            /// </summary>
-            /// <param name="checksum"></param>
-            public void SetChecksum(string checksum)
-            {
-                if (!string.IsNullOrWhiteSpace(checksum) && string.IsNullOrWhiteSpace(Sha256Checksum))
-                    Sha256Checksum = checksum;
-            }
-
-            public bool IsComparable()
-            {
-                return !(string.IsNullOrWhiteSpace(Sha256Checksum) || Sha256Checksum == "nofilefound");
-            }
-        }
-
-        [Description("Hodnotící kritéria veřejné zakázky")]
-        public class HodnoticiKriteria : IEquatable<HodnoticiKriteria>
-        {
-            [Description("Pořadí.")]
-            public int Poradi { get; set; }
-            [Keyword]
-            [Description("Popis kritéria")]
-            public string Kriterium { get; set; }
-            [Text]
-            [Description("Název kritéria")]
-            public string Nazev { get; set; }
-
-            [Number]
-            [Description("Váha v hodnocení")]
-            public decimal Vaha { get; set; } = 0;
-
-            public bool Equals(HodnoticiKriteria other)
+            public bool Equals(Document other)
             {
                 if (ReferenceEquals(null, other)) return false;
                 if (ReferenceEquals(this, other)) return true;
-                return Poradi == other.Poradi &&
-                       string.Equals(Kriterium, other.Kriterium, StringComparison.InvariantCultureIgnoreCase) &&
-                       string.Equals(Nazev, other.Nazev, StringComparison.InvariantCultureIgnoreCase) &&
-                       Vaha == other.Vaha;
+                if (string.IsNullOrWhiteSpace(Sha256Checksum)) return false;
+
+                return Sha256Checksum == other.Sha256Checksum; 
             }
 
             public override bool Equals(object obj)
@@ -585,28 +560,9 @@ namespace HlidacStatu.Entities.VZ
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;
                 if (obj.GetType() != this.GetType()) return false;
-                return Equals((HodnoticiKriteria)obj);
+                return Equals((Document)obj);
             }
 
-            public override int GetHashCode()
-            {
-                var hashCode = new HashCode();
-                hashCode.Add(Poradi);
-                hashCode.Add(Kriterium, StringComparer.InvariantCultureIgnoreCase);
-                hashCode.Add(Nazev, StringComparer.InvariantCultureIgnoreCase);
-                hashCode.Add(Vaha);
-                return hashCode.ToHashCode();
-            }
-
-            public static bool operator ==(HodnoticiKriteria left, HodnoticiKriteria right)
-            {
-                return Equals(left, right);
-            }
-
-            public static bool operator !=(HodnoticiKriteria left, HodnoticiKriteria right)
-            {
-                return !Equals(left, right);
-            }
         }
 
         public class Subject : IEquatable<Subject>
@@ -625,10 +581,7 @@ namespace HlidacStatu.Entities.VZ
             {
                 if (ReferenceEquals(null, other)) return false;
                 if (ReferenceEquals(this, other)) return true;
-                return string.Equals(ICO, other.ICO, StringComparison.InvariantCultureIgnoreCase) &&
-                       string.Equals(Jmeno, other.Jmeno, StringComparison.InvariantCultureIgnoreCase) &&
-                       string.Equals(ProfilZadavatele, other.ProfilZadavatele,
-                           StringComparison.InvariantCultureIgnoreCase);
+                return string.Equals(ICO, other.ICO, StringComparison.InvariantCultureIgnoreCase);
             }
 
             public override bool Equals(object obj)
@@ -641,11 +594,7 @@ namespace HlidacStatu.Entities.VZ
 
             public override int GetHashCode()
             {
-                var hashCode = new HashCode();
-                hashCode.Add(ICO, StringComparer.InvariantCultureIgnoreCase);
-                hashCode.Add(Jmeno, StringComparer.InvariantCultureIgnoreCase);
-                hashCode.Add(ProfilZadavatele, StringComparer.InvariantCultureIgnoreCase);
-                return hashCode.ToHashCode();
+                return ICO.GetHashCode();
             }
 
             public static bool operator ==(Subject left, Subject right)
@@ -664,10 +613,6 @@ namespace HlidacStatu.Entities.VZ
         [Description("HTML stránky zakázky, pokud bylo parsováno z HTML")]
         public string RawHtml { get; set; }
 
-        public string CPVText(string cpv)
-        {
-            return CPVToText(cpv);
-        }
         public static string CPVToText(string cpv)
         {
             if (string.IsNullOrEmpty(cpv))
@@ -686,18 +631,6 @@ namespace HlidacStatu.Entities.VZ
             else
                 return cpv;
 
-        }
-
-        public void InitId()
-        {
-            Id = GenerateId(Dataset, EvidencniCisloZakazky);
-        }
-
-        public static string GenerateId(string dataset, string evidencniCisloZakazky)
-        {
-            if (string.IsNullOrEmpty(dataset) || string.IsNullOrEmpty(evidencniCisloZakazky))
-                throw new NullReferenceException();
-            return Devmasters.Crypto.Hash.ComputeHashToHex(dataset + "|" + evidencniCisloZakazky); 
         }
 
         public string GetUrl(bool local = true)
@@ -725,7 +658,6 @@ namespace HlidacStatu.Entities.VZ
             else
                 return null;
         }
-
 
         static string cisloZakazkyRegex = @"Evidenční \s* číslo \s* zakázky: \s*(?<zakazka>(Z?)\d{1,8}([-]*\d{1,7})?)\s+";
         static string cisloConnectedFormRegex = @"Evidenční \s* číslo \s* souvisejícího \s* formuláře: \s*(?<zakazka>(F?)\d{1,8}([-]*\d{1,7})?)\s+";
@@ -804,73 +736,11 @@ namespace HlidacStatu.Entities.VZ
         }
         public bool NotInterestingToShow() { return false; }
 
-
-
-
-
-
-        public class ZakazkaSource
-        {
-            public string ZakazkaURL { get; set; }
-            public string ProfilZadavatelUrl { get; set; }
-            public string SearchZakazkaUrl { get; set; }
-
-        }
-        public class ExportedVZ
-        {
-            public class SubjectExport
-            {
-                public SubjectExport() { }
-
-                public string ICO { get; set; }
-                public string Jmeno { get; set; }
-                public string KrajId { get; set; }
-                public string OkresId { get; set; }
-            }
-            public string Id { get; set; }
-            public string EvidencniCisloZakazky { get; set; }
-            public SubjectExport Zadavatel { get; set; }
-            public Subject[] Dodavatele { get; set; }
-            public string NazevZakazky { get; set; }
-            public string PopisZakazky { get; set; }
-            public string[] CPV { get; set; }
-            public DateTime? DatumUverejneni { get; set; }
-            public DateTime? LhutaDoruceni { get; set; }
-            public DateTime? DatumUzavreniSmlouvy { get; set; }
-            public DateTime? PosledniZmena { get; set; }
-            public StavyZakazky StavZakazky { get; set; }
-            public decimal? OdhadovanaHodnotaBezDPH { get; set; } = null;
-            public decimal? KonecnaHodnotaBezDPH { get; set; } = null;
-            public string OdhadovanaHodnotaMena { get; set; }
-            public string KonecnaHodnotaMena { get; set; }
-            public string UrlProfiluZadavatele { get; set; }
-            public ZakazkaSource ZdrojZakazky { get; set; }
-        }
-        public VerejnaZakazka Export(bool allData = false)
-        {
-            VerejnaZakazka vz = (VerejnaZakazka)MemberwiseClone();
-            if (allData == false)
-            {
-                if (vz.Dokumenty != null)
-                {
-                    foreach (var vzd in vz.Dokumenty)
-                    {
-                        vzd.DirectUrl = "";
-                        vzd.PlainDocumentId = "";
-                        vzd.PlainText = "-- Tato data jsou dostupná pouze v komerční nebo speciální licenci. Kontaktujte nás. --";
-                    }
-                }
-            }
-            vz.RawHtml = "";
-            return vz;
-        }
-
         public ExpandoObject FlatExport()
         {
             dynamic v = new ExpandoObject();
             v.Url = GetUrl(false);
-            v.CisloZakazky = EvidencniCisloZakazky;
-
+            v.datasety = VypisZdroju(";");
             v.PosledniZmena = PosledniZmena;
             v.LhutaDoruceni = LhutaDoruceni;
             v.KonecnaHodnotaBezDPH = KonecnaHodnotaBezDPH;

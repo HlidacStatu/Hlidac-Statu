@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities;
+using System.IO;
+using HlidacStatu.Entities;
 using MimeDetective.Storage;
 
 namespace HlidacStatu.Connectors.IO
@@ -16,12 +17,12 @@ namespace HlidacStatu.Connectors.IO
         { }
 
         public PrilohaFile(string root)
-        : base(3, root, (s) => { return Devmasters.Crypto.Hash.ComputeHashToHex(s.Id).Substring(0, 3) + "\\" + s.Id; })
+        : base(3, root, (s) => { return Devmasters.Crypto.Hash.ComputeHashToHex(s.Id).Substring(0, 3) + Path.DirectorySeparatorChar + s.Id; })
         {
         }
         public override string GetFullDir(Smlouva obj)
         {
-            return base.GetFullDir(obj) + obj.Id + "\\";
+            return base.GetFullDir(obj) + obj.Id + Path.DirectorySeparatorChar;
         }
         public string GetFullPath(Smlouva obj, Smlouva.Priloha priloha, RequestedFileType filetype = RequestedFileType.Original)
         {
@@ -44,7 +45,7 @@ namespace HlidacStatu.Connectors.IO
 
         public override string GetRelativeDir(Smlouva obj)
         {
-            return base.GetRelativeDir(obj) + obj.Id + "\\";
+            return base.GetRelativeDir(obj) + obj.Id + Path.DirectorySeparatorChar;
         }
         public string GetRelativePath(Smlouva obj, Smlouva.Priloha priloha, RequestedFileType filetype = RequestedFileType.Original)
         {
