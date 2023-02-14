@@ -8,7 +8,7 @@ namespace HlidacStatu.Entities
     public partial class MonitoredTask
     {
         [NotMapped()]
-        public TimeSpan MinIntervalBetweenUpdates { get; set; } = TimeSpan.FromSeconds(5);
+        public TimeSpan MinIntervalBetweenUpdates { get; set; } = TimeSpan.FromSeconds(10);
         [NotMapped()]
         public DateTime LastTimeProgressUpdated { get; protected set; }  = DateTime.MinValue;
 

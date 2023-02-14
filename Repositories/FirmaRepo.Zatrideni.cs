@@ -16,8 +16,8 @@ namespace HlidacStatu.Repositories
     {
         public static class Zatrideni
         {
-            private static Devmasters.Cache.Hazelcast.Manager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory> instanceByZatrideni
-                = Devmasters.Cache.Hazelcast.Manager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory>.GetSafeInstance("oboryByObor", 
+            private static Devmasters.Cache.Memcached.Manager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory> instanceByZatrideni
+                = Devmasters.Cache.Memcached.Manager<Firma.Zatrideni.Item[], Firma.Zatrideni.SubjektyObory>.GetSafeInstance("oboryByObor", 
                     obor => GetSubjektyDirectAsync(obor).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromDays(2),
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','));

@@ -32,18 +32,18 @@ namespace HlidacStatu.Repositories
             return o ?? nullObj;
         }
 
-        public static Devmasters.Cache.Hazelcast.Manager<Firma, string> instanceByIco
-            = Devmasters.Cache.Hazelcast.Manager<Firma, string>.GetSafeInstance("firmyByICO_v2_", getByIco, TimeSpan.FromHours(4),
+        public static Devmasters.Cache.Memcached.Manager<Firma, string> instanceByIco
+            = Devmasters.Cache.Memcached.Manager<Firma, string>.GetSafeInstance("firmyByICO_v2_", getByIco, TimeSpan.FromHours(4),
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
                    );
 
-        public static Devmasters.Cache.Hazelcast.Manager<Firma, string> instanceByDS
-            = Devmasters.Cache.Hazelcast.Manager<Firma, string>.GetSafeInstance("firmyByDS_v2_", getByDS, TimeSpan.FromHours(4),
+        public static Devmasters.Cache.Memcached.Manager<Firma, string> instanceByDS
+            = Devmasters.Cache.Memcached.Manager<Firma, string>.GetSafeInstance("firmyByDS_v2_", getByDS, TimeSpan.FromHours(4),
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
                     );
 
-        public static Devmasters.Cache.Hazelcast.Manager<string, string> instanceNameOnlyByIco
-            = Devmasters.Cache.Hazelcast.Manager<string, string>.GetSafeInstance("firmaNameOnlyByICO_v2_", getNameByIco, TimeSpan.FromHours(12),
+        public static Devmasters.Cache.Memcached.Manager<string, string> instanceNameOnlyByIco
+            = Devmasters.Cache.Memcached.Manager<string, string>.GetSafeInstance("firmaNameOnlyByICO_v2_", getNameByIco, TimeSpan.FromHours(12),
                     Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(',')
                     );
 

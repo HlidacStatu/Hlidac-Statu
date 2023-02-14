@@ -9,8 +9,8 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static class SmlouvyStatistics
     {
-        static Devmasters.Cache.Hazelcast.Manager<StatisticsPerYear<Smlouva.Statistics.Data>, string> _cache
-            = Devmasters.Cache.Hazelcast.Manager<StatisticsPerYear<Smlouva.Statistics.Data>, string>
+        static Devmasters.Cache.Memcached.Manager<StatisticsPerYear<Smlouva.Statistics.Data>, string> _cache
+            = Devmasters.Cache.Memcached.Manager<StatisticsPerYear<Smlouva.Statistics.Data>, string>
                 .GetSafeInstance("SmlouvyStatistics_Query_v3_",
                     (query) => CalculateAsync(query).ConfigureAwait(false).GetAwaiter().GetResult(),
                     TimeSpan.FromHours(12),

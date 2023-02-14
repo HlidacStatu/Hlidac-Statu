@@ -9,22 +9,24 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static partial class FirmaStatistics
     {
-        static Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
-           _VZCache = Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
+        static Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
+           _VZCache = Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
                .GetSafeInstance("Firma_VZStatistics",
-                   (firma) => CalculateVZStat(firma),
-                   TimeSpan.FromHours(12),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                   f => f.ICO);
+                    (firma) => CalculateVZStat(firma),
+                    TimeSpan.Zero,
+                    Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+                    keyValueSelector: f => f.ICO);
 
 
-        static Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
-           _holdingVZCache = Devmasters.Cache.Hazelcast.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
+        static Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
+           _holdingVZCache = Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
                .GetSafeInstance("Holding_VZStatistics",
                    (obj) => CalculateHoldingVZStat(obj.firma, obj.aktualnost),
-                   TimeSpan.FromHours(12),
-                    Devmasters.Config.GetWebConfigValue("HazelcastServers").Split(','),
-                   obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
+                   TimeSpan.Zero,
+Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
+Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
 
         public static StatisticsSubjectPerYear<Firma.Statistics.VZ> CachedHoldingStatisticsVZ(
     Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost,
