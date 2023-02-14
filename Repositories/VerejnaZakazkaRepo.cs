@@ -18,7 +18,6 @@ using HlidacStatu.Entities;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
-using HlidacStatu.Entities.XSD;
 
 namespace HlidacStatu.Repositories
 {
@@ -183,7 +182,6 @@ namespace HlidacStatu.Repositories
                 originalVZ.Changelog.Add("Merging changelogs {{");
                 originalVZ.Changelog.AddRange(newVZ.Changelog);
                 originalVZ.Changelog.Add("}} Merging changelogs");
-                
             }
             
             // preferujeme nové informace před starými
@@ -248,9 +246,9 @@ namespace HlidacStatu.Repositories
                 return oldProp;
             if (oldProp is not null && oldProp.Equals(newProp))
                 return oldProp;
-            if (newProp is int and 0 && oldProp is int and not 0) //default integers shouldnt overwrite value
+            if (newProp is 0 && oldProp is int and not 0) //default integers shouldnt overwrite value
                 return oldProp;
-            if (newProp is decimal and 0m && oldProp is decimal and not 0m) //default decimals shouldnt overwrite value
+            if (newProp is 0m && oldProp is decimal and not 0m) //default decimals shouldnt overwrite value
                 return oldProp;
             if (newProp is DateTime np && np < new DateTime(1900, 1, 1)) //fix for some cases where we do not get correct date
                 return oldProp;
@@ -262,13 +260,13 @@ namespace HlidacStatu.Repositories
 
         private static void SendToOcrQueue(VerejnaZakazka newVZ)
         { 
-            // if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
-            // {
-            //     ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
-            //         newVZ.Id,
-            //         null,
-            //         HlidacStatu.Lib.OCR.Api.Client.TaskPriority.Low);
-            // }
+            if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
+            {
+                ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
+                    newVZ.Id,
+                    null,
+                    HlidacStatu.Lib.OCR.Api.Client.TaskPriority.Low);
+            }
         }
 
         /// <summary>
@@ -401,7 +399,6 @@ namespace HlidacStatu.Repositories
                 return null;
         }
         
-        //todo: test it!
         public static async Task<VerejnaZakazka> FindOriginalDocumentFromESAsync(VerejnaZakazka zakazka)
         {
             var es = await Manager.GetESClient_VerejneZakazkyAsync();
@@ -431,13 +428,7 @@ namespace HlidacStatu.Repositories
                 return null;
             }
 
-            
             return res.Documents.SingleOrDefault();
-        }
-
-        public static Task<bool> ExistsAsync(VerejnaZakazka vz, ElasticClient client = null)
-        {
-            return ExistsAsync(vz.Id, client);
         }
 
         public static async Task<bool> ExistsAsync(string id, ElasticClient client = null)
