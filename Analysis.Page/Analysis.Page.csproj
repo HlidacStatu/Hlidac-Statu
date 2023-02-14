@@ -21,7 +21,7 @@
     <PackageReference Include="Devmasters.Core" Version="4.1.2" />
     <PackageReference Include="Devmasters.Imaging" Version="4.0.3" />
     <PackageReference Include="Devmasters.IO" Version="4.1.4" />
-    <PackageReference Include="Devmasters.Logging" Version="4.1.1" />
+    <PackageReference Include="Devmasters.Logging" Version="4.2.1" />
     <PackageReference Include="itext7" Version="7.2.5" />
     <PackageReference Include="OpenCvSharp4" Version="4.7.0.20230115" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.7.0.20230115" />

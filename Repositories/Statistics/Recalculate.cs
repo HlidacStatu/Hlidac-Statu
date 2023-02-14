@@ -25,10 +25,12 @@ namespace HlidacStatu.Repositories.Statistics
             threads = threads ?? 20;
 
             log.Info("{method} Starting with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, threads.Value);
-            var queueItems = GetFromProcessingQueue(threads.Value*50, threads.Value);
+            var queueItems = GetFromProcessingQueue(threads.Value* threads.Value, threads.Value);
 
             while (queueItems.Count() > 0)
             {
+                log.Info("{method} Starting Subjekt statistics recalculate for {count} subjects with {numOfThreads} threads",
+                    queueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt),MethodBase.GetCurrentMethod().Name, threads.Value);
                 // rebuild cache for subjekt
                 Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(queueItems.Where(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt),
                     item =>
@@ -56,6 +58,9 @@ namespace HlidacStatu.Repositories.Statistics
                     !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
                     monitor: new MonitoredTaskRepo.ForBatch()
                     );
+
+                log.Info("{method} Starting Subjekt-Holding statistics recalculate for {count} subjects with {numOfThreads} threads",
+                    queueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt), MethodBase.GetCurrentMethod().Name, threads.Value);
 
                 // rebuild cache for subjekt holding
                 Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(queueItems.Where(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt),
@@ -87,6 +92,8 @@ namespace HlidacStatu.Repositories.Statistics
                     monitor: new MonitoredTaskRepo.ForBatch()
                     );
 
+                log.Info("{method} Starting Osoba statistics recalculate for {count} subjects with {numOfThreads} threads",
+                    queueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Person), MethodBase.GetCurrentMethod().Name, threads.Value);
                 // rebuild cache for person 
                 Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(
                     queueItems.Where(m => m.ItemType == RecalculateItem.ItemTypeEnum.Person),
@@ -125,6 +132,10 @@ namespace HlidacStatu.Repositories.Statistics
             }
             else
                 list.Add(item);
+
+            log.Debug("{method} expanding "+ item.ItemType.ToString() + " {name} to {count} items",
+                MethodBase.GetCurrentMethod().Name, item.Id, list.Count);
+
             return list;
         }
 
@@ -165,8 +176,9 @@ namespace HlidacStatu.Repositories.Statistics
         private static List<RecalculateItem> FirmaForQueue(List<RecalculateItem> list,
             Firma f, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy, int deep)
         {
+            log.Verbose("{method} expanding {ico} {subjekt} vazby, recursive deep {deep}, current list {count} items",
+                    MethodBase.GetCurrentMethod().Name,f.ICO, f.Jmeno, deep, list.Count);
 
-            System.Diagnostics.Debug.WriteLine($"{f.Jmeno} /{deep}/ {list.Count} count");
 
             var it = new RecalculateItem(f, statsType, provokeBy);
             if (list.Contains(it, comparer) == false)
