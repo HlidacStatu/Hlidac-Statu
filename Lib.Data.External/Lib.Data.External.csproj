@@ -67,7 +67,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="InfluxDB.Client" Version="4.9.0" />
+    <PackageReference Include="Devmasters.Logging" Version="4.2.3" />
+    <PackageReference Include="InfluxDB.Client" Version="4.10.0" />
     <PackageReference Include="linqtotwitter" Version="6.15.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="4.10.0" />
@@ -90,7 +91,7 @@
     <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="Enums.NET" Version="4.0.1" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
-    <PackageReference Include="Neo4j.Driver" Version="5.4.0" />
+    <PackageReference Include="Neo4j.Driver" Version="5.5.0" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
     <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
     <PackageReference Include="NitoAsyncEx.Context.StrongName" Version="1.1.0" />

@@ -105,7 +105,7 @@ namespace HlidacStatu.Lib.Data.External
 
         }
 
-        static Devmasters.Logging.Logger logger = new Devmasters.Logging.Logger("HlidacStatu.Lib.OCR.TikaServer");
+        static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger(typeof(TikaClient));
 
         string[] skip = new string[] { "Content-Type", "X-TIKA:content" };
         public string Filename { get; }

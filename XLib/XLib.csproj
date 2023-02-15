@@ -64,9 +64,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Cache.Memcached" Version="4.1.1" />
+      <PackageReference Include="Devmasters.Cache.Memcached" Version="4.1.2" />
       <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
-      <PackageReference Include="Scriban" Version="5.5.2" />
+      <PackageReference Include="Scriban" Version="5.6.0" />
       <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
     </ItemGroup>
 
