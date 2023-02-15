@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HlidacStatu.LibCore.Extensions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyModel;
 
 namespace SponzoriLoader
 {
@@ -74,7 +75,7 @@ namespace SponzoriLoader
             Common.UploadPeopleDonations(peopleDonations, _user, _zdroj);
             Common.UploadCompanyDonations(companyDonations, _user, _zdroj);
 
-            await FixPeopleSponzorsAsync();
+            //await FixPeopleSponzorsAsync(); Moved to downloader for regular runs
         }
 
         
@@ -180,33 +181,6 @@ namespace SponzoriLoader
             return 0;
         }
 
-        public static async Task FixPeopleSponzorsAsync()
-        {
-            var osoby = await OsobaRepo.PeopleWithAnySponzoringRecordAsync();
-
-            var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = 7 };
-            Parallel.ForEach(osoby, parallelOptions, osoba =>
-            {
-                bool isSponzor = osoba.IsSponzor();
-                var status = osoba.StatusOsoby();
-                bool shouldSetSponzor = isSponzor && status == Osoba.StatusOsobyEnum.NeniPolitik;
-                bool isNoLongerSponzor = status == Osoba.StatusOsobyEnum.Sponzor && !isSponzor;
-                
-                if (shouldSetSponzor)
-                {
-                    osoba.Status = (int)Osoba.StatusOsobyEnum.Sponzor;
-                    OsobaRepo.Update(osoba, "petr@hlidacstatu.cz");
-                }
-
-                if (isNoLongerSponzor)
-                {
-                    osoba.Status = (int)Osoba.StatusOsobyEnum.NeniPolitik;
-                    OsobaRepo.Update(osoba, "petr@hlidacstatu.cz");
-                }
-
-            });
-            
-            
-        }
+        
     }
 }

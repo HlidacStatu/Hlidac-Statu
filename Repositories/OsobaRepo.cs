@@ -484,9 +484,13 @@ namespace HlidacStatu.Repositories
             var results = await db.Osoba.FromSqlInterpolated($@"
                     Select * 
                       from Osoba os
-                     where os.status in ({(int)Osoba.StatusOsobyEnum.NeniPolitik},{(int)Osoba.StatusOsobyEnum.Sponzor})
+                     where os.status = {(int)Osoba.StatusOsobyEnum.NeniPolitik}
                        and exists (select 1 from Sponzoring
-                                    where os.internalid = osobaiddarce)")
+                                    where os.internalid = osobaiddarce)
+                     union 
+                    SELECT * 
+                      from Osoba os
+                     where os.status = {(int)Osoba.StatusOsobyEnum.Sponzor}")
                 .ToListAsync(cancellationToken: cancellationToken);
             return results;
         }
