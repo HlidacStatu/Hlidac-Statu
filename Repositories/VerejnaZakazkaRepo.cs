@@ -238,7 +238,7 @@ namespace HlidacStatu.Repositories
                 "Zadavatel.Jmeno",
                 originalVZ.Changelog);
             
-
+            originalVZ.Zdroje.UnionWith(newVZ.Zdroje);
             originalVZ.CPV.UnionWith(newVZ.CPV);
             originalVZ.UrlZakazky.UnionWith(newVZ.UrlZakazky);
             originalVZ.Formulare.UnionWith(newVZ.Formulare);
