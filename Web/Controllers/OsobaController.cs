@@ -124,7 +124,7 @@ namespace HlidacStatu.Web.Controllers
 
             osoba = Osoby.GetByNameId.Get(id);
 
-            if (osoba == null )
+            if (osoba == null || osoba.Status == (int)Osoba.StatusOsobyEnum.NeniPolitik )
             {
                 actionResult = NotFound();
                 return false;
