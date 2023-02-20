@@ -7,6 +7,17 @@
 
     <div class="p-5 mb-4 rounded-3">
         <div class="container-fluid py-5">
+            @if (true || this.Request.HasFormContentType)
+            {
+                <div class="card text-bg-success mb-5" style="max-width: 40rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Děkujeme za zájem, odpovíme co nejdříve.</h5>
+                        <p class="card-text" style="font-weight:bold;color:whitesmoke">Pokračovat na <a href="/Souhrn?obor=IT&rok=2020" style="color:whitesmoke">report za rok 2020</a> (<b><span style="color:yellow">zadarmo!</span></b>) nebo na <a href="/" style="color:whitesmoke">titulní stranu</a>.</p>
+                    </div>
+                </div>
+            }
+
+
             <h1 class="display-5 fw-bold">Kontakt</h1>
             <p class="col-md-8 fs-4">
                 Potřebujete informace k některé z našich hotových analýz?
@@ -14,9 +25,21 @@
                 Máte dotazy nebo připomínky k zakoupené analýze?
             </p>
             <p class="col-md-8 fs-4">
-                Kontaktujte nás na <b>obchod@watchdoganalytics.cz</b> nebo v pracovní době na telefonu <b>+420777737810</b>.
+                Kontaktujte nás na <a href="mailto:obchod@watchdoganalytics.cz?cc=michal@michalblaha.cz&subject=Cenov%C3%A9%20anal%C3%BDzy"><b>obchod@watchdoganalytics.cz</b></a>, v pracovní době na telefonu <b>+420777737810</b> nebo nám pošlete zprávu pomocí tohoto formuláře.
             </p>
-            <a href="mailto:obchod@watchdoganalytics.cz?cc=michal@michalblaha.cz&subject=Cenov%C3%A9%20anal%C3%BDzy" class="btn btn-primary btn-lg" type="button">Poslat e-mail</a>
+            <p>
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="from" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="from" name="from" placeholder="vas@email.cz">
+                    </div>
+                    <div class="mb-3">
+                        <label for="text" class="form-label">Zpráva</label>
+                        <textarea class="form-control" id="text" name="text" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Odeslat</button>
+                </form>
+            </p>
         </div>
     </div>
 </div>

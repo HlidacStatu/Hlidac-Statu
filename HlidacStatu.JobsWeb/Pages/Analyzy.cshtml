@@ -21,14 +21,14 @@
             <div class="row row-cols-2 row-cols-md-4 g-0">
                 <table class="table ">
                     @{
-                        var a_it20 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 });
+                        var a_it22 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2022 });
                     }
-                    @if (HttpContext.HasAccess("IT", 2020).Result.Access == false)
+                    @if (HttpContext.HasAccess("IT", 2022).Result.Access == false)
                     {
-                        <tr @Html.Raw(Request.Query["accent"].Equals("it2020") ? "class=\"table-warning\"" : "")>
+                        <tr @Html.Raw(Request.Query["accent"].Equals("it2022") ? "class=\"table-warning\"" : "")>
                             <td width="60%">
                                 <div class="fs-6 fw-bolder text-decoration-none text-muted">
-                                    Přehled obvyklých cen IT prací ve státní správě za rok 2020
+                                    Přehled obvyklých cen IT prací ve státní správě za rok 2022
                                 </div>
                             </td>
                             <td width="20%">
@@ -36,32 +36,45 @@
                             </td>
                             <td width="20%">
                                 <div class="text-muted small">
-                                    Údaje z @a_it20.PocetSmluv smluv od <b class="text-black">@a_it20.PocetZadavatelu</b> zadavatelů,
-                                    <b class="text-black">@a_it20.PocetDodavatelu</b> dodavatelů,
-                                    zahrnuje <b class="text-black">@a_it20.PocetCen cen</b>.
+
+                                    @*                                    <span class="text-danger fw-bold">
+                                Pracujeme na reportu. Ve statistice vidíte, kolik smluv jsme zatím zpracovali.
+                                </span>
+                                <br />
+                                <br />*@
+
+                                    Údaje z @a_it22.PocetSmluv smluv od <b class="text-black">@a_it22.PocetZadavatelu</b> zadavatelů,
+                                    <b class="text-black">@a_it22.PocetDodavatelu</b> dodavatelů,
+                                    zahrnuje <b class="text-black">@a_it22.PocetCen cen</b>.
                                 </div>
                             </td>
                         </tr>
                     }
                     else
                     {
-                        <tr @Html.Raw(Request.Query["accent"].Equals("it2020") ? "class=\"table-warning\"" : "")>
+                        <tr @Html.Raw(Request.Query["accent"].Equals("it2022") ? "class=\"table-warning\"" : "")>
                             <td>
-                                <a class="fs-6 fw-bolder" href="/Souhrn?obor=IT&rok=2020">Přehled obvyklých cen IT prací ve státní správě za rok 2020</a>
+                                <a class="fs-6 fw-bolder" href="/Souhrn?obor=IT&rok=2022">Přehled obvyklých cen IT prací ve státní správě za rok 2022</a>
                             </td>
                             <td>
-                                <a class="btn btn-primary" href="/Souhrn?obor=IT&rok=2020">Otevřít analýzu</a>
+                                <a class="btn btn-primary" href="/Souhrn?obor=IT&rok=2022">Otevřít analýzu</a>
                             </td>
                             <td>
                                 <div class="text-muted small">
-                                    Údaje z @a_it20.PocetSmluv smluv od <b class="text-black">@a_it20.PocetZadavatelu</b> zadavatelů,
-                                    <b class="text-black">@a_it20.PocetDodavatelu</b> dodavatelů,
-                                    zahrnuje <b class="text-black">@a_it20.PocetCen cen</b>.
+                                    @*                                    <span class="text-danger fw-bold">
+                                Pracujeme na reportu. Ve statistice vidíte, kolik smluv jsme zatím zpracovali.
+                                </span>
+                                <br />
+                                <br />*@
+                                    Údaje z @a_it22.PocetSmluv smluv od <b class="text-black">@a_it22.PocetZadavatelu</b> zadavatelů,
+                                    <b class="text-black">@a_it22.PocetDodavatelu</b> dodavatelů,
+                                    zahrnuje <b class="text-black">@a_it22.PocetCen cen</b>.
                                 </div>
                             </td>
                         </tr>
                     }
-                    @{
+
+                                        @{
                         var a_it21 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2021 });
                     }
                     @if (HttpContext.HasAccess("IT", 2021).Result.Access == false)
@@ -103,59 +116,27 @@
                         </tr>
                     }
 
+
                     @{
-                        var a_it22 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2022 });
+                        var a_it20 = new JobService.AnalysisStat(new YearlyStatisticsGroup.Key() { Obor = "IT", Rok = 2020 });
                     }
-                    @if (HttpContext.HasAccess("IT", 2022).Result.Access == false)
-                    {
-                        <tr @Html.Raw(Request.Query["accent"].Equals("it2022") ? "class=\"table-warning\"" : "")>
-                            <td width="60%">
-                                <div class="fs-6 fw-bolder text-decoration-none text-muted">
-                                    Přehled obvyklých cen IT prací ve státní správě za rok 2022
-                                </div>
-                            </td>
-                            <td width="20%">
-                                <a class="btn btn-primary" href="/Objednat">Objednat</a>
-                            </td>
-                            <td width="20%">
-                                <div class="text-muted small">
-
-@*                                    <span class="text-danger fw-bold">
-                                        Pracujeme na reportu. Ve statistice vidíte, kolik smluv jsme zatím zpracovali.
-                                    </span>
-                                    <br />
-                                    <br />*@
-
-                                    Údaje z @a_it22.PocetSmluv smluv od <b class="text-black">@a_it22.PocetZadavatelu</b> zadavatelů,
-                                    <b class="text-black">@a_it22.PocetDodavatelu</b> dodavatelů,
-                                    zahrnuje <b class="text-black">@a_it22.PocetCen cen</b>.
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                    else
-                    {
-                        <tr @Html.Raw(Request.Query["accent"].Equals("it2022") ? "class=\"table-warning\"" : "")>
+                        <tr @Html.Raw(Request.Query["accent"].Equals("it2020") ? "class=\"table-warning\"" : "")>
                             <td>
-                                <a class="fs-6 fw-bolder" href="/Souhrn?obor=IT&rok=2022">Přehled obvyklých cen IT prací ve státní správě za rok 2022</a>
+                                <a class="fs-6 fw-bolder" href="/Souhrn?obor=IT&rok=2020">Přehled obvyklých cen IT prací ve státní správě za rok 2020</a>
                             </td>
                             <td>
-                                <a class="btn btn-primary" href="/Souhrn?obor=IT&rok=2022">Otevřít analýzu</a>
+                            <a class="btn btn-primary" href="/Souhrn?obor=IT&rok=2020"><span style="color:yellow">ZDARMA, OTEVŘÍT</span></a>
                             </td>
                             <td>
                                 <div class="text-muted small">
-@*                                    <span class="text-danger fw-bold">
-                                        Pracujeme na reportu. Ve statistice vidíte, kolik smluv jsme zatím zpracovali.
-                                    </span>
-                                    <br />
-                                    <br />*@
-                                    Údaje z @a_it22.PocetSmluv smluv od <b class="text-black">@a_it22.PocetZadavatelu</b> zadavatelů,
-                                    <b class="text-black">@a_it22.PocetDodavatelu</b> dodavatelů,
-                                    zahrnuje <b class="text-black">@a_it22.PocetCen cen</b>.
+                                    Údaje z @a_it20.PocetSmluv smluv od <b class="text-black">@a_it20.PocetZadavatelu</b> zadavatelů,
+                                    <b class="text-black">@a_it20.PocetDodavatelu</b> dodavatelů,
+                                    zahrnuje <b class="text-black">@a_it20.PocetCen cen</b>.
                                 </div>
                             </td>
                         </tr>
-                    }
+                    
+
 
 
                     <tr @Html.Raw(Request.Query["accent"].Equals("demo") ? "class=\"table-warning\"" : "")>
