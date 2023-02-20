@@ -16,7 +16,7 @@ public static class CacheIndexFactory
     {
         return new(
             Path.Combine(path, "kindex"),
-            TimeSpan.FromDays(15),
+            null, //TimeSpan.FromDays(15),
             () => SubjectNameCache.GetCompanies().Values,
             new IndexingOptions<SubjectNameCache>()
             {
@@ -29,7 +29,7 @@ public static class CacheIndexFactory
     {
         return new(
             Path.Combine(path, "np_firmy"),
-            TimeSpan.FromDays(15),
+            null, //TimeSpan.FromDays(15),
             () => AutocompleteRepo.GenerateAutocompleteFirmyOnly(),
             new IndexingOptions<Autocomplete>()
             {
@@ -42,7 +42,7 @@ public static class CacheIndexFactory
     {
         return new(
             Path.Combine(path, "uptimeServer"),
-            TimeSpan.FromHours(24),
+            null, //TimeSpan.FromHours(24),
             () => UptimeServerRepo.AllActiveServers().Select(uptimeServer => new StatniWebyAutocomplete(uptimeServer)),
             new IndexingOptions<StatniWebyAutocomplete>()
             {
@@ -55,7 +55,7 @@ public static class CacheIndexFactory
     {
         return new(
             Path.Combine(path, "full"),
-            TimeSpan.FromHours(24),
+            null, //TimeSpan.FromHours(24),
             () => AutocompleteRepo.GenerateAutocomplete(),
             new IndexingOptions<Autocomplete>()
             {
@@ -70,7 +70,7 @@ public static class CacheIndexFactory
     {
         return new(
             Path.Combine(path, "adresy"),
-            TimeSpan.FromHours(24),
+            null, //TimeSpan.FromHours(24),
             () => AdresyRepo.GetAdresyKVolbamAsync().GetAwaiter().GetResult(),
             new IndexingOptions<AdresyKVolbam>()
             {

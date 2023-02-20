@@ -42,7 +42,7 @@ public class CachedIndex<T> where T : IEquatable<T>
     }
 
     public CachedIndex(string baseDir,
-        TimeSpan expiration,
+        TimeSpan? expiration,
         Func<IEnumerable<T>> populateFunc,
         IndexingOptions<T> indexingOptions,
         ILogger logger)
@@ -57,9 +57,12 @@ public class CachedIndex<T> where T : IEquatable<T>
 
         _index = new Index<T>(CurrentDirectory, _indexingOptions.IndexAnalyzer, _indexingOptions.QueryAnalyzer);
 
+        // skip
+        if(expiration is null)
+            return;
 
         // set timer for cache renewal
-        _timer = new Timer(expiration.TotalMilliseconds)
+        _timer = new Timer(expiration.Value.TotalMilliseconds)
         {
             Enabled = true,
             AutoReset = true,
