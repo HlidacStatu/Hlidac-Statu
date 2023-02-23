@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using HlidacStatu.AutocompleteApi.Services;
-using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
+﻿using HlidacStatu.AutocompleteApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.AutocompleteApi.Controllers
@@ -10,28 +7,22 @@ namespace HlidacStatu.AutocompleteApi.Controllers
     [Route("[controller]")]
     public class StatusController : ControllerBase
     {
-        private CacheService _cacheService;
+        private IndexCache _cacheService;
 
-        public StatusController(CacheService cacheService)
+        public StatusController(IndexCache cacheService)
         {
             _cacheService = cacheService;
         }
 
         [HttpGet]
-        public JsonResult OverallStatus()
+        public ActionResult<Status> OverallStatus()
         {
-            using DbEntities db = new DbEntities();
+            var status = _cacheService.Status();
 
-            var firstPolitik = db.Osoba.Where(o => o.Status == 3).FirstOrDefault();
-
-
-            var resultObj = new
-            {
-                DbConnection = firstPolitik,
-                CacheService = _cacheService.Status,
-                UptimeServerRepoServerCount = UptimeServerRepo.AllActiveServers().Length,
-            };
-            return new JsonResult(resultObj);
+            if (status is null)
+                return StatusCode(418, "Not ready");
+            
+            return new JsonResult(status);
         }
     
     }

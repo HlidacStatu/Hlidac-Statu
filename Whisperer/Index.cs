@@ -14,7 +14,7 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
 {
     public const LuceneVersion LuceneVersion = Lucene.Net.Util.LuceneVersion.LUCENE_48;
 
-    private HashSet<char> SearchModifiingChars = new("&|+-!(){}[]^\"~*?:\\/".ToCharArray());
+    private readonly HashSet<char> SearchModifiingChars = new("&|+-!(){}[]^\"~*?:\\/".ToCharArray());
         
     private const string SearchFieldName = nameof(SearchFieldName);
     private const string DataFieldName = nameof(DataFieldName);
@@ -30,36 +30,11 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
     /// <param name="directoryPath">Path to a directory where all documents are saved. Every instance should have its own documents!</param>
     /// <param name="indexAnalyzer">If needed, you can create your custom Analyzer for storing data.</param>
     /// <param name="queryAnalyzer">If needed, you can create your custom Analyzer for processing query.</param>
-    public Index(string directoryPath, Analyzer? indexAnalyzer = null, Analyzer? queryAnalyzer = null)
+    public Index(string directoryPath)
     {
         _directory = new MMapDirectory(directoryPath);
-        _indexAnalyzer = indexAnalyzer ?? new DefaultAutocompleteAnalyzer(LuceneVersion);
-        _queryAnalyzer = queryAnalyzer ?? new DefaultAutocompleteQueryAnalyzer(LuceneVersion);
-    }
-
-    /// <summary>
-    /// Creates Whisperer's Index, delete all files in target folder and populate it within one step 
-    /// </summary>
-    /// <param name="directoryPath">Path to a directory where all documents are saved. Every instance should have its own documents!</param>
-    /// <param name="indexAnalyzer">If needed, you can create your custom Analyzer for storing data.</param>
-    /// <param name="queryAnalyzer">If needed, you can create your custom Analyzer for processing query.</param>
-    /// <param name="documents">Objects which are stored</param>
-    /// <param name="textSelector">Text, which is going to be indexed and searched.</param>
-    /// <param name="boostSelector">Multiplier - how much is the document going to be boosted.</param>
-    /// <param name="filterSelector">If you want to use filtered search, then you can create your own filters.
-    /// Reccommendation is to use simple lowercase words without diacritics (accents)</param>
-    public Index(string directoryPath, IEnumerable<T> documents,
-        Func<T, string> textSelector,
-        Func<T, float>? boostSelector = null,
-        Func<T, string>? filterSelector = null, 
-        Analyzer? indexAnalyzer = null, 
-        Analyzer? queryAnalyzer = null)
-    {
-        _directory = new MMapDirectory(directoryPath);
-        _indexAnalyzer = indexAnalyzer ?? new DefaultAutocompleteAnalyzer(LuceneVersion);
-        _queryAnalyzer = queryAnalyzer ?? new DefaultAutocompleteQueryAnalyzer(LuceneVersion);
-        DeleteDocuments();
-        AddDocuments(documents, textSelector, boostSelector, filterSelector);
+        _indexAnalyzer = new DefaultAutocompleteAnalyzer(LuceneVersion);
+        _queryAnalyzer = new DefaultAutocompleteQueryAnalyzer(LuceneVersion);
     }
 
     /// <summary>
@@ -174,8 +149,8 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
 
     public void Dispose()
     {
-        _indexAnalyzer.Dispose();
-        _queryAnalyzer.Dispose();
+        _indexAnalyzer?.Dispose();
+        _queryAnalyzer?.Dispose();
         _directory.Dispose();
     }
 }

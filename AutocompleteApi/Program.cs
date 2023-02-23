@@ -46,30 +46,15 @@ Devmasters.Config.Init(builder.Configuration);
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.csCulture;
 
-// Generate index files only
-if (args.Length > 0 && args[0] == "gen")
-{
-    try
-    {
-        logger.Information("Starting index generator");
-        await IndexGenerator.GenerateIndexesAsync(logger);
-        logger.Information("Index generator finished");
-    }
-    finally
-    {
-        Log.CloseAndFlush();
-    }
-    return 0;
-}
-
-
 // run application
 logger.Information("Starting application");
 try
 {
     logger.Information("Configuring services");
-    builder.Services.AddSingleton<CacheService>(new CacheService(logger));
+    builder.Services.AddHostedService<TimedHostedService>();
+    builder.Services.AddSingleton<IndexCache>(new IndexCache());
     builder.Services.AddControllers();
+    builder.Services.AddHttpClient();
     logger.Information("Services configured");
 
     var app = builder.Build();
