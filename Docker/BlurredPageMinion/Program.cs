@@ -26,7 +26,7 @@ foreach (System.Collections.DictionaryEntry kv in Environment.GetEnvironmentVari
 
 var confBuilder = new ConfigurationBuilder()
                .SetBasePath(Directory.GetCurrentDirectory())
-               .AddJsonFile("appsettings.json", optional: true)
+               .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
                .AddEnvironmentVariables();
 var appConfiguration = confBuilder.Build();
 
