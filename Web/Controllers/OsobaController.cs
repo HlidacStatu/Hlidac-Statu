@@ -3,6 +3,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -123,8 +124,18 @@ namespace HlidacStatu.Web.Controllers
 
 
             osoba = Osoby.GetByNameId.Get(id);
+            if (osoba == null)
+            {
+                actionResult = NotFound();
+                return false;
+            }
+            var osobaStat = Repositories.Statistics.OsobaStatistics.CachedStatistics(osoba, Relation.AktualnostType.Nedavny, null);
 
-            if (osoba == null || osoba.Status == (int)Osoba.StatusOsobyEnum.NeniPolitik )
+            if (
+                osobaStat.SoukromeFirmy.Sum(m=>m.Value.Summary().PocetSmluv)==0
+                && osobaStat.StatniFirmy.Sum(m => m.Value.Summary().PocetSmluv) == 0
+                && osoba.Status == (int)Osoba.StatusOsobyEnum.NeniPolitik
+                )
             {
                 actionResult = NotFound();
                 return false;
