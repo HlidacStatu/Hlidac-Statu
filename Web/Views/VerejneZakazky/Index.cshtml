@@ -25,7 +25,7 @@
             {
         //Q = "zverejneno:=>" + DateTime.Now.Date.AddMonths(-3).ToString("yyyy-MM-dd")
         Q = "*",
-                Oblast = obl.Value,
+                Oblast = obl.Id.ToString(),
                 Page = 0,
                 PageSize = 0,
                 ExactNumOfResults=true
@@ -36,7 +36,7 @@
             {
                 Q = "zverejneno:[" + DateTime.Now.Date.AddMonths(-1).ToString("yyyy-MM-dd") + " TO *]",
         //Q = "*",
-        Oblast = obl.Value,
+        Oblast = obl.Id.ToString(),
                 Page = 0,
                 PageSize = 0,
                 ExactNumOfResults=true
@@ -47,7 +47,7 @@
             {
                 Q = "zverejneno:[" + DateTime.Now.Date.AddDays(-8).ToString("yyyy-MM-dd") + " TO *]",
         //Q = "*",
-        Oblast = obl.Value,
+        Oblast = obl.Id.ToString(),
                 Page = 0,
                 PageSize = 0,
                 ExactNumOfResults=true
@@ -56,8 +56,8 @@
             ).Total;
         <div class="col-xs-6 col-sm-4" style="padding:5px">
 
-            <a href="/verejnezakazky/hledat?q=*&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.Value)&order=1" class="list-group-item">
-                <h4 class="list-group-item-heading">@obl.Key</h4>
+            <a href="/verejnezakazky/hledat?q=*&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.Id.ToString())&order=1" class="list-group-item">
+                <h4 class="list-group-item-heading">@obl.Id</h4>
                 <p class="list-group-item-text">
                     Celkem @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)numAll, "<b>Žádná zakázka</b> za poslední roky", "<b>Jedna zakázka</b> za poslední roky", "<b>{0} zakázky</b> za poslední roky", "<b>{0} zakázek</b> za poslední roky"))
                     @if (numAll == 0)

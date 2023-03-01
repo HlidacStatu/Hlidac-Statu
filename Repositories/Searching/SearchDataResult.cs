@@ -78,7 +78,7 @@ namespace HlidacStatu.Repositories.Searching
         {
             return
                 Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(SmlouvaRepo.Searching.OrderResult)).Select(
-                    m => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem() { Value = m.Value, Text = "Řadit " + m.Key }
+                    m => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem() { Value = m.Id.ToString(), Text = "Řadit " + m.Name }
                     ).ToList();
         };
 

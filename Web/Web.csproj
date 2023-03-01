@@ -58,10 +58,10 @@
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="6.0.5" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="6.0.5" />
         <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="6.0.3" />
-        <PackageReference Include="Devmasters.Cache.Memcached" Version="4.1.2" />
-        <PackageReference Include="Devmasters.Core" Version="4.1.3" />
-        <PackageReference Include="Devmasters.Lang" Version="4.0.3" />
-        <PackageReference Include="Devmasters.Logging" Version="4.2.3" />
+        <PackageReference Include="Devmasters.Cache.Memcached" Version="4.4.0" />
+        <PackageReference Include="Devmasters.Core" Version="4.4.0" />
+        <PackageReference Include="Devmasters.Lang" Version="4.4.0" />
+        <PackageReference Include="Devmasters.Logging" Version="4.4.0" />
         
         <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.3.0" />
         <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.372" />

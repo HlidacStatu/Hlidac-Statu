@@ -215,7 +215,7 @@ namespace HlidacStatu.Repositories
                 UradySmlouvyGlobal(null, await CalculateGlobalRankPerYear_UradySmlouvyAsync(null, threads, logOutputFunc, progressOutputFunc));
                 foreach (var main in Devmasters.Enums.EnumTools
                     .EnumToEnumerable(typeof(Smlouva.SClassification.ClassificationsTypes))
-                    .Select(m => new { value = Convert.ToInt32(m.Value), key = m.Key })
+                    .Select(m => new { value = Convert.ToInt32(m.Id), key = m.Name })
                     .Where(m => m.value % 100 == 0)
                     )
                 {

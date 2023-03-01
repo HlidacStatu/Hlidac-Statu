@@ -37,7 +37,7 @@
 
     var periodList = Devmasters.Enums.EnumTools
         .EnumToEnumerable(typeof(WatchDog.PeriodTime))
-        .Select(m => new SelectListItem() {Value = m.Value, Text = "" + m.Key, Disabled = (Convert.ToInt32(m.Value) < 2)})
+        .Select(m => new SelectListItem() {Value = m.Id.ToString(), Text = "" + m.Name, Disabled = (Convert.ToInt32(m.Id) < 2)})
         .ToList();
 
     string uid = Guid.NewGuid().ToString("N");

@@ -5,7 +5,7 @@
 
                 var statusList = Devmasters.Enums.EnumTools
                                   .EnumToEnumerable(typeof(Osoba.StatusOsobyEnum))
-                                  .Select(m => new SelectListItem() { Value = m.Value, Text = "" + m.Key })
+                                  .Select(m => new SelectListItem() { Value = m.Id.ToString(), Text = "" + m.Name })
                                   .ToList(); }
 
 <h2>EditPersonNP</h2>

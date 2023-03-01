@@ -52,13 +52,13 @@
 
                 var oblastiList = Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(VerejnaZakazkaRepo.Searching.CPVSkupiny))
                     .Select(
-                        m => new { Value = ((VerejnaZakazkaRepo.Searching.CPVSkupiny)int.Parse(m.Value)).ToString(), Text = m.Key }
+                        m => new { Id = ((VerejnaZakazkaRepo.Searching.CPVSkupiny)m.Id).ToString(), Name = m.Name }
                     )
                     .ToList();
                 }
                 @foreach (var item in oblastiList)
             {
-                <li><kbd>@item.Value</kbd> - @item.Text</li>
+                <li><kbd>@item.Id</kbd> - @item.Name</li>
 
         }
             </ul>

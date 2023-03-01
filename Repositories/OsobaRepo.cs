@@ -543,8 +543,8 @@ namespace HlidacStatu.Repositories
                 }
                 ).ToArray();
             string[] angazovanostDesc = Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(HlidacStatu.DS.Graphs.Relation.RelationSimpleEnum))
-                .Where(m => Convert.ToInt32(m.Value) < 0)
-                .Select(m => m.Key).ToArray();
+                .Where(m => Convert.ToInt32(m.Id) < 0)
+                .Select(m => m.Name).ToArray();
 
 
             r.Vazbyfirmy = Graph.VsechnyDcerineVazby(osoba)

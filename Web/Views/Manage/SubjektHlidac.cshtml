@@ -122,13 +122,13 @@
                 <select class="form-control" name="period" id="period">
                     @foreach (var kv in periodList)
                     {
-                        if (kv.Value == "2")
+                        if (kv.Id == 2)
                         {
-                            <option value="@kv.Value" selected="selected">@kv.Key</option>
+                            <option value="@kv.Id" selected="selected">@kv.Name</option>
                         }
                         else //if (user?.IsInRole("betatester") == true || user?.IsInRole("canEditData") == true)
                         {
-                            <option value="@kv.Value" >@kv.Key</option>
+                            <option value="@kv.Id" >@kv.Name</option>
                         }
                     }
                 </select>

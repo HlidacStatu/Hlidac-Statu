@@ -615,15 +615,15 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
                             new HlidacStatu.Repositories.Searching.VerejnaZakazkaSearchData()
                     {
                         Q = "zverejneno:[" + DateTime.Now.Date.AddMonths(-3).ToString("yyyy-MM-dd") + " TO *]",
-                        Oblast = obl.Value,
+                        Oblast = obl.Id.ToString(),
                         Page = 0,
                         PageSize = 0,
                         ExactNumOfResults = true
                     }).Total;
                             topVZ.Add(
                             new Tuple<string, string, long>(
-                            $"/verejnezakazky/hledat?q=*&oblast={VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.Value)}&order=1",
-                            $"{obl.Key} ({RenderData.NiceNumber(num3M)})",
+                            $"/verejnezakazky/hledat?q=*&oblast={VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.Id.ToString())}&order=1",
+                            $"{obl.Name} ({RenderData.NiceNumber(num3M)})",
                             num3M
                             )
                             );

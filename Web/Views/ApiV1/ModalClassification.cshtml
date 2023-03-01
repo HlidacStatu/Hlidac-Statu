@@ -32,7 +32,7 @@
                 <div class="checkbox" style="height:400px;overflow-y:auto;border:1px #d0d0d0 solid;width:80%;overflow-x:hidden;padding:10px;">
                     @foreach (var main in Devmasters.Enums.EnumTools
                         .EnumToEnumerable(typeof(Smlouva.SClassification.ClassificationsTypes))
-                        .Select(m => new { value = Convert.ToInt32(m.Value), key = m.Key })
+                        .Select(m => new { value = Convert.ToInt32(m.Id), key = m.Name })
                         .Where(m => m.value % 100 == 0)
                         .OrderBy(m => m.key)
                         )
@@ -44,7 +44,7 @@
                         </div>
                         foreach (var item in Devmasters.Enums.EnumTools
                             .EnumToEnumerable(typeof(Smlouva.SClassification.ClassificationsTypes))
-                            .Select(m => new { value = Convert.ToInt32(m.Value), key = m.Key })
+                            .Select(m => new { value = Convert.ToInt32(m.Id), key = m.Name })
                             .Where(m => m.value % 100 != 0)
                             .Where(m => m.value - (m.value % 100) == main.value)
                             .OrderBy(m => m.key)

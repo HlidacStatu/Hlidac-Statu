@@ -7,7 +7,7 @@
 @{ 
     ViewBag.Title = "Company Detail";
     var typeList = EnumTools.EnumToEnumerable(typeof(OsobaEvent.Types))
-        .Select(m => new SelectListItem() { Value = m.Value, Text = "" + m.Key })
+        .Select(m => new SelectListItem() { Value = m.Id.ToString(), Text = "" + m.Name })
         .ToList();
 
 }

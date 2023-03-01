@@ -18,7 +18,7 @@ namespace HlidacStatu.Repositories.Searching
                 .Union(
                     Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(VerejnaZakazkaRepo.Searching.CPVSkupiny))
                     .Select(
-                        m => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem() { Value = m.Value, Text = m.Key }
+                        m => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem() { Value = m.Id.ToString(), Text = m.Name}
                     )
                 )
                 .ToList();
@@ -163,7 +163,7 @@ namespace HlidacStatu.Repositories.Searching
                 .Union(
                     Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(VZOrderResult))
                     .Select(
-                        m => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem() { Value = m.Value, Text = "Řadit " + m.Key }
+                        m => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem() { Value = m.Id.ToString(), Text = "Řadit " + m.Name }
                     )
                 )
                 .ToList();
