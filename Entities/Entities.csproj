@@ -29,7 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Datastructures\DataStructures.csproj" />
+      <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
       <ProjectReference Include="..\Lib.Analytics\Lib.Analytics.csproj" />
       <ProjectReference Include="..\Lib.OCR.Api.Client\Lib.OCR.Api.Client.csproj" />
     </ItemGroup>

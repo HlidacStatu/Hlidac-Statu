@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Datastructures\DataStructures.csproj" />
+      <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
       <ProjectReference Include="..\Connectors\Connectors.csproj" />
       <ProjectReference Include="..\Entities\Entities.csproj" />
       <ProjectReference Include="..\HlidacStatu.Lib.Db.Insolvence\HlidacStatu.Lib.Db.Insolvence.csproj" />
