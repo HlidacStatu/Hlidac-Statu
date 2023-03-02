@@ -131,16 +131,6 @@ namespace HlidacStatu.Web.Controllers
             }
             var osobaStat = Repositories.Statistics.OsobaStatistics.CachedStatistics(osoba, Relation.AktualnostType.Nedavny, null);
 
-            if (
-                osobaStat.SoukromeFirmy.Sum(m=>m.Value.Summary().PocetSmluv)==0
-                && osobaStat.StatniFirmy.Sum(m => m.Value.Summary().PocetSmluv) == 0
-                && osoba.Status == (int)Osoba.StatusOsobyEnum.NeniPolitik
-                )
-            {
-                actionResult = NotFound();
-                return false;
-            }
-
 
             actionResult = View("Index", osoba);
             return true;
