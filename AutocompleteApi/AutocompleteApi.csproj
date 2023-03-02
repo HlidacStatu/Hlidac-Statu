@@ -31,4 +31,11 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="DockerfileCI">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>
