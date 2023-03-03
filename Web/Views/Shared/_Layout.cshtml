@@ -209,6 +209,12 @@
             var u = "https://ma.hlidacstatu.cz/";
             _paq.push(['setTrackerUrl', u + 'matomo.php']);
             _paq.push(['setSiteId', '1']);
+            @if (this.User?.Identity?.IsAuthenticated == true)
+            {
+                <text>
+                _paq.push(['setUserId', '@(this.User.Identity.Name)']);
+                </text>
+            }
             var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
             g.async = true; g.src = u + 'matomo.js'; s.parentNode.insertBefore(g, s);
         })();
@@ -292,7 +298,7 @@
                     {
                         <a href="/manage/Watchdogs"
                            alt="Všichni uložení hlídači" title="Všichni uložení hlídači"
-                           onclick="ga('send', 'event', 'btnWatchDog', 'List', 'authenticated');" role="button"
+                           onclick="_my_event('send', 'event', 'btnWatchDog', 'List', 'authenticated');" role="button"
                            class="btn btn-warning btn-sm" style="padding-left: 5px;padding-right: 5px;display:block">
                             <i style="color:black;" class="fas fa-eye"></i>
                         </a>
@@ -309,11 +315,11 @@
                             nextUrl = "";
                         }
 
-                        <a onclick="ga('send', 'event', 'loginBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Login?returnUrl=@(nextUrl)" id="loginLink">
+                        <a onclick="_my_event('send', 'event', 'loginBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Login?returnUrl=@(nextUrl)" id="loginLink">
                             <img src="/Content/img/icon-user.svg" style="padding-right: 8px;">
                             Přihlášení
                         </a>
-                        <a onclick="ga('send', 'event', 'registerBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Register?returnUrl=@(nextUrl)" id="regLink">Registrace</a>
+                        <a onclick="_my_event('send', 'event', 'registerBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Register?returnUrl=@(nextUrl)" id="regLink">Registrace</a>
                     }
                 </li>
 
@@ -332,14 +338,14 @@
                 <li class="level2">
                     @if (User.Identity?.IsAuthenticated ?? false)
                     {
-                        <a onclick="ga('send', 'event', 'bookmarksBtn', 'click','@Context.Request.Path'); return true;" title="Všechny uložené záložky" alt="Všechny uložené záložky" href="/manage/zalozky"><span style="color:#c9302c;" class="bookmark bookmarkOn"><i class="fad fa-bookmark"></i></span>Záložky</a>
-                        <a onclick="ga('send', 'event', 'manageBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/manage/" title="Nastavení účtu" alt="Nastavení účtu"><span class="fad fa-user"></span>Účet</a>
-                        <a onclick="ga('send', 'event', 'logoffBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Logout?rnd=@Guid.NewGuid().ToString("N")">Odhlásit</a>
+                        <a onclick="_my_event('send', 'event', 'bookmarksBtn', 'click','@Context.Request.Path'); return true;" title="Všechny uložené záložky" alt="Všechny uložené záložky" href="/manage/zalozky"><span style="color:#c9302c;" class="bookmark bookmarkOn"><i class="fad fa-bookmark"></i></span>Záložky</a>
+                        <a onclick="_my_event('send', 'event', 'manageBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/manage/" title="Nastavení účtu" alt="Nastavení účtu"><span class="fad fa-user"></span>Účet</a>
+                        <a onclick="_my_event('send', 'event', 'logoffBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Logout?rnd=@Guid.NewGuid().ToString("N")">Odhlásit</a>
                     }
                     else
                     {
-                        <a onclick="ga('send', 'event', 'loginBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Login">Přihlášení</a>
-                        <a onclick="ga('send', 'event', 'registerBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Register">Registrace</a>
+                        <a onclick="_my_event('send', 'event', 'loginBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Login">Přihlášení</a>
+                        <a onclick="_my_event('send', 'event', 'registerBtn', 'click','@Context.Request.Path'); return true;" href="/Identity/Account/Register">Registrace</a>
                     }
                 </li>
             </ul>
@@ -488,11 +494,11 @@
                             </p>
                         </div>
                         <div class="col-sm-2 col-xs-12">
-                            <a style="margin-top:15px;" class="fund-daruj-btn float-end text-end" onclick="ga('send', 'event', 'darujAdFooter', 'daruj-btn', '1'); return false;" id="fund-daruj-btn" target="_blank" href="#">Chápu, díky!</a>
+                            <a style="margin-top:15px;" class="fund-daruj-btn float-end text-end" onclick="_my_event('send', 'event', 'darujAdFooter', 'daruj-btn', '1'); return false;" id="fund-daruj-btn" target="_blank" href="#">Chápu, díky!</a>
                         </div>
                         <div class="fund-zavri">
-                            <a id="fund-info-btn" onclick="ga('send', 'event', 'darujAdFooter', 'viceinfo', '1');" target="_blank" href="https://www.hlidacstatu.cz/texty/zalozky-si-za-vas-zapamatuji-vse-co-potrebujete/">Více informací</a>
-                            <a id="fund-zavri-btn" onclick="ga('send', 'event', 'darujAdFooter', 'zavri', '1');" style="margin-left:30px;color:#ff5900" href="#"><span class="fas fa-times"></span></a>
+                            <a id="fund-info-btn" onclick="_my_event('send', 'event', 'darujAdFooter', 'viceinfo', '1');" target="_blank" href="https://www.hlidacstatu.cz/texty/zalozky-si-za-vas-zapamatuji-vse-co-potrebujete/">Více informací</a>
+                            <a id="fund-zavri-btn" onclick="_my_event('send', 'event', 'darujAdFooter', 'zavri', '1');" style="margin-left:30px;color:#ff5900" href="#"><span class="fas fa-times"></span></a>
                         </div>
                     </div>
 
@@ -606,7 +612,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-bs-dismiss="modal">Zavřít</button>
-                        <a id="VZInfoAnonRegister" onclick="ga('send', 'event', 'registerBtn', 'click','@Context.Request.Path#VZPristupOmezen'); return true;" href="/Identity/account/Register?returnUrl=" class="btn btn-primary">Zaregistrovat se</a>
+                        <a id="VZInfoAnonRegister" onclick="_my_event('send', 'event', 'registerBtn', 'click','@Context.Request.Path#VZPristupOmezen'); return true;" href="/Identity/account/Register?returnUrl=" class="btn btn-primary">Zaregistrovat se</a>
                     </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->

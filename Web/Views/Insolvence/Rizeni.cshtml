@@ -44,9 +44,9 @@
         Podrobné informace o insolvencích jsou dostupné pouze registrovaným uživatelům Hlídače Státu.
         <b>Registrace je zdarma a je velmi jednoduchá</b>. Stačí vám pouze platný email.
     </p>
-    <p>Pokud jste již zaregistrováni, <a onclick="ga('send', 'event', 'loginBtn', 'click','@Context.Request.Path#PristupOmezen'); return true;" href="/account/Login?returnUrl=@Url.Action()" class="btn btn-default">zalogujte se</a>. </p>
+    <p>Pokud jste již zaregistrováni, <a onclick="_my_event('send', 'event', 'loginBtn', 'click','@Context.Request.Path#PristupOmezen'); return true;" href="/account/Login?returnUrl=@Url.Action()" class="btn btn-default">zalogujte se</a>. </p>
     <p>
-        <a onclick="ga('send', 'event', 'registerBtn', 'click','@Context.Request.Path#PristupOmezen'); return true;"
+        <a onclick="_my_event('send', 'event', 'registerBtn', 'click','@Context.Request.Path#PristupOmezen'); return true;"
            href="/account/Register?returnUrl=@Url.Action()" class="btn btn-primary">Zaregistrovat se</a>
     </p>
     <script>
@@ -226,17 +226,17 @@ else
 <div class="col-xs-12">
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="nav-item">
-            <a href="#@(id)1" class="nav-link active" onclick="ga('send', 'event', 'tabHorizontal', 'change_1','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)1" role="tab" data-bs-toggle="tab">
+            <a href="#@(id)1" class="nav-link active" onclick="_my_event('send', 'event', 'tabHorizontal', 'change_1','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)1" role="tab" data-bs-toggle="tab">
                 @Html.Raw($"Dlužníci ({Model.Rizeni?.Dluznici?.Count ?? 0})")
             </a>
         </li>
         <li role="presentation" class="nav-item">
-            <a href="#@(id)2" class="nav-link" onclick="ga('send', 'event', 'tabHorizontal', 'change_2','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)2" role="tab" data-bs-toggle="tab">
+            <a href="#@(id)2" class="nav-link" onclick="_my_event('send', 'event', 'tabHorizontal', 'change_2','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)2" role="tab" data-bs-toggle="tab">
                 @Html.Raw($"Věřitelé ({Model.Rizeni?.Veritele?.Count ?? 0})")
             </a>
         </li>
         <li role="presentation" class="nav-item">
-            <a href="#@(id)3" class="nav-link" onclick="ga('send', 'event', 'tabHorizontal', 'change_3','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)3" role="tab" data-bs-toggle="tab">
+            <a href="#@(id)3" class="nav-link" onclick="_my_event('send', 'event', 'tabHorizontal', 'change_3','@ViewContext.GetRequestPath()'); return true;" aria-controls="@(id)3" role="tab" data-bs-toggle="tab">
                 @Html.Raw($"Insolveční správci ({Model.Rizeni?.Spravci?.Count ?? 0})")
             </a>
         </li>

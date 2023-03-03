@@ -18,7 +18,7 @@
                 string? s = arrTabnames[i];
                 if (s != null)
                 {
-                    <a href="#" onclick="ga('send', 'event', 'tabVertical', 'change_@i','@Model.GaPageEventId'); return true;" class="list-group-item @(first ? "active" : "")">
+                    <a href="#" onclick="_my_event('send', 'event', 'tabVertical', 'change_@i','@Model.GaPageEventId'); return true;" class="list-group-item @(first ? "active" : "")">
                         @Html.Raw(s)
                     </a>
                     first = false;

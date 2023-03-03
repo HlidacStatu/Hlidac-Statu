@@ -69,17 +69,27 @@ function eraseCookie(name) {
     createCookie(name, "", -1);
 }
 
+function _my_event(p1, p2, p3, p4, p5, p6, p7) {
 
+    //_my_event('send', 'event', [eventCategory], [eventAction], [eventLabel], [eventValue], [fieldsObject]);
+    //https://www.searchenginewatch.com/2018/03/19/how-to-set-up-event-tracking-in-google-analytics/
+    ga(p1, p2, p3, p4, p5, p6,p7);
+
+    
+    //_paq.push(['trackEvent', category, action, name, value, { dimension1: 'DimensionValue' }]);
+    //https://developer.matomo.org/guides/tracking-javascript-guide#manually-trigger-events
+    _paq.push(['trackEvent', p3, p4, p5, p6, p7]);
+}
 var trackInLink = function (obj, source) {
     var url = obj.getAttribute("href");
-    ga('send', 'event', 'insideLink', source, url, {
+    _my_event('send', 'event', 'insideLink', source, url, {
         'transport': 'beacon'
     });
     return true;
 }
 var trackOutLink = function (obj, source) {
     var url = obj.getAttribute("href");
-    ga('send', 'event', 'outbound', source, url, {
+    _my_event('send', 'event', 'outbound', source, url, {
         'transport': 'beacon'
     });
     return true;
@@ -327,7 +337,7 @@ $(function () {
 
     if (darDatDiff > 5 && darNum < 20) {
         $('#dar-footer-msg-' + campaignN).fadeIn();
-        ga('send', 'event', 'darujAdfooter' + campaignN, 'shown', { nonInteraction: true });
+        _my_event('send', 'event', 'darujAdfooter' + campaignN, 'shown', { nonInteraction: true });
         const myModal = new bootstrap.Modal('#dar-footer-msg-' + campaignN + '-modal');
         myModal.show();
 

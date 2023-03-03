@@ -64,7 +64,7 @@
     <script type="text/javascript">
         $(document).ready(function () {
         if (_showTrackJS) {
-                ga('send', 'event', 'pageload', 'OutOfWatchDogs', '@User.Identity?.Name', {
+                _my_event('send', 'event', 'pageload', 'OutOfWatchDogs', '@User.Identity?.Name', {
                 nonInteraction: true
             });
         }

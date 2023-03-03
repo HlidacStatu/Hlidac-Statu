@@ -11,7 +11,7 @@
     
 }
 
-<a href="#" class="@Model.Style" onclick="ga('send', 'event', 'exportBtn', 'click','@Model.GaPageEventId'); return true;" role="button" data-bs-toggle="modal" data-bs-target="#modal@(modalid)"><span class="small">Exportovat výsledky do Excelu</span></a> <!-- Modal -->
+<a href="#" class="@Model.Style" onclick="_my_event('send', 'event', 'exportBtn', 'click','@Model.GaPageEventId'); return true;" role="button" data-bs-toggle="modal" data-bs-target="#modal@(modalid)"><span class="small">Exportovat výsledky do Excelu</span></a> <!-- Modal -->
 <div class="modal fade" id="modal@(modalid)" tabindex="-1" role="dialog" aria-labelledby="modal@(modalid)">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -31,7 +31,7 @@
                 {
                     <p>
                         <a role="button" class="btn btn-primary btn-sm" target="_blank"
-                           onclick="ga('send', 'event', 'exportBtn', 'export','@Model.GaPageEventId'); return true;"
+                           onclick="_my_event('send', 'event', 'exportBtn', 'export','@Model.GaPageEventId'); return true;"
                            href="/manage/exportresult/@(Model.Typ)?q=@(System.Net.WebUtility.UrlEncode(Model.Query))&h=@(SmlouvaRepo.Searching.QueryHash(Model.Typ,Model.Query))&o=@(Model.Order)&ct=excel&@(Model.MoreParams)">
                             Export do Excelu
                         </a>
@@ -60,7 +60,7 @@
                     <hr />
                     <p><b>Export funguje pouze, když jste přihlášeni.</b></p>
                     <p>
-                        <a onclick="ga('send', 'event', 'registerBtn', 'click','@Model.GaPageEventId'); return true;" href="/account/Register?returnUrl=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))">Registrace</a>
+                        <a onclick="_my_event('send', 'event', 'registerBtn', 'click','@Model.GaPageEventId'); return true;" href="/account/Register?returnUrl=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))">Registrace</a>
                         je jednoduchá a zdarma. Pokud už jste zaregistrováni, stačí se <a href="/account/Login?returnUrl=@(System.Net.WebUtility.UrlEncode(Context.Request.GetEncodedPathAndQuery()))">přihlásit</a>.
                     </p>}
             </div>

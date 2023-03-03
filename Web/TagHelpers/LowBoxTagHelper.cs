@@ -13,7 +13,7 @@ namespace HlidacStatu.Web.TagHelpers
         {
             var preContent = $@"<div class='low-box' style='max-height:{Width}px'>
         <div class='low-box-line' style='top:{Width - 55}px'>
-        <a href='#' onclick=""ga('send', 'event', 'btnLowBoxMore', 'showMore','{GaPageEventId}'); return true;"" class='more'></a></div>
+        <a href='#' onclick=""_my_event('send', 'event', 'btnLowBoxMore', 'showMore','{GaPageEventId}'); return true;"" class='more'></a></div>
         <div class='low-box-content'>";
 
             output.TagName = null;

@@ -255,7 +255,7 @@ title='<span style=""font-weight:bold;font-style: italic;font-size:130%;border-b
         })
 
         $(document).ready(function () {
-            ga('send', 'event', 'pageload', 'cenik', '@(User.Identity.Name)', {
+            _my_event('send', 'event', 'pageload', 'cenik', '@(User.Identity.Name)', {
                 nonInteraction: true
             });
         });

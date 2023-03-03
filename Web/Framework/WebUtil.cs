@@ -33,7 +33,7 @@ namespace HlidacStatu.Web.Framework
         public static IHtmlContent GAClick(this IHtmlHelper htmlHelper)
         {
             return new HtmlString(
-                $" onclick=\"ga('send', 'event', 'logoffBtn', 'click','{htmlHelper.GetRequestPath()}')\" ");
+                $" onclick=\"_my_event('send', 'event', 'logoffBtn', 'click','{htmlHelper.GetRequestPath()}')\" ");
         }
 
         public static IHtmlContent IfExists(bool showExists, string exists, string ifEmpty = "")
