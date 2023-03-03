@@ -71,8 +71,11 @@ namespace HlidacStatu.Web.Framework
             {
                 throw new ArgumentNullException(nameof(hostEnvironment));
             }
-
+#if DEBUG
+            return true;
+#else
             return hostEnvironment.IsEnvironment("Petr") || hostEnvironment.IsEnvironment("Michal");
+#endif
         }
 
     }

@@ -195,7 +195,7 @@ function ResendConfirmationMail(calledBy) {
                 btn1.addClass("btn-success");
                 btn1.text("Email odeslán. Zkontrolujte si poštu, i složku s nevyžádanou poštou.");
             }
-            else  {
+            else {
                 btn1.removeClass("btn-default");
                 btn1.addClass("btn-danger");
                 btn1.text("Nastala nějaká chyba, víme o ni a budeme ji řešit.");
@@ -245,14 +245,13 @@ function ChangeBookmark(btn) {
         });
 }
 
-function InitLowBox()
-{
+function InitLowBox() {
     console.log("init LowBox");
     $(".low-box").each(function () {
         var t = $(this);
         var more = t.find(".low-box-line:first");
         var actheight = t.outerHeight();
-        var cssheight = parseInt(t.css("max-height"),10);
+        var cssheight = parseInt(t.css("max-height"), 10);
         if (actheight < cssheight) {
             var totalHeight = 0;
             t.find(".low-box-content").css({
@@ -269,7 +268,6 @@ function InitLowBox()
 }
 
 
-var campaignN = "bookmark";
 var menuOpened = false;
 $(function () {
 
@@ -287,10 +285,10 @@ $(function () {
             // Set height to prevent instant jumpdown when max height is removed
             "height": $up.height(),
             "max-height": 9999
-            })
+        })
             .animate({
                 height: totalHeight,
-                top:"+=60"
+                top: "+=60"
             });
 
         // fade out read-more
@@ -314,6 +312,7 @@ $(function () {
     });
 
     // ADS
+    var campaignN = "ceny";
 
     var darLast = parseInt(readCookie("darLast" + campaignN));
     if (isNaN(darLast))
@@ -326,37 +325,39 @@ $(function () {
 
 
 
-    if (false && darDatDiff > 5 && darNum < 5) {
+    if (darDatDiff > 5 && darNum < 20) {
+        $('#dar-footer-msg-' + campaignN).fadeIn();
+        ga('send', 'event', 'darujAdfooter' + campaignN, 'shown', { nonInteraction: true });
+        const myModal = new bootstrap.Modal('#dar-footer-msg-' + campaignN + '-modal');
+        myModal.show();
 
-        $('#dar-footer-msg').fadeIn();
-        ga('send', 'event', 'darujAdfooter', 'shown', { nonInteraction: true });
         createCookie("darLast" + campaignN, now.getTime(), 25);
         createCookie("darNum" + campaignN, darNum + 1, 360);
 
 
         //setTimeout(function () { $('#ads').fadeIn(); }, 500);
 
-        var zavri = $("#dar-footer-msg #fund-zavri-btn");
-        var info = $("#dar-footer-msg #fund-info-btn");
-        var daruj = $("#dar-footer-msg #fund-daruj-btn");
+        var zavri = $("#dar-footer-msg" + campaignN + " #fund-zavri-btn");
+        var info = $("#dar-footer-msg" + campaignN + " #fund-info-btn");
+        var daruj = $("#dar-footer-msg" + campaignN + " #fund-daruj-btn");
 
         daruj.click(function () {
             createCookie("darLast" + campaignN, now.getTime(), 25);
             createCookie("darNum" + campaignN, darNum + 3, 360);
-            $('#dar-footer-msg').fadeOut();
+            $('#dar-footer-msg' + campaignN).fadeOut();
 
         });
         info.click(function () {
             createCookie("darLast" + campaignN, now.getTime(), 11);
             createCookie("darNum" + campaignN, darNum + 1, 360);
-            $('#dar-footer-msg').fadeOut();
+            $('#dar-footer-msg' + campaignN).fadeOut();
             return true;
         });
 
         zavri.click(function () {
             createCookie("darLast" + campaignN, now.getTime(), 5);
             createCookie("darNum" + campaignN, darNum + 1, 360);
-            $('#dar-footer-msg').fadeOut();
+            $('#dar-footer-msg' + campaignN).fadeOut();
             return false;
         });
     }
@@ -475,80 +476,80 @@ function setNewSearchAsDefault() {
 }
 
 $(document).ready(function () {
-/*
-    $('#autocomsearch').select2({
-        theme: "bootstrap",
-        minimumInputLength: 2,
-        tags: true,
-        dataType: 'json',
-        placeholder: 'Zadejte dotaz, jméno úřadu, firmy, politika',
-        language: {
-            inputTooShort: function () {
-                return 'Prosím, zadejte alespoň 2 znaky';
-            }
-        },
-        //tokenSeparators: [' '],
-        ajax: {
-            type: 'GET',
-            contentType: "application/json; charset=utf-8",
+    /*
+        $('#autocomsearch').select2({
+            theme: "bootstrap",
+            minimumInputLength: 2,
+            tags: true,
             dataType: 'json',
-            delay: 250,
-            url: function (params) {
-                return '/beta/autocomplete/?q=' + params.term;
+            placeholder: 'Zadejte dotaz, jméno úřadu, firmy, politika',
+            language: {
+                inputTooShort: function () {
+                    return 'Prosím, zadejte alespoň 2 znaky';
+                }
             },
-            // data: function (params) {
-            //     var query = { q: params.term };
-            //     return JSON.stringify(query);
-            // },
-            params: { // extra parameters that will be passed to ajax
+            //tokenSeparators: [' '],
+            ajax: {
+                type: 'GET',
                 contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                delay: 250,
+                url: function (params) {
+                    return '/beta/autocomplete/?q=' + params.term;
+                },
+                // data: function (params) {
+                //     var query = { q: params.term };
+                //     return JSON.stringify(query);
+                // },
+                params: { // extra parameters that will be passed to ajax
+                    contentType: "application/json; charset=utf-8",
+                },
+                processResults: function (data) {
+                    // Transforms the top-level key of the response object from 'items' to 'results'
+                    return {
+                        results: $.map(data, function (obj) {
+                            obj.id = obj.id || obj.Id;
+                            obj.text = obj.text || obj.Text;
+                            return obj;
+                        })
+                    };
+                }
             },
-            processResults: function (data) {
-                // Transforms the top-level key of the response object from 'items' to 'results'
-                return {
-                    results: $.map(data, function (obj) {
-                        obj.id = obj.id || obj.Id;
-                        obj.text = obj.text || obj.Text;
-                        return obj;
-                    })
-                };
-            }
-        },
-        templateResult: formatOptions
-    });
-
-    //submit behaviour
-    //$("#new-search-input").on('submit', function (e) {
-    //    var searchval = $('#autocomsearch').val().join(' ');
-
-    //    $('#search-result-query-data').val(searchval);
-    //});
-
-    //$('#autocomsearch').on("select2:open", function (e) {
-    //    menuOpened = true;
-    //});
-    //$('#autocomsearch').on("select2:close", function (e) {
-    //    menuOpened = false;
-    //});
-
-    //on enter keypress
-    //$('.select2-search__field').on('keydown', function (e) {
-    //    if (e.keyCode === 13 && menuOpened == false) {
-    //        $("#new-search-input").submit();
-    //    }
-    //});
-    */
+            templateResult: formatOptions
+        });
+    
+        //submit behaviour
+        //$("#new-search-input").on('submit', function (e) {
+        //    var searchval = $('#autocomsearch').val().join(' ');
+    
+        //    $('#search-result-query-data').val(searchval);
+        //});
+    
+        //$('#autocomsearch').on("select2:open", function (e) {
+        //    menuOpened = true;
+        //});
+        //$('#autocomsearch').on("select2:close", function (e) {
+        //    menuOpened = false;
+        //});
+    
+        //on enter keypress
+        //$('.select2-search__field').on('keydown', function (e) {
+        //    if (e.keyCode === 13 && menuOpened == false) {
+        //        $("#new-search-input").submit();
+        //    }
+        //});
+        */
 
     // set default search input
     var defaultSearch = parseInt(readCookie("defaultOldSearch"));
     if (isNaN(defaultSearch) || defaultSearch == 0) {
         $('#old-search-input').hide();
-        $('#new-search-input').show(); 
+        $('#new-search-input').show();
         $('button.old-search-input').hide();
         $('button.new-search-input').show();
 
     } else {
-        $('#old-search-input').show(); 
+        $('#old-search-input').show();
         $('#new-search-input').hide();
         $('button.old-search-input').show();
         $('button.new-search-input').hide();

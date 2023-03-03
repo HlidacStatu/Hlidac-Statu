@@ -346,6 +346,7 @@ namespace HlidacStatu.Web
                     "Scripts/typeahead.bundle.min.js",
                     "Scripts/bloodhound.min.js");
 
+                pipeline.MinifyJsFiles(new NUglify.JavaScript.CodeSettings() { MinifyCode = Constants.IsDevelopment(WebHostEnvironment)==false });
             });
         }
 
