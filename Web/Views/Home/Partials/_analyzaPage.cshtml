@@ -47,7 +47,7 @@
 </h1>
 @{
     var res = await HlidacStatu.XLib.Search
-        .GeneralSearchAsync(Model.Query, 1, 1, false, "");
+        .GeneralSearchAsync(Model.Query, 1, 1, false, "", this.User);
 }
 <p>
     <a href="/hledatSmlouvy?q=@(System.Net.WebUtility.UrlEncode(Model.Query))" class="btn btn-primary btn-sm">Zobrazit výsledky tohoto dotazu</a>

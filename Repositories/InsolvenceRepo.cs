@@ -14,6 +14,28 @@ namespace HlidacStatu.Repositories
 {
     public static partial class InsolvenceRepo
     {
+
+        static string[] defaultRolesWithoutLimitation = new string[] { "Admin", "novinar" };
+
+        public static bool IsLimitedAccess(System.Security.Principal.IPrincipal user, string[]? validRoles = null)
+        {
+            validRoles ??= defaultRolesWithoutLimitation;
+            if (user?.Identity?.IsAuthenticated == true)
+            {
+                if (validRoles.Count() == 0)
+                    return false;
+
+                foreach (var role in validRoles)
+                {
+                    if (user.IsInRole(role.Trim()))
+                        return false;
+                }
+                return true;
+            }
+            return true;
+
+        }
+
         public static async Task<InsolvenceDetail> LoadFromEsAsync(string id, bool includeDocumentsPlainText, bool limitedView)
         {
             var client = await Repositories.ES.Manager.GetESClient_InsolvenceAsync();

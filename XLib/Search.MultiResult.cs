@@ -128,7 +128,9 @@ namespace HlidacStatu.XLib
 
         }
 
-        public static async Task<MultiResult> GeneralSearchAsync(string query, int page = 1, int pageSize = 10, bool showBeta = false, string order = null)
+        public static async Task<MultiResult> GeneralSearchAsync(
+            string query, int page = 1, int pageSize = 10, bool showBeta = false, string order = null,
+            System.Security.Principal.IPrincipal user = null)
         {
             MultiResult res = new MultiResult() { Query = query };
 
@@ -220,25 +222,28 @@ namespace HlidacStatu.XLib
                     }
                 }));
 
-            taskList.Add(
-                Task.Run(async() =>
-                {
-                    try
+            if (InsolvenceRepo.IsLimitedAccess(user)==false)
+            {
+                taskList.Add(
+                    Task.Run(async () =>
                     {
-                        Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
-                        sw.Start();
-                        var iqu = new InsolvenceSearchResult { Q = query, PageSize = pageSize, Order = order };
-                        res.Insolvence = iqu;
-                        res.Insolvence = await InsolvenceRepo.Searching.SimpleSearchAsync(new InsolvenceSearchResult { Q = query, PageSize = pageSize, Order = order });
-                        sw.Stop();
-                        res.Insolvence.ElapsedTime = sw.Elapsed;
-                    }
-                    catch (System.Exception e)
-                    {
-                        Util.Consts.Logger.Error("MultiResult GeneralSearch for insolvence query" + query, e);
-                    }
-                }));
-            
+                        try
+                        {
+                            Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+                            sw.Start();
+                            var iqu = new InsolvenceSearchResult { Q = query, PageSize = pageSize, Order = order };
+                            res.Insolvence = iqu;
+                            res.Insolvence = await InsolvenceRepo.Searching.SimpleSearchAsync(new InsolvenceSearchResult { Q = query, PageSize = pageSize, Order = order });
+                            sw.Stop();
+                            res.Insolvence.ElapsedTime = sw.Elapsed;
+                        }
+                        catch (System.Exception e)
+                        {
+                            Util.Consts.Logger.Error("MultiResult GeneralSearch for insolvence query" + query, e);
+                        }
+                    }));
+            }
+
             taskList.Add(
                 Task.Run(async () =>
                 {

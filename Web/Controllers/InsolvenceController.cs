@@ -31,12 +31,17 @@ namespace HlidacStatu.Web.Controllers
 
         public async Task<ActionResult> Hledat(Repositories.Searching.InsolvenceSearchResult model)
         {
-            if (model == null || ModelState.IsValid == false)
+            if (IsLimitedView())
+            {
+                return RedirectToAction("PristupOmezen", "Insolvence");
+            }
+
+            model.LimitedView = IsLimitedView();
+            if (model == null || ModelState.IsValid == false || model.LimitedView)
             {
                 return View(new Repositories.Searching.InsolvenceSearchResult());
             }
 
-            model.LimitedView = IsLimitedView();
             var res = await InsolvenceRepo.Searching.SimpleSearchAsync(model);
 
             AuditRepo.Add(
@@ -55,6 +60,11 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
             {
                 return new NotFoundResult();
+            }
+
+            if (IsLimitedView())
+            {
+                return RedirectToAction("PristupOmezen", "Insolvence");
             }
 
             //show highlighting
@@ -87,6 +97,11 @@ namespace HlidacStatu.Web.Controllers
             {
                 return new NotFoundResult();
             }
+            if (IsLimitedView())
+            {
+                return RedirectToAction("PristupOmezen", "Insolvence");
+            }
+
 
             bool showHighliting = !string.IsNullOrEmpty(Request.Query["qs"]);
 
@@ -125,6 +140,12 @@ namespace HlidacStatu.Web.Controllers
             {
                 return new NotFoundResult();
             }
+
+            if (IsLimitedView())
+            {
+                return RedirectToAction("PristupOmezen", "Insolvence");
+            }
+
 
             var dokument = await InsolvenceRepo.LoadDokumentAsync(id, false);
             if (dokument == null)

@@ -654,7 +654,7 @@ text zpravy: {txt}
             bool showBeta = User.Identity?.IsAuthenticated == true && User.IsInRole("BetaTester");
 
             var res = await XLib.Search
-                .GeneralSearchAsync(q, 1, Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal, showBeta, order);
+                .GeneralSearchAsync(q, 1, Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal, showBeta, order, this.User);
             AuditRepo.Add(
                 Audit.Operations.UserSearch
                 , User?.Identity?.Name
