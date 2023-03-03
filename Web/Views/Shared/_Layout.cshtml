@@ -199,25 +199,22 @@
     <link href="@Html.Raw("/scripts/tagify/tagify.4.17.7.css")" rel="stylesheet" type="text/css" />
     <script src="/scripts/autocomplete.v1.2.js"></script>
 
-
-    @*    <!-- Global site tag (gtag.js) - Google Ads: 310986777 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-310986777"></script>
+    <!-- Matomo -->
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'AW-310986777');
+        var _paq = window._paq = window._paq || [];
+        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function () {
+            var u = "https://ma.hlidacstatu.cz/";
+            _paq.push(['setTrackerUrl', u + 'matomo.php']);
+            _paq.push(['setSiteId', '1']);
+            var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+            g.async = true; g.src = u + 'matomo.js'; s.parentNode.insertBefore(g, s);
+        })();
     </script>
+    <!-- End Matomo Code -->
 
-    <script type="text/javascript">
-    /* <![CDATA[ */
-    var seznam_retargeting_id = 138934;
-    /* ]]> */
-    </script>
-    <script type="text/javascript" src="//c.imedia.cz/js/retargeting.js"></script>
-
-    *@
 </head>
 <body class="new-body">
     <div id="fb-root"></div>
