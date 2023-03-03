@@ -1,6 +1,5 @@
 using System;
 using Devmasters.Log;
-using HlidacStatu.AutocompleteApi;
 using HlidacStatu.AutocompleteApi.Services;
 using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.MiddleWares;
@@ -45,6 +44,12 @@ builder.Host.ConfigureHostForDocker();
 Devmasters.Config.Init(builder.Configuration);
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.csCulture;
+
+// wati until generator (dependency) is running
+var baseUrl = Devmasters.Config.GetWebConfigValue("GeneratorUrl");
+var url = $"{baseUrl}/test"; //test endpoint
+await HlidacStatu.LibCore.Docker.WaitUntilServiceIsRunning(url);
+
 
 // run application
 logger.Information("Starting application");
