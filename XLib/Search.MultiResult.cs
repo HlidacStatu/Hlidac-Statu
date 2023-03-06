@@ -23,7 +23,7 @@ namespace HlidacStatu.XLib
             public bool OsobaFtx = false;
             public Repositories.Searching.Search.GeneralResult<Firma> Firmy { get; set; } = null;
             public Datasets.Search.DatasetMultiResult Datasets { get; set; }
-            public InsolvenceSearchResult Insolvence { get; set; } = null;
+            public InsolvenceSearchResult Insolvence { get; set; } = new ();
             public DotaceSearchResult Dotace { get; set; } = null;
 
             public List<Registration> DatasetRegistrations { get; set; } = new();
