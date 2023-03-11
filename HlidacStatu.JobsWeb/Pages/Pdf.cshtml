@@ -4,6 +4,7 @@
 @model HlidacStatu.Ceny.Pages.PdfModel
 
 @{
+
     CompareDataModel graphModel = new CompareDataModel();
     TableViewModel tableModel = new TableViewModel();
     var statistics = new List<JobStatistics>();
@@ -38,6 +39,8 @@
         tableModel.LinkHref = "/obor";
         tableModel.Caption = "";
     }
+    ViewData["Title"] = "Souhrnné statistiky ICT prací pro " + rok;
+
 }
 @section scripts
 {
@@ -47,6 +50,10 @@
 
 @if (Model.Key.HasValue)
 {
+    <div class="row mb-4 no-print">
+        <div class="col-sm-12"><button class="btn btn-secondary float-end" onclick="window.print();return false;">Vytisknout či stáhnout PDF</button></div>
+    </div>
+
     <h2>Přehled obvyklých cen IT prací ve státní správě za rok @rok</h2>
 
     <p>
