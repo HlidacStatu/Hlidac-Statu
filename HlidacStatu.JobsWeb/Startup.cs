@@ -7,6 +7,7 @@ using HlidacStatu.Ceny.Services;
 using HlidacStatu.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -127,13 +128,14 @@ namespace HlidacStatu.Ceny
             //     options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2
             // );
             
-            // services.ConfigureApplicationCookie(o =>
-            // {
-            //     o.Cookie.Domain = ".hlidacstatu.cz"; 
-            //     o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
-            //     
-            //     o.Cookie.SameSite = SameSiteMode.Lax;
-            // });
+            services.ConfigureApplicationCookie(o =>
+            {
+                o.ExpireTimeSpan = TimeSpan.FromDays(30);
+                o.Cookie.Domain = ".watchdoganalytics.cz";
+                o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+
+                o.Cookie.SameSite = SameSiteMode.Strict;
+            });
             
             //add third party authentication
             services.AddAuthentication()

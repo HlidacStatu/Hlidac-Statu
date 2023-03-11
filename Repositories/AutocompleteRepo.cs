@@ -28,7 +28,7 @@ namespace HlidacStatu.Repositories
         /// ! Slow, long running operation
         /// </summary>
         /// <returns></returns>
-        public static IEnumerable<Autocomplete> GenerateAutocomplete(bool debug = false, Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
+        public static async Task<IEnumerable<Autocomplete>> GenerateAutocomplete(bool debug = false, Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
         {
             AutocompleteRepo.debug = debug;
             IEnumerable<Autocomplete> companies = new List<Autocomplete>();
@@ -100,21 +100,6 @@ namespace HlidacStatu.Repositories
                     }
                 },
 
-
-                () =>
-                {
-                    try
-                    {
-                        Consts.Logger.Info("GenerateAutocomplete Loading people");
-                        people = LoadPeopleAsync(logOutputFunc, progressOutputFunc).ConfigureAwait(false).GetAwaiter().GetResult();
-                        Consts.Logger.Info("GenerateAutocomplete Loading people done");
-                    }
-                    catch (Exception e)
-                    {
-                        Consts.Logger.Error("GenerateAutocomplete People error ", e);
-                    }
-                },
-
                 () =>
                 {
                     try
@@ -156,22 +141,20 @@ namespace HlidacStatu.Repositories
                         Consts.Logger.Error("GenerateAutocomplete Operators error ", e);
                     }
                 }
-                
-                // () =>
-                // {
-                //     try
-                //     {
-                //         Consts.Logger.Info("GenerateAutocomplete Loading articles");
-                //         operators = LoadArticles();
-                //         Consts.Logger.Info("GenerateAutocomplete Loading articles done");
-                //     }
-                //     catch (Exception e)
-                //     {
-                //         Consts.Logger.Error("GenerateAutocomplete articles error ", e);
-                //     }
-                // }
-                );
-
+            );
+            
+            
+            try
+            {
+                Consts.Logger.Info("GenerateAutocomplete Loading people");
+                people = await LoadPeopleAsync(logOutputFunc, progressOutputFunc);
+                Consts.Logger.Info("GenerateAutocomplete Loading people done");
+            }
+            catch (Exception e)
+            {
+                Consts.Logger.Error("GenerateAutocomplete People error ", e);
+            }
+            
             Consts.Logger.Info("GenerateAutocomplete done");
 
             return companies

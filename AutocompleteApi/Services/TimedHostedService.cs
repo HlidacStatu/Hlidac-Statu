@@ -23,6 +23,10 @@ public class TimedHostedService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         using var timer = new PeriodicTimer(TimeSpan.FromHours(8));
+        
+        // This is important so this background task wont hold server from starting.
+        await Task.Yield();
+
         do
         {
             logger.Debug($"Timer triggered.");
