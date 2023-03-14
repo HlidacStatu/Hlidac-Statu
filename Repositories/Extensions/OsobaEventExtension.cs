@@ -15,9 +15,9 @@ namespace HlidacStatu.Extensions
             {
 
                 case OsobaEvent.Types.Politicka:
-                case OsobaEvent.Types.PolitickaPracovni:
+                case OsobaEvent.Types.PolitickaExekutivni:
                 case OsobaEvent.Types.VerejnaSpravaJine:
-                case OsobaEvent.Types.VerejnaSpravaPracovni:
+                case OsobaEvent.Types.VerejnaSpravaExekutivni:
                 case OsobaEvent.Types.SoukromaPracovni:
                 case OsobaEvent.Types.VolenaFunkce:
                     sb.Append($"{osobaEvent.AddInfo} {osobaEvent.RenderDatum(txtOd: "od", txtDo: " do ", template: "({0})")} ");
@@ -41,7 +41,7 @@ namespace HlidacStatu.Extensions
                     else
                         return (osobaEvent.Title + " " + osobaEvent.Note).Trim();
 
-                case OsobaEvent.Types.Specialni:
+                case OsobaEvent.Types.Vazby:
                 default:
                     if (!string.IsNullOrEmpty(osobaEvent.AddInfo + osobaEvent.Organizace))
                     {
@@ -76,9 +76,9 @@ namespace HlidacStatu.Extensions
             switch ((OsobaEvent.Types)osobaEvent.Type)
             {
                 case OsobaEvent.Types.Politicka:
-                case OsobaEvent.Types.PolitickaPracovni:
+                case OsobaEvent.Types.PolitickaExekutivni:
                 case OsobaEvent.Types.VerejnaSpravaJine:
-                case OsobaEvent.Types.VerejnaSpravaPracovni:
+                case OsobaEvent.Types.VerejnaSpravaExekutivni:
                 case OsobaEvent.Types.SoukromaPracovni:
                 case OsobaEvent.Types.VolenaFunkce:
                     sb.Append($"{osobaEvent.AddInfo} {osobaEvent.RenderDatum(txtOd: "od", txtDo: " do ", template: "({0})")} ");
@@ -102,7 +102,7 @@ namespace HlidacStatu.Extensions
                     else
                         return (osobaEvent.Title + " " + osobaEvent.Note).Trim();
 
-                case OsobaEvent.Types.Specialni:
+                case OsobaEvent.Types.Vazby:
                 default:
                     if (!string.IsNullOrEmpty(osobaEvent.AddInfo + osobaEvent.Organizace))
                     {

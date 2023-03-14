@@ -142,10 +142,10 @@ namespace HlidacStatu.Entities
 
         public static int[] VerejnopravniUdalosti = new int[] {
             (int)OsobaEvent.Types.VolenaFunkce,
-            (int)OsobaEvent.Types.PolitickaPracovni,
+            (int)OsobaEvent.Types.PolitickaExekutivni,
             (int)OsobaEvent.Types.Politicka,
             (int)OsobaEvent.Types.VerejnaSpravaJine,
-            (int)OsobaEvent.Types.VerejnaSpravaPracovni,
+            (int)OsobaEvent.Types.VerejnaSpravaExekutivni,
             (int)OsobaEvent.Types.Osobni,
             (int)OsobaEvent.Types.Jine
         };

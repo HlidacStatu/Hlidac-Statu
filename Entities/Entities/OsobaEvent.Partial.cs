@@ -44,26 +44,37 @@ namespace HlidacStatu.Entities
         public enum Types
         {
             [NiceDisplayName("Speciální")]
-            Specialni = 0,
+            [Display(Name="Vazby", Description = "Speciální vazby na firmy, nebo osoby")]
+            Vazby = 0,
             [NiceDisplayName("Volená funkce")]
+            [Display(Name="Volená funkce", Description = "funkce do které musela být osoba zvolena")]
             VolenaFunkce = 1,
             [NiceDisplayName("Soukromá pracovní")]
+            [Display(Name="Soukromá pracovní", Description = "Povolání - ne nutně spojené s politikou")]
             SoukromaPracovni = 2,
             [NiceDisplayName("Osobní")]
+            [Display(Name="Osobní", Description = "Další věci týkající se osoby (vzdělání, koníčky, ...)")]
             Osobni = 4,
-            [NiceDisplayName("Veřejná správa pracovní")]
-            VerejnaSpravaPracovni = 6,
+            [NiceDisplayName("Veřejná správa exekutivní")]
+            [Display(Name="Veřejná správa exekutivní", Description = "Funkce kam jsou lidi jmenováni nebo vybráni (úřady, st. podniky, p.o. atp)")]
+            VerejnaSpravaExekutivni = 6,
             [NiceDisplayName("Politická")]
+            [Display(Name="Politická", Description = "Události spojené s politickou stranou/hnutím a kandidaturou")]
             Politicka = 7,
-            [NiceDisplayName("Politická pracovní")]
-            PolitickaPracovni = 9,
+            [NiceDisplayName("Politická exekutivní")]
+            [Display(Name="Politická exekutivní", Description = "Funkce spojené s politickou exekutivní rolí")]
+            PolitickaExekutivni = 9,
             [NiceDisplayName("Veřejná správa jiné")]
+            [Display(Name="Veřejná správa jiné", Description = "Členové dozorčích rad, správních rad a jiných orgánů v úřadech a státních organizacích")]
             VerejnaSpravaJine = 10,
             [NiceDisplayName("Jiné")]
+            [Display(Name="Jiné", Description = "Vše, co by nešlo zařadit do jiné kategorie")]
             Jine = 11,
             [NiceDisplayName("Sociální sítě")]
+            [Display(Name="Sociální sítě", Description = "Odkazy na profil na sociálních sítích")]
             SocialniSite = 12,
             [NiceDisplayName("Centrální registr oznámení")]
+            [Display(Name="Centrální registr oznámení", Description = "Události z CRO - aktuálně neaktualizované")]
             CentralniRegistrOznameni = 13
         }
 

@@ -340,7 +340,7 @@ namespace HlidacStatu.Repositories
 
             public static int[] PolitikImportanceEventTypes = new int[]
             {
-                (int) OsobaEvent.Types.Politicka, (int) OsobaEvent.Types.PolitickaPracovni,
+                (int) OsobaEvent.Types.Politicka, (int) OsobaEvent.Types.PolitickaExekutivni,
                 (int) OsobaEvent.Types.VolenaFunkce
             };
 
