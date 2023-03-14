@@ -597,7 +597,7 @@ namespace HlidacStatu.Repositories
                     var politickeEventy = new HashSet<int>()
                     {
                         (int)OsobaEvent.Types.Politicka,
-                        (int)OsobaEvent.Types.PolitickaPracovni,
+                        (int)OsobaEvent.Types.PolitickaExekutivni,
                         // Patří sem i volená?
                     };
                     
@@ -609,7 +609,7 @@ namespace HlidacStatu.Repositories
 
                 case Zatrideni.Ministr:
                     return GetByEvent(e =>
-                            e.Type == (int)OsobaEvent.Types.PolitickaPracovni
+                            e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && e.AddInfo.ToLower().StartsWith("ministr")
                             && e.Organizace.ToLower().StartsWith("ministerstvo")
                             && (e.DatumDo == null || e.DatumDo >= toDate)
@@ -618,7 +618,7 @@ namespace HlidacStatu.Repositories
 
                 case Zatrideni.Hejtman:
                     return GetByEvent(e =>
-                            e.Type == (int)OsobaEvent.Types.PolitickaPracovni
+                            e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && e.AddInfo.ToLower().StartsWith("hejtman")
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
@@ -662,7 +662,7 @@ namespace HlidacStatu.Repositories
                 
                 case Zatrideni.PoradcePredsedyVlady:
                     return GetByEvent(e =>
-                            e.Type == (int)OsobaEvent.Types.PolitickaPracovni
+                            e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && (e.AddInfo.ToLower().StartsWith("poradce předsedy vlády") ||
                                 e.AddInfo.ToLower().StartsWith("poradkyně předsedy vlády"))
                             && e.Organizace.ToLower().StartsWith("úřad vlády čr")
