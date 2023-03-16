@@ -15,7 +15,10 @@
     if (Model.Key.HasValue)
     {
         if (showStatistics)
+        {
             statistics = JobService.GetTagStatistics(Model.Obor, Model.Key.Value);
+            tableModel.CompareWithFirstLine = true;
+        }
         graphModel.BasicData = statistics;
 
         tableModel.Statistics = statistics;
@@ -29,6 +32,7 @@
 
 @if (showStatistics)
 {
+    
     <partial name="Shared/_SouhrnTable" model="tableModel" />
 }
 
