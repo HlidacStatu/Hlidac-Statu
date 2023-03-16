@@ -6,7 +6,7 @@ namespace HlidacStatu.Entities;
 /// <summary>
 /// Slouží pro ukládání historie dokumentů
 /// </summary>
-public class DocumentHistory
+public class DocumentHistory<T> where T : IDocumentHash
 {
     [Date]
     public DateTime SaveDate { get; set; } = DateTime.Now;
@@ -18,8 +18,8 @@ public class DocumentHistory
     [Keyword]
     public string DocumentId { get; set; }
     
-    [Object]
-    public Object Document { get; set; }
+    [Object(Enabled = false)] // neindexujeme vnitřní strukturu
+    public T Document { get; set; }
     [Keyword]
     public string DocumentHash { get; set; }
     [Keyword]

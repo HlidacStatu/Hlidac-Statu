@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories.ES
 {
@@ -132,11 +133,18 @@ namespace HlidacStatu.Repositories.ES
         {
             return GetESClientAsync(defaultIndexName_VerejneZakazky, timeOut, connectionLimit, IndexType.VerejneZakazky);
         }
-        public static async Task<ElasticClient> GetESClient_VerejneZakazkyAsync(int timeOut = 60000, int connectionLimit = 80)
+        public static Task<ElasticClient> GetESClient_VerejneZakazkyAsync(int timeOut = 60000, int connectionLimit = 80)
         {
             // workaround to get to the hidden index
             
             string indexName = "hs-verejnezakazky_new-02";
+            return HackClientIndex(indexName, timeOut, connectionLimit);
+
+            // return GetESClientAsync(defaultIndexName_VerejneZakazkyNew, timeOut, connectionLimit, IndexType.VerejneZakazky);
+        }
+
+        private static async Task<ElasticClient> HackClientIndex(string indexName, int timeOut, int connectionLimit)
+        {
             string cnnset = string.Format("{0}|{1}|{2}", indexName, timeOut, connectionLimit);
             ConnectionSettings sett = GetElasticSearchConnectionSettings(indexName, timeOut, connectionLimit);
 
@@ -166,8 +174,6 @@ namespace HlidacStatu.Repositories.ES
             }
 
             return _clients[cnnset];
-
-            //return GetESClientAsync(defaultIndexName_VerejneZakazkyNew, timeOut, connectionLimit, IndexType.VerejneZakazky);
         }
         
         public static Task<ElasticClient> GetESClient_DocumentHistoryAsync(int timeOut = 60000, int connectionLimit = 80)
@@ -525,7 +531,7 @@ namespace HlidacStatu.Repositories.ES
                     res = await client.Indices
                         .CreateAsync(indexName, i => i
                             .InitializeUsing(idxSt)
-                            .Map<Entities.DocumentHistory>(map => map.AutoMap().DateDetection(false))
+                            .Map<Entities.DocumentHistory<IDocumentHash>>(map => map.AutoMap().DateDetection(false))
                         );
                     break;
                 case IndexType.ProfilZadavatele:

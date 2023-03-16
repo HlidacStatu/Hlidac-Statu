@@ -7,14 +7,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
+using Microsoft.Extensions.Primitives;
 
 namespace HlidacStatu.Entities.VZ
 
 {
     [Description("Struktura verejne zakazky v Hlidaci Statu")]
-    public partial class VerejnaZakazka
-        : IBookmarkable, IFlattenedExport
+    public class VerejnaZakazka : IBookmarkable, IFlattenedExport, IDocumentHash
     {
         public class Sources
         {
@@ -75,8 +76,7 @@ namespace HlidacStatu.Entities.VZ
             [Description("URL formuláře, může být prázdné")]
             [Keyword(Index = false)]
             public String URL { get; set; } = string.Empty;
-
-
+            
             //[Boolean]
             //public bool 
             public bool Equals(Formular other)
@@ -390,7 +390,9 @@ namespace HlidacStatu.Entities.VZ
             }
         }
 
-
+        [Description("Prvotní zdroj, kde jsme se o VZ dozvěděli")]
+        [Keyword(Index = false)]
+        public String Origin { get; set; }
 
         public string FormattedCena(bool html)
         {
@@ -756,6 +758,65 @@ namespace HlidacStatu.Entities.VZ
                 ((IDictionary<String, Object>)v).Add($"DodavatelIco_{i}", Dodavatele[i].ICO);
             }
             return v;
+        }
+
+        public string GetDocumentHash()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(DatumUverejneni);
+            sb.Append(LhutaDoruceni);
+            sb.Append(LhutaPrihlaseni);
+            sb.Append(NazevZakazky);
+            sb.Append(PopisZakazky);
+            sb.Append(PopisZakazkyRozza);
+            sb.Append(DatumUzavreniSmlouvy);
+            sb.Append(VvzInternalId);
+            sb.Append(KonecnaHodnotaMena);
+            sb.Append(OdhadovanaHodnotaMena);
+            sb.Append(KonecnaHodnotaBezDPH);
+            sb.Append(OdhadovanaHodnotaBezDPH);
+            sb.Append(RawHtml);
+            sb.Append(StavVZ);
+            foreach (var dodavatel in Dodavatele)
+            {
+                sb.Append(dodavatel.Jmeno);
+                sb.Append(dodavatel.ICO);
+                sb.Append(dodavatel.ProfilZadavatele);
+            }
+            foreach (var dokument in Dokumenty)
+            {
+                if (string.IsNullOrWhiteSpace(dokument.Sha256Checksum))
+                {
+                    sb.Append(dokument.Name);
+                    foreach (var url in dokument.DirectUrls)
+                    {
+                        sb.Append(url);
+                    }
+                    foreach (var url in dokument.OficialUrls)
+                    {
+                        sb.Append(url);
+                    }
+                    foreach (var sid in dokument.StorageIds)
+                    {
+                        sb.Append(sid);
+                    }
+                }
+                else
+                {
+                    sb.Append(dokument.Sha256Checksum);
+                }
+            }
+            sb.AppendJoin(";", Formulare.Select(f => f.GetHashCode()));
+            sb.AppendJoin(";", Zdroje.Select(x => x.UniqueId));
+            sb.AppendJoin(";", ExternalIds);
+            sb.Append(Zadavatel.Jmeno);
+            sb.Append(Zadavatel.ICO);
+            sb.Append(Zadavatel.ProfilZadavatele);
+            sb.AppendJoin(";", ExternalIds);
+            sb.AppendJoin(";", UrlZakazky);
+            sb.AppendJoin(";", CPV);
+
+            return Checksum.DoChecksum(sb.ToString());
         }
     }
 }

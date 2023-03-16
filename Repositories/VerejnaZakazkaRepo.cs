@@ -114,12 +114,32 @@ namespace HlidacStatu.Repositories
                 {
                     firstVz = MergeVz(firstVz, storedDuplicate);
 
-                    await elasticClient.DeleteByQueryAsync<VerejnaZakazka>(s => s.Query(q =>
-                        q.Term(t => t.Field(f => f.Id).Value(storedDuplicate.Id))));
+                    try
+                    {
+                        await DocumentHistoryRepo<VerejnaZakazka>.SaveAsync(storedDuplicate, storedDuplicate.Origin, firstVz.Id);
+
+                        await elasticClient.DeleteByQueryAsync<VerejnaZakazka>(s => s.Query(q =>
+                            q.Term(t => t.Field(f => f.Id).Value(storedDuplicate.Id))));
+                    }
+                    catch (Exception e)
+                    {
+                        Consts.Logger.Error(
+                            $"VZ ERROR Merging ID:{firstVz.Id} with ID:{storedDuplicate.Id}.", e);
+                    }
 
                 }
 
                 firstVz = MergeVz(firstVz, newVZ);
+                try
+                {
+                    await DocumentHistoryRepo<VerejnaZakazka>.SaveAsync(newVZ, newVZ.Origin, firstVz.Id);
+                }
+                catch (Exception e)
+                {
+                    Consts.Logger.Error(
+                        $"VZ ERROR Merging ID:{firstVz.Id} with new VZ from {newVZ.Origin}.", e);
+                }
+                
 
                 SendToOcrQueue(firstVz);
                 
