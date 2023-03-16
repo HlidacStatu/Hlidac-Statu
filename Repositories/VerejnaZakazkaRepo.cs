@@ -311,6 +311,7 @@ namespace HlidacStatu.Repositories
 
         private static void SendToOcrQueue(VerejnaZakazka newVZ)
         { 
+            return;
             if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
             {
                 ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,

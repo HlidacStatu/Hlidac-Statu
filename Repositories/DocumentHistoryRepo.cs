@@ -46,7 +46,7 @@ public static class DocumentHistoryRepo<T> where T: IDocumentHash
         return res.IsValid && res.Documents.Any();
     }
     
-    public static async Task<List<DocumentHistory<T>>> LoadDoccsWithId(string docId)
+    public static async Task<List<DocumentHistory<T>>> LoadDocsWithId(string docId)
     {
         var elasticClient = await Manager.GetESClient_DocumentHistoryAsync();
         var res = await elasticClient.SearchAsync<DocumentHistory<T>>(s => s
