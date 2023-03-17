@@ -45,7 +45,7 @@ public class TimedHostedService : BackgroundService
             logger.Debug($"Loading {indexType:G} index.");
             try
             {
-                await _indexCache.DownloadCacheIndexAsync(indexType, _httpClientFactory);
+                await _indexCache.DownloadCacheIndexAsync(indexType);
             }
             catch (Exception e)
             {
@@ -53,8 +53,8 @@ public class TimedHostedService : BackgroundService
             }
         }
 
-        _indexCache.UpdateCache();
-
+        await _indexCache.UpdateCacheAsync();
+        
         await Task.Delay(TimeSpan.FromMinutes(3),
             stoppingToken); // waits so that some possible stuck requests frees old indexes
 

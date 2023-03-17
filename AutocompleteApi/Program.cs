@@ -57,7 +57,7 @@ try
 {
     logger.Information("Configuring services");
     builder.Services.AddHostedService<TimedHostedService>();
-    builder.Services.AddSingleton<IndexCache>(new IndexCache());
+    builder.Services.AddSingleton<IndexCache>();
     builder.Services.AddControllers();
     builder.Services.AddHttpClient();
     logger.Information("Services configured");

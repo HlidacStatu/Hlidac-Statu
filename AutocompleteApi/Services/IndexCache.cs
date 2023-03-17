@@ -25,6 +25,12 @@ public class IndexCache
     public Index<AdresyKVolbam> Adresy { get; set; }
 
     private Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger<IndexCache>();
+    private IHttpClientFactory _httpClientFactory;
+
+    public IndexCache(IHttpClientFactory httpClientFactory)
+    {
+        _httpClientFactory = httpClientFactory;
+    }
 
     private DateTime? LastUpdateRun { get; set; }
 
@@ -32,7 +38,7 @@ public class IndexCache
     {
         if (LastUpdateRun is null)
             return null;
-        
+
         return new Status()
         {
             LastUpdate = LastUpdateRun.Value,
@@ -44,17 +50,8 @@ public class IndexCache
         };
     }
 
-    public async Task DownloadCacheIndexAsync(AutocompleteIndexType indexType,
-        IHttpClientFactory httpClientFactory)
-    {
-        var baseUrl = Devmasters.Config.GetWebConfigValue("GeneratorUrl");
-        var httpClient = httpClientFactory.CreateClient();
-
-        AsyncRetryPolicy<HttpResponseMessage> retryPolicy = HttpPolicyExtensions
-            .HandleTransientHttpError()
-            .WaitAndRetryAsync(5, attempt => TimeSpan.FromMilliseconds(attempt * 50));
-
-        var type = indexType switch
+    private string AutocompleteIndexTypeToString(AutocompleteIndexType indexType) =>
+        indexType switch
         {
             AutocompleteIndexType.Adresy => nameof(AutocompleteIndexType.Adresy),
             AutocompleteIndexType.KIndex => nameof(AutocompleteIndexType.KIndex),
@@ -64,6 +61,17 @@ public class IndexCache
             _ => throw new ArgumentOutOfRangeException()
         };
 
+    public async Task DownloadCacheIndexAsync(AutocompleteIndexType indexType)
+    {
+        var baseUrl = Devmasters.Config.GetWebConfigValue("GeneratorUrl");
+        var httpClient = _httpClientFactory.CreateClient();
+
+        AsyncRetryPolicy<HttpResponseMessage> retryPolicy = HttpPolicyExtensions
+            .HandleTransientHttpError()
+            .WaitAndRetryAsync(5, attempt => TimeSpan.FromMilliseconds(attempt * 50));
+
+        var type = AutocompleteIndexTypeToString(indexType);
+
         string lastTimeStamp = CurrentIndexStamp(indexType) ?? "_null_";
 
         var url = $"{baseUrl}?type={type}&lastTimestamp={lastTimeStamp}";
@@ -72,7 +80,7 @@ public class IndexCache
             httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
 
         _ = responseMessage.EnsureSuccessStatusCode();
-        if(responseMessage.StatusCode == HttpStatusCode.NoContent) // there are no newer data ready
+        if (responseMessage.StatusCode == HttpStatusCode.NoContent) // there are no newer data ready
             return;
 
         await using var stream = await responseMessage.Content.ReadAsStreamAsync();
@@ -80,15 +88,21 @@ public class IndexCache
         var outputDirName = responseMessage.Content.Headers.ContentDisposition?.FileName?.Replace(".zip", "");
         if (outputDirName is null)
         {
-            logger.Warning("Output directory name couldnt be retrieved.", responseMessage.Content.Headers.ContentDisposition);
+            logger.Warning("Output directory name couldnt be retrieved.",
+                responseMessage.Content.Headers.ContentDisposition);
             outputDirName = DateTime.Now.ToString("0yyyyMMdd");
         }
+
         var outputDirPath = Path.Combine(PathToIndexFolder(indexType), outputDirName);
         zipArchive.ExtractToDirectory(outputDirPath);
     }
 
 
-    public void UpdateCache()
+    /// <summary>
+    /// Updates cache if it can. If a new Index is corrupted, then it rolls back to the old one and reports corrupted Index to Generator.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public async Task UpdateCacheAsync()
     {
         foreach (var indexType in Enum.GetValues<AutocompleteIndexType>())
         {
@@ -102,19 +116,79 @@ public class IndexCache
             switch (indexType)
             {
                 case AutocompleteIndexType.Adresy:
-                    Adresy = new Index<AdresyKVolbam>(path);
+                {
+                    var newIndex = new Index<AdresyKVolbam>(path);
+                    if (IsIndexCorrupted(newIndex))
+                    {
+                        await ReportCorruptedIndexAsync(path, indexType);
+                    }
+                    else
+                    {
+                        var oldIndex = Adresy;
+                        Adresy = newIndex;
+                        oldIndex.Dispose();
+                    }
+                }
                     break;
                 case AutocompleteIndexType.KIndex:
-                    Kindex = new Index<SubjectNameCache>(path);
+                {
+                    var newIndex = new Index<SubjectNameCache>(path);
+                    if (IsIndexCorrupted(newIndex))
+                    {
+                        await ReportCorruptedIndexAsync(path, indexType);
+                    }
+                    else
+                    {
+                        var oldIndex = Adresy;
+                        Kindex = newIndex;
+                        oldIndex.Dispose();
+                    }
+                }
                     break;
                 case AutocompleteIndexType.Company:
-                    Company = new Index<Autocomplete>(path);
+                {
+                    var newIndex = new Index<Autocomplete>(path);
+                    if (IsIndexCorrupted(newIndex))
+                    {
+                        await ReportCorruptedIndexAsync(path, indexType);
+                    }
+                    else
+                    {
+                        var oldIndex = Adresy;
+                        Company = newIndex;
+                        oldIndex.Dispose();
+                    }
+                }
                     break;
                 case AutocompleteIndexType.Uptime:
-                    UptimeServer = new Index<StatniWebyAutocomplete>(path);
+                {
+                    var newIndex = new Index<StatniWebyAutocomplete>(path);
+                    if (IsIndexCorrupted(newIndex))
+                    {
+                        await ReportCorruptedIndexAsync(path, indexType);
+                    }
+                    else
+                    {
+                        var oldIndex = Adresy;
+                        UptimeServer = newIndex;
+                        oldIndex.Dispose();
+                    }
+                }
                     break;
                 case AutocompleteIndexType.Full:
-                    FullAutocomplete = new Index<Autocomplete>(path);
+                {
+                    var newIndex = new Index<Autocomplete>(path);
+                    if (IsIndexCorrupted(newIndex))
+                    {
+                        await ReportCorruptedIndexAsync(path, indexType);
+                    }
+                    else
+                    {
+                        var oldIndex = Adresy;
+                        FullAutocomplete = newIndex;
+                        oldIndex.Dispose();
+                    }
+                }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -122,6 +196,48 @@ public class IndexCache
         }
 
         LastUpdateRun = DateTime.Now;
+    }
+
+    private async Task ReportCorruptedIndexAsync(string path, AutocompleteIndexType indexType)
+    {
+        var yymmddPart = path.Split(Path.DirectorySeparatorChar, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)?
+            .Last();
+        
+        var baseUrl = Devmasters.Config.GetWebConfigValue("GeneratorUrl");
+        var httpClient = _httpClientFactory.CreateClient();
+
+        AsyncRetryPolicy<HttpResponseMessage> retryPolicy = HttpPolicyExtensions
+            .HandleTransientHttpError()
+            .WaitAndRetryAsync(5, attempt => TimeSpan.FromMilliseconds(attempt * 50));
+        
+        
+        var type = AutocompleteIndexTypeToString(indexType);
+        var url = $"{baseUrl}?type={type}&name={yymmddPart}";
+
+        using var responseMessage = await retryPolicy.ExecuteAsync(() =>
+            httpClient.DeleteAsync(url));
+
+        if (responseMessage.StatusCode != HttpStatusCode.OK)
+        {
+            logger.Warning($"Pravděpodobně došlo k selhání při promazávání vadných dat u generátoru. " +
+                           $"Url [{url}], response [{responseMessage.StatusCode} - {responseMessage.ReasonPhrase}]");
+        }
+        
+        
+    }
+
+    private bool IsIndexCorrupted<T>(Index<T> index) where T : IEquatable<T>
+    {
+        try
+        {
+            _ = index.Search("a");
+            return true;
+        }
+        catch (Exception e)
+        {
+            logger.Error($"Index {typeof(T).Name} is corrupted.", e);
+            return true;
+        }
     }
 
     private static string PathToIndexFolder(AutocompleteIndexType type)
