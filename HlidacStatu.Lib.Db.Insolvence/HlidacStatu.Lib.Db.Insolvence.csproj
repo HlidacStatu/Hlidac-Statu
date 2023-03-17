@@ -12,7 +12,7 @@
     <PackageReference Include="Devmasters.Collections" Version="4.4.0" />
     <PackageReference Include="Devmasters.Core" Version="4.4.0" />
     <PackageReference Include="Devmasters.DT" Version="4.4.0" />
-    <PackageReference Include="Devmasters.Lang" Version="4.4.0" />
+    <PackageReference Include="Devmasters.Lang" Version="4.4.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.14" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />

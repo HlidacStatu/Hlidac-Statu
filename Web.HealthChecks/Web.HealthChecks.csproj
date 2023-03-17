@@ -20,7 +20,7 @@
 		<PackageReference Include="Devmasters.Core" Version="4.4.0" />
 		<PackageReference Include="Docker.DotNet" Version="3.125.12" />
 		<PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.3.0" />
-		<PackageReference Include="IPNetwork2" Version="2.6.552" />
+		<PackageReference Include="IPNetwork2" Version="2.6.556" />
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.14" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.10" />
