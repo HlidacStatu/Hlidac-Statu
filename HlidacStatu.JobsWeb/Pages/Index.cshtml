@@ -20,8 +20,8 @@
 <!-- Page content-->
 <!-- Hero-->
 <section class="overflow-hidden">
-    <div class="container pb-sm-2 pb-md-4 py-xl-5">
-        <div class="row align-items-center py-5 mt-md-2 my-lg-3 my-xl-4 my-xxl-5">
+    <div class="container pb-sm-2 pb-md-4">
+        <div class="row align-items-center py-5 mt-md-2 ">
             <div class="col-lg-7 order-lg-2 d-flex justify-content-center justify-content-lg-end mb-4 mb-md-5 mb-lg-0 pb-3 pb-md-0">
                 <div class="parallax me-lg-n4 me-xl-n5" style="max-width: 667px;">
                     <div class="parallax-layer" data-depth="0.1"><img src="assets/img/landing/business-consulting/hero/01.png" alt="Layer"></div>
@@ -49,12 +49,12 @@
                 </p>
                 @* Chybí akce pro odeslání mailu u tlačítka. Je potřeba ji přidat *@
                 <form asp-antiforgery="false" method="post" action="kontakt">
-                <div class="input-group mx-auto mx-lg-0" style="max-width: 420px;"> 
-                     <span class="input-group-text text-muted"><i class="ai-mail"></i></span> 
-                     <input class="form-control" type="email" id="from" name="from" placeholder="Napište váš email"> 
-                     <input type="hidden" name="text" id="text" value="Kontaktujte me prosim." />
-                     <button class="btn btn-primary" type="submit">Ozveme se vám</button> 
-                 </div>
+                    <div class="input-group mx-auto mx-lg-0" style="max-width: 420px;">
+                        <span class="input-group-text text-muted"><i class="ai-mail"></i></span>
+                        <input class="form-control" type="email" id="from" name="from" placeholder="Napište váš email">
+                        <input type="hidden" name="text" id="text" value="Kontaktujte me prosim." />
+                        <button class="btn btn-primary" type="submit">Ozveme se vám</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -64,7 +64,7 @@
 
 
 <!-- Stats-->
-<section class="container pb-sm-3 pb-md-2 pb-lg-2 mb-xl-2 mb-xxl-2">
+<section class="container pb-sm-3 pb-md-2 pb-lg-2 ">
     <div class="bg-light rounded-5 py-4 py-md-5 px-lg-5">
         <div class="row row-cols-2 row-cols-md-4 g-0">
             <div class="col d-md-flex justify-content-center text-center text-md-start position-relative">
@@ -87,7 +87,7 @@
             </div>
             <div class="col d-md-flex justify-content-center text-center text-md-start position-relative">
                 <div class="p-3 px-sm-0 py-sm-4">
-                    <div class="h2 display-5 text-primary mb-0">@(DateTime.Now.Year-2016) let</div><span>zkušeností v oboru</span>
+                    <div class="h2 display-5 text-primary mb-0">@(DateTime.Now.Year - 2016) let</div><span>zkušeností v oboru</span>
                 </div>
             </div>
         </div>
@@ -113,7 +113,7 @@
                     </svg>
                     <h3 class="h4 card-title mt-0">Unikátní analýzy</h3>
                     <p class="card-text">
-                        Cenové analýzy jsou v ČR <b>jediným produktem</b> svého druhu. Dostanete 
+                        Cenové analýzy jsou v ČR <b>jediným produktem</b> svého druhu. Dostanete
                         <ul>
                             <li><b>Detailní</b> nákupní ceny IT služeb státu.</li>
                             <li>Porovnání nabídek <b>dodavatelů</b>.</li>
@@ -181,9 +181,10 @@
                     <h3 class="h4 card-title mt-0">Kdo ví, zvítězí</h3>
                     <p class="card-text">
                         <b>
-                            Cenotvorba</b> je zásadní částí nabídky ve výběrovém řízení.
+                            Cenotvorba
+                        </b> je zásadní částí nabídky ve výběrovém řízení.
                         Znalost obvyklé cenové hladiny zadavatele i předchozích nabídkových cen konkurentů vám umožní
-                        zvolit nejlepší cenu. 
+                        zvolit nejlepší cenu.
                         <b>Nepodbízejte se</b> příliš nízkou cenou a <b>nepropásněte</b> obchodní příležitost příliš drahou nabídkou.
                     </p>
                     <p>
@@ -243,7 +244,7 @@
 </section>
 
 <!-- Clients (Logos autoplay slider)-->
-@if (false)
+@if (true)
 {
     <section class="pb-5 pt-2 pt-sm-3 pt-md-4 pt-lg-5">
         <div class="container pb-4 mb-2 mb-lg-3">
@@ -251,176 +252,137 @@
             @*<p class="text-center mb-0">More than 2,000 clients using Around to analyze data</p>*@
         </div>
         <div class="swiper pb-4 swiper-initialized swiper-horizontal swiper-pointer-events swiper-free-mode" data-swiper-options="{
-        &quot;spaceBetween&quot;: 24,
-        &quot;loop&quot;: true,
-        &quot;grabCursor&quot;: false,
-        &quot;centeredSlides&quot;: true,
-        &quot;autoplay&quot;: {
-        &quot;delay&quot;: 0,
-        &quot;disableOnInteraction&quot;: false
-        },
-        &quot;freeMode&quot;: true,
-        &quot;speed&quot;: 10000,
-        &quot;freeModeMomentum&quot;: false,
-        &quot;breakpoints&quot;: {
-        &quot;0&quot;: { &quot;slidesPerView&quot;: 2 },
-        &quot;400&quot;: { &quot;slidesPerView&quot;: 3 },
-        &quot;600&quot;: { &quot;slidesPerView&quot;: 4 },
-        &quot;800&quot;: { &quot;slidesPerView&quot;: 5 },
-        &quot;1200&quot;: { &quot;slidesPerView&quot;: 6 },
-        &quot;1400&quot;: { &quot;slidesPerView&quot;: 7 },
-        &quot;1600&quot;: { &quot;slidesPerView&quot;: 8 }
-        }
-        }">
-            <div class="swiper-wrapper" style="transition-timing-function: linear !important; transform: translate3d(-1254px, 0px, 0px); transition-duration: 10000ms;" id="swiper-wrapper-78341049965431ece" aria-live="off">
-                <div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-active" data-swiper-slide-index="2" role="group" aria-label="3 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-next" data-swiper-slide-index="3" role="group" aria-label="4 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="4" role="group" aria-label="5 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/05-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/05-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="5" role="group" aria-label="6 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/06-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/06-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="6" role="group" aria-label="7 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="7" role="group" aria-label="8 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/05-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/05-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="8" role="group" aria-label="9 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/02-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/02-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide" data-swiper-slide-index="0" role="group" aria-label="1 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/01-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/01-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide swiper-slide-prev" data-swiper-slide-index="1" role="group" aria-label="2 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/02-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/02-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide swiper-slide-active" data-swiper-slide-index="2" role="group" aria-label="3 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide swiper-slide-next" data-swiper-slide-index="3" role="group" aria-label="4 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide" data-swiper-slide-index="4" role="group" aria-label="5 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/05-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/05-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide" data-swiper-slide-index="5" role="group" aria-label="6 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/06-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/06-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide" data-swiper-slide-index="6" role="group" aria-label="7 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide" data-swiper-slide-index="7" role="group" aria-label="8 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/05-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/05-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide" data-swiper-slide-index="8" role="group" aria-label="9 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/02-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/02-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="0" role="group" aria-label="1 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/01-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/01-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-prev" data-swiper-slide-index="1" role="group" aria-label="2 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/02-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/02-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-active" data-swiper-slide-index="2" role="group" aria-label="3 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-next" data-swiper-slide-index="3" role="group" aria-label="4 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="4" role="group" aria-label="5 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/05-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/05-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="5" role="group" aria-label="6 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/06-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/06-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="6" role="group" aria-label="7 / 9" style="width: 185px; margin-right: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
-                </div>
-            </div>
-            <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
-        </div>
-        <div class="swiper swiper-initialized swiper-horizontal swiper-pointer-events swiper-free-mode swiper-rtl" dir="rtl" data-swiper-options="{
-        &quot;spaceBetween&quot;: 24,
-        &quot;loop&quot;: true,
-        &quot;grabCursor&quot;: false,
-        &quot;centeredSlides&quot;: true,
-        &quot;autoplay&quot;: {
-        &quot;delay&quot;: 0,
-        &quot;disableOnInteraction&quot;: false
-        },
-        &quot;freeMode&quot;: true,
-        &quot;speed&quot;: 8500,
-        &quot;freeModeMomentum&quot;: false,
-        &quot;breakpoints&quot;: {
-        &quot;0&quot;: { &quot;slidesPerView&quot;: 2 },
-        &quot;400&quot;: { &quot;slidesPerView&quot;: 3 },
-        &quot;600&quot;: { &quot;slidesPerView&quot;: 4 },
-        &quot;800&quot;: { &quot;slidesPerView&quot;: 5 },
-        &quot;1200&quot;: { &quot;slidesPerView&quot;: 6 },
-        &quot;1400&quot;: { &quot;slidesPerView&quot;: 7 },
-        &quot;1600&quot;: { &quot;slidesPerView&quot;: 8 }
-        }
-        }">
-            <div class="swiper-wrapper" style="transition-timing-function: linear !important; transform: translate3d(1463px, 0px, 0px); transition-duration: 8500ms;" id="swiper-wrapper-ed5549f39669976e" aria-live="off">
-                <div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-prev" data-swiper-slide-index="2" role="group" aria-label="3 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-active" data-swiper-slide-index="3" role="group" aria-label="4 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/02-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/02-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-next" data-swiper-slide-index="4" role="group" aria-label="5 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="5" role="group" aria-label="6 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/01-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/01-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="6" role="group" aria-label="7 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="7" role="group" aria-label="8 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/02-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/02-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="8" role="group" aria-label="9 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
-                </div>
+                &quot;spaceBetween&quot;: 24,
+                &quot;loop&quot;: true,
+                &quot;grabCursor&quot;: false,
+                &quot;centeredSlides&quot;: true,
+                &quot;autoplay&quot;: {
+                &quot;delay&quot;: 0,
+                &quot;disableOnInteraction&quot;: false
+                },
+                &quot;freeMode&quot;: true,
+                &quot;speed&quot;: 60000,
+                &quot;freeModeMomentum&quot;: false,
+                &quot;breakpoints&quot;: {
+                &quot;0&quot;: { &quot;slidesPerView&quot;: 2 },
+                &quot;400&quot;: { &quot;slidesPerView&quot;: 3 },
+                &quot;600&quot;: { &quot;slidesPerView&quot;: 4 },
+                &quot;800&quot;: { &quot;slidesPerView&quot;: 5 },
+                &quot;1200&quot;: { &quot;slidesPerView&quot;: 6 },
+                &quot;1400&quot;: { &quot;slidesPerView&quot;: 7 },
+                &quot;1600&quot;: { &quot;slidesPerView&quot;: 8 }
+                }
+                }">
+            <div class="swiper-wrapper" style="transition-timing-function: linear !important; transform: translate3d(-1254px, 0px, 0px); transition-duration: 60000ms;" id="swiper-wrapper-78341049965431ece" aria-live="off">
                 <div class="swiper-slide" data-swiper-slide-index="0" role="group" aria-label="1 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/06-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/06-light.svg" width="196" alt="Logo"></div>
+                    <div class="bg-gray rounded-4">
+                        <img class="d-block d-dark-mode-none mx-auto" src="/content/cust/vzp.svg" width="196" alt="Logo">
+                        <img class="d-none d-dark-mode-block mx-auto" src="/content/cust/vzp.svg" width="196" alt="Logo">
+                    </div>
                 </div>
                 <div class="swiper-slide" data-swiper-slide-index="1" role="group" aria-label="2 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/05-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/05-light.svg" width="196" alt="Logo"></div>
+                    <div class="bg-gray rounded-4">
+                        <img class="d-block d-dark-mode-none mx-auto" src="/content/cust/mpo.svg" width="196" alt="Logo">
+                        <img class="d-none d-dark-mode-block mx-auto" src="/content/cust/mpo.svg" width="196" alt="Logo">
+                    </div>
                 </div>
                 <div class="swiper-slide swiper-slide-prev" data-swiper-slide-index="2" role="group" aria-label="3 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide swiper-slide-active" data-swiper-slide-index="3" role="group" aria-label="4 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/02-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/02-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide swiper-slide-next" data-swiper-slide-index="4" role="group" aria-label="5 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide" data-swiper-slide-index="5" role="group" aria-label="6 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/01-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/01-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide" data-swiper-slide-index="6" role="group" aria-label="7 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide" data-swiper-slide-index="7" role="group" aria-label="8 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/02-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/02-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide" data-swiper-slide-index="8" role="group" aria-label="9 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
-                </div>
-                <div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="0" role="group" aria-label="1 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/06-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/06-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="1" role="group" aria-label="2 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/05-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/05-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-prev" data-swiper-slide-index="2" role="group" aria-label="3 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-active" data-swiper-slide-index="3" role="group" aria-label="4 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/02-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/02-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-next" data-swiper-slide-index="4" role="group" aria-label="5 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="5" role="group" aria-label="6 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/01-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/01-light.svg" width="196" alt="Logo"></div>
-                </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="6" role="group" aria-label="7 / 9" style="width: 185px; margin-left: 24px;">
-                    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
+                    <div class="bg-gray rounded-4">
+                        <img class="d-block d-dark-mode-none mx-auto" src="/content/cust/gfr.svg" width="196" alt="Logo">
+                        <img class="d-none d-dark-mode-block mx-auto" src="/content/cust/gfr.svg" width="196" alt="Logo">
+                    </div>
                 </div>
             </div>
             <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
         </div>
+        @*        <div class="swiper swiper-initialized swiper-horizontal swiper-pointer-events swiper-free-mode swiper-rtl" dir="rtl" data-swiper-options="{
+    &quot;spaceBetween&quot;: 24,
+    &quot;loop&quot;: true,
+    &quot;grabCursor&quot;: false,
+    &quot;centeredSlides&quot;: true,
+    &quot;autoplay&quot;: {
+    &quot;delay&quot;: 0,
+    &quot;disableOnInteraction&quot;: false
+    },
+    &quot;freeMode&quot;: true,
+    &quot;speed&quot;: 8500,
+    &quot;freeModeMomentum&quot;: false,
+    &quot;breakpoints&quot;: {
+    &quot;0&quot;: { &quot;slidesPerView&quot;: 2 },
+    &quot;400&quot;: { &quot;slidesPerView&quot;: 3 },
+    &quot;600&quot;: { &quot;slidesPerView&quot;: 4 },
+    &quot;800&quot;: { &quot;slidesPerView&quot;: 5 },
+    &quot;1200&quot;: { &quot;slidesPerView&quot;: 6 },
+    &quot;1400&quot;: { &quot;slidesPerView&quot;: 7 },
+    &quot;1600&quot;: { &quot;slidesPerView&quot;: 8 }
+    }
+    }">
+    <div class="swiper-wrapper" style="transition-timing-function: linear !important; transform: translate3d(1463px, 0px, 0px); transition-duration: 8500ms;" id="swiper-wrapper-ed5549f39669976e" aria-live="off">
+    <div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-prev" data-swiper-slide-index="2" role="group" aria-label="3 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="/content/cust/vzp.jpg" width="196" alt="Logo"></div>
+    </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-active" data-swiper-slide-index="3" role="group" aria-label="4 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="/content/cust/vzp.jpg" width="196" alt="Logo"></div>
+    </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-next" data-swiper-slide-index="4" role="group" aria-label="5 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="/content/cust/vzp.jpg" width="196" alt="Logo"></div>
+    </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="5" role="group" aria-label="6 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/01-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/01-light.svg" width="196" alt="Logo"></div>
+    </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="6" role="group" aria-label="7 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
+    </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="7" role="group" aria-label="8 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/02-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/02-light.svg" width="196" alt="Logo"></div>
+    </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="8" role="group" aria-label="9 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
+    </div>
+    <div class="swiper-slide" data-swiper-slide-index="0" role="group" aria-label="1 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/06-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/06-light.svg" width="196" alt="Logo"></div>
+    </div>
+    <div class="swiper-slide" data-swiper-slide-index="1" role="group" aria-label="2 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/05-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/05-light.svg" width="196" alt="Logo"></div>
+    </div>
+    <div class="swiper-slide swiper-slide-prev" data-swiper-slide-index="2" role="group" aria-label="3 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
+    </div>
+    <div class="swiper-slide swiper-slide-active" data-swiper-slide-index="3" role="group" aria-label="4 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/02-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/02-light.svg" width="196" alt="Logo"></div>
+    </div>
+    <div class="swiper-slide swiper-slide-next" data-swiper-slide-index="4" role="group" aria-label="5 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
+    </div>
+    <div class="swiper-slide" data-swiper-slide-index="5" role="group" aria-label="6 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/01-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/01-light.svg" width="196" alt="Logo"></div>
+    </div>
+    <div class="swiper-slide" data-swiper-slide-index="6" role="group" aria-label="7 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
+    </div>
+    <div class="swiper-slide" data-swiper-slide-index="7" role="group" aria-label="8 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/02-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/02-light.svg" width="196" alt="Logo"></div>
+    </div>
+    <div class="swiper-slide" data-swiper-slide-index="8" role="group" aria-label="9 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
+    </div>
+    <div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="0" role="group" aria-label="1 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/06-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/06-light.svg" width="196" alt="Logo"></div>
+    </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="1" role="group" aria-label="2 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/05-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/05-light.svg" width="196" alt="Logo"></div>
+    </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-prev" data-swiper-slide-index="2" role="group" aria-label="3 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
+    </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-active" data-swiper-slide-index="3" role="group" aria-label="4 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/02-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/02-light.svg" width="196" alt="Logo"></div>
+    </div><div class="swiper-slide swiper-slide-duplicate swiper-slide-duplicate-next" data-swiper-slide-index="4" role="group" aria-label="5 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/03-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/03-light.svg" width="196" alt="Logo"></div>
+    </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="5" role="group" aria-label="6 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/01-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/01-light.svg" width="196" alt="Logo"></div>
+    </div><div class="swiper-slide swiper-slide-duplicate" data-swiper-slide-index="6" role="group" aria-label="7 / 9" style="width: 185px; margin-left: 24px;">
+    <div class="bg-gray rounded-4"><img class="d-block d-dark-mode-none mx-auto" src="assets/img/landing/business-consulting/clients/04-dark.svg" width="196" alt="Logo"><img class="d-none d-dark-mode-block mx-auto" src="assets/img/landing/business-consulting/clients/04-light.svg" width="196" alt="Logo"></div>
+    </div>
+    </div>
+    <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
+    </div>*@
     </section>
 }
 
 <!-- Industries (Carousel on screens < 992px)-->
-<section class="container pb-5 pt-3 pt-sm-4 pt-lg-5 my-xl-3 my-xxl-5" id="obory">
+<section class="container pb-5 pt-3 pt-sm-4 pt-lg-5 " id="obory">
     <h2 class="h1 text-center">Odvětví</h2>
     <p class="text-center pb-4 mb-2 mb-lg-3">
         Analýzy postupně rozšiřujeme na další obory. Nejaktuálnější jsou analýzy ICT prací a profesí od roku 2020.
