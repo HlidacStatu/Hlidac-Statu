@@ -30,12 +30,17 @@ public class TimedHostedService : BackgroundService
         do
         {
             logger.Debug($"Timer triggered.");
-            await RunLoop(stoppingToken);
+            await RunLoad(stoppingToken);
+            
+            await Task.Delay(TimeSpan.FromMinutes(3),
+                stoppingToken); // waits so that some possible stuck requests frees old indexes
+
+            _indexCache.DeleteOldCache();
             
         } while (await timer.WaitForNextTickAsync(stoppingToken));
     }
 
-    private async Task RunLoop(CancellationToken stoppingToken)
+    private async Task RunLoad(CancellationToken stoppingToken)
     {
         foreach (var indexType in Enum.GetValues<AutocompleteIndexType>())
         {
@@ -55,9 +60,14 @@ public class TimedHostedService : BackgroundService
 
         await _indexCache.UpdateCacheAsync();
         
-        await Task.Delay(TimeSpan.FromMinutes(3),
-            stoppingToken); // waits so that some possible stuck requests frees old indexes
-
-        _indexCache.DeleteOldCache();
+        // When something is not loaded (due to the corruption, then run reloading again
+        if (_indexCache.Adresy is null ||
+            _indexCache.Company is null ||
+            _indexCache.Kindex is null ||
+            _indexCache.FullAutocomplete is null ||
+            _indexCache.UptimeServer is null)
+            await RunLoad(stoppingToken);
+        
+        
     }
 }

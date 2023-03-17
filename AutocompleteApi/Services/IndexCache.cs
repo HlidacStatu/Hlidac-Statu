@@ -18,11 +18,11 @@ namespace HlidacStatu.AutocompleteApi.Services;
 
 public class IndexCache
 {
-    public Index<SubjectNameCache> Kindex { get; set; }
-    public Index<Autocomplete> Company { get; set; }
-    public Index<StatniWebyAutocomplete> UptimeServer { get; set; }
-    public Index<Autocomplete> FullAutocomplete { get; set; }
-    public Index<AdresyKVolbam> Adresy { get; set; }
+    public Index<SubjectNameCache>? Kindex { get; set; }
+    public Index<Autocomplete>? Company { get; set; }
+    public Index<StatniWebyAutocomplete>? UptimeServer { get; set; }
+    public Index<Autocomplete>? FullAutocomplete { get; set; }
+    public Index<AdresyKVolbam>? Adresy { get; set; }
 
     private Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger<IndexCache>();
     private IHttpClientFactory _httpClientFactory;
@@ -121,6 +121,8 @@ public class IndexCache
                     if (IsIndexCorrupted(newIndex))
                     {
                         await ReportCorruptedIndexAsync(path, indexType);
+                        newIndex.Dispose();
+                        Directory.Delete(path, recursive:true);
                     }
                     else
                     {
@@ -136,6 +138,8 @@ public class IndexCache
                     if (IsIndexCorrupted(newIndex))
                     {
                         await ReportCorruptedIndexAsync(path, indexType);
+                        newIndex.Dispose();
+                        Directory.Delete(path, recursive:true);
                     }
                     else
                     {
@@ -151,6 +155,8 @@ public class IndexCache
                     if (IsIndexCorrupted(newIndex))
                     {
                         await ReportCorruptedIndexAsync(path, indexType);
+                        newIndex.Dispose();
+                        Directory.Delete(path, recursive:true);
                     }
                     else
                     {
@@ -166,6 +172,8 @@ public class IndexCache
                     if (IsIndexCorrupted(newIndex))
                     {
                         await ReportCorruptedIndexAsync(path, indexType);
+                        newIndex.Dispose();
+                        Directory.Delete(path, recursive:true);
                     }
                     else
                     {
@@ -181,6 +189,8 @@ public class IndexCache
                     if (IsIndexCorrupted(newIndex))
                     {
                         await ReportCorruptedIndexAsync(path, indexType);
+                        newIndex.Dispose();
+                        Directory.Delete(path, recursive:true);
                     }
                     else
                     {
@@ -265,7 +275,7 @@ public class IndexCache
         foreach (var indexType in Enum.GetValues<AutocompleteIndexType>())
         {
             var directories = Directory.EnumerateDirectories(PathToIndexFolder(indexType));
-            var dirsToDelete = directories.OrderByDescending(f => f).Skip(2);
+            var dirsToDelete = directories.OrderByDescending(f => f).Skip(3);
 
             foreach (var dirToDelete in dirsToDelete)
             {
