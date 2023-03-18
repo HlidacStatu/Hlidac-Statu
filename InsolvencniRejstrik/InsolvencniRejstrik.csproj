@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Devmasters.Core">
-      <Version>4.4.0</Version>
+      <Version>4.4.11</Version>
     </PackageReference>
     <PackageReference Include="Devmasters.Net">
       <Version>4.4.1</Version>
@@ -68,7 +68,7 @@
       <Version>7.17.5</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.2</Version>
+      <Version>13.0.3</Version>
     </PackageReference>
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.1" />

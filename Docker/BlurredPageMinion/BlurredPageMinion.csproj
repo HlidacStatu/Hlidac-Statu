@@ -15,33 +15,33 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Remove="runtimeconfig.template.json"/>
+        <Content Remove="runtimeconfig.template.json" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Devmasters.Batch" Version="4.4.0"/>
-        <PackageReference Include="Devmasters.Core" Version="4.4.0"/>
-        <PackageReference Include="Devmasters.Diags" Version="4.4.0"/>
-        <PackageReference Include="Devmasters.IO" Version="4.4.0"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.14"/>
-        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0"/>
-        <PackageReference Include="NeoSmart.PrettySize" Version="3.1.1"/>
-        <PackageReference Include="SkiaSharp" Version="2.88.3"/>
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.3"/>
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.3"/>
-        <PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="2.88.3"/>
+        <PackageReference Include="Devmasters.Batch" Version="4.4.0" />
+        <PackageReference Include="Devmasters.Core" Version="4.4.11" />
+        <PackageReference Include="Devmasters.Diags" Version="4.4.0" />
+        <PackageReference Include="Devmasters.IO" Version="4.4.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.14" />
+        <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+        <PackageReference Include="NeoSmart.PrettySize" Version="3.1.1" />
+        <PackageReference Include="SkiaSharp" Version="2.88.3" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.3" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.3" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="2.88.3" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Hlidac-Statu\Analysis.Page.Cmd\Analysis.Page.Cmd.csproj"/>
-        <ProjectReference Include="..\..\..\Hlidac-Statu\Analysis.Page\Analysis.Page.csproj"/>
+        <ProjectReference Include="..\..\..\Hlidac-Statu\Analysis.Page.Cmd\Analysis.Page.Cmd.csproj" />
+        <ProjectReference Include="..\..\..\Hlidac-Statu\Analysis.Page\Analysis.Page.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <Resource Include="runtimeconfig.template.json"/>
+        <Resource Include="runtimeconfig.template.json" />
     </ItemGroup>
 
     <ItemGroup>
@@ -73,6 +73,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Properties\PublishProfiles\"/>
+        <Folder Include="Properties\PublishProfiles\" />
     </ItemGroup>
 </Project>

@@ -14,3 +14,8 @@
         display: none !important;
     }
 }
+
+/* Use a more specific selector if possible */
+*[id] {
+    scroll-margin-top: 5rem;
+}
