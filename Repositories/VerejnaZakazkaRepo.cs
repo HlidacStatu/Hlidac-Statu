@@ -482,5 +482,34 @@ namespace HlidacStatu.Repositories
             var res = await es.DocumentExistsAsync<VerejnaZakazka>(id);
             return res.Exists;
         }
+
+        public static async Task<string> GetDocumentTextAsync(string documentSha256Checksum, ElasticClient client = null)
+        {
+            client ??= await Manager.GetESClient_VerejneZakazkyAsync();
+            // find possible candidates
+            var res = await client.SearchAsync<VerejnaZakazka>(s => s
+                .Query(q => q
+                    .Term(t => t.Field("dokumenty.sha256Checksum").Value(documentSha256Checksum))
+                ));
+
+            if (!res.IsValid)
+            {
+                Consts.Logger.Warning($"VZ problems with query. {res.DebugInformation}");
+                return null;
+            }
+            
+            if (!res.Hits.Any())
+                return null;
+
+
+            var vz = res.Documents.FirstOrDefault();
+
+            var doc = vz?.Dokumenty.FirstOrDefault(d => d.Sha256Checksum == documentSha256Checksum);
+
+            if (doc is not null && doc.EnoughExtractedText)
+                return doc.PlainText;
+
+            return null;
+        }
     }
 }
