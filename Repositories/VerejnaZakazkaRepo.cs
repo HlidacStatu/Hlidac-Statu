@@ -40,12 +40,12 @@ namespace HlidacStatu.Repositories
                 Statistics.Recalculate.AddFirmaToProcessingQueue(dod.ICO, Statistics.RecalculateItem.StatisticsTypeEnum.VZ, $"VZ {vz.Id}");
         }
 
-        private static async Task SaveIncompleteVzAsync(VerejnaZakazka incompleteVz)
+        private static async Task SaveIncompleteVzAsync(VerejnaZakazka incompleteVz, ElasticClient elasticClient)
         {
             try
             {
                 //teoreticky můžeme použít incompleteVz.Changelog na zapsání nalezených chyb
-                var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
+                elasticClient ??= await Manager.GetESClient_VerejneZakazkyAsync();
                 incompleteVz.HasIssues = true;
                 await elasticClient.IndexDocumentAsync<VerejnaZakazka>(incompleteVz);
                 AfterSave(incompleteVz);
@@ -62,8 +62,11 @@ namespace HlidacStatu.Repositories
         /// Update or insert new
         /// </summary>
         /// <param name="newVZ"></param>
+        /// <param name="elasticClient"></param>
+        /// <param name="httpClient"></param>
         /// <param name="posledniZmena"></param>
-        public static async Task UpsertAsync(VerejnaZakazka newVZ, HttpClient httpClient = null, DateTime? posledniZmena = null)
+        public static async Task UpsertAsync(VerejnaZakazka newVZ, ElasticClient elasticClient = null,
+            HttpClient httpClient = null, DateTime? posledniZmena = null)
         {
             if (newVZ is null)
                 return;
@@ -88,12 +91,12 @@ namespace HlidacStatu.Repositories
                 // there might be issues to find proper ICO, so we have to save half-complete VZ
                 if (string.IsNullOrWhiteSpace(newVZ.Zadavatel?.ICO))
                 {
-                    await SaveIncompleteVzAsync(newVZ);
+                    await SaveIncompleteVzAsync(newVZ, elasticClient);
                     return;
                 }
                 
-                var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
-                var storedDuplicates = await FindDocumentsFromTheSameSourcesAsync(newVZ);
+                elasticClient ??= await Manager.GetESClient_VerejneZakazkyAsync();
+                var storedDuplicates = await FindDocumentsFromTheSameSourcesAsync(newVZ, elasticClient);
 
                 // VZ neexistuje => ukládáme
                 if (storedDuplicates is null || !storedDuplicates.Any())
@@ -218,9 +221,9 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task UpdateDocumentsInVz(string id, List<VerejnaZakazka.Document> dokumenty)
+        public static async Task UpdateDocumentsInVz(string id, List<VerejnaZakazka.Document> dokumenty, ElasticClient elasticClient = null)
         {
-            var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
+            elasticClient ??= await Manager.GetESClient_VerejneZakazkyAsync();
             var zakazka = await LoadFromESAsync(id, elasticClient);
             MergeDocuments(zakazka, dokumenty);
             await elasticClient.IndexDocumentAsync<VerejnaZakazka>(zakazka);
@@ -444,19 +447,19 @@ namespace HlidacStatu.Repositories
 
         public static async Task<VerejnaZakazka> LoadFromESAsync(string id, ElasticClient client = null)
         {
-            var es = client ?? await Manager.GetESClient_VerejneZakazkyAsync();
-            var res = await es.GetAsync<VerejnaZakazka>(id);
+            client ??= await Manager.GetESClient_VerejneZakazkyAsync();
+            var res = await client.GetAsync<VerejnaZakazka>(id);
             if (res.Found)
                 return res.Source;
             else
                 return null;
         }
         
-        public static async Task<IEnumerable<VerejnaZakazka>> FindDocumentsFromTheSameSourcesAsync(VerejnaZakazka zakazka)
+        public static async Task<IEnumerable<VerejnaZakazka>> FindDocumentsFromTheSameSourcesAsync(VerejnaZakazka zakazka, ElasticClient elasticClient)
         {
-            var es = await Manager.GetESClient_VerejneZakazkyAsync();
+            elasticClient ??= await Manager.GetESClient_VerejneZakazkyAsync();
             // find possible candidates
-            var res = await es.SearchAsync<VerejnaZakazka>(s => s
+            var res = await elasticClient.SearchAsync<VerejnaZakazka>(s => s
                 .Query(q => q
                     .Bool(b => b
                         .Must(bm =>
@@ -478,8 +481,8 @@ namespace HlidacStatu.Repositories
 
         public static async Task<bool> ExistsAsync(string id, ElasticClient client = null)
         {
-            var es = client ?? await Manager.GetESClient_VerejneZakazkyAsync();
-            var res = await es.DocumentExistsAsync<VerejnaZakazka>(id);
+            client ??= await Manager.GetESClient_VerejneZakazkyAsync();
+            var res = await client.DocumentExistsAsync<VerejnaZakazka>(id);
             return res.Exists;
         }
 
