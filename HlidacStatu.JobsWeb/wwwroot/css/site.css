@@ -19,3 +19,12 @@
 *[id] {
     scroll-margin-top: 5rem;
 }
+
+.logo-position {
+    max-width: 190px;
+    height: auto;
+    max-height: 84px;
+    padding-top: 8px;
+    padding: 10px 8px 0px 10px;
+    width: auto;
+}
