@@ -26,8 +26,10 @@ namespace HlidacStatu.XLib.Watchdogs
 
             Util.Consts.Logger.Info($"SingleEmailPerUser Start processing {watchdogs.Count()} watchdogs.");
 
+
             Dictionary<string, WatchDog[]> groupedByUserNoSpecContact = watchdogs
                 .Where(w => w != null)
+                .Where(w=>w.UnconfirmedUser() != null)
                 .Where(m => string.IsNullOrEmpty(m.SpecificContact))
                 .GroupBy(k => k.UnconfirmedUser().Id,
                         v => v,
