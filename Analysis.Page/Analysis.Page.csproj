@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Devmasters.Core" Version="4.4.11" />
+    <PackageReference Include="Devmasters.Core" Version="4.4.12" />
     <PackageReference Include="Devmasters.Imaging" Version="4.0.3" />
     <PackageReference Include="Devmasters.IO" Version="4.4.0" />
     <PackageReference Include="Devmasters.Logging" Version="4.4.0" />

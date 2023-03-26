@@ -19,8 +19,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Devmasters.Batch" Version="4.4.0" />
-        <PackageReference Include="Devmasters.Core" Version="4.4.11" />
+        <PackageReference Include="Devmasters.Batch" Version="4.4.1" />
+        <PackageReference Include="Devmasters.Core" Version="4.4.12" />
         <PackageReference Include="Devmasters.Diags" Version="4.4.0" />
         <PackageReference Include="Devmasters.IO" Version="4.4.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />

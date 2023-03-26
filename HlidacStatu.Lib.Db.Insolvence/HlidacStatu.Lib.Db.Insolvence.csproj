@@ -8,10 +8,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Batch" Version="4.4.0" />
+    <PackageReference Include="Devmasters.Batch" Version="4.4.1" />
     <PackageReference Include="Devmasters.Collections" Version="4.4.0" />
-    <PackageReference Include="Devmasters.Core" Version="4.4.11" />
-    <PackageReference Include="Devmasters.DT" Version="4.4.0" />
+    <PackageReference Include="Devmasters.Core" Version="4.4.12" />
+    <PackageReference Include="Devmasters.DT" Version="4.4.1" />
     <PackageReference Include="Devmasters.Lang" Version="4.4.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.14" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.14" />

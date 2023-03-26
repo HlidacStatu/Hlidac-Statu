@@ -7,7 +7,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Core" Version="4.4.11" />
+    <PackageReference Include="Devmasters.Core" Version="4.4.12" />
     <PackageReference Include="Devmasters.DBUpgrader" Version="4.4.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />

@@ -7,13 +7,13 @@
 	</PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Devmasters.Core" Version="4.4.11" />
+        <PackageReference Include="Devmasters.Core" Version="4.4.12" />
         <PackageReference Include="Devmasters.Imaging" Version="4.0.3" />
         <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="6.0.14" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.14" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.10" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.14" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.15" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.14" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.14" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.14">
