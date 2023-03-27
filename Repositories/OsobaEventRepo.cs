@@ -302,6 +302,8 @@ namespace HlidacStatu.Repositories
 
             osobaEvent.Organizace = ParseTools.NormalizaceStranaShortName(osobaEvent.Organizace);
             osobaEvent.Created = DateTime.Now;
+            osobaEvent.ModifiedBy = user;
+            osobaEvent.Modified = DateTime.Now;
             db.OsobaEvent.Add(osobaEvent);
             db.SaveChanges();
             if (osobaEvent.OsobaId > 0)
@@ -342,6 +344,9 @@ namespace HlidacStatu.Repositories
             eventToUpdate.Status = osobaEvent.Status;
             eventToUpdate.Ceo = osobaEvent.Ceo;
             eventToUpdate.Created = DateTime.Now;
+            eventToUpdate.Note = osobaEvent.Note;
+            eventToUpdate.ModifiedBy = user;
+            eventToUpdate.Modified = DateTime.Now;
 
             db.SaveChanges();
             if (osobaEvent.OsobaId > 0)
