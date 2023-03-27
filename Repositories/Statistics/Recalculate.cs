@@ -27,7 +27,7 @@ namespace HlidacStatu.Repositories.Statistics
             log.Info("{method} Starting with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, threads.Value);
             if (debug)
                 Console.WriteLine($"getting from queue {threads.Value * threads.Value} items");
-            var queueItems = GetFromProcessingQueue(threads.Value* threads.Value, threads.Value);
+            var queueItems = GetFromProcessingQueue(threads.Value* threads.Value, threads.Value, debug);
             if (debug)
                 Console.WriteLine($"got from queue {queueItems.Count()} items");
 
@@ -135,7 +135,7 @@ namespace HlidacStatu.Repositories.Statistics
 
                 if (debug)
                     Console.WriteLine($"getting from queue {threads.Value * threads.Value} items");
-                queueItems = GetFromProcessingQueue(threads.Value * threads.Value, threads.Value);
+                queueItems = GetFromProcessingQueue(threads.Value * threads.Value, threads.Value,outputWriter,progressWriter,debug);
                 if (debug)
                     Console.WriteLine($"got from queue {queueItems.Count()} items");
             }
