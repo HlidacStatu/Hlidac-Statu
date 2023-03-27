@@ -137,7 +137,7 @@ namespace HlidacStatu.Repositories.Statistics
                     Console.WriteLine($"getting from queue {threads.Value * threads.Value} items");
                 queueItems = GetFromProcessingQueue(threads.Value * threads.Value, threads.Value);
                 if (debug)
-                    Console.WriteLine($"got from queue {queueItems.Count} items");
+                    Console.WriteLine($"got from queue {queueItems.Count()} items");
             }
 
             log.Info("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
