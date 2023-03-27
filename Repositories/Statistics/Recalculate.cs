@@ -17,7 +17,7 @@ namespace HlidacStatu.Repositories.Statistics
 
         static Devmasters.Batch.ActionProgressWriter debugProgressWr = new Devmasters.Batch.ActionProgressWriter(0.1f);
 
-        public static void RecalculateTasks(int? threads = null,
+        public static void RecalculateTasks(int? threads = null, bool debug=false,
             Action<string> outputWriter = null, 
             Action<Devmasters.Batch.ActionProgressData> progressWriter = null
             )
@@ -25,7 +25,11 @@ namespace HlidacStatu.Repositories.Statistics
             threads = threads ?? 20;
 
             log.Info("{method} Starting with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, threads.Value);
+            if (debug)
+                Console.WriteLine($"getting from queue {threads.Value * threads.Value} items");
             var queueItems = GetFromProcessingQueue(threads.Value* threads.Value, threads.Value);
+            if (debug)
+                Console.WriteLine($"got from queue {queueItems.Count()} items");
 
             while (queueItems.Count() > 0)
             {
@@ -37,6 +41,9 @@ namespace HlidacStatu.Repositories.Statistics
                     {
                         var f = Firmy.Get(item.Id);
                         if (f != null)
+                        {
+                            if (debug)
+                                Console.WriteLine($"start statistics {f.ICO} {f.Jmeno}");
                             switch (item.StatisticsType)
                             {
                                 case RecalculateItem.StatisticsTypeEnum.Smlouva:
@@ -51,7 +58,9 @@ namespace HlidacStatu.Repositories.Statistics
                                 default:
                                     break;
                             }
-
+                            if (debug)
+                                Console.WriteLine($"end statistics {f.ICO} {f.Jmeno}");
+                        }
                         return new Devmasters.Batch.ActionOutputData();
                     },
                     outputWriter, progressWriter,
@@ -69,6 +78,8 @@ namespace HlidacStatu.Repositories.Statistics
                         var f = Firmy.Get(item.Id);
                         if (f != null)
                         {
+                            if (debug)
+                                Console.WriteLine($"start holding statistics {f.ICO} {f.Jmeno}");
                             switch (item.StatisticsType)
                             {
                                 case RecalculateItem.StatisticsTypeEnum.Smlouva:
@@ -84,6 +95,10 @@ namespace HlidacStatu.Repositories.Statistics
                                     break;
                             }
                             _ = f.InfoFacts(forceUpdateCache: true);
+
+                            if (debug)
+                                Console.WriteLine($"end holding statistics {f.ICO} {f.Jmeno}");
+
                         }
                         return new Devmasters.Batch.ActionOutputData();
                     },
@@ -102,8 +117,12 @@ namespace HlidacStatu.Repositories.Statistics
                         var o = Osoby.GetByNameId.Get(item.Id);
                         if (o != null)
                         {
+                            if (debug)
+                                Console.WriteLine($"start statistics osoba {o.NameId}");
                             _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
                             _ = o.InfoFactsCached(forceUpdateCache: true);
+                            if (debug)
+                                Console.WriteLine($"end statistics osoba {o.NameId}");
                         }
 
                         return new Devmasters.Batch.ActionOutputData();
