@@ -202,6 +202,9 @@ namespace HlidacStatu.Repositories.Statistics
             log.Verbose("{method} expanding {ico} {subjekt} vazby, recursive deep {deep}, current list {count} items",
                     MethodBase.GetCurrentMethod().Name,f.ICO, f.Jmeno, deep, list.Count);
 
+            //StackOverflow defense
+            if (list.Count > 10_000)
+                return list;
 
             var it = new RecalculateItem(f, statsType, provokeBy);
             if (list.Contains(it, comparer) == false)
@@ -256,11 +259,20 @@ namespace HlidacStatu.Repositories.Statistics
             Devmasters.Batch.Manager.DoActionForAll<int>(Enumerable.Range(0, count),
                 _ =>
                 {
-                    var item = GetOneFromProcessingQueue();
-                    if (item == null)
-                        return new Devmasters.Batch.ActionOutputData() { CancelRunning = true };
+                    try
+                    {
+                        var item = GetOneFromProcessingQueue();
+                        if (item == null)
+                            return new Devmasters.Batch.ActionOutputData() { CancelRunning = true };
 
-                    res.Enqueue(item);
+                        res.Enqueue(item);
+
+                    }
+                    catch (Exception e)
+                    {
+
+                        log.Error("GetOneFromProcessingQueue error", e);
+                    }
 
                     return new Devmasters.Batch.ActionOutputData() { CancelRunning = res.Count >= count };
                 },
@@ -277,14 +289,24 @@ namespace HlidacStatu.Repositories.Statistics
             Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(res,
                 item =>
                 {
+                    try
+                    {
+
                     if (debug)
                         Console.WriteLine($"GetFromProcessingQueue getting cascade for {item.UniqueKey}");
                     List<RecalculateItem> cascade = CascadeItems(item);
                     if (debug)
                         Console.WriteLine($"GetFromProcessingQueue got cascade for {item.UniqueKey}");
+                        foreach (var i in cascade)
+                            list.Add(i);
 
-                    foreach (var i in cascade)
-                        list.Add(i);
+                    }
+                    catch (Exception e)
+                    {
+                        log.Error("CascadeItems error", e);
+                        throw;
+                    }
+
 
                     return new Devmasters.Batch.ActionOutputData();
                 },
