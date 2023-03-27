@@ -246,9 +246,11 @@ namespace HlidacStatu.Repositories.Statistics
         }
 
         public static IEnumerable<RecalculateItem> GetFromProcessingQueue(int count, int threads,
-            Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null)
+            Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null, bool debug=false)
         {
             log.Debug("{method} Starting for {records} records with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, count, threads);
+            if (debug)
+                Console.WriteLine($"GetFromProcessingQueue getting from queue {count} items");
 
             System.Collections.Concurrent.ConcurrentQueue<RecalculateItem> res = new();
             Devmasters.Batch.Manager.DoActionForAll<int>(Enumerable.Range(0, count),
@@ -267,13 +269,19 @@ namespace HlidacStatu.Repositories.Statistics
             );
 
             log.Debug("{method} get {records} records from ProcessingQueue", MethodBase.GetCurrentMethod().Name, count);
+            if (debug)
+                Console.WriteLine($"GetFromProcessingQueue got from queue {count} items");
 
             System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new();
 
             Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(res,
                 item =>
                 {
+                    if (debug)
+                        Console.WriteLine($"GetFromProcessingQueue getting cascade for {item.UniqueKey}");
                     List<RecalculateItem> cascade = CascadeItems(item);
+                    if (debug)
+                        Console.WriteLine($"GetFromProcessingQueue got cascade for {item.UniqueKey}");
 
                     foreach (var i in cascade)
                         list.Add(i);
