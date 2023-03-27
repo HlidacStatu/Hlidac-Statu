@@ -94,10 +94,13 @@ namespace HlidacStatu.Entities
         [ShowNiceDisplayName()]
         public enum Statuses
         {
+            // Nulovou hodnotu nepřidávat do flagů, mohlo by to rozbít některé komponenty
             [NiceDisplayName("Skryto NP")]
             NasiPoliticiSkryte = 1,
-            //[NiceDisplayName("Jen pro tesst")]
-            //HlidacSkryte = 2
+            // [NiceDisplayName("Jen pro tesst")]
+            // HlidacSkryte = 2,
+            // [NiceDisplayName("test3")]
+            // WhateverElse = 4
         }
 
 
@@ -106,36 +109,15 @@ namespace HlidacStatu.Entities
             DatumOd = new DateTime(year, 1, 1);
             DatumDo = new DateTime(year, 12, 31);
         }
-
-        // není nejrychlejší, ale asi stačí
+        
         [NotMapped]
-        public string TypeName
-        {
-            get
-            {
-                using (DbEntities db = new DbEntities())
-                {
-                    string result = db.EventType.AsQueryable()
-                    .Where(type =>
-                        type.Id == Type
-                    )
-                    .Select(type => type.Name)
-                    .FirstOrDefault();
-
-                    return result;
-                }
-            }
-        }
-
+        public string TypeName => ((OsobaEvent.Types)Type).ToNiceDisplayName();
 
 
         public OsobaEvent ShallowCopy()
         {
             return (OsobaEvent)MemberwiseClone();
         }
-
-
-
 
 
         public string ToAuditJson()
