@@ -112,6 +112,12 @@ namespace HlidacStatu.Repositories
             return basic;
         }
 
+        /// <summary>
+        /// If you want to update, then use Update method
+        /// </summary>
+        /// <param name="osoba"></param>
+        /// <param name="externalIds"></param>
+        /// <returns></returns>
         public static Osoba Save(Osoba osoba, params OsobaExternalId[] externalIds)
         {
             using (DbEntities db = new DbEntities())
