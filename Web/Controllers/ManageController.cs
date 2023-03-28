@@ -543,9 +543,7 @@ namespace HlidacStatu.Web.Controllers
             ViewBag.Osoba = o;
             return View();
         }
-
-
-
+        
 
         [AllowAnonymous]
         [HttpPost]
