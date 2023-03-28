@@ -3,6 +3,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -24,10 +25,26 @@ namespace HlidacStatu.Repositories.Statistics
         {
             threads = threads ?? 20;
 
+            int numFromQueue = threads.Value * threads.Value;
+
+            using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
+    RECALCULATIONQUEUENAME,
+    Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+    ))
+            {
+                var numInQ = q.MessageCount();
+                if (numInQ > numFromQueue * 2)
+                    numFromQueue = (int)(numInQ / 2);
+            }
+
+
+
             log.Info("{method} Starting with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, threads.Value);
             if (debug)
-                Console.WriteLine($"getting from queue {threads.Value * threads.Value} items");
-            var queueItems = GetFromProcessingQueue(threads.Value* threads.Value, threads.Value, outputWriter, progressWriter, debug);
+                Console.WriteLine($"getting from queue {numFromQueue} items");
+
+
+            var queueItems = GetFromProcessingQueue(numFromQueue, threads.Value, outputWriter, progressWriter, debug);
             if (debug)
                 Console.WriteLine($"got from queue {queueItems.Count()} items");
 
@@ -134,8 +151,8 @@ namespace HlidacStatu.Repositories.Statistics
 
 
                 if (debug)
-                    Console.WriteLine($"getting from queue {threads.Value * threads.Value} items");
-                queueItems = GetFromProcessingQueue(threads.Value * threads.Value, threads.Value,outputWriter,progressWriter,debug);
+                    Console.WriteLine($"getting from queue {numFromQueue} items");
+                queueItems = GetFromProcessingQueue(numFromQueue, threads.Value,outputWriter,progressWriter,debug);
                 if (debug)
                     Console.WriteLine($"got from queue {queueItems.Count()} items");
             }
@@ -331,7 +348,7 @@ namespace HlidacStatu.Repositories.Statistics
             log.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
 
             return list.OrderBy(o => o.Created)
-                .Distinct(comparer)
+                .Distinct(comparer`)
                 .OrderBy(o => o.Created);
         }
         public static RecalculateItem GetOneFromProcessingQueue()
