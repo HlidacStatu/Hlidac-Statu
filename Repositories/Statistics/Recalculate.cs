@@ -144,9 +144,9 @@ namespace HlidacStatu.Repositories.Statistics
 
         }
 
-        private static List<RecalculateItem> CascadeItems(RecalculateItem item)
+        private static List<RecalculateItem> CascadeItems(RecalculateItem item, ref System.Collections.Concurrent.ConcurrentBag<RecalculateItem> alreadyOnList)
         {
-            List<RecalculateItem> list = new List<RecalculateItem>();
+            List<RecalculateItem> list = new List<RecalculateItem>(alreadyOnList);
             if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
             {
                 var f = Firmy.Get(item.Id);
@@ -253,8 +253,9 @@ namespace HlidacStatu.Repositories.Statistics
 
         public static void Debug()
         {
+            var fakeList = new System.Collections.Concurrent.ConcurrentBag<RecalculateItem>();
             var item = new RecalculateItem(Firmy.Get("00000205"), RecalculateItem.StatisticsTypeEnum.VZ,"recalculateDebug");
-            List<RecalculateItem> cascade = CascadeItems(item);
+            List<RecalculateItem> cascade = CascadeItems(item, ref fakeList);
 
         }
 
@@ -274,8 +275,8 @@ namespace HlidacStatu.Repositories.Statistics
                         var item = GetOneFromProcessingQueue();
                         if (item == null)
                             return new Devmasters.Batch.ActionOutputData() { CancelRunning = true };
-
-                        res.Enqueue(item);
+                        if (res.Contains(item, comparer) == false)
+                            res.Enqueue(item);
 
                     }
                     catch (Exception e)
@@ -294,7 +295,7 @@ namespace HlidacStatu.Repositories.Statistics
             if (debug)
                 Console.WriteLine($"GetFromProcessingQueue got from queue {count} items");
 
-            System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new();
+            System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(res);
 
             Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(res,
                 item =>
@@ -304,12 +305,14 @@ namespace HlidacStatu.Repositories.Statistics
 
                     if (debug)
                         Console.WriteLine($"GetFromProcessingQueue getting cascade for {item.UniqueKey}");
-                    List<RecalculateItem> cascade = CascadeItems(item);
+                    List<RecalculateItem> cascade = CascadeItems(item, ref list);
                     if (debug)
                         Console.WriteLine($"GetFromProcessingQueue got cascade for {item.UniqueKey}");
                         foreach (var i in cascade)
-                            list.Add(i);
-
+                        {
+                            if (list.Contains(i, comparer) == false)
+                                list.Add(i);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -328,7 +331,7 @@ namespace HlidacStatu.Repositories.Statistics
             log.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
 
             return list.OrderBy(o => o.Created)
-                .Distinct()
+                .Distinct(comparer)
                 .OrderBy(o => o.Created);
         }
         public static RecalculateItem GetOneFromProcessingQueue()
