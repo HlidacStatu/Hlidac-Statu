@@ -1,7 +1,9 @@
 ﻿using Amazon.Runtime.Internal.Util;
+using Devmasters.Batch;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -25,26 +27,33 @@ namespace HlidacStatu.Repositories.Statistics
         {
             threads = threads ?? 20;
 
-            int numFromQueue = threads.Value * threads.Value;
-
+            int numFromQueue = 0;
             using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
-    RECALCULATIONQUEUENAME,
-    Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
-    ))
+                                RECALCULATIONQUEUENAME,
+                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+            ))
             {
-                var numInQ = q.MessageCount();
-                if (numInQ > numFromQueue * 2)
-                    numFromQueue = (int)(numInQ / 2);
+                numFromQueue = (int)q.MessageCount();
             }
 
 
+            var allItems = GetItemsFromProcessingQueue(numFromQueue, threads.Value, outputWriter,progressWriter,debug);
+            var uniqueItems = allItems.Distinct(comparer);
+
+            using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
+                RECALCULATIONQUEUENAME,
+                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                ))
+            {
+                q.Send(uniqueItems);                
+            }
 
             log.Info("{method} Starting with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, threads.Value);
             if (debug)
                 Console.WriteLine($"getting from queue {numFromQueue} items");
 
 
-            var queueItems = GetFromProcessingQueue(numFromQueue, threads.Value, outputWriter, progressWriter, debug);
+            var queueItems = GetFromProcessingQueueWithParents(threads.Value*threads.Value, threads.Value, outputWriter, progressWriter, debug);
             if (debug)
                 Console.WriteLine($"got from queue {queueItems.Count()} items");
 
@@ -152,7 +161,7 @@ namespace HlidacStatu.Repositories.Statistics
 
                 if (debug)
                     Console.WriteLine($"getting from queue {numFromQueue} items");
-                queueItems = GetFromProcessingQueue(numFromQueue, threads.Value,outputWriter,progressWriter,debug);
+                queueItems = GetFromProcessingQueueWithParents(threads.Value * threads.Value, threads.Value,outputWriter,progressWriter,debug);
                 if (debug)
                     Console.WriteLine($"got from queue {queueItems.Count()} items");
             }
@@ -276,12 +285,56 @@ namespace HlidacStatu.Repositories.Statistics
 
         }
 
-        public static IEnumerable<RecalculateItem> GetFromProcessingQueue(int count, int threads,
+        public static IEnumerable<RecalculateItem> GetFromProcessingQueueWithParents(int count, int threads,
             Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null, bool debug=false)
+        {
+            IEnumerable<RecalculateItem> res = GetItemsFromProcessingQueue(count, threads, outputWriter, progressWriter, debug);
+
+            System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(res);
+
+            Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(res,
+                item =>
+                {
+                    try
+                    {
+
+                        if (debug)
+                            Console.WriteLine($"GetFromProcessingQueueWithParents getting cascade for {item.UniqueKey}");
+                        List<RecalculateItem> cascade = CascadeItems(item, ref list);
+                        if (debug)
+                            Console.WriteLine($"GetFromProcessingQueueWithParents got cascade for {item.UniqueKey}");
+                        foreach (var i in cascade)
+                        {
+                            if (list.Contains(i, comparer) == false)
+                                list.Add(i);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        log.Error("CascadeItems error", e);
+                        throw;
+                    }
+
+
+                    return new Devmasters.Batch.ActionOutputData();
+                },
+                outputWriter, progressWriter,
+                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
+                monitor: new MonitoredTaskRepo.ForBatch(logger: log)
+                );
+
+            log.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
+
+            return list.OrderBy(o => o.Created)
+                .Distinct(comparer)
+                .OrderBy(o => o.Created);
+        }
+
+        private static IEnumerable<RecalculateItem> GetItemsFromProcessingQueue(int count, int threads, Action<string> outputWriter, Action<ActionProgressData> progressWriter, bool debug)
         {
             log.Debug("{method} Starting for {records} records with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, count, threads);
             if (debug)
-                Console.WriteLine($"GetFromProcessingQueue getting from queue {count} items");
+                Console.WriteLine($"GetFromProcessingQueueWithParents getting from queue {count} items");
 
             System.Collections.Concurrent.ConcurrentQueue<RecalculateItem> res = new();
             Devmasters.Batch.Manager.DoActionForAll<int>(Enumerable.Range(0, count),
@@ -310,47 +363,10 @@ namespace HlidacStatu.Repositories.Statistics
 
             log.Debug("{method} get {records} records from ProcessingQueue", MethodBase.GetCurrentMethod().Name, count);
             if (debug)
-                Console.WriteLine($"GetFromProcessingQueue got from queue {count} items");
-
-            System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(res);
-
-            Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(res,
-                item =>
-                {
-                    try
-                    {
-
-                    if (debug)
-                        Console.WriteLine($"GetFromProcessingQueue getting cascade for {item.UniqueKey}");
-                    List<RecalculateItem> cascade = CascadeItems(item, ref list);
-                    if (debug)
-                        Console.WriteLine($"GetFromProcessingQueue got cascade for {item.UniqueKey}");
-                        foreach (var i in cascade)
-                        {
-                            if (list.Contains(i, comparer) == false)
-                                list.Add(i);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        log.Error("CascadeItems error", e);
-                        throw;
-                    }
-
-
-                    return new Devmasters.Batch.ActionOutputData();
-                },
-                outputWriter, progressWriter,
-                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
-                monitor: new MonitoredTaskRepo.ForBatch(logger:log)
-                );
-
-            log.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
-
-            return list.OrderBy(o => o.Created)
-                .Distinct(comparer)
-                .OrderBy(o => o.Created);
+                Console.WriteLine($"GetFromProcessingQueueWithParents got from queue {count} items");
+            return res;
         }
+
         public static RecalculateItem GetOneFromProcessingQueue()
         {
             int tries = 3;
