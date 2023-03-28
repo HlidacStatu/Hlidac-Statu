@@ -214,13 +214,16 @@ namespace HlidacStatu.Repositories.Statistics
             if (deep > 50)
                 return list;
 
-
-            foreach (var ff in f.ParentFirmy(DS.Graphs.Relation.AktualnostType.Nedavny))
+            var parents = f.ParentFirmy(DS.Graphs.Relation.AktualnostType.Nedavny);
+            foreach (var ff in parents)
             {
-                FirmaForQueue(list, ff, statsType, provokeBy, deep + 1);
+                var ff_it = new RecalculateItem(ff, statsType,provokeBy);
+                if (list.Contains(ff_it, comparer) == false)
+                    FirmaForQueue(list, ff, statsType, provokeBy, deep + 1);
             }
 
-            foreach (var vaz in f.Osoby_v_OR(DS.Graphs.Relation.AktualnostType.Nedavny))
+            var os_parents = f.Osoby_v_OR(DS.Graphs.Relation.AktualnostType.Nedavny);
+            foreach (var vaz in os_parents)
             {
                 var item = new RecalculateItem(vaz.o, statsType, provokeBy);
                 if (list.Contains(item, comparer) == false)
@@ -246,6 +249,13 @@ namespace HlidacStatu.Repositories.Statistics
                 //TODO log
                 return false;
             }
+        }
+
+        public static void Debug()
+        {
+            var item = new RecalculateItem(Firmy.Get("00000205"), RecalculateItem.StatisticsTypeEnum.VZ,"recalculateDebug");
+            List<RecalculateItem> cascade = CascadeItems(item);
+
         }
 
         public static IEnumerable<RecalculateItem> GetFromProcessingQueue(int count, int threads,
