@@ -348,7 +348,7 @@ namespace HlidacStatu.Repositories.Statistics
             log.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
 
             return list.OrderBy(o => o.Created)
-                .Distinct(comparer`)
+                .Distinct(comparer)
                 .OrderBy(o => o.Created);
         }
         public static RecalculateItem GetOneFromProcessingQueue()
