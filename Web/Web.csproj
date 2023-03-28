@@ -62,6 +62,7 @@
         <PackageReference Include="Devmasters.Core" Version="4.4.12" />
         <PackageReference Include="Devmasters.Lang" Version="4.4.10" />
         <PackageReference Include="Devmasters.Logging" Version="4.4.0" />
+        <PackageReference Include="EasyNetQ" Version="7.4.3" />
         
         <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.3.0" />
         <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.384" />
@@ -86,7 +87,7 @@
         <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.12" />
         <PackageReference Include="PDFtoImage" Version="2.2.0" />
         <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
-        <PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
+        <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
         
         <PackageReference Include="Schema.NET" Version="11.0.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
