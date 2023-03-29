@@ -50,6 +50,23 @@ namespace HlidacStatu.Repositories
             
             return query.ToList();
         }
+        
+        public static List<OsobaEvent> GetByIco(string ico, Expression<Func<OsobaEvent, bool>> predicate = null)
+        {
+            if (string.IsNullOrWhiteSpace(ico))
+                return Enumerable.Empty<OsobaEvent>().ToList();
+                
+            using DbEntities db = new DbEntities();
+
+            var query = db.OsobaEvent
+                .AsNoTracking()
+                .Where(m => m.Ico == ico);
+
+            if (predicate is not null)
+                query = query.Where(predicate);
+            
+            return query.ToList();
+        }
 
         // tohle by ještě sneslo optimalizaci - ale až budou k dispozici data
         public static IEnumerable<string> GetAddInfos(string jmeno, int? eventTypeId, int maxNumOfResults = 1500)
