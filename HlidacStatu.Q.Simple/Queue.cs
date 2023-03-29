@@ -103,7 +103,7 @@ namespace HlidacStatu.Q.Simple
         }
         public Response<T> Get(bool autoack = false)
         {
-            
+
             //var body = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(message));
             var res = channel.BasicGet(QueueName, autoack);
             if (res == null)
@@ -160,5 +160,9 @@ namespace HlidacStatu.Q.Simple
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        #region Static
+
+        #endregion
     }
 }

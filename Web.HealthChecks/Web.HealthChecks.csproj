@@ -17,14 +17,14 @@
 		<PackageReference Include="AspNetCore.HealthChecks.Uris" Version="6.0.3" />
 		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Extension" Version="7.3.8" />
 		<PackageReference Include="CouchbaseNetClient" Version="2.7.26" />
-		<PackageReference Include="Devmasters.Core" Version="4.4.0" />
-		<PackageReference Include="Docker.DotNet" Version="3.125.12" />
+		<PackageReference Include="Devmasters.Core" Version="4.4.12" />
+		<PackageReference Include="Docker.DotNet" Version="3.125.13" />
 		<PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.3.0" />
-		<PackageReference Include="IPNetwork2" Version="2.6.552" />
+		<PackageReference Include="IPNetwork2" Version="2.6.556" />
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.14" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.10" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.14" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.15" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.14" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.14" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.14" />

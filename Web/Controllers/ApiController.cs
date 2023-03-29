@@ -51,6 +51,33 @@ namespace HlidacStatu.Web.Controllers
             
         }
 
+        public async Task<IActionResult> Autocomplete2(string q, string category, CancellationToken ctx)
+        {
+            var autocompleteHost = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint").Replace("20002","20003");
+            var autocompletePath = $"/autocomplete/autocomplete?q={q}";
+            var cat = string.IsNullOrWhiteSpace(category) ? "" : $"&category={category}";
+            var uri = new Uri($"{autocompleteHost}{autocompletePath}{cat}");
+            using var client = _httpClientFactory.CreateClient(Constants.DefaultHttpClient);
+
+            try
+            {
+                var response = await client.GetAsync(uri, ctx);
+
+                return new HttpResponseMessageActionResult(response);
+            }
+            catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
+            {
+                // canceled by user
+                Util.Consts.Logger.Info("Autocomplete canceled by user");
+            }
+            catch (Exception e)
+            {
+                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { q });
+            }
+
+            return NoContent();
+
+        }
         // GET: ApiV1
         public ActionResult Index()
         {

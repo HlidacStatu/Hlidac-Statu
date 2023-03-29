@@ -6,17 +6,17 @@
         <Version>1.0.2</Version>
     </PropertyGroup>
     <ItemGroup>
-        <None Remove="appsettings.json.sample"/>
+        <None Remove="appsettings.json.sample" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="MailKit" Version="3.5.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.14"/>
-        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0"/>
+        <PackageReference Include="MailKit" Version="3.6.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.14" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj"/>
-        <ProjectReference Include="..\HlidacStatu.Q\HlidacStatu.Q.csproj"/>
-        <ProjectReference Include="..\LibCore\LibCore.csproj"/>
+        <ProjectReference Include="..\HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj" />
+        <ProjectReference Include="..\HlidacStatu.Q\HlidacStatu.Q.csproj" />
+        <ProjectReference Include="..\LibCore\LibCore.csproj" />
     </ItemGroup>
     <ItemGroup>
         <Content Update="appsettings.json">
