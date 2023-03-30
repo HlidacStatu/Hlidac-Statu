@@ -43,7 +43,7 @@ namespace HlidacStatu.Entities
         [ShowNiceDisplayName()]
         public enum Types
         {
-            [NiceDisplayName("Speciální")]
+            [NiceDisplayName("Vazby")]
             [Display(Name="Vazby", Description = "Speciální vazby na firmy, nebo osoby")]
             Vazby = 0,
             [NiceDisplayName("Volená funkce")]
