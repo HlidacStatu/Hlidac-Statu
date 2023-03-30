@@ -34,17 +34,18 @@ namespace HlidacStatu.Repositories
 
         private static void AfterSave(VerejnaZakazka vz)
         {
+            return;
             Statistics.Recalculate.AddFirmaToProcessingQueue(vz.Zadavatel.ICO, Statistics.RecalculateItem.StatisticsTypeEnum.VZ , $"VZ {vz.Id}");
             foreach (var dod in vz.Dodavatele)
                 Statistics.Recalculate.AddFirmaToProcessingQueue(dod.ICO, Statistics.RecalculateItem.StatisticsTypeEnum.VZ, $"VZ {vz.Id}");
         }
 
-        private static async Task SaveIncompleteVzAsync(VerejnaZakazka incompleteVz)
+        private static async Task SaveIncompleteVzAsync(VerejnaZakazka incompleteVz, ElasticClient elasticClient)
         {
             try
             {
                 //teoreticky můžeme použít incompleteVz.Changelog na zapsání nalezených chyb
-                var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
+                elasticClient ??= await Manager.GetESClient_VerejneZakazkyAsync();
                 incompleteVz.HasIssues = true;
                 await elasticClient.IndexDocumentAsync<VerejnaZakazka>(incompleteVz);
                 AfterSave(incompleteVz);
@@ -61,8 +62,11 @@ namespace HlidacStatu.Repositories
         /// Update or insert new
         /// </summary>
         /// <param name="newVZ"></param>
+        /// <param name="elasticClient"></param>
+        /// <param name="httpClient"></param>
         /// <param name="posledniZmena"></param>
-        public static async Task UpsertAsync(VerejnaZakazka newVZ, HttpClient httpClient = null, DateTime? posledniZmena = null)
+        public static async Task UpsertAsync(VerejnaZakazka newVZ, ElasticClient elasticClient = null,
+            HttpClient httpClient = null, DateTime? posledniZmena = null)
         {
             if (newVZ is null)
                 return;
@@ -87,57 +91,97 @@ namespace HlidacStatu.Repositories
                 // there might be issues to find proper ICO, so we have to save half-complete VZ
                 if (string.IsNullOrWhiteSpace(newVZ.Zadavatel?.ICO))
                 {
-                    await SaveIncompleteVzAsync(newVZ);
+                    await SaveIncompleteVzAsync(newVZ, elasticClient);
                     return;
                 }
                 
-                var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
-                var originalVZ = await FindOriginalDocumentFromESAsync(newVZ);
+                elasticClient ??= await Manager.GetESClient_VerejneZakazkyAsync();
+                var storedDuplicates = await FindDocumentsFromTheSameSourcesAsync(newVZ, elasticClient);
 
                 // VZ neexistuje => ukládáme
-                if (originalVZ is null)
+                if (storedDuplicates is null || !storedDuplicates.Any())
                 {
                     SendToOcrQueue(newVZ);
                     await elasticClient.IndexDocumentAsync(newVZ);
                     AfterSave(newVZ);
                     return;
                 }
-                
-                //VZ existuje => mergujeme
-                // zajistit, že budeme mít checksum všude
-                // zakomentováno, protože to stahuje data zbytečně 2x u stejných VZ. 
-                //var storeOriginalDocumentsTask = StoreDocumentCopyToHlidacStorageAsync(originalVZ, httpClient);
-                
-                MergeSimpleProperties(ref originalVZ, newVZ);
 
-                // merge dodavatele
-                foreach (var newDodavatel in newVZ.Dodavatele)
+                var storedDuplicatesOrdered = storedDuplicates.OrderBy(d => d.LastUpdated).ToList();
+
+                //the oldest one will be our permanent doc 
+                var firstVz = storedDuplicatesOrdered.First();
+
+                // firstly merge all connected VZs in db
+                foreach (var storedDuplicate in storedDuplicatesOrdered.Skip(1) )
                 {
-                    var origDodavatel = originalVZ.Dodavatele.Where(d => d.Equals(newDodavatel)).FirstOrDefault();
+                    firstVz = MergeVz(firstVz, storedDuplicate);
 
-                    if (origDodavatel is not null)
+                    try
                     {
-                        origDodavatel.Jmeno = SetProperty(origDodavatel.Jmeno, newDodavatel.Jmeno, "Dodavatel.Jmeno", originalVZ.Changelog);
+                        await DocumentHistoryRepo<VerejnaZakazka>.SaveAsync(storedDuplicate, storedDuplicate.Origin, firstVz.Id);
+
+                        await elasticClient.DeleteByQueryAsync<VerejnaZakazka>(s => s.Query(q =>
+                            q.Term(t => t.Field(f => f.Id).Value(storedDuplicate.Id))));
                     }
-                    else
+                    catch (Exception e)
                     {
-                        originalVZ.Dodavatele.Add(newDodavatel);
+                        Consts.Logger.Error(
+                            $"VZ ERROR Merging ID:{firstVz.Id} with ID:{storedDuplicate.Id}.", e);
                     }
-                }    
+
+                }
+
+                firstVz = MergeVz(firstVz, newVZ);
+                try
+                {
+                    await DocumentHistoryRepo<VerejnaZakazka>.SaveAsync(newVZ, newVZ.Origin, firstVz.Id);
+                }
+                catch (Exception e)
+                {
+                    Consts.Logger.Error(
+                        $"VZ ERROR Merging ID:{firstVz.Id} with new VZ from {newVZ.Origin}.", e);
+                }
                 
-                //merge dokumenty
-                //await storeOriginalDocumentsTask;
-                MergeDocuments(originalVZ, newVZ.Dokumenty);
-                SendToOcrQueue(originalVZ);
+
+                SendToOcrQueue(firstVz);
                 
-                await elasticClient.IndexDocumentAsync<VerejnaZakazka>(originalVZ);
-                AfterSave(originalVZ);
+                await elasticClient.IndexDocumentAsync<VerejnaZakazka>(firstVz);
+                
+                AfterSave(firstVz);
             }
             catch (Exception e)
             {
                 Consts.Logger.Error(
                     $"VZ ERROR Upserting ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}", e);
             }
+        }
+
+        private static VerejnaZakazka MergeVz(VerejnaZakazka destination, VerejnaZakazka source)
+        {
+            MergeSimpleProperties(ref destination, source);
+
+            // merge dodavatele
+            foreach (var dodavatel in source.Dodavatele)
+            {
+                var origDodavatel = destination.Dodavatele.FirstOrDefault(d => d.Equals(dodavatel));
+
+                if (origDodavatel is not null)
+                {
+                    //update
+                    origDodavatel.Jmeno =
+                        SetProperty(origDodavatel.Jmeno, dodavatel.Jmeno, "Dodavatel.Jmeno", destination.Changelog);
+                }
+                else
+                {
+                    //add
+                    destination.Dodavatele.Add(dodavatel);
+                }
+            }
+
+            //merge dokumenty
+            MergeDocuments(destination, source.Dokumenty);
+            return destination;
         }
 
         /// <summary>
@@ -177,9 +221,9 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static async Task UpdateDocumentsInVz(string id, List<VerejnaZakazka.Document> dokumenty)
+        public static async Task UpdateDocumentsInVz(string id, List<VerejnaZakazka.Document> dokumenty, ElasticClient elasticClient = null)
         {
-            var elasticClient = await Manager.GetESClient_VerejneZakazkyAsync();
+            elasticClient ??= await Manager.GetESClient_VerejneZakazkyAsync();
             var zakazka = await LoadFromESAsync(id, elasticClient);
             MergeDocuments(zakazka, dokumenty);
             await elasticClient.IndexDocumentAsync<VerejnaZakazka>(zakazka);
@@ -270,6 +314,7 @@ namespace HlidacStatu.Repositories
 
         private static void SendToOcrQueue(VerejnaZakazka newVZ)
         { 
+            return;
             if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
             {
                 ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
@@ -386,6 +431,7 @@ namespace HlidacStatu.Repositories
                 verejnaZakazka.PosledniZmena = posledniZmena;
             else
                 verejnaZakazka.PosledniZmena = verejnaZakazka.GetPosledniZmena();
+            
             verejnaZakazka.LastUpdated = DateTime.Now;
 
             foreach (var zdroj in verejnaZakazka.Zdroje)
@@ -401,19 +447,19 @@ namespace HlidacStatu.Repositories
 
         public static async Task<VerejnaZakazka> LoadFromESAsync(string id, ElasticClient client = null)
         {
-            var es = client ?? await Manager.GetESClient_VerejneZakazkyAsync();
-            var res = await es.GetAsync<VerejnaZakazka>(id);
+            client ??= await Manager.GetESClient_VerejneZakazkyAsync();
+            var res = await client.GetAsync<VerejnaZakazka>(id);
             if (res.Found)
                 return res.Source;
             else
                 return null;
         }
         
-        public static async Task<VerejnaZakazka> FindOriginalDocumentFromESAsync(VerejnaZakazka zakazka)
+        public static async Task<IEnumerable<VerejnaZakazka>> FindDocumentsFromTheSameSourcesAsync(VerejnaZakazka zakazka, ElasticClient elasticClient)
         {
-            var es = await Manager.GetESClient_VerejneZakazkyAsync();
+            elasticClient ??= await Manager.GetESClient_VerejneZakazkyAsync();
             // find possible candidates
-            var res = await es.SearchAsync<VerejnaZakazka>(s => s
+            var res = await elasticClient.SearchAsync<VerejnaZakazka>(s => s
                 .Query(q => q
                     .Bool(b => b
                         .Must(bm =>
@@ -424,28 +470,49 @@ namespace HlidacStatu.Repositories
             if (!res.IsValid)
             {
                 Consts.Logger.Warning($"VZ problems with query. {res.DebugInformation}");
-                return null;
+                return Enumerable.Empty<VerejnaZakazka>();
             }
             
-            if (res.Hits.Count() <= 0)
-                return null;
-
-            if (res.Hits.Count > 1)
-            {
-                Consts.Logger.Warning($"VZ Too many matches found. Only one is allowed. \n" +
-                                      $"Ico: {zakazka.Zadavatel.ICO}\n" +
-                                      $"Zdroje:{zakazka.VypisZdroju()}");
-                return null;
-            }
-
-            return res.Documents.SingleOrDefault();
+            if (!res.Hits.Any())
+                return Enumerable.Empty<VerejnaZakazka>();
+            
+            return res.Documents;
         }
 
         public static async Task<bool> ExistsAsync(string id, ElasticClient client = null)
         {
-            var es = client ?? await Manager.GetESClient_VerejneZakazkyAsync();
-            var res = await es.DocumentExistsAsync<VerejnaZakazka>(id);
+            client ??= await Manager.GetESClient_VerejneZakazkyAsync();
+            var res = await client.DocumentExistsAsync<VerejnaZakazka>(id);
             return res.Exists;
+        }
+
+        public static async Task<string> GetDocumentTextAsync(string documentSha256Checksum, ElasticClient client = null)
+        {
+            client ??= await Manager.GetESClient_VerejneZakazkyAsync();
+            // find possible candidates
+            var res = await client.SearchAsync<VerejnaZakazka>(s => s
+                .Query(q => q
+                    .Term(t => t.Field("dokumenty.sha256Checksum").Value(documentSha256Checksum))
+                ));
+
+            if (!res.IsValid)
+            {
+                Consts.Logger.Warning($"VZ problems with query. {res.DebugInformation}");
+                return null;
+            }
+            
+            if (!res.Hits.Any())
+                return null;
+
+
+            var vz = res.Documents.FirstOrDefault();
+
+            var doc = vz?.Dokumenty.FirstOrDefault(d => d.Sha256Checksum == documentSha256Checksum);
+
+            if (doc is not null && doc.EnoughExtractedText)
+                return doc.PlainText;
+
+            return null;
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 using Polly;
@@ -48,6 +49,12 @@ public class Checksum
     public static string GenerateInvalidChecksum()
     {
         return InvalidChecksum + Guid.NewGuid().ToString("N");
+    }
+
+    public static string DoChecksum(string text)
+    {
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(text));
+        return ConvertToCorrectEndiannessFormat(hash);
     }
     
     public static string DoChecksum(byte[] file)
