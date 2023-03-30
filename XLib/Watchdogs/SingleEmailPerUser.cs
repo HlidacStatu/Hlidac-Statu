@@ -10,6 +10,7 @@ namespace HlidacStatu.XLib.Watchdogs
 {
     public class SingleEmailPerUser
     {
+
         public async static Task SendWatchdogsAsync(IEnumerable<WatchDog> watchdogs,
             bool force = false, string[] specificContacts = null,
             DateTime? fromSpecificDate = null, DateTime? toSpecificDate = null,
@@ -26,8 +27,10 @@ namespace HlidacStatu.XLib.Watchdogs
 
             Util.Consts.Logger.Info($"SingleEmailPerUser Start processing {watchdogs.Count()} watchdogs.");
 
+
             Dictionary<string, WatchDog[]> groupedByUserNoSpecContact = watchdogs
                 .Where(w => w != null)
+                .Where(w => w.UnconfirmedUser() != null)
                 .Where(m => string.IsNullOrEmpty(m.SpecificContact))
                 .GroupBy(k => k.UnconfirmedUser().Id,
                         v => v,

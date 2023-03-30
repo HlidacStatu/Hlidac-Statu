@@ -1,8 +1,11 @@
 ﻿using Amazon.Runtime.Internal.Util;
+using Devmasters.Batch;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -17,15 +20,42 @@ namespace HlidacStatu.Repositories.Statistics
 
         static Devmasters.Batch.ActionProgressWriter debugProgressWr = new Devmasters.Batch.ActionProgressWriter(0.1f);
 
-        public static void RecalculateTasks(int? threads = null,
+        public static void RecalculateTasks(int? threads = null, bool debug=false,
             Action<string> outputWriter = null, 
             Action<Devmasters.Batch.ActionProgressData> progressWriter = null
             )
         {
             threads = threads ?? 20;
 
+            int numFromQueue = 0;
+            using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
+                                RECALCULATIONQUEUENAME,
+                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+            ))
+            {
+                numFromQueue = (int)q.MessageCount();
+            }
+
+
+            var allItems = GetItemsFromProcessingQueue(numFromQueue, threads.Value, outputWriter,progressWriter,debug);
+            var uniqueItems = allItems.Distinct(comparer);
+
+            using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
+                RECALCULATIONQUEUENAME,
+                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                ))
+            {
+                q.Send(uniqueItems);                
+            }
+
             log.Info("{method} Starting with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, threads.Value);
-            var queueItems = GetFromProcessingQueue(threads.Value* threads.Value, threads.Value);
+            if (debug)
+                Console.WriteLine($"getting from queue {numFromQueue} items");
+
+
+            var queueItems = GetFromProcessingQueueWithParents(threads.Value*threads.Value, threads.Value, outputWriter, progressWriter, debug);
+            if (debug)
+                Console.WriteLine($"got from queue {queueItems.Count()} items");
 
             while (queueItems.Count() > 0)
             {
@@ -37,6 +67,9 @@ namespace HlidacStatu.Repositories.Statistics
                     {
                         var f = Firmy.Get(item.Id);
                         if (f != null)
+                        {
+                            if (debug)
+                                Console.WriteLine($"start statistics {f.ICO} {f.Jmeno}");
                             switch (item.StatisticsType)
                             {
                                 case RecalculateItem.StatisticsTypeEnum.Smlouva:
@@ -51,7 +84,9 @@ namespace HlidacStatu.Repositories.Statistics
                                 default:
                                     break;
                             }
-
+                            if (debug)
+                                Console.WriteLine($"end statistics {f.ICO} {f.Jmeno}");
+                        }
                         return new Devmasters.Batch.ActionOutputData();
                     },
                     outputWriter, progressWriter,
@@ -69,6 +104,8 @@ namespace HlidacStatu.Repositories.Statistics
                         var f = Firmy.Get(item.Id);
                         if (f != null)
                         {
+                            if (debug)
+                                Console.WriteLine($"start holding statistics {f.ICO} {f.Jmeno}");
                             switch (item.StatisticsType)
                             {
                                 case RecalculateItem.StatisticsTypeEnum.Smlouva:
@@ -84,6 +121,10 @@ namespace HlidacStatu.Repositories.Statistics
                                     break;
                             }
                             _ = f.InfoFacts(forceUpdateCache: true);
+
+                            if (debug)
+                                Console.WriteLine($"end holding statistics {f.ICO} {f.Jmeno}");
+
                         }
                         return new Devmasters.Batch.ActionOutputData();
                     },
@@ -102,8 +143,12 @@ namespace HlidacStatu.Repositories.Statistics
                         var o = Osoby.GetByNameId.Get(item.Id);
                         if (o != null)
                         {
+                            if (debug)
+                                Console.WriteLine($"start statistics osoba {o.NameId}");
                             _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
                             _ = o.InfoFactsCached(forceUpdateCache: true);
+                            if (debug)
+                                Console.WriteLine($"end statistics osoba {o.NameId}");
                         }
 
                         return new Devmasters.Batch.ActionOutputData();
@@ -114,16 +159,20 @@ namespace HlidacStatu.Repositories.Statistics
                     );
 
 
-                queueItems = GetFromProcessingQueue(100000, threads.Value);
+                if (debug)
+                    Console.WriteLine($"getting from queue {numFromQueue} items");
+                queueItems = GetFromProcessingQueueWithParents(threads.Value * threads.Value, threads.Value,outputWriter,progressWriter,debug);
+                if (debug)
+                    Console.WriteLine($"got from queue {queueItems.Count()} items");
             }
 
             log.Info("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
 
         }
 
-        private static List<RecalculateItem> CascadeItems(RecalculateItem item)
+        private static List<RecalculateItem> CascadeItems(RecalculateItem item, ref System.Collections.Concurrent.ConcurrentBag<RecalculateItem> alreadyOnList)
         {
-            List<RecalculateItem> list = new List<RecalculateItem>();
+            List<RecalculateItem> list = new List<RecalculateItem>(alreadyOnList);
             if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
             {
                 var f = Firmy.Get(item.Id);
@@ -179,6 +228,9 @@ namespace HlidacStatu.Repositories.Statistics
             log.Verbose("{method} expanding {ico} {subjekt} vazby, recursive deep {deep}, current list {count} items",
                     MethodBase.GetCurrentMethod().Name,f.ICO, f.Jmeno, deep, list.Count);
 
+            //StackOverflow defense
+            if (list.Count > 10_000)
+                return list;
 
             var it = new RecalculateItem(f, statsType, provokeBy);
             if (list.Contains(it, comparer) == false)
@@ -188,13 +240,16 @@ namespace HlidacStatu.Repositories.Statistics
             if (deep > 50)
                 return list;
 
-
-            foreach (var ff in f.ParentFirmy(DS.Graphs.Relation.AktualnostType.Nedavny))
+            var parents = f.ParentFirmy(DS.Graphs.Relation.AktualnostType.Nedavny);
+            foreach (var ff in parents)
             {
-                FirmaForQueue(list, ff, statsType, provokeBy, deep + 1);
+                var ff_it = new RecalculateItem(ff, statsType,provokeBy);
+                if (list.Contains(ff_it, comparer) == false)
+                    FirmaForQueue(list, ff, statsType, provokeBy, deep + 1);
             }
 
-            foreach (var vaz in f.Osoby_v_OR(DS.Graphs.Relation.AktualnostType.Nedavny))
+            var os_parents = f.Osoby_v_OR(DS.Graphs.Relation.AktualnostType.Nedavny);
+            foreach (var vaz in os_parents)
             {
                 var item = new RecalculateItem(vaz.o, statsType, provokeBy);
                 if (list.Contains(item, comparer) == false)
@@ -222,20 +277,83 @@ namespace HlidacStatu.Repositories.Statistics
             }
         }
 
-        public static IEnumerable<RecalculateItem> GetFromProcessingQueue(int count, int threads,
-            Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null)
+        public static void Debug()
+        {
+            var fakeList = new System.Collections.Concurrent.ConcurrentBag<RecalculateItem>();
+            var item = new RecalculateItem(Firmy.Get("00000205"), RecalculateItem.StatisticsTypeEnum.VZ,"recalculateDebug");
+            List<RecalculateItem> cascade = CascadeItems(item, ref fakeList);
+
+        }
+
+        public static IEnumerable<RecalculateItem> GetFromProcessingQueueWithParents(int count, int threads,
+            Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null, bool debug=false)
+        {
+            IEnumerable<RecalculateItem> res = GetItemsFromProcessingQueue(count, threads, outputWriter, progressWriter, debug);
+
+            System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(res);
+
+            Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(res,
+                item =>
+                {
+                    try
+                    {
+
+                        if (debug)
+                            Console.WriteLine($"GetFromProcessingQueueWithParents getting cascade for {item.UniqueKey}");
+                        List<RecalculateItem> cascade = CascadeItems(item, ref list);
+                        if (debug)
+                            Console.WriteLine($"GetFromProcessingQueueWithParents got cascade for {item.UniqueKey}");
+                        foreach (var i in cascade)
+                        {
+                            if (list.Contains(i, comparer) == false)
+                                list.Add(i);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        log.Error("CascadeItems error", e);
+                        throw;
+                    }
+
+
+                    return new Devmasters.Batch.ActionOutputData();
+                },
+                outputWriter, progressWriter,
+                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
+                monitor: new MonitoredTaskRepo.ForBatch(logger: log)
+                );
+
+            log.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
+
+            return list.OrderBy(o => o.Created)
+                .Distinct(comparer)
+                .OrderBy(o => o.Created);
+        }
+
+        private static IEnumerable<RecalculateItem> GetItemsFromProcessingQueue(int count, int threads, Action<string> outputWriter, Action<ActionProgressData> progressWriter, bool debug)
         {
             log.Debug("{method} Starting for {records} records with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, count, threads);
+            if (debug)
+                Console.WriteLine($"GetFromProcessingQueueWithParents getting from queue {count} items");
 
             System.Collections.Concurrent.ConcurrentQueue<RecalculateItem> res = new();
             Devmasters.Batch.Manager.DoActionForAll<int>(Enumerable.Range(0, count),
                 _ =>
                 {
-                    var item = GetOneFromProcessingQueue();
-                    if (item == null)
-                        return new Devmasters.Batch.ActionOutputData() { CancelRunning = true };
+                    try
+                    {
+                        var item = GetOneFromProcessingQueue();
+                        if (item == null)
+                            return new Devmasters.Batch.ActionOutputData() { CancelRunning = true };
+                        if (res.Contains(item, comparer) == false)
+                            res.Enqueue(item);
 
-                    res.Enqueue(item);
+                    }
+                    catch (Exception e)
+                    {
+
+                        log.Error("GetOneFromProcessingQueue error", e);
+                    }
 
                     return new Devmasters.Batch.ActionOutputData() { CancelRunning = res.Count >= count };
                 },
@@ -244,30 +362,11 @@ namespace HlidacStatu.Repositories.Statistics
             );
 
             log.Debug("{method} get {records} records from ProcessingQueue", MethodBase.GetCurrentMethod().Name, count);
-
-            System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new();
-
-            Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(res,
-                item =>
-                {
-                    List<RecalculateItem> cascade = CascadeItems(item);
-
-                    foreach (var i in cascade)
-                        list.Add(i);
-
-                    return new Devmasters.Batch.ActionOutputData();
-                },
-                outputWriter, progressWriter,
-                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
-                monitor: new MonitoredTaskRepo.ForBatch(logger:log)
-                );
-
-            log.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
-
-            return list.OrderBy(o => o.Created)
-                .Distinct()
-                .OrderBy(o => o.Created);
+            if (debug)
+                Console.WriteLine($"GetFromProcessingQueueWithParents got from queue {count} items");
+            return res;
         }
+
         public static RecalculateItem GetOneFromProcessingQueue()
         {
             int tries = 3;

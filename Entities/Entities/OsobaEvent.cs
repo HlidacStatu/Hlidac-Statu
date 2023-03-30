@@ -34,5 +34,8 @@ namespace HlidacStatu.Entities
         public string Ico { get; set; }
         [Column("CEO")]
         public int? Ceo { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? Modified { get; set; }
+        public string ModifiedBy { get; set; }
     }
 }

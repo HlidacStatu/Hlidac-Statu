@@ -11,5 +11,6 @@ namespace HlidacStatu.Ceny.Models
         public string Caption { get; set; } = "Přehled cen - souhrn";
         public string FirstColumnName { get; set; } = "Pozice";
         public YearlyStatisticsGroup.Key? Key { get; set; }
+        public bool CompareWithFirstLine { get; set; } = false;
     }
 }

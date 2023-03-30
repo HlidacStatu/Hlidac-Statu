@@ -14,6 +14,18 @@ namespace HlidacStatu.Q.Simple
         public ulong? ResponseId { get; set; } = null;
     }
 
+    public class Queue
+    {
+        public static long MessageCountInQ(string queueName, string connectionString)
+        {
+            using (HlidacStatu.Q.Simple.Queue<object> q = new Q.Simple.Queue<object>(queueName, connectionString))
+            {
+                return q.MessageCount();
+            }
+        }
+    }
+
+
     public class Queue<T>
         : IDisposable
 
@@ -55,7 +67,6 @@ namespace HlidacStatu.Q.Simple
                 return 0;
             }
         }
-
         public long MessageCount()
         {
             try
@@ -103,7 +114,7 @@ namespace HlidacStatu.Q.Simple
         }
         public Response<T> Get(bool autoack = false)
         {
-            
+
             //var body = Encoding.UTF8.GetBytes(Newtonsoft.Json.JsonConvert.SerializeObject(message));
             var res = channel.BasicGet(QueueName, autoack);
             if (res == null)
@@ -160,5 +171,9 @@ namespace HlidacStatu.Q.Simple
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
+        #region Static
+
+        #endregion
     }
 }

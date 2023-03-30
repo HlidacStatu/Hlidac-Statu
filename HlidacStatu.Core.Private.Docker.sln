@@ -186,6 +186,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebPlayground", "Hlidac-Sta
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AsrRunner", "Hlidac-Statu\Docker\AsrRunner\AsrRunner.csproj", "{0925A2D5-F82F-458F-A19D-3A1A170CFEAA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MLUtil", "Hlidac-Statu-Private\MLUtils\MLUtil.csproj", "{BB56AB60-9976-42E1-9832-13070A4719CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -452,6 +454,10 @@ Global
 		{0925A2D5-F82F-458F-A19D-3A1A170CFEAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0925A2D5-F82F-458F-A19D-3A1A170CFEAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0925A2D5-F82F-458F-A19D-3A1A170CFEAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB56AB60-9976-42E1-9832-13070A4719CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB56AB60-9976-42E1-9832-13070A4719CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB56AB60-9976-42E1-9832-13070A4719CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB56AB60-9976-42E1-9832-13070A4719CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -534,6 +540,7 @@ Global
 		{71C901F5-95EF-4731-B504-D5F5FFE96B62} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 		{298C5C6F-E442-48C1-BD5B-8DB800C6244E} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 		{0925A2D5-F82F-458F-A19D-3A1A170CFEAA} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
+		{BB56AB60-9976-42E1-9832-13070A4719CC} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}

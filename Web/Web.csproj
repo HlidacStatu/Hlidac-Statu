@@ -58,13 +58,14 @@
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="6.0.5" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="6.0.5" />
         <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="6.0.3" />
-        <PackageReference Include="Devmasters.Cache.Memcached" Version="4.4.0" />
-        <PackageReference Include="Devmasters.Core" Version="4.4.0" />
-        <PackageReference Include="Devmasters.Lang" Version="4.4.0" />
+        <PackageReference Include="Devmasters.Cache.Memcached" Version="4.4.1" />
+        <PackageReference Include="Devmasters.Core" Version="4.4.12" />
+        <PackageReference Include="Devmasters.Lang" Version="4.4.10" />
         <PackageReference Include="Devmasters.Logging" Version="4.4.0" />
+        <PackageReference Include="EasyNetQ" Version="7.4.3" />
         
         <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.3.0" />
-        <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.372" />
+        <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.384" />
         <PackageReference Include="log4net" Version="2.0.15" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.14" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.14" />
@@ -72,7 +73,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.14" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.10" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.14" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.15" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.14" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.14" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.14" />

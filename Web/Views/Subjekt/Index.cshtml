@@ -378,7 +378,7 @@
             jak z věstníku veřejných zakázek, tak z profilů zadavatelů.
         </p>
         @{
-            var profilyZadavatele = (await ProfilZadavateleRepo.GetByIcoAsync(Model.ICO)).Select(m => m.Url?.Trim()).Distinct();
+            var profilyZadavatele = (await ProfilZadavateleRepo.GetByIcoAsync(Model.ICO));
             var resVZdodav = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("icododavatel:" + Model.ICO, null, 1, 0, "1");
             var resVZzadav = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("icozadavatel:" + Model.ICO, null, 1, 0, "1");
             Dictionary<string, long> vzakaz = new();
@@ -408,9 +408,17 @@
             {
                 <p>
                     U subjektu registrujeme @Html.Raw(Devmasters.Lang.CS.Plural.Get(profilyZadavatele.Count(),
-            "jeden profil zadavatele","{0} profily zadavatele","{0} profilů zadavatele"
-            )).
+                        "jeden profil zadavatele","{0} profily zadavatele","{0} profilů zadavatele")).
                 </p>
+                <p>
+                    <ul>
+                        @foreach (var pz in profilyZadavatele)
+                        {
+                            <li><a target="_blank" href="@pz.Url">@(pz.Url.Length >=40 ? pz.Url.Substring(0,40)+"..." : pz.Url)</a> (uveřejněn @(pz.DatumUverejneni?.ToString("dd. MM. yyyy")))</li>
+                        }
+                    </ul>
+                </p>
+
             }
         }
         <a href="/subjekt/VerejneZakazky/@Model.ICO" class="moreinfolink text-uppercase"><strong>Zobrazit podrobnosti o veřejných zakázkách</strong></a>
