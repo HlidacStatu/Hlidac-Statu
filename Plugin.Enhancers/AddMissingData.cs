@@ -59,7 +59,7 @@ namespace HlidacStatu.Plugin.Enhancers
                 if (string.IsNullOrEmpty(currPref))
                 {
                     //NENI PREFIX, DOPLN HO
-                    string newico = zahr + "-" + subj.ico;
+                    string newico = zahr.Country + "-" + subj.ico;
                     _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněno zahraniční ID subjektu. Doplněn prefix před ID firmy", "", path + ".ico", newico, subj.ico, this));
                     subj.ico = newico;
                     changed = true;
