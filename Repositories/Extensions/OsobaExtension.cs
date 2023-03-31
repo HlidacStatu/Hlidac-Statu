@@ -59,7 +59,7 @@ namespace HlidacStatu.Extensions
         {
             var ret = osoba.Events(ev =>
                     ev.Type == (int)OsobaEvent.Types.Politicka
-                    || ev.Type == (int)OsobaEvent.Types.PolitickaPracovni
+                    || ev.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                     || ev.Type == (int)OsobaEvent.Types.VolenaFunkce
                 )
                 .Where(ev =>
@@ -287,14 +287,14 @@ namespace HlidacStatu.Extensions
         {
             if (deletePrevious)
             {
-                var oes = osoba.Events(m => m.Type == (int)OsobaEvent.Types.Specialni);
+                var oes = osoba.Events(m => m.Type == (int)OsobaEvent.Types.Vazby);
                 foreach (var o in oes)
                 {
                     OsobaEventRepo.Delete(o, user);
                 }
             }
 
-            OsobaEvent oe = new OsobaEvent(osoba.InternalId, "", text, OsobaEvent.Types.Specialni);
+            OsobaEvent oe = new OsobaEvent(osoba.InternalId, "", text, OsobaEvent.Types.Vazby);
             oe.Organizace = ParseTools.NormalizaceStranaShortName(strana);
             oe.Zdroj = zdroj;
             return osoba.AddOrUpdateEvent(oe, user);
@@ -304,7 +304,7 @@ namespace HlidacStatu.Extensions
             string zdroj, string user)
         {
             OsobaEvent oe = new OsobaEvent(osoba.InternalId, string.Format("{0}", pozice), "",
-                OsobaEvent.Types.PolitickaPracovni);
+                OsobaEvent.Types.PolitickaExekutivni);
             oe.Organizace = ParseTools.NormalizaceStranaShortName(strana);
             oe.Zdroj = zdroj;
             oe.DatumOd = new DateTime(rokOd, 1, 1, 0, 0, 0, DateTimeKind.Local);
@@ -351,10 +351,10 @@ namespace HlidacStatu.Extensions
             var fixedOrder = new List<int>()
             {
                 (int) OsobaEvent.Types.VolenaFunkce,
-                (int) OsobaEvent.Types.PolitickaPracovni,
+                (int) OsobaEvent.Types.PolitickaExekutivni,
                 (int) OsobaEvent.Types.Politicka,
                 (int) OsobaEvent.Types.VerejnaSpravaJine,
-                (int) OsobaEvent.Types.VerejnaSpravaPracovni,
+                (int) OsobaEvent.Types.VerejnaSpravaExekutivni,
                 (int) OsobaEvent.Types.Osobni,
                 (int) OsobaEvent.Types.Jine
             };
@@ -425,10 +425,10 @@ namespace HlidacStatu.Extensions
             int[] types =
             {
                 (int) OsobaEvent.Types.VolenaFunkce,
-                (int) OsobaEvent.Types.PolitickaPracovni,
+                (int) OsobaEvent.Types.PolitickaExekutivni,
                 (int) OsobaEvent.Types.Politicka,
                 (int) OsobaEvent.Types.VerejnaSpravaJine,
-                (int) OsobaEvent.Types.VerejnaSpravaPracovni,
+                (int) OsobaEvent.Types.VerejnaSpravaExekutivni,
                 (int) OsobaEvent.Types.Osobni,
                 (int) OsobaEvent.Types.Jine
             };

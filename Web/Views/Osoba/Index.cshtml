@@ -38,14 +38,14 @@
     }
     @{
         int[] types = {
-    (int)OsobaEvent.Types.VolenaFunkce,
-    (int)OsobaEvent.Types.PolitickaPracovni,
-    (int)OsobaEvent.Types.Politicka,
-    (int)OsobaEvent.Types.VerejnaSpravaJine,
-    (int)OsobaEvent.Types.VerejnaSpravaPracovni,
-    (int)OsobaEvent.Types.Osobni,
-    (int)OsobaEvent.Types.Jine
-    };
+            (int)OsobaEvent.Types.VolenaFunkce,
+            (int)OsobaEvent.Types.PolitickaExekutivni,
+            (int)OsobaEvent.Types.Politicka,
+            (int)OsobaEvent.Types.VerejnaSpravaJine,
+            (int)OsobaEvent.Types.VerejnaSpravaExekutivni,
+            (int)OsobaEvent.Types.Osobni,
+            (int)OsobaEvent.Types.Jine
+        };
 
         var listingNum = 3;
         var funkceOsobaNum = Model.Events(m => types.Contains(m.Type)).Count();

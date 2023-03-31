@@ -1,4 +1,4 @@
-﻿using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using HlidacStatu.Lib.Data.External.RPP;
 using HlidacStatu.Repositories.ProfilZadavatelu;
 
@@ -17,6 +17,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories.ES
 {
@@ -54,7 +55,8 @@ namespace HlidacStatu.Repositories.ES
             RPP_Kategorie,
             RPP_OVM,
             RPP_ISVS,
-            InDocTableCells
+            InDocTableCells,
+            DocumentHistory,
         }
 
         public static string defaultIndexName = "hlidacsmluv";
@@ -63,6 +65,7 @@ namespace HlidacStatu.Repositories.ES
 
         public static string defaultIndexName_VerejneZakazky = "verejnezakazky";
         public static string defaultIndexName_VerejneZakazkyNew = "verejnezakazky_new";
+        public static string defaultIndexName_DocumentHistory = "documenthistory";
         public static string defaultIndexName_ProfilZadavatele = "profilzadavatele";
         public static string defaultIndexName_VerejneZakazkyNaProfiluRaw = "verejnezakazkyprofilraw";
         public static string defaultIndexName_Firmy = "firmy";
@@ -132,7 +135,49 @@ namespace HlidacStatu.Repositories.ES
         }
         public static Task<ElasticClient> GetESClient_VerejneZakazkyAsync(int timeOut = 60000, int connectionLimit = 80)
         {
+            // workaround to get to the hidden index
+            // string indexName = "hs-verejnezakazky_new-02";
+            // return HackClientIndex(indexName, timeOut, connectionLimit);
+            
             return GetESClientAsync(defaultIndexName_VerejneZakazkyNew, timeOut, connectionLimit, IndexType.VerejneZakazky);
+        }
+
+        private static async Task<ElasticClient> HackClientIndex(string indexName, int timeOut, int connectionLimit)
+        {
+            string cnnset = string.Format("{0}|{1}|{2}", indexName, timeOut, connectionLimit);
+            ConnectionSettings sett = GetElasticSearchConnectionSettings(indexName, timeOut, connectionLimit);
+
+            if (!_clients.ContainsKey(cnnset))
+            {
+                await _clientSemaphore.WaitAsync();
+                try
+                {
+                    if (!_clients.ContainsKey(cnnset))
+                    {
+                        //if (idxType.HasValue == false)
+                        //    idxType = GetIndexTypeForDefaultIndexName(indexName);
+
+                        var client = new ElasticClient(sett);
+                        //await InitElasticSearchIndexAsync(_client, IndexType.VerejneZakazky);
+                        var ret = await client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex);
+                        if (ret.Exists == false)
+                            await CreateIndexAsync(client, IndexType.VerejneZakazky, withAlias: false);
+
+                        _clients.TryAdd(cnnset, client);
+                    }
+                }
+                finally
+                {
+                    _clientSemaphore.Release();
+                }
+            }
+
+            return _clients[cnnset];
+        }
+        
+        public static Task<ElasticClient> GetESClient_DocumentHistoryAsync(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClientAsync(defaultIndexName_DocumentHistory, timeOut, connectionLimit, IndexType.DocumentHistory);
         }
         
         public static Task<ElasticClient> GetESClient_VerejneZakazkyOldAsync(int timeOut = 60000, int connectionLimit = 80)
@@ -449,7 +494,7 @@ namespace HlidacStatu.Repositories.ES
 
         }
 
-        public static async Task CreateIndexAsync(ElasticClient client, IndexType idxTyp)
+        public static async Task CreateIndexAsync(ElasticClient client, IndexType idxTyp, bool withAlias = true)
         {
             IndexSettings set = new IndexSettings();
             set.NumberOfReplicas = 1;
@@ -471,7 +516,7 @@ namespace HlidacStatu.Repositories.ES
 
             CreateIndexResponse res = null;
             var aliasName = client.ConnectionSettings.DefaultIndex;
-            var indexName = $"hs-{aliasName}-01";
+            var indexName = withAlias ? $"hs-{aliasName}-01" : aliasName;
             switch (idxTyp)
             {
                 case IndexType.VerejneZakazky:
@@ -480,6 +525,13 @@ namespace HlidacStatu.Repositories.ES
                            .InitializeUsing(idxSt)
                            .Map<Entities.VZ.VerejnaZakazka>(map => map.AutoMap().DateDetection(false))
                        );
+                    break;
+                case IndexType.DocumentHistory:
+                    res = await client.Indices
+                        .CreateAsync(indexName, i => i
+                            .InitializeUsing(idxSt)
+                            .Map<Entities.DocumentHistory<IDocumentHash>>(map => map.AutoMap().DateDetection(false))
+                        );
                     break;
                 case IndexType.ProfilZadavatele:
                     res = await client.Indices
@@ -704,7 +756,8 @@ namespace HlidacStatu.Repositories.ES
                     break;
             }
             
-            await client.Indices.PutAliasAsync(indexName, aliasName);
+            if(withAlias)
+                await client.Indices.PutAliasAsync(indexName, aliasName);
 
         }
 

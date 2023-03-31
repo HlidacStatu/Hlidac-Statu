@@ -18,6 +18,12 @@ namespace HlidacStatu.AutocompleteApi.Controllers
             _cacheService = cacheService;
         }
 
+        /// <summary>
+        /// Vrátí data pro vše z hlídače státu
+        /// </summary>
+        /// <param name="q">dotaz</param>
+        /// <param name="category">Kategorie oddělené mezerami. Seznam kategorií je v CategoryEnum </param>
+        /// <returns></returns>
         [HttpGet]
         public IEnumerable<Autocomplete> Autocomplete(string q, string? category = null)
         {

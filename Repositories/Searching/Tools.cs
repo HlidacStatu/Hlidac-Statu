@@ -549,7 +549,7 @@ namespace HlidacStatu.Repositories.Searching
         }
 
 
-        public static async Task<DataResultset<string>> GetAllIdsAsync(ElasticClient sourceESClient, int maxDegreeOfParallelism,
+        public static async Task<DataResultset<string>> GetAllIdsAsync(this ElasticClient sourceESClient, int maxDegreeOfParallelism,
             string query = null, int batchSize = 100,
             Action<string> logOutputFunc = null, Action<Devmasters.Batch.ActionProgressData> progressOutputFunc = null,
             IMonitor monitor = null)

@@ -202,7 +202,7 @@
         @(await Html.KIndexLabelLinkAsync(Model.firma.ICO, 30, linkToKindex: true))@Model.title
         @if (this.User?.IsInRole("canEditData") == true)
         {
-            <a href="/manage/CompanyDetail?ico=@Model.firma.ICO" style="font-size:0.8em">
+            <a href="https://admin.hlidacstatu.cz/EventEditor/Company/@Model.firma.ICO" target="_blank" style="font-size:0.8em">
                 <i class="far fa-axe"></i>
             </a>
         }
