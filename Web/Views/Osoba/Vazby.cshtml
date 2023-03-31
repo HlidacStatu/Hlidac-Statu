@@ -41,7 +41,26 @@
     @if (statistics.SoukromeFirmy.Count > 0 && statistics.SoukromeFirmySummary().Summary().PocetSmluv > 0)
     {
         <p>
-            @Model.FullName() se angažuje, nebo se v posledních 5 letech angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
+            @switch (aktualnost)
+            {
+                case Relation.AktualnostType.Libovolny:
+                    <text>
+                        @Model.FullName() se angažuje nebo angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
+                    </text>
+                    break;
+                case Relation.AktualnostType.Aktualni:
+                    <text>
+                        @Model.FullName() se angažuje  v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
+                    </text>
+
+                    break;
+                default:
+                    <text>
+                        @Model.FullName() se angažuje, nebo se v posledních 5 letech angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě", "{0} soukromých firmách", "{0} soukromých firmách")
+                    </text>
+
+                    break;
+            }
             @if (statistics.NeziskovkyCount() > 0)
             {
                 <span>(z toho v @Devmasters.Lang.CS.Plural.Get(statistics.NeziskovkyCount(), "jedné neziskovce", "{0} neziskovkách", "{0} neziskovkách")):</span>
@@ -70,14 +89,53 @@
     {
 
         <p>
-            @Model.FullName() se angažuje, nebo se v posledních 5 letech angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchoduje se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
+            @switch (aktualnost)
+            {
+                case Relation.AktualnostType.Libovolny:
+                    <text>
+                        @Model.FullName() se angažuje nebo se angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchoduje se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
+                    </text>
+                    break;
+                case Relation.AktualnostType.Aktualni:
+                    <text>
+                        @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchoduje se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
+                    </text>
+
+                    break;
+                default:
+                    <text>
+                        @Model.FullName() se angažuje nebo se v posledních 5 letech angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.SoukromeFirmy.Count, "jedné soukromé firmě, která neobchoduje se státem", "{0} soukromých firmách, které neobchodují se státem", "{0} soukromých firmách, které neobchodují se státem").
+                    </text>
+
+                    break;
+            }
         </p>
     }
 
     @if (statistics.StatniFirmy.Count > 0)
     {
         <p>
-            @Model.FullName() se angažuje, nebo se v posledních 5 letech angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
+            @switch (aktualnost)
+            {
+                case Relation.AktualnostType.Libovolny:
+                    <text>
+                        @Model.FullName() se angažuje nebo angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
+                    </text>
+                    break;
+                case Relation.AktualnostType.Aktualni:
+                    <text>
+                        @Model.FullName() se angažuje v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
+                    </text>
+
+                    break;
+                default:
+                    <text>
+                        @Model.FullName() se angažuje, nebo se v posledních 5 letech angažoval v @Devmasters.Lang.CS.Plural.Get(statistics.StatniFirmy.Count, "jedné organizaci", "{0} organizacích", "{0} organizacích"):
+                    </text>
+
+                    break;
+            }
+
             <ul>
                 @foreach (var stat in statistics.StatniFirmy
                .OrderByDescending(o => o.Value.CurrentSeasonStatistics().CelkovaHodnotaSmluv)

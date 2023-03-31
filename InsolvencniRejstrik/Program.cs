@@ -14,12 +14,15 @@ using HlidacStatu.Entities.Insolvence;
 	{
 		static void Main(string[] args)
 		{
+            var cfg = HlidacConfigExtensions.InitializeConsoleConfiguration(args, "downloader");
+            Devmasters.Config.Init(cfg);
+
+            
 			System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
 			System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.czCulture;
 			
-			IConfiguration configuration = HlidacConfigExtensions.InitializeConsoleConfiguration(args);
-			Devmasters.Config.Init(configuration);
 
+			
 			Console.WriteLine("HlidacStatu - Insolvencni rejstrik  v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
 			Console.WriteLine("----------------------------------------------");
 			Console.WriteLine();

@@ -42,6 +42,7 @@ keyValueSelector: obj => obj.firma.ICO + "-" + obj.aktualnost.ToString());
             Firma firma,
             bool forceUpdateCache = false)
         {
+
             if (forceUpdateCache)
                 _VZCache.Delete(firma);
 
