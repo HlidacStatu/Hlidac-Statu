@@ -21,7 +21,7 @@
                 <span style='white-space:nowrap'>
                     @if (item.HasIssues)
                     {
-                        <i class="fas fa-exclamation-circle text-warning" title="Tato zakázka nemusí mít kompletní, nebo správné údaje. Informace zde uvedené je potřeba si ověřit."></i>
+                        <i class="fas fa-exclamation-circle text-warning" title="Tato zakázka nemusí mít kompletní, nebo mít správné údaje. Informace zde uvedené je potřeba si ověřit."></i>
                     }
                     <add-bookmark item="item"></add-bookmark>&nbsp;
                     @if (LimitedAccess.IsAuthenticatedOrSearchCrawler(Context.Request))
