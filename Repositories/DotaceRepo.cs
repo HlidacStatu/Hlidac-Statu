@@ -1,5 +1,4 @@
 using HlidacStatu.Entities.Dotace;
-using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 
@@ -14,7 +13,7 @@ namespace HlidacStatu.Repositories
 {
     public static partial class DotaceRepo
     {
-        
+
         private static ElasticClient _dotaceClient = Manager.GetESClient_DotaceAsync()
             .ConfigureAwait(false).GetAwaiter().GetResult();
 
@@ -142,22 +141,31 @@ namespace HlidacStatu.Repositories
             string scrollTimeout = "2m",
             int scrollSize = 300)
         {
+
             ISearchResponse<Dotace> initialResponse = null;
-            if (query is null)
+            try
             {
-                initialResponse = await _dotaceClient.SearchAsync<Dotace>(scr => scr
-                    .From(0)
-                    .Take(scrollSize)
-                    .MatchAll()
-                    .Scroll(scrollTimeout));
+                if (query is null)
+                {
+                    initialResponse = await _dotaceClient.SearchAsync<Dotace>(scr => scr
+                        .From(0)
+                        .Take(scrollSize)
+                        .MatchAll()
+                        .Scroll(scrollTimeout));
+                }
+                else
+                {
+                    initialResponse = await _dotaceClient.SearchAsync<Dotace>(scr => scr
+                        .From(0)
+                        .Take(scrollSize)
+                        .Query(q => query)
+                        .Scroll(scrollTimeout));
+                }
             }
-            else
+            catch (Exception e)
             {
-                initialResponse = await _dotaceClient.SearchAsync<Dotace>(scr => scr
-                    .From(0)
-                    .Take(scrollSize)
-                    .Query(q => query)
-                    .Scroll(scrollTimeout));
+
+                throw;
             }
 
             if (!initialResponse.IsValid || string.IsNullOrEmpty(initialResponse.ScrollId))
@@ -185,7 +193,7 @@ namespace HlidacStatu.Repositories
                 isScrollSetHasData = loopingResponse.Documents.Any();
             }
 
-            await _dotaceClient.ClearScrollAsync(new ClearScrollRequest(scrollid));
+            _ = await _dotaceClient.ClearScrollAsync(new ClearScrollRequest(scrollid));
         }
 
     }
