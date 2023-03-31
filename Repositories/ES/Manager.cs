@@ -136,11 +136,10 @@ namespace HlidacStatu.Repositories.ES
         public static Task<ElasticClient> GetESClient_VerejneZakazkyAsync(int timeOut = 60000, int connectionLimit = 80)
         {
             // workaround to get to the hidden index
+            // string indexName = "hs-verejnezakazky_new-02";
+            // return HackClientIndex(indexName, timeOut, connectionLimit);
             
-            string indexName = "hs-verejnezakazky_new-02";
-            return HackClientIndex(indexName, timeOut, connectionLimit);
-
-            // return GetESClientAsync(defaultIndexName_VerejneZakazkyNew, timeOut, connectionLimit, IndexType.VerejneZakazky);
+            return GetESClientAsync(defaultIndexName_VerejneZakazkyNew, timeOut, connectionLimit, IndexType.VerejneZakazky);
         }
 
         private static async Task<ElasticClient> HackClientIndex(string indexName, int timeOut, int connectionLimit)
