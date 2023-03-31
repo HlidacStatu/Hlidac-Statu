@@ -34,7 +34,6 @@ namespace HlidacStatu.Repositories
 
         private static void AfterSave(VerejnaZakazka vz)
         {
-            return;
             Statistics.Recalculate.AddFirmaToProcessingQueue(vz.Zadavatel.ICO, Statistics.RecalculateItem.StatisticsTypeEnum.VZ , $"VZ {vz.Id}");
             foreach (var dod in vz.Dodavatele)
                 Statistics.Recalculate.AddFirmaToProcessingQueue(dod.ICO, Statistics.RecalculateItem.StatisticsTypeEnum.VZ, $"VZ {vz.Id}");
@@ -314,7 +313,6 @@ namespace HlidacStatu.Repositories
 
         private static void SendToOcrQueue(VerejnaZakazka newVZ)
         { 
-            return;
             if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
             {
                 ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
