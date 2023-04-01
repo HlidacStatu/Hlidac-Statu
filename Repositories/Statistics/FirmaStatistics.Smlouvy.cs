@@ -45,11 +45,11 @@ namespace HlidacStatu.Repositories.Statistics
 
         }
 
-        static Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)> 
+        static Devmasters.Cache.Elastic.ManagerAsync<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)> 
             _smlouvaCache
-            = Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
+            = Devmasters.Cache.Elastic.ManagerAsync<StatisticsSubjectPerYear<Smlouva.Statistics.Data>, (Firma firma, int? obor)>
                 .GetSafeInstance("Firma_SmlouvyStatistics_v3_",
-                    (obj) => _calculateSmlouvyStatsAsync(obj.firma, obj.obor).ConfigureAwait(false).GetAwaiter().GetResult(),
+                    async (obj) => await _calculateSmlouvyStatsAsync(obj.firma, obj.obor),
                     TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
                     Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
@@ -58,14 +58,16 @@ namespace HlidacStatu.Repositories.Statistics
         public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> GetStatistics(Firma firma, int? obor, bool forceUpdateCache = false)
         {
             if (forceUpdateCache)
-                _smlouvaCache.Delete((firma, obor));
+                _ = Task.Run(async () => await _smlouvaCache.DeleteAsync((firma, obor))).Wait(TimeSpan.FromSeconds(10));
 
-            return _smlouvaCache.Get((firma, obor));
+            StatisticsSubjectPerYear<Smlouva.Statistics.Data> ret = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
+            _ = Task.Run(async () => { ret = await _smlouvaCache.GetAsync((firma, obor)); }).Wait(TimeSpan.FromSeconds(20));
+            return ret;
         }
         public static void SetStatistics(Firma firma, int? obor, StatisticsSubjectPerYear<Smlouva.Statistics.Data> data)
         {
 
-            _smlouvaCache.Set((firma, obor),data);
+            _ = Task.Run(async () => { await _smlouvaCache.SetAsync((firma, obor), data); }).Wait(TimeSpan.FromSeconds(10));
         }
         private static async Task<StatisticsSubjectPerYear<Smlouva.Statistics.Data>> _calculateSmlouvyStatsAsync(Firma f, int? obor)
         {
