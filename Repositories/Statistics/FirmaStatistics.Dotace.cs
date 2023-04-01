@@ -10,10 +10,10 @@ namespace HlidacStatu.Repositories.Statistics
 {
     public static partial class FirmaStatistics
     {
-        static Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
-            _dotaceCache = Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
+        static Devmasters.Cache.Elastic.ManagerAsync<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
+            _dotaceCache = Devmasters.Cache.Elastic.ManagerAsync<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
                 .GetSafeInstance("Firma_DotaceStatistics_v2",
-                    (firma) => CalculateDotaceStatAsync(firma).ConfigureAwait(false).GetAwaiter().GetResult(),
+                    async (firma) => await CalculateDotaceStatAsync(firma).ConfigureAwait(false),
                     TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
                     Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
@@ -46,9 +46,12 @@ namespace HlidacStatu.Repositories.Statistics
             bool forceUpdateCache = false)
         {
             if (forceUpdateCache)
-                _dotaceCache.Delete(firma);
-
-            return _dotaceCache.Get(firma);
+            {
+                _ = Task.Run(async () => { await _dotaceCache.DeleteAsync(firma); }).Wait(TimeSpan.FromSeconds(10));
+            }
+            StatisticsSubjectPerYear<Firma.Statistics.Dotace> ret = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
+            _ = Task.Run(async () => { ret = await _dotaceCache.GetAsync(firma); }).Wait(TimeSpan.FromSeconds(20));
+            return ret;
         }
 
         private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateHoldingDotaceStat(Firma firma,
@@ -60,10 +63,10 @@ namespace HlidacStatu.Repositories.Statistics
                 .Select(f => new { f.ICO, dotaceStats = f.StatistikaDotaci() });
 
             var statistikyPerIco = new Dictionary<string, StatisticsSubjectPerYear<Firma.Statistics.Dotace>>();
-            foreach (var ico in statistiky.Select(m=>m.ICO).Distinct())
+            foreach (var ico in statistiky.Select(m => m.ICO).Distinct())
             {
                 statistikyPerIco[ico] = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
-                statistikyPerIco[ico] = StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistikyPerIco.Where(w => w.Key == ico).Select(m=>m.Value));
+                statistikyPerIco[ico] = StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistikyPerIco.Where(w => w.Key == ico).Select(m => m.Value));
             }
 
             var aggregate = Lib.Analytics.StatisticsSubjectPerYear<Firma.Statistics.Dotace>.Aggregate(statistikyPerIco.Values);
