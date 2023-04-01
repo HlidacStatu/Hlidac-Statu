@@ -20,9 +20,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Cache.AWS_S3" Version="4.4.2" />
-      <PackageReference Include="Devmasters.Cache.Elastic" Version="4.4.2" />
-      <PackageReference Include="Devmasters.Cache.Memcached" Version="4.4.2" />
+      <PackageReference Include="Devmasters.Cache.AWS_S3" Version="4.5.0" />
+      <PackageReference Include="Devmasters.Cache.Elastic" Version="4.5.0" />
+      <PackageReference Include="Devmasters.Cache.Memcached" Version="4.5.0" />
       <PackageReference Include="InfluxDB.Client" Version="4.11.0" />
       <PackageReference Include="NEST" Version="7.17.5" />
       <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />

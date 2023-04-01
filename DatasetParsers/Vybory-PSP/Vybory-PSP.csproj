@@ -18,12 +18,12 @@
     <ProjectReference Include="..\..\Lib.OCR.Api.Client\Lib.OCR.Api.Client.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Batch" Version="4.4.1" />
-    <PackageReference Include="Devmasters.Collections" Version="4.4.0" />
-    <PackageReference Include="Devmasters.IO" Version="4.4.0" />
+    <PackageReference Include="Devmasters.Batch" Version="4.5.0" />
+    <PackageReference Include="Devmasters.Collections" Version="4.5.0" />
+    <PackageReference Include="Devmasters.IO" Version="4.5.0" />
     <PackageReference Include="HlidacStatu.Api.Dataset.Connector" Version="1.3.3" />
-    <PackageReference Include="KaldiASR.SpeechToText" Version="4.4.1" />
-    <PackageReference Include="Newton.SpeechToText.Cloud" Version="4.4.1" />
+    <PackageReference Include="KaldiASR.SpeechToText" Version="4.5.0" />
+    <PackageReference Include="Newton.SpeechToText.Cloud" Version="4.5.0" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.14" />
     <PackageReference Include="System.ComponentModel.Composition" Version="6.0.0" />
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.1" />
