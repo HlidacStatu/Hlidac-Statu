@@ -190,6 +190,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutocompleteGenerator", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MLUtil", "..\Hlidac-Statu-Private\MLUtils\MLUtil.csproj", "{C20CB612-3806-442A-9E29-166A7C84482A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WasmLibrary", "WasmLibrary\WasmLibrary.csproj", "{609D6957-1938-45D7-8331-F0DECC8BF45A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -456,6 +458,10 @@ Global
 		{C20CB612-3806-442A-9E29-166A7C84482A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C20CB612-3806-442A-9E29-166A7C84482A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C20CB612-3806-442A-9E29-166A7C84482A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{609D6957-1938-45D7-8331-F0DECC8BF45A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{609D6957-1938-45D7-8331-F0DECC8BF45A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{609D6957-1938-45D7-8331-F0DECC8BF45A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{609D6957-1938-45D7-8331-F0DECC8BF45A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -538,6 +544,7 @@ Global
 		{EFAA0F2C-1D61-4B6C-B1F6-0DB2DD59BEB2} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{0B3B079C-A1EC-4B27-BBF0-FD5F83977A28} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{C20CB612-3806-442A-9E29-166A7C84482A} = {AF9C295F-FA98-4C4C-9A87-25F1792C9E3D}
+		{609D6957-1938-45D7-8331-F0DECC8BF45A} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
