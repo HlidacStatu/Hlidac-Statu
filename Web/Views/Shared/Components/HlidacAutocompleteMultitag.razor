@@ -1,0 +1,301 @@
+@using System.Threading
+@using Microsoft.AspNetCore.Components.Web
+@typeparam TItem
+
+<div class="hlidac-auocomplete mb-3">
+    <div class="input-group">
+        @foreach (var tagItem in TagItems)
+        {
+            <div class="input-group-text position-relative pe-3 selected-element @(ReferenceEquals(tagItem, _currentlySelectedTag)? ActiveTag : "")">
+                @if (TagTemplate is null)
+                {
+                    <span class="no-overflow">@GetTextFromItem(tagItem)</span>
+                }
+                else
+                {
+                    @TagTemplate(tagItem)
+                }
+                <button class="btn btn-sm position-absolute top-0 end-0 pt-0 pe-0"
+                        @onclick="@(() => RemoveSelectedTag(tagItem))">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        }
+        @if (TagItems.Count > 2)
+        {
+            <div class="input-group-newline"></div>
+        }
+        <input @ref="InputBoxElement"
+               type="text"
+               autocomplete="off"
+               placeholder="Začněte psát pro hledání"
+               class="hlidac-autocomplete-input form-control"
+               @bind="@InputBoxValue"
+               @bind:event="oninput"
+               @onkeyup="@(async (e) => await SearchAsync(e))"
+               @onkeydown="OnInputKeyDown"/>
+
+        <button class="btn btn-primary" @onclick="@(SubmitSearch)">
+            Hledat
+        </button>
+    </div>
+    @if (IsAnyOptionItem)
+    {
+        <div class="hlidac-autocomplete-list">
+            <div class="list-group">
+                @for (var index = 0; index < OptionItems.Count; index++)
+                {
+                    var item = OptionItems[index];
+                    if (ItemTemplate is not null)
+                    {
+                        int option = index; // we have to do it like this, because index is from the outer scope
+                        <button class="list-group-item list-group-item-action @(option == _selectedOption ? "active" : "")"
+                                @onclick="@(() => SelectItemAsync(option))">
+                            @ItemTemplate(item)
+                        </button>
+                    }
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public RenderFragment<TItem>? ItemTemplate { get; set; }
+    
+    [Parameter]
+    public RenderFragment<AutocompleteItem<TItem>>? TagTemplate { get; set; }
+
+    [Parameter]
+    public Func<string, CancellationToken, Task<List<TItem>>> SearchFuncAsync { get; set; } = null!;
+
+    [Parameter]
+    public Func<TItem, string> TextSelector { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<List<AutocompleteItem<TItem>>> OnAutocompleteSubmitted { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnAutocompleteTextSelected { get; set; }
+
+    private ElementReference InputBoxElement { get; set; }
+    private string? InputBoxValue { get; set; }
+    private bool IsInputboxEmpty => string.IsNullOrEmpty(InputBoxValue);
+
+    private List<AutocompleteItem<TItem>> TagItems { get; set; } = new();
+    private AutocompleteItem<TItem>? _currentlySelectedTag = null;
+    private bool TagExist => TagItems.Any();
+
+    private CancellationTokenSource? _cts;
+    private Task<List<TItem>>? _searchTask;
+
+    private List<TItem>? OptionItems { get; set; }
+    private bool IsAnyOptionItem => OptionItems is not null && OptionItems.Count > 0;
+
+    private int _selectedOption = -1;
+    
+    private const string ActiveTag = "border border-3 border-warning";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        if (TextSelector is null)
+            throw new ArgumentNullException(nameof(TextSelector));
+
+        if (SearchFuncAsync is null)
+            throw new ArgumentNullException(nameof(SearchFuncAsync));
+    }
+
+    private string GetTextFromItem(AutocompleteItem<TItem> autocompleteItem)
+    {
+        if (autocompleteItem.Value is null)
+            return autocompleteItem.Text ?? "";
+
+        return TextSelector(autocompleteItem.Value);
+    }
+
+    private async Task SearchAsync(KeyboardEventArgs eventArgs)
+    {
+    //string? query = eventArgs.Value?.ToString();
+        string query = InputBoxValue;
+        CancelRunningTask();
+
+    // if query is empty, we can cleanup task and data
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            CloseOptions();
+            return;
+        }
+
+        _cts = new CancellationTokenSource();
+
+    // here we can also add delay when typing before sending a request
+
+        try
+        {
+            _searchTask = SearchFuncAsync.Invoke(query, _cts.Token);
+
+            var data = await _searchTask;
+
+            if (!_searchTask.IsCanceled)
+                OptionItems = data;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+
+    private void CloseOptions()
+    {
+        OptionItems = null;
+        _searchTask = null;
+        _selectedOption = -1;
+    }
+
+    private void CancelRunningTask()
+    {
+        if (_searchTask is not null && !_searchTask.IsCompleted && !_searchTask.IsCanceled
+            && _cts is not null && !_cts.IsCancellationRequested)
+            _cts.Cancel();
+    }
+
+
+    private void OnSelectOption(int option)
+    {
+        Interlocked.Exchange(ref _selectedOption, option);
+    }
+
+    private void OnDeselectOption(int option)
+    {
+        Interlocked.CompareExchange(ref _selectedOption, -1, option);
+    }
+
+    private async Task SelectItemAsync(int option)
+    {
+        if (!IsAnyOptionItem || option == -1)
+        {
+            if (!IsInputboxEmpty)
+                TagItems.Add(new AutocompleteItem<TItem>(InputBoxValue));
+        }
+
+        if (IsAnyOptionItem && option >= 0 && option <= OptionItems.Count)
+        {
+            TagItems.Add(new AutocompleteItem<TItem>(OptionItems[option]));
+        }
+
+        CloseOptions();
+
+    //cleanup input box and focus on it
+        InputBoxValue = "";
+        await InputBoxElement.FocusAsync();
+    }
+
+    private async Task OnInputKeyDown(KeyboardEventArgs eventArgs)
+    {
+        switch (eventArgs.Code)
+        {
+            case "ArrowUp" when IsAnyOptionItem:
+                if (_selectedOption < 0) // selected item is at the top
+                    _selectedOption = OptionItems?.Count - 1 ?? -1;
+                else
+                    _selectedOption--;
+                break;
+            case "ArrowDown" when IsAnyOptionItem:
+                if (_selectedOption == OptionItems?.Count - 1) // selected item is at the bottom
+                    _selectedOption = 0;
+                else
+                    _selectedOption++;
+                break;
+            case "Escape":
+                CancelRunningTask();
+                CloseOptions();
+                break;;
+            case "Enter" when IsInputboxEmpty:
+                await SubmitSearch();
+                break;
+            case "Enter":
+                await SelectItemAsync(_selectedOption);
+                break;
+            case "Backspace" when IsInputboxEmpty:
+                RemoveSelectedTag(_currentlySelectedTag);
+                break;
+            case "ArrowLeft" when IsInputboxEmpty:
+                GetPreviousTag();
+                break;
+            case "ArrowRight" when IsInputboxEmpty:
+                GetNextTag();
+                break;
+            default:
+                _currentlySelectedTag = null;
+                break;
+        }
+    }
+
+    private void GetNextTag()
+    {
+        if(!TagExist)
+            return;
+
+        if (_currentlySelectedTag is not null)
+        {
+            var index = TagItems.FindIndex(m => ReferenceEquals(m, _currentlySelectedTag));
+            index++;
+            if (index < TagItems.Count)
+            {
+                _currentlySelectedTag = TagItems[index];
+                return;
+            }
+        }
+        
+        _currentlySelectedTag = TagItems.First();
+        
+    }
+
+    private void GetPreviousTag()
+    {
+        if(!TagExist)
+            return;
+
+        if (_currentlySelectedTag is not null)
+        {
+            var index = TagItems.FindIndex(m => ReferenceEquals(m, _currentlySelectedTag));
+            index--;
+            if (index >= 0)
+            {
+                _currentlySelectedTag = TagItems[index];
+                return;
+            }
+        }
+        
+        _currentlySelectedTag = TagItems.Last();
+    }
+
+    private void RemoveSelectedTag(AutocompleteItem<TItem>? autocompleteItem = null)
+    {
+        if (autocompleteItem is null && TagExist)
+        {
+            TagItems.Remove(TagItems.Last());
+            return;
+        }
+        
+        if (autocompleteItem is not null && TagItems.Contains(autocompleteItem))
+        {
+            TagItems.Remove(autocompleteItem);
+            _currentlySelectedTag = null;
+            return;
+        }
+    }
+
+    private async Task SubmitSearch()
+    {
+        //add what is in inputbox
+        await SelectItemAsync(-1);
+        //notify parent, that we are done
+        await OnAutocompleteSubmitted.InvokeAsync(TagItems);
+    }
+
+}

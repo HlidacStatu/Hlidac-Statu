@@ -147,7 +147,7 @@ namespace HlidacStatu.Web
                     policyBuilder.WaitAndRetryAsync(
                         3, retryNumber => TimeSpan.FromMilliseconds(10)));
             
-
+            services.AddServerSideBlazor();
 
         }
 
@@ -301,6 +301,7 @@ namespace HlidacStatu.Web
                     defaults: new { controller = "Data", action = "Index" });
 
                 endpoints.MapRazorPages();
+                endpoints.MapBlazorHub();
             });
 
         }
@@ -346,7 +347,7 @@ namespace HlidacStatu.Web
                     "Scripts/typeahead.bundle.min.js",
                     "Scripts/bloodhound.min.js");
 
-                pipeline.MinifyJsFiles(new NUglify.JavaScript.CodeSettings() { MinifyCode = Constants.IsDevelopment(WebHostEnvironment)==false });
+                // pipeline.MinifyJsFiles(new NUglify.JavaScript.CodeSettings() { MinifyCode = Constants.IsDevelopment(WebHostEnvironment)==false });
             });
         }
 

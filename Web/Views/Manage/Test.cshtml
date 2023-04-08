@@ -1,0 +1,28 @@
+﻿@using System.Net.Http
+@model HlidacStatu.Web.Models.IndexViewModel
+@inject IHttpClientFactory HttpClientFactory
+
+
+<base href="~/" />
+<script src="_framework/blazor.server.js"></script>
+
+<h1>Blazor test in mvc</h1>
+@* *@
+@* <div> *@
+@*     <p>prerendered</p> *@
+@*     @(await Html.RenderComponentAsync<HlidacStatu.Web.Views.Shared.Components.Hokus>(RenderMode.ServerPrerendered, new { Data = " Hello World " })) *@
+@* </div> *@
+
+
+@* <div> *@
+@*     <p>nomal</p> *@
+@*     @(await Html.RenderComponentAsync<HlidacStatu.Web.Views.Shared.Components.AutocompleteWrap>( *@
+@*         RenderMode.Server,  *@
+@*         new { HttpClientFactory = HttpClientFactory })) *@
+@* </div> *@
+
+<div>
+    <p>nomal</p>
+    @(await Html.RenderComponentAsync<HlidacStatu.Web.Views.Shared.Components.AutocompleteWrap>(
+        RenderMode.Server, new { Endpoint = "http://10.10.150.203:20002", HttpClient = HttpClientFactory.CreateClient() }))
+</div>

@@ -1,0 +1,108 @@
+@using HlidacStatu.Entities
+@using System.Threading
+@using System.Text.Json
+@using Microsoft.AspNetCore.Http
+
+@inject NavigationManager Navigation
+
+<h3>AutoComplete Test</h3>
+
+<HlidacAutocompleteMultitag SearchFuncAsync="@((s, token) => OnSearch(s, token))"
+                            OnAutocompleteSubmitted="@(OnAutocompleteSubmitted)"
+                            TextSelector="@((autocomplete) => autocomplete.Text)"
+                            TItem="Autocomplete">
+    <TagTemplate>
+        @if (context.Value is null)
+        {
+            <span style="overflow:hidden; text-overflow:ellipsis;">@context.Text</span>
+        }
+        else
+        {
+            <span style="overflow:hidden; text-overflow:ellipsis;">@(CategoryToPicture(context.Value.Category))&nbsp;@context.Value.Text</span>
+        }
+    </TagTemplate>
+    <ItemTemplate>
+        <div>
+            <h6>@context.Text</h6>
+            <Small>@context.Description</Small>
+        </div>
+    </ItemTemplate>
+</HlidacAutocompleteMultitag>
+
+
+
+
+@code {
+
+    [Parameter]
+    public string Endpoint { get; set; }
+
+    [Parameter]
+    public HttpClient HttpClient { get; set; }
+
+    private async Task<List<Autocomplete>> OnSearch(string query, CancellationToken cancellationToken)
+    {
+        
+        JsonSerializerOptions? _jsonSerializerOptions = new()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+        
+        var autocompletePath = $"/autocomplete/autocomplete?q={query}";
+        
+        var uri = new Uri($"{Endpoint}{autocompletePath}");
+        // using var client = HttpClientFactory.CreateClient();
+        //using var client = new HttpClient();
+
+        try
+        {
+            using var response = await HttpClient.GetAsync(uri, cancellationToken);
+
+            _ = response.EnsureSuccessStatusCode();
+
+
+            var datastream = await response.Content.ReadAsStreamAsync(cancellationToken);
+
+            var autocomplete = await JsonSerializer.DeserializeAsync<List<Autocomplete>>(datastream,
+                cancellationToken: cancellationToken,
+                options: _jsonSerializerOptions);
+
+            return autocomplete ?? Enumerable.Empty<Autocomplete>().ToList();
+        }
+        catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
+        {
+        // canceled by user
+        }
+        catch (Exception e)
+        {
+        //log exception?
+        }
+
+        return Enumerable.Empty<Autocomplete>().ToList();
+    }
+    
+    private Task OnAutocompleteSubmitted(List<AutocompleteItem<Autocomplete>> autocomplete)
+    {
+        string qs = string.Join(" ", autocomplete.Select(i => i.Value?.Id ?? i.Text ?? ""));
+        
+        string url = $"https://www.hlidacstatu.cz/hledat?q={qs}";
+        Navigation.NavigateTo(url);
+        
+        return Task.CompletedTask;
+    }
+
+    private RenderFragment CategoryToPicture(Autocomplete.CategoryEnum categoryEnum) => categoryEnum switch
+    {
+        Autocomplete.CategoryEnum.Company => @<i class='fas fa-industry-alt fa-xs text-muted'></i>,
+        Autocomplete.CategoryEnum.StateCompany => @<i class='fas fa-industry-alt fa-xs text-muted'></i>,
+        Autocomplete.CategoryEnum.Authority => @<i class='fas fa-university fa-xs text-muted'></i>,
+        Autocomplete.CategoryEnum.City => @<i class='fas fa-city fa-xs text-muted'></i>,
+        Autocomplete.CategoryEnum.Person => @<i class="fa-duotone fa-user-secret fa-xs text-muted"></i>,
+        Autocomplete.CategoryEnum.Operator => @<i class="fa-solid fa-circle-small fa-xs text-muted"></i>,
+        Autocomplete.CategoryEnum.Synonym => @<i class="fa-regular fa-hashtag fa-xs text-muted"></i>,
+        Autocomplete.CategoryEnum.Oblast => @<i class="fa-regular fa-tag fa-xs text-muted"></i>,
+        _ => @<i class="fa-regular fa-alien-8bit"></i>
+    };
+    
+    
+}
