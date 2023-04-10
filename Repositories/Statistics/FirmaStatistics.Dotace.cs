@@ -13,7 +13,7 @@ namespace HlidacStatu.Repositories.Statistics
         static Devmasters.Cache.Elastic.ManagerAsync<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
             _dotaceCache = Devmasters.Cache.Elastic.ManagerAsync<StatisticsSubjectPerYear<Firma.Statistics.Dotace>, Firma>
                 .GetSafeInstance("Firma_DotaceStatistics_v2",
-                    async (firma) => await CalculateDotaceStatAsync(firma).ConfigureAwait(false),
+                    async (firma) => await CalculateDotaceStatAsync(firma),
                     TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
                     Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
@@ -54,6 +54,20 @@ namespace HlidacStatu.Repositories.Statistics
             return ret;
         }
 
+
+        public async static Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> CachedStatisticsDotaceAsync(
+            Firma firma,
+            bool forceUpdateCache = false)
+        {
+            await Task.Delay(100);
+            if (forceUpdateCache)
+            {
+                await _dotaceCache.DeleteAsync(firma);
+            }
+            StatisticsSubjectPerYear<Firma.Statistics.Dotace> ret = new StatisticsSubjectPerYear<Firma.Statistics.Dotace>();
+            ret = await _dotaceCache.GetAsync(firma);
+            return ret;
+        }
         private static StatisticsSubjectPerYear<Firma.Statistics.Dotace> CalculateHoldingDotaceStat(Firma firma,
             HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)
         {
@@ -83,6 +97,7 @@ namespace HlidacStatu.Repositories.Statistics
 
         private static async Task<StatisticsSubjectPerYear<Firma.Statistics.Dotace>> CalculateDotaceStatAsync(Firma f)
         {
+            await Task.Delay(100);
             var dotaceFirmy = await DotaceRepo.GetDotaceForIcoAsync(f.ICO).ToListAsync();
 
             // doplnit počty dotací

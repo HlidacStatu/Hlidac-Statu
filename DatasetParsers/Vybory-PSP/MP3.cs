@@ -50,7 +50,7 @@ namespace Vybory_PSP
             if (exists_S2T == false && startV2T)
             {
                 using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent(
-                    $"https://www.hlidacstatu.cz/api/v2/internalq/Voice2TextNewTask/{datasetid}/{recId}")
+                    $"https://api.hlidacstatu.cz/api/v2/internalq/Voice2TextNewTask/{datasetid}/{recId}")
                 )
                 {
                     net.Method = Devmasters.Net.HttpClient.MethodEnum.POST;

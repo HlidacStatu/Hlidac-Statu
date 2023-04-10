@@ -155,6 +155,7 @@ namespace HlidacStatu.Repositories
                 }
                 else
                 {
+                    await Task.Delay(100);
                     initialResponse = await _dotaceClient.SearchAsync<Dotace>(scr => scr
                         .From(0)
                         .Take(scrollSize)
