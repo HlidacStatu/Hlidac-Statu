@@ -385,7 +385,8 @@ namespace HlidacStatu.Repositories
                     Directory.CreateDirectory(destinationFolder);
                     var destination = Init.VzPrilohaLocalCopy.GetFullPath(hlidacStorageId);
 
-                    File.Move(fullTempPath, destination);
+                    if(!File.Exists(destination))
+                        File.Move(fullTempPath, destination);
                 }
                 catch (Exception e)
                 {

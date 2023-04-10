@@ -68,6 +68,11 @@ namespace HlidacStatu.Web.Controllers
             return View(model);
         }
 
+        public async Task<ActionResult> Test()
+        {
+            await Task.Delay(10);
+            return View();
+        }
 
         public ActionResult Firmy2ICO()
         {
