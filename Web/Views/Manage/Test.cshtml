@@ -5,18 +5,21 @@
 @section scripts
 {
     <style>
-        .hlidac-auocomplete {
-            border: 2px solid yellow;            
+        .hlidac-autocomplete {
+            /*border: 2px solid yellow;   */         
             position:relative;
+            padding:0;
+            margin:0;
         }
 
-            .hlidac-auocomplete .hlidac-autocomplete-list {
-                border: 1px solid red;
+            .hlidac-autocomplete .hlidac-autocomplete-list {
+                /*border: 1px solid red;*/
                 position:absolute;
-                top:50px;
                 left:0px;
                 z-index:100;
                 width:80%;
+                margin: 0;
+                padding: 0;
             }
         
         .no-overflow {
@@ -53,7 +56,7 @@
 @* </div> *@
 
 <div>
-    <p>nomal</p>
+    <p>normal</p>
     @(await Html.RenderComponentAsync<HlidacStatu.Web.Views.Shared.Components.AutocompleteWrap>(
         RenderMode.Server, new { Endpoint = "http://10.10.150.203:20002", HttpClient = HttpClientFactory.CreateClient() }))
 </div>

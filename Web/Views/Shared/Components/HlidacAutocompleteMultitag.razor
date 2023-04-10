@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @typeparam TItem
 
-<div class="hlidac-auocomplete mb-3">
+<div class="hlidac-autocomplete mb-3">
     <div class="input-group">
         @foreach (var tagItem in TagItems)
         {
@@ -35,7 +35,7 @@
                @onkeyup="@(async (e) => await SearchAsync(e))"
                @onkeydown="OnInputKeyDown"/>
 
-        <button class="btn btn-primary" @onclick="@(SubmitSearch)">
+        <button class="btn btn-primary" @onclick="@(SubmitSearch)" style="margin-bottom:0;margin-top:0;padding-bottom:0">
             Hledat
         </button>
     </div>
@@ -50,7 +50,8 @@
                     {
                         int option = index; // we have to do it like this, because index is from the outer scope
                         <button class="list-group-item list-group-item-action @(option == _selectedOption ? "active" : "")"
-                                @onclick="@(() => SelectItemAsync(option))">
+                                @onclick="@(() => SelectItemAsync(option))"
+                        >
                             @ItemTemplate(item)
                         </button>
                     }
