@@ -2,6 +2,24 @@
 @model HlidacStatu.Web.Models.IndexViewModel
 @inject IHttpClientFactory HttpClientFactory
 
+@section scripts
+{
+    <style>
+        .hlidac-auocomplete {
+            border: 2px solid yellow;            
+            position:relative;
+        }
+
+            .hlidac-auocomplete .hlidac-autocomplete-list {
+                border: 1px solid red;
+                position:absolute;
+                top:50px;
+                left:0px;
+                z-index:100;
+                width:80%;
+            }
+    </style>
+}
 
 <base href="~/" />
 <script src="_framework/blazor.server.js"></script>
@@ -25,4 +43,47 @@
     <p>nomal</p>
     @(await Html.RenderComponentAsync<HlidacStatu.Web.Views.Shared.Components.AutocompleteWrap>(
         RenderMode.Server, new { Endpoint = "http://10.10.150.203:20002", HttpClient = HttpClientFactory.CreateClient() }))
+</div>
+
+<div class="row">
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
+    <div class="col">Text pod hledáním</div>
 </div>
