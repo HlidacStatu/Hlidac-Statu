@@ -95,10 +95,10 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
         }
     }
 
-    public IEnumerable<T> Search(string query, int numResults = 10, string? filter = null)
+    public IEnumerable<ScoredResult<T>> Search(string query, int numResults = 10, string? filter = null)
     {
         if (string.IsNullOrWhiteSpace(query))
-            return Enumerable.Empty<T>();
+            return Enumerable.Empty<ScoredResult<T>>();
         
         query = query.ReplaceDisallowedCharsWithSpace(SearchModifiingChars) //we need to remove special characters
             .ToLower(); //also we need to remove boolean operators AND OR NOT - make them lowercase is enough  
@@ -132,26 +132,21 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
 
         var hits = indexSearcher.Search(finalQuery, null, maxResults);
 
-        var scoredDocuments = hits.ScoreDocs.Select(doc => (doc.Score, Document:indexSearcher.Doc(doc.Doc) ));
+        var scoredDocuments = hits.ScoreDocs
+            .Select(doc => new ScoredResult<T>(
+                doc.Score, 
+                GetOriginalFromLuceneDocument(indexSearcher.Doc(doc.Doc))
+            ));
 
-        var sortedDocuments = scoredDocuments
-            .OrderByDescending(s => s.Score)
-            .ThenBy(s => s.Document.GetField(SearchFieldName).GetStringValue().Length)
-            .Select(s => s.Document)
-            .ToList();
-        
-        
-        var results = new HashSet<T>(maxResults);
-
-        foreach (var result in sortedDocuments)
-        {
-            var json = result.GetField(DataFieldName).GetStringValue();
-            var data = JsonSerializer.Deserialize<T>(json);
-            if (data is not null)
-                results.Add(data);
-        }
+        var results = new HashSet<ScoredResult<T>>(scoredDocuments);
 
         return results.Take(numResults);
+    }
+
+    private T GetOriginalFromLuceneDocument(Document luceneDocument)
+    {
+        var json = luceneDocument.GetField(DataFieldName).GetStringValue();
+        return JsonSerializer.Deserialize<T>(json);
     }
 
     public void Dispose()
