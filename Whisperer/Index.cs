@@ -132,11 +132,18 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
 
         var hits = indexSearcher.Search(finalQuery, null, maxResults);
 
-        var documens = hits.ScoreDocs.Select(doc => indexSearcher.Doc(doc.Doc));
+        var scoredDocuments = hits.ScoreDocs.Select(doc => (doc.Score, Document:indexSearcher.Doc(doc.Doc) ));
 
+        var sortedDocuments = scoredDocuments
+            .OrderByDescending(s => s.Score)
+            .ThenBy(s => s.Document.GetField(SearchFieldName).GetStringValue().Length)
+            .Select(s => s.Document)
+            .ToList();
+        
+        
         var results = new HashSet<T>(maxResults);
 
-        foreach (var result in documens)
+        foreach (var result in sortedDocuments)
         {
             var json = result.GetField(DataFieldName).GetStringValue();
             var data = JsonSerializer.Deserialize<T>(json);
