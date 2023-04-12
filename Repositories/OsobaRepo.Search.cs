@@ -180,7 +180,7 @@ namespace HlidacStatu.Repositories
             }
 
             // search all people by name, surname and dob
-            public static IEnumerable<Osoba> FindAll(string name, string birthYear, bool extendedSearch = true)
+            public static IEnumerable<Osoba> FindAll(string name, string birthYear, bool extendedSearch = true, int take = 200)
             {
                 if (string.IsNullOrWhiteSpace(name)
                     && string.IsNullOrWhiteSpace(birthYear))
@@ -206,7 +206,7 @@ namespace HlidacStatu.Repositories
                                     || (m.PrijmeniAscii + " " + m.JmenoAscii).StartsWith(nquery) == true
                                 )
                                 && (!isValidYear || m.Narozeni.Value.Year == validYear)
-                            ).Take(200).ToArray();
+                            ).Take(take).ToArray();
                     }
                 }
                 else
@@ -221,9 +221,9 @@ namespace HlidacStatu.Repositories
                                 || (m.PrijmeniAscii + " " + m.JmenoAscii).StartsWith(nquery,
                                     StringComparison.InvariantCultureIgnoreCase) == true
                             )
-                            && (!isValidYear || m.Narozeni.Value.Year == validYear)
+                            && (!isValidYear || m.Narozeni?.Year == validYear)
                         )
-                        .Take(200);
+                        .Take(take);
                 }
             }
 
