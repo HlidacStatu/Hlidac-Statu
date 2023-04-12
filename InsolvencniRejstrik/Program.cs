@@ -35,7 +35,8 @@ using HlidacStatu.Entities.Insolvence;
 			var toFiles = false;
 			var fromFiles = false;
 			var only625fix = false;
-			var onlyEventTypeFix = false;
+            var only636fix = false;
+            var onlyEventTypeFix = false;
 			var onlyMissingDocumentsFix = false;
 			var onlyCacheFix = false;
 			var skipLines = 0;
@@ -54,7 +55,8 @@ using HlidacStatu.Entities.Insolvence;
 				{ "to-files", "uklada data do souboru namisto do databaze", v => toFiles = true},
 				{ "from-files", "cte data ze souboru a uklada je do databaze", v => fromFiles = true},
 				{ "625-fix", "oprava udalosti 625", v => only625fix = true},
-				{ "event-type-fix", "doplneni chybejicich typu udalosti u dokumentu", v => onlyEventTypeFix = true},
+                { "636-fix", "znepristupneni odstranenych", v => only636fix= true},
+                { "event-type-fix", "doplneni chybejicich typu udalosti u dokumentu", v => onlyEventTypeFix = true},
 				{ "missing-documents-fix", "doplneni chybejicich dokumentu", v => onlyMissingDocumentsFix = true },
 				{ "cache-fix", "doplneni chybejicich zaznamy v cache", v => onlyCacheFix = true },
 				{ "reload-failed", "zkusi znovu vlozit udalosti, ktere se nepodarilo ulozit", v => reloadFailed = true },
@@ -137,7 +139,11 @@ using HlidacStatu.Entities.Insolvence;
 			{
 				new Event625().Execute(skipLines, cacheFile);
 			}
-			else if (onlyEventTypeFix)
+            else if (only636fix)
+            {
+                new Event636().Execute(skipLines, cacheFile);
+            }
+            else if (onlyEventTypeFix)
 			{
 				new AddMissingEventTypes().Execute(cacheFile);
 			}

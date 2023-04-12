@@ -57,13 +57,11 @@
 }
 else
 {
-    // if (Model.Rizeni.Odstraneny)
-    // {
-    //  šablona je unloaded
-    //     <partial name="_OdstranenoZIR"/>
-    // }
-    // else 
-    if (!Model.Rizeni.OnRadar)
+    if (Model.Rizeni.Odstraneny)
+    {
+        <partial name="_OdstranenoZIR"/>
+    }
+    else if (!Model.Rizeni.OnRadar)
     {
         <partial name="_OnRadarInfo"/>
     }

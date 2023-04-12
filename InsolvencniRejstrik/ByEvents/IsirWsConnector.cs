@@ -160,7 +160,7 @@ namespace InsolvencniRejstrik.ByEvents
 							switch (item.TypUdalosti)
 							{
 								case "1": // zmena osoby
-								case "625": // Zasilani udaju o zmene osoby veritele v prihlasce
+                                case "625": // Zasilani udaju o zmene osoby veritele v prihlasce
 									GlobalStats.OsobaChangedEvent++;
 									var osoba = GetOsoba(xdoc, rizeni, item.Id, item.DatumZalozeniUdalosti);
 									if (osoba == null || UpdatePerson(osoba, xdoc.Descendants("osoba").FirstOrDefault()))
@@ -189,7 +189,11 @@ namespace InsolvencniRejstrik.ByEvents
 										updated = true;
 									}
 									break;
-								default:
+								case "636": //Znepřístupnění údajů o dlužníkovi dle § 425 IZ
+                                    rizeni.Odstraneny = true;
+									updated= true;
+									break;
+                                default:
 									var state = ParseValue(xdoc.Descendants("vec").FirstOrDefault(), "druhStavRizeni");
 									if (!string.IsNullOrEmpty(state) && rizeni.Stav != state)
 									{
@@ -314,6 +318,7 @@ namespace InsolvencniRejstrik.ByEvents
 				rizeni.PosledniZmena = item.DatumZalozeniUdalosti;
 				GlobalStats.DocumentCount++;
 			}
+
 		}
 
 		private Rizeni CreateNewInsolvencyProceeding(string spisovaZnacka)
