@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.RegularExpressions;
+using HlidacStatu.Util;
 
 namespace HlidacStatu.Entities
 {
@@ -350,6 +351,14 @@ namespace HlidacStatu.Entities
             return url;
         }
 
+        public string Kraj()
+        {
+            if (KrajId is null)
+                return "neznámý kraj";
+
+            return CZ_Nuts.Kraje.TryGetValue(KrajId, out string kraj) ? kraj : KrajId;
+        }
+        
         public string BookmarkName()
         {
             return Jmeno;
