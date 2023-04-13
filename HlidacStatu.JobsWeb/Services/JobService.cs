@@ -12,7 +12,7 @@ namespace HlidacStatu.Ceny.Services
 {
     public static partial class JobService
     {
-        public const string NezarazenyName = "-nezařazený-";
+        public const string NezarazenyName = "-nezařazený do skupiny-";
 
         // make it "in memory", load it asynchronously, recalculate once a day?
         //private static List<JobPrecalculated> DistinctJobs { get; set; }
