@@ -197,16 +197,18 @@ namespace HlidacStatu.Repositories
                 {
                     using (DbEntities db = new DbEntities())
                     {
-                        return db.Osoba.AsNoTracking()
-                            .Where(m =>
-                                (
-                                    m.PrijmeniAscii.StartsWith(nquery) == true
-                                    || m.JmenoAscii.StartsWith(nquery) == true
-                                    || (m.JmenoAscii + " " + m.PrijmeniAscii).StartsWith(nquery) == true
-                                    || (m.PrijmeniAscii + " " + m.JmenoAscii).StartsWith(nquery) == true
-                                )
-                                && (!isValidYear || m.Narozeni.Value.Year == validYear)
-                            ).Take(take).ToArray();
+                        return db.Osoba.FromSqlInterpolated($@"
+                            select *
+                              from Osoba os
+                             where ( os.narozeni is not null
+                                     or exists(select 1 from OsobaEvent oe where oe.OsobaId = os.InternalId)
+                                     or exists(select 1 from OsobaVazby ov where ov.OsobaID = os.InternalId))
+                               and ((JmenoAscii + ' ' + PrijmeniAscii) LIKE {nquery} + '%'
+                                    OR (PrijmeniAscii + ' ' + JmenoAscii) LIKE {nquery} + '%')
+                               and (({isValidYear} = 0 OR YEAR(Narozeni) = {validYear}))")
+                            .AsNoTracking()
+                            .Take(take)
+                            .ToArray();
                     }
                 }
                 else
