@@ -12,7 +12,7 @@ namespace HlidacStatu.Ceny.Services
 {
     public static partial class JobService
     {
-        private const string OstatniName = "-ostatní-";
+        public const string NezarazenyName = "-nezařazený-";
 
         // make it "in memory", load it asynchronously, recalculate once a day?
         //private static List<JobPrecalculated> DistinctJobs { get; set; }
@@ -60,7 +60,7 @@ namespace HlidacStatu.Ceny.Services
                         string[] tags = firstJobOverview.Tags?.Split("|",
                             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                         if (tags == null || tags.Length == 0)
-                            tags = new[] { OstatniName };
+                            tags = new[] { NezarazenyName };
                         return new JobPrecalculated()
                         {
                             AnalyzaName = firstJobOverview.AnalyzaName,
