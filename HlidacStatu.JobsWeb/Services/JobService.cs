@@ -12,7 +12,7 @@ namespace HlidacStatu.Ceny.Services
 {
     public static partial class JobService
     {
-        private const string OstatniName = "-ostatni-";
+        private const string OstatniName = "-ostatní-";
 
         // make it "in memory", load it asynchronously, recalculate once a day?
         //private static List<JobPrecalculated> DistinctJobs { get; set; }
