@@ -17,22 +17,24 @@
         if (showStatistics)
         {
             statistics = JobService.GetTagStatistics(Model.Obor, Model.Key.Value);
-            tableModel.CompareWithFirstLine = true;
+            //tableModel.CompareWithFirstLine = true;
+            //přidáme první řádek se souhrnem, vůči kterému se vše porovnává
+            tableModel.ShowFirstColumnNameUnderFirstRow = true;
+            tableModel.StatisticsSummary = JobService.GetStatistics(Model.Key.Value)
+                .FirstOrDefault(s => s.Name == Model.Obor);
         }
         graphModel.BasicData = statistics;
 
         tableModel.Statistics = statistics;
-        tableModel.FirstColumnName = "Tag";
+        tableModel.FirstColumnName = "Podskupiny";
     }
-
 }
-
 
 <h1>@Model.Obor</h1>
 
+
 @if (showStatistics)
 {
-    
     <partial name="Shared/_SouhrnTable" model="tableModel" />
 }
 
