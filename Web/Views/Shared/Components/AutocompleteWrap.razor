@@ -7,28 +7,46 @@
 
 <h3>AutoComplete Test</h3>
 
-<HlidacAutocompleteMultitag SearchFuncAsync="@((s, token) => OnSearch(s, token))"
-                            OnAutocompleteSubmitted="@(OnAutocompleteSubmitted)"
-                            TextSelector="@((autocomplete) => autocomplete.Text)"
-                            TItem="Autocomplete">
-    <TagTemplate>
-        @if (context.Value is null)
-        {
-            <span style="overflow:hidden; text-overflow:ellipsis;">@context.Text</span>
-        }
-        else
-        {
-            <span style="overflow:hidden; text-overflow:ellipsis;">@(CategoryToPicture(context.Value.Category))&nbsp;@context.Value.Text</span>
-        }
-    </TagTemplate>
-    <ItemTemplate>
-        <div>
-            <h6>@context.Text</h6>
-            <Small>@context.Description</Small>
-        </div>
-    </ItemTemplate>
-</HlidacAutocompleteMultitag>
+<ErrorBoundary>
+    <ChildContent>
+        <HlidacAutocompleteMultitag SearchFuncAsync="@((s, token) => OnSearch(s, token))"
+                                    OnAutocompleteSubmitted="@(OnAutocompleteSubmitted)"
+                                    TextSelector="@((autocomplete) => autocomplete.Text)"
+                                    TItem="Autocomplete">
+            <TagTemplate>
+                @if (context.Value is null)
+                {
+                    <span style="overflow:hidden; text-overflow:ellipsis;">@context.Text</span>
+                }
+                else
+                {
+                    <span style="overflow:hidden; text-overflow:ellipsis;">@(CategoryToPicture(context.Value.Category))&nbsp;@context.Value.Text</span>
+                }
+            </TagTemplate>
+            <ItemTemplate>
+                <div>
+                    <h6>@context.Text</h6>
+                    <Small>@context.Description</Small>
+                </div>
+            </ItemTemplate>
+        </HlidacAutocompleteMultitag>
+    </ChildContent>
+    <ErrorContent>
+        <div class="hlidac-autocomplete mb-3">
+            <div class="input-group">
+                <input type="text"
+                       autocomplete="off"
+                       placeholder="Došlo k neočekávané chybě. Načtěte prosím stránku znovu"
+                       class="hlidac-autocomplete-input form-control"
+                       disabled="disabled"/>
 
+                <a class="btn btn-primary" href="javascript:window.location.reload()" style="margin-bottom:0;margin-top:0;padding-bottom:0">
+                    Načíst znovu
+                </a>
+            </div>
+        </div>
+    </ErrorContent>
+</ErrorBoundary>
 
 
 
@@ -42,17 +60,16 @@
 
     private async Task<List<Autocomplete>> OnSearch(string query, CancellationToken cancellationToken)
     {
-        
         JsonSerializerOptions? _jsonSerializerOptions = new()
         {
             PropertyNameCaseInsensitive = true
         };
-        
+
         var autocompletePath = $"/autocomplete/autocomplete?q={query}";
-        
+
         var uri = new Uri($"{Endpoint}{autocompletePath}");
-        // using var client = HttpClientFactory.CreateClient();
-        //using var client = new HttpClient();
+    // using var client = HttpClientFactory.CreateClient();
+    //using var client = new HttpClient();
 
         try
         {
@@ -71,23 +88,23 @@
         }
         catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
         {
-        // canceled by user
+    // canceled by user
         }
         catch (Exception e)
         {
-        //log exception?
+    //log exception?
         }
 
         return Enumerable.Empty<Autocomplete>().ToList();
     }
-    
+
     private Task OnAutocompleteSubmitted(List<AutocompleteItem<Autocomplete>> autocomplete)
     {
         string qs = string.Join(" ", autocomplete.Select(i => i.Value?.Id ?? i.Text ?? ""));
-        
+
         string url = $"https://www.hlidacstatu.cz/hledat?q={qs}";
         Navigation.NavigateTo(url);
-        
+
         return Task.CompletedTask;
     }
 
@@ -102,7 +119,7 @@
         Autocomplete.CategoryEnum.Synonym => @<i class="fa-regular fa-hashtag fa-xs text-muted"></i>,
         Autocomplete.CategoryEnum.Oblast => @<i class="fa-regular fa-tag fa-xs text-muted"></i>,
         _ => @<i class="fa-regular fa-alien-8bit"></i>
-    };
-    
-    
+        };
+
+
 }
