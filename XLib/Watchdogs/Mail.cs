@@ -145,23 +145,23 @@ namespace HlidacStatu.XLib.Watchdogs
                     parts.Insert(0, Template.Paragraph(openingText));
 
                 //add advertisement
-                if (DateTime.Now < new DateTime(2023, 9, 2))
+                if (DateTime.Now < new DateTime(2023, 12, 12))
                 {
+                    int adNum = System.Random.Shared.Next(1, 12);
+
                     parts.Insert(0, Template.Margin());
-                    parts.Insert(0, Template.AdInBox("500px",
-                        "whitesmoke", "black",
+                    parts.Insert(0, Template.AdInBox("Nejrozsáhlejší analýza cen ICT služeb na českém trhu.<br/>Přesná a aktuální.<br/>Ze skutečně uzavřených smluv.",
+                        "#ffb33a", "black",
                         new SMTPTools.EmbeddedImage[] { new SMTPTools.EmbeddedImage() {
                              ContentType= "image/png",
-                             FilePath=HlidacStatu.Connectors.Init.WebAppRoot+@"ad\300x300\square_3.png",
+                             widthInPx= 500,
+                             FilePath=HlidacStatu.Connectors.Init.WebAppRoot+$"/ad/1080x1080/{adNum}.jpg",
                              ReplacementInMail="#ADIMG1#"
                         } },
-                    "<div style=\"margin:10px\">"
-                    + "<a style='color:black' href='https://www.WatchdogAnalytics.cz/?utm_source=watchdoginfomail&utm_medium=email&utm_campaign=start&utm_content=adplace_sq3'>"
-                    + "<div style='text-align:center;margin-bottom:10px;'>Nejrozsáhlejší analýza <b>cen ICT služeb</b> na českém trhu. Přesná a aktuální, pouze ze <b>skutečně uzavřených smluv</b>.</div>"
+                    $"<a style='color:black' href='https://www.WatchdogAnalytics.cz/?utm_source=watchdoginfomail&utm_medium=email&utm_campaign=start&utm_content=ad_{adNum}'>"
                     + "<div style='text-align:center;margin-bottom:10px;'>#ADIMG1#</div>"
-                    + "<div style='text-align: center;'>Klikněte sem pro více informací!</div>"
+                    + "<div style='text-align: center;'>Klikněte pro více informací!</div>"
                     + "</a>"
-                    + "</div>"
                     )
                         );
                 }

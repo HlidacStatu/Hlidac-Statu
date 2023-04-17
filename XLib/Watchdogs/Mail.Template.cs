@@ -9,28 +9,29 @@ namespace HlidacStatu.XLib.Watchdogs
         {
 
             /// <summary>
-            /// - width - {0} 
+            /// - headerText - {0} 
             /// - background color {1}
             /// - foreground color {2}
             /// - content {3}
             /// </summary>
             static string adInBoxTemplateHtml = @"
-<div style='text-align:center;padding-top:20px;padding-bottom:20px;width:{0}'>
 <table style='width:100%;border:2px solid {1};font-family: Cabin, sans-serif;' cellspacing=0 cellpadding=0 border=0>
-<tr><td bgcolor='{1}' color='{2}' style='background:{1};color:{2}'>
+<tr><td bgcolor='{1}' color='black' style='background:{1};color:black'>
+<h3 style='text-align: center;padding-top: 20px;padding-bottom: 0;margin: 0;color:{2}'>{0}</h3>
+</td></tr>
+<tr><td bgcolor='{1}' style='background:{1};color:{2}' height='20' style='line-height: 20px; min-height: 20px;'>
 {3}
 </td></tr>
 </table>
-</div>
 ";
 
-            public static RenderedContent AdInBox(string width, string backgroundColor, string foregroundColor,
+            public static RenderedContent AdInBox(string headerText, string backgroundColor, string foregroundColor,
                 IEnumerable<SMTPTools.EmbeddedImage> images,string content
                 )
             {
                 return new RenderedContent()
                 {
-                    ContentHtml = string.Format(adInBoxTemplateHtml, width, backgroundColor,foregroundColor,content),
+                    ContentHtml = string.Format(adInBoxTemplateHtml, headerText, backgroundColor,foregroundColor,content),
                     ContentText = null,
                     Images = images
 
@@ -62,7 +63,7 @@ namespace HlidacStatu.XLib.Watchdogs
             static string headerTemplateHtml = @"
 <table style='width:100%;border:2px solid #3669AA;font-family: Cabin, sans-serif;' cellspacing=0 cellpadding=0 border=0>
 <tr><td style='background:#3669AA;color:white;padding-top:20px;'>
-<h4 style='text-align: center;'>Data: <b>{0} ({1})</b> </h4>
+<h4 style='text-align: center;'><b>{0} ({1})</b> </h4>
 </td></tr>
 <tr><td style='background:#EFF4FB;color:black;padding-top:20px;' bgcolor='#EFF4FB'>
 {2}

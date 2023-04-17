@@ -13,8 +13,9 @@ namespace HlidacStatu.Util
         public class EmbeddedImage
         {
             public string ContentId { get; set; } = Guid.NewGuid().ToString("N");
-            public string ImageHtmlCode => @$"<img src='cid:{this.ContentId}'/>";
+            public string ImageHtmlCode => @$"<img style='width:{widthInPx}px;height:auto' width='{widthInPx}' height='auto' src='cid:{this.ContentId}'/>";
             public string FilePath { get; set; }
+            public int widthInPx { get; set; }
             public string ContentType { get; set; }
             public string ReplacementInMail { get; set; }
 

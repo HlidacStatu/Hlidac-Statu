@@ -56,9 +56,19 @@ namespace HlidacStatu.XLib.Watchdogs
 
                     Util.Consts.Logger.Info("SingleEmailPerUser watchdog {userWatchdogId} sending to {email}.",
                         string.Join(",", userWatchdogs.Select(m => m.Id.ToString())), user.Email);
+                    Mail.SendStatus res= Mail.SendStatus.SendingError;
+                    try
+                    {
 
-                    var res = await Mail.SendWatchdogsInOneEmailAsync(userWatchdogs, user,
+                        res = await Mail.SendWatchdogsInOneEmailAsync(userWatchdogs, user,
                         force, specificContacts, fromSpecificDate, toSpecificDate, openingText);
+                    }
+                    catch (Exception e)
+                    {
+                        res = Mail.SendStatus.SendingError;
+                        Util.Consts.Logger.Error("SingleEmailPerUser watchdog {userWatchdogId} to {email} sent results with {exception}.",e,
+                            string.Join(",", userWatchdogs.Select(m => m.Id.ToString())), user.Email, res.ToString(),e.ToString());
+                    }
 
                     Util.Consts.Logger.Info("SingleEmailPerUser watchdog {userWatchdogId} to {email} sent result {result}.",
                         string.Join(",",userWatchdogs.Select(m=>m.Id.ToString())), user.Email, res.ToString());
