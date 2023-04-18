@@ -1,4 +1,5 @@
 ﻿@using System.Net.Http
+@using HlidacStatu.Util
 @model HlidacStatu.Web.Models.IndexViewModel
 @inject IHttpClientFactory HttpClientFactory
 
@@ -58,7 +59,11 @@
 <div>
     <p>normal</p>
     @(await Html.RenderComponentAsync<HlidacStatu.Web.Views.Shared.Components.AutocompleteWrap>(
-        RenderMode.Server, new { Endpoint = "http://10.10.150.203:20002", HttpClient = HttpClientFactory.CreateClient() }))
+        RenderMode.Server, new { 
+            Endpoint = "http://10.10.150.203:20002", 
+            HttpClient = HttpClientFactory.CreateClient(),
+            SearchPath = "manage/test"
+        }))
 </div>
 
 <div class="row">

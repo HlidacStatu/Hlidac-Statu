@@ -80,6 +80,9 @@
 
     [Parameter]
     public EventCallback<string> OnAutocompleteTextSelected { get; set; }
+    
+    [Parameter]
+    public List<string>? InputTags { get; set; }
 
     private ElementReference InputBoxElement { get; set; }
     private string? InputBoxValue { get; set; }
@@ -102,6 +105,14 @@
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
+
+        if (!TagExist && InputTags is not null && InputTags.Any())
+        {
+            foreach (var inputTag in InputTags)
+            {
+                TagItems.Add(new AutocompleteItem<TItem>(inputTag));
+            }
+        }
 
         if (TextSelector is null)
             throw new ArgumentNullException(nameof(TextSelector));

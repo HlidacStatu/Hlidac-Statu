@@ -82,31 +82,36 @@ namespace HlidacStatu.Web.Controllers
 
         public ActionResult Photo(string id, [FromQuery] string option)
         {
+            string noPhotoPath = $"Content{Path.DirectorySeparatorChar}Img{Path.DirectorySeparatorChar}personNoPhoto.png";
             if (string.IsNullOrEmpty(id))
             {
                 string f = HttpContext.Request.Query["f"];
                 if (string.IsNullOrEmpty(f) || f?.Contains("..") == true)
-                    return File(System.IO.File.ReadAllBytes(Init.WebAppRoot + @"Content\Img\personNoPhoto.png"), "image/png");
+                    return File(System.IO.File.ReadAllBytes(Init.WebAppRoot + noPhotoPath), "image/png");
 
                 var nameId = Devmasters.RegexUtil.GetRegexGroupValue(f, @"\d{2} \\ (?<nameid>\w* - \w* (-\d{1,3})?) - small\.jpg", "nameid");
                 if (string.IsNullOrEmpty(nameId))
-                    return File(System.IO.File.ReadAllBytes(Init.WebAppRoot + @"Content\Img\personNoPhoto.png"), "image/png");
+                    return File(System.IO.File.ReadAllBytes(Init.WebAppRoot + noPhotoPath), "image/png");
                 else
                     return Redirect("/photo/" + nameId);
             }
             var o = Osoby.GetByNameId.Get(id);
             if (o == null)
-                return File(System.IO.File.ReadAllBytes(Init.WebAppRoot + @"Content\Img\personNoPhoto.png"), "image/png");
+                return File(System.IO.File.ReadAllBytes(Init.WebAppRoot + noPhotoPath), "image/png");
             else
             {
                 if (o.HasPhoto())
                     return File(System.IO.File.ReadAllBytes(o.GetPhotoPath(option)), "image/jpg");
                 else
-                    return File(System.IO.File.ReadAllBytes(Init.WebAppRoot + @"Content\Img\personNoPhoto.png"), "image/png");
+                    return File(System.IO.File.ReadAllBytes(Init.WebAppRoot + noPhotoPath), "image/png");
             }
         }
 
-
+        public ActionResult NoveHledani()
+        {
+            return View();
+        }
+        
         public ActionResult Reporty()
         {
             return View();

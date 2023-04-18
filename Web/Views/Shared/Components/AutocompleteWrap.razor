@@ -1,17 +1,82 @@
 @using HlidacStatu.Entities
 @using System.Threading
 @using System.Text.Json
+@using HlidacStatu.Util
 @using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.WebUtilities
 
 @inject NavigationManager Navigation
 
 <h3>AutoComplete Test</h3>
+
+<style>
+    .hlidac-autocomplete {
+        /*border: 2px solid yellow;   */         
+        position:relative;
+        padding:0;
+        margin:0;
+    }
+
+    .hlidac-autocomplete .hlidac-autocomplete-list {
+        /*border: 1px solid red;*/
+        position:absolute;
+        left:0px;
+        z-index:100;
+        width:80%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .no-overflow {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .selected-element {
+        max-width: 200px;
+    }
+    
+    .input-group-newline {
+        width: 100%;
+    }
+    
+    .hs-avatar {
+        float: left;
+        width: 50px;
+        height: auto;
+        margin-right: 10px;
+        color: #ccc;
+        position: relative;
+        font-size: 45px;
+    }
+    
+    .hs-avatar img {
+        width: 50px;
+        vertical-align: top;
+    }
+    
+    .hs-autocomplete-description {
+        margin-left: 70px;
+        
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    
+    
+    
+    
+    
+</style>
 
 <ErrorBoundary>
     <ChildContent>
         <HlidacAutocompleteMultitag SearchFuncAsync="@((s, token) => OnSearch(s, token))"
                                     OnAutocompleteSubmitted="@(OnAutocompleteSubmitted)"
                                     TextSelector="@((autocomplete) => autocomplete.Text)"
+                                    InputTags="InputTags"
                                     TItem="Autocomplete">
             <TagTemplate>
                 @if (context.Value is null)
@@ -25,9 +90,18 @@
             </TagTemplate>
             <ItemTemplate>
                 <div>
-                    <h6>@context.Text</h6>
-                    <Small>@context.Description</Small>
+                    <div class="hs-avatar">
+                        @((MarkupString)context.ImageElement)
+                    </div>
+                    <div class="hs-autocomplete-description">
+                        
+                        <h6 class="fw-bold">@context.Text</h6>
+                        <small>@context.Description</small>
+                        <br/>
+                        <small class="text-muted"><i>@context.Type</i></small>
+                    </div>
                 </div>
+
             </ItemTemplate>
         </HlidacAutocompleteMultitag>
     </ChildContent>
@@ -57,6 +131,26 @@
 
     [Parameter]
     public HttpClient HttpClient { get; set; }
+    
+    [Parameter]
+    public string SearchPath { get; set; }
+
+    private List<string>? InputTags { get; set; }
+    
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var q) &&
+            QueryHelpers.ParseQuery(uri.Query).TryGetValue("qtl", out var qtl))
+        {
+            InputTags = ParseTools.ParseQueryStringWithOffsets(q, qtl);
+        }
+        
+    }
+
 
     private async Task<List<Autocomplete>> OnSearch(string query, CancellationToken cancellationToken)
     {
@@ -100,10 +194,12 @@
 
     private Task OnAutocompleteSubmitted(List<AutocompleteItem<Autocomplete>> autocomplete)
     {
-        string qs = string.Join(" ", autocomplete.Select(i => i.Value?.Id ?? i.Text ?? ""));
+        //string qs = string.Join(" ", );
+        (string qs, string qtl) = ParseTools.CreateQueryWithOffsets(
+            autocomplete.Select(i => i.Value?.Id ?? i.Text ?? "").ToList());
 
-        string url = $"https://www.hlidacstatu.cz/hledat?q={qs}";
-        Navigation.NavigateTo(url);
+        string url = $"{Navigation.BaseUri}{SearchPath}?q={qs}&qtl={qtl}";
+        Navigation.NavigateTo(url, true);
 
         return Task.CompletedTask;
     }
