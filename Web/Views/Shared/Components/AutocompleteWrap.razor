@@ -7,8 +7,6 @@
 
 @inject NavigationManager Navigation
 
-<h3>AutoComplete Test</h3>
-
 <style>
     .hlidac-autocomplete {
         /*border: 2px solid yellow;   */         
@@ -65,7 +63,16 @@
     }
     
     
+    #components-reconnect-modal,
+    #components-reconnect-modal.components-reconnect-show {
+        display: none;
+    }
     
+     
+    #components-reconnect-modal.components-reconnect-failed, 
+    #components-reconnect-modal.components-reconnect-rejected {
+        display: block;
+    }
     
     
     
@@ -121,6 +128,12 @@
         </div>
     </ErrorContent>
 </ErrorBoundary>
+
+<div id="components-reconnect-modal">
+    <a class="btn btn-primary" href="javascript:window.location.reload()" style="margin-bottom:0;margin-top:0;padding-bottom:0">
+        Došlo k chybě připojení. Chcete-li používat vyhledávací okno, načtěte znovu tuto stránku.
+    </a>
+</div>
 
 
 
