@@ -82,7 +82,7 @@
     public EventCallback<string> OnAutocompleteTextSelected { get; set; }
     
     [Parameter]
-    public List<string>? InputTags { get; set; }
+    public List<AutocompleteItem<TItem>>? InputTags { get; set; }
 
     private ElementReference InputBoxElement { get; set; }
     private string? InputBoxValue { get; set; }
@@ -110,7 +110,7 @@
         {
             foreach (var inputTag in InputTags)
             {
-                TagItems.Add(new AutocompleteItem<TItem>(inputTag));
+                TagItems.Add(inputTag);
             }
         }
 
