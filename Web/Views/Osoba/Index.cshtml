@@ -359,9 +359,9 @@
         oinsolv.Add("veritele|věřitel|věřitele|veřitelem", oinsVeritel.Total);
         oinsolv.Add("spravci|insolvenční správce|insolvenčního správce|insolvenčním správcem", oinsSpravce.Total);
 
-        var insDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("osobaIddluznik:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
-        var insVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("osobaIdveritel:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
-        var insSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync("osobaIdspravce:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var insDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("odstraneny:false AND osobaIddluznik:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var insVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("odstraneny:false AND osobaIdveritel:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var insSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync("odstraneny:false AND osobaIdspravce:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
 
         Dictionary<string, long> insolv = new();
         insolv.Add("dluznik|dlužník|dlužníka|dlužníkem", insDluznik.Total);

@@ -44,6 +44,7 @@
 }
 @section scripts
 {
+
 @*<script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>*@
 @*<link href="/css/interface.css" rel="stylesheet" type="text/css">*@
 }
@@ -54,8 +55,10 @@
         <div class="col-sm-12"><button class="btn btn-secondary float-end" onclick="window.print();return false;">Vytisknout či stáhnout PDF</button></div>
     </div>
 
-    <h2>Přehled obvyklých cen IT prací ve státní správě za rok @rok</h2>
 
+    <h2 class="d-print-none">Přehled obvyklých cen IT prací ve státní správě za rok @rok</h2>
+    <h1 class="d-none d-print-block">Přehled obvyklých cen IT prací ve státní správě za rok @rok</h1>
+    
     <p>
         Tento materiál analyzuje přehled obvyklých cen ICT prací na základě skutečně sjednaných cen v smlouvách pro ICT služby,
         uveřejněných v registru smluv za rok @rok.
@@ -129,7 +132,7 @@
         Za obvyklou cenu je považován medián v rozpětí charakterizovaném dolním a horním kvartilem.
     </p>
 
-    foreach (var statistic in statistics)
+    foreach (var statistic in statistics.OrderBy(o=>o.Name))
     {
         var jobOverviewViewModel = new JobOverviewViewModel()
         {

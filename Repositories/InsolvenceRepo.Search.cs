@@ -92,7 +92,7 @@ namespace HlidacStatu.Repositories
                 //check invalid query ( tag: missing value)
 
                 if (searchdata.LimitedView)
-                    modifiedQ = Query.ModifyQueryAND(modifiedQ, "onRadar:true");
+                    modifiedQ = Query.ModifyQueryAND(modifiedQ, "onRadar:true", "NOT(odstraneny:true)");
 
                 //var qc = Lib.Search.Tools.GetSimpleQuery<Rizeni>(modifiedQ, rules); ;
                 var qc = SimpleQueryCreator.GetSimpleQuery<Rizeni>(modifiedQ, irules);
