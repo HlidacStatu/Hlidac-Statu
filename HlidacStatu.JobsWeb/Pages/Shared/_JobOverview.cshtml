@@ -1,3 +1,4 @@
+@using HlidacStatu.Ceny.Helpers
 @using HlidacStatu.Ceny.Models
 @using HlidacStatu.Ceny.Services
 @model HlidacStatu.Ceny.Models.JobOverviewViewModel
@@ -32,7 +33,7 @@
 }
 
 
-<h3 id="@Model.Statistics.Name">@Model.Statistics.Name</h3>
+<h3 id="@Model.Statistics.Name.MakeIdFromName()">@Model.Statistics.Name</h3>
 
 <p>Obvyklá cena pro kategorii @Model.Statistics.Name je @Model.Statistics.Median.ToString("N0") Kč s DPH a pohybuje se v rozpětí od @Model.Statistics.DolniKvartil.ToString("N0") Kč do @Model.Statistics.HorniKvartil.ToString("N0") Kč s DPH.</p>
 <p>@Model.Statistics.Description</p>

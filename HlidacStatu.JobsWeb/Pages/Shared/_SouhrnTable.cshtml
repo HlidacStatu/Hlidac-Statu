@@ -1,3 +1,4 @@
+@using HlidacStatu.Ceny.Helpers
 @using HlidacStatu.Ceny.Models
 @using HlidacStatu.Ceny.Services
 @model HlidacStatu.Ceny.Models.TableViewModel
@@ -102,7 +103,7 @@
                         <td scope="row" title="@(row.Name == JobService.NezarazenyName ? "Nezařazený do podskupiny." : $"Zařazený do podskupiny {row.Name}.")">
                             @if (Model.LinkSamePage)
                             {
-                                <a href="#@row.Name">@row.Name</a>
+                                <a href="#@row.Name.MakeIdFromName()">@row.Name</a>
                             }
                             else
                             {
@@ -168,7 +169,7 @@
                     <td scope="row" title="@(row.Name == JobService.NezarazenyName ? "Nezařazený do podskupiny." : $"Zařazený do podskupiny {row.Name}.")">
                         @if (Model.LinkSamePage)
                         {
-                            <a href="#@row.Name">@row.Name</a>
+                            <a href="#@row.Name.MakeIdFromName()">@row.Name</a>
                         }
                         else
                         {
