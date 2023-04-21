@@ -91,7 +91,7 @@
 
             if (row != null)
             {
-                data = data.Where(n => n.Name != JobService.NezarazenyName);
+                data = data.Where(n => n.Name != JobService.NezarazenyName).OrderBy(x => x.Name);
                 <tr>
                     @if (string.IsNullOrEmpty(Model.LinkHref))
                     {
