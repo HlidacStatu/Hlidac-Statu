@@ -49,7 +49,7 @@ Highcharts.chart('@uniqueName', {
     tooltip: {
         formatter: function () {
             return '<p>Cenové rozpětí <b>' + this.x +
-                '-'+ (this.x+2000) + '</b> Kč bez DPH</p><p>' + this.y + ' smluv obsahuje ceny za den práce v tomto rozpětí</p>';
+                '-'+ (this.x+2000) + '</b> Kč s DPH</p><p>' + this.y + ' smluv obsahuje ceny za den práce v tomto rozpětí</p>';
         },
         //headerFormat: '<p>Cenové rozpětí {point.key}-{point.key}</p><p>',
         //pointFormat: '{point.y:.0f} smluv obsahuje ceny v tomto rozpětí',

@@ -6,9 +6,7 @@
     IEnumerable<JobStatistics> data = Model.Statistics
         .Where(m => !string.IsNullOrEmpty(m.Name))
         .OrderBy(x => x.Name);
-    
-    if (Model.ShowFirstColumnNameUnderFirstRow)
-        data = data.Skip(1);
+
 
     bool compareWithSummary = Model.StatisticsSummary is not null;
 }
@@ -18,185 +16,189 @@
 <table class="table table-sm table-striped mt-4">
     <caption>ceny s DPH</caption>
     <thead>
-    <tr>
-        <th scope="col">@(Model.ShowFirstColumnNameUnderFirstRow? "" : Model.FirstColumnName)</th>
-        <th scope="col" class="text-end">Dolní kvartil</th>
-        <th scope="col" class="text-end">Medián</th>
-        <th scope="col" class="text-end border-end">Horní kvartil</th>
-        <th scope="col" class="text-end">Minimum</th>
-        <th scope="col" class="text-end">Průměr</th>
-        <th scope="col" class="text-end">Maximum</th>
-        <th scope="col" class="text-end">Počet<br/>smluv</th>
-        @if (!Model.HideDodavatelCount)
-        {
-            <th scope="col" class="text-end">Počet<br/>dodavatelů</th>
-        }
-        <th scope="col" class="text-end">Počet<br/>cen</th>
-    </tr>
-    <tr>
-        <th></th>
-        <th class="align-middle border-start text-center border-end" colspan="3">
-            <div class="middle-line left right">
-                <b style="color:black">&nbsp;Rozsah obvyklých cen&nbsp;</b>
-                <br/><small>% rozdíl oproti souhrnu v prvním řádku</small>
-            </div>
-        </th>
+        <tr>
+            <th scope="col">@(Model.ShowFirstColumnNameUnderFirstRow ? "" : Model.FirstColumnName)</th>
+            <th scope="col" class="text-end">Dolní kvartil</th>
+            <th scope="col" class="text-end">Medián</th>
+            <th scope="col" class="text-end border-end">Horní kvartil</th>
+            <th scope="col" class="text-end">Minimum</th>
+            <th scope="col" class="text-end">Průměr</th>
+            <th scope="col" class="text-end">Maximum</th>
+            <th scope="col" class="text-end">Počet<br />smluv</th>
+            @if (!Model.HideDodavatelCount)
+            {
+                <th scope="col" class="text-end">Počet<br />dodavatelů</th>
+            }
+            <th scope="col" class="text-end">Počet<br />cen</th>
+        </tr>
+        <tr>
+            <th></th>
+            <th class="align-middle border-start text-center border-end" colspan="3">
+                <div class="middle-line left right">
+                    <b style="color:black">&nbsp;Rozsah obvyklých cen&nbsp;</b>
+                    <br /><small>% rozdíl oproti souhrnu v prvním řádku</small>
+                </div>
+            </th>
 
-        <th class="align-middle text-center" colspan="@(Model.HideDodavatelCount ? 5 : 6)">
-            <div class="middle-line left right">
-                &nbsp;Průměr a extrémy&nbsp;
-                @*<br/>@(Devmasters.TextUtil.ShortenText(Model.SubjectName,30))*@
-            </div>
-        </th>
-    </tr>
+            <th class="align-middle text-center" colspan="@(Model.HideDodavatelCount ? 5 : 6)">
+                <div class="middle-line left right">
+                    &nbsp;Průměr a extrémy&nbsp;
+                    @*<br/>@(Devmasters.TextUtil.ShortenText(Model.SubjectName,30))*@
+                </div>
+            </th>
+        </tr>
     </thead>
     <tbody>
 
-    @if (compareWithSummary)
-    {
-        <tr class="bg-success bg-opacity-10">
-            <td scope="row" title="Souhrn pozice @Model.StatisticsSummary.Name">Souhrn pozice @Model.StatisticsSummary.Name</td>
-
-            <td class="text-end number border-start">
-                <b>@Model.StatisticsSummary.DolniKvartil.ToString("N0")</b>
-            </td>
-            <td class="text-end number">
-                <b>@Model.StatisticsSummary.Median.ToString("N0")</b>
-            </td>
-            <td class="text-end number border-end">
-                <b>@Model.StatisticsSummary.HorniKvartil.ToString("N0")</b>
-            </td>
-            <td class="text-end number">
-                @Model.StatisticsSummary.Minimum.ToString("N0")
-            </td>
-            <td class="text-end number">
-                @Model.StatisticsSummary.Average.ToString("N0")
-            </td>
-            <td class="text-end number">
-                @Model.StatisticsSummary.Maximum.ToString("N0")
-            </td>
-            <td class="text-end number">@Model.StatisticsSummary.ContractCount</td>
-            @if (!Model.HideDodavatelCount)
-            {
-                <td class="text-end number">@Model.StatisticsSummary.SupplierCount</td>
-            }
-            <td class="text-end number">@Model.StatisticsSummary.PriceCount</td>
-        </tr>
-        <tr>
-            <td colspan="10" style="height: 20px"></td>
-        </tr>
-    }
-    
-    @if (Model.ShowFirstColumnNameUnderFirstRow && Model.Statistics.Any())
-    {
-        var row = Model.Statistics.First();
-        <tr>
-            @if (string.IsNullOrEmpty(Model.LinkHref))
-            {
-                <td scope="row" title="@(row.Name == JobService.NezarazenyName ? "Nezařazený do podskupiny." : $"Zařazený do podskupiny {row.Name}.")">@row.Name</td>
-            }
-            else
-            {
-                <td scope="row" title="@(row.Name == JobService.NezarazenyName ? "Nezařazený do podskupiny." : $"Zařazený do podskupiny {row.Name}.")">
-                    <a href="@Model.LinkHref/@row.Name?@(Model.Key?.UrlDecodedParams)">@row.Name</a>
-                </td>
-            }
-            <td class="text-end number border-start">
-                <b>@row.DolniKvartil.ToString("N0")</b>
-                @if (compareWithSummary)
-                {
-                    <div>@Html.Raw(Calc.PercentChangeHtml(Model.StatisticsSummary.DolniKvartil, row.DolniKvartil))</div>
-                }
-            </td>
-            <td class="text-end number">
-                <b>@row.Median.ToString("N0")</b>
-                @if (compareWithSummary)
-                {
-                    <div>@Html.Raw(Calc.PercentChangeHtml(Model.StatisticsSummary.Median, row.Median))</div>
-                }
-            </td>
-            <td class="text-end number border-end">
-                <b>@row.HorniKvartil.ToString("N0")</b>
-                @if (compareWithSummary)
-                {
-                    <div>@Html.Raw(Calc.PercentChangeHtml(Model.StatisticsSummary.HorniKvartil, row.HorniKvartil))</div>
-                }
-            </td>
-            <td class="text-end number">
-                @row.Minimum.ToString("N0")
-            </td>
-            <td class="text-end number">
-                @row.Average.ToString("N0")
-            </td>
-            <td class="text-end number">
-                @row.Maximum.ToString("N0")
-            </td>
-            <td class="text-end number">@row.ContractCount</td>
-            @if (!Model.HideDodavatelCount)
-            {
-                <td class="text-end number">@row.SupplierCount</td>
-            }
-            <td class="text-end number">@row.PriceCount</td>
-        </tr>
-        
-        if (data.Any())
+        @if (compareWithSummary)
         {
+            <tr class="bg-success bg-opacity-10">
+                <td scope="row" title="Souhrn pozice @Model.StatisticsSummary.Name">Souhrn pozice @Model.StatisticsSummary.Name</td>
+
+                <td class="text-end number border-start">
+                    <b>@Model.StatisticsSummary.DolniKvartil.ToString("N0")</b>
+                </td>
+                <td class="text-end number">
+                    <b>@Model.StatisticsSummary.Median.ToString("N0")</b>
+                </td>
+                <td class="text-end number border-end">
+                    <b>@Model.StatisticsSummary.HorniKvartil.ToString("N0")</b>
+                </td>
+                <td class="text-end number">
+                    @Model.StatisticsSummary.Minimum.ToString("N0")
+                </td>
+                <td class="text-end number">
+                    @Model.StatisticsSummary.Average.ToString("N0")
+                </td>
+                <td class="text-end number">
+                    @Model.StatisticsSummary.Maximum.ToString("N0")
+                </td>
+                <td class="text-end number">@Model.StatisticsSummary.ContractCount</td>
+                @if (!Model.HideDodavatelCount)
+                {
+                    <td class="text-end number">@Model.StatisticsSummary.SupplierCount</td>
+                }
+                <td class="text-end number">@Model.StatisticsSummary.PriceCount</td>
+            </tr>
             <tr>
-                <td class="pt-4"><strong>@Model.FirstColumnName</strong></td>
+                <td colspan="10" style="height: 20px"></td>
             </tr>
         }
-    }
 
-    @foreach (JobStatistics row in data)
-    {
-        <tr>
-            @if (string.IsNullOrEmpty(Model.LinkHref))
+        @if (Model.ShowFirstColumnNameUnderFirstRow && Model.Statistics.Any())
+        {
+            var row = data.FirstOrDefault(n => n.Name == JobService.NezarazenyName);
+
+            if (row != null)
             {
-                <td scope="row" title="@(row.Name == JobService.NezarazenyName ? "Nezařazený do podskupiny." : $"Zařazený do podskupiny {row.Name}.")">@row.Name</td>
+                data = data.Where(n => n.Name != JobService.NezarazenyName);
+                <tr>
+                    @if (string.IsNullOrEmpty(Model.LinkHref))
+                    {
+                        <td scope="row" title="@(row.Name == JobService.NezarazenyName ? "Nezařazený do podskupiny." : $"Zařazený do podskupiny {row.Name}.")">@row.Name</td>
+                    }
+                    else
+                    {
+                        <td scope="row" title="@(row.Name == JobService.NezarazenyName ? "Nezařazený do podskupiny." : $"Zařazený do podskupiny {row.Name}.")">
+                            <a href="@Model.LinkHref/@row.Name?@(Model.Key?.UrlDecodedParams)">@row.Name</a>
+                        </td>
+                    }
+                    <td class="text-end number border-start">
+                        <b>@row.DolniKvartil.ToString("N0")</b>
+                        @if (compareWithSummary)
+                        {
+                            <div>@Html.Raw(Calc.PercentChangeHtml(Model.StatisticsSummary.DolniKvartil, row.DolniKvartil))</div>
+                        }
+                    </td>
+                    <td class="text-end number">
+                        <b>@row.Median.ToString("N0")</b>
+                        @if (compareWithSummary)
+                        {
+                            <div>@Html.Raw(Calc.PercentChangeHtml(Model.StatisticsSummary.Median, row.Median))</div>
+                        }
+                    </td>
+                    <td class="text-end number border-end">
+                        <b>@row.HorniKvartil.ToString("N0")</b>
+                        @if (compareWithSummary)
+                        {
+                            <div>@Html.Raw(Calc.PercentChangeHtml(Model.StatisticsSummary.HorniKvartil, row.HorniKvartil))</div>
+                        }
+                    </td>
+                    <td class="text-end number">
+                        @row.Minimum.ToString("N0")
+                    </td>
+                    <td class="text-end number">
+                        @row.Average.ToString("N0")
+                    </td>
+                    <td class="text-end number">
+                        @row.Maximum.ToString("N0")
+                    </td>
+                    <td class="text-end number">@row.ContractCount</td>
+                    @if (!Model.HideDodavatelCount)
+                    {
+                        <td class="text-end number">@row.SupplierCount</td>
+                    }
+                    <td class="text-end number">@row.PriceCount</td>
+                </tr>
             }
-            else
+            if (data.Any())
             {
-                <td scope="row" title="@(row.Name == JobService.NezarazenyName ? "Nezařazený do podskupiny." : $"Zařazený do podskupiny {row.Name}.")">
-                    <a href="@Model.LinkHref/@row.Name?@(Model.Key?.UrlDecodedParams)">@row.Name</a>
+                <tr>
+                    <td class="pt-4"><strong>@Model.FirstColumnName</strong></td>
+                </tr>
+            }
+        }
+
+        @foreach (JobStatistics row in data)
+        {
+            <tr>
+                @if (string.IsNullOrEmpty(Model.LinkHref))
+                {
+                    <td scope="row" title="@(row.Name == JobService.NezarazenyName ? "Nezařazený do podskupiny." : $"Zařazený do podskupiny {row.Name}.")">@row.Name</td>
+                }
+                else
+                {
+                    <td scope="row" title="@(row.Name == JobService.NezarazenyName ? "Nezařazený do podskupiny." : $"Zařazený do podskupiny {row.Name}.")">
+                        <a href="@Model.LinkHref/@row.Name?@(Model.Key?.UrlDecodedParams)">@row.Name</a>
+                    </td>
+                }
+                <td class="text-end number border-start">
+                    <b>@row.DolniKvartil.ToString("N0")</b>
+                    @if (compareWithSummary)
+                    {
+                        <div>@Html.Raw(Calc.PercentChangeHtml(Model.StatisticsSummary.DolniKvartil, row.DolniKvartil))</div>
+                    }
                 </td>
-            }
-            <td class="text-end number border-start">
-                <b>@row.DolniKvartil.ToString("N0")</b>
-                @if (compareWithSummary)
+                <td class="text-end number">
+                    <b>@row.Median.ToString("N0")</b>
+                    @if (compareWithSummary)
+                    {
+                        <div>@Html.Raw(Calc.PercentChangeHtml(Model.StatisticsSummary.Median, row.Median))</div>
+                    }
+                </td>
+                <td class="text-end number border-end">
+                    <b>@row.HorniKvartil.ToString("N0")</b>
+                    @if (compareWithSummary)
+                    {
+                        <div>@Html.Raw(Calc.PercentChangeHtml(Model.StatisticsSummary.HorniKvartil, row.HorniKvartil))</div>
+                    }
+                </td>
+                <td class="text-end number">
+                    @row.Minimum.ToString("N0")
+                </td>
+                <td class="text-end number">
+                    @row.Average.ToString("N0")
+                </td>
+                <td class="text-end number">
+                    @row.Maximum.ToString("N0")
+                </td>
+                <td class="text-end number">@row.ContractCount</td>
+                @if (!Model.HideDodavatelCount)
                 {
-                    <div>@Html.Raw(Calc.PercentChangeHtml(Model.StatisticsSummary.DolniKvartil, row.DolniKvartil))</div>
+                    <td class="text-end number">@row.SupplierCount</td>
                 }
-            </td>
-            <td class="text-end number">
-                <b>@row.Median.ToString("N0")</b>
-                @if (compareWithSummary)
-                {
-                    <div>@Html.Raw(Calc.PercentChangeHtml(Model.StatisticsSummary.Median, row.Median))</div>
-                }
-            </td>
-            <td class="text-end number border-end">
-                <b>@row.HorniKvartil.ToString("N0")</b>
-                @if (compareWithSummary)
-                {
-                    <div>@Html.Raw(Calc.PercentChangeHtml(Model.StatisticsSummary.HorniKvartil, row.HorniKvartil))</div>
-                }
-            </td>
-            <td class="text-end number">
-                @row.Minimum.ToString("N0")
-            </td>
-            <td class="text-end number">
-                @row.Average.ToString("N0")
-            </td>
-            <td class="text-end number">
-                @row.Maximum.ToString("N0")
-            </td>
-            <td class="text-end number">@row.ContractCount</td>
-            @if (!Model.HideDodavatelCount)
-            {
-                <td class="text-end number">@row.SupplierCount</td>
-            }
-            <td class="text-end number">@row.PriceCount</td>
-        </tr>
-    }
+                <td class="text-end number">@row.PriceCount</td>
+            </tr>
+        }
     </tbody>
 </table>
