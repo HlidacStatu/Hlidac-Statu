@@ -13,6 +13,8 @@ namespace HlidacStatu.Ceny.Models
         public string FirstColumnName { get; set; } = "Pozice";
         public bool ShowFirstColumnNameUnderFirstRow { get; set; }
         public YearlyStatisticsGroup.Key? Key { get; set; }
+
+        public bool LinkSamePage => LinkHref.Equals("#");
         //public bool CompareWithFirstLine { get; set; } = false;
     }
 }

@@ -100,7 +100,14 @@
                     else
                     {
                         <td scope="row" title="@(row.Name == JobService.NezarazenyName ? "Nezařazený do podskupiny." : $"Zařazený do podskupiny {row.Name}.")">
-                            <a href="@Model.LinkHref/@row.Name?@(Model.Key?.UrlDecodedParams)">@row.Name</a>
+                            @if (Model.LinkSamePage)
+                            {
+                                <a href="#@row.Name">@row.Name</a>
+                            }
+                            else
+                            {
+                                <a href="@Model.LinkHref/@row.Name?@(Model.Key?.UrlDecodedParams)">@row.Name</a>
+                            }
                         </td>
                     }
                     <td class="text-end number border-start">
@@ -159,7 +166,14 @@
                 else
                 {
                     <td scope="row" title="@(row.Name == JobService.NezarazenyName ? "Nezařazený do podskupiny." : $"Zařazený do podskupiny {row.Name}.")">
-                        <a href="@Model.LinkHref/@row.Name?@(Model.Key?.UrlDecodedParams)">@row.Name</a>
+                        @if (Model.LinkSamePage)
+                        {
+                            <a href="#@row.Name">@row.Name</a>
+                        }
+                        else
+                        {
+                            <a href="@Model.LinkHref/@row.Name?@(Model.Key?.UrlDecodedParams)">@row.Name</a>
+                        }
                     </td>
                 }
                 <td class="text-end number border-start">
