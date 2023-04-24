@@ -152,7 +152,7 @@
 
             var data = await _searchTask;
 
-            if (!_searchTask.IsCanceled)
+            if (!_searchTask?.IsCanceled == true)
                 OptionItems = data;
         }
         catch (Exception e)

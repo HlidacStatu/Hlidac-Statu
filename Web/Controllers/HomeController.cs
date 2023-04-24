@@ -107,9 +107,13 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
-        public ActionResult NoveHledani()
+        public async Task<ActionResult> NoveHledani(string q, string order)
         {
-            return View();
+            var res = await XLib.Search
+                .GeneralSearchAsync(q, 1, Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal, false, order, this.User);
+
+            string viewName = "NoveHledani";
+            return View(viewName, res);
         }
         
         public ActionResult Reporty()

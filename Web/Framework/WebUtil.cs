@@ -77,7 +77,13 @@ namespace HlidacStatu.Web.Framework
         public static IHtmlContent SetAutofocusOnId(string id)
         {
             return new HtmlString(
-                $@"<script>window.onload = function() {{var input = document.getElementById(""{id}"").focus();}}</script>");
+                $@"<script>
+window.onload = function() {{ 
+    var input = document.getElementById(""{id}"");
+    if (input)
+        input.focus();
+    }}
+</script>");
         }
 
         public static IHtmlContent AddVisitImg(string path)
