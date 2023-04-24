@@ -178,7 +178,7 @@
             return new AutocompleteItem<Autocomplete>(new Autocomplete()
             {
                 Id = parsedQuery,
-                Text = osoba.Jmeno,
+                Text = osoba.FullName(),
                 Category = Autocomplete.CategoryEnum.Person
             });
         }
