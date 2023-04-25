@@ -21,7 +21,7 @@
 
     Devmasters.DT.StopWatchLaps viewRenderTimes = new Devmasters.DT.StopWatchLaps();
     Devmasters.DT.StopWatchLaps.Interval viewRenderTimesInt = null;
-    viewRenderTimesInt = viewRenderTimes.AddAndStartLap("content header");
+    viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("content header");
 }
 
 @section breadcrumb
@@ -209,7 +209,7 @@ else if (Model.HasResults == false)
 
     //main content based on number of results
 
-    viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Models into ordered collection");
+    viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Models into ordered collection");
 
     List<string> paorder = new();
     if (Model.HasSmlouvy)
@@ -278,7 +278,7 @@ else if (Model.HasResults == false)
 
 @* BOXES *@
 @{
-    viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Boxes");
+    viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Boxes");
 }
 
 
@@ -343,7 +343,7 @@ else if (Model.HasResults == false)
 @*BOXES for*@
 
 @{
-    viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Html links 1");
+    viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Html links 1");
 }
 @if (htmlLinks.Count > 0)
 {
@@ -459,7 +459,7 @@ else if (Model.HasResults == false)
         {
             if (Model.HasSmlouvy)
             {
-                viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Result smlouvy");
+                viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Result smlouvy");
                 if (numOfSmluv == 0)
                 {
                     <hr />
@@ -491,7 +491,7 @@ else if (Model.HasResults == false)
         {
             if (Model.HasVZ)
             {
-                viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Result VZ");
+                viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Result VZ");
 
                 if (numOfVZ == 0)
                 {
@@ -524,7 +524,7 @@ else if (Model.HasResults == false)
         }
         else if (part == Model.Dotace.GetType().Name)
         {
-            viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Result dotace");
+            viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Result dotace");
             if (Model.HasDotace)
             {
                 if (numOfDotaci == 0)
@@ -556,7 +556,7 @@ else if (Model.HasResults == false)
         }
         else if (part == Model.Insolvence.GetType().Name)
         {
-            viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Result insolvence");
+            viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Result insolvence");
             if (Model.HasInsolvence)
             {
                 if (numOfInsolvenci == 0)
@@ -590,7 +590,7 @@ else if (Model.HasResults == false)
         }
         else if (part == Model.Osoby.GetType().Name)
         {
-            viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Result osoby");
+            viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Result osoby");
             if (Model.HasOsoby)
             {
                 <div class="row" id="osoby">
@@ -634,7 +634,7 @@ else if (Model.HasResults == false)
         }
         else if (part == Model.Firmy.GetType().Name)
         {
-            viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Result firmy");
+            viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Result firmy");
             if (Model.HasFirmy)
             {
                 if (numOfFirem == 0)
@@ -678,7 +678,7 @@ else if (Model.HasResults == false)
         }
         else if (part == Model.Datasets.GetType().Name)
         {
-            viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Result smlouvy");
+            viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Result smlouvy");
             if (Model.HasDatasets)
             {
                 Devmasters.DT.StopWatchEx sw = new();
@@ -749,7 +749,7 @@ else if (Model.HasResults == false)
 
         if (htmlLinks.Count > 0)
         {
-            viewRenderTimesInt = viewRenderTimes.AddAndStartLap("Html links 2");
+            viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Html links 2");
 
             <hr style="margin-top:30px;" />
             <h3><span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> jsme nalezli ještě v těchto databázích</h3>

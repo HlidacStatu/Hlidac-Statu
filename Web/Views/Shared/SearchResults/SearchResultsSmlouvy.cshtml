@@ -3,7 +3,7 @@
 @{
     Devmasters.DT.StopWatchLaps viewRenderTimes = new Devmasters.DT.StopWatchLaps();
     Devmasters.DT.StopWatchLaps.Interval viewRenderTimesInt = null;
-    viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results");
+    viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("smlouvy results");
 
 }
 <table class="table table-hover">
@@ -23,7 +23,7 @@
     <tbody>
     @foreach (var item in Model?.ElasticResults.Hits)
     {
-        viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 0 id:"+ item.Id );
+        viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("smlouvy results render 0 id:"+ item.Id );
 
         var rec = item.Source;
 
@@ -36,7 +36,7 @@
             bgLevel = HlidacStatu.Entities.Issues.Importance.GetCssClass(confLevel, true);
             iconLevel = HlidacStatu.Entities.Issues.Importance.GetIcon(confLevel);
         }
-        viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 1 id:"+ item.Id );
+        viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("smlouvy results render 1 id:"+ item.Id );
 
         <tr class="bg@(bgLevel) first">
             <td>
@@ -51,7 +51,7 @@
                 </span>
             </td>
             @{
-                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 2 id:" + item.Id);
+                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("smlouvy results render 2 id:" + item.Id);
             }
             <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">@rec.datumUzavreni.ToShortDateString()</td>
             @if (Model.SmallRender == false)
@@ -68,7 +68,7 @@
                 </td>
             }
             @{
-                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 3 id:" + item.Id);
+                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("smlouvy results render 3 id:" + item.Id);
             }
             <td>
                 @if (!string.IsNullOrEmpty(rec.Platce?.ico))
@@ -81,7 +81,7 @@
                 }
             </td>
                 @{
-                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 4 id:" + item.Id);
+                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("smlouvy results render 4 id:" + item.Id);
                 }
                 <td>
                 @if (rec.Prijemce.Count() == 1)
@@ -116,7 +116,7 @@
                 }
             </td>
             @{
-                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 5 id:" + item.Id);
+                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("smlouvy results render 5 id:" + item.Id);
             }
             <td>@Html.Raw(rec.NicePrice(html: true))</td>
 
@@ -124,7 +124,7 @@
         <tr class="bg@(bgLevel) last">
             <td></td>
                 @{
-                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 2-1 id:" + item.Id);
+                    viewRenderTimesInt.Stop(); viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("smlouvy results render 2-1 id:" + item.Id);
                 }
 
             <td colspan="@(Model.SmallRender ? "5" : "6")">
@@ -145,7 +145,7 @@
 
         if (Model.Chyby)
         {
-            viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 3-1 id:" + item.Id);
+            viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("smlouvy results render 3-1 id:" + item.Id);
             if (rec.Issues != null && rec.Issues.Where(m => m.Public).Count() > 0)
             {
                 <tr class="bg@(bgLevel) last">
@@ -181,7 +181,7 @@
         }
         if (Model.AdditionalRender != null)
         {
-            viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results render 3-1 id:" + item.Id);
+            viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("smlouvy results render 3-1 id:" + item.Id);
             @Html.Raw(Model.AdditionalRender(rec))
             viewRenderTimesInt.Stop();
         }
@@ -190,7 +190,7 @@
     </tbody>
 </table>
 @{
-    viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy results pagination:" );
+    viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("smlouvy results pagination:" );
 }
 <partial name="SearchResults/Pagination" model="@(new PaginationViewModel(Model, "/HledatSmlouvy", exportType: "smlouvy"))"/>
 

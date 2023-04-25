@@ -19,7 +19,7 @@
 
     var aktualnost = Relation.AktualnostType.Nedavny;
 
-    var intv = laps.AddAndStartLap("StatistikaRegistruSmluv");
+    var intv = laps.StopPreviousAndStartNextLap("StatistikaRegistruSmluv");
     var statistics = Model.StatistikaRegistrSmluv(aktualnost);
 
     //unused stuff
@@ -34,7 +34,7 @@
 @* První sloupec *@
 <div class="col-sm-7 col-xs-12 order-1">
     @{
-        laps.AddAndStartLap("funkce");
+        laps.StopPreviousAndStartNextLap("funkce");
     }
     @{
         int[] types = {
@@ -78,7 +78,7 @@
         <hr />
     }
     @{
-        laps.AddAndStartLap("sponzoring");
+        laps.StopPreviousAndStartNextLap("sponzoring");
         var sponzorOsobaNum = Model.Sponzoring().Count();
         var sponzorOsoba = Model.SponzoringToHtml(
         (sponzorOsobaNum <= listingNum + 1 ? listingNum + 1 : listingNum),
@@ -112,7 +112,7 @@
         <hr />
     }
     @{
-        laps.AddAndStartLap("registr smluv");
+        laps.StopPreviousAndStartNextLap("registr smluv");
     }
     @if (statistics.SoukromeFirmySummary().Summary().PocetSmluv + statistics.NeziskovkySummary().Summary().PocetSmluv > 0)
     {
@@ -133,7 +133,7 @@
         <hr />
     }
     @{
-        laps.AddAndStartLap("angazovanost");
+        laps.StopPreviousAndStartNextLap("angazovanost");
     }
     @if (statistics.SoukromeFirmy.Count > 0 || statistics.StatniFirmy.Count > 0)
     {
@@ -288,7 +288,7 @@
 
     @*dotace*@
     @{
-        laps.AddAndStartLap("dotace");
+        laps.StopPreviousAndStartNextLap("dotace");
     }
 
     @{
@@ -347,7 +347,7 @@
     @* ----- Insolvence -----*@
     @*dotace*@
     @{
-        laps.AddAndStartLap("insolvence");
+        laps.StopPreviousAndStartNextLap("insolvence");
     }
     @{
         var oinsDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("dluznici.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
@@ -428,7 +428,7 @@
 
     @* ----- Veřejné zakázky -----*@
     @{
-        laps.AddAndStartLap("verejne zakazky");
+        laps.StopPreviousAndStartNextLap("verejne zakazky");
     }
     @{
         var resVZdodav = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaiddodavatel:" + Model.NameId, null, 1, 0, "1");
@@ -472,7 +472,7 @@
     }
 
     @{
-        laps.AddAndStartLap("datasety");
+        laps.StopPreviousAndStartNextLap("datasety");
     }
 
     @{

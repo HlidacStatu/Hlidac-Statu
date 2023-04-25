@@ -89,7 +89,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 return null;
 
             Devmasters.DT.StopWatchLaps stopWatchLaps = new Devmasters.DT.StopWatchLaps();
-            var swint = stopWatchLaps.AddAndStartLap("NPOI");
+            var swint = stopWatchLaps.StopPreviousAndStartNextLap("NPOI");
             int tblCount = 1;
             using (var rs = File.OpenRead(fn))
             {

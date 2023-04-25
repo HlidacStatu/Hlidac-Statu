@@ -83,7 +83,7 @@ namespace HlidacStatu.Repositories
 
             try
             {
-                var lap = swl.AddAndStartLap("SQL save");
+                var lap = swl.StopPreviousAndStartNextLap("SQL save");
                 HlidacStatu.Connectors.DirectDB.NoResult("exec UptimeServer_SaveStatus @serverId, @lastCheck, @lastResponseCode, @lastResponseSize, @lastResponseTimeInMs, @lastUptimeStatus",
                     new IDataParameter[]
                     {
@@ -96,7 +96,7 @@ namespace HlidacStatu.Repositories
                     });
                 lap.Stop();
 
-                lap = swl.AddAndStartLap("InfluxDb save");
+                lap = swl.StopPreviousAndStartNextLap("InfluxDb save");
                 HlidacStatu.Lib.Data.External.InfluxDb.AddPoints("uptimer", "hlidac",
                     PointData.Measurement("uptime")
                         .Tag("uptimer", lastCheck.Uptimer)
@@ -119,7 +119,7 @@ namespace HlidacStatu.Repositories
                     );
                 lap.Stop();
 
-                lap = swl.AddAndStartLap("CheckAlert ");
+                lap = swl.StopPreviousAndStartNextLap("CheckAlert ");
                 UptimeServerRepo.Alert.CheckAndAlertServer(lastCheck.ServerId);
                 lap.Stop();
 

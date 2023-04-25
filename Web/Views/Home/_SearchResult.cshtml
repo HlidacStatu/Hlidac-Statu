@@ -11,7 +11,7 @@
 
     Devmasters.DT.StopWatchLaps viewRenderTimes = new Devmasters.DT.StopWatchLaps();
     Devmasters.DT.StopWatchLaps.Interval viewRenderTimesInt = null;
-    viewRenderTimesInt = viewRenderTimes.AddAndStartLap("smlouvy res content header");
+    viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("smlouvy res content header");
 
 }
 

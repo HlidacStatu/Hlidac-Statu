@@ -20,17 +20,17 @@
 
     Devmasters.DT.StopWatchLaps laps = new();
 
-    var intv = laps.AddAndStartLap("StatistikaRegistruSmluv");
+    var intv = laps.StopPreviousAndStartNextLap("StatistikaRegistruSmluv");
     HlidacStatu.Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> statistics = Model.StatistikaRegistruSmluv();
     intv.Stop();
 
-    intv = laps.AddAndStartLap("CurrentSeasonStatistics");
+    intv = laps.StopPreviousAndStartNextLap("CurrentSeasonStatistics");
     var seasonStat = statistics.CurrentSeasonStatistics();
     var currentSeasonYear = statistics.CurrentSeasonYear();
     var zmenaObjemuSmluv = statistics.ChangeBetweenYears(currentSeasonYear - 1, currentSeasonYear, s => s.CelkovaHodnotaSmluv);
     intv.Stop();
 
-    intv = laps.AddAndStartLap("KIndex");
+    intv = laps.StopPreviousAndStartNextLap("KIndex");
     var kindex = await Model.KindexAsync();
 
     bool OnSankcniSeznam = false;
@@ -128,7 +128,7 @@
     }
     @{
         intv.Stop();
-        intv = laps.AddAndStartLap("RegistrSmluv");
+        intv = laps.StopPreviousAndStartNextLap("RegistrSmluv");
     }
 
     @* ----- Rizika ----- *@
@@ -366,7 +366,7 @@
     <hr />
     @{
         intv.Stop();
-        intv = laps.AddAndStartLap("VerejneZakazky");
+        intv = laps.StopPreviousAndStartNextLap("VerejneZakazky");
     }
 
     @* ----- Veřejné zakázky -----*@
@@ -428,7 +428,7 @@
     @* ----- Dotace -----*@
     @{
         intv.Stop();
-        intv = laps.AddAndStartLap("Dotace");
+        intv = laps.StopPreviousAndStartNextLap("Dotace");
     }
 
     <div>
@@ -600,7 +600,7 @@
     @* ----- Insolvence -----*@
     @{
         intv.Stop();
-        intv = laps.AddAndStartLap("Insolvence");
+        intv = laps.StopPreviousAndStartNextLap("Insolvence");
     }
 
     <div>
@@ -675,7 +675,7 @@
     {
 
         intv.Stop();
-        intv = laps.AddAndStartLap("uradSVazbami");
+        intv = laps.StopPreviousAndStartNextLap("uradSVazbami");
 
         var uradSVazbami = HlidacStatu.Repositories.StaticData.UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache.Get()
         .SoukromeFirmy.Where(m => m.Ico == Model.ICO && m.Detail != null && m.Detail.Count > 0)
@@ -715,7 +715,7 @@
 
     @{
         intv.Stop();
-        intv = laps.AddAndStartLap("Dodavatele");
+        intv = laps.StopPreviousAndStartNextLap("Dodavatele");
     }
 
     @{
@@ -751,7 +751,7 @@
     <hr />
     @{
         intv.Stop();
-        intv = laps.AddAndStartLap("Odberatele");
+        intv = laps.StopPreviousAndStartNextLap("Odberatele");
     }
 
     <div>
@@ -771,7 +771,7 @@
     <hr />
     @{
         intv.Stop();
-        intv = laps.AddAndStartLap("DalsiDB");
+        intv = laps.StopPreviousAndStartNextLap("DalsiDB");
     }
 
     @{
@@ -817,7 +817,7 @@
     }
     @{
         intv.Stop();
-        intv = laps.AddAndStartLap("DalsiInfo");
+        intv = laps.StopPreviousAndStartNextLap("DalsiInfo");
     }
 
     <div>
