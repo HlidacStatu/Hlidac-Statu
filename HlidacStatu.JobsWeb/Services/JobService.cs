@@ -59,7 +59,7 @@ namespace HlidacStatu.Ceny.Services
                         Entities.Cena firstJobOverview = g.FirstOrDefault();
                         string[] tags = firstJobOverview.Tags?.Split("|",
                             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-                        if (tags == null || tags.Length == 0)
+                        if (tags == null || tags.Length == 0 )
                             tags = new[] { NezarazenyName };
                         return new JobPrecalculated()
                         {
@@ -147,17 +147,20 @@ namespace HlidacStatu.Ceny.Services
         private static Dictionary<string, List<JobStatistics>> CalculateTags(List<JobPrecalculated> distinctJobs,
             YearlyStatisticsGroup.Key key)
         {
-            Dictionary<string, List<JobStatistics>> ret = distinctJobs
-                .Where(x => x.AnalyzaName == key.Obor && x.Year == key.Rok) //filtruj analyzu
-                .SelectMany(j => j.Tags, (precalculated, tag) => new { precalculated, tag = tag }) // vem vsechny tagy
-                .GroupBy(j => j.precalculated.Polozka) //groupuj podle pracovni pozici
-                .ToDictionary(g => g.Key, g =>
+            var jobs = distinctJobs
+                .Where(x => x.AnalyzaName == key.Obor && x.Year == key.Rok).ToArray(); //filtruj analyzu
+            var tags = jobs
+                .SelectMany(j => j.Tags, (precalculated, tag) => new { precalculated, tag = tag }).ToArray(); // vem vsechny tagy
+
+            var perPozice = tags.GroupBy(j => j.precalculated.Polozka).ToArray(); //groupuj podle pracovni pozici
+            
+                
+            Dictionary<string, List<JobStatistics>> ret = perPozice.ToDictionary(g => g.Key, g =>
                     g.GroupBy(i => i.tag) //groupuj podle tabu u pracovni pozice
                         .Select(ig => new JobStatistics(ig.Select(x => x.precalculated), ig.Key))
                         .Where(s => s.PriceCount >= _minimumPriceCount)
                         .ToList()
-                );
-
+                ); 
             return ret;
         }
 

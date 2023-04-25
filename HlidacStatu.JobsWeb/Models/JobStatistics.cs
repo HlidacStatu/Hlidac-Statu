@@ -30,7 +30,7 @@ namespace HlidacStatu.Ceny.Models
             var precalculatedJobsList = precalculatedJobs.ToList(); // aby nedocházelo k několikanásobné enumeraci
             
             //todo: salarydX se nikde nepouziva  dal v kodu - bezi tu zbytecne enumerace
-            var salarydX = precalculatedJobsList.Select(x =>new { p = (double)x.PricePerUnitVat, pk = x.JobPk }).ToList();
+            //var salarydX = precalculatedJobsList.Select(x =>new { p = (double)x.PricePerUnitVat, pk = x.JobPk }).ToList();
 
             var salaryd = precalculatedJobsList.Select(x => (double)x.PricePerUnitVat).ToList();
             double dolniKvartil = salaryd.LowerQuartile();
