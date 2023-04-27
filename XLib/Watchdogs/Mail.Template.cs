@@ -137,7 +137,7 @@ namespace HlidacStatu.XLib.Watchdogs
             public static string DefaultEmailFooterHtml = @"
 <p style='font-size:18px;'><b>Podpořte provoz Hlídače</b></p>
 <p>👉 <b>Kontrolujeme politiky a úředníky</b>, zda s našimi penězi zacházejí správně.
-<br>👉 <b>Stali jsme se důležitým zdroje informací pro novináře</b>.
+<br>👉 <b>Stali jsme se důležitým zdrojem informací pro novináře</b>.
 <br>👉 <b>Pomáháme státu zavádět moderní e-government</b>.
 <br>👉 <b>Zvyšujeme transparentnost českého státu.</b>
 </p>
@@ -154,7 +154,7 @@ namespace HlidacStatu.XLib.Watchdogs
 PODPOŘTE PROVOZ HLÍDAČE
 
 👉 Kontrolujeme politiky a úředníky, zda s našimi penězi zacházejí správně.
-👉 Stali jsme se důležitým zdroje informací pro novináře.
+👉 Stali jsme se důležitým zdrojem informací pro novináře.
 👉 Pomáháme státu zavádět moderní e-government.
 👉 Zvyšujeme transparentnost českého státu.
 
