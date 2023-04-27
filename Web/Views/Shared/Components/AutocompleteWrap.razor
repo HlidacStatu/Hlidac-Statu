@@ -180,22 +180,29 @@
     {
         await base.OnParametersSetAsync();
 
-        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var q))
+        try
         {
-            _query = q;
-            
-            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("qtl", out var qtl))
+            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var q))
             {
-                var parsedQueries = ParseTools.ParseQueryStringWithOffsets(q, qtl);
-                InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
-            }
-            else
-            {
-                var parsedQueries = ParseTools.ParseQueryStringWithoutOffsets(q);
-                InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
-            }
+                _query = q;
             
+                if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("qtl", out var qtl))
+                {
+                    var parsedQueries = ParseTools.ParseQueryStringWithOffsets(q, qtl);
+                    InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
+                }
+                else
+                {
+                    var parsedQueries = ParseTools.ParseQueryStringWithoutOffsets(q);
+                    InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
+                }
+            
+            }
+        }
+        catch (Exception e)
+        {
+            Util.Consts.Logger.Error("During autocomplete usage an error occured. OnParametersSetAsync in Wrapper.", e);
         }
     }
 
@@ -206,50 +213,55 @@
 
     private AutocompleteItem<Autocomplete> CreateAutocompleteItemFromQuery(string parsedQuery)
     {
-        if (parsedQuery.StartsWith("osobaid:", StringComparison.InvariantCultureIgnoreCase))
+        try
         {
-            var osoba = OsobaRepo.GetByNameId(parsedQuery.Substring(8));
-            return new AutocompleteItem<Autocomplete>(new Autocomplete()
+            if (parsedQuery.StartsWith("osobaid:", StringComparison.InvariantCultureIgnoreCase))
             {
-                Id = parsedQuery,
-                Text = osoba.FullName(),
-                Category = Autocomplete.CategoryEnum.Person
-            });
-        }
-        else if (parsedQuery.StartsWith("ico:", StringComparison.InvariantCultureIgnoreCase))
-        {
-            var firma = FirmaRepo.FromIco(parsedQuery.Substring(4));
-
-            Autocomplete.CategoryEnum kategorie = Autocomplete.CategoryEnum.Company;
-            if (firma.TypSubjektu == Firma.TypSubjektuEnum.Obec)
-            {
-                kategorie = Autocomplete.CategoryEnum.City;
+                var osoba = OsobaRepo.GetByNameId(parsedQuery.Substring(8));
+                return new AutocompleteItem<Autocomplete>(new Autocomplete()
+                {
+                    Id = parsedQuery,
+                    Text = osoba.FullName(),
+                    Category = Autocomplete.CategoryEnum.Person
+                });
             }
-            else if (firma.Kod_PF > 110 && firma.JsemOVM() && firma.IsInRS == 1)
+            else if (parsedQuery.StartsWith("ico:", StringComparison.InvariantCultureIgnoreCase))
             {
-                kategorie = Autocomplete.CategoryEnum.Authority;
-            }
+                var firma = FirmaRepo.FromIco(parsedQuery.Substring(4));
 
-            return new AutocompleteItem<Autocomplete>(new Autocomplete()
+                Autocomplete.CategoryEnum kategorie = Autocomplete.CategoryEnum.Company;
+                if (firma.TypSubjektu == Firma.TypSubjektuEnum.Obec)
+                {
+                    kategorie = Autocomplete.CategoryEnum.City;
+                }
+                else if (firma.Kod_PF > 110 && firma.JsemOVM() && firma.IsInRS == 1)
+                {
+                    kategorie = Autocomplete.CategoryEnum.Authority;
+                }
+
+                return new AutocompleteItem<Autocomplete>(new Autocomplete()
+                {
+                    Id = parsedQuery,
+                    Text = firma.Jmeno,
+                    Category = kategorie
+                });
+            }
+            else if (parsedQuery.StartsWith("oblast:", StringComparison.InvariantCultureIgnoreCase))
             {
-                Id = parsedQuery,
-                Text = firma.Jmeno,
-                Category = kategorie
-            });
+                return new AutocompleteItem<Autocomplete>(new Autocomplete()
+                {
+                    Id = parsedQuery,
+                    Text = parsedQuery,
+                    Category = Autocomplete.CategoryEnum.Oblast
+                });
+            }
         }
-        else if (parsedQuery.StartsWith("oblast:", StringComparison.InvariantCultureIgnoreCase))
+        catch (Exception e)
         {
-            return new AutocompleteItem<Autocomplete>(new Autocomplete()
-            {
-                Id = parsedQuery,
-                Text = parsedQuery,
-                Category = Autocomplete.CategoryEnum.Oblast
-            });
+            Util.Consts.Logger.Error("During autocomplete usage an error occured. CreateAutocompleteItemFromQuery in Wrapper.", e);
         }
-        else
-        {
-            return new AutocompleteItem<Autocomplete>(parsedQuery);
-        }
+        
+        return new AutocompleteItem<Autocomplete>(parsedQuery);
     }
 
 
@@ -263,8 +275,6 @@
         var autocompletePath = $"/autocomplete/autocomplete?q={query}";
 
         var uri = new Uri($"{Endpoint}{autocompletePath}");
-    // using var client = HttpClientFactory.CreateClient();
-    //using var client = new HttpClient();
 
         try
         {
@@ -283,11 +293,11 @@
         }
         catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
         {
-    // canceled by user
+            // canceled by user (writing more letters), do not need catch here 
         }
         catch (Exception e)
         {
-    //log exception?
+            Util.Consts.Logger.Error("During autocomplete usage an error occured. OnSearch in Wrapper.", e);
         }
 
         return Enumerable.Empty<Autocomplete>().ToList();
@@ -295,12 +305,18 @@
 
     private Task OnAutocompleteSubmitted(List<AutocompleteItem<Autocomplete>> autocomplete)
     {
-    //string qs = string.Join(" ", );
-        (string qs, string qtl) = ParseTools.CreateQueryWithOffsets(
-            autocomplete.Select(i => i.Value?.Id ?? i.Text ?? "").ToList());
+        try
+        {
+            (string qs, string qtl) = ParseTools.CreateQueryWithOffsets(
+                autocomplete.Select(i => i.Value?.Id ?? i.Text ?? "").ToList());
 
-        string url = $"{Navigation.BaseUri}{SearchPath}?q={qs}&qtl={qtl}";
-        Navigation.NavigateTo(url, true);
+            string url = $"{Navigation.BaseUri}{SearchPath}?q={qs}&qtl={qtl}";
+            Navigation.NavigateTo(url, true);
+        }
+        catch (Exception e)
+        {
+            Util.Consts.Logger.Error("During autocomplete usage an error occured. OnAutocompleteSubmitted in Wrapper.", e);
+        }
 
         return Task.CompletedTask;
     }
