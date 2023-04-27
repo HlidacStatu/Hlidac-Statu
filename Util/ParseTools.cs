@@ -439,6 +439,15 @@ namespace HlidacStatu.Util
 
             return results;
         }
+        
+        public static List<string> ParseQueryStringWithoutOffsets(string queryString)
+        {
+            if (string.IsNullOrWhiteSpace(queryString))
+                return null;
+
+            return queryString.Split(" ", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .ToList();
+        }
 
     }
 }

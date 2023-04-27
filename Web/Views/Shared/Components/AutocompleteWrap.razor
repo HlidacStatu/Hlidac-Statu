@@ -181,12 +181,21 @@
         await base.OnParametersSetAsync();
 
         var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var q) &&
-            QueryHelpers.ParseQuery(uri.Query).TryGetValue("qtl", out var qtl))
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var q))
         {
             _query = q;
-            var parsedQueries = ParseTools.ParseQueryStringWithOffsets(q, qtl);
-            InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
+            
+            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("qtl", out var qtl))
+            {
+                var parsedQueries = ParseTools.ParseQueryStringWithOffsets(q, qtl);
+                InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
+            }
+            else
+            {
+                var parsedQueries = ParseTools.ParseQueryStringWithoutOffsets(q);
+                InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
+            }
+            
         }
     }
 
