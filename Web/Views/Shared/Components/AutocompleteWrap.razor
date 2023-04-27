@@ -67,74 +67,97 @@
     
     #components-reconnect-modal,
     #components-reconnect-modal.components-reconnect-show {
+        display: block;
+    }
+    
+    #components-reconnect-modal .connection-ok,
+    #components-reconnect-modal.components-reconnect-show .connection-ok {
+        display: block;
+    }
+     
+    #components-reconnect-modal.components-reconnect-failed .connection-ok, 
+    #components-reconnect-modal.components-reconnect-rejected .connection-ok {
         display: none;
     }
     
+    #components-reconnect-modal .connection-error,
+    #components-reconnect-modal.components-reconnect-show .connection-error {
+        display: none;
+    }
      
-    #components-reconnect-modal.components-reconnect-failed, 
-    #components-reconnect-modal.components-reconnect-rejected {
+    #components-reconnect-modal.components-reconnect-failed .connection-error, 
+    #components-reconnect-modal.components-reconnect-rejected .connection-error {
         display: block;
     }
     
 </style>
 
-<ErrorBoundary>
-    <ChildContent>
-        <HlidacAutocompleteMultitag SearchFuncAsync="@((s, token) => OnSearch(s, token))"
-                                    OnAutocompleteSubmitted="@(OnAutocompleteSubmitted)"
-                                    TextSelector="@((autocomplete) => autocomplete.Text)"
-                                    InputTags="InputTags"
-                                    TItem="Autocomplete">
-            <TagTemplate>
-                @if (context.Value is null)
-                {
-                    <span style="overflow:hidden; text-overflow:ellipsis;">@context.Text</span>
-                }
-                else
-                {
-                    <span style="overflow:hidden; text-overflow:ellipsis;">@(CategoryToPicture(context.Value.Category))&nbsp;@context.Value.Text</span>
-                }
-            </TagTemplate>
-            <ItemTemplate>
-                <div>
-                    <div class="hs-avatar">
-                        @((MarkupString)context.ImageElement)
-                    </div>
-                    <div class="hs-autocomplete-description">
-                        
-                        <h6 class="fw-bold">@context.Text</h6>
-                        <small>@context.Description</small>
-                        <br/>
-                        <small class="text-muted"><i>@context.Type</i></small>
+<div id="components-reconnect-modal">
+    <div class="connection-ok">
+        <ErrorBoundary >
+            <ChildContent>
+                <HlidacAutocompleteMultitag SearchFuncAsync="@((s, token) => OnSearch(s, token))"
+                                            OnAutocompleteSubmitted="@(OnAutocompleteSubmitted)"
+                                            TextSelector="@((autocomplete) => autocomplete.Text)"
+                                            InputTags="InputTags"
+                                            TItem="Autocomplete">
+                    <TagTemplate>
+                        @if (context.Value is null)
+                        {
+                            <span style="overflow:hidden; text-overflow:ellipsis;">@context.Text</span>
+                        }
+                        else
+                        {
+                            <span style="overflow:hidden; text-overflow:ellipsis;">@(CategoryToPicture(context.Value.Category))&nbsp;@context.Value.Text</span>
+                        }
+                    </TagTemplate>
+                    <ItemTemplate>
+                        <div>
+                            <div class="hs-avatar">
+                                @((MarkupString)context.ImageElement)
+                            </div>
+                            <div class="hs-autocomplete-description">
+
+                                <h6 class="fw-bold">@context.Text</h6>
+                                <small>@context.Description</small>
+                                <br/>
+                                <small class="text-muted">
+                                    <i>@context.Type</i>
+                                </small>
+                            </div>
+                        </div>
+
+                    </ItemTemplate>
+                </HlidacAutocompleteMultitag>
+            </ChildContent>
+            <ErrorContent>
+                <div class="hlidac-autocomplete mb-3">
+                    <div class="input-group">
+                        <input type="text"
+                               autocomplete="off"
+                               placeholder="Došlo k neočekávané chybě. Načtěte prosím stránku znovu"
+                               class="hlidac-autocomplete-input form-control"
+                               disabled="disabled"/>
+
+                        <a class="btn btn-primary" href="javascript:window.location.reload()" style="margin-bottom:0;margin-top:0;padding-bottom:0">
+                            Načíst znovu
+                        </a>
                     </div>
                 </div>
+            </ErrorContent>
+        </ErrorBoundary>
+    </div>
 
-            </ItemTemplate>
-        </HlidacAutocompleteMultitag>
-    </ChildContent>
-    <ErrorContent>
-        <div class="hlidac-autocomplete mb-3">
-            <div class="input-group">
-                <input type="text"
-                       autocomplete="off"
-                       placeholder="Došlo k neočekávané chybě. Načtěte prosím stránku znovu"
-                       class="hlidac-autocomplete-input form-control"
-                       disabled="disabled"/>
-
-                <a class="btn btn-primary" href="javascript:window.location.reload()" style="margin-bottom:0;margin-top:0;padding-bottom:0">
-                    Načíst znovu
-                </a>
-            </div>
-        </div>
-    </ErrorContent>
-</ErrorBoundary>
-
-<div id="components-reconnect-modal">
-    <a class="btn btn-warning btn-sm" href="javascript:window.location.reload()" style="margin-bottom:0;margin-top:0;padding-bottom:0">
-        Došlo k chybě připojení. Chcete-li používat vyhledávací okno, načtěte znovu tuto stránku.
-    </a>
+    <div class="connection-error">
+        <form class="header__search__input-wrapper" method="get" style="visibility:visible">
+            <input value="@_query" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
+            <button class="header__search__btn" formaction="/hledat">Hledat</button>
+        </form>
+        <a class="btn btn-warning btn-sm" href="javascript:window.location.reload()" style="margin-bottom:0;margin-top:0;padding-bottom:0">
+            Chyba připojení. Chcete-li používat vylepšené hledání, načtěte znovu tuto stránku.
+        </a>
+    </div>
 </div>
-
 
 
 @code {
@@ -144,25 +167,27 @@
 
     [Parameter]
     public HttpClient HttpClient { get; set; }
-    
+
     [Parameter]
     public string SearchPath { get; set; }
 
     private List<AutocompleteItem<Autocomplete>>? InputTags { get; set; }
-    
-    
+
+    private string _query;
+
+
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        
+
         var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var q) &&
             QueryHelpers.ParseQuery(uri.Query).TryGetValue("qtl", out var qtl))
         {
+            _query = q;
             var parsedQueries = ParseTools.ParseQueryStringWithOffsets(q, qtl);
             InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
         }
-        
     }
 
     private List<AutocompleteItem<Autocomplete>> CreateAutocompleteItemsFromparsedQueries(List<string> parsedQueries)
@@ -190,12 +215,12 @@
             if (firma.TypSubjektu == Firma.TypSubjektuEnum.Obec)
             {
                 kategorie = Autocomplete.CategoryEnum.City;
-            } 
+            }
             else if (firma.Kod_PF > 110 && firma.JsemOVM() && firma.IsInRS == 1)
             {
                 kategorie = Autocomplete.CategoryEnum.Authority;
             }
-            
+
             return new AutocompleteItem<Autocomplete>(new Autocomplete()
             {
                 Id = parsedQuery,
@@ -216,8 +241,6 @@
         {
             return new AutocompleteItem<Autocomplete>(parsedQuery);
         }
-        
-        
     }
 
 
@@ -263,7 +286,7 @@
 
     private Task OnAutocompleteSubmitted(List<AutocompleteItem<Autocomplete>> autocomplete)
     {
-        //string qs = string.Join(" ", );
+    //string qs = string.Join(" ", );
         (string qs, string qtl) = ParseTools.CreateQueryWithOffsets(
             autocomplete.Select(i => i.Value?.Id ?? i.Text ?? "").ToList());
 

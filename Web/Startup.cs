@@ -20,7 +20,9 @@ using System.Threading.Tasks;
 using Devmasters.Log;
 using HlidacStatu.Entities.Entities;
 using HlidacStatu.LibCore.Filters;
+using HlidacStatu.Web.Views.Shared.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -148,6 +150,8 @@ namespace HlidacStatu.Web
                         3, retryNumber => TimeSpan.FromMilliseconds(10)));
             
             services.AddServerSideBlazor();
+
+            services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
 
         }
 
