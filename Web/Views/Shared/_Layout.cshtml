@@ -1,10 +1,15 @@
 ﻿
 @using System.Linq
+@using System.Net.Http
 @using Devmasters.Collections
 @using HlidacStatu.Datasets
 @using HlidacStatu.Entities
+@using HlidacStatu.Web.TagHelpers
 @using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using Microsoft.Extensions.Primitives
+
+@inject IHttpClientFactory HttpClientFactory
 
 @{
     int PocetReportu = 24;
@@ -221,6 +226,10 @@
         })();
     </script>
     <!-- End Matomo Code -->
+    
+    <!-- Blazor -->
+    <base href="~/" />
+    <script src="_framework/blazor.server.js"></script>
 
 </head>
 <body class="new-body">
@@ -380,31 +389,30 @@
             <!-- desktop menu items only -->
 
             <div class="header__search">
-                <form class="header__search__input-wrapper old-search-input" id="old-search-input" method="get" style="visibility:visible">
-                    <input value="@ViewBag.Query" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
-                    @if (ViewBag.AdditionalForm != null && false)
-                    {
-                        DoubleForm dform = (DoubleForm)ViewBag.AdditionalForm;
-                        <button class="form-search__btn" style="max-width: 200px; white-space:normal; word-break: break-word; line-height: 1.2em;" formaction="@dform.SecondaryAction">@dform.SecondaryActionLabel</button>
-                        <button class="header__search__btn" formaction="@dform.PrimaryAction">@dform.PrimaryActionLabel</button>
-                    }
-                    else
-                    {
-                        <button class="header__search__btn" formaction="/hledat">Hledat</button>
-                    }
-                </form>
-
-
-                <form id="new-search-input" class="new-search-input " method="get" action="/hledat" style="visibility:hidden">
-                    <div class="new-search-wrapper">
-                        <div class="input-group">
-                            <input class="form-control nopadding " name="q" value="@(ViewBag.Query)" id="new-search-input-q" />
-                            <span class="input-group-btn">
-                                <button id="new-search-input-btn" class="btn btn-primary" style="left:-7px;top:-5px"> hledat</button>
-                            </span>
-                        </div>
-                    </div>
-                </form>
+                <div id="old-search-input">
+                    <form class="header__search__input-wrapper old-search-input" id="old-search-input" method="get" style="visibility:visible">
+                        <input value="@ViewBag.Query" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
+                        @if (ViewBag.AdditionalForm != null && false)
+                        {
+                            DoubleForm dform = (DoubleForm)ViewBag.AdditionalForm;
+                            <button class="form-search__btn" style="max-width: 200px; white-space:normal; word-break: break-word; line-height: 1.2em;" formaction="@dform.SecondaryAction">@dform.SecondaryActionLabel</button>
+                            <button class="header__search__btn" formaction="@dform.PrimaryAction">@dform.PrimaryActionLabel</button>
+                        }
+                        else
+                        {
+                            <button class="header__search__btn" formaction="/hledat">Hledat</button>
+                        }
+                    </form>    
+                </div>
+                <div id="new-search-input">
+                    @(await Html.RenderComponentAsync<HlidacStatu.Web.Views.Shared.Components.AutocompleteWrap>(
+                        RenderMode.Server, new { 
+                            Endpoint = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint"), 
+                            HttpClient = HttpClientFactory.CreateClient(),
+                            SearchPath = "hledat"
+                        }))
+                </div>
+                
                 <script>
                     MakeAutocomplete('#new-search-input');
                 </script>
