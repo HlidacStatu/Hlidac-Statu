@@ -1,6 +1,9 @@
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using System;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
@@ -63,6 +66,29 @@ namespace HlidacStatu.Repositories
         }
         public static MonitoredTask Finish(this MonitoredTask task, bool success = true, Exception exception = null)
         {
+            string except = "";
+            if (exception?.GetType() == typeof(AggregateException))
+            {
+                StringBuilder sb = new StringBuilder(1024);
+                foreach (Exception exInnerException in ((AggregateException)exception).Flatten().InnerExceptions)
+                {
+                    Exception exNestedInnerException = exInnerException;
+                    do
+                    {
+                        if (!string.IsNullOrEmpty(exNestedInnerException.Message))
+                        {
+                            sb.AppendLine(exNestedInnerException.ToString());
+                            sb.AppendLine("\n\n----------\n\n");
+                        }
+                        exNestedInnerException = exNestedInnerException.InnerException;
+                    }
+                    while (exNestedInnerException != null);
+                }
+                except=sb.ToString();
+            }
+            else
+                except = exception?.ToString();
+
             task.Progress = SetProgress(100);
             task.Finished = DateTime.Now;
             task.Success = success;
