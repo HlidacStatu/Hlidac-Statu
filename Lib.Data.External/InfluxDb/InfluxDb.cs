@@ -10,6 +10,9 @@ namespace HlidacStatu.Lib.Data.External
 
     public static class InfluxDb
     {
+        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.Data.External.InfluxDb");
+        private static Devmasters.Log.Logger loggerTrace = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.Data.External.InfluxDb.Trace");
+
         public class ResponseItem
         {
             public int ServerId { get; set; }
@@ -67,7 +70,7 @@ namespace HlidacStatu.Lib.Data.External
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error("UptimeServerRepo.SaveLastCheck error ", e);
+                logger.Error("UptimeServerRepo.SaveLastCheck error ", e);
                 return false;
             }
 
@@ -117,7 +120,7 @@ namespace HlidacStatu.Lib.Data.External
 
                 try
                 {
-                    HlidacStatu.Util.Consts.Logger.Debug("Calling InfluxDB query {query} from time {timeBack}", query, timeBack);
+                    loggerTrace.Debug("Calling InfluxDB query {query} from time {timeBack}", query, timeBack);
 
                     List<InfluxDB.Client.Core.Flux.Domain.FluxTable> res =
                         influxDbClient.GetQueryApi().QueryAsync(query, "hlidac")
@@ -127,7 +130,7 @@ namespace HlidacStatu.Lib.Data.External
                 }
                 catch (Exception e)
                 {
-                    HlidacStatu.Util.Consts.Logger.Error("InfluxDB query error\n{query}", e, query);
+                    logger.Error("InfluxDB query error\n{query}", e, query);
                     //throw;
                 }
             }

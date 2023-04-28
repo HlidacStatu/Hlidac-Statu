@@ -29,7 +29,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 using Polly;
-
+using Serilog.Filters;
 
 namespace HlidacStatu.Web
 {
@@ -208,6 +208,9 @@ namespace HlidacStatu.Web
             Devmasters.Log.Logger webExceptionLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Web.Exceptions",
                 Devmasters.Log.Logger.DefaultConfiguration()
                     .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
+                    .Filter.ByExcluding(Matching.FromSource("HlidacStatu.Lib.ES.Trace") )
+                    .Filter.ByExcluding(Matching.FromSource("HlidacStatu.Lib.Data.External.InfluxDb.Trace"))
+                    .MinimumLevel.Information()
                     .AddLogStash(new Uri("http://10.10.150.203:5000"))
                     .AddFileLoggerFilePerLevel(logpath2, "slog.txt",
                         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
