@@ -8,16 +8,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
     public class Client
     {
         
-        public static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Camelot.Api",
-                            Devmasters.Log.Logger.DefaultConfiguration()
-                                .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
-                                .AddFileLoggerFilePerLevel("c:/Data/Logs/HlidacStatu/Camelot.Api", "slog.txt",
-                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
-                                    rollingInterval: Serilog.RollingInterval.Day,
-                                    fileSizeLimitBytes: null,
-                                    retainedFileCountLimit: 9,
-                                    shared: true
-                                    ));
+        public static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Camelot.Api");
         public static async Task<CamelotResult> GetTablesFromPDFAsync(
             string pdfUrl, ClientLow.Commands command, 
             CamelotResult.Formats format = CamelotResult.Formats.JSON, 

@@ -25,11 +25,7 @@ namespace HlidacStatu.Repositories.ES
     {
 
         public static Devmasters.Log.Logger ESTraceLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.ES.Trace");
-        public static Devmasters.Log.Logger ESLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.ES",
-                            Devmasters.Log.Logger.DefaultConfiguration()
-                                .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
-                            );
-        public static bool ESTraceLoggerExists = log4net.LogManager.Exists("HlidacStatu.Lib.ES.Trace")?.Logger?.IsEnabledFor(log4net.Core.Level.Debug) == true;
+        public static Devmasters.Log.Logger ESLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.ES");
 
         public enum IndexType
         {
@@ -360,7 +356,7 @@ namespace HlidacStatu.Repositories.ES
                 })
                 ;
 
-            if (System.Diagnostics.Debugger.IsAttached || ESTraceLoggerExists || Devmasters.Config.GetWebConfigValue("ESDebugDataEnabled") == "true")
+            if (System.Diagnostics.Debugger.IsAttached || Devmasters.Config.GetWebConfigValue("ESDebugDataEnabled") == "true")
                 settings = settings.DisableDirectStreaming();
 
             if (connectionLimit.HasValue)

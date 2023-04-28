@@ -11,18 +11,7 @@ namespace HlidacStatu.Repositories
     {
         public static partial class Alert
         {
-            static Logger loggerAlert = Devmasters.Log.Logger.CreateLogger("HlidacStatu.UptimeServerAlert",
-                Devmasters.Log.Logger.EmptyConfiguration()
-                .AddLogStash(new Uri("http://10.10.150.203:5000"))
-                //.WriteTo.Http("http://10.10.150.203:5000",
-                //    batchPostingLimit: 2,
-                //    queueLimit: 2,
-                //    textFormatter: new Elastic.CommonSchema.Serilog.EcsTextFormatter(new Elastic.CommonSchema.Serilog.EcsTextFormatterConfiguration()),
-                //    batchFormatter: new Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter()
-                //    )
-                //.WriteTo.Console()
-                .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
-                );
+            static Logger loggerAlert = Devmasters.Log.Logger.CreateLogger("HlidacStatu.UptimeServerAlert");
 
             static Alert()
             {

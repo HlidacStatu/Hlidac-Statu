@@ -69,10 +69,7 @@ try
         MinimumRequestTimeToTrackMs = 900
     });
 
-    var timeMeasureLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.AutocompleteApi.ResponseTimes",
-        Devmasters.Log.Logger.DefaultConfiguration()
-            .Enrich.WithProperty("codeversion",
-                System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString()));
+    var timeMeasureLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.AutocompleteApi.ResponseTimes");
             
     app.UseTimeMeasureMiddleware(timeMeasureLogger);
     if (app.Environment.IsDevelopment())

@@ -8,16 +8,7 @@ namespace HlidacStatu.Lib.Data.External
 {
     public class ConvertPrilohaToPDF
     {
-        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.ConvertPrilohaToPDF",
-                    Devmasters.Log.Logger.DefaultConfiguration()
-                        .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
-                        .AddFileLoggerFilePerLevel("c:/Data/Logs/HlidacStatu/ConvertPrilohaToPDF", "slog.txt",
-                            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
-                            rollingInterval: Serilog.RollingInterval.Day,
-                            fileSizeLimitBytes: null,
-                            retainedFileCountLimit: 9,
-                            shared: true
-                            ));
+        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.ConvertPrilohaToPDF");
 
 
         public static byte[] PrilohaToPDFfromFile(byte[] content, int maxTries = 10)

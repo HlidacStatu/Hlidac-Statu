@@ -12,7 +12,7 @@ namespace HlidacStatu.Repositories
                 .WriteTo.Http("http://10.10.150.203:5001",1024*1024,
                                 textFormatter:new Elastic.CommonSchema.Serilog.EcsTextFormatter(),
                                 batchFormatter:new Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter()
-                )
+                ),false
             );
 
         public static Audit Add<T>(Audit.Operations operation, string user, T newObj, T prevObj)

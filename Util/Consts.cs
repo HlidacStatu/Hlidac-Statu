@@ -31,17 +31,7 @@ namespace HlidacStatu.Util
         public static System.Globalization.CultureInfo csCulture = System.Globalization.CultureInfo.GetCultureInfo("cs");
         public static Random Rnd = new Random();
 
-        public static Devmasters.Log.Logger Logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu",
-                            Devmasters.Log.Logger.DefaultConfiguration()
-                                .AddLogStash(new Uri("http://10.10.150.203:5000")) //todo: tohle předělat na centrální konfiguraci
-                                .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
-                                .AddFileLoggerFilePerLevel($"{Devmasters.Config.GetWebConfigValue("SerilogBasePath")}/HlidacStatu/Web", "slog.txt",
-                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
-                                    rollingInterval: Serilog.RollingInterval.Day,
-                                    fileSizeLimitBytes: null,
-                                    retainedFileCountLimit: 9,
-                                    shared: true
-                                    ));
+        public static Devmasters.Log.Logger Logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu");
 
     }
 }
