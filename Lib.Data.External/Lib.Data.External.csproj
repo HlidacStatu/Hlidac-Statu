@@ -67,7 +67,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Devmasters.Logging" Version="4.5.20" />
+    <PackageReference Include="Devmasters.Logging" Version="4.5.21" />
     <PackageReference Include="InfluxDB.Client" Version="4.12.0" />
     <PackageReference Include="linqtotwitter" Version="6.15.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
