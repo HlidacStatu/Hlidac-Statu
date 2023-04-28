@@ -302,7 +302,7 @@ else
     <div class="row">
         <div class="col-xs-12">
             <div class="text-end">
-                <a asp-controller="ApiV2Weby" asp-action="Status" asp-route-id="@Model.Id">Stahnout dostupnost v JSON (Open Data)</a>
+                <a href="https://api.hlidacstatu.cz/api/v2/Weby/@(Model.Id)?days=1">Stahnout dostupnost v JSON (Open Data)</a>
             </div>
         </div>
 
