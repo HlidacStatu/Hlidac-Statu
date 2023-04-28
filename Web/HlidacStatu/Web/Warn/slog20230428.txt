@@ -2,3 +2,7 @@
 2023-04-28 16:59:26.706  [WRN] /_blazor with ?id=8YZOgNjhyxjCLykC1fI2nw for michal@michalblaha.cz done in 263564 ms
 2023-04-28 17:11:03.649  [WRN] / with  for michal@michalblaha.cz done in 43516 ms
 2023-04-28 17:11:48.957  [WRN] /_blazor with ?id=QE--jzB0zBZkuG324lJ1bg for michal@michalblaha.cz done in 44769 ms
+2023-04-28 17:20:36.201 HlidacStatu.PageTimes [WRN] / with  for michal@michalblaha.cz done in 39829 ms
+2023-04-28 17:20:54.764 HlidacStatu.PageTimes [WRN] /_blazor with ?id=jh_YDLeXuwVSs4Flg9xMSw for michal@michalblaha.cz done in 17994 ms
+2023-04-28 17:22:20.622 HlidacStatu.PageTimes [WRN] / with  for michal@michalblaha.cz done in 45012 ms
+2023-04-28 17:22:38.505 HlidacStatu.PageTimes [WRN] /_blazor with ?id=4CLPLgUFDmYGRny2xXmJxw for michal@michalblaha.cz done in 17415 ms

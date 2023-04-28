@@ -7,3 +7,8 @@
 2023-04-28 17:10:16.325  [INF] Starting web application 1.1.0.0
 2023-04-28 17:10:17.539  [INF] Starting web application _1.1.0.0_
 2023-04-28 17:10:40.456 HlidacStatu [INF] Static data - LastBlogPosts
+2023-04-28 17:19:54.936 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-04-28 17:20:14.676 HlidacStatu [INF] Static data - LastBlogPosts
+2023-04-28 17:21:34.348 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-04-28 17:21:34.599 HlidacStatu.Web.Exceptions [INF] Starting web application 1.1.0.0 exc logger
+2023-04-28 17:21:56.156 HlidacStatu [INF] Static data - LastBlogPosts
