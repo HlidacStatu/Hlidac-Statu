@@ -401,7 +401,7 @@
                 </div>
                 <div id="new-search-input">
                     @(await Html.RenderComponentAsync<HlidacStatu.Web.Views.Shared.Components.AutocompleteWrap>(
-                        RenderMode.Server, new { 
+                        RenderMode.ServerPrerendered, new { 
                             Endpoint = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint"), 
                             HttpClient = HttpClientFactory.CreateClient(),
                             SearchPath = "hledat"
