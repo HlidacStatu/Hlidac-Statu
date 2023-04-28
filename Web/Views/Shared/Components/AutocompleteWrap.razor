@@ -179,10 +179,12 @@
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-
+        
+        Uri? uri = null;
+        
         try
         {
-            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+            uri = Navigation.ToAbsoluteUri(Navigation.Uri);
             if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var q))
             {
                 _query = q;
@@ -202,12 +204,14 @@
         }
         catch (Exception e)
         {
-            Util.Consts.Logger.Error("During autocomplete usage an error occured. OnParametersSetAsync in Wrapper.", e);
+            Util.Consts.Logger.Error($"During autocomplete usage an error occured. OnParametersSetAsync in Wrapper. query=[{uri?.Query}]", e);
         }
     }
 
-    private List<AutocompleteItem<Autocomplete>> CreateAutocompleteItemsFromparsedQueries(List<string> parsedQueries)
+    private List<AutocompleteItem<Autocomplete>> CreateAutocompleteItemsFromparsedQueries(List<string>? parsedQueries)
     {
+        if (parsedQueries is null)
+            return Enumerable.Empty<AutocompleteItem<Autocomplete>>().ToList();
         return parsedQueries.AsParallel().Select(CreateAutocompleteItemFromQuery).ToList();
     }
 
@@ -297,7 +301,7 @@
         }
         catch (Exception e)
         {
-            Util.Consts.Logger.Error("During autocomplete usage an error occured. OnSearch in Wrapper.", e);
+            Util.Consts.Logger.Error($"During autocomplete usage an error occured. OnSearch in Wrapper. Query was=[{query}]", e);
         }
 
         return Enumerable.Empty<Autocomplete>().ToList();
