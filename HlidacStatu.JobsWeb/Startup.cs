@@ -41,8 +41,8 @@ namespace HlidacStatu.Ceny
             services.ConfigureApplicationCookie(options =>
             {
                 //options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-                //options.Cookie.Name = "YourAppCookieName";
-                //options.Cookie.HttpOnly = true;
+                options.Cookie.Name = "WAIdentCook";
+                options.Cookie.HttpOnly = true;
                 options.ExpireTimeSpan = TimeSpan.FromDays(14);
                 //options.LoginPath = "/Identity/Account/Login";
                 // ReturnUrlParameter requires 
