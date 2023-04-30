@@ -42,7 +42,7 @@ namespace HlidacStatu.Ceny
             {
                 //options.AccessDeniedPath = "/Identity/Account/AccessDenied";
                 //options.Cookie.Name = "YourAppCookieName";
-                options.Cookie.HttpOnly = true;
+                //options.Cookie.HttpOnly = true;
                 options.ExpireTimeSpan = TimeSpan.FromDays(14);
                 //options.LoginPath = "/Identity/Account/Login";
                 // ReturnUrlParameter requires 
