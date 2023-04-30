@@ -1,11 +1,8 @@
-﻿using Amazon.Runtime.Internal.Util;
-using Devmasters.Batch;
+﻿using Devmasters.Batch;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -20,8 +17,8 @@ namespace HlidacStatu.Repositories.Statistics
 
         static Devmasters.Batch.ActionProgressWriter debugProgressWr = new Devmasters.Batch.ActionProgressWriter(0.1f);
 
-        public static void RecalculateTasks(int? threads = null, bool debug=false,
-            Action<string> outputWriter = null, 
+        public static void RecalculateTasks(int? threads = null, bool debug = false,
+            Action<string> outputWriter = null,
             Action<Devmasters.Batch.ActionProgressData> progressWriter = null
             )
         {
@@ -37,134 +34,109 @@ namespace HlidacStatu.Repositories.Statistics
             }
 
 
-            var allItems = GetItemsFromProcessingQueue(numFromQueue, threads.Value, outputWriter,progressWriter,debug);
-            var uniqueItems = allItems.Distinct(comparer);
+            var allItems = GetItemsFromProcessingQueue(numFromQueue, threads.Value, outputWriter, progressWriter, debug);
+            List<RecalculateItem> uniqueItems = allItems.Distinct(comparer).ToList();
 
-            using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
-                RECALCULATIONQUEUENAME,
-                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
-                ))
-            {
-                q.Send(uniqueItems);                
-            }
+            //using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
+            //    RECALCULATIONQUEUENAME,
+            //    Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+            //    ))
+            //{
+            //    q.Send(uniqueItems);
+            //}
+
+            start:
 
             log.Info("{method} Starting with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, threads.Value);
             if (debug)
+                Console.WriteLine($"getting from queue {uniqueItems.Count()} items");
+
+
+            //var queueItems = GetFromProcessingQueueWithParents(threads.Value*threads.Value, threads.Value, outputWriter, progressWriter, debug);
+            if (debug)
+                Console.WriteLine($"got from queue {uniqueItems.Count()} items");
+
+            log.Info("{method} Starting Subjekt statistics recalculate for {count} subjects with {numOfThreads} threads",
+                uniqueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt), MethodBase.GetCurrentMethod().Name, threads.Value);
+            // rebuild cache for subjekt
+
+
+
+            Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(uniqueItems.Where(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt),
+                item =>
+                {
+                    var f = Firmy.Get(item.Id);
+                    if (f != null)
+                    {
+                        if (debug)
+                            Console.WriteLine($"start statistics {f.ICO} {f.Jmeno}");
+                        switch (item.StatisticsType)
+                        {
+                            case RecalculateItem.StatisticsTypeEnum.Smlouva:
+                                _ = f.StatistikaRegistruSmluv(forceUpdateCache: true);
+                                _ = f.HoldingStatisticsRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);                                
+                                break;
+                            case RecalculateItem.StatisticsTypeEnum.VZ:
+                                _ = f.StatistikaVerejneZakazky(forceUpdateCache: true);
+                                _ = f.HoldingStatistikaVerejneZakazky(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
+                                break;
+                            case RecalculateItem.StatisticsTypeEnum.Dotace:
+                                _ = f.StatistikaDotaci(forceUpdateCache: true);
+                                _ = f.HoldingStatistikaDotaci( DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
+                                break;
+                            default:
+                                break;
+                        }
+                        _ = f.InfoFacts(forceUpdateCache: true);
+
+                        if (debug)
+                            Console.WriteLine($"end statistics {f.ICO} {f.Jmeno}");
+                    }
+                    return new Devmasters.Batch.ActionOutputData();
+                },
+                outputWriter, progressWriter,
+                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
+                monitor: new MonitoredTaskRepo.ForBatch()
+                );
+
+            log.Info("{method} Starting Subjekt-Holding statistics recalculate for {count} subjects with {numOfThreads} threads",
+                uniqueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt), MethodBase.GetCurrentMethod().Name, threads.Value);
+
+       
+            log.Info("{method} Starting Osoba statistics recalculate for {count} subjects with {numOfThreads} threads",
+                uniqueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Person), MethodBase.GetCurrentMethod().Name, threads.Value);
+            // rebuild cache for person 
+            Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(
+                uniqueItems.Where(m => m.ItemType == RecalculateItem.ItemTypeEnum.Person),
+                item =>
+                {
+                    var o = Osoby.GetByNameId.Get(item.Id);
+                    if (o != null)
+                    {
+                        if (debug)
+                            Console.WriteLine($"start statistics osoba {o.NameId}");
+                        _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
+                        _ = o.InfoFactsCached(forceUpdateCache: true);
+                        if (debug)
+                            Console.WriteLine($"end statistics osoba {o.NameId}");
+                    }
+
+                    return new Devmasters.Batch.ActionOutputData();
+                },
+                outputWriter, progressWriter,
+                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
+                monitor: new MonitoredTaskRepo.ForBatch()
+                );
+
+
+            if (debug)
                 Console.WriteLine($"getting from queue {numFromQueue} items");
 
-
-            var queueItems = GetFromProcessingQueueWithParents(threads.Value*threads.Value, threads.Value, outputWriter, progressWriter, debug);
-            if (debug)
-                Console.WriteLine($"got from queue {queueItems.Count()} items");
-
-            while (queueItems.Count() > 0)
-            {
-                log.Info("{method} Starting Subjekt statistics recalculate for {count} subjects with {numOfThreads} threads",
-                    queueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt),MethodBase.GetCurrentMethod().Name, threads.Value);
-                // rebuild cache for subjekt
-                Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(queueItems.Where(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt),
-                    item =>
-                    {
-                        var f = Firmy.Get(item.Id);
-                        if (f != null)
-                        {
-                            if (debug)
-                                Console.WriteLine($"start statistics {f.ICO} {f.Jmeno}");
-                            switch (item.StatisticsType)
-                            {
-                                case RecalculateItem.StatisticsTypeEnum.Smlouva:
-                                    _ = f.StatistikaRegistruSmluv(forceUpdateCache: true);
-                                    break;
-                                case RecalculateItem.StatisticsTypeEnum.VZ:
-                                    _ = f.StatistikaVerejneZakazky(forceUpdateCache: true);
-                                    break;
-                                case RecalculateItem.StatisticsTypeEnum.Dotace:
-                                    _ = f.StatistikaDotaci(forceUpdateCache: true);
-                                    break;
-                                default:
-                                    break;
-                            }
-                            if (debug)
-                                Console.WriteLine($"end statistics {f.ICO} {f.Jmeno}");
-                        }
-                        return new Devmasters.Batch.ActionOutputData();
-                    },
-                    outputWriter, progressWriter,
-                    !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
-                    monitor: new MonitoredTaskRepo.ForBatch()
-                    );
-
-                log.Info("{method} Starting Subjekt-Holding statistics recalculate for {count} subjects with {numOfThreads} threads",
-                    queueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt), MethodBase.GetCurrentMethod().Name, threads.Value);
-
-                // rebuild cache for subjekt holding
-                Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(queueItems.Where(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt),
-                    item =>
-                    {
-                        var f = Firmy.Get(item.Id);
-                        if (f != null)
-                        {
-                            if (debug)
-                                Console.WriteLine($"start holding statistics {f.ICO} {f.Jmeno}");
-                            switch (item.StatisticsType)
-                            {
-                                case RecalculateItem.StatisticsTypeEnum.Smlouva:
-                                    _ = f.HoldingStatisticsRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
-                                    break;
-                                case RecalculateItem.StatisticsTypeEnum.VZ:
-                                    _ = f.HoldingStatistikaVerejneZakazky(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
-                                    break;
-                                case RecalculateItem.StatisticsTypeEnum.Dotace:
-                                    _ = f.HoldingStatistikaDotaci(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
-                                    break;
-                                default:
-                                    break;
-                            }
-                            _ = f.InfoFacts(forceUpdateCache: true);
-
-                            if (debug)
-                                Console.WriteLine($"end holding statistics {f.ICO} {f.Jmeno}");
-
-                        }
-                        return new Devmasters.Batch.ActionOutputData();
-                    },
-                    outputWriter, progressWriter,
-                    !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
-                    monitor: new MonitoredTaskRepo.ForBatch()
-                    );
-
-                log.Info("{method} Starting Osoba statistics recalculate for {count} subjects with {numOfThreads} threads",
-                    queueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Person), MethodBase.GetCurrentMethod().Name, threads.Value);
-                // rebuild cache for person 
-                Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(
-                    queueItems.Where(m => m.ItemType == RecalculateItem.ItemTypeEnum.Person),
-                    item =>
-                    {
-                        var o = Osoby.GetByNameId.Get(item.Id);
-                        if (o != null)
-                        {
-                            if (debug)
-                                Console.WriteLine($"start statistics osoba {o.NameId}");
-                            _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
-                            _ = o.InfoFactsCached(forceUpdateCache: true);
-                            if (debug)
-                                Console.WriteLine($"end statistics osoba {o.NameId}");
-                        }
-
-                        return new Devmasters.Batch.ActionOutputData();
-                    },
-                    outputWriter, progressWriter,
-                    !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
-                    monitor: new MonitoredTaskRepo.ForBatch()
-                    );
-
-
-                if (debug)
-                    Console.WriteLine($"getting from queue {numFromQueue} items");
-                queueItems = GetFromProcessingQueueWithParents(threads.Value * threads.Value, threads.Value,outputWriter,progressWriter,debug);
-                if (debug)
-                    Console.WriteLine($"got from queue {queueItems.Count()} items");
-            }
+            allItems = GetItemsFromProcessingQueue(numFromQueue, threads.Value, outputWriter, progressWriter, debug);
+            uniqueItems = allItems.Distinct(comparer).ToList();
+            if (uniqueItems.Count > 0)
+                goto start;
+            
 
             log.Info("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
 
@@ -182,7 +154,7 @@ namespace HlidacStatu.Repositories.Statistics
             else
                 list.Add(item);
 
-            log.Debug("{method} expanding "+ item.ItemType.ToString() + " {name} to {count} items",
+            log.Debug("{method} expanding " + item.ItemType.ToString() + " {name} to {count} items",
                 MethodBase.GetCurrentMethod().Name, item.Id, list.Count);
 
             return list;
@@ -226,7 +198,7 @@ namespace HlidacStatu.Repositories.Statistics
             Firma f, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy, int deep)
         {
             log.Verbose("{method} expanding {ico} {subjekt} vazby, recursive deep {deep}, current list {count} items",
-                    MethodBase.GetCurrentMethod().Name,f.ICO, f.Jmeno, deep, list.Count);
+                    MethodBase.GetCurrentMethod().Name, f.ICO, f.Jmeno, deep, list.Count);
 
             //StackOverflow defense
             if (list.Count > 10_000)
@@ -243,7 +215,7 @@ namespace HlidacStatu.Repositories.Statistics
             var parents = f.ParentFirmy(DS.Graphs.Relation.AktualnostType.Nedavny);
             foreach (var ff in parents)
             {
-                var ff_it = new RecalculateItem(ff, statsType,provokeBy);
+                var ff_it = new RecalculateItem(ff, statsType, provokeBy);
                 if (list.Contains(ff_it, comparer) == false)
                     FirmaForQueue(list, ff, statsType, provokeBy, deep + 1);
             }
@@ -280,13 +252,13 @@ namespace HlidacStatu.Repositories.Statistics
         public static void Debug()
         {
             var fakeList = new System.Collections.Concurrent.ConcurrentBag<RecalculateItem>();
-            var item = new RecalculateItem(Firmy.Get("00000205"), RecalculateItem.StatisticsTypeEnum.VZ,"recalculateDebug");
+            var item = new RecalculateItem(Firmy.Get("00000205"), RecalculateItem.StatisticsTypeEnum.VZ, "recalculateDebug");
             List<RecalculateItem> cascade = CascadeItems(item, ref fakeList);
 
         }
 
         public static IEnumerable<RecalculateItem> GetFromProcessingQueueWithParents(int count, int threads,
-            Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null, bool debug=false)
+            Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null, bool debug = false)
         {
             IEnumerable<RecalculateItem> res = GetItemsFromProcessingQueue(count, threads, outputWriter, progressWriter, debug);
 
