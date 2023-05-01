@@ -14,7 +14,7 @@ namespace HlidacStatu.Repositories.Statistics
     {
         static Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
            _VZCache = Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, Firma>
-               .GetSafeInstance("Firma_VZStatistics",
+               .GetSafeInstance("Firma_VZStatistics_",
                     (firma) => CalculateVZStat(firma),
                     TimeSpan.Zero,
                     Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
@@ -24,7 +24,7 @@ namespace HlidacStatu.Repositories.Statistics
 
         static Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
            _holdingVZCache = Devmasters.Cache.Elastic.Manager<StatisticsSubjectPerYear<Firma.Statistics.VZ>, (Firma firma, HlidacStatu.DS.Graphs.Relation.AktualnostType aktualnost)>
-               .GetSafeInstance("Holding_VZStatistics",
+               .GetSafeInstance("Holding_VZStatistics_",
                    (obj) => CalculateHoldingVZStat(obj.firma, obj.aktualnost),
                    TimeSpan.Zero,
 Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),

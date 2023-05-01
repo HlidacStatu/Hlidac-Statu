@@ -263,9 +263,9 @@
 
         @if (statistics.Summary().PocetSmluv > 0)
         {
-        <p>
-            V registru smluv evidujeme @Html.Raw(statistics.Summary().ToNiceString(null,true,$"/hledat?q=ico:{Model.ICO}"))
-        </p>
+            <p>
+                V registru smluv evidujeme @Html.Raw(statistics.Summary().ToNiceString(null,true,$"/hledat?q=ico:{Model.ICO}"))
+            </p>
         }
         <p>
             V roce @(currentSeasonYear) uzavřel @(Model.JsemOVM() ? "úřad" : "subjekt")
@@ -379,13 +379,12 @@
         </p>
         @{
             var profilyZadavatele = (await ProfilZadavateleRepo.GetByIcoAsync(Model.ICO));
-            var resVZdodav = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("icododavatel:" + Model.ICO, null, 1, 0, "1");
-            var resVZzadav = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync("icozadavatel:" + Model.ICO, null, 1, 0, "1");
+            var vzStat = Model.StatistikaVerejneZakazky();
             Dictionary<string, long> vzakaz = new();
-            vzakaz.Add("dodavatel|dodavatel|dodavatele|dodavatelem", resVZdodav.Total);
-            vzakaz.Add("zadavatel|zadavatel|zadavatele|zadavatelem", resVZzadav.Total);
+            vzakaz.Add("dodavatel|dodavatel|dodavatele|dodavatelem", vzStat.Summary().PocetJakoDodavatel);
+            vzakaz.Add("zadavatel|zadavatel|zadavatele|zadavatelem", vzStat.Summary().PocetJakoZadavatel);
 
-            if (resVZdodav.Total + resVZzadav.Total > 0)
+            if (vzStat.Summary().PocetJakoDodavatel + vzStat.Summary().PocetJakoZadavatel > 0)
             {
                 <p>
                     @Model.Jmeno se vyskytuje
@@ -403,18 +402,67 @@
                         }
                     </ul>
                 </p>
+
+                <div class="row">
+                    <div class="col-sm-12 col-xs-12">
+                        <hr />
+                        @{
+                            var vzStatChart = vzStat
+                                .OrderBy(s => s.Year)
+                                .ToList();
+                            //Graf hodnota smluv
+                            var hodnotaVZGraphData = new Series[]
+                            {
+                new()
+                {
+                Name = "Hodnota zakázek jako zadavatel",
+                Type = Series.SeriesType.column,
+                Data = vzStatChart
+                .Select(x => new SeriesData(x.Year, x.Value.CelkovaHodnotaJakoZadavatel)).ToArray(),
+                SeriesTooltip = new SeriesTooltip()
+                {
+                ValueSuffix = " Kč"
+                }
+                },
+                new()
+                {
+                Name = "Hodnota zakázek jako dodavatel",
+                Type = Series.SeriesType.column,
+                Data = vzStatChart
+                .Select(x => new SeriesData(x.Year, x.Value.CelkovaHodnotaJakoDodavatel)).ToArray(),
+                SeriesTooltip = new SeriesTooltip()
+                {
+                ValueSuffix = " Kč"
+                }
+                },
+                new()
+                {
+                Name = "Počet zakázek",
+                Data = vzStatChart
+                .Select(x => new SeriesData(x.Year, x.Value.PocetJakoDodavatel +x.Value.PocetJakoZadavatel)).ToArray(),
+                Type = Series.SeriesType.line,
+
+                }
+                            };
+                        }
+                        @Html.ColumnGraph("Hodnota veřejných zakázek po letech", hodnotaVZGraphData, yTitleRight: "Počet veřejných zakázek")
+                    </div>
+
+                </div>
+
+
             }
             if (profilyZadavatele?.Count() > 0)
             {
                 <p>
                     U subjektu registrujeme @Html.Raw(Devmasters.Lang.CS.Plural.Get(profilyZadavatele.Count(),
-                        "jeden profil zadavatele","{0} profily zadavatele","{0} profilů zadavatele")).
+            "jeden profil zadavatele","{0} profily zadavatele","{0} profilů zadavatele")).
                 </p>
                 <p>
                     <ul>
                         @foreach (var pz in profilyZadavatele)
                         {
-                            <li><a target="_blank" href="@pz.Url">@(pz.Url.Length >=40 ? pz.Url.Substring(0,40)+"..." : pz.Url)</a> (uveřejněn @(pz.DatumUverejneni?.ToString("dd. MM. yyyy")))</li>
+                            <li><a target="_blank" href="@pz.Url">@(pz.Url.Length >= 40 ? pz.Url.Substring(0, 40) + "..." : pz.Url)</a> (uveřejněn @(pz.DatumUverejneni?.ToString("dd. MM. yyyy")))</li>
                         }
                     </ul>
                 </p>
