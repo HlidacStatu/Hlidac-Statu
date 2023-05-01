@@ -8,32 +8,29 @@ namespace HlidacStatu.Entities
         {
             public partial class VZ : CoreStat, IAddable<VZ>
             {
-                public long PocetVypsanychVZ { get; set; } = 0;
-                public decimal PocetUcastiVeVZ { get; set; } = 0;
-                public long PocetVyherVeVZ { get; set; }
-                public decimal CelkovaHodnotaVypsanychVZ { get; set; } = 0;
-                public decimal CelkoveHodnotaVZsUcasti { get; set; }
+                public long PocetJakoDodavatel { get; set; } = 0;
+                public long PocetJakoZadavatel { get; set; } = 0;
+                public decimal CelkovaHodnotaJakoDodavatel { get; set; } = 0m;
+                public decimal CelkovaHodnotaJakoZadavatel { get; set; } = 0m;
 
                 public VZ Add(VZ other)
                 {
                     return new VZ()
                     {
-                        PocetUcastiVeVZ = PocetUcastiVeVZ + (other?.PocetUcastiVeVZ ?? 0),
-                        PocetVyherVeVZ = PocetVyherVeVZ + (other?.PocetVyherVeVZ ?? 0),
-                        PocetVypsanychVZ = PocetVypsanychVZ + (other?.PocetVypsanychVZ ?? 0),
-                        CelkovaHodnotaVypsanychVZ = CelkovaHodnotaVypsanychVZ + (other?.CelkovaHodnotaVypsanychVZ ?? 0),
-                        CelkoveHodnotaVZsUcasti = CelkoveHodnotaVZsUcasti + (other?.CelkoveHodnotaVZsUcasti ?? 0),
+                        PocetJakoDodavatel = PocetJakoDodavatel + (other?.PocetJakoDodavatel ?? 0),
+                        PocetJakoZadavatel = PocetJakoZadavatel + (other?.PocetJakoZadavatel ?? 0),
+                        CelkovaHodnotaJakoDodavatel = CelkovaHodnotaJakoDodavatel + (other?.CelkovaHodnotaJakoDodavatel ?? 0),
+                        CelkovaHodnotaJakoZadavatel = CelkovaHodnotaJakoZadavatel + (other?.CelkovaHodnotaJakoZadavatel ?? 0),
                     };
                 }
                 public VZ Subtract(VZ other)
                 {
                     return new VZ()
                     {
-                        PocetUcastiVeVZ = PocetUcastiVeVZ - (other?.PocetUcastiVeVZ ?? 0),
-                        PocetVyherVeVZ = PocetVyherVeVZ - (other?.PocetVyherVeVZ ?? 0),
-                        PocetVypsanychVZ = PocetVypsanychVZ - (other?.PocetVypsanychVZ ?? 0),
-                        CelkovaHodnotaVypsanychVZ = CelkovaHodnotaVypsanychVZ - (other?.CelkovaHodnotaVypsanychVZ ?? 0),
-                        CelkoveHodnotaVZsUcasti = CelkoveHodnotaVZsUcasti - (other?.CelkoveHodnotaVZsUcasti ?? 0),
+                        PocetJakoDodavatel = PocetJakoDodavatel - (other?.PocetJakoDodavatel ?? 0),
+                        PocetJakoZadavatel = PocetJakoZadavatel - (other?.PocetJakoZadavatel ?? 0),
+                        CelkovaHodnotaJakoDodavatel = CelkovaHodnotaJakoDodavatel - (other?.CelkovaHodnotaJakoDodavatel ?? 0),
+                        CelkovaHodnotaJakoZadavatel = CelkovaHodnotaJakoZadavatel - (other?.CelkovaHodnotaJakoZadavatel ?? 0),
                     };
                 }
 

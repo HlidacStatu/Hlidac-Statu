@@ -285,7 +285,8 @@ namespace HlidacStatu.Repositories
 
             public static Task<VerejnaZakazkaSearchData> SimpleSearchAsync(string query, string[] cpv,
                 int page, int pageSize, string order, bool Zahajeny = false, bool withHighlighting = false,
-                bool exactNumOfResults = false, string oblast = "", CancellationToken cancellationToken = default)
+                bool exactNumOfResults = false, string oblast = "", 
+                AggregationContainerDescriptor<Entities.VZ.VerejnaZakazka> anyAggregation = null, CancellationToken cancellationToken = default)
                 =>  SimpleSearchAsync(
                         new VerejnaZakazkaSearchData()
                         {
@@ -298,8 +299,8 @@ namespace HlidacStatu.Repositories
                             Zahajeny = Zahajeny,
                             Oblast = oblast,
                             ExactNumOfResults = exactNumOfResults
-                        }, withHighlighting: withHighlighting
-                        ,cancellationToken: cancellationToken
+                        }, withHighlighting: withHighlighting, anyAggregation: anyAggregation
+                        , cancellationToken: cancellationToken
                     );
 
             public static async Task<VerejnaZakazkaSearchData> SimpleSearchAsync(
