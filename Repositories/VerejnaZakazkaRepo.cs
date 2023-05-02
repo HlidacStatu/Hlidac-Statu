@@ -144,6 +144,8 @@ namespace HlidacStatu.Repositories
                 
 
                 SendToOcrQueue(firstVz);
+
+                FixPublicationDate(firstVz);
                 
                 await elasticClient.IndexDocumentAsync<VerejnaZakazka>(firstVz);
                 
@@ -153,6 +155,14 @@ namespace HlidacStatu.Repositories
             {
                 Consts.Logger.Error(
                     $"VZ ERROR Upserting ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}", e);
+            }
+        }
+
+        private static void FixPublicationDate(VerejnaZakazka firstVz)
+        {
+            if (firstVz.DatumUverejneni is null && firstVz.FirstPublishedDocument() != null)
+            {
+                firstVz.DatumUverejneni = firstVz.FirstPublishedDocument()?.VlozenoNaProfil;
             }
         }
 

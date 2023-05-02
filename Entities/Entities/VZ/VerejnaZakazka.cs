@@ -414,6 +414,10 @@ namespace HlidacStatu.Entities.VZ
             {
                 return LastestFormular().Zverejnen;
             }
+            else if (LastestModifiedDocument() != null)
+            {
+                return LastestModifiedDocument().LastUpdate;
+            }
             else if (DatumUverejneni.HasValue)
             {
                 return DatumUverejneni;
@@ -422,7 +426,6 @@ namespace HlidacStatu.Entities.VZ
             {
                 return null;
             }
-
         }
 
 
@@ -660,6 +663,25 @@ namespace HlidacStatu.Entities.VZ
             else
                 return null;
         }
+        
+        public Document LastestModifiedDocument()
+        {
+            if (Dokumenty != null)
+                return Dokumenty.Where(document => document.LastUpdate is not null)
+                    .MaxBy(document => document.LastUpdate);
+            else
+                return null;
+        }
+        
+        public Document FirstPublishedDocument()
+        {
+            if (Dokumenty != null)
+                return Dokumenty.Where(document => document.VlozenoNaProfil is not null)
+                    .MinBy(document => document.VlozenoNaProfil);
+            else
+                return null;
+        }
+        
 
         static string cisloZakazkyRegex = @"Evidenční \s* číslo \s* zakázky: \s*(?<zakazka>(Z?)\d{1,8}([-]*\d{1,7})?)\s+";
         static string cisloConnectedFormRegex = @"Evidenční \s* číslo \s* souvisejícího \s* formuláře: \s*(?<zakazka>(F?)\d{1,8}([-]*\d{1,7})?)\s+";
