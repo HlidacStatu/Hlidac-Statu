@@ -1,6 +1,7 @@
 @using HlidacStatu.Entities
 @using System.Threading
 @using System.Text.Json
+@using System.Web
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.Util
@@ -313,8 +314,8 @@
         {
             (string qs, string qtl) = ParseTools.CreateQueryWithOffsets(
                 autocomplete.Select(i => i.Value?.Id ?? i.Text ?? "").ToList());
-
-            string url = $"{Navigation.BaseUri}{SearchPath}?q={qs}&qtl={qtl}";
+            
+            string url = $"{Navigation.BaseUri}{SearchPath}?q={HttpUtility.UrlEncode(qs)}&qtl={qtl}";
             Navigation.NavigateTo(url, true);
         }
         catch (Exception e)
