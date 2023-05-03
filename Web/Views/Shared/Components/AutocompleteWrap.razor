@@ -263,7 +263,7 @@
         }
         catch (Exception e)
         {
-            Util.Consts.Logger.Error("During autocomplete usage an error occured. CreateAutocompleteItemFromQuery in Wrapper.", e);
+            Util.Consts.Logger.Error($"During autocomplete usage an error occured. CreateAutocompleteItemFromQuery in Wrapper. Parsed query [{parsedQuery}]", e);
         }
         
         return new AutocompleteItem<Autocomplete>(parsedQuery);
