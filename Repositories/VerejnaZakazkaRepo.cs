@@ -158,7 +158,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private static void FixPublicationDate(VerejnaZakazka firstVz)
+        public static void FixPublicationDate(VerejnaZakazka firstVz)
         {
             if (firstVz.DatumUverejneni is null && firstVz.FirstPublishedDocument() != null)
             {
