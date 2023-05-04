@@ -269,7 +269,8 @@
         }
         catch (Exception e)
         {
-            Util.Consts.Logger.Error($"During autocomplete usage an error occured. CreateAutocompleteItemFromQuery in Wrapper. Parsed query [{parsedQuery}]", e);
+            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+            Util.Consts.Logger.Error($"During autocomplete usage an error occured. CreateAutocompleteItemFromQuery in Wrapper. Parsed query [{parsedQuery}], uri=[{uri}]", e);
         }
         
         return new AutocompleteItem<Autocomplete>(parsedQuery);
