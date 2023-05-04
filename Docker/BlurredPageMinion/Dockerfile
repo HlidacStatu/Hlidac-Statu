@@ -4,7 +4,7 @@
 FROM hlidacstatu/opencvbase AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0-focal AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy AS build
 WORKDIR /src
 COPY ["Hlidac-Statu/Docker/BlurredPageMinion/BlurredPageMinion.csproj", "Hlidac-Statu/Docker/BlurredPageMinion/"]
 RUN dotnet restore "Hlidac-Statu/Docker/BlurredPageMinion/BlurredPageMinion.csproj"
