@@ -223,33 +223,39 @@
             if (parsedQuery.StartsWith("osobaid:", StringComparison.InvariantCultureIgnoreCase))
             {
                 var osoba = OsobaRepo.GetByNameId(parsedQuery.Substring(8));
-                return new AutocompleteItem<Autocomplete>(new Autocomplete()
+                if (osoba is not null)
                 {
-                    Id = parsedQuery,
-                    Text = osoba.FullName(),
-                    Category = Autocomplete.CategoryEnum.Person
-                });
+                    return new AutocompleteItem<Autocomplete>(new Autocomplete()
+                    {
+                        Id = parsedQuery,
+                        Text = osoba.FullName(),
+                        Category = Autocomplete.CategoryEnum.Person
+                    });
+                }
             }
             else if (parsedQuery.StartsWith("ico:", StringComparison.InvariantCultureIgnoreCase))
             {
                 var firma = FirmaRepo.FromIco(parsedQuery.Substring(4));
+                if (firma is not null)
+                {
+                    Autocomplete.CategoryEnum kategorie = Autocomplete.CategoryEnum.Company;
+                    if (firma.TypSubjektu == Firma.TypSubjektuEnum.Obec)
+                    {
+                        kategorie = Autocomplete.CategoryEnum.City;
+                    }
+                    else if (firma.Kod_PF > 110 && firma.JsemOVM() && firma.IsInRS == 1)
+                    {
+                        kategorie = Autocomplete.CategoryEnum.Authority;
+                    }
 
-                Autocomplete.CategoryEnum kategorie = Autocomplete.CategoryEnum.Company;
-                if (firma.TypSubjektu == Firma.TypSubjektuEnum.Obec)
-                {
-                    kategorie = Autocomplete.CategoryEnum.City;
-                }
-                else if (firma.Kod_PF > 110 && firma.JsemOVM() && firma.IsInRS == 1)
-                {
-                    kategorie = Autocomplete.CategoryEnum.Authority;
+                    return new AutocompleteItem<Autocomplete>(new Autocomplete()
+                    {
+                        Id = parsedQuery,
+                        Text = firma.Jmeno,
+                        Category = kategorie
+                    });
                 }
 
-                return new AutocompleteItem<Autocomplete>(new Autocomplete()
-                {
-                    Id = parsedQuery,
-                    Text = firma.Jmeno,
-                    Category = kategorie
-                });
             }
             else if (parsedQuery.StartsWith("oblast:", StringComparison.InvariantCultureIgnoreCase))
             {

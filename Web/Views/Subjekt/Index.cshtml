@@ -790,7 +790,7 @@
         <p>
             V roce @currentSeasonYear byly největšími smluvními dodavateli @(Model.JsemOVM() ? "úřadu" : "subjektu") společnosti
             <ul>
-                @Html.Raw(string.Join("", topDodavatele.Take(6).Select(m => $"<li><a href='{m}'>{Firmy.GetJmeno(m)}</a></li>")))
+                @Html.Raw(string.Join("", topDodavatele.Take(6).Select(m => $"<li><a href='/subjekt/{m}'>{Firmy.GetJmeno(m)}</a></li>")))
             </ul>
         </p>
         <a href="/subjekt/dodavatele/@Model.ICO" class="moreinfolink text-uppercase"><strong>Zobrazit podrobnosti o všech dodavatelích</strong></a>
@@ -811,7 +811,7 @@
         <p>
             V roce @currentSeasonYear byly největšími smluvními odběrateli @(Model.JsemOVM() ? "úřadu" : "subjektu") společnosti
             <ul>
-                @Html.Raw(string.Join("", topOdberatele.Take(6).Select(m => $"<li><a href='{m}'>{Firmy.GetJmeno(m)}</a></li>")))
+                @Html.Raw(string.Join("", topOdberatele.Take(6).Select(m => $"<li><a href='/subjekt/{m}'>{Firmy.GetJmeno(m)}</a></li>")))
             </ul>
         </p>
         <a href="/subjekt/odberatele/@Model.ICO" class="moreinfolink text-uppercase"><strong>Zobrazit podrobnosti o všech odběratelích</strong></a>
