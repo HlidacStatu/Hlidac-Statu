@@ -2,7 +2,6 @@
 
     <PropertyGroup>
                 <TargetFramework>net7.0</TargetFramework>
-<TargetFramework>net7.0</TargetFramework>
         <AssemblyName>HlidacStatu.Repositories</AssemblyName>
         <RootNamespace>HlidacStatu.Repositories</RootNamespace>
     </PropertyGroup>
@@ -27,7 +26,6 @@
       <PackageReference Include="InfluxDB.Client" Version="4.12.0" />
       <PackageReference Include="NEST" Version="7.17.5" />
       <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
-      <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
       <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
     </ItemGroup>
 
