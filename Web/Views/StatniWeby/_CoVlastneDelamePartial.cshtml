@@ -1,0 +1,18 @@
+<div class="bs-callout primary">
+    <h4>Hlídání dostupnosti státní webů. Co to vlastně děláme?</h4>
+    <p>
+        Měříme každou minutu, zda důležité weby státu vůbec běží, a pokud ano, tak jak rychle odpovídají. A tomu odpovídají i zobrazené barvy.
+        Pokud služba odpovídá rychle, dáváme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.OK))">zelenou - v pořádku</b>.
+        Pokud odpovídá déle, dáváme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Pomalé))">oranžovou - pomalá odpověď.</b>.
+        Pokud neodpoví nebo odpoví za dlouhou dobu, použijeme <b style="color:@(UptimeServer.Availability.GetStatusChartColor(UptimeSSL.Statuses.Nedostupné))">červenou za nedostupnost</b>.
+    </p>
+    @if (ViewData.ContainsKey("DisplayHttpsRating") && (bool)ViewData["DisplayHttpsRating"])
+    {
+        <p>
+            Systém hodnocení HTTPS je jednoduchý: A+ je nejlepší známka, F nejhorší, M znamená špatné jméno serveru v certifikátu, T znamená špatný certifikát, X že zabezpečený přenos není vůbec podporován.
+        </p>
+    }
+    <p>
+        <a href="@Url.Action("JakMerime", "StatniWeby")">Podrobný popis měření a hodnocení</a>.
+    </p>
+</div>
