@@ -21,7 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="AutocompleteBasicIndexes" />
       <Folder Include="Properties" />
     </ItemGroup>
 

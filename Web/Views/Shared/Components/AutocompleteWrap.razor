@@ -284,6 +284,8 @@
             PropertyNameCaseInsensitive = true
         };
 
+        query = HttpUtility.UrlEncode(query);
+
         var autocompletePath = $"/autocomplete/autocomplete?q={query}";
 
         var uri = new Uri($"{Endpoint}{autocompletePath}");
