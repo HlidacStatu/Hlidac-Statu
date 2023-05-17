@@ -785,58 +785,58 @@ namespace HlidacStatu.Entities.VZ
         public string GetDocumentHash()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(DatumUverejneni);
-            sb.Append(LhutaDoruceni);
-            sb.Append(LhutaPrihlaseni);
-            sb.Append(NazevZakazky);
-            sb.Append(PopisZakazky);
-            sb.Append(PopisZakazkyRozza);
-            sb.Append(DatumUzavreniSmlouvy);
-            sb.Append(VvzInternalId);
-            sb.Append(KonecnaHodnotaMena);
-            sb.Append(OdhadovanaHodnotaMena);
-            sb.Append(KonecnaHodnotaBezDPH);
-            sb.Append(OdhadovanaHodnotaBezDPH);
-            sb.Append(RawHtml);
-            sb.Append(StavVZ);
+            _ = sb.Append(DatumUverejneni)
+                .Append(LhutaDoruceni)
+                .Append(LhutaPrihlaseni)
+                .Append(NazevZakazky)
+                .Append(PopisZakazky)
+                .Append(PopisZakazkyRozza)
+                .Append(DatumUzavreniSmlouvy)
+                .Append(VvzInternalId)
+                .Append(KonecnaHodnotaMena)
+                .Append(OdhadovanaHodnotaMena)
+                .Append(KonecnaHodnotaBezDPH)
+                .Append(OdhadovanaHodnotaBezDPH)
+                .Append(RawHtml)
+                .Append(StavVZ);
             foreach (var dodavatel in Dodavatele)
             {
-                sb.Append(dodavatel.Jmeno);
-                sb.Append(dodavatel.ICO);
-                sb.Append(dodavatel.ProfilZadavatele);
+                _ = sb.Append(dodavatel.Jmeno)
+                    .Append(dodavatel.ICO)
+                    .Append(dodavatel.ProfilZadavatele);
             }
             foreach (var dokument in Dokumenty)
             {
                 if (string.IsNullOrWhiteSpace(dokument.Sha256Checksum))
                 {
-                    sb.Append(dokument.Name);
+                    _ = sb.Append(dokument.Name);
                     foreach (var url in dokument.DirectUrls)
                     {
-                        sb.Append(url);
+                        _ = sb.Append(url);
                     }
                     foreach (var url in dokument.OficialUrls)
                     {
-                        sb.Append(url);
+                        _ = sb.Append(url);
                     }
                     foreach (var sid in dokument.StorageIds)
                     {
-                        sb.Append(sid);
+                        _ = sb.Append(sid);
                     }
                 }
                 else
                 {
-                    sb.Append(dokument.Sha256Checksum);
+                    _= sb.Append(dokument.Sha256Checksum);
                 }
             }
-            sb.AppendJoin(";", Formulare.Select(f => f.GetHashCode()));
-            sb.AppendJoin(";", Zdroje.Select(x => x.UniqueId));
-            sb.AppendJoin(";", ExternalIds);
-            sb.Append(Zadavatel.Jmeno);
-            sb.Append(Zadavatel.ICO);
-            sb.Append(Zadavatel.ProfilZadavatele);
-            sb.AppendJoin(";", ExternalIds);
-            sb.AppendJoin(";", UrlZakazky);
-            sb.AppendJoin(";", CPV);
+            _ = sb.AppendJoin(";", Formulare.Select(f => f.GetHashCode()))
+                .AppendJoin(";", Zdroje.Select(x => x.UniqueId))
+                .AppendJoin(";", ExternalIds)
+                .Append(Zadavatel.Jmeno)
+                .Append(Zadavatel.ICO)
+                .Append(Zadavatel.ProfilZadavatele)
+                .AppendJoin(";", ExternalIds)
+                .AppendJoin(";", UrlZakazky)
+                .AppendJoin(";", CPV);
 
             return Checksum.DoChecksum(sb.ToString());
         }

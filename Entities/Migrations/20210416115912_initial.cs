@@ -8,25 +8,25 @@ namespace HlidacStatu.Entities.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey("FK_dbo.AspNetUserRoles_dbo.AspNetRoles_RoleId", "AspNetUserRoles");
-            migrationBuilder.DropForeignKey("FK_dbo.AspNetUserRoles_dbo.AspNetUsers_UserId", "AspNetUserRoles");
-            migrationBuilder.DropForeignKey("FK_dbo.AspNetUserClaims_dbo.AspNetUsers_UserId", "AspNetUserClaims");
-            migrationBuilder.DropForeignKey("FK_dbo.AspNetUserLogins_dbo.AspNetUsers_UserId", "AspNetUserLogins");
-            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetRoles", "AspNetRoles");
-            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUserRoles", "AspNetUserRoles");
-            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUsers", "AspNetUsers");
-            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUserClaims", "AspNetUserClaims");
-            migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUserLogins", "AspNetUserLogins");
-            migrationBuilder.DropPrimaryKey("PK_AspNetUserTokens", "AspNetUserTokens");
+            _ = migrationBuilder.DropForeignKey("FK_dbo.AspNetUserRoles_dbo.AspNetRoles_RoleId", "AspNetUserRoles");
+            _ = migrationBuilder.DropForeignKey("FK_dbo.AspNetUserRoles_dbo.AspNetUsers_UserId", "AspNetUserRoles");
+            _ = migrationBuilder.DropForeignKey("FK_dbo.AspNetUserClaims_dbo.AspNetUsers_UserId", "AspNetUserClaims");
+            _ = migrationBuilder.DropForeignKey("FK_dbo.AspNetUserLogins_dbo.AspNetUsers_UserId", "AspNetUserLogins");
+            _ = migrationBuilder.DropPrimaryKey("PK_dbo.AspNetRoles", "AspNetRoles");
+            _ = migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUserRoles", "AspNetUserRoles");
+            _ = migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUsers", "AspNetUsers");
+            _ = migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUserClaims", "AspNetUserClaims");
+            _ = migrationBuilder.DropPrimaryKey("PK_dbo.AspNetUserLogins", "AspNetUserLogins");
+            _ = migrationBuilder.DropPrimaryKey("PK_AspNetUserTokens", "AspNetUserTokens");
 
-            migrationBuilder.RenameTable("AspNetUserRoles", newName: "AspNetUserRoles_old");
-            migrationBuilder.RenameTable("AspNetUserClaims", newName: "AspNetUserClaims_old");
-            migrationBuilder.RenameTable("AspNetUserLogins", newName: "AspNetUserLogins_old");
-            migrationBuilder.RenameTable("AspNetRoles", newName: "AspNetRoles_old");
-            migrationBuilder.RenameTable("AspNetUsers", newName: "AspNetUsers_old");
-            migrationBuilder.RenameTable("AspNetUserTokens", newName: "AspNetUserTokens_old");
+            _ = migrationBuilder.RenameTable("AspNetUserRoles", newName: "AspNetUserRoles_old");
+            _ = migrationBuilder.RenameTable("AspNetUserClaims", newName: "AspNetUserClaims_old");
+            _ = migrationBuilder.RenameTable("AspNetUserLogins", newName: "AspNetUserLogins_old");
+            _ = migrationBuilder.RenameTable("AspNetRoles", newName: "AspNetRoles_old");
+            _ = migrationBuilder.RenameTable("AspNetUsers", newName: "AspNetUsers_old");
+            _ = migrationBuilder.RenameTable("AspNetUserTokens", newName: "AspNetUserTokens_old");
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
@@ -40,7 +40,7 @@ namespace HlidacStatu.Entities.Migrations
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetUserApiTokens",
                 columns: table => new
                 {
@@ -55,7 +55,7 @@ namespace HlidacStatu.Entities.Migrations
                     table.PrimaryKey("PK_AspNetUserApiTokens", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
@@ -80,7 +80,7 @@ namespace HlidacStatu.Entities.Migrations
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -101,7 +101,7 @@ namespace HlidacStatu.Entities.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
@@ -122,7 +122,7 @@ namespace HlidacStatu.Entities.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
@@ -142,7 +142,7 @@ namespace HlidacStatu.Entities.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
@@ -166,7 +166,7 @@ namespace HlidacStatu.Entities.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
+            _ = migrationBuilder.CreateTable(
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
@@ -186,46 +186,46 @@ namespace HlidacStatu.Entities.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
                 unique: true,
                 filter: "[NormalizedName] IS NOT NULL");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
                 table: "AspNetUserClaims",
                 column: "UserId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserLogins_UserId",
                 table: "AspNetUserLogins",
                 column: "UserId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserRoles_RoleId",
                 table: "AspNetUserRoles",
                 column: "RoleId");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "EmailIndex",
                 table: "AspNetUsers",
                 column: "NormalizedEmail");
 
-            migrationBuilder.CreateIndex(
+            _ = migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
 
-            migrationBuilder.Sql(
+            _ = migrationBuilder.Sql(
                 @"insert into AspNetUsers 
                 select Id, UserName, UPPER(UserName), 
                        Email, UPPER(email), EmailConfirmed, 
@@ -236,30 +236,30 @@ namespace HlidacStatu.Entities.Migrations
                   FROM AspNetUsers_old;"
             );
 
-            migrationBuilder.Sql(
+            _ = migrationBuilder.Sql(
                 @"insert into AspNetRoles
                 select Id, Name, UPPER(Name), NEWID()
                 from AspNetRoles_old;"
             );
 
-            migrationBuilder.Sql(
+            _ = migrationBuilder.Sql(
                 @"insert into AspNetUserClaims(UserId, ClaimType, ClaimValue)
                 select UserId, ClaimType, ClaimValue
                 from AspNetUserClaims_old;"
             );
 
-            migrationBuilder.Sql(
+            _ = migrationBuilder.Sql(
                 @"insert into AspNetUserLogins
                 select LoginProvider, ProviderKey, LoginProvider, UserId
                 from AspNetUserLogins_old"
             );
 
-            migrationBuilder.Sql(
+            _ = migrationBuilder.Sql(
                 @"insert into AspNetUserRoles
                 select * from AspNetUserRoles_old;"
             );
 
-            migrationBuilder.Sql(
+            _ = migrationBuilder.Sql(
                 @"insert into AspNetUserApiTokens
                 select * from AspNetUserTokens_old;"
             );

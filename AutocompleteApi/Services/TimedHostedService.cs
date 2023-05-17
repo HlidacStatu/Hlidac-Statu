@@ -42,15 +42,9 @@ public class TimedHostedService : BackgroundService
     {
         var downloadAndUpdateTasks = Enum.GetValues<AutocompleteIndexType>()
             .Select(it => DownloadAndUpdateAsync(it, stoppingToken));
+
+        await Task.WhenAll(downloadAndUpdateTasks);
         
-        if (false && Debugger.IsAttached)
-        {
-            await Task.WhenAll(downloadAndUpdateTasks.First());
-        }
-        else
-        {
-            await Task.WhenAll(downloadAndUpdateTasks);
-        }
     }
 
     private async Task DownloadAndUpdateAsync(AutocompleteIndexType indexType, CancellationToken cancellationToken)

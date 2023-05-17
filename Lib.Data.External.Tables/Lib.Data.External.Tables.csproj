@@ -2,7 +2,6 @@
 
   <PropertyGroup>
             <TargetFramework>net7.0</TargetFramework>
-<TargetFramework>net7.0</TargetFramework>
     <RootNamespace>HlidacStatu.Lib.Data.External.Tables</RootNamespace>
     <Version>1.1.0</Version>
   </PropertyGroup>

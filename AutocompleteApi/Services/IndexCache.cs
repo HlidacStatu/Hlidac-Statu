@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -34,7 +35,7 @@ public class IndexCache
         _httpClientFactory = httpClientFactory;
     }
 
-    private Dictionary<AutocompleteIndexType, DateTime?> LastUpdateRun { get; set; } = new();
+    private ConcurrentDictionary<AutocompleteIndexType, DateTime?> LastUpdateRun { get; set; } = new();
 
     public Status? Status()
     {
@@ -43,7 +44,7 @@ public class IndexCache
 
         return new Status()
         {
-            LastUpdates = LastUpdateRun,
+            LastUpdates = LastUpdateRun.ToDictionary(ks => ks.Key, vs => vs.Value),
             KindexDataStamp = CurrentIndexStamp(AutocompleteIndexType.KIndex),
             CompanyDataStamp = CurrentIndexStamp(AutocompleteIndexType.Company),
             UptimeServerDataStamp = CurrentIndexStamp(AutocompleteIndexType.Uptime),

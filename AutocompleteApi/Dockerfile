@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
@@ -7,7 +7,6 @@ RUN sed -i 's/TLSv1.2/TLSv1.0/g' /etc/ssl/openssl.cnf
 RUN apt-get update && apt-get install -y curl
 
 #folder path from caches
-#COPY AutocompleteBasicIndexes/ /var/Autocomplete_App_Data/autocomplete
 COPY bin/dockerPublish/ .
 
 ENTRYPOINT ["dotnet", "HlidacStatu.AutocompleteApi.dll"]

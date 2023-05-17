@@ -2,7 +2,6 @@
 
     <PropertyGroup>
                 <TargetFramework>net7.0</TargetFramework>
-<TargetFramework>net7.0</TargetFramework>
         <AssemblyName>HlidacStatu.AutocompleteApi</AssemblyName>
         <RootNamespace>HlidacStatu.AutocompleteApi</RootNamespace>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
@@ -22,7 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="AutocompleteBasicIndexes" />
       <Folder Include="Properties" />
     </ItemGroup>
 

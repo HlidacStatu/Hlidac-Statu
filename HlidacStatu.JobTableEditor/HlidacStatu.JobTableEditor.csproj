@@ -2,7 +2,6 @@
 
     <PropertyGroup>
                 <TargetFramework>net7.0</TargetFramework>
-<TargetFramework>net7.0</TargetFramework>
         <UserSecretsId>aspnet-HlidacStatu.JobTableEditor-644FAF95-3C71-40FC-9CE8-906A59B06239</UserSecretsId>
 		<GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
 

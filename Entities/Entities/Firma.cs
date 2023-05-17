@@ -95,6 +95,7 @@ namespace HlidacStatu.Entities
         [NotMapped]
         public string[] DatovaSchranka { get; set; } = new string[] { };
         public DateTime? Datum_Zapisu_OR { get; set; }
+        public DateTime? DatumZaniku { get; set; }
         public byte? Stav_subjektu { get; set; }
         public int? Status { get; set; }
         public int? Typ { get; set; }
