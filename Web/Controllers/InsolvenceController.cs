@@ -33,6 +33,13 @@ namespace HlidacStatu.Web.Controllers
         {
             if (IsLimitedView())
             {
+                AuditRepo.Add(
+                Audit.Operations.UserSearch
+                , User?.Identity?.Name
+                , HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString()
+                , "Insolvence"
+                , "no_access"
+                , model?.Q,null);
                 return RedirectToAction("PristupOmezen", "Insolvence");
             }
 
