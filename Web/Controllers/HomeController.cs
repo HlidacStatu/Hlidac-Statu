@@ -58,6 +58,22 @@ namespace HlidacStatu.Web.Controllers
 
         }
 
+        [HttpPost]
+        public ActionResult Analyza(string ids)
+        {
+            if (string.IsNullOrWhiteSpace(ids))
+                return View((HlidacStatu.Lib.Analysis.TemplatedQuery)null);
+
+            string[] ids_arr = ids.Split(new string[] { ",", ";", " ", Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+            ids_arr = ids_arr.Select(m => m.Trim()).Where(s => s.Length > 0).ToArray();
+
+            if (ids_arr.Length == 0)
+                return View((HlidacStatu.Lib.Analysis.TemplatedQuery)null);
+
+            var q = $"id:( {string.Join(" OR ", ids_arr)} )";
+            return Analyza("", q, "", "", "",null);
+        }
+        [HttpGet]
         public ActionResult Analyza(string p, string q, string title, string description, string moreUrl, int? y)
         {
             ViewData.Add(Constants.CacheKeyName,

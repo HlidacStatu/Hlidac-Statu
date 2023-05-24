@@ -29,7 +29,7 @@ namespace HlidacStatu.Repositories.Statistics
         public static async Task<StatisticsPerYear<Smlouva.Statistics.Data>> CalculateAsync(string query)
         {
             StatisticsPerYear<SimpleStat> _calc_SeZasadnimNedostatkem =
-                await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND chyby:zasadni", Consts.RegistrSmluvYearsList);
+                await ES.QueryGrouped.SmlouvyPerYearAsync($"( chyby:zasadni ) AND ( {query} )  ", Consts.RegistrSmluvYearsList);
 
             StatisticsPerYear<SimpleStat> _calc_UzavrenoOVikendu =
                 await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND (hint.denUzavreni:>0)",

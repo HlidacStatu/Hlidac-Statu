@@ -626,7 +626,7 @@ namespace HlidacStatu.Web.Framework
             string tableId = "",
             string dataTableOptions = @"{
                          'language': {
-                            'url': '//cdn.datatables.net/plug-ins/1.10.19/i18n/Czech.json'
+                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                         },
                         'order': [],
                         'lengthChange': false,
@@ -634,25 +634,33 @@ namespace HlidacStatu.Web.Framework
                         }",
             string customTableHeader = null)
         {
-
-            var sb = new System.Text.StringBuilder(1024);
             string _tableId = tableId;
             if (string.IsNullOrEmpty(tableId))
             {
                 _tableId = Devmasters.TextUtil.GenRandomString("abcdefghijklmnopqrstuvwxyz", 10);
             }
 
+            if (dataTableOptions.Contains("#id#"))
+            {
+                dataTableOptions = dataTableOptions.Replace("#id#", _tableId);
+            }
+
+            var sb = new System.Text.StringBuilder(1024);
+
             sb.AppendLine(@"<script>
 var tbl_" + _tableId + @";
 $(document).ready(function () {
-tbl_" + _tableId + @" = $('#" + _tableId + @"').DataTable(" + dataTableOptions + @");
+    tbl_" + _tableId + @" = $('#" + _tableId + @"').DataTable(" + dataTableOptions + @");
+
 });
 </script>");
+            //    $('#" + _tableId + @"_btn').html(tbl_" + _tableId + @".buttons().container().html()); 
 
             if (!string.IsNullOrEmpty(rds?.Title))
             {
                 sb.AppendFormat("<h3>{0}</h3>", rds?.Title ?? "");
             }
+            sb.AppendFormat($"<div id='{_tableId}_btn'></div>");
             sb.AppendFormat("<table id=\"{0}\" class=\"table-sorted table table-bordered table-striped\">", _tableId);
             if (customTableHeader == null)
             {

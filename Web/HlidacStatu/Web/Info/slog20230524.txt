@@ -1,0 +1,171 @@
+2023-05-24 14:15:52.449 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-05-24 14:16:27.596 HlidacStatu [INF] Static data - LastBlogPosts
+2023-05-24 14:18:23.141 HlidacStatu [INF] Static data - Init start
+2023-05-24 14:18:23.146 HlidacStatu [INF] Static data - NespolehlivyPlatciDPH 
+2023-05-24 14:18:23.152 HlidacStatu [INF] Static data - Insolvence_firem_politiku 
+2023-05-24 14:18:23.157 HlidacStatu [INF] Static data - SponzorujiciFirmy_Vsechny 
+2023-05-24 14:18:23.161 HlidacStatu [INF] Static data - SponzorujiciFirmy_nedavne
+2023-05-24 14:18:23.166 HlidacStatu [INF] Static data - Politici
+2023-05-24 14:18:29.399 HlidacStatu [INF] Static data - DarujmeStats
+2023-05-24 14:18:29.406 HlidacStatu [INF] Static data - BasicStatisticData 
+2023-05-24 14:18:29.410 HlidacStatu [INF] Static data - FirmySVazbamiNaPolitiky_*
+2023-05-24 14:18:29.414 HlidacStatu [INF] Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*
+2023-05-24 14:18:29.418 HlidacStatu [INF] Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*
+2023-05-24 14:18:29.707 HlidacStatu [INF] Static data - Init DONE
+2023-05-24 14:27:36.093 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-05-24 14:27:51.064 HlidacStatu [INF] Static data - Init start
+2023-05-24 14:27:51.104 HlidacStatu [INF] Static data - NespolehlivyPlatciDPH 
+2023-05-24 14:27:51.146 HlidacStatu [INF] Static data - Insolvence_firem_politiku 
+2023-05-24 14:27:51.153 HlidacStatu [INF] Static data - SponzorujiciFirmy_Vsechny 
+2023-05-24 14:27:51.159 HlidacStatu [INF] Static data - SponzorujiciFirmy_nedavne
+2023-05-24 14:27:51.165 HlidacStatu [INF] Static data - Politici
+2023-05-24 14:28:08.692 HlidacStatu [INF] Static data - LastBlogPosts
+2023-05-24 14:28:09.388 HlidacStatu [INF] Static data - DarujmeStats
+2023-05-24 14:28:09.394 HlidacStatu [INF] Static data - BasicStatisticData 
+2023-05-24 14:28:09.398 HlidacStatu [INF] Static data - FirmySVazbamiNaPolitiky_*
+2023-05-24 14:28:09.403 HlidacStatu [INF] Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*
+2023-05-24 14:28:09.407 HlidacStatu [INF] Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*
+2023-05-24 14:28:09.614 HlidacStatu [INF] Static data - Init DONE
+2023-05-24 14:58:08.899 HlidacStatu [INF] Static data - Mestske_Firmy 
+2023-05-24 14:58:09.824 HlidacStatu [INF] Static data - DatoveSchranky 
+2023-05-24 14:58:24.606 HlidacStatu [INF] Static data - MinisterstvaCache
+2023-05-24 14:58:25.253 HlidacStatu [INF] Static data - FirmyNazvyOnlyAscii
+2023-05-24 15:03:17.981 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-05-24 15:14:11.133 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-05-24 15:14:27.716 HlidacStatu [INF] Static data - LastBlogPosts
+2023-05-24 15:15:44.425 HlidacStatu [INF] Static data - Init start
+2023-05-24 15:15:44.430 HlidacStatu [INF] Static data - NespolehlivyPlatciDPH 
+2023-05-24 15:15:44.434 HlidacStatu [INF] Static data - Insolvence_firem_politiku 
+2023-05-24 15:15:44.438 HlidacStatu [INF] Static data - SponzorujiciFirmy_Vsechny 
+2023-05-24 15:15:44.441 HlidacStatu [INF] Static data - SponzorujiciFirmy_nedavne
+2023-05-24 15:15:44.444 HlidacStatu [INF] Static data - Politici
+2023-05-24 15:15:52.943 HlidacStatu [INF] Static data - DarujmeStats
+2023-05-24 15:15:52.951 HlidacStatu [INF] Static data - BasicStatisticData 
+2023-05-24 15:15:52.955 HlidacStatu [INF] Static data - FirmySVazbamiNaPolitiky_*
+2023-05-24 15:15:52.960 HlidacStatu [INF] Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*
+2023-05-24 15:15:52.966 HlidacStatu [INF] Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*
+2023-05-24 15:15:53.159 HlidacStatu [INF] Static data - Init DONE
+2023-05-24 15:16:27.652 HlidacStatu [INF] Static data - Mestske_Firmy 
+2023-05-24 15:16:29.329 HlidacStatu [INF] Static data - DatoveSchranky 
+2023-05-24 15:16:48.301 HlidacStatu [INF] Static data - MinisterstvaCache
+2023-05-24 15:16:49.287 HlidacStatu [INF] Static data - FirmyNazvyOnlyAscii
+2023-05-24 15:45:03.889 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-05-24 15:45:36.744 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-05-24 15:45:53.352 HlidacStatu [INF] Static data - LastBlogPosts
+2023-05-24 15:46:21.317 HlidacStatu [INF] Static data - Init start
+2023-05-24 15:46:21.323 HlidacStatu [INF] Static data - NespolehlivyPlatciDPH 
+2023-05-24 15:46:21.327 HlidacStatu [INF] Static data - Insolvence_firem_politiku 
+2023-05-24 15:46:21.332 HlidacStatu [INF] Static data - SponzorujiciFirmy_Vsechny 
+2023-05-24 15:46:21.336 HlidacStatu [INF] Static data - SponzorujiciFirmy_nedavne
+2023-05-24 15:46:21.341 HlidacStatu [INF] Static data - Politici
+2023-05-24 15:46:27.454 HlidacStatu [INF] Static data - DarujmeStats
+2023-05-24 15:46:27.464 HlidacStatu [INF] Static data - BasicStatisticData 
+2023-05-24 15:46:27.470 HlidacStatu [INF] Static data - FirmySVazbamiNaPolitiky_*
+2023-05-24 15:46:27.476 HlidacStatu [INF] Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*
+2023-05-24 15:46:27.481 HlidacStatu [INF] Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*
+2023-05-24 15:46:27.708 HlidacStatu [INF] Static data - Init DONE
+2023-05-24 15:50:52.518 HlidacStatu [INF] Static data - Mestske_Firmy 
+2023-05-24 15:50:54.361 HlidacStatu [INF] Static data - DatoveSchranky 
+2023-05-24 15:51:09.537 HlidacStatu [INF] Static data - MinisterstvaCache
+2023-05-24 15:51:10.418 HlidacStatu [INF] Static data - FirmyNazvyOnlyAscii
+2023-05-24 16:03:03.326 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-05-24 16:03:22.583 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-05-24 16:03:39.674 HlidacStatu [INF] Static data - LastBlogPosts
+2023-05-24 22:08:26.489 HlidacStatu [INF] Static data - Init start
+2023-05-24 22:08:26.494 HlidacStatu [INF] Static data - NespolehlivyPlatciDPH 
+2023-05-24 22:08:26.498 HlidacStatu [INF] Static data - Insolvence_firem_politiku 
+2023-05-24 22:08:26.502 HlidacStatu [INF] Static data - SponzorujiciFirmy_Vsechny 
+2023-05-24 22:08:26.506 HlidacStatu [INF] Static data - SponzorujiciFirmy_nedavne
+2023-05-24 22:08:26.510 HlidacStatu [INF] Static data - Politici
+2023-05-24 22:08:33.056 HlidacStatu [INF] Static data - DarujmeStats
+2023-05-24 22:08:33.063 HlidacStatu [INF] Static data - BasicStatisticData 
+2023-05-24 22:08:33.067 HlidacStatu [INF] Static data - FirmySVazbamiNaPolitiky_*
+2023-05-24 22:08:33.072 HlidacStatu [INF] Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*
+2023-05-24 22:08:33.076 HlidacStatu [INF] Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*
+2023-05-24 22:08:33.308 HlidacStatu [INF] Static data - Init DONE
+2023-05-24 22:09:09.185 HlidacStatu [INF] Static data - Mestske_Firmy 
+2023-05-24 22:09:11.494 HlidacStatu [INF] Static data - DatoveSchranky 
+2023-05-24 22:09:27.606 HlidacStatu [INF] Static data - MinisterstvaCache
+2023-05-24 22:09:28.492 HlidacStatu [INF] Static data - FirmyNazvyOnlyAscii
+2023-05-24 22:19:04.031 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-05-24 22:19:22.232 HlidacStatu [INF] Static data - LastBlogPosts
+2023-05-24 22:19:23.872 HlidacStatu [INF] Static data - Init start
+2023-05-24 22:19:23.877 HlidacStatu [INF] Static data - NespolehlivyPlatciDPH 
+2023-05-24 22:19:23.881 HlidacStatu [INF] Static data - Insolvence_firem_politiku 
+2023-05-24 22:19:23.885 HlidacStatu [INF] Static data - SponzorujiciFirmy_Vsechny 
+2023-05-24 22:19:23.889 HlidacStatu [INF] Static data - SponzorujiciFirmy_nedavne
+2023-05-24 22:19:23.892 HlidacStatu [INF] Static data - Politici
+2023-05-24 22:19:36.521 HlidacStatu [INF] Static data - DarujmeStats
+2023-05-24 22:19:36.527 HlidacStatu [INF] Static data - BasicStatisticData 
+2023-05-24 22:19:36.531 HlidacStatu [INF] Static data - FirmySVazbamiNaPolitiky_*
+2023-05-24 22:19:36.536 HlidacStatu [INF] Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*
+2023-05-24 22:19:36.540 HlidacStatu [INF] Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*
+2023-05-24 22:19:36.800 HlidacStatu [INF] Static data - Init DONE
+2023-05-24 22:22:34.043 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-05-24 22:22:51.729 HlidacStatu [INF] Static data - LastBlogPosts
+2023-05-24 22:23:42.035 HlidacStatu [INF] Static data - Init start
+2023-05-24 22:23:42.041 HlidacStatu [INF] Static data - NespolehlivyPlatciDPH 
+2023-05-24 22:23:42.044 HlidacStatu [INF] Static data - Insolvence_firem_politiku 
+2023-05-24 22:23:42.049 HlidacStatu [INF] Static data - SponzorujiciFirmy_Vsechny 
+2023-05-24 22:23:42.052 HlidacStatu [INF] Static data - SponzorujiciFirmy_nedavne
+2023-05-24 22:23:42.055 HlidacStatu [INF] Static data - Politici
+2023-05-24 22:23:48.734 HlidacStatu [INF] Static data - DarujmeStats
+2023-05-24 22:23:48.742 HlidacStatu [INF] Static data - BasicStatisticData 
+2023-05-24 22:23:48.746 HlidacStatu [INF] Static data - FirmySVazbamiNaPolitiky_*
+2023-05-24 22:23:48.749 HlidacStatu [INF] Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*
+2023-05-24 22:23:48.753 HlidacStatu [INF] Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*
+2023-05-24 22:23:48.991 HlidacStatu [INF] Static data - Init DONE
+2023-05-24 22:24:26.543 HlidacStatu [INF] Static data - Mestske_Firmy 
+2023-05-24 22:24:29.061 HlidacStatu [INF] Static data - DatoveSchranky 
+2023-05-24 22:24:44.078 HlidacStatu [INF] Static data - MinisterstvaCache
+2023-05-24 22:24:44.535 HlidacStatu [INF] Static data - FirmyNazvyOnlyAscii
+2023-05-24 22:32:53.978 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-05-24 22:33:12.435 HlidacStatu [INF] Static data - LastBlogPosts
+2023-05-24 22:33:22.494 HlidacStatu [INF] Static data - Init start
+2023-05-24 22:33:22.501 HlidacStatu [INF] Static data - NespolehlivyPlatciDPH 
+2023-05-24 22:33:22.507 HlidacStatu [INF] Static data - Insolvence_firem_politiku 
+2023-05-24 22:33:22.512 HlidacStatu [INF] Static data - SponzorujiciFirmy_Vsechny 
+2023-05-24 22:33:22.516 HlidacStatu [INF] Static data - SponzorujiciFirmy_nedavne
+2023-05-24 22:33:22.520 HlidacStatu [INF] Static data - Politici
+2023-05-24 22:33:36.647 HlidacStatu [INF] Static data - DarujmeStats
+2023-05-24 22:33:36.653 HlidacStatu [INF] Static data - BasicStatisticData 
+2023-05-24 22:33:36.660 HlidacStatu [INF] Static data - FirmySVazbamiNaPolitiky_*
+2023-05-24 22:33:36.666 HlidacStatu [INF] Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*
+2023-05-24 22:33:36.670 HlidacStatu [INF] Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*
+2023-05-24 22:33:36.921 HlidacStatu [INF] Static data - Init DONE
+2023-05-24 22:34:18.828 HlidacStatu [INF] Static data - Mestske_Firmy 
+2023-05-24 22:34:20.415 HlidacStatu [INF] Static data - DatoveSchranky 
+2023-05-24 22:34:36.108 HlidacStatu [INF] Static data - MinisterstvaCache
+2023-05-24 22:34:36.465 HlidacStatu [INF] Static data - FirmyNazvyOnlyAscii
+2023-05-24 22:36:54.763 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-05-24 22:37:04.784 HlidacStatu [INF] Static data - Init start
+2023-05-24 22:37:04.819 HlidacStatu [INF] Static data - NespolehlivyPlatciDPH 
+2023-05-24 22:37:04.840 HlidacStatu [INF] Static data - Insolvence_firem_politiku 
+2023-05-24 22:37:04.844 HlidacStatu [INF] Static data - SponzorujiciFirmy_Vsechny 
+2023-05-24 22:37:04.849 HlidacStatu [INF] Static data - SponzorujiciFirmy_nedavne
+2023-05-24 22:37:04.853 HlidacStatu [INF] Static data - Politici
+2023-05-24 22:37:14.057 HlidacStatu [INF] Static data - LastBlogPosts
+2023-05-24 22:37:20.120 HlidacStatu [INF] Static data - DarujmeStats
+2023-05-24 22:37:20.127 HlidacStatu [INF] Static data - BasicStatisticData 
+2023-05-24 22:37:20.131 HlidacStatu [INF] Static data - FirmySVazbamiNaPolitiky_*
+2023-05-24 22:37:20.135 HlidacStatu [INF] Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*
+2023-05-24 22:37:20.138 HlidacStatu [INF] Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*
+2023-05-24 22:37:20.516 HlidacStatu [INF] Static data - Init DONE
+2023-05-24 22:40:35.642 HlidacStatu [INF] Starting web application 1.1.0.0
+2023-05-24 22:40:56.327 HlidacStatu [INF] Static data - LastBlogPosts
+2023-05-24 22:41:50.506 HlidacStatu [INF] Static data - Init start
+2023-05-24 22:41:50.512 HlidacStatu [INF] Static data - NespolehlivyPlatciDPH 
+2023-05-24 22:41:50.516 HlidacStatu [INF] Static data - Insolvence_firem_politiku 
+2023-05-24 22:41:50.522 HlidacStatu [INF] Static data - SponzorujiciFirmy_Vsechny 
+2023-05-24 22:41:50.526 HlidacStatu [INF] Static data - SponzorujiciFirmy_nedavne
+2023-05-24 22:41:50.530 HlidacStatu [INF] Static data - Politici
+2023-05-24 22:41:56.883 HlidacStatu [INF] Static data - DarujmeStats
+2023-05-24 22:41:56.889 HlidacStatu [INF] Static data - BasicStatisticData 
+2023-05-24 22:41:56.893 HlidacStatu [INF] Static data - FirmySVazbamiNaPolitiky_*
+2023-05-24 22:41:56.897 HlidacStatu [INF] Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*
+2023-05-24 22:41:56.901 HlidacStatu [INF] Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*
+2023-05-24 22:41:57.126 HlidacStatu [INF] Static data - Init DONE
+2023-05-24 22:42:30.203 HlidacStatu [INF] Static data - Mestske_Firmy 
+2023-05-24 22:42:31.386 HlidacStatu [INF] Static data - DatoveSchranky 
+2023-05-24 22:42:47.776 HlidacStatu [INF] Static data - MinisterstvaCache
+2023-05-24 22:42:48.378 HlidacStatu [INF] Static data - FirmyNazvyOnlyAscii

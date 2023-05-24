@@ -34,9 +34,23 @@
         <h4>Analyzovat smlouvy nalezené pomocí dotazu:</h4>
         <form method="get" action="/analyza" class="form-search__input-wrapper" role="form">
             
-            <input class="form-search__input" id="Q" name="Q" value="@Model.Query" placeholder="hledaný výraz ..." style="max-width: none;" type="text">
+            <input class="form-search__input" id="Q" name="Q" value="@Model.Query" placeholder="hledaný výraz ..." style="max-width: none" type="text">
             <button class="form-search__btn" type="submit">Analyzovat nalezené smlouvy</button>
         </form>
     </div>
 </div>
 
+<div class="row">
+    <div class="col-xs-12 col-sm-12">
+        <h4>Analyzovat smlouvy podle ID verze smlouvy:
+            <small>Seznam ID oddělený mezerou, čárkou, středníkem či odřádkováním</small>
+
+        </h4>
+        
+        <form method="post" action="/analyza" class="form-search__input-wrapper" role="form">
+
+            <textarea class="form-search__input" id="ids" name="ids" value="" placeholder="" rows="10" style="max-width: none;height:150px;font-size:0.9em"></textarea>
+            <button class="form-search__btn" type="submit">Analyzovat smlouvy podle ID</button>
+        </form>
+    </div>
+</div>

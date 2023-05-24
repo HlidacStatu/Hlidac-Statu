@@ -12,8 +12,8 @@
 }
 @section scripts
 {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.19/css/jquery.dataTables.css"/>
-    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 }
 
 
@@ -45,7 +45,7 @@
                     @Html.Raw(
                         ChartUtil.RenderReportTableT("Sponzorující osoby", Model[0], @"{
                          'language': {
-                            'url': '//cdn.datatables.net/plug-ins/1.10.12/i18n/Czech.json'
+                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                         },
                         'paging': true,
                         'pageLength': 15,
@@ -63,7 +63,7 @@
                     @Html.Raw(
                         ChartUtil.RenderReportTableT("Sponzorující firmy", Model[1], @"{
                          'language': {
-                            'url': '//cdn.datatables.net/plug-ins/1.10.12/i18n/Czech.json'
+                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                         },
                         'paging': true,
                         'pageLength': 15,

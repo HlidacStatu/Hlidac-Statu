@@ -101,7 +101,18 @@ namespace HlidacStatu.Repositories.Searching
             }
 
             // [\p{L}\p{M}\d_] \p{L} -znaky všech abeced \p{M} -kombinované znaky
-            string invalidFormatRegex = @"(AND \s+)? ([^""]\w +\.?\w +) :($|[^\""=><[\p{L}\p{M}\d_{)]) (AND )?";
+            string invalidFormatRegex = @"((AND|OR|NOT) \s+)? # mozny operator pred
+
+ ([^""]\w +\.?\w +) # operator 
+ :
+ 
+ ( $ #konec text
+   | #nebo
+   [^\""=><[\p{L}\p{M}\d_{)(] #jiny znak je je zde na seznamu
+ ) 
+ 
+ ((AND|OR|NOT) )?  #mozny operator
+";
             Match mIsInvalid = Regex.Match(query, invalidFormatRegex,
                 (RegexOptions.IgnorePatternWhitespace | RegexOptions.IgnoreCase));
             if (mIsInvalid.Success)
