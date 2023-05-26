@@ -1,15 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatu.XLib.Render;
-
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -621,6 +619,58 @@ namespace HlidacStatu.Web.Framework
             }
         }
 
+        public static object DatatableOptionsObject(
+            bool paging = true, int? pageLength = 10, bool info = false, bool filter = true, string dom = "Bfrtip",
+            bool lengthChange = false, bool exportButtons = true, bool searching=true,
+            bool ordering = true, int? orderColumnIdx = null, string? orderDirection = null
+            )
+        {
+            var core = new
+            {
+                language = new
+                {
+                    url = "//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json"
+                },
+                lengthChange = lengthChange,
+                paging = paging,
+                pageLength = pageLength.HasValue? pageLength.Value : (int?)null,
+                info = info,
+                filter = filter,
+                searching = searching,
+                dom = dom,
+                buttons = exportButtons==false ? null : new[] {
+                    new {
+                        extend ="csvHtml5",
+                        text = "Export do CSV",
+                        exportOptions = new
+                            {
+                                modifier = new {search="none" }
+                            }
+                    },
+                    new {
+                        extend ="excelHtml5",
+                        text = "Export do Excelu",
+                        exportOptions = new
+                            {
+                                modifier = new {search="none" }
+                            }
+                    },
+                },
+                ordering = ordering,
+                order = orderColumnIdx.HasValue == false ? null : new[] {new object[] {orderColumnIdx.Value, orderDirection}}
+            };
+            return core;
+        }
+        public static string DatatableOptions(
+            bool paging = true, int? pageLength = 10, bool info = false, bool filter = true, string dom = "Bfrtip",
+            bool lengthChange = false, bool exportButtons = true, bool searching = true,
+            bool ordering = true, int? orderColumnIdx = null, string? orderDirection = null)
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(
+                DatatableOptionsObject(paging, pageLength,info,filter,dom,lengthChange,exportButtons,searching, ordering, orderColumnIdx,orderDirection)
+                );
+        }
+
         public static IHtmlContent DataToHTMLTable<T>(this IHtmlHelper htmlHelper,
             ReportDataSource<T> rds,
             string tableId = "",
@@ -654,13 +704,11 @@ $(document).ready(function () {
 
 });
 </script>");
-            //    $('#" + _tableId + @"_btn').html(tbl_" + _tableId + @".buttons().container().html()); 
 
             if (!string.IsNullOrEmpty(rds?.Title))
             {
                 sb.AppendFormat("<h3>{0}</h3>", rds?.Title ?? "");
             }
-            sb.AppendFormat($"<div id='{_tableId}_btn'></div>");
             sb.AppendFormat("<table id=\"{0}\" class=\"table-sorted table table-bordered table-striped\">", _tableId);
             if (customTableHeader == null)
             {

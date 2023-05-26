@@ -9,37 +9,6 @@
 
 
 @{
-    string dataTableOptions = @"{
-        buttons: [
-                {
-                    extend: 'csvHtml5',
-                    text: 'Zkopírovat obsah',
-                    exportOptions: {
-                        modifier: {
-                            search: 'none'
-                        }
-                    }
-                },
-                {
-                    extend: 'excelHtml5',
-                    text: 'Excel',
-                    exportOptions: {
-                        modifier: {
-                            search: 'none'
-                        }
-                    }
-                }
-            ],
-        'language': {
-                'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-        },
-        'order': [[2,'desc']],
-        'lengthChange': false,
-        'pageLength': 10,
-        'info': false,
-        'filter': true,
-        'dom': 'Bfrtip'
-    }";
 
 
     int[] Years = HlidacStatu.Lib.Analytics.Consts.RegistrSmluvYearsList.Where(m => m > 2018).ToArray();
@@ -62,6 +31,7 @@
 @{
     var topDodavateleFull = await HlidacStatu.Repositories.ES.QueryGrouped.TopDodavatelePerYearStatsAsync(
                 Model.Query, Years);
+                
     List<StatisticsSubjectPerYear<SimpleStat>> topDodavatele = topDodavateleFull.PerIco.CombinedTop(50);
     var topDodavateleCurrSeason = topDodavateleFull.PerYear.CombinedTop(currentSeasonYear, 10);
 
@@ -243,8 +213,8 @@
                         },
                         OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
                         CssClass = "number"
-                    },
-                    new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
+                    },                   
+                new ReportDataSource<KeyValuePair<string, SimpleStat>>.Column()
                     {
                         Name = "Hodnota smluv",
                         HtmlRender = (m) =>
@@ -259,7 +229,7 @@
 
                 rdsDodav.AddRows(topDodavatele.Select(m => new KeyValuePair<string, SimpleStat>(m.ICO,m.Summary())));
         }
-        @Html.DataToHTMLTable(rdsDodav, dataTableOptions: dataTableOptions)
+            @Html.DataToHTMLTable(rdsDodav, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx:2, orderDirection:"desc"))
     </p>
 
     <p>
@@ -360,7 +330,7 @@
 
                 rdsDodav.AddRows(topZadavatele.Select(m => new KeyValuePair<string, SimpleStat>(m.ICO, m.Summary())));
             }
-            @Html.DataToHTMLTable(rdsZadav, dataTableOptions: dataTableOptions)
+            @Html.DataToHTMLTable(rdsZadav, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx:2, orderDirection:"desc"))
     </p>
 
     <p>

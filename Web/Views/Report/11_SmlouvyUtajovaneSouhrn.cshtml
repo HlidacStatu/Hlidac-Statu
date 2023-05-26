@@ -95,14 +95,7 @@
     <div class="col-xs-12 dontembed">
         @foreach (var q in model.GetQueue("perIcoChart_d"))
         {
-            @ChartUtil.RenderReport(q, @"{
-                         'language': {
-                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-                        },
-                        'order': [[3,'desc']],
-                        'lengthChange': false,
-                        'info': false,
-                        }", q.Key)
+            @ChartUtil.RenderReport(q, HtmlExtensions.DatatableOptions(orderColumnIdx:3, orderDirection:"desc"), q.Key)
         }
 
 
@@ -110,14 +103,7 @@
     <div class="col-xs-12">
         @foreach (var q in model.GetQueue("perIcoTable"))
         {
-            @ChartUtil.RenderReport(q, @"{
-                         'language': {
-                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-                        },
-                        'order': [[3,'desc']],
-                        'lengthChange': false,
-                        'info': false,
-                        }", q.Key)
+            @ChartUtil.RenderReport(q, HtmlExtensions.DatatableOptions(orderColumnIdx:3, orderDirection:"desc"), q.Key)
         }
     </div>
 </div>

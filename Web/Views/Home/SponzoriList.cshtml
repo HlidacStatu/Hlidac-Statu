@@ -37,16 +37,7 @@
             Vyberte rok, pro který chcete zobrazit sponzory.
         </h4>
     </div>
-    @ChartUtil.RenderReportTableT("", Model, @"{
-                 'language': {
-                    'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-                },
-                'ordering': false,
-                'order': [0,'asc'],
-                'lengthChange': false,
-                'info': false,
-                'paging': false
-                }")
+    @ChartUtil.RenderReportTableT("", Model,HtmlExtensions.DatatableOptions(orderColumnIdx:0,orderDirection:"asc",ordering:false, paging:false))
 }
 else if (ViewBag.SponzoriFirmy == true)
 {
@@ -59,15 +50,7 @@ else if (ViewBag.SponzoriFirmy == true)
             <li class="active">Firemní sponzoři</li>
         </ol>
     }
-    @ChartUtil.RenderReportTableT("",Model,@"{
-                 'language': {
-                    'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-                },
-                'order': [2,'desc'],
-                'lengthChange': false,
-                'info': false,
-                'paging': true
-                }")
+    @ChartUtil.RenderReportTableT("",Model,HtmlExtensions.DatatableOptions(orderColumnIdx:2,orderDirection:"desc",ordering:false, paging:true))
 }
 else
 {
@@ -83,15 +66,7 @@ else
         <div>
             <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" url="@Context.Request.GetDisplayUrl()" style="font-size:200%" ></add-bookmark>
         </div>
-        @ChartUtil.RenderReportTableT("",Model, @"{
-                     'language': {
-                        'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-                    },
-                    'order': [2,'desc'],
-                    'lengthChange': false,
-                    'info': false,
-                    'paging': true
-                    }")
+    @ChartUtil.RenderReportTableT("",Model,HtmlExtensions.DatatableOptions(orderColumnIdx:2,orderDirection:"desc",ordering:false, paging:true))
 
     }
 

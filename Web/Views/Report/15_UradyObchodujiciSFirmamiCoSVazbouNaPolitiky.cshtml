@@ -134,13 +134,6 @@
             {
                 Type = ReportModel.QueueItem.types.table,
                 Data = rds1
-            }, @"{
-                'language': {
-                'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-            },
-            'order': [[2, 'desc']],
-            'lengthChange': false,
-            'info': false,
-            }", "t1")
+            }, HtmlExtensions.DatatableOptions(orderColumnIdx: 2, orderDirection: "desc"), "t1")
         )
 }

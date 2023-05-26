@@ -1,4 +1,6 @@
 ﻿@using System.Linq;
+@using HlidacStatu.Web.Framework;
+
 @model HlidacStatu.Web.Models.DokumentListViewModel
 
 @{
@@ -46,15 +48,6 @@
 
 <script>
 	$(document).ready(function () {
-		$('#@tableId').DataTable({
-			'language': {
-				'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-			},
-            'ordering': false,
-            'paging': false,
-            'searching': false,
-			'lengthChange': false,
-			'info': false,
-		});
+        $('#@tableId').DataTable(HtmlExtensions.DatatableOptions(ordering: false, paging: false, searching: false));
 	});
 </script>

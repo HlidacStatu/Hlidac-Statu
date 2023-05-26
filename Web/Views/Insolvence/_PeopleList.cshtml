@@ -3,6 +3,7 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using Microsoft.AspNetCore.Html
+@using HlidacStatu.Web.Framework
 
 @model PeopleListViewModel
 
@@ -49,15 +50,7 @@
 {
 <script>
 		$(document).ready(function () {
-			$('#@tableId').DataTable({
-				'language': {
-					'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-				},
-				'order': [],
-				'lengthChange': false,
-                'info': false,
-                'pageLength': 5
-			});
+			$('#@tableId').DataTable(HtmlExtensions.DatatableOptions(ordering: false, pageLength: 5));
 		});
 </script>
 }

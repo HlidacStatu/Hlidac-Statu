@@ -227,15 +227,7 @@ else
                     <div style="position:relative;top:33px;">
                         <share-widget url="@($"{Context.Request.GetDisplayUrl()}&part={currPart}")" title="Vložit tuto tabulku do vlastní stránky"></share-widget>
                     </div>
-                    @Html.Raw(ChartUtil.RenderReport(p, @"{
-                                 'language': {
-                                 'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-                                 },
-                                 'order': [[6,'desc']],
-                                 'lengthChange': false,
-                                 'pageLength': 20,
-                                 'info': false,
-                                 }", p.Key)
+                    @Html.Raw(ChartUtil.RenderReport(p, HtmlExtensions.DatatableOptions(orderColumnIdx:6, orderDirection:"desc", pageLength:20), p.Key)
                                   )
                 </div>
 
