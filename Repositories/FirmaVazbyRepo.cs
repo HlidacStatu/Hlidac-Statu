@@ -7,6 +7,7 @@ using HlidacStatu.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories
 {
@@ -294,6 +295,26 @@ namespace HlidacStatu.Repositories
             var firstRel = Graph.VsechnyDcerineVazby(firma.ICO, true);
 
             firma.Vazby(HlidacStatu.DS.Graphs.Graph.Edge.Merge(oldRel, firstRel).ToArray());
+        }
+
+        public static void FixVazbaDatumDo()
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                db.Database.ExecuteSqlRaw(@"update FirmaVazby
+                   set DatumDo = fi.DatumZaniku 
+                  from FirmaVazby fv
+                  join Firma fi on fi.ICO = FV.ICO
+                 where fv.datumdo is null
+                   and fi.DatumZaniku is not null");
+                
+                db.Database.ExecuteSqlRaw(@"update FirmaVazby
+                   set DatumDo = fi.DatumZaniku 
+                  from FirmaVazby fv
+                  join Firma fi on fi.ICO = FV.VazbakICO
+                 where fv.datumdo is null
+                   and fi.DatumZaniku is not null");
+            }
         }
     }
 }

@@ -74,6 +74,13 @@
                 <td class="text-nowrap text-muted col-sm-5">Založeno</td>
                 <td class="col-sm-7">@(Model.Datum_Zapisu_OR?.ToString("dd.MM.yyyy"))</td>
             </tr>
+            @if (Model.DatumZaniku is not null)
+            {
+                <tr>
+                    <td class="text-nowrap text-muted col-sm-5">Zaniklo</td>
+                    <td class="col-sm-7">@(Model.DatumZaniku?.ToString("dd.MM.yyyy"))</td>
+                </tr>
+            }
             <tr>
                 <td class="text-nowrap text-muted col-sm-5">IČO</td>
                 <td class="col-sm-7">@Model.ICO</td>
