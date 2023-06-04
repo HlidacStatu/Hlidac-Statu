@@ -4,7 +4,7 @@ using HlidacStatu.Repositories;
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,22 +15,20 @@ namespace HlidacStatu.Web.Controllers
     public partial class DataController : Controller
     {
 
-        static Devmasters.Cache.LocalMemory.Cache<Models.DatasetIndexStat[]> datasetIndexStatCache =
-            new Devmasters.Cache.LocalMemory.Cache<Models.DatasetIndexStat[]>(TimeSpan.FromMinutes(15), (o) =>
-                {
+        static Devmasters.Cache.LocalMemory.CacheAsync<Models.DatasetIndexStat[]> datasetIndexStatCache =
+            new Devmasters.Cache.LocalMemory.CacheAsync<Models.DatasetIndexStat[]>(TimeSpan.FromMinutes(15), async (o) =>
+                 {
                     List<Models.DatasetIndexStat> ret = new List<Models.DatasetIndexStat>();
-                    var datasets = DataSetDB.Instance.SearchDataRawAsync("*", 1, 200)
-                        .ConfigureAwait(false).GetAwaiter().GetResult()
-                        .Result
-                        .Select(s => Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(s.Item2))
-                        .Where(m => m.id != null);
+                        var datasetsS = await DataSetDB.Instance.SearchDataRawAsync("*", 1, 200);
+                        var datasets = datasetsS.Result
+                            .Select(s => Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(s.Item2))
+                            .Where(m => m.id != null);
 
                     foreach (var ds in datasets)
                     {
                         var rec = new Models.DatasetIndexStat() { Ds = ds };
                         var dsContent = DataSet.CachedDatasets.Get(ds.id.ToString());
-                        var allrec = dsContent.SearchDataAsync("", 1, 1, sort: "DbCreated desc", exactNumOfResults: true)
-                            .ConfigureAwait(false).GetAwaiter().GetResult();
+                        var allrec = await dsContent.SearchDataAsync("", 1, 1, sort: "DbCreated desc", exactNumOfResults: true);
                         rec.RecordNum = allrec.Total;
 
                         if (rec.RecordNum > 0)
@@ -40,8 +38,7 @@ namespace HlidacStatu.Web.Controllers
                                 rec.LastRecord = (DateTime?)lRec.DbCreated;
                         }
 
-                        var recordWeek = dsContent.SearchDataAsync($"DbCreated:[{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")} TO *]", 1, 0, exactNumOfResults: true)
-                            .ConfigureAwait(false).GetAwaiter().GetResult();
+                        var recordWeek = await dsContent.SearchDataAsync($"DbCreated:[{DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd")} TO *]", 1, 0, exactNumOfResults: true);
                         rec.RecordNumWeek = recordWeek.Total;
 
                         ret.Add(rec);
@@ -53,16 +50,17 @@ namespace HlidacStatu.Web.Controllers
 
 
 
-        public ActionResult Index(string id)
+        public async Task<ActionResult> Index(string id)
         {
             if (Request.Query["refresh"] == "1")
-                datasetIndexStatCache.Invalidate();
+                await datasetIndexStatCache.InvalidateAsync();
 
             Models.DatasetIndexStat[] datasets = null;
             if (User.IsInRole("Admin") == true)
-                datasets = datasetIndexStatCache.Get();
+                datasets = await datasetIndexStatCache.GetAync();
             else
-                datasets = datasetIndexStatCache.Get().Where(m => m.Ds.hidden == false).ToArray();
+                datasets = (await datasetIndexStatCache.GetAync())
+                    .Where(m => m.Ds.hidden == false).ToArray();
 
             if (string.IsNullOrEmpty(id))
                 return View(datasets);
@@ -114,7 +112,7 @@ namespace HlidacStatu.Web.Controllers
 
             if (confirmation == ds.DatasetId)
             {
-                datasetIndexStatCache.Invalidate();
+                await datasetIndexStatCache.InvalidateAsync();
 
                 await DataSetDB.Instance.DeleteRegistrationAsync(ds.DatasetId, email);
                 return RedirectToAction("Index");
@@ -167,7 +165,7 @@ namespace HlidacStatu.Web.Controllers
             if (string.IsNullOrEmpty(id))
                 return RedirectToAction("Index");
 
-            datasetIndexStatCache.Invalidate();
+            await datasetIndexStatCache.InvalidateAsync();
 
             var ds = DataSet.CachedDatasets.Get(id);
             if (ds == null)

@@ -30,7 +30,7 @@ namespace HlidacStatu.Web.Controllers
 
             var email = Request?.HttpContext?.User?.Identity?.Name;
 
-            datasetIndexStatCache.Invalidate();
+            await datasetIndexStatCache.InvalidateAsync();
 
             var newReg = WebFormToRegistration(data, form);
             newReg.datasetId = form["datasetId"];
@@ -81,7 +81,7 @@ namespace HlidacStatu.Web.Controllers
             if (reg == null)
                 ViewBag.ApiResponseError = ApiResponseStatus.Error(500, "Nekorektní záloha datasetu", "Nekorektní záloha datasetu");
 
-            datasetIndexStatCache.Invalidate();
+            await datasetIndexStatCache.InvalidateAsync();
 
             if (reg != null)
             {
@@ -334,7 +334,7 @@ namespace HlidacStatu.Web.Controllers
             if (DataSet.ExistsDataset(reg.datasetId))
                 reg.datasetId = reg.datasetId + "-" + Devmasters.TextUtil.GenRandomString(5);
 
-            datasetIndexStatCache.Invalidate();
+            await datasetIndexStatCache.InvalidateAsync();
 
             var status = await DataSet.Api.CreateAsync(reg, email);
 
@@ -456,7 +456,7 @@ namespace HlidacStatu.Web.Controllers
             if ((await ds.HasAdminAccessAsync(Request?.HttpContext?.User)) == false)
                 return View("NoAccess");
 
-            datasetIndexStatCache.Invalidate();
+            await datasetIndexStatCache.InvalidateAsync();
 
             Guid fileId = Guid.NewGuid();
             var uTmp = new Connectors.IO.UploadedTmpFile();
@@ -509,7 +509,7 @@ namespace HlidacStatu.Web.Controllers
             if ((await ds.HasAdminAccessAsync(Request?.HttpContext?.User)) == false)
                 return View("NoAccess");
 
-            datasetIndexStatCache.Invalidate();
+            await datasetIndexStatCache.InvalidateAsync();
 
             if (ds.IsFlatStructure() == false)
             {
