@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="bootstrap" Version="5.2.3" />
+        <PackageReference Include="bootstrap" Version="5.3.0" />
         <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="7.0.5" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.5" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />
@@ -18,7 +18,7 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>

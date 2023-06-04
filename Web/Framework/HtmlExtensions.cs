@@ -4,8 +4,10 @@ using HlidacStatu.Repositories;
 using HlidacStatu.XLib.Render;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Nest;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -622,10 +624,11 @@ namespace HlidacStatu.Web.Framework
         public static object DatatableOptionsObject(
             bool paging = true, int? pageLength = 10, bool info = false, bool filter = true, string dom = "Bfrtip",
             bool lengthChange = false, bool exportButtons = true, bool searching=true,
-            bool ordering = true, int? orderColumnIdx = null, string? orderDirection = null
+            bool ordering = true, int? orderColumnIdx = null, string? orderDirection = null,
+            Dictionary<string,object> customObjs = null
             )
         {
-            var core = new
+            dynamic conf = new
             {
                 language = new
                 {
@@ -659,7 +662,22 @@ namespace HlidacStatu.Web.Framework
                 ordering = ordering,
                 order = orderColumnIdx.HasValue == false ? null : new[] {new object[] {orderColumnIdx.Value, orderDirection}}
             };
-            return core;
+
+            if (customObjs?.Count > 0)
+            {
+                var expando = conf as IDictionary<string, object>;
+                foreach (var kv in customObjs)
+                {
+                    if (expando.ContainsKey(kv.Key))
+                        expando[kv.Key] = kv.Value;
+                    else
+                        expando.TryAdd(kv.Key, kv.Value);
+                }
+                return expando;
+            }
+            else
+                return conf;
+
         }
         public static string DatatableOptions(
             bool paging = true, int? pageLength = 10, bool info = false, bool filter = true, string dom = "Bfrtip",
