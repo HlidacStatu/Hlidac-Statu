@@ -11,7 +11,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Logging" Version="4.5.22" />
+      <PackageReference Include="Devmasters.Logging" Version="4.5.24" />
       <PackageReference Include="FluentFTP" Version="46.0.2" />
       <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
       <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />

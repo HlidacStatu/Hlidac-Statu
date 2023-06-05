@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Cache.AWS_S3" Version="4.5.1" />
+      <PackageReference Include="Devmasters.Cache.AWS_S3" Version="4.5.2" />
       <PackageReference Include="Devmasters.Cache.Elastic" Version="4.5.1" />
       <PackageReference Include="Devmasters.Cache.Memcached" Version="4.5.1" />
       <PackageReference Include="InfluxDB.Client" Version="4.12.0" />
