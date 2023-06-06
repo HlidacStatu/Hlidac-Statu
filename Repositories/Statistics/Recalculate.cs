@@ -17,35 +17,65 @@ namespace HlidacStatu.Repositories.Statistics
 
         static Devmasters.Batch.ActionProgressWriter debugProgressWr = new Devmasters.Batch.ActionProgressWriter(0.1f);
 
-        public static void RecalculateTasks(int? threads = null, bool debug = false,
+        public static void RecalculateTasks(int? threads = null, bool debug = false, string[] ids = null,
             Action<string> outputWriter = null,
             Action<Devmasters.Batch.ActionProgressData> progressWriter = null
             )
         {
+            bool onlyIds = ids?.Count() > 0;
+
+
+
             threads = threads ?? 20;
 
             int numFromQueue = 0;
-            using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
-                                RECALCULATIONQUEUENAME,
-                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
-            ))
+            List<RecalculateItem> uniqueItems = null;
+            IEnumerable<RecalculateItem> allItems = null;
+            if (onlyIds)
             {
-                numFromQueue = (int)q.MessageCount();
+                uniqueItems = ids
+                    .Select(m => new RecalculateItem()
+                    {
+                        StatisticsType = RecalculateItem.StatisticsTypeEnum.Smlouva,
+                        Id = m,
+                        ItemType = RecalculateItem.ItemTypeEnum.Subjekt
+                    })
+                    .Concat(
+                        ids.Select(m => new RecalculateItem()
+                        {
+                            StatisticsType = RecalculateItem.StatisticsTypeEnum.Smlouva,
+                            Id = m,
+                            ItemType = RecalculateItem.ItemTypeEnum.Person
+                        })
+                    )
+                    .Distinct(comparer)
+                    .ToList();
+            }
+            else
+            {
+                using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
+                                    RECALCULATIONQUEUENAME,
+                    Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                ))
+                {
+                    numFromQueue = (int)q.MessageCount();
+                }
+
+
+                allItems = GetItemsFromProcessingQueue(numFromQueue, threads.Value, outputWriter, progressWriter, debug);
+                uniqueItems = allItems.Distinct(comparer).ToList();
             }
 
 
-            var allItems = GetItemsFromProcessingQueue(numFromQueue, threads.Value, outputWriter, progressWriter, debug);
-            List<RecalculateItem> uniqueItems = allItems.Distinct(comparer).ToList();
+        //using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
+        //    RECALCULATIONQUEUENAME,
+        //    Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+        //    ))
+        //{
+        //    q.Send(uniqueItems);
+        //}
 
-            //using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
-            //    RECALCULATIONQUEUENAME,
-            //    Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
-            //    ))
-            //{
-            //    q.Send(uniqueItems);
-            //}
-
-            start:
+        start:
 
             log.Info("{method} Starting with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, threads.Value);
             if (debug)
@@ -74,7 +104,7 @@ namespace HlidacStatu.Repositories.Statistics
                         {
                             case RecalculateItem.StatisticsTypeEnum.Smlouva:
                                 _ = f.StatistikaRegistruSmluv(forceUpdateCache: true);
-                                _ = f.HoldingStatisticsRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);                                
+                                _ = f.HoldingStatisticsRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
                                 break;
                             case RecalculateItem.StatisticsTypeEnum.VZ:
                                 _ = f.StatistikaVerejneZakazky(forceUpdateCache: true);
@@ -82,7 +112,7 @@ namespace HlidacStatu.Repositories.Statistics
                                 break;
                             case RecalculateItem.StatisticsTypeEnum.Dotace:
                                 _ = f.StatistikaDotaci(forceUpdateCache: true);
-                                _ = f.HoldingStatistikaDotaci( DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
+                                _ = f.HoldingStatistikaDotaci(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
                                 break;
                             default:
                                 break;
@@ -102,7 +132,7 @@ namespace HlidacStatu.Repositories.Statistics
             log.Info("{method} Starting Subjekt-Holding statistics recalculate for {count} subjects with {numOfThreads} threads",
                 uniqueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt), MethodBase.GetCurrentMethod().Name, threads.Value);
 
-       
+
             log.Info("{method} Starting Osoba statistics recalculate for {count} subjects with {numOfThreads} threads",
                 uniqueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Person), MethodBase.GetCurrentMethod().Name, threads.Value);
             // rebuild cache for person 
@@ -131,12 +161,16 @@ namespace HlidacStatu.Repositories.Statistics
 
             if (debug)
                 Console.WriteLine($"getting from queue {numFromQueue} items");
-
-            allItems = GetItemsFromProcessingQueue(numFromQueue, threads.Value, outputWriter, progressWriter, debug);
-            uniqueItems = allItems.Distinct(comparer).ToList();
+            if (onlyIds)
+                uniqueItems.Clear();
+            else
+            {
+                allItems = GetItemsFromProcessingQueue(numFromQueue, threads.Value, outputWriter, progressWriter, debug);
+                uniqueItems = allItems.Distinct(comparer).ToList();
+            }
             if (uniqueItems.Count > 0)
                 goto start;
-            
+
 
             log.Info("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
 

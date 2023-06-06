@@ -59,7 +59,10 @@ namespace HlidacStatu.Plugin.Enhancers
                 if (string.IsNullOrEmpty(currPref))
                 {
                     //NENI PREFIX, DOPLN HO
-                    string newico = zahr.Country + "-" + subj.ico;
+                    string newico = zahr.Country + "-" + subj.ico
+                        .Replace("HlidacStatu.Util.DataValidators+ZahranicniAdresa-", "")
+                        .Replace("HlidacStatu.Util.DataValidators+ZahranicniAdresa", "")
+                        ;
                     _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Doplněno zahraniční ID subjektu. Doplněn prefix před ID firmy", "", path + ".ico", newico, subj.ico, this));
                     subj.ico = newico;
                     changed = true;
@@ -67,7 +70,10 @@ namespace HlidacStatu.Plugin.Enhancers
                 else if (currPref != zahr.Country)
                 {
                     //je jiny PREFIX, uprav ho
-                    string newico = zahr.Country + subj.ico.Substring(2);
+                    string newico = zahr.Country + subj.ico.Substring(2)
+                        .Replace("HlidacStatu.Util.DataValidators+ZahranicniAdresa-","")
+                        .Replace("HlidacStatu.Util.DataValidators+ZahranicniAdresa", "")
+                        ;
                     _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Upraveno zahraniční ID subjektu. Doplněn prefix před ID firmy", "", path + ".ico", zahr + "-" + subj.ico, subj.ico, this));
                     subj.ico = newico;
                     changed = true;
