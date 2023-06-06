@@ -67,7 +67,7 @@ namespace HlidacStatu.Plugin.Enhancers
                 else if (currPref != zahr.Country)
                 {
                     //je jiny PREFIX, uprav ho
-                    string newico = zahr + subj.ico.Substring(2);
+                    string newico = zahr.Country + subj.ico.Substring(2);
                     _item.Enhancements = _item.Enhancements.AddOrUpdate(new Enhancement("Upraveno zahraniční ID subjektu. Doplněn prefix před ID firmy", "", path + ".ico", zahr + "-" + subj.ico, subj.ico, this));
                     subj.ico = newico;
                     changed = true;
