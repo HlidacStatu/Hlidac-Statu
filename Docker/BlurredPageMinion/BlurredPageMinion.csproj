@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Devmasters.Batch" Version="4.5.1" />
+        <PackageReference Include="Devmasters.Batch" Version="4.5.2" />
         <PackageReference Include="Devmasters.Core" Version="4.5.1" />
         <PackageReference Include="Devmasters.Diags" Version="4.5.1" />
         <PackageReference Include="Devmasters.IO" Version="4.5.1" />
