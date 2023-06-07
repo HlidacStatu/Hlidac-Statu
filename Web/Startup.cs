@@ -204,7 +204,10 @@ namespace HlidacStatu.Web
             app.UseStatusCodePagesWithReExecute("/error/{0}");
             app.UseHttpsRedirection();
 
-            var logpath2 = Path.Combine(Devmasters.Config.GetWebConfigValue("SerilogBasePath"), "HlidacStatu/Web");
+            var logdir2 = Devmasters.Config.GetWebConfigValue("SerilogBasePath");
+            if (string.IsNullOrEmpty(logdir2))
+                logdir2 = "/Data/Log/";
+            var logpath2 = Path.Combine(logdir2, "HlidacStatu/Web");
             Devmasters.Log.Logger webExceptionLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Web.Exceptions",
                 Devmasters.Log.Logger.DefaultConfiguration()
                     .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
@@ -212,7 +215,7 @@ namespace HlidacStatu.Web
                     .Filter.ByExcluding(Matching.FromSource("HlidacStatu.Lib.Data.External.InfluxDb.Trace"))
                     .MinimumLevel.Information()
                     .AddLogStash(new Uri("http://10.10.150.203:5000"))
-                    .AddFileLoggerFilePerLevel(logpath2, "slog.txt",
+                    .AddFileLoggerFilePerLevel(logpath2, "/Data/Log/Api/slog.txt",
                         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
                         rollingInterval: Serilog.RollingInterval.Day,
                         fileSizeLimitBytes: null,

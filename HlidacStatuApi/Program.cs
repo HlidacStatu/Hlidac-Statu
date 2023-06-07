@@ -185,8 +185,10 @@ app.Use(async (context, next) =>
 #if !DEBUG
     app.UseHttpsRedirection();
 #endif
-
-var logpath2 = Path.Combine(Devmasters.Config.GetWebConfigValue("SerilogBasePath"), "HlidacStatu/api");
+var logdir2 = Devmasters.Config.GetWebConfigValue("SerilogBasePath");
+if (string.IsNullOrEmpty(logdir2))
+    logdir2 = "/Data/Log/";
+var logpath2 = Path.Combine(logdir2, "HlidacStatu/api");
 Devmasters.Log.Logger apiExceptionLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Api.Exceptions",
     Devmasters.Log.Logger.DefaultConfiguration()
         .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())

@@ -15,10 +15,6 @@ if (location.search.indexOf(param + '=') !== -1) {
     history.replaceState(null, '', replace);
 }
 
-//function ga(p1, p2, p3, p4, p5, p6, p7) {
-//    console.log("fake ga " + p1 + ' ' + p2 + ' ' + p3 + ' ' + p4 + ' ' + p5 + ' ' + p6  )
-//}
-
 //cookie-less tracker from https://helgeklein.com/blog/google-analytics-cookieless-tracking-without-gdpr-consent/
 const cyrb53 = function (str, seed = 0) {
     let h1 = 0xdeadbeef ^ seed,
@@ -73,7 +69,7 @@ function _my_event(p1, p2, p3, p4, p5, p6, p7) {
 
     //_my_event('send', 'event', [eventCategory], [eventAction], [eventLabel], [eventValue], [fieldsObject]);
     //https://www.searchenginewatch.com/2018/03/19/how-to-set-up-event-tracking-in-google-analytics/
-    ga(p1, p2, p3, p4, p5, p6,p7);
+    //ga(p1, p2, p3, p4, p5, p6,p7);
 
     
     //_paq.push(['trackEvent', category, action, name, value, { dimension1: 'DimensionValue' }]);
