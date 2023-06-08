@@ -194,6 +194,20 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                             default:
                                 return "";
                         }
+                    case KIndexParts.PercZacerneno:
+                        switch (lbl)
+                        {
+                            case KIndexLabelValues.A:
+                                return "Nemají významně začerněné smlouvy.";
+                            case KIndexLabelValues.B:
+                            case KIndexLabelValues.C:
+                            case KIndexLabelValues.D:
+                            case KIndexLabelValues.E:
+                            case KIndexLabelValues.F:
+                                return $"Zveřejnili {Devmasters.Lang.CS.Plural.Get(this.AnnualData.Statistika.PocetZacernenychSmluv, "{0} významně začerněnou smlouvu;{0} významně začerněné smlouvy;{0} významně začerněných smluv")}.";
+                            default:
+                                return "";
+                        }
                     case KIndexParts.PercSmlouvySPolitickyAngazovanouFirmou:
                         switch (lbl)
                         {
@@ -250,6 +264,8 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     case KIndexParts.PercNovaFirmaDodavatel:
                         return 10m;
                     case KIndexParts.PercUzavrenoOVikendu:
+                        return 10m;
+                    case KIndexParts.PercZacerneno:
                         return 10m;
                     case KIndexParts.PercSmlouvySPolitickyAngazovanouFirmou:
                         return 10m;
@@ -340,7 +356,22 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                             return KIndexLabelValues.C;
                         else if (value < 0.04m || pocetSmluv3 <= 5) //pokud je malo smluv, nedavej vetsi riziko
                             return KIndexLabelValues.D;
-                        else if (value < 0.5m)
+                        else if (value < 0.05m)
+                            return KIndexLabelValues.E;
+                        else
+                            return KIndexLabelValues.F;
+
+                    case KIndexParts.PercZacerneno:
+                        int pocetSmluv4 = Devmasters.ParseText.ToInt(addValue?.ToString()) ?? 1000; //default hodne smluv
+                        if (value == 0)
+                            return KIndexLabelValues.A;
+                        else if (value < 0.02m)
+                            return KIndexLabelValues.B;
+                        else if (value < 0.03m)
+                            return KIndexLabelValues.C;
+                        else if (value < 0.04m || pocetSmluv4 <= 5) //pokud je malo smluv, nedavej vetsi riziko
+                            return KIndexLabelValues.D;
+                        else if (value < 0.05m)
                             return KIndexLabelValues.E;
                         else
                             return KIndexLabelValues.F;
@@ -395,6 +426,8 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                         return baseQ + "  AND " + "( hint.pocetDniOdZalozeniFirmy:>-50 AND hint.pocetDniOdZalozeniFirmy:<30 )";
                     case KIndexParts.PercUzavrenoOVikendu:
                         return baseQ + "  AND " + "hint.denUzavreni:>0";
+                    case KIndexParts.PercZacerneno:
+                        return baseQ + "  AND " + "(prilohy.blurredPages.numOfExtensivelyBlurredPages:>0)";
                     case KIndexParts.PercSmlouvyPod50kBonus:
                         return baseQ + "  AND " + " cena:>0 AND cena:<50000";
                     default:
@@ -444,6 +477,11 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                             "že právě ty problematické smlouvy byly uzavřeny mimo pracovní den, aby se snížila možnost třetích stran na to reagovat. " +
                             "Takto Ministerstvo dopravy obešlo konkurenci a <a href='https://www.idnes.cz/ekonomika/doprava/stat-obesel-skytoll-podpisem-smlouvy-s-kapschem-v-nedeli.A160830_175428_eko-doprava_suj' onclick=\"return trackOutLink(this, 'kindex-detail'); \">uzavřelo smlouvu za 5 miliard Kč v neděli</a>. " +
                             "Hodnota <b>0</b> znamená, že žádná smlouva takto uzavřená není, hodnota <b>0.5</b> znamená polovinu smluv uzavřenou mimo pracovní den.";
+                    case KIndexData.KIndexParts.PercZacerneno:
+                        return "Procentní podíl smluv, které obsahují alespoň jednu stranu smlouvy začerněnou z více než 20%. Začerňování smluv je v pořádku pro odstranění osobních údajů. To tvoří obvykle malé procento začernění. " +
+                            "V rámci skrytí podstatných náležitostí smlouvy (často s výmluvou na obchodní tajemství) dochází k začernění velkých částí smluv a to je již rizikové. " +
+                            "Pokud počet takto hodně začerněných částí smluv tvoří významnou část všech smluv organizace, je to fakt, který se negativně projeví na hodnotě K-Indexu." +
+                            "Hodnota <b>0</b> znamená, že žádná smlouva nemá významně začerněné stránky, hodnota <b>0.2</b> znamená, že 20% smluv takto začerněné jsou.";
                     case KIndexData.KIndexParts.PercSmlouvySPolitickyAngazovanouFirmou:
                         return "Procentní podíl smluv, které jsou uzavřeny s firmou, která má vazbu na politiku, neboli sponzorovala politickou stranu, " +
                             "nebo je přímo či nepřímo vlastněna sponzorem politické strany anebo ji přímo či nepřímo vlastní politik. " +

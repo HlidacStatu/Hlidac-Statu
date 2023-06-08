@@ -91,7 +91,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                         }
                     }
                 }
-                if (_popisy[prefix].ContainsKey(value))
+                if (_popisy.ContainsKey(prefix)  && _popisy[prefix].ContainsKey(value))
                     return _popisy[prefix][value];
                 else
                     return value;

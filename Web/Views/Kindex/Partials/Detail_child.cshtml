@@ -536,6 +536,17 @@ else
                 </tr>
                 @foreach (var part in EnumTools.EnumToEnumerable<KIndexData.KIndexParts>())
                 {
+                    if (currYear.Rok<2022)
+                    {
+                        if (part.Value == KIndexData.KIndexParts.PercZacerneno)
+                            continue; //skip zacerneno pred rokem 2022
+                    }
+                    else
+                    {
+                        if (part.Value == KIndexData.KIndexParts.PercUzavrenoOVikendu)
+                            continue; //skip UzavrenoOVikendu od roku 2022
+                    }
+
                     var radek = currYear.KIndexVypocet.Radky.FirstOrDefault(m => m.VelicinaPart == part.Value);
                     if (radek == null)
                     {
@@ -575,6 +586,7 @@ else
                                             case KIndexData.KIndexParts.PercSmluvUlimitu:
                                             case KIndexData.KIndexParts.PercNovaFirmaDodavatel:
                                             case KIndexData.KIndexParts.PercUzavrenoOVikendu:
+                                            case KIndexData.KIndexParts.PercZacerneno:
                                             case KIndexData.KIndexParts.PercSmlouvySPolitickyAngazovanouFirmou:
                                                 <partial name="Partials/ParametrDetail" model="@(new KindexDetailsViewModel(currYear, radek.VelicinaPart, true, Model.Jmeno, Model.Ico))"/>
                                                 break;

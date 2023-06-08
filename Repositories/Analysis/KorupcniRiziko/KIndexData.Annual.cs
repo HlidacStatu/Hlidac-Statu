@@ -63,6 +63,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             //r22
             public decimal PercUzavrenoOVikendu { get; set; } // % smluv uzavřených o víkendu či státním svátku
 
+            public decimal PercZacerneno { get; set; } // % smluv vyrazne zacernenych
+
+
             public List<KoncentraceDodavateluObor> KoncetraceDodavateluObory { get; set; } //Koncentrace dodavatelů
 
             public KoncentraceDodavateluObor KoncetraceDodavateluProObor(int oborId)

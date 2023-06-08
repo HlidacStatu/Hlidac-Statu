@@ -285,6 +285,7 @@ else
             </span>
         </td>}
                 </tr>
+
                 <tr>
                     <td>
                         % smluv uzavřených<br />o víkendu
@@ -299,6 +300,24 @@ else
                 @HlidacStatu.Util.RenderData.NicePercent(val)
             </span>
         </td>}
+                </tr>
+                <tr>
+                    <td>
+                        % smluv významně<br />začerněných
+                    </td>
+                    @{
+                        min = Model.Min(m => m.ForYear(rok).PercZacerneno);
+                        max = Model.Max(m => m.ForYear(rok).PercZacerneno);
+                    }
+                    @foreach (var ki in Model)
+                    {
+                        val = ki.ForYear(rok).PercZacerneno;
+                        <td>
+                            <span style="color:@(grad.Color(val,min,max).ToHex())">
+                                @HlidacStatu.Util.RenderData.NicePercent(val)
+                            </span>
+                        </td>
+                    }
                 </tr>
 
                 <tr>

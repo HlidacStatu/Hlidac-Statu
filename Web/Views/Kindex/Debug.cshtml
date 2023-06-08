@@ -188,17 +188,29 @@
             <td>
                 @HlidacStatu.Util.RenderData.NicePercent(Model.ForYear(y).PercSmluvUlimitu)
             </td>}
+            </tr>
+            <tr>
+                <td>
+                    % smluv uzavřených o víkendu
+                </td>
+                @for (int y = fromY; y <= toY; y++)
+                {
+                    <td>
+                        @HlidacStatu.Util.RenderData.NicePercent(Model.ForYear(y).PercUzavrenoOVikendu)
+                    </td>}
                 </tr>
                 <tr>
                     <td>
-                        % smluv uzavřených o víkendu
+                        % významně začerněných smluv 
                     </td>
                     @for (int y = fromY; y <= toY; y++)
                     {
-            <td>
-                @HlidacStatu.Util.RenderData.NicePercent(Model.ForYear(y).PercUzavrenoOVikendu)
-            </td>}
+                        <td>
+                            @HlidacStatu.Util.RenderData.NicePercent(Model.ForYear(y).PercZacerneno)
+                        </td>
+                    }
                 </tr>
+
 
                 <tr>
                     <td>

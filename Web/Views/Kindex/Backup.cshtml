@@ -524,9 +524,10 @@ else
                                         case KIndexData.KIndexParts.PercSmluvUlimitu:
                                         case KIndexData.KIndexParts.PercNovaFirmaDodavatel:
                                         case KIndexData.KIndexParts.PercUzavrenoOVikendu:
+                                        case KIndexData.KIndexParts.PercZacerneno:
                                         case KIndexData.KIndexParts.PercSmlouvySPolitickyAngazovanouFirmou:
-                                            <partial name="Partials/ParametrDetail" model="@(new KindexDetailsViewModel(currYear, radek.VelicinaPart, false, Model.Jmeno, Model.Ico))"/>
-                                            break;
+                                        <partial name="Partials/ParametrDetail" model="@(new KindexDetailsViewModel(currYear, radek.VelicinaPart, false, Model.Jmeno, Model.Ico))"/>
+                                        break;
                                         case KIndexData.KIndexParts.KoncentraceDodavateluObory:
                                             <partial name="Partials/KoncentraceOboryDetail" model="@(new KindexDetailsViewModel(currYear, radek.VelicinaPart, false, Model.Jmeno, Model.Ico))"/>
                                             break;

@@ -26,6 +26,7 @@
             public long PocetSmluvSeZasadnimNedostatkem { get; set; }
             public long PocetSmluvULimitu { get; set; }
             public long PocetSmluvOVikendu { get; set; }
+            public long PocetZacernenychSmluv { get; set; }
             public long PocetSmluvNovaFirma { get; set; }
 
         }

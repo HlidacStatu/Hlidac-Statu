@@ -35,10 +35,16 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             [NiceDisplayName("Podíl smluv uzavřených o víkendu či svátku")]
             PercUzavrenoOVikendu = 7,
 
+            [SortValue(7)]
+            [GroupValue("Doplnkove")]
+            [NiceDisplayName("Podíl smluv s výrazným začerněním")]
+            PercZacerneno = 11,
+
             [SortValue(5)]
             [GroupValue("Doplnkove")]
             [NiceDisplayName("Podíl smluv uzavřených s nově založenými firmami")]
             PercNovaFirmaDodavatel = 6,
+
 
 
             [SortValue(10)]

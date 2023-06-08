@@ -113,9 +113,18 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             ret.PercNovaFirmaDodavatel =
                 smlouvyZaRok == 0 ? 0m : (decimal)_calc_Stat[year].PocetSmluvNovaFirma / smlouvyZaRok;
             ret.PercSmluvUlimitu = smlouvyZaRok == 0 ? 0m : (decimal)_calc_Stat[year].PocetSmluvULimitu / smlouvyZaRok;
-            ret.PercUzavrenoOVikendu =
-                smlouvyZaRok == 0 ? 0m : (decimal)_calc_Stat[year].PocetSmluvOVikendu / smlouvyZaRok;
 
+            if (year < 2022)
+            {
+                ret.PercUzavrenoOVikendu =
+                  smlouvyZaRok == 0 ? 0m : (decimal)_calc_Stat[year].PocetSmluvOVikendu / smlouvyZaRok;
+            }
+            else
+            {
+                ret.PercZacerneno=
+                   smlouvyZaRok == 0 ? 0m : (decimal)_calc_Stat[year].PocetZacernenychSmluv / smlouvyZaRok;
+
+            }
             var stat = this.urad.StatistikaRegistruSmluv()[year];
             //todo: tenhle objekt by mohl vycházet ze stávajícího nového objektu statistiky
             ret.Statistika = new KIndexData.StatistickeUdaje()
@@ -134,6 +143,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 SumKcSmluvPolitiky = stat.SumKcSmluvSponzorujiciFirmy,
                 PocetSmluvULimitu = stat.PocetSmluvULimitu,
                 PocetSmluvOVikendu = stat.PocetSmluvOVikendu,
+                PocetZacernenychSmluv = stat.PocetZacernenychSmluv,
                 PocetSmluvSeZasadnimNedostatkem = stat.PocetSmluvSeZasadnimNedostatkem,
                 PocetSmluvNovaFirma = stat.PocetSmluvNovaFirma,
             };
@@ -444,16 +454,25 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             );
 
 
-            //r21
-            val += datayear.PercUzavrenoOVikendu *
-                   KIndexData.DetailInfo.DefaultKIndexPartKoeficient(KIndexData.KIndexParts.PercUzavrenoOVikendu); //84
-            vradky.Add(
-                new KIndexData.VypocetDetail.Radek(KIndexData.KIndexParts.PercUzavrenoOVikendu,
-                    datayear.PercUzavrenoOVikendu,
-                    KIndexData.DetailInfo.DefaultKIndexPartKoeficient(KIndexData.KIndexParts.PercUzavrenoOVikendu))
-            );
-
-
+            if (datayear.Rok < 2022)
+            {             //r21
+                val += datayear.PercUzavrenoOVikendu *
+                       KIndexData.DetailInfo.DefaultKIndexPartKoeficient(KIndexData.KIndexParts.PercUzavrenoOVikendu); //84
+                vradky.Add(
+                    new KIndexData.VypocetDetail.Radek(KIndexData.KIndexParts.PercUzavrenoOVikendu,
+                        datayear.PercUzavrenoOVikendu,
+                        KIndexData.DetailInfo.DefaultKIndexPartKoeficient(KIndexData.KIndexParts.PercUzavrenoOVikendu))
+                );
+            }
+            else {
+                val += datayear.PercZacerneno *
+                       KIndexData.DetailInfo.DefaultKIndexPartKoeficient(KIndexData.KIndexParts.PercZacerneno); //84
+                vradky.Add(
+                    new KIndexData.VypocetDetail.Radek(KIndexData.KIndexParts.PercZacerneno,
+                        datayear.PercZacerneno,
+                        KIndexData.DetailInfo.DefaultKIndexPartKoeficient(KIndexData.KIndexParts.PercZacerneno))
+                );
+            }
             //r22
             val += datayear.PercSmlouvySPolitickyAngazovanouFirmou *
                    KIndexData.DetailInfo.DefaultKIndexPartKoeficient(KIndexData.KIndexParts

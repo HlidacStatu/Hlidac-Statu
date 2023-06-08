@@ -35,6 +35,10 @@ namespace HlidacStatu.Repositories.Statistics
                 await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND (hint.denUzavreni:>0)",
                     Consts.RegistrSmluvYearsList);
 
+            StatisticsPerYear<SimpleStat> _calc_Zacerneno = 
+                await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND (prilohy.blurredPages.numOfExtensivelyBlurredPages:>0)",
+                    Consts.RegistrSmluvYearsList);
+
             StatisticsPerYear<SimpleStat> _calc_ULimitu =
                 await ES.QueryGrouped.SmlouvyPerYearAsync($"({query}) AND ( hint.smlouvaULimitu:>0 )",
                     Consts.RegistrSmluvYearsList);
@@ -96,6 +100,7 @@ namespace HlidacStatu.Repositories.Statistics
                     SumKcSmluvSponzorujiciFirmy = _calc_sVazbouNaPolitikyNedavne[year].CelkemCena,
                     PocetSmluvULimitu = _calc_ULimitu[year].Pocet,
                     PocetSmluvOVikendu = _calc_UzavrenoOVikendu[year].Pocet,
+                    PocetZacernenychSmluv = _calc_Zacerneno[year].Pocet,
                     PocetSmluvSeZasadnimNedostatkem = _calc_SeZasadnimNedostatkem[year].Pocet,
                     PocetSmluvNovaFirma = _calc_NovaFirmaDodavatel[year].Pocet,
                     PoOblastech = _calc_poOblastech[year]

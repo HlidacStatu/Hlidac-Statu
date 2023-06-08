@@ -28,6 +28,7 @@ namespace HlidacStatu.Entities
                 public long PocetSmluvSeZasadnimNedostatkem { get; set; }
                 public long PocetSmluvULimitu { get; set; }
                 public long PocetSmluvOVikendu { get; set; }
+                public long PocetZacernenychSmluv { get; set; }
                 public long PocetSmluvNovaFirma { get; set; }
 
                 public Dictionary<int, SimpleStat> PoOblastech { get; set; } = new Dictionary<int, SimpleStat>();
@@ -64,6 +65,7 @@ namespace HlidacStatu.Entities
                         PocetSmluvSeZasadnimNedostatkem = PocetSmluvSeZasadnimNedostatkem + (other?.PocetSmluvSeZasadnimNedostatkem ?? 0),
                         PocetSmluvULimitu = PocetSmluvULimitu + (other?.PocetSmluvULimitu ?? 0),
                         PocetSmluvOVikendu = PocetSmluvOVikendu + (other?.PocetSmluvOVikendu ?? 0),
+                        PocetZacernenychSmluv = PocetZacernenychSmluv + (other?.PocetZacernenychSmluv ?? 0),
                         PocetSmluvNovaFirma = PocetSmluvNovaFirma + (other?.PocetSmluvNovaFirma ?? 0),
                         PoOblastech = PoOblastech.ToDictionary(entry => entry.Key,
                             entry => entry.Value)
@@ -100,6 +102,7 @@ namespace HlidacStatu.Entities
                         PocetSmluvSeZasadnimNedostatkem = PocetSmluvSeZasadnimNedostatkem - (other?.PocetSmluvSeZasadnimNedostatkem ?? 0),
                         PocetSmluvULimitu = PocetSmluvULimitu - (other?.PocetSmluvULimitu ?? 0),
                         PocetSmluvOVikendu = PocetSmluvOVikendu - (other?.PocetSmluvOVikendu ?? 0),
+                        PocetZacernenychSmluv = PocetZacernenychSmluv - (other?.PocetZacernenychSmluv ?? 0),
                         PocetSmluvNovaFirma = PocetSmluvNovaFirma - (other?.PocetSmluvNovaFirma ?? 0),
                         PoOblastech = PoOblastech.ToDictionary(entry => entry.Key,
                             entry => entry.Value)
