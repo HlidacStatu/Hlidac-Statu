@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Nest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -85,6 +86,10 @@ namespace HlidacStatu.Util
 
         public static decimal PercentileCont(decimal percentile, IEnumerable<decimal> seq)
         {
+            if (seq == null)
+                return 0m;
+            if (seq.Count() == 0)
+                return 0m;
             var elements = seq.ToArray();
             Array.Sort(elements);
             decimal realIndex = percentile * (elements.Length - 1);
