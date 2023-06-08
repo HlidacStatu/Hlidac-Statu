@@ -1,9 +1,9 @@
 ﻿using HlidacStatu.Repositories;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Nest;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -97,7 +97,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                     })
                     .OrderBy(m => m.KIndex)
                     .ToList();
-                
+
                 foreach (KIndexData.KIndexParts part in Enum.GetValues(typeof(KIndexData.KIndexParts)))
                 {
                     stat.SubjektOrderedListPartsAsc.Add(part, datayear
@@ -121,11 +121,13 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 List<KIndexData.VypocetDetail.Radek> radky = new List<KIndexData.VypocetDetail.Radek>();
                 foreach (KIndexData.KIndexParts part in Enum.GetValues(typeof(KIndexData.KIndexParts)))
                 {
-                    decimal val = datayear
+                    decimal val = 0;
+                    var tmp = datayear
                         .Select(m => m.Value.KIndexVypocet.Radky
                             .FirstOrDefault(r => r.Velicina == (int)part))
-                        .Where(a => a != null)
-                        .Average(a => a.Hodnota);
+                        .Where(a => a != null);
+                    if (tmp.Count() > 0)
+                        val = tmp.Average(a => a.Hodnota);
 
                     KIndexData.VypocetDetail.Radek radek = new KIndexData.VypocetDetail.Radek(part, val,
                         KIndexData.DetailInfo.DefaultKIndexPartKoeficient(part));

@@ -315,7 +315,7 @@ text zpravy: {txt}";
 
             if (Util.DataValidators.CheckCZICO(Util.ParseTools.NormalizeIco(id)))
             {
-                KIndexData kdata = await KIndex.GetAsync(Util.ParseTools.NormalizeIco(id));
+                KIndexData kdata = await KIndex.GetAsync(Util.ParseTools.NormalizeIco(id),refreshCache:true);
                 ViewBag.ICO = id;
                 return View("Debug", kdata);
             }
@@ -328,7 +328,7 @@ text zpravy: {txt}";
                     var f = Firmy.Get(Util.ParseTools.NormalizeIco(i));
                     if (f.Valid)
                     {
-                        var kidx = await KIndex.GetAsync(Util.ParseTools.NormalizeIco(i));
+                        var kidx = await KIndex.GetAsync(Util.ParseTools.NormalizeIco(i), refreshCache: true);
                         if (kidx != null)
                             kdata.Add(kidx);
                     }

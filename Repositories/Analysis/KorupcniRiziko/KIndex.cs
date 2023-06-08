@@ -58,7 +58,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             return kindexReadyIcos; 
         }
 
-        public static async Task<KIndexData> GetAsync(string ico, bool useTemp = false)
+        public static async Task<KIndexData> GetAsync(string ico, bool useTemp = false, bool refreshCache = false)
         {
             if (kindexReadyIcos != null && kindexReadyIcos.Count > 0)
             {
@@ -67,6 +67,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             }
             if (string.IsNullOrEmpty(ico))
                 return null;
+            if (refreshCache)
+                _cachedKIndexData.Delete((ico, useTemp));
+
             KIndexData f =  _cachedKIndexData.Get((ico,useTemp));
             if (f == null || f.Ico == "-")
                 return null;
