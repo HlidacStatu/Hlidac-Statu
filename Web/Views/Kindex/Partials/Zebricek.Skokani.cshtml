@@ -39,11 +39,11 @@
     <div class="col-sm-12">
         <h3 class="">
             Žebříček pro další roky:
-            @for (int year = 2017; year < DateTime.Now.Year ; year++)
+            @for (int year = 2017; year < DateTime.Now.Year; year++)
             {
                 if (year != ViewBag.SelectedYear)
                 {
-                    <a style="padding-right:20px;" href="@(ViewBag.SelectedLadder)?rok=@year"><i class="fas fa-arrow-square-right"></i> @year</a>
+                    <a style="padding-right:20px;" href="/kindex/zebricek/@(ViewBag.SelectedLadder)?rok=@year"><i class="fas fa-arrow-square-right"></i> @year</a>
                 }
                 else
                 {
@@ -69,14 +69,14 @@
                 }
                 else
                 {
-                    <a style="padding-right:20px;" href="@(ViewBag.SelectedLadder)?rok=@selectedYear"><i class="fas fa-arrow-square-right"></i>Zrušit filter, zobrazit vše</a>
+                    <a style="padding-right:20px;" href="/kindex/zebricek/@(ViewBag.SelectedLadder)?rok=@selectedYear"><i class="fas fa-arrow-square-right"></i>Zrušit filter, zobrazit vše</a>
                 }
                 @foreach (var group in filterGroups)
                 {
                     if (group.Key != selectedGroup)
                     {
                         <span style="padding-right:20px;">
-                            <a href="@(ViewBag.SelectedLadder)?@(filterUrlValue)=@System.Net.WebUtility.UrlEncode(group.Key)&rok=@selectedYear"><i class="fas fa-arrow-square-right"></i>@group.Key </a>(@group.Value)
+                            <a href="/kindex/zebricek/@(ViewBag.SelectedLadder)?@(filterUrlValue)=@System.Net.WebUtility.UrlEncode(group.Key)&rok=@selectedYear"><i class="fas fa-arrow-square-right"></i>@group.Key </a>(@group.Value)
                         </span>
                     }
                     else

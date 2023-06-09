@@ -70,11 +70,11 @@
     <div class="col-sm-12">
         <h3 class="">
             Žebříček pro další roky:
-            @foreach (int year in Consts.AvailableCalculationYears.Where(m=> maxYear==null || m <= maxYear))
+            @foreach (int year in Consts.AvailableCalculationYears.Where(m => this.User.IsInRole("Admin") || maxYear == null || m <= maxYear))
             {
                 if (year != selectedYear)
                 {
-                    <a style="padding-right:20px;" href="@(ViewBag.SelectedLadder)?rok=@year&kraj=@System.Net.WebUtility.UrlEncode(selectedKraj)&group=@System.Net.WebUtility.UrlEncode(selectedGroup)"><i class="fas fa-arrow-square-right"></i> @year</a>
+                    <a style="padding-right:20px;" href="/kindex/zebricek/@(ViewBag.SelectedLadder)?rok=@year&kraj=@System.Net.WebUtility.UrlEncode(selectedKraj)&group=@System.Net.WebUtility.UrlEncode(selectedGroup)"><i class="fas fa-arrow-square-right"></i> @year</a>
                 }
                 else
                 {
