@@ -47,21 +47,8 @@ namespace HlidacStatu.Connectors.IO
         {
             return base.GetRelativeDir(obj) + obj.Id + Path.DirectorySeparatorChar;
         }
-        public string GetRelativePath(Smlouva obj, Smlouva.Priloha priloha, RequestedFileType filetype = RequestedFileType.Original)
-        {
-            return GetRelativePath(obj, priloha.odkaz);
-        }
-        public string GetRelativePath(Smlouva obj, string prilohaUrl, RequestedFileType filetype = RequestedFileType.Original)
-        {
-            if (string.IsNullOrEmpty(prilohaUrl) || obj == null)
-                return string.Empty;
-            var fn = GetRelativeDir(obj) + Encode(prilohaUrl);
-            if (filetype == RequestedFileType.PDF)
-                fn = fn + ".pdf";
-            return fn;
-
-            //return base.GetRelativePath(obj, Devmasters.Crypto.Hash.ComputeHash(prilohaUrl));
-        }
+        
+        
         public override string GetRelativePath(Smlouva obj, string prilohaUrl)
         {
             throw new System.NotImplementedException("Use GetRelativePath(Smlouva obj, string prilohaUrl, RequestedFileType filetype = RequestedFileType.Original)");

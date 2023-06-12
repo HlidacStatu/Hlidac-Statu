@@ -168,34 +168,6 @@ namespace HlidacStatu.DS.Graphs
 
             }
 
-            [Obsolete()]
-            public static Edge[] GetLongestEdges_obsolete(IEnumerable<Edge> relations)
-            {
-                if (relations == null)
-                    return null;
-                if (relations.Count() < 2)
-                    return relations.ToArray();
-
-                var longestE = new List<Edge>();
-
-                var uniqEdges = relations
-                                    .Select(r => string.Join("|", r.From.UniqId, r.To.UniqId))
-                                    .Distinct();
-
-                foreach (var uniq in uniqEdges)
-                {
-                    var eParts = uniq.Split('|');
-
-                    var le = GetLongestEdge(relations
-                                 .Where(r => r.From.UniqId == eParts[0] && r.To.UniqId == eParts[1]));
-
-                    if (le != null)
-                        longestE.Add(le);
-                }
-
-                return longestE.ToArray();
-            }
-
             public static Edge[] GetLongestEdges(IEnumerable<Edge> relations)
             {
                 var longestE = new List<Edge>();
@@ -335,24 +307,6 @@ namespace HlidacStatu.DS.Graphs
                 Edge bestRelation = relations.Where(r => r.RelFrom == fromDate && r.RelTo == toDate).FirstOrDefault();
                 if (bestRelation == null)
                 {
-                    return relations.OrderByDescending(m => m.LengthOfEdgeInDays()).FirstOrDefault();
-                }
-                else
-                    return bestRelation;
-            }
-
-            public static Edge GetNewestPossibleEdge(IEnumerable<Edge> relations, DateTime? fromDate, DateTime? toDate)
-            {
-                Edge bestRelation = relations.Where(r =>
-                                                            (fromDate.HasValue == false || fromDate <= r.RelFrom)
-                                                            &&
-                                                            (toDate.HasValue == false || r.RelTo <= toDate)
-                                                        )
-                                                .OrderByDescending(m => fromDate)
-                                                .FirstOrDefault();
-                if (bestRelation == null)
-                {
-                    //bestRelation = relations.Where(m => m.Relationship == RelationSimpleEnum.Souhrnny).FirstOrDefault();
                     return relations.OrderByDescending(m => m.LengthOfEdgeInDays()).FirstOrDefault();
                 }
                 else

@@ -37,12 +37,6 @@ namespace HlidacStatu.Datasets
                     return filesystem.GetFullPath(this, NormalizeFilename(filename));
                 }
 
-                //don't use
-                private byte[] GetData(string filename)
-                {
-                    return System.IO.File.ReadAllBytes(GetFullPath(filename));
-                }
-
                 public bool Exists(Uri url)
                 {
                     var fullname = GetFullPath(url);
@@ -79,22 +73,7 @@ namespace HlidacStatu.Datasets
                     return generatedFileName;
                 }
 
-                //private now, don't use
-                private bool __Save(string originalFilePath)
-                {
-
-                    System.IO.FileInfo fi = new System.IO.FileInfo(originalFilePath);
-
-                    FileAttributes fa = new FileAttributes()
-                    {
-                        ContentType = HlidacStatu.Util.MimeTools.MimetypeFromExtension(originalFilePath),
-                        Source = originalFilePath,
-                        Size = fi.Length,
-                        Downloaded = DateTime.UtcNow
-                    };
-                    var data = System.IO.File.ReadAllBytes(originalFilePath);
-                    return SaveMeOnDisk(ref data, GetFullPath(originalFilePath), fa);
-                }
+                
                 public bool Save(Uri url)
                 {
                     using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent(url.AbsoluteUri))

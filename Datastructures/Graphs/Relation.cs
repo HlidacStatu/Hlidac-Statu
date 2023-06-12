@@ -209,22 +209,6 @@ namespace HlidacStatu.DS.Graphs
             return sb.ToString();
         }
 
-
-
-
-        public static Graph.Edge[] AktualniVazby_old(IEnumerable<Graph.Edge> allRelations, AktualnostType minAktualnost)
-        {
-            if (allRelations == null)
-                return new Graph.Edge[] { };
-
-            if (minAktualnost <= AktualnostType.Neaktualni)
-                return allRelations.ToArray();
-
-            return allRelations
-                .Where(m => m.Aktualnost >= minAktualnost)
-                .ToArray();
-        }
-
         public static Graph.Edge[] AktualniVazby(IEnumerable<Graph.Edge> allRelations, AktualnostType minAktualnost, Graph.Edge root)
         {
             if (allRelations == null)
@@ -414,56 +398,6 @@ namespace HlidacStatu.DS.Graphs
                 default:
                     //rel.Relationship = Relation.RelationDescriptionEnum.Jednatel;
                     return RelationSimpleEnum.Jiny;
-            }
-        }
-        public static string TypVazbyToDescription(int typVazby)
-        {
-            RelationSimpleEnum simple = TypVazbyToRelationSimple(typVazby);
-
-            switch (typVazby)
-            {
-
-                case 1:
-                    return RelationSimpleEnum.Jednatel.ToNiceDisplayName();
-                case 3:
-                    return RelationSimpleEnum.Prokura.ToNiceDisplayName();
-                case 4:
-                case 7:
-                case 2:
-                case 18:
-                case 25:
-                case 26:
-                case 28:
-                case 31:
-                    return RelationSimpleEnum.Dozorci_rada.ToNiceDisplayName();
-
-                case 33:
-                case 34:
-                case 35:
-                    return RelationSimpleEnum.Dozorci_rada.ToNiceDisplayName();
-                case 5:
-                case 9:
-                case 10:
-                case 15:
-                case 19:
-                case 24:
-                    return RelationSimpleEnum.Spolecnik.ToNiceDisplayName();
-                case 100:
-                    return RelationSimpleEnum.Jednatel.ToNiceDisplayName();
-                case 23://
-                case 29://
-                case 11://
-                case 12://
-                case 13://
-                case 16://
-                case 17://
-                case 37://
-                case 40://
-                case 41://
-                case 42: //
-                case 99:
-                default:
-                    return simple.ToNiceDisplayName();
             }
         }
     }

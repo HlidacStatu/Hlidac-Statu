@@ -11,12 +11,6 @@ namespace HlidacStatu.DetectFaces
 {
     public class FromImage
     {
-
-        public static IEnumerable<string> DetectAndParseFacesIntoFiles(string imageFile, int minSize, int marginInPercent)
-        {
-            return DetectAndParseFacesIntoFiles(System.IO.File.ReadAllBytes(imageFile), minSize, marginInPercent);
-        }
-
         public static IEnumerable<string> DetectAndParseFacesIntoFiles(byte[] imageData, int minSize, int marginInPercent)
         {
             List<string> files = new List<string>();
