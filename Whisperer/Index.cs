@@ -100,8 +100,7 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
         if (string.IsNullOrWhiteSpace(query))
             return Enumerable.Empty<ScoredResult<T>>();
         
-        query = query.ReplaceDisallowedCharsWithSpace(SearchModifiingChars) //we need to remove special characters
-            .ToLower(); //also we need to remove boolean operators AND OR NOT - make them lowercase is enough  
+        
         
         // It can happen that in results will be synonyms which are going to be filtered out
         // so we need this "buffer"
@@ -113,6 +112,12 @@ public sealed class Index<T> : IDisposable where T : IEquatable<T>
         {
             DefaultOperator = Operator.AND
         };
+        
+        query = QueryParser.Escape(query) //we need to escape special characters
+            .ToLower(); //also we need to remove boolean operators AND OR NOT - make them lowercase is enough
+        
+        // query = query.ReplaceDisallowedCharsWithSpace(SearchModifiingChars) //we need to remove special characters
+        //     .ToLower(); //also we need to remove boolean operators AND OR NOT - make them lowercase is enough  
 
         var searchQuery = queryParser.Parse(query);
 
