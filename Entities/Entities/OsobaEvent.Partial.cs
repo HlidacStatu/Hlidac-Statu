@@ -103,13 +103,6 @@ namespace HlidacStatu.Entities
             // WhateverElse = 4
         }
 
-
-        public void SetYearInterval(int year)
-        {
-            DatumOd = new DateTime(year, 1, 1);
-            DatumDo = new DateTime(year, 12, 31);
-        }
-        
         [NotMapped]
         public string TypeName => ((OsobaEvent.Types)Type).ToNiceDisplayName();
 
@@ -133,19 +126,6 @@ namespace HlidacStatu.Entities
         public string ToAuditObjectId()
         {
             return Pk.ToString();
-        }
-
-        public static bool Compare(OsobaEvent a, OsobaEvent b)
-        {
-            return a.AddInfo == b.AddInfo
-                && a.AddInfoNum == b.AddInfoNum
-                && a.DatumDo == b.DatumDo
-                && a.DatumOd == b.DatumOd
-                && a.Organizace == b.Organizace
-                && a.OsobaId == b.OsobaId
-                && a.Status == b.Status
-                && a.Title == b.Title
-                && a.Type == b.Type;
         }
 
         public bool IsOverlaping(OsobaEvent other, out OsobaEvent mergedEvent)

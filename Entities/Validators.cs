@@ -370,16 +370,6 @@ namespace HlidacStatu.Entities
             return icos.ToArray();
         }
 
-
-        public static DateTime? DateInText(string value)
-        {
-            var ret = DatesInText(value);
-            if (ret == null)
-                return null;
-            else
-                return ret.First().Value;
-        }
-
         public static Dictionary<int, DateTime> DatesInText(string value)
         {
             Dictionary<int, DateTime> ret = new Dictionary<int, DateTime>();

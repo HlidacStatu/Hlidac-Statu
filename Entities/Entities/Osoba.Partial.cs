@@ -66,20 +66,6 @@ namespace HlidacStatu.Entities
             return FullNameWithNarozeni();
         }
 
-        public string FullNameToQuery(bool exact = true)
-        {
-            if (exact)
-            {
-                List<string> parts = new List<string>();
-                parts.AddRange(Jmeno.Split(' '));
-                parts.AddRange(Prijmeni.Split(' '));
-                string q = $" ( {string.Join(" ", parts.Select(m => m + "~0"))} ) ";
-                return q;
-            }
-            else
-                return $"(\"{FullName()}\")";
-        }
-
         public string FullName(bool html = false)
         {
             string ret = string.Format("{0} {1} {2}{3}", TitulPred, Jmeno, Prijmeni, string.IsNullOrEmpty(TitulPo) ? "" : ", " + TitulPo).Trim();

@@ -733,12 +733,6 @@ namespace HlidacStatu.Entities.VZ
             return string.IsNullOrEmpty(xd.Root.Element(name).Value) == false;
         }
 
-        public static VerejnaZakazka FromHtml(string html, int displayId)
-        {
-            throw new NotImplementedException("not finished yet. See XML parser");
-
-        }
-
         public string ToAuditJson()
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);

@@ -281,66 +281,11 @@ namespace HlidacStatu.Extensions
                 .Where(e => Osoba.VerejnopravniUdalosti.Contains(e.Type));
         }
 
-
-        public static OsobaEvent AddDescription(this Osoba osoba, string text, string strana, string zdroj, string user,
-            bool deletePrevious = false)
-        {
-            if (deletePrevious)
-            {
-                var oes = osoba.Events(m => m.Type == (int)OsobaEvent.Types.Vazby);
-                foreach (var o in oes)
-                {
-                    OsobaEventRepo.Delete(o, user);
-                }
-            }
-
-            OsobaEvent oe = new OsobaEvent(osoba.InternalId, "", text, OsobaEvent.Types.Vazby);
-            oe.Organizace = ParseTools.NormalizaceStranaShortName(strana);
-            oe.Zdroj = zdroj;
-            return osoba.AddOrUpdateEvent(oe, user);
-        }
-
-        public static OsobaEvent AddFunkce(this Osoba osoba, string pozice, string strana, int rokOd, int? rokDo,
-            string zdroj, string user)
-        {
-            OsobaEvent oe = new OsobaEvent(osoba.InternalId, string.Format("{0}", pozice), "",
-                OsobaEvent.Types.PolitickaExekutivni);
-            oe.Organizace = ParseTools.NormalizaceStranaShortName(strana);
-            oe.Zdroj = zdroj;
-            oe.DatumOd = new DateTime(rokOd, 1, 1, 0, 0, 0, DateTimeKind.Local);
-            oe.DatumDo = rokDo == null
-                ? (DateTime?)null
-                : new DateTime(rokDo.Value, 12, 31, 0, 0, 0, DateTimeKind.Local);
-            return osoba.AddOrUpdateEvent(oe, user);
-        }
-
-        public static OsobaEvent AddClenStrany(this Osoba osoba, string strana, int rokOd, int? rokDo, string zdroj,
-            string user)
-        {
-            OsobaEvent oe = new OsobaEvent(osoba.InternalId, string.Format("Člen strany {0}", strana), "",
-                OsobaEvent.Types.Politicka);
-            oe.Organizace = ParseTools.NormalizaceStranaShortName(strana);
-            oe.AddInfo = "člen strany";
-            oe.Zdroj = zdroj;
-            oe.DatumOd = new DateTime(rokOd, 1, 1, 0, 0, 0, DateTimeKind.Local);
-            oe.DatumDo = rokDo == null
-                ? (DateTime?)null
-                : new DateTime(rokDo.Value, 12, 31, 0, 0, 0, DateTimeKind.Local);
-            return osoba.AddOrUpdateEvent(oe, user);
-        }
-
         public static Sponzoring AddSponsoring(this Osoba osoba, Sponzoring sponzoring, string user)
         {
             sponzoring.OsobaIdDarce = osoba.InternalId;
             var result = SponzoringRepo.Create(sponzoring, user);
             return result;
-        }
-
-        public static string Description(this Osoba osoba, bool html, string template = "{0}",
-            string itemTemplate = "{0}",
-            string itemDelimeter = "<br/>")
-        {
-            return osoba.Description(html, m => true, int.MaxValue, template, itemTemplate, itemDelimeter);
         }
 
         public static string Description(this Osoba osoba, bool html, Expression<Func<OsobaEvent, bool>> predicate,

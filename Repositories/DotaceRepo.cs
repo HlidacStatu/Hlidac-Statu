@@ -34,6 +34,7 @@ namespace HlidacStatu.Repositories
 
         }
 
+        //do not delete - it is used by another project
         public static async Task SaveAsync(Dotace dotace)
         {
             if (dotace == null) throw new ArgumentNullException(nameof(dotace));
@@ -77,61 +78,11 @@ namespace HlidacStatu.Repositories
 
             return result.Errors;
         }
-
-        public static async Task<(decimal Sum, int Count)> GetStatisticsForIcoAsync(string ico)
-        {
-            var dotaceAggs = new AggregationContainerDescriptor<Dotace>()
-                .Sum("souhrn", s => s
-                    .Field(f => f.DotaceCelkem)
-                );
-
-            var dotaceSearch = await Searching.SimpleSearchAsync($"ico:{ico}", 1, 1,
-                DotaceSearchResult.DotaceOrderResult.FastestForScroll, false,
-                dotaceAggs, exactNumOfResults: true);
-
-            decimal sum = (decimal)dotaceSearch.ElasticResults.Aggregations.Sum("souhrn").Value;
-            int count = (int)dotaceSearch.Total;
-
-            return (sum, count);
-        }
-
-        public static async Task<Dictionary<string, (decimal Sum, int Count)>> GetStatisticsForHoldingAsync(string ico)
-        {
-            var dotaceAggsH = new AggregationContainerDescriptor<Dotace>()
-                .Terms("icos", s => s
-                    .Field(f => f.Prijemce.Ico)
-                    .Size(5000)
-                    .Aggregations(a => a
-                        .Sum("sum", ss => ss.Field(ff => ff.DotaceCelkem))
-                    )
-                );
-            var dotaceSearchH = await Searching.SimpleSearchAsync($"holding:{ico}", 1, 1,
-                DotaceSearchResult.DotaceOrderResult.FastestForScroll, false,
-                dotaceAggsH, exactNumOfResults: true);
-
-            var items = ((BucketAggregate)dotaceSearchH.ElasticResults.Aggregations["icos"]).Items;
-
-            Dictionary<string, (decimal Sum, int Count)> dict = items.ToDictionary(
-                i => ((KeyedBucket<object>)i).Key.ToString(),
-                i => ((decimal)((KeyedBucket<object>)i).Sum("sum").Value,
-                    (int)((KeyedBucket<object>)i).DocCount)
-                );
-
-            return dict;
-        }
-
+        
         public static IAsyncEnumerable<Dotace> GetDotaceForIcoAsync(string ico)
         {
             QueryContainer qc = new QueryContainerDescriptor<Dotace>()
                 .Term(f => f.Prijemce.Ico, ico);
-
-            return YieldAllAsync(qc);
-        }
-
-        public static IAsyncEnumerable<Dotace> GetDotaceForHoldingAsync(string holdingIco)
-        {
-            string query = Tools.FixInvalidQuery($"holding:{holdingIco}", Searching.QueryShorcuts(), Searching.QueryOperators);
-            var qc = SimpleQueryCreator.GetSimpleQuery<Dotace>(query, Searching.Irules);
 
             return YieldAllAsync(qc);
         }

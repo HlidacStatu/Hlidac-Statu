@@ -194,20 +194,5 @@ namespace HlidacStatu.KIndexGenerator
             //return bitmap;
 
         }
-
-        public MemoryStream PngStream()
-        {
-            MemoryStream ms = new MemoryStream();
-            this.BitMap().Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-            return ms;
-
-        }
-        public byte[] PngArray()
-        {
-            using (MemoryStream ms = this.PngStream())
-            {
-                return ms.ToArray();
-            }
-        }
     }
 }

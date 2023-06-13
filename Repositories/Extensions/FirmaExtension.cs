@@ -115,13 +115,6 @@ namespace HlidacStatu.Extensions
         }
 
         public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> StatistikaRegistruSmluv(
-            this Firma firma,
-            Smlouva.SClassification.ClassificationsTypes classif, bool forceUpdateCache = false)
-        {
-            return firma.StatistikaRegistruSmluv((int)classif,forceUpdateCache);
-        }
-
-        public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data> StatistikaRegistruSmluv(
             this Firma firma, int? iclassif = null, bool forceUpdateCache = false)
         {
             return FirmaStatistics.GetStatistics(firma, iclassif, forceUpdateCache);
@@ -168,13 +161,6 @@ namespace HlidacStatu.Extensions
                     .Where(p => p != null)
                     .OrderBy(p => p.Prijmeni)
                     .ToArray();
-        }
-
-        public static BasicDataForSubject<List<BasicData<string>>>
-            NespolehlivyPlatceDPH_obchodSuradyStat(this Firma firma)
-        {
-            return StaticData.NespolehlivyPlatciDPH_obchodySurady_Cache.Get().SoukromeFirmy
-                .FirstOrDefault(f => f.Ico == firma.ICO);
         }
 
         public static bool IsNespolehlivyPlatceDPH(this Firma firma)
@@ -346,15 +332,6 @@ namespace HlidacStatu.Extensions
             return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, obor, forceUpdateCache);
         }
 
-        public static Lib.Analytics.StatisticsSubjectPerYear<Smlouva.Statistics.Data>
-            HoldingStatisticsRegistrSmluvProObor(
-                this Firma firma,
-                Relation.AktualnostType aktualnost,
-                Smlouva.SClassification.ClassificationsTypes classification, bool forceUpdateCache = false)
-        {
-            return FirmaStatistics.CachedHoldingStatisticsSmlouvy(firma, aktualnost, (int)classification, forceUpdateCache);
-        }
-
         public static bool PatrimStatuAlespon25procent(this Firma firma) => (firma.TypSubjektu == Firma.TypSubjektuEnum.PatrimStatu25perc);
 
         internal static bool _patrimStatuAlespon25procent(this Firma firma)
@@ -486,18 +463,7 @@ namespace HlidacStatu.Extensions
                     .Select(s => s.ToHtml())
                     .Take(take));
         }
-
-        public static string EventsToHtml(this Firma firma, Expression<Func<OsobaEvent, bool>> predicate,
-            int take = int.MaxValue)
-        {
-            return string.Join("<br />",
-                firma.Events(predicate)
-                    .OrderByDescending(s => s.DatumDo == null ? s.DatumDo : s.DatumOd)
-                    .Select(e => e.RenderHtml())
-                    .Take(take));
-        }
-
-
+        
         public static IEnumerable<OsobaEvent> Events(this Firma firma, Expression<Func<OsobaEvent, bool>> predicate)
         {
             using (DbEntities db = new DbEntities())
@@ -515,30 +481,13 @@ namespace HlidacStatu.Extensions
             return SponzoringRepo.GetByDarce(firma.ICO, predicate);
         }
 
-        public static OsobaEvent AddOrUpdateEvent(this Firma firma, OsobaEvent ev, string user)
-        {
-            if (ev == null || firma == null)
-                return null;
-
-            ev.Ico = firma.ICO;
-            return OsobaEventRepo.CreateOrUpdate(ev, user);
-
-        }
-
         public static Sponzoring AddSponsoring(this Firma firma, Sponzoring sponzoring, string user)
         {
             sponzoring.IcoDarce = firma.ICO;
             var result = SponzoringRepo.Create(sponzoring, user);
             return result;
         }
-
-        public static string Description(this Firma firma, bool html, string template = "{0}",
-            string itemTemplate = "{0}",
-            string itemDelimeter = "<br/>", int numOfRecords = int.MaxValue)
-        {
-            return firma.Description(html, m => true, template, itemTemplate, itemDelimeter, numOfRecords);
-        }
-
+        
         public static string Description(this Firma firma, bool html, Expression<Func<OsobaEvent, bool>> predicate,
             string template = "{0}", string itemTemplate = "{0}",
             string itemDelimeter = "<br/>", int numOfRecords = int.MaxValue)
@@ -591,13 +540,7 @@ namespace HlidacStatu.Extensions
                 .Where(m => m.IcoDarce == firma.ICO && m.DarovanoDne < date)
                 .Any();
         }
-
-        public static bool ObecneJmenoRodMuzsky(this Firma firma)
-        {
-            return firma.ObecneJmeno() == uradName;
-        }
-
-
+        
         static Devmasters.Cache.Elastic.Manager<InfoFact[], Firma> _infoFactsCache()
         {
             var cache = Devmasters.Cache.Elastic.Manager<InfoFact[], Firma>

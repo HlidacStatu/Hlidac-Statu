@@ -78,11 +78,6 @@ namespace HlidacStatu.JobTableEditor.Data
             };
         }
 
-        public void SetOriginalValue()
-        {
-            Value = Cell.OriginalCellText;
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
