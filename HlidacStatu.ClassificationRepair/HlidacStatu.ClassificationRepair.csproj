@@ -9,8 +9,8 @@
         <None Remove="appsettings.json.sample" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="MailKit" Version="4.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.5" />
+        <PackageReference Include="MailKit" Version="4.1.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.7" />
         <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
     </ItemGroup>
     <ItemGroup>

@@ -15,26 +15,26 @@
 		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="6.0.5" />
 		<PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="6.0.5" />
 		<PackageReference Include="AspNetCore.HealthChecks.Uris" Version="6.0.3" />
-		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Extension" Version="7.4.4" />
+		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Extension" Version="7.4.6" />
 		<PackageReference Include="CouchbaseNetClient" Version="2.7.26" />
 		<PackageReference Include="Devmasters.Core" Version="4.5.1" />
 		<PackageReference Include="Docker.DotNet" Version="3.125.15" />
 		<PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.3.0" />
-		<PackageReference Include="IPNetwork2" Version="2.6.586" />
-		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.5" />
+		<PackageReference Include="IPNetwork2" Version="2.6.589" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.7" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.5" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.5" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.5" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.5">
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.7" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.7">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="7.0.5" />
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.6" />
+		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="7.0.7" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.7" />
 		<PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
 	</ItemGroup>
 
