@@ -474,11 +474,9 @@ namespace HlidacStatu.Repositories.Searching
             var qs = new QueryContainerDescriptor<T>().MatchAll();
             if (!string.IsNullOrEmpty(query))
             {
-                qs = new QueryContainerDescriptor<T>()
-                    .QueryString(qq => qq
-                        .Query(query)
-                        .DefaultOperator(Operator.And)
-                    );
+                query = Tools.FixInvalidQuery(query, Repositories.SmlouvaRepo.Searching.Irules, Tools.DefaultQueryOperators);
+
+                qs = Repositories.SmlouvaRepo.Searching.GetSimpleQuery(query);
             }
 
             long total = 0;
@@ -572,11 +570,9 @@ namespace HlidacStatu.Repositories.Searching
             var qs = new QueryContainerDescriptor<object>().MatchAll();
             if (!string.IsNullOrEmpty(query))
             {
-                qs = new QueryContainerDescriptor<object>()
-                    .QueryString(qq => qq
-                        .Query(query)
-                        .DefaultOperator(Operator.And)
-                    );
+                query = Tools.FixInvalidQuery(query, Repositories.SmlouvaRepo.Searching.Irules, Tools.DefaultQueryOperators);
+
+                qs = Repositories.SmlouvaRepo.Searching.GetSimpleQuery(query);
             }
             var resCount = await sourceESClient.SearchAsync<object>(a => a
                 .Source(false)
