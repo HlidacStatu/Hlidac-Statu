@@ -337,7 +337,7 @@
                                         @Html.Raw(";&nbsp;")
                                         <a href="@(priloha.GetUrl(Model.Id, true, UriKind.Relative))&forcePDF=true" data-link="kopie">(PDF)</a>
                                     }
-                                    @if (priloha.WordCount > 10)
+                                    @if (priloha.WordCount > 2)
                                     {
                                         @Html.Raw(";&nbsp;")
                                         <a href="@Url.Action("TextSmlouvy", new {id = @Model.Id, hash = priloha.hash?.Value, q = Context.Request.Query["Q"]})">zobrazit čistý text přílohy</a>

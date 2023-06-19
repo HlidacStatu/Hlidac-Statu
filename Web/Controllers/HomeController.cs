@@ -349,10 +349,14 @@ text zpravy: {txt}
         }
         public async Task<ActionResult> KopiePrilohy(string Id, string hash, string secret, bool forcePDF = false)
         {
+
             if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(hash))
                 return NotFound();
 
-            var model = await SmlouvaRepo.LoadAsync(Id);
+            if (User.Identity.IsAuthenticated == false)
+                return NotFound();
+
+                var model = await SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return NotFound();
