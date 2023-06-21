@@ -28,7 +28,7 @@ namespace HlidacStatu.Lib.Data.External
                 var res = Devmasters.Net.HttpClient.Simple.PostAsync<ApiResult<byte[]>>(
                     Devmasters.Config.GetWebConfigValue("LibreOffice.Service.Api") + "/LibreOffice/ConvertFromFile",
                     form,
-                    headers: headers, timeout: TimeSpan.FromMinutes(2))
+                    headers: headers, timeout: TimeSpan.FromMinutes(4))
                     .ConfigureAwait(false).GetAwaiter().GetResult();
 
                 if (res.Success)

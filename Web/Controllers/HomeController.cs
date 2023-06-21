@@ -353,10 +353,7 @@ text zpravy: {txt}
             if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(hash))
                 return NotFound();
 
-            if (User.Identity.IsAuthenticated == false)
-                return NotFound();
-
-                var model = await SmlouvaRepo.LoadAsync(Id);
+            var model = await SmlouvaRepo.LoadAsync(Id);
             if (model == null)
             {
                 return NotFound();
