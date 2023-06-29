@@ -239,6 +239,8 @@ namespace HlidacStatu.Entities
         public virtual DbSet<PravniFormaOvm> PravniFormaOvm { get; set; }
         public virtual DbSet<TypOvm> TypOvm { get; set; }
         public virtual DbSet<ConfigurationValue> ConfigurationValues { get; set; }
+        
+        public virtual DbSet<PlatUrednika> PlatyUredniku { get; set; }
 
         //views
         public DbSet<FindPersonDTO> FindPersonView { get; set; }

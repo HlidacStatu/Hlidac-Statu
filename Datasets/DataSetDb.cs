@@ -21,7 +21,6 @@ namespace HlidacStatu.Datasets
             new Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]>(
                         TimeSpan.FromMinutes(5), (obj) =>
                         {
-
                             var datasets = Instance.SearchDataRawAsync("*", 1, 500)
                                 .ConfigureAwait(false).GetAwaiter().GetResult()
                             .Result
