@@ -15,211 +15,171 @@
 
 @* Pravý sloupec *@
 <div class="col-sm-4 col-xs-12 order-md-3 order-sm-0">
-<div class="row">
+    <div class="row">
 
-    @if (ceo.Osoba != null && ceo.Osoba.IsValid())
-    {
-        <div class="col-sm-4">
-            <div class="person-profile-thumb">
-                <a href="@ceo.Osoba.GetUrl()">
-                    <div class="photo">
-                        <div class="profile-picture" style="background-image: url('@ceo.Osoba.GetPhotoUrl(local: true)')"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div class="col-sm-8">
-            <p class="py-0 my-0 text-muted">@ceo.Role</p>
-            <p class="py-0 my-0 lead">
-                <a href="@ceo.Osoba.GetUrl()">@ceo.Osoba.FullName()</a>
-            </p>
-            <p class="py-0 my-0">od @(ceo.From?.ToString("dd.MM.yyyy"))</p>
-            @if (ceo.Osoba.GetSocialContacts().Any())
-            {
-                <p class="py-0 my-0 text-muted">
-                    @foreach (var ev in ceo.Osoba.GetSocialContacts())
-                    {
-                        <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, "", "")</span>
-                    }
-                </p>
-            }
-
-        </div>
-    }
-    else
-    {
-        var rppOsoby = await Model.CeoFromRPPAsync();
-        if (rppOsoby.Count() > 0)
+        @if (ceo.Osoba != null && ceo.Osoba.IsValid())
         {
             <div class="col-sm-4">
                 <div class="person-profile-thumb">
-                    <div class="photo">
-                        <div class="profile-picture" style="background-image: url('/photo/unknown')"></div>
-                    </div>
+                    <a href="@ceo.Osoba.GetUrl()">
+                        <div class="photo">
+                            <div class="profile-picture" style="background-image: url('@ceo.Osoba.GetPhotoUrl(local: true)')"></div>
+                        </div>
+                    </a>
                 </div>
             </div>
             <div class="col-sm-8">
-                <p class="py-0 my-0 text-muted">Zastupovaný</p>
-                @foreach (var os in rppOsoby)
+                <p class="py-0 my-0 text-muted">@ceo.Role</p>
+                <p class="py-0 my-0 lead">
+                    <a href="@ceo.Osoba.GetUrl()">@ceo.Osoba.FullName()</a>
+                </p>
+                <p class="py-0 my-0">od @(ceo.From?.ToString("dd.MM.yyyy"))</p>
+                @if (ceo.Osoba.GetSocialContacts().Any())
                 {
-                    <p class="py-0 my-0 lead">@($"{os.jmeno.Capitalize()} {os.prijmeni.Capitalize()}")</p>
-                    <p class="py-0 my-0 text-muted small">změna @(os.poslednizmena?.ToString("dd.MM.yyyy"))</p>
+                    <p class="py-0 my-0 text-muted">
+                        @foreach (var ev in ceo.Osoba.GetSocialContacts())
+                        {
+                            <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, "", "")</span>
+                        }
+                    </p>
                 }
+
             </div>
         }
-    }
-
-</div>
-<div>
-    <table>
-        <tr>
-            <td class="text-nowrap text-muted col-sm-5">Založeno</td>
-            <td class="col-sm-7">@(Model.Datum_Zapisu_OR?.ToString("dd.MM.yyyy"))</td>
-        </tr>
-        @if (Model.DatumZaniku is not null)
+        else
         {
-            <tr>
-                <td class="text-nowrap text-muted col-sm-5">Zaniklo</td>
-                <td class="col-sm-7">@(Model.DatumZaniku?.ToString("dd.MM.yyyy"))</td>
-            </tr>
-        }
-        <tr>
-            <td class="text-nowrap text-muted col-sm-5">IČO</td>
-            <td class="col-sm-7">@Model.ICO</td>
-        </tr>
-        <tr>
-            <td class="text-nowrap text-muted col-sm-5">Datová schránka</td>
-            <td class="col-sm-5">@string.Join(", ", Model.DatovaSchranka)</td>
-        </tr>
-        @if (Model.GetSocialContacts().Any(m => m.Network == OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
-        {
-            <tr>
-                <td class="text-nowrap text-muted col-sm-5">Záznamy zastupitelstva</td>
-                <td class="col-sm-5">
-                    @foreach (var ev in Model.GetSocialContacts().Where(m => m.Network == OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+            var rppOsoby = await Model.CeoFromRPPAsync();
+            if (rppOsoby.Count() > 0)
+            {
+                <div class="col-sm-4">
+                    <div class="person-profile-thumb">
+                        <div class="photo">
+                            <div class="profile-picture" style="background-image: url('/photo/unknown')"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-8">
+                    <p class="py-0 my-0 text-muted">Zastupovaný</p>
+                    @foreach (var os in rppOsoby)
                     {
-                        <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, Model.ICO, "")</span>
+                        <p class="py-0 my-0 lead">@($"{os.jmeno.Capitalize()} {os.prijmeni.Capitalize()}")</p>
+                        <p class="py-0 my-0 text-muted small">změna @(os.poslednizmena?.ToString("dd.MM.yyyy"))</p>
                     }
-                </td>
-            </tr>
+                </div>
+            }
         }
 
-        @if (Model.GetSocialContacts().Any(m => m.Network != OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
-        {
-            <tr>
-                <td class="text-nowrap text-muted col-sm-5">Odkazy</td>
-                <td class="col-sm-5">
-                    @foreach (var ev in Model.GetSocialContacts().Where(m => m.Network != OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
-                    {
-                        <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, Model.ICO, "")</span>
-                    }
-                </td>
-            </tr>
-        }
-
-    </table>
-</div>
-<hr/>
-Data firem nám poskytuje <a href="https://www.merk.cz" target="_blank" onclick="return trackOutLink(this,'Merk.cz');">Merk.cz</a>.
-<br/>Moc děkujeme <i class="fa-solid fa-heart" style="color:red"></i>
-<hr/>
-
-@{
-    HlidacStatu.Datasets.DataSet skutMajitDS = HlidacStatu.Datasets.DataSet.CachedDatasets.Get("skutecni-majitele");
-    var skutMajitRes = (await skutMajitDS.SearchDataRawAsync("ico:" + Model.ICO, 1, 1)).Result.ToList();
-}
-@if (skutMajitRes.Any())
-{
-    Newtonsoft.Json.Linq.JObject obj = Newtonsoft.Json.Linq.JObject.Parse(skutMajitRes.First().Item2);
-    if (obj["skutecni_majitele"]?.Count() > 0)
-    {
-        var aktualniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value == null);
-        var vymazaniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value != null);
-        if (aktualniMajitele.Count() > 0)
-        {
-            <h4>@(aktualniMajitele.Count() > 1 ? "Skuteční majitelé" : "Skutečný majitel")</h4>
-            <partial name="_renderSkutecniMajitele" model="@aktualniMajitele"/>
-            <div style="padding-bottom:10px;">&nbsp;</div>
-        }
-
-
-        if (vymazaniMajitele.Count() > 0)
-        {
-            <h4>@(vymazaniMajitele.Count() > 1 ? "Vymazaní majitelé" : "Vymazaný majitel")</h4>
-            <partial name="_renderSkutecniMajitele" model="@vymazaniMajitele"/>
-        }
-    }
-    <hr/>
-}
-
-@if (Model.PatrimStatu())
-{
-    var platyUredniku = await PlatyUrednikuRepo.GetCenyForIco(Model.ICO);
-
-    if (platyUredniku.Any())
-    {
-        var sortedYears = platyUredniku.OrderByDescending(pu => pu.Rok).Select(pu => pu.Rok).Distinct();
-
-        var lastYear = sortedYears.FirstOrDefault();
-        var secondLastYear = sortedYears.Skip(1).FirstOrDefault();
-
-        var platyLastYear = platyUredniku.Where(pu => pu.Rok == lastYear).OrderBy(pu => pu.Pozice).ToList();
-
-        var minOthersLast = platyLastYear.Where(pu => !pu.HeadOfOffice).Where(pu => pu.PocetMes > 0)
-            .Min(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
-
-        var maxOthersLast = platyLastYear.Where(pu => !pu.HeadOfOffice).Where(pu => pu.PocetMes > 0)
-            .Max(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
-
-        <p>Průměrná měsíční mzda včetně odměn</p>
-        
+    </div>
+    <div>
         <table>
             <tr>
-                <th colspan="2" class="col-sm-12">
-                    za rok @lastYear
-                </th>
+                <td class="text-nowrap text-muted col-sm-5">Založeno</td>
+                <td class="col-sm-7">@(Model.Datum_Zapisu_OR?.ToString("dd.MM.yyyy"))</td>
             </tr>
-            @foreach (var plat in platyLastYear.Where(p => p.HeadOfOffice))
-            {
-                if (plat.PocetMes > 0)
-                {
-                    var mesicniPlatVcetneOdmen = (plat.Plat + plat.Odmeny + plat.Bonus) / plat.PocetMes;
-                    <tr>
-                        <td class="text-nowrap text-muted col-sm-5">@plat.Pozice</td>
-                        <td class="col-sm-7 text-end">@mesicniPlatVcetneOdmen.ToString("##,##0")&nbsp;Kč</td>
-                    </tr>
-                }
-            }
-            @if (platyLastYear.Count > 1)
+            @if (Model.DatumZaniku is not null)
             {
                 <tr>
-                    <td class="text-nowrap text-muted col-sm-5">Rozsah @platyLastYear.Count platů vedoucích pozic</td>
-                    <td class="col-sm-7 text-end">@minOthersLast.ToString("##,##0")&nbsp;-&nbsp;@maxOthersLast.ToString("##,##0")&nbsp;Kč</td>
+                    <td class="text-nowrap text-muted col-sm-5">Zaniklo</td>
+                    <td class="col-sm-7">@(Model.DatumZaniku?.ToString("dd.MM.yyyy"))</td>
                 </tr>
             }
-            else if (platyLastYear.Count == 0)
+            <tr>
+                <td class="text-nowrap text-muted col-sm-5">IČO</td>
+                <td class="col-sm-7">@Model.ICO</td>
+            </tr>
+            <tr>
+                <td class="text-nowrap text-muted col-sm-5">Datová schránka</td>
+                <td class="col-sm-5">@string.Join(", ", Model.DatovaSchranka)</td>
+            </tr>
+            @if (Model.GetSocialContacts().Any(m => m.Network == OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
             {
-                var plat = platyLastYear.FirstOrDefault();
-                var mesicniPlatVcetneOdmen = (plat.Plat + plat.Odmeny + plat.Bonus) / plat.PocetMes;
                 <tr>
-                    <td class="text-nowrap text-muted col-sm-5">@plat.Pozice</td>
-                    <td class="col-sm-7 text-end">@mesicniPlatVcetneOdmen.ToString("##,##0")&nbsp;Kč</td>
+                    <td class="text-nowrap text-muted col-sm-5">Záznamy zastupitelstva</td>
+                    <td class="col-sm-5">
+                        @foreach (var ev in Model.GetSocialContacts().Where(m => m.Network == OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+                        {
+                            <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, Model.ICO, "")</span>
+                        }
+                    </td>
                 </tr>
             }
-            @if (secondLastYear != 0)
+
+            @if (Model.GetSocialContacts().Any(m => m.Network != OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
             {
-                var platySecondLastYear = platyUredniku.Where(pu => pu.Rok == secondLastYear).OrderBy(pu => pu.Pozice).ToList();
-                var minOthersSecondLast = platySecondLastYear.Where(pu => !pu.HeadOfOffice).Where(pu => pu.PocetMes > 0)
-                    .Min(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
-                var maxOthersSecondLast = platySecondLastYear.Where(pu => !pu.HeadOfOffice).Where(pu => pu.PocetMes > 0)
-                    .Max(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
-                
+                <tr>
+                    <td class="text-nowrap text-muted col-sm-5">Odkazy</td>
+                    <td class="col-sm-5">
+                        @foreach (var ev in Model.GetSocialContacts().Where(m => m.Network != OsobaEvent.SocialNetwork.Zaznam_zastupitelstva))
+                        {
+                            <span>@Html.SocialLinkWithIcon(ev.Network, ev.Contact, Model.ICO, "")</span>
+                        }
+                    </td>
+                </tr>
+            }
+
+        </table>
+    </div>
+    <hr />
+    Data firem nám poskytuje <a href="https://www.merk.cz" target="_blank" onclick="return trackOutLink(this,'Merk.cz');">Merk.cz</a>.
+    <br />Moc děkujeme <i class="fa-solid fa-heart" style="color:red"></i>
+    <hr />
+
+    @{
+        HlidacStatu.Datasets.DataSet skutMajitDS = HlidacStatu.Datasets.DataSet.CachedDatasets.Get("skutecni-majitele");
+        var skutMajitRes = (await skutMajitDS.SearchDataRawAsync("ico:" + Model.ICO, 1, 1)).Result.ToList();
+    }
+    @if (skutMajitRes.Any())
+    {
+        Newtonsoft.Json.Linq.JObject obj = Newtonsoft.Json.Linq.JObject.Parse(skutMajitRes.First().Item2);
+        if (obj["skutecni_majitele"]?.Count() > 0)
+        {
+            var aktualniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value == null);
+            var vymazaniMajitele = obj["skutecni_majitele"].Where(m => ((JValue)m["datum_vymaz"]).Value != null);
+            if (aktualniMajitele.Count() > 0)
+            {
+                <h4>@(aktualniMajitele.Count() > 1 ? "Skuteční majitelé" : "Skutečný majitel")</h4>
+                <partial name="_renderSkutecniMajitele" model="@aktualniMajitele" />
+                <div style="padding-bottom:10px;">&nbsp;</div>
+            }
+
+
+            if (vymazaniMajitele.Count() > 0)
+            {
+                <h4>@(vymazaniMajitele.Count() > 1 ? "Vymazaní majitelé" : "Vymazaný majitel")</h4>
+                <partial name="_renderSkutecniMajitele" model="@vymazaniMajitele" />
+            }
+        }
+        <hr />
+    }
+
+    @if (Model.PatrimStatu())
+    {
+        var platyUredniku = await PlatyUrednikuRepo.GetCenyForIco(Model.ICO);
+
+        if (platyUredniku.Any())
+        {
+            var sortedYears = platyUredniku.OrderByDescending(pu => pu.Rok).Select(pu => pu.Rok).Distinct();
+
+            var lastYear = sortedYears.FirstOrDefault();
+            var secondLastYear = sortedYears.Skip(1).FirstOrDefault();
+
+            var platyLastYear = platyUredniku.Where(pu => pu.Rok == lastYear).OrderBy(pu => pu.Pozice).ToList();
+
+            var othersLast = platyLastYear.Where(pu => !pu.HeadOfOffice).Where(pu => pu.PocetMes > 0);
+
+            var minOthersLast = othersLast.Count() == 0 ? 0 : othersLast.Min(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
+
+            var maxOthersLast = othersLast.Count() == 0 ? 0 : othersLast.Max(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
+
+            <p>Průměrná měsíční mzda včetně odměn</p>
+
+            <table>
                 <tr>
                     <th colspan="2" class="col-sm-12">
-                        za rok @secondLastYear
+                        za rok @lastYear
                     </th>
                 </tr>
-                @foreach (var plat in platySecondLastYear.Where(p => p.HeadOfOffice))
+                @foreach (var plat in platyLastYear.Where(p => p.HeadOfOffice))
                 {
                     if (plat.PocetMes > 0)
                     {
@@ -230,96 +190,138 @@ Data firem nám poskytuje <a href="https://www.merk.cz" target="_blank" onclick=
                         </tr>
                     }
                 }
-                @if (platySecondLastYear.Count > 1)
+                @if (platyLastYear.Count > 1)
                 {
                     <tr>
-                        <td class="text-nowrap text-muted col-sm-5">Rozsah @platySecondLastYear.Count platů vedoucích pozic</td>
-                        <td class="col-sm-7 text-end">@minOthersSecondLast.ToString("##,##0")&nbsp;-&nbsp;@maxOthersSecondLast.ToString("##,##0")&nbsp;Kč</td>
+                        <td class="text-nowrap text-muted col-sm-5">Rozsah @platyLastYear.Count platů vedoucích pozic</td>
+                        <td class="col-sm-7 text-end">@minOthersLast.ToString("##,##0")&nbsp;-&nbsp;@maxOthersLast.ToString("##,##0")&nbsp;Kč</td>
                     </tr>
                 }
-                else if (platySecondLastYear.Count == 0)
+                else if (platyLastYear.Count == 0)
                 {
-                    var plat = platySecondLastYear.FirstOrDefault();
+                    var plat = platyLastYear.FirstOrDefault();
                     var mesicniPlatVcetneOdmen = (plat.Plat + plat.Odmeny + plat.Bonus) / plat.PocetMes;
                     <tr>
                         <td class="text-nowrap text-muted col-sm-5">@plat.Pozice</td>
                         <td class="col-sm-7 text-end">@mesicniPlatVcetneOdmen.ToString("##,##0")&nbsp;Kč</td>
                     </tr>
                 }
-            }
+                @if (secondLastYear != 0)
+                {
+                    var platySecondLastYear = platyUredniku.Where(pu => pu.Rok == secondLastYear).OrderBy(pu => pu.Pozice).ToList();
 
-        </table>
-        <p class="text-end mt-4"> Informace o platech z <a href="@platyUredniku.FirstOrDefault().Link">platyuredniku.cz</a> </p>
-        <hr/>
-    }
-}
+                    var othersSecondLast = platySecondLastYear.Where(pu => !pu.HeadOfOffice).Where(pu => pu.PocetMes > 0);
+                    var minOthersSecondLast = othersSecondLast.Count() == 0 ? 0 :
+                        othersSecondLast.Min(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
+                    var maxOthersSecondLast = othersSecondLast.Count() == 0 ? 0 : 
+                        othersSecondLast.Max(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
 
-<div class="watcher">
-    <h4>Chci hlídat</h4>
-    <div>
-        @{
-    {
-        var wdModel = new WatchdogViewModel(null,
-            $"ico:{Model.ICO}",
-            $"Všechny změny o {TextUtil.ShortenText(Model.Jmeno, 30)}",
-            prefillWDname: $"Novinky pro {Model.Jmeno}",
-            buttonCss: "btn btn-warning btn-xs",
-            showWdList: false, preButtonText: "");
+                    <tr>
+                        <th colspan="2" class="col-sm-12">
+                            za rok @secondLastYear
+                        </th>
+                    </tr>
+                    @foreach (var plat in platySecondLastYear.Where(p => p.HeadOfOffice))
+                    {
+                        if (plat.PocetMes > 0)
+                        {
+                            var mesicniPlatVcetneOdmen = (plat.Plat + plat.Odmeny + plat.Bonus) / plat.PocetMes;
+                            <tr>
+                                <td class="text-nowrap text-muted col-sm-5">@plat.Pozice</td>
+                                <td class="col-sm-7 text-end">@mesicniPlatVcetneOdmen.ToString("##,##0")&nbsp;Kč</td>
+                            </tr>
+                        }
+                    }
+                    @if (platySecondLastYear.Count > 1)
+                    {
+                        <tr>
+                            <td class="text-nowrap text-muted col-sm-5">Rozsah @platySecondLastYear.Count platů vedoucích pozic</td>
+                            <td class="col-sm-7 text-end">@minOthersSecondLast.ToString("##,##0")&nbsp;-&nbsp;@maxOthersSecondLast.ToString("##,##0")&nbsp;Kč</td>
+                        </tr>
+                    }
+                    else if (platySecondLastYear.Count == 0)
+                    {
+                        var plat = platySecondLastYear.FirstOrDefault();
+                        var mesicniPlatVcetneOdmen = (plat.Plat + plat.Odmeny + plat.Bonus) / plat.PocetMes;
+                        <tr>
+                            <td class="text-nowrap text-muted col-sm-5">@plat.Pozice</td>
+                            <td class="col-sm-7 text-end">@mesicniPlatVcetneOdmen.ToString("##,##0")&nbsp;Kč</td>
+                        </tr>
+                    }
+                }
 
-        <partial name="WebUtil/AddWatchdog" model="wdModel"/>
-    }
+            </table>
+            <p class="text-end mt-4"> Informace o platech z <a href="@platyUredniku.FirstOrDefault().Link">platyuredniku.cz</a> </p>
+            <hr />
         }
-    </div>
-    <div>
-        @if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Any())
-        {
-            if (Model.JsemOVM())
-            {
+    }
+
+    <div class="watcher">
+        <h4>Chci hlídat</h4>
+        <div>
+            @{
                 {
                     var wdModel = new WatchdogViewModel(null,
+                    $"ico:{Model.ICO}",
+                    $"Všechny změny o {TextUtil.ShortenText(Model.Jmeno, 30)}",
+                    prefillWDname: $"Novinky pro {Model.Jmeno}",
+                    buttonCss: "btn btn-warning btn-xs",
+                    showWdList: false, preButtonText: "");
+
+                    <partial name="WebUtil/AddWatchdog" model="wdModel" />
+                }
+            }
+        </div>
+        <div>
+            @if (Model.AktualniVazby(Relation.AktualnostType.Nedavny).Any())
+            {
+                if (Model.JsemOVM())
+                {
+                    {
+                        var wdModel = new WatchdogViewModel(null,
                         $"holding:{Model.ICO}",
                         $"Změny i {Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny), "v jedné podřízené organizaci", "ve {0} podřízených organizacích", "v {0} podřízených organizacích")}",
                         prefillWDname: $"Novinky pro {Model.Jmeno}",
                         buttonCss: "btn btn-warning btn-xs",
                         showWdList: false, preButtonText: "");
 
-                    <partial name="WebUtil/AddWatchdog" model="wdModel"/>
+                        <partial name="WebUtil/AddWatchdog" model="wdModel" />
+                    }
                 }
-            }
-            else
-            {
+                else
                 {
-                    var wdModel = new WatchdogViewModel(null,
+                    {
+                        var wdModel = new WatchdogViewModel(null,
                         $"holding:{Model.ICO}",
                         $"Změny i {Devmasters.Lang.CS.Plural.Get(Model.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny), "v jedné dceřiné společnosti", "ve {0} dceřiných společnostech", "v {0} dceřiných společnostech")}",
                         prefillWDname: $"Novinky pro {Model.Jmeno}",
                         buttonCss: "btn btn-warning btn-xs",
                         showWdList: false, preButtonText: "");
 
-                    <partial name="WebUtil/AddWatchdog" model="wdModel"/>
+                        <partial name="WebUtil/AddWatchdog" model="wdModel" />
+                    }
                 }
             }
-        }
+        </div>
     </div>
-</div>
-<hr/>
-<div>
-    <span class="text-muted">Chci sdílet s ostatními</span>
+    <hr />
     <div>
-        @{
-            var linkUrl = $"{ViewContext.GetBaseUrl()}/subjekt/{Model.ICO}";
-        }
-        <share-facebook url="@linkUrl"></share-facebook>
-        <share-twitter url="@linkUrl" text="@($"{Model.Jmeno} na @HlidacStatu - {Model.InfoFacts().First().Render(false)}")"></share-twitter>
-        <share-widget url="@linkUrl"></share-widget>
+        <span class="text-muted">Chci sdílet s ostatními</span>
+        <div>
+            @{
+                var linkUrl = $"{ViewContext.GetBaseUrl()}/subjekt/{Model.ICO}";
+            }
+            <share-facebook url="@linkUrl"></share-facebook>
+            <share-twitter url="@linkUrl" text="@($"{Model.Jmeno} na @HlidacStatu - {Model.InfoFacts().First().Render(false)}")"></share-twitter>
+            <share-widget url="@linkUrl"></share-widget>
+        </div>
     </div>
-</div>
 
-<div id="div_toc" class="sticky-top">
-    <p class="pt-4" style="display:none">
-        <b>Obsah stránky</b>
-    </p>
-    <nav id="toc"></nav>
-</div>
+    <div id="div_toc" class="sticky-top">
+        <p class="pt-4" style="display:none">
+            <b>Obsah stránky</b>
+        </p>
+        <nav id="toc"></nav>
+    </div>
 
 </div>
