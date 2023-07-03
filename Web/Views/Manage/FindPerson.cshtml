@@ -71,7 +71,7 @@ else
 
                         </div>
                         <div>
-                            @Html.ActionLink(@osoba.FullName(), "PersonDetail", new {id = osoba.InternalId}, new {@class = "section-title link--blue"})
+                            <a href="https://admin.hlidacstatu.cz/EventEditor/@osoba.InternalId" class="section-title link--blue">@osoba.FullName()</a>
                             <div class="new-p new-p--gray new-p--small">
                                 @(osoba.NarozeniUmrtiFull())
                             </div>
@@ -99,8 +99,7 @@ else
                     }
                 </div>
                 <div class="col-sm-2 col-md-2">
-                    @Html.ActionLink("Editovat osobu", "EditPersonNP", new {id = osoba.InternalId}, new {@class = "btn btn-primary btn-sm"})
-                    @Html.ActionLink("Editovat události", "PersonDetail", new {id = osoba.InternalId}, new {@class = "btn btn-primary btn-sm"})
+                    <a href="https://admin.hlidacstatu.cz/EventEditor/@osoba.InternalId" class="btn btn-primary btn-sm">Editovat</a>
                 </div>
             </li>
         }

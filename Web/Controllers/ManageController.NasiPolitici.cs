@@ -22,33 +22,7 @@ namespace HlidacStatu.Web.Controllers
 
             return View(osoby);
         }
-
-        [Authorize(Roles = "NasiPoliticiAdmin")]
-        public ActionResult PersonDetail(int? id, string columOrdering, int? descending)
-        {
-            if (id == null) return RedirectToAction(nameof(FindPerson));
-
-            Osoba osoba = OsobaRepo.GetByInternalId(id ?? 0);
-
-            return View(osoba);
-        }
-
-        [Authorize(Roles = "canEditData")]
-        public ActionResult CompanyDetail(string ico, string columOrdering, int? descending)
-        {
-            if (string.IsNullOrWhiteSpace(ico))
-                return NotFound();
-
-            Firma firma = FirmaRepo.FromIco(ico);
-
-            if (firma is null || !firma.Valid)
-                return NotFound();
-
-
-            return View(firma);
-        }
-
-
+        
         [Authorize(Roles = "NasiPoliticiAdmin")]
         public ActionResult CreatePerson()
         {
@@ -77,45 +51,6 @@ namespace HlidacStatu.Web.Controllers
             }
 
             return View(osoba);
-        }
-
-        [Authorize(Roles = "NasiPoliticiAdmin")]
-        public ActionResult EditPersonNP(int? id)
-        {
-            if (id == null) return RedirectToAction(nameof(FindPerson));
-
-            Osoba osoba = OsobaRepo.GetByInternalId(id ?? 0);
-
-            return View(osoba);
-        }
-
-        [Authorize(Roles = "NasiPoliticiAdmin")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult EditPersonNP(int id, [Bind("InternalId,TitulPred,Jmeno,Prijmeni,TitulPo,Narozeni,Umrti,Status,WikiId")] Osoba osoba)
-        {
-
-            if (id != osoba.InternalId) return RedirectToAction(nameof(FindPerson));
-            if (ModelState.IsValid)
-            {
-                Osoba result = OsobaRepo.Update(osoba, this.User.Identity.Name);
-
-                return RedirectToAction(nameof(FindPerson),
-                    new
-                    {
-                        jmeno = $"{osoba.Jmeno} {osoba.Prijmeni}",
-                        narozeni = osoba.Narozeni?.ToString("dd.MM.yyyy")
-                    });
-            }
-
-            return View(osoba);
-        }
-
-        [Authorize(Roles = "NasiPoliticiAdmin")]
-        public ActionResult SetTimestamp(int id)
-        {
-            OsobaRepo.SetManualTimeStamp(id, this.User.Identity.Name);
-            return RedirectToAction(nameof(PersonDetail), new { id });
         }
 
         [Authorize(Roles = "NasiPoliticiAdmin")]
