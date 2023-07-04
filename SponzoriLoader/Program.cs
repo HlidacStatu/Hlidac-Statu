@@ -1,6 +1,4 @@
 ﻿using HlidacStatu.Entities;
-using HlidacStatu.Extensions;
-using HlidacStatu.Repositories;
 using HlidacStatu.Util;
 
 using Newtonsoft.Json;
@@ -14,7 +12,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HlidacStatu.LibCore.Extensions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyModel;
 
 namespace SponzoriLoader
 {
