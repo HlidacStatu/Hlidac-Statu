@@ -28,6 +28,9 @@
         <thead>
         <tr>
             <th scope="col">Pozice</th>
+            <th scope="col" class="text-end">5 kvartil</th>
+            <th scope="col" class="text-end">10 kvartil</th>
+            <th scope="col" class="text-end">15 kvartil</th>
             <th scope="col" class="text-end">Dolní kvartil</th>
             <th scope="col" class="text-end">Medián</th>
             <th scope="col" class="text-end">Horní kvartil</th>
@@ -45,6 +48,9 @@
                 <th scope="row">
                     <a href="/Obor/@row.Name">@row.Name</a>
                 </th>
+                <td class="text-end">@row.Kvartil(5).ToString("N0")</td>
+                <td class="text-end">@row.Kvartil(10).ToString("N0")</td>
+                <td class="text-end">@row.Kvartil(15).ToString("N0")</td>
                 <td class="text-end">@row.DolniKvartil.ToString("N0")</td>
                 <td class="text-end">@row.Median.ToString("N0")</td>
                 <td class="text-end">@row.HorniKvartil.ToString("N0")</td>

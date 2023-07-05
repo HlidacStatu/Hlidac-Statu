@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics.Statistics;
@@ -33,6 +34,7 @@ namespace HlidacStatu.Ceny.Models
             //var salarydX = precalculatedJobsList.Select(x =>new { p = (double)x.PricePerUnitVat, pk = x.JobPk }).ToList();
 
             var salaryd = precalculatedJobsList.Select(x => (double)x.PricePerUnitVat).ToList();
+            decimal[] kvartily = Enumerable.Range(1, 100).Select(x => (decimal)salaryd.Percentile(x)).ToArray();
             double dolniKvartil = salaryd.LowerQuartile();
             double horniKvartil = salaryd.UpperQuartile();
             //decimal outlierRange = (horniKvartil - dolniKvartil) * 1.5m;
@@ -69,6 +71,7 @@ namespace HlidacStatu.Ceny.Models
             LowOutliers = salaryd.Where(x => x < leftWhisk).OrderBy(x => x).Select(x => (decimal)x).ToArray();
             HighOutliers = salaryd.Where(x => x > rightWhisk).OrderBy(x => x).Select(x => (decimal)x).ToArray();
             PriceCount = salaryd.Count();
+            Kvartily = kvartily;
             
             SupplierCount = precalculatedJobsList.SelectMany(x => x.IcaDodavatelu).Distinct().Count();
             ContractCount = precalculatedJobsList.Select(x => x.SmlouvaId).Distinct().Count();
@@ -81,6 +84,8 @@ namespace HlidacStatu.Ceny.Models
         public string Description { get; set; }
         public decimal DolniKvartil { get; set; }
         public decimal HorniKvartil { get; set; }
+        
+        public decimal[] Kvartily { get; set; }
         public decimal Minimum { get; set; }
         public decimal Maximum { get; set; }
         public decimal Average { get; set; }
@@ -97,5 +102,19 @@ namespace HlidacStatu.Ceny.Models
         public string[] Contracts { get; set; }
         public string[] Odberatele { get; set; }
         public string[] Dodavatele { get; set; }
+
+        /// <summary>
+        /// Vrátí kvartil
+        /// </summary>
+        /// <param name="kvartil">číslo kvartilu od 1 do 100</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        public decimal Kvartil(int kvartil)
+        {
+            if (kvartil < 1 || kvartil > 100)
+                throw new ArgumentOutOfRangeException();
+
+            return Kvartily[kvartil - 1];
+        }
     }
 }
