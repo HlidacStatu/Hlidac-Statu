@@ -17,7 +17,20 @@
 
         histogram.Data = JobService.GetDistinctJobs(Model.Key.Value);
         histogram.Title = "Histogram všeho";
+        histogram.MaxWidth = 1200;
     }
+}
+
+@{
+    TableViewModel tableModel = new TableViewModel();
+    var obor = "Architekt";
+    var statistics1 = JobService.GetTagStatistics(obor, Model.Key.Value);
+    //tableModel.CompareWithFirstLine = true;
+    //přidáme první řádek se souhrnem, vůči kterému se vše porovnává
+    tableModel.ShowFirstColumnNameUnderFirstRow = true;
+    tableModel.StatisticsSummary = JobService.GetStatistics(Model.Key.Value)
+        .FirstOrDefault(s => s.Name == obor);
+
 }
 
 <h1>Souhrnné statistiky</h1>
@@ -42,7 +55,7 @@
         </tr>
         </thead>
         <tbody>
-        @foreach (var row in statistics)
+        @foreach (var row in statistics.OrderBy(m=>m.Name))
         {
             <tr>
                 <th scope="row">
@@ -64,6 +77,53 @@
         }
         </tbody>
     </table>
+
+    <hr />
+    <h2>@obor</h2>
+    <table class="table table-sm table-striped mt-4">
+        <caption>Přehled cen - souhrn</caption>
+        <thead>
+            <tr>
+                <th scope="col">Pozice</th>
+                <th scope="col" class="text-end">5 kvartil</th>
+                <th scope="col" class="text-end">10 kvartil</th>
+                <th scope="col" class="text-end">15 kvartil</th>
+                <th scope="col" class="text-end">Dolní kvartil</th>
+                <th scope="col" class="text-end">Medián</th>
+                <th scope="col" class="text-end">Horní kvartil</th>
+                <th scope="col" class="text-end">Minimum</th>
+                <th scope="col" class="text-end">Průměr</th>
+                <th scope="col" class="text-end">Maximum</th>
+                <th scope="col" class="text-end">Počet smluv</th>
+                <th scope="col" class="text-end">Počet dodavatelů</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in statistics1.OrderBy(m => m.Name))
+            {
+                <tr>
+                    <th scope="row">
+                        <a href="/Obor/@row.Name">@row.Name</a>
+                    </th>
+                    <td class="text-end">@row.Kvartil(5).ToString("N0")</td>
+                    <td class="text-end">@row.Kvartil(10).ToString("N0")</td>
+                    <td class="text-end">@row.Kvartil(15).ToString("N0")</td>
+                    <td class="text-end">@row.DolniKvartil.ToString("N0")</td>
+                    <td class="text-end">@row.Median.ToString("N0")</td>
+                    <td class="text-end">@row.HorniKvartil.ToString("N0")</td>
+                    <td class="text-end">@row.Minimum.ToString("N0")</td>
+                    <td class="text-end">@row.Average.ToString("N0")</td>
+                    <td class="text-end">@row.Maximum.ToString("N0")</td>
+                    <td class="text-end">@row.ContractCount</td>
+                    <td class="text-end">@row.SupplierCount</td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+    <hr />
 
     <partial name="Shared/_BoxPlot" model="graphModel"/>
 
