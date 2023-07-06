@@ -94,6 +94,7 @@ namespace HlidacStatu.Ceny.Services
                         TagStatistics = CalculateTags(DistinctJobs, key),
                         OdberateleStatistics = CalculateOdberatele(DistinctJobs, key),
                         DodavateleStatistics = CalculateDodavatele(DistinctJobs, key),
+                        //Jobs = DistinctJobs.Where(m=>m.AnalyzaName == key.Obor && m.Year == key.Rok).ToList(),
                     };
 
                     GlobalStats.TryAdd(key, yearlyStatisticsGroup);

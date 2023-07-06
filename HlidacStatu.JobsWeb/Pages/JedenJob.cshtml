@@ -6,7 +6,9 @@
 @{
     ViewData["Title"] = "Souhrnné statistiky";
 
-    int percentil = Devmasters.ParseText.ToInt( Request.Query["percentil"].FirstOrDefault(),15) ?? 15;
+    int percentil = Devmasters.ParseText.ToInt(Request.Query["percentil"].FirstOrDefault(), 15) ?? 15;
+    int maxprice = Devmasters.ParseText.ToInt(Request.Query["maxprice"].FirstOrDefault(), int.MaxValue) ?? int.MaxValue;
+    int minprice = Devmasters.ParseText.ToInt(Request.Query["minprice"].FirstOrDefault(), 0) ?? 0;
 
     CompareDataModel graphModel = new();
     BarGraph histogram = new();
@@ -35,48 +37,74 @@
 
 }
 
+<h2>Params</h2>
+<p>
+    Custom percentil (percentil=): @percentil <br/>
+    Min MD Price pro filtr smluv (minprice=): @minprice <br />
+    Max MD Price for filtr smluv (maxprice=): @maxprice <br />
+
+    
+</p>
 <h1>Souhrnné statistiky</h1>
 @if (Model.Key.HasValue)
 {
     <table class="table table-sm table-striped mt-4">
         <caption>Přehled cen - souhrn</caption>
         <thead>
-        <tr>
-            <th scope="col">Pozice</th>
-            <th scope="col" class="text-end">5 kvartil</th>
-            <th scope="col" class="text-end">10 kvartil</th>
-            <th scope="col" class="text-end">@percentil kvartil</th>
-            <th scope="col" class="text-end">Dolní kvartil</th>
-            <th scope="col" class="text-end">Medián</th>
-            <th scope="col" class="text-end">Horní kvartil</th>
-            <th scope="col" class="text-end">Minimum</th>
-            <th scope="col" class="text-end">Průměr</th>
-            <th scope="col" class="text-end">Maximum</th>
-            <th scope="col" class="text-end">Počet smluv</th>
-            <th scope="col" class="text-end">Počet dodavatelů</th>
-        </tr>
+            <tr>
+                <th scope="col">Pozice</th>
+                <th scope="col" class="text-end">5 percentil</th>
+                <th scope="col" class="text-end">10 percentil</th>
+                <th scope="col" class="text-end">@percentil percentil</th>
+                <th scope="col" class="text-end">Dolní kvartil</th>
+                <th scope="col" class="text-end">Medián</th>
+                <th scope="col" class="text-end">Horní kvartil</th>
+                <th scope="col" class="text-end">Minimum</th>
+                <th scope="col" class="text-end">Průměr</th>
+                <th scope="col" class="text-end">Maximum</th>
+                <th scope="col" class="text-end">Počet smluv</th>
+                <th scope="col" class="text-end">Počet dodavatelů</th>
+            </tr>
         </thead>
         <tbody>
-        @foreach (var row in statistics.OrderBy(m=>m.Name))
-        {
-            <tr>
-                <th scope="row">
-                    <a href="/Obor/@row.Name">@row.Name</a>
-                </th>
-                <td class="text-end">@row.Kvartil(5).ToString("N0")</td>
-                <td class="text-end">@row.Kvartil(10).ToString("N0")</td>
-                <td class="text-end">@row.Kvartil(percentil).ToString("N0")</td>
-                <td class="text-end">@row.DolniKvartil.ToString("N0")</td>
-                <td class="text-end">@row.Median.ToString("N0")</td>
-                <td class="text-end">@row.HorniKvartil.ToString("N0")</td>
-                <td class="text-end">@row.Minimum.ToString("N0")</td>
-                <td class="text-end">@row.Average.ToString("N0")</td>
-                <td class="text-end">@row.Maximum.ToString("N0")</td>
-                <td class="text-end">@row.ContractCount</td>
-                <td class="text-end">@row.SupplierCount</td>
+            @foreach (var row in statistics.OrderBy(m => m.Name))
+            {
+                <tr>
+                    <th scope="row">
+                        <a href="/Obor/@row.Name">@row.Name</a>
+                        @{
+                            var smlouvyIds = row.Jobs
+                                            .Where(m => minprice <= m.PricePerUnitVat && m.PricePerUnitVat <= maxprice)
+                                            .Select(m=>m.SmlouvaId)
+                                            .Distinct();
 
-            </tr>
-        }
+                            var smlouvyQuery = "";
+
+                            if (smlouvyIds.Count() > 0)
+                            {
+                                smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
+                            }
+
+                        }
+                        @if (smlouvyQuery.Length > 0)
+                        {
+                            <a target="_blank" href="https://www.hlidacstatu.cz/hledatsmlouvy?q=@(System.Net.WebUtility.UrlEncode(smlouvyQuery))"><i class="fa-regular fa-file-contract"></i>(@smlouvyIds.Count())</a>
+                        }
+                    </th>
+                    <td class="text-end">@row.Kvartil(5).ToString("N0")</td>
+                    <td class="text-end">@row.Kvartil(10).ToString("N0")</td>
+                    <td class="text-end">@row.Kvartil(percentil).ToString("N0")</td>
+                    <td class="text-end">@row.DolniKvartil.ToString("N0")</td>
+                    <td class="text-end">@row.Median.ToString("N0")</td>
+                    <td class="text-end">@row.HorniKvartil.ToString("N0")</td>
+                    <td class="text-end">@row.Minimum.ToString("N0")</td>
+                    <td class="text-end">@row.Average.ToString("N0")</td>
+                    <td class="text-end">@row.Maximum.ToString("N0")</td>
+                    <td class="text-end">@row.ContractCount</td>
+                    <td class="text-end">@row.SupplierCount</td>
+
+                </tr>
+            }
         </tbody>
     </table>
 
@@ -87,9 +115,9 @@
         <thead>
             <tr>
                 <th scope="col">Pozice</th>
-                <th scope="col" class="text-end">5 kvartil</th>
-                <th scope="col" class="text-end">10 kvartil</th>
-                <th scope="col" class="text-end">@percentil kvartil</th>
+                <th scope="col" class="text-end">5 percentil</th>
+                <th scope="col" class="text-end">10 percentil</th>
+                <th scope="col" class="text-end">@percentil percentil</th>
                 <th scope="col" class="text-end">Dolní kvartil</th>
                 <th scope="col" class="text-end">Medián</th>
                 <th scope="col" class="text-end">Horní kvartil</th>
@@ -106,6 +134,24 @@
                 <tr>
                     <th scope="row">
                         <a href="/Obor/@row.Name">@row.Name</a>
+                        @{
+                            var smlouvyIds = row.Jobs
+                            .Where(m => minprice <= m.PricePerUnitVat && m.PricePerUnitVat <= maxprice)
+                            .Select(m => m.SmlouvaId)
+                            .Distinct();
+
+                            var smlouvyQuery = "";
+
+                            if (smlouvyIds.Count() > 0)
+                            {
+                                smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
+                            }
+
+                        }
+                        @if (smlouvyQuery.Length > 0)
+                        {
+                            <a target="_blank" href="https://www.hlidacstatu.cz/hledatsmlouvy?q=@(System.Net.WebUtility.UrlEncode(smlouvyQuery))"><i class="fa-regular fa-file-contract"></i>(@smlouvyIds.Count())</a>
+                        }
                     </th>
                     <td class="text-end">@row.Kvartil(5).ToString("N0")</td>
                     <td class="text-end">@row.Kvartil(10).ToString("N0")</td>
@@ -127,7 +173,7 @@
 
     <hr />
 
-    <partial name="Shared/_BoxPlot" model="graphModel"/>
+    <partial name="Shared/_BoxPlot" model="graphModel" />
 
-    <partial name="Shared/_BarGraph" model="histogram"/>
+    <partial name="Shared/_BarGraph" model="histogram" />
 }

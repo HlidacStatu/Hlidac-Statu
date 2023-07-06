@@ -78,6 +78,7 @@ namespace HlidacStatu.Ceny.Models
             Dodavatele = precalculatedJobsList.SelectMany(x => x.IcaDodavatelu).Distinct().ToArray();
             Odberatele = precalculatedJobsList.Select(x => x.IcoOdberatele).Distinct().ToArray();
             Contracts = precalculatedJobsList.Select(x => x.SmlouvaId).Distinct().ToArray();
+            Jobs = precalculatedJobs.ToList();
         }
 
         public string Name { get; set; }
@@ -99,6 +100,7 @@ namespace HlidacStatu.Ceny.Models
         public int SupplierCount { get; set; }
         public int PriceCount { get; set; }
 
+        public List<JobPrecalculated> Jobs { get; set; }
         public string[] Contracts { get; set; }
         public string[] Odberatele { get; set; }
         public string[] Dodavatele { get; set; }

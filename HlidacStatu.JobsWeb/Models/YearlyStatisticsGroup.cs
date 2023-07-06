@@ -62,6 +62,8 @@ namespace HlidacStatu.Ceny.Models
 
         public Key KeyInfo { get; set; }
 
+        //public List<JobPrecalculated> Jobs { get; set; } = new List<JobPrecalculated>();
+
         public List<JobStatistics> JobStatistics { get; set; } = new();
         public Dictionary<string, List<JobStatistics>> TagStatistics { get; set; } = new();
         public Dictionary<string, List<JobStatistics>> OdberateleStatistics { get; set; } = new();
