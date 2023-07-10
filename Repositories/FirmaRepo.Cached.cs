@@ -191,12 +191,12 @@ namespace HlidacStatu.Repositories
             catch (Exception e)
             {
                 HlidacStatu.Util.Consts.Logger.Fatal("FirmaRepo static fatal exception", e);
-                System.IO.File.AppendAllText(@"c:\data\logs\fatal.txt", "\n\n" 
+                System.IO.File.AppendAllText(@"c:\data\logs\fatal.txt", "\n\n"
                     + DateTime.Now.ToLongDateString()
-                    + " " 
+                    + " "
                     + DateTime.Now.ToLongTimeString()
                     + ":"
-                    +  HlidacStatu.Util.Helper.PrettyPrintException(e);
+                    + HlidacStatu.Util.Helper.PrettyPrintException(e));
                 throw;
             }
         }
