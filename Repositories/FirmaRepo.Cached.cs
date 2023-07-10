@@ -1,6 +1,6 @@
 using Devmasters.Cache;
 using Devmasters.Cache.LocalMemory;
-
+using Devmasters.Log;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Util;
@@ -39,10 +39,11 @@ namespace HlidacStatu.Repositories
             AppDataPath = Init.WebAppDataPath;
             if (string.IsNullOrEmpty(AppDataPath))
             {
+                HlidacStatu.Util.Consts.Logger.Fatal("Not defined config App_Data_Path");
                 throw new ArgumentNullException("App_Data_Path");
             }
 
-
+            try { 
             Consts.Logger.Info("Static data - Mestske_Firmy ");
             VsechnyStatniMestskeFirmy = FirmaVlastnenaStatemRepo.IcaStatnichFirem().ToHashSet();
             VsechnyStatniMestskeFirmy.Add("60193913"); //Pražská energetika
@@ -186,6 +187,12 @@ namespace HlidacStatu.Repositories
                         return res;
                     }
                 );
+            }
+            catch (Exception e)
+            {
+                HlidacStatu.Util.Consts.Logger.Fatal("FirmaRepo static fatal exception", e);
+                throw;
+            }
         }
     }
 }

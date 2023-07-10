@@ -1,5 +1,5 @@
 using Devmasters;
-
+using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Data.External.DatoveSchranky;
@@ -15,7 +15,6 @@ namespace HlidacStatu.Repositories
 {
     public static partial class FirmaRepo
     {
-        static string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
 
         private static async Task PrepareBeforeSaveAsync(Firma firma, bool updateLastUpdateValue = true)
         {
@@ -30,7 +29,6 @@ namespace HlidacStatu.Repositories
             string sqlNACE = @"INSERT into firma_NACE(ico, nace) values(@ico,@nace)";
             string sqlDS = @"INSERT into firma_DS(ico, DatovaSchranka) values(@ico,@DatovaSchranka)";
 
-            string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
             try
             {
                 using (DbEntities db = new DbEntities())
@@ -186,7 +184,7 @@ namespace HlidacStatu.Repositories
                 string sql = @"insert into firma(ico,dic,stav_subjektu, jmeno, jmenoascii, versionupdate, popis)
                                 values(@ico,@dic,@stav,@jmeno,@jmenoascii,0,@adresa)";
 
-                p.ExecuteNonQuery(cnnStr, CommandType.Text, sql, new IDataParameter[] {
+                p.ExecuteNonQuery(DirectDB.DefaultCnnStr, CommandType.Text, sql, new IDataParameter[] {
                     new SqlParameter("ico", ico),
                     new SqlParameter("dic", ico),
                     new SqlParameter("stav", (int)1),
@@ -295,7 +293,7 @@ namespace HlidacStatu.Repositories
             {
                 string sql = @"select ico from Firma where IsInRS = 1";
 
-                var res = p.ExecuteDataset(cnnStr, CommandType.Text, sql, null);
+                var res = p.ExecuteDataset(DirectDB.DefaultCnnStr, CommandType.Text, sql, null);
 
                 if (res.Tables.Count > 0 && res.Tables[0].Rows.Count > 0)
                 {
@@ -342,14 +340,14 @@ namespace HlidacStatu.Repositories
             {
                 using (PersistLib p = new PersistLib())
                 {
-                    f.DatovaSchranka = p.ExecuteDataset(cnnStr, CommandType.Text, "select DatovaSchranka from firma_DS where ico=@ico", new IDataParameter[] {
+                    f.DatovaSchranka = p.ExecuteDataset(DirectDB.DefaultCnnStr, CommandType.Text, "select DatovaSchranka from firma_DS where ico=@ico", new IDataParameter[] {
                         new SqlParameter("ico", f.ICO)
                         }).Tables[0]
                         .AsEnumerable()
                         .Select(m => m[0].ToString())
                         .ToArray();
 
-                    f.NACE = p.ExecuteDataset(cnnStr, CommandType.Text, "select NACE from firma_Nace where ico=@ico", new IDataParameter[] {
+                    f.NACE = p.ExecuteDataset(DirectDB.DefaultCnnStr, CommandType.Text, "select NACE from firma_Nace where ico=@ico", new IDataParameter[] {
                         new SqlParameter("ico", f.ICO)
                         }).Tables[0]
                         .AsEnumerable()
@@ -363,12 +361,11 @@ namespace HlidacStatu.Repositories
 
         public static string NameFromIco(string ico, bool IcoIfNotFound = false)
         {
-            string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
             using (PersistLib p = new PersistLib())
             {
                 string sql = @"select jmeno from Firma where ico = @ico";
 
-                var res = p.ExecuteScalar(cnnStr, CommandType.Text, sql, new IDataParameter[] {
+                var res = p.ExecuteScalar(DirectDB.DefaultCnnStr, CommandType.Text, sql, new IDataParameter[] {
                         new SqlParameter("ico", ico)
                         });
 
