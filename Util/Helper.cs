@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text;
+using System;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.Util
 {
@@ -35,6 +37,34 @@ namespace HlidacStatu.Util
             where TDerived : TBase 
         {
             return (TBase) await task;
+        }
+
+        public static string PrettyPrintException(Exception ex)
+        {
+            StringBuilder sb = new StringBuilder(1024);
+            Exception currentEx = ex;
+            int exceptionDepth = 0;
+            while (currentEx != null)
+            {
+
+                sb.Append("  Ex Type: " + currentEx.GetType().ToString() + "\r\n");
+                if (currentEx.Message != null)
+                    sb.Append("  LogMessage: " + currentEx.Message + "\r\n");
+
+                if (currentEx.TargetSite != null)
+                    sb.Append("  In Method: " + currentEx.TargetSite.ToString() + "\r\n");
+
+                if (currentEx.StackTrace != null)
+                    sb.Append("  Stack Trace: \r\n" + currentEx.StackTrace + "\r\n");
+
+                currentEx = currentEx.InnerException;
+                if (currentEx != null)
+                {
+                    sb.Append("\r\n\r\n");
+                    exceptionDepth++;
+                }
+            }
+            return sb.ToString();
         }
     }
 }

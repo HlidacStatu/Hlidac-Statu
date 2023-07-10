@@ -93,6 +93,7 @@ namespace HlidacStatu.Repositories
                 var deb5 = deb4
                     .GroupBy(o => o.AdresaOvm.KrajNazev, o => o.IdDS ?? "");
                 var deb6 = deb5
+                    .Where(g=>g.Key != null)
                     .ToDictionary(g => g.Key, g => g.ToArray());
                 return deb6;
             }
