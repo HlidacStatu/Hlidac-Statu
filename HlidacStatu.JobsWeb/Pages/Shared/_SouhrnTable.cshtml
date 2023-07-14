@@ -37,7 +37,10 @@
             <th class="align-middle border-start text-center border-end" colspan="3">
                 <div class="middle-line left right">
                     <b style="color:black">&nbsp;Rozsah obvyklých cen&nbsp;</b>
-                    <br /><small>% rozdíl oproti souhrnu v prvním řádku</small>
+                    @if (compareWithSummary) {
+                        <br />
+                        <small>% rozdíl oproti souhrnu v prvním řádku</small>
+                    }
                 </div>
             </th>
 
