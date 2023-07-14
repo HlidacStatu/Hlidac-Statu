@@ -90,6 +90,11 @@ namespace HlidacStatu.Repositories
                 var deb4 = deb3
                     .Where(o => o.PrimarniOvm == "Ano")
                     .ToList();
+                if (deb4.Any(m => m.IdDS == "mgjbetz")) // Dobruska nema kraj
+                {
+                    var rec = deb4.FirstOrDefault(m => m.IdDS == "mgjbetz");
+                    rec.AdresaOvm.KrajNazev = "Královéhradecký";
+                }
                 var deb5 = deb4
                     .GroupBy(o => o.AdresaOvm.KrajNazev, o => o.IdDS ?? "");
                 var deb6 = deb5
