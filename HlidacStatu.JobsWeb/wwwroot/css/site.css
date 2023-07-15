@@ -28,3 +28,12 @@
     padding: 10px 8px 0px 10px;
     width: auto;
 }
+
+.number {
+    font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace !important;
+    text-align: right !important;
+}
+
+    .number .small {
+        font-size: 90% !important;
+    }

@@ -1,0 +1,181 @@
+@page
+@using HlidacStatu.Ceny.Models
+@using HlidacStatu.Ceny.Services
+@model HlidacStatu.Ceny.Pages.JedenJobModel
+
+@{
+    ViewData["Title"] = "Souhrnné statistiky a detailní porovnání";
+
+    var analyza = this.HttpContext.TryFindKey();
+
+    int percentil = Devmasters.ParseText.ToInt(Request.Query["percentil"].FirstOrDefault(), 10) ?? 10;
+    int maxprice = Devmasters.ParseText.ToInt(Request.Query["maxprice"].FirstOrDefault(), 199999) ?? 199999;
+    int minprice = Devmasters.ParseText.ToInt(Request.Query["minprice"].FirstOrDefault(), 0) ?? 0;
+
+    CompareDataModel graphModel = new();
+    BarGraph histogram = new();
+    List<JobStatistics> statistics = new();
+
+    if (Model.Key.HasValue)
+    {
+        statistics = JobService.GetStatistics(Model.Key.Value);
+
+        histogram.Data = JobService.GetDistinctJobs(Model.Key.Value);
+        histogram.Title = "Histogram všeho";
+        histogram.MaxWidth = 1200;
+    }
+}
+
+
+<h2>Aktivní parametry</h2>
+<p>
+        <table class="table table-bordered table-condensed" style="width:auto">
+            <tr>
+                <th>Vybraný percentil pro srovnání</th>
+                <td class="number"><input id="in_percentil" type="number" name="percentil" value="@percentil" style="text-align: right !important;width:100px" class="small" />. percentil</td>
+            </tr>
+            <tr><td colspan="2">Počet smluv, ve kterých jsme nalezli jednotlivé pozice, filtrované podle rozsahu cen</td></tr>
+            <tr>
+                <th>Minimální cena pro pozici</th>
+            <td class="number"><input id="in_minprice" type="number" name="minprice" value="@minprice" style="text-align: right !important;width:100px" class="small" />Kč s DPH/MD</td>
+            </tr>
+            <tr>
+                <th>Maximální cena pro pozici</th>
+            <td class="number"><input id="in_maxprice" type="number" name="maxprice" value="@maxprice" style="text-align: right !important;width:100px" class="small" />Kč s DPH/MD</td>
+            </tr>
+            <tr><td colspan="2" style="text-align: right !important;"><button type="button" onclick="changeParams()">Změnit parametry</button></td></tr>
+        </table>
+        <script>
+            function changeParams() {
+            var url = 'advanced?@Html.Raw(analyza.Value.UrlDecodedParams)&percentil=' + $("#in_percentil").val() + '&minprice=' + $("#in_minprice").val() + '&maxprice=' + $("in_maxprice").val();
+            window.location=url;
+        }
+        </script>
+</p>
+<h1>Souhrnné statistiky</h1>
+@if (Model.Key.HasValue)
+{
+    <table class="table table-sm table-striped mt-4">
+        <caption>Přehled cen - souhrn</caption>
+        <thead>
+            <tr>
+                <th scope="col">Pozice (počet smluv)</th>
+                <th scope="col" class="text-end">@percentil percentil</th>
+                <th scope="col" class="text-end">Dolní kvartil</th>
+                <th scope="col" class="text-end">Medián</th>
+                <th scope="col" class="text-end">Horní kvartil</th>
+                <th scope="col" class="text-end">Minimum</th>
+                <th scope="col" class="text-end">Průměr</th>
+                <th scope="col" class="text-end">Maximum</th>
+                <th scope="col" class="text-end">Počet smluv</th>
+                <th scope="col" class="text-end">Počet dodavatelů</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in statistics.OrderBy(m => m.Name))
+            {
+                <tr>
+                    <th scope="row">
+                        <a href="/Obor/@row.Name">@row.Name</a>
+                        @{
+                            var smlouvyIds = row.Jobs
+                            .Where(m => minprice <= m.PricePerUnitVat && m.PricePerUnitVat <= maxprice)
+                            .Select(m => m.SmlouvaId)
+                            .Distinct();
+
+                            var smlouvyQuery = "";
+
+                            if (smlouvyIds.Count() > 0)
+                            {
+                                smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
+                            }
+
+                        }
+                        @if (smlouvyQuery.Length > 0)
+                        {
+                            <a target="_blank" href="https://www.hlidacstatu.cz/hledatsmlouvy?q=@(System.Net.WebUtility.UrlEncode(smlouvyQuery))"><i class="fa-regular fa-file-contract"></i>(@smlouvyIds.Count())</a>
+                        }
+                    </th>
+                    <td class="text-end">@row.Kvartil(percentil).ToString("N0")</td>
+                    <td class="text-end">@row.DolniKvartil.ToString("N0")</td>
+                    <td class="text-end">@row.Median.ToString("N0")</td>
+                    <td class="text-end">@row.HorniKvartil.ToString("N0")</td>
+                    <td class="text-end">@row.Minimum.ToString("N0")</td>
+                    <td class="text-end">@row.Average.ToString("N0")</td>
+                    <td class="text-end">@row.Maximum.ToString("N0")</td>
+                    <td class="text-end">@row.ContractCount</td>
+                    <td class="text-end">@row.SupplierCount</td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+    <h1>Statisticky pro jednotlivé pozice</h1>
+
+    @foreach (var obor in statistics.Where(m => !string.IsNullOrEmpty(m.Name)).OrderBy(x => x.Name))
+    {
+        var statistics1 = JobService.GetTagStatistics(obor.Name, Model.Key.Value);
+
+        <h2>@obor.Name</h2>
+        <table class="table table-sm table-striped mt-4">
+            <caption>Přehled cen - souhrn</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Pozice</th>
+                    <th scope="col" class="text-end">@percentil percentil</th>
+                    <th scope="col" class="text-end">Dolní kvartil</th>
+                    <th scope="col" class="text-end">Medián</th>
+                    <th scope="col" class="text-end">Horní kvartil</th>
+                    <th scope="col" class="text-end">Minimum</th>
+                    <th scope="col" class="text-end">Průměr</th>
+                    <th scope="col" class="text-end">Maximum</th>
+                    <th scope="col" class="text-end">Počet smluv</th>
+                    <th scope="col" class="text-end">Počet dodavatelů</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in statistics1.OrderBy(m => m.Name))
+                {
+                    <tr>
+                        <th scope="row">
+                            <a href="/Obor/@row.Name">@row.Name</a>
+                            @{
+                                var smlouvyIds = row.Jobs
+                                .Where(m => minprice <= m.PricePerUnitVat && m.PricePerUnitVat <= maxprice)
+                                .Select(m => m.SmlouvaId)
+                                .Distinct();
+
+                                var smlouvyQuery = "";
+
+                                if (smlouvyIds.Count() > 0)
+                                {
+                                    smlouvyQuery = "id:(" + string.Join(" OR ", smlouvyIds) + ")";
+                                }
+
+                            }
+                            @if (smlouvyQuery.Length > 0)
+                            {
+                                <a target="_blank" href="https://www.hlidacstatu.cz/hledatsmlouvy?q=@(System.Net.WebUtility.UrlEncode(smlouvyQuery))"><i class="fa-regular fa-file-contract"></i>(@smlouvyIds.Count())</a>
+                            }
+                        </th>
+                        <td class="text-end">@row.Kvartil(percentil).ToString("N0")</td>
+                        <td class="text-end">@row.DolniKvartil.ToString("N0")</td>
+                        <td class="text-end">@row.Median.ToString("N0")</td>
+                        <td class="text-end">@row.HorniKvartil.ToString("N0")</td>
+                        <td class="text-end">@row.Minimum.ToString("N0")</td>
+                        <td class="text-end">@row.Average.ToString("N0")</td>
+                        <td class="text-end">@row.Maximum.ToString("N0")</td>
+                        <td class="text-end">@row.ContractCount</td>
+                        <td class="text-end">@row.SupplierCount</td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    }
+
+
+}
