@@ -294,7 +294,7 @@
                                 <a class="btn btn-outline-primary" asp-page="/Pdf" asp-route-obor="@obor" asp-route-rok="@rok">Celá zpráva</a>
                                 @if (userAccess.AnalyzeLevel == Entities.CenyCustomer.AccessDetail.AccessDetailLevel.PRO)
                                 {
-                                    <a class="btn btn-outline-primary" asp-page="/advanced" asp-route-obor="@obor" asp-route-rok="@rok">Analýza souhrnu</a>
+                                    <a class="btn btn-outline-primary" asp-page="/advanced" asp-route-obor="@obor" asp-route-rok="@rok">Detailní analýza</a>
                                 }
                             </div>
                             @if (this.User.IsInRole("Admin"))
