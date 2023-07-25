@@ -331,6 +331,36 @@ namespace HlidacStatu.Extensions
             return mustQs;
         }
 
+        /// <summary>
+        /// Zjišťuje jestli je skutečný majitel na smlouvě
+        /// </summary>
+        /// <param name="smlouva"></param>
+        /// <returns>Vrací true, když existuje skutečný majitel u všech příjemců, nebo příjemci nepodléhají zákonu o evidenci SKM</returns>
+        public static async Task<bool> MaSkutecnehoMajiteleAsync(this Smlouva smlouva)
+        {
+            if (smlouva.datumUzavreni < SkutecniMajiteleRepo.PlatnyOd)
+                return true;
+            
+            foreach (var prijemce in smlouva.Prijemce)
+            {
+                var firma = FirmaRepo.FromIco(prijemce.ico);
+
+                if (SkutecniMajiteleRepo.PodlehaSkm(firma, smlouva.datumUzavreni))
+                {
+                    var result = await SkutecniMajiteleRepo.GetAsync(firma.ICO);
+
+                    //skm nenalezen
+                    if (result == null)
+                        return false;
+                }
+
+
+            }
+
+            return true;
+
+
+        }
 
 
     }
