@@ -25,6 +25,7 @@ namespace HlidacStatu.Repositories
 
         public static void Save(Firma firma)
         {
+            //PrepareBeforeSaveAsync(firma).GetAwaiter().GetResult();
 
             string sqlNACE = @"INSERT into firma_NACE(ico, nace) values(@ico,@nace)";
             string sqlDS = @"INSERT into firma_DS(ico, DatovaSchranka) values(@ico,@DatovaSchranka)";
