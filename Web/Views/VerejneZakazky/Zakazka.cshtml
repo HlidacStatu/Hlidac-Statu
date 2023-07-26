@@ -4,6 +4,9 @@
 @using System.Linq;
 @using HlidacStatu.Entities.VZ
 @using HlidacStatu.Extensions
+@using HlidacStatu.Repositories
+@using HlidacStatu.Web.TagHelpers
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using NPOI.SS.Formula.Functions
 
 
@@ -109,6 +112,13 @@ else
                     else
                     {
                         <span>@od.Jmeno</span>
+                    }
+
+                    var datum = Model.DatumUzavreniSmlouvy ?? Model.DatumUverejneni ?? new DateTime(1900,1,1);
+                    
+                    if (!await SkutecniMajiteleRepo.MaSkutecnehoMajiteleAsync(od.ICO, datum))
+                    {
+                        <div class="alert alert-warning"><span class="fas fa-exclamation-circle"></span>U tohoto dodavatele stát nezná skutečného majitele.</div><br/>
                     }
                 }
             </td>

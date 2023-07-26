@@ -599,7 +599,7 @@
                 <text>
                     <br />Příjemce peněz
                     <div>
-                        @if (!await Model.MaSkutecnehoMajiteleAsync())
+                        @if (!await SkutecniMajiteleRepo.MaSkutecnehoMajiteleAsync(subjekt.ico, Model.datumUzavreni))
                         {
                             <div class="alert alert-warning"><span class="fas fa-exclamation-circle"></span>U tohoto dodavatele stát nezná skutečného majitele.</div><br/>
                         }

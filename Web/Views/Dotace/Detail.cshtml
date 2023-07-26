@@ -1,6 +1,9 @@
 ﻿@using HlidacStatu.Entities.Dotace
+@using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Searching
+@using HlidacStatu.Web.TagHelpers
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model HlidacStatu.Entities.Dotace.Dotace
 
 @{
@@ -62,6 +65,11 @@
             <th>Příjemce dotace</th>
             <td>
                 @Model.Prijemce.HlidacJmeno
+                @if (!await Model.MaSkutecnehoMajiteleAsync())
+                {
+                    <br/>
+                    <div class="alert alert-warning"><span class="fas fa-exclamation-circle"></span>U tohoto dodavatele stát nezná skutečného majitele.</div><br/>
+                }
             </td>
         </tr>
         <tr>
