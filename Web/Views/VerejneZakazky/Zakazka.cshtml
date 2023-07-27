@@ -114,11 +114,16 @@ else
                         <span>@od.Jmeno</span>
                     }
 
-                    var datum = Model.DatumUzavreniSmlouvy ?? Model.DatumUverejneni ?? new DateTime(1900,1,1);
+                    var datum = Model.DatumUverejneni ?? new DateTime(1900,1,1);
                     
                     if (!await SkutecniMajiteleRepo.MaSkutecnehoMajiteleAsync(od.ICO, datum))
                     {
-                        <div class="alert alert-warning"><span class="fas fa-exclamation-circle"></span>U tohoto dodavatele stát nezná skutečného majitele.</div><br/>
+                        <div class="alert alert-warning">
+                            <span class="fa-stack">
+                                <i class="fa-duotone fa-user fa-stack-2x"></i>
+                                <i class="fa-solid fa-question fa-stack-1x" style="margin-top: -6px;"></i>
+                            </span>U tohoto dodavatele stát nezná skutečného majitele.
+                        </div><br/>
                     }
                 }
             </td>
