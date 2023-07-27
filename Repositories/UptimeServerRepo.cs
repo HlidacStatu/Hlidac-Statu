@@ -267,10 +267,23 @@ namespace HlidacStatu.Repositories
                 (o) =>
                 {
                     using (HlidacStatu.Entities.DbEntities db = new HlidacStatu.Entities.DbEntities())
-                        return db.UptimeServers
+                    {
+                        try
+                        {
+
+                        var ret = db.UptimeServers
                             .AsNoTracking()
                             .Where(m => m.Active == 1)
                             .ToArray();
+
+                        return ret;
+                        }
+                        catch (Exception e)
+                        {
+
+                            throw;
+                        }
+                    }
                 }
         );
         public static UptimeServer[] AllActiveServers()
