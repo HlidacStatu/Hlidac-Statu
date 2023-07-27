@@ -197,15 +197,15 @@ namespace HlidacStatu.Repositories
                 {
                     using (DbEntities db = new DbEntities())
                     {
-                        return db.Osoba.FromSqlInterpolated($@"
+                        System.FormattableString sql = $@"
                             select *
                               from Osoba os
-                             where ( os.narozeni is not null
-                                     or exists(select 1 from OsobaEvent oe where oe.OsobaId = os.InternalId)
-                                     or exists(select 1 from OsobaVazby ov where ov.OsobaID = os.InternalId))
-                               and ((JmenoAscii + ' ' + PrijmeniAscii) LIKE {nquery} + '%'
+                             where 
+                               ((JmenoAscii + ' ' + PrijmeniAscii) LIKE {nquery} + '%'
                                     OR (PrijmeniAscii + ' ' + JmenoAscii) LIKE {nquery} + '%')
-                               and (({isValidYear} = 0 OR YEAR(Narozeni) = {validYear}))")
+                               and (({validYear} = 0 OR YEAR(Narozeni) = {validYear}))";
+
+                        return db.Osoba.FromSqlInterpolated(sql)
                             .AsNoTracking()
                             .Take(take)
                             .ToArray();
