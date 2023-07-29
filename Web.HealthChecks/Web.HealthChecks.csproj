@@ -20,21 +20,21 @@
 		<PackageReference Include="Devmasters.Core" Version="4.5.1" />
 		<PackageReference Include="Docker.DotNet" Version="3.125.15" />
 		<PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.3.0" />
-		<PackageReference Include="IPNetwork2" Version="2.6.589" />
-		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.7" />
+		<PackageReference Include="IPNetwork2" Version="2.6.598" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.9" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.7" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.7" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.7" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.7" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.7" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.7" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.7">
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.9">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="7.0.7" />
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="7.0.9" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.8" />
 		<PackageReference Include="RabbitMQ.Client" Version="6.5.0" />
 	</ItemGroup>
 

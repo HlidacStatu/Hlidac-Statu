@@ -10,7 +10,7 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="MailKit" Version="4.1.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.7" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.9" />
         <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
     </ItemGroup>
     <ItemGroup>

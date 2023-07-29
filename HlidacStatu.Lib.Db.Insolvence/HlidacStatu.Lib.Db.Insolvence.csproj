@@ -13,8 +13,8 @@
     <PackageReference Include="Devmasters.Core" Version="4.5.1" />
     <PackageReference Include="Devmasters.DT" Version="4.5.2" />
     <PackageReference Include="Devmasters.Lang" Version="4.5.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.9" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" />

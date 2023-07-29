@@ -11,11 +11,11 @@
       <PackageReference Include="Devmasters.Cache" Version="4.5.1" />
       <PackageReference Include="Devmasters.Core" Version="4.5.1" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.7" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.7" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.7" />
-      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.7" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.7">
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.9" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.9" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.9" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.9" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.9">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
