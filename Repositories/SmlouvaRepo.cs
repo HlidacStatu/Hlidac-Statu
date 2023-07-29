@@ -265,6 +265,7 @@ namespace HlidacStatu.Repositories
         );
 
         public static string SmlouvaProcessingQueueName = "smlouvy2Process";
+        public static string SmlouvaProcessingQueueNameOnDemand = "smlouvy2ProcessOnDemand";
         public static bool AddToProcessingQueue(this Smlouva smlouva,
                 bool forceOCR = false,
                 bool forceClassification = false,
@@ -303,12 +304,15 @@ namespace HlidacStatu.Repositories
             bool forceOCR = false,
             bool forceClassification = false,
             bool forceTablesMining = false,
-            bool forceBlurredPages = false
+            bool forceBlurredPages = false,
+            bool onDemandQueue = false
             )
         {
 
+            string queueName = onDemandQueue ? SmlouvaProcessingQueueNameOnDemand : SmlouvaProcessingQueueName;
+
             using HlidacStatu.Q.Simple.Queue<Smlouva.Queued> q = new Q.Simple.Queue<Smlouva.Queued>(
-                SmlouvaProcessingQueueName,
+                queueName,
                 Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
                 );
 
@@ -324,10 +328,12 @@ namespace HlidacStatu.Repositories
                 );
             return true;
         }
-        public static Smlouva.Queued GetSmlouvaFromProcessingQueue()
+        public static Smlouva.Queued GetSmlouvaFromProcessingQueue(bool onDemandQueue = false)
         {
+            string queueName = onDemandQueue ? SmlouvaProcessingQueueNameOnDemand : SmlouvaProcessingQueueName;
+
             using HlidacStatu.Q.Simple.Queue<Smlouva.Queued> q = new Q.Simple.Queue<Smlouva.Queued>(
-                SmlouvaProcessingQueueName,
+                queueName,
                 Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
                 );
 
