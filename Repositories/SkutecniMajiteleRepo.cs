@@ -15,7 +15,7 @@ namespace HlidacStatu.Repositories
         public static HashSet<int> KodyPravniFormyKtereMajiVyjimku = new()
         {
             100, 101, 102, 103, 104, 105, 106, 107, 108,
-            145, 301, 302, 312, 313, 314, 325, 331, 332, 352, 353, 361, 362, 381, 382, 421,
+            145, 301, 302, 312, 313, 314, 325, 331, 332, 352, 353, 361, 362, 381, 382, 421, 424,
             521, 525, 601, 641, 661, 703, 706, 707, 711, 721, 722, 723, 733, 741, 745, 761, 771, 801,
             804, 805, 811, 907, 937, 941, 952
         };
@@ -38,6 +38,22 @@ namespace HlidacStatu.Repositories
                 
             if(StatniFirmyKdeNeniPotrebaSkutecnyMajitel.Contains(firma.Typ ?? 0))
                 return false;
+
+            return true;
+        }
+
+        public static async Task<bool> MaSkutecnehoMajiteleAsync(string ico, DateTime datumPocatku)
+        {
+            var firma = FirmaRepo.FromIco(ico);
+
+            if (PodlehaSkm(firma, datumPocatku))
+            {
+                var result = await GetAsync(firma.ICO);
+
+                //skm nenalezen
+                if (result == null)
+                    return false;
+            }
 
             return true;
         }
