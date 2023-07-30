@@ -27,7 +27,6 @@
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.8.0.20230708" />
     <PackageReference Include="OpenCvSharp4.runtime.linux-arm" Version="4.8.0.20230708" />
     <PackageReference Include="OpenCvSharp4.runtime.ubuntu.18.04-x64" Version="4.6.0.20220608" />
-    <PackageReference Include="PDFtoImage" Version="2.3.0" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
   </ItemGroup>
@@ -51,6 +50,9 @@
     </Reference>
     <Reference Include="Accord.Statistics">
       <HintPath>..\3rd\Accord-framework\Accord.Imaging\bin\Release\netstandard2.1\Accord.Statistics.dll</HintPath>
+    </Reference>
+    <Reference Include="PDFtoImage">
+      <HintPath>..\3rd\binaries\PDFtoImage\net7.0\PDFtoImage.dll</HintPath>
     </Reference>
   </ItemGroup>
 

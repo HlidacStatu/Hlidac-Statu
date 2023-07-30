@@ -1,22 +1,26 @@
-#See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
+#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-#Using custom image based on https://github.com/shimat/opencvsharp/blob/master/docker/ubuntu20-dotnet6-opencv4.6.0/Dockerfile
-FROM hlidacstatu/opencvbase AS base
+#FROM mcr.microsoft.com/dotnet/runtime:7.0 AS base
+FROM hlidacstatu/opencvbase:net7 AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["Hlidac-Statu/Docker/BlurredPageMinion/BlurredPageMinion.csproj", "Hlidac-Statu/Docker/BlurredPageMinion/"]
-RUN dotnet restore "Hlidac-Statu/Docker/BlurredPageMinion/BlurredPageMinion.csproj"
+COPY ["Hlidac-Statu/nuget.config", "Hlidac-Statu/"]
+COPY ["Hlidac-statu/Docker/BlurredPageMinion/BlurredPageMinion.csproj", "Hlidac-statu/Docker/BlurredPageMinion/"]
+COPY ["Hlidac-statu/Analysis.Page.Cmd/Analysis.Page.Cmd.csproj", "Hlidac-statu/Analysis.Page.Cmd/"]
+COPY ["Hlidac-statu/Analysis.Page/Analysis.Page.csproj", "Hlidac-statu/Analysis.Page/"]
+COPY ["Hlidac-statu/Datastructures/DataStructures.csproj", "Hlidac-statu/Datastructures/"]
+COPY ["Hlidac-statu/Util/Util.csproj", "Hlidac-statu/Util/"]
+RUN dotnet restore "Hlidac-statu/Docker/BlurredPageMinion/BlurredPageMinion.csproj"
 COPY . .
-WORKDIR "/src/Hlidac-Statu/Docker/BlurredPageMinion"
+WORKDIR "/src/Hlidac-statu/Docker/BlurredPageMinion"
 RUN dotnet build "BlurredPageMinion.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "BlurredPageMinion.csproj" -c Release -o /app/publish
+RUN dotnet publish "BlurredPageMinion.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-RUN chmod +x /app/linux-x64/AnalyzePageTextAreaCmd
 ENTRYPOINT ["dotnet", "BlurredPageMinion.dll"]

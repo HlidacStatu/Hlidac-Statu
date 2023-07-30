@@ -9,7 +9,7 @@
             Provides methods to render PDFs into images.
             </summary>
         </member>
-        <member name="M:PDFtoImage.Conversion.SaveJpeg(System.String,System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SaveJpeg(System.String,System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a JPEG.
             </summary>
@@ -22,8 +22,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SaveJpeg(System.IO.Stream,System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SaveJpeg(System.IO.Stream,System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a JPEG.
             </summary>
@@ -36,8 +38,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SaveJpeg(System.String,System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SaveJpeg(System.String,System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a JPEG.
             </summary>
@@ -50,8 +54,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SaveJpeg(System.IO.Stream,System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SaveJpeg(System.IO.Stream,System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a JPEG.
             </summary>
@@ -64,8 +70,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SaveJpeg(System.String,System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SaveJpeg(System.String,System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a JPEG.
             </summary>
@@ -78,8 +86,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SaveJpeg(System.IO.Stream,System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SaveJpeg(System.IO.Stream,System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a JPEG.
             </summary>
@@ -92,8 +102,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SavePng(System.String,System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SavePng(System.String,System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a PNG.
             </summary>
@@ -106,8 +118,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SavePng(System.IO.Stream,System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SavePng(System.IO.Stream,System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a PNG.
             </summary>
@@ -120,8 +134,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SavePng(System.String,System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SavePng(System.String,System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a PNG.
             </summary>
@@ -134,8 +150,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SavePng(System.IO.Stream,System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SavePng(System.IO.Stream,System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a PNG.
             </summary>
@@ -148,8 +166,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SavePng(System.String,System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SavePng(System.String,System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a PNG.
             </summary>
@@ -162,8 +182,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SavePng(System.IO.Stream,System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SavePng(System.IO.Stream,System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a PNG.
             </summary>
@@ -176,8 +198,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SaveWebp(System.String,System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SaveWebp(System.String,System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a bitmap.
             </summary>
@@ -190,8 +214,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SaveWebp(System.IO.Stream,System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SaveWebp(System.IO.Stream,System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a bitmap.
             </summary>
@@ -204,8 +230,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SaveWebp(System.String,System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SaveWebp(System.String,System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a bitmap.
             </summary>
@@ -218,8 +246,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SaveWebp(System.IO.Stream,System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SaveWebp(System.IO.Stream,System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a bitmap.
             </summary>
@@ -232,8 +262,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SaveWebp(System.String,System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SaveWebp(System.String,System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a bitmap.
             </summary>
@@ -246,8 +278,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.SaveWebp(System.IO.Stream,System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.SaveWebp(System.IO.Stream,System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF and saves it as a bitmap.
             </summary>
@@ -260,8 +294,10 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
         </member>
-        <member name="M:PDFtoImage.Conversion.ToImage(System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.ToImage(System.String,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF into an image.
             </summary>
@@ -273,9 +309,11 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
             <returns>The converted PDF page as an image.</returns>
         </member>
-        <member name="M:PDFtoImage.Conversion.ToImage(System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.ToImage(System.Byte[],System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF into an image.
             </summary>
@@ -287,9 +325,11 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
             <returns>The converted PDF page as an image.</returns>
         </member>
-        <member name="M:PDFtoImage.Conversion.ToImage(System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.ToImage(System.IO.Stream,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF into an image.
             </summary>
@@ -301,9 +341,11 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
             <returns>The rendered PDF page as an image.</returns>
         </member>
-        <member name="M:PDFtoImage.Conversion.ToImage(System.IO.Stream,System.Boolean,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.ToImage(System.IO.Stream,System.Boolean,System.String,System.Int32,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders a single page of a given PDF into an image.
             </summary>
@@ -316,9 +358,11 @@
             <param name="height">The height of the desired <paramref name="page"/>. Use <see langword="null"/> if the original height should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
             <returns>The rendered PDF page as an image.</returns>
         </member>
-        <member name="M:PDFtoImage.Conversion.ToImages(System.String,System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.ToImages(System.String,System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders all pages of a given PDF into images.
             </summary>
@@ -329,9 +373,11 @@
             <param name="height">The height of all pages. Use <see langword="null"/> if the original height (per page) should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
             <returns>The rendered PDF pages as images.</returns>
         </member>
-        <member name="M:PDFtoImage.Conversion.ToImages(System.Byte[],System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.ToImages(System.Byte[],System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders all pages of a given PDF into images.
             </summary>
@@ -342,9 +388,11 @@
             <param name="height">The height of all pages. Use <see langword="null"/> if the original height (per page) should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
             <returns>The rendered PDF pages as images.</returns>
         </member>
-        <member name="M:PDFtoImage.Conversion.ToImages(System.IO.Stream,System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.ToImages(System.IO.Stream,System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders all pages of a given PDF into images.
             </summary>
@@ -355,9 +403,11 @@
             <param name="height">The height of all pages. Use <see langword="null"/> if the original height (per page) should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
             <returns>The rendered PDF pages as images.</returns>
         </member>
-        <member name="M:PDFtoImage.Conversion.ToImages(System.IO.Stream,System.Boolean,System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean)">
+        <member name="M:PDFtoImage.Conversion.ToImages(System.IO.Stream,System.Boolean,System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation)">
             <summary>
             Renders all pages of a given PDF into images.
             </summary>
@@ -369,9 +419,11 @@
             <param name="height">The height of all pages. Use <see langword="null"/> if the original height (per page) should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
             <returns>The rendered PDF pages as images.</returns>
         </member>
-        <member name="M:PDFtoImage.Conversion.ToImagesAsync(System.String,System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Threading.CancellationToken)">
+        <member name="M:PDFtoImage.Conversion.ToImagesAsync(System.String,System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation,System.Threading.CancellationToken)">
             <summary>
             Renders all pages of a given PDF into images.
             </summary>
@@ -383,9 +435,11 @@
             <param name="height">The height of all pages. Use <see langword="null"/> if the original height (per page) should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
             <returns>The rendered PDF pages as images.</returns>
         </member>
-        <member name="M:PDFtoImage.Conversion.ToImagesAsync(System.Byte[],System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Threading.CancellationToken)">
+        <member name="M:PDFtoImage.Conversion.ToImagesAsync(System.Byte[],System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation,System.Threading.CancellationToken)">
             <summary>
             Renders all pages of a given PDF into images.
             </summary>
@@ -397,9 +451,11 @@
             <param name="height">The height of all pages. Use <see langword="null"/> if the original height (per page) should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
             <returns>The rendered PDF pages as images.</returns>
         </member>
-        <member name="M:PDFtoImage.Conversion.ToImagesAsync(System.IO.Stream,System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Threading.CancellationToken)">
+        <member name="M:PDFtoImage.Conversion.ToImagesAsync(System.IO.Stream,System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation,System.Threading.CancellationToken)">
             <summary>
             Renders all pages of a given PDF into images.
             </summary>
@@ -411,9 +467,11 @@
             <param name="height">The height of all pages. Use <see langword="null"/> if the original height (per page) should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
             <returns>The rendered PDF pages as images.</returns>
         </member>
-        <member name="M:PDFtoImage.Conversion.ToImagesAsync(System.IO.Stream,System.Boolean,System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Threading.CancellationToken)">
+        <member name="M:PDFtoImage.Conversion.ToImagesAsync(System.IO.Stream,System.Boolean,System.String,System.Int32,System.Nullable{System.Int32},System.Nullable{System.Int32},System.Boolean,System.Boolean,System.Boolean,PDFtoImage.PdfRotation,System.Threading.CancellationToken)">
             <summary>
             Renders all pages of a given PDF into images.
             </summary>
@@ -426,6 +484,8 @@
             <param name="height">The height of all pages. Use <see langword="null"/> if the original height (per page) should be used.</param>
             <param name="withAnnotations">Specifies whether annotations be rendered.</param>
             <param name="withFormFill">Specifies whether form filling will be rendered.</param>
+            <param name="withAspectRatio">Specifies that <paramref name="width"/> or <paramref name="height"/> should be adjusted for aspect ratio (either one must be <see langword="null"/>).</param>
+            <param name="rotation">Specifies the rotation at 90 degree intervals.</param>
             <returns>The rendered PDF pages as images.</returns>
         </member>
         <member name="M:PDFtoImage.Conversion.GetPageCount(System.String,System.String)">
@@ -559,20 +619,7 @@
             Size of each page in the PDF document.
             </summary>
         </member>
-        <member name="M:PDFtoImage.PdfiumViewer.PdfDocument.Render(System.Int32,System.Int32,System.Int32,System.Single,System.Single,PDFtoImage.PdfiumViewer.PdfRenderFlags,System.Boolean)">
-            <summary>
-            Renders a page of the PDF document to an image.
-            </summary>
-            <param name="page">Number of the page to render.</param>
-            <param name="width">Width of the rendered image.</param>
-            <param name="height">Height of the rendered image.</param>
-            <param name="dpiX">Horizontal DPI.</param>
-            <param name="dpiY">Vertical DPI.</param>
-            <param name="flags">Flags used to influence the rendering.</param>
-            <param name="renderFormFill">Render form fills.</param>
-            <returns>The rendered image.</returns>
-        </member>
-        <member name="M:PDFtoImage.PdfiumViewer.PdfDocument.Render(System.Int32,System.Int32,System.Int32,System.Single,System.Single,PDFtoImage.PdfiumViewer.PdfRotation,PDFtoImage.PdfiumViewer.PdfRenderFlags,System.Boolean)">
+        <member name="M:PDFtoImage.PdfiumViewer.PdfDocument.Render(System.Int32,System.Int32,System.Int32,System.Single,System.Single,PDFtoImage.PdfRotation,PDFtoImage.PdfiumViewer.PdfRenderFlags,System.Boolean)">
             <summary>
             Renders a page of the PDF document to an image.
             </summary>
@@ -649,29 +696,29 @@
             Correct height/width for DPI.
             </summary>
         </member>
-        <member name="T:PDFtoImage.PdfiumViewer.PdfRotation">
+        <member name="T:PDFtoImage.PdfRotation">
             <summary>
             Specifies the rotation of pages shown in the PDF renderer.
             </summary>
         </member>
-        <member name="F:PDFtoImage.PdfiumViewer.PdfRotation.Rotate0">
+        <member name="F:PDFtoImage.PdfRotation.Rotate0">
             <summary>
-            Rotates the output 0 degrees.
+            No rotation.
             </summary>
         </member>
-        <member name="F:PDFtoImage.PdfiumViewer.PdfRotation.Rotate90">
+        <member name="F:PDFtoImage.PdfRotation.Rotate90">
             <summary>
-            Rotates the output 90 degrees.
+            Rotated 90 degrees clockwise.
             </summary>
         </member>
-        <member name="F:PDFtoImage.PdfiumViewer.PdfRotation.Rotate180">
+        <member name="F:PDFtoImage.PdfRotation.Rotate180">
             <summary>
-            Rotates the output 180 degrees.
+            Rotated 180 degrees.
             </summary>
         </member>
-        <member name="F:PDFtoImage.PdfiumViewer.PdfRotation.Rotate270">
+        <member name="F:PDFtoImage.PdfRotation.Rotate270">
             <summary>
-            Rotates the output 270 degrees.
+            Rotated 90 degrees counter-clockwise.
             </summary>
         </member>
     </members>

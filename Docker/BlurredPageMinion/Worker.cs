@@ -117,6 +117,9 @@ namespace BlurredPageMinion
 
                 try
                 {
+                    logger.LogDebug($"Downloading {p.url}");
+                    Console.WriteLine($"Downloading {p.url}");
+
                     using (Stream s = await httpClient.GetStreamAsync(p.url).ConfigureAwait(false))
                     {
                         using (var fs = new FileStream(tmpPdf, FileMode.CreateNew))

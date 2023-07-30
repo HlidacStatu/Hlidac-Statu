@@ -2,8 +2,9 @@
 #docker build -f DockerfileFromPublish -t hlidacstatu/uptimer:1.1.1 .
 #docker push hlidacstatu/uptimer:1.1.1
 
-FROM hlidacstatu/opencvbase AS base
+FROM hlidacstatu/opencvbase:net7 AS base
 WORKDIR /app
 
 COPY . .
+RUN chmod +x /app/linux-x64/AnalyzePageAreaCmd
 ENTRYPOINT ["dotnet", "BlurredPageMinion.dll"]
