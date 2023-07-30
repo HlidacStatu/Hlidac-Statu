@@ -67,7 +67,7 @@ namespace HlidacStatu.Repositories
             var res = await _doTablesClient.IndexAsync(data, o => o.Id(data.Id)); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)
             {
-                throw new ApplicationException(res.ServerError?.ToString());
+                throw new ApplicationException(res.ServerError?.ToString() ?? res.OriginalException?.ToString() ?? res.ToString());
             }
         }
 
