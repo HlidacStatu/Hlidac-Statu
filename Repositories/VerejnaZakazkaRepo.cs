@@ -83,10 +83,6 @@ namespace HlidacStatu.Repositories
                         newVZ.Zadavatel.ICO = firma.ICO;
                 }
                 
-                await StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
-                SetupUpdateDates(newVZ, posledniZmena);
-                MergeDuplicateDocuments(newVZ);
-
                 // there might be issues to find proper ICO, so we have to save half-complete VZ
                 if (string.IsNullOrWhiteSpace(newVZ.Zadavatel?.ICO))
                 {
@@ -97,59 +93,64 @@ namespace HlidacStatu.Repositories
                 elasticClient ??= await Manager.GetESClient_VerejneZakazkyAsync();
                 var storedDuplicates = await FindDocumentsFromTheSameSourcesAsync(newVZ, elasticClient);
 
-                // VZ neexistuje => ukládáme
-                if (storedDuplicates is null || !storedDuplicates.Any())
+                // VZ existuje => mergujeme
+                if (storedDuplicates is not null && storedDuplicates.Any())
                 {
-                    SendToOcrQueue(newVZ);
-                    await elasticClient.IndexDocumentAsync(newVZ);
-                    AfterSave(newVZ);
-                    return;
-                }
+                    var storedDuplicatesOrdered = storedDuplicates.OrderBy(d => d.LastUpdated).ToList();
 
-                var storedDuplicatesOrdered = storedDuplicates.OrderBy(d => d.LastUpdated).ToList();
+                    //the oldest one will be our permanent doc 
+                    var firstVz = storedDuplicatesOrdered.First();
 
-                //the oldest one will be our permanent doc 
-                var firstVz = storedDuplicatesOrdered.First();
+                    // firstly merge all connected VZs in db
+                    foreach (var storedDuplicate in storedDuplicatesOrdered.Skip(1))
+                    {
+                        firstVz = MergeVz(firstVz, storedDuplicate);
+                        //merge dokumenty
+                        MergeDocuments(firstVz, storedDuplicate.Dokumenty);
 
-                // firstly merge all connected VZs in db
-                foreach (var storedDuplicate in storedDuplicatesOrdered.Skip(1) )
-                {
-                    firstVz = MergeVz(firstVz, storedDuplicate);
+                        try
+                        {
+                            await DocumentHistoryRepo<VerejnaZakazka>.SaveAsync(storedDuplicate, storedDuplicate.Origin,
+                                firstVz.Id);
+
+                            await elasticClient.DeleteByQueryAsync<VerejnaZakazka>(s => s.Query(q =>
+                                q.Term(t => t.Field(f => f.Id).Value(storedDuplicate.Id))));
+                        }
+                        catch (Exception e)
+                        {
+                            Consts.Logger.Error(
+                                $"VZ ERROR Merging ID:{firstVz.Id} with ID:{storedDuplicate.Id}.", e);
+                        }
+                    }
+
+                    firstVz = MergeVz(firstVz, newVZ); //počítá se s tím, že jsou dokumenty stažené
+                    MergeDocuments(firstVz, newVZ.Dokumenty);
 
                     try
                     {
-                        await DocumentHistoryRepo<VerejnaZakazka>.SaveAsync(storedDuplicate, storedDuplicate.Origin, firstVz.Id);
-
-                        await elasticClient.DeleteByQueryAsync<VerejnaZakazka>(s => s.Query(q =>
-                            q.Term(t => t.Field(f => f.Id).Value(storedDuplicate.Id))));
+                        await DocumentHistoryRepo<VerejnaZakazka>.SaveAsync(newVZ, newVZ.Origin, firstVz.Id);
                     }
                     catch (Exception e)
                     {
                         Consts.Logger.Error(
-                            $"VZ ERROR Merging ID:{firstVz.Id} with ID:{storedDuplicate.Id}.", e);
+                            $"VZ ERROR Merging ID:{firstVz.Id} with new VZ from {newVZ.Origin}.", e);
                     }
 
-                }
+                    newVZ = firstVz;
 
-                firstVz = MergeVz(firstVz, newVZ);
-                try
-                {
-                    await DocumentHistoryRepo<VerejnaZakazka>.SaveAsync(newVZ, newVZ.Origin, firstVz.Id);
-                }
-                catch (Exception e)
-                {
-                    Consts.Logger.Error(
-                        $"VZ ERROR Merging ID:{firstVz.Id} with new VZ from {newVZ.Origin}.", e);
                 }
                 
-
-                SendToOcrQueue(firstVz);
-
-                FixPublicationDate(firstVz);
+                // stáhnout dokumenty, které nemají checksum
+                await StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
+                SetupUpdateDates(newVZ, posledniZmena);
                 
-                await elasticClient.IndexDocumentAsync<VerejnaZakazka>(firstVz);
+                // zmergovat stejné dokumenty podle sha
+                MergeDocumentsBySHA(newVZ);
                 
-                AfterSave(firstVz);
+                SendToOcrQueue(newVZ);
+                FixPublicationDate(newVZ);
+                await elasticClient.IndexDocumentAsync<VerejnaZakazka>(newVZ);
+                AfterSave(newVZ);
             }
             catch (Exception e)
             {
@@ -187,9 +188,6 @@ namespace HlidacStatu.Repositories
                     destination.Dodavatele.Add(dodavatel);
                 }
             }
-
-            //merge dokumenty
-            MergeDocuments(destination, source.Dokumenty);
             return destination;
         }
 
@@ -202,8 +200,13 @@ namespace HlidacStatu.Repositories
         {
             foreach (var newDoc in newDocuments)
             {
-                var origDoc = originalVZ.Dokumenty.FirstOrDefault(d => d.Equals(newDoc));
                 // update document by checksum
+                var origDoc = originalVZ.Dokumenty.FirstOrDefault(d => d.Equals(newDoc)) 
+                              // update document by link
+                              ?? originalVZ.Dokumenty.FirstOrDefault(d => d.DirectUrls.Any() && d.DirectUrls.Overlaps(newDoc.DirectUrls))
+                              // update document by storage id
+                              ?? originalVZ.Dokumenty.FirstOrDefault(d => d.StorageIds.Any() && d.StorageIds.Overlaps(newDoc.StorageIds));
+
                 if (origDoc is not null)
                 {
                     MergeDocumentProperties(origDoc, newDoc, originalVZ.Changelog);
@@ -215,7 +218,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private static void MergeDuplicateDocuments(VerejnaZakazka newVZ)
+        private static void MergeDocumentsBySHA(VerejnaZakazka newVZ)
         {
             var groups = newVZ.Dokumenty
                 .GroupBy(d => d.Sha256Checksum)
