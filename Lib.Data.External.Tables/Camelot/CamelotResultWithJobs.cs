@@ -4,13 +4,13 @@ using HlidacStatu.DetectJobs;
 
 namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
-    public class CamelotResultWithJobs : CamelotResult
+    public class CamelotResultWithJobs : HlidacStatu.DS.Api.TablesInDoc.ApiResult
     {
         //static HlidacStatu.DetectJobs.InTables it_inTables = new DetectJobs.InTables("IT",
         //    HlidacStatu.DetectJobs.IT.Keywords, HlidacStatu.DetectJobs.IT.OtherWords, HlidacStatu.DetectJobs.IT.BlacklistedWords
         //    );
 
-        public CamelotResultWithJobs(HlidacStatu.Entities.DocTables.Result cr)
+        public CamelotResultWithJobs(HlidacStatu.DS.Api.TablesInDoc.Result cr)
         {
             if (cr == null)
                 throw new ArgumentNullException("cr");

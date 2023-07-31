@@ -12,7 +12,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
     {
 
 
-        public static async Task<DocTables.Result[]> ParseTablesFromDocumentAsync(string smlouvaId, string prilohaId)
+        public static async Task<HlidacStatu.DS.Api.TablesInDoc.Result[]> ParseTablesFromDocumentAsync(string smlouvaId, string prilohaId)
         {
 
             Smlouva s = await SmlouvaRepo.LoadAsync(smlouvaId);
@@ -29,22 +29,22 @@ namespace HlidacStatu.Lib.Data.External.Tables
             return await ParseTablesFromDocumentAsync(s, p);
         }
 
-        public static async Task<DocTables.Result[]> ParseTablesFromDocumentAsync(Smlouva smlouva, Smlouva.Priloha priloha, bool throwException = false)
+        public static async Task<HlidacStatu.DS.Api.TablesInDoc.Result[]> ParseTablesFromDocumentAsync(Smlouva smlouva, Smlouva.Priloha priloha, bool throwException = false)
         {
             Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
             sw.Start();
             try
             {
-                DocTables.Result[] myRes = null;
+                HlidacStatu.DS.Api.TablesInDoc.Result[] myRes = null;
                 if (smlouva.znepristupnenaSmlouva()==false)
                     myRes = PDF.GetMaxTablesFromPDFAsync(
                         priloha.LocalCopyUrl(smlouva.Id, true,null, null), 
-                            Camelot.CamelotResult.Formats.JSON).Result;
+                            HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats.JSON).Result;
 
                 if (myRes == null)
                     myRes = PDF.GetMaxTablesFromPDFAsync(
                         priloha.LocalCopyUrl(smlouva.Id, true, secret: Devmasters.Config.GetWebConfigValue("LocalPrilohaUniversalSecret")),
-                        Camelot.CamelotResult.Formats.JSON).Result;
+                        HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats.JSON).Result;
 
                 sw.Stop();
                 Util.Consts.Logger.Debug($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} done in {sw.ElapsedMilliseconds}ms, found {myRes?.Sum(m => m.Tables?.Length ?? 0)} tables");
@@ -82,7 +82,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
             return null;
         }
 
-        public static DocTables.Result[] GetTablesFromPriloha(Smlouva s, Smlouva.Priloha p)
+        public static HlidacStatu.DS.Api.TablesInDoc.Result[] GetTablesFromPriloha(Smlouva s, Smlouva.Priloha p)
         {
             if (s == null || p == null)
                 return null;

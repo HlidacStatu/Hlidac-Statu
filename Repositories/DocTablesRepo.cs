@@ -10,11 +10,11 @@ namespace HlidacStatu.Repositories
     {
         private static ElasticClient _doTablesClient = Manager.GetESClient_DocTablesAsync()
     .ConfigureAwait(false).GetAwaiter().GetResult();
-        static Devmasters.Cache.AWS_S3.CacheProvider<DocTables.Result[]> awsClient = null;
+        static Devmasters.Cache.AWS_S3.CacheProvider<HlidacStatu.DS.Api.TablesInDoc.Result[]> awsClient = null;
 
         static DocTablesRepo()
         {
-            awsClient = new Devmasters.Cache.AWS_S3.CacheProvider<DocTables.Result[]>(
+            awsClient = new Devmasters.Cache.AWS_S3.CacheProvider<HlidacStatu.DS.Api.TablesInDoc.Result[]>(
                 new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
                 Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
                 Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
@@ -48,7 +48,7 @@ namespace HlidacStatu.Repositories
                 : false;
         }
 
-        public static async Task SaveAsync(string smlouvaId, string prilohaId, DocTables.Result[] tables)
+        public static async Task SaveAsync(string smlouvaId, string prilohaId, HlidacStatu.DS.Api.TablesInDoc.Result[] tables)
         {
             var dt = new DocTables()
             {
@@ -78,7 +78,7 @@ namespace HlidacStatu.Repositories
                     return;
 
             string key = $"SmlouvyPrilohyTbls/{smlouvaId}/{prilohaId}";
-            DocTables.Result[] data = awsClient.Get(key);
+            HlidacStatu.DS.Api.TablesInDoc.Result[] data = awsClient.Get(key);
             if (data == null)
                 return;
 
@@ -88,7 +88,7 @@ namespace HlidacStatu.Repositories
         {
 
             string key = $"SmlouvyPrilohyTbls/{smlouvaId}/{prilohaId}";
-            DocTables.Result[] data = awsClient.Get(key);
+            HlidacStatu.DS.Api.TablesInDoc.Result[] data = awsClient.Get(key);
             if (data == null)
                 return;
 

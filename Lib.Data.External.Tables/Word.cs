@@ -13,7 +13,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
     {
         private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.Data.External.Tables.Word");
 
-        public static HlidacStatu.Entities.DocTables.Result[] GetTablesFromWord(Uri url, string filename)
+        public static HlidacStatu.DS.Api.TablesInDoc.Result[] GetTablesFromWord(Uri url, string filename)
         {
             if (filename?.EndsWith(".doc") == true)
             {
@@ -46,7 +46,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 }
             }
         }
-        public static HlidacStatu.Entities.DocTables.Result[] GetTablesFromWord(string fn)
+        public static HlidacStatu.DS.Api.TablesInDoc.Result[] GetTablesFromWord(string fn)
         {
             try
             {
@@ -64,17 +64,17 @@ namespace HlidacStatu.Lib.Data.External.Tables
             }
             return null;
         }
-        private static HlidacStatu.Entities.DocTables.Result[] GetTablesFromWordDOC(string fn)
+        private static HlidacStatu.DS.Api.TablesInDoc.Result[] GetTablesFromWordDOC(string fn)
         {
             // not implemented
             logger.Warning($"DOC is not supported {fn}");
             return null;
 
         }
-        private static HlidacStatu.Entities.DocTables.Result[] GetTablesFromWordDOCX(string fn)
+        private static HlidacStatu.DS.Api.TablesInDoc.Result[] GetTablesFromWordDOCX(string fn)
         {
-            HlidacStatu.Entities.DocTables.Result res = new HlidacStatu.Entities.DocTables.Result();
-            var tbls = new List<HlidacStatu.Entities.DocTables.Result.Table>();
+            HlidacStatu.DS.Api.TablesInDoc.Result res = new HlidacStatu.DS.Api.TablesInDoc.Result();
+            var tbls = new List<HlidacStatu.DS.Api.TablesInDoc.Result.Table>();
 
             if (File.Exists(fn) == false)
                 return null;
@@ -93,20 +93,20 @@ namespace HlidacStatu.Lib.Data.External.Tables
                     {
                         var r = xtbl.Rows[ri];
 
-                        //simulate Camelot JSON HlidacStatu.Entities.DocTables.Result
+                        //simulate Camelot JSON HlidacStatu.DS.Api.TablesInDoc.Result
                         var jsonCols = new Newtonsoft.Json.Linq.JObject();
                         for (int ci = 0; ci < r.GetTableCells().Count; ci++)
                         {
                             var c = r.GetTableCells()[ci];
                             var cont = c.GetTextRecursively();
                             cont = Devmasters.TextUtil.NormalizeToBlockText(cont)?.Trim();
-                            //simulate Camelot JSON HlidacStatu.Entities.DocTables.Result
+                            //simulate Camelot JSON HlidacStatu.DS.Api.TablesInDoc.Result
                             jsonCols.Add(ci.ToString(), cont);
                         }
                         jsonTbl.Add(jsonCols);
                         tblCount++;
                     }
-                    tbls.Add(new HlidacStatu.Entities.DocTables.Result.Table()
+                    tbls.Add(new HlidacStatu.DS.Api.TablesInDoc.Result.Table()
                     {
                         Content = jsonTbl.ToString(),
                         Page = 0,
@@ -122,7 +122,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
             res.Format = "NPOI.Docx";
             res.ElapsedTimeInMs = (int)swint.ExactElapsedMs;
 
-            return new HlidacStatu.Entities.DocTables.Result[] { res };
+            return new HlidacStatu.DS.Api.TablesInDoc.Result[] { res };
         }
 
     }
