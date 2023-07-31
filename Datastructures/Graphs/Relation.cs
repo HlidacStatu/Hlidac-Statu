@@ -246,8 +246,8 @@ namespace HlidacStatu.DS.Graphs
             if (callDeep > 100)
             {
                 //primitive stackoverflow protection
-                HlidacStatu.Util.Consts.Logger.Error("_childrenVazby stackoverflow protection {@parentFrom}-{parentTo} {@originalRootFrom}-{@originalRootTo}", 
-                    parent.From?.UniqId, parent.To?.UniqId, originalRoot.From?.UniqId, originalRoot.To?.UniqId);
+                //HlidacStatu.Util.Consts.Logger.Error("_childrenVazby stackoverflow protection {@parentFrom}-{parentTo} {@originalRootFrom}-{@originalRootTo}", 
+                //    parent.From?.UniqId, parent.To?.UniqId, originalRoot.From?.UniqId, originalRoot.To?.UniqId);
                 return items.ToArray();
             }
 

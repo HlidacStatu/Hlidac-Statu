@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Analysis.Page", "..\Hlidac-Statu-Private\Docker\BlurredPageMinion\Analysis.Page\Analysis.Page.csproj", "{D5781580-DE7E-40B9-AC89-8070411592E3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Analysis.Page.Cmd", "..\Hlidac-Statu-Private\Docker\BlurredPageMinion\Analysis.Page.Cmd\Analysis.Page.Cmd.csproj", "{6678AD5A-D387-4AE0-8266-FB7D1E171563}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnalyzePageAreaCmd", "..\Hlidac-Statu-Private\Docker\BlurredPageMinion\AnalyzePageAreaCmd\AnalyzePageAreaCmd.csproj", "{EE7128AF-A9DE-4C69-A4C2-112E04E7488D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlurredPageMinion", "..\Hlidac-Statu-Private\Docker\BlurredPageMinion\BlurredPageMinion\BlurredPageMinion.csproj", "{28C09613-C179-4B75-B898-9A1F9232D955}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataStructures", "Datastructures\DataStructures.csproj", "{7A3DF554-E378-48FC-887B-5F1F2181838D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D5781580-DE7E-40B9-AC89-8070411592E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5781580-DE7E-40B9-AC89-8070411592E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5781580-DE7E-40B9-AC89-8070411592E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5781580-DE7E-40B9-AC89-8070411592E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6678AD5A-D387-4AE0-8266-FB7D1E171563}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6678AD5A-D387-4AE0-8266-FB7D1E171563}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6678AD5A-D387-4AE0-8266-FB7D1E171563}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6678AD5A-D387-4AE0-8266-FB7D1E171563}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE7128AF-A9DE-4C69-A4C2-112E04E7488D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE7128AF-A9DE-4C69-A4C2-112E04E7488D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE7128AF-A9DE-4C69-A4C2-112E04E7488D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE7128AF-A9DE-4C69-A4C2-112E04E7488D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28C09613-C179-4B75-B898-9A1F9232D955}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28C09613-C179-4B75-B898-9A1F9232D955}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28C09613-C179-4B75-B898-9A1F9232D955}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28C09613-C179-4B75-B898-9A1F9232D955}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A3DF554-E378-48FC-887B-5F1F2181838D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A3DF554-E378-48FC-887B-5F1F2181838D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A3DF554-E378-48FC-887B-5F1F2181838D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A3DF554-E378-48FC-887B-5F1F2181838D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {36E21DB2-BDA8-4988-B092-3B87593B90AC}
+	EndGlobalSection
+EndGlobal

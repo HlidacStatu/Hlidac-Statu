@@ -1,13 +1,10 @@
-﻿using System.Data;
-using System.Data.SqlClient;
-
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
 using Swashbuckle.AspNetCore.Annotations;
+using System.Data;
+using System.Data.SqlClient;
 using static HlidacStatu.DS.Api.BlurredPage;
 
 namespace HlidacStatuApi.Controllers.ApiV2
@@ -26,7 +23,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             public DateTime? taken { get; set; } = null;
             public string takenByUser { get; set; } = null;
         }
-        static System.Collections.Concurrent.ConcurrentDictionary<string, processed> idsToProcess = null;
+
         static long runningSaveThreads = 0;
         static long savingPagesInThreads = 0;
         static long savedInThread = 0;
@@ -246,7 +243,6 @@ namespace HlidacStatuApi.Controllers.ApiV2
             try
             {
                 Task.WaitAll(tasks.ToArray());
-                _ = idsToProcess.Remove(data.smlouvaId, out var dt);
                 return true;
             }
             catch (Exception e)
@@ -265,7 +261,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "PrivateApi")]
         [HttpGet("AddTask")]
-        public async Task<ActionResult<bool>> AddTask(string id, bool force =true)
+        public async Task<ActionResult<bool>> AddTask(string id, bool force = true)
         {
             var sml = await SmlouvaRepo.LoadAsync(id, includePrilohy: false);
             if (sml != null)
@@ -304,22 +300,25 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
         }
 
-        ////[ApiExplorerSettings(IgnoreApi = true)]
-        //[Authorize(Roles = "blurredAPIAccess")]
-        //[HttpGet("Stats")]
-        //public async Task<ActionResult<BlurredPageAPIStatistics>> Stats()
-        //{
-        //    DateTime now = DateTime.Now;
-        //    var inProcess = idsToProcess.Where(m => m.Value.taken != null);
-        //    var res = new BlurredPageAPIStatistics()
-        //    {
-        //        total = idsToProcess.Count,
-        //        currTaken = inProcess.Count(),
-        //        totalFailed = inProcess.Count(m => (now - m.Value.taken.Value) > MAXDURATION_OF_TASK_IN_MIN)
-        //    };
+        //[ApiExplorerSettings(IgnoreApi = true)]
+        [Authorize(Roles = "blurredAPIAccess")]
+        [HttpGet("Stats")]
+        public async Task<ActionResult<BlurredPageAPIStatistics>> Stats()
+        {
+            using HlidacStatu.Q.Simple.Queue<BpGet> q = new HlidacStatu.Q.Simple.Queue<BpGet>(
+                BlurredPageProcessingQueueName,
+                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+            );
 
-        //    return res;
-        //}
+
+            DateTime now = DateTime.Now;
+            var res = new BlurredPageAPIStatistics()
+            {
+                total = q.MessageCount()
+            };
+
+            return res;
+        }
         ////[ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize()]
         //[HttpGet("Stats2")]
