@@ -184,6 +184,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MLUtil", "..\Hlidac-Statu-P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Llama", "..\Hlidac-Statu-Private\Llama\Llama.csproj", "{65FC5E58-4EA0-4F6E-8E25-4876D37EBD9D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Analysis.Page", "..\Hlidac-Statu-Private\Docker\BlurredPageMinion\Analysis.Page\Analysis.Page.csproj", "{6B9E7196-0529-43BC-9B17-60D5E22A4669}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -438,6 +440,10 @@ Global
 		{65FC5E58-4EA0-4F6E-8E25-4876D37EBD9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65FC5E58-4EA0-4F6E-8E25-4876D37EBD9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65FC5E58-4EA0-4F6E-8E25-4876D37EBD9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B9E7196-0529-43BC-9B17-60D5E22A4669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B9E7196-0529-43BC-9B17-60D5E22A4669}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B9E7196-0529-43BC-9B17-60D5E22A4669}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B9E7196-0529-43BC-9B17-60D5E22A4669}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -517,6 +523,7 @@ Global
 		{EFAA0F2C-1D61-4B6C-B1F6-0DB2DD59BEB2} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{C20CB612-3806-442A-9E29-166A7C84482A} = {AF9C295F-FA98-4C4C-9A87-25F1792C9E3D}
 		{65FC5E58-4EA0-4F6E-8E25-4876D37EBD9D} = {AF9C295F-FA98-4C4C-9A87-25F1792C9E3D}
+		{6B9E7196-0529-43BC-9B17-60D5E22A4669} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
