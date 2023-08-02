@@ -10,6 +10,7 @@ namespace HlidacStatu.Entities
         public string ImageElement { get; set; }
         public string Type { get; set; }
         public string Description { get; set; }
+        public string KIndex { get; set; }
         public float PriorityMultiplier { get; set; }
 
         public CategoryEnum Category { get; set; }

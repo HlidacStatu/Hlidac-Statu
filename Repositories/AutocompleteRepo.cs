@@ -13,6 +13,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+using Consts = HlidacStatu.Util.Consts;
 
 namespace HlidacStatu.Repositories
 {
@@ -90,20 +92,6 @@ namespace HlidacStatu.Repositories
                 {
                     try
                     {
-                        Consts.Logger.Info("GenerateAutocomplete Loading authorities");
-                        authorities = LoadAuthorities(logOutputFunc, progressOutputFunc);
-                        Consts.Logger.Info("GenerateAutocomplete Loading authorities done");
-                    }
-                    catch (Exception e)
-                    {
-                        Consts.Logger.Error("GenerateAutocomplete Authorities error ", e);
-                    }
-                },
-
-                () =>
-                {
-                    try
-                    {
                         Consts.Logger.Info("GenerateAutocomplete Loading oblasti");
                         oblasti = LoadOblasti();
                         Consts.Logger.Info("GenerateAutocomplete Loading oblasti done");
@@ -143,6 +131,16 @@ namespace HlidacStatu.Repositories
                 }
             );
             
+            try
+            {
+                Consts.Logger.Info("GenerateAutocomplete Loading authorities");
+                authorities = await LoadAuthoritiesAsync(logOutputFunc, progressOutputFunc);
+                Consts.Logger.Info("GenerateAutocomplete Loading authorities done");
+            }
+            catch (Exception e)
+            {
+                Consts.Logger.Error("GenerateAutocomplete Authorities error ", e);
+            }
             
             try
             {
@@ -243,13 +241,14 @@ namespace HlidacStatu.Repositories
                     Description = FixKraj(f.Item3),
                     PriorityMultiplier = 1.5f,
                     ImageElement = "<i class='fas fa-industry-alt'></i>",
+                    KIndex = (KIndex.GetAsync(f.Item2).GetAwaiter().GetResult())?.LastKIndexLabel().ToString("G"),
                     Category = Autocomplete.CategoryEnum.StateCompany
                 }).ToList();
             return results;
         }
 
         //úřady
-        private static List<Autocomplete> LoadAuthorities(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
+        private static async Task<List<Autocomplete>> LoadAuthoritiesAsync(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
         {
             string sql = $@"select Jmeno, ICO, KrajId , status
                              from Firma 
@@ -261,9 +260,9 @@ namespace HlidacStatu.Repositories
             var lockObj = new object();
             List<Autocomplete> results = new List<Autocomplete>();
 
-            Devmasters.Batch.Manager.DoActionForAll<Tuple<string, string, string, int?>>(
+            await Devmasters.Batch.Manager.DoActionForAllAsync<Tuple<string, string, string, int?>>(
                 DirectDB.GetList<string, string, string, int?>(sql).ToArray(),
-                (f) =>
+                async f =>
                 {
                     string img = "<i class='fas fa-university'></i>";
 
@@ -284,6 +283,7 @@ namespace HlidacStatu.Repositories
                         Description = FixKraj(f.Item3),
                         PriorityMultiplier = 2,
                         ImageElement = img,
+                        KIndex = (await KIndex.GetAsync(f.Item2))?.LastKIndexLabel().ToString("G"),
                         Category = Autocomplete.CategoryEnum.Authority
                     };
 
@@ -395,7 +395,7 @@ namespace HlidacStatu.Repositories
                         synonyms[0] = new Autocomplete()
                         {
                             Id = $"osobaid:{o.NameId}",
-                            Text = $"{o.Prijmeni} {o.Jmeno}{AppendTitle(o.TitulPred, o.TitulPo)}",
+                            Text = $"{o.Jmeno} {o.Prijmeni}{AppendTitle(o.TitulPred, o.TitulPo)}",
                             PriorityMultiplier = priority,
                             Type = o.StatusOsoby().ToNiceDisplayName(),
                             ImageElement = $"<img src='{o.GetPhotoUrl(false)}' />",
@@ -406,7 +406,7 @@ namespace HlidacStatu.Repositories
                         };
  
                         synonyms[1] = synonyms[0].Clone();
-                        synonyms[1].Text = $"{o.Jmeno} {o.Prijmeni}{AppendTitle(o.TitulPred, o.TitulPo)}";
+                        synonyms[1].Text = $"{o.Prijmeni} {o.Jmeno}{AppendTitle(o.TitulPred, o.TitulPo)}";
 
                         await semaphoreLock.WaitAsync();
                         try
