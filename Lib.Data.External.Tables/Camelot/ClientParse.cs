@@ -11,7 +11,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
     {
         public string PdfUrl { get; }
         public ClientLow.Commands Command { get; }
-        public HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats Format { get; }
+        public HlidacStatu.DS.Api.TablesInDoc.Formats Format { get; }
         public string Pages { get; }
 
         public string SessionId { get; private set; } = null;
@@ -23,7 +23,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
         private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("Camelot.ClientParse");
         public ClientParse(IApiConnection connection,
-            string pdfUrl, ClientLow.Commands command, HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats format = HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats.JSON, string pages = "all")
+            string pdfUrl, ClientLow.Commands command, HlidacStatu.DS.Api.TablesInDoc.Formats format = HlidacStatu.DS.Api.TablesInDoc.Formats.JSON, string pages = "all")
         {
             PdfUrl = pdfUrl;
             Command = command;
@@ -73,10 +73,10 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
         }
 
-        public async Task<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>> GetSessionAsync()
+        public async Task<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>> GetSessionAsync()
         {
             if (string.IsNullOrEmpty(this.SessionId))
-                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>(false) { ErrorCode = 404, ErrorDescription = "sessionID is empty" };
+                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>(false) { ErrorCode = 404, ErrorDescription = "sessionID is empty" };
 
             try
             {
@@ -86,7 +86,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
             catch (Exception e)
             {
-                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>(false) { ErrorDescription = e.ToString(), ErrorCode = 500 };
+                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>(false) { ErrorDescription = e.ToString(), ErrorCode = 500 };
             }
         }
 

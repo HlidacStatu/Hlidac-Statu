@@ -10,5 +10,14 @@ namespace HlidacStatu.DS.Api
     {
         public static string TablesInDocProcessingQueueName = "tablesInDoc2Process";
 
+        public enum Formats
+        {
+            CSV,
+            JSON,
+            HTML,
+            EXCEL,
+            SQLITE
+        }
+
     }
 }

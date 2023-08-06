@@ -10,14 +10,14 @@ namespace HlidacStatu.Lib.Data.External.Tables
     public static class PDF
     {
         public static async Task<HlidacStatu.DS.Api.TablesInDoc.Result[]> GetMaxTablesFromPDFAsync(
-            string pdfUrl, HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats format = HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats.JSON, string pages = "all", 
+            string pdfUrl, HlidacStatu.DS.Api.TablesInDoc.Formats format = HlidacStatu.DS.Api.TablesInDoc.Formats.JSON, string pages = "all", 
             TimeSpan? executionTimeout = null,
             IApiConnection conn = null
             )
         {
-            List<HlidacStatu.DS.Api.TablesInDoc.ApiResult> res = new List<HlidacStatu.DS.Api.TablesInDoc.ApiResult>();
-            HlidacStatu.DS.Api.TablesInDoc.ApiResult resLatt = null;
-            HlidacStatu.DS.Api.TablesInDoc.ApiResult resStre = null;
+            List<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult> res = new List<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>();
+            HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult resLatt = null;
+            HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult resStre = null;
             ParallelOptions po = new ParallelOptions();
 
             //if (System.Diagnostics.Debugger.IsAttached)
@@ -27,14 +27,14 @@ namespace HlidacStatu.Lib.Data.External.Tables
                  () =>
                  {
                      resLatt = Client.GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.lattice, format, pages,executionTimeout,conn).Result;
-                     if (resLatt.Status != HlidacStatu.DS.Api.TablesInDoc.ApiResult.Statuses.Error.ToString())
+                     if (resLatt.Status != HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult.Statuses.Error.ToString())
                          res.Add(resLatt);
                      Client.logger.Debug($"PDF {pdfUrl} done Latt in {resLatt.ElapsedTimeInMs}ms on {resLatt.CamelotServer}, status {resLatt.Status}");
                  },
                 () =>
                 {
                     resStre = Client.GetTablesFromPDFAsync(pdfUrl, ClientLow.Commands.stream, format, pages, executionTimeout, conn).Result;
-                    if (resStre.Status != HlidacStatu.DS.Api.TablesInDoc.ApiResult.Statuses.Error.ToString())
+                    if (resStre.Status != HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult.Statuses.Error.ToString())
                         res.Add(resStre);
                     Client.logger.Debug($"PDF {pdfUrl} done Stream in {resStre?.ElapsedTimeInMs}ms on {resStre.CamelotServer}, status {resStre.Status}");
                 });

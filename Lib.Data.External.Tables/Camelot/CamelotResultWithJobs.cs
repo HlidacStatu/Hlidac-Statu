@@ -4,7 +4,7 @@ using HlidacStatu.DetectJobs;
 
 namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
-    public class CamelotResultWithJobs : HlidacStatu.DS.Api.TablesInDoc.ApiResult
+    public class CamelotResultWithJobs : HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult
     {
         //static HlidacStatu.DetectJobs.InTables it_inTables = new DetectJobs.InTables("IT",
         //    HlidacStatu.DetectJobs.IT.Keywords, HlidacStatu.DetectJobs.IT.OtherWords, HlidacStatu.DetectJobs.IT.BlacklistedWords

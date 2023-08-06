@@ -11,7 +11,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
     {
         public string PdfUrl { get; }
         public ClientLow.Commands Command { get; }
-        public HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats Format { get; }
+        public HlidacStatu.DS.Api.TablesInDoc.Formats Format { get; }
         public string Pages { get; }
 
         public string SessionId { get; private set; } = null;
@@ -23,7 +23,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
         private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Camelot.Client.Simple");
         public SimpleClient(IApiConnection connection,
-            string pdfUrl, ClientLow.Commands command, HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats format = HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats.JSON, string pages = "all")
+            string pdfUrl, ClientLow.Commands command, HlidacStatu.DS.Api.TablesInDoc.Formats format = HlidacStatu.DS.Api.TablesInDoc.Formats.JSON, string pages = "all")
         {
             PdfUrl = pdfUrl;
             Command = command;
@@ -33,7 +33,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             cl = new ClientLow(conn.GetEndpointUrl(), connection.GetApiKey());
         }
 
-        public async Task<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>> ParseFromUrl(int numberOfTries = 10)
+        public async Task<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>> ParseFromUrl(int numberOfTries = 10)
         {
             try
             {
@@ -61,12 +61,12 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 } //for
                 this.SessionId = null;
                 logger.Error($"no free resources");
-                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>(false);
+                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>(false);
 
             }
             catch (Exception e)
             {
-                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>(false) { ErrorCode = 500, ErrorDescription = e.ToString() };
+                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>(false) { ErrorCode = 500, ErrorDescription = e.ToString() };
             }
         }
 

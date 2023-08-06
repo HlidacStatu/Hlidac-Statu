@@ -34,7 +34,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             this.apiKey = apiKey;
         }
 
-        public async Task<ApiResult<string>> StartSessionAsync(string pdfUrl, Commands command, HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats format, string pages = "all")
+        public async Task<ApiResult<string>> StartSessionAsync(string pdfUrl, Commands command, HlidacStatu.DS.Api.TablesInDoc.Formats format, string pages = "all")
         {
             try
             {
@@ -61,7 +61,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
         }
 
-        public async Task<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>> ParseFromUrl(string pdfUrl, Commands command, HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats format, string pages = "all")
+        public async Task<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>> ParseFromUrl(string pdfUrl, Commands command, HlidacStatu.DS.Api.TablesInDoc.Formats format, string pages = "all")
         {
             try
             {
@@ -73,7 +73,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
                 var httpreq = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Get, url);
                 httpreq.Headers.Add("Authorization", apiKey);
-                var res = await Devmasters.Net.HttpClient.Simple.SendAsync<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>>(
+                var res = await Devmasters.Net.HttpClient.Simple.SendAsync<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>>(
                     Devmasters.Net.HttpClient.Simple.SharedClient(TimeSpan.FromMinutes(5)),
                     httpreq );
 
@@ -83,11 +83,11 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             catch (Exception e)
             {
                 logger.Error("StartSessionWithUrl API call error {apiEndpoint}", ex: e, propertyValues: ApiEndpoint);
-                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>(false);
+                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>(false);
             }
         }
 
-        public async Task<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>> GetSessionAsync(string sessionId)
+        public async Task<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>> GetSessionAsync(string sessionId)
         {
 
             try
@@ -98,7 +98,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     string url = ApiEndpoint + "/Camelot/GetSession?sessionId=" + System.Net.WebUtility.UrlEncode(sessionId);
 
                     var json = await wc.DownloadStringTaskAsync(new Uri(url));
-                    var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>>(json);
+                    var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>>(json);
                     return res;
                 }
 
@@ -106,7 +106,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             catch (Exception e)
             {
                 logger.Error("GetSession API call error {apiEndpoint}", ex: e, propertyValues: ApiEndpoint);
-                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>(false);
+                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>(false);
             }
         }
 
@@ -120,7 +120,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     string url = ApiEndpoint + "/Camelot/EndSession?sessionId=" + System.Net.WebUtility.UrlEncode(sessionId);
 
                     var json = await wc.DownloadStringTaskAsync(new Uri(url));
-                    var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>>(json);
+                    var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>>(json);
 
                     return res;
                 }
@@ -129,7 +129,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             catch (Exception e)
             {
                 logger.Error("EndSession API call error {apiEndpoint}", ex: e, propertyValues: ApiEndpoint);
-                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult>(false);
+                return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>(false);
             }
         }
         public async Task<ApiResult<CamelotVersionData>> VersionAsync()

@@ -9,9 +9,9 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
     {
         
         public static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Camelot.Api");
-        public static async Task<HlidacStatu.DS.Api.TablesInDoc.ApiResult> GetTablesFromPDFAsync(
+        public static async Task<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult> GetTablesFromPDFAsync(
             string pdfUrl, ClientLow.Commands command, 
-            HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats format = HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats.JSON, 
+            HlidacStatu.DS.Api.TablesInDoc.Formats format = HlidacStatu.DS.Api.TablesInDoc.Formats.JSON, 
             string pages = "all", TimeSpan? executionTimeout = null,
             IApiConnection conn = null)
         {
@@ -23,14 +23,14 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
                 using (var cl = new ClientParse(conn, pdfUrl, command, format, pages))
                 {
-                    ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiResult> res = null;
+                    ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult> res = null;
                     var session = await cl.StartSessionAsync();
                     if (session.Success == false)
                     {
 
-                        return new HlidacStatu.DS.Api.TablesInDoc.ApiResult()
+                        return new HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult()
                         {
-                            Status = HlidacStatu.DS.Api.TablesInDoc.ApiResult.Statuses.Error.ToString(),
+                            Status = HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult.Statuses.Error.ToString(),
                             ElapsedTimeInMs = (long)executionTimeout.Value.TotalMilliseconds,
                             FoundTables = 0,
                             ScriptOutput = session.ErrorDescription,
@@ -52,9 +52,9 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                         }
                         else
                         {
-                            return new HlidacStatu.DS.Api.TablesInDoc.ApiResult()
+                            return new HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult()
                             {
-                                Status = HlidacStatu.DS.Api.TablesInDoc.ApiResult.Statuses.Error.ToString(),
+                                Status = HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult.Statuses.Error.ToString(),
                                 ElapsedTimeInMs = (long)executionTimeout.Value.TotalMilliseconds,
                                 FoundTables = 0,
                                 ScriptOutput = "APIClient: Session disappeard",
@@ -64,9 +64,9 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                         }
                         if ((DateTime.Now - started) > executionTimeout)
                         {
-                            return new HlidacStatu.DS.Api.TablesInDoc.ApiResult()
+                            return new HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult()
                             {
-                                Status = HlidacStatu.DS.Api.TablesInDoc.ApiResult.Statuses.Error.ToString(),
+                                Status = HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult.Statuses.Error.ToString(),
                                 ElapsedTimeInMs = (long)executionTimeout.Value.TotalMilliseconds,
                                 FoundTables = 0,
                                 ScriptOutput = "APIClient: Timeout expired",
@@ -80,9 +80,9 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
             catch (Exception e)
             {
-                return new HlidacStatu.DS.Api.TablesInDoc.ApiResult()
+                return new HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult()
                 {
-                    Status = HlidacStatu.DS.Api.TablesInDoc.ApiResult.Statuses.Error.ToString(),
+                    Status = HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult.Statuses.Error.ToString(),
                     ElapsedTimeInMs = (long)executionTimeout.Value.TotalMilliseconds,
                     FoundTables = 0,
                     ScriptOutput = e.ToString(),

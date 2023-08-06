@@ -39,12 +39,12 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 if (smlouva.znepristupnenaSmlouva()==false)
                     myRes = PDF.GetMaxTablesFromPDFAsync(
                         priloha.LocalCopyUrl(smlouva.Id, true,null, null), 
-                            HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats.JSON).Result;
+                            HlidacStatu.DS.Api.TablesInDoc.Formats.JSON).Result;
 
                 if (myRes == null)
                     myRes = PDF.GetMaxTablesFromPDFAsync(
                         priloha.LocalCopyUrl(smlouva.Id, true, secret: Devmasters.Config.GetWebConfigValue("LocalPrilohaUniversalSecret")),
-                        HlidacStatu.DS.Api.TablesInDoc.ApiResult.Formats.JSON).Result;
+                        HlidacStatu.DS.Api.TablesInDoc.Formats.JSON).Result;
 
                 sw.Stop();
                 Util.Consts.Logger.Debug($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} done in {sw.ElapsedMilliseconds}ms, found {myRes?.Sum(m => m.Tables?.Length ?? 0)} tables");
@@ -82,6 +82,15 @@ namespace HlidacStatu.Lib.Data.External.Tables
             return null;
         }
 
+        public static bool HasTablesFromPriloha(Smlouva s, Smlouva.Priloha p)
+        {
+            if (s == null || p == null)
+                return false;
+
+            return DocTablesRepo.ExistsAsync(s.Id, p.UniqueHash())
+                    .ConfigureAwait(false).GetAwaiter().GetResult();
+
+        }
         public static HlidacStatu.DS.Api.TablesInDoc.Result[] GetTablesFromPriloha(Smlouva s, Smlouva.Priloha p)
         {
             if (s == null || p == null)

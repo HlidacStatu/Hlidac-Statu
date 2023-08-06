@@ -19,7 +19,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         private class processed
         {
 
-            public BpGet request { get; set; }
+            public BpTask request { get; set; }
             public DateTime? taken { get; set; } = null;
             public string takenByUser { get; set; } = null;
         }
@@ -38,11 +38,11 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
         [HttpGet("Get")]
-        public async Task<ActionResult<BpGet>> Get()
+        public async Task<ActionResult<BpTask>> Get()
         {
             CheckRoleRecord(this.User.Identity.Name);
 
-            using HlidacStatu.Q.Simple.Queue<BpGet> q = new HlidacStatu.Q.Simple.Queue<BpGet>(
+            using HlidacStatu.Q.Simple.Queue<BpTask> q = new HlidacStatu.Q.Simple.Queue<BpTask>(
                 HlidacStatu.DS.Api.BlurredPage.BlurredPageProcessingQueueName,
                 Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
                 );
@@ -272,11 +272,11 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     if (toProcess.Any())
                     {
 
-                        var request = new BpGet()
+                        var request = new BpTask()
                         {
                             smlouvaId = id,
                             prilohy = toProcess
-                                .Select(priloha => new BpGet.BpGPriloha()
+                                .Select(priloha => new BpTask.BpGPriloha()
                                 {
                                     uniqueId = priloha.UniqueHash(),
                                     url = priloha.LocalCopyUrl(id, true)
@@ -285,7 +285,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                                 .ToArray()
                         };
 
-                        using HlidacStatu.Q.Simple.Queue<BpGet> q = new HlidacStatu.Q.Simple.Queue<BpGet>(
+                        using HlidacStatu.Q.Simple.Queue<BpTask> q = new HlidacStatu.Q.Simple.Queue<BpTask>(
                             BlurredPageProcessingQueueName,
                             Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
                             );
@@ -305,7 +305,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [HttpGet("Stats")]
         public async Task<ActionResult<BlurredPageAPIStatistics>> Stats()
         {
-            using HlidacStatu.Q.Simple.Queue<BpGet> q = new HlidacStatu.Q.Simple.Queue<BpGet>(
+            using HlidacStatu.Q.Simple.Queue<BpTask> q = new HlidacStatu.Q.Simple.Queue<BpTask>(
                 BlurredPageProcessingQueueName,
                 Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
             );

@@ -10,26 +10,12 @@ namespace HlidacStatu.DS.Api
     {
 
 
-        public class ApiResult : TablesInDoc.Result
+        public class ApiResult2
         {
-            public enum Formats
-            {
-                CSV,
-                JSON,
-                HTML,
-                EXCEL,
-                SQLITE
-            }
 
-            public string CamelotServer { get; set; }
+            public Task task { get; set; }
 
-            public string SessionId { get; set; }
-            public string ScriptOutput { get; set; }
-
-            public bool ErrorOccured()
-            {
-                return this.Status.ToLower() == "error";
-            }
+            public TablesInDoc.Result[] results { get; set; }
 
         }
 

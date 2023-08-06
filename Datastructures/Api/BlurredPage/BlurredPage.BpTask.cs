@@ -3,7 +3,7 @@
     public partial class BlurredPage
     {
 
-        public class BpGet
+        public class BpTask
         {
             public class BpGPriloha
             {
