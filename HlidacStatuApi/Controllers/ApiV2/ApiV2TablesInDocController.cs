@@ -104,7 +104,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
 
         //[ApiExplorerSettings(IgnoreApi = true)]
-        [Authorize(Roles = "PrivateApi")]
+        //[Authorize(Roles = "blurredAPIAccess")]
         [HttpGet("AddTask")]
         public async Task<ActionResult<bool>> AddTask(string id, bool force = true)
         {
@@ -112,7 +112,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
 
         //[ApiExplorerSettings(IgnoreApi = true)]
-        [Authorize(Roles = "blurredAPIAccess")]
+        //[Authorize(Roles = "blurredAPIAccess")]
         [HttpGet("Stats")]
         public async Task<ActionResult<BlurredPageAPIStatistics>> Stats()
         {
