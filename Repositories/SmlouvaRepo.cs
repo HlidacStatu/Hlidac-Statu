@@ -270,36 +270,25 @@ namespace HlidacStatu.Repositories
                 bool forceOCR = false,
                 bool forceClassification = false,
                 bool forceTablesMining = false,
-                bool forceBlurredPages = false
+                bool forceBlurredPages = false,
+                bool onDemandQueue = false
             )
         {
-            return AddToProcessingQueue(smlouva.Id, forceOCR, forceClassification, forceTablesMining, forceBlurredPages);
-
+            return AddToProcessingQueue(smlouva.Id, forceOCR, forceClassification, forceTablesMining, forceBlurredPages,onDemandQueue);
         }
         public static bool AddToProcessingQueue(this string smlouvaId,
         bool forceOCR = false,
         bool forceClassification = false,
         bool forceTablesMining = false,
-        bool forceBlurredPages = false
+        bool forceBlurredPages = false,
+        bool onDemandQueue = false
+
     )
         {
-
-            using HlidacStatu.Q.Simple.Queue<Smlouva.Queued> q = new Q.Simple.Queue<Smlouva.Queued>(
-                SmlouvaProcessingQueueName,
-                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
-                );
-
-            var sq = new Smlouva.Queued()
-            {
-                SmlouvaId = smlouvaId,                 
-                ForceBlurredPages = forceBlurredPages,
-                ForceClassification = forceClassification,
-                ForceOCR = forceOCR,
-                ForceTablesMining = forceTablesMining
-            };
-            q.Send(sq);
-            return true;
+            return AddToProcessingQueue(new string[] {smlouvaId}, 
+                forceOCR, forceClassification,forceTablesMining,forceBlurredPages, onDemandQueue);
         }
+
         public static bool AddToProcessingQueue(IEnumerable<string> smlouvyIds,
             bool forceOCR = false,
             bool forceClassification = false,

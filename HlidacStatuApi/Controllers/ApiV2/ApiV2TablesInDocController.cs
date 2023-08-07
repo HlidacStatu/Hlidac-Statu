@@ -103,7 +103,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
 
 
-        [ApiExplorerSettings(IgnoreApi = true)]
+        //[ApiExplorerSettings(IgnoreApi = true)]
         [Authorize(Roles = "PrivateApi")]
         [HttpGet("AddTask")]
         public async Task<ActionResult<bool>> AddTask(string id, bool force = true)
