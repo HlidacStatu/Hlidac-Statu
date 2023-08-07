@@ -10,7 +10,7 @@ using static HlidacStatu.DS.Api.BlurredPage;
 namespace HlidacStatuApi.Controllers.ApiV2
 {
 
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [ApiExplorerSettings(IgnoreApi = false)]
     [SwaggerTag("TablesInDoc")]
     [ApiController()]
     [Route("api/v2/tbls")]

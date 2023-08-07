@@ -7,6 +7,10 @@
             public string prilohaId { get; set; }
             public string url { get; set; }
             public string smlouvaId { get; set; }
+
+            public Formats format { get; set; } = Formats.JSON;
+
+
         }
     }
 }
