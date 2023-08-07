@@ -27,7 +27,7 @@ namespace HlidacStatu.Repositories
             .HandleTransientHttpError()
             .OrResult(r => r.RequestMessage.RequestUri.Host.Contains("bpapi.datlab.eu") &&
                            r.StatusCode == HttpStatusCode.Forbidden)
-            .WaitAndRetryAsync(5, _ => TimeSpan.FromSeconds(1));
+            .WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(1));
 
         // Emergency HttpClient for cases where it is not convinient to inject HttpClient.
         private static Lazy<HttpClient> _lazyHttpClient = new();
@@ -383,7 +383,7 @@ namespace HlidacStatu.Repositories
                     fullTempPath = Path.Combine(temporaryPath, filename);
 
                     string downloadUrl = dokument.GetDocumentUrlToDownload();
-                    await DownloadFileAsync(httpClient, downloadUrl, fullTempPath);
+                    await DownloadFileAsync(httpClient, downloadUrl, fullTempPath, vz.Id);
 
                     // calculate checksum first and get length so we can create hlidacStorageId
                     using (var fileStream = File.Open(fullTempPath, FileMode.Open, FileAccess.Read))
@@ -415,15 +415,24 @@ namespace HlidacStatu.Repositories
 
         private static async Task DownloadFileAsync(HttpClient httpClient,
             string url,
-            string path) 
+            string path,
+            string vzId) 
         {
-            using var responseMessage = await _retryPolicy.ExecuteAsync(() =>
-                httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
-
-            try
+            // turn off retry
+            // using var responseMessage = await _retryPolicy.ExecuteAsync(() =>
+            //     httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead));
+            
+            using var responseMessage = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            
+            if (!responseMessage.IsSuccessStatusCode)
             {
-                _ = responseMessage.EnsureSuccessStatusCode();
-                
+                Consts.Logger.Error($"Url: {url} for VZ (id:{vzId}) returned {responseMessage.StatusCode} status code with reason phrase: {responseMessage.ReasonPhrase}.");
+                throw new Exception(
+                    $"Can't download file for VZ (id:{vzId}). Http status code: {responseMessage.StatusCode}");
+            }
+            
+            try
+            {   
                 var stream = await responseMessage.Content.ReadAsStreamAsync();
                 await using var fileStream = File.Open(path, FileMode.Create);
                 
@@ -432,7 +441,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                Consts.Logger.Error($"Url: {url} can not process stream properly.", e);
+                Consts.Logger.Error($"Url: {url} for VZ (id:{vzId}) can not process stream properly.", e);
                 throw;
             }
         }
