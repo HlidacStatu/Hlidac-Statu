@@ -12,6 +12,7 @@ namespace HlidacStatu.LibCore.MiddleWares
     public class OnHTTPErrorMiddleware
     {
         public const string ItemKeyName = "errorPageCtx";
+        public const string ItemKeyNameObj = "errorPageCtxObj";
         private readonly RequestDelegate _next;
         private readonly Logger logger;
 
@@ -74,11 +75,12 @@ namespace HlidacStatu.LibCore.MiddleWares
                     if (httpContext.Items.ContainsKey(ItemKeyName))
                     {
                         var prevStr = httpContext.Items[ItemKeyName] as string;
-                        httpContext.Items[ItemKeyName] = prevStr + "\n\n====== Next404 =======" + str;
+                        httpContext.Items[ItemKeyName] = prevStr + "\n\n====== Next404 =======" + str;                        
                     }
                     else
                         httpContext.Items.Add(ItemKeyName, str);
 
+                    httpContext.Items[ItemKeyNameObj] = Devmasters.Net.WebContextLogger.Get404ErrorContextInfo(httpContext);
                 }
                 catch (Exception e)
                 {

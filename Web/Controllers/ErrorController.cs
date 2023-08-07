@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -23,8 +24,12 @@ namespace HlidacStatu.Web.Controllers
         public IActionResult PageNotFound()
         {
             string err = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyName] as string;
+            
+            Util.Consts.Logger.Warning($"HTTP 404 - Page not found.\n\n" + err);
+            var errObj = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyNameObj] as Dictionary<string, string>;
 
-            Util.Consts.Logger.Warning($"404 - Page not found.\n\n" + err);
+            if (errObj != null)
+                Util.Consts.Logger.Error("HTTP 404 - page not found, context {context}",errObj);
 
             return View();
         }

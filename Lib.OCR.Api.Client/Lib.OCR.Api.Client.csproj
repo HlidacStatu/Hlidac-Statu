@@ -11,7 +11,7 @@
     <PackageReference Include="Devmasters.Core" Version="4.5.1" />
     <PackageReference Include="Devmasters.DT" Version="4.5.2" />
     <PackageReference Include="Devmasters.Lang" Version="4.5.1" />
-    <PackageReference Include="Devmasters.Net" Version="4.5.4" />
+    <PackageReference Include="Devmasters.Net" Version="4.5.7" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Net.Http.Headers" Version="2.2.8" />
