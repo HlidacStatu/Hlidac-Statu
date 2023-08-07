@@ -84,6 +84,27 @@ namespace HlidacStatu.Util
             return ret;
         }
 
+        public static decimal PercentileForValue(IEnumerable<decimal> data, decimal specificValue)
+        {
+            if (data == null || data.Count() == 0)
+                throw new ArgumentException("Array cannot be null or empty.");
+
+            // Sort the array
+            var sortedNumbers = data.OrderBy(n => n).ToArray();
+
+            // Find the index where the specific value would be inserted
+            int index = Array.BinarySearch(sortedNumbers, specificValue);
+
+            if (index < 0)
+            {
+                // If the specific value is not in the array, BinarySearch returns the bitwise complement of the index 
+                // of the next larger value or, if there's no larger value, the bitwise complement of the length of the array.
+                index = ~index;
+            }
+
+            // Calculate the quantile
+            return (decimal)index / sortedNumbers.Length;
+        }
         public static decimal PercentileCont(decimal percentile, IEnumerable<decimal> seq)
         {
             if (seq == null)
