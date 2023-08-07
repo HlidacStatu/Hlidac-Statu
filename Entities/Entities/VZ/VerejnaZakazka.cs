@@ -599,7 +599,7 @@ namespace HlidacStatu.Entities.VZ
 
             public override int GetHashCode()
             {
-                return ICO.GetHashCode();
+                return ICO?.GetHashCode() ?? Jmeno?.GetHashCode() ?? 0;
             }
 
             public static bool operator ==(Subject left, Subject right)
