@@ -35,7 +35,7 @@
     </div>
     <div class="col-sm-12">
         <h4>Vytvoření účtu přímo na Hlídači státu</h4>
-        <form asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+        <form asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal" autocomplete="off">
             <div asp-validation-summary="All" class="text-danger"></div>
             <honeypot></honeypot>
             <div class="form-group">
