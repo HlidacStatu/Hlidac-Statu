@@ -37,3 +37,108 @@
     .number .small {
         font-size: 90% !important;
     }
+
+
+/*
+    Bootstrap unofficial Callouts
+*/
+.bs-callout {
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+}
+
+    .bs-callout.small {
+        padding: 7px;
+        margin: 12px 0;
+        border: 1px solid #eee;
+        border-left-width: 5px;
+        border-radius: 3px;
+        font-size: 1em;
+    }
+
+        .bs-callout.small h4 {
+            font-size: 16px;
+        }
+
+        .bs-callout.small div, .bs-callout.small p {
+            font-size: 1em;
+            line-height: 1em;
+        }
+
+    .bs-callout.noborder {
+        margin-left: 30px;
+        border-top: none;
+        border-right: none;
+        border-bottom: none;
+        border-left-width: 5px;
+        border-radius: 3px;
+    }
+
+    .bs-callout h4 {
+        margin-top: 0;
+        margin-bottom: 5px;
+    }
+
+    .bs-callout p:last-child {
+        margin-bottom: 0;
+    }
+
+    .bs-callout code {
+        border-radius: 3px;
+    }
+
+    .bs-callout + .bs-callout {
+        margin-top: -5px;
+    }
+
+    .bs-callout.default, .bs-callout.gray {
+        border-left-color: #777;
+    }
+
+        .bs-callout.default h4, .bs-callout.gray h4 {
+            color: #777;
+        }
+
+    .bs-callout.primary {
+        border-left-color: #428bca;
+    }
+
+        .bs-callout.primary h4 {
+            color: #428bca;
+        }
+
+    .bs-callout.success {
+        border-left-color: #5cb85c;
+    }
+
+        .bs-callout.success h4 {
+            color: #5cb85c;
+        }
+
+    .bs-callout.danger {
+        border-left-color: #d9534f;
+    }
+
+        .bs-callout.danger h4 {
+            color: #d9534f;
+        }
+
+    .bs-callout.warning {
+        border-left-color: #f0ad4e;
+    }
+
+        .bs-callout.warning h4 {
+            color: #f0ad4e;
+        }
+
+    .bs-callout.info {
+        border-left-color: #5bc0de;
+    }
+
+        .bs-callout.info h4 {
+            color: #5bc0de;
+        }
+
