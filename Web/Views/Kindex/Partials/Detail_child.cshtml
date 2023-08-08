@@ -132,14 +132,14 @@
                                     if (futureData)
                                     {
                                         <span title="@HlidacStatu.Util.RenderData.NiceNumber(kidx.KIndex)">
-                                            <a href="@ViewBag.ICO?rok=@year&priv=@(KIndex.PlannedKIndexHash(Model.Ico, year))">@Html.KIndexIcon(kidx.KIndexLabel, "padding-left:6px;height:18px", useTemp: futureData) v @year</a>
+                                            <a href="/kindex/detail/@ViewBag.ICO?rok=@year&priv=@(KIndex.PlannedKIndexHash(Model.Ico, year))">@Html.KIndexIcon(kidx.KIndexLabel, "padding-left:6px;height:18px", useTemp: futureData) v @year</a>
                                             @(postfix)
                                         </span>
                                     }
                                     else
                                     {
                                         <span title="@HlidacStatu.Util.RenderData.NiceNumber(kidx.KIndex)">
-                                            <a href="@ViewBag.ICO?rok=@year">@Html.KIndexIcon(kidx.KIndexLabel, "padding-left:6px;height:18px") v @year</a>
+                                            <a href="/kindex/detail/@ViewBag.ICO?rok=@year">@Html.KIndexIcon(kidx.KIndexLabel, "padding-left:6px;height:18px") v @year</a>
                                             @(postfix)
                                         </span>
                                     }
@@ -203,14 +203,14 @@ else
                                     if (futureData)
                                     {
                                         <span title="@HlidacStatu.Util.RenderData.NiceNumber(kidx.KIndex)">
-                                            <a href="@ViewBag.ICO?rok=@year&priv=@(KIndex.PlannedKIndexHash(Model.Ico, year))">@Html.KIndexIcon(kidx.KIndexLabel, "padding-left:6px;height:18px", useTemp: futureData) v @year</a>
+                                            <a href="/kindex/detail/@ViewBag.ICO?rok=@year&priv=@(KIndex.PlannedKIndexHash(Model.Ico, year))">@Html.KIndexIcon(kidx.KIndexLabel, "padding-left:6px;height:18px", useTemp: futureData) v @year</a>
                                             @(postfix)
                                         </span>
                                     }
                                     else
                                     {
                                         <span title="@HlidacStatu.Util.RenderData.NiceNumber(kidx.KIndex)">
-                                            <a href="@ViewBag.ICO?rok=@year">@Html.KIndexIcon(kidx.KIndexLabel, "padding-left:6px;height:18px") v @year</a>
+                                            <a href="/kindex/detail/@ViewBag.ICO?rok=@year">@Html.KIndexIcon(kidx.KIndexLabel, "padding-left:6px;height:18px") v @year</a>
                                             @(postfix)
                                         </span>
                                     }

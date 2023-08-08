@@ -120,7 +120,7 @@
                                 if (kidx != null && kidx.KIndexReady && year != selectedYear)
                                 {
                                     <span title="@HlidacStatu.Util.RenderData.NiceNumber(kidx.KIndex)">
-                                        <a href="@ViewBag.ICO?rok=@year">@Html.KIndexIcon(kidx.KIndexLabel, "padding-left:6px;height:18px") v @year</a>@(postfix)
+                                        <a href="/kindex/backup/@ViewBag.ICO?rok=@year">@Html.KIndexIcon(kidx.KIndexLabel, "padding-left:6px;height:18px") v @year</a>@(postfix)
                                     </span>
                                 }
                             }
@@ -179,7 +179,7 @@ else
                                 if (kidx != null && kidx.KIndexReady && year != selectedYear)
                                 {
                                     <span title="@HlidacStatu.Util.RenderData.NiceNumber(kidx.KIndex)">
-                                        <a href="@ViewBag.ICO?rok=@year">@Html.KIndexIcon(kidx.KIndexLabel, "padding-left:6px;height:18px") v @year</a>@(postfix)
+                                        <a href="/kindex/backup/@ViewBag.ICO?rok=@year">@Html.KIndexIcon(kidx.KIndexLabel, "padding-left:6px;height:18px") v @year</a>@(postfix)
                                     </span>
                                 }
                             }
