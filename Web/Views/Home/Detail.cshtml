@@ -598,15 +598,22 @@
                 <text>
                     <br/>Příjemce peněz
                     <div>
-                        @if (!await SkutecniMajiteleRepo.MaSkutecnehoMajiteleAsync(subjekt.ico, Model.datumUzavreni))
+                        @try
                         {
-                            <div class="alert alert-warning">
-                                <span class="fa-stack">
-                                    <i class="fa-duotone fa-user fa-stack-2x"></i>
-                                    <i class="fa-solid fa-question fa-stack-1x" style="margin-top: -6px;"></i>
-                                </span>U tohoto příjemce stát nezná skutečného majitele.
-                            </div>
-                            <br/>
+                            if (!await SkutecniMajiteleRepo.MaSkutecnehoMajiteleAsync(subjekt.ico, Model.datumUzavreni))
+                            {
+                                <div class="alert alert-warning">
+                                    <span class="fa-stack">
+                                        <i class="fa-duotone fa-user fa-stack-2x"></i>
+                                        <i class="fa-solid fa-question fa-stack-1x" style="margin-top: -6px;"></i>
+                                    </span>U tohoto příjemce stát nezná skutečného majitele.
+                                </div>
+                                <br/>
+                            }
+                        }
+                        catch
+                        {
+                            // neni ico neni skm
                         }
                         @if (!string.IsNullOrWhiteSpace(Model.Platce?.ico) && !string.IsNullOrWhiteSpace(subjekt.ico))
                         {
