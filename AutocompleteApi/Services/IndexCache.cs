@@ -15,6 +15,7 @@ using HlidacStatu.LibCore.Enums;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
+using Serilog;
 using Whisperer;
 
 namespace HlidacStatu.AutocompleteApi.Services;
@@ -27,7 +28,7 @@ public class IndexCache
     public Index<Autocomplete>? FullAutocomplete { get; set; }
     public Index<AdresyKVolbam>? Adresy { get; set; }
 
-    private Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger<IndexCache>();
+    private ILogger logger = Log.ForContext<IndexCache>();
     private IHttpClientFactory _httpClientFactory;
 
     public IndexCache(IHttpClientFactory httpClientFactory)

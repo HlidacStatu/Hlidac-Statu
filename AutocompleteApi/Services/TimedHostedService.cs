@@ -6,12 +6,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.LibCore.Enums;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace HlidacStatu.AutocompleteApi.Services;
 
 public class TimedHostedService : BackgroundService
 {
-    private Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger<TimedHostedService>();
+    private ILogger logger = Log.ForContext<TimedHostedService>();
     private IndexCache _indexCache;
 
     public TimedHostedService(IndexCache indexCache, IHttpClientFactory httpClientFactory)
