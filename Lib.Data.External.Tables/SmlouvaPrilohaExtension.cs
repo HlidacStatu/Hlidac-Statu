@@ -104,5 +104,18 @@ namespace HlidacStatu.Lib.Data.External.Tables
 
             return data.Tables;
         }
+        public static HlidacStatu.Entities.DocTables GetTablesInDocStructure(Smlouva s, Smlouva.Priloha p)
+        {
+            if (s == null || p == null)
+                return null;
+
+            DocTables data = DocTablesRepo.GetAsync(s.Id, p.UniqueHash())
+                    .ConfigureAwait(false).GetAwaiter().GetResult();
+
+            if (data == null)
+                return null;
+
+            return data;
+        }
     }
 }

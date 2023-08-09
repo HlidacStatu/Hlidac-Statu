@@ -1,4 +1,4 @@
-﻿@model HlidacStatu.DS.Api.TablesInDoc.Result[]
+﻿@model HlidacStatu.Entities.DocTables
 @using HlidacStatu.Entities;
 @using HlidacStatu.Repositories;
 @using System.Linq;
@@ -14,25 +14,25 @@
         <h2>Data neexistuji, asi chyba</h2>
         return;
     }
-
-    var tbls = Model.Select(m => new HlidacStatu.Lib.Data.External.Tables.Camelot.CamelotResultWithJobs(m)).ToArray();
+    var tbls = Model.Tables;
+    var tblsWithJobs = tbls.Select(m => new HlidacStatu.Lib.Data.External.Tables.Camelot.CamelotResultWithJobs(m)).ToArray();
 }
-
-@for (int i = 0; i < Model.Length; i++)
+<p>update @(Model.Updated)</p>
+@for (int i = 0; i < tbls.Length; i++)
 {
-    if (Model[i].FoundTables > 0)
+    if (tbls[i].FoundTables > 0)
     {
-        <h2 style="padding-top:20px;" id="@(Model[i].Algorithm)">Nalezene tabulky - algoritmus @(Model[i].Algorithm)</h2>
-        @foreach (var tbl in tbls[i].TablesWithJobs
-         .OrderByDescending(m => m.FoundJobs.Length)
-         .ThenBy(m => m.Page)
-         .ThenBy(m => m.TableInPage))
+        <h2 style="padding-top:20px;" id="@(tbls[i].Algorithm)">Nalezene tabulky - algoritmus @(tbls[i].Algorithm) </h2>
+        @foreach (var tbl in tblsWithJobs[i].TablesWithJobs
+        .OrderByDescending(m => m.FoundJobs.Length)
+        .ThenBy(m => m.Page)
+        .ThenBy(m => m.TableInPage))
         {
-            <div style="font-size:120%;padding:15px 0 5px 0;" id="@($"{Model[i].Algorithm}_{tbl.Page}_{tbl.TableInPage}")">
-                @(Model[i].Algorithm) <b>Strana @tbl.Page</b>, tabulka na stránce <b>@tbl.TableInPage</b>
-                <br/>
+            <div style="font-size:120%;padding:15px 0 5px 0;" id="@($"{tbls[i].Algorithm}_{tbl.Page}_{tbl.TableInPage}")">
+                @(tbls[i].Algorithm) <b>Strana @tbl.Page</b>, tabulka na stránce <b>@tbl.TableInPage</b>
+                <br />
                 <a target="_blank" href="ShowPrilohaTablesOnePage?s=@(this.Context.Request.Query["s"].ToString())&p=@(this.Context.Request.Query["p"].ToString())&page=@tbl.Page"><i class="far fa-file-alt"></i> Ukázat stránku</a>
-                <a target="_blank" href="@(priloha.odkaz)" style="padding-left:20px"><i class="far fa-file-pdf"></i> Otevřít celé PDF</a> 
+                <a target="_blank" href="@(priloha.odkaz)" style="padding-left:20px"><i class="far fa-file-pdf"></i> Otevřít celé PDF</a>
             </div>
             @if (tbl.FoundJobs.Length > 0)
             {
@@ -41,7 +41,7 @@
                         @foreach (var f in tbl.FoundJobs)
                         {
                             <tr>
-                                <td>@(string.Join(";",f.Names))</td>
+                                <td>@(string.Join(";", f.Names))</td>
                                 @foreach (var pr in f.Prices)
                                 {
                                     <td><span style="padding:0px 20px 0 10px;">@(pr.ToString("N0"))</span></td>
@@ -53,17 +53,17 @@
             }
             <div style="background-color:#e0e0e0">
                 <table class="table table-bordered table-striped table-condensed">
-                @foreach (var r in tbl.ParsedContent())
-                {
-                    <tr>
-                        @foreach (var c in r)
-                        {
-                            <td>@c</td>
-                        }
-                    </tr>
+                    @foreach (var r in tbl.ParsedContent())
+                    {
+                        <tr>
+                            @foreach (var c in r)
+                            {
+                                <td>@c</td>
+                            }
+                        </tr>
 
-                }
-                    </table>
+                    }
+                </table>
             </div>
         }
     }
