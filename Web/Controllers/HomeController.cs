@@ -96,30 +96,41 @@ namespace HlidacStatu.Web.Controllers
             return View(model);
         }
 
+        public const string NoPhotoSvg = @"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""no""?>
+<!DOCTYPE svg PUBLIC ""-//W3C//DTD SVG 1.1//EN"" ""http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"">
+<svg width=""100%"" height=""100%"" viewBox=""0 0 256 256"" version=""1.1"" xmlns=""http://www.w3.org/2000/svg"" xmlns:xlink=""http://www.w3.org/1999/xlink"" xml:space=""preserve"" xmlns:serif=""http://www.serif.com/"" style=""fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"">
+    <rect x=""-0"" y=""-0"" width=""256"" height=""256"" style=""fill:rgb(190,190,190);""/>
+    <g transform=""matrix(1.08475,0,0,1.04237,-10.8475,-0.423729)"">
+        <g>
+            <path d=""M246,246C246,246 247.3,229.8 246,221.3C244.9,214.6 234.3,205.7 194.9,191.2C156.1,176.9 158.5,183.9 158.5,157.7C158.5,140.7 167.2,150.6 172.7,118.3C174.8,105.6 176.6,114.1 181.2,93.7C183.7,83 179.5,82.2 180,77.1C180.5,72 181,67.4 181.9,57C183,44 171,10 128,10C85,10 73,44 74.2,57C75.1,67.4 75.6,72 76.1,77.1C76.6,82.2 72.5,83 74.9,93.7C79.6,114 81.3,105.6 83.4,118.3C88.9,150.6 97.6,140.7 97.6,157.7C97.6,184 100,177.1 61.2,191.2C21.8,205.6 11,214.6 10,221.3C8.6,229.8 10,246 10,246L246,246Z"" style=""fill:rgb(240,240,240);fill-rule:nonzero;""/>
+        </g>
+    </g>
+</svg>
+";
         public ActionResult Photo(string id, [FromQuery] string option)
         {
-            string noPhotoPath = $"Content{Path.DirectorySeparatorChar}Img{Path.DirectorySeparatorChar}personNoPhoto.png";
+            //string noPhotoPath = $"Content{Path.DirectorySeparatorChar}Img{Path.DirectorySeparatorChar}personNoPhoto.png";
             if (string.IsNullOrEmpty(id))
             {
                 string f = HttpContext.Request.Query["f"];
                 if (string.IsNullOrEmpty(f) || f?.Contains("..") == true)
-                    return File(System.IO.File.ReadAllBytes(Init.WebAppRoot + noPhotoPath), "image/png");
+                    return Content(NoPhotoSvg, "image/svg+xml");
 
                 var nameId = Devmasters.RegexUtil.GetRegexGroupValue(f, @"\d{2} \\ (?<nameid>\w* - \w* (-\d{1,3})?) - small\.jpg", "nameid");
                 if (string.IsNullOrEmpty(nameId))
-                    return File(System.IO.File.ReadAllBytes(Init.WebAppRoot + noPhotoPath), "image/png");
+                    return Content(NoPhotoSvg, "image/svg+xml");
                 else
                     return Redirect("/photo/" + nameId);
             }
             var o = Osoby.GetByNameId.Get(id);
             if (o == null)
-                return File(System.IO.File.ReadAllBytes(Init.WebAppRoot + noPhotoPath), "image/png");
+                return Content(NoPhotoSvg, "image/svg+xml");
             else
             {
                 if (o.HasPhoto())
                     return File(System.IO.File.ReadAllBytes(o.GetPhotoPath(option)), "image/jpg");
                 else
-                    return File(System.IO.File.ReadAllBytes(Init.WebAppRoot + noPhotoPath), "image/png");
+                    return Content(NoPhotoSvg, "image/svg+xml");
             }
         }
 
