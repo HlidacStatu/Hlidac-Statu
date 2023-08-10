@@ -120,29 +120,7 @@ namespace HlidacStatu.Web.Controllers
         {
             return View();
         }
-        public ActionResult OsobaMerge(string osoba1, string osoba2)
-        {
-            Osoba o1 = OsobaRepo.GetByNameId(osoba1.Trim());
-            Osoba o2 = OsobaRepo.GetByNameId(osoba2.Trim(), canReturnDuplicate: true);
-            if (o1 != null && o2 != null)
-            {
-                o1.MergeWith(o2, User.Identity?.Name);
-                return Redirect(o1.GetUrl(true));
-            }
-            return View("index");
-        }
-
-        public ActionResult OsobaMergeById(int osoba1, int osoba2)
-        {
-            Osoba o1 = OsobaRepo.GetByInternalId(osoba1);
-            Osoba o2 = OsobaRepo.GetByInternalId(osoba2, canReturnDuplicate: true);
-            if (o1 != null && o2 != null)
-            {
-                o1.MergeWith(o2, User.Identity?.Name);
-                return Redirect(o1.GetUrl(true));
-            }
-            return View("index");
-        }
+       
 
         [Authorize(Roles = "canEditData")]
         public ActionResult AddKindexFeedback(string ico, int year)
