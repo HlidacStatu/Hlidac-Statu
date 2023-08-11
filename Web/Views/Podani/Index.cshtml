@@ -1,0 +1,193 @@
+﻿@{
+    ViewBag.Title = "Podání";
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li class="active">@ViewBag.Title</li>
+    </ol>
+}
+
+
+<h1>Jednotlivá podání, která můžete učinit přes vašeho oblíbeného Hlídače státu</h1>
+
+<button id="startRecord">Start Recording</button>
+<button id="stopRecord" disabled>Stop Recording</button>
+<form action="/podani/SaveObtezujiciHovor" method="post" class="form-group" id="myform">
+  <div class="card mb-3">
+    <h5 class="card-header">Podání</h5>
+    <div class="col-sm-9 col-xl-10">
+      <div class="card-body">
+        <div class="mx-auto">
+          <div class="form-floating">
+            <input type="text" id="jmeno" name="jmeno"
+                   class="form-control"/>
+            <label for="jmeno">Jméno a příjmení</label>
+          </div>
+        </div>
+        <div class="mx-auto">
+          <div class="form-floating">
+            <input type="text" id="datum" name="datum"
+                   class="form-control"/>
+            <label for="datum">Datum a čas hovoru</label>
+          </div>
+        </div>
+        <div class="mx-auto">
+          <div class="form-floating">
+            <input type="text" id="volany" name="volany"
+                   class="form-control"/>
+            <label for="volany">Vaše telefonní číslo</label>
+          </div>
+        </div>
+        <div class="mx-auto">
+          <div class="form-floating">
+            <input type="text" id="volajici" name="volajici"
+                   class="form-control"/>
+            <label for="volajici">Telefonní číslo, které volalo</label>
+          </div>
+        </div>
+        <div class="mx-auto">
+          <div class="form-floating">
+            <input type="text" id="spolecnost" name="spolecnost"
+                   class="form-control"/>
+            <label for="spolecnost">Název společnosti, která volala</label>
+          </div>
+        </div>
+        <div class="mx-auto">
+          <div class="form-floating">
+            <input type="text" id="ucel" name="ucel"
+                   class="form-control"
+                   value="marketingový hovor"/>
+            <label for="ucel">Účel hovoru</label>
+          </div>
+        </div>
+        <div class="mx-auto">
+          <div class="form-floating">
+            <input type="text" id="teloperator" name="teloperator"
+                   class="form-control"/>
+            <label for="teloperator">Název Vašeho operátora</label>
+          </div>
+        </div>
+        <div class="mx-auto">
+          <div class="form-floating">
+            <input type="text" id="kontakt" name="kontakt"
+                   class="form-control"/>
+            <label for="kontakt">Kontakt, kde Vás může úřad zastihnout pro doplnění žádosti</label>
+          </div>
+        </div>
+        @* <input type="file" id="audio" name="audio" hidden="hidden"/> *@
+        <button class="btn btn-success" id="formSubmit">Odeslat</button>
+      </div>
+    </div>
+  </div>
+</form>
+
+
+
+<script>
+let mediaRecorder;
+let audioChunks = [];
+let audioBlob;
+
+let mediaType;
+
+if (MediaRecorder.isTypeSupported("audio/webm"))
+{
+  mediaType = "audio/webm";  
+} else if (MediaRecorder.isTypeSupported("audio/mp4"))
+{
+  mediaType = "audio/mp4";
+}
+else {
+  mediaType = "audio";
+}
+  
+navigator.mediaDevices.getUserMedia({ audio: true })
+  .then(stream => {
+    const options = {
+      mimeType: mediaType,
+      bitsPerSecond: 128000
+    };
+    mediaRecorder = new MediaRecorder(stream, options);
+
+    mediaRecorder.onstart = () => {
+      audioChunks = [];
+    };
+
+    mediaRecorder.ondataavailable = event => {
+      audioChunks.push(event.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      audioBlob = new Blob(audioChunks, {type: mediaType});
+      
+      // const form = document.getElementById('myform');
+      // const formData = new FormData(form);
+      // formData.append('audio', audioBlob);
+      
+      // const audioFile = new File([audioBlob], 'audiofile', { type: 'mediaType' });
+      // const ade = document.getElementById('audio');
+      // // Set the files property of the input element to an array containing the audio file
+      //  ade.files = [audioFile];
+      
+      // const formData = new FormData();
+      // formData.append("audio", audioBlob);
+    
+      // $.ajax({
+      //   url: "/podani/SaveAudio",
+      //   type: "POST",
+      //   data: formData,
+      //   processData: false,
+      //   contentType: false,
+      //   success: function(response) {
+      //     console.log(response);
+      //   },
+      //   error: function(err) {
+      //     console.error("Error uploading audio", err);
+      //   }
+      // });
+    };
+
+    document.getElementById("startRecord").onclick = () => {
+      mediaRecorder.start();
+      document.getElementById("stopRecord").disabled = false;
+      document.getElementById("startRecord").disabled = true;
+    };
+
+    document.getElementById("stopRecord").onclick = () => {
+      mediaRecorder.stop();
+      document.getElementById("stopRecord").disabled = true;
+      document.getElementById("startRecord").disabled = false;
+    };
+  });
+
+document.getElementById('formSubmit').addEventListener("click", (event) => {
+  event.preventDefault();
+
+  const form = document.getElementById('myform');
+  const formData = new FormData(form);
+  formData.append('audio', audioBlob);
+  
+  for (const key of formData.keys()) {
+    console.log(key);
+  }
+  
+  $.ajax({
+    url: "/podani/SaveObtezujiciHovor",
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function(response) {
+      console.log(response);
+    },
+    error: function(err) {
+      console.error("Error uploading audio", err);
+    }
+  });
+  
+});
+
+</script>

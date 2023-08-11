@@ -1,8 +1,0 @@
-2023-06-04 06:49:29.914 HlidacStatu [INF] Starting web application 1.1.0.0
-2023-06-04 11:10:54.769 HlidacStatu [INF] Starting web application 1.1.0.0
-2023-06-04 11:14:09.221 HlidacStatu [INF] Static data - LastBlogPosts
-2023-06-04 11:21:43.685 HlidacStatu [INF] Starting web application 1.1.0.0
-2023-06-04 12:18:45.951 HlidacStatu [INF] Starting web application 1.1.0.0
-2023-06-04 12:19:26.249 HlidacStatu [INF] Static data - LastBlogPosts
-2023-06-04 13:31:13.781 HlidacStatu [INF] Starting web application 1.1.0.0
-2023-06-04 13:31:33.124 HlidacStatu [INF] Static data - LastBlogPosts
