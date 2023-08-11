@@ -13,8 +13,10 @@
 
 <h1>Jednotlivá podání, která můžete učinit přes vašeho oblíbeného Hlídače státu</h1>
 
-<button id="startRecord">Start Recording</button>
-<button id="stopRecord" disabled>Stop Recording</button>
+<button onclick="startRecording()">Start Recording</button>
+<button onclick="stopRecording()">Stop Recording</button>
+<button onclick="downloadMP3()">Download MP3</button>
+
 <form action="/podani/SaveObtezujiciHovor" method="post" class="form-group" id="myform">
   <div class="card mb-3">
     <h5 class="card-header">Podání</h5>
@@ -52,7 +54,7 @@
           <div class="form-floating">
             <input type="text" id="spolecnost" name="spolecnost"
                    class="form-control"/>
-            <label for="spolecnost">Název společnosti, která volala</label>
+            <label for="spolecnost">Název/jméno volajícího</label>
           </div>
         </div>
         <div class="mx-auto">
@@ -85,83 +87,97 @@
 </form>
 
 
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
 <script>
 let mediaRecorder;
 let audioChunks = [];
-let audioBlob;
+let mp3Blob;
+let audioBlob
 
-let mediaType;
-
-if (MediaRecorder.isTypeSupported("audio/webm"))
-{
-  mediaType = "audio/webm";  
-} else if (MediaRecorder.isTypeSupported("audio/mp4"))
-{
-  mediaType = "audio/mp4";
-}
-else {
-  mediaType = "audio";
-}
-  
-navigator.mediaDevices.getUserMedia({ audio: true })
-  .then(stream => {
-    const options = {
-      mimeType: mediaType,
-      bitsPerSecond: 128000
-    };
+async function startRecording() {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const options = { bitsPerSecond: 128000 };
     mediaRecorder = new MediaRecorder(stream, options);
-
-    mediaRecorder.onstart = () => {
-      audioChunks = [];
-    };
-
     mediaRecorder.ondataavailable = event => {
-      audioChunks.push(event.data);
+        audioChunks.push(event.data);
     };
+    mediaRecorder.onstop = async () => {
+        audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+        // const buffer = await blobToArrayBuffer(audioBlob);
+        // convertToMp3(buffer);
+    };
+    audioChunks = [];
+    mediaRecorder.start();
+}
 
-    mediaRecorder.onstop = () => {
-      audioBlob = new Blob(audioChunks, {type: mediaType});
-      
-      // const form = document.getElementById('myform');
-      // const formData = new FormData(form);
-      // formData.append('audio', audioBlob);
-      
-      // const audioFile = new File([audioBlob], 'audiofile', { type: 'mediaType' });
-      // const ade = document.getElementById('audio');
-      // // Set the files property of the input element to an array containing the audio file
-      //  ade.files = [audioFile];
-      
-      // const formData = new FormData();
-      // formData.append("audio", audioBlob);
-    
-      // $.ajax({
-      //   url: "/podani/SaveAudio",
-      //   type: "POST",
-      //   data: formData,
-      //   processData: false,
-      //   contentType: false,
-      //   success: function(response) {
-      //     console.log(response);
-      //   },
-      //   error: function(err) {
-      //     console.error("Error uploading audio", err);
-      //   }
-      // });
-    };
+function stopRecording() {
+    if (mediaRecorder) {
+        mediaRecorder.stop();
+    }
+}
 
-    document.getElementById("startRecord").onclick = () => {
-      mediaRecorder.start();
-      document.getElementById("stopRecord").disabled = false;
-      document.getElementById("startRecord").disabled = true;
-    };
+// function downloadMP3() {
+//     if (mp3Blob) {
+//         const url = URL.createObjectURL(mp3Blob);
+//         const a = document.createElement("a");
+//         a.href = url;
+//         a.download = "recorded_audio.mp3";
+//         document.body.appendChild(a);
+//         a.click();
+//         document.body.removeChild(a);
+//     }
+// }
+function downloadMP3() {
+    if (audioBlob) {
+        const url = URL.createObjectURL(audioBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "recorded_audio.wav";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+}
 
-    document.getElementById("stopRecord").onclick = () => {
-      mediaRecorder.stop();
-      document.getElementById("stopRecord").disabled = true;
-      document.getElementById("startRecord").disabled = false;
-    };
-  });
+// function blobToArrayBuffer(blob) {
+//     return new Promise(resolve => {
+//         const reader = new FileReader();
+//         reader.readAsArrayBuffer(blob);
+//         reader.onload = () => resolve(reader.result);
+//     });
+// }
+
+// function convertToMp3(buffer) {
+//     const audioData = new Int16Array(buffer);
+//     const mp3encoder = new lamejs.Mp3Encoder(1, 44100, 128);
+//     const mp3Data = [];
+//     const mp3buf = mp3encoder.encodeBuffer(audioData);
+//     if (mp3buf.length > 0) {
+//         mp3Data.push(mp3buf);
+//     }
+//     mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
+// }
+
+// function convertToMp3(buffer) {
+//     const audioData = new Int8Array(buffer);
+//     const int16Buffer = int8ToInt16(audioData);
+//     const mp3encoder = new lamejs.Mp3Encoder(1, 44100, 128);
+//     const mp3Data = [];
+//     const mp3buf = mp3encoder.encodeBuffer(int16Buffer);
+//     if (mp3buf.length > 0) {
+//         mp3Data.push(mp3buf);
+//     }
+//     mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
+// }
+//
+// function int8ToInt16(input) {
+//     const output = new Int16Array(input.length / 2);
+//     for (let i = 0; i < output.length; i++) {
+//         output[i] = (input[2*i] << 8) | (input[2*i+1] & 0xFF);
+//     }
+//     return output;
+// }
+
 
 document.getElementById('formSubmit').addEventListener("click", (event) => {
   event.preventDefault();
@@ -175,17 +191,27 @@ document.getElementById('formSubmit').addEventListener("click", (event) => {
   }
   
   $.ajax({
-    url: "/podani/SaveObtezujiciHovor",
-    type: "POST",
-    data: formData,
-    processData: false,
-    contentType: false,
-    success: function(response) {
-      console.log(response);
-    },
-    error: function(err) {
-      console.error("Error uploading audio", err);
-    }
+      url: "/podani/SaveObtezujiciHovor",
+      type: "POST",
+      data: formData,
+      processData: false,
+      contentType: false,
+      responseType: 'blob',  // Set expected response type to blob for the PDF data
+      success: function(response) {
+        // Convert the blob response to an Object URL
+        const blob = new Blob([response], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        
+        // Create the download link and append it to the document
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.download = 'document.pdf';  // Set desired download file name
+        downloadLink.textContent = 'Download PDF';
+        document.body.appendChild(downloadLink);
+      },
+      error: function(err) {
+        console.error("Error uploading audio", err);
+      }
   });
   
 });

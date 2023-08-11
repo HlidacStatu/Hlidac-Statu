@@ -10,40 +10,18 @@ namespace HlidacStatu.Web.Pdfs;
 
 public class ObtezujiciHovorPdf
 {
-    private const string DatumVoleb = "13. a 14. ledna 2023";
-    private const string DatumVoleb2 = "27. a 28. ledna 2023";
-
-    private const string NadpisPrvniRadek = "Žádost o vydání voličského průkazu";
-    private const string NadpisDruhyRadek = "pro hlasování ve volbách prezidenta ČR";
+    private static string[] AdresatLines = new string[]
+    {
+        "Český telekomunikační úřad",
+        "poštovní přihrádka 02",
+        "225 02 Praha 025",
+        "datová schránka: a9qaats",
+        "e-mail: podatelna@ctu.cz"
+    };
     
-    
-    private const string HlavniTextCastPrvni =
-        $"Podle ustanovení § 33 zákona č. 275/2012 Sb., o volbě prezidenta republiky a o změně některých zákonů (zákon o volbě prezidenta republiky), § 6a zákona č. 247/1995 Sb., o volbách do Parlamentu České republiky a o změně a doplnění některých dalších zákonů, ve znění pozdějších předpisů, § 30 zákona č. 62/2003 Sb., o volbách do Evropského parlamentu a o změně některých zákonů, ve znění pozdějších předpisů, § 26a zákona č. 130/2000 Sb., o volbách do zastupitelstev krajů a o změně některých zákonů, ve znění pozdějších předpisů (dále jen zákon o volbách do EP), žádám ";
-    
-
     public static byte[] Create(ObtezujiciHovor zadost)
     {
-        string hlavniTextCastDruha;
-            
-        string nadpisTretiRadek; 
-        if (zadost.PrvniKolo && !zadost.DruheKolo)
-        {
-            nadpisTretiRadek = $"konaných dne {DatumVoleb} (první kolo)";
-            hlavniTextCastDruha = $" o vydání voličského průkazu pro hlasování ve volbách prezidenta ČR konaných:\nve dnech {DatumVoleb} (první kolo),\nneboť nebudu moci volit ve volebním okrsku, v jehož seznamu voličů jsem zapsán(a)."; 
-        }
-        else if (zadost.DruheKolo && !zadost.PrvniKolo)
-        {
-            nadpisTretiRadek = $"konaných dne {DatumVoleb2} (druhé kolo)";
-            hlavniTextCastDruha = $" o vydání voličského průkazu pro hlasování ve volbách prezidenta ČR konaných:\nve dnech {DatumVoleb2} (druhé kolo),\nneboť nebudu moci volit ve volebním okrsku, v jehož seznamu voličů jsem zapsán(a).";
-        }
-        else
-        {
-            nadpisTretiRadek = $"konaných v termínech\n{DatumVoleb} (první kolo),\na {DatumVoleb2} (druhé kolo)";
-            hlavniTextCastDruha = $" o vydání voličského průkazu pro hlasování ve volbách prezidenta ČR konaných:\nve dnech {DatumVoleb} (první kolo)\na ve dnech {DatumVoleb2} (druhé kolo),\nneboť nebudu moci volit ve volebním okrsku, v jehož seznamu voličů jsem zapsán(a).";
-        }
-        
-        
-        var logoPath = Path.Combine(_rootPath, "wwwroot", "assets", "images", "hslogo.png");
+        // var logoPath = Path.Combine(_rootPath, "wwwroot", "assets", "images", "hslogo.png");
 
         var document = Document.Create(container =>
         {
@@ -63,12 +41,13 @@ public class ObtezujiciHovorPdf
 
                 // Hlavička
                 page.Header()
-                    .AlignCenter()
+                    .AlignLeft()
                     .Text(text =>
                     {
-                        text.Line(NadpisPrvniRadek).Bold().FontSize(26).LineHeight(0.8f);
-                        text.Line(NadpisDruhyRadek).SemiBold().FontSize(20).LineHeight(0.9f);
-                        text.Line(nadpisTretiRadek).SemiBold().FontSize(20).LineHeight(0.9f);
+                        foreach (var line in AdresatLines)
+                        {
+                            text.Line(line).SemiBold().FontSize(15).LineHeight(0.6f);    
+                        }
                     });
 
                 // Tělo
@@ -78,57 +57,39 @@ public class ObtezujiciHovorPdf
                     {
                         x.Spacing(20);
                         x.Item()
-                            .AlignRight()
-                            .Border(1)
+                            .AlignLeft()
                             .PaddingVertical(15)
-                            .PaddingLeft(5)
-                            .PaddingRight(200)
-                            .Text("Číslo voličského průkazu: ");
+                            .Text("Věc: Podání stížnosti na nevyžádaný marketingový hovor");
 
                         x.Item().Text(text =>
                         {
-                            text.Span(HlavniTextCastPrvni);
-                            text.Span($"{zadost.UradNazev}, {zadost.AdresaUradu}").SemiBold();
-                            text.Span(hlavniTextCastDruha);
+                            text.Span($"Dne {zadost.Datum} došlo mou osobou k přijetí hovoru na mém telefonním čísle od volajícího {zadost.Spolecnost}. Jednalo se o marketingový hovor, který byl obtěžující a nevyžádaný. Volajícímu nebyl dán mou osobou k takovým hovorům souhlas a to ani nikdy v minulosti. Dodávám, že mé telefonní číslo není uvedené v žádném veřejně dostupném seznamu.");
                         });
 
+                        x.Item()
+                            .AlignLeft()
+                            .PaddingVertical(15)
+                            .Text("Bližší informace o nevyžádaném marketingovém hovoru");
+                        
                         x.Item().Text(text =>
                         {
-                            text.Span("Jméno a příjmení žadatele (voliče): ").SemiBold();
-                            text.Line(zadost.JmenoZadatele);
-
-                            text.Span("Datum narození: ").SemiBold();
-                            text.Line(zadost.DatumNarozeniZadatele);
-
-                            text.Span("Trvalý pobyt: ").SemiBold();
-                            text.Line(zadost.AdresaZadatele);
-
+                            text.Line("Příjemce hovoru:");
+                            text.Span("Jméno: ").SemiBold();
+                            text.Line(zadost.Jmeno);
                             text.Span("Telefonní číslo: ").SemiBold();
-                            text.Line(zadost.TelefonZadatele);
-                        });
-
-
-                        x.Item().Text(text =>
-                        {
-                            text.Line($"K tomu sděluji, že voličský průkaz {zadost.Prevzeti}").SemiBold();
-                            if (zadost.Prevzeti == "žádám zaslat na jinou adresu: ")
-                            {
-                                text.Span(zadost.PrevzetiAdresa);
-                            }
+                            text.Line(zadost.Volany);
+                            text.Span("Operator: ").SemiBold();
+                            text.Line(zadost.Teloperator);
+                            text.Span("Kontakt: ").SemiBold();
+                            text.Line(zadost.Kontakt);
+                            
+                            text.Line("Volající:");
+                            text.Span("Název: ").SemiBold();
+                            text.Line(zadost.Spolecnost);
+                            text.Span("Telefonní číslo: ").SemiBold();
+                            text.Line(zadost.Volajici);
                         });
                         
-                        x.Item().PaddingTop(50).Row(row =>
-                        {
-                            row.RelativeItem();
-                            row.RelativeItem();
-                            row.ConstantItem(200).AlignBottom().AlignCenter()
-                                .Text(text =>
-                                {
-                                    text.Line("_____________________");
-                                    text.Line("podpis voliče");
-                                });
-                        });
-                        x.Item().Text("Voličský průkaz převzal volič osobně dne: _________________");
                     });
 
                 page.Footer()
@@ -137,7 +98,7 @@ public class ObtezujiciHovorPdf
                         row.RelativeItem();
                         row.ConstantItem(200).AlignRight().Column(col =>
                         {
-                            col.Item().Width(60).AlignRight().Image(logoPath, ImageScaling.FitArea);
+                            // col.Item().Width(60).AlignRight().Image(logoPath, ImageScaling.FitArea);
                             col.Item().AlignRight().Text("www.HlidacStatu.cz").FontSize(7);
                         });
                     });
