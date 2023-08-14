@@ -17,7 +17,7 @@
 <button onclick="stopRecording()">Stop Recording</button>
 <button onclick="downloadMP3()">Download MP3</button>
 
-<form action="/podani/SaveObtezujiciHovor" method="post" class="form-group" id="myform">
+<form action="/podani/SaveObtezujiciHovor" method="post" class="form-group" id="myform" onsubmit="event.preventDefault(); downloadPDF();">
   <div class="card mb-3">
     <h5 class="card-header">Podání</h5>
     <div class="col-sm-9 col-xl-10">
@@ -26,37 +26,51 @@
           <div class="form-floating">
             <input type="text" id="jmeno" name="jmeno"
                    class="form-control"/>
-            <label for="jmeno">Jméno a příjmení</label>
+            <label for="jmeno">Vaše jméno a příjmení</label>
           </div>
         </div>
         <div class="mx-auto">
           <div class="form-floating">
-            <input type="text" id="datum" name="datum"
+            <input type="text" id="datumHovoru" name="datumHovoru"
                    class="form-control"/>
-            <label for="datum">Datum a čas hovoru</label>
+            <label for="datumHovoru">Datum hovoru</label>
+          </div>
+        </div>
+        <div class="mx-auto">
+                  <div class="form-floating">
+                    <input type="text" id="casHovoru" name="casHovoru"
+                           class="form-control"/>
+                    <label for="casHovoru">Čas hovoru</label>
+                  </div>
+                </div>
+        <div class="mx-auto">
+          <div class="form-floating">
+            <input type="text" id="cisloVolaneho" name="cisloVolaneho"
+                   class="form-control"/>
+            <label for="cisloVolaneho">Vaše telefonní číslo</label>
           </div>
         </div>
         <div class="mx-auto">
           <div class="form-floating">
-            <input type="text" id="volany" name="volany"
+            <input type="text" id="cisloVolajiciho" name="cisloVolajiciho"
                    class="form-control"/>
-            <label for="volany">Vaše telefonní číslo</label>
+            <label for="cisloVolajiciho">Telefonní číslo, které volalo</label>
           </div>
         </div>
         <div class="mx-auto">
           <div class="form-floating">
-            <input type="text" id="volajici" name="volajici"
+            <input type="text" id="volajiciSpolecnost" name="volajiciSpolecnost"
                    class="form-control"/>
-            <label for="volajici">Telefonní číslo, které volalo</label>
+            <label for="volajiciSpolecnost">Název společnosti, která volala</label>
           </div>
         </div>
         <div class="mx-auto">
-          <div class="form-floating">
-            <input type="text" id="spolecnost" name="spolecnost"
-                   class="form-control"/>
-            <label for="spolecnost">Název/jméno volajícího</label>
-          </div>
-        </div>
+                  <div class="form-floating">
+                    <input type="text" id="volajiciJmeno" name="volajiciJmeno"
+                           class="form-control"/>
+                    <label for="volajiciJmeno">Jméno člověka se kterým jsem volal</label>
+                  </div>
+                </div>
         <div class="mx-auto">
           <div class="form-floating">
             <input type="text" id="ucel" name="ucel"
@@ -80,7 +94,7 @@
           </div>
         </div>
         @* <input type="file" id="audio" name="audio" hidden="hidden"/> *@
-        <button class="btn btn-success" id="formSubmit">Odeslat</button>
+        <button type="submit" class="btn btn-success" id="formSubmit">Odeslat</button>
       </div>
     </div>
   </div>
@@ -96,15 +110,13 @@ let audioBlob
 
 async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const options = { bitsPerSecond: 128000 };
+    const options = { audioBitsPerSecond: 68000 };
     mediaRecorder = new MediaRecorder(stream, options);
     mediaRecorder.ondataavailable = event => {
         audioChunks.push(event.data);
     };
     mediaRecorder.onstop = async () => {
         audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-        // const buffer = await blobToArrayBuffer(audioBlob);
-        // convertToMp3(buffer);
     };
     audioChunks = [];
     mediaRecorder.start();
@@ -116,17 +128,6 @@ function stopRecording() {
     }
 }
 
-// function downloadMP3() {
-//     if (mp3Blob) {
-//         const url = URL.createObjectURL(mp3Blob);
-//         const a = document.createElement("a");
-//         a.href = url;
-//         a.download = "recorded_audio.mp3";
-//         document.body.appendChild(a);
-//         a.click();
-//         document.body.removeChild(a);
-//     }
-// }
 function downloadMP3() {
     if (audioBlob) {
         const url = URL.createObjectURL(audioBlob);
@@ -139,81 +140,30 @@ function downloadMP3() {
     }
 }
 
-// function blobToArrayBuffer(blob) {
-//     return new Promise(resolve => {
-//         const reader = new FileReader();
-//         reader.readAsArrayBuffer(blob);
-//         reader.onload = () => resolve(reader.result);
-//     });
-// }
-
-// function convertToMp3(buffer) {
-//     const audioData = new Int16Array(buffer);
-//     const mp3encoder = new lamejs.Mp3Encoder(1, 44100, 128);
-//     const mp3Data = [];
-//     const mp3buf = mp3encoder.encodeBuffer(audioData);
-//     if (mp3buf.length > 0) {
-//         mp3Data.push(mp3buf);
-//     }
-//     mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
-// }
-
-// function convertToMp3(buffer) {
-//     const audioData = new Int8Array(buffer);
-//     const int16Buffer = int8ToInt16(audioData);
-//     const mp3encoder = new lamejs.Mp3Encoder(1, 44100, 128);
-//     const mp3Data = [];
-//     const mp3buf = mp3encoder.encodeBuffer(int16Buffer);
-//     if (mp3buf.length > 0) {
-//         mp3Data.push(mp3buf);
-//     }
-//     mp3Blob = new Blob(mp3Data, { type: 'audio/mp3' });
-// }
-//
-// function int8ToInt16(input) {
-//     const output = new Int16Array(input.length / 2);
-//     for (let i = 0; i < output.length; i++) {
-//         output[i] = (input[2*i] << 8) | (input[2*i+1] & 0xFF);
-//     }
-//     return output;
-// }
-
-
-document.getElementById('formSubmit').addEventListener("click", (event) => {
-  event.preventDefault();
+async function downloadPDF() {
 
   const form = document.getElementById('myform');
   const formData = new FormData(form);
-  formData.append('audio', audioBlob);
   
-  for (const key of formData.keys()) {
-    console.log(key);
-  }
+  fetch('/podani/SaveObtezujiciHovor', {
+          method: 'POST',
+          body: formData
+      })
+      .then(response => response.blob())
+      .then(blob => {
+          const url = window.URL.createObjectURL(blob);
+            const downloadLink = document.createElement('a');
+            //a.style.display = 'none';
+            downloadLink.href = url;
+            downloadLink.download = 'obtezujici-hovor.pdf';  // Set desired download file name
+            downloadLink.textContent = 'Download PDF';
+            document.body.appendChild(downloadLink);
+      })
+      .catch((error) => {
+          console.error('There was an error:', error);
+      });
   
-  $.ajax({
-      url: "/podani/SaveObtezujiciHovor",
-      type: "POST",
-      data: formData,
-      processData: false,
-      contentType: false,
-      responseType: 'blob',  // Set expected response type to blob for the PDF data
-      success: function(response) {
-        // Convert the blob response to an Object URL
-        const blob = new Blob([response], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        
-        // Create the download link and append it to the document
-        const downloadLink = document.createElement('a');
-        downloadLink.href = url;
-        downloadLink.download = 'document.pdf';  // Set desired download file name
-        downloadLink.textContent = 'Download PDF';
-        document.body.appendChild(downloadLink);
-      },
-      error: function(err) {
-        console.error("Error uploading audio", err);
-      }
-  });
   
-});
+}
 
 </script>

@@ -2,6 +2,7 @@
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
+using System.Net.Mime;
 using HlidacStatu.Web.Models;
 using HlidacStatu.Web.Pdfs;
 using Microsoft.AspNetCore.Http;
@@ -24,16 +25,19 @@ namespace HlidacStatu.Web.Controllers
         }
         
         [HttpPost]
-        public ActionResult SaveObtezujiciHovor(string jmeno, string datum, string volany, string volajici, 
-            string spolecnost, string ucel, string teloperator, string kontakt)
+        public ActionResult SaveObtezujiciHovor(string jmeno, string datumHovoru, string casHovoru, 
+            string cisloVolaneho, string cisloVolajiciho, 
+            string volajiciSpolecnost, string volajiciJmeno, string ucel, string teloperator, string kontakt)
         {
             var obtezujiciHovor = new ObtezujiciHovor()
             {
                 Jmeno = jmeno,
-                Datum = datum,
-                Volany = volany,
-                Volajici = volajici,
-                Spolecnost = spolecnost,
+                DatumHovoru = datumHovoru,
+                CasHovoru = casHovoru,
+                CisloVolaneho = cisloVolaneho,
+                CisloVolajiciho = cisloVolajiciho,
+                VolajiciSpolecnost = volajiciSpolecnost,
+                VolajiciJmeno = volajiciJmeno,
                 Ucel = ucel,
                 Teloperator = teloperator,
                 Kontakt = kontakt
@@ -41,7 +45,7 @@ namespace HlidacStatu.Web.Controllers
 
             var pdf = ObtezujiciHovorPdf.Create(obtezujiciHovor);
 
-            return Json(new { success = true });
+            return File(pdf, MediaTypeNames.Application.Pdf, "obtezujiciHovor.pdf");
         }
         
     }
