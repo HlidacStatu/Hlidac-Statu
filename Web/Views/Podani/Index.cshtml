@@ -5,99 +5,113 @@
 @section breadcrumb
 {
     <ol class="breadcrumb">
-        <li><a href="/">Hlídač Státu</a></li>
+        <li>
+            <a href="/">Hlídač Státu</a>
+        </li>
         <li class="active">@ViewBag.Title</li>
     </ol>
 }
 
 
-<h1>Jednotlivá podání, která můžete učinit přes vašeho oblíbeného Hlídače státu</h1>
+<h3>Jednotlivá podání, která můžete učinit přes vašeho oblíbeného Hlídače státu</h3>
+<div class="card mb-3">
+    <h5 class="card-header">Nahrávání záznamu</h5>
+    <div class="col-sm-9 col-xl-10">
+        <div class="card-body">
+            <h5 class="card-title">Pro úspěšné vyřízení žádosti je ideální nahrát záznam hovoru</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Nezapomeňte svůj telefon dát na hlasitý odposlech a položit ho co nejblíže k počítači</h6>
 
-<button onclick="startRecording()">Start Recording</button>
-<button onclick="stopRecording()">Stop Recording</button>
-<button onclick="downloadMP3()">Download MP3</button>
+            <div class="mx-auto">
+                <button class="btn btn-success collapse show" id="startRecording" onclick="startRecording()">Začít nahrávat <i class="fa-duotone fa-microphone-lines"></i></button>
+                <button class="btn btn-danger collapse" id="stopRecording" onclick="stopRecording()">Vypnout nahrávání <i class="fa-duotone fa-microphone-lines" style="--fa-primary-color: #0ba800;"></i></button>
+                <button class="btn btn-info collapse" id="downloadAudio" onclick="downloadMP3()">Stáhnout záznam</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <form action="/podani/SaveObtezujiciHovor" method="post" class="form-group" id="myform" onsubmit="event.preventDefault(); downloadPDF();">
-  <div class="card mb-3">
-    <h5 class="card-header">Podání</h5>
-    <div class="col-sm-9 col-xl-10">
-      <div class="card-body">
-        <div class="mx-auto">
-          <div class="form-floating">
-            <input type="text" id="jmeno" name="jmeno"
-                   class="form-control"/>
-            <label for="jmeno">Vaše jméno a příjmení</label>
-          </div>
-        </div>
-        <div class="mx-auto">
-          <div class="form-floating">
-            <input type="text" id="datumHovoru" name="datumHovoru"
-                   class="form-control"/>
-            <label for="datumHovoru">Datum hovoru</label>
-          </div>
-        </div>
-        <div class="mx-auto">
-                  <div class="form-floating">
-                    <input type="text" id="casHovoru" name="casHovoru"
-                           class="form-control"/>
-                    <label for="casHovoru">Čas hovoru</label>
-                  </div>
+    <div class="card mb-3">
+        <h5 class="card-header">Podání</h5>
+        <div class="col-sm-9 col-xl-10">
+            <div class="card-body">
+                <h5 class="card-title">Dále je potřeba vyplnit maximum informací</h5>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="jmeno" name="jmeno"
+                               class="form-control"/>
+                        <label for="jmeno">Vaše jméno a příjmení</label>
+                    </div>
                 </div>
-        <div class="mx-auto">
-          <div class="form-floating">
-            <input type="text" id="cisloVolaneho" name="cisloVolaneho"
-                   class="form-control"/>
-            <label for="cisloVolaneho">Vaše telefonní číslo</label>
-          </div>
-        </div>
-        <div class="mx-auto">
-          <div class="form-floating">
-            <input type="text" id="cisloVolajiciho" name="cisloVolajiciho"
-                   class="form-control"/>
-            <label for="cisloVolajiciho">Telefonní číslo, které volalo</label>
-          </div>
-        </div>
-        <div class="mx-auto">
-          <div class="form-floating">
-            <input type="text" id="volajiciSpolecnost" name="volajiciSpolecnost"
-                   class="form-control"/>
-            <label for="volajiciSpolecnost">Název společnosti, která volala</label>
-          </div>
-        </div>
-        <div class="mx-auto">
-                  <div class="form-floating">
-                    <input type="text" id="volajiciJmeno" name="volajiciJmeno"
-                           class="form-control"/>
-                    <label for="volajiciJmeno">Jméno člověka se kterým jsem volal</label>
-                  </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="datumHovoru" name="datumHovoru"
+                               class="form-control"/>
+                        <label for="datumHovoru">Datum hovoru</label>
+                    </div>
                 </div>
-        <div class="mx-auto">
-          <div class="form-floating">
-            <input type="text" id="ucel" name="ucel"
-                   class="form-control"
-                   value="marketingový hovor"/>
-            <label for="ucel">Účel hovoru</label>
-          </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="casHovoru" name="casHovoru"
+                               class="form-control"/>
+                        <label for="casHovoru">Čas hovoru</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="cisloVolaneho" name="cisloVolaneho"
+                               class="form-control"/>
+                        <label for="cisloVolaneho">Vaše telefonní číslo</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="cisloVolajiciho" name="cisloVolajiciho"
+                               class="form-control"/>
+                        <label for="cisloVolajiciho">Telefonní číslo, které volalo</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="volajiciSpolecnost" name="volajiciSpolecnost"
+                               class="form-control"/>
+                        <label for="volajiciSpolecnost">Název společnosti, která volala</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="volajiciJmeno" name="volajiciJmeno"
+                               class="form-control"/>
+                        <label for="volajiciJmeno">Jméno člověka se kterým jsem volal</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="ucel" name="ucel"
+                               class="form-control"
+                               value="marketingový hovor"/>
+                        <label for="ucel">Účel hovoru</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="teloperator" name="teloperator"
+                               class="form-control"/>
+                        <label for="teloperator">Název Vašeho operátora</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="kontakt" name="kontakt"
+                               class="form-control"/>
+                        <label for="kontakt">Kontakt, kde Vás může úřad zastihnout pro doplnění žádosti</label>
+                    </div>
+                </div>
+                @* <input type="file" id="audio" name="audio" hidden="hidden"/> *@
+                <button type="submit" class="btn btn-success" id="formSubmit">Vygenerovat podání</button>
+            </div>
         </div>
-        <div class="mx-auto">
-          <div class="form-floating">
-            <input type="text" id="teloperator" name="teloperator"
-                   class="form-control"/>
-            <label for="teloperator">Název Vašeho operátora</label>
-          </div>
-        </div>
-        <div class="mx-auto">
-          <div class="form-floating">
-            <input type="text" id="kontakt" name="kontakt"
-                   class="form-control"/>
-            <label for="kontakt">Kontakt, kde Vás může úřad zastihnout pro doplnění žádosti</label>
-          </div>
-        </div>
-        @* <input type="file" id="audio" name="audio" hidden="hidden"/> *@
-        <button type="submit" class="btn btn-success" id="formSubmit">Odeslat</button>
-      </div>
     </div>
-  </div>
 </form>
 
 
@@ -109,23 +123,30 @@ let mp3Blob;
 let audioBlob
 
 async function startRecording() {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const options = { audioBitsPerSecond: 68000 };
-    mediaRecorder = new MediaRecorder(stream, options);
-    mediaRecorder.ondataavailable = event => {
-        audioChunks.push(event.data);
-    };
-    mediaRecorder.onstop = async () => {
-        audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-    };
-    audioChunks = [];
-    mediaRecorder.start();
+  $('#stopRecording').collapse('show');
+    $('#startRecording').collapse('hide');
+    $('#downloadAudio').collapse('hide');
+
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const options = { audioBitsPerSecond: 68000 };
+  mediaRecorder = new MediaRecorder(stream, options);
+  mediaRecorder.ondataavailable = event => {
+      audioChunks.push(event.data);
+  };
+  mediaRecorder.onstop = async () => {
+      audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+  };
+  audioChunks = [];
+  mediaRecorder.start();
 }
 
 function stopRecording() {
-    if (mediaRecorder) {
-        mediaRecorder.stop();
-    }
+  $('#stopRecording').collapse('hide');
+  $('#startRecording').collapse('hide');
+  $('#downloadAudio').collapse('show');
+  if (mediaRecorder) {
+      mediaRecorder.stop();
+  }  
 }
 
 function downloadMP3() {
