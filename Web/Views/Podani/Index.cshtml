@@ -1,5 +1,6 @@
 ﻿@{
     ViewBag.Title = "Podání";
+    var currentTime = DateTime.Now;
 }
 
 @section breadcrumb
@@ -14,17 +15,22 @@
 
 
 <h3>Jednotlivá podání, která můžete učinit přes vašeho oblíbeného Hlídače státu</h3>
+
+<p>Pokud nevíte jak postupovat s vyplněním žádosti, můžete se podívat na náš <a href="/podani/obtezujiciHovorNavod">návod</a></p>
+
 <div class="card mb-3">
     <h5 class="card-header">Nahrávání záznamu</h5>
     <div class="col-sm-9 col-xl-10">
         <div class="card-body">
-            <h5 class="card-title">Pro úspěšné vyřízení žádosti je ideální nahrát záznam hovoru</h5>
-            <h6 class="card-subtitle mb-2 text-muted">Nezapomeňte svůj telefon dát na hlasitý odposlech a položit ho co nejblíže k počítači</h6>
-
+            <div class="collapse show audioInfoTrigger">
+                <h5 class="card-title">Pro úspěšné vyřízení žádosti je ideální nahrát záznam hovoru</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Nezapomeňte svůj telefon dát na hlasitý odposlech a položit ho co nejblíže k počítači</h6>
+            </div>
+            <h6 class="card-subtitle mb-2 text-muted collapse hide audioInfoTrigger">Nahraný soubor ke stažení najdete níže.</h6>
             <div class="mx-auto">
                 <button class="btn btn-success collapse show" id="startRecording" onclick="startRecording()">Začít nahrávat <i class="fa-duotone fa-microphone-lines"></i></button>
                 <button class="btn btn-danger collapse" id="stopRecording" onclick="stopRecording()">Vypnout nahrávání <i class="fa-duotone fa-microphone-lines" style="--fa-primary-color: #0ba800;"></i></button>
-                <button class="btn btn-info collapse" id="downloadAudio" onclick="downloadMP3()">Stáhnout záznam</button>
+                @* <button class="btn btn-info collapse" id="downloadAudio" onclick="downloadMP3()">Stáhnout záznam</button> *@
             </div>
         </div>
     </div>
@@ -45,44 +51,40 @@
                 </div>
                 <div class="mx-auto">
                     <div class="form-floating">
-                        <input type="text" id="datumHovoru" name="datumHovoru"
+                        <input type="text" id="cisloVolaneho" name="cisloVolaneho"
                                class="form-control"/>
+                        <label for="cisloVolaneho">Vaše tel. číslo</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="teloperator" name="teloperator"
+                               class="form-control"/>
+                        <label for="teloperator">Váš operátor</label>
+                    </div>
+                </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="kontakt" name="kontakt"
+                               class="form-control"/>
+                        <label for="kontakt">Případný další kontakt, kde Vás může úřad zastihnout pro doplnění žádosti</label>
+                    </div>
+                </div>
+                <br/>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="datumHovoru" name="datumHovoru"
+                               class="form-control"
+                               value="@currentTime.ToString("dd. MM. yyyy")"/>
                         <label for="datumHovoru">Datum hovoru</label>
                     </div>
                 </div>
                 <div class="mx-auto">
                     <div class="form-floating">
                         <input type="text" id="casHovoru" name="casHovoru"
-                               class="form-control"/>
+                               class="form-control"
+                               value="@currentTime.ToString("HH:mm")"/>
                         <label for="casHovoru">Čas hovoru</label>
-                    </div>
-                </div>
-                <div class="mx-auto">
-                    <div class="form-floating">
-                        <input type="text" id="cisloVolaneho" name="cisloVolaneho"
-                               class="form-control"/>
-                        <label for="cisloVolaneho">Vaše telefonní číslo</label>
-                    </div>
-                </div>
-                <div class="mx-auto">
-                    <div class="form-floating">
-                        <input type="text" id="cisloVolajiciho" name="cisloVolajiciho"
-                               class="form-control"/>
-                        <label for="cisloVolajiciho">Telefonní číslo, které volalo</label>
-                    </div>
-                </div>
-                <div class="mx-auto">
-                    <div class="form-floating">
-                        <input type="text" id="volajiciSpolecnost" name="volajiciSpolecnost"
-                               class="form-control"/>
-                        <label for="volajiciSpolecnost">Název společnosti, která volala</label>
-                    </div>
-                </div>
-                <div class="mx-auto">
-                    <div class="form-floating">
-                        <input type="text" id="volajiciJmeno" name="volajiciJmeno"
-                               class="form-control"/>
-                        <label for="volajiciJmeno">Jméno člověka se kterým jsem volal</label>
                     </div>
                 </div>
                 <div class="mx-auto">
@@ -93,26 +95,52 @@
                         <label for="ucel">Účel hovoru</label>
                     </div>
                 </div>
+                <br/>
+
                 <div class="mx-auto">
                     <div class="form-floating">
-                        <input type="text" id="teloperator" name="teloperator"
+                        <input type="text" id="volajiciSpolecnost" name="volajiciSpolecnost"
                                class="form-control"/>
-                        <label for="teloperator">Název Vašeho operátora</label>
+                        <label for="volajiciSpolecnost">Název společnosti volajícího</label>
                     </div>
                 </div>
                 <div class="mx-auto">
                     <div class="form-floating">
-                        <input type="text" id="kontakt" name="kontakt"
+                        <input type="text" id="volajiciJmeno" name="volajiciJmeno"
                                class="form-control"/>
-                        <label for="kontakt">Kontakt, kde Vás může úřad zastihnout pro doplnění žádosti</label>
+                        <label for="volajiciJmeno">Jméno volajícího</label>
                     </div>
                 </div>
+                <div class="mx-auto">
+                    <div class="form-floating">
+                        <input type="text" id="cisloVolajiciho" name="cisloVolajiciho"
+                               class="form-control"/>
+                        <label for="cisloVolajiciho">Číslo volajícího</label>
+                    </div>
+                </div>
+
                 @* <input type="file" id="audio" name="audio" hidden="hidden"/> *@
                 <button type="submit" class="btn btn-success" id="formSubmit">Vygenerovat podání</button>
             </div>
         </div>
     </div>
 </form>
+
+<div class="card mb-3">
+    <h5 class="card-header">Ke stažení</h5>
+    <div class="col-sm-9 col-xl-10">
+        <div class="card-body">
+            <h5 class="card-title">Zde najdete vygenerované soubory ke stažení</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Nezapomeňte svůj telefon dát na hlasitý odposlech a položit ho co nejblíže k počítači</h6>
+
+            <div class="mx-auto">
+                <button class="btn btn-info collapse" id="downloadAudio" onclick="downloadMP3()">Stáhnout záznam</button>
+                <br/>
+                <a class="btn btn-info collapse" id="downloadPdf">Stáhnout pdf</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.0/lame.min.js"></script>
@@ -143,6 +171,7 @@ async function startRecording() {
 function stopRecording() {
   $('#stopRecording').collapse('hide');
   $('#startRecording').collapse('hide');
+  $('.audioInfoTrigger').collapse('toggle');
   $('#downloadAudio').collapse('show');
   if (mediaRecorder) {
       mediaRecorder.stop();
@@ -172,13 +201,12 @@ async function downloadPDF() {
       })
       .then(response => response.blob())
       .then(blob => {
-          const url = window.URL.createObjectURL(blob);
-            const downloadLink = document.createElement('a');
-            //a.style.display = 'none';
-            downloadLink.href = url;
-            downloadLink.download = 'obtezujici-hovor.pdf';  // Set desired download file name
-            downloadLink.textContent = 'Download PDF';
-            document.body.appendChild(downloadLink);
+        const url = window.URL.createObjectURL(blob);
+        const downloadEl = document.getElementById("downloadPdf"); 
+        
+        downloadEl.setAttribute("href", url)
+        downloadEl.setAttribute("download", 'obtezujici-hovor.pdf')
+        $('#downloadPdf').collapse('show');
       })
       .catch((error) => {
           console.error('There was an error:', error);

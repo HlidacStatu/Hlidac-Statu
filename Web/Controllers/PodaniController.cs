@@ -24,6 +24,11 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
         
+        public ActionResult ObtezujiciHovorNavod()
+        {
+            return View();
+        }
+        
         [HttpPost]
         public ActionResult SaveObtezujiciHovor(string jmeno, string datumHovoru, string casHovoru, 
             string cisloVolaneho, string cisloVolajiciho, 
