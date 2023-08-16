@@ -451,13 +451,15 @@ namespace HlidacStatu.Extensions
                 !excludedImportanceLevels.Contains(InfoFact.ImportanceLevel.Medium))
             {
                 DateTime datumOd = new DateTime(DateTime.Now.Year - 10, 1, 1);
-                var sponzoring = osoba.Sponzoring(s => s.IcoPrijemce != null && s.DarovanoDne >= datumOd).ToList();
-                if (sponzoring != null && sponzoring.Count() > 0)
+                var sponzoringPrimy = osoba.Sponzoring(s => s.IcoPrijemce != null 
+                                                        && s.DarovanoDne >= datumOd
+                                                        && s.Typ != (int)Entities.Sponzoring.TypDaru.DarFirmy).ToList();
+                if (sponzoringPrimy != null && sponzoringPrimy.Count() > 0)
                 {
-                    string[] strany = sponzoring.Select(m => m.IcoPrijemce).Distinct().ToArray();
-                    int[] roky = sponzoring.Select(m => m.DarovanoDne.Value.Year).Distinct().OrderBy(y => y).ToArray();
-                    decimal celkem = sponzoring.Sum(m => m.Hodnota) ?? 0;
-                    decimal top = sponzoring.Max(m => m.Hodnota) ?? 0;
+                    string[] strany = sponzoringPrimy.Select(m => m.IcoPrijemce).Distinct().ToArray();
+                    int[] roky = sponzoringPrimy.Select(m => m.DarovanoDne.Value.Year).Distinct().OrderBy(y => y).ToArray();
+                    decimal celkem = sponzoringPrimy.Sum(m => m.Hodnota) ?? 0;
+                    decimal top = sponzoringPrimy.Max(m => m.Hodnota) ?? 0;
                     string
                         prvniStrana =
                             FirmaRepo.FromIco(strany[0])
@@ -468,6 +470,32 @@ namespace HlidacStatu.Extensions
                                            $"mezi roky {roky.First()} - {roky.Last() - 2000}",
                                            $"mezi roky {roky.First()} - {roky.Last() - 2000}")
                                        + $" sponzoroval{(osoba.Muz() ? "" : "a")} " +
+                                       Plural.Get(strany.Length, "stranu " + prvniStrana,
+                                           "{0} polit. strany", "{0} polit. stran")
+                                       + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
+                                       + $"Nejvyšší sponzorský dar byl ve výši {RenderData.ShortNicePrice(top, html: true)}. "
+                        , InfoFact.ImportanceLevel.Medium)
+                    );
+                }
+                var sponzoringPresFirmu = osoba.Sponzoring(s => s.IcoPrijemce != null 
+                                                            && s.DarovanoDne >= datumOd
+                                                            && s.Typ == (int)Entities.Sponzoring.TypDaru.DarFirmy).ToList();
+                if (sponzoringPresFirmu != null && sponzoringPresFirmu.Count() > 0)
+                {
+                    string[] strany = sponzoringPresFirmu.Select(m => m.IcoPrijemce).Distinct().ToArray();
+                    int[] roky = sponzoringPresFirmu.Select(m => m.DarovanoDne.Value.Year).Distinct().OrderBy(y => y).ToArray();
+                    decimal celkem = sponzoringPresFirmu.Sum(m => m.Hodnota) ?? 0;
+                    decimal top = sponzoringPresFirmu.Max(m => m.Hodnota) ?? 0;
+                    string
+                        prvniStrana =
+                            FirmaRepo.FromIco(strany[0])
+                                .Jmeno;
+
+                    f.Add(new InfoFact($"{osoba.FullName()} "
+                                       + Plural.Get(roky.Count(), "v roce " + roky[0],
+                                           $"mezi roky {roky.First()} - {roky.Last() - 2000}",
+                                           $"mezi roky {roky.First()} - {roky.Last() - 2000}")
+                                       + $" nepřímo sponzoroval{(osoba.Muz() ? "" : "a")} jako člen statutárního orgánu " +
                                        Plural.Get(strany.Length, "stranu " + prvniStrana,
                                            "{0} polit. strany", "{0} polit. stran")
                                        + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
