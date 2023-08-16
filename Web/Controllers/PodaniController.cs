@@ -23,8 +23,13 @@ namespace HlidacStatu.Web.Controllers
         {
             return View();
         }
+
+        public ActionResult NevyzadanyHovor()
+        {
+            return View();
+        }
         
-        public ActionResult ObtezujiciHovorNavod()
+        public ActionResult NevyzadanyHovorNavod()
         {
             return View();
         }
