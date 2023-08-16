@@ -4,7 +4,7 @@
 }
 
 @section breadcrumb
-{
+    {
     <ol class="breadcrumb">
         <li>
             <a href="/">Hlídač Státu</a>
@@ -21,16 +21,21 @@
     <h5 class="card-header">Nahrávání záznamu</h5>
     <div class="col-sm-9 col-xl-10">
         <div class="card-body">
-            <div class="collapse show audioInfoTrigger">
-                <h5 class="card-title">Pro úspěšné vyřízení žádosti je ideální nahrát záznam hovoru</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Nezapomeňte svůj telefon dát na hlasitý odposlech a položit ho co nejblíže k počítači</h6>
+            <div class="collapse show">
+                <h5 class="card-title">Pro úspěšné a účinné vyřízení žádosti je nejlepší nahrát záznam hovoru</h5>
+                @* <h6 class="card-subtitle mb-2 text-warning"></h6> *@
+                <div class="p-2 text-warning-emphasis bg-warning-subtle border border-warning-subtle rounded-3 fs-6">
+                    Nezapomeňte svůj telefon dát na hlasitý odposlech a položit ho co nejblíže k počítači
+                </div>
             </div>
             <h6 class="card-subtitle mb-2 text-muted collapse hide audioInfoTrigger">Nahraný soubor ke stažení najdete níže.</h6>
             <h5 class="text-danger collapse hide onRecordingTrigger">Nezapomeňte svůj telefon dát na hlasitý odposlech a položit ho co nejblíže k počítači</h5>
             <div class="mx-auto">
-                <button class="btn btn-danger collapse show" id="startRecording" onclick="startRecording()">Začít nahrávat <i class="fa-duotone fa-microphone-lines"></i></button>
+                <button class="btn btn-danger collapse show" id="startRecording" onclick="startRecording()"><i class="fa-duotone fa-microphone-lines fa-beat fa-lg"></i> Začít nahrávat</button>
                 <button class="btn btn-warning collapse" id="stopRecording" onclick="stopRecording()">Vypnout nahrávání <i class="fa-duotone fa-microphone-lines" style="--fa-primary-color: #0ba800;"></i></button>
                 @* <button class="btn btn-info collapse" id="downloadAudio" onclick="downloadMP3()">Stáhnout záznam</button> *@
+                <p>Volajícího nemusíte upozornit ani žádat o souhlas, že si tento hovor nahráváte.
+                </p>
             </div>
         </div>
     </div>
@@ -41,38 +46,50 @@
         <h5 class="card-header">Informace o hovoru</h5>
         <div class="col-sm-9 col-xl-10">
             <div class="card-body">
-                <h5 class="card-title">Dále je potřeba vyplnit maximum informací</h5>
-                <p>???Michale, sem ten pomocný text???</p>
+                <h5 class="card-title">Dále je potřeba vyplnit tyto informace</h5>
+                <p class="lead"></p>
+                <div class="bs-callout warning">
+                    <h4>Jak se zeptat během hovoru na údaje do formuláře?</h4>
+                    <p>
+                        <ol>
+                            <li>"Omlouvám se, přeslechl/a jsem jméno společnosti, ze které voláte"</li>
+                            <li>"A jaké je Vaše jméno?"</li>
+                            <li>"Z jakého důvodu mi, prosím, voláte?"</li>
+                            <li>"Kdy jsem Vám dal/a souhlas, že mě můžete kontaktovat?"</li>
+                            <li>"Už mi prosím nevolejte, děkuji a nashledanou."</li>
+                        </ol>
+                    </p>
+                </div>
                 <div class="mx-auto">
                     <div class="form-floating">
                         <input type="text" id="volajiciSpolecnost" name="volajiciSpolecnost"
-                               class="form-control"/>
+                               class="form-control" />
                         <label for="volajiciSpolecnost">Název společnosti volajícího</label>
                     </div>
                 </div>
                 <div class="mx-auto">
                     <div class="form-floating">
                         <input type="text" id="volajiciJmeno" name="volajiciJmeno"
-                               class="form-control"/>
+                               class="form-control" />
                         <label for="volajiciJmeno">Jméno volajícího</label>
                     </div>
                 </div>
                 <div class="mx-auto">
                     <div class="form-floating">
                         <input type="text" id="cisloVolajiciho" name="cisloVolajiciho"
-                               class="form-control"/>
+                               class="form-control" />
                         <label for="cisloVolajiciho">Číslo volajícího</label>
                     </div>
                 </div>
 
-                <br/>
+                <br />
                 <div class="row mb-3">
                     <div class="form-floating col">
                         <div class="mx-auto">
                             <div class="form-floating">
                                 <input type="text" id="datumHovoru" name="datumHovoru"
                                        class="form-control"
-                                       value="@currentTime.ToString("dd. MM. yyyy")"/>
+                                       value="@currentTime.ToString("dd. MM. yyyy")" />
                                 <label for="datumHovoru">Datum hovoru</label>
                             </div>
                         </div>
@@ -82,7 +99,7 @@
                             <div class="form-floating">
                                 <input type="text" id="casHovoru" name="casHovoru"
                                        class="form-control"
-                                       value="@currentTime.ToString("HH:mm")"/>
+                                       value="@currentTime.ToString("HH:mm")" />
                                 <label for="casHovoru">Čas hovoru</label>
                             </div>
                         </div>
@@ -92,7 +109,7 @@
                     <div class="form-floating">
                         <input type="text" id="ucel" name="ucel"
                                class="form-control"
-                               value="marketingový hovor"/>
+                               value="marketingový hovor" />
                         <label for="ucel">Účel hovoru</label>
                     </div>
                 </div>
@@ -107,28 +124,28 @@
                 <div class="mx-auto">
                     <div class="form-floating">
                         <input type="text" id="jmeno" name="jmeno"
-                               class="form-control"/>
+                               class="form-control" />
                         <label for="jmeno">Vaše jméno a příjmení</label>
                     </div>
                 </div>
                 <div class="mx-auto">
                     <div class="form-floating">
                         <input type="text" id="cisloVolaneho" name="cisloVolaneho"
-                               class="form-control"/>
+                               class="form-control" />
                         <label for="cisloVolaneho">Vaše tel. číslo</label>
                     </div>
                 </div>
                 <div class="mx-auto">
                     <div class="form-floating">
                         <input type="text" id="teloperator" name="teloperator"
-                               class="form-control"/>
+                               class="form-control" />
                         <label for="teloperator">Váš operátor</label>
                     </div>
                 </div>
                 <div class="mx-auto">
                     <div class="form-floating">
                         <input type="text" id="kontakt" name="kontakt"
-                               class="form-control"/>
+                               class="form-control" />
                         <label for="kontakt">Případný další kontakt, kde Vás může úřad zastihnout pro doplnění žádosti</label>
                     </div>
                 </div>
@@ -146,7 +163,7 @@
             <h5 class="card-title">Zde najdete vygenerované soubory ke stažení</h5>
             <div class="mx-auto">
                 <button class="btn btn-info collapse" id="downloadAudio" onclick="downloadMP3()">Stáhnout záznam</button>
-                <br/>
+                <br />
                 <a class="btn btn-info collapse" id="downloadPdf">Stáhnout pdf</a>
             </div>
 
@@ -164,77 +181,77 @@
 
 
 <script>
-let mediaRecorder;
-let audioChunks = [];
-let mp3Blob;
-let audioBlob
+    let mediaRecorder;
+    let audioChunks = [];
+    let mp3Blob;
+    let audioBlob
 
-async function startRecording() {
-  $('#stopRecording').collapse('show');
-  $('#onRecordingTrigger').collapse('show');
-  $('#startRecording').collapse('hide');
-  $('#downloadAudio').collapse('hide');
+    async function startRecording() {
+        $('#stopRecording').collapse('show');
+        $('#onRecordingTrigger').collapse('show');
+        $('#startRecording').collapse('hide');
+        $('#downloadAudio').collapse('hide');
 
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  const options = { audioBitsPerSecond: 68000 };
-  mediaRecorder = new MediaRecorder(stream, options);
-  mediaRecorder.ondataavailable = event => {
-      audioChunks.push(event.data);
-  };
-  mediaRecorder.onstop = async () => {
-      audioBlob = new Blob(audioChunks, { type: "audio/wav" });
-  };
-  audioChunks = [];
-  mediaRecorder.start();
-}
-
-function stopRecording() {
-  $('#stopRecording').collapse('hide');
-  $('#onRecordingTrigger').collapse('hide');
-  $('#startRecording').collapse('show');
-  $('#startRecording').text('Začít znovu nahrávat (přepíše se poslední záznam)');
-  $('.audioInfoTrigger').collapse('toggle');
-  $('#downloadAudio').collapse('show');
-  if (mediaRecorder) {
-      mediaRecorder.stop();
-  }  
-}
-
-function downloadMP3() {
-    if (audioBlob) {
-        const url = URL.createObjectURL(audioBlob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "recorded_audio.wav";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const options = { audioBitsPerSecond: 68000 };
+        mediaRecorder = new MediaRecorder(stream, options);
+        mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+        };
+        mediaRecorder.onstop = async () => {
+            audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+        };
+        audioChunks = [];
+        mediaRecorder.start();
     }
-}
 
-async function downloadPDF() {
+    function stopRecording() {
+        $('#stopRecording').collapse('hide');
+        $('#onRecordingTrigger').collapse('hide');
+        $('#startRecording').collapse('show');
+        $('#startRecording').text('Začít znovu nahrávat (přepíše se poslední záznam)');
+        $('.audioInfoTrigger').collapse('toggle');
+        $('#downloadAudio').collapse('show');
+        if (mediaRecorder) {
+            mediaRecorder.stop();
+        }
+    }
 
-  const form = document.getElementById('myform');
-  const formData = new FormData(form);
-  
-  fetch('/podani/SaveObtezujiciHovor', {
-          method: 'POST',
-          body: formData
-      })
-      .then(response => response.blob())
-      .then(blob => {
-        const url = window.URL.createObjectURL(blob);
-        const downloadEl = document.getElementById("downloadPdf"); 
-        
-        downloadEl.setAttribute("href", url)
-        downloadEl.setAttribute("download", 'obtezujici-hovor.pdf')
-        $('#downloadPdf').collapse('show');
-      })
-      .catch((error) => {
-          console.error('There was an error:', error);
-      });
-  
-  
-}
+    function downloadMP3() {
+        if (audioBlob) {
+            const url = URL.createObjectURL(audioBlob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "recorded_audio.wav";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    }
+
+    async function downloadPDF() {
+
+        const form = document.getElementById('myform');
+        const formData = new FormData(form);
+
+        fetch('/podani/SaveObtezujiciHovor', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const downloadEl = document.getElementById("downloadPdf");
+
+                downloadEl.setAttribute("href", url)
+                downloadEl.setAttribute("download", 'obtezujici-hovor.pdf')
+                $('#downloadPdf').collapse('show');
+            })
+            .catch((error) => {
+                console.error('There was an error:', error);
+            });
+
+
+    }
 
 </script>
