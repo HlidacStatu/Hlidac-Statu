@@ -34,7 +34,8 @@
                 <button class="btn btn-danger collapse show" id="startRecording" onclick="startRecording()"><i class="fa-duotone fa-microphone-lines fa-beat fa-lg"></i> Začít nahrávat</button>
                 <button class="btn btn-warning collapse" id="stopRecording" onclick="stopRecording()">Vypnout nahrávání <i class="fa-duotone fa-microphone-lines" style="--fa-primary-color: #0ba800;"></i></button>
                 @* <button class="btn btn-info collapse" id="downloadAudio" onclick="downloadMP3()">Stáhnout záznam</button> *@
-                <p>Volajícího nemusíte upozornit ani žádat o souhlas, že si tento hovor nahráváte.
+                <p>
+                    Volajícího nemusíte upozornit ani žádat o souhlas, že si tento hovor nahráváte.
                 </p>
             </div>
         </div>
@@ -120,7 +121,7 @@
         <h5 class="card-header">Informace o mně</h5>
         <div class="col-sm-9 col-xl-10">
             <div class="card-body">
-                <h5 class="card-title">Dále je potřeba vyplnit maximum informací</h5>
+                <h5 class="card-title">Dále je potřeba vyplnit informace o Vás, jako stěžovateli.</h5>
                 <div class="mx-auto">
                     <div class="form-floating">
                         <input type="text" id="jmeno" name="jmeno"
@@ -139,7 +140,7 @@
                     <div class="form-floating">
                         <input type="text" id="teloperator" name="teloperator"
                                class="form-control" />
-                        <label for="teloperator">Váš operátor</label>
+                        <label for="teloperator">Váš operátor (pod názvem, pod kterým ho znáte vy)</label>
                     </div>
                 </div>
                 <div class="mx-auto">
@@ -150,7 +151,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-success" id="formSubmit">Vygenerovat podání</button>
+                <button type="submit" class="btn btn-success" id="formSubmit">Vygenerovat dokument se stížností</button>
             </div>
         </div>
     </div>
@@ -162,23 +163,42 @@
         <div class="card-body">
             <h5 class="card-title">Zde najdete vygenerované soubory ke stažení</h5>
             <div class="mx-auto">
-                <button class="btn btn-info collapse" id="downloadAudio" onclick="downloadMP3()">Stáhnout záznam</button>
+                <button class="btn btn-info collapse" id="downloadAudio" onclick="downloadMP3()">Stáhnout záznam hovoru</button>
                 <br />
-                <a class="btn btn-info collapse" id="downloadPdf">Stáhnout pdf</a>
+                <a class="btn btn-info collapse" id="downloadPdf">Stáhnout stížnost jako PDF</a>
             </div>
 
             <p>
-                Připravené soubory si stáhněte na disk a pošlete je v příloze úřadu jedním z následujících způsobů. V předmětu zprávy také uveďte, že jde o <strong>Podání stížnosti na nevyžádaný marketingový hovor</strong>
+                Připravené soubory si stáhněte na disk a pošlete je v příloze úřadu jedním z následujících způsobů:
             </p>
             <ul>
-                <li>Emailem na podatelna@ctu.cz</li>
-                <li>Datovou schránkou na a9qaats</li>
+                <li>Emailem na <code>podatelna@ctu.cz</code></li>
+                <li>nebo datovou schránkou na <code>a9qaats</code></li>
             </ul>
-
+            <p>
+                V předmětu zprávy také uveďte, že jde o <code>Podání stížnosti na nevyžádaný marketingový hovor</code>.
+            </p>
         </div>
     </div>
 </div>
+<div class="card mb-3">
+    <h5 class="card-header">Jak pracujeme s údaji z formuláře?</h5>
+    <div class="col-sm-9 col-xl-10">
+        <div class="card-body">
+            <p>
+                <ul>
+                    <li>Zvukový záznam vzniká <b>pouze na vašem počítači</b> a nikdy ho neposíláme na náš ani jakýkoliv cizí server.</li>
+                    <li>
+                        Údaje z formuláře (o volajícím a vaše kontaktní údaje) zasíláme pouze na náš server <b>pouze pro potřebu vygenerování PDF se stížností</b>
+                        a informace s vašimi kontaktními údaji neukládáme.
+                    </li>
+                    <li>Údaje o volajícím ukládáme pouze pro statistické účely a nejsou jakkoliv spojeny s informacemi o vás.</li>
+                </ul>
+            </p>
+        </div>
 
+    </div>
+</div>
 
 <script>
     let mediaRecorder;
