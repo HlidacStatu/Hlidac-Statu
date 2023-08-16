@@ -214,7 +214,8 @@
     let mediaRecorder;
     let audioChunks = [];
     let mp3Blob;
-    let audioBlob
+    let audioBlob;
+    let audioStream;
 
     async function startRecording() {
         $('#stopRecording').collapse('show');
@@ -223,9 +224,9 @@
         $('#downloadAudio').collapse('hide');
         //$('.onRecordingTrigger').collapse('toggle');
 
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         const options = { audioBitsPerSecond: 68000 };
-        mediaRecorder = new MediaRecorder(stream, options);
+        mediaRecorder = new MediaRecorder(audioStream, options);
         mediaRecorder.ondataavailable = event => {
             audioChunks.push(event.data);
         };
@@ -246,6 +247,9 @@
         $('#downloadAudio').collapse('show');
         if (mediaRecorder) {
             mediaRecorder.stop();
+        }
+        if (audioStream) {
+            audioStream.getTracks().forEach(track => track.stop());
         }
     }
   
