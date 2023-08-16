@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Podání";
+    ViewBag.Title = "Stížnost na nevyžádaný marketingový hovor";
     var currentTime = DateTime.Now;
 }
 
@@ -13,26 +13,28 @@
     </ol>
 }
 
-<h3>Jednotlivá podání, která můžete učinit přes vašeho oblíbeného Hlídače státu</h3>
+<h4>Průvodce nahráním a sepsáním stížnosti na nevyžádaný marketingový hovor</h4>
 
-<p>Pokud nevíte jak postupovat s vyplněním žádosti, můžete se podívat na náš <a href="/podani/obtezujiciHovorNavod">návod</a></p>
+<p>Detailní postup najdete v našem <a href="/podani/obtezujiciHovorNavod">návodu</a>, ale formulář vás celým sepsáním stížnosti provede.</p>
 
 <div class="card mb-3">
     <h5 class="card-header">Nahrávání záznamu</h5>
     <div class="col-sm-9 col-xl-10">
         <div class="card-body">
             <div class="collapse show">
-                <h5 class="card-title">Pro úspěšné a účinné vyřízení žádosti je nejlepší nahrát záznam hovoru</h5>
+                <p class="card-title fs-6">
+                    Pro úspěšné a účinné vyřízení žádosti <b>je nejlepší nahrát záznam hovoru</b>.
+                    Většina telefonů neumožňuje hovor nahrát přímo na telefonu, proto můžete hovor nahrát na mikrofon vašeho počítače nebo notebooku.
+                </p>
                 @* <h6 class="card-subtitle mb-2 text-warning"></h6> *@
-                <div class="p-2 text-warning-emphasis bg-warning-subtle border border-warning-subtle rounded-3 fs-6">
-                    Nezapomeňte svůj telefon dát na hlasitý odposlech a položit ho co nejblíže k počítači
+                <div class="p-2 text-warning-emphasis bg-warning-subtle border border-warning-subtle rounded-3 fs-6 mb-3">
+                    Dejte telefon na hlasitý odposlech a držte ho poblíž notebooku nebo mikrofonu (či webkamery) připojeného k počítači a zmáčněte červené tlačítko <code>Začít nahrávat</code>.
                 </div>
             </div>
-            <h6 class="card-subtitle mb-2 text-muted collapse hide audioInfoTrigger">Nahraný soubor ke stažení najdete níže.</h6>
-            <h5 class="text-danger collapse hide onRecordingTrigger">Nezapomeňte svůj telefon dát na hlasitý odposlech a položit ho co nejblíže k počítači</h5>
             <div class="mx-auto">
                 <button class="btn btn-danger collapse show" id="startRecording" onclick="startRecording()"><i class="fa-duotone fa-microphone-lines fa-beat fa-lg"></i> Začít nahrávat</button>
-                <button class="btn btn-warning collapse" id="stopRecording" onclick="stopRecording()">Vypnout nahrávání <i class="fa-duotone fa-microphone-lines" style="--fa-primary-color: #0ba800;"></i></button>
+                <button class="btn btn-warning collapse" id="stopRecording" onclick="stopRecording()"><i class="fa-duotone fa-microphone-lines fa-beat fa-lg" style="color:red"></i> Vypnout nahrávání</button>
+                <div class="alert alert-success collapse hide audioInfoTrigger" role="alert">Nahraný soubor ke stažení najdete níže na stránce.</div>
                 @* <button class="btn btn-info collapse" id="downloadAudio" onclick="downloadMP3()">Stáhnout záznam</button> *@
                 <p>
                     Volajícího nemusíte upozornit ani žádat o souhlas, že si tento hovor nahráváte.
@@ -47,8 +49,7 @@
         <h5 class="card-header">Informace o hovoru</h5>
         <div class="col-sm-9 col-xl-10">
             <div class="card-body">
-                <h5 class="card-title">Dále je potřeba vyplnit tyto informace</h5>
-                <p class="lead"></p>
+                <h5 class="card-title">Během hovoru nebo po něm vyplňte informace o volajícím do formuláře</h5>
                 <div class="bs-callout warning">
                     <h4>Jak se zeptat během hovoru na údaje do formuláře?</h4>
                     <p>
@@ -57,10 +58,12 @@
                             <li>"A jaké je Vaše jméno?"</li>
                             <li>"Z jakého důvodu mi, prosím, voláte?"</li>
                             <li>"Kdy jsem Vám dal/a souhlas, že mě můžete kontaktovat?"</li>
-                            <li>"Už mi prosím nevolejte, děkuji a nashledanou."</li>
+                            <li>"Už mi nevolejte, nedal jsem vam nikdy souhlas a nepřeji si být obtěžován, děkuji a nashledanou."</li>
                         </ol>
                     </p>
                 </div>
+
+                <h5>Informace o hovoru</h5>
                 <div class="mx-auto">
                     <div class="form-floating">
                         <input type="text" id="volajiciSpolecnost" name="volajiciSpolecnost"
@@ -121,7 +124,13 @@
         <h5 class="card-header">Informace o mně</h5>
         <div class="col-sm-9 col-xl-10">
             <div class="card-body">
-                <h5 class="card-title">Dále je potřeba vyplnit informace o Vás, jako stěžovateli.</h5>
+                <p>
+                    <h5 class="card-title">Vyplňte informace o Vás, jako stěžovateli a vše pro vygenerování stížnosti je hotovo. Pokud jste ještě nevypnuli nahrávání hovoru, zastavte nahrávání tlačítem <code>Vypnout nahrávání</code></h5>
+
+                    <button class="btn btn-warning collapse" id="stopRecording2" onclick="stopRecording()"><i class="fa-duotone fa-microphone-lines fa-beat fa-lg" style="color:red"></i> Vypnout nahrávání</button>
+                    <div class="alert alert-success collapse hide audioInfoTrigger" role="alert">Nahraný soubor ke stažení najdete níže na stránce.</div>
+
+                </p>
                 <div class="mx-auto">
                     <div class="form-floating">
                         <input type="text" id="jmeno" name="jmeno"
@@ -158,18 +167,18 @@
 </form>
 
 <div class="card mb-3">
-    <h5 class="card-header">Ke stažení</h5>
+    <h5 class="card-header">Odeslání stížnosti</h5>
     <div class="col-sm-9 col-xl-10">
         <div class="card-body">
             <h5 class="card-title">Zde najdete vygenerované soubory ke stažení</h5>
             <div class="mx-auto">
-                <button class="btn btn-info collapse" id="downloadAudio" onclick="downloadMP3()">Stáhnout záznam hovoru</button>
-                <br />
+                <button class="btn btn-info collapse me-3" id="downloadAudio" onclick="downloadMP3()"><i class="fa-kit fa-regular-circle-microphone-circle-arrow-down fa-lg"></i>&nbsp;Stáhnout záznam hovoru</button>
+
                 <a class="btn btn-info collapse" id="downloadPdf">Stáhnout stížnost jako PDF</a>
             </div>
 
             <p>
-                Připravené soubory si stáhněte na disk a pošlete je v příloze úřadu jedním z následujících způsobů:
+                Připravené dokumenty (PDF a případně zvukový záznam) si stáhněte na disk a pošlete je v příloze úřadu jedním z následujících způsobů:
             </p>
             <ul>
                 <li>Emailem na <code>podatelna@ctu.cz</code></li>
@@ -208,6 +217,7 @@
 
     async function startRecording() {
         $('#stopRecording').collapse('show');
+        $('#stopRecording2').collapse('show');
         $('#onRecordingTrigger').collapse('show');
         $('#startRecording').collapse('hide');
         $('#downloadAudio').collapse('hide');
@@ -227,6 +237,7 @@
 
     function stopRecording() {
         $('#stopRecording').collapse('hide');
+        $('#stopRecording2').collapse('hide');
         $('#onRecordingTrigger').collapse('hide');
         $('#startRecording').collapse('show');
         $('#startRecording').text('Začít znovu nahrávat (přepíše se poslední záznam)');
