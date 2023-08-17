@@ -160,6 +160,9 @@ namespace HlidacStatu.Entities.XSD {
         public string predmet;
         
         /// <remarks/>
+        public string cenaNeuvedena;
+        
+        /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(DataType="date")]
         public System.DateTime datumUzavreni;
         

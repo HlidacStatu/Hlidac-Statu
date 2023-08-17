@@ -42,6 +42,7 @@ namespace HlidacStatu.Entities
 
             navazanyZaznam = item.smlouva.navazanyZaznam;
             predmet = item.smlouva.predmet;
+            DuvodNeuvedeniCeny = item.smlouva.cenaNeuvedena;
             schvalil = item.smlouva.schvalil;
 
 
@@ -215,6 +216,10 @@ namespace HlidacStatu.Entities
 
         [Text]
         public string predmet { get; set; }
+        
+        [Text]
+        public string DuvodNeuvedeniCeny { get; set; }
+
 
         public Subjekt[] Prijemce { get; set; }
         public Priloha[] Prilohy { get; set; }
