@@ -3,6 +3,7 @@
 @using System.Text.Json
 @using System.Web
 @using HlidacStatu.Extensions
+@using HlidacStatu.Lib.Analysis.KorupcniRiziko
 @using HlidacStatu.Repositories
 @using HlidacStatu.Util
 @using Microsoft.AspNetCore.Http
@@ -119,7 +120,16 @@
                             </div>
                             <div class="hs-autocomplete-description">
 
-                                <h6 class="fw-bold">@context.Text</h6>
+                                <h6 class="fw-bold">
+                                    @if (!string.IsNullOrWhiteSpace(context.KIndex))
+                                    {
+                                        if (Enum.TryParse<KIndexData.KIndexLabelValues>(context.KIndex, out var KindexLabel))
+                                        {
+                                            @((MarkupString)KIndexData.KindexImageIcon(KindexLabel, "height: 20px; vertical-align: text-bottom; margin-right: 5px;"))
+                                        }
+                                    }
+                                    @context.Text
+                                </h6>
                                 <small>@context.Description</small>
                                 <br/>
                                 <small class="text-muted">
