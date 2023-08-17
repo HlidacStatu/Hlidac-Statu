@@ -209,7 +209,7 @@
                         Name = "Počet smluv",
                         HtmlRender = (m) =>
                         {
-                            return HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet);
+                            return $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.Key)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}";
                         },
                         OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
                         CssClass = "number"
@@ -310,7 +310,8 @@
                 Name = "Počet smluv",
                 HtmlRender = (m) =>
             {
-                return HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet);
+
+                return $"<a style='float:left' href='/hledatSmlouvy?q={System.Net.WebUtility.UrlEncode(Model.Query + " AND ico:" + m.Key)}'><i class='fas fa-link' aria-hidden='true'></i></a> {HlidacStatu.Util.RenderData.NiceNumber(m.Value.Pocet)}";
             },
                 OrderValueRender = (m) => HlidacStatu.Util.RenderData.OrderValueFormat(m.Value.Pocet),
                 CssClass = "number"
@@ -328,7 +329,7 @@
                 );
 
 
-                rdsDodav.AddRows(topZadavatele.Select(m => new KeyValuePair<string, SimpleStat>(m.ICO, m.Summary())));
+                rdsZadav.AddRows(topZadavatele.Select(m => new KeyValuePair<string, SimpleStat>(m.ICO, m.Summary())));
             }
             @Html.DataToHTMLTable(rdsZadav, dataTableOptions: HtmlExtensions.DatatableOptions(orderColumnIdx:2, orderDirection:"desc"))
     </p>
