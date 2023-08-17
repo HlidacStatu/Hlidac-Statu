@@ -91,6 +91,13 @@ $(document).ready(function(){
         $('#kindexDisclaimerPopupfbForm').modal('show');
     }
 
+    var urihash = window.location.hash;
+    if (urihash) {
+                $('html,body').animate({ scrollTop: $(urihash).offset().top }, 500);
+                $(urihash).click();
+    }
+
+
 });
     function showHelp(btn, id) {
         var visible = $(btn).text().includes('@Html.Raw(ukazatTxt)');
@@ -198,7 +205,7 @@ else
             ViewBag.ICO = Model.id;
             ViewBag.FutureData = futureData;
             ViewBag.SelectedYear = ViewBag.SelectedYear;
-            <partial name="Partials/Detail_child" model="@kidx"/>
+                        <partial name="Partials/Detail_child" model="@kidx"/>
         }
 
     </cache>

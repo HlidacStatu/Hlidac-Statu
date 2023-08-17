@@ -170,7 +170,7 @@ Highcharts.chart('" + containerId + @"', {
             //https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/pie-semi-circle
             string containerId = "chart_" + Guid.NewGuid().ToString("N");
             string sdata = data
-                .Select(m => $"['{m.Item1}',{m.Item2.ToString(HlidacStatu.Util.Consts.enCulture)}]")
+                .Select(m => $"['{m.Item1.Replace("'","\'")}',{m.Item2.ToString(HlidacStatu.Util.Consts.enCulture)}]")
                 .Aggregate((f, s) => f + "," + s);
 
             var sb = @"

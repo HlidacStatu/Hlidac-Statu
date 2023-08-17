@@ -558,7 +558,7 @@ else
                         <td style="font-size:15px;">
                             @radek.VelicinaLongName
                             <small>
-                                <a href="#detail_@((KIndexData.KIndexParts) radek.Velicina)" onclick="showHelp(this,'#detail_@(radek.Velicina)');return false;">@ukazatTxt</a>
+                                <a href="#detail_@((KIndexData.KIndexParts) radek.Velicina)" id="detail_@((KIndexData.KIndexParts)radek.Velicina)" onclick="showHelp(this,'#detail_@(radek.Velicina)');return false;">@ukazatTxt</a>
                             </small>
                         </td>
                         <td style="text-align:right;font-size: 15px;vertical-align: top; color: @(KIndexData.KIndexLabelColor(KIndexData.DetailInfo.KIndexLabelForPart((KIndexData.KIndexParts) radek.Velicina, radek.Hodnota)))">
