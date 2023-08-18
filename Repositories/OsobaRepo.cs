@@ -617,7 +617,8 @@ namespace HlidacStatu.Repositories
                     return GetByEvent(e =>
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
                             && e.AddInfo.ToLower().StartsWith("ministr")
-                            && e.Organizace.ToLower().StartsWith("ministerstvo")
+                            && (e.Organizace.ToLower().StartsWith("ministerstvo")
+                                || e.Ico.Trim() == "00006599")
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
