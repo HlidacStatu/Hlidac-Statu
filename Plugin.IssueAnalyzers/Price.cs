@@ -89,6 +89,11 @@ namespace HlidacStatu.Plugin.IssueAnalyzers
                     issues.Add(
                         new Issue(this, (int)IssueType.IssueTypes.Nulova_hodnota_smlouvy_ostatni, "Nulová hodnota smlouvy", "Smlouva nemá v metadatech uvedenu cenu. Utajení hodnoty smlouvy je možné pouze v odůvodněných případech, což při této kontrole nehodnotíme. Tuto smlouvu jsme identifikovali jako ukončení smlouvy, kde je nulová hodnota smlouvy možná.")
                         );
+                else if (string.IsNullOrWhiteSpace(item.cenaNeuvedenaDuvod) != false )
+                    issues.Add(
+                        new Issue(this, (int)IssueType.IssueTypes.Nulova_hodnota_smlouvy_oduvodneno, "Nulová hodnota smlouvy", $"Smlouva nemá v metadatech uvedenu cenu. Zveřejňovatel smlouvy uvedl tento důvod: '{item.cenaNeuvedenaDuvod}'.")
+                    );
+
                 else
                     issues.Add(
                     new Issue(this, (int)IssueType.IssueTypes.Nulova_hodnota_smlouvy, "Nulová hodnota smlouvy", "Smlouva nemá v metadatech uvedenu cenu. Utajení hodnoty smlouvy je možné pouze v odůvodněných případech, což při této kontrole nehodnotíme.")

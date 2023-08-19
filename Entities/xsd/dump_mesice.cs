@@ -158,8 +158,9 @@ namespace HlidacStatu.Entities.XSD {
         
         /// <remarks/>
         public string predmet;
-        
+
         /// <remarks/>
+        /// Důvod neuvedení nebo skrytí ceny
         public string cenaNeuvedena;
         
         /// <remarks/>
@@ -192,6 +193,10 @@ namespace HlidacStatu.Entities.XSD {
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(DataType="integer")]
         public string navazanyZaznam;
+
+        /// <remarks/> XSD_1.6
+        /// Znepřístupnit předchozí verzi záznamu 1 - Ano, 0 - Ne</xs:documentation>
+        public bool? znepristupnitPredchoziZaznam;
     }
     
     /// <remarks/>
@@ -219,12 +224,17 @@ namespace HlidacStatu.Entities.XSD {
         
         /// <remarks/>
         public bool? platce;
-        
+
+        /// <remarks/> XSD_1.6
+        ///  Identifikace smluvní strany
+        /// FO, PFO, PO, OVM, ZFO (zahr.FO), ZPO (zahr.PO)
+        public string identifikace;
+
         ///// <remarks/>
         //[System.Xml.Serialization.XmlIgnoreAttribute()]
         //public bool platceSpecified;
     }
-    
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
     [System.SerializableAttribute()]
@@ -250,12 +260,17 @@ namespace HlidacStatu.Entities.XSD {
         
         /// <remarks/>
         public bool? prijemce;
-        
+
+        /// <remarks/> XSD_1.6
+        ///  Identifikace smluvní strany
+		/// FO, PFO, PO, OVM, ZFO (zahr.FO), ZPO (zahr.PO)
+        public string identifikace;
+
         ///// <remarks/>
         //[System.Xml.Serialization.XmlIgnoreAttribute()]
         //public bool prijemceSpecified;
     }
-    
+
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
     [System.SerializableAttribute()]

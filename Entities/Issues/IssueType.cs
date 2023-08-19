@@ -43,6 +43,7 @@ namespace HlidacStatu.Entities.Issues
             Neplatna_cena_vypocetDPH = 107,
             Nulova_hodnota_smlouvy_u_dodatku = 108,
             Nulova_hodnota_smlouvy_ostatni = 109,
+            Nulova_hodnota_smlouvy_oduvodneno = 110,
 
             NecitelnostSmlouvy = 200,
 
@@ -89,6 +90,7 @@ namespace HlidacStatu.Entities.Issues
                     case IssueTypes.Zaporna_cena_s_DPH:
                     case IssueTypes.Nulova_hodnota_smlouvy_u_dodatku:
                     case IssueTypes.Nulova_hodnota_smlouvy_ostatni:
+                    case IssueTypes.Nulova_hodnota_smlouvy_oduvodneno:
                     case IssueTypes.SmlouvaZverejnenaPozde_DodatekVynutilPublikaci:
                     case IssueTypes.SmlouvaZverejnenaPozde30dni_NemuselaBytZverejnena:
                     case IssueTypes.SmlouvaZverejnenaPozde3Mesice_NemuselaBytZverejnena:

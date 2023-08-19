@@ -18,6 +18,7 @@ namespace HlidacStatu.Entities
                 ico = s.ico;
                 nazev = s.nazev;
                 utvar = s.utvar;
+                identifikace = s.identifikace;
             }
 
             public Subjekt(tSmlouvaSubjekt s)
@@ -27,6 +28,7 @@ namespace HlidacStatu.Entities
                 ico = s.ico;
                 nazev = s.nazev;
                 utvar = s.utvar;
+                identifikace = s.identifikace;
             }
 
             public string adresa { get; set; }
@@ -40,6 +42,35 @@ namespace HlidacStatu.Entities
             public string nazev { get; set; }
             [Keyword()]
             public string utvar { get; set; }
+
+            ///  Identifikace smluvní strany
+            /// FO, PFO, PO, OVM, ZFO (zahr.FO), ZPO (zahr.PO)
+            [Keyword()]
+            public string identifikace { get; set; }
+
+            public string IdentifikaceFull()
+            {
+                switch (this.identifikace.ToLowerInvariant())
+                {
+                    case "fo":
+                        return "fyzická osoba";
+                    case "pfo":
+                        return "podnikatel";
+                    case "po":
+                        return "právnická osoba";
+                    case "ovm":
+                        return "orgán veřejné moci";
+                    case "zfo":
+                        return "zahraniční fyzická osoba";
+                    case "zpo":
+                        return "zahraniční právnická osoba";
+                    default:
+                        return string.Empty;
+                        break;
+                }
+
+
+            }
         }
     }
 }

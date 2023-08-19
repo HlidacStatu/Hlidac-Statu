@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Policy;
 
 namespace HlidacStatu.Entities
@@ -40,11 +41,12 @@ namespace HlidacStatu.Entities
             hodnotaBezDph = item.smlouva.hodnotaBezDphSpecified ? item.smlouva.hodnotaBezDph : (decimal?)null;
             hodnotaVcetneDph = item.smlouva.hodnotaVcetneDphSpecified ? item.smlouva.hodnotaVcetneDph : (decimal?)null;
 
-            navazanyZaznam = item.smlouva.navazanyZaznam;
             predmet = item.smlouva.predmet;
-            DuvodNeuvedeniCeny = item.smlouva.cenaNeuvedena;
             schvalil = item.smlouva.schvalil;
 
+            navazanyZaznam = item.smlouva.navazanyZaznam;
+            znepristupnitPredchoziZaznam = item.smlouva.znepristupnitPredchoziZaznam ?? false;
+            cenaNeuvedenaDuvod = item.smlouva.cenaNeuvedena;
 
             //smluvni strany
 
@@ -187,6 +189,11 @@ namespace HlidacStatu.Entities
         [Keyword]
         public string navazanyZaznam { get; set; }
 
+        [Nest.Boolean]
+        public bool znepristupnitPredchoziZaznam { get; set; } = false;
+
+        public string cenaNeuvedenaDuvod { get; set; } = null;
+
         [Keyword]
         public string odkaz { get; set; }
         public Subjekt Platce { get; set; }
@@ -217,9 +224,6 @@ namespace HlidacStatu.Entities
         [Text]
         public string predmet { get; set; }
         
-        [Text]
-        public string DuvodNeuvedeniCeny { get; set; }
-
 
         public Subjekt[] Prijemce { get; set; }
         public Priloha[] Prilohy { get; set; }
