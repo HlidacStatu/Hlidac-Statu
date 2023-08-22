@@ -490,13 +490,14 @@ namespace HlidacStatu.Extensions
                         prvniStrana =
                             FirmaRepo.FromIco(strany[0])
                                 .Jmeno;
-
-                    f.Add(new InfoFact($"{osoba.FullName()} "
+                    
+                    f.Add(new InfoFact($"{osoba.FullName()} byl{(osoba.Muz() ? "" : "a")}"
+                                       + $" členem statutárního orgánu společnosti, která " 
                                        + Plural.Get(roky.Count(), "v roce " + roky[0],
                                            $"mezi roky {roky.First()} - {roky.Last() - 2000}",
                                            $"mezi roky {roky.First()} - {roky.Last() - 2000}")
-                                       + $" nepřímo sponzoroval{(osoba.Muz() ? "" : "a")} jako člen statutárního orgánu " +
-                                       Plural.Get(strany.Length, "stranu " + prvniStrana,
+                                       + $" sponzorovala "
+                                       + Plural.Get(strany.Length, "stranu " + prvniStrana,
                                            "{0} polit. strany", "{0} polit. stran")
                                        + $" v&nbsp;celkové výši <b>{RenderData.ShortNicePrice(celkem, html: true)}</b>. "
                                        + $"Nejvyšší sponzorský dar byl ve výši {RenderData.ShortNicePrice(top, html: true)}. "
