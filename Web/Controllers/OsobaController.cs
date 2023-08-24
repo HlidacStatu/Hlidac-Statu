@@ -53,6 +53,22 @@ namespace HlidacStatu.Web.Controllers
 
             return result;
         }
+        
+        public ActionResult SponzoringDetail(string id, int rok)
+        {
+            if (rok == 0)
+                return RedirectToAction(nameof(Sponzoring));
+
+            ViewBag.Rok = rok;
+            if (TryGetOsoba(id, out var osoba, out var result))
+            {
+                (Osoba osoba, string viewName, string title) model = (osoba, "SponzoringDetail", $"{osoba.FullName()} - Sponzoring politických stran");
+                return View("_osobaLayout", model);
+            }
+
+            return result;
+        }
+        
         public ActionResult DalsiDatabaze(string id)
         {
             if (TryGetOsoba(id, out var osoba, out var result))

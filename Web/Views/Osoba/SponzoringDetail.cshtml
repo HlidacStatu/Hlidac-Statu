@@ -12,20 +12,18 @@
 @* První sloupec *@
 <div class="col-sm-7 col-xs-12 order-1">
     <p class="text-muted sub-header-info">
-        Souhrnný přehled finančních a nefinančních podpor politickým stranám. Podpory větší než 5000 Kč zobrazujeme po dobu 10 let, menší podpory po dobu 5 let.
+        Přehled jednotlivých finančních a nefinančních podpor politickým stranám. Podpory větší než 5000 Kč zobrazujeme po dobu 10 let, menší podpory po dobu 5 let.
     </p>
     
     @{
         var sponzoring = Model.Sponzoring()
             .Where(m => m.Typ != (int)Sponzoring.TypDaru.DarFirmy)
-            .GroupBy(s => (rok: s.DarovanoDne?.Year ?? 0, ico: s.IcoPrijemce),
-            (key, val) => (Rok: key.rok, Ico: key.ico, Dar: val.Sum(x => x.Hodnota ?? 0)))
+            .Where(m => m.DarovanoDne?.Year == ViewBag.Rok)
             .ToList();
 
         var sponzoringFirma = Model.Sponzoring()
             .Where(m => m.Typ == (int)Sponzoring.TypDaru.DarFirmy)
-            .GroupBy(s => (rok: s.DarovanoDne?.Year ?? 0, ico: s.IcoPrijemce, Darceico: s.IcoDarce),
-            (key, val) => (Rok: key.rok, Ico: key.ico, Darceico: key.Darceico, Dar: val.Sum(x => x.Hodnota ?? 0)))
+            .Where(m => m.DarovanoDne?.Year == ViewBag.Rok)
             .ToList();
         
         var sponzoringData = new ReportDataSource<(int Rok, string Ico, decimal Dar)>(
@@ -35,7 +33,7 @@
                 {
                     Name = "Rok",
                     CssClass = "number",
-                    HtmlRender = (x) => $"<a href=\"/Osoba/SponzoringDetail/{Model.NameId}?rok={x.Rok.ToString()}\">{x.Rok.ToString()}</a>" ,
+                    HtmlRender = (x) => x.Rok.ToString(),
                     TextRender = (x) => x.Rok.ToString()
                 },
                 new ReportDataSource<(int Rok, string Ico, decimal Dar)>.Column()
@@ -53,11 +51,11 @@
                     CssClass = "number"
                 },
             });
-        foreach (var dar in sponzoring.OrderByDescending(m => m.Rok))
+        foreach (var dar in sponzoring)
         {
-            sponzoringData.AddRow(dar);
+            sponzoringData.AddRow((dar.DarovanoDne?.Year ?? 0,  dar.IcoPrijemce, dar.Hodnota ?? 0));
         }
-        sponzoringData.Title = "Přehled souhrných darů politickým stranám";
+        sponzoringData.Title = "Přehled jednotlivých darů politickým stranám";
     }
     @if (sponzoring.Count > 0)
     {
@@ -111,9 +109,9 @@
                     CssClass = "number"
                 }
             });
-        foreach (var dar in sponzoringFirma.OrderByDescending(m => m.Rok))
+        foreach (var dar in sponzoringFirma)
         {
-            sponzoringFirmyData.AddRow(dar);
+            sponzoringFirmyData.AddRow((dar.DarovanoDne?.Year ?? 0, dar.IcoPrijemce, dar.IcoDarce, dar.Hodnota ?? 0));
         }
         <hr />
         <div>
@@ -122,4 +120,5 @@
         </div>
     }
 
+    <a href="@($"/Osoba/Sponzoring/{Model.NameId}")">Zpět na souhrn</a>
 </div>
