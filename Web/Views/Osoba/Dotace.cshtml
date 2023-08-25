@@ -50,7 +50,7 @@
                 },
                 new()
                 {
-                    Name = "Počet poskytnutých dotací v době působení ve vedení",
+                    Name = "<span data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"Za období působení ve statutárních orgánech společnosti\">Počet poskytnutých dotací v době působení ve firmě</span>",
                     TextRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.pocetStatutar)}",
                     HtmlRender = (x) => $"{HlidacStatu.Util.RenderData.NiceNumber(x.pocetStatutar)}",
                     OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.pocetStatutar),
@@ -58,7 +58,7 @@
                 },
                 new()
                 {
-                    Name = "Souhrnná výše poskytnutých dotací v době působení ve vedení",
+                    Name = "<span data-bs-toggle=\"tooltip\" data-bs-placement=\"top\" title=\"Za období působení ve statutárních orgánech společnosti\">Souhrnná výše poskytnutých dotací v době působení ve firmě</span>",
                     TextRender = (x) => $"{HlidacStatu.Util.RenderData.NicePriceHtml(x.sumStatutar)}",
                     HtmlRender = (x) => $"{HlidacStatu.Util.RenderData.NicePriceHtml(x.sumStatutar)}",
                     OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.sumStatutar),
