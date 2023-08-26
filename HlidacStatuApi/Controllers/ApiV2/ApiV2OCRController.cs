@@ -25,6 +25,32 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
         [HttpGet("Get")]
+        public async Task<ActionResult<HlidacStatu.DS.Api.OcrWork.Task>> GetTask()
+        {
+            CheckRoleRecord(this.User.Identity.Name);
+
+            demoswitcher = !demoswitcher;
+            if (demoswitcher)
+                return new HlidacStatu.DS.Api.OcrWork.Task()
+                {
+                    parentDocId = "0",
+                    prilohaId = "00",
+                    type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva,
+                    url = "http://zapisnikzmizeleho.cz/wp-content/themes/zapisnikz1.1/img-zapisnik/velikonocni-festival-brno-2011-04/stabat-mater-program.gif"
+                };
+            else
+                return new HlidacStatu.DS.Api.OcrWork.Task()
+                {
+                    parentDocId = "1",
+                    prilohaId = "1",
+                    type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva,
+                    url = "https://www.hlidacstatu.cz/KopiePrilohy/4288264?hash=d702c02db57b151eb685c7923d673b3709710b01f1e0050add51d8d1569189a9"
+                };
+
+        }
+        [ApiExplorerSettings(IgnoreApi = true)]
+        //[Authorize(Roles = "blurredAPIAccess")]
+        [HttpGet("Get")]
         public async Task<ActionResult<HlidacStatu.DS.Api.OcrWork.Task[]>> GetMore(int numberOfTasks)
         {
             CheckRoleRecord(this.User.Identity.Name);
