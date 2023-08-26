@@ -78,7 +78,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
         [HttpPost("Save")]
-        public async Task<ActionResult> Save([FromBody] HlidacStatu.DS.Api.OcrWork.Task data)
+        public async Task<ActionResult> Save([FromBody] HlidacStatu.DS.Api.OcrWork.Result data)
         {
             CheckRoleRecord(this.User.Identity.Name);
 
