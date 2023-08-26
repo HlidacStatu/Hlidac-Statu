@@ -50,7 +50,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
         [ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
-        [HttpGet("Get")]
+        [HttpGet("GetMore")]
         public async Task<ActionResult<HlidacStatu.DS.Api.OcrWork.Task[]>> GetMore(int numberOfTasks)
         {
             CheckRoleRecord(this.User.Identity.Name);
