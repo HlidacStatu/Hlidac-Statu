@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace HlidacStatu.DS.Api
 {
-    public partial class OCR
+    public partial class OcrWork
     {
         public static string OCRProcessingQueueName = "blurredPage2Process";
     }
