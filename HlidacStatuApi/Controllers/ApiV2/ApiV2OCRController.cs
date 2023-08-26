@@ -1,4 +1,7 @@
-﻿using HlidacStatu.Entities;
+﻿using Devmasters.Collections;
+using HlidacStatu.Entities;
+using HlidacStatu.Entities.Enhancers;
+using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Data;
@@ -33,6 +36,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             if (demoswitcher)
                 return new HlidacStatu.DS.Api.OcrWork.Task()
                 {
+                    taskId="0",
                     parentDocId = "0",
                     prilohaId = "00",
                     type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva,
@@ -42,6 +46,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             else
                 return new HlidacStatu.DS.Api.OcrWork.Task()
                 {
+                    taskId = "00",
                     parentDocId = "1",
                     prilohaId = "1",
                     type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva,
@@ -78,12 +83,115 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
         [HttpPost("Save")]
-        public async Task<ActionResult> Save([FromBody] HlidacStatu.DS.Api.OcrWork.Result data)
+        public async Task<ActionResult> Save([FromBody] HlidacStatu.DS.Api.OcrWork.Result res)
         {
             CheckRoleRecord(this.User.Identity.Name);
+            if (res.Task.type == HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva)
+            {
+                return await _saveSmlouva(res);
+            }
+            return StatusCode(200);
+        }
 
-            //await HlidacStatu.Lib.Data.External.Tables.TablesInDocs.Minion.SaveFinishedTaskAsync(data);
+        private async Task<ActionResult> _saveSmlouva(HlidacStatu.DS.Api.OcrWork.Result res)
+        {
+            List<Smlouva.Priloha> newPrilohy = new List<Smlouva.Priloha>();
+            bool changed = false;
+            if (res.IsValid == HlidacStatu.DS.Api.OcrWork.Result.ResultStatus.Valid)
+            {
+                var sml = await SmlouvaRepo.LoadAsync(res.Task.parentDocId);
+                if (sml == null)
+                    return StatusCode(404);
+                var attIdx = sml.Prilohy
+                        .Select((pr, i) => new { i, pr })
+                        .Where(m => m.pr.UniqueHash() == res.Task.prilohaId)
+                        .FirstOrDefault();
+                if (attIdx == null)
+                    return StatusCode(404);
+                int i = attIdx.i;
+                Smlouva.Priloha att = attIdx.pr;
+                if (res.Documents.Count > 1)
+                {
+                    //first
+                    att.PlainTextContent = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(res.Documents[0].Text);
+                    if (res.Documents[0].UsedOCR)
+                        att.PlainTextContentQuality = DataQualityEnum.Estimated;
+                    else
+                        att.PlainTextContentQuality = DataQualityEnum.Parsed;
 
+                    att.ContentType = res.Documents[0].ContentType;
+
+                    att.UpdateStatistics(sml);
+
+                    att.LastUpdate = DateTime.Now;
+
+                    if (att.EnoughExtractedText)
+                    {
+                        if (att.PlainTextContentQuality == DataQualityEnum.Estimated)
+                            sml.Enhancements = sml.Enhancements.AddOrUpdate(new Enhancement("Text přílohy extrahován z OCR dokumentu ", "", "item.Prilohy[" + i.ToString() + "].PlainTextContent", "", "", "FullOcrMinion"));
+                        else
+                            sml.Enhancements = sml.Enhancements.AddOrUpdate(new Enhancement("Text přílohy extrahován z obsahu dokumentu ", "", "item.Prilohy[" + i.ToString() + "].PlainTextContent", "", "", "FullOcrMinion"));
+                    }
+
+                    for (int ii = 1; ii < res.Documents.Count; ii++)
+                    {
+
+                        var att1 = new Smlouva.Priloha();
+                        att1.PlainTextContent = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(res.Documents[ii].Text);
+                        if (res.Documents[ii].UsedOCR)
+                            att1.PlainTextContentQuality = DataQualityEnum.Estimated;
+                        else
+                            att1.PlainTextContentQuality = DataQualityEnum.Parsed;
+
+                        att1.ContentType = res.Documents[ii].ContentType;
+                        att1.odkaz = att.odkaz + "#num" + ii;
+                        att1.UpdateStatistics(sml);
+
+                        att1.LastUpdate = DateTime.Now;
+
+                        if (att1.EnoughExtractedText)
+                        {
+                            if (att1.PlainTextContentQuality == DataQualityEnum.Estimated)
+                                sml.Enhancements = sml.Enhancements.AddOrUpdate(new Enhancement("Text přílohy extrahován z OCR dokumentu ", "", "item.Prilohy[" + (sml.Prilohy.Count() + ii).ToString() + "].PlainTextContent", "", "", "FullOcrMinion"));
+                            else
+                                sml.Enhancements = sml.Enhancements.AddOrUpdate(new Enhancement("Text přílohy extrahován z obsahu dokumentu ", "", "item.Prilohy[" + (sml.Prilohy.Count() + ii).ToString() + "].PlainTextContent", "", "", "FullOcrMinion"));
+
+                        }
+                        newPrilohy.Add(att1);
+                        changed = true;
+                    }
+                    //others
+
+                } //docs.count > 1
+                else if (res.Documents.Count == 1)
+                {
+                    att.PlainTextContent = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(res.Documents[0].Text);
+                    if (res.Documents[0].UsedOCR)
+                        att.PlainTextContentQuality = DataQualityEnum.Estimated;
+                    else
+                        att.PlainTextContentQuality = DataQualityEnum.Parsed;
+                    att.ContentType = res.Documents[0].ContentType;
+                    att.UpdateStatistics(sml);
+
+                    att.LastUpdate = DateTime.Now;
+
+                    if (att.EnoughExtractedText)
+                    {
+                        if (att.PlainTextContentQuality == DataQualityEnum.Estimated)
+                            sml.Enhancements = sml.Enhancements.AddOrUpdate(new Enhancement("Text přílohy extrahován z OCR dokumentu ", "", "item.Prilohy[" + i.ToString() + "].PlainTextContent", "", "", "FullOcrMinion"));
+                        else
+                            sml.Enhancements = sml.Enhancements.AddOrUpdate(new Enhancement("Text přílohy extrahován z obsahu dokumentu ", "", "item.Prilohy[" + i.ToString() + "].PlainTextContent", "", "", "FullOcrMinion"));
+
+                    }
+                    changed = true;
+                }//docs.count = 1
+                if (newPrilohy.Count > 0)
+                    sml.Prilohy = sml.Prilohy.Concat(newPrilohy).ToArray();
+                if (changed)
+                {
+                    _ = await SmlouvaRepo.SaveAsync(sml);
+                }
+            } //smlouvy.valid
             return StatusCode(200);
         }
 

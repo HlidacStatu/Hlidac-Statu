@@ -10,6 +10,13 @@ namespace HlidacStatu.Entities.Enhancers
         public Enhancement(string title, string description, string changedParameter,
             string changedOldValue, string changedNewValue, IEnhancer enhancer
             )
+            : this(title, description, changedParameter, changedOldValue, changedNewValue, enhancer.GetType().FullName)
+        {
+        }
+
+        public Enhancement(string title, string description, string changedParameter,
+            string changedOldValue, string changedNewValue, string enhancerName
+            )
         {
             Title = title;
             Description = description;
@@ -19,10 +26,9 @@ namespace HlidacStatu.Entities.Enhancers
                 PreviousValue = changedOldValue,
                 NewValue = changedNewValue
             };
-            EnhancerType = enhancer.GetType().FullName;
+            EnhancerType = enhancerName;
 
         }
-
         public class Change
         {
             [Nest.Keyword]

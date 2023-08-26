@@ -13,7 +13,7 @@ namespace HlidacStatu.DS.Api
         }
         public class Task
         {
-            
+            public string taskId { get; set; }
             public string prilohaId { get; set; }
             public string url { get; set; }
             public string origFilename { get; set; } = "file.bin";
