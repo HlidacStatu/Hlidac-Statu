@@ -16,6 +16,7 @@ namespace HlidacStatu.DS.Api
             
             public string prilohaId { get; set; }
             public string url { get; set; }
+            public string origFilename { get; set; } = "file.bin";
             public string parentDocId { get; set; }
 
             public DocTypes type { get; set; }
