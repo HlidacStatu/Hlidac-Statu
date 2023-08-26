@@ -263,7 +263,11 @@ void AddAllHealtChecks(IServiceCollection services, IConfiguration Configuration
             name: "Web server využitá pamět",
             tags: new[] { "Web server", "process", "memory" })
         .AddHealthCheckWithResponseTime(
-            new global::HealthChecks.SqlServer.SqlServerHealthCheck(Configuration["ConnectionStrings:DefaultConnection"], "select top 1 username from AspNetUsers"),
+            new global::HealthChecks.SqlServer.SqlServerHealthCheck(
+                new HealthChecks.SqlServer.SqlServerHealthCheckOptions() { 
+                    ConnectionString = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection"),
+                     CommandText= "select top 1 username from AspNetUsers"
+                }),
             "SQL server", HealthStatus.Unhealthy, tags: new[] { "DB", "db" }
         )
         .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ProcessOpenPorts>(

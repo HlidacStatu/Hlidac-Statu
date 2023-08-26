@@ -85,7 +85,7 @@
     <WCFMetadataStorage Include="Connected Services\eAgri.DeMinimis.WS\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="7.0.1" />
+    <PackageReference Include="Autofac" Version="7.1.0" />
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Devmasters.Imaging" Version="4.5.0.1" />
     <PackageReference Include="EntityFramework" Version="6.4.4" />

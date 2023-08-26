@@ -8,7 +8,7 @@
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Devmasters.Core" Version="4.5.1" />
     <PackageReference Include="Devmasters.DT" Version="4.5.2" />
-    <PackageReference Include="EPPlus" Version="6.2.7" />
+    <PackageReference Include="EPPlus" Version="6.2.8" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
 

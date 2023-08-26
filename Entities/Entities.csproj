@@ -15,14 +15,14 @@
       <PackageReference Include="Devmasters.IO" Version="4.5.1" />
       <PackageReference Include="Devmasters.Lang" Version="4.5.1" />
       <PackageReference Include="Enums.NET" Version="4.0.1" />
-      <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="7.0.9" />
-      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.9" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.9">
+      <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="7.0.10" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.10" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.10">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.9" />
-      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.9" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.10" />
       <PackageReference Include="NEST" Version="7.17.5" />
       <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.15" />
       <PackageReference Include="SmartAnalyzers.CSharpExtensions.Annotations" Version="4.2.8" />
