@@ -85,6 +85,7 @@ namespace HlidacStatu.DS.Api
             public ResultStatus IsValid { get; set; } = ResultStatus.Unknown;
             public string Error { get; set; } = null;
 
+            public Task Task { get; set; }
 
             public TimeSpan Remains()
             {
