@@ -1,4 +1,6 @@
-﻿using System;
+﻿using iText.StyledXmlParser.Jsoup.Helper;
+using Nest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,6 +21,12 @@ namespace HlidacStatu.DS.Api
 
             public class Document
             {
+                public class KeyVal
+                {
+                    public string Key { get; set; }
+                    public string Value { get; set; }
+                }
+
                 public string ContentType { get; set; }
 
                 private string _filename = default(string);
@@ -41,6 +49,8 @@ namespace HlidacStatu.DS.Api
 
                 public string UsedTool { get; set; }
                 public string Server { get; set; }
+
+                public KeyVal[] FileMetadata = new KeyVal[] { };
 
             }
 
@@ -84,7 +94,6 @@ namespace HlidacStatu.DS.Api
             public ResultStatus IsValid { get; set; } = ResultStatus.Unknown;
             public string Error { get; set; } = null;
 
-            public Task Task { get; set; }
 
             public TimeSpan Remains()
             {

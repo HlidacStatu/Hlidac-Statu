@@ -9,7 +9,7 @@ namespace HlidacStatu.Entities
 {
     public partial class ItemToOcrQueue
     {
-        public void SetOptions(ItemOption option)
+        public void SetOptions(OcrWork.ItemOption option)
         {
             if (option == null)
                 this.Options = null;
@@ -19,18 +19,18 @@ namespace HlidacStatu.Entities
             _options = option;
         }
 
-        ItemOption _options = null;
-        public ItemOption GetOptions()
+        OcrWork.ItemOption _options = null;
+        public OcrWork.ItemOption GetOptions()
         {
             if (_options == null)
             {
-                var itemOptions = ItemOption.Default;
+                var itemOptions = OcrWork.ItemOption.Default;
                 try
                 {
                     if (string.IsNullOrEmpty(this.Options))
-                        return ItemOption.Default;
+                        return OcrWork.ItemOption.Default;
 
-                    itemOptions = Newtonsoft.Json.JsonConvert.DeserializeObject<ItemOption>(this.Options);
+                    itemOptions = Newtonsoft.Json.JsonConvert.DeserializeObject<OcrWork.ItemOption>(this.Options);
 
                 }
                 catch (Exception)
@@ -41,49 +41,11 @@ namespace HlidacStatu.Entities
             return _options;
         }
 
-        public enum ItemToOcrType
-        {
-            Smlouva,
-            Insolvence,
-            Dataset,
-            VerejnaZakazka
-        }
 
-        public ItemToOcrType OcrWorkToItemToOcrType(OcrWork.DocTypes doctype)
-        {
-            switch (doctype)
-            {
-                case OcrWork.DocTypes.Smlouva:
-                    return ItemToOcrType.Smlouva;
-                case OcrWork.DocTypes.VerejnaZakazka:
-                    return ItemToOcrType.VerejnaZakazka;
-                case OcrWork.DocTypes.Dataset:
-                    return ItemToOcrType.Dataset;
-                case OcrWork.DocTypes.Insolvence:
-                    return ItemToOcrType.Insolvence;
-                default:
-                    return ItemToOcrType.Smlouva;
-            }
-        }
 
-        public OcrWork.DocTypes ItemToOcrTypeToOcrWork(ItemToOcrType ocrType)
-        {
-            switch (ocrType)
-            {
-                case ItemToOcrType.Smlouva:
-                    return OcrWork.DocTypes.Smlouva;
-                case ItemToOcrType.VerejnaZakazka:
-                    return OcrWork.DocTypes.VerejnaZakazka;
-                case ItemToOcrType.Dataset:
-                    return OcrWork.DocTypes.Dataset;
-                case ItemToOcrType.Insolvence:
-                    return OcrWork.DocTypes.Insolvence;
-                default:
-                    return OcrWork.DocTypes.Smlouva;
-            }
-        }
 
-        private static IQueryable<ItemToOcrQueue> CreateQuery(DbEntities db, ItemToOcrType? itemType, string itemSubType)
+
+        private static IQueryable<ItemToOcrQueue> CreateQuery(DbEntities db, OcrWork.DocTypes? itemType, string itemSubType)
         {
             IQueryable<ItemToOcrQueue> sql = null;
             sql = db.ItemToOcrQueue.AsQueryable()
@@ -98,7 +60,7 @@ namespace HlidacStatu.Entities
 
             return sql;
         }
-        public static bool AreThereItemsToProcess(ItemToOcrType? itemType = null, string itemSubType = null)
+        public static bool AreThereItemsToProcess(OcrWork.DocTypes? itemType = null, string itemSubType = null)
         {
             using (DbEntities db = new DbEntities())
             {
@@ -108,7 +70,7 @@ namespace HlidacStatu.Entities
         }
 
         static object lockTakeFromQueue = new object();
-        public static IEnumerable<ItemToOcrQueue> TakeFromQueue(ItemToOcrType? itemType = null, string itemSubType = null, int maxItems = 30)
+        public static IEnumerable<ItemToOcrQueue> TakeFromQueue(OcrWork.DocTypes? itemType = null, string itemSubType = null, int maxItems = 30)
         {
             using (DbEntities db = new DbEntities())
             {
@@ -153,31 +115,22 @@ namespace HlidacStatu.Entities
         }
 
 
-        public class ItemOption
-        {
-            public bool force { get; set; } = false;
-            public bool missingOnly { get; set; } = true;
-            public int? lengthLessThan { get; set; } = null;
-
-            private static ItemOption _default = new ItemOption();
-            public static ItemOption Default { get => _default; }
-
-        }
+       
 
 
-        public static Lib.OCR.Api.Result AddNewTask(ItemToOcrType itemType, string itemId, string itemSubType = null,
+        public static Lib.OCR.Api.Result AddNewTask(OcrWork.DocTypes itemType, string itemId, string itemSubType = null,
             Lib.OCR.Api.Client.TaskPriority priority = Lib.OCR.Api.Client.TaskPriority.Standard,
-            ItemOption options = null
+            OcrWork.ItemOption options = null
             )
         {
             return AddNewTask(itemType, itemId, itemSubType, (int)priority, options);
         }
-        public static Lib.OCR.Api.Result AddNewTask(ItemToOcrType itemType, string itemId,
+        public static Lib.OCR.Api.Result AddNewTask(OcrWork.DocTypes itemType, string itemId,
             string itemSubType = null, int priority = 5,
-            ItemOption options = null
+            OcrWork.ItemOption options = null
             )
         {
-            options = options ?? ItemOption.Default;
+            options = options ?? OcrWork.ItemOption.Default;
 
             using (DbEntities db = new DbEntities())
             {

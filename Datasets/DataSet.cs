@@ -1,5 +1,5 @@
 ﻿using Elasticsearch.Net;
-
+using HlidacStatu.DS.Api;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
@@ -802,7 +802,7 @@ namespace HlidacStatu.Datasets
                     {
                         if (Uri.TryCreate(jo["DocumentUrl"].Value<string>(), UriKind.Absolute, out var uri2Ocr))
                         {
-                            ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.Dataset,
+                            ItemToOcrQueue.AddNewTask(OcrWork.DocTypes.Dataset,
                                 finalId,
                                 datasetId,
                                 Lib.OCR.Api.Client.TaskPriority.Standard);

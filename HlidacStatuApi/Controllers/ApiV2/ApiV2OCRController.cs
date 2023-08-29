@@ -24,46 +24,90 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
 
 
-        static bool demoswitcher = false;
+        static ItemToOcrQueue[] demodata = new ItemToOcrQueue[]
+        {
+            new ItemToOcrQueue()
+            {
+                ItemId="5247700",
+                ItemType = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva.ToString(),
+                Pk = 0,
+            }
+
+        };
+
+        static int demoCounter = 0;
         [ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
         [HttpGet("Get")]
-        public async Task<ActionResult<HlidacStatu.DS.Api.OcrWork.Task>> GetTask()
+        public async Task<ActionResult<HlidacStatu.DS.Api.OcrWork.Task>> GetTask(bool? demo = null)
         {
             CheckRoleRecord(this.User.Identity.Name);
 
-            demoswitcher = !demoswitcher;
-            if (demoswitcher)
-                return new HlidacStatu.DS.Api.OcrWork.Task()
-                {
-                    taskId = "0",
-                    parentDocId = "0",
-                    type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva,
-                    docs = new HlidacStatu.DS.Api.OcrWork.Task.Doc[]{
-                        new HlidacStatu.DS.Api.OcrWork.Task.Doc()
-                        {
-                            prilohaId = "00",
-                            url = "http://zapisnikzmizeleho.cz/wp-content/themes/zapisnikz1.1/img-zapisnik/velikonocni-festival-brno-2011-04/stabat-mater-program.gif",
-                            origFilename = "stabat-mater-program.gif"
-                        }
-                    }
-                };
-            else
-                return new HlidacStatu.DS.Api.OcrWork.Task()
-                {
-                    taskId = "00",
-                    parentDocId = "1",
-                    type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva,
-                    docs = new HlidacStatu.DS.Api.OcrWork.Task.Doc[]{
-                        new HlidacStatu.DS.Api.OcrWork.Task.Doc()
-                        {
-                            prilohaId = "1",
-                            url = "https://www.hlidacstatu.cz/KopiePrilohy/4288264?hash=d702c02db57b151eb685c7923d673b3709710b01f1e0050add51d8d1569189a9",
-                            origFilename = "DRNP2012VC1485D2.pdf"
-                        }
-                    }
-                };
+            if (demo == true)
+            {
+                var resd = demodata[demoCounter];
+                demoCounter++;
+                if (demoCounter >= demodata.Length)
+                    demoCounter = 0;
+                return await GetSmlouva(resd);
+            }
 
+            int tries = 0;
+        start:
+            var items = HlidacStatu.Entities.ItemToOcrQueue.TakeFromQueue(HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva, maxItems: 1);
+            if (items == null)
+                return StatusCode(404);
+            if (items.Count() == 0)
+                return StatusCode(404);
+            ItemToOcrQueue item = items.First();
+            HlidacStatu.DS.Api.OcrWork.DocTypes itemType = Enum.Parse<HlidacStatu.DS.Api.OcrWork.DocTypes>(item.ItemType);
+
+            HlidacStatu.DS.Api.OcrWork.Task task = null;
+            switch (itemType)
+            {
+                case HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva:
+                    task = await GetSmlouva(item);
+                    break;
+                case HlidacStatu.DS.Api.OcrWork.DocTypes.VerejnaZakazka:
+                    break;
+                case HlidacStatu.DS.Api.OcrWork.DocTypes.Dataset:
+                    break;
+                case HlidacStatu.DS.Api.OcrWork.DocTypes.Insolvence:
+                    break;
+                default:
+                    break;
+            }
+            if (task == null)
+            {
+                if (tries < 20)
+                {
+                    tries++;
+                    goto start;
+                }
+                else
+                    return StatusCode(404);
+            }
+            return task;
+        }
+
+        private async Task<HlidacStatu.DS.Api.OcrWork.Task> GetSmlouva(ItemToOcrQueue item)
+        {
+            var sml = await SmlouvaRepo.LoadAsync(item.ItemId, includePrilohy: false);
+
+            if (sml == null)
+                return null;
+            HlidacStatu.DS.Api.OcrWork.Task res = new HlidacStatu.DS.Api.OcrWork.Task();
+            res.taskId = item.Pk.ToString();
+            res.type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva;
+            res.parentDocId = item.ItemId;
+            res.docs = sml.Prilohy.Select(m => new HlidacStatu.DS.Api.OcrWork.Task.Doc()
+            {
+                origFilename = m.nazevSouboru,
+                prilohaId = m.UniqueHash(),
+                url = m.odkaz
+            }).ToArray();
+
+            return res;
         }
 
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -91,7 +135,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return null; //TODO
 
         }
-        [ApiExplorerSettings(IgnoreApi = true)]
+
+        //[ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
         [HttpPost("Save")]
         public async Task<ActionResult> Save([FromBody] HlidacStatu.DS.Api.OcrWork.Task res)
@@ -99,30 +144,45 @@ namespace HlidacStatuApi.Controllers.ApiV2
             CheckRoleRecord(this.User.Identity.Name);
             if (res.type == HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva)
             {
-                return await _saveSmlouva(res);
+                var done = await _saveSmlouva(res);
+                ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
+                return StatusCode(200);
             }
             return StatusCode(200);
         }
 
-        private async Task<ActionResult> _saveSmlouva(HlidacStatu.DS.Api.OcrWork.Task res)
+        private async Task<bool> _saveSmlouva(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             List<Smlouva.Priloha> newPrilohy = new List<Smlouva.Priloha>();
             bool changed = false;
 
             var sml = await SmlouvaRepo.LoadAsync(res.parentDocId);
             if (sml == null)
-                return StatusCode(404);
-
+            {
+                HlidacStatuApi.Code.Log.Logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
+                return false;
+            }
             foreach (var doc in res.docs)
             {
                 var attIdx = sml.Prilohy
                         .Select((pr, i) => new { i, pr })
                         .Where(m => m.pr.UniqueHash() == doc.prilohaId)
                         .FirstOrDefault();
-                if (attIdx == null)
-                    return StatusCode(404);
-                int i = attIdx.i;
-                Smlouva.Priloha att = attIdx.pr;
+                int i = 0;
+                Smlouva.Priloha att = null;
+                if (attIdx != null)
+                {
+                    i = attIdx.i;
+                    att = attIdx.pr;
+                }
+                else
+                {
+                    HlidacStatuApi.Code.Log.Logger.Warning("Cannot find priloha {prilohaId} for smlouva {docId}", doc.prilohaId, res.parentDocId);
+                    i = 0;
+                    att = new Smlouva.Priloha();
+                    newPrilohy.Add(att);
+
+                }
                 if (doc.result.Documents.Count > 1)
                 {
                     //first
@@ -133,6 +193,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
                         att.PlainTextContentQuality = DataQualityEnum.Parsed;
 
                     att.ContentType = doc.result.Documents[0].ContentType;
+                    if (doc.result.Documents[0].FileMetadata?.Count() > 0)
+                        att.FileMetadata = doc.result.Documents[0].FileMetadata
+                            .Select(m => new Smlouva.Priloha.KeyVal() { Key = m.Key, Value = m.Value }).ToArray();
 
                     att.UpdateStatistics(sml);
 
@@ -158,6 +221,11 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
                         att1.ContentType = doc.result.Documents[ii].ContentType;
                         att1.odkaz = att.odkaz + "#num" + ii;
+
+                        if (doc.result.Documents[ii].FileMetadata?.Count() > 0)
+                            att1.FileMetadata = doc.result.Documents[ii].FileMetadata
+                                .Select(m => new Smlouva.Priloha.KeyVal() { Key = m.Key, Value = m.Value }).ToArray();
+
                         att1.UpdateStatistics(sml);
 
                         att1.LastUpdate = DateTime.Now;
@@ -184,6 +252,11 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     else
                         att.PlainTextContentQuality = DataQualityEnum.Parsed;
                     att.ContentType = doc.result.Documents[0].ContentType;
+
+                    if (doc.result.Documents[0].FileMetadata?.Count() > 0)
+                        att.FileMetadata = doc.result.Documents[0].FileMetadata
+                            .Select(m => new Smlouva.Priloha.KeyVal() { Key = m.Key, Value = m.Value }).ToArray();
+
                     att.UpdateStatistics(sml);
 
                     att.LastUpdate = DateTime.Now;
@@ -205,7 +278,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 _ = await SmlouvaRepo.SaveAsync(sml);
             }
-            return StatusCode(200);
+            return true;
         }
 
 

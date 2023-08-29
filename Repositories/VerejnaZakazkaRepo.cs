@@ -18,6 +18,7 @@ using HlidacStatu.Entities;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
+using HlidacStatu.DS.Api;
 
 namespace HlidacStatu.Repositories
 {
@@ -328,7 +329,7 @@ namespace HlidacStatu.Repositories
         { 
             if (newVZ.Dokumenty.Any(d => !d.EnoughExtractedText))
             {
-                ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.VerejnaZakazka,
+                ItemToOcrQueue.AddNewTask(OcrWork.DocTypes.VerejnaZakazka,
                     newVZ.Id,
                     null,
                     HlidacStatu.Lib.OCR.Api.Client.TaskPriority.Low);

@@ -1,5 +1,5 @@
 ﻿using Devmasters.Collections;
-
+using HlidacStatu.DS.Api;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Enhancers;
 using HlidacStatu.Repositories;
@@ -139,7 +139,7 @@ namespace HlidacStatu.Plugin.Enhancers
                                 //    HlidacStatu.Lib.OCR.Api.Client.TaskPriority.High, intensity
                                 //    ); 
                                 Base.Logger.Debug($"TextMiner Client.TextFromFile Adding NewTask Id:{item.Id} att:{att.nazevSouboru}  async:{asyncOCR}  skipOCR:{intensity.ToString()}");
-                                res = ItemToOcrQueue.AddNewTask(ItemToOcrQueue.ItemToOcrType.Smlouva, item.Id, priority: this.priority);
+                                res = ItemToOcrQueue.AddNewTask(OcrWork.DocTypes.Smlouva, item.Id, priority: this.priority);
                                 Base.Logger.Debug($"TextMiner Client.TextFromFile Added NewTask Id:{item.Id} att:{att.nazevSouboru}  async:{asyncOCR}  skipOCR:{intensity.ToString()}");
                             }
                             else
