@@ -19,7 +19,6 @@ namespace HlidacStatu.DS.Api
 
             public class Document
             {
-                //private static MimeMapping mime = new MimeMapping.Mime();
                 public string ContentType { get; set; }
 
                 private string _filename = default(string);

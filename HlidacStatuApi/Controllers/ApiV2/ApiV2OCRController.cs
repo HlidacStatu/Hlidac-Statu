@@ -36,25 +36,36 @@ namespace HlidacStatuApi.Controllers.ApiV2
             if (demoswitcher)
                 return new HlidacStatu.DS.Api.OcrWork.Task()
                 {
-                    taskId="0",
+                    taskId = "0",
                     parentDocId = "0",
-                    prilohaId = "00",
                     type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva,
-                    url = "http://zapisnikzmizeleho.cz/wp-content/themes/zapisnikz1.1/img-zapisnik/velikonocni-festival-brno-2011-04/stabat-mater-program.gif",
-                    origFilename = "stabat-mater-program.gif"
+                    docs = new HlidacStatu.DS.Api.OcrWork.Task.Doc[]{
+                        new HlidacStatu.DS.Api.OcrWork.Task.Doc()
+                        {
+                            prilohaId = "00",
+                            url = "http://zapisnikzmizeleho.cz/wp-content/themes/zapisnikz1.1/img-zapisnik/velikonocni-festival-brno-2011-04/stabat-mater-program.gif",
+                            origFilename = "stabat-mater-program.gif"
+                        }
+                    }
                 };
             else
                 return new HlidacStatu.DS.Api.OcrWork.Task()
                 {
                     taskId = "00",
                     parentDocId = "1",
-                    prilohaId = "1",
                     type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva,
-                    url = "https://www.hlidacstatu.cz/KopiePrilohy/4288264?hash=d702c02db57b151eb685c7923d673b3709710b01f1e0050add51d8d1569189a9",
-                    origFilename = "DRNP2012VC1485D2.pdf"
+                    docs = new HlidacStatu.DS.Api.OcrWork.Task.Doc[]{
+                        new HlidacStatu.DS.Api.OcrWork.Task.Doc()
+                        {
+                            prilohaId = "1",
+                            url = "https://www.hlidacstatu.cz/KopiePrilohy/4288264?hash=d702c02db57b151eb685c7923d673b3709710b01f1e0050add51d8d1569189a9",
+                            origFilename = "DRNP2012VC1485D2.pdf"
+                        }
+                    }
                 };
 
         }
+
         [ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
         [HttpGet("GetMore")]
@@ -83,43 +94,45 @@ namespace HlidacStatuApi.Controllers.ApiV2
         [ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
         [HttpPost("Save")]
-        public async Task<ActionResult> Save([FromBody] HlidacStatu.DS.Api.OcrWork.Result res)
+        public async Task<ActionResult> Save([FromBody] HlidacStatu.DS.Api.OcrWork.Task res)
         {
             CheckRoleRecord(this.User.Identity.Name);
-            if (res.Task.type == HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva)
+            if (res.type == HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva)
             {
                 return await _saveSmlouva(res);
             }
             return StatusCode(200);
         }
 
-        private async Task<ActionResult> _saveSmlouva(HlidacStatu.DS.Api.OcrWork.Result res)
+        private async Task<ActionResult> _saveSmlouva(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             List<Smlouva.Priloha> newPrilohy = new List<Smlouva.Priloha>();
             bool changed = false;
-            if (res.IsValid == HlidacStatu.DS.Api.OcrWork.Result.ResultStatus.Valid)
+
+            var sml = await SmlouvaRepo.LoadAsync(res.parentDocId);
+            if (sml == null)
+                return StatusCode(404);
+
+            foreach (var doc in res.docs)
             {
-                var sml = await SmlouvaRepo.LoadAsync(res.Task.parentDocId);
-                if (sml == null)
-                    return StatusCode(404);
                 var attIdx = sml.Prilohy
                         .Select((pr, i) => new { i, pr })
-                        .Where(m => m.pr.UniqueHash() == res.Task.prilohaId)
+                        .Where(m => m.pr.UniqueHash() == doc.prilohaId)
                         .FirstOrDefault();
                 if (attIdx == null)
                     return StatusCode(404);
                 int i = attIdx.i;
                 Smlouva.Priloha att = attIdx.pr;
-                if (res.Documents.Count > 1)
+                if (doc.result.Documents.Count > 1)
                 {
                     //first
-                    att.PlainTextContent = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(res.Documents[0].Text);
-                    if (res.Documents[0].UsedOCR)
+                    att.PlainTextContent = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(doc.result.Documents[0].Text);
+                    if (doc.result.Documents[0].UsedOCR)
                         att.PlainTextContentQuality = DataQualityEnum.Estimated;
                     else
                         att.PlainTextContentQuality = DataQualityEnum.Parsed;
 
-                    att.ContentType = res.Documents[0].ContentType;
+                    att.ContentType = doc.result.Documents[0].ContentType;
 
                     att.UpdateStatistics(sml);
 
@@ -133,17 +146,17 @@ namespace HlidacStatuApi.Controllers.ApiV2
                             sml.Enhancements = sml.Enhancements.AddOrUpdate(new Enhancement("Text přílohy extrahován z obsahu dokumentu ", "", "item.Prilohy[" + i.ToString() + "].PlainTextContent", "", "", "FullOcrMinion"));
                     }
 
-                    for (int ii = 1; ii < res.Documents.Count; ii++)
+                    for (int ii = 1; ii < doc.result.Documents.Count; ii++)
                     {
 
                         var att1 = new Smlouva.Priloha();
-                        att1.PlainTextContent = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(res.Documents[ii].Text);
-                        if (res.Documents[ii].UsedOCR)
+                        att1.PlainTextContent = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(doc.result.Documents[ii].Text);
+                        if (doc.result.Documents[ii].UsedOCR)
                             att1.PlainTextContentQuality = DataQualityEnum.Estimated;
                         else
                             att1.PlainTextContentQuality = DataQualityEnum.Parsed;
 
-                        att1.ContentType = res.Documents[ii].ContentType;
+                        att1.ContentType = doc.result.Documents[ii].ContentType;
                         att1.odkaz = att.odkaz + "#num" + ii;
                         att1.UpdateStatistics(sml);
 
@@ -163,14 +176,14 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     //others
 
                 } //docs.count > 1
-                else if (res.Documents.Count == 1)
+                else if (doc.result.Documents.Count == 1)
                 {
-                    att.PlainTextContent = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(res.Documents[0].Text);
-                    if (res.Documents[0].UsedOCR)
+                    att.PlainTextContent = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(doc.result.Documents[0].Text);
+                    if (doc.result.Documents[0].UsedOCR)
                         att.PlainTextContentQuality = DataQualityEnum.Estimated;
                     else
                         att.PlainTextContentQuality = DataQualityEnum.Parsed;
-                    att.ContentType = res.Documents[0].ContentType;
+                    att.ContentType = doc.result.Documents[0].ContentType;
                     att.UpdateStatistics(sml);
 
                     att.LastUpdate = DateTime.Now;
@@ -187,11 +200,11 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 }//docs.count = 1
                 if (newPrilohy.Count > 0)
                     sml.Prilohy = sml.Prilohy.Concat(newPrilohy).ToArray();
-                if (changed)
-                {
-                    _ = await SmlouvaRepo.SaveAsync(sml);
-                }
-            } //smlouvy.valid
+            }
+            if (changed)
+            {
+                _ = await SmlouvaRepo.SaveAsync(sml);
+            }
             return StatusCode(200);
         }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using HlidacStatu.DS.Api;
+using Microsoft.EntityFrameworkCore;
 
 using System;
 using System.Collections.Generic;
@@ -46,6 +47,40 @@ namespace HlidacStatu.Entities
             Insolvence,
             Dataset,
             VerejnaZakazka
+        }
+
+        public ItemToOcrType OcrWorkToItemToOcrType(OcrWork.DocTypes doctype)
+        {
+            switch (doctype)
+            {
+                case OcrWork.DocTypes.Smlouva:
+                    return ItemToOcrType.Smlouva;
+                case OcrWork.DocTypes.VerejnaZakazka:
+                    return ItemToOcrType.VerejnaZakazka;
+                case OcrWork.DocTypes.Dataset:
+                    return ItemToOcrType.Dataset;
+                case OcrWork.DocTypes.Insolvence:
+                    return ItemToOcrType.Insolvence;
+                default:
+                    return ItemToOcrType.Smlouva;
+            }
+        }
+
+        public OcrWork.DocTypes ItemToOcrTypeToOcrWork(ItemToOcrType ocrType)
+        {
+            switch (ocrType)
+            {
+                case ItemToOcrType.Smlouva:
+                    return OcrWork.DocTypes.Smlouva;
+                case ItemToOcrType.VerejnaZakazka:
+                    return OcrWork.DocTypes.VerejnaZakazka;
+                case ItemToOcrType.Dataset:
+                    return OcrWork.DocTypes.Dataset;
+                case ItemToOcrType.Insolvence:
+                    return OcrWork.DocTypes.Insolvence;
+                default:
+                    return OcrWork.DocTypes.Smlouva;
+            }
         }
 
         private static IQueryable<ItemToOcrQueue> CreateQuery(DbEntities db, ItemToOcrType? itemType, string itemSubType)
