@@ -166,7 +166,7 @@
     {
     Name = "Fyzické osoby",
     Type = Series.SeriesType.column,
-    Data = SponzoringRepo.SponzoringPerYear(icoStrany,SponzoringRepo.DefaultLastSponzoringYear()-10,SponzoringRepo.DefaultLastSponzoringYear(),false,true).Result
+    Data = SponzoringRepo.SponzoringPerYear(icoStrany,SponzoringRepo.DefaultLastSponzoringYear()-10,SponzoringRepo.DefaultLastSponzoringYear(),true,false).Result
     .Select(x=> new SeriesData(x.Key, x.Value) )
     .ToArray(),
     SeriesTooltip = new SeriesTooltip()
@@ -178,7 +178,7 @@
     {
     Name = "Firmy",
     Type = Series.SeriesType.column,
-    Data = SponzoringRepo.SponzoringPerYear(icoStrany,SponzoringRepo.DefaultLastSponzoringYear()-10,SponzoringRepo.DefaultLastSponzoringYear(),true,false).Result
+    Data = SponzoringRepo.SponzoringPerYear(icoStrany,SponzoringRepo.DefaultLastSponzoringYear()-10,SponzoringRepo.DefaultLastSponzoringYear(),false,true).Result
     .Select(x=> new SeriesData(x.Key, x.Value) )
     .ToArray(),
     SeriesTooltip = new SeriesTooltip()
