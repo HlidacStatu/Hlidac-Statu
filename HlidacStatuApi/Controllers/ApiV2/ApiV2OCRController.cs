@@ -230,6 +230,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
         public async Task<ActionResult> Save([FromBody] HlidacStatu.DS.Api.OcrWork.Task res)
         {
             CheckRoleRecord(this.User.Identity.Name);
+            try
+            {
+
             switch (res.type)
             {
                 case HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva:
@@ -244,6 +247,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     break;
                 default:
                     break;
+            }
+            }
+            catch (Exception e)
+            {
+                HlidacStatuApi.Code.Log.Logger.Error(e,"Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
+                return StatusCode(500);
             }
             return StatusCode(200);
         }
