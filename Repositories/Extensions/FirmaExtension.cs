@@ -577,7 +577,7 @@ namespace HlidacStatu.Extensions
 
             if (stat.Sum(stat.YearsAfter2016(), s => s.PocetSmluv) == 0)
             {
-                f.Add(new InfoFact($"{sName} nemá žádné smluvní vztahy evidované v&nbsp;registru smluv. ",
+                f.Add(new InfoFact($"{sName} nemá žádné smluvní vztahy evidované s&nbsp;veřejnou správou. ",
                     InfoFact.ImportanceLevel.Medium));
                 f.Add(new InfoFact(
                     $"{(sMuzsky ? "Byl založen" : "Byla založena")} <b>{firma.Datum_Zapisu_OR?.ToString("d. M. yyyy")}</b>. ",
@@ -606,9 +606,9 @@ namespace HlidacStatu.Extensions
                 else
                     f.Add(new InfoFact($"V roce <b>{rok}</b> uzavřel{(sMuzsky ? "" : "a")} {sName.ToLower()} " +
                                        Devmasters.Lang.CS.Plural.Get(stat[rok].PocetSmluv,
-                                           "jednu smlouvu v&nbsp;registru smluv",
-                                           "{0} smlouvy v&nbsp;registru smluv",
-                                           "celkem {0} smluv v&nbsp;registru smluv")
+                                           "jednu smlouvu s&nbsp;veřejnou správou",
+                                           "{0} smlouvy s&nbsp;veřejnou správou",
+                                           "celkem {0} smluv s&nbsp;veřejnou správou")
                                        + $" za <b>{RenderData.ShortNicePrice(stat[rok].CelkovaHodnotaSmluv, html: true)}</b>. "
                         , InfoFact.ImportanceLevel.Summary)
                     );
@@ -621,13 +621,13 @@ namespace HlidacStatu.Extensions
                     switch (zmena)
                     {
                         case decimal n when n > 0:
-                            text += $"došlo k <b>nárůstu zakázek o&nbsp;{procentniZmena:P2}</b> v&nbsp;Kč. ";
+                            text += $"došlo k <b>nárůstu státních zakázek o&nbsp;{procentniZmena:P2}</b> v&nbsp;Kč. ";
                             break;
                         case decimal n when n < 0:
-                            text += $"došlo k <b>poklesu zakázek o&nbsp;{procentniZmena:P2}</b> v&nbsp;Kč . ";
+                            text += $"došlo k <b>poklesu státních zakázek o&nbsp;{procentniZmena:P2}</b> v&nbsp;Kč . ";
                             break;
                         default:
-                            text += " nedošlo ke změně objemu zakázek. ";
+                            text += " nedošlo ke změně objemu státních zakázek. ";
                             break;
                     }
 
@@ -708,7 +708,8 @@ namespace HlidacStatu.Extensions
                     }
                 }
 
-                if (firma.PatrimStatu() == false
+                if (//TODO rozlisit prime a neprime angazovani
+                    firma.PatrimStatu() == false
                     && StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(firma.ICO)
                 )
                 {
