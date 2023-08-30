@@ -61,30 +61,42 @@ namespace HlidacStatu.DS.Api
             {
                 if (_mergedDocument == null)
                 {
-                    Document doc = new Document();
-
-                    if (this.Documents.Count == 0)
-                    {
-                        doc.Text = "";
-                    }
-                    else if (this.Documents.Count == 1)
-                    {
-                        doc = this.Documents[0];
-                    }
-                    else if (this.Documents.Count > 1)
-                    {
-                        doc.Text = this.Documents
-                            .Select(m => $"--------- soubor : {m.Filename} ---------" + m.Text)
-                            .Aggregate((f, s) => f + "\n\n\n\n\n\n" + s);
-                        doc.Pages = this.Documents.Sum(m => m.Pages);
-                        doc.RemainsInSec = this.Documents.Sum(m => m.RemainsInSec);
-                        doc.UsedOCR = this.Documents.Any(m => m.UsedOCR);
-                        doc.UsedTool = this.Documents.Select(m => m.UsedTool).Aggregate((f, s) => f + "|" + s);
-                        doc.Confidence = this.Documents.Average(m => m.Confidence);
-                    }
-                    _mergedDocument = doc;
+                   
+                    _mergedDocument = MergeDocumentsIntoOne(this.Documents);
                 }
                 return _mergedDocument;
+            }
+
+            public static Document MergeDocumentsIntoOne(IEnumerable<Document> docs)
+            {
+
+                Document doc = new Document();
+
+                if (docs.Count() == 0)
+                {
+                    doc.Text = "";
+                }
+                else if (docs.Count() == 1)
+                {
+                    doc = docs.First();
+                }
+                else if (docs.Count() > 1)
+                {
+                    doc.Text = docs
+                        .Select(m => $"--------- soubor : {m.Filename} ---------" + m.Text)
+                        .Aggregate((f, s) => f + "\n\n\n\n\n\n" + s);
+                    doc.Pages = docs.Sum(m => m.Pages);
+                    doc.RemainsInSec = docs.Sum(m => m.RemainsInSec);
+                    doc.UsedOCR = docs.Any(m => m.UsedOCR);
+                    doc.UsedTool = docs.Select(m => m.UsedTool).Aggregate((f, s) => f + "|" + s);
+                    doc.Confidence = docs.Average(m => m.Confidence);
+                    doc.ContentType = docs.First().ContentType;
+                    doc.FileMetadata = docs.SelectMany(m=>m.FileMetadata).ToArray();
+                    doc.Filename = docs.First().Filename;
+                    doc.Server = docs.First().Server;
+                    
+                }
+                return doc;
             }
 
             public string Server { get; set; } = System.Environment.MachineName;

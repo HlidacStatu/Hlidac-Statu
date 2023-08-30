@@ -9,7 +9,6 @@ using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
-using Microsoft.Extensions.Primitives;
 
 namespace HlidacStatu.Entities.VZ
 
@@ -20,11 +19,11 @@ namespace HlidacStatu.Entities.VZ
         public class Sources
         {
             public const string VestnikVerejnychZakazek = "https://vestnikverejnychzakazek.cz";
-            public const string VestnikVerejnychZakazekOld ="https://old.vestnikverejnychzakazek.cz";
+            public const string VestnikVerejnychZakazekOld = "https://old.vestnikverejnychzakazek.cz";
             public const string Datlab = "https://datlab.eu";
             public const string Rozza = "https://rozza.cz";
         }
-        
+
         public const string Pre2016Dataset = "VVZ-2006";
         public const string Post2016Dataset = "VVZ-2016";
         public const string ProfileOnlyDataset = "VVZ-Profil";
@@ -76,7 +75,7 @@ namespace HlidacStatu.Entities.VZ
             [Description("URL formuláře, může být prázdné")]
             [Keyword(Index = false)]
             public String URL { get; set; } = string.Empty;
-            
+
             //[Boolean]
             //public bool 
             public bool Equals(Formular other)
@@ -200,11 +199,11 @@ namespace HlidacStatu.Entities.VZ
 
         [Description("Unikátní ID zakázky. Nevyplňujte, ID vygeneruje Hlídač Státu.")]
         public string Id { get; init; } = Guid.NewGuid().ToString("N");
-        
+
         [Keyword()]
         [Description("Interní ID na věstníku veřejných zakázek")]
         public string VvzInternalId { get; set; } = null;
-        
+
         [Boolean]
         [Description("Označuje problematickou VZ. Tyto zakázky nezobrazovat. Chyby je potřeba opravit")]
         public bool HasIssues { get; set; } = false;
@@ -227,7 +226,7 @@ namespace HlidacStatu.Entities.VZ
                 get => _domena;
                 set
                 {
-                    if(Uri.TryCreate(value, UriKind.Absolute, out var uri))
+                    if (Uri.TryCreate(value, UriKind.Absolute, out var uri))
                     {
                         _domena = uri.GetLeftPart(UriPartial.Authority);
                     }
@@ -267,7 +266,7 @@ namespace HlidacStatu.Entities.VZ
                 return UniqueId.GetHashCode(StringComparison.InvariantCultureIgnoreCase);
             }
         }
-        
+
         [Object(Enabled = false)] //tady prohledávat nebudeme, index zatěžovat nepotřebujeme
         public List<string> Changelog { get; set; } = new();
 
@@ -311,7 +310,7 @@ namespace HlidacStatu.Entities.VZ
             return Zdroje.FirstOrDefault()?.IdVDomene;
 
         }
-        
+
         [Keyword()]
         [Description("Externí ID. Seznam dalších různých ID, např. ze systému Rozza")]
         public HashSet<string> ExternalIds { get; set; } = new();
@@ -359,7 +358,7 @@ namespace HlidacStatu.Entities.VZ
         [Date()]
         [Description("Lhůta pro doručení nabídek")]
         public DateTime? LhutaDoruceni { get; set; } = null;
-        
+
         [Date()]
         [Description("Lhůta pro doručení přihlášky k účasti na VZ")]
         public DateTime? LhutaPrihlaseni { get; set; } = null;
@@ -376,7 +375,7 @@ namespace HlidacStatu.Entities.VZ
 
         [Description("Číselná hodnota odvozeného stavu zakázky z enumerace 'StavyZakazky'.")]
         public int StavVZ { get; set; } = 0;
-        
+
         [Object(Ignore = true)]
         public StavyZakazky StavZakazky
         {
@@ -459,7 +458,7 @@ namespace HlidacStatu.Entities.VZ
             [Description("Kontrolní součet SHA256 souboru pro ověření unikátnosti.")]
             [Text]
             public string Sha256Checksum { get; set; }
-            
+
             /// <summary>
             /// Do not set anywhere except Repo
             /// </summary>
@@ -469,11 +468,11 @@ namespace HlidacStatu.Entities.VZ
             [Description("URL odkazy uvedené v profilu zadavatele")]
             [Keyword]
             public HashSet<string> OficialUrls { get; set; } = new();
-            
+
             [Description("Přímé URL na tento dokument.")]
             [Keyword]
             public HashSet<string> DirectUrls { get; set; } = new();
-            
+
             [Description("Popis obsahu dokumentu, z XML na profilu z pole dokument/typ_dokumentu.")]
             [Keyword]
             public string TypDokumentu { get; set; }
@@ -481,7 +480,7 @@ namespace HlidacStatu.Entities.VZ
             [Description("Datum vložení, uveřejnění dokumentu.")]
             [Date]
             public DateTime? VlozenoNaProfil { get; set; }
-            
+
             [Description("Číslo verze")]
             [Keyword]
             public string CisloVerze { get; set; }
@@ -489,7 +488,7 @@ namespace HlidacStatu.Entities.VZ
             [Description("Neuvádět, obsah dokumentu v plain textu pro ftx vyhledávání")]
             [Text()]
             public string PlainText { get; set; }
-            
+
             [Description("Neuvádět.")]
             public DataQualityEnum PlainTextContentQuality { get; set; } = DataQualityEnum.Unknown;
 
@@ -499,7 +498,7 @@ namespace HlidacStatu.Entities.VZ
 
             [Description("Neuvádět")]
             [Date]
-            public DateTime? LastProcessed { get; set; } =null;
+            public DateTime? LastProcessed { get; set; } = null;
 
             [Description("Neuvádět")]
             [Keyword()]
@@ -521,7 +520,7 @@ namespace HlidacStatu.Entities.VZ
             {
                 if (StorageIds.Count == 0 || string.IsNullOrWhiteSpace(StorageIds.FirstOrDefault()))
                     return DirectUrls.FirstOrDefault();
-                
+
                 return $"http://bpapi.datlab.eu/document/{StorageIds.FirstOrDefault()}";
             }
 
@@ -529,8 +528,25 @@ namespace HlidacStatu.Entities.VZ
             {
                 if (string.IsNullOrWhiteSpace(Sha256Checksum) || SizeInBytes == 0)
                     return "";
-                
+
                 return Sha256Checksum + "_" + SizeInBytes;
+            }
+
+            public string GetUniqueId()
+            {
+                var uId = GetHlidacStorageId();
+                if (string.IsNullOrEmpty(uId))
+                {
+                    if (this.StorageIds?.Count > 0 && !string.IsNullOrEmpty(this.StorageIds.OrderBy(o => o).First()))
+                        uId = this.StorageIds.OrderBy(o => o).First();
+                    else if (DirectUrls?.Count > 0)
+                        uId = Devmasters.Crypto.Hash.ComputeHashToHex(DirectUrls.First());
+                    else if (PlainDocumentIds?.Count > 0)
+                        uId = this.PlainDocumentIds.OrderBy(o => o).First();
+                    else
+                        uId = "undefined";
+                }
+                return uId;
             }
 
             [Keyword()]
@@ -557,7 +573,7 @@ namespace HlidacStatu.Entities.VZ
                 if (ReferenceEquals(this, other)) return true;
                 if (string.IsNullOrWhiteSpace(Sha256Checksum)) return false;
 
-                return Sha256Checksum == other.Sha256Checksum; 
+                return Sha256Checksum == other.Sha256Checksum;
             }
 
             public override bool Equals(object obj)
@@ -663,7 +679,7 @@ namespace HlidacStatu.Entities.VZ
             else
                 return null;
         }
-        
+
         public Document LastestModifiedDocument()
         {
             if (Dokumenty != null)
@@ -672,7 +688,7 @@ namespace HlidacStatu.Entities.VZ
             else
                 return null;
         }
-        
+
         public Document FirstPublishedDocument()
         {
             if (Dokumenty != null)
@@ -681,7 +697,7 @@ namespace HlidacStatu.Entities.VZ
             else
                 return null;
         }
-        
+
 
         static string cisloZakazkyRegex = @"Evidenční \s* číslo \s* zakázky: \s*(?<zakazka>(Z?)\d{1,8}([-]*\d{1,7})?)\s+";
         static string cisloConnectedFormRegex = @"Evidenční \s* číslo \s* souvisejícího \s* formuláře: \s*(?<zakazka>(F?)\d{1,8}([-]*\d{1,7})?)\s+";
@@ -819,7 +835,7 @@ namespace HlidacStatu.Entities.VZ
                 }
                 else
                 {
-                    _= sb.Append(dokument.Sha256Checksum);
+                    _ = sb.Append(dokument.Sha256Checksum);
                 }
             }
             _ = sb.AppendJoin(";", Formulare.Select(f => f.GetHashCode()))

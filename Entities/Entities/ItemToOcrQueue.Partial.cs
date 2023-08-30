@@ -185,6 +185,20 @@ namespace HlidacStatu.Entities
         }
 
 
+        public static ItemToOcrQueue GetTask(int taskItemId)
+        {
+            using (DbEntities db = new DbEntities())
+            {
+
+                ItemToOcrQueue i = db.ItemToOcrQueue
+                    .AsNoTracking()
+                    .Where(m => m.Pk == taskItemId)
+                    .FirstOrDefault();
+
+                return i;
+            }
+        }
+
         public static void SetDone(int taskItemId, bool success, string result = null)
         {
             using (DbEntities db = new DbEntities())

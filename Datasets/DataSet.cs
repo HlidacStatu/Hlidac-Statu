@@ -21,6 +21,7 @@ using System.Net.Mail;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace HlidacStatu.Datasets
 {
@@ -969,6 +970,42 @@ namespace HlidacStatu.Datasets
             //GetRequest req = new GetRequest(client.ConnectionSettings.DefaultIndex, "data", Id);
             var res = await client.LowLevel.DocumentExistsAsync<ExistsResponse>(client.ConnectionSettings.DefaultIndex, Id);
             return res.Exists;
+        }
+
+        public static List<Uri> GetFromItems_HsDocumentUrls(dynamic dataObj, bool ignoreDocumentPlaintextContent=true,
+            int? documentPlaintextContentLengthLess=null)
+        {
+            if (dataObj == null) return null;
+            var jobj = (Newtonsoft.Json.Linq.JObject)dataObj;
+            var jpaths = jobj
+                .SelectTokens("$..HsProcessType")
+                .ToArray();
+            var jpathObjs = jpaths.Select(j => j.Parent.Parent).ToArray();
+
+            List<Uri> urisToOcr = new List<Uri>();
+            foreach (var jo in jpathObjs)
+            {
+                if (
+                DataSet.OCRCommands.Contains(jo["HsProcessType"].Value<string>())
+                )
+                {
+                    if (jo["DocumentUrl"] != null
+                      && (string.IsNullOrEmpty(jo["DocumentPlainText"].Value<string>())
+                            || ignoreDocumentPlaintextContent
+                            || (documentPlaintextContentLengthLess.HasValue && jo["DocumentPlainText"].Value<string>()?.Length <= documentPlaintextContentLengthLess)
+                        )
+                    )
+                    {
+                        if (Uri.TryCreate(jo["DocumentUrl"].Value<string>(), UriKind.Absolute, out var uri2Ocr))
+                        {  //get text from document
+
+                            urisToOcr.Add(uri2Ocr);
+                        }
+
+                    }
+                }
+            }
+            return urisToOcr;
         }
 
         public async Task<dynamic> GetDataObjAsync(string Id)

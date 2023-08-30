@@ -83,7 +83,7 @@ namespace HlidacStatu.Repositories
 
             try
             {
-                var data = await client.SearchAsync<Rizeni>(s => s
+                ISearchResponse<Rizeni> data = await client.SearchAsync<Rizeni>(s => s
                     .Source(sr => sr.Includes(r => r.Fields("dokumenty.*").Fields("spisovaZnacka")))
                     .Query(q => q.Match(m => m.Field("dokumenty.id").Query(id)))); //TODO
 

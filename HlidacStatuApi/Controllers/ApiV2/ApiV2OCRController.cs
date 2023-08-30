@@ -1,10 +1,11 @@
 ﻿using Devmasters.Collections;
+using HlidacStatu.Datasets;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Enhancers;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Data;
 using System.Data.SqlClient;
 using static HlidacStatu.DS.Api.BlurredPage;
 
@@ -30,6 +31,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 ItemId="5247700",
                 ItemType = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva.ToString(),
+                Pk = 0,
+            },
+            new ItemToOcrQueue()
+            {
+                ItemId="f2b68b53f77c45b684a6314bac32e864",
+                ItemType = HlidacStatu.DS.Api.OcrWork.DocTypes.VerejnaZakazka.ToString(),
                 Pk = 0,
             }
 
@@ -69,16 +76,20 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     task = await GetSmlouva(item);
                     break;
                 case HlidacStatu.DS.Api.OcrWork.DocTypes.VerejnaZakazka:
+                    task = await GetVZ(item);
                     break;
                 case HlidacStatu.DS.Api.OcrWork.DocTypes.Dataset:
+                    task = await GetDatasetItem(item);
                     break;
                 case HlidacStatu.DS.Api.OcrWork.DocTypes.Insolvence:
+                    task = await GetInsolvence(item);
                     break;
                 default:
                     break;
             }
             if (task == null)
             {
+                ItemToOcrQueue.SetDone(item.Pk, false, "record not found");
                 if (tries < 20)
                 {
                     tries++;
@@ -88,6 +99,83 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     return StatusCode(404);
             }
             return task;
+        }
+        private async Task<HlidacStatu.DS.Api.OcrWork.Task> GetDatasetItem(ItemToOcrQueue item)
+        {
+            //await DoOCRDatasetAsync(item.ItemSubType, null, new string[] { item.ItemId }, null, true, false, 100, lengthLess);
+            if (!DataSet.ExistsDataset(item.ItemSubType.ToLower()))
+            {
+                return null;
+            }
+            var ds = DataSet.CachedDatasets.Get(item.ItemSubType.ToLower());
+
+            var dsitem = await ds.GetDataObjAsync(item.ItemId);
+            List<Uri> uris = DataSet.GetFromItems_HsDocumentUrls(dsitem, true);
+            if (uris?.Count > 0)
+            {
+                HlidacStatu.DS.Api.OcrWork.Task res = new HlidacStatu.DS.Api.OcrWork.Task();
+                res.taskId = item.Pk.ToString();
+                res.type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva;
+                res.parentDocId = item.ItemId;
+                res.docs = uris
+                    .Select(m => new HlidacStatu.DS.Api.OcrWork.Task.Doc()
+                    {
+                        origFilename = "",
+                        prilohaId = m.AbsoluteUri,
+                        url = m.AbsoluteUri
+                    })
+                    .ToArray();
+
+                return res;
+            }
+            else
+                return null;
+        }
+
+        private async Task<HlidacStatu.DS.Api.OcrWork.Task> GetInsolvence(ItemToOcrQueue item)
+        {
+            HlidacStatu.Entities.Insolvence.Rizeni? insolv = (await InsolvenceRepo.LoadFromEsAsync(item.ItemId, false, false))?.Rizeni;
+
+            if (insolv == null)
+                return null;
+            HlidacStatu.DS.Api.OcrWork.Task res = new HlidacStatu.DS.Api.OcrWork.Task();
+            res.taskId = item.Pk.ToString();
+            res.type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva;
+            res.parentDocId = item.ItemId;
+            res.docs = insolv.Dokumenty
+                //.Where(m => Uri.TryCreate(m.GetDocumentUrlToDownload(), UriKind.Absolute, out _))
+                .Select(m => new HlidacStatu.DS.Api.OcrWork.Task.Doc()
+                {
+                    origFilename = "",
+                    prilohaId = m.Id,
+                    url = m.Url
+                })
+                .ToArray();
+
+            return res;
+        }
+
+        private async Task<HlidacStatu.DS.Api.OcrWork.Task> GetVZ(ItemToOcrQueue item)
+        {
+            var vz = await VerejnaZakazkaRepo.LoadFromESAsync(item.ItemId);
+
+            if (vz == null)
+                return null;
+            HlidacStatu.DS.Api.OcrWork.Task res = new HlidacStatu.DS.Api.OcrWork.Task();
+            res.taskId = item.Pk.ToString();
+            res.type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva;
+            res.parentDocId = item.ItemId;
+            res.docs = vz.Dokumenty
+                .Where(m => Uri.TryCreate(m.GetDocumentUrlToDownload(), UriKind.Absolute, out _))
+                .Select(m => new HlidacStatu.DS.Api.OcrWork.Task.Doc()
+                {
+                    origFilename = m.Name,
+                    prilohaId = m.GetUniqueId(),
+                    url = m.GetDocumentUrlToDownload()
+                })
+                .ToArray();
+
+            return res;
         }
 
         private async Task<HlidacStatu.DS.Api.OcrWork.Task> GetSmlouva(ItemToOcrQueue item)
@@ -142,11 +230,20 @@ namespace HlidacStatuApi.Controllers.ApiV2
         public async Task<ActionResult> Save([FromBody] HlidacStatu.DS.Api.OcrWork.Task res)
         {
             CheckRoleRecord(this.User.Identity.Name);
-            if (res.type == HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva)
+            switch (res.type)
             {
-                var done = await _saveSmlouva(res);
-                ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
-                return StatusCode(200);
+                case HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva:
+                    var done = await _saveSmlouva(res);
+                    ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
+                    return StatusCode(200);
+                case HlidacStatu.DS.Api.OcrWork.DocTypes.VerejnaZakazka:
+                    break;
+                case HlidacStatu.DS.Api.OcrWork.DocTypes.Dataset:
+                    break;
+                case HlidacStatu.DS.Api.OcrWork.DocTypes.Insolvence:
+                    break;
+                default:
+                    break;
             }
             return StatusCode(200);
         }
@@ -280,84 +377,188 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             return true;
         }
-
-
-        [ApiExplorerSettings(IgnoreApi = true)]
-        //[Authorize(Roles = "blurredAPIAccess")]
-        [HttpPost("Log")]
-        public async Task<ActionResult> Log([FromBody] string log)
+        private async Task<bool> _saveInsolvence(HlidacStatu.DS.Api.OcrWork.Task res)
         {
-            CheckRoleRecord(this.User.Identity.Name);
-
-            HlidacStatuApi.Code.Log.Logger.Error(
-                "{action} {from} {user} {ip} {message}",
-                "RemoteLog",
-                "TablesInDocsMinion",
-                HttpContext?.User?.Identity?.Name,
-                HttpContext.Connection.RemoteIpAddress?.ToString(),
-                log);
-
-            return StatusCode(200);
-        }
-
-        private static void CheckRoleRecord(string username)
-        {
-            return;
-            //check if user is in blurredAPIAccess roles
-            try
+            HlidacStatu.Entities.Insolvence.Rizeni? insolv = (await InsolvenceRepo.LoadFromEsAsync(res.parentDocId, false, false))?.Rizeni;
+            if (insolv == null)
             {
-                var found = HlidacStatu.Connectors.DirectDB.GetList<string, string>(
-                    "select u.Id, ur.UserId from AspNetUsers u left join AspNetUserRoles ur on u.id = ur.UserId and ur.RoleId='e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' where u.UserName = @username",
-                    System.Data.CommandType.Text, new IDataParameter[] { new SqlParameter("username", username) }
-                    );
-                if (found.Count() == 0)
-                    return;
-                if (found.Count() == 1 && found.First().Item2 == null)
+                HlidacStatuApi.Code.Log.Logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
+                return false;
+            }
+            foreach (var doc in res.docs)
+            {
+                var att = insolv.Dokumenty
+                    .FirstOrDefault(m => m.Id == doc.prilohaId);
+                if (att != null)
                 {
-                    HlidacStatu.Connectors.DirectDB.NoResult(
-                        @"insert into AspNetUserRoles select  (select id from AspNetUsers where Email like @username) as userId,'e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' as roleId",
-                        System.Data.CommandType.Text, new IDataParameter[] { new SqlParameter("username", username) }
+                    var mergedDoc = doc.result.MergedDocuments();
+                    att.PlainText = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(mergedDoc.Text);
+                    att.Lenght = att.PlainText.Length;
+                    att.WordCount = Devmasters.TextUtil.CountWords(att.PlainText);
+
+                    att.LastUpdate = DateTime.Now;
+                }//docs.count = 1
+            }
+            await InsolvenceRepo.SaveRizeniAsync(insolv);
+            return true;
+        }
+        private async Task<bool> _saveVZ(HlidacStatu.DS.Api.OcrWork.Task res)
+        {
+            var vz = await VerejnaZakazkaRepo.LoadFromESAsync(res.parentDocId);
+            if (vz == null)
+            {
+                HlidacStatuApi.Code.Log.Logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
+                return false;
+            }
+            foreach (var doc in res.docs)
+            {
+                HlidacStatu.Entities.VZ.VerejnaZakazka.Document? att = vz.Dokumenty
+                    .FirstOrDefault(m => m.GetUniqueId()== doc.prilohaId);
+                if (att != null)
+                {
+                    var mergedDoc = doc.result.MergedDocuments();
+                    att.ContentType = mergedDoc.ContentType;
+                    att.PlainText = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(mergedDoc.Text);
+                    if (mergedDoc.UsedOCR)
+                        att.PlainTextContentQuality = DataQualityEnum.Estimated;
+                    else
+                        att.PlainTextContentQuality = DataQualityEnum.Parsed;
+                    att.ContentType = mergedDoc.ContentType;
+                    att.Lenght = att.PlainText.Length;
+                    att.WordCount = Devmasters.TextUtil.CountWords(att.PlainText);
+                    att.LastUpdate = DateTime.Now;
+                }//docs.count = 1
+            }
+            await VerejnaZakazkaRepo.UpsertAsync(vz);
+            return true;
+        }
+        private async Task<bool> _saveDataset(HlidacStatu.DS.Api.OcrWork.Task res)
+            {
+                var task = ItemToOcrQueue.GetTask(Convert.ToInt32(res.taskId));
+                if (task == null)
+                {
+                    HlidacStatuApi.Code.Log.Logger.Error("Cannot get task {taskId}.", res.taskId);
+                    return false;
+                }
+
+                var ds = DataSet.CachedDatasets.Get(task.ItemSubType.ToLower());
+                if (ds == null)
+                {
+                    HlidacStatuApi.Code.Log.Logger.Error("Cannot get dataset {datasetname} from task {taskId}.", task.ItemSubType.ToLower(), res.taskId);
+                    return false;
+                }
+                var item = await ds.GetDataObjAsync(task.ItemId);
+                if (item == null)
+                {
+                    HlidacStatuApi.Code.Log.Logger.Error("Cannot get item {datasetitemid} dataset {datasetname} from task {taskId}.", task.ItemId, task.ItemSubType.ToLower(), res.taskId);
+                    return false;
+                }
+
+                var jobj = (Newtonsoft.Json.Linq.JObject)item;
+                var jpaths = jobj
+                    .SelectTokens("$..HsProcessType")
+                    .ToArray();
+                var jpathObjs = jpaths.Select(j => j.Parent.Parent).ToArray();
+
+                foreach (var jo in jpathObjs)
+                {
+                    if (DataSet.OCRCommands.Contains(jo["HsProcessType"].Value<string>()))
+                    {
+                        if (jo["DocumentUrl"] != null &&
+                              Uri.TryCreate(jo["DocumentUrl"].Value<string>(), UriKind.Absolute, out var uri2Ocr))
+                        {
+                            if (res.docs.Any(m => m.url.ToLower() == uri2Ocr.AbsoluteUri.ToLower()))
+                            {
+                                jo["DocumentPlainText"] = HlidacStatu.DS.Api.OcrWork.Result.MergeDocumentsIntoOne(
+                                        res.docs
+                                        .First(m => m.url.ToLower() == uri2Ocr.AbsoluteUri.ToLower())
+                                        .result.Documents
+                                    ).Text;
+                            }
+                        }
+                    }
+                }
+
+                await ds.AddDataAsync(jobj.ToString(), task.ItemId, jobj["DbCreatedBy"].Value<string>(), true, true);
+                return true;
+            }
+
+            [ApiExplorerSettings(IgnoreApi = true)]
+            //[Authorize(Roles = "blurredAPIAccess")]
+            [HttpPost("Log")]
+            public async Task<ActionResult> Log([FromBody] string log)
+            {
+                CheckRoleRecord(this.User.Identity.Name);
+
+                HlidacStatuApi.Code.Log.Logger.Error(
+                    "{action} {from} {user} {ip} {message}",
+                    "RemoteLog",
+                    "TablesInDocsMinion",
+                    HttpContext?.User?.Identity?.Name,
+                    HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    log);
+
+                return StatusCode(200);
+            }
+
+            private static void CheckRoleRecord(string username)
+            {
+                return;
+                //check if user is in blurredAPIAccess roles
+                try
+                {
+                    var found = HlidacStatu.Connectors.DirectDB.GetList<string, string>(
+                        "select u.Id, ur.UserId from AspNetUsers u left join AspNetUserRoles ur on u.id = ur.UserId and ur.RoleId='e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' where u.UserName = @username",
+                        System.Data.CommandType.Text, new System.Data.IDataParameter[] { new SqlParameter("username", username) }
                         );
+                    if (found.Count() == 0)
+                        return;
+                    if (found.Count() == 1 && found.First().Item2 == null)
+                    {
+                        HlidacStatu.Connectors.DirectDB.NoResult(
+                            @"insert into AspNetUserRoles select  (select id from AspNetUsers where Email like @username) as userId,'e9a30ca6-8aa7-423c-88f2-b7dd24eda7f8' as roleId",
+                            System.Data.CommandType.Text, new System.Data.IDataParameter[] { new SqlParameter("username", username) }
+                            );
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    HlidacStatuApi.Code.Log.Logger.Error("cannot add {username} to the role blurredAPIAccess", e, username);
                 }
 
             }
-            catch (Exception e)
+
+
+            //[ApiExplorerSettings(IgnoreApi = true)]
+            //[Authorize(Roles = "blurredAPIAccess")]
+            [HttpGet("AddTask")]
+            public async Task<ActionResult<bool>> AddTask(string id, bool force = true)
             {
-                HlidacStatuApi.Code.Log.Logger.Error("cannot add {username} to the role blurredAPIAccess", e, username);
+                return await HlidacStatu.Lib.Data.External.Tables.TablesInDocs.Minion.CreateNewTaskAsync(id, force);
             }
 
-        }
-
-
-        //[ApiExplorerSettings(IgnoreApi = true)]
-        //[Authorize(Roles = "blurredAPIAccess")]
-        [HttpGet("AddTask")]
-        public async Task<ActionResult<bool>> AddTask(string id, bool force = true)
-        {
-            return await HlidacStatu.Lib.Data.External.Tables.TablesInDocs.Minion.CreateNewTaskAsync(id, force);
-        }
-
-        //[ApiExplorerSettings(IgnoreApi = true)]
-        //[Authorize(Roles = "blurredAPIAccess")]
-        [HttpGet("Stats")]
-        public async Task<ActionResult<BlurredPageAPIStatistics>> Stats()
-        {
-            using HlidacStatu.Q.Simple.Queue<BpTask> q = new HlidacStatu.Q.Simple.Queue<BpTask>(
-                BlurredPageProcessingQueueName,
-                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
-            );
-
-
-            DateTime now = DateTime.Now;
-            var res = new BlurredPageAPIStatistics()
+            //[ApiExplorerSettings(IgnoreApi = true)]
+            //[Authorize(Roles = "blurredAPIAccess")]
+            [HttpGet("Stats")]
+            public async Task<ActionResult<BlurredPageAPIStatistics>> Stats()
             {
-                total = q.MessageCount()
-            };
+                using HlidacStatu.Q.Simple.Queue<BpTask> q = new HlidacStatu.Q.Simple.Queue<BpTask>(
+                    BlurredPageProcessingQueueName,
+                    Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                );
 
-            return res;
+
+                DateTime now = DateTime.Now;
+                var res = new BlurredPageAPIStatistics()
+                {
+                    total = q.MessageCount()
+                };
+
+                return res;
+            }
+
+
+
         }
-
-
-
     }
-}
