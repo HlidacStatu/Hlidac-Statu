@@ -11,7 +11,7 @@ namespace HlidacStatu.Web.Framework
         public static readonly string ApiToken = "";
 
 
-        public const string AntispamInputName = "email_22x";
+        public const string AntispamInputName = "zip_2";
 
         public const string CacheKeyName = "H_CacheKey";
 

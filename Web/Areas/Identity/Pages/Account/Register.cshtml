@@ -37,7 +37,7 @@
         <h4>Vytvoření účtu přímo na Hlídači státu</h4>
         <form asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal" autocomplete="off">
             <div asp-validation-summary="All" class="text-danger"></div>
-            @* <honeypot></honeypot> *@
+            <honeypot></honeypot>
             <div class="form-group">
                 <label asp-for="Input.Email" class="col-md-2 control-label">E-mail</label>
                 <div class="col-sm-8">
