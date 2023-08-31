@@ -1,6 +1,5 @@
 ﻿using Devmasters.Collections;
 using HlidacStatu.Datasets;
-using HlidacStatu.DS.Api;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Enhancers;
 using HlidacStatu.Repositories;
@@ -80,7 +79,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 }
                 else
                 {
-                    item = new ItemToOcrQueue() 
+                    item = new ItemToOcrQueue()
                     {
                         ItemId = itemId,
                         ItemSubType = itemSubType,
@@ -135,6 +134,10 @@ namespace HlidacStatuApi.Controllers.ApiV2
         private async Task<HlidacStatu.DS.Api.OcrWork.Task> GetDatasetItem(ItemToOcrQueue item)
         {
             //await DoOCRDatasetAsync(item.ItemSubType, null, new string[] { item.ItemId }, null, true, false, 100, lengthLess);
+            if (string.IsNullOrWhiteSpace(item.ItemSubType.ToLower()))
+            {
+                return null;
+            }
             if (!DataSet.ExistsDataset(item.ItemSubType.ToLower()))
             {
                 return null;
@@ -264,21 +267,27 @@ namespace HlidacStatuApi.Controllers.ApiV2
             CheckRoleRecord(this.User.Identity.Name);
             try
             {
-
+                bool done = false;
                 switch (res.type)
                 {
                     case HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva:
-                        var done = await _saveSmlouva(res);
+                        done = await _saveSmlouva(res);
                         ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
                         return StatusCode(200);
                     case HlidacStatu.DS.Api.OcrWork.DocTypes.VerejnaZakazka:
-                        break;
+                        done = await _saveVZ(res);
+                        ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
+                        return StatusCode(200);
                     case HlidacStatu.DS.Api.OcrWork.DocTypes.Dataset:
-                        break;
+                        done = await _saveDataset(res);
+                        ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
+                        return StatusCode(200);
                     case HlidacStatu.DS.Api.OcrWork.DocTypes.Insolvence:
-                        break;
+                        done = await _saveInsolvence(res);
+                        ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
+                        return StatusCode(200);
                     default:
-                        break;
+                        return StatusCode(404);
                 }
             }
             catch (Exception e)
@@ -475,12 +484,6 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
         private async Task<bool> _saveDataset(HlidacStatu.DS.Api.OcrWork.Task res)
         {
-            var task = ItemToOcrQueue.GetTask(Convert.ToInt32(res.taskId));
-            if (task == null)
-            {
-                HlidacStatuApi.Code.Log.Logger.Error("Cannot get task {taskId}.", res.taskId);
-                return false;
-            }
 
             var ds = DataSet.CachedDatasets.Get(task.ItemSubType.ToLower());
             if (ds == null)
