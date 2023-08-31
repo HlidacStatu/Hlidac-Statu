@@ -32,11 +32,24 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 ItemId="5247700",
                 ItemType = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva.ToString(),
                 Pk = 0,
-            },
-            new ItemToOcrQueue()
+            }
+            ,new ItemToOcrQueue()
             {
                 ItemId="f2b68b53f77c45b684a6314bac32e864",
                 ItemType = HlidacStatu.DS.Api.OcrWork.DocTypes.VerejnaZakazka.ToString(),
+                Pk = 0,
+            }
+            ,new ItemToOcrQueue()
+            {
+                ItemId="INS 3185/2020",
+                ItemType = HlidacStatu.DS.Api.OcrWork.DocTypes.Insolvence.ToString(),
+                Pk = 0,
+            }
+            ,new ItemToOcrQueue()
+            {
+                ItemId="KORNB7JCJE54",
+                ItemSubType="veklep",
+                ItemType = HlidacStatu.DS.Api.OcrWork.DocTypes.Dataset.ToString(),
                 Pk = 0,
             }
 
@@ -49,6 +62,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
         public async Task<ActionResult<HlidacStatu.DS.Api.OcrWork.Task>> GetTask(bool? demo = null)
         {
             CheckRoleRecord(this.User.Identity.Name);
+            ItemToOcrQueue item = null;
+            int tries = 0;
 
             if (demo == true)
             {
@@ -56,17 +71,19 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 demoCounter++;
                 if (demoCounter >= demodata.Length)
                     demoCounter = 0;
-                return await GetSmlouva(resd);
+                item = resd;
+            }
+            else
+            {
+                var items = HlidacStatu.Entities.ItemToOcrQueue.TakeFromQueue(HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva, maxItems: 1);
+                if (items == null)
+                    return StatusCode(404);
+                if (items.Count() == 0)
+                    return StatusCode(404);
+                item = items.First();
             }
 
-            int tries = 0;
         start:
-            var items = HlidacStatu.Entities.ItemToOcrQueue.TakeFromQueue(HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva, maxItems: 1);
-            if (items == null)
-                return StatusCode(404);
-            if (items.Count() == 0)
-                return StatusCode(404);
-            ItemToOcrQueue item = items.First();
             HlidacStatu.DS.Api.OcrWork.DocTypes itemType = Enum.Parse<HlidacStatu.DS.Api.OcrWork.DocTypes>(item.ItemType);
 
             HlidacStatu.DS.Api.OcrWork.Task task = null;
@@ -251,7 +268,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception e)
             {
-                HlidacStatuApi.Code.Log.Logger.Error(e,"Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
+                HlidacStatuApi.Code.Log.Logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", e, res.taskId, res.parentDocId, res.type);
                 return StatusCode(500);
             }
             return StatusCode(200);
