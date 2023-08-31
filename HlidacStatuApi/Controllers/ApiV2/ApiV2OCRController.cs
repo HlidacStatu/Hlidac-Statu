@@ -429,7 +429,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
         private async Task<bool> _saveInsolvence(HlidacStatu.DS.Api.OcrWork.Task res)
         {
-            HlidacStatu.Entities.Insolvence.Rizeni? insolv = (await InsolvenceRepo.LoadFromEsAsync(res.parentDocId, false, false))?.Rizeni;
+            HlidacStatu.Entities.Insolvence.Rizeni? insolv = (await InsolvenceRepo.LoadFromEsAsync(res.parentDocId, true, false))?.Rizeni;
             if (insolv == null)
             {
                 HlidacStatuApi.Code.Log.Logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
