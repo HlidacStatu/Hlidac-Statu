@@ -484,6 +484,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
         private async Task<bool> _saveDataset(HlidacStatu.DS.Api.OcrWork.Task res)
         {
+            var task = ItemToOcrQueue.GetTask(Convert.ToInt32(res.taskId));
+            if (task == null)
+            {
+                HlidacStatuApi.Code.Log.Logger.Error("Cannot get task {taskId}.", res.taskId);
+                return false;
+            }
 
             var ds = DataSet.CachedDatasets.Get(task.ItemSubType.ToLower());
             if (ds == null)
