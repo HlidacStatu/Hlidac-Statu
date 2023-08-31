@@ -132,7 +132,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 HlidacStatu.DS.Api.OcrWork.Task res = new HlidacStatu.DS.Api.OcrWork.Task();
                 res.taskId = item.Pk.ToString();
-                res.type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva;
+                res.type = HlidacStatu.DS.Api.OcrWork.DocTypes.Dataset;
                 res.parentDocId = item.ItemId;
                 res.docs = uris
                     .Select(m => new HlidacStatu.DS.Api.OcrWork.Task.Doc()
@@ -157,7 +157,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 return null;
             HlidacStatu.DS.Api.OcrWork.Task res = new HlidacStatu.DS.Api.OcrWork.Task();
             res.taskId = item.Pk.ToString();
-            res.type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva;
+            res.type = HlidacStatu.DS.Api.OcrWork.DocTypes.Insolvence;
             res.parentDocId = item.ItemId;
             res.docs = insolv.Dokumenty
                 //.Where(m => Uri.TryCreate(m.GetDocumentUrlToDownload(), UriKind.Absolute, out _))
@@ -180,7 +180,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 return null;
             HlidacStatu.DS.Api.OcrWork.Task res = new HlidacStatu.DS.Api.OcrWork.Task();
             res.taskId = item.Pk.ToString();
-            res.type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva;
+            res.type = HlidacStatu.DS.Api.OcrWork.DocTypes.VerejnaZakazka;
             res.parentDocId = item.ItemId;
             res.docs = vz.Dokumenty
                 .Where(m => Uri.TryCreate(m.GetDocumentUrlToDownload(), UriKind.Absolute, out _))
