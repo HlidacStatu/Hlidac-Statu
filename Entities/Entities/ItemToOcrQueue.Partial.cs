@@ -9,7 +9,7 @@ namespace HlidacStatu.Entities
 {
     public partial class ItemToOcrQueue
     {
-        public void SetOptions(OcrWork.ItemOption option)
+        public void SetOptions(OcrWork.TaskOptions option)
         {
             if (option == null)
                 this.Options = null;
@@ -19,18 +19,18 @@ namespace HlidacStatu.Entities
             _options = option;
         }
 
-        OcrWork.ItemOption _options = null;
-        public OcrWork.ItemOption GetOptions()
+        OcrWork.TaskOptions _options = null;
+        public OcrWork.TaskOptions GetOptions()
         {
             if (_options == null)
             {
-                var itemOptions = OcrWork.ItemOption.Default;
+                var itemOptions = OcrWork.TaskOptions.Default;
                 try
                 {
                     if (string.IsNullOrEmpty(this.Options))
-                        return OcrWork.ItemOption.Default;
+                        return OcrWork.TaskOptions.Default;
 
-                    itemOptions = Newtonsoft.Json.JsonConvert.DeserializeObject<OcrWork.ItemOption>(this.Options);
+                    itemOptions = Newtonsoft.Json.JsonConvert.DeserializeObject<OcrWork.TaskOptions>(this.Options);
 
                 }
                 catch (Exception)
@@ -118,31 +118,26 @@ namespace HlidacStatu.Entities
        
 
 
-        public static Lib.OCR.Api.Result AddNewTask(OcrWork.DocTypes itemType, string itemId, string itemSubType = null,
-            Lib.OCR.Api.Client.TaskPriority priority = Lib.OCR.Api.Client.TaskPriority.Standard,
-            OcrWork.ItemOption options = null
+        public static void AddNewTask(OcrWork.DocTypes itemType, string itemId, string itemSubType = null,
+            DS.Api.OcrWork.TaskPriority priority = DS.Api.OcrWork.TaskPriority.Standard,
+            OcrWork.TaskOptions options = null
             )
         {
-            return AddNewTask(itemType, itemId, itemSubType, (int)priority, options);
+             AddNewTask(itemType, itemId, itemSubType, (int)priority, options);
         }
-        public static Lib.OCR.Api.Result AddNewTask(OcrWork.DocTypes itemType, string itemId,
+        public static void AddNewTask(OcrWork.DocTypes itemType, string itemId,
             string itemSubType = null, int priority = 5,
-            OcrWork.ItemOption options = null
+            OcrWork.TaskOptions options = null
             )
         {
-            options = options ?? OcrWork.ItemOption.Default;
+            options = options ?? OcrWork.TaskOptions.Default;
 
             using (DbEntities db = new DbEntities())
             {
                 IQueryable<ItemToOcrQueue> sql = CreateQuery(db, itemType, itemSubType);
                 sql = sql.Where(m => m.ItemId == itemId);
                 var _sql = sql.ToQueryString();
-                if (sql.Any()) //already in the queue
-                    return new Lib.OCR.Api.Result()
-                    {
-                        IsValid = Lib.OCR.Api.Result.ResultStatus.InQueueWithCallback,
-                        Id = "uknown"
-                    };
+               
 
                 ItemToOcrQueue i = new ItemToOcrQueue();
                 i.Created = DateTime.Now;
@@ -153,11 +148,7 @@ namespace HlidacStatu.Entities
                 i.SetOptions(options);
                 db.ItemToOcrQueue.Add(i);
                 db.SaveChanges();
-                return new Lib.OCR.Api.Result()
-                {
-                    IsValid = Lib.OCR.Api.Result.ResultStatus.InQueueWithCallback,
-                    Id = "uknown"
-                };
+                
             }
         }
 

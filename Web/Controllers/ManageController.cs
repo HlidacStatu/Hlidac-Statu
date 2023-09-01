@@ -244,7 +244,7 @@ namespace HlidacStatu.Web.Controllers
             string oldJson = form["oldJson"];
             string newJson = form["jsonRaw"];
             Smlouva s = Newtonsoft.Json.JsonConvert.DeserializeObject<Smlouva>(newJson);
-            await SmlouvaRepo.SaveAsync(s);
+            await SmlouvaRepo.SaveAsync(s, fireOCRDone:true);
 
             return Redirect("Index");
         }

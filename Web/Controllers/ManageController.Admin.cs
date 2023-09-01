@@ -140,7 +140,7 @@ namespace HlidacStatu.Web.Controllers
                 s.Issues = issues.ToArray();
 
 
-                await SmlouvaRepo.SaveAsync(s);
+                await SmlouvaRepo.SaveAsync(s, fireOCRDone: false);
                 return Redirect(s.GetUrl(true));
             }
         }

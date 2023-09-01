@@ -806,7 +806,7 @@ namespace HlidacStatu.Datasets
                             ItemToOcrQueue.AddNewTask(OcrWork.DocTypes.Dataset,
                                 finalId,
                                 datasetId,
-                                Lib.OCR.Api.Client.TaskPriority.Standard);
+                                DS.Api.OcrWork.TaskPriority.Standard);
                         }
                     }
                 }

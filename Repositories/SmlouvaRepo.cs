@@ -264,29 +264,29 @@ namespace HlidacStatu.Repositories
                 .Distinct()
         );
 
-        public static string SmlouvaProcessingQueueName = "smlouvy2Process";
-        public static string SmlouvaProcessingQueueNameOnDemand = "smlouvy2ProcessOnDemand";
+        //public static string SmlouvaProcessingQueueName = "smlouvy2Process";
+        //public static string SmlouvaProcessingQueueNameOnDemand = "smlouvy2ProcessOnDemand";
         public static bool AddToProcessingQueue(this Smlouva smlouva,
                 bool forceOCR = false,
                 bool forceClassification = false,
                 bool forceTablesMining = false,
                 bool forceBlurredPages = false,
-                bool onDemandQueue = false
+            decimal priorityBoost = 1.0m
             )
         {
-            return AddToProcessingQueue(smlouva.Id, forceOCR, forceClassification, forceTablesMining, forceBlurredPages,onDemandQueue);
+            return AddToProcessingQueue(smlouva.Id, forceOCR, forceClassification, forceTablesMining, forceBlurredPages, priorityBoost);
         }
         public static bool AddToProcessingQueue(this string smlouvaId,
         bool forceOCR = false,
         bool forceClassification = false,
         bool forceTablesMining = false,
         bool forceBlurredPages = false,
-        bool onDemandQueue = false
+            decimal priorityBoost = 1.0m
 
     )
         {
-            return AddToProcessingQueue(new string[] {smlouvaId}, 
-                forceOCR, forceClassification,forceTablesMining,forceBlurredPages, onDemandQueue);
+            return AddToProcessingQueue(new string[] { smlouvaId },
+                forceOCR, forceClassification, forceTablesMining, forceBlurredPages, priorityBoost);
         }
 
         public static bool AddToProcessingQueue(IEnumerable<string> smlouvyIds,
@@ -294,49 +294,93 @@ namespace HlidacStatu.Repositories
             bool forceClassification = false,
             bool forceTablesMining = false,
             bool forceBlurredPages = false,
-            bool onDemandQueue = false
+            decimal priorityBoost = 1.0m
             )
         {
-
-            string queueName = onDemandQueue ? SmlouvaProcessingQueueNameOnDemand : SmlouvaProcessingQueueName;
-
-            using HlidacStatu.Q.Simple.Queue<Smlouva.Queued> q = new Q.Simple.Queue<Smlouva.Queued>(
-                queueName,
-                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
-                );
-
-            q.Send(
-                smlouvyIds.Select(m=> new Smlouva.Queued()
-                {
-                    SmlouvaId = m,
-                    ForceBlurredPages = forceBlurredPages,
-                    ForceClassification = forceClassification,
-                    ForceOCR = forceOCR,
-                    ForceTablesMining = forceTablesMining
-                })                
-                );
-            return true;
+            return AddToProcessingQueue(smlouvyIds, priorityBoost,
+            new DS.Api.OcrWork.TaskOptions()
+            {
+                forceOCR = forceOCR,
+                forceBlurredPages = forceBlurredPages,
+                forceClassification = forceClassification,
+                forceTablesMining = forceTablesMining
+            });
         }
-        public static Smlouva.Queued GetSmlouvaFromProcessingQueue(bool onDemandQueue = false)
+        public static bool AddToProcessingQueue(IEnumerable<string> smlouvyIds,
+            decimal priorityBoost = 1.0m,
+            DS.Api.OcrWork.TaskOptions options = null
+            )
         {
-            string queueName = onDemandQueue ? SmlouvaProcessingQueueNameOnDemand : SmlouvaProcessingQueueName;
+            var res = true;
+            foreach (var id in smlouvyIds)
+            {
+                ItemToOcrQueue.AddNewTask(DS.Api.OcrWork.DocTypes.Smlouva,
+                    id, null,
+                    (int)((int)DS.Api.OcrWork.TaskPriority.Standard * priorityBoost),
+                    options
+            );
 
-            using HlidacStatu.Q.Simple.Queue<Smlouva.Queued> q = new Q.Simple.Queue<Smlouva.Queued>(
-                queueName,
+            }
+            return res;
+        }
+
+        /*        public static Smlouva.Queued GetSmlouvaFromProcessingQueue(bool onDemandQueue = false)
+                {
+                    string queueName = onDemandQueue ? SmlouvaProcessingQueueNameOnDemand : SmlouvaProcessingQueueName;
+
+                    using HlidacStatu.Q.Simple.Queue<Smlouva.Queued> q = new Q.Simple.Queue<Smlouva.Queued>(
+                        queueName,
+                        Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                        );
+
+                    ulong? id = null;
+                    var sq = q.GetAndAck(out id);
+                    if (sq != null)
+                    {
+                        sq.ItemIdInQueue = id;
+                    }
+                    return sq;
+                }
+        */
+
+
+        public static DS.Api.OcrWork.Task GetSmlouvaWithFinishedOCR()
+        {
+            using HlidacStatu.Q.Simple.Queue<DS.Api.OcrWork.Task> q = new HlidacStatu.Q.Simple.Queue<DS.Api.OcrWork.Task>(
+                DS.Api.OcrWork.OCRDoneProcessingQueueName,
                 Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
                 );
 
             ulong? id = null;
             var sq = q.GetAndAck(out id);
-            if (sq != null)
-            {
-                sq.ItemIdInQueue = id;
-            }
+
             return sq;
         }
 
+        public static bool FireOCRDoneEvent(Smlouva smlouva)
+        {
 
-        public static async Task<bool> SaveAsync(Smlouva smlouva, ElasticClient client = null, bool updateLastUpdateValue = true, bool skipPrepareBeforeSave = false)
+            if (smlouva == null)
+                return false;
+
+            using HlidacStatu.Q.Simple.Queue<DS.Api.OcrWork.Task> q = new HlidacStatu.Q.Simple.Queue<DS.Api.OcrWork.Task>(
+                DS.Api.OcrWork.OCRDoneProcessingQueueName,
+                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                );
+            var task = new DS.Api.OcrWork.Task()
+            {
+                parentDocId = smlouva.Id,
+                type = DS.Api.OcrWork.DocTypes.Smlouva,
+            };
+            q.Send(task);
+
+            return true;
+        }
+        public static async Task<bool> SaveAsync(Smlouva smlouva,
+            ElasticClient client = null,
+            bool updateLastUpdateValue = true,
+            bool skipPrepareBeforeSave = false,
+            bool fireOCRDone = false)
         {
             if (smlouva == null)
                 return false;
@@ -359,7 +403,7 @@ namespace HlidacStatu.Repositories
                 {
                     foreach (var pr in preSml.Prijemce)
                     {
-                        updateStat = updateStat || smlouva.Prijemce.Any(p => p.ico == pr.ico)==false;
+                        updateStat = updateStat || smlouva.Prijemce.Any(p => p.ico == pr.ico) == false;
                     }
                     foreach (var pr in smlouva.Prijemce)
                     {
@@ -401,7 +445,8 @@ namespace HlidacStatu.Repositories
                     Recalculate.AddFirmaToProcessingQueue(pr.ico, RecalculateItem.StatisticsTypeEnum.Smlouva, $"smlouva {smlouva.Id}");
             }
 
-
+            if (fireOCRDone == true)
+                FireOCRDoneEvent(smlouva);
             return res.IsValid;
         }
 
@@ -484,14 +529,15 @@ namespace HlidacStatu.Repositories
                         .ToArray();
                 }
 
-                await SaveAsync(smlouva);
+                await SaveAsync(smlouva, fireOCRDone: false
+                    );
             }
             else if (platnyZaznam == false && smlouva.znepristupnenaSmlouva() == false)
             {
                 smlouva.platnyZaznam = platnyZaznam;
                 if (!smlouva.Issues.Any(m => m.IssueTypeId == -1))
                     smlouva.AddSpecificIssue(issue);
-                await SaveAsync(smlouva);
+                await SaveAsync(smlouva, fireOCRDone: false);
             }
         }
 
@@ -597,7 +643,7 @@ namespace HlidacStatu.Repositories
             if (s.Classification?.Version == 1 && s.Classification?.Types != null)
             {
                 s.Classification.ConvertToV2();
-                await SaveAsync(s, null, false);
+                await SaveAsync(s, null, false, fireOCRDone: false);
             }
 
             return s;

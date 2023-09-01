@@ -1,5 +1,5 @@
 ﻿using HlidacStatu.Api.Dataset.Connector;
-
+using HlidacStatu.DS.Api;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -116,7 +116,7 @@ namespace Vybory_PSP
                                 var ocrRes = HlidacStatu.Lib.OCR.Api.Client.TextFromUrl(
                                     Devmasters.Config.GetWebConfigValue("OCRServerApiKey"),
                                     new Uri(d.DocumentUrl),
-                                    "Vybory-PSP-parser", HlidacStatu.Lib.OCR.Api.Client.TaskPriority.High,
+                                    "Vybory-PSP-parser", OcrWork.TaskPriority.High,
                                      HlidacStatu.Lib.OCR.Api.Client.MiningIntensity.Maximum,
                                     null, TimeSpan.FromMinutes(120));
 

@@ -10,6 +10,10 @@ namespace HlidacStatu.Connectors
     {
         public static string DefaultCnnStr = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection");
 
+        public static T GetValue<T>(string sql, CommandType type = CommandType.Text, IDataParameter[] param = null, string cnnString = null)
+        {
+            return GetList<T>(GetRowValues<T>, sql, type, param, cnnString).FirstOrDefault();
+        }
 
         public static IEnumerable<T> GetList<T>(string sql, CommandType type = CommandType.Text, IDataParameter[] param = null, string cnnString = null)
         {

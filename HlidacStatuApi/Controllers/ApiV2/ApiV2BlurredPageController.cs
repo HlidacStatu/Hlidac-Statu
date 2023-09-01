@@ -237,7 +237,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                         }
                     }
                 }
-                _ = await SmlouvaRepo.SaveAsync(sml, updateLastUpdateValue: false, skipPrepareBeforeSave: true);
+                _ = await SmlouvaRepo.SaveAsync(sml, updateLastUpdateValue: false, skipPrepareBeforeSave: true, fireOCRDone:false);
 
             }
             try

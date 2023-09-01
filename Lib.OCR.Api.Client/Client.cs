@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 
 using System;
 using System.Threading.Tasks;
+using HlidacStatu.DS.Api;
 
 namespace HlidacStatu.Lib.OCR.Api
 {
@@ -28,7 +29,6 @@ namespace HlidacStatu.Lib.OCR.Api
             SetCustomApiURL(defaultApiUrl);
         }
 
-
         public enum MiningIntensity
         {
             ForceOCR = -1,
@@ -36,44 +36,34 @@ namespace HlidacStatu.Lib.OCR.Api
             SkipOCR = 1
         }
 
-        public enum TaskPriority
-        {
-            Lowest = 0,
-            Low = 5,
-            Standard = 10,
-            High = 20,
-            Immediate = 100,
-            Critical = 999,
-        }
-
         public static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.OCR.Api.Client");
 
         public static TimeSpan defaultWaitingTime = TimeSpan.FromHours(1);
 
-        #region with TaskPriority
+        #region with OcrWork.TaskPriority
 
 
-        public static async Task<Result> TextFromUrlAsync(string apikey, Uri url, string client, TaskPriority priority,
+        public static async Task<Result> TextFromUrlAsync(string apikey, Uri url, string client, OcrWork.TaskPriority priority,
             MiningIntensity intensity, string origFilename = null, TimeSpan? maxWaitingTime = null,
             TimeSpan? restartTaskAfterTime = null/*, Api.CallbackData callBackData = null*/)
         {
             return await TextFromUrlAsync(apikey, url, client, (int)priority, intensity, origFilename, maxWaitingTime, restartTaskAfterTime/*, callBackData */);
         }
-        public static async Task<Result> TextFromFileAsync(string apikey, string fileOnDisk, string client, TaskPriority priority,
+        public static async Task<Result> TextFromFileAsync(string apikey, string fileOnDisk, string client, OcrWork.TaskPriority priority,
             MiningIntensity intensity, string origFilename = "", TimeSpan? maxWaitingTime = null,
             TimeSpan? restartTaskAfterTime = null/*, Api.CallbackData callBackData = null*/)
         {
             return await TextFromFileAsync(apikey, fileOnDisk, client, (int)priority, intensity, origFilename, maxWaitingTime, restartTaskAfterTime/*, callBackData */);
         }
 
-        public static Result TextFromFile(string apikey, string fileOnDisk, string client, TaskPriority priority,
+        public static Result TextFromFile(string apikey, string fileOnDisk, string client, OcrWork.TaskPriority priority,
             MiningIntensity intensity, string origFilename = "", TimeSpan? maxWaitingTime = null,
             TimeSpan? restartTaskAfterTime = null/*, Api.CallbackData callBackData = null*/)
         {
             return TextFromFile(apikey, fileOnDisk, client, (int)priority, intensity, origFilename, maxWaitingTime, restartTaskAfterTime/*, callBackData */);
         }
 
-        public static Result TextFromUrl(string apikey, Uri url, string client, TaskPriority priority,
+        public static Result TextFromUrl(string apikey, Uri url, string client, OcrWork.TaskPriority priority,
             MiningIntensity intensity, string origFilename = null, TimeSpan? maxWaitingTime = null,
             TimeSpan? restartTaskAfterTime = null/*, Api.CallbackData callBackData = null*/)
         {

@@ -6,6 +6,6 @@ namespace HlidacStatu.DS.Api
 {
     public partial class OcrWork
     {
-        public static string OCRProcessingQueueName = "blurredPage2Process";
+        public static string OCRDoneProcessingQueueName = "ocrDone";
     }
 }

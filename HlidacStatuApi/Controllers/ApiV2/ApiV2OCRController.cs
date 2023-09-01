@@ -423,7 +423,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             if (changed)
             {
-                _ = await SmlouvaRepo.SaveAsync(sml);
+                _ = await SmlouvaRepo.SaveAsync(sml,fireOCRDone:true);
             }
             return true;
         }

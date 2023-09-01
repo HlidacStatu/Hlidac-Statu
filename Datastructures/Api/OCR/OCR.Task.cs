@@ -1,21 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace HlidacStatu.DS.Api
+﻿namespace HlidacStatu.DS.Api
 {
     public partial class OcrWork
     {
-        public class ItemOption
-        {
-            public bool force { get; set; } = false;
-            public bool missingOnly { get; set; } = true;
-            public int? lengthLessThan { get; set; } = null;
 
-            private static ItemOption _default = new ItemOption();
-            public static ItemOption Default { get => _default; }
+        public class TaskOptions
+        {
+            public bool forceOCR { get; set; } = false;
+            public bool ocrMissingOnly { get; set; } = true;
+            public int? ocrLengthLessThan { get; set; } = null;
+
+            public bool forceClassification { get; set; } = false;
+            public bool forceTablesMining { get; set; } = false;
+            public bool forceBlurredPages { get; set; } = false;
+
+
+            private static TaskOptions _default = new TaskOptions();
+            public static TaskOptions Default { get => _default; }
 
         }
+
+        public enum TaskPriority
+        {
+            Lowest = 0,
+            Low = 5,
+            Standard = 10,
+            High = 20,
+            Immediate = 100,
+            Critical = 999,
+        }
+
 
         public enum DocTypes
         {
@@ -37,7 +50,7 @@ namespace HlidacStatu.DS.Api
             public string taskId { get; set; }
             public string parentDocId { get; set; }
             public Doc[] docs { get; set; }
-
+            public TaskOptions options { get; set; }
             public DocTypes type { get; set; }
 
         }

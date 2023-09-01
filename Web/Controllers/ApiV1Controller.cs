@@ -789,7 +789,7 @@ namespace HlidacStatu.Web.Controllers
                     var newIss = s.Issues.Where(m => m.IssueTypeId != 200).ToList();
                     newIss.AddRange(await textCheck.FindIssuesAsync(s));
                     s.Issues = newIss.ToArray();
-                    await SmlouvaRepo.SaveAsync(s);
+                    await SmlouvaRepo.SaveAsync(s, fireOCRDone: false);
                 }
             }
 

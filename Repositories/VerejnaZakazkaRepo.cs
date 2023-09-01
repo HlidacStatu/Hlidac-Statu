@@ -332,7 +332,7 @@ namespace HlidacStatu.Repositories
                 ItemToOcrQueue.AddNewTask(OcrWork.DocTypes.VerejnaZakazka,
                     newVZ.Id,
                     null,
-                    HlidacStatu.Lib.OCR.Api.Client.TaskPriority.Low);
+                    DS.Api.OcrWork.TaskPriority.Low);
             }
         }
 
