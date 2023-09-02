@@ -361,16 +361,23 @@ namespace HlidacStatu.Repositories
 
         public static bool FireOCRDoneEvent(Smlouva smlouva, OcrWork.TaskOptions options = null)
         {
-            return FireOCRDoneEvent(smlouva?.Id,options);
+            return FireOCRDoneEvent(smlouva?.Id, options);
         }
         public static bool FireOCRDoneEvent(IEnumerable<string> smlouvyIds, OcrWork.TaskOptions options = null)
         {
             bool ok = true;
-            foreach (var id in smlouvyIds)
+
+            using HlidacStatu.Q.Simple.Queue<DS.Api.OcrWork.Task> q = new HlidacStatu.Q.Simple.Queue<DS.Api.OcrWork.Task>(
+                DS.Api.OcrWork.OCRDoneProcessingQueueName,
+                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                );
+            var tasks = smlouvyIds.Select(m => new DS.Api.OcrWork.Task()
             {
-                if (!string.IsNullOrEmpty(id))
-                    ok = ok && FireOCRDoneEvent(id,options);
-            }
+                parentDocId = m,
+                type = DS.Api.OcrWork.DocTypes.Smlouva,
+                options = options
+            });
+            q.Send(tasks);
             return ok;
         }
         public static bool FireOCRDoneEvent(string smlouvaId, OcrWork.TaskOptions options = null)
