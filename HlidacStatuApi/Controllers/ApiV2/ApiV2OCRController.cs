@@ -89,7 +89,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             else
             {
-                var items = HlidacStatu.Entities.ItemToOcrQueue.TakeFromQueue(HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva, maxItems: 1);
+                var items = HlidacStatu.Entities.ItemToOcrQueue.TakeFromQueue(maxItems: 1);
                 if (items == null)
                     return StatusCode(404);
                 if (items.Count() == 0)
