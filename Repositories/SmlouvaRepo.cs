@@ -677,7 +677,7 @@ namespace HlidacStatu.Repositories
 
                         res = includePrilohy
                             ? await c1.GetAsync<Smlouva>(idVerze)
-                            : await c1.GetAsync<Smlouva>(idVerze, s => s.SourceExcludes(sml => sml.Prilohy));
+                            : await c1.GetAsync<Smlouva>(idVerze, s => s.SourceExcludes("prilohy.plainTextContent"));
 
                         if (res.Found)
                             return res.Source;
