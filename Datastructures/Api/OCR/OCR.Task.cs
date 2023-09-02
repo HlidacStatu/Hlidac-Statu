@@ -1,8 +1,22 @@
-﻿namespace HlidacStatu.DS.Api
+﻿using System;
+
+namespace HlidacStatu.DS.Api
 {
     public partial class OcrWork
     {
+        public class OcrWorkStat
+        {
+            public Devmasters.DT.DateInterval TimePeriod { get; set; }
+            public TimeSpan Duration { get; set; }
+            public OcrWork.DocTypes? Type { get; set; }
+            public long Tasks { get; set; }
+            public long Files { get; set; }
+            public long FullOCR { get; set; 
+            }
+            public long ExternalErrors { get; set; }
+            public long InternalErrors { get; set; }
 
+        }
         public class TaskOptions
         {
             public bool forceOCR { get; set; } = false;
