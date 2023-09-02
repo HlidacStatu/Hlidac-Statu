@@ -330,7 +330,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     newPrilohy.Add(att);
 
                 }
-                if (doc.result.Documents.Count > 1)
+                if (doc.result?.Documents?.Count > 1)
                 {
                     //first
                     att.PlainTextContent = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(doc.result.Documents[0].Text);
@@ -391,7 +391,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     //others
 
                 } //docs.count > 1
-                else if (doc.result.Documents.Count == 1)
+                else if (doc.result?.Documents?.Count == 1)
                 {
                     att.PlainTextContent = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(doc.result.Documents[0].Text);
                     if (doc.result.Documents[0].UsedOCR)
@@ -439,7 +439,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 var att = insolv.Dokumenty
                     .FirstOrDefault(m => m.Id == doc.prilohaId);
-                if (att != null)
+                if (att != null && doc.result != null)
                 {
                     var mergedDoc = doc.result.MergedDocuments();
                     att.PlainText = HlidacStatu.Util.ParseTools.NormalizePrilohaPlaintextText(mergedDoc.Text);
@@ -464,7 +464,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 HlidacStatu.Entities.VZ.VerejnaZakazka.Document? att = vz.Dokumenty
                     .FirstOrDefault(m => m.GetUniqueId() == doc.prilohaId);
-                if (att != null)
+                if (att != null && doc.result != null)
                 {
                     var mergedDoc = doc.result.MergedDocuments();
                     att.ContentType = mergedDoc.ContentType;
@@ -519,11 +519,16 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     {
                         if (res.docs.Any(m => m.url.ToLower() == uri2Ocr.AbsoluteUri.ToLower()))
                         {
-                            jo["DocumentPlainText"] = HlidacStatu.DS.Api.OcrWork.Result.MergeDocumentsIntoOne(
-                                    res.docs
-                                    .First(m => m.url.ToLower() == uri2Ocr.AbsoluteUri.ToLower())
-                                    .result.Documents
-                                ).Text;
+                            var resDocs = res.docs
+                                    .Where(m => m.url.ToLower() == uri2Ocr.AbsoluteUri.ToLower());
+                            foreach (var doc in resDocs)
+                            {
+                                if (doc.result != null)
+                                    jo["DocumentPlainText"] = HlidacStatu.DS.Api.OcrWork.Result.MergeDocumentsIntoOne(
+                                            doc.result.Documents
+                                        ).Text;
+
+                            }
                         }
                     }
                 }
