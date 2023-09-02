@@ -1,5 +1,6 @@
 using Devmasters.Batch;
 using HlidacStatu.Connectors;
+using HlidacStatu.DS.Api;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Issues;
@@ -353,14 +354,29 @@ namespace HlidacStatu.Repositories
 
             ulong? id = null;
             var sq = q.GetAndAck(out id);
-
+            if (sq != null)
+                sq.options = sq.options ?? new OcrWork.TaskOptions();
             return sq;
         }
 
-        public static bool FireOCRDoneEvent(Smlouva smlouva)
+        public static bool FireOCRDoneEvent(Smlouva smlouva, OcrWork.TaskOptions options = null)
+        {
+            return FireOCRDoneEvent(smlouva?.Id,options);
+        }
+        public static bool FireOCRDoneEvent(IEnumerable<string> smlouvyIds, OcrWork.TaskOptions options = null)
+        {
+            bool ok = true;
+            foreach (var id in smlouvyIds)
+            {
+                if (!string.IsNullOrEmpty(id))
+                    ok = ok && FireOCRDoneEvent(id,options);
+            }
+            return ok;
+        }
+        public static bool FireOCRDoneEvent(string smlouvaId, OcrWork.TaskOptions options = null)
         {
 
-            if (smlouva == null)
+            if (smlouvaId == null)
                 return false;
 
             using HlidacStatu.Q.Simple.Queue<DS.Api.OcrWork.Task> q = new HlidacStatu.Q.Simple.Queue<DS.Api.OcrWork.Task>(
@@ -369,8 +385,9 @@ namespace HlidacStatu.Repositories
                 );
             var task = new DS.Api.OcrWork.Task()
             {
-                parentDocId = smlouva.Id,
+                parentDocId = smlouvaId,
                 type = DS.Api.OcrWork.DocTypes.Smlouva,
+                options = options
             };
             q.Send(task);
 

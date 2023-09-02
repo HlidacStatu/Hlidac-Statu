@@ -64,7 +64,7 @@ namespace HlidacStatu.DS.Api
             public string taskId { get; set; }
             public string parentDocId { get; set; }
             public Doc[] docs { get; set; }
-            public TaskOptions options { get; set; }
+            public TaskOptions options { get; set; } = TaskOptions.Default;
             public DocTypes type { get; set; }
 
         }
