@@ -66,7 +66,7 @@ namespace HlidacStatu.Repositories
         /// <param name="httpClient"></param>
         /// <param name="posledniZmena"></param>
         public static async Task UpsertAsync(VerejnaZakazka newVZ, ElasticClient elasticClient = null,
-            HttpClient httpClient = null, DateTime? posledniZmena = null)
+            HttpClient httpClient = null, DateTime? posledniZmena = null, bool sendToOcr = true)
         {
             if (newVZ is null)
                 return;
@@ -148,7 +148,9 @@ namespace HlidacStatu.Repositories
                 // zmergovat stejné dokumenty podle sha
                 MergeDocumentsBySHA(newVZ);
                 
-                SendToOcrQueue(newVZ);
+                if (sendToOcr)
+                    SendToOcrQueue(newVZ);
+
                 FixPublicationDate(newVZ);
                 await elasticClient.IndexDocumentAsync<VerejnaZakazka>(newVZ);
                 AfterSave(newVZ);
