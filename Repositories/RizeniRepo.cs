@@ -134,7 +134,7 @@ namespace HlidacStatu.Repositories
             PrepareForSave(rizeni);
             if (forceOnRadarValue.HasValue)
                 rizeni.OnRadar = forceOnRadarValue.Value;
-
+            
             var res = await client.IndexAsync<Rizeni>(rizeni,
                 o => o.Id(rizeni.SpisovaZnacka)); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)

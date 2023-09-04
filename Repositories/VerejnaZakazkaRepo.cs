@@ -66,7 +66,7 @@ namespace HlidacStatu.Repositories
         /// <param name="httpClient"></param>
         /// <param name="posledniZmena"></param>
         public static async Task UpsertAsync(VerejnaZakazka newVZ, ElasticClient elasticClient = null,
-            HttpClient httpClient = null, DateTime? posledniZmena = null, bool sendToOcr = true)
+            HttpClient httpClient = null, DateTime? posledniZmena = null, bool sendToOcr = true, bool updatePosledniZmena = true)
         {
             if (newVZ is null)
                 return;
@@ -143,7 +143,7 @@ namespace HlidacStatu.Repositories
                 
                 // stáhnout dokumenty, které nemají checksum
                 await StoreDocumentCopyToHlidacStorageAsync(newVZ, httpClient);
-                SetupUpdateDates(newVZ, posledniZmena);
+                SetupUpdateDates(newVZ, posledniZmena, updatePosledniZmena);
                 
                 // zmergovat stejné dokumenty podle sha
                 MergeDocumentsBySHA(newVZ);
@@ -449,23 +449,26 @@ namespace HlidacStatu.Repositories
             }
         }
         
-        private static void SetupUpdateDates(VerejnaZakazka verejnaZakazka, DateTime? posledniZmena)
+        private static void SetupUpdateDates(VerejnaZakazka verejnaZakazka, DateTime? posledniZmena, bool updateposledniZmena)
         {
             if (posledniZmena.HasValue)
                 verejnaZakazka.PosledniZmena = posledniZmena;
-            else
+            else if (updateposledniZmena)           
                 verejnaZakazka.PosledniZmena = verejnaZakazka.GetPosledniZmena();
-            
-            verejnaZakazka.LastUpdated = DateTime.Now;
+
+            if (updateposledniZmena)
+                verejnaZakazka.LastUpdated = DateTime.Now;
 
             foreach (var zdroj in verejnaZakazka.Zdroje)
             {
-                zdroj.Modified = DateTime.Now;
+                if (updateposledniZmena)
+                    zdroj.Modified = DateTime.Now;
             }
             
             foreach (var dokument in verejnaZakazka.Dokumenty)
             {
-                dokument.LastUpdate = DateTime.Now;
+                if (updateposledniZmena)
+                    dokument.LastUpdate = DateTime.Now;
             }
         }
 

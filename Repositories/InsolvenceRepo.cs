@@ -15,7 +15,7 @@ namespace HlidacStatu.Repositories
     public static partial class InsolvenceRepo
     {
 
-        static string[] defaultRolesWithoutLimitation = new string[] { "Admin", "novinar" };
+        static string[] defaultRolesWithoutLimitation = new string[] { }; //"Admin", "novinar" };
 
         public static bool IsLimitedAccess(System.Security.Principal.IPrincipal user, string[]? validRoles = null)
         {

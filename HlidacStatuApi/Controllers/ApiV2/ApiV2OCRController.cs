@@ -479,7 +479,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     att.LastUpdate = DateTime.Now;
                 }//docs.count = 1
             }
-            await VerejnaZakazkaRepo.UpsertAsync(vz,sendToOcr:false);
+            await VerejnaZakazkaRepo.UpsertAsync(vz,sendToOcr:false,updatePosledniZmena:false);
             return true;
         }
         private async Task<bool> _saveDataset(HlidacStatu.DS.Api.OcrWork.Task res)
