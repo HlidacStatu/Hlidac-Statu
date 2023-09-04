@@ -458,18 +458,6 @@ namespace HlidacStatu.Repositories
 
             if (updateposledniZmena)
                 verejnaZakazka.LastUpdated = DateTime.Now;
-
-            foreach (var zdroj in verejnaZakazka.Zdroje)
-            {
-                if (updateposledniZmena)
-                    zdroj.Modified = DateTime.Now;
-            }
-            
-            foreach (var dokument in verejnaZakazka.Dokumenty)
-            {
-                if (updateposledniZmena)
-                    dokument.LastUpdate = DateTime.Now;
-            }
         }
 
         public static async Task<VerejnaZakazka> LoadFromESAsync(string id, ElasticClient client = null)
