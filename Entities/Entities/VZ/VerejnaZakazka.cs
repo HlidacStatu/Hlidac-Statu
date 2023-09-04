@@ -244,7 +244,7 @@ namespace HlidacStatu.Entities.VZ
             // [Date()]
             // public DateTime PosledniZmenaZdroje { get; set; }
             [Date()]
-            public DateTime? Modified { get; set; }
+            public DateTime? Modified { get; set; } = DateTime.Now;
 
             public bool Equals(Zdroj other)
             {

@@ -346,12 +346,12 @@ namespace HlidacStatu.Repositories
         private static void MergeDocumentProperties(VerejnaZakazka.Document originalDoc, VerejnaZakazka.Document newDoc,
             List<string> changelog)
         {
+            int originalChangelogCount = changelog?.Count() ?? 0;
             originalDoc.Name = SetProperty(originalDoc.Name, newDoc.Name, "Document.Name", changelog);
             originalDoc.CisloVerze = SetProperty(originalDoc.CisloVerze, newDoc.CisloVerze, "Document.CisloVerze", changelog);
             originalDoc.ContentType = SetProperty(originalDoc.ContentType, newDoc.ContentType, "Document.ContentType", changelog);
             originalDoc.TypDokumentu = SetProperty(originalDoc.TypDokumentu, newDoc.TypDokumentu, "Document.TypDokumentu", changelog);
             originalDoc.LastProcessed = SetProperty(originalDoc.LastProcessed, newDoc.LastProcessed, "Document.LastProcessed", changelog);
-            originalDoc.LastUpdate = SetProperty(originalDoc.LastUpdate, newDoc.LastUpdate, "Document.LastUpdate", changelog);
             originalDoc.VlozenoNaProfil = SetProperty(originalDoc.VlozenoNaProfil, newDoc.VlozenoNaProfil, "Document.VlozenoNaProfil", changelog);
             originalDoc.Lenght = SetProperty(originalDoc.Lenght, newDoc.Lenght, "Document.Lenght", changelog);
             originalDoc.Pages = SetProperty(originalDoc.Pages, newDoc.Pages, "Document.Pages", changelog);
@@ -369,6 +369,12 @@ namespace HlidacStatu.Repositories
             originalDoc.PlainTextContentQuality = newDoc.PlainTextContentQuality == DataQualityEnum.Unknown
                 ? originalDoc.PlainTextContentQuality
                 : newDoc.PlainTextContentQuality;
+
+            int currentChangelogCount = changelog?.Count() ?? 0;
+            if ( currentChangelogCount > originalChangelogCount)
+            {
+                originalDoc.LastUpdate = DateTime.Now;
+            }
         }
 
         public static async Task StoreDocumentCopyToHlidacStorageAsync(VerejnaZakazka vz, HttpClient httpClient)
