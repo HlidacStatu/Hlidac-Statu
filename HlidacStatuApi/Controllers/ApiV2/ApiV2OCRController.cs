@@ -265,6 +265,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
         public async Task<ActionResult> Save([FromBody] HlidacStatu.DS.Api.OcrWork.Task res)
         {
             CheckRoleRecord(this.User.Identity.Name);
+            Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
+            sw.Start();
             try
             {
                 bool done = false;
@@ -294,6 +296,14 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
                 HlidacStatuApi.Code.Log.Logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", e, res.taskId, res.parentDocId, res.type);
                 return StatusCode(500);
+            }
+            finally
+            {
+                sw.Stop();
+                if (sw.ElapsedMilliseconds>10000)
+                {
+                    HlidacStatuApi.Code.Log.Logger.Warning("Too log task {taskId} document {docId} of type {docType} elapsed {elapsed_ms}", res.taskId, res.parentDocId, res.type,sw.ElapsedMilliseconds);
+                }
             }
             return StatusCode(200);
         }
