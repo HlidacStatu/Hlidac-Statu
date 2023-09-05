@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Devmasters.Log;
 
@@ -11,11 +13,13 @@ namespace HlidacStatu.LibCore.MiddleWares
     {
         private readonly Logger _logger;
         private readonly RequestDelegate _next;
+        private readonly List<string> _exceptions;
 
-        public TimeMeasureMiddleware(RequestDelegate next, Devmasters.Log.Logger logger)
+        public TimeMeasureMiddleware(RequestDelegate next, Devmasters.Log.Logger logger, List<string> exceptions)
         {
             _next = next;
             _logger = logger;
+            _exceptions = exceptions;
         }
 
         public async Task Invoke(HttpContext httpContext)
@@ -26,6 +30,9 @@ namespace HlidacStatu.LibCore.MiddleWares
             sw.Start();
             await _next(httpContext);
             sw.Stop();
+            
+            if(_exceptions.Any(e => url.ToString().StartsWith(e, StringComparison.InvariantCultureIgnoreCase)))
+                return;
 
             httpContext.Items.TryAdd("timeToProcessRequest", sw.ElapsedMilliseconds);
             
@@ -55,9 +62,9 @@ namespace HlidacStatu.LibCore.MiddleWares
 
     public static class TimeMeasureMiddlewareExtension
     {
-        public static IApplicationBuilder UseTimeMeasureMiddleware(this IApplicationBuilder builder, Devmasters.Log.Logger logger = null)
+        public static IApplicationBuilder UseTimeMeasureMiddleware(this IApplicationBuilder builder, Devmasters.Log.Logger logger, List<string>? exceptions = null)
         {
-            return builder.UseMiddleware<TimeMeasureMiddleware>(logger);
+            return builder.UseMiddleware<TimeMeasureMiddleware>(logger, exceptions ?? new List<string>());
         }
     }
 }

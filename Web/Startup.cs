@@ -168,8 +168,8 @@ namespace HlidacStatu.Web
             var logpath = Path.Combine(Devmasters.Config.GetWebConfigValue("SerilogBasePath"), "HlidacStatu/Web.PageTimes");
             var timeMeasureLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.PageTimes");
             
-            //request time measurement
-            app.UseTimeMeasureMiddleware(timeMeasureLogger);
+            //request time measurement with exception for /_blazor pages
+            app.UseTimeMeasureMiddleware(timeMeasureLogger, new List<string>() { "/_blazor" });
                 
 
             if (Constants.IsDevelopment(env))
