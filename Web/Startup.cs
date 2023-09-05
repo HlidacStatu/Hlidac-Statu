@@ -165,7 +165,6 @@ namespace HlidacStatu.Web
                 ApplicationName = "WEB"
             });
             
-            var logpath = Path.Combine(Devmasters.Config.GetWebConfigValue("SerilogBasePath"), "HlidacStatu/Web.PageTimes");
             var timeMeasureLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.PageTimes");
             
             //request time measurement with exception for /_blazor pages
