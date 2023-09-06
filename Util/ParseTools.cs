@@ -55,6 +55,7 @@ namespace HlidacStatu.Util
 
             return result;
         }
+
         public static bool EnoughExtractedTextCheck(string plaintext, int pages)
         {
             pages = pages - 2;

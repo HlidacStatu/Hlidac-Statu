@@ -118,6 +118,18 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 default:
                     break;
             }
+            if (task.docs == null || task.docs?.Length == 0)
+            {
+                ItemToOcrQueue.SetDone(item.Pk, true, "No docs to OCR");
+                if (tries < 20)
+                {
+                    tries++;
+                    goto start;
+                }
+                else
+                    return StatusCode(404);
+            }
+
             if (task == null)
             {
                 ItemToOcrQueue.SetDone(item.Pk, false, "record not found");
@@ -145,7 +157,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             var ds = DataSet.CachedDatasets.Get(item.ItemSubType.ToLower());
 
             var dsitem = await ds.GetDataObjAsync(item.ItemId);
-            List<Uri> uris = DataSet.GetFromItems_HsDocumentUrls(dsitem, true);
+            List<Uri> uris = DataSet.GetFromItems_HsDocumentUrls(dsitem, false,20);
             if (uris?.Count > 0)
             {
                 HlidacStatu.DS.Api.OcrWork.Task res = new HlidacStatu.DS.Api.OcrWork.Task();
@@ -179,6 +191,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             res.parentDocId = item.ItemId;
             res.docs = insolv.Dokumenty
                 //.Where(m => Uri.TryCreate(m.GetDocumentUrlToDownload(), UriKind.Absolute, out _))
+                .Where(m => item.GetOptions().forceOCR || HlidacStatu.Util.ParseTools.EnoughExtractedTextCheck(m.WordCount, m.Lenght, m.WordCount, 0) == false)
                 .Select(m => new HlidacStatu.DS.Api.OcrWork.Task.Doc()
                 {
                     origFilename = "",
@@ -201,6 +214,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             res.type = HlidacStatu.DS.Api.OcrWork.DocTypes.VerejnaZakazka;
             res.parentDocId = item.ItemId;
             res.docs = vz.Dokumenty
+                .Where(m => item.GetOptions().forceOCR || HlidacStatu.Util.ParseTools.EnoughExtractedTextCheck(m.WordCount, m.Lenght, m.WordCount, 0) == false)
                 .Where(m => Uri.TryCreate(m.GetDocumentUrlToDownload(), UriKind.Absolute, out _))
                 .Select(m => new HlidacStatu.DS.Api.OcrWork.Task.Doc()
                 {
@@ -223,12 +237,15 @@ namespace HlidacStatuApi.Controllers.ApiV2
             res.taskId = item.Pk.ToString();
             res.type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva;
             res.parentDocId = item.ItemId;
-            res.docs = sml.Prilohy.Select(m => new HlidacStatu.DS.Api.OcrWork.Task.Doc()
-            {
-                origFilename = m.nazevSouboru,
-                prilohaId = m.UniqueHash(),
-                url = m.odkaz
-            }).ToArray();
+            res.docs = sml.Prilohy
+                .Where(m=> item.GetOptions().forceOCR || HlidacStatu.Util.ParseTools.EnoughExtractedTextCheck(m.WordCount, m.Lenght, m.WordCount, m.WordsVariance)==false)
+                .Select(m => new HlidacStatu.DS.Api.OcrWork.Task.Doc()
+                    {
+                        origFilename = m.nazevSouboru,
+                        prilohaId = m.UniqueHash(),
+                        url = m.odkaz
+                    })
+                .ToArray();
 
             return res;
         }
@@ -300,9 +317,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
             finally
             {
                 sw.Stop();
-                if (sw.ElapsedMilliseconds>10000)
+                if (sw.ElapsedMilliseconds > 10000)
                 {
-                    HlidacStatuApi.Code.Log.Logger.Warning("Too log task {taskId} document {docId} of type {docType} elapsed {elapsed_ms}", res.taskId, res.parentDocId, res.type,sw.ElapsedMilliseconds);
+                    HlidacStatuApi.Code.Log.Logger.Warning("Too log task {taskId} document {docId} of type {docType} elapsed {elapsed_ms}", res.taskId, res.parentDocId, res.type, sw.ElapsedMilliseconds);
                 }
             }
             return StatusCode(200);
@@ -433,7 +450,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             if (changed)
             {
-                _ = await SmlouvaRepo.SaveAsync(sml,fireOCRDone:true);
+                _ = await SmlouvaRepo.SaveAsync(sml, fireOCRDone: true);
             }
             return true;
         }
@@ -489,7 +506,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     att.LastUpdate = DateTime.Now;
                 }//docs.count = 1
             }
-            await VerejnaZakazkaRepo.UpsertAsync(vz,sendToOcr:false,updatePosledniZmena:false);
+            await VerejnaZakazkaRepo.UpsertAsync(vz, sendToOcr: false, updatePosledniZmena: false);
             return true;
         }
         private async Task<bool> _saveDataset(HlidacStatu.DS.Api.OcrWork.Task res)

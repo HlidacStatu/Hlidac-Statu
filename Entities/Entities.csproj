@@ -12,7 +12,7 @@
       <PackageReference Include="Devmasters.Crypto" Version="4.5.1" />
       <PackageReference Include="Devmasters.DT" Version="4.5.2" />
       <PackageReference Include="Devmasters.Enums" Version="4.5.1" />
-      <PackageReference Include="Devmasters.IO" Version="4.5.2" />
+      <PackageReference Include="Devmasters.IO" Version="4.5.4" />
       <PackageReference Include="Devmasters.Lang" Version="4.5.1" />
       <PackageReference Include="Enums.NET" Version="4.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="7.0.10" />
