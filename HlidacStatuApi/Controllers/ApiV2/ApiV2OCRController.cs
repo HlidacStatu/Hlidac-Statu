@@ -157,7 +157,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             var ds = DataSet.CachedDatasets.Get(item.ItemSubType.ToLower());
 
             var dsitem = await ds.GetDataObjAsync(item.ItemId);
-            List<Uri> uris = DataSet.GetFromItems_HsDocumentUrls(dsitem, false,20);
+            List<Uri> uris = DataSet.GetFromItems_HsDocumentUrls(dsitem, false, 20);
             if (uris?.Count > 0)
             {
                 HlidacStatu.DS.Api.OcrWork.Task res = new HlidacStatu.DS.Api.OcrWork.Task();
@@ -238,13 +238,13 @@ namespace HlidacStatuApi.Controllers.ApiV2
             res.type = HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva;
             res.parentDocId = item.ItemId;
             res.docs = sml.Prilohy
-                .Where(m=> item.GetOptions().forceOCR || HlidacStatu.Util.ParseTools.EnoughExtractedTextCheck(m.WordCount, m.Lenght, m.WordCount, m.WordsVariance)==false)
+                .Where(m => item.GetOptions().forceOCR || m.EnoughExtractedText == false)
                 .Select(m => new HlidacStatu.DS.Api.OcrWork.Task.Doc()
-                    {
-                        origFilename = m.nazevSouboru,
-                        prilohaId = m.UniqueHash(),
-                        url = m.odkaz
-                    })
+                {
+                    origFilename = m.nazevSouboru,
+                    prilohaId = m.UniqueHash(),
+                    url = m.odkaz
+                })
                 .ToArray();
 
             return res;

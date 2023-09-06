@@ -112,7 +112,10 @@ namespace HlidacStatu.Entities
             {
                 get
                 {
-                    return ParseTools.EnoughExtractedTextCheck(PlainTextContent, Pages);
+                    if (this.WordCount > 0 && this.Lenght>0 && this.UniqueWordsCount>0)
+                        return HlidacStatu.Util.ParseTools.EnoughExtractedTextCheck(this.WordCount, this.Lenght, this.UniqueWordsCount, this.WordsVariance);
+                    else
+                        return ParseTools.EnoughExtractedTextCheck(PlainTextContent, Pages);
                 }
             }
 
