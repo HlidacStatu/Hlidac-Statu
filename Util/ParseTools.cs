@@ -80,7 +80,7 @@ namespace HlidacStatu.Util
             
             var variance = Devmasters.TextUtil.WordsVarianceInText(textWithTrimmedSpaces);
             var uniqueWordsCount = variance.Item2;
-            var wordsVariance = variance.Item1;
+            var wordsVariance = variance.Item1; //0 = kazde slovo jine, 1=vsechna stejna
 
             return EnoughExtractedTextCheck(wordsPerPage, lengthPerPage, uniqueWordsCount, wordsVariance);
         }
