@@ -1,4 +1,5 @@
 using Devmasters.Log;
+using Hangfire;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities;
 using HlidacStatu.LibCore.Extensions;
@@ -133,6 +134,12 @@ if (_shouldRunHealthcheckFeature)
     AddAllHealtChecks(builder.Services, builder.Configuration);
 
 }
+builder.Services.AddHangfire(configuration => configuration
+        .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UseSqlServerStorage(Devmasters.Config.GetWebConfigValue("HangFireConnection")));
+builder.Services.AddHangfireServer();
 
 // Pipeline below -------------------------------------------------------------------------------------------------
 var app = builder.Build();
@@ -241,6 +248,8 @@ if (_shouldRunHealthcheckFeature)
 
 
 }
+
+app.UseHangfireServer();
 
 HlidacStatuApi.Code.Log.Logger.Info("{action} {code}.", "starting", "web API");
 app.Run();

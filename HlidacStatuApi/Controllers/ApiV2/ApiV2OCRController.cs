@@ -287,28 +287,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
             sw.Start();
             try
             {
+                _ = Hangfire.BackgroundJob.Enqueue(() => DoSave(res));
                 bool done = false;
-                switch (res.type)
-                {
-                    case HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva:
-                        done = await _saveSmlouva(res);
-                        ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
-                        return StatusCode(200);
-                    case HlidacStatu.DS.Api.OcrWork.DocTypes.VerejnaZakazka:
-                        done = await _saveVZ(res);
-                        ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
-                        return StatusCode(200);
-                    case HlidacStatu.DS.Api.OcrWork.DocTypes.Dataset:
-                        done = await _saveDataset(res);
-                        ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
-                        return StatusCode(200);
-                    case HlidacStatu.DS.Api.OcrWork.DocTypes.Insolvence:
-                        done = await _saveInsolvence(res);
-                        ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
-                        return StatusCode(200);
-                    default:
-                        return StatusCode(404);
-                }
             }
             catch (Exception e)
             {
@@ -326,7 +306,41 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return StatusCode(200);
         }
 
-        private async Task<bool> _saveSmlouva(HlidacStatu.DS.Api.OcrWork.Task res)
+        public static void DoSave(HlidacStatu.DS.Api.OcrWork.Task res)
+        {
+            try
+            {
+
+                switch (res.type)
+                {
+                    case HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva:
+                        _ = _saveSmlouva(res).ConfigureAwait(false).GetAwaiter().GetResult();
+                        ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
+                        break;
+                    case HlidacStatu.DS.Api.OcrWork.DocTypes.VerejnaZakazka:
+                        _ = _saveVZ(res).ConfigureAwait(false).GetAwaiter().GetResult();
+                        ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
+                        break;
+                    case HlidacStatu.DS.Api.OcrWork.DocTypes.Dataset:
+                        _ = _saveDataset(res).ConfigureAwait(false).GetAwaiter().GetResult();
+                        ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
+                        break;
+                    case HlidacStatu.DS.Api.OcrWork.DocTypes.Insolvence:
+                        _ = _saveInsolvence(res).ConfigureAwait(false).GetAwaiter().GetResult();
+                        ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                HlidacStatuApi.Code.Log.Logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", e, res.taskId, res.parentDocId, res.type);
+                throw;
+            }
+
+        }
+        private static async Task<bool> _saveSmlouva(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             List<Smlouva.Priloha> newPrilohy = new List<Smlouva.Priloha>();
             bool changed = false;
@@ -455,7 +469,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             return true;
         }
-        private async Task<bool> _saveInsolvence(HlidacStatu.DS.Api.OcrWork.Task res)
+        private static async Task<bool> _saveInsolvence(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             HlidacStatu.Entities.Insolvence.Rizeni? insolv = (await InsolvenceRepo.LoadFromEsAsync(res.parentDocId, true, false))?.Rizeni;
             if (insolv == null)
@@ -480,7 +494,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             await InsolvenceRepo.SaveRizeniAsync(insolv);
             return true;
         }
-        private async Task<bool> _saveVZ(HlidacStatu.DS.Api.OcrWork.Task res)
+        private static async Task<bool> _saveVZ(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             var vz = await VerejnaZakazkaRepo.LoadFromESAsync(res.parentDocId);
             if (vz == null)
@@ -510,7 +524,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             await VerejnaZakazkaRepo.UpsertAsync(vz, sendToOcr: false, updatePosledniZmena: false);
             return true;
         }
-        private async Task<bool> _saveDataset(HlidacStatu.DS.Api.OcrWork.Task res)
+        private static async Task<bool> _saveDataset(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             var task = ItemToOcrQueue.GetTask(Convert.ToInt32(res.taskId));
             if (task == null)
