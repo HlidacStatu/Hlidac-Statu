@@ -272,22 +272,22 @@ namespace HlidacStatu.Repositories
                 bool forceClassification = false,
                 bool forceTablesMining = false,
                 bool forceBlurredPages = false,
-            decimal priorityBoost = 1.0m
+            int priority = (int)OcrWork.TaskPriority.Standard
             )
         {
-            return AddToProcessingQueue(smlouva.Id, forceOCR, forceClassification, forceTablesMining, forceBlurredPages, priorityBoost);
+            return AddToProcessingQueue(smlouva.Id, forceOCR, forceClassification, forceTablesMining, forceBlurredPages, priority);
         }
         public static bool AddToProcessingQueue(this string smlouvaId,
         bool forceOCR = false,
         bool forceClassification = false,
         bool forceTablesMining = false,
         bool forceBlurredPages = false,
-            decimal priorityBoost = 1.0m
+        int priority = (int)OcrWork.TaskPriority.Standard
 
     )
         {
             return AddToProcessingQueue(new string[] { smlouvaId },
-                forceOCR, forceClassification, forceTablesMining, forceBlurredPages, priorityBoost);
+                forceOCR, forceClassification, forceTablesMining, forceBlurredPages, priority);
         }
 
         public static bool AddToProcessingQueue(IEnumerable<string> smlouvyIds,
@@ -295,10 +295,10 @@ namespace HlidacStatu.Repositories
             bool forceClassification = false,
             bool forceTablesMining = false,
             bool forceBlurredPages = false,
-            decimal priorityBoost = 1.0m
+            int priority = (int)OcrWork.TaskPriority.Standard
             )
         {
-            return AddToProcessingQueue(smlouvyIds, priorityBoost,
+            return AddToProcessingQueue(smlouvyIds, priority,
             new DS.Api.OcrWork.TaskOptions()
             {
                 forceOCR = forceOCR,
@@ -308,7 +308,7 @@ namespace HlidacStatu.Repositories
             });
         }
         public static bool AddToProcessingQueue(IEnumerable<string> smlouvyIds,
-            decimal priorityBoost = 1.0m,
+            int priority = (int)OcrWork.TaskPriority.Standard,
             DS.Api.OcrWork.TaskOptions options = null
             )
         {
@@ -317,7 +317,7 @@ namespace HlidacStatu.Repositories
             {
                 ItemToOcrQueue.AddNewTask(DS.Api.OcrWork.DocTypes.Smlouva,
                     id, null,
-                    (int)((int)DS.Api.OcrWork.TaskPriority.Standard * priorityBoost),
+                    priority,
                     options
             );
 
