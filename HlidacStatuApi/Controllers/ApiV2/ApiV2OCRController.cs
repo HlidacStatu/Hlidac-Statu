@@ -67,6 +67,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
             ItemToOcrQueue item = null;
             int tries = 0;
 
+        start:
+
             if (demo == true)
             {
                 if (string.IsNullOrEmpty(itemId))
@@ -97,7 +99,6 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 item = items.First();
             }
 
-        start:
             HlidacStatu.DS.Api.OcrWork.DocTypes _itemType = Enum.Parse<HlidacStatu.DS.Api.OcrWork.DocTypes>(item.ItemType);
 
             HlidacStatu.DS.Api.OcrWork.Task task = null;
