@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
+using RazorEngine.Compilation.ImpromptuInterface.InvokeExt;
 
 string CORSPolicy = "from_hlidacstatu.cz";
 
@@ -134,12 +135,16 @@ if (_shouldRunHealthcheckFeature)
     AddAllHealtChecks(builder.Services, builder.Configuration);
 
 }
-builder.Services.AddHangfire(configuration => configuration
+_= builder.Services.AddHangfire(configuration => configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
-        .UseSqlServerStorage(Devmasters.Config.GetWebConfigValue("HangFireConnection")));
-builder.Services.AddHangfireServer();
+
+        .UseSqlServerStorage(Devmasters.Config.GetWebConfigValue("HangFireConnection"))
+            .WithJobExpirationTimeout(TimeSpan.FromHours(6))
+        
+        );
+_= builder.Services.AddHangfireServer();
 
 // Pipeline below -------------------------------------------------------------------------------------------------
 var app = builder.Build();
