@@ -6,6 +6,7 @@ using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
+using HlidacStatuApi.Code;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
@@ -149,6 +150,7 @@ _= builder.Services.AddHangfireServer();
 // Pipeline below -------------------------------------------------------------------------------------------------
 var app = builder.Build();
 
+
 app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
 {
     LimitToPaths = new List<string> { "/api" },
@@ -255,6 +257,7 @@ if (_shouldRunHealthcheckFeature)
 }
 
 app.UseHangfireServer();
+GlobalJobFilters.Filters.Add(new ShortExpirationTimeAttribute());
 
 HlidacStatuApi.Code.Log.Logger.Info("{action} {code}.", "starting", "web API");
 app.Run();
