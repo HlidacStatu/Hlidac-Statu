@@ -307,6 +307,16 @@ namespace HlidacStatu.Repositories
                 forceTablesMining = forceTablesMining
             });
         }
+
+
+        public static bool AddToProcessingQueue(string smlouvaId,
+            int priority = (int)OcrWork.TaskPriority.Standard,
+            DS.Api.OcrWork.TaskOptions options = null
+            )
+        { 
+            return AddToProcessingQueue(new string[] { smlouvaId }, priority, options);
+        }
+
         public static bool AddToProcessingQueue(IEnumerable<string> smlouvyIds,
             int priority = (int)OcrWork.TaskPriority.Standard,
             DS.Api.OcrWork.TaskOptions options = null

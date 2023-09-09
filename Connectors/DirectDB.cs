@@ -187,8 +187,11 @@ namespace HlidacStatu.Connectors
             }
         }
 
-
-        public static string GetRawSql(CommandType typ, string text, IDataParameter[] pars)
+        public static string GetRawSql(string text, IDataParameter[] pars)
+        {
+            return GetRawSql(CommandType.Text, text, pars);
+        }
+            public static string GetRawSql(CommandType typ, string text, IDataParameter[] pars)
         {
             // vytahne spoj a inicializuje
             string _connStr = DefaultCnnStr;

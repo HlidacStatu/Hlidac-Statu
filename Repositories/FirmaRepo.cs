@@ -204,6 +204,7 @@ namespace HlidacStatu.Repositories
             {
 
                 f = db.Firma.AsQueryable().FirstOrDefault(m => m.ICO == ico);
+                f.ICO = HlidacStatu.Util.ParseTools.NormalizeIco(f.ICO);
 
                 if (f != null)
                 {

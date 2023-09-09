@@ -79,8 +79,10 @@ namespace HlidacStatu.Repositories
             if (f == null)
                 return Firma.LoadError;
             else
+            {
+                f.ICO = HlidacStatu.Util.ParseTools.NormalizeIco(f.ICO); //fix
                 return f;
-
+            }
         }
 
     }

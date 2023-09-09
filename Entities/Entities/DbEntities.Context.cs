@@ -251,6 +251,9 @@ namespace HlidacStatu.Entities
         public DbSet<AdresyKVolbam> AdresyKVolbam { get; set; }
         public DbSet<SponzoringDetail> SponzoringDetails { get; set; }
 
+        public DbSet<ObceZUJ> ObceZUJ { get; set; }
+        public DbSet<ObceZUJAttr> ObceZUJAttr { get; set; }
+        public DbSet<ObceZUJAttrName> ObceZUJAttrName { get; set; }
 
     }
 }
