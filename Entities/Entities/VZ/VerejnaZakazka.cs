@@ -561,6 +561,7 @@ namespace HlidacStatu.Entities.VZ
                 }
             }
 
+
             public void CalculateDocStats()
             {
                 Lenght = PlainText.Length;
