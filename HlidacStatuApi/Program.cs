@@ -257,7 +257,7 @@ if (_shouldRunHealthcheckFeature)
 }
 
 app.UseHangfireServer();
-GlobalJobFilters.Filters.Add(new ShortExpirationTimeAttribute());
+//GlobalJobFilters.Filters.Add(new ShortExpirationTimeAttribute());
 
 HlidacStatuApi.Code.Log.Logger.Info("{action} {code}.", "starting", "web API");
 app.Run();
