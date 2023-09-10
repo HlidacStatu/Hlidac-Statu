@@ -371,7 +371,7 @@ namespace HlidacStatu.Repositories
                 .OrderBy(o => o.Created);
         }
 
-        private static IEnumerable<RecalculateItem> GetItemsFromProcessingQueue(int count)
+        public static IEnumerable<RecalculateItem> GetItemsFromProcessingQueue(int count)
         {
 
 
@@ -380,8 +380,13 @@ namespace HlidacStatu.Repositories
                 var res = db.RecalculateItem
                     .AsNoTracking()
                     .OrderBy(o => o.Created)
-                    .Take(count);
+                    .Take(count)
+                    .ToArray();
 
+                foreach (var i in res)
+                {
+                    db.Database.ExecuteSql($"delete from recalculateItemQueue where id={i.Id} and itemtype={(int)i.ItemType} and StatisticsType = {(int)i.StatisticsType}");
+                }
                 return res;
 
             }
