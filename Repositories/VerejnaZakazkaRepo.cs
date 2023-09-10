@@ -35,9 +35,9 @@ namespace HlidacStatu.Repositories
 
         private static void AfterSave(VerejnaZakazka vz)
         {
-            _ = Statistics.Recalculate.AddFirmaToProcessingQueue(vz.Zadavatel.ICO, Statistics.RecalculateItem.StatisticsTypeEnum.VZ , $"VZ {vz.Id}");
+            RecalculateItemRepo.AddFirmaToProcessingQueue(vz.Zadavatel.ICO, RecalculateItem.StatisticsTypeEnum.VZ , $"VZ {vz.Id}");
             foreach (var dod in vz.Dodavatele)
-                _ = Statistics.Recalculate.AddFirmaToProcessingQueue(dod.ICO, Statistics.RecalculateItem.StatisticsTypeEnum.VZ, $"VZ {vz.Id}");
+                _ = RecalculateItemRepo.AddFirmaToProcessingQueue(dod.ICO, RecalculateItem.StatisticsTypeEnum.VZ, $"VZ {vz.Id}");
         }
 
         private static async Task SaveIncompleteVzAsync(VerejnaZakazka incompleteVz, ElasticClient elasticClient)

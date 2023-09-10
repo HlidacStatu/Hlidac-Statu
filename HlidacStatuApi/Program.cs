@@ -142,7 +142,7 @@ _= builder.Services.AddHangfire(configuration => configuration
         .UseRecommendedSerializerSettings()
 
         .UseSqlServerStorage(Devmasters.Config.GetWebConfigValue("HangFireConnection"))
-            .WithJobExpirationTimeout(TimeSpan.FromHours(6))
+            .WithJobExpirationTimeout(TimeSpan.FromMinutes(55))
         
         );
 _= builder.Services.AddHangfireServer();

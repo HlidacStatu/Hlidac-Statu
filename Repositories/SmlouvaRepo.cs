@@ -474,9 +474,9 @@ namespace HlidacStatu.Repositories
 
             if (updateStat)
             {
-                Recalculate.AddFirmaToProcessingQueue(smlouva.Platce.ico, RecalculateItem.StatisticsTypeEnum.Smlouva, $"smlouva {smlouva.Id}");
+                RecalculateItemRepo.AddFirmaToProcessingQueue(smlouva.Platce.ico, RecalculateItem.StatisticsTypeEnum.Smlouva, $"smlouva {smlouva.Id}");
                 foreach (var pr in smlouva.Prijemce)
-                    Recalculate.AddFirmaToProcessingQueue(pr.ico, RecalculateItem.StatisticsTypeEnum.Smlouva, $"smlouva {smlouva.Id}");
+                    RecalculateItemRepo.AddFirmaToProcessingQueue(pr.ico, RecalculateItem.StatisticsTypeEnum.Smlouva, $"smlouva {smlouva.Id}");
             }
 
             if (fireOCRDone == true)

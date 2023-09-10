@@ -50,7 +50,7 @@ namespace HlidacStatu.Repositories
             }
             else
             {
-                Statistics.Recalculate.AddFirmaToProcessingQueue(dotace.Prijemce.Ico, Statistics.RecalculateItem.StatisticsTypeEnum.Dotace, $"VZ {dotace.IdDotace}");
+                RecalculateItemRepo.AddFirmaToProcessingQueue(dotace.Prijemce.Ico,Entities.RecalculateItem.StatisticsTypeEnum.Dotace, $"VZ {dotace.IdDotace}");
             }
         }
 

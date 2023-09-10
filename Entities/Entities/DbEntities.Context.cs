@@ -31,7 +31,7 @@ namespace HlidacStatu.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            _ = modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
+            //_ = modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
             _ = modelBuilder.Entity<CenyCustomer>().HasKey(u => new
             {
@@ -192,6 +192,12 @@ namespace HlidacStatu.Entities
             //         .HasConversion<int>();
             // });
 
+            _ = modelBuilder.Entity<RecalculateItem>(entity =>
+            {
+                _ = entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
+            });
+
+
         }
 
         public virtual DbSet<UptimeServer> UptimeServers { get; set; }
@@ -254,6 +260,8 @@ namespace HlidacStatu.Entities
         public DbSet<ObceZUJ> ObceZUJ { get; set; }
         public DbSet<ObceZUJAttr> ObceZUJAttr { get; set; }
         public DbSet<ObceZUJAttrName> ObceZUJAttrName { get; set; }
+
+        public DbSet<RecalculateItem> RecalculateItem { get; set; }
 
     }
 }

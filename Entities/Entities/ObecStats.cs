@@ -39,6 +39,7 @@ namespace HlidacStatu.Entities
             Trafostanice,
             Vodojem,
 
+
         }
         static Dictionary<Attrs, string> AttrsToStr = new Dictionary<Attrs, string>()
         {

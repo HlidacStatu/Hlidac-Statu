@@ -1,30 +1,31 @@
-﻿using Devmasters.Batch;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace HlidacStatu.Repositories.Statistics
+namespace HlidacStatu.Repositories
 {
-    public class Recalculate
+    public class RecalculateItemRepo
     {
-        static Devmasters.Log.Logger log = Devmasters.Log.Logger.CreateLogger<Recalculate>();
+        static Devmasters.Log.Logger log = Devmasters.Log.Logger.CreateLogger<RecalculateItemRepo>();
 
-        private const string RECALCULATIONQUEUENAME = "recalculation2Process";
-        static RecalculateItemEqComparer comparer = new RecalculateItemEqComparer();
+        public const string RECALCULATIONQUEUENAME = "recalculation2Process";
+        static Entities.RecalculateItemEqComparer comparer = new Entities.RecalculateItemEqComparer();
 
         static Devmasters.Batch.ActionProgressWriter debugProgressWr = new Devmasters.Batch.ActionProgressWriter(0.1f);
 
         public static void RecalculateTasks(int? threads = null, bool debug = false, string[] ids = null,
             Action<string> outputWriter = null,
-            Action<Devmasters.Batch.ActionProgressData> progressWriter = null
+            Action<Devmasters.Batch.ActionProgressData> progressWriter = null,
+            int? maxItemsInBatch = null
             )
         {
             bool onlyIds = ids?.Count() > 0;
 
-
+            maxItemsInBatch = maxItemsInBatch ?? int.MaxValue;
 
             threads = threads ?? 20;
 
@@ -58,11 +59,11 @@ namespace HlidacStatu.Repositories.Statistics
                     Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
                 ))
                 {
-                    numFromQueue = (int)q.MessageCount();
+                    numFromQueue = Math.Min((int)q.MessageCount(), maxItemsInBatch.Value);
                 }
 
 
-                allItems = GetItemsFromProcessingQueue(numFromQueue, threads.Value, outputWriter, progressWriter, debug);
+                allItems = GetItemsFromProcessingQueue(numFromQueue);
                 uniqueItems = allItems.Distinct(comparer).ToList();
             }
 
@@ -165,8 +166,7 @@ namespace HlidacStatu.Repositories.Statistics
                 uniqueItems.Clear();
             else
             {
-                allItems = GetItemsFromProcessingQueue(numFromQueue, threads.Value, outputWriter, progressWriter, debug);
-                uniqueItems = allItems.Distinct(comparer).ToList();
+                allItems = GetItemsFromProcessingQueue(numFromQueue);
             }
             if (uniqueItems.Count > 0)
                 goto start;
@@ -268,13 +268,48 @@ namespace HlidacStatu.Repositories.Statistics
         {
             try
             {
+                using (DbEntities db = new DbEntities())
+                {
+                    var strategy = db.Database.CreateExecutionStrategy();
+                    bool res = strategy.Execute<bool>(() =>
+                    {
+                        using (var dbTran = db.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead))
+                        {
 
-                using HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
-                    RECALCULATIONQUEUENAME,
-                    Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
-                    );
+                            try
+                            {
+                                var exists = db.RecalculateItem.Any(m =>
+                                    m.Id == item.Id
+                                    && m.ItemType == item.ItemType
+                                    && m.StatisticsType == item.StatisticsType
+                                );
+                                if (exists)
+                                {
+                                    dbTran.Rollback();
+                                    return false;
+                                }
+                                _ = db.RecalculateItem.Add(item);
+                                _ = db.SaveChanges();
+                                dbTran.Commit();
+                                return true;
+                            }
+                            catch (Exception e)
+                            {
+                                dbTran.Rollback();
+                                throw;
+                            }
+                        }
+                    });
+
+                    return res;
+                }
+                /*using HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
+                        RECALCULATIONQUEUENAME,
+                        Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
+                        );
                 q.Send(item);
-                return true;
+                return true;*/
+
             }
             catch (Exception)
             {
@@ -294,7 +329,7 @@ namespace HlidacStatu.Repositories.Statistics
         public static IEnumerable<RecalculateItem> GetFromProcessingQueueWithParents(int count, int threads,
             Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null, bool debug = false)
         {
-            IEnumerable<RecalculateItem> res = GetItemsFromProcessingQueue(count, threads, outputWriter, progressWriter, debug);
+            IEnumerable<RecalculateItem> res = GetItemsFromProcessingQueue(count);
 
             System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(res);
 
@@ -336,71 +371,24 @@ namespace HlidacStatu.Repositories.Statistics
                 .OrderBy(o => o.Created);
         }
 
-        private static IEnumerable<RecalculateItem> GetItemsFromProcessingQueue(int count, int threads, Action<string> outputWriter, Action<ActionProgressData> progressWriter, bool debug)
+        private static IEnumerable<RecalculateItem> GetItemsFromProcessingQueue(int count)
         {
-            log.Debug("{method} Starting for {records} records with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, count, threads);
-            if (debug)
-                Console.WriteLine($"GetFromProcessingQueueWithParents getting from queue {count} items");
 
-            System.Collections.Concurrent.ConcurrentQueue<RecalculateItem> res = new();
-            Devmasters.Batch.Manager.DoActionForAll<int>(Enumerable.Range(0, count),
-                _ =>
-                {
-                    try
-                    {
-                        var item = GetOneFromProcessingQueue();
-                        if (item == null)
-                            return new Devmasters.Batch.ActionOutputData() { CancelRunning = true };
-                        if (res.Contains(item, comparer) == false)
-                            res.Enqueue(item);
 
-                    }
-                    catch (Exception e)
-                    {
-
-                        log.Error("GetOneFromProcessingQueue error", e);
-                    }
-
-                    return new Devmasters.Batch.ActionOutputData() { CancelRunning = res.Count >= count };
-                },
-                outputWriter, progressWriter,
-                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: Math.Min(threads, 10), monitor: new MonitoredTaskRepo.ForBatch()
-            );
-
-            log.Debug("{method} get {records} records from ProcessingQueue", MethodBase.GetCurrentMethod().Name, count);
-            if (debug)
-                Console.WriteLine($"GetFromProcessingQueueWithParents got from queue {count} items");
-            return res;
-        }
-
-        public static RecalculateItem GetOneFromProcessingQueue()
-        {
-            int tries = 3;
-        start:
-            try
+            using (Entities.DbEntities db = new DbEntities())
             {
-                tries--;
-                using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
-                    RECALCULATIONQUEUENAME,
-                    Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
-                    ))
-                {
-                    var sq = q.GetAndAck();
-                    return sq;
-                }
-            }
-            catch (Exception e)
-            {
-                if (tries >= 0)
-                {
-                    System.Threading.Thread.Sleep(200);
-                    goto start;
-                }
-                //TODO log
-                return null;
+                var res = db.RecalculateItem
+                    .AsNoTracking()
+                    .OrderBy(o => o.Created)
+                    .Take(count);
+
+                return res;
 
             }
+
+
         }
+
 
     }
 }
