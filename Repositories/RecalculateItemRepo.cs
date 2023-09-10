@@ -62,7 +62,8 @@ namespace HlidacStatu.Repositories
             {
                 numFromQueue = RecalculateQueueLength();
 
-                allItems = GetItemsFromProcessingQueue(numFromQueue);
+                allItems = GetFromProcessingQueueWithParents(numFromQueue,threads.Value, 
+                    outputWriter,progressWriter,debug);
                 uniqueItems = allItems.Distinct(comparer).ToList();
             }
 
@@ -139,7 +140,8 @@ namespace HlidacStatu.Repositories
                 uniqueItems.Clear();
             else
             {
-                allItems = GetItemsFromProcessingQueue(numFromQueue);
+                allItems = GetFromProcessingQueueWithParents(numFromQueue, threads.Value,
+                    outputWriter, progressWriter, debug);
             }
             if (uniqueItems.Count > 0)
                 goto start;
