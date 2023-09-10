@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities;
+﻿using HlidacStatu.Connectors;
+using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,12 +11,17 @@ namespace HlidacStatu.Repositories
 {
     public class RecalculateItemRepo
     {
-        static Devmasters.Log.Logger log = Devmasters.Log.Logger.CreateLogger<RecalculateItemRepo>();
+        public static Devmasters.Log.Logger log = Devmasters.Log.Logger.CreateLogger<RecalculateItemRepo>();
 
-        public const string RECALCULATIONQUEUENAME = "recalculation2Process";
+        //public const string RECALCULATIONQUEUENAME = "recalculation2Process";
         static Entities.RecalculateItemEqComparer comparer = new Entities.RecalculateItemEqComparer();
 
         static Devmasters.Batch.ActionProgressWriter debugProgressWr = new Devmasters.Batch.ActionProgressWriter(0.1f);
+
+        public static int RecalculateQueueLength()
+        {
+            return DirectDB.GetValue<int>("select count(*) from RecalculateItemQueue with (nolock)");
+        }
 
         public static void RecalculateTasks(int? threads = null, bool debug = false, string[] ids = null,
             Action<string> outputWriter = null,
@@ -54,14 +60,7 @@ namespace HlidacStatu.Repositories
             }
             else
             {
-                using (HlidacStatu.Q.Simple.Queue<RecalculateItem> q = new Q.Simple.Queue<RecalculateItem>(
-                                    RECALCULATIONQUEUENAME,
-                    Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
-                ))
-                {
-                    numFromQueue = Math.Min((int)q.MessageCount(), maxItemsInBatch.Value);
-                }
-
+                numFromQueue = RecalculateQueueLength();
 
                 allItems = GetItemsFromProcessingQueue(numFromQueue);
                 uniqueItems = allItems.Distinct(comparer).ToList();
@@ -96,33 +95,12 @@ namespace HlidacStatu.Repositories
             Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(uniqueItems.Where(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt),
                 item =>
                 {
-                    var f = Firmy.Get(item.Id);
-                    if (f != null)
-                    {
-                        if (debug)
-                            Console.WriteLine($"start statistics {f.ICO} {f.Jmeno}");
-                        switch (item.StatisticsType)
-                        {
-                            case RecalculateItem.StatisticsTypeEnum.Smlouva:
-                                _ = f.StatistikaRegistruSmluv(forceUpdateCache: true);
-                                _ = f.HoldingStatisticsRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
-                                break;
-                            case RecalculateItem.StatisticsTypeEnum.VZ:
-                                _ = f.StatistikaVerejneZakazky(forceUpdateCache: true);
-                                _ = f.HoldingStatistikaVerejneZakazky(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
-                                break;
-                            case RecalculateItem.StatisticsTypeEnum.Dotace:
-                                _ = f.StatistikaDotaci(forceUpdateCache: true);
-                                _ = f.HoldingStatistikaDotaci(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
-                                break;
-                            default:
-                                break;
-                        }
-                        _ = f.InfoFacts(forceUpdateCache: true);
+                    if (debug)
+                        Console.WriteLine($"start statistics firma {item.Id}");
+                    RecalculateFirma(item);
+                    if (debug)
+                        Console.WriteLine($"end statistics firma {item.Id}");
 
-                        if (debug)
-                            Console.WriteLine($"end statistics {f.ICO} {f.Jmeno}");
-                    }
                     return new Devmasters.Batch.ActionOutputData();
                 },
                 outputWriter, progressWriter,
@@ -141,16 +119,11 @@ namespace HlidacStatu.Repositories
                 uniqueItems.Where(m => m.ItemType == RecalculateItem.ItemTypeEnum.Person),
                 item =>
                 {
-                    var o = Osoby.GetByNameId.Get(item.Id);
-                    if (o != null)
-                    {
-                        if (debug)
-                            Console.WriteLine($"start statistics osoba {o.NameId}");
-                        _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
-                        _ = o.InfoFactsCached(forceUpdateCache: true);
-                        if (debug)
-                            Console.WriteLine($"end statistics osoba {o.NameId}");
-                    }
+                    if (debug)
+                        Console.WriteLine($"start statistics osoba {item.Id}");
+                    RecalculateOsoba(item);
+                    if (debug)
+                        Console.WriteLine($"end statistics osoba {item.Id}");
 
                     return new Devmasters.Batch.ActionOutputData();
                 },
@@ -174,6 +147,43 @@ namespace HlidacStatu.Repositories
 
             log.Info("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
 
+        }
+
+        public static void RecalculateOsoba(RecalculateItem item)
+        {
+            var o = Osoby.GetByNameId.Get(item.Id);
+            if (o != null)
+            {
+                _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
+                _ = o.InfoFactsCached(forceUpdateCache: true);
+            }
+        }
+
+        public static void RecalculateFirma(RecalculateItem item)
+        {
+            var f = Firmy.Get(item.Id);
+            if (f != null)
+            {
+                switch (item.StatisticsType)
+                {
+                    case RecalculateItem.StatisticsTypeEnum.Smlouva:
+                        _ = f.StatistikaRegistruSmluv(forceUpdateCache: true);
+                        _ = f.HoldingStatisticsRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
+                        break;
+                    case RecalculateItem.StatisticsTypeEnum.VZ:
+                        _ = f.StatistikaVerejneZakazky(forceUpdateCache: true);
+                        _ = f.HoldingStatistikaVerejneZakazky(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
+                        break;
+                    case RecalculateItem.StatisticsTypeEnum.Dotace:
+                        _ = f.StatistikaDotaci(forceUpdateCache: true);
+                        _ = f.HoldingStatistikaDotaci(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
+                        break;
+                    default:
+                        break;
+                }
+                _ = f.InfoFacts(forceUpdateCache: true);
+
+            }
         }
 
         private static List<RecalculateItem> CascadeItems(RecalculateItem item, ref System.Collections.Concurrent.ConcurrentBag<RecalculateItem> alreadyOnList)
