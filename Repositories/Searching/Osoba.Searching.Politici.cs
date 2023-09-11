@@ -45,7 +45,7 @@ namespace HlidacStatu.Repositories.Searching
             if (string.IsNullOrWhiteSpace(path))
                 path = Devmasters.IO.IOTools.GetExecutingDirectoryName(true);
 
-            foreach (var s in System.IO.File.ReadAllLines(path + "Czech.3-2-5.dic"))
+            foreach (var s in Repositories.StaticData.CzechDictCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries))
             {
                 slova.Add(s);
             }

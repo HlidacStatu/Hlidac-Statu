@@ -54,6 +54,17 @@ namespace HlidacStatu.Repositories
 
         public static Devmasters.Cache.LocalMemory.Cache<List<double>> BasicStatisticData = null;
 
+        public static Devmasters.Cache.AWS_S3.Cache<string> CzechDictCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+            TimeSpan.Zero, "Czech.3-2-5.dic.txt", (obj) =>
+            {
+                return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/Czech.3-2-5.dic.txt").Result;
+            }, null);
+        public static Devmasters.Cache.AWS_S3.Cache<string> CrawlerUserAgentsCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+            TimeSpan.Zero, "crawler-user-agents.json", (obj) =>
+            {
+                return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/crawler-user-agents.json").Result;
+            }, null);
+
 
         public static Dictionary<string, Lib.Analysis.TemplatedQuery> Afery = new Dictionary<string, Lib.Analysis.TemplatedQuery>();
 

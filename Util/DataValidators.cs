@@ -13,6 +13,25 @@ namespace HlidacStatu.Util
         static List<string> czobce = new List<string>();
         static List<string> skobce = new List<string>();
         static Dictionary<string, string> ciziStaty = new Dictionary<string, string>();
+
+        static Devmasters.Cache.AWS_S3.Cache<string> czobceCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+    TimeSpan.Zero, "czobce.txt", (obj) =>
+    {
+        return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/czobce.txt").Result;
+    }, null);
+
+        static Devmasters.Cache.AWS_S3.Cache<string> skobceCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+    TimeSpan.Zero, "skobce.txt", (obj) =>
+    {
+        return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/skobce.txt").Result;
+    }, null);
+
+        static Devmasters.Cache.AWS_S3.Cache<string> statyCache = new Devmasters.Cache.AWS_S3.Cache<string>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+TimeSpan.Zero, "staty.txt", (obj) =>
+{
+return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/staty.txt").Result;
+}, null);
+
         static DataValidators()
         {
 
@@ -31,8 +50,7 @@ namespace HlidacStatu.Util
                 root = root + Path.DirectorySeparatorChar;
 
 
-            var tmp = System.IO.File.ReadLines(root + "staty.txt")
-                //.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
+            var tmp = statyCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => m.Split('\t'))
                 .Select(mm =>
                 {
@@ -47,10 +65,10 @@ namespace HlidacStatu.Util
                     ciziStaty.Add(kv.Key, kv.Value);
             }
 
-            czobce = System.IO.File.ReadLines(root + "czobce.txt")
+            czobce = czobceCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                     .Select(m => Devmasters.TextUtil.RemoveDiacritics(m.Trim()).ToLower())
                     .ToList();
-            skobce = System.IO.File.ReadLines(root + "skobce.txt")
+            skobce = skobceCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                     .Select(m => Devmasters.TextUtil.RemoveDiacritics(m.Trim()).ToLower())
                     .ToList();
 

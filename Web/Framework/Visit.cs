@@ -25,7 +25,7 @@ namespace HlidacStatu.Web.Framework
                 if (AllCrawlers == null)
                     AllCrawlers = new HashSet<string>(
                         Newtonsoft.Json.JsonConvert.
-                            DeserializeObject<Crawler[]>(System.IO.File.ReadAllText(Init.WebAppDataPath + "crawler-user-agents.json"))
+                            DeserializeObject<Crawler[]>(Repositories.StaticData.CrawlerUserAgentsCache.Get())
                             .SelectMany(m => m.instances)
                             .Distinct()
                     );
