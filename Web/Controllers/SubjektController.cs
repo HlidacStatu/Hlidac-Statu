@@ -148,7 +148,7 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult OrganizacniStruktura(string id, string orgId)
         {
             //ico => id translation!
-            if (!StaticData.OrganizacniStrukturyUradu.Get().TryGetValue(id, out var ossu))
+            if (!StaticData.OrganizacniStrukturyUraduCache.Get().Urady.TryGetValue(id, out var ossu))
             {
                 return RedirectToAction("Index");
             }
@@ -164,8 +164,8 @@ namespace HlidacStatu.Web.Controllers
                 dataHierarchy = ossu.FirstOrDefault()?.GenerateD3DataHierarchy();
             }
 
-            var osu = StaticData.OrganizacniStrukturyUradu.Get();
-            ViewBag.ExporDate = StaticData.OrganizacniStrukturyUraduExportDate;
+            var osu = StaticData.OrganizacniStrukturyUraduCache.Get();
+            ViewBag.ExporDate = osu.PlatneKDatu;
 
             return dataHierarchy is null ? RedirectToAction("Index") : (ActionResult)View(dataHierarchy);
         }

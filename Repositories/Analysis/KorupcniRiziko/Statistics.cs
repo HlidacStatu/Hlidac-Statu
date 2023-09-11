@@ -13,8 +13,12 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         static int[] Percentiles = new int[] { 1, 5, 10, 25, 33, 50, 66, 75, 90, 95, 99 };
 
-        public static Devmasters.Cache.File.Cache<Statistics[]> KIndexStatTotal = new Devmasters.Cache.File.Cache<Statistics[]>(
-                Init.WebAppDataPath, TimeSpan.Zero, "KIndexStat",
+        public static Devmasters.Cache.AWS_S3.Cache<Statistics[]> KIndexStatTotal = new Devmasters.Cache.AWS_S3.Cache<Statistics[]>(
+                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), 
+                    TimeSpan.Zero, "KIndexStat",
                     (o) =>
                     {
                         return CalculateAsync().ConfigureAwait(false).GetAwaiter().GetResult().ToArray();

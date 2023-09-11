@@ -31,7 +31,7 @@ namespace HlidacStatu.Repositories
         public static string[] ObceIII_DS = null;
 
         public static
-            Devmasters.Cache.File.Cache<System.Collections.Concurrent.ConcurrentDictionary<string, string[]>>
+            Devmasters.Cache.AWS_S3.Cache<System.Collections.Concurrent.ConcurrentDictionary<string, string[]>>
             FirmyNazvyOnlyAscii = null;
 
         static FirmaRepo()
@@ -140,9 +140,13 @@ namespace HlidacStatu.Repositories
             Util.Consts.Logger.Info("Static data - FirmyNazvyOnlyAscii");
 
             FirmyNazvyOnlyAscii =
-                new Devmasters.Cache.File.Cache<
+                new Devmasters.Cache.AWS_S3.Cache<
                     System.Collections.Concurrent.ConcurrentDictionary<string, string[]>>
-                (AppDataPath, TimeSpan.Zero, "FirmyNazvyOnlyAscii",
+                (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), 
+                    TimeSpan.Zero, "FirmyNazvyOnlyAscii",
                     (o) =>
                     {
                         Util.Consts.Logger.Info("Static data - FirmyNazvyOnlyAscii starting generation");

@@ -14,9 +14,13 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             Ico = ico;
         }
 
-        public static Devmasters.Cache.File.Cache<Dictionary<string, SubjectNameCache>> CachedCompanies =
-            new Devmasters.Cache.File.Cache<Dictionary<string, SubjectNameCache>>(
-                Init.WebAppDataPath, TimeSpan.Zero, "KIndexCompanies",
+        public static Devmasters.Cache.AWS_S3.Cache<Dictionary<string, SubjectNameCache>> CachedCompanies =
+            new Devmasters.Cache.AWS_S3.Cache<Dictionary<string, SubjectNameCache>>(
+                new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), 
+                    TimeSpan.Zero, "KIndexCompanies",
                     (o) =>
                     {
                         return ListCompaniesAsync().ConfigureAwait(false).GetAwaiter().GetResult();

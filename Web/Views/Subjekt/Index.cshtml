@@ -901,7 +901,7 @@
                 </span>
             }
         </p>
-        @if (HlidacStatu.Repositories.StaticData.OrganizacniStrukturyUradu.Get().TryGetValue(Model.ICO, out var ossu))
+        @if (HlidacStatu.Repositories.StaticData.OrganizacniStrukturyUraduCache.Get().Urady.TryGetValue(Model.ICO, out var ossu))
         {
             var sum = new HlidacStatu.Entities.OrgStrukturyStatu.Summary(ossu);
             if (sum.Urady > 0)

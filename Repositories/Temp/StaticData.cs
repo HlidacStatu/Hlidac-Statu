@@ -32,22 +32,22 @@ namespace HlidacStatu.Repositories
         public static string[] Mestske_Firmy = new string[] { };
 
 
-        public static Devmasters.Cache.File.Cache<Dictionary<string, List<JednotkaOrganizacni>>> OrganizacniStrukturyUradu = null;
+        public static Devmasters.Cache.AWS_S3.Cache<OrganizacniStrukturyUradu> OrganizacniStrukturyUraduCache = null;
         public static DateTime OrganizacniStrukturyUraduExportDate;
 
-        public static Devmasters.Cache.File.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>> FirmyCasovePodezreleZalozene = null;
-        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_aktualni_Cache = null;
-        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_nedavne_Cache = null;
-        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_vsechny_Cache = null;
+        public static Devmasters.Cache.AWS_S3.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>> FirmyCasovePodezreleZalozene = null;
+        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_aktualni_Cache = null;
+        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_nedavne_Cache = null;
+        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky> FirmySVazbamiNaPolitiky_vsechny_Cache = null;
 
-        public static Devmasters.Cache.File.Cache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]> Insolvence_firem_politiku_Cache = null;
+        public static Devmasters.Cache.AWS_S3.Cache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]> Insolvence_firem_politiku_Cache = null;
 
-        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = null;
-        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache = null;
-        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache = null;
+        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = null;
+        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache = null;
+        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache = null;
 
-        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSNespolehlivymiPlatciDPH_Cache = null;
-        public static Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> NespolehlivyPlatciDPH_obchodySurady_Cache = null;
+        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> UradyObchodujiciSNespolehlivymiPlatciDPH_Cache = null;
+        public static Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat> NespolehlivyPlatciDPH_obchodySurady_Cache = null;
 
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Vsechny = null;
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>> SponzorujiciFirmy_Nedavne = null;
@@ -203,8 +203,12 @@ namespace HlidacStatu.Repositories
                     });
 
                 Util.Consts.Logger.Info("Static data - Insolvence_firem_politiku ");
-                Insolvence_firem_politiku_Cache = new Devmasters.Cache.File.Cache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]>(
-                    Connectors.Init.WebAppDataPath, TimeSpan.Zero, "Insolvence_firem_politiku", (obj) =>
+                Insolvence_firem_politiku_Cache = new Devmasters.Cache.AWS_S3.Cache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]>(
+                    new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
+                    "Insolvence_firem_politiku", (obj) =>
                      {
                          var ret = new List<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>>();
                          var lockObj = new object();
@@ -398,31 +402,49 @@ namespace HlidacStatu.Repositories
 
 
                 Util.Consts.Logger.Info("Static data - FirmySVazbamiNaPolitiky_*");
-                FirmySVazbamiNaPolitiky_aktualni_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-                   (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "FirmySVazbamiNaPolitiky_Aktualni",
+                FirmySVazbamiNaPolitiky_aktualni_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
+                   (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
+                     "FirmySVazbamiNaPolitiky_Aktualni",
                    (o) =>
                        {
                            return AnalysisCalculation.LoadFirmySVazbamiNaPolitiky(Relation.AktualnostType.Aktualni, true);
                        });
 
-                FirmySVazbamiNaPolitiky_nedavne_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-                   (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "FirmySVazbamiNaPolitiky_Nedavne",
+                FirmySVazbamiNaPolitiky_nedavne_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
+                   (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
+
+                   "FirmySVazbamiNaPolitiky_Nedavne",
                    (o) =>
                    {
                        return new AnalysisCalculation.VazbyFiremNaPolitiky();
                        
                    });
 
-                FirmySVazbamiNaPolitiky_vsechny_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
-                   (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "FirmySVazbamiNaPolitiky_Vsechny",
+                FirmySVazbamiNaPolitiky_vsechny_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
+                   (
+                    new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
+                    "FirmySVazbamiNaPolitiky_Vsechny",
                    (o) =>
                    {
                        return AnalysisCalculation.LoadFirmySVazbamiNaPolitiky(Relation.AktualnostType.Libovolny, true);
                    });
 
 
-                FirmyCasovePodezreleZalozene = new Devmasters.Cache.File.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>>
-                   (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "FirmyCasovePodezreleZalozene",
+                FirmyCasovePodezreleZalozene = new Devmasters.Cache.AWS_S3.Cache<IEnumerable<AnalysisCalculation.IcoSmlouvaMinMax>>
+                   (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
+                    "FirmyCasovePodezreleZalozene",
                    (o) =>
                    {
                        return AnalysisCalculation.GetFirmyCasovePodezreleZalozeneAsync()
@@ -439,24 +461,37 @@ namespace HlidacStatu.Repositories
 
 
                 Util.Consts.Logger.Info("Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*");
-                UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni",
+                UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
+                    (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
+                    "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni",
                     (o) =>
                     {
                         return AnalysisCalculation.UradyObchodujiciSFirmami_s_vazbouNaPolitikyAsync(Relation.AktualnostType.Aktualni, true)
                             .ConfigureAwait(false).GetAwaiter().GetResult();
                     }
                     );
-                UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne",
+                UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
+                    (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
+                    "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_nedavne",
                     (o) =>
                     {
                         return AnalysisCalculation.UradyObchodujiciSFirmami_s_vazbouNaPolitikyAsync(Relation.AktualnostType.Nedavny, true)
                             .ConfigureAwait(false).GetAwaiter().GetResult();
                     }
                     );
-                UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny",
+                UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
+                    (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
+
+                    "UradyObchodujiciSFirmami_s_vazbouNaPolitiky_vsechny",
                     (o) =>
                     {
                         return AnalysisCalculation.UradyObchodujiciSFirmami_s_vazbouNaPolitikyAsync(Relation.AktualnostType.Libovolny, true)
@@ -465,15 +500,25 @@ namespace HlidacStatu.Repositories
                     );
 
                 Util.Consts.Logger.Info("Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*");
-                UradyObchodujiciSNespolehlivymiPlatciDPH_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "UradyObchodujiciSNespolehlivymiPlatciDPH",
+                UradyObchodujiciSNespolehlivymiPlatciDPH_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
+                    (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
+
+                    "UradyObchodujiciSNespolehlivymiPlatciDPH",
                     (o) =>
                     {
                         return new AnalysisCalculation.VazbyFiremNaUradyStat(); //refresh from task
                     }
                     );
-                NespolehlivyPlatciDPH_obchodySurady_Cache = new Devmasters.Cache.File.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
-                    (Connectors.Init.WebAppDataPath, TimeSpan.Zero, "NespolehlivyPlatciDPH_obchodySurady",
+                NespolehlivyPlatciDPH_obchodySurady_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
+                    (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), TimeSpan.Zero,
+
+                    "NespolehlivyPlatciDPH_obchodySurady",
                     (o) =>
                     {
                         return new AnalysisCalculation.VazbyFiremNaUradyStat(); //refresh from task
@@ -535,10 +580,19 @@ namespace HlidacStatu.Repositories
                 // hierarchie uradu
                 try
                 {
-                    var ossu = ParseOssu();
-                    OrganizacniStrukturyUradu = new Devmasters.Cache.File.Cache<Dictionary<string, List<JednotkaOrganizacni>>>(
-                        Connectors.Init.WebAppDataPath, TimeSpan.FromDays(90), "OrganizacniStrukturyUradu", (obj) =>
+                    OrganizacniStrukturyUraduCache = new Devmasters.Cache.AWS_S3.Cache<OrganizacniStrukturyUradu>(
+                                            new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), 
+                    TimeSpan.FromDays(90), 
+                    "OrganizacniStrukturyUradu", (obj) =>
                         {
+                            OrganizacniStrukturyUradu res = new OrganizacniStrukturyUradu();
+                            var ossu = ParseOssu();
+
+                            res.PlatneKDatu = ossu.ExportInfo.ExportDatumCas;
+
                             var _organizaniStrukturyUradu = new Dictionary<string, List<JednotkaOrganizacni>>();
                             try
                             {
@@ -602,10 +656,11 @@ namespace HlidacStatu.Repositories
                             {
                                 Util.Consts.Logger.Error($"Chyba záznamu při zpracování struktury úřadů. {ex}");
                             }
-                            return _organizaniStrukturyUradu;
+
+                            res.Urady = _organizaniStrukturyUradu;
+                            return res;
                         }, null);
                     
-                    OrganizacniStrukturyUraduExportDate = ossu.ExportInfo.ExportDatumCas;
                 }
                 catch (Exception ex)
                 {
@@ -621,11 +676,12 @@ namespace HlidacStatu.Repositories
 
         private static organizacni_struktura_sluzebnich_uradu ParseOssu()
         {
-            string path = $"{Connectors.Init.WebAppDataPath}{Path.DirectorySeparatorChar}ISoSS_Opendata_OSYS_OSSS.xml";
+            string url = "https://portal.isoss.cz/opendata/ISoSS_Opendata_OSYS_OSSS.xml";
+            string xml = Devmasters.Net.HttpClient.Simple.GetAsync(url).Result; 
 
             var ser = new XmlSerializer(typeof(organizacni_struktura_sluzebnich_uradu));
             
-            using (var streamReader = new StreamReader(path))
+            using (var streamReader = new StringReader(xml))
             {
                 using (var reader = XmlReader.Create(streamReader))
                 {

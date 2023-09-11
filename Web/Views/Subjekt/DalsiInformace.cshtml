@@ -47,7 +47,7 @@
     }
 
 
-    @if (HlidacStatu.Repositories.StaticData.OrganizacniStrukturyUradu.Get().TryGetValue(Model.ICO, out var podrizeneOrg))
+    @if (HlidacStatu.Repositories.StaticData.OrganizacniStrukturyUraduCache.Get().Urady.TryGetValue(Model.ICO, out var podrizeneOrg))
     {
         var sum = new HlidacStatu.Entities.OrgStrukturyStatu.Summary(podrizeneOrg);
         <div>
