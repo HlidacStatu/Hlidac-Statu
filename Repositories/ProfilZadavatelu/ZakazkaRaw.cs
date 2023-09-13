@@ -9,6 +9,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Repositories.ProfilZadavatelu
 {

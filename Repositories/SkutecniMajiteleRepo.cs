@@ -4,6 +4,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories

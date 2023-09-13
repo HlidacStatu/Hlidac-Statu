@@ -1,13 +1,3 @@
-using HlidacStatu.Lib.Analysis.KorupcniRiziko;
-using HlidacStatu.Lib.Data.External.RPP;
-using HlidacStatu.Repositories.ProfilZadavatelu;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Primitives;
-
-using Nest;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -18,8 +8,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+using HlidacStatu.Lib.Data.External.RPP;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Primitives;
+using Nest;
 
-namespace HlidacStatu.Repositories.ES
+namespace HlidacStatu.Connectors
 {
     public class Manager
     {

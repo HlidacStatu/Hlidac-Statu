@@ -21,6 +21,7 @@ using System.Net.Mail;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace HlidacStatu.Datasets
@@ -49,7 +50,7 @@ namespace HlidacStatu.Datasets
 
 
             reg.NormalizeShortName();
-            var client = await Repositories.ES.Manager.GetESClientAsync(reg.datasetId, idxType: Manager.IndexType.DataSource);
+            var client = await Manager.GetESClientAsync(reg.datasetId, idxType: Manager.IndexType.DataSource);
 
             if (reg.searchResultTemplate != null && !string.IsNullOrEmpty(reg.searchResultTemplate?.body))
             {
@@ -182,7 +183,7 @@ namespace HlidacStatu.Datasets
         protected DataSet(string datasourceName, bool fireException)
         {
             datasetId = datasourceName.ToLower();
-            client = Repositories.ES.Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource)
+            client = Manager.GetESClientAsync(datasetId, idxType: Manager.IndexType.DataSource)
                 .ConfigureAwait(false).GetAwaiter().GetResult();
 
             var ret = client.Indices.ExistsAsync(client.ConnectionSettings.DefaultIndex)

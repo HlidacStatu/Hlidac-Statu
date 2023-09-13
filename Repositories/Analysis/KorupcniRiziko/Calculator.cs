@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
 using Nest;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
@@ -636,7 +637,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         {
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
             {
-                var client = await Repositories.ES.Manager.GetESClientAsync();
+                var client = await Manager.GetESClientAsync();
                 return await client.SearchAsync<Smlouva>(a => a
                     .Size(size)
                     .Source(ss => ss.Excludes(sml => sml.Field(ff => ff.Prilohy)))
@@ -648,7 +649,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 
 
             List<smlouvaStat> smlStat = new List<smlouvaStat>();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Repositories.ES.Manager.GetESClientAsync(),
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(),
                 searchFunc,
                 (h, o) =>
                 {

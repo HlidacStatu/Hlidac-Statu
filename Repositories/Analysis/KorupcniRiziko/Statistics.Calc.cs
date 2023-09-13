@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -34,9 +35,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
         public static async Task<IEnumerable<Statistics>> CalculateAsync(string[] forIcos = null, bool futureKIDX = false)
         {
-            var client = await Repositories.ES.Manager.GetESClient_KIndexAsync();
+            var client = await Manager.GetESClient_KIndexAsync();
             if (futureKIDX)
-                client = await Repositories.ES.Manager.GetESClient_KIndexTempAsync();
+                client = await Manager.GetESClient_KIndexTempAsync();
 
             int[] calculationYears = Consts.ToCalculationYears;
             Func<int, int, Task<ISearchResponse<KIndexData>>> searchfnc = null;

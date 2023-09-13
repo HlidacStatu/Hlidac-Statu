@@ -21,6 +21,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
 using HlidacStatu.LibCore;
 using HlidacStatu.Web.Framework;
 
