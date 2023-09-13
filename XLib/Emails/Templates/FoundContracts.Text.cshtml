@@ -1,4 +1,5 @@
-﻿Content-Type: text/plain; charset=utf-8
+﻿@using HlidacStatu.XLib.Emails.Templates
+Content-Type: text/plain; charset=utf-8
 
 Dobrý den.
 Našli jsme nové záznamy pro hlídače nových smluv "@Model.WDName".
@@ -13,7 +14,7 @@ Včera přibylo do Registru smluv @Model.TotalTxt pro tento dotaz:
     </text>
 }
 
-@foreach (FoundContractItem smlouva in @Model.Smlouvy)
+@foreach (FoundContractItem smlouva in Model.Smlouvy)
 {
 <text>
 ============================================
