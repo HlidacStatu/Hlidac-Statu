@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using HlidacStatu.Lib.Data.External.RPP;
+using HlidacStatu.Repositories.ProfilZadavatelu;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Primitives;

@@ -2,6 +2,7 @@
 
 @using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 @using System.Linq;
+@using HlidacStatu.Repositories
 
 
 @{
@@ -23,7 +24,7 @@
 
 
 @{
-    var feedbacks = (await KindexFeedback.GetKindexFeedbacksAsync(Model.Ico, Model.Year)).ToList();
+    var feedbacks = (await KIndexRepo.GetKindexFeedbacksAsync(Model.Ico, Model.Year)).ToList();
 }
 @if (feedbacks.Count() > 0)
 {

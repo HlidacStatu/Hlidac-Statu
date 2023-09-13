@@ -1,14 +1,14 @@
 ﻿using Devmasters.Collections;
 using HlidacStatu.Entities;
-using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
-using HlidacStatu.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using HlidacStatu.Extensions;
+using HlidacStatu.Repositories;
 using Nest;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
@@ -39,7 +39,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         public static async Task<Calculator> CreateCalculatorAsync(string ico, bool useTemp)
         {
             var calculator = new Calculator(ico);
-            calculator.kindex = await KIndexData.GetDirectAsync((ico, useTemp));
+            calculator.kindex = await KIndexRepo.GetDirectAsync((ico, useTemp));
             return calculator;
         }
 

@@ -1,10 +1,11 @@
 ﻿@model HlidacStatu.Entities.Firma 
 @using System.Linq;
+@using HlidacStatu.Repositories
 
 @{
     Layout = null;
 
-    var roky = HlidacStatu.Lib.Analysis.KorupcniRiziko.Consts.AvailableCalculationYears;
+    var roky = KIndexRepo.GetAvailableCalculationYears();
 
 }
 

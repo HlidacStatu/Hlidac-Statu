@@ -3,6 +3,7 @@
 @using Devmasters.Enums;
 @using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 @using System.Linq;
+@using HlidacStatu.Repositories
 
 @{
 
@@ -74,7 +75,7 @@
     <div class="col-sm-12">
         <h3 class="">
             Porovnání pro další roky:
-            @foreach (int year in Consts.AvailableCalculationYears)
+            @foreach (int year in KIndexRepo.GetAvailableCalculationYears())
             {
                 if (year != selectedYear)
                 {

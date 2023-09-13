@@ -1,14 +1,6 @@
-﻿using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.ES;
-
-using Nest;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -16,22 +8,8 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
     [Nest.ElasticsearchType(IdProperty = nameof(Ico))]
     public partial class KIndexData
     {
-
-        public static KIndexData Empty(string ico, string jmeno = null)
-        {
-            KIndexData kidx = new KIndexData();
-            kidx.Ico = ico;
-            kidx.Jmeno = jmeno ?? Firmy.GetJmeno(ico);
-            kidx.roky = Consts.AvailableCalculationYears
-                .Select(rok => Annual.Empty(rok))
-                .ToList();
-            return kidx;
-        }
-
         public static int[] KIndexLimits = { 0, 3, 6, 9, 12, 15 };
-
-
-
+        
         /// <summary>
         /// Returns IMG html tag with path to icon.
         /// </summary>
@@ -150,23 +128,6 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         [Nest.Date]
         public DateTime LastSaved { get; set; }
 
-        public async Task SaveAsync(string comment, bool useTempDb = false)
-        {
-            await Backup.CreateBackupAsync(comment, this.Ico, useTempDb);
-
-            //calculate fields before saving
-            this.LastSaved = DateTime.Now;
-            var client = await Manager.GetESClient_KIndexAsync();
-            if (useTempDb)
-                client = await Manager.GetESClient_KIndexTempAsync();
-
-            var res = await client.IndexAsync<KIndexData>(this, o => o.Id(this.Ico)); //druhy parametr musi byt pole, ktere je unikatni
-            if (!res.IsValid)
-            {
-                throw new ApplicationException(res.ServerError?.ToString());
-            }
-        }
-
         public static KIndexLabelValues CalculateLabel(decimal? value)
         {
             KIndexLabelValues label = KIndexLabelValues.None;
@@ -178,38 +139,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
             return label;
         }
-        public static async Task<KIndexData> GetDirectAsync((string ico, bool useTempDb) param)
-        {
-            if (Consts.KIndexExceptions.Contains(param.ico) && param.useTempDb == false)
-                return null;
-
-            var client = await Manager.GetESClient_KIndexAsync();
-            if (param.useTempDb)
-                client = await Manager.GetESClient_KIndexTempAsync();
-
-
-            var res = await client.GetAsync<KIndexData>(param.ico);
-            if (res.Found == false)
-                return null;
-            else if (!res.IsValid)
-            {
-                throw new ApplicationException(res.ServerError?.ToString());
-            }
-            else
-            {
-                KIndexData f = res.Source;
-                //fill Annual
-                foreach (var r in f.roky)
-                {
-                    if (r != null)
-                        r.Ico = param.ico;
-                }
-                return f;
-            }
-        }
-
-
-
+        
         public static string KIndexLabelColor(KIndexLabelValues label)
         {
             switch (label)
@@ -233,7 +163,6 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             }
         }
 
-
         public static string KIndexLabelIconUrl(KIndexLabelValues value, bool local = true, bool showNone = false)
         {
             string url = "";
@@ -253,70 +182,6 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 
             }
         }
-
-        public async Task<IOrderedEnumerable<Backup>> GetPreviousVersionsAsync(bool futureData = false)
-        {
-            ElasticClient client = await Manager.GetESClient_KIndexBackupAsync();
-            if (futureData)
-                client = await Manager.GetESClient_KIndexBackupTempAsync();
-
-            ISearchResponse<Backup> searchResults = null;
-            try
-            {
-                searchResults = await client.SearchAsync<Backup>(s =>
-                        s.Query(q => q.Term(f => f.KIndex.Ico, this.Ico)));
-
-                if (searchResults.IsValid && searchResults.Hits.Count > 0)
-                {
-                    var hits = searchResults.Hits.Select(h => h.Source).OrderByDescending(s => s.Created);
-                    return hits;
-                }
-            }
-            catch (Exception e)
-            {
-                string origQuery = $"ico:{this.Ico};";
-                AuditRepo.Add(Audit.Operations.Search, "", "", "KindexFeedback", "error", origQuery, null);
-                if (searchResults != null && searchResults.ServerError != null)
-                {
-                    Manager.LogQueryError<Backup>(searchResults,
-                        $"Exception for {origQuery}",
-                        ex: e);
-                }
-                else
-                {
-                    Util.Consts.Logger.Error(origQuery, e);
-                }
-            }
-
-            return Enumerable.Empty<Backup>().OrderBy(x => 1);
-
-        }
-
-        public static async Task<Backup> GetPreviousVersionAsync(string id)
-        {
-            ElasticClient client = await Manager.GetESClient_KIndexBackupAsync();
-            if (!string.IsNullOrEmpty(Devmasters.Config.GetWebConfigValue("UseKindexTemp")))
-                client = await Manager.GetESClient_KIndexBackupTempAsync();
-
-            try
-            {
-                var searchResult = await client.GetAsync<Backup>(id);
-
-                if (searchResult.IsValid)
-                {
-                    return searchResult.Source;
-                }
-            }
-            catch (Exception e)
-            {
-                string origQuery = $"id:{id};";
-                AuditRepo.Add(Audit.Operations.Search, "", "", "KindexFeedback", "error", origQuery, null);
-                Util.Consts.Logger.Error(origQuery, e);
-            }
-
-            return null;
-        }
-
     }
 }
 
