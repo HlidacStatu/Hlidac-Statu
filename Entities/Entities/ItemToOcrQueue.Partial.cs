@@ -50,7 +50,8 @@ namespace HlidacStatu.Entities
             IQueryable<ItemToOcrQueue> sql = null;
             sql = db.ItemToOcrQueue.AsQueryable()
                 .Where(m => m.Done == null
-                        && m.Started == null);
+                        && m.Started == null
+                        && m.WaitForPK == null);
 
             if (itemType != null)
                 sql = sql.Where(m => m.ItemType == itemType.ToString());
@@ -195,14 +196,19 @@ namespace HlidacStatu.Entities
             using (DbEntities db = new DbEntities())
             {
 
-                ItemToOcrQueue i = db.ItemToOcrQueue.AsQueryable().Where(m => m.Pk == taskItemId).FirstOrDefault();
+                ItemToOcrQueue i = db.ItemToOcrQueue.AsQueryable().FirstOrDefault(m => m.Pk == taskItemId);
                 if (i != null)
                 {
                     i.Done = DateTime.Now;
                     i.Success = success ? 1 : 0;
                     i.Result = result;
-                    db.SaveChanges();
                 }
+
+                var waitingTask = db.ItemToOcrQueue.FirstOrDefault(m => m.WaitForPK == taskItemId);
+                if (waitingTask != null)
+                    waitingTask.WaitForPK = null;
+
+                _= db.SaveChanges();
             }
         }
 

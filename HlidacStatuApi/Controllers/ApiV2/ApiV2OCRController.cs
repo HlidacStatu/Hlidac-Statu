@@ -121,6 +121,17 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 default:
                     break;
             }
+            if (task == null)
+            {
+                ItemToOcrQueue.SetDone(item.Pk, false, "record not found");
+                if (tries < 20)
+                {
+                    tries++;
+                    goto start;
+                }
+                else
+                    return StatusCode(404);
+            }
             if (task.docs == null || task.docs?.Length == 0)
             {
                 ItemToOcrQueue.SetDone(item.Pk, true, "No docs to OCR");
@@ -133,17 +144,28 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     return StatusCode(404);
             }
 
-            if (task == null)
+            if (task.docs.Length>50)
             {
-                ItemToOcrQueue.SetDone(item.Pk, false, "record not found");
-                if (tries < 20)
+                //split task into more
+                ItemToOcrQueue secondItem = new ItemToOcrQueue()
                 {
-                    tries++;
-                    goto start;
+                    Created = item.Created,
+                    ItemId = item.ItemId,
+                    ItemSubType = item.ItemSubType,
+                    ItemType = item.ItemType,
+                    Options = item.Options,
+                    Priority= item.Priority,
+                    Started= item.Started,
+                    WaitForPK = item.Pk
+                };
+                using (DbEntities db = new  DbEntities())
+                {
+                    db.ItemToOcrQueue.Add(secondItem);
+                    db.SaveChanges();
                 }
-                else
-                    return StatusCode(404);
+                task.docs = task.docs.Take(50).ToArray();
             }
+
             return task;
         }
         private async Task<HlidacStatu.DS.Api.OcrWork.Task> GetDatasetItem(ItemToOcrQueue item)
