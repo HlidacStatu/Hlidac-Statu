@@ -153,12 +153,17 @@ namespace HlidacStatu.Util
                 return string.Empty;
 
             ico = ico.Trim().ToLower();
+            
             if (string.IsNullOrEmpty(ico))
                 return string.Empty;
 
             if (ico.StartsWith("cz-"))
                 return MerkIcoToICO(ico);
 
+            Regex regex = new Regex(@"^\w{2}-\d*$");
+            if (regex.IsMatch(ico))
+                return ico;
+            
             ico = Devmasters.TextUtil.NormalizeToNumbersOnly(ico);
             if (string.IsNullOrEmpty(ico))
                 return string.Empty;
