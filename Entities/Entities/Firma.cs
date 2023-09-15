@@ -360,6 +360,14 @@ namespace HlidacStatu.Entities
             return CZ_Nuts.Kraje.TryGetValue(KrajId, out string kraj) ? kraj : KrajId;
         }
         
+        public bool Registrovana_v_zahranici
+        {
+            get
+            {
+                return DataValidators.IsFirmaIcoZahranicni(this.ICO);
+            }
+        }
+
         public string BookmarkName()
         {
             return Jmeno;

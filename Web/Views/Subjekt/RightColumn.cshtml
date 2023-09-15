@@ -11,7 +11,10 @@
     Layout = null;
 
     var ceo = Model.Ceo();
+
+
 }
+
 
 @* Pravý sloupec *@
 <div class="col-sm-4 col-xs-12 order-md-3 order-sm-0">
@@ -128,7 +131,9 @@
         HlidacStatu.Datasets.DataSet skutMajitDS = HlidacStatu.Datasets.DataSet.CachedDatasets.Get("skutecni-majitele");
         var skutMajitRes = (await skutMajitDS.SearchDataRawAsync("ico:" + Model.ICO, 1, 1)).Result.ToList();
     }
-    @if (skutMajitRes.Any())
+    @if (skutMajitRes.Any()
+    && Devmasters.Config.GetWebConfigValue("HiddenSkutecniMajiteleICO")?.Split(",")?.Contains(Model.ICO) == false
+    )
     {
         Newtonsoft.Json.Linq.JObject obj = Newtonsoft.Json.Linq.JObject.Parse(skutMajitRes.First().Item2);
         if (obj["skutecni_majitele"]?.Count() > 0)
@@ -150,6 +155,15 @@
             }
         }
         <hr />
+    }
+    else if (Model.Registrovana_v_zahranici == false)
+    {
+        <h4>Skuteční majitelé</h4>
+        <div>
+            <a href="https://esm.justice.cz/ias/issm/rejstrik-$sm?ico=@(Model.ICO)&jenPlatne=PLATNE&polozek=50&typHledani=STARTS_WITH&typHledaniSpolku=ALL">Najít v Evidenci skutečných majitelů<i class="fa-regular fa-arrow-up-right-from-square"></i></a>
+        </div>
+        <div style="padding-bottom:10px;">&nbsp;</div>
+
     }
 
     @if (Model.PatrimStatu())
@@ -212,9 +226,9 @@
 
                     var othersSecondLast = platySecondLastYear.Where(pu => !pu.HeadOfOffice).Where(pu => pu.PocetMes > 0);
                     var minOthersSecondLast = othersSecondLast.Count() == 0 ? 0 :
-                        othersSecondLast.Min(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
-                    var maxOthersSecondLast = othersSecondLast.Count() == 0 ? 0 : 
-                        othersSecondLast.Max(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
+                    othersSecondLast.Min(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
+                    var maxOthersSecondLast = othersSecondLast.Count() == 0 ? 0 :
+                    othersSecondLast.Max(pu => (pu.Plat + pu.Odmeny + pu.Bonus) / pu.PocetMes);
 
                     <tr>
                         <th colspan="2" class="col-sm-12">

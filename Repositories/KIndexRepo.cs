@@ -6,6 +6,7 @@ using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using HlidacStatu.Util;
+using InfluxDB.Client.Api.Domain;
 using Nest;
 using Consts = HlidacStatu.Lib.Analysis.KorupcniRiziko.Consts;
 
@@ -31,8 +32,23 @@ public static class KIndexRepo
         }
         return null;
     }
-    
-    public static KIndexData.KIndexParts[] OrderedValuesFromBestForInfofacts(this KIndexData.Annual annual, string ico)
+
+
+    static Devmasters.Cache.LocalMemory.Manager<KIndexData.KIndexParts[], (KIndexData.Annual, string)> _orderedValuesFromBestForInfofactsCache
+        = Devmasters.Cache.LocalMemory.Manager<KIndexData.KIndexParts[], (KIndexData.Annual, string)>.GetSafeInstance("orderedValuesFromBestForInfofacts",
+            (data) => _orderedValuesFromBestForInfofacts(data.Item1, data.Item2),
+            TimeSpan.FromDays(2), (data) => $"{data.Item1.Ico}_{data.Item1.Rok}-{data.Item2}"
+            );
+
+    public static KIndexData.KIndexParts[] OrderedValuesFromBestForInfofacts(this KIndexData.Annual annual, string ico, bool invalidateCache = false)
+    {
+        if (invalidateCache)
+            _orderedValuesFromBestForInfofactsCache.Delete((annual, ico));
+
+        return _orderedValuesFromBestForInfofactsCache.Get((annual, ico));
+    }
+
+    static KIndexData.KIndexParts[] _orderedValuesFromBestForInfofacts(this KIndexData.Annual annual, string ico)
     {
         if (annual._orderedValuesForInfofacts == null)
         {
