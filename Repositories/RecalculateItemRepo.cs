@@ -11,7 +11,7 @@ namespace HlidacStatu.Repositories
 {
     public class RecalculateItemRepo
     {
-        public static Devmasters.Log.Logger log = Devmasters.Log.Logger.CreateLogger<RecalculateItemRepo>();
+        public static Devmasters.Log.Logger log = null;
 
         //public const string RECALCULATIONQUEUENAME = "recalculation2Process";
         static Entities.RecalculateItemEqComparer comparer = new Entities.RecalculateItemEqComparer();
@@ -80,12 +80,12 @@ namespace HlidacStatu.Repositories
 
             log.Info("{method} Starting with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, threads.Value);
             if (debug)
-                Console.WriteLine($"getting from queue {uniqueItems.Count()} items");
+                log.Debug($"getting from queue {uniqueItems.Count()} items");
 
 
             //var queueItems = GetFromProcessingQueueWithParents(threads.Value*threads.Value, threads.Value, outputWriter, progressWriter, debug);
             if (debug)
-                Console.WriteLine($"got from queue {uniqueItems.Count()} items");
+                log.Debug($"got from queue {uniqueItems.Count()} items");
 
             log.Info("{method} Starting Subjekt statistics recalculate for {count} subjects with {numOfThreads} threads",
                 uniqueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt), MethodBase.GetCurrentMethod().Name, threads.Value);
@@ -97,10 +97,10 @@ namespace HlidacStatu.Repositories
                 item =>
                 {
                     if (debug)
-                        Console.WriteLine($"start statistics firma {item.Id}");
+                        log.Debug($"start statistics firma {item.Id}");
                     RecalculateFirma(item);
                     if (debug)
-                        Console.WriteLine($"end statistics firma {item.Id}");
+                        log.Debug($"end statistics firma {item.Id}");
 
                     return new Devmasters.Batch.ActionOutputData();
                 },
@@ -121,10 +121,10 @@ namespace HlidacStatu.Repositories
                 item =>
                 {
                     if (debug)
-                        Console.WriteLine($"start statistics osoba {item.Id}");
+                        log.Debug($"start statistics osoba {item.Id}");
                     RecalculateOsoba(item);
                     if (debug)
-                        Console.WriteLine($"end statistics osoba {item.Id}");
+                        log.Debug($"end statistics osoba {item.Id}");
 
                     return new Devmasters.Batch.ActionOutputData();
                 },
@@ -135,7 +135,7 @@ namespace HlidacStatu.Repositories
 
 
             if (debug)
-                Console.WriteLine($"getting from queue {numFromQueue} items");
+                log.Debug($"getting from queue {numFromQueue} items");
             if (onlyIds)
                 uniqueItems.Clear();
             else
@@ -341,7 +341,11 @@ namespace HlidacStatu.Repositories
         public static IEnumerable<RecalculateItem> GetFromProcessingQueueWithParents(int count, int threads,
             Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null, bool debug = false)
         {
+            if (debug)
+                log.Debug($"getting {count} from processing queue");
             IEnumerable<RecalculateItem> res = GetItemsFromProcessingQueue(count);
+            if (debug)
+                log.Debug($"got {res.Count()} from processing queue. Looking for parents");
 
             System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(res);
 
@@ -352,10 +356,10 @@ namespace HlidacStatu.Repositories
                     {
 
                         if (debug)
-                            Console.WriteLine($"GetFromProcessingQueueWithParents getting cascade for {item.UniqueKey}");
+                            log.Debug($"GetFromProcessingQueueWithParents getting cascade for {item.UniqueKey}");
                         List<RecalculateItem> cascade = CascadeItems(item, ref list);
                         if (debug)
-                            Console.WriteLine($"GetFromProcessingQueueWithParents got cascade for {item.UniqueKey}");
+                            log.Debug($"GetFromProcessingQueueWithParents got cascade for {item.UniqueKey}");
                         foreach (var i in cascade)
                         {
                             if (list.Contains(i, comparer) == false)
@@ -372,8 +376,8 @@ namespace HlidacStatu.Repositories
                     return new Devmasters.Batch.ActionOutputData();
                 },
                 outputWriter, progressWriter,
-                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads,
-                monitor: new MonitoredTaskRepo.ForBatch(logger: log)
+                !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads
+                
                 );
 
             log.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
