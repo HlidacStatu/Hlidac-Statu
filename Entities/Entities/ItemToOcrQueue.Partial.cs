@@ -152,7 +152,7 @@ namespace HlidacStatu.Entities
             }
         }
 
-        public static void ResetTask(int taskItemId, bool decreasePriority = true)
+        public static void ResetTask(long taskItemId, bool decreasePriority = true)
         {
             using (DbEntities db = new DbEntities())
             {
@@ -176,7 +176,7 @@ namespace HlidacStatu.Entities
         }
 
 
-        public static ItemToOcrQueue GetTask(int taskItemId)
+        public static ItemToOcrQueue GetTask(long taskItemId)
         {
             using (DbEntities db = new DbEntities())
             {
@@ -190,7 +190,7 @@ namespace HlidacStatu.Entities
             }
         }
 
-        public static void SetDone(int taskItemId, bool success, string result = null)
+        public static void SetDone(long taskItemId, bool success, string result = null)
         {
             using (DbEntities db = new DbEntities())
             {

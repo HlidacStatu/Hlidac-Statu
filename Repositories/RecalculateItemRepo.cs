@@ -62,8 +62,8 @@ namespace HlidacStatu.Repositories
             {
                 numFromQueue = RecalculateQueueLength();
 
-                allItems = GetFromProcessingQueueWithParents(numFromQueue,threads.Value, 
-                    outputWriter,progressWriter,debug);
+                allItems = GetFromProcessingQueueWithParents(numFromQueue, threads.Value,
+                    outputWriter, progressWriter, debug);
                 uniqueItems = allItems.Distinct(comparer).ToList();
             }
 
@@ -158,6 +158,8 @@ namespace HlidacStatu.Repositories
             {
                 _ = o.StatistikaRegistrSmluv(DS.Graphs.Relation.AktualnostType.Nedavny, forceUpdateCache: true);
                 _ = o.InfoFactsCached(forceUpdateCache: true);
+                RecalculateItemRepo.Finish(item);
+
             }
         }
 
@@ -184,7 +186,7 @@ namespace HlidacStatu.Repositories
                         break;
                 }
                 _ = f.InfoFacts(forceUpdateCache: true);
-
+                RecalculateItemRepo.Finish(item);
             }
         }
 
@@ -276,6 +278,23 @@ namespace HlidacStatu.Repositories
             return list;
         }
 
+        public static bool Finish(RecalculateItem item)
+        {
+            return Finish(item.Pk);
+        }
+        public static bool Finish(long pk)
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                var dbItem = db.RecalculateItem.FirstOrDefault(m => m.Pk == pk);
+                if (dbItem == null) return false;
+
+                dbItem.Done = DateTime.Now;
+
+                _ = db.SaveChanges();
+                return true;
+            }
+        }
         public static bool AddToProcessingQueue(RecalculateItem item)
         {
             try
@@ -285,17 +304,17 @@ namespace HlidacStatu.Repositories
                     var strategy = db.Database.CreateExecutionStrategy();
                     bool res = strategy.Execute<bool>(() =>
                     {
-                    using (var dbTran = db.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead))
-                    {
-
-                        try
+                        using (var dbTran = db.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead))
                         {
-                            var exists = db.RecalculateItem.Any(m =>
-                                m.Id == item.Id
-                                && m.ItemType == item.ItemType
-                                && m.StatisticsType == item.StatisticsType
-                                && (m.Done == null)
-                                );
+
+                            try
+                            {
+                                var exists = db.RecalculateItem.Any(m =>
+                                    m.Id == item.Id
+                                    && m.ItemType == item.ItemType
+                                    && m.StatisticsType == item.StatisticsType
+                                    && (m.Done == null)
+                                    );
                                 if (exists)
                                 {
                                     dbTran.Rollback();
@@ -378,7 +397,7 @@ namespace HlidacStatu.Repositories
                 },
                 outputWriter, progressWriter,
                 !System.Diagnostics.Debugger.IsAttached, maxDegreeOfParallelism: threads
-                
+
                 );
 
             log.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
@@ -396,7 +415,7 @@ namespace HlidacStatu.Repositories
             {
                 var res = db.RecalculateItem
                     .AsNoTracking()
-                    .Where(m=>m.Started == null)
+                    .Where(m => m.Started == null)
                     .OrderBy(o => o.Created)
                     .Take(count)
                     .ToArray();

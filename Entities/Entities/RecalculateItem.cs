@@ -67,7 +67,7 @@ namespace HlidacStatu.Entities
         }
 
         [Key(), DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string Pk { get; set; }
+        public long Pk { get; set; }
 
         [StringLength(256)]
         public string Id { get; set; }

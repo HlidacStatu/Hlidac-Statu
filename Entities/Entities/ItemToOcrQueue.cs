@@ -13,7 +13,7 @@ namespace HlidacStatu.Entities
     {
         [Key]
         [Column("pk")]
-        public int Pk { get; set; }
+        public long Pk { get; set; }
 
         [Required]
         [Column("itemType")]
@@ -43,7 +43,8 @@ namespace HlidacStatu.Entities
         [Column("Options")]        
         public string Options { get; set; }
 
-        
+        public long? WaitForPK { get; set; }
+
 
     }
 }
