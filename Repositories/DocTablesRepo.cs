@@ -3,6 +3,7 @@ using HlidacStatu.Entities;
 using System;
 using Nest;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Repositories
 {

@@ -9,7 +9,7 @@ using Nest;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-
+using HlidacStatu.Connectors;
 using Osoba = HlidacStatu.Entities.Insolvence.Osoba;
 
 namespace HlidacStatu.Repositories

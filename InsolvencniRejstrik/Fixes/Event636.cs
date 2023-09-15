@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using HlidacStatu.Connectors;
 
 namespace InsolvencniRejstrik.Fixes
 {

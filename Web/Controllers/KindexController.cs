@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using HlidacStatu.LibCore;
 using HlidacStatu.Web.Framework;
 
+
 namespace HlidacStatu.Web.Controllers
 {
     public class KindexController : Controller
@@ -58,8 +59,8 @@ namespace HlidacStatu.Web.Controllers
             {
                 return Redirect("/");
             }
-
-            Backup backup = await KIndexData.GetPreviousVersionAsync(id);
+            
+            Backup backup = await KIndexRepo.GetPreviousVersionAsync(id);
 
             SetViewbagSelectedYear(ref rok);
             ViewBag.BackupCreated = backup.Created.ToString("dd.MM.yyyy");
@@ -71,7 +72,7 @@ namespace HlidacStatu.Web.Controllers
 
         private void SetViewbagSelectedYear(ref int? rok, int? maxYear = null)
         {
-            rok = Consts.FixKindexYear(rok);
+            rok = KIndexRepo.FixKindexYear(rok);
             if (maxYear == null && !this.User.IsInRole("Admin"))
             {
                 maxYear = Devmasters.ParseText.ToInt(Devmasters.Config.GetWebConfigValue("KIndexMaxYear"));
@@ -246,7 +247,7 @@ text zpravy: {txt}";
 
         public async Task<JsonResult> KindexForIco(string id, int? rok = null)
         {
-            rok = Consts.FixKindexYear(rok);
+            rok = KIndexRepo.FixKindexYear(rok);
             var f = Firmy.Get(Util.ParseTools.NormalizeIco(id));
             if (f.Valid)
             {
@@ -290,7 +291,7 @@ text zpravy: {txt}";
             if (string.IsNullOrEmpty(id))
                 return NotFound();
 
-            var feedback = await KindexFeedback.GetByIdAsync(id);
+            var feedback = await KIndexRepo.GetByIdAsync(id);
 
             if (feedback is null)
                 return NotFound();
@@ -343,7 +344,7 @@ text zpravy: {txt}";
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<ActionResult> PercentileBanner(string id, int? part = null, int? rok = null)
         {
-            rok = Consts.FixKindexYear(rok);
+            rok = KIndexRepo.FixKindexYear(rok);
             var kidx = await KIndex.GetAsync(id);
             if (kidx != null)
             {
@@ -411,7 +412,7 @@ text zpravy: {txt}";
                 }
                 else
                 {
-                    year = Consts.FixKindexYear(rok);
+                    year = KIndexRepo.FixKindexYear(rok);
                     label = kidx.ForYear(year)?.KIndexLabel ?? KIndexData.KIndexLabelValues.None;
                     infoFacts = kidx.InfoFacts(year);
                 }

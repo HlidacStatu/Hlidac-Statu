@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Manager = HlidacStatu.Connectors.Manager;
 
 namespace HlidacStatu.Repositories
 {
@@ -86,7 +87,7 @@ namespace HlidacStatu.Repositories
                 if (from.HasValue)
                     sdate = $" AND podepsano:[{from?.ToString("yyyy-MM-dd") ?? "*"} TO {from?.ToString("yyyy-MM-dd") ?? DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")}]"; //podepsano:[2016-01-01 TO 2016-12-31]
 
-                var client = await Repositories.ES.Manager.GetESClientAsync();
+                var client = await Manager.GetESClientAsync();
                 return await client.SearchAsync<Smlouva>(a => a
                     .TrackTotalHits(page * size == 0)
                     .Size(size)
@@ -98,7 +99,7 @@ namespace HlidacStatu.Repositories
             };
 
             List<Smlouva> smlouvy = new List<Smlouva>();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Repositories.ES.Manager.GetESClientAsync(), searchFunc,
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(), searchFunc,
                   (hit, o) =>
                   {
                       smlouvy.Add(hit.Source);
@@ -232,7 +233,7 @@ namespace HlidacStatu.Repositories
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = null;
             searchFunc = async (size, page) =>
             {
-                var client = await Repositories.ES.Manager.GetESClientAsync();
+                var client = await Manager.GetESClientAsync();
                 return await client.SearchAsync<Smlouva>(a => a
                             .TrackTotalHits(page * size == 0)
                             .Size(size)
@@ -249,7 +250,7 @@ namespace HlidacStatu.Repositories
             Dictionary<string, BasicDataForSubject<List<BasicData<string>>>> uradyStatni = new Dictionary<string, BasicDataForSubject<List<BasicData<string>>>>();
             Dictionary<string, BasicDataForSubject<List<BasicData<string>>>> uradySoukr = new Dictionary<string, BasicDataForSubject<List<BasicData<string>>>>();
             object lockObj = new object();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Repositories.ES.Manager.GetESClientAsync(), searchFunc,
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(), searchFunc,
                   (hit, param) =>
                   {
                       Smlouva s = hit.Source;
@@ -438,7 +439,7 @@ namespace HlidacStatu.Repositories
             //smlouvy s politikama
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
             {
-                var client = await Repositories.ES.Manager.GetESClientAsync();
+                var client = await Manager.GetESClientAsync();
                 return await client.SearchAsync<Smlouva>(a => a
                     .TrackTotalHits(page * size == 0)
                     .Size(size)
@@ -451,7 +452,7 @@ namespace HlidacStatu.Repositories
 
 
             List<string> smlouvyIds = new List<string>();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Repositories.ES.Manager.GetESClientAsync(), searchFunc,
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(), searchFunc,
                   (hit, param) =>
                   {
 

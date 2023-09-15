@@ -1,5 +1,4 @@
 ﻿using HlidacStatu.Entities.Entities.Analysis;
-using HlidacStatu.Repositories.ES;
 
 
 using Nest;
@@ -8,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
+using HlidacStatu.Repositories;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -18,7 +19,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 .GetSafeInstance("KIndexData",
                 param =>
                 {
-                    KIndexData f = KIndexData.GetDirectAsync(param).ConfigureAwait(false).GetAwaiter().GetResult();
+                    KIndexData f = KIndexRepo.GetDirectAsync(param).ConfigureAwait(false).GetAwaiter().GetResult();
                     if (f == null || f.Ico == "-")
                         return null;
                     return f;

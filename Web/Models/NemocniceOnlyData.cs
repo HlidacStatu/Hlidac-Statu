@@ -4,6 +4,7 @@ using Nest;
 
 using System;
 using System.ComponentModel;
+using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Web.Models
 {

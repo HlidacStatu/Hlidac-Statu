@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using HlidacStatu.Repositories;
 
 namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
@@ -38,7 +39,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
             if (string.IsNullOrWhiteSpace(Ico))
                 throw new Exception("Ico is missing");
 
-            year = Consts.FixKindexYear(year);
+            year = KIndexRepo.FixKindexYear(year);
             var kindex = await KIndex.GetAsync(Ico);
 
             if (kindex != null)

@@ -149,7 +149,7 @@ $(document).ready(function(){
             <tr><th>Rok</th><th>Ready 2020?</th><th>Zverejneny KIndex</th><th>Ready 2021?</th><th>Planovany ke zverejneni</th><th>KIndex 2021 v1</th></tr>
         </thead>
         <tbody>
-            @foreach (var rok in Consts.AvailableCalculationYears)
+            @foreach (var rok in KIndexRepo.GetAvailableCalculationYears())
             {
                 var kidxP = kidxPublic?.ForYear(rok);
                 var kidxF = kidxFuture?.ForYear(rok);

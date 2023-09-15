@@ -2,6 +2,7 @@ using HlidacStatu.Entities;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Repositories
 {
@@ -12,7 +13,7 @@ namespace HlidacStatu.Repositories
             new Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeSSL[]>(TimeSpan.FromHours(2), (obj) =>
                 {
                     UptimeSSL[] res = new UptimeSSL[] { };
-                    var client = ES.Manager.GetESClient_UptimeSSLAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                    var client = Manager.GetESClient_UptimeSSLAsync().ConfigureAwait(false).GetAwaiter().GetResult();
                     var resX = client
                         .SearchAsync<UptimeSSL>(s => s
                             .Query(q => q.MatchAll())
@@ -53,7 +54,7 @@ namespace HlidacStatu.Repositories
         {
             try
             {
-                var client = await Repositories.ES.Manager.GetESClient_UptimeSSLAsync();
+                var client = await Manager.GetESClient_UptimeSSLAsync();
                 await client.IndexAsync<UptimeSSL>(item, m => m.Id(item.Id));
 
             }
@@ -67,7 +68,7 @@ namespace HlidacStatu.Repositories
         }
         public static async Task<UptimeSSL> LoadLatestAsync(string domain)
         {
-            var cl = await ES.Manager.GetESClient_UptimeSSLAsync();
+            var cl = await Manager.GetESClient_UptimeSSLAsync();
 
             var res = await cl.SearchAsync<UptimeSSL>(s => s
                 .Query(q=>q

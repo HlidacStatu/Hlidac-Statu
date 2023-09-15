@@ -8,7 +8,7 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
 {
     public partial class KIndexData
     {
-        public partial class Annual
+        public class Annual
         {
             public static Annual Empty(int rok)
             {
@@ -18,10 +18,8 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 ann.KIndexVypocet = new VypocetDetail() { Radky = new VypocetDetail.Radek[] { } };
                 return ann;
             }
-
+            
             protected Annual() { }
-
-
 
             [Nest.Date]
             public DateTime LastUpdated { get; set; }
@@ -142,38 +140,9 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
                 return KIndexData.KIndexLabelIconUrl(KIndexLabel, local);
             }
 
-            KIndexParts[] _orderedValuesForInfofacts = null;
-            static readonly object _lockObj = new object();
-            public KIndexParts[] OrderedValuesFromBestForInfofacts(string ico)
-            {
-                if (_orderedValuesForInfofacts == null)
-                {
-                    lock (_lockObj)
-                    {
-                        if (_orderedValuesForInfofacts == null)
-                        {
-                            Statistics stat = Statistics.GetStatistics(Rok); //todo: může být null, co s tím?
-                            if (KIndexVypocet.Radky != null || KIndexVypocet.Radky.Count() > 0)
-
-                                _orderedValuesForInfofacts = KIndexVypocet.Radky
-                                    .Select(m => new { r = m, rank = stat.SubjektRank(ico, m.VelicinaPart) })
-                                    .Where(m => m.rank.HasValue)
-                                    .Where(m =>
-                                        m.r.VelicinaPart != KIndexParts.PercNovaFirmaDodavatel //nezajimava oblast
-                                        && !(m.r.VelicinaPart == KIndexParts.PercSmlouvyPod50kBonus && m.r.Hodnota == 0) //bez bonusu
-                                    )
-                                    .OrderBy(m => m.rank)
-                                    .ThenBy(o => o.r.Hodnota)
-                                    .Select(m => m.r.VelicinaPart)
-                                    .ToArray(); //better debug
-                            else
-                                _orderedValuesForInfofacts = new KIndexParts[] { };
-                        }
-                    }
-                }
-                return _orderedValuesForInfofacts;
-
-            }
+            public KIndexParts[] _orderedValuesForInfofacts = null;
+            public readonly object _lockObj = new object();
+            
 
         }
 

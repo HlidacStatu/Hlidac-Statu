@@ -8,6 +8,7 @@ using Nest;
 
 using System;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Repositories
 {

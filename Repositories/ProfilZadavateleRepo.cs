@@ -6,6 +6,7 @@ using Nest;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Repositories
 {

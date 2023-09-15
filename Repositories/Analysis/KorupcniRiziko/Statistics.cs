@@ -1,5 +1,4 @@
-﻿using HlidacStatu.Connectors;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 
 using System;
 using System.Collections.Generic;
@@ -55,10 +54,10 @@ namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
         /// <returns>Positive number means improvement. Negative number means worsening.</returns>
         public static IEnumerable<SubjectWithKIndexTrend> GetJumpersFromBest(int year)
         {
-            if (year < Consts.AvailableCalculationYears.Min() + 1)
-                year = Consts.AvailableCalculationYears.Min() + 1;
-            if (year > Consts.AvailableCalculationYears.Max())
-                year = Consts.AvailableCalculationYears.Max();
+            if (year < KIndexRepo.GetAvailableCalculationYears().Min() + 1)
+                year = KIndexRepo.GetAvailableCalculationYears().Min() + 1;
+            if (year > KIndexRepo.GetAvailableCalculationYears().Max())
+                year = KIndexRepo.GetAvailableCalculationYears().Max();
 
             var statChosenYear = KIndexStatTotal.Get().FirstOrDefault(m => m.Rok == year).SubjektOrderedListKIndexAsc;
             var statYearBefore = KIndexStatTotal.Get().FirstOrDefault(m => m.Rok == year - 1).SubjektOrderedListKIndexAsc;

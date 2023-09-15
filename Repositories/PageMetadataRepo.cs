@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.ES;
 
@@ -34,7 +34,7 @@ namespace HlidacStatu.Repositories
         {
             try
             {
-                var client = await Repositories.ES.Manager.GetESClient_PageMetadataAsync();
+                var client = await Manager.GetESClient_PageMetadataAsync();
                 await client.IndexAsync<PageMetadata>(item, m => m.Id(item.Id));
 
             }
@@ -75,7 +75,7 @@ namespace HlidacStatu.Repositories
                 return Array.Empty<Smlouva.Priloha>();
 
 
-            var cl = await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync();
+            var cl = await Manager.GetESClient_PageMetadataAsync();
             var res = await cl.SearchAsync<PageMetadata>(s => s
                 .Query(q => q
                     .Match(m=>m
@@ -106,7 +106,7 @@ namespace HlidacStatu.Repositories
         }
         public static async Task<DataResultset<PageMetadata>> GetDataForDocument(string smlouvaId, string prilohaUniqueId)
         {
-            var cl = await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync();
+            var cl = await Manager.GetESClient_PageMetadataAsync();
             
             var recs = await Searching.Tools.GetAllRecordsAsync<PageMetadata>(cl, 5, $"smlouvaId:{smlouvaId} AND prilohaId:{prilohaUniqueId}");
 
@@ -123,7 +123,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<PageMetadata> LoadAsync(string id)
         {
-            var cl = await ES.Manager.GetESClient_PageMetadataAsync();
+            var cl = await Manager.GetESClient_PageMetadataAsync();
 
             var res = await cl.GetAsync<PageMetadata>(id);
             if (res.Found == false)

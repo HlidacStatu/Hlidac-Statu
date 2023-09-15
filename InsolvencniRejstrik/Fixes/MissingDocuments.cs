@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using HlidacStatu.Connectors;
 
 namespace InsolvencniRejstrik.Fixes
 {
@@ -107,7 +108,7 @@ namespace InsolvencniRejstrik.Fixes
 
 		private Rizeni LoadRizeni(string spisovaZnacka)
 		{
-			var res = HlidacStatu.Repositories.ES.Manager.GetESClient_InsolvenceAsync().ConfigureAwait(false).GetAwaiter().GetResult().Get<Rizeni>(spisovaZnacka);
+			var res = Manager.GetESClient_InsolvenceAsync().ConfigureAwait(false).GetAwaiter().GetResult().Get<Rizeni>(spisovaZnacka);
 			return res.Found ? res.Source : null;
 		}
 

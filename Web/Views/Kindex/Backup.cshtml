@@ -200,7 +200,7 @@ else
 }
 
 @{
-    var feedbacks = (await KindexFeedback.GetKindexFeedbacksAsync(Model.Ico, selectedYear)).ToList();
+    var feedbacks = (await KIndexRepo.GetKindexFeedbacksAsync(Model.Ico, selectedYear)).ToList();
 }
 @if (feedbacks.Any())
 {

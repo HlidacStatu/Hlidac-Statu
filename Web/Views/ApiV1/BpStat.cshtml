@@ -1,4 +1,5 @@
 ﻿@using HlidacStatu.Util;
+@using HlidacStatu.Connectors
 @{
     /**/
 
@@ -34,17 +35,17 @@
 
     var now = DateTime.Now;
 
-    var pagesCountLast7dT = (await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync())
+    var pagesCountLast7dT = (await Manager.GetESClient_PageMetadataAsync())
                             .CountAsync<HlidacStatu.Entities.PageMetadata>(q => q
                                 .Query(qs => qs.QueryString(q => q.Query($"blurred.created:" + HlidacStatu.Repositories.Searching.Tools.ToElasticDateInterval(now.AddDays(-7), now)))
                                 )
                             );
-    var pagesCountLast1dT = (await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync())
+    var pagesCountLast1dT = (await Manager.GetESClient_PageMetadataAsync())
                             .CountAsync<HlidacStatu.Entities.PageMetadata>(q => q
                                 .Query(qs => qs.QueryString(q => q.Query($"blurred.created:" + HlidacStatu.Repositories.Searching.Tools.ToElasticDateInterval(now.AddDays(-1), now)))
                                 )
                             );
-    var pagesCountT = (await HlidacStatu.Repositories.ES.Manager.GetESClient_PageMetadataAsync())
+    var pagesCountT = (await Manager.GetESClient_PageMetadataAsync())
                             .CountAsync<HlidacStatu.Entities.PageMetadata>();
 
     var pagesCount = (await pagesCountT).Count;

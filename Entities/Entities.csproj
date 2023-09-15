@@ -35,4 +35,5 @@
       <ProjectReference Include="..\Lib.OCR.Api.Client\Lib.OCR.Api.Client.csproj" />
     </ItemGroup>
 
+
 </Project>

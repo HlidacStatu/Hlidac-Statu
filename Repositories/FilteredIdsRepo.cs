@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Nest;
 using System.Linq;
+using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Repositories
 {
@@ -50,7 +51,7 @@ namespace HlidacStatu.Repositories
         }
         public static async Task<string[]> GetSmlouvyIdAsync(QueryBatch query)
         {
-            var client = await ES.Manager.GetESClientAsync();
+            var client = await Manager.GetESClientAsync();
 
             var ids = await Searching.Tools.GetAllIdsAsync(client, 10, query.Query, 
                 logOutputFunc: query.LogOutputFunc, progressOutputFunc: query.ProgressOutputFunc);
@@ -69,7 +70,7 @@ namespace HlidacStatu.Repositories
 
             Func<int, int, Task<ISearchResponse<Smlouva>>> searchFunc = async (size, page) =>
             {
-                var client = await ES.Manager.GetESClientAsync();
+                var client = await Manager.GetESClientAsync();
                 return await client.SearchAsync<Smlouva>(a => a
                     .Size(size)
                     .Source(false)
@@ -80,7 +81,7 @@ namespace HlidacStatu.Repositories
             };
 
             List<string> ids2Process = new List<string>();
-            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await ES.Manager.GetESClientAsync(),
+            await Repositories.Searching.Tools.DoActionForQueryAsync<Smlouva>(await Manager.GetESClientAsync(),
                 searchFunc, (hit, param) =>
                 {
                     ids2Process.Add(hit.Id);

@@ -14,7 +14,7 @@ using HlidacStatu.Util;
 
 using Nest;
 
-using Manager = HlidacStatu.Repositories.ES.Manager;
+using Manager = HlidacStatu.Connectors.Manager;
 
 namespace HlidacStatu.Repositories.Searching
 {
@@ -188,7 +188,7 @@ namespace HlidacStatu.Repositories.Searching
 
         public static async Task<ValidateQueryResponse> ValidateQueryRawAsync(string query)
         {
-            return await ValidateSpecificQueryRawAsync<Smlouva>(await Repositories.ES.Manager.GetESClientAsync(),
+            return await ValidateSpecificQueryRawAsync<Smlouva>(await Manager.GetESClientAsync(),
                 SmlouvaRepo.Searching.GetSimpleQuery(query));
         }
 
@@ -223,7 +223,7 @@ namespace HlidacStatu.Repositories.Searching
         {
             prefix = prefix ?? HlidacStatu.Util.StackReport.GetCallingMethod(false, skipFrames: 1);
 
-            var client = elasticClient ?? await Repositories.ES.Manager.GetESClientAsync();
+            var client = elasticClient ?? await Manager.GetESClientAsync();
 
             Func<int, int, Task<ISearchResponse<T>>> searchFunc = null;
 

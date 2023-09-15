@@ -4,6 +4,7 @@ using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
 using System;
 using System.Linq;
+using HlidacStatu.Connectors;
 
 namespace InsolvencniRejstrik.ByEvents
 {
