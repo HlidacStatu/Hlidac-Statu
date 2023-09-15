@@ -155,7 +155,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     ItemType = item.ItemType,
                     Options = item.Options,
                     Priority= item.Priority,
-                    Started= item.Started,
+                    Started= null,
+                    Done = null,
                     WaitForPK = item.Pk
                 };
                 using (DbEntities db = new  DbEntities())
