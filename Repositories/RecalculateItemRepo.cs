@@ -285,15 +285,16 @@ namespace HlidacStatu.Repositories
                     var strategy = db.Database.CreateExecutionStrategy();
                     bool res = strategy.Execute<bool>(() =>
                     {
-                        using (var dbTran = db.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead))
-                        {
+                    using (var dbTran = db.Database.BeginTransaction(System.Data.IsolationLevel.RepeatableRead))
+                    {
 
-                            try
-                            {
-                                var exists = db.RecalculateItem.Any(m =>
-                                    m.Id == item.Id
-                                    && m.ItemType == item.ItemType
-                                    && m.StatisticsType == item.StatisticsType
+                        try
+                        {
+                            var exists = db.RecalculateItem.Any(m =>
+                                m.Id == item.Id
+                                && m.ItemType == item.ItemType
+                                && m.StatisticsType == item.StatisticsType
+                                && (m.Done == null)
                                 );
                                 if (exists)
                                 {
@@ -395,13 +396,14 @@ namespace HlidacStatu.Repositories
             {
                 var res = db.RecalculateItem
                     .AsNoTracking()
+                    .Where(m=>m.Started == null)
                     .OrderBy(o => o.Created)
                     .Take(count)
                     .ToArray();
 
                 foreach (var i in res)
                 {
-                    db.Database.ExecuteSql($"delete from recalculateItemQueue where id={i.Id} and itemtype={(int)i.ItemType} and StatisticsType = {(int)i.StatisticsType}");
+                    db.Database.ExecuteSql($"update recalculateItemQueue set started=getdate() where pk={i.Pk}");
                 }
                 return res;
 

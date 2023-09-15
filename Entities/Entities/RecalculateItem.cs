@@ -36,7 +36,7 @@ namespace HlidacStatu.Entities
     }
 
     [Table("RecalculateItemQueue")]
-    [PrimaryKey("Id","ItemType","StatisticsType")]
+    [PrimaryKey("Pk")]
     public class RecalculateItem
     {
         public RecalculateItem() { }
@@ -66,18 +66,25 @@ namespace HlidacStatu.Entities
             Dotace = 3,
         }
 
-        [Key, Column(Order =0)]
+        [Key(), DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string Pk { get; set; }
+
         [StringLength(256)]
         public string Id { get; set; }
 
-        [Key]
-        [Column(Order = 1,TypeName = "int")]
+        [Column(TypeName = "int")]
         public ItemTypeEnum ItemType { get; set; }
 
-        [Key]
-        [Column(Order = 2,TypeName = "int")]
+        [Column(TypeName = "int")]
         public StatisticsTypeEnum StatisticsType { get; set; }
+
+        [Required]
         public DateTime Created { get; set; } = DateTime.Now;
+
+
+        public DateTime? Started { get; set; } = null;
+        public DateTime? Done { get; set; } = null;
+
         [Required]
         [StringLength(256)]
         public string ProvokedBy { get; set; }
