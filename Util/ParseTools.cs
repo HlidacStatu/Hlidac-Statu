@@ -160,8 +160,8 @@ namespace HlidacStatu.Util
             if (ico.StartsWith("cz-"))
                 return MerkIcoToICO(ico);
 
-            Regex regex = new Regex(@"^\w{2}-\d*$");
-            if (regex.IsMatch(ico))
+
+            if (DataValidators.IsFirmaIcoZahranicni(ico))
                 return ico;
             
             ico = Devmasters.TextUtil.NormalizeToNumbersOnly(ico);
