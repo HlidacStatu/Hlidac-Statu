@@ -39,6 +39,7 @@ namespace HlidacStatu.Connectors
             //DataSourceDb,
             DataSource,
             Insolvence,
+            InsolvenceDocs,
             Dotace,
             UptimeItem,
             UptimeSSL,
@@ -70,6 +71,7 @@ namespace HlidacStatu.Connectors
         public static string defaultIndexName_Logs = "logs";
         //public static string defaultIndexName_DataSourceDb = "hlidacstatu_datasources";
         public static string defaultIndexName_Insolvence = "insolvencnirestrik";
+        public static string defaultIndexName_InsolvenceDocs = "insolvencedocs";
         public static string defaultIndexName_Dotace = "dotace";
         public static string defaultIndexName_Uptime = "uptime";
         public static string defaultIndexName_UptimeSSL = "uptimessl";
@@ -222,6 +224,11 @@ namespace HlidacStatu.Connectors
         {
             return GetESClientAsync(defaultIndexName_Insolvence, timeOut, connectionLimit, IndexType.Insolvence);
         }
+        public static Task<ElasticClient> GetESClient_InsolvenceDocsAsync(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClientAsync(defaultIndexName_InsolvenceDocs, timeOut, connectionLimit, IndexType.InsolvenceDocs);
+        }
+
         //public static ElasticClient GetESClient_Uptime(int timeOut = 60000, int connectionLimit = 80)
         //{
         //    return GetESClient(defaultIndexName_Uptime, timeOut, connectionLimit, IndexType.UptimeItem);
@@ -534,10 +541,21 @@ namespace HlidacStatu.Connectors
                        );
                     break;
                 case IndexType.Insolvence:
+                    idxSt.Settings.NumberOfShards = 16;
+                    idxSt.Settings.RefreshInterval = "5s";
                     res = await client.Indices
                        .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Insolvence.Rizeni>(map => map.AutoMap().DateDetection(false))
+                       );
+                    break;
+                case IndexType.InsolvenceDocs:
+                    idxSt.Settings.NumberOfShards = 16;
+                    idxSt.Settings.RefreshInterval = "5s";
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
+                           .InitializeUsing(idxSt)
+                           .Map<Entities.Insolvence.SearchableDocument>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Dotace:

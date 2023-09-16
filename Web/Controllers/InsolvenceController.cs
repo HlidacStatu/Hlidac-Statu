@@ -77,14 +77,14 @@ namespace HlidacStatu.Web.Controllers
             //show highlighting
             bool showHighliting = !string.IsNullOrEmpty(Request.Query["qs"]);
 
-            var model = await InsolvenceRepo.LoadFromEsAsync(id, showHighliting, false);
+            Entities.Insolvence.InsolvenceDetail model = await InsolvenceRepo.LoadFromEsAsync(id, showHighliting, false);
             if (model == null)
             {
                 return new NotFoundResult();
             }
 
             if (IsLimitedView() && model.Rizeni.OnRadar == false)
-                return RedirectToAction("PristupOmezen", new { id = model.Rizeni.UrlId() });
+                return RedirectToAction("PristupOmezen", new { id = model.Rizeni.NormalizedId() });
 
             if (showHighliting)
             {
@@ -119,7 +119,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
             if (IsLimitedView() && data.Rizeni.OnRadar == false)
-                return RedirectToAction("PristupOmezen", new { id = data.Rizeni.UrlId() });
+                return RedirectToAction("PristupOmezen", new { id = data.Rizeni.NormalizedId() });
 
             IReadOnlyDictionary<string, IReadOnlyCollection<string>> highlighting = null;
             if (showHighliting)
@@ -135,7 +135,7 @@ namespace HlidacStatu.Web.Controllers
             return View(new DokumentyViewModel
             {
                 SpisovaZnacka = data.Rizeni.SpisovaZnacka,
-                UrlId = data.Rizeni.UrlId(),
+                UrlId = data.Rizeni.NormalizedId(),
                 Dokumenty = data.Rizeni.Dokumenty.ToArray(),
                 HighlightingData = highlighting
             });
@@ -161,7 +161,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
             if (IsLimitedView() && dokument.Rizeni.OnRadar == false)
-                return RedirectToAction("PristupOmezen", new { id = dokument.Rizeni.UrlId() });
+                return RedirectToAction("PristupOmezen", new { id = dokument.Rizeni.NormalizedId() });
 
             return View(dokument);
         }

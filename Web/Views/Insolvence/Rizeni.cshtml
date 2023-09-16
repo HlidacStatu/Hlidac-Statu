@@ -310,7 +310,7 @@ else
         </tbody>
     </table>
     <div class="text-end">
-        <a href="@Url.Action("Dokumenty", "Insolvence", new { id = Model.Rizeni.UrlId(), qs = Context.Request.Query["qs"] })">Všechny dokumenty (@Model.Rizeni.Dokumenty.Count())</a>
+        <a href="@Url.Action("Dokumenty", "Insolvence", new { id = Model.Rizeni.NormalizedId(), qs = Context.Request.Query["qs"] })">Všechny dokumenty (@Model.Rizeni.Dokumenty.Count())</a>
     </div>
 </div>
 

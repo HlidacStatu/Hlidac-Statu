@@ -35,7 +35,7 @@ namespace InsolvencniRejstrik.ByEvents
 		private FilePath GetFilePath(Rizeni item)
 		{
 			var dir = $@"data\{item.SpisovaZnacka.Split('/')[1]}";
-			return new FilePath { FullPath = $@"{dir}\{item.UrlId()}.json", Dir = dir };
+			return new FilePath { FullPath = $@"{dir}\{item.NormalizedId()}.json", Dir = dir };
 		}
 
 		private class FilePath

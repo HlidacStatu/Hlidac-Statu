@@ -97,7 +97,7 @@ namespace HlidacStatu.Repositories
                 return data.Hits.Select(h => new DokumentSeSpisovouZnackou
                 {
                     SpisovaZnacka = h.Source.SpisovaZnacka,
-                    UrlId = h.Source.UrlId(),
+                    UrlId = h.Source.NormalizedId(),
                     Dokument = h.Source.Dokumenty.Single(d => d.Id == id),
                     Rizeni = h.Source
                 }).First();

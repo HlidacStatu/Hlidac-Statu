@@ -15,7 +15,7 @@ namespace HlidacStatu.Entities.Insolvence
 
         public string GetUrl(bool local, string foundWithQuery)
         {
-            var url = "/insolvence/rizeni/" + Rizeni.UrlId();
+            var url = "/insolvence/rizeni/" + Rizeni.NormalizedId();
             if (!string.IsNullOrEmpty(foundWithQuery))
                 url = url + "?qs=" + System.Net.WebUtility.UrlEncode(foundWithQuery);
             return local ? url : "https://www.hlidacstatu.cz" + url;
