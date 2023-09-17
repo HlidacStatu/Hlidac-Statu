@@ -245,7 +245,7 @@ namespace HlidacStatu.Repositories
         private static List<RecalculateItem> FirmaForQueue(List<RecalculateItem> list,
             Firma f, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy, int deep)
         {
-            log.Verbose("{method} expanding {ico} {subjekt} vazby, recursive deep {deep}, current list {count} items",
+            log?.Verbose("{method} expanding {ico} {subjekt} vazby, recursive deep {deep}, current list {count} items",
                     MethodBase.GetCurrentMethod().Name, f.ICO, f.Jmeno, deep, list.Count);
 
             //StackOverflow defense
@@ -362,10 +362,10 @@ namespace HlidacStatu.Repositories
             Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null, bool debug = false)
         {
             if (debug)
-                log.Debug($"getting {count} from processing queue");
+                log?.Debug($"getting {count} from processing queue");
             IEnumerable<RecalculateItem> res = GetItemsFromProcessingQueue(count);
             if (debug)
-                log.Debug($"got {res.Count()} from processing queue. Looking for parents");
+                log?.Debug($"got {res.Count()} from processing queue. Looking for parents");
 
             System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(res);
 
@@ -376,10 +376,10 @@ namespace HlidacStatu.Repositories
                     {
 
                         if (debug)
-                            log.Debug($"GetFromProcessingQueueWithParents getting cascade for {item.UniqueKey}");
+                            log?.Debug($"GetFromProcessingQueueWithParents getting cascade for {item.UniqueKey}");
                         List<RecalculateItem> cascade = CascadeItems(item, ref list);
                         if (debug)
-                            log.Debug($"GetFromProcessingQueueWithParents got cascade for {item.UniqueKey}");
+                            log?.Debug($"GetFromProcessingQueueWithParents got cascade for {item.UniqueKey}");
                         foreach (var i in cascade)
                         {
                             if (list.Contains(i, comparer) == false)
@@ -388,7 +388,7 @@ namespace HlidacStatu.Repositories
                     }
                     catch (Exception e)
                     {
-                        log.Error("CascadeItems error", e);
+                        log?.Error("CascadeItems error", e);
                         throw;
                     }
 
@@ -400,7 +400,7 @@ namespace HlidacStatu.Repositories
 
                 );
 
-            log.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
+            log?.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
 
             return list.OrderBy(o => o.Created)
                 .Distinct(comparer)

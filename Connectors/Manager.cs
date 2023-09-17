@@ -550,8 +550,8 @@ namespace HlidacStatu.Connectors
                        );
                     break;
                 case IndexType.InsolvenceDocs:
-                    idxSt.Settings.NumberOfShards = 16;
-                    idxSt.Settings.RefreshInterval = "5s";
+                    idxSt.Settings.NumberOfShards = 8;
+                    idxSt.Settings.RefreshInterval = "15s";
                     res = await client.Indices
                        .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
