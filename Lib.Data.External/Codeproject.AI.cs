@@ -26,12 +26,24 @@ namespace Codeproject.AI
 
     public partial class Client
     {
-        public static async Task<byte[]> ImagePortraitFilter(byte[] bytesContent, float strength = 0.5f)
+        static string DefaultApiServerRoot = "http://10.10.100.113:32168";
+
+        public Uri ApiServerRoot { get; }
+
+        public Client() 
+            : this(new Uri(DefaultApiServerRoot))
+        {}
+        public Client(Uri apiServerRoot)
+        {
+            ApiServerRoot = apiServerRoot;
+        }
+
+        public  async Task<byte[]> ImagePortraitFilterAsync(byte[] bytesContent, float strength = 0.5f)
         {
             var form = new MultipartFormDataContent();
             form.Add(new ByteArrayContent(bytesContent), "image", "anyfile.jpg");
             form.Add(new StringContent(strength.ToString(HlidacStatu.Util.Consts.enCulture).ToLower()), "strength");
-            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<PortraitFilterResponse>("http://10.10.100.103:32168/v1/image/portraitfilter",
+            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<PortraitFilterResponse>(this.ApiServerRoot + "v1/image/portraitfilter",
                 form);
 
             if (res?.success == true)
@@ -43,12 +55,15 @@ namespace Codeproject.AI
                 throw new ApiResponseException(res.error);
         }
 
-        public static async Task<byte[]> ImageRemoveBackground(byte[] bytesContent, bool use_alphamatting = false)
+        public  async Task<byte[]> ImageRemoveBackgroundAsync(byte[] bytesContent, bool use_alphamatting = false)
         {
+            try
+            {
+
             var form = new MultipartFormDataContent();
             form.Add(new ByteArrayContent(bytesContent), "image", "anyfile.jpg");
             form.Add(new StringContent(use_alphamatting.ToString().ToLower()), "use_alphamatting");
-            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<Base64ImageDataResponse>("http://10.10.100.103:32168/v1/image/removebackground",
+            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<Base64ImageDataResponse>(this.ApiServerRoot + "v1/image/removebackground",
                 form);
 
             if (res?.success == true)
@@ -58,13 +73,20 @@ namespace Codeproject.AI
             }
             else
                 throw new ApiResponseException(res.error);
+            }
+            catch (Exception e)
+            {
+
+                throw new ApiResponseException(e.ToString());
+            }
+
         }
 
-        public static async Task<byte[]> ImageSuperResolution(byte[] bytesContent)
+        public  async Task<byte[]> ImageSuperResolutionAsync(byte[] bytesContent)
         {
             var form = new MultipartFormDataContent();
             form.Add(new ByteArrayContent(bytesContent), "image", "anyfile.jpg");
-            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<Base64ImageDataResponse>("http://10.10.100.103:32168/v1/image/superresolution",
+            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<Base64ImageDataResponse>(this.ApiServerRoot + "v1/image/superresolution",
                 form);
 
             if (res?.success == true)
@@ -76,12 +98,12 @@ namespace Codeproject.AI
                 throw new ApiResponseException(res.error);
         }
 
-        public static async Task<string> VisionFaceRegister(byte[] bytesContent, string userid)
+        public  async Task<string> VisionFaceRegisterAsync(byte[] bytesContent, string userid)
         {
             var form = new MultipartFormDataContent();
             form.Add(new ByteArrayContent(bytesContent), "imageN", "anyfile.jpg");
             form.Add(new StringContent(userid), "userid");
-            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<VisionFaceRegisterResponse>("http://10.10.100.103:32168/v1/vision/face/register",
+            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<VisionFaceRegisterResponse>(this.ApiServerRoot + "v1/vision/face/register",
                 form);
             Console.WriteLine("S");
 
@@ -94,9 +116,9 @@ namespace Codeproject.AI
                 throw new ApiResponseException(res.error);
         }
 
-        public static async Task<string[]> VisionFaceList()
+        public  async Task<string[]> VisionFaceListAsync()
         {
-            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<VisionFaceListResponse>("http://10.10.100.103:32168/v1/vision/face/list");
+            var res = await Devmasters.Net.HttpClient.Simple.PostAsync<VisionFaceListResponse>(this.ApiServerRoot + "v1/vision/face/list");
             if (res?.success == true)
             {
                 return res.faces;

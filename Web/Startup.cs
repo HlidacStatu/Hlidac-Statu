@@ -67,7 +67,7 @@ namespace HlidacStatu.Web
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
 
 
-            DBUpgrades.DBUpgrader.UpgradeDatabases(Connectors.DirectDB.DefaultCnnStr);
+           DBUpgrades.DBUpgrader.UpgradeDatabases(Connectors.DirectDB.DefaultCnnStr);
 
 
             string connectionString = Configuration.GetConnectionString("DefaultConnection");

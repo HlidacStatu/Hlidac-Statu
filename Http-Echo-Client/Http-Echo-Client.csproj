@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Devmasters.Net" Version="4.5.7" />
+    <PackageReference Include="Devmasters.Net" Version="4.5.10" />
   </ItemGroup>
 
 </Project>

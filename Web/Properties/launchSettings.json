@@ -1,16 +1,4 @@
 {
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iis": {
-      "applicationUrl": "https://local.hlidacstatu.cz",
-      "sslPort": 0
-    },
-    "iisExpress": {
-      "applicationUrl": "http://localhost:10667",
-      "sslPort": 44314
-    }
-  },
   "profiles": {
     "IIS Express": {
       "commandName": "IISExpress",
@@ -34,11 +22,23 @@
       "launchBrowser": true,
       "launchUrl": "https://local.hlidacstatu.cz",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Michal"
+        "ASPNETCORE_ENVIRONMENT": "Production"
       },
       "use64Bit": true,
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "dotnetRunMessages": "true"
+    }
+  },
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "https://local.hlidacstatu.cz",
+      "sslPort": 0
+    },
+    "iisExpress": {
+      "applicationUrl": "http://localhost:10667",
+      "sslPort": 44314
     }
   }
 }
