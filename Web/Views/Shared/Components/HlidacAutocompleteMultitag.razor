@@ -3,10 +3,10 @@
 @typeparam TItem
 
 <div class="hlidac-autocomplete mb-3">
-    <div class="input-group">
+    <div class="input-group bg-white rounded-2">
         @foreach (var tagItem in TagItems)
         {
-            <div class="input-group-text position-relative pe-3 selected-element @(ReferenceEquals(tagItem, _currentlySelectedTag)? ActiveTag : "")">
+            <div style="margin:4px 2px;" class="input-group-text position-relative pe-3 rounded-pill selected-element rounded-pill bg-primary-subtle border border-1 border-primary @(ReferenceEquals(tagItem, _currentlySelectedTag)? ActiveTag : "")">
                 @if (TagTemplate is null)
                 {
                     <span class="no-overflow">@GetTextFromItem(tagItem)</span>
@@ -15,7 +15,7 @@
                 {
                     @TagTemplate(tagItem)
                 }
-                <button class="btn btn-sm position-absolute top-0 end-0 pt-0 pe-0"
+                <button class="btn btn-sm position-absolute top-0 pt-0 pe-0" style="right:7px"
                         @onclick="@(() => RemoveSelectedTag(tagItem))">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -29,7 +29,7 @@
                type="text"
                autocomplete="off"
                placeholder="Začněte psát pro hledání"
-               class="hlidac-autocomplete-input form-control"
+               class="hlidac-autocomplete-input form-control border border-0"
                @bind="@InputBoxValue"
                @bind:event="oninput"
                @onkeyup="@(async (e) => await SearchAsync(e))"
