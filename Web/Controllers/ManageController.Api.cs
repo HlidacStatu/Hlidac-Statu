@@ -362,8 +362,11 @@ namespace HlidacStatu.Web.Controllers
                 var path = o.GetPhotoPath();
                 if (System.IO.File.Exists(path))
                 {
-                    var cl = new Codeproject.AI.Client();
-                    var noBackGr = cl.ImageRemoveBackgroundAsync(System.IO.File.ReadAllBytes(o.GetPhotoPath()), true).Result;
+                    
+                    var noBackGr = HlidacStatu.AI.Photo.RemoveBackgroundAsync(
+                        new Uri(Devmasters.Config.GetWebConfigValue("RemoveBackgroundAPI")),
+                        System.IO.File.ReadAllBytes(o.GetPhotoPath()), 
+                        AI.Photo.RemoveBackgroundStyles.Person).Result;
                     if (noBackGr != null)
                     {
                         System.IO.File.WriteAllBytes(o.GetPhotoPath("small.nobackground.jpg",true), noBackGr);

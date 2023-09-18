@@ -7,7 +7,7 @@
 
 @{
     var osoby = HlidacStatu.Repositories.OsobaRepo.PolitickyAktivni.Get()
-                .Take(100)
+                .Take(1000)
                 .AsParallel().Where(o => o?.HasPhoto() == true)
                 .ToList();
 

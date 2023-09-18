@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Hlidac-Statu-Private\AI\AI.csproj" />
       <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
       <ProjectReference Include="..\Connectors\Connectors.csproj" />
       <ProjectReference Include="..\Entities\Entities.csproj" />

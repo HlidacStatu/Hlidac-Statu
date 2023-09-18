@@ -298,7 +298,7 @@ namespace HlidacStatu.Repositories
                         }
                         if (string.IsNullOrEmpty(contentType))
                         {
-                            var tikaRes = Lib.Data.External.TikaClient.GetText(GetDownloadedPrilohaPath(p, s, RequestedFileType.Original));
+                            var tikaRes = AI.Doc.GetText(GetDownloadedPrilohaPath(p, s, RequestedFileType.Original));
 
                             if (tikaRes != null)
                                 contentType = tikaRes.ContentType;

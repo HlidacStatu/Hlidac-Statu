@@ -108,6 +108,7 @@ namespace HlidacStatu.Web.Controllers
     </g>
 </svg>
 ";
+        [ResponseCache(Duration = 60*60*2, Location = ResponseCacheLocation.Client)]
         public ActionResult Photo(string id, [FromQuery] string option)
         {
             //string noPhotoPath = $"Content{Path.DirectorySeparatorChar}Img{Path.DirectorySeparatorChar}personNoPhoto.png";
