@@ -610,8 +610,15 @@ namespace HlidacStatu.Web.Controllers
                                     {
                                         //Devmasters.IO.IOTools.MoveFile(fn, HlidacStatu.Lib.Init.OsobaFotky.GetFullPath(o, "small.jpg"));
                                         imi.Resize(new System.Drawing.Size(300, 300), true, Devmasters.Imaging.InMemoryImage.InterpolationsQuality.High, true);
-                                        imi.SaveAsJPEG(Init.OsobaFotky.GetFullPath(o, "small.jpg"), 80);
-                                        return Redirect("/Osoba/" + o.NameId);
+                                        imi.SaveAsJPEG(o.GetPhotoPath(), 80);
+                                        var noBackGr = HlidacStatu.AI.Photo.RemoveBackgroundAsync(
+                                                    new Uri(Devmasters.Config.GetWebConfigValue("RemoveBackgroundAPI")),
+                                                    System.IO.File.ReadAllBytes(o.GetPhotoPath()),
+                                                    AI.Photo.RemoveBackgroundStyles.Person).Result;
+                                        if (noBackGr != null)
+                                            System.IO.File.WriteAllBytes(o.GetPhotoPath("small.nobackground.jpg", true), noBackGr);
+
+                                            return Redirect("/Osoba/" + o.NameId);
                                     }
                                     else
                                     {
