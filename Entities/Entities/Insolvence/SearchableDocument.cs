@@ -15,15 +15,13 @@ namespace HlidacStatu.Entities.Insolvence
             var docs = rizeni.Dokumenty.ToList();
             rizeni.Dokumenty = null;
             List<SearchableDocument> res = new List<SearchableDocument>();
-            bool clean = false;
             foreach (var d in docs)
             {
-                res.Add(CreateSearchableDocument(rizeni, d, clean));
-                clean = true;
+                res.Add(CreateSearchableDocument(rizeni, d));
             }
             return res.ToArray();
         }
-        public static SearchableDocument CreateSearchableDocument(Rizeni rizeni, Dokument dokument, bool cleanData)
+        public static SearchableDocument CreateSearchableDocument(Rizeni rizeni, Dokument dokument)
         {
 
 
@@ -32,15 +30,13 @@ namespace HlidacStatu.Entities.Insolvence
 
             sdoc.RecordId = rizeni.NormalizedId() + "_" + dokument.Id; ;
             sdoc.SpisovaZnacka = rizeni.SpisovaZnacka;
-            sdoc.internalTopHit = cleanData ? 0 : 1;
             sdoc.Rizeni = rizeni.DeepClone();
             if (sdoc.Rizeni.Dokumenty!= null)
                 sdoc.Rizeni.Dokumenty = null;
-            if (cleanData)
-            {
-                sdoc.internalVeriteleCount = sdoc.Rizeni.Veritele.Count;
-                sdoc.Rizeni.Veritele = sdoc.Rizeni.Veritele.Take(2).ToList();
-            }
+
+            sdoc.internalVeriteleCount = sdoc.Rizeni.Veritele.Count;
+            sdoc.Rizeni.Veritele = sdoc.Rizeni.Veritele.Take(2).ToList();
+            
             return sdoc;
         }
         public SearchableDocument() { }
@@ -53,8 +49,6 @@ namespace HlidacStatu.Entities.Insolvence
 
         public Rizeni Rizeni { get; set; }
 
-        [Nest.Number]
-        public int internalTopHit { get; set; } = 0;
         [Nest.Number]
         public int internalVeriteleCount { get; set; } = 0;
     }
