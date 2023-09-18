@@ -4,7 +4,6 @@ using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Extensions;
-using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories;
 using HlidacStatu.Util;
 using HlidacStatu.Web.Filters;
@@ -21,6 +20,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Entities.Entities.KIndex;
 
 namespace HlidacStatu.Web.Controllers
 {

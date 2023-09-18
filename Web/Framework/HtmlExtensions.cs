@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Entities.Entities.KIndex;
+using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -67,24 +69,24 @@ namespace HlidacStatu.Web.Framework
                 return htmlHelper.Raw("");
 
             ico = Util.ParseTools.NormalizeIco(ico);
-            Tuple<int?, Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues> lbl = await Lib.Analysis.KorupcniRiziko.KIndex.GetLastLabelAsync(ico, useTemp);
+            Tuple<int?, KIndexData.KIndexLabelValues> lbl = await KIndex.GetLastLabelAsync(ico, useTemp);
             if (lbl != null)
             {
-                if (showNone || lbl.Item2 != Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues.None)
+                if (showNone || lbl.Item2 != KIndexData.KIndexLabelValues.None)
                     return KIndexIcon(htmlHelper, lbl.Item2, style, showNone);
             }
             return htmlHelper.Raw("");
         }
-        public static IHtmlContent KIndexIcon(this IHtmlHelper htmlHelper, Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues label,
+        public static IHtmlContent KIndexIcon(this IHtmlHelper htmlHelper, KIndexData.KIndexLabelValues label,
             int heightInPx = 15, string hPadding = "3px", string vPadding = "0", bool showNone = false, bool useTemp = false)
         {
             return htmlHelper.KIndexIcon(label, $"padding:{vPadding} {hPadding};height:{heightInPx}px;width:auto", showNone, useTemp: useTemp);
         }
 
-        public static IHtmlContent KIndexIcon(this IHtmlHelper htmlHelper, Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues label,
+        public static IHtmlContent KIndexIcon(this IHtmlHelper htmlHelper, KIndexData.KIndexLabelValues label,
             string style, bool showNone = false, string title = "", bool useTemp = false)
         {
-            return htmlHelper.Raw(Lib.Analysis.KorupcniRiziko.KIndexData.KindexImageIcon(label, style, showNone, title));
+            return htmlHelper.Raw(KIndexData.KindexImageIcon(label, style, showNone, title));
         }
 
         public static Task<IHtmlContent> KIndexLabelLinkAsync(this IHtmlHelper htmlHelper, string ico,
@@ -101,15 +103,15 @@ namespace HlidacStatu.Web.Framework
 
             ico = Util.ParseTools.NormalizeIco(ico);
             var user = htmlHelper.ViewContext.HttpContext.User;
-            Tuple<int?, Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues>? kidx = await Lib.Analysis.KorupcniRiziko.KIndex.GetLastLabelAsync(ico);
+            Tuple<int?, KIndexData.KIndexLabelValues>? kidx = await KIndex.GetLastLabelAsync(ico);
             if (kidx == null)
                 return htmlHelper.Raw("");
 
-            Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues lbl = kidx.Item2;
+            KIndexData.KIndexLabelValues lbl = kidx.Item2;
             return htmlHelper.KIndexLabelLinkAsync(ico, lbl, style, showNone, rok, linkToKindex: linkToKindex);
         }
         public static IHtmlContent KIndexLabelLinkAsync(this IHtmlHelper htmlHelper, string ico,
-            Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues label,
+            KIndexData.KIndexLabelValues label,
             string style, bool showNone = false, int? rok = null, bool linkToKindex = false)
         {
             if (string.IsNullOrEmpty(ico))
@@ -117,9 +119,9 @@ namespace HlidacStatu.Web.Framework
 
             if (linkToKindex)
             {
-                if (label != Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues.None || showNone)
+                if (label != KIndexData.KIndexLabelValues.None || showNone)
                 {
-                    if (label == Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues.None)
+                    if (label == KIndexData.KIndexLabelValues.None)
                         return htmlHelper.KIndexIcon(label, style, showNone);
                     else
                         return htmlHelper.Raw($"<a href='{KIndexDetailUrl(htmlHelper, ico, rok)}'>"
@@ -129,9 +131,9 @@ namespace HlidacStatu.Web.Framework
             }
             else
             {
-                if (label != Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues.None || showNone)
+                if (label != KIndexData.KIndexLabelValues.None || showNone)
                 {
-                    if (label == Lib.Analysis.KorupcniRiziko.KIndexData.KIndexLabelValues.None)
+                    if (label == KIndexData.KIndexLabelValues.None)
                         return htmlHelper.KIndexIcon(label, style, showNone);
                     else
                         return htmlHelper.Raw($"<a href='/Subjekt/{ico}'>"

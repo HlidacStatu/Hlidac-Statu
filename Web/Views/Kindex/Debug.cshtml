@@ -1,7 +1,7 @@
-﻿@model HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndexData
+﻿@model HlidacStatu.Entities.Entities.KIndex.KIndexData
 @using System.Linq
 @using HlidacStatu.Entities
-@using HlidacStatu.Lib.Analysis.KorupcniRiziko
+@using HlidacStatu.Entities.Entities.KIndex
 @using HlidacStatu.Repositories
 @{ var f = Firmy.Get(ViewBag.ICO);
     ViewBag.Title = "Index klíčových rizik";
@@ -36,7 +36,7 @@
 {
 <div class="p-5 mb-4 bg-jumbo rounded-3">
     <h1>K–Index</h1>
-    <p>Tento subjekt uzavřel v každém roce méně než @(HlidacStatu.Lib.Analysis.KorupcniRiziko.Consts.MinSmluvPerYear) smluv.</p>
+    <p>Tento subjekt uzavřel v každém roce méně než @(Consts.MinSmluvPerYear) smluv.</p>
     <p>Pro spočítání K–Indexu je to příliš málo smluv.</p>
 </div>return;
 }

@@ -2,6 +2,8 @@
 @using System.Linq;
 @using Devmasters.Enums;
 @using Devmasters.Collections;
+@using HlidacStatu.Entities.Entities.KIndex
+@using HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
 @{
     ViewBag.Title = "K–Index";
@@ -46,7 +48,7 @@
                 </p>
             </div>
             <div class="block-button-wrapper">
-                <a href="@HlidacStatu.Lib.Analysis.KorupcniRiziko.KIndexData.GetKratkaMetodikaURL()" class="btn btn-default btn-default-new btn-sm">Stručný popis K-Indexu</a>
+                <a href="@KIndexData.GetKratkaMetodikaURL()" class="btn btn-default btn-default-new btn-sm">Stručný popis K-Indexu</a>
                 <a href="https://texty.hlidacstatu.cz/k-index-otazky-a-odpovedi/" class="btn btn-default btn-default-new btn-sm">Otázky &Aacute; odpovědi</a>
             </div>
 
@@ -118,7 +120,7 @@
                     Náhodně vybraný štítek Indexu klíčových rizik pro dnešní den.
                 </p>
                 @{
-                    var todaysOrg = HlidacStatu.Lib.Analysis.KorupcniRiziko.Statistics
+                    var todaysOrg = Statistics
                         .GetStatistics(2019).SubjektOrderedListKIndexAsc.TipOfTheDay();
                 }
                 <div>

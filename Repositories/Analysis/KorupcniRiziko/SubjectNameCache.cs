@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
+namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 {
     public class SubjectNameCache : IEquatable<SubjectNameCache>
     {

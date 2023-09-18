@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
+namespace HlidacStatu.Entities.Entities.KIndex
 {
     public partial class KIndexData
     {

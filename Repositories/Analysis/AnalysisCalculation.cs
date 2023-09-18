@@ -1,20 +1,17 @@
-﻿using Devmasters.Batch;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Devmasters.Batch;
 using Devmasters.Enums;
-
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities.Analysis;
 using HlidacStatu.Extensions;
-
 using Nest;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Manager = HlidacStatu.Connectors.Manager;
 
-namespace HlidacStatu.Repositories
+namespace HlidacStatu.Repositories.Analysis
 {
     public class AnalysisCalculation
     {

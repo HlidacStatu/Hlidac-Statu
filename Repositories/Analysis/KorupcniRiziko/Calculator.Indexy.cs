@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HlidacStatu.Entities.Entities.KIndex;
 
-namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
+namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 {
 
     public partial class Calculator

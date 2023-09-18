@@ -1,10 +1,10 @@
-﻿using HlidacStatu.Entities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using HlidacStatu.Repositories;
+using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities.KIndex;
 
-namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
+namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 {
     public class SubjectWithKIndex : Firma.Zatrideni.Item
     {

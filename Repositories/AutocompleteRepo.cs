@@ -13,7 +13,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using Consts = HlidacStatu.Util.Consts;
 
 namespace HlidacStatu.Repositories

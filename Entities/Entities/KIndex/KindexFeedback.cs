@@ -1,7 +1,7 @@
-﻿using Nest;
-using System;
+﻿using System;
+using Nest;
 
-namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
+namespace HlidacStatu.Entities.Entities.KIndex
 {
     [ElasticsearchType(IdProperty = nameof(Id))]
     public class KindexFeedback

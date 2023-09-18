@@ -1,7 +1,8 @@
-﻿@model (HlidacStatu.Lib.Analytics.StatisticsPerYear<Smlouva.Statistics.Data> statistics, HlidacStatu.Lib.Analysis.TemplatedQuery query)
+﻿@model (HlidacStatu.Lib.Analytics.StatisticsPerYear<Smlouva.Statistics.Data> statistics, HlidacStatu.Repositories.Analysis.TemplatedQuery query)
 @using HlidacStatu.Entities
 @using HlidacStatu.Entities.Entities.Analysis
-@using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+@using HlidacStatu.Entities.Entities.KIndex
+@using HlidacStatu.Repositories.Analysis.KorupcniRiziko
 
 @{
     Layout = null;

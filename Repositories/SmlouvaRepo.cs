@@ -5,7 +5,6 @@ using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Issues;
 using HlidacStatu.Extensions;
-using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Statistics;
 using Nest;
@@ -15,6 +14,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using HlidacStatu.Entities.Entities.KIndex;
 using Manager = HlidacStatu.Connectors.Manager;
 
 

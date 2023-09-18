@@ -1,11 +1,9 @@
-﻿using HlidacStatu.Entities;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
+namespace HlidacStatu.Entities.Entities.KIndex
 {
     public partial class KIndexData
     {

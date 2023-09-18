@@ -1,8 +1,8 @@
-﻿@model IEnumerable<SubjectWithKIndex>
+﻿@model IEnumerable<HlidacStatu.Repositories.Analysis.KorupcniRiziko.SubjectWithKIndex>
 
 @using Devmasters.Enums;
-@using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 @using System.Linq;
+@using HlidacStatu.Entities.Entities.KIndex
 @using HlidacStatu.Repositories
 
 @{
@@ -139,7 +139,7 @@
             </thead>
             <tbody>
                 @foreach (var record in data
-                    .Where(r => !( r.KIndex == HlidacStatu.Lib.Analysis.KorupcniRiziko.Consts.MinSmluvPerYearKIndexValue 
+                    .Where(r => !( r.KIndex == Consts.MinSmluvPerYearKIndexValue 
                             || r.KIndex == 0
                         )
                         
@@ -177,7 +177,7 @@
         <div>
             @{
                 string[] rest = data
-                    .Where(r => r.KIndex == HlidacStatu.Lib.Analysis.KorupcniRiziko.Consts.MinSmluvPerYearKIndexValue || r.KIndex==0 )
+                    .Where(r => r.KIndex == Consts.MinSmluvPerYearKIndexValue || r.KIndex==0 )
                     .Select(r => 
                         $"<a href=\"/subjekt/{r.Ico}\" >{Html.KIndexIcon(KIndexData.KIndexLabelValues.None, 15, showNone: true)}{r.Jmeno}</a>"
                     ).ToArray();
