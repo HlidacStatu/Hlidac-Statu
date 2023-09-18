@@ -16,7 +16,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using HlidacStatu.Entities.Entities.KIndex;
 using HlidacStatu.Lib.Data.External.RPP;
+using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 
 namespace HlidacStatu.Extensions
 {
@@ -143,9 +145,9 @@ namespace HlidacStatu.Extensions
             return FirmaStatistics.CachedHoldingStatisticsVZ(firma, aktualnost, forceUpdateCache);
         }
 
-        public static Task<Lib.Analysis.KorupcniRiziko.KIndexData> KindexAsync(this Firma firma, bool useTemp = false)
+        public static Task<KIndexData> KindexAsync(this Firma firma, bool useTemp = false)
         {
-            return Lib.Analysis.KorupcniRiziko.KIndex.GetAsync(firma.ICO, useTemp);
+            return KIndex.GetAsync(firma.ICO, useTemp);
         }
 
         public static bool MaVazbyNaPolitiky(this Firma firma)

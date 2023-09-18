@@ -1,16 +1,13 @@
-﻿using HlidacStatu.Entities.Entities.Analysis;
-
-
-using Nest;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
-using HlidacStatu.Repositories;
+using HlidacStatu.Entities.Entities.Analysis;
+using HlidacStatu.Entities.Entities.KIndex;
+using Nest;
 
-namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
+namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 {
     public static class KIndex
     {

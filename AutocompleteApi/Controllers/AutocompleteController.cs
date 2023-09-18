@@ -3,7 +3,7 @@ using System.Linq;
 using HlidacStatu.AutocompleteApi.Services;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Views;
-using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HlidacStatu.AutocompleteApi.Controllers

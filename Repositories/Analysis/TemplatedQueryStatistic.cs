@@ -1,6 +1,6 @@
 ﻿using HlidacStatu.Entities;
 
-namespace HlidacStatu.Lib.Analysis
+namespace HlidacStatu.Repositories.Analysis
 {
     public class TemplatedQuery
     {
@@ -29,7 +29,7 @@ namespace HlidacStatu.Lib.Analysis
         public string Description { get; set; }
         public string NameOfView { get; set; }
         public int? Year { get; set; }
-        public Analytics.StatisticsPerYear<Smlouva.Statistics.Data> Data
+        public Lib.Analytics.StatisticsPerYear<Smlouva.Statistics.Data> Data
         {
             get
             {

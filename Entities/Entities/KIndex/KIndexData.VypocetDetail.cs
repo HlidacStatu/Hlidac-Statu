@@ -1,9 +1,7 @@
-﻿using Devmasters.Enums;
+﻿using System.Linq;
+using Devmasters.Enums;
 
-using System.Linq;
-
-
-namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
+namespace HlidacStatu.Entities.Entities.KIndex
 {
     public partial class KIndexData
     {

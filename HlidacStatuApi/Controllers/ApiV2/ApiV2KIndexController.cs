@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+﻿using HlidacStatu.Entities.Entities.KIndex;
+using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,7 +1,6 @@
 ﻿using Devmasters.Enums;
 
 using HlidacStatu.Entities;
-using HlidacStatu.Lib.Analysis.KorupcniRiziko;
 using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 
@@ -13,7 +12,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using HlidacStatu.Entities.Entities.KIndex;
 using HlidacStatu.LibCore;
+using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using HlidacStatu.Web.Framework;
 
 

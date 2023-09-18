@@ -1,7 +1,6 @@
-﻿using HlidacStatu.Lib.Analysis.KorupcniRiziko;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using HlidacStatu.Entities.Entities.KIndex;
 
 namespace HlidacStatu.Web.Models.Apiv2
 {

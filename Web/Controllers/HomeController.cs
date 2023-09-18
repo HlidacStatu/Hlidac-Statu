@@ -14,6 +14,7 @@ using HlidacStatu.Entities.VZ;
 using HlidacStatu.Extensions;
 using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.Repositories;
+using HlidacStatu.Repositories.Analysis;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Framework;
@@ -62,13 +63,13 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult Analyza(string ids)
         {
             if (string.IsNullOrWhiteSpace(ids))
-                return View((HlidacStatu.Lib.Analysis.TemplatedQuery)null);
+                return View((TemplatedQuery)null);
 
             string[] ids_arr = ids.Split(new string[] { ",", ";", " ", Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
             ids_arr = ids_arr.Select(m => m.Trim()).Where(s => s.Length > 0).ToArray();
 
             if (ids_arr.Length == 0)
-                return View((HlidacStatu.Lib.Analysis.TemplatedQuery)null);
+                return View((TemplatedQuery)null);
 
             var q = $"id:( {string.Join(" OR ", ids_arr)} )";
             return Analyza("", q, "", "", "",null);
@@ -79,16 +80,16 @@ namespace HlidacStatu.Web.Controllers
             ViewData.Add(Constants.CacheKeyName,
                 WebUtil.GenerateCacheKey(new object[] { p, q, title, description, moreUrl, y }));
 
-            var model = new Lib.Analysis.TemplatedQuery() { Query = q, Text = title, Description = description };
+            var model = new TemplatedQuery() { Query = q, Text = title, Description = description };
 
 
             if (StaticData.Afery.ContainsKey(p?.ToLower() ?? ""))
                 model = StaticData.Afery[p.ToLower()];
             else if (!string.IsNullOrEmpty(q))
             {
-                model = new Lib.Analysis.TemplatedQuery() { Query = q, Text = title, Description = description };
+                model = new TemplatedQuery() { Query = q, Text = title, Description = description };
                 if (Uri.TryCreate(moreUrl, UriKind.Absolute, out var uri))
-                    model.Links = new Lib.Analysis.TemplatedQuery.AHref[] {
+                    model.Links = new TemplatedQuery.AHref[] {
                         new(uri.AbsoluteUri,"více informací")
                     };
             }

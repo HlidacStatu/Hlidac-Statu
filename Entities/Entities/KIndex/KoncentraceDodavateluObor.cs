@@ -1,4 +1,4 @@
-﻿namespace HlidacStatu.Lib.Analysis.KorupcniRiziko
+﻿namespace HlidacStatu.Entities.Entities.KIndex
 {
     public class KoncentraceDodavateluObor
     {

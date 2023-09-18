@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
-using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+using HlidacStatu.Entities.Entities.KIndex;
 using HlidacStatu.Util;
 using InfluxDB.Client.Api.Domain;
 using Nest;
-using Consts = HlidacStatu.Lib.Analysis.KorupcniRiziko.Consts;
+using Consts = HlidacStatu.Entities.Entities.KIndex.Consts;
 
 namespace HlidacStatu.Repositories;
 
@@ -56,7 +56,7 @@ public static class KIndexRepo
             {
                 if (annual._orderedValuesForInfofacts == null)
                 {
-                    var stat = HlidacStatu.Lib.Analysis.KorupcniRiziko.Statistics.GetStatistics(annual.Rok); //todo: může být null, co s tím?
+                    var stat = Analysis.KorupcniRiziko.Statistics.GetStatistics(annual.Rok); //todo: může být null, co s tím?
                     if (annual.KIndexVypocet.Radky != null || annual.KIndexVypocet.Radky.Count() > 0)
 
                         annual._orderedValuesForInfofacts = annual.KIndexVypocet.Radky
@@ -157,7 +157,7 @@ public static class KIndexRepo
         if (Consts.XAvailableCalculationYears is null || !Consts.XAvailableCalculationYears.Any())
         {
             Consts.XAvailableCalculationYears = Consts.ToCalculationYears
-                .Where(r => r <= HlidacStatu.Lib.Analysis.KorupcniRiziko.Statistics.KIndexStatTotal.Get().Max(m => m.Rok))
+                .Where(r => r <= Analysis.KorupcniRiziko.Statistics.KIndexStatTotal.Get().Max(m => m.Rok))
                 .ToArray(); 
         }
 

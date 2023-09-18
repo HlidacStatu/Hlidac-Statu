@@ -1,4 +1,4 @@
-﻿using HlidacStatu.Lib.Analysis.KorupcniRiziko;
+﻿using HlidacStatu.Entities.Entities.KIndex;
 
 namespace HlidacStatuApi.Models
 {

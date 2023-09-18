@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
+using HlidacStatu.Repositories.Analysis;
 
 namespace HlidacStatu.Repositories
 {
@@ -66,7 +67,7 @@ namespace HlidacStatu.Repositories
             }, null);
 
 
-        public static Dictionary<string, Lib.Analysis.TemplatedQuery> Afery = new Dictionary<string, Lib.Analysis.TemplatedQuery>();
+        public static Dictionary<string, TemplatedQuery> Afery = new Dictionary<string, TemplatedQuery>();
 
         public static Devmasters.Cache.LocalMemory.Cache<Dictionary<string, NespolehlivyPlatceDPH>> NespolehlivyPlatciDPH = null;
 
@@ -539,48 +540,48 @@ namespace HlidacStatu.Repositories
 
 
                 //AFERY
-                Afery.Add("parlamentnilisty", new Lib.Analysis.TemplatedQuery()
+                Afery.Add("parlamentnilisty", new TemplatedQuery()
                 {
                     Text = "Inzerce na Parlamentních listech",
                     Description = "Které úřady inzerují na serveru Parlamentní listy? Smlouvy s inzercí na médiích Our Media a.s. (vydavatel Parlamentních listů) anebo s mediaplánem přímo pro PL. Částky ze smluv jsou orientační a mohou obsahovat objednávky i na jiná média.",
                     Query = "\"OUR MEDIA\" OR \"Parlamentní listy\" OR \"Parlamentnilisty.cz\" OR ico:28876890 OR \"KrajskeListy.cz\" OR \"Krajské listy\" OR \"Prvnizpravy.cz\" OR icoPrijemce:24214868",
                     UrlTemplate = "/HledatSmlouvy?Q={0}",
-                    Links = new Lib.Analysis.TemplatedQuery.AHref[]{
-                        new Lib.Analysis.TemplatedQuery.AHref("https://web.archive.org/web/20170102215202/http://mediahub.cz/komunikace-35809/clanky-v-parlamentnich-listech-si-plati-ministri-i-hejtmani-celkove-castky-jdou-do-milionu-inzerce-vypada-jako-redakcni-clanky-1058528",
+                    Links = new TemplatedQuery.AHref[]{
+                        new TemplatedQuery.AHref("https://web.archive.org/web/20170102215202/http://mediahub.cz/komunikace-35809/clanky-v-parlamentnich-listech-si-plati-ministri-i-hejtmani-celkove-castky-jdou-do-milionu-inzerce-vypada-jako-redakcni-clanky-1058528",
                         "Články v Parlamentních listech si platí ministři i hejtmani. Celkové částky jdou do milionů. Inzerce vypadá jako redakční články"),
-                        new Lib.Analysis.TemplatedQuery.AHref("https://denikn.cz/39674/valentuv-server-zautocil-na-transparency-hned-pote-co-ho-narkla-ze-stretu-zajmu-nahoda-rika-senator/",
+                        new TemplatedQuery.AHref("https://denikn.cz/39674/valentuv-server-zautocil-na-transparency-hned-pote-co-ho-narkla-ze-stretu-zajmu-nahoda-rika-senator/",
                         "Valentův server zaútočil na Transparency hned poté, co ho nařkla ze střetu zájmů.")
                     }
                 });
-                Afery.Add("uklid-praha-cssd", new Lib.Analysis.TemplatedQuery()
+                Afery.Add("uklid-praha-cssd", new TemplatedQuery()
                 {
                     Text = "Úklidové služby pro firmy členů ČSSD",
                     Description = "Zakázky pro firmy Premio Invest a Lasesmed, které vlastní členové ČSSD a roky dostávaly stovky milionů za úklid v Praze od městských organizací, kde mají vliv sociálnědemokratičtí politici.",
                     Query = "ico:26746590 OR ico:28363809",
                     UrlTemplate = "/HledatSmlouvy?Q={0}",
-                    Links = new Lib.Analysis.TemplatedQuery.AHref[]{
-                        new Lib.Analysis.TemplatedQuery.AHref("https://zpravy.aktualne.cz/domaci/uklid-prahy-jako-stranicky-byznys-clenove-cssd-vlastni-firmy/r~328647c27c2811e7954a002590604f2e/","Úklid Prahy jako byznys ČSSD. Její členové mají firmy, které žijí ze stamilionových zakázek od města"),
+                    Links = new TemplatedQuery.AHref[]{
+                        new TemplatedQuery.AHref("https://zpravy.aktualne.cz/domaci/uklid-prahy-jako-stranicky-byznys-clenove-cssd-vlastni-firmy/r~328647c27c2811e7954a002590604f2e/","Úklid Prahy jako byznys ČSSD. Její členové mají firmy, které žijí ze stamilionových zakázek od města"),
                     }
                 });
-                Afery.Add("eet", new Lib.Analysis.TemplatedQuery()
+                Afery.Add("eet", new TemplatedQuery()
                 {
                     Text = "EET",
                     Description = "Smlouvy pokrývající vývoj a provoz EET. ",
                     Query = "(ico:03630919 OR ico:72054506 OR ico:72080043) AND (EET OR ADIS)",
                     UrlTemplate = "/HledatSmlouvy?Q={0}",
-                    Links = new Lib.Analysis.TemplatedQuery.AHref[]{
-                        new Lib.Analysis.TemplatedQuery.AHref("https://dotyk.denik.cz/publicistika/eet-babisuv-nepruhledny-system-na-vymahani-dani-20160915.html","EET: Babišův neprůhledný systém na vymáhání daní"),
-                        new Lib.Analysis.TemplatedQuery.AHref("https://www.hlidacstatu.cz/texty/10x-predrazene-eet-skutecne-naklady-na-eet/","10x předražené EET: skutečné náklady na EET"),
+                    Links = new TemplatedQuery.AHref[]{
+                        new TemplatedQuery.AHref("https://dotyk.denik.cz/publicistika/eet-babisuv-nepruhledny-system-na-vymahani-dani-20160915.html","EET: Babišův neprůhledný systém na vymáhání daní"),
+                        new TemplatedQuery.AHref("https://www.hlidacstatu.cz/texty/10x-predrazene-eet-skutecne-naklady-na-eet/","10x předražené EET: skutečné náklady na EET"),
                     }
                 });
-                Afery.Add("elektronicke-myto", new Lib.Analysis.TemplatedQuery()
+                Afery.Add("elektronicke-myto", new TemplatedQuery()
                 {
                     Text = "Elektronické mýto",
                     Description = @"Smlouvy související elektronickým mýtem.",
                     Query = "\"elektronické mýto\"",
                     UrlTemplate = "/HledatSmlouvy?Q={0}"
                 });
-                Afery.Add("rsd-s-omezenou-soutezi", new Lib.Analysis.TemplatedQuery()
+                Afery.Add("rsd-s-omezenou-soutezi", new TemplatedQuery()
                 {
                     Text = "Smlouvy ŘSD s omezenou soutěží",
                     Description = @"Smlouvy ŘSD uzavřené v užším řízení či v jednacím řízení bez uveřejnění.",
