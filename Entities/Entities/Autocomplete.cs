@@ -47,6 +47,7 @@ namespace HlidacStatu.Entities
             Oblast,
             Synonym,
             Operator,
+            Hint,
             Kindex
         }
     }
