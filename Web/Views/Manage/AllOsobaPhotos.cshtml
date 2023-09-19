@@ -6,11 +6,20 @@
 }
 
 @{
-    var osoby = HlidacStatu.Repositories.OsobaRepo.PolitickyAktivni.Get()
-                .Take(1000)
-                .AsParallel().Where(o => o?.HasPhoto() == true)
-                .ToList();
+    var filter = this.Context.Request.Query["start"].FirstOrDefault();
 
+    List<HlidacStatu.Entities.Osoba> osoby = new();
+
+
+    if (!string.IsNullOrEmpty(filter))   
+    {
+        filter = Devmasters.TextUtil.RemoveDiacritics(filter.First().ToString().ToUpperInvariant());
+        osoby = HlidacStatu.Repositories.OsobaRepo.PolitickyAktivni.Get()
+                .Where(o=>Devmasters.TextUtil.RemoveDiacritics((o.Prijmeni+o.Jmeno)[0].ToString().ToUpperInvariant()) == filter)
+                .AsParallel()
+                .Where(o => o?.HasPhoto() == true)
+                .ToList();
+    }
 
 }
 
@@ -64,6 +73,19 @@
     }
 </script>
 <div class="row">
+    <h5>
+        @foreach (var fs in HlidacStatu.Repositories.OsobaRepo.PolitickyAktivni.Get()
+            .Where(o=>!string.IsNullOrWhiteSpace(o.Prijmeni+o.Jmeno))
+            .Select(o => Devmasters.TextUtil.RemoveDiacritics((o.Prijmeni + o.Jmeno)[0].ToString().ToUpperInvariant()))
+            .Distinct()
+            .Order()        
+        )
+        {
+            <span><a href="?filter=@(fs)">@(fs)</a> -</span>
+        }
+        @*<span><a href="?filter=_">Ostatní</a></span> *@
+    </h5>
+
     <table>
         @foreach (var o in osoby.OrderBy(o => o.Jmeno))
         {
