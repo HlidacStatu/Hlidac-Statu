@@ -23,7 +23,7 @@
         position:absolute;
         left:0px;
         z-index:100;
-        width:80%;
+        width:100%;
         margin: 0;
         padding: 0;
     }
@@ -127,7 +127,7 @@
                             <div class="hs-avatar">
                                 @((MarkupString)context.ImageElement)
                             </div>
-                            <div class="hs-autocomplete-description">
+                            <div class="hs-autocomplete-description flex-grow-1">
                                 @if (context.Category == Autocomplete.CategoryEnum.Hint)
                                 {
                                     <h6 class="align-middle">@context.Text <span class="badge rounded-pill bg-secondary">@context.Id</span></h6>
@@ -149,6 +149,17 @@
                                         <i>@context.Type</i>
                                     </p>
                                 }
+                            </div>
+                            <div>
+                                @if (context.Id.StartsWith("osobaid:"))
+                                {
+                                    <a href="/osoba/@context.Id.Replace("osobaid:","")"><i class="fa-solid fa-arrow-up-right-from-square fa-2xl"></i></a>
+                                }
+                                @if (context.Id.StartsWith("ico:"))
+                                {
+                                    <a href="/subjekt/@context.Id.Replace("ico:","")"><i class="fa-solid fa-arrow-up-right-from-square fa-2xl"></i></a>
+                                }
+                                    
                             </div>
                         </div>
                     </ItemTemplate>
