@@ -42,6 +42,22 @@
             Hledat
         </button>
     </div>
+    
+    @if (ShowHelpTips && string.IsNullOrWhiteSpace(InputBoxValue))
+    {
+        <div class="hlidac-autocomplete-list">
+            <div class="list-group">
+                @if (HelpTemplate is not null)
+                {
+                    @foreach (RenderFragment helpTip in HelpTips)
+                    {
+                        @HelpTemplate(helpTip)
+                    }
+                }
+            </div>
+        </div>
+    }
+    
     @if (IsAnyOptionItem)
     {
         <div class="hlidac-autocomplete-list">
@@ -70,6 +86,9 @@
     
     [Parameter]
     public RenderFragment<AutocompleteItem<TItem>>? TagTemplate { get; set; }
+    
+    [Parameter]
+    public RenderFragment<RenderFragment>? HelpTemplate { get; set; }
 
     [Parameter]
     public Func<string, CancellationToken, Task<List<TItem>>> SearchFuncAsync { get; set; } = null!;
@@ -87,7 +106,7 @@
     public List<AutocompleteItem<TItem>>? InputTags { get; set; }
     
     [Parameter]
-    public List<TItem>? SearchHintOptions { get; set; } 
+    public List<RenderFragment>? HelpTips { get; set; } 
 
     private ElementReference InputBoxElement { get; set; }
     private string? InputBoxValue { get; set; }
@@ -102,6 +121,7 @@
 
     private List<TItem>? OptionItems { get; set; }
     private bool IsAnyOptionItem => OptionItems is not null && OptionItems.Count > 0;
+    private bool ShowHelpTips { get; set; }
 
     private string InputBoxPlaceHolder
     {
@@ -109,6 +129,7 @@
             "Napište další vyhledávaný výraz, nebo stiskněte \"Hledat\"" : 
             "Začněte psát jméno, kraj, IČO, firmu, politickou stranu, ...";
     }
+
 
     private int _selectedOption = -1;
     
@@ -220,6 +241,7 @@
 
     private async Task OnInputKeyDown(KeyboardEventArgs eventArgs)
     {
+        HideDefaultHintItems();
         switch (eventArgs.Code)
         {
             case "ArrowUp" when IsAnyOptionItem:
@@ -324,10 +346,12 @@
 
     private void ShowDefaultHintItems()
     {
-        if(IsAnyOptionItem)
-            return;
-
-        OptionItems = SearchHintOptions;
+        ShowHelpTips = true;
+    }
+    
+    private void HideDefaultHintItems()
+    {
+        ShowHelpTips = false;
     }
 
 }
