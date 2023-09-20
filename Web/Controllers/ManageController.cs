@@ -600,7 +600,7 @@ namespace HlidacStatu.Web.Controllers
                         {
                             //C:\Windows\TEMP\tmp3EB0.tmp.0.faces.jpg
                             var rootfn = Devmasters.RegexUtil.GetRegexGroupValue(fn, @"(?<tempfn>.*)\.\d{1,2}\.faces\.jpg$", "tempfn");
-                            var target = Init.OsobaFotky.GetFullPath(o, "small.uploaded.jpg");
+                            var target = o.GetPhotoPath(Osoba.PhotoTypes.UploadedSmall, true) ;//Init.OsobaFotky.GetFullPath(o, "small.uploaded.jpg");
                             try
                             {
                                 using (Devmasters.Imaging.InMemoryImage imi = new Devmasters.Imaging.InMemoryImage(fn))
@@ -616,7 +616,7 @@ namespace HlidacStatu.Web.Controllers
                                                     System.IO.File.ReadAllBytes(o.GetPhotoPath()),
                                                     AI.Photo.RemoveBackgroundStyles.Person).Result;
                                         if (noBackGr != null)
-                                            System.IO.File.WriteAllBytes(o.GetPhotoPath("small.nobackground.jpg", true), noBackGr);
+                                            System.IO.File.WriteAllBytes(o.GetPhotoPath( Osoba.PhotoTypes.NoBackground, true), noBackGr);
 
                                             return Redirect("/Osoba/" + o.NameId);
                                     }

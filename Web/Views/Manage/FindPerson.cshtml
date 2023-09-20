@@ -58,7 +58,7 @@ else
                             <br/>
                             @if (osoba.HasPhoto())
                             {
-                                var zdroj = osoba.GetPhotoSource() ?? "";
+                                var zdroj = osoba.GetPhotoCreatorSource() ?? "";
                                 <a class="btn btn-default btn-sm" href="/manage/changePhoto/@osoba.NameId" role="button">Změnit fotku</a>
                                 <a title="@zdroj" href="@zdroj" style="font-size:75%;text-decoration:none">
                                     <span class="text-muted">@(zdroj != "" ? "zdroj" : "")</span>

@@ -21,9 +21,9 @@ namespace HlidacStatu.Extensions
                     Osoba o = Osoby.GetByNameId.Get(data.Value<string>("nameId"));
                     if (o != null)
                     {
-                        var path = Init.OsobaFotky.GetFullPath(o, "original.uploaded.jpg");
-                        var pathSmall = Init.OsobaFotky.GetFullPath(o, "small.uploaded.jpg");
-                        Devmasters.IO.IOTools.MoveFile(pathSmall, Init.OsobaFotky.GetFullPath(o, "small.jpg"));
+                        var path = o.GetPhotoPath(Osoba.PhotoTypes.UploadedOriginal, true); //Init.OsobaFotky.GetFullPath(o, "original.uploaded.jpg");
+                        var pathSmall = o.GetPhotoPath(Osoba.PhotoTypes.UploadedSmall, true); // Init.OsobaFotky.GetFullPath(o, "small.uploaded.jpg");
+                        Devmasters.IO.IOTools.MoveFile(pathSmall, o.GetPhotoPath(Osoba.PhotoTypes.Small) ); //Init.OsobaFotky.GetFullPath(o, "small.jpg")
 
                         if (Devmasters.TextUtil.IsValidEmail(review.CreatedBy))
                         {

@@ -1,11 +1,10 @@
 using Devmasters;
-
+using Devmasters.Enums;
+using EnumsNET;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
-
 using Microsoft.EntityFrameworkCore;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +13,7 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Devmasters.Enums;
+using static HlidacStatu.Entities.Osoba;
 
 namespace HlidacStatu.Repositories
 {
@@ -291,7 +290,7 @@ namespace HlidacStatu.Repositories
                         osobaToUpdate.WikiId = normalizedWikiId;
 
                     Save(osobaToUpdate);
-                    
+
                     AuditRepo.Add<Osoba>(Audit.Operations.Update, user, osobaToUpdate, osobaOriginal);
 
                     return osobaToUpdate;
@@ -388,8 +387,7 @@ namespace HlidacStatu.Repositories
             //obrazek
             if (original.HasPhoto() == false && duplicated.HasPhoto())
             {
-                foreach (var fn in new string[]
-                    {"small.jpg", "source.txt", "original.uploaded.jpg", "small.uploaded.jpg"})
+                foreach (var fn in Enums.GetValues<PhotoTypes>().Select(en=>en.ToNiceDisplayName()))
                 {
                     var from = Init.OsobaFotky.GetFullPath(duplicated, fn);
                     var to = Init.OsobaFotky.GetFullPath(original, fn);
@@ -418,7 +416,7 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static string GetPhotoSource(this Osoba osoba)
+        public static string GetPhotoCreatorSource(this Osoba osoba)
         {
             var fn = Init.OsobaFotky.GetFullPath(osoba, "source.txt");
             if (File.Exists(fn))
@@ -440,39 +438,48 @@ namespace HlidacStatu.Repositories
             return null;
         }
 
-        public static string GetPhotoPath(this Osoba osoba, string anotherName = null, bool force = false)
+   
+        public static string GetPhotoPath(this Osoba osoba, PhotoTypes phototype = PhotoTypes.Small, bool ignoreMissingFile = false)
+        { 
+            return GetPhotoPath(osoba, phototype.ToNiceDisplayName(), ignoreMissingFile);
+        }
+        private static string GetPhotoPath(this Osoba osoba, string anotherName = null, bool force = false)
         {
             if (osoba.HasPhoto())
             {
-                if (!string.IsNullOrEmpty(anotherName) 
+                if (!string.IsNullOrEmpty(anotherName)
                     && (System.IO.File.Exists(Init.OsobaFotky.GetFullPath(osoba, anotherName)) || force)
-                    
+
                     )
-                { 
+                {
                     return Init.OsobaFotky.GetFullPath(osoba, anotherName);
-                }    
-                var path = Init.OsobaFotky.GetFullPath(osoba, "small.jpg");
+                }
+                var path = Init.OsobaFotky.GetFullPath(osoba, PhotoTypes.Small.ToNiceDisplayName());
                 return path;
             }
             else
                 return Init.WebAppRoot + @"Content\Img\personNoPhoto.png";
         }
 
-        public static string GetPhotoUrl(this Osoba osoba, bool local = false, string option = "")
+        public static string GetPhotoUrl(this Osoba osoba, bool local = false, PhotoTypes phototype = PhotoTypes.Small, bool randomizeUrl = false)
+        {
+            return GetPhotoUrl(osoba, local, phototype.ToNiceDisplayName() + (randomizeUrl ? $"&rnd={DateTimeOffset.UnixEpoch}" : ""));
+        }
+        private static string GetPhotoUrl(this Osoba osoba, bool local = false, string option = "")
         {
             if (local)
             {
-                return "/Photo/" + osoba.NameId + (string.IsNullOrEmpty(option)? "" : $"?option={option}");
+                return "/Photo/" + osoba.NameId + (string.IsNullOrEmpty(option) ? "" : $"?phototype={option}");
             }
             else
             {
-                return "https://www.hlidacstatu.cz/Photo/" + osoba.NameId + (string.IsNullOrEmpty(option) ? "" : $"?option={option}");
+                return "https://www.hlidacstatu.cz/Photo/" + osoba.NameId + (string.IsNullOrEmpty(option) ? "" : $"?phototype={option}");
             }
         }
 
         public static bool HasPhoto(this Osoba osoba)
         {
-            var path = Init.OsobaFotky.GetFullPath(osoba, "small.jpg");
+            var path = Init.OsobaFotky.GetFullPath(osoba, PhotoTypes.Small.ToNiceDisplayName()); // "small.jpg"
             return File.Exists(path);
         }
 
@@ -486,7 +493,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task<List<Osoba>> PeopleWithAnySponzoringRecordAsync(CancellationToken cancellationToken = default)
         {
-            await using var db  = new DbEntities();
+            await using var db = new DbEntities();
             var results = await db.Osoba.FromSqlInterpolated($@"
                     Select * 
                       from Osoba os
@@ -500,7 +507,7 @@ namespace HlidacStatu.Repositories
                 .ToListAsync(cancellationToken: cancellationToken);
             return results;
         }
-        
+
 
         public static Osoba.JSON Export(this Osoba osoba, bool allData = false)
         {
@@ -589,14 +596,14 @@ namespace HlidacStatu.Repositories
             Europoslanec,
             [NiceDisplayName("Poradce předsedy vlády")]
             PoradcePredsedyVlady,
-            
+
         }
-        
+
         public static List<Osoba> GetByZatrideni(Zatrideni zatrideni, DateTime? toDate)
         {
             if (!toDate.HasValue)
                 toDate = DateTime.Now;
-            
+
             switch (zatrideni)
             {
                 case Zatrideni.Politik:
@@ -606,8 +613,8 @@ namespace HlidacStatu.Repositories
                         (int)OsobaEvent.Types.PolitickaExekutivni,
                         // Patří sem i volená?
                     };
-                    
-                    return GetByEvent(e => 
+
+                    return GetByEvent(e =>
                             politickeEventy.Any(pe => pe == e.Type)
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
@@ -630,7 +637,7 @@ namespace HlidacStatu.Repositories
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
-                
+
                 case Zatrideni.Poslanec:
                     return GetByEvent(e =>
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
@@ -640,7 +647,7 @@ namespace HlidacStatu.Repositories
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
-                
+
                 case Zatrideni.Europoslanec:
                     return GetByEvent(e =>
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
@@ -650,14 +657,14 @@ namespace HlidacStatu.Repositories
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
-                
+
                 case Zatrideni.SefUradu:
                     return GetByEvent(e =>
                             e.Ceo == 1
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
-                
+
                 case Zatrideni.Senator:
                     return GetByEvent(e =>
                             e.Type == (int)OsobaEvent.Types.VolenaFunkce
@@ -666,7 +673,7 @@ namespace HlidacStatu.Repositories
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
-                
+
                 case Zatrideni.PoradcePredsedyVlady:
                     return GetByEvent(e =>
                             e.Type == (int)OsobaEvent.Types.PolitickaExekutivni
@@ -676,11 +683,11 @@ namespace HlidacStatu.Repositories
                             && (e.DatumDo == null || e.DatumDo >= toDate)
                             && (e.DatumOd == null || e.DatumOd <= toDate))
                         .ToList();
-                
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(zatrideni), zatrideni, null);
             }
         }
-        
+
     }
 }

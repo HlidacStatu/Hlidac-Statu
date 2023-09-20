@@ -332,7 +332,7 @@ namespace HlidacStatu.Web.Controllers
         }
 
         [Authorize(Roles = "canEditData")]
-        public JsonResult RemovePhoto(string id, string option)
+        public JsonResult RemovePhoto(string id, HlidacStatu.Entities.Osoba.PhotoTypes phototype)
         {
             var o = Osoby.GetByNameId.Get(id);
             if (o == null)
@@ -341,7 +341,7 @@ namespace HlidacStatu.Web.Controllers
             }
             if (o.HasPhoto())
             {
-                var path = o.GetPhotoPath(option,true);
+                var path = o.GetPhotoPath(phototype,true);
                 if (System.IO.File.Exists(path))
                     Devmasters.IO.IOTools.DeleteFile(path, TimeSpan.FromSeconds(1), TimeSpan.FromMilliseconds(500), false);
             }
@@ -369,7 +369,7 @@ namespace HlidacStatu.Web.Controllers
                         AI.Photo.RemoveBackgroundStyles.Person).Result;
                     if (noBackGr != null)
                     {
-                        System.IO.File.WriteAllBytes(o.GetPhotoPath("small.nobackground.jpg",true), noBackGr);
+                        System.IO.File.WriteAllBytes(o.GetPhotoPath( Entities.Osoba.PhotoTypes.NoBackground,true), noBackGr);
                         return new JsonResult(true);
                     }
                     return new JsonResult(false);

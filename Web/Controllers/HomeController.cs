@@ -109,7 +109,7 @@ namespace HlidacStatu.Web.Controllers
 </svg>
 ";
         [ResponseCache(Duration = 60*60*2, Location = ResponseCacheLocation.Client)]
-        public ActionResult Photo(string id, [FromQuery] string option)
+        public ActionResult Photo(string id, [FromQuery] Osoba.PhotoTypes phototype, bool random)
         {
             //string noPhotoPath = $"Content{Path.DirectorySeparatorChar}Img{Path.DirectorySeparatorChar}personNoPhoto.png";
             if (string.IsNullOrEmpty(id))
@@ -130,7 +130,7 @@ namespace HlidacStatu.Web.Controllers
             else
             {
                 if (o.HasPhoto())
-                    return File(System.IO.File.ReadAllBytes(o.GetPhotoPath(option)), "image/jpg");
+                    return File(System.IO.File.ReadAllBytes(o.GetPhotoPath(phototype)), "image/jpg");
                 else
                     return Content(NoPhotoSvg, "image/svg+xml");
             }

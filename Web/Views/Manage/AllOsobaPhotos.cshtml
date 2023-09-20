@@ -31,7 +31,7 @@
         btn.css('color', 'gray');
         img.css({ 'opacity': 0.2 });
         var imgUrl = img.css('background-image');
-        var jqxhr = $.ajax('/manage/RemovePhoto/' + nameid + '?option='+option)
+        var jqxhr = $.ajax('/manage/RemovePhoto/' + nameid + '?phototype=' + option)
             .done(function (data, textStatus, jqXHR) {
                 btn.css('color', prevColor);
                 btn.css('cursor', 'pointer');
@@ -57,7 +57,7 @@
         img.css({ 'opacity': 0.2 });
         d = new Date();
         var imgUrl = img.css('background-image');
-        var newImgUrl = 'url("https://www.hlidacstatu.cz/Photo/' + nameid + '?option=small.nobackground.jpg&tt=' + d.getTime() + '")';
+        var newImgUrl = 'url("https://www.hlidacstatu.cz/Photo/' + nameid + '?phototype=NoBackground&tt=' + d.getTime() + '")';
         var jqxhr = $.ajax('/manage/DoPhotoRemoveBackground/' + nameid)
             .done(function (data, textStatus, jqXHR) {
                 btn.css('color', prevColor);
@@ -109,7 +109,7 @@
                 <td>
                     <div class="person-profile-thumb">
                         <div class="photo">
-                            <div id="@(o.NameId)_bg" class="profile-picture border" style="background-image: url('@(o.GetPhotoUrl(local: true,"small.nobackground.jpg"))')"></div>
+                            <div id="@(o.NameId)_bg" class="profile-picture border" style="background-image: url('@(o.GetPhotoUrl(local: true, phototype: HlidacStatu.Entities.Osoba.PhotoTypes.NoBackground))')"></div>
                         </div>
                     </div>
                     <div style="padding-left:50px;">

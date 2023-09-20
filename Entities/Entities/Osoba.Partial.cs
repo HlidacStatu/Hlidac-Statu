@@ -32,6 +32,24 @@ namespace HlidacStatu.Entities
         {
         }
 
+        [ShowNiceDisplayName]
+        public enum PhotoTypes
+        {
+            [NiceDisplayName("small.jpg")]
+            Small,
+            [NiceDisplayName("original.jpg")]
+            Original,
+            [NiceDisplayName("small.nobackground.jpg")]
+            NoBackground,
+            [NiceDisplayName("small.blackwhite.jpg")]
+            BlackWhite,
+            [NiceDisplayName("small.cartoon.jpg")]
+            Cartoon,
+            [NiceDisplayName("original.uploaded.jpg")]
+            UploadedOriginal,
+            [NiceDisplayName("small.uploaded.jpg")]
+            UploadedSmall,
+        }
 
         public StatusOsobyEnum StatusOsoby() { return (StatusOsobyEnum)Status; }
 
