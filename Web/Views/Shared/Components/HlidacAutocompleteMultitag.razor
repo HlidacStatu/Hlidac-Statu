@@ -1,5 +1,7 @@
 @using System.Threading
+@using HlidacStatu.Entities
 @using Microsoft.AspNetCore.Components.Web
+@* @using YamlDotNet.Core *@
 @typeparam TItem
 
 <div class="hlidac-autocomplete mb-3">
@@ -28,12 +30,13 @@
         <input @ref="InputBoxElement"
                type="text"
                autocomplete="off"
-               placeholder="Začněte psát pro hledání"
+               placeholder="@InputBoxPlaceHolder"
                class="hlidac-autocomplete-input form-control border border-0"
                @bind="@InputBoxValue"
                @bind:event="oninput"
                @onkeyup="@(async (e) => await SearchAsync(e))"
-               @onkeydown="OnInputKeyDown"/>
+               @onkeydown="OnInputKeyDown"
+               @onclick="@ShowDefaultHintItems"/>
 
         <button class="btn btn-primary" @onclick="@(SubmitSearch)" style="margin-bottom:0;margin-top:0;padding-bottom:0">
             Hledat
@@ -45,13 +48,12 @@
             <div class="list-group">
                 @for (var index = 0; index < OptionItems.Count; index++)
                 {
+                    int option = index; // we have to do it like this, because index is from the outer scope
                     var item = OptionItems[index];
                     if (ItemTemplate is not null)
                     {
-                        int option = index; // we have to do it like this, because index is from the outer scope
                         <button class="list-group-item list-group-item-action @(option == _selectedOption ? "active" : "")"
-                                @onclick="@(() => SelectItemAsync(option))"
-                        >
+                                @onclick="@(() => SelectItemAsync(option))">
                             @ItemTemplate(item)
                         </button>
                     }
@@ -83,6 +85,9 @@
     
     [Parameter]
     public List<AutocompleteItem<TItem>>? InputTags { get; set; }
+    
+    [Parameter]
+    public List<TItem>? SearchHintOptions { get; set; } 
 
     private ElementReference InputBoxElement { get; set; }
     private string? InputBoxValue { get; set; }
@@ -97,6 +102,13 @@
 
     private List<TItem>? OptionItems { get; set; }
     private bool IsAnyOptionItem => OptionItems is not null && OptionItems.Count > 0;
+
+    private string InputBoxPlaceHolder
+    {
+        get => TagItems.Count > 0 ? 
+            "Napište další vyhledávaný výraz, nebo stiskněte \"Hledat\"" : 
+            "Začněte psát jméno, kraj, IČO, firmu, politickou stranu, ...";
+    }
 
     private int _selectedOption = -1;
     
@@ -308,6 +320,14 @@
         await SelectItemAsync(-1);
         //notify parent, that we are done
         await OnAutocompleteSubmitted.InvokeAsync(TagItems);
+    }
+
+    private void ShowDefaultHintItems()
+    {
+        if(IsAnyOptionItem)
+            return;
+
+        OptionItems = SearchHintOptions;
     }
 
 }

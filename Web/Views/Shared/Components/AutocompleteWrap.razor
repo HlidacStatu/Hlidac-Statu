@@ -6,7 +6,6 @@
 @using HlidacStatu.Extensions
 @using HlidacStatu.Repositories
 @using HlidacStatu.Util
-@using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.WebUtilities
 
 @inject NavigationManager Navigation
@@ -24,9 +23,15 @@
         position:absolute;
         left:0px;
         z-index:100;
-        width:80%;
+        width:100%;
         margin: 0;
         padding: 0;
+    }
+    
+    .hlidac-autocomplete .hlidac-autocomplete-list .list-group-item {
+        margin: 0;
+        padding-top: 2px;
+        padding-bottom: 2px;
     }
     
     .no-overflow {
@@ -44,22 +49,18 @@
     }
     
     .hs-avatar {
-        float: left;
         width: 50px;
         height: auto;
-        margin-right: 10px;
         color: #ccc;
-        position: relative;
         font-size: 45px;
     }
     
     .hs-avatar img {
         width: 50px;
-        vertical-align: top;
     }
     
     .hs-autocomplete-description {
-        margin-left: 70px;
+        margin-left: 15px;
         
         overflow: hidden;
         text-overflow: ellipsis;
@@ -102,6 +103,7 @@
                                             OnAutocompleteSubmitted="@(OnAutocompleteSubmitted)"
                                             TextSelector="@((autocomplete) => autocomplete.Text)"
                                             InputTags="InputTags"
+                                            SearchHintOptions="SearchHintOptions"
                                             TItem="Autocomplete">
                     <TagTemplate>
                         @if (context.Value is null)
@@ -110,34 +112,56 @@
                         }
                         else
                         {
-                            <span style="overflow:hidden; text-overflow:ellipsis;">@(CategoryToPicture(context.Value.Category))&nbsp;@context.Value.Text</span>
+                            if (context.Value.Category is Autocomplete.CategoryEnum.Hint)
+                            {
+                                <span style="overflow:hidden; text-overflow:ellipsis;">@(CategoryToPicture(context.Value.Category))&nbsp;@context.Value.Id</span>
+                            }
+                            else
+                            {
+                                <span style="overflow:hidden; text-overflow:ellipsis;">@(CategoryToPicture(context.Value.Category))&nbsp;@context.Value.Text</span>
+                            }
                         }
                     </TagTemplate>
                     <ItemTemplate>
-                        <div>
+                        <div class="d-flex align-items-center justify-content-start">
                             <div class="hs-avatar">
                                 @((MarkupString)context.ImageElement)
                             </div>
-                            <div class="hs-autocomplete-description">
-
-                                <h6 class="fw-bold">
-                                    @if (!string.IsNullOrWhiteSpace(context.KIndex))
-                                    {
-                                        if (Enum.TryParse<KIndexData.KIndexLabelValues>(context.KIndex, out var KindexLabel))
+                            <div class="hs-autocomplete-description flex-grow-1">
+                                @if (context.Category == Autocomplete.CategoryEnum.Hint)
+                                {
+                                    <h6 class="align-middle">@context.Text <span class="badge rounded-pill bg-secondary">@context.Id</span></h6>
+                                }
+                                else
+                                {
+                                    <h6 class="fw-bold mb-0">
+                                        @if (!string.IsNullOrWhiteSpace(context.KIndex))
                                         {
-                                            @((MarkupString)KIndexData.KindexImageIcon(KindexLabel, "height: 20px; vertical-align: text-bottom; margin-right: 5px;"))
+                                            if (Enum.TryParse<KIndexData.KIndexLabelValues>(context.KIndex, out var KindexLabel))
+                                            {
+                                                @((MarkupString)KIndexData.KindexImageIcon(KindexLabel, "height: 20px; vertical-align: text-bottom; margin-right: 5px;"))
+                                            }
                                         }
-                                    }
-                                    @context.Text
-                                </h6>
-                                <small>@context.Description</small>
-                                <br/>
-                                <small class="text-muted">
-                                    <i>@context.Type</i>
-                                </small>
+                                        @context.Text
+                                    </h6>
+                                    <small>@context.Description</small>
+                                    <p class="small text-muted mb-0">
+                                        <i>@context.Type</i>
+                                    </p>
+                                }
+                            </div>
+                            <div>
+                                @if (context.Id.StartsWith("osobaid:"))
+                                {
+                                    <a href="/osoba/@context.Id.Replace("osobaid:","")"><i class="fa-solid fa-arrow-up-right-from-square fa-2xl"></i></a>
+                                }
+                                @if (context.Id.StartsWith("ico:"))
+                                {
+                                    <a href="/subjekt/@context.Id.Replace("ico:","")"><i class="fa-solid fa-arrow-up-right-from-square fa-2xl"></i></a>
+                                }
+                                    
                             </div>
                         </div>
-
                     </ItemTemplate>
                 </HlidacAutocompleteMultitag>
             </ChildContent>
@@ -185,6 +209,38 @@
     private List<AutocompleteItem<Autocomplete>>? InputTags { get; set; }
 
     private string _query;
+
+    private List<Autocomplete> SearchHintOptions = new()
+    {
+        new Autocomplete()
+        {
+            Id = "\"Velký deštník\"",
+            Text = "Přesný výraz - použijte uvozovky",
+            ImageElement = "<i class=\"fa-solid fa-magnifying-glass\"></i>",
+            Category = Autocomplete.CategoryEnum.Hint
+        },
+        new Autocomplete()
+        {
+            Id = "Kraj Vysočina",
+            Text = "Všechna slova v různých tvarech",
+            ImageElement = "<i class=\"fa-solid fa-magnifying-glass\"></i>",
+            Category = Autocomplete.CategoryEnum.Hint
+        },
+        new Autocomplete()
+        {
+            Id = "osobaid:ivan-bartos",
+            Text = "Osoba",
+            ImageElement = "<i class=\"fa-solid fa-magnifying-glass\"></i>",
+            Category = Autocomplete.CategoryEnum.Hint
+        },
+        new Autocomplete()
+        {
+            Id = "ico:00007064",
+            Text = "IČO organizace pro vyhledání firmy",
+            ImageElement = "<i class=\"fa-solid fa-magnifying-glass\"></i>",
+            Category = Autocomplete.CategoryEnum.Hint 
+        }
+    };
 
 
     protected override async Task OnParametersSetAsync()
@@ -312,8 +368,17 @@
             var autocomplete = await JsonSerializer.DeserializeAsync<List<Autocomplete>>(datastream,
                 cancellationToken: cancellationToken,
                 options: _jsonSerializerOptions);
+            
+            // add hint
+            autocomplete.Insert(0, new Autocomplete()
+            {
+                Text = "Vyhledat text",
+                Id = query,
+                ImageElement = "<i class=\"fa-solid fa-magnifying-glass\"></i>",
+                Category = Autocomplete.CategoryEnum.Hint
+            });
 
-            return autocomplete ?? Enumerable.Empty<Autocomplete>().ToList();
+            return autocomplete;
         }
         catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
         {
@@ -355,6 +420,7 @@
         Autocomplete.CategoryEnum.Operator => @<i class="fa-solid fa-circle-small fa-xs text-muted"></i>,
         Autocomplete.CategoryEnum.Synonym => @<i class="fa-regular fa-hashtag fa-xs text-muted"></i>,
         Autocomplete.CategoryEnum.Oblast => @<i class="fa-regular fa-tag fa-xs text-muted"></i>,
+        Autocomplete.CategoryEnum.Hint => @<i class="fa-solid fa-magnifying-glass fa-xs text-muted"></i>,                                                                                               
         _ => @<i class="fa-regular fa-alien-8bit"></i>
         };
 
