@@ -127,7 +127,7 @@
                             <div class="hs-avatar">
                                 @((MarkupString)context.ImageElement)
                             </div>
-                            <div class="hs-autocomplete-description flex-grow-1">
+                            <div class="hs-autocomplete-description flex-grow-1 me-2">
                                 @if (context.Category == Autocomplete.CategoryEnum.Hint)
                                 {
                                     <h6 class="align-middle">@context.Text <span class="badge rounded-pill bg-secondary">@context.Id</span></h6>
@@ -153,11 +153,11 @@
                             <div>
                                 @if (context.Id.StartsWith("osobaid:"))
                                 {
-                                    <a href="/osoba/@context.Id.Replace("osobaid:","")"><i class="fa-solid fa-arrow-up-right-from-square fa-2xl"></i></a>
+                                    <a href="/osoba/@context.Id.Replace("osobaid:","")" class="text-muted"><i class="fa-regular fa-arrow-up-right-from-square fa-lg"></i></a>
                                 }
                                 @if (context.Id.StartsWith("ico:"))
                                 {
-                                    <a href="/subjekt/@context.Id.Replace("ico:","")"><i class="fa-solid fa-arrow-up-right-from-square fa-2xl"></i></a>
+                                    <a href="/subjekt/@context.Id.Replace("ico:","")" class="text-muted"><i class="fa-regular fa-arrow-up-right-from-square fa-lg"></i></a>
                                 }
                                     
                             </div>
