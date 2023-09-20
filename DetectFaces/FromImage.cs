@@ -11,6 +11,23 @@ namespace HlidacStatu.DetectFaces
 {
     public class FromImage
     {
+        static string modelFilename = "haarcascade_frontalface_default.xml";
+        static FromImage()
+        {
+            if (!System.IO.File.Exists(modelFilename))
+            {
+                try
+                {
+                    System.IO.File.WriteAllBytes(modelFilename,
+                        new System.Net.Http.HttpClient().GetByteArrayAsync("https://somedata.hlidacstatu.cz/AppData/haarcascade_frontalface_default.xml").Result
+                    );
+                }
+                catch (Exception)
+                {
+
+                }
+            }
+        }
         public static IEnumerable<string> DetectAndParseFacesIntoFiles(byte[] imageData, int minSize, int marginInPercent)
         {
             List<string> files = new List<string>();
@@ -34,7 +51,7 @@ namespace HlidacStatu.DetectFaces
                     throw new ArgumentOutOfRangeException("marginInPercent", "must be between 0 and 100");
                 List<byte[]> facesImg = new List<byte[]>();
                 CascadeClassifier _cascadeClassifier;
-                _cascadeClassifier = new CascadeClassifier("haarcascade_frontalface_default.xml");
+                _cascadeClassifier = new CascadeClassifier(modelFilename);
                 //Image<Bgr, byte> img = Image<Bgr, byte>.FromIplImagePtr(image.Image.GetHbitmap);  
 
                 Image<Bgr, byte> img = image.Image.ToImage<Bgr, byte>();
