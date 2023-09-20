@@ -546,7 +546,7 @@ namespace HlidacStatu.Web.Controllers
                 if (form["phase"] == "start") //upload
                 {
                     byte[] data = null;
-                    var path = Init.OsobaFotky.GetFullPath(o, "original.uploaded.jpg");
+                    var path = o.GetPhotoPath(Osoba.PhotoTypes.UploadedOriginal, true); //, "original.uploaded.jpg");
                     var pathTxt = Init.OsobaFotky.GetFullPath(o, "source.txt");
                     var source = form["source"].ToString();
                     string[] facesFiles = new string[] { };
@@ -575,7 +575,8 @@ namespace HlidacStatu.Web.Controllers
                         facesFiles = DetectFaces.FromImage.DetectAndParseFacesIntoFiles(data, 150, 40).ToArray();
                         if (data != null && facesFiles.Length > 0)
                         {
-                            System.IO.File.WriteAllText(pathTxt, source);
+                            if (!string.IsNullOrWhiteSpace(source))
+                                System.IO.File.WriteAllText(pathTxt, source);
                             System.IO.File.WriteAllBytes(path, data);
                         }
                     }
