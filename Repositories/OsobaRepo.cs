@@ -463,7 +463,7 @@ namespace HlidacStatu.Repositories
 
         public static string GetPhotoUrl(this Osoba osoba, bool local = false, PhotoTypes phototype = PhotoTypes.Small, bool randomizeUrl = false)
         {
-            return GetPhotoUrl(osoba, local, phototype.ToNiceDisplayName() + (randomizeUrl ? $"&rnd={DateTimeOffset.UnixEpoch}" : ""));
+            return GetPhotoUrl(osoba, local, phototype.ToString() + (randomizeUrl ? $"&rnd={DateTimeOffset.UnixEpoch}" : ""));
         }
         private static string GetPhotoUrl(this Osoba osoba, bool local = false, string option = "")
         {

@@ -108,13 +108,12 @@ namespace HlidacStatu.Web.Controllers
     </g>
 </svg>
 ";
-        [ResponseCache(Duration = 60*60*2, Location = ResponseCacheLocation.Client)]
-        public ActionResult Photo(string id, [FromQuery] Osoba.PhotoTypes phototype, bool random)
+        [ResponseCache(Duration = 60*60*2, Location = ResponseCacheLocation.Client, VaryByQueryKeys =new string[] {"*" })]
+        public ActionResult Photo(string id, [FromQuery] Osoba.PhotoTypes phototype, [FromQuery] bool rnd, [FromQuery] string f)
         {
             //string noPhotoPath = $"Content{Path.DirectorySeparatorChar}Img{Path.DirectorySeparatorChar}personNoPhoto.png";
             if (string.IsNullOrEmpty(id))
             {
-                string f = HttpContext.Request.Query["f"];
                 if (string.IsNullOrEmpty(f) || f?.Contains("..") == true)
                     return Content(NoPhotoSvg, "image/svg+xml");
 

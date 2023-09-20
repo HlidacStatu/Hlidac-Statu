@@ -143,6 +143,7 @@ namespace HlidacStatu.Web
                 c.IncludeXmlComments(xmlPath);
             });
 
+            services.AddResponseCaching();
 
             services.AddHttpClient(Constants.DefaultHttpClient)
                 .AddTransientHttpErrorPolicy(policyBuilder =>
@@ -268,6 +269,7 @@ namespace HlidacStatu.Web
             });
 
             app.UseRouting();
+            app.UseResponseCaching();
 
             app.UseAuthentication();
             app.UseApiAuthenticationMiddleware();
