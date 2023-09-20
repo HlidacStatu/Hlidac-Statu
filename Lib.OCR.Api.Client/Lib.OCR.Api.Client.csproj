@@ -26,6 +26,6 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Datastructures\DataStructures.csproj" />
+    <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
   </ItemGroup>
 </Project>
