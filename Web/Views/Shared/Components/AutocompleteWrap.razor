@@ -12,92 +12,97 @@
 
 <style>
     .hlidac-autocomplete {
-        /*border: 2px solid yellow;   */         
-        position:relative;
-        padding:0;
-        margin:0;
+        /*border: 2px solid yellow;   */
+        position: relative;
+        padding: 0;
+        margin: 0;
     }
 
-    .hlidac-autocomplete .hlidac-autocomplete-list {
-        /*border: 1px solid red;*/
-        position:absolute;
-        left:0px;
-        z-index:100;
-        width:100%;
-        margin: 0;
-        padding: 0;
-    }
-    
-    .hlidac-autocomplete .hlidac-autocomplete-list .list-group-item {
-        margin: 0;
-        padding-top: 2px;
-        padding-bottom: 2px;
-    }
-    
+        .hlidac-autocomplete .hlidac-autocomplete-list {
+            /*border: 1px solid red;*/
+            position: absolute;
+            left: 0px;
+            z-index: 100;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+            .hlidac-autocomplete .hlidac-autocomplete-list .list-group-item {
+                margin: 0;
+                padding-top: 2px;
+                padding-bottom: 2px;
+            }
+
     .no-overflow {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
-    
+
     .selected-element {
         max-width: 200px;
     }
-    
+
     .input-group-newline {
         width: 100%;
     }
-    
+
     .hs-avatar {
         width: 50px;
         height: auto;
         color: #ccc;
         font-size: 45px;
     }
-    
-    .hs-avatar img {
-        width: 50px;
-    }
-    
+
+        .hs-avatar.small {
+            font-size: 25px;
+        }
+
+        .hs-avatar img {
+            width: 50px;
+        }
+
     .hs-autocomplete-description {
         margin-left: 15px;
-        
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
-    
-    
+
+        .hs-autocomplete-description.small {
+            margin-top: 10px;
+        }
+
     #components-reconnect-modal,
     #components-reconnect-modal.components-reconnect-show {
         display: block;
     }
-    
-    #components-reconnect-modal .connection-ok,
-    #components-reconnect-modal.components-reconnect-show .connection-ok {
-        display: block;
-    }
-     
-    #components-reconnect-modal.components-reconnect-failed .connection-ok, 
-    #components-reconnect-modal.components-reconnect-rejected .connection-ok {
-        display: none;
-    }
-    
-    #components-reconnect-modal .connection-error,
-    #components-reconnect-modal.components-reconnect-show .connection-error {
-        display: none;
-    }
-     
-    #components-reconnect-modal.components-reconnect-failed .connection-error, 
-    #components-reconnect-modal.components-reconnect-rejected .connection-error {
-        display: block;
-    }
-    
+
+        #components-reconnect-modal .connection-ok,
+        #components-reconnect-modal.components-reconnect-show .connection-ok {
+            display: block;
+        }
+
+        #components-reconnect-modal.components-reconnect-failed .connection-ok,
+        #components-reconnect-modal.components-reconnect-rejected .connection-ok {
+            display: none;
+        }
+
+        #components-reconnect-modal .connection-error,
+        #components-reconnect-modal.components-reconnect-show .connection-error {
+            display: none;
+        }
+
+        #components-reconnect-modal.components-reconnect-failed .connection-error,
+        #components-reconnect-modal.components-reconnect-rejected .connection-error {
+            display: block;
+        }
 </style>
 
 <div id="components-reconnect-modal">
     <div class="connection-ok">
-        <ErrorBoundary >
+        <ErrorBoundary>
             <ChildContent>
                 <HlidacAutocompleteMultitag SearchFuncAsync="@((s, token) => OnSearch(s, token))"
                                             OnAutocompleteSubmitted="@(OnAutocompleteSubmitted)"
@@ -124,10 +129,10 @@
                     </TagTemplate>
                     <ItemTemplate>
                         <div class="d-flex align-items-center justify-content-start">
-                            <div class="hs-avatar">
+                            <div class="hs-avatar @((context.Category == Autocomplete.CategoryEnum.Hint)? "small" : "")">
                                 @((MarkupString)context.ImageElement)
                             </div>
-                            <div class="hs-autocomplete-description flex-grow-1 me-2">
+                            <div class="hs-autocomplete-description  @((context.Category == Autocomplete.CategoryEnum.Hint)? "small" : "") flex-grow-1 me-2">
                                 @if (context.Category == Autocomplete.CategoryEnum.Hint)
                                 {
                                     <h6 class="align-middle">@context.Text <span class="badge rounded-pill bg-secondary">@context.Id</span></h6>
@@ -159,7 +164,7 @@
                                 {
                                     <a href="/subjekt/@context.Id.Replace("ico:","")" class="text-muted"><i class="fa-regular fa-arrow-up-right-from-square fa-lg"></i></a>
                                 }
-                                    
+
                             </div>
                         </div>
                     </ItemTemplate>
@@ -172,7 +177,7 @@
                                autocomplete="off"
                                placeholder="Došlo k neočekávané chybě. Načtěte prosím stránku znovu"
                                class="hlidac-autocomplete-input form-control"
-                               disabled="disabled"/>
+                               disabled="disabled" />
 
                         <a class="btn btn-primary" href="javascript:window.location.reload()" style="margin-bottom:0;margin-top:0;padding-bottom:0">
                             Načíst znovu
@@ -214,48 +219,55 @@
     {
         new Autocomplete()
         {
-            Id = "\"Velký deštník\"",
-            Text = "Přesný výraz - použijte uvozovky",
+            Id = "",
+            Text = "Začněte psát a my vám nabídneme nejvhodnější slova k doplnění",
             ImageElement = "<i class=\"fa-solid fa-magnifying-glass\"></i>",
             Category = Autocomplete.CategoryEnum.Hint
         },
         new Autocomplete()
         {
-            Id = "Kraj Vysočina",
-            Text = "Všechna slova v různých tvarech",
+            Id = "petr fiala",
+            Text = "Hledat můžete úřady, politiky, osoby, firmy podle jména i IČ i libovolná slova",
             ImageElement = "<i class=\"fa-solid fa-magnifying-glass\"></i>",
             Category = Autocomplete.CategoryEnum.Hint
         },
         new Autocomplete()
         {
-            Id = "osobaid:ivan-bartos",
-            Text = "Osoba",
+            Id = "min fin",
+            Text = "Stačí napsat počáteční písmena slov a my si zbytek domyslíme.",
             ImageElement = "<i class=\"fa-solid fa-magnifying-glass\"></i>",
             Category = Autocomplete.CategoryEnum.Hint
         },
         new Autocomplete()
         {
-            Id = "ico:00007064",
-            Text = "IČO organizace pro vyhledání firmy",
+            Id = "reklamní kampaň",
+            Text = "Najdeme slova ve všech tvarech, časech a pádech",
             ImageElement = "<i class=\"fa-solid fa-magnifying-glass\"></i>",
-            Category = Autocomplete.CategoryEnum.Hint 
+            Category = Autocomplete.CategoryEnum.Hint
+        },
+        new Autocomplete()
+        {
+            Id = "\"Zelená úsporám\"",
+            Text = "Víte přesný výraz? dejte ho do uvozovek a my hledáme přesnou shodu",
+            ImageElement = "<i class=\"fa-solid fa-magnifying-glass\"></i>",
+            Category = Autocomplete.CategoryEnum.Hint
         }
-    };
+            };
 
 
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        
+
         Uri? uri = null;
-        
+
         try
         {
             uri = Navigation.ToAbsoluteUri(Navigation.Uri);
             if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var q))
             {
                 _query = q;
-            
+
                 if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("qtl", out var qtl))
                 {
                     var parsedQueries = ParseTools.ParseQueryStringWithOffsets(q, qtl);
@@ -266,7 +278,7 @@
                     var parsedQueries = ParseTools.ParseQueryStringWithoutOffsets(q);
                     InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
                 }
-            
+
             }
         }
         catch (Exception e)
@@ -292,11 +304,11 @@
                 if (osoba is not null)
                 {
                     return new AutocompleteItem<Autocomplete>(new Autocomplete()
-                    {
-                        Id = parsedQuery,
-                        Text = osoba.FullName(),
-                        Category = Autocomplete.CategoryEnum.Person
-                    });
+                            {
+                                Id = parsedQuery,
+                                Text = osoba.FullName(),
+                                Category = Autocomplete.CategoryEnum.Person
+                            });
                 }
             }
             else if (parsedQuery.StartsWith("ico:", StringComparison.InvariantCultureIgnoreCase))
@@ -315,22 +327,22 @@
                     }
 
                     return new AutocompleteItem<Autocomplete>(new Autocomplete()
-                    {
-                        Id = parsedQuery,
-                        Text = firma.Jmeno,
-                        Category = kategorie
-                    });
+                            {
+                                Id = parsedQuery,
+                                Text = firma.Jmeno,
+                                Category = kategorie
+                            });
                 }
 
             }
             else if (parsedQuery.StartsWith("oblast:", StringComparison.InvariantCultureIgnoreCase))
             {
                 return new AutocompleteItem<Autocomplete>(new Autocomplete()
-                {
-                    Id = parsedQuery,
-                    Text = parsedQuery,
-                    Category = Autocomplete.CategoryEnum.Oblast
-                });
+                        {
+                            Id = parsedQuery,
+                            Text = parsedQuery,
+                            Category = Autocomplete.CategoryEnum.Oblast
+                        });
             }
         }
         catch (Exception e)
@@ -338,7 +350,7 @@
             var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
             Util.Consts.Logger.Error($"During autocomplete usage an error occured. CreateAutocompleteItemFromQuery in Wrapper. Parsed query [{parsedQuery}], uri=[{uri}]", e);
         }
-        
+
         return new AutocompleteItem<Autocomplete>(parsedQuery);
     }
 
@@ -346,9 +358,9 @@
     private async Task<List<Autocomplete>> OnSearch(string query, CancellationToken cancellationToken)
     {
         JsonSerializerOptions? _jsonSerializerOptions = new()
-        {
-            PropertyNameCaseInsensitive = true
-        };
+                {
+                    PropertyNameCaseInsensitive = true
+                };
 
         query = HttpUtility.UrlEncode(query);
 
@@ -366,23 +378,23 @@
             var datastream = await response.Content.ReadAsStreamAsync(cancellationToken);
 
             var autocomplete = await JsonSerializer.DeserializeAsync<List<Autocomplete>>(datastream,
-                cancellationToken: cancellationToken,
-                options: _jsonSerializerOptions);
-            
+        cancellationToken: cancellationToken,
+        options: _jsonSerializerOptions);
+
             // add hint
             autocomplete.Insert(0, new Autocomplete()
-            {
-                Text = "Vyhledat text",
-                Id = query,
-                ImageElement = "<i class=\"fa-solid fa-magnifying-glass\"></i>",
-                Category = Autocomplete.CategoryEnum.Hint
-            });
+                    {
+                        Text = "Vyhledat text",
+                        Id = query,
+                        ImageElement = "<i class=\"fa-solid fa-magnifying-glass\"></i>",
+                        Category = Autocomplete.CategoryEnum.Hint
+                    });
 
             return autocomplete;
         }
         catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
         {
-            // canceled by user (writing more letters), do not need catch here 
+            // canceled by user (writing more letters), do not need catch here
         }
         catch (Exception e)
         {
@@ -397,8 +409,8 @@
         try
         {
             (string qs, string qtl) = ParseTools.CreateQueryWithOffsets(
-                autocomplete.Select(i => i.Value?.Id ?? i.Text ?? "").ToList());
-            
+        autocomplete.Select(i => i.Value?.Id ?? i.Text ?? "").ToList());
+
             string url = $"{Navigation.BaseUri}{SearchPath}?q={HttpUtility.UrlEncode(qs)}&qtl={qtl}";
             Navigation.NavigateTo(url, true);
         }
@@ -420,9 +432,9 @@
         Autocomplete.CategoryEnum.Operator => @<i class="fa-solid fa-circle-small fa-xs text-muted"></i>,
         Autocomplete.CategoryEnum.Synonym => @<i class="fa-regular fa-hashtag fa-xs text-muted"></i>,
         Autocomplete.CategoryEnum.Oblast => @<i class="fa-regular fa-tag fa-xs text-muted"></i>,
-        Autocomplete.CategoryEnum.Hint => @<i class="fa-solid fa-magnifying-glass fa-xs text-muted"></i>,                                                                                               
+        Autocomplete.CategoryEnum.Hint => @<i class="fa-solid fa-magnifying-glass fa-xs text-muted"></i>,
         _ => @<i class="fa-regular fa-alien-8bit"></i>
-        };
+    };
 
 
 }
