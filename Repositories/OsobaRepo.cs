@@ -387,7 +387,7 @@ namespace HlidacStatu.Repositories
             //obrazek
             if (original.HasPhoto() == false && duplicated.HasPhoto())
             {
-                foreach (var fn in Enums.GetValues<PhotoTypes>().Select(en=>en.ToNiceDisplayName()))
+                foreach (var fn in Enums.GetValues<PhotoTypes>().Select(en => en.ToNiceDisplayName()))
                 {
                     var from = Init.OsobaFotky.GetFullPath(duplicated, fn);
                     var to = Init.OsobaFotky.GetFullPath(original, fn);
@@ -416,12 +416,19 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static void DeleteAllPhotoVariants(this Osoba osoba, bool includedOriginalUpload = false)
+        public static void DeleteAllPhotoVariants(this Osoba osoba, bool includingOriginalUpload = false)
         {
 
             foreach (var ft in Enums.GetValues<PhotoTypes>())
             {
-                Devmasters.IO.IOTools.DeleteFile(osoba.GetPhotoPath(ft, true));
+                if (ft == PhotoTypes.UploadedOriginal)
+                {
+                    if (includingOriginalUpload)
+                        Devmasters.IO.IOTools.DeleteFile(osoba.GetPhotoPath(ft, true));
+                }
+                else
+                    Devmasters.IO.IOTools.DeleteFile(osoba.GetPhotoPath(ft, true));
+
             }
         }
 
@@ -434,7 +441,7 @@ namespace HlidacStatu.Repositories
                 return string.Empty;
         }
         public static string GetPhotoPath(this Osoba osoba, PhotoTypes phototype = PhotoTypes.Small, bool ignoreMissingFile = false)
-        { 
+        {
             return GetPhotoPath(osoba, phototype.ToNiceDisplayName(), ignoreMissingFile);
         }
         private static string GetPhotoPath(this Osoba osoba, string anotherName = null, bool force = false)
