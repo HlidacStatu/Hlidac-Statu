@@ -442,14 +442,15 @@ namespace HlidacStatu.Repositories
         }
         public static string GetPhotoPath(this Osoba osoba, PhotoTypes phototype = PhotoTypes.Small, bool ignoreMissingFile = false)
         {
-            return GetPhotoPath(osoba, phototype.ToNiceDisplayName(), ignoreMissingFile);
+            return _getPhotoPath(osoba, phototype.ToNiceDisplayName(), ignoreMissingFile);
         }
-        private static string GetPhotoPath(this Osoba osoba, string anotherName = null, bool force = false)
+        private static string _getPhotoPath(this Osoba osoba, string anotherName = null, bool ignoreMissingFile = false)
         {
-            if (osoba.HasPhoto())
+            var defaultFn = Init.OsobaFotky.GetFullPath(osoba, PhotoTypes.Small.ToNiceDisplayName());
+            if (System.IO.File.Exists(defaultFn) || ignoreMissingFile)
             {
                 if (!string.IsNullOrEmpty(anotherName)
-                    && (System.IO.File.Exists(Init.OsobaFotky.GetFullPath(osoba, anotherName)) || force)
+                    && (System.IO.File.Exists(Init.OsobaFotky.GetFullPath(osoba, anotherName)) || ignoreMissingFile)
 
                     )
                 {
@@ -464,9 +465,9 @@ namespace HlidacStatu.Repositories
 
         public static string GetPhotoUrl(this Osoba osoba, bool local = false, PhotoTypes phototype = PhotoTypes.Small, bool randomizeUrl = false)
         {
-            return GetPhotoUrl(osoba, local, phototype.ToString() + (randomizeUrl ? $"&rnd={Random.Shared.Next()}" : ""));
+            return _getPhotoUrl(osoba, local, phototype.ToString() + (randomizeUrl ? $"&rnd={Random.Shared.Next()}" : ""));
         }
-        private static string GetPhotoUrl(this Osoba osoba, bool local = false, string option = "")
+        private static string _getPhotoUrl(this Osoba osoba, bool local = false, string option = "")
         {
             if (local)
             {
@@ -480,7 +481,7 @@ namespace HlidacStatu.Repositories
 
         public static bool HasPhoto(this Osoba osoba)
         {
-            var path = Init.OsobaFotky.GetFullPath(osoba, PhotoTypes.Small.ToNiceDisplayName()); // "small.jpg"
+            var path = osoba.GetPhotoPath(PhotoTypes.Small, true); //Init.OsobaFotky.GetFullPath(osoba, PhotoTypes.Small.ToNiceDisplayName()); // "small.jpg"
             return File.Exists(path);
         }
 
