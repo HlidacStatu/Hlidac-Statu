@@ -416,29 +416,23 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static string GetPhotoCreatorSource(this Osoba osoba)
+        public static void DeleteAllPhotoVariants(this Osoba osoba, bool includedOriginalUpload = false)
         {
-            var fn = Init.OsobaFotky.GetFullPath(osoba, "source.txt");
-            if (File.Exists(fn))
-            {
-                try
-                {
-                    var source = File.ReadAllText(fn)?.Trim() ?? "";
-                    if (!string.IsNullOrEmpty(source) && Uri.TryCreate(source, UriKind.Absolute, out var url))
-                    {
-                        return source;
-                    }
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-            }
 
-            return null;
+            foreach (var ft in Enums.GetValues<PhotoTypes>())
+            {
+                Devmasters.IO.IOTools.DeleteFile(osoba.GetPhotoPath(ft, true));
+            }
         }
 
-   
+        public static string GetSourceOfPhoto(this Osoba osoba)
+        {
+            var fn = osoba.GetPhotoPath(PhotoTypes.SourceOfPhoto, true);
+            if (System.IO.File.Exists(fn))
+                return System.IO.File.ReadAllText(fn);
+            else
+                return string.Empty;
+        }
         public static string GetPhotoPath(this Osoba osoba, PhotoTypes phototype = PhotoTypes.Small, bool ignoreMissingFile = false)
         { 
             return GetPhotoPath(osoba, phototype.ToNiceDisplayName(), ignoreMissingFile);

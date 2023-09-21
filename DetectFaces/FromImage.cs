@@ -37,6 +37,7 @@ namespace HlidacStatu.DetectFaces
             {
                 var fn = fnroot + "." + count + ".faces.jpg";
                 System.IO.File.WriteAllBytes(fn, img);
+                System.Threading.Thread.Sleep(50);
                 files.Add(fn);
                 count++;
             }

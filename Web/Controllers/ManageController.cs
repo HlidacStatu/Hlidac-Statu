@@ -547,7 +547,7 @@ namespace HlidacStatu.Web.Controllers
                 {
                     byte[] data = null;
                     var path = o.GetPhotoPath(Osoba.PhotoTypes.UploadedOriginal, true); //, "original.uploaded.jpg");
-                    var pathTxt = Init.OsobaFotky.GetFullPath(o, "source.txt");
+                    var pathTxt = o.GetPhotoPath(Osoba.PhotoTypes.SourceOfPhoto, true);// Init.OsobaFotky.GetFullPath(o, "source.txt");
                     var source = form["source"].ToString();
                     string[] facesFiles = new string[] { };
                     if (!string.IsNullOrEmpty(form["url"]))

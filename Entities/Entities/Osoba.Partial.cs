@@ -49,6 +49,8 @@ namespace HlidacStatu.Entities
             UploadedOriginal,
             [NiceDisplayName("small.uploaded.jpg")]
             UploadedSmall,
+            [NiceDisplayName("source.txt")]
+            SourceOfPhoto,
         }
 
         public StatusOsobyEnum StatusOsoby() { return (StatusOsobyEnum)Status; }
