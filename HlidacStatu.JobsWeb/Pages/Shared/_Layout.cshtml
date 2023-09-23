@@ -299,7 +299,7 @@
                             </div>
                             @if (this.User.IsInRole("Admin"))
                             {
-                                <div class="btn-group me-2 no-print" role="group" style="background-color:white;box-shadow:rgb(0 0 0 / 35%) 0px 5px 15px;">
+                                <div class="btn-group me-2 no-print adminBlock" role="group" style="background-color:white;box-shadow:rgb(0 0 0 / 35%) 0px 5px 15px;">
                                     <a class="btn btn-outline-secondary" asp-page="/JedenJob" asp-route-obor="@obor" asp-route-rok="@rok">▸ Experiment</a>
                                     <a class="btn btn-outline-secondary" asp-page="/Stats" asp-route-obor="@obor" asp-route-rok="@rok">▸ Zebricek</a>
                                 </div>

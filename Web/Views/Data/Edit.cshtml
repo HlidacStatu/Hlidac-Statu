@@ -74,7 +74,7 @@
             </div>
             @if (Context.User.IsInRole("Admin"))
             {
-                <div class="form-group">
+                <div class="form-group adminBlock">
                     @Html.LabelFor(m => m.createdBy, "Vytvořil", new { @class = "col-sm-2 control-label" })
                     <div class="col-sm-10">
                         @Html.TextBoxFor(m => m.createdBy, new { @class = "" })

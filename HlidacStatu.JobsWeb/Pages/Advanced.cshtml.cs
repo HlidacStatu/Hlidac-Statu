@@ -8,14 +8,15 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HlidacStatu.Ceny.Pages
 {
-    [Authorize(Roles = "Admin")]
+    /*[Authorize(Roles = "Admin")]*/
     public class AdvancedModel : PageModel
     {
         public YearlyStatisticsGroup.Key? Key { get; set; }
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var obor_rok =JobService.TryFindKey(HttpContext);
+
+            var obor_rok = JobService.TryFindKey(HttpContext);
 
             var ad = await HttpContext.HasAccess();
             if (ad.Access == false)

@@ -33,11 +33,11 @@ else
                 <a href="@Model.GetUrl(true)">
                     @if (ceo.Osoba != null && ceo.Osoba.IsValid())
                     {
-                    <div class="profile-picture" style="background-image: url('@ceo.Osoba.GetPhotoUrl(local: true, Osoba.PhotoTypes.NoBackground)')"></div>
+                    <div class="profile-picture border" style="background-image: url('@ceo.Osoba.GetPhotoUrl(local: true, Osoba.PhotoTypes.NoBackground)')"></div>
                     }
                     else
                     {
-                    <div class="profile-picture" style="background-image: url('/photo/unknown')"></div>
+                    <div class="profile-picture border" style="background-image: url('/photo/unknown')"></div>
                     }
                 </a>
                 <div>

@@ -11,7 +11,7 @@
     string schovatTxt = "schovat detail";
 
     ViewBag.SelectedYear = Model.rok.HasValue ?
-                                Math.Min(Model.rok.Value, HtmlExtensions.MaxKIndexYearToShow(User)) 
+                                Math.Min(Model.rok.Value, HtmlExtensions.MaxKIndexYearToShow(User))
                                 : HtmlExtensions.MaxKIndexYearToShow(User);
 
     bool futureData = KIndex.PlannedKIndexHash(Model.id, Model.rok ?? 0) == Model.priv;
@@ -46,8 +46,8 @@
 
 
 @section scripts
-{
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
+    {
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
     <script src="~/bundles/highcharts"></script>
     <script src="/scripts/highcharts-6/highcharts-more.js"></script>
@@ -71,53 +71,53 @@
             })
         });
 
-$(document).ready(function(){
+        $(document).ready(function () {
 
-    $("#sel_obory").change(function(){
-        $(this).find("option:selected").each(function(){
-            var optionValue = $(this).attr("value");
-            if(optionValue){
-                $(".boxobor").not("." + optionValue).hide();
-                $(".boxobor." + optionValue).show();
-                InitLowBox();
-            } else{
-                $(".boxobor").hide();
+            $("#sel_obory").change(function () {
+                $(this).find("option:selected").each(function () {
+                    var optionValue = $(this).attr("value");
+                    if (optionValue) {
+                        $(".boxobor").not("." + optionValue).hide();
+                        $(".boxobor." + optionValue).show();
+                        InitLowBox();
+                    } else {
+                        $(".boxobor").hide();
+                    }
+                });
+            }).change();
+
+            var shown = readCookie("kindexDisclaimerNoteShown");
+            if (shown != "yes") {
+                createCookie("kindexDisclaimerNoteShown", "yes", 2);
+                $('#kindexDisclaimerPopupfbForm').modal('show');
             }
-        });
-    }).change();
-    
-    var shown = readCookie("kindexDisclaimerNoteShown");
-    if (shown != "yes") {
-        createCookie("kindexDisclaimerNoteShown", "yes", 2);
-        $('#kindexDisclaimerPopupfbForm').modal('show');
-    }
 
-    var urihash = window.location.hash;
-    if (urihash) {
+            var urihash = window.location.hash;
+            if (urihash) {
                 $('html,body').animate({ scrollTop: $(urihash).offset().top }, 500);
                 $(urihash).click();
-    }
+            }
 
 
-});
-    function showHelp(btn, id) {
-        var visible = $(btn).text().includes('@Html.Raw(ukazatTxt)');
-        if (visible) {
-            $(id).show(300, function(){ InitLowBox(); });
-            $(btn).text('@Html.Raw(schovatTxt)');
+        });
+        function showHelp(btn, id) {
+            var visible = $(btn).text().includes('@Html.Raw(ukazatTxt)');
+            if (visible) {
+                $(id).show(300, function () { InitLowBox(); });
+                $(btn).text('@Html.Raw(schovatTxt)');
+            }
+            else {
+                $(id).hide(300);
+                $(btn).text('@Html.Raw(ukazatTxt)');
+            }
         }
-        else {
-            $(id).hide(300);
-            $(btn).text('@Html.Raw(ukazatTxt)');
-        }
-    }
     </script>
 
 
 }
 
 @section breadcrumb
-{
+    {
     <ol class="breadcrumb">
         <li><a href="/">Hlídač Státu</a></li>
         <li><a href="/kindex">K–Index</a></li>
@@ -126,7 +126,7 @@ $(document).ready(function(){
     </ol>
 }
 @section onlyembed
-{
+    {
     @*@Html.Action("CachedAction_Child_12H", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed", key = Model.NameId, param1 = aktualnost.ToString() })*@
     @*@Html.Action("Osoba_child", new { model = Model, aktualnost = aktualnost, NameOfView = "OsobaProfil_embed" })*@
 
@@ -143,47 +143,46 @@ $(document).ready(function(){
 
     KIndexData kidxPublic = await kIndexPublicTask;
     KIndexData kidxFuture = await kIndexFutureTask;
-
-    <h3>Info pro adminy</h3>
-    <table class="table table-bordered table-condensed table-striped">
-        <thead>
-            <tr><th>Rok</th><th>Ready 2020?</th><th>Zverejneny KIndex</th><th>Ready 2021?</th><th>Planovany ke zverejneni</th><th>KIndex 2021 v1</th></tr>
-        </thead>
-        <tbody>
-            @foreach (var rok in KIndexRepo.GetAvailableCalculationYears())
-            {
-                var kidxP = kidxPublic?.ForYear(rok);
-                var kidxF = kidxFuture?.ForYear(rok);
-                //var prevP = kidxPublic.GetPreviousVersions()?.Select(m => m?.KIndex?.ForYear(rok)?.KIndex)?.Where(m=>m!=null);
-                var prevF = (await kidxFuture?.GetPreviousVersionsAsync(true))?
+    <div class="adminBlock">
+        <h3>Info pro adminy</h3>
+        <table class="table table-bordered table-condensed table-striped">
+            <thead>
+                <tr><th>Rok</th><th>Ready 2020?</th><th>Zverejneny KIndex</th><th>Ready 2021?</th><th>Planovany ke zverejneni</th><th>KIndex 2021 v1</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var rok in KIndexRepo.GetAvailableCalculationYears())
+                {
+                    var kidxP = kidxPublic?.ForYear(rok);
+                    var kidxF = kidxFuture?.ForYear(rok);
+                    //var prevP = kidxPublic.GetPreviousVersions()?.Select(m => m?.KIndex?.ForYear(rok)?.KIndex)?.Where(m=>m!=null);
+                    var prevF = (await kidxFuture?.GetPreviousVersionsAsync(true))?
                     .OrderByDescending(o => o.Created)?
                     .Select(m => m?.KIndex?.ForYear(rok)?.KIndex)?
                     .Where(m => m != null)?
                     .Select(m => m.Value.ToString("N2"))
                     .ToList();
-                <tr>
-                    <td>@rok</td>
-                    <td>@(kidxP?.KIndexReady)</td>
-                    <td>@($"{kidxP?.KIndex:N2}")</td>
-                    <td>@(kidxF?.KIndexReady)</td>
-                    <td>@($"{kidxF?.KIndex:N2}")</td>
-                    <td>@(prevF?.Count()>0 ? prevF.Aggregate((ff,s)=>ff+" <- "+s) :  "" )</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
+                    <tr>
+                        <td>@rok</td>
+                        <td>@(kidxP?.KIndexReady)</td>
+                        <td>@($"{kidxP?.KIndex:N2}")</td>
+                        <td>@(kidxF?.KIndexReady)</td>
+                        <td>@($"{kidxF?.KIndex:N2}")</td>
+                        <td>@(prevF?.Count() > 0 ? prevF.Aggregate((ff, s) => ff + " <- " + s) : "")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @if (Consts.KIndexExceptions.Contains(Model.id)
-     && futureData == false)
+    && futureData == false)
 {
     <div class="p-5 mb-4 bg-jumbo rounded-3">
         <div class="container">
             <div class="row">
                 <h2 style="padding-top:0;margin-top:0;margin-bottom:30px"><a href="/subjekt/@f.ICO"><b>@f.Jmeno</b></a> za rok <b>@ViewBag.SelectedYear</b></h2>
                 <div class="col-sm-1">
-
                 </div>
                 <div class="col-sm-9">
                     <h4>
@@ -199,14 +198,14 @@ $(document).ready(function(){
 }
 else
 {
-    
+
     <cache expires-after="@Constants.CachedActionLength.Cache24H"
            vary-by="@($"{Model.id}_{Model.rok}_{Model.priv}")">
         @{
             ViewBag.ICO = Model.id;
             ViewBag.FutureData = futureData;
             ViewBag.SelectedYear = ViewBag.SelectedYear;
-                        <partial name="Partials/Detail_child" model="@kidx"/>
+            <partial name="Partials/Detail_child" model="@kidx" />
         }
 
     </cache>
@@ -215,33 +214,33 @@ else
 <h3>Nástroje pro hodnocené organizace</h3>
 @if (futureData)
 {
-    <partial name="WebUtil/FeedbackUniversal" 
-             model="@(new FeedbackUniversalViewModel("Vyjádření subjektu k hodnocení K-Index", 
+    <partial name="WebUtil/FeedbackUniversal"
+             model="@(new FeedbackUniversalViewModel("Vyjádření subjektu k hodnocení K-Index",
                         "Jste zástupcem tohoto subjektu a chcete se vyjádřit k výsledné známce nebo jednotlivým parametrům K-Indexu a chcete výsledky K-Indexu veřejně okomentovat? Napište nám zpětnou vazbu a my ji v plném znění zveřejníme.<br/>"
                         + "Zpětnou vazbu nám můžete poslat <b>tímto formulářem</b>, nebo z e-mailu úřadu na <b>podpora@hlidacstatu.cz</b> anebo datovkou na <a href=\"https://www.mojedatovaschranka.cz/sds/detail?dbid=a9jia5t\">a9jia5t</a>.",
                         "Vyjádření určené ke zveřejnění",
                         "Vyjádření k hodnocení K-Index",
                         "/kindex/recalculateFeedback",
                         mustAuth: false,
-                        addData: Model.id))"/>
+                        addData: Model.id))" />
 
 }
 else
 {
     <alert-modal open-modal-btn-text="Vyjádření k hodnocení K-Index"
-         header-text="Vyjádření subjektu k hodnocení K-Index"
-         alert-text="@("Jste zástupcem tohoto subjektu a chcete se vyjádřit k výsledné známce nebo jednotlivým parametrům K-Indexu? Napište nám zpětnou vazbu do naší datové schránky <a href=\"https://www.mojedatovaschranka.cz/sds/detail?dbid=a9jia5t\">a9jia5t</a>. Vaši zprávu uveřejníme vedle našeho hodnocení.")"
-         close-modal-btn-text="Rozumím"></alert-modal>
+                 header-text="Vyjádření subjektu k hodnocení K-Index"
+                 alert-text="@("Jste zástupcem tohoto subjektu a chcete se vyjádřit k výsledné známce nebo jednotlivým parametrům K-Indexu? Napište nám zpětnou vazbu do naší datové schránky <a href=\"https://www.mojedatovaschranka.cz/sds/detail?dbid=a9jia5t\">a9jia5t</a>. Vaši zprávu uveřejníme vedle našeho hodnocení.")"
+                 close-modal-btn-text="Rozumím"></alert-modal>
 }
-<partial name="WebUtil/FeedbackUniversal" 
-         model="@(new FeedbackUniversalViewModel("Přepočítat K-Index", 
+<partial name="WebUtil/FeedbackUniversal"
+         model="@(new FeedbackUniversalViewModel("Přepočítat K-Index",
                     "Pokud jste upravili své smlouvy v registru smluv, můžete si nechat přepočítat svůj K-Index. Přepočítání může trvat v závislosti na vytížení našich serverů několik dní. Pro přepočítání musíte být zaregistrováni.",
-                    "Důvod pro přepočítání", 
+                    "Důvod pro přepočítání",
                     "Přepočítat K-Index",
                     "/kindex/recalculateFeedback",
                     mustAuth: true,
-                    addData: Model.id))"/>
-                    
+                    addData: Model.id))" />
+
 <div class="modal fade" id="kindexDisclaimerPopupfbForm" tabindex="-1" role="dialog"
      aria-labelledby="kindexDisclaimerPopupfbTitle" aria-hidden="true">
     <div class="modal-dialog">
@@ -253,7 +252,7 @@ else
                 </h4>
                 <button type="button" class="btn-close"
                         data-bs-dismiss="modal">
-                    
+
                     <span class="sr-only">Zavřít</span>
                 </button>
             </div>
@@ -268,7 +267,7 @@ else
                             <li>Zjištěná rizika znamenají pouze vyšší možnost výskytu námi posuzovaných a identifikovaných situací u analyzovaných smluv.</li>
                             <li>Kontrola jako celek má sloužit jako vstup pro lepší nastavení vnitřních kontrolních postupů či snadnější nalezení vzniklých chyb.</li>
                         </ol>
-                        
+
                     </p>
 
                 </form>

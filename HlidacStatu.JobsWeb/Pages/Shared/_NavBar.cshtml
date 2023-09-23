@@ -30,8 +30,9 @@
 
                     @if (this.User.IsInRole("Admin"))
                     {
-                        <a style="color:#0074e4;" class="nav-link" asp-page="/JedenJob" asp-route-obor="@obor" asp-route-rok="@rok">▸ Experiment</a>
-                        <a style="color:#0074e4;" class="nav-link" asp-page="/Stats" asp-route-obor="@obor" asp-route-rok="@rok">▸ Zebricek</a>
+
+                        <a style="color:#0074e4;" class="nav-link adminBlock" asp-page="/JedenJob" asp-route-obor="@obor" asp-route-rok="@rok">▸ Experiment</a>
+                        <a style="color:#0074e4;" class="nav-link adminBlock" asp-page="/Stats" asp-route-obor="@obor" asp-route-rok="@rok">▸ Zebricek</a>
                     }
                 }
             </div>
