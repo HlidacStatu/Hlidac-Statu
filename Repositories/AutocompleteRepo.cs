@@ -271,7 +271,7 @@ namespace HlidacStatu.Repositories
                     {
                         var o = fi.Ceo().Osoba;
                         if (o != null)
-                            img = $"<img src='{o.GetPhotoUrl(false)}' />";
+                            img = $"<img src='{o.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />";
                     }
 
                     var res = new Autocomplete()
@@ -333,7 +333,7 @@ namespace HlidacStatu.Repositories
                     {
                         var o = fi.Ceo().Osoba;
                         if (o != null)
-                            img = $"<img src='{o.GetPhotoUrl(false)}' />";
+                            img = $"<img src='{o.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />";
                     }
 
                     var synonyms = new Autocomplete[2];
@@ -398,7 +398,7 @@ namespace HlidacStatu.Repositories
                             Text = $"{o.Jmeno} {o.Prijmeni}{AppendTitle(o.TitulPred, o.TitulPo)}",
                             PriorityMultiplier = priority,
                             Type = o.StatusOsoby().ToNiceDisplayName(),
-                            ImageElement = $"<img src='{o.GetPhotoUrl(false)}' />",
+                            ImageElement = $"<img src='{o.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />",
                             Description = InfoFact.RenderInfoFacts((await 
                                 o.InfoFactsAsync(excludedInfoFactImportanceLevels)).ToArray(),
                                 2, true, false, "", "{0}", false),

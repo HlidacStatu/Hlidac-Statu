@@ -64,7 +64,7 @@
                     Description = HlidacStatu.Util.InfoFact.RenderInfoFacts(Model.osoba.InfoFactsCached(), 4, true, true, ", "),
                     FamilyName = Model.osoba.Prijmeni,
                     GivenName = Model.osoba.Jmeno,
-                    Image = Model.osoba.HasPhoto() ? new Uri(Model.osoba.GetPhotoUrl(false)) : null,
+                            Image = Model.osoba.HasPhoto() ? new Uri(Model.osoba.GetPhotoUrl(false, HlidacStatu.Entities.Osoba.PhotoTypes.NoBackground)) : null,
                     Brand = new Schema.NET.Brand(){
                         Name= Model.osoba.CurrentPoliticalParty(),                       
                     },

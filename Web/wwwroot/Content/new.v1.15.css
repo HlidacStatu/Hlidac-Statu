@@ -3150,3 +3150,8 @@ nav[data-toggle='toc'] .nav .nav {
   display: block;
 }
 */
+
+.adminBlock {
+    border: 7px solid #ffc0cb;
+    background: rgba(255,192,203,0.5);
+}
