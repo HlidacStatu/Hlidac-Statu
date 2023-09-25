@@ -6,6 +6,8 @@ namespace HlidacStatu.Entities
     {
         public string Id { get; set; }
         public string Text { get; set; }
+        
+        public string DisplayText { get; set; }
         public string AdditionalHiddenSearchText { get; set; } 
         public string ImageElement { get; set; }
         public string Type { get; set; }
@@ -35,6 +37,11 @@ namespace HlidacStatu.Entities
         public override int GetHashCode()
         {
             return (Id != null ? StringComparer.InvariantCultureIgnoreCase.GetHashCode(Id) : 0);
+        }
+
+        public override string ToString()
+        {
+            return string.IsNullOrWhiteSpace(DisplayText) ? Text : DisplayText;
         }
 
         public enum CategoryEnum

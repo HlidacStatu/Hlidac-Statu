@@ -179,6 +179,13 @@ namespace HlidacStatu.Repositories
                 }).ToList();
             return results;
         }
+        
+        private static string NormalizeJmenoForSearch(string firma)
+        {
+            string jmenoFirmyBezKoncovky = Firma.JmenoBezKoncovkyFull(firma, out string koncovka);
+            string normalizedKoncovka = Firma.NormalizedKoncovka(koncovka);
+            return $"{jmenoFirmyBezKoncovky} {normalizedKoncovka}";
+        }
 
         //firmy
         private static List<Autocomplete> LoadCompanies(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
@@ -201,7 +208,8 @@ namespace HlidacStatu.Repositories
                     res = new Autocomplete()
                     {
                         Id = $"ico:{f.Item2}",
-                        Text = f.Item1,
+                        DisplayText = f.Item1,
+                        Text = NormalizeJmenoForSearch(f.Item1),
                         AdditionalHiddenSearchText = f.Item2,
                         Type = ("firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
                         Description = FixKraj(f.Item3),
@@ -220,6 +228,8 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
+        
+
         //státní firmy
         private static List<Autocomplete> LoadStateCompanies()
         {
@@ -235,7 +245,8 @@ namespace HlidacStatu.Repositories
                 .Select(f => new Autocomplete()
                 {
                     Id = $"ico:{f.Item2}",
-                    Text = f.Item1,
+                    DisplayText = f.Item1,
+                    Text = NormalizeJmenoForSearch(f.Item1),
                     AdditionalHiddenSearchText = f.Item2,
                     Type = ("státní firma" + " " + Firma.StatusFull(f.Item4, true)).Trim(),
                     Description = FixKraj(f.Item3),
@@ -277,7 +288,8 @@ namespace HlidacStatu.Repositories
                     var res = new Autocomplete()
                     {
                         Id = $"ico:{f.Item2}",
-                        Text = f.Item1,
+                        DisplayText = f.Item1,
+                        Text = NormalizeJmenoForSearch(f.Item1),
                         AdditionalHiddenSearchText = f.Item2,
                         Type = "úřad",
                         Description = FixKraj(f.Item3),
