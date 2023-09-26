@@ -106,7 +106,7 @@
             <ChildContent>
                 <HlidacAutocompleteMultitag SearchFuncAsync="@((s, token) => OnSearch(s, token))"
                                             OnAutocompleteSubmitted="@(OnAutocompleteSubmitted)"
-                                            TextSelector="@((autocomplete) => autocomplete?.ToString())"
+                                            TextSelector="@((autocomplete) => autocomplete?.RenderText())"
                                             InputTags="InputTags"
                                             HelpTips="HelpTips"
                                             TItem="Autocomplete">
@@ -123,7 +123,7 @@
                             }
                             else
                             {
-                                <span style="overflow:hidden; text-overflow:ellipsis;">@(CategoryToPicture(context.Value.Category))&nbsp;@context.Value.ToString()</span>
+                                <span style="overflow:hidden; text-overflow:ellipsis;">@(CategoryToPicture(context.Value.Category))&nbsp;@context.Value.RenderText()</span>
                             }
                         }
                     </TagTemplate>
@@ -146,7 +146,7 @@
                                 @if (context.Category == Autocomplete.CategoryEnum.Hint)
                                 {
                                     <h6 class="align-middle">
-                                        @context.ToString() <span class="badge rounded-pill bg-secondary">@context.Id</span>
+                                        @context.RenderText() <span class="badge rounded-pill bg-secondary">@context.Id</span>
                                     </h6>
                                 }
                                 else
@@ -159,7 +159,7 @@
                                                 @((MarkupString)KIndexData.KindexImageIcon(KindexLabel, "height: 20px; vertical-align: text-bottom; margin-right: 5px;"))
                                             }
                                         }
-                                        @context.ToString()
+                                        @context.RenderText()
                                     </h6>
                                     <small>@context.Description</small>
                                     <p class="small text-muted mb-0">
@@ -392,7 +392,7 @@
         try
         {
             (string qs, string qtl) = ParseTools.CreateQueryWithOffsets(
-                autocomplete.Select(i => i.Value?.Id ?? i.ToString() ?? "").ToList());
+                autocomplete.Select(i => i.Value?.Id ?? i.Text ?? "").ToList());
 
             string url = $"{Navigation.BaseUri}{SearchPath}?q={HttpUtility.UrlEncode(qs)}&qtl={qtl}";
             Navigation.NavigateTo(url, true);

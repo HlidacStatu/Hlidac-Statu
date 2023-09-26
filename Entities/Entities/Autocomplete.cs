@@ -39,7 +39,7 @@ namespace HlidacStatu.Entities
             return (Id != null ? StringComparer.InvariantCultureIgnoreCase.GetHashCode(Id) : 0);
         }
 
-        public override string ToString()
+        public string RenderText()
         {
             return string.IsNullOrWhiteSpace(DisplayText) ? Text : DisplayText;
         }
