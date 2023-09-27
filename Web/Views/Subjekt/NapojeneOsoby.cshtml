@@ -1,0 +1,46 @@
+﻿@model Firma 
+@using HlidacStatu.Extensions
+@using HlidacStatu.Entities;
+@using HlidacStatu.Repositories
+
+@{
+    Layout = null;
+
+    var napojeneOsoby = await Model.NapojeneOsobyMinisterstvaAsync();
+}
+<div class="col-sm-7 col-xs-12 order-1">
+    <h4></h4>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <table class="table table-new table-new--dotted table-hover">
+                @foreach (var napojenaOsoba in napojeneOsoby)
+                {
+                    <tr>
+                        <td>
+                            @napojenaOsoba.OsobaEvent.DatumOd?.ToString("dd.MM.yyyy") - @napojenaOsoba.OsobaEvent.DatumDo?.ToString("dd.MM.yyyy")
+                        </td>
+                        <td>
+                            <div class="person-profile-thumb person-profile-thumb--small" style="float:left">
+                                <a href="@napojenaOsoba.Osoba.GetUrl()">
+                                    <div class="photo">
+                                        <div class="profile-picture border" style="width:40px;height:40px;background-image: url('@napojenaOsoba.Osoba.GetPhotoUrl(local: true, Osoba.PhotoTypes.NoBackground)')"></div>
+
+                                    </div>
+                                    <div>
+                                        <p class="py-0 my-0">
+                                            <a href="@napojenaOsoba.Osoba.GetUrl()">@napojenaOsoba.Osoba.FullName()</a>
+                                        </p>
+                                    </div>
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            @napojenaOsoba.OsobaEvent.AddInfo
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
+    </div>
+</div>

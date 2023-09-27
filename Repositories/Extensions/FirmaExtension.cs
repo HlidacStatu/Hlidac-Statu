@@ -17,6 +17,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities.Entities.KIndex;
+using HlidacStatu.Entities.Views;
 using HlidacStatu.Lib.Data.External.RPP;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 
@@ -61,6 +62,30 @@ namespace HlidacStatu.Extensions
             return false;
         }
 
+        public static async Task<List<NapojenaOsoba>> NapojeneOsobyMinisterstvaAsync(this Firma firma)
+        {
+            await using var db = new DbEntities();
+
+            var eventTypes = new[]
+            {
+                (int)OsobaEvent.Types.PolitickaExekutivni
+            };
+
+            var r = from oe in db.OsobaEvent
+                join os in db.Osoba on oe.OsobaId equals os.InternalId
+                where eventTypes.Any(et => et == oe.Type)
+                where oe.Ico == firma.ICO
+                orderby oe.DatumOd descending, oe.DatumDo descending 
+                select new NapojenaOsoba()
+                {
+                    Osoba = os,
+                    OsobaEvent = oe
+                };
+
+
+            return await r.ToListAsync();
+
+        }
 
         static string[] vyjimky_v_RS_ = new string[] { "00006572", "63839407", "48136000", "48513687", "49370227", "70836981", "05553539" }; //§ 3 odst. 2 f) ... Poslanecká sněmovna, Senát, Kancelář prezidenta republiky, Ústavní soud, Nejvyšší kontrolní úřad, Kancelář veřejného ochránce práv a Úřad Národní rozpočtové rady
         public static async Task<bool> MusiPublikovatDoRSAsync(this Firma firma)

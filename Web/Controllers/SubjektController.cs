@@ -144,6 +144,17 @@ namespace HlidacStatu.Web.Controllers
 
             return result;
         }
+        
+        public ActionResult NapojeneOsoby(string id)
+        {
+            if (TryGetCompany(id, out var firma, out var result))
+            {
+                (Firma firma, string viewName, string title) model = (firma, "NapojeneOsoby", $"{firma.Jmeno} - Napojené osoby");
+                return View("_subjektLayout", model);
+            }
+
+            return result;
+        }
 
         public ActionResult OrganizacniStruktura(string id, string orgId)
         {

@@ -262,6 +262,8 @@ namespace HlidacStatu.Entities
         public DbSet<ObceZUJAttrName> ObceZUJAttrName { get; set; }
 
         public DbSet<RecalculateItem> RecalculateItem { get; set; }
+        
+        public DbSet<NapojenaOsoba> NapojeneOsobyView { get; set; }
 
     }
 }
