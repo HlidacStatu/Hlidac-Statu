@@ -4,76 +4,147 @@
     //int b = 12 / aa;
 
     
-    var tw = new HlidacStatu.Lib.Data.External.Twitter(HlidacStatu.Lib.Data.External.Twitter.TwAccount.HlidacW);
-
-    var twid = tw.NewThreadAsync("prvni tweet", "nasledovany druhym", "a mozna pribyde i treti", " a ctvrty").Result;
-
     
 
 }
+@section metatags
+    {
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css"
+          rel="stylesheet" />
+}
+
 @section Scripts
 {
 }
+<style>
+    .nav-item.dropdown.dropdown-mega {
+        position: static;
+    }
 
-<h2>Current time: @(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.ffff"))</h2>
-
-<hr />
-<h2>tweet @twid</h2>
-<hr />
-@*<form id="new-search-input2" class="new-search-input" method="get" action="/hledat">
-    <div class="select2-wrapper">
-        <div class="input-group input-group-lg">
-            <input class="form-control input-lg nopadding" name="q" id="new-search-input2-q" />
-            <span class="input-group-btn">
-                <button id="new-search-input2-btn" class="btn btn-primary" style="left:-7px;top:-5px"> hledat</button>
-            </span>
-        </div>
-    </div>
-
-</form>*@
-
-
-<hr />
-
-<hr />
-@*<div class="tagify__dropdown__item " tabindex="0" role="option" id="osobaid:andrej-babis" value="Andrej Babiš (Ing. )" searchby="Ing. Andrej Babiš (*1954), poslanec (od 2013)  - Poslanecká sněmovna PČR, premiér (od 2017)  - Vláda České republiky. Ing. Andrej Babiš mezi roky 2012 - 19 sponzoroval stranu ANO 2011 v celkové výši 30 mil. Kč. Nejvyšší sponzorský dar byl ve výši 8 mil. Kč. " html="%3Cimg%20src%3D'https%3A%2F%2Fwww.hlidacstatu.cz%2FPhoto%2Fandrej-babis'%20%2F%3E" type="Politik" description="Ing. Andrej Babiš (*1954), poslanec (od 2013)  - Poslanecká sněmovna PČR, premiér (od 2017)  - Vláda České republiky. Ing. Andrej Babiš mezi roky 2012 - 19 sponzoroval stranu ANO 2011 v celkové výši 30 mil. Kč. Nejvyšší sponzorský dar byl ve výši 8 mil. Kč. " tagifysuggestionidx="0">
-    <div class="clearfix">
-        <div class="tagify__dropdown__item__avatar"><img src="https://www.hlidacstatu.cz/Photo/andrej-babis"></div>
-        <div class="tagify__dropdown__item__info">
-            <div class="tagify__dropdown__item__title">Andrej Babiš (Ing. )</div>
-            <div class="tagify__dropdown__item__descr">Ing. Andrej Babiš (*1954), poslanec (od 2013) - Poslanecká sněmovna PČR, premiér (od 2017) - Vláda České republiky. Ing. Andrej Babiš mezi roky 2012 - 19 sponzoroval stranu ANO 2011 v celkové výši 30 mil. Kč. Nejvyšší sponzorský dar byl ve výši 8 mil. Kč. </div>
-            <div class="tagify__dropdown__item__stat"><i>Politik</i></div>
-        </div>
-    </div>
-</div>*@
-@*<img src="~/Content/kindex/iconD.svg" style="height:30px" />
-    <br />
-    <img src="~/Content/kindex/iconD.svg" style="height:130px" />
-
-
-    <div class="row">
-
-        <div class="col-xs-3 ">
-            <div class="low-box">
-                <p>malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
-                <p class="line"><a href="#" class="more">Read More</a></p>
+        .nav-item.dropdown.dropdown-mega .dropdown-menu {
+            width: 90%;
+            top: auto;
+            left: 5%;
+        }
+</style>
+<!-- Start Mega Menu HTML -->
+<nav class="navbar navbar-expand-lg navbar-light shadow">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <a href="/" class="logo">
+                <svg width="46" height="46" viewBox="0 0 46 46">
+                    <use xlink:href="/content/defs.svg#logo"></use>
+                </svg>
+                Hlídač<br/><strong>Státu</strong>
+            </a>
+        </a>
+        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-content">
+            <div class="hamburger-toggle">
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </div>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar-content">
+            <ul class="navbar-nav mr-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown dropdown-mega position-static">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Smlouvy</a>
+                    <div class="dropdown-menu shadow">
+                        <div class="mega-content px-4">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-12 col-sm-4 col-md-3 py-4">
+                                        <h5>Typy smluv</h5>
+                                        <div class="list-group">
+                                            <a class="list-group-item" href="#">Velke</a>
+                                            <a class="list-group-item" href="#">Moc male</a>
+                                            <a class="list-group-item" href="#">Moc podivne</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-4 col-md-3 py-4">
+                                        <h5>Urady</h5>
+                                        <div class="card">
+                                            <img src="img/banner-image.jpg" class="img-fluid" alt="image">
+                                            <div class="card-body">
+                                                <p class="card-text">URADY URADY URADY text to build on the card title and make up the bulk of the card's content.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-4 col-md-3 py-4">
+                                        <h5>Dalsi smloupec 1</h5>
+                                        <p><b>CodeHim</b> is one of the BEST developer websites that provide web designers and developers with a simple way to preview and download a variety of free code & scripts.</p>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-3 py-4">
+                                        <h5>Dalsi sloupec 2</h5>
+                                        <div class="list-group">
+                                            <a class="list-group-item" href="#">Accomodations</a>
+                                            <a class="list-group-item" href="#">Terms & Conditions</a>
+                                            <a class="list-group-item" href="#">Privacy</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item dropdown dropdown-mega position-static">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Zakazky</a>
+                    <div class="dropdown-menu shadow">
+                        <div class="mega-content px-4">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-12 col-sm-4 col-md-3 py-4">
+                                        <h5>Typy zakazek</h5>
+                                        <div class="list-group">
+                                            <a class="list-group-item" href="#">IT</a>
+                                            <a class="list-group-item" href="#">Stavebni</a>
+                                            <a class="list-group-item" href="#">zase podivne</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-4 col-md-3 py-4">
+                                        <h5>Urady</h5>
+                                        <div class="card">
+                                            <img src="img/banner-image.jpg" class="img-fluid" alt="image">
+                                            <div class="card-body">
+                                                <p class="card-text">MMR MMR MMR text to build on the card title and make up the bulk of the card's content.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-sm-4 col-md-3 py-4">
+                                        <h5>Dalsi smloupec 3</h5>
+                                        <p><b>CodeHim</b> is one of the BEST developer websites that provide web designers and developers with a simple way to preview and download a variety of free code & scripts.</p>
+                                    </div>
+                                    <div class="col-12 col-sm-12 col-md-3 py-4">
+                                        <h5>Dalsi sloupec 4</h5>
+                                        <div class="list-group">
+                                            <a class="list-group-item" href="#">Accomodations</a>
+                                            <a class="list-group-item" href="#">Terms & Conditions</a>
+                                            <a class="list-group-item" href="#">Privacy</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                </li>
+            </ul>
+            <form class="d-flex ms-auto">
+                <div class="input-group">
+                    <input class="form-control border-0 mr-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-primary border-0" type="submit">Search</button>
+                </div>
+            </form>
         </div>
     </div>
-
-    <partial name="WebUtil/DynamicModal"
-             model="@(new DynamicModalViewModel($"/api/v1/modalclassification/234234", "(Má být smlouva označena jako platná?).", loadingText: "Ověřuji platnost smlouvy v registru smluv", style: "padding:0;margin:0"))" />
-
-
-
-    <div class="clearfix"></div>
-    <hr />
-
-    <script src='/widget/porj5?width=500' type='text/javascript'></script>
-    <div id='porj5' style='width:500px' widget-page='/Subjekt/00281859'></div>
-
-    <div class="clearfix"></div>
-    <hr />
-
-    <script src='/widget/asdf?width=500' type='text/javascript'></script>
-    <div id='asdf' style='width:500px' widget-page='/kindex/detail/00006947'></div>*@
+</nav>

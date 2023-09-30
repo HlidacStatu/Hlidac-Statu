@@ -610,7 +610,7 @@ namespace HlidacStatu.Web.Controllers
                                     if (User?.IsInRole("Admin") == true)
                                     {
                                         //Devmasters.IO.IOTools.MoveFile(fn, HlidacStatu.Lib.Init.OsobaFotky.GetFullPath(o, "small.jpg"));
-                                        imi.Resize(new System.Drawing.Size(300, 300), true, Devmasters.Imaging.InMemoryImage.InterpolationsQuality.High, true);
+                                        imi.Resize(new SixLabors.ImageSharp.Size(300, 300), true, Devmasters.Imaging.InMemoryImage.InterpolationsQuality.High, true);
                                         imi.SaveAsJPEG(o.GetPhotoPath(), 80);
                                         var noBackGr = HlidacStatu.AI.Photo.RemoveBackgroundAsync(
                                                     new Uri(Devmasters.Config.GetWebConfigValue("RemoveBackgroundAPI")),

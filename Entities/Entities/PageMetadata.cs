@@ -66,7 +66,7 @@ namespace HlidacStatu.Entities
                 public int Height { get; set; }
 
 
-                public static explicit operator Boundary(System.Drawing.Rectangle m)
+                public static explicit operator Boundary(SixLabors.ImageSharp.Rectangle m)
                 {
                     return new Boundary()
                     {

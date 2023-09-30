@@ -6,6 +6,7 @@ using Emgu.CV.Structure;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 
 namespace HlidacStatu.DetectFaces
 {
@@ -55,7 +56,17 @@ namespace HlidacStatu.DetectFaces
                 _cascadeClassifier = new CascadeClassifier(modelFilename);
                 //Image<Bgr, byte> img = Image<Bgr, byte>.FromIplImagePtr(image.Image.GetHbitmap);  
 
-                Image<Bgr, byte> img = image.Image.ToImage<Bgr, byte>();
+                //1. Convert ImageSharp.Image to byte array:
+                byte[] imageBytes;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    image.SaveAsPNG(ms);
+                    imageBytes = ms.ToArray();
+                }
+                //dirty trick. init System.Drawing.Bitmp 
+                Mat mat = new Mat();
+                CvInvoke.Imdecode(imageBytes, Emgu.CV.CvEnum.ImreadModes.Color, mat);
+                Image<Bgr, byte> img = mat.ToImage<Bgr, byte>();
 
                 Image<Gray, byte> grayframe = img.Convert<Gray, byte>();
                 var faces = _cascadeClassifier.DetectMultiScale(grayframe, 1.1, 10, Size.Empty); //the actual face detection happens here
@@ -78,7 +89,7 @@ namespace HlidacStatu.DetectFaces
                     if (newY + newHeight > image.Image.Height)
                         newHeight = image.Image.Height - newY;
 
-                    Rectangle newFaceRect = new Rectangle(newX, newY, newWidth, newHeight);
+                    SixLabors.ImageSharp.Rectangle newFaceRect = new SixLabors.ImageSharp.Rectangle(newX, newY, newWidth, newHeight);
 
                     //img.Draw(newFaceRect, new Bgr(Color.BurlyWood), 3); //the detected face(s) is highlighted here using a box that is drawn around it/them
                     using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
