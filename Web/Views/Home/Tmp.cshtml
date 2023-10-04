@@ -1,150 +1,96 @@
 ﻿@{
     ViewBag.Title = "";
-    
+
+    //Layout = null;
     //int b = 12 / aa;
 
-    
-    
+
+
 
 }
-@section metatags
+@using System.Linq
+@using System.Net.Http
+@using Devmasters.Collections
+@using HlidacStatu.Datasets
+@using HlidacStatu.Entities
+@using HlidacStatu.Web.TagHelpers
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Primitives
+
+@inject IHttpClientFactory HttpClientFactory
+
+@{
+    int PocetReportu = 24;
+
+    try
     {
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.2/mdb.min.css"
-          rel="stylesheet" />
-}
-
-@section Scripts
-{
-}
-<style>
-    .nav-item.dropdown.dropdown-mega {
-        position: static;
+        var query = new StringValues();
+        if (string.IsNullOrEmpty(ViewBag.Query)
+            && Context.Request.Query.TryGetValue("Q", out query)
+        )
+        {
+            ViewBag.Query = query;
+        }
+    }
+    catch (Exception)
+    {
+        if (ViewData.ContainsKey("InvokeErrorAction") == false)
+        {
+            throw;
+        }
     }
 
-        .nav-item.dropdown.dropdown-mega .dropdown-menu {
-            width: 90%;
-            top: auto;
-            left: 5%;
+    string title = ViewBag.Title;
+    if (string.IsNullOrEmpty(title))
+    {
+        title = "Hlídač státu. Hlídame je, protože si to zaslouží.";
+    }
+    else
+    {
+        title = title + " - " + "Hlídač státu.";
+    }
+    string description = "Hlídač státu - veřejná kontrola státních a veřejných institucí. Veřejnoprospěšný projekt. Hlídač smluv a registr smluv. Hlídač Webů.";
+    if (!string.IsNullOrEmpty(ViewBag.Description))
+    {
+        description = ViewBag.Description + " Hlídač státu.";
+    }
+
+    bool ShowEmailConfirmation = false;
+    if (User.Identity?.IsAuthenticated ?? false)
+    {
+        if (!string.IsNullOrEmpty(this.User?.Identity?.Name))
+        {
+            var email = this.User?.Identity?.Name;
+            using (DbEntities db = new())
+            {
+                var user = db.Users.AsQueryable().Where(m => m.Email == email && m.EmailConfirmed == false).FirstOrDefault();
+                ShowEmailConfirmation = user != null;
+            }
         }
-</style>
-<!-- Start Mega Menu HTML -->
-<nav class="navbar navbar-expand-lg navbar-light shadow">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">
-            <a href="/" class="logo">
-                <svg width="46" height="46" viewBox="0 0 46 46">
-                    <use xlink:href="/content/defs.svg#logo"></use>
-                </svg>
-                Hlídač<br/><strong>Státu</strong>
-            </a>
-        </a>
-        <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-content">
-            <div class="hamburger-toggle">
-                <div class="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        </button>
-        <div class="collapse navbar-collapse" id="navbar-content">
-            <ul class="navbar-nav mr-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-                <li class="nav-item dropdown dropdown-mega position-static">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Smlouvy</a>
-                    <div class="dropdown-menu shadow">
-                        <div class="mega-content px-4">
-                            <div class="container-fluid">
-                                <div class="row">
-                                    <div class="col-12 col-sm-4 col-md-3 py-4">
-                                        <h5>Typy smluv</h5>
-                                        <div class="list-group">
-                                            <a class="list-group-item" href="#">Velke</a>
-                                            <a class="list-group-item" href="#">Moc male</a>
-                                            <a class="list-group-item" href="#">Moc podivne</a>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-4 col-md-3 py-4">
-                                        <h5>Urady</h5>
-                                        <div class="card">
-                                            <img src="img/banner-image.jpg" class="img-fluid" alt="image">
-                                            <div class="card-body">
-                                                <p class="card-text">URADY URADY URADY text to build on the card title and make up the bulk of the card's content.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-4 col-md-3 py-4">
-                                        <h5>Dalsi smloupec 1</h5>
-                                        <p><b>CodeHim</b> is one of the BEST developer websites that provide web designers and developers with a simple way to preview and download a variety of free code & scripts.</p>
-                                    </div>
-                                    <div class="col-12 col-sm-12 col-md-3 py-4">
-                                        <h5>Dalsi sloupec 2</h5>
-                                        <div class="list-group">
-                                            <a class="list-group-item" href="#">Accomodations</a>
-                                            <a class="list-group-item" href="#">Terms & Conditions</a>
-                                            <a class="list-group-item" href="#">Privacy</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item dropdown dropdown-mega position-static">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Zakazky</a>
-                    <div class="dropdown-menu shadow">
-                        <div class="mega-content px-4">
-                            <div class="container-fluid">
-                                <div class="row">
-                                    <div class="col-12 col-sm-4 col-md-3 py-4">
-                                        <h5>Typy zakazek</h5>
-                                        <div class="list-group">
-                                            <a class="list-group-item" href="#">IT</a>
-                                            <a class="list-group-item" href="#">Stavebni</a>
-                                            <a class="list-group-item" href="#">zase podivne</a>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-4 col-md-3 py-4">
-                                        <h5>Urady</h5>
-                                        <div class="card">
-                                            <img src="img/banner-image.jpg" class="img-fluid" alt="image">
-                                            <div class="card-body">
-                                                <p class="card-text">MMR MMR MMR text to build on the card title and make up the bulk of the card's content.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 col-sm-4 col-md-3 py-4">
-                                        <h5>Dalsi smloupec 3</h5>
-                                        <p><b>CodeHim</b> is one of the BEST developer websites that provide web designers and developers with a simple way to preview and download a variety of free code & scripts.</p>
-                                    </div>
-                                    <div class="col-12 col-sm-12 col-md-3 py-4">
-                                        <h5>Dalsi sloupec 4</h5>
-                                        <div class="list-group">
-                                            <a class="list-group-item" href="#">Accomodations</a>
-                                            <a class="list-group-item" href="#">Terms & Conditions</a>
-                                            <a class="list-group-item" href="#">Privacy</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-                </li>
-            </ul>
-            <form class="d-flex ms-auto">
-                <div class="input-group">
-                    <input class="form-control border-0 mr-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-primary border-0" type="submit">Search</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</nav>
+
+    }
+
+}
+<p>
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+    &nbsp;<br />
+</p>
