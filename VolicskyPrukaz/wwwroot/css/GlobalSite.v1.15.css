@@ -188,13 +188,6 @@ body {
 
 
 
-nav ul li.separator {
-    padding-left: 5px;
-    border-left: 1px solid #aaa;
-    border-left-color: #aaa;
-    border-left-style: solid;
-    border-left-width: 1px;
-}
 
 /**
  * Common page parts - nav, hero, ...
@@ -203,9 +196,6 @@ header {
     padding: 15px 30px 15px 30px;
 }
 
-body.nav-open header {
-    background: #ffffff;
-}
 
 .logo {
     float: left;
@@ -227,6 +217,10 @@ body.nav-open header {
             vertical-align: bottom;
         }
 
+/*
+body.nav-open header {
+    background: #ffffff;
+}
 
 nav {
     display: block;
@@ -248,16 +242,6 @@ nav {
             font-size: 14px;
         }
 
-@media (min-width: 992px) {
-    nav {
-        float: none;
-    }
-
-        nav.level2 {
-            float: right;
-        }
-}
-
 nav ul {
     display: none;
     margin: 0;
@@ -270,16 +254,60 @@ nav.level2 {
     display: block;
 }
 
+
+nav ul.menu li.menu {
+    display: inline-block;
+}
+
+    nav ul.menu li.menu a {
+        display: inline-block;
+        margin: 0 15px;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 24px;
+        text-transform: uppercase;
+        color: #3e6deb;
+    }
+
+        nav ul.menu li.menu a.tight {
+            margin: 0 10px 0 0;
+        }
+
+        nav ul.menu li.menu a:hover {
+            color: #25272d;
+        }
+
+        nav ul.menu li.menu a.active {
+            font-weight: 700;
+            color: #25272d;
+        }
+
+    nav ul.menu li.menu.separator {
+        padding-left: 5px;
+        border-left: 1px solid #aaa;
+        border-left-color: #aaa;
+        border-left-style: solid;
+        border-left-width: 1px;
+    }
+
 @media (min-width: 992px) {
-    nav ul {
+    nav {
+        float: none;
+    }
+
+        nav.level2 {
+            float: right;
+        }
+
+    nav ul.menu {
         display: block;
     }
 
-        nav ul li.level2 {
-            display: none;
-        }
+    nav ul li.level2 {
+        display: none;
+    }
 }
-
+     
 body.nav-open nav ul {
     display: block;
     position: absolute;
@@ -300,6 +328,7 @@ body.nav-open nav ul {
 body.nav-open nav.level2 {
     display: none;
 }
+*/
 
 a {
     color: #3e6deb;
@@ -310,37 +339,12 @@ a {
         color: #25272d;
     }
 
-nav ul li {
-    display: inline-block;
-}
 
 body.nav-open nav ul li {
     display: block;
     padding: 10px 0;
 }
 
-nav ul li a {
-    display: inline-block;
-    margin: 0 15px;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 24px;
-    text-transform: uppercase;
-    color: #3e6deb;
-}
-
-    nav ul li a.tight {
-        margin: 0 10px 0 0;
-    }
-
-    nav ul li a:hover {
-        color: #25272d;
-    }
-
-    nav ul li a.active {
-        font-weight: 700;
-        color: #25272d;
-    }
 
 .hamburger {
     position: relative;
@@ -954,14 +958,15 @@ textarea {
         border-radius: 3px;
         font-size: 1em;
     }
-    .bs-callout.small h4 {
-        font-size: 16px;
-    }
 
-    .bs-callout.small div, .bs-callout.small p {
-        font-size: 1em;
-        line-height: 1em;
-    }
+        .bs-callout.small h4 {
+            font-size: 16px;
+        }
+
+        .bs-callout.small div, .bs-callout.small p {
+            font-size: 1em;
+            line-height: 1em;
+        }
 
     .bs-callout.noborder {
         margin-left: 30px;
@@ -971,7 +976,7 @@ textarea {
         border-left-width: 5px;
         border-radius: 3px;
     }
-        
+
     .bs-callout h4 {
         margin-top: 0;
         margin-bottom: 5px;

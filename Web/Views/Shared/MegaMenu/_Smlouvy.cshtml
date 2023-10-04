@@ -1,0 +1,115 @@
+﻿@using System.Linq
+@using System.Net.Http
+@using Devmasters.Collections
+@using Devmasters.Enums;
+@using HlidacStatu.Datasets
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories;
+@using HlidacStatu.Web.TagHelpers
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Primitives
+
+
+
+<div class="mega-content px-4">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
+                <h3>Registr smluv</h3>
+                <p>
+                    Smlouvy státu se evidují v registru smluv. Do registru smluv mají za povinnost všechny úřady, státní organizace, samospráva,
+                    státní podniky a vysoké školy vkládat <b>smlouvy s hodnotou vyšší než 50&nbsp;000 Kč</b>.
+                </p>
+                <p>
+                    Zákon obsahuje řadu výjimek, kdy smlouvy do registru vloženy být nemusí. Největší výjimka se týká malých obcí
+                    (<abbr title="Obce I. stupně - Nejmenší obce.Vedou evidenci obyvatel, zajišťují v obci volby, zabezpečují ochranu veřejného pořádku atd. Obce II. stupně s pověřeným obecním úřadem Zajišťují různé činnosti (stavební úřady, matriky, ..) za malé obce na základě dohody mezi obcemi nebo rozhodnutí.">obce I. a II. stupně</abbr>),
+                    které nemusí smlouvy do registru uvádět. Mezi další výjimky patří smlouvy v utajovaném režimu.
+                </p>
+                <p>Všechny smlouvy z registru smluv evidujeme, analyzujeme, kontrolujeme, doplňujeme o důležité poznatky a statistické informace.</p>
+            </div>
+            <div class="col-12 col-sm-4 py-4">
+                <h3>Statistiky smluv</h3>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold"><a href="/report/7">Souhrny</a></div>
+                            Souhrnné informace o všech smlouvách
+                        </div>
+                        <span class="badge bg-primary rounded-pill">14</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Stát</div>
+                            <ul>
+                                <li>
+                                    <a href="/adresar/Ministerstva">Ministerstva</a>
+                                    <span class="badge rounded-pill text-bg-light">124</span>
+                                </li>
+                                <li>
+                                    <a href="/adresar/Media">Média</a>
+                                    <span class="badge rounded-pill text-bg-light">124</span>
+
+                                </li>
+                                <li>
+                                    <a href="/adresar/Statni_podniky">Státní podniky</a>
+                                    <span class="badge rounded-pill text-bg-light">124</span>
+                                </li>
+                                <li>
+                                    <a href="/adresar/vyjimky_rs">Výjimky z RS</a>
+                                    <span class="badge rounded-pill text-bg-light">124</span>
+                                </li>
+                                <li><a href="/adresar">... a další</a></li>
+                            </ul>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">14</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Samospráva</div>
+                            <ul>
+                                <li>
+                                    <a href="/adresar/Obce_III_stupne">Obce</a>
+                                    <span class="badge rounded-pill text-bg-light">124</span>
+                                </li>
+                                <li>
+                                    <a href="/adresar/Kraje_Praha">Kraje</a>
+                                    <span class="badge rounded-pill text-bg-light">124</span>
+
+                                </li>
+                                <li>
+                                    <a href="/adresar/Statutarni_mesta">Statutární městsa</a>
+                                    <span class="badge rounded-pill text-bg-light">124</span>
+                                </li>
+                                <li>
+                                    <a href="/adresar/Mestske_casti_Prahy">Městské části Prahy</a>
+                                    <span class="badge rounded-pill text-bg-light">124</span>
+                                </li>
+                                <li><a href="/adresar">... a další</a></li>
+                            </ul>
+                        </div>
+                        <span class="badge bg-primary rounded-pill">14</span>
+                    </li>
+
+                </ul>
+            </div>
+            <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
+                <h3>Speciální reporty</h3>
+                <p>
+                    Smlouvy uveřejněné
+                    @for (int i = 1; i < 8; i++)
+                    {
+                        <a href="/HledatSmlouvy?Q=zverejneno:@(DateTime.Now.AddDays(-1 * i).ToString("yyyy-MM-dd"))">@(i == 1 ? "včera" : DateTime.Now.AddDays(-1 * i).ToString("d.M"))</a>
+                        @(i < 7 ? ", " : ".")
+                    }
+                </p>
+                <p><a href="">Firmy založené těsně před uzavřením smlouvy</a></p>
+                <p><a href="">Smlouvy s firmami, co přímo či nepřímo sponzorují politické strany</a></p>
+                <h5>Podle krajů</h5>
+                <p class="text-center">
+                    <img src="/content/img/Czech_Republic_location_map_nazvy.svg" style="width:90%;height:auto;" />
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

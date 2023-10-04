@@ -4,7 +4,7 @@
 @* @using YamlDotNet.Core *@
 @typeparam TItem
 
-<div class="hlidac-autocomplete mb-3">
+<div class="hlidac-autocomplete">
     <div class="input-group bg-white rounded-2">
         @foreach (var tagItem in TagItems)
         {
@@ -28,6 +28,7 @@
             <div class="input-group-newline"></div>
         }
         <input @ref="InputBoxElement"
+               id="autocompleteInputBox"
                type="text"
                autocomplete="off"
                placeholder="@InputBoxPlaceHolder"

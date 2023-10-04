@@ -1,0 +1,187 @@
+﻿@using System.Linq
+@using System.Net.Http
+@using Devmasters.Collections
+@using Devmasters.Enums;
+@using HlidacStatu.Datasets
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories;
+@using HlidacStatu.Web.TagHelpers
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Primitives
+
+<div class="mega-content px-4">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
+                <h3>Přehledy</h3>
+                <p>Pokud hledáte informace o konkrétním úřadu, nejrychlejší je napsat jeho jméno nebo část 
+                    do <a href="#" onclick="closeMegaMenu(this);$('#autocompleteInputBox').focus();return false;"><b>vyhledávání</b></a>.
+                </p>
+                <p>
+                    Anebo můžete procházet naším adresářem úřadů:
+                </p>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Státní úřady</div>
+                            @{
+                                Firma.Zatrideni.SubjektyObory[] uradyList1 = new Firma.Zatrideni.SubjektyObory[]
+                                {
+                            Firma.Zatrideni.SubjektyObory.Ministerstva,
+                            Firma.Zatrideni.SubjektyObory.Dalsi_ustredni_organy_statni_spravy,
+                            Firma.Zatrideni.SubjektyObory.Media,
+                            Firma.Zatrideni.SubjektyObory.Statni_podniky,
+                            Firma.Zatrideni.SubjektyObory.Organizacni_slozky_statu,
+                                };
+                            }
+                            <ul>
+                                @foreach (var l in uradyList1)
+                                {
+                                    <li>
+                                        <a href="/adresar/@(l.ToString())">@(l.ToNiceDisplayName())</a>
+                                        <span class="badge rounded-pill text-bg-light">@(HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty(l)?.Length ?? 0)</span>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Samospráva</div>
+                            @{
+                                Firma.Zatrideni.SubjektyObory[] uradyList2 = new Firma.Zatrideni.SubjektyObory[]
+                                {
+                            Firma.Zatrideni.SubjektyObory.Obce_III_stupne,
+                            Firma.Zatrideni.SubjektyObory.Kraje_Praha,
+                            Firma.Zatrideni.SubjektyObory.Statutarni_mesta,
+                            Firma.Zatrideni.SubjektyObory.Mestske_casti_Prahy,
+                                };
+                            }
+                            <ul>
+                                @foreach (var l in uradyList2)
+                                {
+                                    <li>
+                                        <a href="/adresar/@(l.ToString())">@(l.ToNiceDisplayName())</a>
+                                        <span class="badge rounded-pill text-bg-light">@(HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty(l)?.Length ?? 0)</span>
+                                    </li>
+                                }
+                            </ul>
+
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Zdravotnictví</div>
+                            @{
+                                Firma.Zatrideni.SubjektyObory[] uradyList3 = new Firma.Zatrideni.SubjektyObory[]
+                                {
+                            Firma.Zatrideni.SubjektyObory.Zdravotni_pojistovny,
+                            Firma.Zatrideni.SubjektyObory.Zdravotni_ustavy,
+                            Firma.Zatrideni.SubjektyObory.Fakultni_nemocnice,
+                            Firma.Zatrideni.SubjektyObory.Velke_nemocnice,
+                            Firma.Zatrideni.SubjektyObory.Nemocnice,
+                                };
+                            }
+                            <ul>
+                                @foreach (var l in uradyList3)
+                                {
+                                    <li>
+                                        <a href="/adresar/@(l.ToString())">@(l.ToNiceDisplayName())</a>
+                                        <span class="badge rounded-pill text-bg-light">@(HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty(l)?.Length ?? 0)</span>
+                                    </li>
+                                }
+                            </ul>
+
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <a href="/adresar">a stovky další úřadů</a>
+                        </div>
+                    </li>
+                </ul>
+
+            </div>
+            <div class="col-12 col-sm-4 py-4 ">
+                <h3>K-Index<br/><small>Index klíčových rizik úřadů</small></h3>
+
+                <div class="text-center">
+                    <img src="/content/img/kindex_a-f.svg" style="max-width:85%;padding-bottom:6px;max-height:80px;">
+                </div>
+                <p>
+                    Index klíčových rizik - zkráceně <b>K–Index</b>, je ukazatel míry rizikových faktorů. Tyto faktory jsou spojovány s rizikem korupce a nehospodárným nakládáním veřejných peněz.
+                </p>
+                <p>
+                    <a href="/kindex/zebricek" class="btn btn-primary btn-sm">Najít hodnocení úřadu/státní firmy</a>
+                    <a href="/kindex#porovnavac" class="btn btn-default btn-sm">Porovnání rizik úřadů/státních firem</a>
+                </p>
+                <p>
+                    <h5 class="fw-bold">Žebříčky K-Indexu</h5>
+                    <a href="/kindex/zebricek/skokani" class="btn btn-default btn-sm">Největší meziroční změny</a>
+                    <a href="/kindex/zebricek/nejlepsi" class="btn btn-default btn-sm">100 nejlepších</a>
+                    <a href="/kindex/zebricek/nejhorsi" class="btn btn-default btn-sm">100 nejhorších</a>
+                    <a href="/kindex/zebricek" class="btn btn-primary btn-sm">Všechny žebříčky</a>
+                </p>
+            </div>
+            <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
+                <h3>Platy úředníků</h3>
+                <p>
+                    Projekt <a href="https://www.platyuredniku.cz/?utm_source=megamenu&utm_medium=referral&utm_campaign=permanent&utm_content=BoxOnTop" target="_blank">Platy úředníků</a> poskytuje informace o platech a odměnách řídících pracovníků z více než 200 institucí.
+                    <a class="btn btn-outline-primary" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .8rem;"
+                       data-bs-toggle="collapse" href="#platyurednikuVice" role="button" aria-expanded="false" aria-controls="platyurednikuVice">
+                        více info o projektu
+                    </a>
+                </p>
+                <div class="collapse" id="platyurednikuVice" style="margin-bottom:1em;">
+                    <div class="card card-body">
+                        Podpora transparentnosti platů nejvyšších státních činitelů však jde  politickým spektrem, což dokazuje i dotazník <a href="https://volebnikalkulacka.cz/">Volební kalkulačky</a>,
+                        v&nbsp;rámci kterého všechny politické subjekty bez výjimky souhlasily s&nbsp;výrokem, že
+                        <span class="font-monospace">platy nejvyšších státních úředníků by měly být veřejnosti známé</span> .
+                        Údaje o výši platů nejvyšších státních úředníků jsou veřejně přístupné v mnoha demokraciích (např. USA, Velké Británii, Německu, Estonsku a dalších).
+                        Zveřejňování platů státních úředníků ve vyspělých demokraciích vychází z obecného principu, že <i>občan jako plátce daní musí být informován o tom, jakým způsobem stát s jeho penězi nakládá</i>.
+                        V&nbsp;České republice nejsou platy centrálně zveřejňovány, ale platí zde zákon <a href="https://www.zakonyprolidi.cz/cs/1999-106" target="_blank"> 106/1999 Sb. o svobodném přístupu k&nbsp;informacím</a>,
+                        který zajišťuje právo veřejnosti na informace týkající se státní správy.
+                        Od roku 2023 je součástí uvedeného zákona paragraf 8 c, který nově informace o platech upravuje a jejich zveřejňování dává za povinnost.
+                    </div>
+                </div>
+
+                <h5>Platy v nejdůležitějších úřadech</h5>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <a href="https://www.platyuredniku.cz/kancelar-prezidenta-republiky">Kancelář prezidenta republiky</a>
+                        <span class="badge rounded-pill text-bg-success"><i class="fa-solid fa-thumbs-up"></i> máme</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <a href="https://www.platyuredniku.cz/poslanecka-snemovna-a-senat">Poslanecká sněmovna a Senát</a>
+                        <span class="badge rounded-pill text-bg-success"><i class="fa-solid fa-thumbs-up"></i> máme</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <a href="https://www.platyuredniku.cz/vlada-a-ministerstva">Vláda a ministerstva</a>
+                        <span class="badge rounded-pill text-bg-success"><i class="fa-solid fa-thumbs-up"></i> máme</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <a href="https://www.platyuredniku.cz/nejvyssi-organy-justice">Nejvyšší orgány justice</a>
+                        <span class="badge rounded-pill text-bg-success"><i class="fa-solid fa-thumbs-up"></i> máme</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <a href="https://www.platyuredniku.cz/instituce-pod-ministerstvem-dopravy">Podřízenky Ministerstva dopravy</a>
+                        <span class="badge rounded-pill text-bg-danger"><i class="fa-solid fa-thumbs-down"></i> malou část</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <a href="https://www.platyuredniku.cz/instituce-pod-ministerstvem-prumyslu-a-obchodu">Podřízenky Ministerstva průmyslu a obchodu</a>
+                        <span class="badge rounded-pill text-bg-warning"><i class="fa-solid fa-thumbs-down"></i> menšinu</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <a href="https://www.platyuredniku.cz/instituce">Ostatní úřady a instituce</a> <i class="fa-solid fa-arrow-up-right-from-square "></i>
+
+                    </li>
+                </ul>
+                <p style="margin-top:1em">Všechny platy úředníků a informaci o organizacích, které platy tají, najdete na serveru
+                </p>
+                <p class="text-center"><a href="https://www.platyuredniku.cz/?utm_source=megamenu&utm_medium=referral&utm_campaign=permanent&utm_content=BoxOnBottom">PlatyUredniku.cz</a></p>
+            </div>
+
+        </div>
+    </div>
+</div>

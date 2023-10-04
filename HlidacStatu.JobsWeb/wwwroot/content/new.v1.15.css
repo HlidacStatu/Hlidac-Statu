@@ -1147,7 +1147,7 @@ select {
 
 @media (min-width: 992px) {
     .header__content .header__search {
-        padding: 8px 0 32px;
+        padding: 24px 0 20px;
     }
 }
 

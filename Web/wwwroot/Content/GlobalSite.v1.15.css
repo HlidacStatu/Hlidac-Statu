@@ -189,14 +189,6 @@ body {
 
 
 
-nav ul li.separator {
-    padding-left: 5px;
-    border-left: 1px solid #aaa;
-    border-left-color: #aaa;
-    border-left-style: solid;
-    border-left-width: 1px;
-}
-
 /**
  * Common page parts - nav, hero, ...
  */
@@ -228,13 +220,59 @@ body.nav-open header {
             vertical-align: bottom;
         }
 
-
+li.mainmenu {
+    display: inline-block;
+}
+/*
 nav {
     display: block;
     float: right;
     margin-top: 10px;
     text-align: right;
 }
+
+nav ul li {
+    display: inline-block;
+}
+
+    nav ul li.separator {
+        padding-left: 5px;
+        border-left: 1px solid #aaa;
+        border-left-color: #aaa;
+        border-left-style: solid;
+        border-left-width: 1px;
+    }
+
+    nav ul li a {
+        display: inline-block;
+        margin: 0 15px;
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 24px;
+        text-transform: uppercase;
+        color: #3e6deb;
+    }
+
+        nav ul li a.tight {
+            margin: 0 10px 0 0;
+        }
+
+        nav ul li a:hover {
+            color: #25272d;
+        }
+
+        nav ul li a.active {
+            font-weight: 700;
+            color: #25272d;
+        }
+
+    nav ul {
+        display: none;
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+        list-style-position: inside;
+    }
 
     nav.level2 {
         display: block;
@@ -250,6 +288,10 @@ nav {
         }
 
 @media (min-width: 992px) {
+    .hamburger {
+        display: none;
+    }
+
     nav {
         float: none;
     }
@@ -257,29 +299,16 @@ nav {
         nav.level2 {
             float: right;
         }
-}
 
-nav ul {
-    display: none;
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-    list-style-position: inside;
-}
-
-nav.level2 {
-    display: block;
-}
-
-@media (min-width: 992px) {
-    nav ul {
-        display: block;
-    }
-
-        nav ul li.level2 {
-            display: none;
+        nav ul {
+            display: block;
         }
+
+            nav ul li.level2 {
+                display: none;
+            }
 }
+*/
 
 body.nav-open nav ul {
     display: block;
@@ -311,37 +340,12 @@ a {
         color: #25272d;
     }
 
-nav ul li {
-    display: inline-block;
-}
 
 body.nav-open nav ul li {
     display: block;
     padding: 10px 0;
 }
 
-nav ul li a {
-    display: inline-block;
-    margin: 0 15px;
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 24px;
-    text-transform: uppercase;
-    color: #3e6deb;
-}
-
-    nav ul li a.tight {
-        margin: 0 10px 0 0;
-    }
-
-    nav ul li a:hover {
-        color: #25272d;
-    }
-
-    nav ul li a.active {
-        font-weight: 700;
-        color: #25272d;
-    }
 
 .hamburger {
     position: relative;
@@ -366,11 +370,6 @@ nav ul li a {
         background-color: #3e6deb;
     }
 
-@media (min-width: 992px) {
-    .hamburger {
-        display: none;
-    }
-}
 
 .social {
     margin-left: 13px;
@@ -955,14 +954,15 @@ textarea {
         border-radius: 3px;
         font-size: 1em;
     }
-    .bs-callout.small h4 {
-        font-size: 16px;
-    }
 
-    .bs-callout.small div, .bs-callout.small p {
-        font-size: 1em;
-        line-height: 1em;
-    }
+        .bs-callout.small h4 {
+            font-size: 16px;
+        }
+
+        .bs-callout.small div, .bs-callout.small p {
+            font-size: 1em;
+            line-height: 1em;
+        }
 
     .bs-callout.noborder {
         margin-left: 30px;
@@ -972,7 +972,7 @@ textarea {
         border-left-width: 5px;
         border-radius: 3px;
     }
-        
+
     .bs-callout h4 {
         margin-top: 0;
         margin-bottom: 5px;

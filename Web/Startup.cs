@@ -30,6 +30,7 @@ using Microsoft.IdentityModel.Tokens;
 
 using Polly;
 using Serilog.Filters;
+using static HlidacStatu.Entities.Osoba.JSON;
 
 namespace HlidacStatu.Web
 {
@@ -317,6 +318,8 @@ namespace HlidacStatu.Web
                     "wwwroot/Content/social-share-kit.css",
                     "wwwroot/Content/new.v1.15.css"
                 };
+
+
                 pipeline.AddCssBundle("/Content/bundled.css", cssPaths)
                     .UseContentRoot() // tohle je tady potřeba, protože při standardním použití se špatně generují relativní cesty ve stylech (bootstrap.css)
                     .AdjustRelativePaths(); //tohle je tady potřeba, aby výsledné cesty neobsahovaly /wwwroot/

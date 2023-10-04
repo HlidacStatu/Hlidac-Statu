@@ -1,0 +1,68 @@
+﻿@using System.Linq
+@using System.Net.Http
+@using Devmasters.Collections
+@using Devmasters.Enums;
+@using HlidacStatu.Datasets
+@using HlidacStatu.Entities
+@using HlidacStatu.Repositories;
+@using HlidacStatu.Web.TagHelpers
+@using Microsoft.AspNetCore.Http.Extensions
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Primitives
+
+
+
+<div class="mega-content px-4">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
+                <h3>Firmy / subjekty</h3>
+                <p>
+                    Evidujeme všechny firmy, které jsou v českém Obchodním rejstříku a detailní analýzy provádíme u firem, které jsou evidovány v Registru smluv a/nebo se účastní veřejných zakázek.
+                    U firem analyzujeme nejen obchodování se státem, ale také provázanost majitelů a statutárních orgání a přímé i nepřímé sponzorování politických stran firmami či jejich majiteli.
+                </p>
+                <p>
+                    Pokud hledáte informace o konkrétní firmě, nejrychlejší je napsat její jméno
+                    do <a href="#" onclick="closeMegaMenu(this);$('#autocompleteInputBox').focus();return false;"><b>vyhledávání</b></a>. Pokud firma existuje, už během psaní vám tuto firmu či s podobným názvem nabídneme k výběru.
+                </p>
+                <hr />
+                <p>
+                    <h5>Speciální reporty</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <a href="/Report/9">Firmy založené těsně před či po uzavřením smlouvy.</a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <a href="/Report/6">Firmy, které se objevily v rejstříku poprvé</a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <a href="/data/Index/skutecni-majitele">Skuteční majitelé firem</a>
+                        </li>
+                    </ul>
+                </p>
+            </div>
+            <div class="col-12 col-sm-4 py-4">
+                <h3>Dotace</h3>
+                <div class="card">
+                    <img src="img/banner-image.jpg" class="img-fluid" alt="image">
+                    <div class="card-body">
+                        <p class="card-text">MMR MMR MMR text to build on the card title and make up the bulk of the card's content.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
+                <h3>Dotace</h3>
+                <p>
+                    Ministerstva, státní fondy nebo nejrůznější podpůrné programy Evropské unie
+                    poskytují na základě vyhlášených podmínek finance těm, kdo o ně požádají.
+                    O dotaci může žádat úřad, soukromá firma nebo i nepodnikající fyzická osoba. Pokud jsou splněny podmínky a dotace
+                    je poskytnuta a musí se to zaevidovat. Informace o dotacích se evidují v různé míře podrobnosti do více než 10 různých
+                    rejstříků a databází, ze kterých je čerpáme my. Update provádíme přibližně 1x za půl roku.
+                </p>
+                <p>
+                    Pokud chcete vyhledávat pouze dotace, nejlepší je to pomocí <a href="/dotace">vyhledávání na stránce dotací</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
