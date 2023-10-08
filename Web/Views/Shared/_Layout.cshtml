@@ -326,7 +326,7 @@
                         </div>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Další databáze<br />Investigace</a>
+                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Dotace a<br />další</a>
                         <div class="dropdown-menu shadow">
                         <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
                             <partial name="MegaMenu/_Dalsi" />
@@ -477,92 +477,10 @@
     <!-- render-scripts -->
     <render-scripts></render-scripts>
 
+    <partial name="ads/_bookmark" />
 
-    <div id="dar-footer-msg" class="ad-footer-msg">
-        <div id="ad1">
-            <div class="fund-list grey" style="display: block;">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-sm-10 col-xs-12">
-                            <p class="small">
-                                Pokud vás zaujme nějaký dokument, profil firmy, výsledek hledání či prakticky jakýkoliv údaj na Hlídači,
-                                <b>nemusíte si ho pamatovat</b>. Stačí si ho uložit do záložek a my si to zapamatujeme za vás.
-                            </p>
-                            <p class="small">
-                                Uložení záložky je snadné, stačí kliknout na ikonu  <a style="font-size:120%" href="#" class="bookmark bookmarkOff" onclick="javascript:return false;"></a>.
-                                Pokud už je konkrétní záložka vytvořená, pak je vybarvena červeně <a style="font-size:120%" href="#" class="bookmark bookmarkOn" onclick="javascript:return false;"></a>.
-                            </p>
-                        </div>
-                        <div class="col-sm-2 col-xs-12">
-                            <a style="margin-top:15px;" class="fund-daruj-btn float-end text-end" onclick="_my_event('send', 'event', 'darujAdFooter', 'daruj-btn', '1'); return false;" id="fund-daruj-btn" target="_blank" href="#">Chápu, díky!</a>
-                        </div>
-                        <div class="fund-zavri">
-                            <a id="fund-info-btn" onclick="_my_event('send', 'event', 'darujAdFooter', 'viceinfo', '1');" target="_blank" href="https://www.hlidacstatu.cz/texty/zalozky-si-za-vas-zapamatuji-vse-co-potrebujete/">Více informací</a>
-                            <a id="fund-zavri-btn" onclick="_my_event('send', 'event', 'darujAdFooter', 'zavri', '1');" style="margin-left:30px;color:#ff5900" href="#"><span class="fas fa-times"></span></a>
-                        </div>
-                    </div>
+    <partial name="ads/_ceny" />
 
-                </div>
-            </div>
-        </div>
-        <noscript>
-            <style>
-                #dar-footer-msg {
-                    display: none;
-                }
-            </style>
-        </noscript>
-    </div>
-
-
-
-    <div id="dar-footer-msg-ceny">
-        <div class="modal fade" id="dar-footer-msg-ceny-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="dar-footer-msg-ceny-modal-label" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" style="margin:0" id="dar-footer-msg-ceny-modal-label">Nejrozsáhlejší analýza cen ICT služeb</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-
-                        <div class="row">
-                            @{
-                                int adNum = System.Random.Shared.Next(1, 12);
-                                string shadow = @" 0px 0px 13px 0px rgba(0,0,0,0.75);";
-                                string css = "-webkit-box-shadow:" + shadow + "-moz-box-shadow:" + shadow + "box-shadow:" + shadow;
-                            }
-                            <div class="text-center mb-4">
-                                <a href="https://www.watchdoganalytics.cz/?utm_source=popup&utm_medium=referral&utm_campaign=start&utm_content=popupImg_@(adNum)">
-                                    <img src="/ad/1080x1080/@(adNum).jpg" style="width:80%;height:auto;@(css)" />
-                                </a>
-                            </div>
-                        </div>
-                        <p>
-                            Navazujeme na <b>Přehled obvyklých cen ICT prací od Ministerstva vnitra</b> a nabízíme aktuální analýzy IT pro roky <b>2022, 2021 a 2020</b>.
-                        </p>
-                        <p>
-                            <i class="fa-solid fa-circle-right" style="color:orange"></i><b>Detailní nákupní ceny</b> IT služeb státu.
-                            <i class="fa-solid fa-circle-right" style="color:orange"></i><b>Porovnání</b> nabídek dodavatelů.
-                            <i class="fa-solid fa-circle-right" style="color:orange"></i><b>Cenové hladiny</b> zadavatelů a jejich porovnání.
-                            <i class="fa-solid fa-circle-right" style="color:orange"></i><b>Meziroční změny</b> cenových hladin a další.
-                        </p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" onclick="_my_event('send', 'event', 'dar-footer-msg-ceny', 'zavri', '1');" data-bs-dismiss="modal">Zavřít</button>
-                        <button type="button" class="btn btn-primary" onclick="location.href='https://www.watchdoganalytics.cz/?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=popup_btn_@(adNum)';return true;">Ukázat analýzy</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <noscript>
-            <style>
-                #dar-footer-msg-ceny {
-                    display: none;
-                }
-            </style>
-        </noscript>
-    </div>
 
 
     @if (!(this.User?.Identity?.IsAuthenticated == true))

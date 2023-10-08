@@ -29,24 +29,126 @@
                 </p>
             </div>
             <div class="col-12 col-sm-4 col-md-3 py-4">
-                <h3>Weby státu</h3>
+                <h3>Hlídání dostupnosti státních webů</h3>
+                <p>
+                    Co to vlastně děláme?
+                    Měříme každou minutu, zda důležité weby státu a samosprývy běží a jak rychle odpovídají.
+                    Tomu odpovídají i zobrazené barvy ve vizualizacích s významem podobným semaforu. Zelená je vše OK, oranžová znamená pomalou odpověď a červená je nedostupný či velmi pomalu odpovídající server.
+                </p>
                 <div class="card">
-                    <img src="img/banner-image.jpg" class="img-fluid" alt="image">
-                    <div class="card-body">
-                        <p class="card-text">MMR MMR MMR text to build on the card title and make up the bulk of the card's content.</p>
-                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <a href='/StatniWeby/Dalsi/Https'>Podpora HTTPs</a>
+                            <span class="badge rounded-pill text-bg-light">@HlidacStatu.Util.RenderData.NiceNumber(HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()?.Count() ?? 0)</span>
+                        </li>
+                        @foreach (var item in UptimeServer.TabsOnWeb.Take(5))
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <a href='/StatniWeby/Dalsi/@(item.Key)'>@(item.Value)</a>
+                                <span class="badge rounded-pill text-bg-light">@HlidacStatu.Util.RenderData.NiceNumber(UptimeServerRepo.ServersIn(item.Key)?.Count() ?? 0)</span>
+                            </li>
+                        }
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <a href='/StatniWeby/'>Všechny sledované weby</a>
+                            <span class="badge rounded-pill text-bg-light">@HlidacStatu.Util.RenderData.NiceNumber(HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers()?.Count() ?? 0)</span>
+                        </li>
+                    </ul>
+
                 </div>
             </div>
             <div class="col-12 col-sm-4 col-md-3 py-4">
-                <h5>Další databáze</h5>
-                <p><b>CodeHim</b> is one of the BEST developer websites that provide web designers and developers with a simple way to preview and download a variety of free code & scripts.</p>
+                <h3>Další databáze</h3>
+                <p>Zpracováváme pro vás desítky dalších menších databází a datových zdrojů z různých oblastí.</p>
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            @{
+                                Dictionary<string, string> datasety = new Dictionary<string, string>()
+                            {
+                            {"vyjadreni-politiku","Politici" },
+                            {"stenozaznamy-psp","Politici" },
+                            {"de-minimis","Rejstříky" },
+                            {"rejstrik-trestu-pravnickych-osob","Rejstříky" },
+                            {"covid-podpora","Ekonomika" },
+                            {"ministry-invoices","Ekonomika" },
+                            {"veklep","Veřejná správa" },
+                            {"zasedani-zastupitelstev","Veřejná správa" },
+                            {"rozhodnuti-uohs","Veřejná správa" },
+
+                            };
+                                var groups = datasety.Values.Distinct();
+                            }
+                            @foreach (var group in groups)
+                            {
+                                <div class="fw-bold">@group</div>
+                                <ul>
+                                    @foreach (var ds in datasety.Where(m => m.Value == group))
+                                    {
+                                        var specificDataset = DataSet.CachedDatasets.Get(ds.Key);
+                                        if (specificDataset != null)
+                                        {
+                                            <li>
+                                                <a href="/data/Index/@ds.Key">@specificDataset.RegistrationAsync().Result.name</a>
+                                                <span class="badge rounded-pill text-bg-light">@HlidacStatu.Util.RenderData.NiceNumber(specificDataset is null? 0 : await specificDataset.NumberOfRecordsAsync())</span>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            }
+                        </div>
+                    </li>
+                </ul>
+
             </div>
             <div class="col-12 col-sm-12 col-md-3 py-4">
-                <h5>Analýza ICT smluv</h5>
-                <div class="list-group">
-                    <a class="list-group-item" href="#">Accomodations</a>
-                    <a class="list-group-item" href="#">Terms & Conditions</a>
-                    <a class="list-group-item" href="#">Privacy</a>
+                <h3>Analýza ICT smluv</h3>
+                <p>
+                    Nejrozsáhlejší analýza <b>cen ICT služeb</b> na českém trhu. Přesná a aktuální, pouze ze <b>skutečně uzavřených smluv</b>.
+                </p>
+                <p>
+                    <a class="btn btn-warning btn-sm" href="https://www.watchdoganalytics.cz/?utm_source=megamenu&utm_medium=referral&utm_campaign=utm_campaign=permanent&utm_content=menuDalsi" role="button">Zobrazit detaily</a>
+                </p>
+                <div class="col d-flex align-items-start">
+                    <i class="fa fa-circle-1 fa-3x bi text-body-secondary flex-shrink-0 me-3" width="1.75em" height="1.75em"></i>
+                    <div>
+                        <h4 class="fw-bold mb-0 fs-4 text-body-emphasis">10&nbsp;000+</h4>
+                        <p>
+                            10 000+ zanalyzovaných cen za ICT služby
+                        </p>
+                    </div>
+                </div>
+                <div class="col d-flex align-items-start">
+                    <i class="fa fa-circle-2 fa-3x bi text-body-secondary flex-shrink-0 me-3" width="1.75em" height="1.75em"></i>
+                    <div>
+                        <h4 class="fw-bold mb-0 fs-4 text-body-emphasis">
+                            2020-22
+                        </h4>
+                        <p>
+                            Trendy za tři roky, navazuje na analýzy z 2017-2018 od Min.vnitra
+                        </p>
+                    </div>
+                </div>
+                <div class="col d-flex align-items-start">
+                    <i class="fa fa-circle-3 fa-3x bi text-body-secondary flex-shrink-0 me-3" width="1.75em" height="1.75em"></i>
+                    <div>
+                        <h4 class="fw-bold mb-0 fs-4 text-body-emphasis">
+                            600+
+                        </h4>
+                        <p>
+                            dodavatelů a zadavatelů. Pro každého unikátní analýza potřeb i provedených nabídek.
+                        </p>
+                    </div>
+                </div>
+                <div class="col d-flex align-items-start">
+                    <i class="fa fa-circle-4 fa-3x bi text-body-secondary flex-shrink-0 me-3" width="1.75em" height="1.75em"></i>
+                    <div>
+                        <h4 class="fw-bold mb-0 fs-4 text-body-emphasis">
+                            rok 2020 zadarmo
+                        </h4>
+                        <p>
+                            Přehled obvyklých cen IT prací ve státní správě za rok 2020 <b>zcela zdarma</b>. Údaje z 726 smluv od 305 zadavatelů, 335 dodavatelů, zahrnuje 3693 cen.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

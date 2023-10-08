@@ -1,10 +1,35 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HlidacStatu.Entities
 {
     public partial class UptimeServer
     {
+
+        public const string NotInGroup = "other";
+
+        public static Dictionary<string, string> TabsOnWeb = new Dictionary<string, string>()
+        {
+            {"ustredni","Služby nejdůležitějších úřadů" },
+            {"registr","Rejstříky, registry a důležité databáze" },
+            {"sluzba","Důležité služby a weby veřejné správy" },
+            {"mesta","Městské weby" },
+            {"kraj","Krajské weby" },
+            {"opendata","Open data, open source" },
+            {"geo","Mapy, geografické služby" },
+            {"api","API rozhraní digitálních služeb státu" },
+            {NotInGroup ,"Ostatní weby" },
+
+        };
+        public static string TableGroupsTitle(string groupName)
+        {
+            if (TabsOnWeb.ContainsKey(groupName.ToLower()))
+                return TabsOnWeb[groupName.ToLower()];
+            else
+                return "";
+        }
+
         string[] _groupArray = null;
         public string[] GroupArray()
         {

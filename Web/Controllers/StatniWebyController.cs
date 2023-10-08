@@ -29,7 +29,7 @@ namespace HlidacStatu.Web.Controllers
             var servers = Repositories.UptimeServerRepo.ServersIn(id.ToString());
             if (servers != null || servers?.Count() > 0)
             {
-                ViewBag.SubTitle = HlidacStatu.Web.Framework.WebyChartUtil.TableGroupsTitle(id);
+                ViewBag.SubTitle = UptimeServer.TableGroupsTitle(id);
                 return View((list: servers, id: id));
             }
 

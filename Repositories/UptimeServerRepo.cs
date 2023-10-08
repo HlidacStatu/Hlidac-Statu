@@ -228,14 +228,13 @@ namespace HlidacStatu.Repositories
 
         }
 
-        public const string NotInGroup = "other";
         public static IEnumerable<int> ServersIn(string group)
         {
             int[] serverIds = null;
             using (Entities.DbEntities db = new HlidacStatu.Entities.DbEntities())
             {
                 var servers = AllActiveServers();
-                if (group == NotInGroup)
+                if (group == UptimeServer.NotInGroup)
                 {
                     serverIds = servers
                         .Where(m => m.GroupArray()?.Count() == 0)

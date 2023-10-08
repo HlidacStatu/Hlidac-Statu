@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Html;
 
 using System.Linq;
 using System.Text;
+using HlidacStatu.Entities;
 
 namespace HlidacStatu.Web.Framework
 {
@@ -52,26 +53,6 @@ namespace HlidacStatu.Web.Framework
         }
 
 
-        static Dictionary<string, string> tabs = new Dictionary<string, string>()
-        {
-            {"ustredni","Služby nejdůležitějších úřadů" },
-            {"registr","Rejstříky, registry a důležité databáze" },
-            {"sluzba","Důležité služby a weby veřejné správy" },
-            {"mesta","Městské weby" },
-            {"kraj","Krajské weby" },
-            {"opendata","Open data, open source" },
-            {"geo","Mapy, geografické služby" },
-            {"api","API rozhraní digitálních služeb státu" },
-            {UptimeServerRepo.NotInGroup ,"Ostatní weby" },
-
-        };
-        public static string TableGroupsTitle(string groupName)
-        {
-            if (tabs.ContainsKey(groupName.ToLower()))
-                return tabs[groupName.ToLower()];
-            else
-                return "";
-        }
         public static IHtmlContent TableNextGroups(string groupName)
         {
 
@@ -99,7 +80,7 @@ namespace HlidacStatu.Web.Framework
 
             ");
 
-            foreach (var item in tabs)
+            foreach (var item in UptimeServer.TabsOnWeb)
             {
                 sb.AppendLine($@"
 <a href='/StatniWeby/Dalsi/{item.Key}' class='list-group-item {WebUtil.IfExists(groupName == item.Key, "active disabled")}'>
