@@ -331,7 +331,7 @@ $(function () {
 
 
 
-    if (darDatDiff > 5 && darNum < 20) {
+    if (false && darDatDiff > 5 && darNum < 20) {
         $('#dar-footer-msg-' + campaignN).fadeIn();
         _my_event('send', 'event', 'darujAdfooter' + campaignN, 'shown', { nonInteraction: true });
         const myModal = new bootstrap.Modal('#dar-footer-msg-' + campaignN + '-modal');
