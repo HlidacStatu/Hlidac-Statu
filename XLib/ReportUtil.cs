@@ -1,7 +1,7 @@
 ﻿using Devmasters.Enums;
 
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities.Analysis;
+using HlidacStatu.Entities.Analysis;
 using HlidacStatu.Lib.Analytics;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;

@@ -6,7 +6,7 @@ using Devmasters.Batch;
 using Devmasters.Enums;
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities.Analysis;
+using HlidacStatu.Entities.Analysis;
 using HlidacStatu.Extensions;
 using Nest;
 using Manager = HlidacStatu.Connectors.Manager;

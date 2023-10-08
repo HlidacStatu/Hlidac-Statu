@@ -1,4 +1,4 @@
-﻿namespace HlidacStatu.Entities.Entities.Analysis
+﻿namespace HlidacStatu.Entities.Analysis
 {
     public static class Riziko
     {

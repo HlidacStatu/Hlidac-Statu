@@ -1,7 +1,7 @@
 ﻿using System;
 using Nest;
 
-namespace HlidacStatu.Entities.Entities.KIndex
+namespace HlidacStatu.Entities.KIndex
 {
     [ElasticsearchType(IdProperty = nameof(Id))]
     public class KindexFeedback

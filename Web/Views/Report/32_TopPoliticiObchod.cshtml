@@ -1,0 +1,112 @@
+﻿@using System.Linq
+@using HlidacStatu.Entities
+@using HlidacStatu.Extensions
+@using HlidacStatu.XLib.Render
+@using HlidacStatu.Repositories
+
+@{
+    Layout = "_ReportLayout";
+
+    int year = Devmasters.ParseText.ToInt(this.Context.Request.Query["rok"].FirstOrDefault(), 0) ?? 0;
+
+    Osoba.Statistics.VerySimple[] showList = HlidacStatu.Repositories.StaticData.TopPoliticiObchodSeStatem.Get()[year];
+
+
+    ReportDataSource poslanciTable = new(new ReportDataSource.Column[]
+    {
+        new() { Name="Politik",
+            HtmlRender = (s) => {
+                Osoba.Statistics.VerySimple stat = (Osoba.Statistics.VerySimple)s;
+                Osoba o = Osoby.GetByNameId.Get(stat.OsobaNameId);
+                return string.Format("<a href='{0}'>{1}</a>", o.GetUrl(), o.FullNameWithYear(true))
+                + "<br />"
+                + Devmasters.TextUtil.ShortenText(o.Description(false,m=> true, numOfRecords: 3), 250).Replace("\n", "<br />");
+            },
+            OrderValueRender = (s) => {
+                Osoba.Statistics.VerySimple stat = (Osoba.Statistics.VerySimple)s;
+                Osoba o = Osoby.GetByNameId.Get(stat.OsobaNameId);
+                return o.FullName(false);
+            }
+        },
+        new() {
+            Name ="Strana/Hnutí",
+            HtmlRender = (s) => {
+                Osoba.Statistics.VerySimple stat = (Osoba.Statistics.VerySimple)s;
+                Osoba o = Osoby.GetByNameId.Get(stat.OsobaNameId);
+                return o.CurrentPoliticalParty();
+            },
+            OrderValueRender = (s) => {
+                Osoba.Statistics.VerySimple stat = (Osoba.Statistics.VerySimple)s;
+                Osoba o = Osoby.GetByNameId.Get(stat.OsobaNameId);
+                return o.CurrentPoliticalParty();
+            }
+        },
+        new() {
+            Name ="Objem uzavřených smluv firem, kde se angažuje",
+            HtmlRender = (s) => {
+                Osoba.Statistics.VerySimple stat = (Osoba.Statistics.VerySimple)s;
+                return HlidacStatu.Util.RenderData.NicePrice( stat.CelkovaHodnotaSmluv, html:true,shortFormat:true);
+            },
+            OrderValueRender = (s) => {
+                Osoba.Statistics.VerySimple stat = (Osoba.Statistics.VerySimple)s;
+                return HlidacStatu.Util.RenderData.OrderValueFormat(stat.CelkovaHodnotaSmluv);
+            }
+        },
+        new() {
+            Name ="Počet smluv uzavřených firmami, kde se angažuje",
+            HtmlRender = (s) => {
+                Osoba.Statistics.VerySimple stat = (Osoba.Statistics.VerySimple)s;
+                return HlidacStatu.Util.RenderData.NiceNumber( stat.PocetSmluv, html:true);
+            },
+            OrderValueRender = (s) => {
+                Osoba.Statistics.VerySimple stat = (Osoba.Statistics.VerySimple)s;
+                return HlidacStatu.Util.RenderData.OrderValueFormat(stat.PocetSmluv);
+            }
+        }
+    });
+
+
+    foreach (var p in showList)
+    {
+        poslanciTable.AddRow(p);
+    }
+}
+
+<h2 id="tblHead">Politici angažovaní ve firmách obchodujících se státem<small>@(year == 0 ? "" : $" v roce {year}")</small></h2>
+<p>Seznam největších smluv @(year == 0 ? "" : $" v roce {year}")</p>
+
+<h4>
+    @if (year == 0)
+    {
+        <b>od roku 2016</b>
+    }
+    else
+    {
+    <a href="/report/32?rok=" style="">od roku 2016</a>
+    }
+    @foreach(int y in HlidacStatu.Entities.KIndex.Consts.ToCalculationYears)
+    {
+        if (year == y)
+        {
+            <span>v roce <b>@y</b></span>
+        }
+        else
+        {
+            <span style="margin-left:1em">v roce <a href="/report/32?rok=@y">@y</a></span>
+        }
+    }
+</h4>
+
+
+@ChartUtil.RenderReport("",ReportModel.QueueItem.types.table, poslanciTable, @"{
+                 'language': {
+                    'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                },
+                'order': [2,'desc'],
+                'lengthChange': false,
+                'info': false,
+                'paging': true,
+                'searching':true,
+                'pageLength': 50,
+                //'columnDefs': [{ 'visible': false, 'targets': 0 }]
+                }", "tbPoslanci")

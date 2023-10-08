@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HlidacStatu.Entities.Entities.Analysis
+namespace HlidacStatu.Entities.Analysis
 {
     public class BasicDataPerYear : DataPerYear<BasicData>
     {

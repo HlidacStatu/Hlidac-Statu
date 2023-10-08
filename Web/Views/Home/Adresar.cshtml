@@ -1,4 +1,4 @@
-﻿@model (string oborName, string kraj)
+﻿@model (string oborName, string kraj, bool zakazky)
 @using HlidacStatu.Entities
 @using Devmasters.Enums
 
@@ -46,7 +46,7 @@
 }
 else
 {
-    <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.oborName}_{Model.kraj}")">
+    <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.oborName}_{Model.kraj}_{Model.zakazky}")">
         <partial name="Partials/Adresar_List" model=Model />
     </cache>
 

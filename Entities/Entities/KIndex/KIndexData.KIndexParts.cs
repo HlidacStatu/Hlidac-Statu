@@ -1,6 +1,6 @@
 ﻿using Devmasters.Enums;
 
-namespace HlidacStatu.Entities.Entities.KIndex
+namespace HlidacStatu.Entities.KIndex
 {
 
     public partial class KIndexData

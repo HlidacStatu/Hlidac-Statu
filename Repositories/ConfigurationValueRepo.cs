@@ -2,7 +2,7 @@ using HlidacStatu.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities;
 
 namespace HlidacStatu.Repositories;
 

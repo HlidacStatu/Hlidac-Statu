@@ -1,5 +1,5 @@
 @model KindexDetailsViewModel
-@using HlidacStatu.Entities.Entities.KIndex
+@using HlidacStatu.Entities.KIndex
 
 @{
     KIndexData.VypocetDetail.Radek vradek = Model.CurrYear.KIndexVypocet.Radky.Where(m => m.VelicinaPart == Model.Part).First();

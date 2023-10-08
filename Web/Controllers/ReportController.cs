@@ -80,6 +80,19 @@ namespace HlidacStatu.Web.Controllers
             return View("28_Ministerstva");
         }
 
+
+        [Route("32")]
+        [HlidacCache(24 * 60 * 60, "id;rok",true)]
+
+        public IActionResult TopPoliticiObchod(int? id, int rok = 0)
+        {
+
+            ViewBag.Title = "Politici angažovaní ve firmách obchodujících se státem " + (rok == 0 ? "" : $" v roce {rok}");
+            ViewBag.SubTitle = "Seznam největších angažovaností";
+            return View("32_TopPoliticiObchod");
+
+        }
+
         [Route("99")]
         public IActionResult CovidUmrti()
         {

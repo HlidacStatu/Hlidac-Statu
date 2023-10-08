@@ -1,4 +1,4 @@
-namespace HlidacStatu.Entities.Entities;
+namespace HlidacStatu.Entities;
 
 public class ConfigurationValue
 {

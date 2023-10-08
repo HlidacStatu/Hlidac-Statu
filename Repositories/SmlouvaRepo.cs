@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Entities.Entities.KIndex;
+using HlidacStatu.Entities.KIndex;
 using Manager = HlidacStatu.Connectors.Manager;
 
 

@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Devmasters.Collections;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities.KIndex;
+using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Extensions;
 using HlidacStatu.Lib.Analytics;
 using Nest;
-using Consts = HlidacStatu.Entities.Entities.KIndex.Consts;
+using Consts = HlidacStatu.Entities.KIndex.Consts;
 
 namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 {

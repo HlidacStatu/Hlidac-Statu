@@ -1,4 +1,4 @@
-﻿using HlidacStatu.Entities.Entities.KIndex;
+﻿using HlidacStatu.Entities.KIndex;
 
 namespace HlidacStatuApi.Models
 {

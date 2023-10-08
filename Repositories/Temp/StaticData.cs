@@ -2,16 +2,16 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.OrgStrukturyStatu;
 using HlidacStatu.Extensions;
-
+using HlidacStatu.Repositories.Analysis;
+using HlidacStatu.Repositories.Statistics;
 using Microsoft.EntityFrameworkCore; //using HlidacStatu.Extensions;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
-using HlidacStatu.Repositories.Analysis;
+using static HlidacStatu.Entities.Osoba.Statistics;
 
 namespace HlidacStatu.Repositories
 {
@@ -65,6 +65,68 @@ namespace HlidacStatu.Repositories
             {
                 return Devmasters.Net.HttpClient.Simple.GetAsync("https://somedata.hlidacstatu.cz/appdata/crawler-user-agents.json").Result;
             }, null);
+
+
+
+        public static Devmasters.Cache.AWS_S3.Cache<Dictionary<int, Osoba.Statistics.VerySimple[]>> TopPoliticiObchodSeStatem =
+            new Devmasters.Cache.AWS_S3.Cache<Dictionary<int, Osoba.Statistics.VerySimple[]>>(new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") }, Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"), Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"), Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+    TimeSpan.Zero, "TopPoliticiObchodSeStatem", (obj) =>
+    {
+        List<Osoba.Statistics.RegistrSmluv> allStats = new();
+        Devmasters.Batch.Manager.DoActionForAll(OsobaRepo.Politici.Get(),
+            (o) =>
+            {
+                if (o != null)
+                {
+                    var stat = o.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny);
+                    if (stat.SoukromeFirmySummary().HasStatistics && stat.SoukromeFirmySummary().Summary().PocetSmluv > 0)
+                    {
+                        allStats.Add(stat);
+                    }
+
+                }
+                return new Devmasters.Batch.ActionOutputData();
+            },
+            Util.Consts.outputWriter.OutputWriter,
+            Util.Consts.progressWriter.ProgressWriter,
+            true, //!System.Diagnostics.Debugger.IsAttached,
+            maxDegreeOfParallelism: 6, prefix: "TopPoliticiObchodSeStatem loading ", monitor: new MonitoredTaskRepo.ForBatch());
+
+
+        Dictionary<int, Osoba.Statistics.VerySimple[]> res = new();
+        res.Add(0,
+                allStats.OrderByDescending(o => o.SoukromeFirmySummary().Summary().CelkovaHodnotaSmluv).Take(100)
+                .Union(allStats.OrderByDescending(o => o.SoukromeFirmySummary().Summary().PocetSmluv).Take(100))
+                .Select(m => new VerySimple()
+                {
+                    OsobaNameId = m.OsobaNameId,
+                    CelkovaHodnotaSmluv = m.SoukromeFirmySummary().Summary().CelkovaHodnotaSmluv,
+                    PocetSmluv = m.SoukromeFirmySummary().Summary().PocetSmluv,
+                    Year = 0,
+                }
+                )
+                .ToArray()
+            );
+        foreach (int year in HlidacStatu.Entities.KIndex.Consts.ToCalculationYears)
+        {
+            res.Add(year,
+                    allStats.OrderByDescending(o => o.SoukromeFirmySummary()[year].CelkovaHodnotaSmluv).Take(100)
+                    .Union(allStats.OrderByDescending(o => o.SoukromeFirmySummary()[year].PocetSmluv).Take(100))
+                    .Select(m => new VerySimple()
+                    {
+                        OsobaNameId = m.OsobaNameId,
+                        CelkovaHodnotaSmluv = m.SoukromeFirmySummary()[year].CelkovaHodnotaSmluv,
+                        PocetSmluv = m.SoukromeFirmySummary()[year].PocetSmluv,
+                        Year = year,
+                    }
+                    )
+                    .ToArray()
+                );
+
+        }
+
+        return res;
+    }, null);
 
 
         public static Dictionary<string, TemplatedQuery> Afery = new Dictionary<string, TemplatedQuery>();
@@ -150,7 +212,7 @@ namespace HlidacStatu.Repositories
 "tatana-mala-2","robert-plaga","klara-dostalova","miroslav-toman","antonin-stanek"
     }; //Pridat Jan Kněžínek	
 
-        
+
         public static string[] Poslanci2021Novacci = new string[] {
             "jana-bacikova","vladimir-balas","romana-belohlavkova","roman-belor","jan-berki","jana-berkovcova",
             "josef-bernard","lubomir-broz-3","eva-decroix","tomas-dubsky-10","ales-dufek","martin-exner-1","petr-fifka",
@@ -168,7 +230,7 @@ namespace HlidacStatu.Repositories
             "libor-turek","barbora-urbanova-5","lukas-vlcek","milada-voborska","viktor-vojtko","vit-vomacka",
             "lubomir-wenzl","milan-wenzl","renata-zajickova","miroslav-zborovsky-2","vladimir-zlinsky","michal-zuna"
         };
-        
+
 
         static StaticData()
         {
@@ -258,7 +320,7 @@ namespace HlidacStatu.Repositories
                                                      }
                                                  }
                                              }
-                                             addList:
+                                         addList:
                                              if (addToList)
                                                  insolvenceIntoList.Add(i);
                                          }
@@ -284,7 +346,7 @@ namespace HlidacStatu.Repositories
                              Util.Consts.outputWriter.OutputWriter,
                              Util.Consts.progressWriter.ProgressWriter,
                              true, //!System.Diagnostics.Debugger.IsAttached,
-                             maxDegreeOfParallelism: 6, prefix:"Insolvence politiku ", monitor: new MonitoredTaskRepo.ForBatch())
+                             maxDegreeOfParallelism: 6, prefix: "Insolvence politiku ", monitor: new MonitoredTaskRepo.ForBatch())
                              .ConfigureAwait(false).GetAwaiter().GetResult();
 
                          return ret.ToArray();
@@ -435,7 +497,7 @@ namespace HlidacStatu.Repositories
                    (o) =>
                    {
                        return new AnalysisCalculation.VazbyFiremNaPolitiky();
-                       
+
                    });
 
                 FirmySVazbamiNaPolitiky_vsechny_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
@@ -596,8 +658,8 @@ namespace HlidacStatu.Repositories
                                             new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
                     Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
                     Devmasters.Config.GetWebConfigValue("Minio.Cache.AccessKey"),
-                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"), 
-                    TimeSpan.FromDays(90), 
+                    Devmasters.Config.GetWebConfigValue("Minio.Cache.SecretKey"),
+                    TimeSpan.FromDays(90),
                     "OrganizacniStrukturyUradu", (obj) =>
                         {
                             OrganizacniStrukturyUradu res = new OrganizacniStrukturyUradu();
@@ -672,14 +734,14 @@ namespace HlidacStatu.Repositories
                             res.Urady = _organizaniStrukturyUradu;
                             return res;
                         }, null);
-                    
+
                 }
                 catch (Exception ex)
                 {
                     Util.Consts.Logger.Error($"Chyba při zpracování struktury úřadů. {ex}");
                 }
 
-                
+
 
                 initialized = true;
             } //lock
@@ -689,10 +751,10 @@ namespace HlidacStatu.Repositories
         private static organizacni_struktura_sluzebnich_uradu ParseOssu()
         {
             string url = "https://portal.isoss.cz/opendata/ISoSS_Opendata_OSYS_OSSS.xml";
-            string xml = Devmasters.Net.HttpClient.Simple.GetAsync(url).Result; 
+            string xml = Devmasters.Net.HttpClient.Simple.GetAsync(url).Result;
 
             var ser = new XmlSerializer(typeof(organizacni_struktura_sluzebnich_uradu));
-            
+
             using (var streamReader = new StringReader(xml))
             {
                 using (var reader = XmlReader.Create(streamReader))

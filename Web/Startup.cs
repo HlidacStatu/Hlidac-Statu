@@ -18,7 +18,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Devmasters.Log;
-using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.Web.Views.Shared.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;

@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Entities.Entities.KIndex;
+using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 
 namespace HlidacStatu.Web.Framework

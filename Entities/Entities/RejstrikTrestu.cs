@@ -1,6 +1,6 @@
 using System;
 
-namespace HlidacStatu.Entities.Entities;
+namespace HlidacStatu.Entities;
 
 public class RejstrikTrestu
 {

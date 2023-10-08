@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using HlidacStatu.Entities.Entities.KIndex;
+using HlidacStatu.Entities.KIndex;
 
 namespace HlidacStatu.Web.Models.Apiv2
 {

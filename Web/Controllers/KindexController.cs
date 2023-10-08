@@ -12,7 +12,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using HlidacStatu.Entities.Entities.KIndex;
+using HlidacStatu.Entities.KIndex;
 using HlidacStatu.LibCore;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using HlidacStatu.Web.Framework;

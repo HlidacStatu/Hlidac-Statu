@@ -608,9 +608,9 @@ text zpravy: {txt}
             return View();
         }
 
-        public ActionResult Adresar(string id, string kraj = null)
+        public ActionResult Adresar(string id, string kraj = null, string vz= "")
         {
-            (string oborName, string kraj) model = (id, kraj);
+            (string oborName, string kraj, bool zakazky) model = (id, kraj, vz=="1");
             return View(model);
         }
 

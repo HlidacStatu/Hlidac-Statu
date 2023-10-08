@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
-using HlidacStatu.Entities.Entities.Analysis;
-using HlidacStatu.Entities.Entities.KIndex;
+using HlidacStatu.Entities.Analysis;
+using HlidacStatu.Entities.KIndex;
 using Nest;
 
 namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko

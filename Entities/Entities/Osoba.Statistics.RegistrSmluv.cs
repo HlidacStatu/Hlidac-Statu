@@ -9,6 +9,14 @@ namespace HlidacStatu.Entities
     {
         public class Statistics
         {
+            public class VerySimple
+            {
+                public string OsobaNameId { get; set; }
+                public long PocetSmluv { get; set; } = 0;
+                public decimal CelkovaHodnotaSmluv { get; set; } = 0;
+                public int Year { get; set; } = 0;
+            }
+
             public class RegistrSmluv
             {
 
@@ -27,6 +35,7 @@ namespace HlidacStatu.Entities
 
 
             }
+
 
 
         }

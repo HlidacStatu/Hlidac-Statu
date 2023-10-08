@@ -145,15 +145,15 @@
 @{ ViewBag.MoreHtml = "<p><b>Tady najdete <a href='/Osoby'>Seznam politiků a jejich vazby na soukromé firmy</a></b></p>"; }
 
 <p>
-    <a href="@Url.Action("OtherReports", new {id = 5, aktualnost = Relation.AktualnostType.Aktualni})"
+    <a href="@Url.Action("Report", new {id = 5, aktualnost = Relation.AktualnostType.Aktualni})"
        class="btn btn-@(aktualnost == Relation.AktualnostType.Aktualni ? "success" : "primary") btn-sm" role="button">
         @(aktualnost == Relation.AktualnostType.Aktualni ? "Zobrazujeme" : "Ukázat") pouze aktuální vazby
     </a>
-    <a href="@Url.Action("OtherReports", new {id = 5, aktualnost = Relation.AktualnostType.Nedavny})"
+    <a href="@Url.Action("Report", new {id = 5, aktualnost = Relation.AktualnostType.Nedavny})"
        class="btn btn-@(aktualnost == Relation.AktualnostType.Nedavny ? "success" : "primary") btn-sm" role="button">
         @(aktualnost == Relation.AktualnostType.Nedavny ? "Zobrazujeme" : "Ukázat") aktuální a nedávno skončené vazby
     </a>
-    <a href="@Url.Action("OtherReports", new {id = 5, aktualnost = Relation.AktualnostType.Libovolny})"
+    <a href="@Url.Action("Report", new {id = 5, aktualnost = Relation.AktualnostType.Libovolny})"
        class="btn btn-@(aktualnost == Relation.AktualnostType.Libovolny ? "success" : "primary") btn-sm" role="button">
         @(aktualnost == Relation.AktualnostType.Libovolny ? "Zobrazujeme" : "Ukázat") všechny vazby včetně historických
     </a>

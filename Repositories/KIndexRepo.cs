@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities.KIndex;
+using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Util;
 using InfluxDB.Client.Api.Domain;
 using Nest;
-using Consts = HlidacStatu.Entities.Entities.KIndex.Consts;
+using Consts = HlidacStatu.Entities.KIndex.Consts;
 
 namespace HlidacStatu.Repositories;
 

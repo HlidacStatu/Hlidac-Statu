@@ -1,5 +1,5 @@
 ﻿using HlidacStatu.Entities.VZ;
-using HlidacStatu.Entities.Entities.Analysis;
+using HlidacStatu.Entities.Analysis;
 
 using Nest;
 

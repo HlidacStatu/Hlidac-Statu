@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace HlidacStatu.Entities.Entities.KIndex
+namespace HlidacStatu.Entities.KIndex
 {
     public class Consts
     {
@@ -32,6 +32,7 @@ namespace HlidacStatu.Entities.Entities.KIndex
 
             ToCalculationYears = Enumerable
                 .Range(2017, DateTime.Now.Year - 2017 - (DateTime.Now.Month >= 4 ? 0 : 1))
+                .OrderBy(o=>o)
                 .ToArray();
         }
 

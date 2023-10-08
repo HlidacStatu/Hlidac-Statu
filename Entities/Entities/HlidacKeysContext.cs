@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace HlidacStatu.Entities.Entities
+namespace HlidacStatu.Entities
 {
     public class HlidacKeysContext : DbContext, IDataProtectionKeyContext
     {

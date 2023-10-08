@@ -1,7 +1,7 @@
 using System;
 using Nest;
 
-namespace HlidacStatu.Entities.Entities;
+namespace HlidacStatu.Entities;
 
 public class DocumentText
 {

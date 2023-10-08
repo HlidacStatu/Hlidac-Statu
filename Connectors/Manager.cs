@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities.KIndex;
+using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Lib.Data.External.RPP;
 using HlidacStatu.Repositories.ProfilZadavatelu;
 using Microsoft.AspNetCore.Http;

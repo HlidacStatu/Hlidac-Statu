@@ -197,7 +197,7 @@
                     _paq.push(['setUserId', '@(this.User.Identity.Name)']);
             </text>
         }
-                                                                    var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+                                                                            var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
             g.async = true; g.src = u + 'matomo.js'; s.parentNode.insertBefore(g, s);
         })();
     </script>
@@ -294,33 +294,43 @@
                         <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Úřady<br />a úředníci</a>
                         @* Urady a urednici megacontent *@
                         <div class="dropdown-menu shadow">
-                            <partial name="MegaMenu/_Urady" />
+                            <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
+                                <partial name="MegaMenu/_Urady" />
+                            </cache>
                         </div>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Firmy, dotace<br />sponzoři stran</a>
+                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Firmy, sponzoři<br />politické strany</a>
                         <div class="dropdown-menu shadow">
-                            <partial name="MegaMenu/_Firmy" />
+                            <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
+                                <partial name="MegaMenu/_Firmy" />
+                            </cache>
                         </div>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
                         <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Smlouvy<br />se státem</a>
                         @* Smlouvy megacontent *@
                         <div class="dropdown-menu shadow">
+                        <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
                             <partial name="MegaMenu/_Smlouvy" />
+                        </cache>
                         </div>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
                         <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Veřejné<br />Zakazky</a>
                         @* Verejne zakazky megacontent *@
                         <div class="dropdown-menu shadow">
+                        <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
                             <partial name="MegaMenu/_VerejneZakazky" />
+                        </cache>
                         </div>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
                         <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Další databáze<br />Investigace</a>
                         <div class="dropdown-menu shadow">
+                        <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
                             <partial name="MegaMenu/_Dalsi" />
+                        </cache>
                         </div>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">

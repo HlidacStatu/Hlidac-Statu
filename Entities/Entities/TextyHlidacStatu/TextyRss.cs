@@ -1,7 +1,7 @@
 using System.Xml.Serialization;
 using System.Collections.Generic;
 
-namespace HlidacStatu.Entities.Entities.TextyHlidacStatu
+namespace HlidacStatu.Entities.TextyHlidacStatu
 {
   
     [XmlRoot(ElementName = "link", Namespace = "http://www.w3.org/2005/Atom")]

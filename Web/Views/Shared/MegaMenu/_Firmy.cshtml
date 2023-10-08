@@ -19,7 +19,7 @@
                 <h3>Firmy / subjekty</h3>
                 <p>
                     Evidujeme všechny firmy, které jsou v českém Obchodním rejstříku a detailní analýzy provádíme u firem, které jsou evidovány v Registru smluv a/nebo se účastní veřejných zakázek.
-                    U firem analyzujeme nejen obchodování se státem, ale také provázanost majitelů a statutárních orgání a přímé i nepřímé sponzorování politických stran firmami či jejich majiteli.
+                    U firem analyzujeme obchodování se státem, provázanost majitelů a statutárních orgánů a přímé i nepřímé sponzorování politických stran firmami či jejich majiteli.
                 </p>
                 <p>
                     Pokud hledáte informace o konkrétní firmě, nejrychlejší je napsat její jméno
@@ -30,7 +30,13 @@
                     <h5>Speciální reporty</h5>
                     <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <a href="/Report/1">Firmy nejvíce obchodující se státem.</a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
                             <a href="/Report/9">Firmy založené těsně před či po uzavřením smlouvy.</a>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <a href="/Report/5">Smlouvy se soukromými ekonomickými subjekty, u kterých existuje přímá a nepřímá vazba na politiky.</a>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-start">
                             <a href="/Report/6">Firmy, které se objevily v rejstříku poprvé</a>
@@ -38,30 +44,86 @@
                         <li class="list-group-item d-flex justify-content-between align-items-start">
                             <a href="/data/Index/skutecni-majitele">Skuteční majitelé firem</a>
                         </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <a href="/data/Index/osoby-kontrolovane-nku">Právnické osoby kontrolované NKÚ</a>
+                        </li>
+
                     </ul>
                 </p>
             </div>
             <div class="col-12 col-sm-4 py-4">
-                <h3>Dotace</h3>
+                <h3>Sponzoři politických stran</h3>
+                @{
+                    var velkeStrany = await SponzoringRepo.PartiesPerYearsOverviewAsync(SponzoringRepo.DefaultLastSponzoringYear(), System.Threading.CancellationToken.None);
+                    velkeStrany = velkeStrany.Where(s => SponzoringRepo.TopStrany
+                    .Any(x => string.Equals(x, s.KratkyNazev, StringComparison.InvariantCultureIgnoreCase)))
+                    .OrderByDescending(s => s.DaryCelkem)
+                    .ToList();
+
+                }
                 <div class="card">
-                    <img src="img/banner-image.jpg" class="img-fluid" alt="image">
-                    <div class="card-body">
-                        <p class="card-text">MMR MMR MMR text to build on the card title and make up the bulk of the card's content.</p>
+                    <div class="card-header">
+                        Sponzoři velkých stran <sup>&nbsp;v roce @(SponzoringRepo.DefaultLastSponzoringYear())</sup>
                     </div>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var str in velkeStrany.Take(7))
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <a href="/sponzori/strana/@(str.KratkyNazev)">@(str.KratkyNazev)</a>
+                                <span class="badge rounded-pill text-bg-light">@HlidacStatu.Util.RenderData.NicePriceHtml(str.DaryCelkem.Value, shortFormat: true)</span>
+                            </li>
+                        }
+                    </ul>
+
                 </div>
+                <hr />
+                <a href="/Sponzori/Strany" class="btn btn-primary btn-sm">Sponzoři všech stran</a>
+                <a href="/Sponzori/TopSponzori" class="btn btn-primary btn-sm">2000 největších sponzorů (osob i firem) vůbec</a>
+                <a href="/Sponzori/TopSponzori?rok=@(SponzoringRepo.DefaultLastSponzoringYear())" class="btn btn-primary btn-sm">Top sponzorující osoby <sup>za @SponzoringRepo.DefaultLastSponzoringYear()</sup></a>
+                <a href="/Sponzori/TopSponzoriFirmy?rok=@(SponzoringRepo.DefaultLastSponzoringYear())" class="btn btn-primary btn-sm">Top sponzorující firmy <sup>za @SponzoringRepo.DefaultLastSponzoringYear()</sup></a>
             </div>
             <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
-                <h3>Dotace</h3>
+                <h3>Politici</h3>
+                <div class="card">
+                    <div class="card-header">
+Politici, kteří podnikají a mají největší obchodní vztahy se státem <small class="text-light">náhodný výběr z největších</small></div>
+                    <ul class="list-group list-group-flush">
+
+                        @foreach (var pol in HlidacStatu.Repositories.StaticData.TopPoliticiObchodSeStatem.Get()[0].Take(20).ShuffleMe().Take(5))
+                        {
+                            var o = Osoby.GetByNameId.Get(pol.OsobaNameId);
+                            <li class="list-group-item">
+                                <div class="person-profile-thumb person-profile-thumb--verysmall">
+                                    <a href="@(o.GetUrl())">
+                                        <div class="profile-picture border" style="background-image: url(@(o.GetPhotoUrl()))">
+                                        </div>
+                                    </a>
+                                    <div>
+                                        <a class="section-title link--blue" href="@(o.GetUrl())">
+                                            @(o.FullNameWithYear())
+                                        </a>
+                                    </div>
+                                </div>
+                            </li>
+
+                        }
+                        <li class="list-group-item">
+                            <a href="/report/32" style="margin-left: 52px">dalších více než 100 politiků</a>
+                        </li>
+                    </ul>
+                </div>
+                <hr />
+
                 <p>
-                    Ministerstva, státní fondy nebo nejrůznější podpůrné programy Evropské unie
-                    poskytují na základě vyhlášených podmínek finance těm, kdo o ně požádají.
-                    O dotaci může žádat úřad, soukromá firma nebo i nepodnikající fyzická osoba. Pokud jsou splněny podmínky a dotace
-                    je poskytnuta a musí se to zaevidovat. Informace o dotacích se evidují v různé míře podrobnosti do více než 10 různých
-                    rejstříků a databází, ze kterých je čerpáme my. Update provádíme přibližně 1x za půl roku.
+                    Hledáte konkrétního politika, podnikatele či sponzora politických stran? Stačí začít psát jeho jméno
+                    do <a href="#" onclick="closeMegaMenu(this);$('#autocompleteInputBox').focus();return false;"><b>vyhledávání</b></a>. Pokud ho známe, už během psaní vám osoby odpovídající dotazu nabídneme.
                 </p>
-                <p>
-                    Pokud chcete vyhledávat pouze dotace, nejlepší je to pomocí <a href="/dotace">vyhledávání na stránce dotací</a>.
-                </p>
+                <a href="/data/Index/vyjadreni-politiku" class="btn btn-primary btn-sm">Politico na sociálních sítích</a>
+                <a href="/data/Index/stenozaznamy-psp" class="btn btn-primary btn-sm">Poslanecké proslovy</a>
+                <a href="/report/16" class="btn btn-primary btn-sm">Poslanci PSP</a>
+                <a href="/report/29" class="btn btn-primary btn-sm">Senátoři</a>
+                <a href="/report/š+" class="btn btn-primary btn-sm">Europoslanci</a>
+
             </div>
         </div>
     </div>

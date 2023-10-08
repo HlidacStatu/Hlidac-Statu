@@ -151,7 +151,7 @@
                 }
 
             }
-            @if (Model.OrigQuery.Contains(chybyQuery, StringComparison.InvariantCultureIgnoreCase))
+            @if (Model.OrigQuery?.Contains(chybyQuery, StringComparison.InvariantCultureIgnoreCase)==true)
             {
                 var qs = $"q={System.Net.WebUtility.UrlEncode(Model.OrigQuery.Replace(chybyQuery, ""))}{queryWithoutQSerialized}";
                 <a class="btn btn-danger btn-sm" href="/hledat?@(qs)">Všechny smlouvy</a>

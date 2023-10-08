@@ -1,7 +1,7 @@
 using Devmasters.Log;
 using Hangfire;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.MiddleWares;

@@ -1,4 +1,4 @@
-﻿using HlidacStatu.Entities.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Entities.Views;
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -112,6 +112,7 @@ namespace HlidacStatu.Entities
 
                 _ = entity.Property(e => e.VersionUpdate).HasDefaultValue<int>(0);
                 _ = entity.Property(e => e.PocetZam).HasDefaultValue<int>(0);
+                _ = entity.Property(e => e.PocetZamDo).HasDefaultValue<int>(0);
 
             });
 

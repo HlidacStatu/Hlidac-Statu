@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace HlidacStatu.Entities.Entities.Analysis
+namespace HlidacStatu.Entities.Analysis
 {
 
     public abstract class DataPerYear

@@ -2,7 +2,7 @@ using Devmasters;
 
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities.Analysis;
+using HlidacStatu.Entities.Analysis;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Statistics;
@@ -16,7 +16,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
-using HlidacStatu.Entities.Entities.KIndex;
+using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Entities.Views;
 using HlidacStatu.Lib.Data.External.RPP;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;

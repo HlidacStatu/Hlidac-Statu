@@ -2035,6 +2035,16 @@ select {
         border: 1px #ddd solid;
     }
 
+.person-profile-thumb--verysmall .profile-picture {
+    width: 36px;
+    height: 36px;
+    margin-left: 22px;
+}
+
+    .person-profile-thumb--verysmall .profile-picture.border {
+        border: 1px #ddd solid;
+    }
+
 .detail-note {
     line-height: 18px;
     margin-top: 6px;

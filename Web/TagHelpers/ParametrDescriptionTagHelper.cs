@@ -1,4 +1,4 @@
-using HlidacStatu.Entities.Entities.KIndex;
+using HlidacStatu.Entities.KIndex;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace HlidacStatu.Web.TagHelpers

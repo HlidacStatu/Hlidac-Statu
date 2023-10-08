@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace HlidacStatu.Entities.Entities.KIndex
+namespace HlidacStatu.Entities.KIndex
 {
     public partial class KIndexData
     {
