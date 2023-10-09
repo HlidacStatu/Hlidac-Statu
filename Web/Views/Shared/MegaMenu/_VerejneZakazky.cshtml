@@ -45,7 +45,7 @@
                 <h5>Veřejné zakázky</h5>
                 <p>
                     Každý subjekt (úřad, škola, nemocnice atp.), kterého se týká zákon o zadávání veřejných zakázek
-                    (<a href="https://www.zakonyprolidi.cz/cs/2016-134" target="_blank">zákon 134/2016</a>)
+                    (<a onclick="return trackOutLink(this,'megamenu');" href="https://www.zakonyprolidi.cz/cs/2016-134" target="_blank">zákon 134/2016</a>)
                     a který chce nakoupit zboží, služby nebo stavební práce nad určitou cenovou hladinou, musí zahájit veřejnou zakázku.
                     Seznamů veřejných zakázek jsou tisíce. Sledujeme je a zakázky z nich sbíráme. Vzhledem ke stavu zdrojových dat ale nemůžeme garantovat, že zobrazíme kompletně všechny.
                 </p>
@@ -59,13 +59,13 @@
 
                         <li class="list-group-item d-flex justify-content-between align-items-start">
                             <div class="ms-2 me-auto">
-                                <div class="fw-bold"><a href="/verejnezakazky/hledat?q=*&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.id.ToString())&order=1">@obl.name</a></div>
+                                <div class="fw-bold"><a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky/hledat?q=*&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.id.ToString())&order=1">@obl.name</a></div>
                             </div>
                         </li>
                     }
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="ms-2 me-auto">
-                            <div class="fw-bold"><a href="/verejnezakazky/">Dalších @(vzOblCount - 10) oblastí VZ</a></div>
+                            <div class="fw-bold"><a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky/">Dalších @(vzOblCount - 10) oblastí VZ</a></div>
                         </div>
                     </li>
 
@@ -91,7 +91,7 @@
                                 @foreach (var l in uradyList1)
                                 {
                                     <li>
-                                        <a href="/adresar/@(l.ToString())?vz=1">@(l.ToNiceDisplayName())</a>
+                                        <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/@(l.ToString())?vz=1">@(l.ToNiceDisplayName())</a>
                                     </li>
                                 }
                             </ul>
@@ -113,7 +113,7 @@
                                 @foreach (var l in uradyList2)
                                 {
                                     <li>
-                                        <a href="/adresar/@(l.ToString())?vz=1">@(l.ToNiceDisplayName())</a>
+                                        <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/@(l.ToString())?vz=1">@(l.ToNiceDisplayName())</a>
                                     </li>
                                 }
                             </ul>
@@ -137,7 +137,7 @@
                                 @foreach (var l in uradyList3)
                                 {
                                     <li>
-                                        <a href="/adresar/@(l.ToString())?vz=1">@(l.ToNiceDisplayName())</a>
+                                        <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/@(l.ToString())?vz=1">@(l.ToNiceDisplayName())</a>
                                     </li>
                                 }
                             </ul>
@@ -146,7 +146,7 @@
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="ms-2 me-auto">
-                            <a href="/adresar?vz=1">a stovky další úřadů</a>
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/adresar?vz=1">a stovky další úřadů</a>
                         </div>
                     </li>
                 </ul>

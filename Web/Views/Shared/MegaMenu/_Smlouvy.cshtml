@@ -18,7 +18,7 @@
             <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
                 <h3>Registr smluv</h3>
                 <p>
-                    Smlouvy státu se evidují v registru smluv. Do registru smluv mají za povinnost dle zákona <a href="https://www.zakonyprolidi.cz/cs/2015-340" target="_blank">č. 340/2015 Sb</a>
+                    Smlouvy státu se evidují v registru smluv. Do registru smluv mají za povinnost dle zákona <a onclick="return trackOutLink(this,'megamenu');" href="https://www.zakonyprolidi.cz/cs/2015-340" target="_blank">č. 340/2015 Sb</a>
                     všechny úřady, státní organizace, samospráva, státní podniky a školy vkládat smlouvy s hodnotou vyšší než 50 000 Kč.
                 </p>
                 <p>
@@ -27,10 +27,10 @@
                 <h5>Rady pro uživatele Registru smluv</h5>
                 <p>
                     <ul>
-                        <li><a href="https://texty.hlidacstatu.cz/faq-registr-smluv/" target="_blank">Otázky a odpovědi k Registru smluv</a></li>
-                        <li><a href="https://texty.hlidacstatu.cz/strojove-citelny-format/" target="_blank">Strojově čitelný formát</a></li>
-                        <li><a href="https://texty.hlidacstatu.cz/k-index-manual-dobre-praxe/" target="_blank">Manuál dobré praxe</a></li>
-                        <li><a href="https://texty.hlidacstatu.cz/k-index-otazky-a-odpovedi/" target="_blank">Otázky a odpovědi ke K-indexu</a></li>
+                        <li><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/faq-registr-smluv/" target="_blank">Otázky a odpovědi k Registru smluv</a></li>
+                        <li><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/strojove-citelny-format/" target="_blank">Strojově čitelný formát</a></li>
+                        <li><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/k-index-manual-dobre-praxe/" target="_blank">Manuál dobré praxe</a></li>
+                        <li><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/k-index-otazky-a-odpovedi/" target="_blank">Otázky a odpovědi ke K-indexu</a></li>
                     </ul>
                 </p>
             </div>
@@ -39,7 +39,7 @@
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="ms-2 me-auto">
-                            <div class="fw-bold"><a href="/report/7">Souhrny</a></div>
+                            <div class="fw-bold"><a onclick="return trackOutLink(this,'megamenu');" href="/report/7">Souhrny</a></div>
                             Souhrnné informace o všech smlouvách
                         </div>
                     </li>
@@ -48,20 +48,20 @@
                             <div class="fw-bold">Stát</div>
                             <ul>
                                 <li>
-                                    <a href="/adresar/Ministerstva">Ministerstva</a>
+                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/Ministerstva">Ministerstva</a>
                                 </li>
                                 <li>
-                                    <a href="/adresar/Media">Média</a>
+                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/Media">Média</a>
 
                                 </li>
                                 <li>
-                                    <a href="/adresar/Statni_podniky">Státní podniky</a>
+                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/Statni_podniky">Státní podniky</a>
                                 </li>
                                 <li>
-                                    <a href="/adresar/vyjimky_rs">Výjimky z RS</a>
+                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/vyjimky_rs">Výjimky z RS</a>
 
                                 </li>
-                                <li><a href="/adresar">... a další</a></li>
+                                <li><a onclick="return trackOutLink(this,'megamenu');" href="/adresar">... a další</a></li>
                             </ul>
                         </div>
 
@@ -71,23 +71,23 @@
                             <div class="fw-bold">Samospráva</div>
                             <ul>
                                 <li>
-                                    <a href="/adresar/Obce_III_stupne">Obce</a>
+                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/Obce_III_stupne">Obce</a>
 
                                 </li>
                                 <li>
-                                    <a href="/adresar/Kraje_Praha">Kraje</a>
+                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/Kraje_Praha">Kraje</a>
 
 
                                 </li>
                                 <li>
-                                    <a href="/adresar/Statutarni_mesta">Statutární městsa</a>
+                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/Statutarni_mesta">Statutární městsa</a>
 
                                 </li>
                                 <li>
-                                    <a href="/adresar/Mestske_casti_Prahy">Městské části Prahy</a>
+                                    <a onclick="return trackOutLink(this,'megamenu');" href="/adresar/Mestske_casti_Prahy">Městské části Prahy</a>
 
                                 </li>
-                                <li><a href="/adresar">... a další</a></li>
+                                <li><a onclick="return trackOutLink(this,'megamenu');" href="/adresar">... a další</a></li>
                             </ul>
                         </div>
 
@@ -141,12 +141,12 @@
                     Smlouvy uveřejněné
                     @for (int i = 1; i < 8; i++)
                     {
-                        <a href="/HledatSmlouvy?Q=zverejneno:@(DateTime.Now.AddDays(-1 * i).ToString("yyyy-MM-dd"))">@(i == 1 ? "včera" : DateTime.Now.AddDays(-1 * i).ToString("d.M"))</a>
+                        <a onclick="return trackOutLink(this,'megamenu');" href="/HledatSmlouvy?Q=zverejneno:@(DateTime.Now.AddDays(-1 * i).ToString("yyyy-MM-dd"))">@(i == 1 ? "včera" : DateTime.Now.AddDays(-1 * i).ToString("d.M"))</a>
                         @(i < 7 ? ", " : ".")
                     }
                 </p>
-                <p><a href="">Firmy založené těsně před uzavřením smlouvy</a></p>
-                <p><a href="">Smlouvy s firmami, co přímo či nepřímo sponzorují politické strany</a></p>
+                <p><a onclick="return trackOutLink(this,'megamenu');" href="">Firmy založené těsně před uzavřením smlouvy</a></p>
+                <p><a onclick="return trackOutLink(this,'megamenu');" href="">Smlouvy s firmami, co přímo či nepřímo sponzorují politické strany</a></p>
                 <!-- <h5>Podle krajů</h5>
                 <p class="text-center">
                     <img src="/content/img/Czech_Republic_location_map_nazvy.svg" style="width:90%;height:auto;" />

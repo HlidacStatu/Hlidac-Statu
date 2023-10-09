@@ -22,29 +22,29 @@
                 </p>
                 <p>
                     Pokud hledáte informace o konkrétní firmě, nejrychlejší je napsat její jméno do
-                    <a href="#" onclick="closeMegaMenu(this);$('#autocompleteInputBox').focus();return false;"><b>vyhledávání</b></a>. Pokud firma existuje, už během psaní vám tuto firmu či s podobným názvem nabídneme k výběru.
+                    <a onclick="return trackOutLink(this,'megamenu');" href="#" onclick="closeMegaMenu(this);$('#autocompleteInputBox').focus();return false;"><b>vyhledávání</b></a>. Pokud firma existuje, už během psaní vám tuto firmu či s podobným názvem nabídneme k výběru.
                 </p>
                 <hr />
                 <p>
                     <h5>Speciální reporty</h5>
                     <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <a href="/Report/1">Firmy nejvíce obchodující se státem.</a>
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/Report/1">Firmy nejvíce obchodující se státem.</a>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <a href="/Report/9">Firmy založené těsně před či po uzavřením smlouvy.</a>
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/Report/9">Firmy založené těsně před či po uzavřením smlouvy.</a>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <a href="/Report/5">Smlouvy se soukromými ekonomickými subjekty, u kterých existuje přímá a nepřímá vazba na politiky.</a>
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/Report/5">Smlouvy se soukromými ekonomickými subjekty, u kterých existuje přímá a nepřímá vazba na politiky.</a>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <a href="/Report/6">Firmy, které se objevily v rejstříku poprvé</a>
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/Report/6">Firmy, které se objevily v rejstříku poprvé</a>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <a href="/data/Index/skutecni-majitele">Skuteční majitelé firem</a>
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/data/Index/skutecni-majitele">Skuteční majitelé firem</a>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <a href="/data/Index/osoby-kontrolovane-nku">Právnické osoby kontrolované NKÚ</a>
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/data/Index/osoby-kontrolovane-nku">Právnické osoby kontrolované NKÚ</a>
                         </li>
 
                     </ul>
@@ -68,7 +68,7 @@
                         @foreach (var str in velkeStrany.Take(7))
                         {
                             <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <a href="/sponzori/strana/@(str.KratkyNazev)">@(str.KratkyNazev)</a>
+                                <a onclick="return trackOutLink(this,'megamenu');" href="/sponzori/strana/@(str.KratkyNazev)">@(str.KratkyNazev)</a>
                                 <span class="badge rounded-pill text-bg-light">@HlidacStatu.Util.RenderData.NicePriceHtml(str.DaryCelkem.Value, shortFormat: true)</span>
                             </li>
                         }
@@ -76,10 +76,10 @@
 
                 </div>
                 <hr />
-                <a href="/Sponzori/Strany" class="btn btn-primary btn-sm">Sponzoři všech stran</a>
-                <a href="/Sponzori/TopSponzori" class="btn btn-primary btn-sm">2000 největších sponzorů (osob i firem) vůbec</a>
-                <a href="/Sponzori/TopSponzori?rok=@(SponzoringRepo.DefaultLastSponzoringYear())" class="btn btn-primary btn-sm">Top sponzorující osoby za @SponzoringRepo.DefaultLastSponzoringYear()</a>
-                <a href="/Sponzori/TopSponzoriFirmy?rok=@(SponzoringRepo.DefaultLastSponzoringYear())" class="btn btn-primary btn-sm">Top sponzorující firmy za @SponzoringRepo.DefaultLastSponzoringYear()</a>
+                <a onclick="return trackOutLink(this,'megamenu');" href="/Sponzori/Strany" class="btn btn-primary btn-sm">Sponzoři všech stran</a>
+                <a onclick="return trackOutLink(this,'megamenu');" href="/Sponzori/TopSponzori" class="btn btn-primary btn-sm">2000 největších sponzorů (osob i firem) vůbec</a>
+                <a onclick="return trackOutLink(this,'megamenu');" href="/Sponzori/TopSponzori?rok=@(SponzoringRepo.DefaultLastSponzoringYear())" class="btn btn-primary btn-sm">Top sponzorující osoby za @SponzoringRepo.DefaultLastSponzoringYear()</a>
+                <a onclick="return trackOutLink(this,'megamenu');" href="/Sponzori/TopSponzoriFirmy?rok=@(SponzoringRepo.DefaultLastSponzoringYear())" class="btn btn-primary btn-sm">Top sponzorující firmy za @SponzoringRepo.DefaultLastSponzoringYear()</a>
             </div>
             <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
                 <h3>Politici</h3>
@@ -93,7 +93,7 @@ Politici, kteří podnikají a mají největší obchodní vztahy se státem <sm
                             var o = Osoby.GetByNameId.Get(pol.OsobaNameId);
                             <li class="list-group-item">
                                 <div class="person-profile-thumb person-profile-thumb--verysmall">
-                                    <a href="@(o.GetUrl())">
+                                    <a onclick="return trackOutLink(this,'megamenu');" href="@(o.GetUrl())">
                                         <div class="profile-picture border" style="background-image: url(@(o.GetPhotoUrl()))">
                                         </div>
                                     </a>
@@ -107,7 +107,7 @@ Politici, kteří podnikají a mají největší obchodní vztahy se státem <sm
 
                         }
                         <li class="list-group-item">
-                            <a href="/report/32" style="margin-left: 52px">dalších více než 100 politiků</a>
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/report/32" style="margin-left: 52px">dalších více než 100 politiků</a>
                         </li>
                     </ul>
                 </div>
@@ -115,13 +115,13 @@ Politici, kteří podnikají a mají největší obchodní vztahy se státem <sm
 
                 <p>
                     Hledáte konkrétního politika, podnikatele či sponzora politických stran? Stačí začít psát jeho jméno
-                    do <a href="#" onclick="closeMegaMenu(this);$('#autocompleteInputBox').focus();return false;"><b>vyhledávání</b></a>. Pokud ho známe, už během psaní vám osoby odpovídající dotazu nabídneme.
+                    do <a onclick="return trackOutLink(this,'megamenu');" href="#" onclick="closeMegaMenu(this);$('#autocompleteInputBox').focus();return false;"><b>vyhledávání</b></a>. Pokud ho známe, už během psaní vám osoby odpovídající dotazu nabídneme.
                 </p>
-                <a href="/data/Index/vyjadreni-politiku" class="btn btn-primary btn-sm">Politici na sociálních sítích</a>
-                <a href="/data/Index/stenozaznamy-psp" class="btn btn-primary btn-sm">Poslanecké proslovy</a>
-                <a href="/report/16" class="btn btn-primary btn-sm">Poslanci PSP</a>
-                <a href="/report/29" class="btn btn-primary btn-sm">Senátoři</a>
-                <a href="/report/š+" class="btn btn-primary btn-sm">Europoslanci</a>
+                <a onclick="return trackOutLink(this,'megamenu');" href="/data/Index/vyjadreni-politiku" class="btn btn-primary btn-sm">Politici na sociálních sítích</a>
+                <a onclick="return trackOutLink(this,'megamenu');" href="/data/Index/stenozaznamy-psp" class="btn btn-primary btn-sm">Poslanecké proslovy</a>
+                <a onclick="return trackOutLink(this,'megamenu');" href="/report/16" class="btn btn-primary btn-sm">Poslanci PSP</a>
+                <a onclick="return trackOutLink(this,'megamenu');" href="/report/29" class="btn btn-primary btn-sm">Senátoři</a>
+                <a onclick="return trackOutLink(this,'megamenu');" href="/report/š+" class="btn btn-primary btn-sm">Europoslanci</a>
 
             </div>
         </div>
