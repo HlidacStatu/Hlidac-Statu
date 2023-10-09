@@ -39,18 +39,15 @@
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-start">
                             <a href='/StatniWeby/Dalsi/Https'>Podpora HTTPs</a>
-                            <span class="badge rounded-pill text-bg-light">@HlidacStatu.Util.RenderData.NiceNumber(HlidacStatu.Repositories.UptimeSSLRepo.AllLatestSSL()?.Count() ?? 0)</span>
                         </li>
                         @foreach (var item in UptimeServer.TabsOnWeb.Take(5))
                         {
                             <li class="list-group-item d-flex justify-content-between align-items-start">
                                 <a href='/StatniWeby/Dalsi/@(item.Key)'>@(item.Value)</a>
-                                <span class="badge rounded-pill text-bg-light">@HlidacStatu.Util.RenderData.NiceNumber(UptimeServerRepo.ServersIn(item.Key)?.Count() ?? 0)</span>
                             </li>
                         }
                         <li class="list-group-item d-flex justify-content-between align-items-start">
                             <a href='/StatniWeby/'>Všechny sledované weby</a>
-                            <span class="badge rounded-pill text-bg-light">@HlidacStatu.Util.RenderData.NiceNumber(HlidacStatu.Repositories.UptimeServerRepo.AllActiveServers()?.Count() ?? 0)</span>
                         </li>
                     </ul>
 
@@ -89,7 +86,6 @@
                                         {
                                             <li>
                                                 <a href="/data/Index/@ds.Key">@specificDataset.RegistrationAsync().Result.name</a>
-                                                <span class="badge rounded-pill text-bg-light">@HlidacStatu.Util.RenderData.NiceNumber(specificDataset is null? 0 : await specificDataset.NumberOfRecordsAsync())</span>
                                             </li>
                                         }
                                     }

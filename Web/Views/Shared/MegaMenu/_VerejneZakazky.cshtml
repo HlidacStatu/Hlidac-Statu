@@ -68,14 +68,12 @@
                             <div class="ms-2 me-auto">
                                 <div class="fw-bold"><a href="/verejnezakazky/hledat?q=*&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.id.ToString())&order=1">@obl.name</a></div>
                             </div>
-                            <span class="badge bg-primary rounded-pill">@(HlidacStatu.Util.RenderData.NiceNumber(obl.count, false))</span>
                         </li>
                     }
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="ms-2 me-auto">
                             <div class="fw-bold"><a href="/verejnezakazky/">Dalších @(vzOblCount - 10) oblastí VZ</a></div>
                         </div>
-                        <span class="badge bg-primary rounded-pill">@(HlidacStatu.Util.RenderData.NiceNumber(vzCountSum - vzCount, false))</span>
                     </li>
 
                 </ul>
@@ -85,64 +83,79 @@
                 <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="ms-2 me-auto">
-                            <div class="fw-bold"><a href="/report/7">Souhrny</a></div>
-                            Souhrnné informace o všech smlouvách
-                        </div>
-                        <span class="badge bg-primary rounded-pill">14</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div class="ms-2 me-auto">
-                            <div class="fw-bold">Stát</div>
+                            <div class="fw-bold">Státní úřady</div>
+                            @{
+                                Firma.Zatrideni.SubjektyObory[] uradyList1 = new Firma.Zatrideni.SubjektyObory[]
+                                {
+                            Firma.Zatrideni.SubjektyObory.Ministerstva,
+                            Firma.Zatrideni.SubjektyObory.Dalsi_ustredni_organy_statni_spravy,
+                            Firma.Zatrideni.SubjektyObory.Media,
+                            Firma.Zatrideni.SubjektyObory.Statni_podniky,
+                            Firma.Zatrideni.SubjektyObory.Organizacni_slozky_statu,
+                                };
+                            }
                             <ul>
-                                <li>
-                                    <a href="/adresar/Ministerstva?vz=1">Ministerstva</a>
-                                    <span class="badge rounded-pill text-bg-light">124</span>
-                                </li>
-                                <li>
-                                    <a href="/adresar/Media?vz=1">Média</a>
-                                    <span class="badge rounded-pill text-bg-light">124</span>
-
-                                </li>
-                                <li>
-                                    <a href="/adresar/Statni_podniky?vz=1">Státní podniky</a>
-                                    <span class="badge rounded-pill text-bg-light">124</span>
-                                </li>
-                                <li>
-                                    <a href="/adresar/vyjimky_rs?vz=1">Výjimky z RS</a>
-                                    <span class="badge rounded-pill text-bg-light">124</span>
-                                </li>
-                                <li><a href="/adresar">... a další</a></li>
+                                @foreach (var l in uradyList1)
+                                {
+                                    <li>
+                                        <a href="/adresar/@(l.ToString())?vz=1">@(l.ToNiceDisplayName())</a>
+                                    </li>
+                                }
                             </ul>
                         </div>
-                        <span class="badge bg-primary rounded-pill">14</span>
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="ms-2 me-auto">
                             <div class="fw-bold">Samospráva</div>
+                            @{
+                                Firma.Zatrideni.SubjektyObory[] uradyList2 = new Firma.Zatrideni.SubjektyObory[]
+                                {
+                            Firma.Zatrideni.SubjektyObory.Obce_III_stupne,
+                            Firma.Zatrideni.SubjektyObory.Kraje_Praha,
+                            Firma.Zatrideni.SubjektyObory.Statutarni_mesta,
+                            Firma.Zatrideni.SubjektyObory.Mestske_casti_Prahy,
+                                };
+                            }
                             <ul>
-                                <li>
-                                    <a href="/adresar/Obce_III_stupne">Obce</a>
-                                    <span class="badge rounded-pill text-bg-light">124</span>
-                                </li>
-                                <li>
-                                    <a href="/adresar/Kraje_Praha">Kraje</a>
-                                    <span class="badge rounded-pill text-bg-light">124</span>
-
-                                </li>
-                                <li>
-                                    <a href="/adresar/Statutarni_mesta">Statutární městsa</a>
-                                    <span class="badge rounded-pill text-bg-light">124</span>
-                                </li>
-                                <li>
-                                    <a href="/adresar/Mestske_casti_Prahy">Městské části Prahy</a>
-                                    <span class="badge rounded-pill text-bg-light">124</span>
-                                </li>
-                                <li><a href="/adresar">... a další</a></li>
+                                @foreach (var l in uradyList2)
+                                {
+                                    <li>
+                                        <a href="/adresar/@(l.ToString())?vz=1">@(l.ToNiceDisplayName())</a>
+                                    </li>
+                                }
                             </ul>
-                        </div>
-                        <span class="badge bg-primary rounded-pill">14</span>
-                    </li>
 
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">Zdravotnictví</div>
+                            @{
+                                Firma.Zatrideni.SubjektyObory[] uradyList3 = new Firma.Zatrideni.SubjektyObory[]
+                                {
+                            Firma.Zatrideni.SubjektyObory.Zdravotni_pojistovny,
+                            Firma.Zatrideni.SubjektyObory.Zdravotni_ustavy,
+                            Firma.Zatrideni.SubjektyObory.Fakultni_nemocnice,
+                            Firma.Zatrideni.SubjektyObory.Velke_nemocnice,
+                            Firma.Zatrideni.SubjektyObory.Nemocnice,
+                                };
+                            }
+                            <ul>
+                                @foreach (var l in uradyList3)
+                                {
+                                    <li>
+                                        <a href="/adresar/@(l.ToString())?vz=1">@(l.ToNiceDisplayName())</a>
+                                    </li>
+                                }
+                            </ul>
+
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <a href="/adresar?vz=1">a stovky další úřadů</a>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
