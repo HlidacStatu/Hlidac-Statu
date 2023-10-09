@@ -62,7 +62,7 @@
                 }
                 <div class="card">
                     <div class="card-header">
-                        Sponzoři velkých stran <sup>&nbsp;v roce @(SponzoringRepo.DefaultLastSponzoringYear())</sup>
+                        Sponzoři velkých stran &nbsp;v roce @(SponzoringRepo.DefaultLastSponzoringYear())
                     </div>
                     <ul class="list-group list-group-flush">
                         @foreach (var str in velkeStrany.Take(7))
@@ -78,8 +78,8 @@
                 <hr />
                 <a href="/Sponzori/Strany" class="btn btn-primary btn-sm">Sponzoři všech stran</a>
                 <a href="/Sponzori/TopSponzori" class="btn btn-primary btn-sm">2000 největších sponzorů (osob i firem) vůbec</a>
-                <a href="/Sponzori/TopSponzori?rok=@(SponzoringRepo.DefaultLastSponzoringYear())" class="btn btn-primary btn-sm">Top sponzorující osoby <sup>za @SponzoringRepo.DefaultLastSponzoringYear()</sup></a>
-                <a href="/Sponzori/TopSponzoriFirmy?rok=@(SponzoringRepo.DefaultLastSponzoringYear())" class="btn btn-primary btn-sm">Top sponzorující firmy <sup>za @SponzoringRepo.DefaultLastSponzoringYear()</sup></a>
+                <a href="/Sponzori/TopSponzori?rok=@(SponzoringRepo.DefaultLastSponzoringYear())" class="btn btn-primary btn-sm">Top sponzorující osoby za @SponzoringRepo.DefaultLastSponzoringYear()</a>
+                <a href="/Sponzori/TopSponzoriFirmy?rok=@(SponzoringRepo.DefaultLastSponzoringYear())" class="btn btn-primary btn-sm">Top sponzorující firmy za @SponzoringRepo.DefaultLastSponzoringYear()</a>
             </div>
             <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
                 <h3>Politici</h3>
@@ -117,7 +117,7 @@ Politici, kteří podnikají a mají největší obchodní vztahy se státem <sm
                     Hledáte konkrétního politika, podnikatele či sponzora politických stran? Stačí začít psát jeho jméno
                     do <a href="#" onclick="closeMegaMenu(this);$('#autocompleteInputBox').focus();return false;"><b>vyhledávání</b></a>. Pokud ho známe, už během psaní vám osoby odpovídající dotazu nabídneme.
                 </p>
-                <a href="/data/Index/vyjadreni-politiku" class="btn btn-primary btn-sm">Politico na sociálních sítích</a>
+                <a href="/data/Index/vyjadreni-politiku" class="btn btn-primary btn-sm">Politici na sociálních sítích</a>
                 <a href="/data/Index/stenozaznamy-psp" class="btn btn-primary btn-sm">Poslanecké proslovy</a>
                 <a href="/report/16" class="btn btn-primary btn-sm">Poslanci PSP</a>
                 <a href="/report/29" class="btn btn-primary btn-sm">Senátoři</a>
