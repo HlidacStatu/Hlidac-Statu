@@ -1,14 +1,7 @@
 ﻿@using System.Linq
-@using System.Net.Http
-@using Devmasters.Collections
 @using Devmasters.Enums;
-@using HlidacStatu.Datasets
 @using HlidacStatu.Entities
 @using HlidacStatu.Repositories;
-@using HlidacStatu.Web.TagHelpers
-@using Microsoft.AspNetCore.Http.Extensions
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.Extensions.Primitives
 
 @{
     var vzList = Devmasters.Enums.EnumTools.EnumToEnumerable(typeof(VerejnaZakazkaRepo.Searching.CPVSkupiny))
@@ -48,6 +41,11 @@
                     (<a onclick="return trackOutLink(this,'megamenu');" href="https://www.zakonyprolidi.cz/cs/2016-134" target="_blank">zákon 134/2016</a>)
                     a který chce nakoupit zboží, služby nebo stavební práce nad určitou cenovou hladinou, musí zahájit veřejnou zakázku.
                     Seznamů veřejných zakázek jsou tisíce. Sledujeme je a zakázky z nich sbíráme. Vzhledem ke stavu zdrojových dat ale nemůžeme garantovat, že zobrazíme kompletně všechny.
+                </p>
+                <p>
+                    Pokud chcete najít informace o konkrétním zadavateli, nejrychlejší je napsat jeho jméno do vyhledávání. 
+                    Pokud vás zajímají podrobnější informace o veřejných zakázkách, zadejte klíčové slovo nebo číslo přímo 
+                    do vyhledavače na stránce veřejných zakázek.
                 </p>
             </div>
             <div class="col-12 col-sm-4 py-4">

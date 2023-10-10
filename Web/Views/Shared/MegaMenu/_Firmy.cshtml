@@ -1,15 +1,6 @@
 ﻿@using System.Linq
-@using System.Net.Http
 @using Devmasters.Collections
-@using Devmasters.Enums;
-@using HlidacStatu.Datasets
-@using HlidacStatu.Entities
 @using HlidacStatu.Repositories;
-@using HlidacStatu.Web.TagHelpers
-@using Microsoft.AspNetCore.Http.Extensions
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.Extensions.Primitives
-
 
 
 <div class="mega-content px-4">
@@ -18,7 +9,7 @@
             <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
                 <h3>Firmy / subjekty</h3>
                 <p>
-                    Evidujeme všechny firmy, které jsou v českém Obchodním rejstříku. U firem evidovaných vv Registru smluv a/nebo se účastnících veřejných zakázek provádíme detailní analýzy. V analýzách zjišťujeme  obchodování se státem, provázanost majitelů a statutárních orgánů a přímé i nepřímé sponzorování politických stran firmami či jejich majiteli.
+                    Evidujeme všechny firmy, které jsou v českém Obchodním rejstříku. U firem evidovaných v Registru smluv a/nebo se účastnících veřejných zakázek provádíme detailní analýzy. V analýzách zjišťujeme  obchodování se státem, provázanost majitelů a statutárních orgánů a přímé i nepřímé sponzorování politických stran firmami či jejich majiteli.
                 </p>
                 <p>
                     Pokud hledáte informace o konkrétní firmě, nejrychlejší je napsat její jméno do
@@ -29,13 +20,13 @@
                     <h5>Speciální reporty</h5>
                     <ul class="list-group">
                         <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <a onclick="return trackOutLink(this,'megamenu');" href="/Report/1">Firmy nejvíce obchodující se státem.</a>
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/Report/1">Firmy nejvíce obchodující se státem</a>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <a onclick="return trackOutLink(this,'megamenu');" href="/Report/9">Firmy založené těsně před či po uzavřením smlouvy.</a>
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/Report/9">Firmy založené těsně před či po uzavřením smlouvy</a>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <a onclick="return trackOutLink(this,'megamenu');" href="/Report/5">Smlouvy se soukromými ekonomickými subjekty, u kterých existuje přímá a nepřímá vazba na politiky.</a>
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/Report/5">Smlouvy se soukromými ekonomickými subjekty, u kterých existuje přímá a nepřímá vazba na politiky</a>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-start">
                             <a onclick="return trackOutLink(this,'megamenu');" href="/Report/6">Firmy, které se objevily v rejstříku poprvé</a>
@@ -46,7 +37,6 @@
                         <li class="list-group-item d-flex justify-content-between align-items-start">
                             <a onclick="return trackOutLink(this,'megamenu');" href="/data/Index/osoby-kontrolovane-nku">Právnické osoby kontrolované NKÚ</a>
                         </li>
-
                     </ul>
                 </p>
             </div>

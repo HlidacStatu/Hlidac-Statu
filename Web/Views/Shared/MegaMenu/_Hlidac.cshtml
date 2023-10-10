@@ -1,15 +1,4 @@
 ﻿@using System.Linq
-@using System.Net.Http
-@using Devmasters.Collections
-@using Devmasters.Enums;
-@using HlidacStatu.Datasets
-@using HlidacStatu.Entities
-@using HlidacStatu.Repositories;
-@using HlidacStatu.Web.TagHelpers
-@using Microsoft.AspNetCore.Http.Extensions
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.Extensions.Primitives
-
 
 
 <div class="mega-content px-4">
@@ -19,15 +8,13 @@
                 <h3>Hlídač státu</h3>
                 <p>
                     <b>
-                        Hlídáme politiky a úřady, aby s veřejnými penězi nakládali svědomitě
+                        Hlídáme politiky a úřady, aby s veřejnými penězi nakládali svědomitě.
                     </b>
-
-                
                 <p>
                     <a class="btn btn-primary px-4" onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/o-serveru/">O hlídači</a>
-                <a class="btn btn-primary px-4" onclick="return trackOutLink(this,'megamenu');" href="/Content/IMPACT-REPORT-2022-low-res.pdf">Co vše děláme</a>
-                <a class="btn btn-primary px-4" onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/team/">Kdo ho tvoří</a>
-            </p>
+                    <a class="btn btn-primary px-4" onclick="return trackOutLink(this,'megamenu');" href="/Content/IMPACT-REPORT-2022-low-res.pdf">Co vše děláme</a>
+                    <a class="btn btn-primary px-4" onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/team/">Kdo ho tvoří</a>
+                </p>
 
                 <hr />
                 <p>
@@ -35,13 +22,6 @@
                         <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/category/napoveda/"><b>Nápověda, tipy a triky</b></a></li>
                         <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/kontakt/">Kontakt</a></li>
                         <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/pro-media/">Pro média</a></li>
-                        <li class="list-group-item">
-                            <a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/provoznipodminky">
-                                Podmínky užívání<br />a ochrana soukromí
-                            </a>
-                        </li>
-                        <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/licence/">Licence</a></li>
-                        <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://wwww.hlidacstatu.cz/api"><b>Pro vývojáře</b></a></li>
                     </ul>
                 </p>
             </div>
@@ -70,10 +50,10 @@
                 </p>
             </div>
             <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
-                <h3>Podpořte nás!<i class="fas fa-heart" style="color:red" aria-hidden="true"></i></h3>
+                <h3>Podpořte nás! <i class="fas fa-heart" style="color:red" aria-hidden="true"></i></h3>
                 <p>
-                    Korupce ze státních zakázek stojí každého z nás 250 půllitrů piva měsíčně. Nechcete platit piva, co nevypijete? 
-                    Pomozte nám to hlídat a přispějte tak k lepšímu fungování ČR.
+                    Korupce ze státních zakázek stojí každého z nás 250 půllitrů piva ročně. Nechcete platit piva, která nevypijete? 
+                    Pomozte nám hlídat a přispějte tak k lepšímu fungování ČR.
                 </p>
                     <ul class="list-group">
                         <li class="list-group-item">

@@ -1,18 +1,4 @@
-﻿@using System.Linq
-@using System.Net.Http
-@using Devmasters.Collections
-@using Devmasters.Enums;
-@using HlidacStatu.Datasets
-@using HlidacStatu.Entities
-@using HlidacStatu.Repositories;
-@using HlidacStatu.Web.TagHelpers
-@using Microsoft.AspNetCore.Http.Extensions
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.Extensions.Primitives
-
-
-
-<div class="mega-content px-4">
+﻿<div class="mega-content px-4">
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
@@ -123,7 +109,7 @@
                                 week_starts: 'monday',
                                 show_days: true,
                                 language: 'cs',
-                                navigation_next: false,
+                                navigation_next: true,
                                 today_markup: '<span class="text-primary fw-bold">[day]</span>',
 
                             });
@@ -138,12 +124,6 @@
 
 
                     <hr />
-                    Smlouvy uveřejněné
-                    @for (int i = 1; i < 8; i++)
-                    {
-                        <a onclick="return trackOutLink(this,'megamenu');" href="/HledatSmlouvy?Q=zverejneno:@(DateTime.Now.AddDays(-1 * i).ToString("yyyy-MM-dd"))">@(i == 1 ? "včera" : DateTime.Now.AddDays(-1 * i).ToString("d.M"))</a>
-                        @(i < 7 ? ", " : ".")
-                    }
                 </p>
                 <p><a onclick="return trackOutLink(this,'megamenu');" href="/Report/9">Firmy založené těsně před uzavřením smlouvy</a></p>
                 <p><a onclick="return trackOutLink(this,'megamenu');" href="/Report/5">Smlouvy s firmami, co přímo či nepřímo sponzorují politické strany</a></p>
