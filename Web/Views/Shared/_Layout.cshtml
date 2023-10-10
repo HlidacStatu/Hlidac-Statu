@@ -289,7 +289,8 @@
                 </div>
             </button>
             <div class="collapse navbar-collapse" id="navbar-content">
-                <ul class="navbar-nav mr-auto mb-2 mb-lg-0 mainmenu">
+
+                <ul class="d-none d-lg-block navbar-nav mr-auto mb-2 mb-lg-0 mainmenu">
                     <li class="nav-item mainmenu">
                         <a class="nav-link active" aria-current="page" href="" onclick="return false;" style="visibility:hidden;cursor:pointer;">&nbsp;&nbsp;&nbsp;</a>
                     </li>
@@ -298,7 +299,7 @@
                         @* Urady a urednici megacontent *@
                         <div class="dropdown-menu shadow">
                             <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                                <partial name="MegaMenu/_Urady" />
+                                <partial name="MegaMenu/_test" />
                             </cache>
                         </div>
                     </li>
@@ -306,7 +307,7 @@
                         <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Firmy, sponzoři,<br />politické strany</a>
                         <div class="dropdown-menu shadow">
                             <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                                <partial name="MegaMenu/_Firmy" />
+                                <partial name="MegaMenu/_test" />
                             </cache>
                         </div>
                     </li>
@@ -315,7 +316,7 @@
                         @* Smlouvy megacontent *@
                         <div class="dropdown-menu shadow">
                         <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                            <partial name="MegaMenu/_Smlouvy" />
+                            <partial name="MegaMenu/_test" />
                         </cache>
                         </div>
                     </li>
@@ -324,7 +325,7 @@
                         @* Verejne zakazky megacontent *@
                         <div class="dropdown-menu shadow">
                         <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                            <partial name="MegaMenu/_VerejneZakazky" />
+                            <partial name="MegaMenu/_test" />
                         </cache>
                         </div>
                     </li>
@@ -332,19 +333,89 @@
                         <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Dotace a<br />další</a>
                         <div class="dropdown-menu shadow">
                         <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                            <partial name="MegaMenu/_Dalsi" />
+                            <partial name="MegaMenu/_test" />
                         </cache>
                         </div>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
                         <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Vše o Hlídači<br /><i class="fas fa-heart" style="color:red" aria-hidden="true"></i> Podpořte nás</a>
                         <div class="dropdown-menu shadow">
-                            <partial name="MegaMenu/_Hlidac" />
+                            <partial name="MegaMenu/_test" />
                         </div>
                     </li>
                 </ul>
+                <ul class="d-lg-none navbar-nav mr-auto mb-2 mb-lg-0 list-group">
+                    <li class="nav-item list-group-item mainmenu fw-bold">
+                        <a href="/menupage/urady">Úřady a úředníci</a>
+                    </li>
+                    <li class="nav-item list-group-item mainmenu fw-bold">
+                        <a href="/menupage/firmy">
+                            Firmy, sponzoři,
+                            politické strany
+                        </a>
+                    </li>
+                    <li class="nav-item list-group-item mainmenu fw-bold">
+                        <a href="/menupage/smlouvy">Smlouvy státu</a>
+                    </li>
+                    <li class="nav-item list-group-item mainmenu fw-bold">
+                        <a href="/menupage/verejnezakazkky">Veřejné zakázky</a>
+                    </li>
+                    <li class="nav-item list-group-item mainmenu fw-bold">
+                        <a href="/menupage/dalsi">Dotace a další</a>
+                    </li>
+                    <li class="nav-item list-group-item mainmenu fw-bold">
+                        <a href="/menupage/hlidac">Vše o Hlídači</a>
+                    </li>
+                    <li class="nav-item list-group-item mainmenu bg-body-secondary">
+
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <a href="/manage/Watchdogs"
+                               alt="Všichni uložení hlídači" title="Všichni uložení hlídači"
+                               onclick="_my_event('send', 'event', 'btnWatchDog', 'List', 'authenticated');" role="button"
+                               class="btn btn-warning btn-sm"
+                               style="margin-right: 0.5em;">
+                                <i style="color:black;" class="fas fa-eye"></i>
+                            </a>
+
+                            <a style="color:#c9302c;margin-right: 0.4em;position:relative;"
+                               title="Všechny uložené záložky" alt="Všechny uložené záložky"
+                               href="/manage/zalozky" class="bookmark bookmarkOn btn btn-small">
+                                <i class="fa-duotone fa-bookmark fa-lg"></i>
+
+                            </a>
+                            <a style="margin-right: 0.5em;position:relative" href="/Identity/Account/manage/"
+                               title="Nastavení účtu" alt="Nastavení účtu"><i class="fa-solid fa-user fa-xl"></i></a>
+
+                            <a style="position:relative;font-weight:bolder"
+                               href="/Identity/Account/Logout?rnd=@Guid.NewGuid().ToString("N")">Odhlásit</a>
+                        }
+                        else
+                        {
+                            string nextUrl = Context.Request.GetEncodedPathAndQuery();
+                            if (nextUrl.ToLower().StartsWith(System.Net.WebUtility.UrlEncode("Identity/account/")))
+                            {
+                                nextUrl = "";
+                            }
+
+                            <a style="position:relative;font-weight:bolder;margin-right:1em;"
+                               onclick="_my_event('send', 'event', 'loginBtn', 'click','@Context.Request.Path'); return true;"
+                               href="/Identity/Account/Login?returnUrl=@(nextUrl)"
+                               id="loginLink">
+                                <i class="fa-solid fa-right-to-bracket fa-lg"></i>
+                                Přihlášení
+                            </a>
+                            <a style="position:relative;font-weight:bolder"
+                               onclick="_my_event('send', 'event', 'registerBtn', 'click','@Context.Request.Path'); return true;"
+                               href="/Identity/Account/Register?returnUrl=@(nextUrl)" id="regLink">
+                                <i class="fa-solid fa-file-user fa-lg"></i> Registrace
+                            </a>
+                        }
+
+                    </li>
+                </ul>
             </div>
-            <div class="d-none d-md-flex rightmenu">
+            <div class="d-none d-lg-flex rightmenu">
 
                 @if (User.Identity?.IsAuthenticated ?? false)
                 {

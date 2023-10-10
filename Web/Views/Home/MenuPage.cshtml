@@ -1,0 +1,61 @@
+﻿@model object
+@using Devmasters.Enums;
+@using HlidacStatu.Datasets
+@using HlidacStatu.Repositories
+@using HlidacStatu.Util;
+@using HlidacStatu.Web.Framework.Report
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using System.Net.Http
+
+@inject IHttpClientFactory HttpClientFactory
+
+@{
+    if (Enum.TryParse<HlidacStatu.Web.Framework.Megamenu.Items>(Model as string,true, out var page) == false)
+    {
+        return;
+    }
+    var pagename = $"MegaMenu/_{page.ToString()}";
+
+}
+
+@switch (page)
+{
+    case Megamenu.Items.dalsi:
+        <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
+            <partial name="MegaMenu/_dalsi" />
+        </cache>
+        break;
+    case Megamenu.Items.firmy:
+        <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
+            <partial name="MegaMenu/_firmy" />
+        </cache>
+        break;
+    case Megamenu.Items.hlidac:
+        <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
+            <partial name="MegaMenu/_hlidac" />
+        </cache>
+        break;
+    case Megamenu.Items.smlouvy:
+        <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
+            <partial name="MegaMenu/_smlouvy" />
+        </cache>
+        break;
+    case Megamenu.Items.urady:
+        <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
+            <partial name="MegaMenu/_urady" />
+        </cache>
+        break;
+    case Megamenu.Items.verejnezakazky:
+        <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
+            <partial name="MegaMenu/_verejnezakazky" />
+        </cache>
+        break;
+    case Megamenu.Items.test:
+        <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
+            <partial name="MegaMenu/_test" />
+        </cache>
+        break;
+    default:
+        break;
+}
+

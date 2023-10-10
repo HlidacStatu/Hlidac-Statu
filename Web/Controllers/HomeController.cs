@@ -41,7 +41,13 @@ namespace HlidacStatu.Web.Controllers
             _hostingEnvironment = hostingEnvironment;
             _userManager = userManager;
         }
+        public async Task<ActionResult> MenuPage(string? id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return Redirect("/");
+            return View((object)id);
 
+        }
         [Authorize]
         public async Task<ActionResult> Kod(string? id)
         {
