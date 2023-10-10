@@ -19,7 +19,7 @@ namespace HlidacStatu.XLib
                     {
                         using (WebClient webClient = new WebClient())
                         {
-                            string blogUrl = @"https://www.hlidacstatu.cz/texty/wp-json/wp/v2/posts";
+                            string blogUrl = @"https://texty.hlidacstatu.cz/wp-json/wp/v2/posts";
                             string response = webClient.DownloadString(blogUrl);
 
                             WpPost[] posts = WpPost.FromJson(response);

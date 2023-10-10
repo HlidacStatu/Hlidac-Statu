@@ -16,13 +16,25 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
-                <h3>O Hlídači</h3>
+                <h3>Hlídač státu</h3>
                 <p>
-                    <ul class="list-group list-group-flush">
+                    <b>
+                        Hlídáme politiky a úřady, aby s veřejnými penězi nakládali svědomitě
+                    </b>
+
+                
+                <p>
+                    <a class="btn btn-primary px-4" onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/o-serveru/">O hlídači</a>
+                <a class="btn btn-primary px-4" onclick="return trackOutLink(this,'megamenu');" href="/Content/IMPACT-REPORT-2022-low-res.pdf">Co vše děláme</a>
+                <a class="btn btn-primary px-4" onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/team/">Kdo ho tvoří</a>
+            </p>
+
+                <hr />
+                <p>
+                    <ul class="list-group">
                         <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/category/napoveda/"><b>Nápověda, tipy a triky</b></a></li>
-                        <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/o-serveru/">O nás</a></li>
-                        <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/team/">Team</a></li>
-                        <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/kodex">Kodex</a></li>
+                        <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/kontakt/">Kontakt</a></li>
+                        <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/pro-media/">Pro média</a></li>
                         <li class="list-group-item">
                             <a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/provoznipodminky">
                                 Podmínky užívání<br />a ochrana soukromí
@@ -31,23 +43,42 @@
                         <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/licence/">Licence</a></li>
                         <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://wwww.hlidacstatu.cz/api"><b>Pro vývojáře</b></a></li>
                     </ul>
-                    <hr />
-                    <h5>Kontakty</h5>
-                <p>
-                    <ul class="list-group">
-                        <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/kontakt/">Kontakt</a></li>
-                        <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/pro-media/">Pro média</a></li>
-                    </ul>
                 </p>
             </div>
             <div class="col-12 col-sm-4 py-4">
-                <h3>Pomoc a dary</h3>
+                <h3>Kauzy a další texty</h3>
                 <p>
 
                     <ul class="list-group">
+                       
+
+                       @foreach (var wp in HlidacStatu.XLib.StaticData.LastBlogPosts
+                        .Get()
+                        .Where(m => m.Date > new DateTime(2020, 1, 25) && m.Categories.Contains(246) == false) //not tipy
+                        .OrderByDescending(m => m.Date)
+                        .Take(5)
+                        )
+                            {
+                            <li class="list-group-item">
+                                <a onclick="return trackOutLink(this,'megamenu');" href="@wp.Link">
+                                    @Devmasters.TextUtil.ShortenText(wp.Title.Rendered, 55)
+                                </a>
+
+                            </li>
+                            }
+                    </ul>
+                </p>
+            </div>
+            <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
+                <h3>Podpořte nás!<i class="fas fa-heart" style="color:red" aria-hidden="true"></i></h3>
+                <p>
+                    Korupce ze státních zakázek stojí každého z nás 250 půllitrů piva měsíčně. Nechcete platit piva, co nevypijete? 
+                    Pomozte nám to hlídat a přispějte tak k lepšímu fungování ČR.
+                </p>
+                    <ul class="list-group">
                         <li class="list-group-item">
                             <a onclick="return trackOutLink(this,'megamenu');" href="https://www.darujme.cz/darovat/1200384">
-                                Podpořte naši činnost finančním datem <i class="fas fa-heart" style="color:red" aria-hidden="true"></i>
+                                Podpořte naši činnost finančním datem 
                             </a>
 
                         </li>
@@ -56,51 +87,9 @@
                                 Podporují nás <i class="fas fa-heart" style="color:red" aria-hidden="true"></i>
                             </a>
                         </li>
-
                         <li class="list-group-item"><a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/pomohu-spravnemu-fungovani-cr/">Proč nás podpořit?</a></li>
-
                     </ul>
-                </p>
-                <div class="embed-responsive embed-responsive-16by9 text-center">
-
-                    <iframe class="embed-responsive-item" 
-                        src="https://www.youtube.com/embed/H1sk26MkA8I?si=rpscfv04eA1g00fN"
-                        title="Hlídáme stát s odvahou" frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowfullscreen></iframe>
-                </div>
-            </div>
-            <div class="col-12 col-sm-4 py-4 bg-body-tertiary">
-                <h3>Co se nám vše podařilo</h3>
-                <p>S malým teamem jsem dokázali veliké věci</p>
-                <dl>
-                    <dt>K-INDEX</dt>
-                    <dd>
-                        Index klíčových rizik vyvolal měřitelnou změnu v chování
-                        úřadů, vyšší transparentnost státní správy a veřejný tlak
-                        na zodpovědné hospodaření s veřejnými penězi.
-                    </dd>
-                    <dt>PLATY ÚŘEDNÍKŮ</dt>
-                    <dd>
-                        Monitoring platů nejvyšších úředníků, které doposud
-                        stát nikde neuváděl, posílil veřejný zájem o odměňování
-                        veřejnými prostředky a přispěl k novelizaci zákona
-                        o přístupu k informacím.
-                    </dd>
-                    <dt>ZVEŘEJŇOVÁNÍ DAT</dt>
-                    <dd>
-                        Intenzivní lobbing za větší otevřenost státu a nepřetržitý
-                        tlak na zveřejňování dat.
-                    </dd>
-                    <dt>POLITICI A PENÍZE STÁTU</dt>
-                    <dd>
-                        Přehled napojení politiků na peníze státu — propojení
-                        a analýza všech dostupných informací. Projekt je unikátem
-                        nejen v ČR, ale rovněž i EU
-                    </dd>
-                </dl>
-                <a onclick="return trackOutLink(this,'megamenu');" href="/Content/IMPACT-REPORT-2022-low-res.pdf" class="btn btn-lg btn-warning">Kompletní impact report</a>
-
+                
             </div>
 
         </div>
