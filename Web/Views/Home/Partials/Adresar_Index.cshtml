@@ -1,4 +1,6 @@
-﻿@using HlidacStatu.Entities
+﻿@model (string oborName, string kraj, bool zakazky)
+
+@using HlidacStatu.Entities
 @using Devmasters.Enums
 @using System.Linq
 
@@ -35,7 +37,7 @@
                 {
                     if (skip.Contains(item.ToString()) == false)
                     {
-                        <a href="/adresar/@(item.ToString())" class="btn btn-default">
+                        <a href="/adresar/@(item.ToString())@(Model.zakazky ? "?vz=1":"")" class="btn btn-default">
                             <span class="text-gray">Zobrazit</span> @(item.ToNiceDisplayName())
                             <span class="text-gray">(@(HlidacStatu.Repositories.FirmaRepo.Zatrideni.Subjekty(item)?.Length ?? 0))</span>
                         </a>
@@ -44,7 +46,7 @@
                 @if (g == "Samospráva")
                 {
                     <div style="border: 2px #ccc dashed;border-radius: 4px 4px 0 0;-webkit-box-shadow: none;box-shadow: none;display:inline-block;padding: 0px 5px 0px 5px;margin-left: 10px">
-                        <form action="/adresar/Obce_III_stupne" method="get" class="form-inline">
+                        <form action="/adresar/Obce_III_stupne@(Model.zakazky ? "?vz=1":"")" method="get" class="form-inline">
                             <select name="kraj" class="form-control">
                                 <option value="">(vyberte kraj)</option>
                                 @Html.Raw(HlidacStatu.Util.CZ_Nuts.Kraje.OrderBy(k => k.Value).Select(k => $"<option value='{k.Value}'>{k.Value}</option>").Aggregate((f, s) => f + s))

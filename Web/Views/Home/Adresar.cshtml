@@ -41,7 +41,7 @@
 @if (string.IsNullOrEmpty(Model.oborName))
 {
     <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H">
-        <partial name="Partials/Adresar_Index" />
+        <partial name="Partials/Adresar_Index" model=Model />
     </cache>
 }
 else
