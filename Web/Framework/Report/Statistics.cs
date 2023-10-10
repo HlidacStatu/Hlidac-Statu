@@ -185,8 +185,8 @@ namespace HlidacStatu.Web.Framework.Report
                         HtmlRender = (s) =>
                         {
                             System.Tuple<string, string> data = (System.Tuple<string, string>)s;
-                            return string.Format("<a href='/subjekt/{0}'>{1}</a>", data.Item2,
-                                data.Item1.Replace("&", "&amp;"));
+                            return string.Format("<a href='/subjekt/{0}'>{1}</a>", data?.Item2,
+                                data?.Item1?.Replace("&", "&amp;"));
                         },
                         ValueRender = (s) =>
                         {
