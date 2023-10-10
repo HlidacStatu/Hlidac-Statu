@@ -70,7 +70,7 @@ namespace SponzoriLoader
             }
 
             //Save to DB
-            Common.UploadPeopleDonations(peopleDonations, _user, _zdroj);
+            //Common.UploadPeopleDonations(peopleDonations, _user, _zdroj);
             Common.UploadCompanyDonations(companyDonations, _user, _zdroj);
 
             //await FixPeopleSponzorsAsync(); Moved to downloader for regular runs
@@ -143,6 +143,10 @@ namespace SponzoriLoader
 
                 titlesBefore = Common.CleanTitles(titlesBefore);
                 titlesAfter = Common.CleanTitles(titlesAfter);
+
+                //jméno firmy nacpat do jména
+                if (string.IsNullOrWhiteSpace(cleanedName.jmeno))
+                    cleanedName.jmeno = record.company;
 
                 Donor donor = new Donor()
                 {
