@@ -25,8 +25,8 @@ namespace SponzoriLoader
             // "https://zpravy.udhpsh.cz/export/vfz2017-index.json",
             // "https://zpravy.udhpsh.cz/zpravy/vfz2018.json",
             // "https://zpravy.udhpsh.cz/zpravy/vfz2019.json",
-            // "https://zpravy.udhpsh.cz/zpravy/vfz2020.json"
-            // "https://zpravy.udhpsh.cz/zpravy/vfz2021.json"
+            // "https://zpravy.udhpsh.cz/zpravy/vfz2020.json",
+            // "https://zpravy.udhpsh.cz/zpravy/vfz2021.json",
             "https://zpravy.udhpsh.cz/zpravy/vfz2022.json"
         };
         
@@ -70,7 +70,7 @@ namespace SponzoriLoader
             }
 
             //Save to DB
-            //Common.UploadPeopleDonations(peopleDonations, _user, _zdroj);
+            Common.UploadPeopleDonations(peopleDonations, _user, _zdroj);
             Common.UploadCompanyDonations(companyDonations, _user, _zdroj);
 
             //await FixPeopleSponzorsAsync(); Moved to downloader for regular runs
