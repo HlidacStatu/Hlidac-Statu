@@ -71,7 +71,7 @@ public static class Common
                     Console.WriteLine(ex.Message);
                 }
 
-                if (firma is null)
+                if (firma is null || firma.Valid == false)
                 {
                     Console.WriteLine($"Chybějící firma v db - ICO: {donor.CompanyId}, nazev: {donor.Name}");
                     continue;

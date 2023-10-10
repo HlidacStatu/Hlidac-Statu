@@ -203,7 +203,7 @@ namespace HlidacStatu.Repositories
             using (DbEntities db = new DbEntities())
             {
 
-                f = db.Firma.AsQueryable().FirstOrDefault(m => m.ICO == ico);
+                f = db.Firma.FirstOrDefault(m => m.ICO == ico);
                 if (f is null)
                     return Firma.NotFound;
                 

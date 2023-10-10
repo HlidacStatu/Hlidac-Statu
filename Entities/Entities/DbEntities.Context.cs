@@ -23,6 +23,7 @@ namespace HlidacStatu.Entities
             var connectionString = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection");
             return new DbContextOptionsBuilder()
                 .UseSqlServer(connectionString, sql=> sql.CommandTimeout(120).EnableRetryOnFailure(2) )
+                //.EnableDetailedErrors()  //ukáže který sloupec je null/nejde deserializovat v chybě
                 //.EnableSensitiveDataLogging(true)
 
                 .Options;
@@ -111,8 +112,8 @@ namespace HlidacStatu.Entities
                     .HasName("PK_Firma");
 
                 _ = entity.Property(e => e.VersionUpdate).HasDefaultValue<int>(0);
-                _ = entity.Property(e => e.PocetZam).HasDefaultValue<int>(0);
-                _ = entity.Property(e => e.PocetZamDo).HasDefaultValue<int>(0);
+                _ = entity.Property(e => e.PocetZam).HasDefaultValue<int?>(0);
+                _ = entity.Property(e => e.PocetZamDo).HasDefaultValue<int?>(0);
 
             });
 
