@@ -299,7 +299,7 @@
                         @* Urady a urednici megacontent *@
                         <div class="dropdown-menu shadow">
                             <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                                <partial name="MegaMenu/_test" />
+                                <partial name="MegaMenu/_urady" />
                             </cache>
                         </div>
                     </li>
@@ -307,7 +307,7 @@
                         <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Firmy, sponzoři,<br />politické strany</a>
                         <div class="dropdown-menu shadow">
                             <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                                <partial name="MegaMenu/_test" />
+                                <partial name="MegaMenu/_firmy" />
                             </cache>
                         </div>
                     </li>
@@ -316,7 +316,7 @@
                         @* Smlouvy megacontent *@
                         <div class="dropdown-menu shadow">
                         <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                            <partial name="MegaMenu/_test" />
+                            <partial name="MegaMenu/_smlouvy" />
                         </cache>
                         </div>
                     </li>
@@ -325,7 +325,7 @@
                         @* Verejne zakazky megacontent *@
                         <div class="dropdown-menu shadow">
                         <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                            <partial name="MegaMenu/_test" />
+                            <partial name="MegaMenu/_verejnezakazky" />
                         </cache>
                         </div>
                     </li>
@@ -333,14 +333,14 @@
                         <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Dotace a<br />další</a>
                         <div class="dropdown-menu shadow">
                         <cache expires-after="@Constants.CachedActionLength.Cache12H" enabled="@(!Html.IsDebug())">
-                            <partial name="MegaMenu/_test" />
+                            <partial name="MegaMenu/_dalsi" />
                         </cache>
                         </div>
                     </li>
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
                         <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Vše o Hlídači<br /><i class="fas fa-heart" style="color:red" aria-hidden="true"></i> Podpořte nás</a>
                         <div class="dropdown-menu shadow">
-                            <partial name="MegaMenu/_test" />
+                            <partial name="MegaMenu/_hlidac" />
                         </div>
                     </li>
                 </ul>
