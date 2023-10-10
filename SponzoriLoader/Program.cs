@@ -26,7 +26,8 @@ namespace SponzoriLoader
             // "https://zpravy.udhpsh.cz/zpravy/vfz2018.json",
             // "https://zpravy.udhpsh.cz/zpravy/vfz2019.json",
             // "https://zpravy.udhpsh.cz/zpravy/vfz2020.json"
-            "https://zpravy.udhpsh.cz/zpravy/vfz2021.json"
+            // "https://zpravy.udhpsh.cz/zpravy/vfz2021.json"
+            "https://zpravy.udhpsh.cz/zpravy/vfz2022.json"
         };
         
         private static void LoadDataFromFiles(Donations peopleDonations, Donations companyDonations)
@@ -47,7 +48,7 @@ namespace SponzoriLoader
             //Before running
             //- update source
             //- select true or false below
-            bool loadDataFromFiles = true;
+            bool loadDataFromFiles = false;
             
             IConfiguration configuration = HlidacConfigExtensions.InitializeConsoleConfiguration(args);
             Devmasters.Config.Init(configuration);
