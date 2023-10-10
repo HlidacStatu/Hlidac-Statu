@@ -1,15 +1,6 @@
 ﻿@using System.Linq
-@using System.Net.Http
-@using Devmasters.Collections
-@using Devmasters.Enums;
 @using HlidacStatu.Datasets
 @using HlidacStatu.Entities
-@using HlidacStatu.Repositories;
-@using HlidacStatu.Web.TagHelpers
-@using Microsoft.AspNetCore.Http.Extensions
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@using Microsoft.Extensions.Primitives
-
 
 
 <div class="mega-content px-4">
@@ -25,6 +16,16 @@
                 <p>
                     Pokud chcete vyhledávat pouze dotace, nejlepší je to pomocí <a href="/dotace">vyhledávání na stránce dotací</a>.
                 </p>
+                <hr />
+                <a onclick="return trackOutLink(this,'megamenu');" href="https://texty.hlidacstatu.cz/hlidacovo-hodnoceni-dotacnich-systemu/" class="btn btn-primary btn-sm">Hlídačovo hodnocení dotačních systémů</a>
+                
+                <a onclick="return trackOutLink(this,'megamenu');" href="https://www.hlidacstatu.cz/data/Index/covid-podpora" class="btn btn-primary btn-sm">Covid podpory 2020-2021 od všech resortů</a>
+                <a onclick="return trackOutLink(this,'megamenu');" href="https://www.hlidacstatu.cz/data/Index/covid-podpory-mpo" class="btn btn-primary btn-sm">Covid podpory od MPO</a>
+                <a onclick="return trackOutLink(this,'megamenu');" href="https://www.hlidacstatu.cz/data/Index/pomoc-covid" class="btn btn-primary btn-sm">Skutečně vydaná pomoc vlády v rámci COVID podpor</a>
+                <a onclick="return trackOutLink(this,'megamenu');" href="https://www.hlidacstatu.cz/data/Index/prijemci-podpory-covid-programu" class="btn btn-primary btn-sm">Příjemci podpory COVID programů</a>
+                <a onclick="return trackOutLink(this,'megamenu');" href="https://www.hlidacstatu.cz/data/Index/de-minimis" class="btn btn-primary btn-sm">Registr podpor de minimis</a>
+                 	
+                
             </div>
             <div class="col-12 col-sm-4 col-md-3 py-4">
                 <h3>Hlídání dostupnosti státních webů</h3>
@@ -75,7 +76,7 @@
                             }
                             @foreach (var group in groups)
                             {
-                                <div class="fw-bold">@group</div>
+                                <div class="fw-bold mb-2">@group</div>
                                 <ul>
                                     @foreach (var ds in datasety.Where(m => m.Value == group))
                                     {
@@ -103,29 +104,26 @@
                     <a class="btn btn-warning btn-sm" href="https://www.watchdoganalytics.cz/?utm_source=megamenu&utm_medium=referral&utm_campaign=utm_campaign=permanent&utm_content=menuDalsi" role="button">Zobrazit detaily</a>
                 </p>
                 <div class="col d-flex align-items-start">
-                    <i class="fa fa-circle-1 fa-2x bi text-body-secondary flex-shrink-0 me-3" width="1.75em" height="1.75em"></i>
                     <div>
-                        <h4 class="fw-bold mb-0 fs-4 text-body-emphasis">10&nbsp;000+</h4>
+                        <h4 class="fw-bold mb-0 fs-5 text-body-emphasis">10&nbsp;000+</h4>
                         <p>
-                            10 000+ zanalyzovaných cen za ICT služby
+                            zanalyzovaných cen za ICT služby.
                         </p>
                     </div>
                 </div>
                 <div class="col d-flex align-items-start">
-                    <i class="fa fa-circle-2 fa-2x bi text-body-secondary flex-shrink-0 me-3" width="1.75em" height="1.75em"></i>
                     <div>
-                        <h4 class="fw-bold mb-0 fs-4 text-body-emphasis">
+                        <h4 class="fw-bold mb-0 fs-5 text-body-emphasis">
                             2020-22
                         </h4>
                         <p>
-                            Trendy za tři roky, navazuje na analýzy z 2017-2018 od Min.vnitra
+                            Trendy za tři roky, navazuje na analýzy z 2017-2018 od ministerstva vnitra.
                         </p>
                     </div>
                 </div>
                 <div class="col d-flex align-items-start">
-                    <i class="fa fa-circle-3 fa-2x bi text-body-secondary flex-shrink-0 me-3" width="1.75em" height="1.75em"></i>
                     <div>
-                        <h4 class="fw-bold mb-0 fs-4 text-body-emphasis">
+                        <h4 class="fw-bold mb-0 fs-5 text-body-emphasis">
                             600+
                         </h4>
                         <p>
@@ -134,10 +132,9 @@
                     </div>
                 </div>
                 <div class="col d-flex align-items-start">
-                    <i class="fa fa-circle-4 fa-2x bi text-body-secondary flex-shrink-0 me-3" width="1.75em" height="1.75em"></i>
                     <div>
-                        <h4 class="fw-bold mb-0 fs-4 text-body-emphasis">
-                            rok 2020 zadarmo
+                        <h4 class="fw-bold mb-0 fs-5 text-body-emphasis">
+                            rok 2020 zdarma
                         </h4>
                         <p>
                             Přehled obvyklých cen IT prací ve státní správě za rok 2020 <b>zcela zdarma</b>. Údaje z 726 smluv od 305 zadavatelů, 335 dodavatelů, zahrnuje 3693 cen.
