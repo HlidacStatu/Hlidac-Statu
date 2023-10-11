@@ -40,15 +40,51 @@
         _showFAD = false;
         _showTrackJS = false;
     </script>
-    
+
     @WebUtil.SetAutofocusOnId("Q")
 }
 
 <div class="watcher-blocks">
 
     <div class="watcher-blocks__wrapper">
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h2 class="new-title">
+                    Nová hlavička
+                </h2>
+            </div>
+            <div class="block-col ">
+                <p>
+                    Nová hlavička obsahuje bohatší navigace a přímé odkazy na služby Hlídače na každé stránce.
+                </p>
+                <p>
+                    <img src="/content/img/MegaMenu.opt.gif" style="width:100%;height:auto" />
+                </p>
+            </div>
+        </div>
 
-        @if (true)
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h2 class="new-title">
+                    Podpořte nás
+                </h2>
+            </div>
+            <div class="block-col " style="width:100%">
+                <div data-darujme-widget-token="bysxno1j5icb8vi6" style="width:100%">&nbsp;</div>
+                    <script type="text/javascript">
+                        +function (w, d, s, u, a, b) {
+                            w['DarujmeObject'] = u;
+                            w[u] = w[u] || function () { (w[u].q = w[u].q || []).push(arguments) };
+                            a = d.createElement(s); b = d.getElementsByTagName(s)[0];
+                            a.async = 1; a.src = "https:\/\/www.darujme.cz\/assets\/scripts\/widget.js";
+                            b.parentNode.insertBefore(a, b);
+                        }(window, document, 'script', 'Darujme');
+                        Darujme(1, "bysxno1j5icb8vi6", 'render', "https:\/\/www.darujme.cz\/widget?token=bysxno1j5icb8vi6", "90%");
+                    </script>
+                
+            </div>
+        </div>
+        @if (false)
         {
             <!-- K-Index -->
             <div class="watcher-block">
@@ -83,10 +119,6 @@
                 *@
                 </div>
             </div>
-
-        }
-        else
-        {
             <div class="watcher-block">
                 <div class="watcher__title">
                     <img src="/Content/img/icon-person-watcher.svg">
@@ -103,64 +135,59 @@
                     </p>
                 </div>
             </div>
-        }
 
-
-        @* Promo v sudý den pro úřady, v lichý pro firmy *@
-        @if (DateTime.Now.Day % 2 == 0) //sudy
-        {
-            <div class="watcher-block">
-                <div class="watcher__title">
-                    <i class="fa-duotone fa-chart-waterfall fa-2xl" style="font-size:2.5em;padding-right:16px;--fa-primary-color:orangered;"></i>
-                    <h2 class="new-title">
-                        <a href="https://www.WatchdogAnalytics.cz/?p=1?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=hpBox" class="newbadge top-right" style="padding-right:15px">
-                            Obvyklé ceny ICT prací
-                        </a>
-                    </h2>
+            @* Promo v sudý den pro úřady, v lichý pro firmy *@
+            @if (DateTime.Now.Day % 2 == 0) //sudy
+            {
+                <div class="watcher-block">
+                    <div class="watcher__title">
+                        <i class="fa-duotone fa-chart-waterfall fa-2xl" style="font-size:2.5em;padding-right:16px;--fa-primary-color:orangered;"></i>
+                        <h2 class="new-title">
+                            <a href="https://www.WatchdogAnalytics.cz/?p=1?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=hpBox" class="newbadge top-right" style="padding-right:15px">
+                                Obvyklé ceny ICT prací
+                            </a>
+                        </h2>
+                    </div>
+                    <div class="block-col ">
+                        <p class="text-black">
+                            Nejrozsáhlejší analýza cen ICT služeb na českém trhu. Přesná a aktuální, pouze ze skutečně uzavřených smluv.
+                            <br />
+                            Minimalizujte neúspěšná výběrová řízení <b>stanoveným obvyklých cenových hladin</b>.
+                            Porovnejte Vaše ceny s jinými úřady, nastavte správné limity. Zabraňte <b>negativní publicitě</b>.
+                        </p>
+                        <p>
+                            <a href="https://www.WatchdogAnalytics.cz/?p=1?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=hpBoxUrad" class="btn btn-warning">Ukázat data za <span style="color:black;font-weight:bolder">2020-2022</span></a>
+                        </p>
+                    </div>
                 </div>
-                <div class="block-col ">
-                    <p class="text-black">
-                        Nejrozsáhlejší analýza cen ICT služeb na českém trhu. Přesná a aktuální, pouze ze skutečně uzavřených smluv.
-                        <br/>
-                        Minimalizujte neúspěšná výběrová řízení <b>stanoveným obvyklých cenových hladin</b>.
-                        Porovnejte Vaše ceny s jinými úřady, nastavte správné limity. Zabraňte <b>negativní publicitě</b>.
-                    </p>
-                    <p>
-                        <a href="https://www.WatchdogAnalytics.cz/?p=1?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=hpBoxUrad" class="btn btn-warning">Ukázat data za <span style="color:black;font-weight:bolder">2020-2022</span></a>
-                    </p>
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="watcher-block">
-                <div class="watcher__title">
-                    <i class="fa-duotone fa-chart-waterfall fa-2xl" style="font-size:2.5em;padding-right:16px;--fa-primary-color:orangered;"></i>
-                    <h2 class="new-title">
-                        <a href="https://www.WatchdogAnalytics.cz/?p=1?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=hpBox" class="newbadge top-right" style="padding-right:15px">
-                            Obvyklé ceny ICT prací
-                        </a>
-                    </h2>
-                </div>
-                <div class="block-col ">
-                    <p class="text-black">
-                        Nejrozsáhlejší analýza cen ICT služeb na českém trhu. Přesná a aktuální, pouze ze skutečně uzavřených smluv.
-                        <br/>
-                        Znalost obvyklé cenové hladiny zadavatele i předchozích nabídkových cen konkurentů vám umožní
-                        zvolit nejlepší cenu.<br />
-                        <b>Nepodbízejte se</b> příliš nízkou cenou a <b>nepropásněte</b> obchodní příležitost příliš drahou nabídkou.
-                    </p>
-                    <p>
-                        <a href="https://www.WatchdogAnalytics.cz/?p=1?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=hpBoxFirma" class="btn btn-warning">Ukázat data za <span style="color:black;font-weight:bolder">2020-2022</span></a>
+            }
+            else
+            {
+                <div class="watcher-block">
+                    <div class="watcher__title">
+                        <i class="fa-duotone fa-chart-waterfall fa-2xl" style="font-size:2.5em;padding-right:16px;--fa-primary-color:orangered;"></i>
+                        <h2 class="new-title">
+                            <a href="https://www.WatchdogAnalytics.cz/?p=1?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=hpBox" class="newbadge top-right" style="padding-right:15px">
+                                Obvyklé ceny ICT prací
+                            </a>
+                        </h2>
+                    </div>
+                    <div class="block-col ">
+                        <p class="text-black">
+                            Nejrozsáhlejší analýza cen ICT služeb na českém trhu. Přesná a aktuální, pouze ze skutečně uzavřených smluv.
+                            <br />
+                            Znalost obvyklé cenové hladiny zadavatele i předchozích nabídkových cen konkurentů vám umožní
+                            zvolit nejlepší cenu.<br />
+                            <b>Nepodbízejte se</b> příliš nízkou cenou a <b>nepropásněte</b> obchodní příležitost příliš drahou nabídkou.
+                        </p>
+                        <p>
+                            <a href="https://www.WatchdogAnalytics.cz/?p=1?utm_source=hp&utm_medium=referral&utm_campaign=start&utm_content=hpBoxFirma" class="btn btn-warning">Ukázat data za <span style="color:black;font-weight:bolder">2020-2022</span></a>
 
-                    </p>
+                        </p>
+                    </div>
                 </div>
-            </div>
 
-        }
-
-        @if (false)
-        {
+            }
             <!-- block Nezhasinat -->
 
             <div class="watcher-block">
@@ -224,12 +251,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
                     </div>
                 </div>
             </div>
-        }
 
-        <!-- block 1 -->
-        <div class="watcher-block">
 
-            @*            <div class="watcher__title">
+            <!-- block 1 -->
+            <div class="watcher-block">
+
+                @*            <div class="watcher__title">
             <img src="/Content/img/logoUA.png" style="height:40px">
             <h2 class="new-title">
             <a href="https://docs.google.com/spreadsheets/d/1oNo6jhtvFY6cPy85Tdv8t3XFUySC8mikdFE22yR-eTs/edit#gid=0">
@@ -245,167 +272,162 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
             </div>
             <div style="margin-top:40px;"></div>
             *@
-            <div class="watcher__title">
-                <img src="/Content/img/icon-contracts.svg">
-                <h2 class="new-title">
-                    <a href="https://texty.hlidacstatu.cz">Hlídač kauz</a>
-                </h2>
-            </div>
-            <div class="block-tags">
-                <span class="tag">
-                    <a href="https://platyuredniku.cz/?utm_source=homepage&utm_medium=line&utm_campaign=168h" onclick="return trackOutLink(this,'Index');" class="tag newbadge top-right">
-                        <b>Jaké platy mají úředníci českých institucí?</b>
-                    </a>
-                </span>
-
-                @foreach (var wp in HlidacStatu.XLib.StaticData.LastBlogPosts
-                .Get()
-                .Where(m => m.Date > new DateTime(2020, 1, 25) && m.Categories.Contains(246) == false) //not tipy
-                .OrderByDescending(m => m.Date)
-                .Take(5)
-                )
-                {
-                    <span class="tag">
-                        <a href="@wp.Link">
-                            @Devmasters.TextUtil.ShortenText(wp.Title.Rendered, 55)
-                        </a>
-                    </span>
-
-                }
-            </div>
-            <div class="block-col block-part">
-                <div class="block-subtitle" style="font-weight:bold;color:red;">
-                    Předražená zakázka na elektronické dálniční známky
-                </div>
-                <div class="block-tags">
-
-                    <span class="tag">
-                        <a href="https://www.hlidacstatu.cz/texty/neobvykle-obvykla-cena-is-pro-dalnicni-znamky-podle-znalce-je-zisk-643-milionu-ze-zakazky-za-98-milionu-obvykly/">
-                            Neobvykle obvyklá cena IS pro dálniční známky.
-                            <span class="fad fa-share-square"></span>
-                        </a>
-                    </span>
-
-                    <span class="tag">
-                        <a href="https://www.hlidacstatu.cz/texty/elektronicke-dalnicni-znamky-jsou-drazsi-nez-papirove/">
-                            Elektronické dálniční známky vyjdou dráž než papírové
-                            <span class="fad fa-share-square"></span>
-                        </a>
-                    </span>
-                </div>
-            </div>
-
-
-            <div class="block-col block-part">
-                <div class="block-subtitle">
-                    Další sledované kauzy
+                <div class="watcher__title">
+                    <img src="/Content/img/icon-contracts.svg">
+                    <h2 class="new-title">
+                        <a href="https://texty.hlidacstatu.cz">Hlídač kauz</a>
+                    </h2>
                 </div>
                 <div class="block-tags">
                     <span class="tag">
-                        <a href="/Hledat?Q=%22elektronické%20mýto%22">
-                            Elektronické mýto
+                        <a href="https://platyuredniku.cz/?utm_source=homepage&utm_medium=line&utm_campaign=168h" onclick="return trackOutLink(this,'Index');" class="tag newbadge top-right">
+                            <b>Jaké platy mají úředníci českých institucí?</b>
                         </a>
                     </span>
-                    <span class="tag">
-                        <a href="/Hledat?Q=icoPlatce:65993390%20AND%20(%20%22stavebn%C3%AD%20práce%20v%20užš%C3%ADm%20ř%C3%ADzen%C3%AD%22%20OR%20%22jednac%C3%AD%20ř%C3%ADzen%C3%AD%20bez%20uveřejněn%C3%AD%22)">
-                            Smlouvy ŘSD s omezenou soutěží
-                        </a>
-                    </span>
-                    <span class="tag">
-                        <a href="/Subjekt/03211223">
-                            ITS - prázdná schránka obchodující s ŘSD
-                        </a>
-                        <a href="https://domaci.ihned.cz/c7-66389160-ofaba-b8b64364b636a5b" target="_blank"><span class="fad fa-share-square"></span></a>
-                    </span>
-                </div>
-            </div>
 
-        </div>
+                    @foreach (var wp in HlidacStatu.XLib.StaticData.LastBlogPosts
+                   .Get()
+                   .Where(m => m.Date > new DateTime(2020, 1, 25) && m.Categories.Contains(246) == false) //not tipy
+                   .OrderByDescending(m => m.Date)
+                   .Take(5)
+                   )
+                    {
+                        <span class="tag">
+                            <a href="@wp.Link">
+                                @Devmasters.TextUtil.ShortenText(wp.Title.Rendered, 55)
+                            </a>
+                        </span>
 
-
-
-        <!-- block 1 -->
-        <div class="watcher-block">
-            <div class="watcher__title">
-                <img src="/Content/img/icon-person-watcher.svg">
-                <h2 class="new-title">
-                    Další databáze
-                </h2>
-            </div>
-            <div class="block-col ">
-                <p>
-                    Na Hlídači máme mnoho databází od nás i od komunity.
-                </p>
-            </div>
-
-            <div class="block-col block-part">
-                <div class="block-subtitle">
-                    Nejzajímavější databáze
-                </div>
-                <div class="block-tags">
-
-                    @{
-                        var veklep = DataSet.CachedDatasets.Get("veklep");
-                        var vyjadreniPolitiku = DataSet.CachedDatasets.Get("vyjadreni-politiku");
-                        var jednaniVlady = DataSet.CachedDatasets.Get("jednani-vlady");
-                        var stenoZaznamy = DataSet.CachedDatasets.Get("stenozaznamy-psp");
-                        var ministryInvoices = DataSet.CachedDatasets.Get("ministry-invoices");
-                        var rozhodnutiUohs = DataSet.CachedDatasets.Get("rozhodnuti-uohs");
-                        var rejstrikTrestuPravnickychOsob = DataSet.CachedDatasets.Get("rejstrik-trestu-pravnickych-osob");
-                        var stavMostu = DataSet.CachedDatasets.Get("stav-mostu");
-                        var narodniInvesticniPlan = DataSet.CachedDatasets.Get("narodni-investicni-plan");
                     }
+                </div>
+                <div class="block-col block-part">
+                    <div class="block-subtitle" style="font-weight:bold;color:red;">
+                        Předražená zakázka na elektronické dálniční známky
+                    </div>
+                    <div class="block-tags">
 
-                    <a href="/data/Index/veklep" class="tag">
-                        Elektronická knihovna legislativního procesu
-                        (@RenderData.NiceNumber(veklep is null? 0 : await veklep.NumberOfRecordsAsync()))
-                    </a>
-                    <a href="/data/Index/vyjadreni-politiku" class="tag">
-                        Vyjádření politiků na <i class="fab fa-facebook-square"></i> a <i class="fab fa-twitter-square"></i>
-                        (@RenderData.NiceNumber(vyjadreniPolitiku is null? 0 : await vyjadreniPolitiku.NumberOfRecordsAsync()))
-                    </a>
-                    <a href="/data/Index/jednani-vlady" class="tag newbadge top-right">
-                        Jednání vlády od 2007
-                        (@RenderData.NiceNumber(jednaniVlady is null? 0 : await jednaniVlady.NumberOfRecordsAsync()))
-                    </a>
-                    <a href="/data/Index/stenozaznamy-psp" class="tag">
-                        Proslovy poslanců v Poslanecké sněmovně od 2008
-                        (@RenderData.NiceNumber(stenoZaznamy is null? 0 : await stenoZaznamy.NumberOfRecordsAsync()))
-                    </a>
-                    <a href="/data/Index/ministry-invoices" class="tag">
-                        Faktury ministerstev za poslední roky
-                        (@RenderData.NiceNumber(ministryInvoices is null? 0 : await ministryInvoices.NumberOfRecordsAsync()))
-                    </a>
-                    <a href="/data/Index/rozhodnuti-uohs" class="tag">
-                        Rozhodnutí ÚOHS
-                        (@RenderData.NiceNumber(rozhodnutiUohs is null? 0 : await rozhodnutiUohs.NumberOfRecordsAsync()))
-                    </a>
-                    <a href="/data/Index/rejstrik-trestu-pravnickych-osob" class="tag">
-                        Rejstřík trestů právnických osob
-                        (@RenderData.NiceNumber(rejstrikTrestuPravnickychOsob is null? 0 : await rejstrikTrestuPravnickychOsob.NumberOfRecordsAsync()))
-                    </a>
-                    <a href="/data/Index/stav-mostu" class="tag">
-                        Stav Mostů v ČR
-                        (@RenderData.NiceNumber(stavMostu is null? 0 : await stavMostu.NumberOfRecordsAsync()))
-                    </a>
-                    <a href="/data/Index/narodni-investicni-plan" class="tag">
-                        Národní investiční plán 2019
-                        (@RenderData.NiceNumber(narodniInvesticniPlan is null? 0 : await narodniInvesticniPlan.NumberOfRecordsAsync()))
-                    </a>
-                    <a href="/data/" class="tag">
-                        a další databáze
-                    </a>
+                        <span class="tag">
+                            <a href="https://www.hlidacstatu.cz/texty/neobvykle-obvykla-cena-is-pro-dalnicni-znamky-podle-znalce-je-zisk-643-milionu-ze-zakazky-za-98-milionu-obvykly/">
+                                Neobvykle obvyklá cena IS pro dálniční známky.
+                                <span class="fad fa-share-square"></span>
+                            </a>
+                        </span>
 
+                        <span class="tag">
+                            <a href="https://www.hlidacstatu.cz/texty/elektronicke-dalnicni-znamky-jsou-drazsi-nez-papirove/">
+                                Elektronické dálniční známky vyjdou dráž než papírové
+                                <span class="fad fa-share-square"></span>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+
+
+                <div class="block-col block-part">
+                    <div class="block-subtitle">
+                        Další sledované kauzy
+                    </div>
+                    <div class="block-tags">
+                        <span class="tag">
+                            <a href="/Hledat?Q=%22elektronické%20mýto%22">
+                                Elektronické mýto
+                            </a>
+                        </span>
+                        <span class="tag">
+                            <a href="/Hledat?Q=icoPlatce:65993390%20AND%20(%20%22stavebn%C3%AD%20práce%20v%20užš%C3%ADm%20ř%C3%ADzen%C3%AD%22%20OR%20%22jednac%C3%AD%20ř%C3%ADzen%C3%AD%20bez%20uveřejněn%C3%AD%22)">
+                                Smlouvy ŘSD s omezenou soutěží
+                            </a>
+                        </span>
+                        <span class="tag">
+                            <a href="/Subjekt/03211223">
+                                ITS - prázdná schránka obchodující s ŘSD
+                            </a>
+                            <a href="https://domaci.ihned.cz/c7-66389160-ofaba-b8b64364b636a5b" target="_blank"><span class="fad fa-share-square"></span></a>
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- block 1 -->
+            <div class="watcher-block">
+                <div class="watcher__title">
+                    <img src="/Content/img/icon-person-watcher.svg">
+                    <h2 class="new-title">
+                        Další databáze
+                    </h2>
+                </div>
+                <div class="block-col ">
+                    <p>
+                        Na Hlídači máme mnoho databází od nás i od komunity.
+                    </p>
+                </div>
+
+                <div class="block-col block-part">
+                    <div class="block-subtitle">
+                        Nejzajímavější databáze
+                    </div>
+                    <div class="block-tags">
+
+                        @{
+                            var veklep = DataSet.CachedDatasets.Get("veklep");
+                            var vyjadreniPolitiku = DataSet.CachedDatasets.Get("vyjadreni-politiku");
+                            var jednaniVlady = DataSet.CachedDatasets.Get("jednani-vlady");
+                            var stenoZaznamy = DataSet.CachedDatasets.Get("stenozaznamy-psp");
+                            var ministryInvoices = DataSet.CachedDatasets.Get("ministry-invoices");
+                            var rozhodnutiUohs = DataSet.CachedDatasets.Get("rozhodnuti-uohs");
+                            var rejstrikTrestuPravnickychOsob = DataSet.CachedDatasets.Get("rejstrik-trestu-pravnickych-osob");
+                            var stavMostu = DataSet.CachedDatasets.Get("stav-mostu");
+                            var narodniInvesticniPlan = DataSet.CachedDatasets.Get("narodni-investicni-plan");
+                        }
+
+                        <a href="/data/Index/veklep" class="tag">
+                            Elektronická knihovna legislativního procesu
+                            (@RenderData.NiceNumber(veklep is null? 0 : await veklep.NumberOfRecordsAsync()))
+                        </a>
+                        <a href="/data/Index/vyjadreni-politiku" class="tag">
+                            Vyjádření politiků na <i class="fab fa-facebook-square"></i> a <i class="fab fa-twitter-square"></i>
+                            (@RenderData.NiceNumber(vyjadreniPolitiku is null? 0 : await vyjadreniPolitiku.NumberOfRecordsAsync()))
+                        </a>
+                        <a href="/data/Index/jednani-vlady" class="tag newbadge top-right">
+                            Jednání vlády od 2007
+                            (@RenderData.NiceNumber(jednaniVlady is null? 0 : await jednaniVlady.NumberOfRecordsAsync()))
+                        </a>
+                        <a href="/data/Index/stenozaznamy-psp" class="tag">
+                            Proslovy poslanců v Poslanecké sněmovně od 2008
+                            (@RenderData.NiceNumber(stenoZaznamy is null? 0 : await stenoZaznamy.NumberOfRecordsAsync()))
+                        </a>
+                        <a href="/data/Index/ministry-invoices" class="tag">
+                            Faktury ministerstev za poslední roky
+                            (@RenderData.NiceNumber(ministryInvoices is null? 0 : await ministryInvoices.NumberOfRecordsAsync()))
+                        </a>
+                        <a href="/data/Index/rozhodnuti-uohs" class="tag">
+                            Rozhodnutí ÚOHS
+                            (@RenderData.NiceNumber(rozhodnutiUohs is null? 0 : await rozhodnutiUohs.NumberOfRecordsAsync()))
+                        </a>
+                        <a href="/data/Index/rejstrik-trestu-pravnickych-osob" class="tag">
+                            Rejstřík trestů právnických osob
+                            (@RenderData.NiceNumber(rejstrikTrestuPravnickychOsob is null? 0 : await rejstrikTrestuPravnickychOsob.NumberOfRecordsAsync()))
+                        </a>
+                        <a href="/data/Index/stav-mostu" class="tag">
+                            Stav Mostů v ČR
+                            (@RenderData.NiceNumber(stavMostu is null? 0 : await stavMostu.NumberOfRecordsAsync()))
+                        </a>
+                        <a href="/data/Index/narodni-investicni-plan" class="tag">
+                            Národní investiční plán 2019
+                            (@RenderData.NiceNumber(narodniInvesticniPlan is null? 0 : await narodniInvesticniPlan.NumberOfRecordsAsync()))
+                        </a>
+                        <a href="/data/" class="tag">
+                            a další databáze
+                        </a>
+
+                    </div>
+                </div>
+
+                <div class="block-button-wrapper">
+                    <a href="/data" class="btn btn-default btn-default-new">Ukázat další databáze</a>
                 </div>
             </div>
-
-            <div class="block-button-wrapper">
-                <a href="/data" class="btn btn-default btn-default-new">Ukázat další databáze</a>
-            </div>
-        </div>
-
-        @if (false)
-        {
 
             <!-- block 2 -->
             <div class="watcher-block">
@@ -469,10 +491,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
                     <a href="/osoby" class="btn btn-default btn-default-new">zobrazit Více v Hlídači osob</a>
                 </div>
             </div>
-        }
 
-        @if (false)
-        {
+
 
             <!-- block Verejne zakazky -->
             <div class="watcher-block">
