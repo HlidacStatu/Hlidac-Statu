@@ -38,7 +38,7 @@ namespace HlidacStatu.Web.Controllers
         {
             return View();
         }
-        public ActionResult Header()
+        public ActionResult HeaderWP()
         {
             string res = "";
             using (Devmasters.Net.HttpClient.URLContent url = new Devmasters.Net.HttpClient.URLContent("https://www.hlidacstatu.cz"))
@@ -54,6 +54,7 @@ namespace HlidacStatu.Web.Controllers
                 int endPos = html.IndexOf(endWord, startPos);
                 if (endPos == -1) return StatusCode(404);  // endWord not found after startWord
                 res = html.Substring(startPos, endPos - startPos);
+                res = res.Replace("href=\"/", "href=\"https://www.hlidacstatu.cz/");
             }
             return Content(res);
         }
