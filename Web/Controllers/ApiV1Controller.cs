@@ -1,19 +1,18 @@
-﻿using HlidacStatu.Entities;
+﻿using HlidacStatu.Connectors;
+using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
+using HlidacStatu.LibCore;
 using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.ProfilZadavatelu;
+using HlidacStatu.Web.Framework;
 using HlidacStatu.Web.Models;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 using Nest;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,9 +20,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using HlidacStatu.Connectors;
-using HlidacStatu.LibCore;
-using HlidacStatu.Web.Framework;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -41,6 +37,25 @@ namespace HlidacStatu.Web.Controllers
         public ActionResult UX()
         {
             return View();
+        }
+        public ActionResult Header()
+        {
+            string res = "";
+            using (Devmasters.Net.HttpClient.URLContent url = new Devmasters.Net.HttpClient.URLContent("https://www.hlidacstatu.cz"))
+            {
+                string html = url.GetContent().Text;
+                string startWord = "<!-- ##head## -->";
+                string endWord = "<!-- ##/head## -->";
+                int startPos = html.IndexOf(startWord);
+                if (startPos == -1) return StatusCode(404);  // startWord not found
+
+                startPos += startWord.Length;  // Move the start position to the end of startWord
+
+                int endPos = html.IndexOf(endWord, startPos);
+                if (endPos == -1) return StatusCode(404);  // endWord not found after startWord
+                res = html.Substring(startPos, endPos - startPos);
+            }
+            return Content(res);
         }
 
         public ActionResult Doc()
@@ -60,7 +75,7 @@ namespace HlidacStatu.Web.Controllers
             return View();
         }
 
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         public ActionResult BpStat2()
         {
             return View();
@@ -70,7 +85,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize]
         public ActionResult Index()
         {
-            
+
             //global::hlst
             ViewBag.Token = AspNetUserApiToken.GetToken(User.Identity.Name).Token
                 .ToString("N");
@@ -88,7 +103,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
             return View();
-            
+
         }
 
         [Authorize]
@@ -254,7 +269,7 @@ namespace HlidacStatu.Web.Controllers
         [Authorize]
         public async Task<ActionResult> VZProfilesList()
         {
-            
+
             List<VZProfilesListRes> list = new();
             var client = await Manager.GetESClient_VerejneZakazkyNaProfiluRawAsync();
             var res = await client.SearchAsync<ZakazkaRaw>(s => s
@@ -280,7 +295,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(list.ToArray()), "application/json");
-        
+
         }
 
         [Authorize]
@@ -309,7 +324,7 @@ namespace HlidacStatu.Web.Controllers
 
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(new { error = res.ServerError.ToString() }),
                 "application/json");
-       
+
         }
 
         [HttpGet()]
@@ -355,7 +370,7 @@ namespace HlidacStatu.Web.Controllers
             string nodes = "-------------------------\n";
             try
             {
-                var client = await Manager.GetESClientAsync(); 
+                var client = await Manager.GetESClientAsync();
                 res = client.Cluster.Health();
                 num = res?.NumberOfNodes ?? 0;
                 status = res?.Status.ToString() ?? "unknown";
@@ -475,7 +490,7 @@ namespace HlidacStatu.Web.Controllers
                 }
                 return new HttpResponseMessageActionResult(response);
             }
-            catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
+            catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
             {
                 // canceled by user
                 Util.Consts.Logger.Info("Autocomplete canceled by user");
@@ -484,7 +499,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { q });
             }
-            
+
             return NoContent();
         }
 
@@ -508,7 +523,7 @@ namespace HlidacStatu.Web.Controllers
                 }
                 return new HttpResponseMessageActionResult(response);
             }
-            catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
+            catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
             {
                 // canceled by user
                 Util.Consts.Logger.Info("Autocomplete canceled by user");
@@ -517,10 +532,10 @@ namespace HlidacStatu.Web.Controllers
             {
                 Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { q });
             }
-            
+
             return NoContent();
         }
-        
+
 
 
         [Authorize]
@@ -529,7 +544,7 @@ namespace HlidacStatu.Web.Controllers
             page = page ?? 1;
             order = order ?? 0;
             Repositories.Searching.SmlouvaSearchResult res = null;
-            
+
             if (string.IsNullOrWhiteSpace(query))
                 return new NotFoundResult();
 
@@ -572,7 +587,7 @@ namespace HlidacStatu.Web.Controllers
         public async Task<ActionResult> Detail(string _id)
         {
             string Id = _id;
-           
+
             if (string.IsNullOrWhiteSpace(Id))
                 return new NotFoundResult();
 
@@ -665,7 +680,7 @@ namespace HlidacStatu.Web.Controllers
 
             return Content(Newtonsoft.Json.JsonConvert.SerializeObject(model, Newtonsoft.Json.Formatting.None),
                 "application/json");
-        
+
         }
 
         class osobaResult
