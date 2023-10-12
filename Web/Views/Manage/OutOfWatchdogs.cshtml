@@ -59,15 +59,3 @@
 </div>
 <div class="clearfix"></div>
 
-@section footerscripts
-{
-    <script type="text/javascript">
-        $(document).ready(function () {
-        if (_showTrackJS) {
-                _my_event('send', 'event', 'pageload', 'OutOfWatchDogs', '@User.Identity?.Name', {
-                nonInteraction: true
-            });
-        }
-        });
-    </script>
-}

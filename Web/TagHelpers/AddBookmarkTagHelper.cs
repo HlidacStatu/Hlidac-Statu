@@ -114,7 +114,7 @@ namespace HlidacStatu.Web.TagHelpers
             output.Attributes.Add("bmurl", Url);
             output.Attributes.Add("bmid", ItemId);
             output.Attributes.Add("bmtype", ItemType);
-            output.Attributes.Add("onclick", "javascript: _my_event('send', 'event', 'bookmark', '', 'authenticated');ChangeBookmark(this);return false;");
+            output.Attributes.Add("onclick", $"javascript: _my_event('send', 'event', 'bookmark', '{ViewContext.GetRequestPath()}', 'authenticated');ChangeBookmark(this);return false;");
         }
 
     }

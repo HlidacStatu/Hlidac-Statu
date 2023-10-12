@@ -185,14 +185,6 @@
     <link rel="stylesheet" href="~/content/bundled.css" />
     <script src="~/bundles/modernizr"></script>
 
-    <script>
-        var _showTrackJS = false;
-        var _showFAD = true;
-        if (_showTrackJS) {
-
-            WebUtil.RenderSmartLookTrackingCode(false)
-        }
-    </script>
     
     @WebUtil.SetAutofocusOnId("Q")
 
@@ -231,17 +223,6 @@
 </head>
 <body class="new-body">
     <div id="fb-root"></div>
-    <script>
-        if (_showTrackJS) {
-            (function (d, s, id) {
-                var js, fjs = d.getElementsByTagName(s)[0];
-                if (d.getElementById(id)) return;
-                js = d.createElement(s); js.id = id;
-                js.src = "//connect.facebook.net/cs_CZ/sdk.js#xfbml=1&version=v2.9";
-                fjs.parentNode.insertBefore(js, fjs);
-            }(document, 'script', 'facebook-jssdk'));
-        }
-    </script>
 
     @if (ShowEmailConfirmation)
     {

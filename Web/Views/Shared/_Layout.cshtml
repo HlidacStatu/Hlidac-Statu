@@ -211,18 +211,6 @@
 
 </head>
 <body class="new-body">
-    <div id="fb-root"></div>
-    <script>
-        if (_showTrackJS) {
-            (function (d, s, id) {
-                var js, fjs = d.getElementsByTagName(s)[0];
-                if (d.getElementById(id)) return;
-                js = d.createElement(s); js.id = id;
-                js.src = "//connect.facebook.net/cs_CZ/sdk.js#xfbml=1&version=v2.9";
-                fjs.parentNode.insertBefore(js, fjs);
-            }(document, 'script', 'facebook-jssdk'));
-        }
-    </script>
 
     @if (ShowEmailConfirmation)
     {
@@ -430,7 +418,7 @@
                 {
                     <a href="/manage/Watchdogs"
                        alt="Všichni uložení hlídači" title="Všichni uložení hlídači"
-                       onclick="_my_event('send', 'event', 'btnWatchDog', 'List', 'authenticated');" role="button"
+                       onclick="_my_event('send', 'event', 'btnWatchDog', 'click', 'authenticated');" role="button"
                        class="btn btn-warning btn-sm"
                        style="margin-right: 0.5em;">
                         <i style="color:black;" class="fas fa-eye"></i>
@@ -438,14 +426,17 @@
 
                     <a style="display:block;color:#c9302c;margin-right: 0.4em;position:relative;top:6px;"
                        title="Všechny uložené záložky" alt="Všechny uložené záložky"
+                       onclick="_my_event('send', 'event', 'bookmarkListBtn', 'click','@Context.Request.Path'); return true;"
                        href="/manage/zalozky" class="bookmark bookmarkOn btn btn-small">
                         <i class="fa-duotone fa-bookmark fa-lg"></i>
 
                     </a>
                     <a style="display:block;margin-right: 0.5em;top:10px;position:relative" href="/Identity/Account/manage/"
+                       onclick="_my_event('send', 'event', 'manageBtn', 'click','@Context.Request.Path'); return true;"
                        title="Nastavení účtu" alt="Nastavení účtu"><i class="fa-solid fa-user fa-xl"></i></a>
 
                     <a style="display:block;top:10px;position:relative;font-weight:bolder"
+                       onclick="_my_event('send', 'event', 'logoutBtn', 'click','@Context.Request.Path'); return true;"
                        href="/Identity/Account/Logout?rnd=@Guid.NewGuid().ToString("N")">Odhlásit</a>
                 }
                 else
