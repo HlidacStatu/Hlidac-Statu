@@ -41,7 +41,7 @@
                 </p>
             </div>
             <div class="col-12 col-md-4 py-4">
-                <h3>Sponzoři politických stran</h3>
+                <h3><a onclick="return trackOutLink(this,'megamenu');" href="/Sponzori">Sponzoři politických stran</a></h3>
                 @{
                     var velkeStrany = await SponzoringRepo.PartiesPerYearsOverviewAsync(SponzoringRepo.DefaultLastSponzoringYear(), System.Threading.CancellationToken.None);
                     velkeStrany = velkeStrany.Where(s => SponzoringRepo.TopStrany
@@ -62,17 +62,20 @@
                                 <span class="badge rounded-pill text-bg-light">@HlidacStatu.Util.RenderData.NicePriceHtml(str.DaryCelkem.Value, shortFormat: true)</span>
                             </li>
                         }
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <a class="fw-bold" onclick="return trackOutLink(this,'megamenu');" href="/sponzori/strany">Sponzoři všech stran</a>
+                        </li>
                     </ul>
 
                 </div>
                 <hr />
-                <a onclick="return trackOutLink(this,'megamenu');" href="/Sponzori/Strany" class="btn btn-primary btn-sm">Sponzoři všech stran</a>
+
                 <a onclick="return trackOutLink(this,'megamenu');" href="/Sponzori/TopSponzori" class="btn btn-primary btn-sm">2000 největších sponzorů (osob i firem) vůbec</a>
                 <a onclick="return trackOutLink(this,'megamenu');" href="/Sponzori/TopSponzori?rok=@(SponzoringRepo.DefaultLastSponzoringYear())" class="btn btn-primary btn-sm">Top sponzorující osoby za @SponzoringRepo.DefaultLastSponzoringYear()</a>
                 <a onclick="return trackOutLink(this,'megamenu');" href="/Sponzori/TopSponzoriFirmy?rok=@(SponzoringRepo.DefaultLastSponzoringYear())" class="btn btn-primary btn-sm">Top sponzorující firmy za @SponzoringRepo.DefaultLastSponzoringYear()</a>
             </div>
             <div class="col-12 col-md-4 py-4 bg-body-tertiary">
-                <h3>Politici</h3>
+                <h3><a onclick="return trackOutLink(this,'megamenu');" href="/osoby">Politici</a></h3>
                 <div class="card">
                     <div class="card-header">
 Politici, kteří podnikají a mají největší obchodní vztahy se státem <small class="text-light">náhodný výběr z největších</small></div>
@@ -97,7 +100,7 @@ Politici, kteří podnikají a mají největší obchodní vztahy se státem <sm
 
                         }
                         <li class="list-group-item">
-                            <a onclick="return trackOutLink(this,'megamenu');" href="/report/32?rok=2022" style="margin-left: 52px">dalších více než 100 politiků</a>
+                            <a class="fw-bold" onclick="return trackOutLink(this,'megamenu');" href="/report/32?rok=2022" style="margin-left: 52px">dalších více než 100 politiků</a>
                         </li>
                     </ul>
                 </div>

@@ -35,7 +35,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 col-md-4 py-4 bg-body-tertiary">
-                <h3>Veřejné zakázky</h3>
+                <h3><a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky">Veřejné zakázky</a></h3>
                 <p>
                     Každý subjekt (úřad, škola, nemocnice atp.), kterého se týká zákon o zadávání veřejných zakázek
                     (<a onclick="return trackOutLink(this,'megamenu');" href="https://www.zakonyprolidi.cz/cs/2016-134" target="_blank">zákon 134/2016</a>)
@@ -55,16 +55,12 @@
                     {
                         vzCount = vzCount + obl.count;
 
-                        <li class="list-group-item d-flex justify-content-between align-items-start">
-                            <div class="ms-2 me-auto">
-                                <div class="fw-bold"><a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky/hledat?q=*&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.id.ToString())&order=1">@obl.name</a></div>
-                            </div>
+                        <li class="list-group-item">
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky/hledat?q=*&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.id.ToString())&order=1">@obl.name</a>
                         </li>
                     }
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div class="ms-2 me-auto">
-                            <div class="fw-bold"><a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky/">Všechny obory veřejných zakázek</a></div>
-                        </div>
+                    <li class="list-group-item">
+                        <b><a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky/">Všechny obory veřejných zakázek</a></b>
                     </li>
 
                 </ul>
@@ -144,7 +140,7 @@
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-start">
                         <div class="ms-2 me-auto">
-                            <a onclick="return trackOutLink(this,'megamenu');" href="/adresar?vz=1">a stovky další úřadů</a>
+                            <a class="fw-bold" onclick="return trackOutLink(this,'megamenu');" href="/adresar?vz=1">a stovky další úřadů</a>
                         </div>
                     </li>
                 </ul>
