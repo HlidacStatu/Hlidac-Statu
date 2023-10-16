@@ -99,9 +99,9 @@
 
     [Parameter]
     public EventCallback<List<AutocompleteItem<TItem>>> OnAutocompleteSubmitted { get; set; }
-
+    
     [Parameter]
-    public EventCallback<string> OnAutocompleteTextSelected { get; set; }
+    public EventCallback<List<AutocompleteItem<TItem>>> OnItemSelected { get; set; }
     
     [Parameter]
     public List<AutocompleteItem<TItem>>? InputTags { get; set; }
@@ -234,6 +234,8 @@
         }
 
         CloseOptions();
+
+        await OnItemSelected.InvokeAsync(TagItems);
 
     //cleanup input box and focus on it
         InputBoxValue = "";
