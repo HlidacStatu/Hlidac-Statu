@@ -8,10 +8,12 @@
     Layout = null;
     var statistics = Model.statistics.Summary(Model.statistics.YearsAfter2016());
     string query = "";
+    bool noRisk = true;
 }
 
 @if (statistics.PercentSmluvBezCeny > 0)
 {
+    noRisk = false;
     query = System.Net.WebUtility.UrlEncode($"( {Model.query.Query} ) AND ( hint.skrytaCena:1 ) ");//
     <p>
         <i class="fas fa-exclamation-circle" style="color:@Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercentBezCeny, statistics.PercentSmluvBezCeny).AsRiziko());padding-right:20px;"></i> 
@@ -31,6 +33,7 @@
 }
 @if (statistics.PocetSmluvULimitu > 0)
 {
+    noRisk = false;
     query = System.Net.WebUtility.UrlEncode($"( {Model.query.Query} ) AND ( hint.smlouvaULimitu:>0 ) ");//
     <p>
         <i class="fas fa-exclamation-circle" style="color:@Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSmluvUlimitu, statistics.PercentSmluvULimitu).AsRiziko());padding-right:20px;"></i> <b>Smlouvy s cenou těsně pod limitem pro veřejné zakázky</b> <a href="/HledatSmlouvy?Q=@query"><i class='fas fa-link'></i></a>
@@ -49,6 +52,7 @@
 }
 @if (statistics.PocetSmluvSeZasadnimNedostatkem > 0)
 {
+    noRisk = false;
     query = System.Net.WebUtility.UrlEncode($"( {Model.query.Query} ) AND ( chyby:zasadni ) ");//
     <p>
         <i class="fas fa-exclamation-circle" style="color:@Riziko.RizikoColor(KIndexData.DetailInfo.KIndexLabelForPart(KIndexData.KIndexParts.PercSeZasadnimNedostatkem, statistics.PercentSmluvSeZasadnimNedostatkem).AsRiziko());padding-right:20px;"></i> <b>Smlouvy se zásadními nedostatky</b> <a href="/HledatSmlouvy?Q=@query"><i class='fas fa-link'></i></a>
@@ -65,5 +69,8 @@
         </span>
     </p>
 }
-
+@if (noRisk)
+{
+<p>Žádná sledovaná rizika jsme u nalezených smluv nenašli.</p>
+}
 
