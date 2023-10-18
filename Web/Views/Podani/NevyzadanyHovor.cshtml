@@ -4,7 +4,7 @@
 }
 
 @section breadcrumb
-    {
+{
     <ol class="breadcrumb">
         <li>
             <a href="/">Hlídač Státu</a>
@@ -122,7 +122,7 @@
         <div class="col-sm-9 col-xl-10">
             <div class="card-body">
                 <p>
-                    <h5 class="card-title">Vyplňte informace o Vás, jako stěžovateli a vše pro vygenerování stížnosti je hotovo. Pokud jste ještě nevypnuli nahrávání hovoru, zastavte nahrávání tlačítem <code>Vypnout nahrávání</code></h5>
+                    <h5 class="card-title">Vyplňte informace o Vás jako stěžovateli a vše pro vygenerování stížnosti je hotovo. Pokud jste ještě nevypnuli nahrávání hovoru, zastavte nahrávání tlačítem <code>Vypnout nahrávání</code></h5>
 
                     <button class="btn btn-warning collapse" id="stopRecording2" onclick="stopRecording()"><i class="fa-duotone fa-microphone-lines fa-beat fa-lg" style="color:red"></i> Vypnout nahrávání</button>
                     <div class="alert alert-success collapse hide audioInfoTrigger" role="alert">Nahraný soubor ke stažení najdete níže na stránce.</div>
@@ -156,8 +156,15 @@
                         <label for="kontakt">Případný další kontakt, kde Vás může úřad zastihnout pro doplnění žádosti</label>
                     </div>
                 </div>
+                <div class="mx-auto">
+                    <div class="form-check">
+                        <input type="checkbox" id="cookies" name="cookies"
+                               class="form-check-input" checked/>
+                        <label for="cookies" class="form-check-label">Uložit cookies (pouze ve vašem prohlížeči) pro další použití</label>
+                    </div>
+                </div>
 
-                <button type="submit" class="btn btn-success" id="formSubmit">Vygenerovat dokument se stížností</button>
+                <button type="submit" class="btn btn-success" id="formSubmit" onclick="saveCookies()">Vygenerovat dokument se stížností</button>
             </div>
         </div>
     </div>
@@ -208,6 +215,14 @@
 
 
 <script>
+    
+    $(document).ready(function () {
+        $('#jmeno').val(readCookie("nevyzadanyHovor_Jmeno"));
+        $('#cisloVolaneho').val(readCookie("nevyzadanyHovor_CisloVolaneho"));
+        $('#teloperator').val(readCookie("nevyzadanyHovor_Teloperator"));
+        $('#kontakt').val(readCookie("nevyzadanyHovor_Kontakt"));
+    });
+
     let mediaRecorder;
     let audioChunks = [];
     let mp3Blob;
@@ -287,5 +302,20 @@ async function downloadPDF() {
   
   
 }
+
+function saveCookies() {
+    if ($('#cookies').is(":checked")) {
+        const jmeno = $('#jmeno').val();
+        const cisloVolaneho = $('#cisloVolaneho').val();
+        const teloperator = $('#teloperator').val();
+        const kontakt = $('#kontakt').val();
+        
+        createCookie("nevyzadanyHovor_Jmeno", jmeno, 365);
+        createCookie("nevyzadanyHovor_CisloVolaneho", cisloVolaneho, 365);
+        createCookie("nevyzadanyHovor_Teloperator", teloperator, 365);
+        createCookie("nevyzadanyHovor_Kontakt", kontakt, 365);
+    }
+}
+        
 
 </script>

@@ -7,6 +7,7 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Util
 @using Microsoft.AspNetCore.WebUtilities
+@using Foundatio.Parsers.ElasticQueries
 
 @inject NavigationManager Navigation
 
@@ -106,6 +107,7 @@
             <ChildContent>
                 <HlidacAutocompleteMultitag SearchFuncAsync="@((s, token) => OnSearch(s, token))"
                                             OnAutocompleteSubmitted="@(OnAutocompleteSubmitted)"
+                                            OnItemSelected="@(OnAutocompleteItemSelected)"
                                             TextSelector="@((autocomplete) => autocomplete?.RenderText())"
                                             InputTags="InputTags"
                                             HelpTips="HelpTips"
@@ -185,6 +187,12 @@
                         </div>
                     </ItemTemplate>
                 </HlidacAutocompleteMultitag>
+                @if (Navigation.Uri.EndsWith("beta"))
+                {
+                    <div class="header__search__hint" style="font-size:15px;text-decoration:none;">
+                        @_humanizedQuery
+                    </div>
+                }
             </ChildContent>
             <ErrorContent>
                 <div class="hlidac-autocomplete">
@@ -230,6 +238,8 @@
     private List<AutocompleteItem<Autocomplete>>? InputTags { get; set; }
 
     private string _query;
+
+    private string _humanizedQuery;
 
     private List<RenderFragment> HelpTips = new List<RenderFragment>()
     {
@@ -419,5 +429,19 @@
         _ => @<i class="fa-regular fa-alien-8bit"></i>
         };
 
+
+    private async Task OnAutocompleteItemSelected(List<AutocompleteItem<Autocomplete>> autocompleteTags)
+    {
+        //todo: change it into a human readable text here 
+        
+        (string qs, string qtl) = ParseTools.CreateQueryWithOffsets(
+            autocompleteTags.Select(i => i.Value?.Id ?? i.Text ?? "").ToList());
+        
+        var parser = new ElasticQueryParser();
+        var result = parser.Parse(qs);
+
+        _humanizedQuery = await HQueryNodeVisitor.RunAsync(result); 
+        
+    }
 
 }
