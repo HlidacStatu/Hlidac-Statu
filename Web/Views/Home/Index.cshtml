@@ -43,18 +43,54 @@
 <div class="watcher-blocks">
 
     <div class="watcher-blocks__wrapper">
+      
+
         <div class="watcher-block">
             <div class="watcher__title">
-                <h2 class="new-title">
-                    Nová hlavička
-                </h2>
+                <h3 class="new-title">
+                    Stížnost na nevyžádané marketingové hovory
+                </h3>
             </div>
             <div class="block-col ">
                 <p>
-                    Nová hlavička obsahuje bohatší navigace a přímé odkazy na služby Hlídače na každé stránce.
+                    Průvodce nahráním hovoru a posláním stížnosti na nevyžádané marketingové hovory.
                 </p>
                 <p>
-                    <img src="/content/img/MegaMenu.opt.gif" style="width:100%;height:auto" />
+                    <a class="btn btn-danger btn-sm" href="/podani/nevyzadanyHovor" >Spustit průvodce</a>
+                </p>
+            </div>
+
+            <hr />
+
+            <!-- MailerLite Universal -->
+            <script>
+                (function (m, a, i, l, e, r) {
+                    m['MailerLiteObject'] = e; function f() {
+                        var c = { a: arguments, q: [] }; var r = this.push(c); return "number" != typeof r ? r : f.bind(c.q);
+                    }
+                    f.q = f.q || []; m[e] = m[e] || f.bind(f.q); m[e].q = m[e].q || f.q; r = a.createElement(i);
+                    var _ = a.getElementsByTagName(i)[0]; r.async = 1; r.src = l + '?v' + (~~(new Date().getTime() / 1000000));
+                    _.parentNode.insertBefore(r, _);
+                })(window, document, 'script', 'https://static.mailerlite.com/js/universal.js', 'ml');
+
+                var ml_account = ml('accounts', '1727018', 'u8a0r9v8n8', 'load');
+            </script>
+            <!-- End MailerLite Universal -->
+            <div class="watcher__title">
+                <h3 class="new-title">
+                    Novinky a zajímavé články mailem
+                </h3>
+            </div>
+            <div class="block-col ">
+                <p>
+                    Přihlaste se k odběru měsíčního newsletteru a mějte přehled o všem důležitém!
+                </p>
+                <p>
+                    <script>
+                        var ml_webform_4032532 = ml_account('webforms', '4032532', 'g4v0v6', 'load');
+                        ml_webform_4032532('animation', 'contentPush');
+                    </script>
+                    <a class="btn btn-primary btn-sm" href="javascript:;" onclick="ml_webform_4032532('show')">Přihlásit k odběru</a>
                 </p>
             </div>
         </div>
