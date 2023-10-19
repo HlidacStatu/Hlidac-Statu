@@ -18,7 +18,6 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Devmasters.Log;
-using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.Web.Views.Shared.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -30,7 +29,6 @@ using Microsoft.IdentityModel.Tokens;
 
 using Polly;
 using Serilog.Filters;
-using static HlidacStatu.Entities.Osoba.JSON;
 
 namespace HlidacStatu.Web
 {
@@ -431,29 +429,30 @@ namespace HlidacStatu.Web
                     string clientId = appleAuthSetting["Id"];
                     string secret = appleAuthSetting["Secret"];
                     string teamId = appleAuthSetting["TeamId"];
+                    string keyId = appleAuthSetting["KeyId"];
                     
                     options.ClientId = clientId; // Service ID
                     
                     options.Authority = "https://appleid.apple.com"; // disco doc: https://appleid.apple.com/.well-known/openid-configuration
- 
+                
                     options.CallbackPath = "/signin-apple"; // corresponding to your redirect URI
-
+                
                     options.ResponseType = "code id_token"; // hybrid flow due to lack of PKCE support
                     options.ResponseMode = "form_post"; // form post due to prevent PII in the URL
                     options.DisableTelemetry = true;
-
+                
                     options.Scope.Clear(); // apple does not support the profile scope
                     options.Scope.Add("openid");
                     options.Scope.Add("email");
                     options.Scope.Add("name");
-
+                
                     // custom client secret generation - secret can be re-used for up to 6 months
                     options.Events.OnAuthorizationCodeReceived = context =>
                     {
-                        context.TokenEndpointRequest.ClientSecret = TokenGenerator.CreateNewToken(clientId, secret, teamId);
+                        context.TokenEndpointRequest.ClientSecret = TokenGenerator.CreateNewToken(clientId, secret, teamId, keyId);
                         return Task.CompletedTask;
                     };
-
+                
                     options.UsePkce = false; // apple does not currently support PKCE (April 2021)
                 })
                 .AddOpenIdConnect("mojeid", options =>
@@ -489,7 +488,7 @@ namespace HlidacStatu.Web
         
         private static class TokenGenerator
         {
-            public static string CreateNewToken(string clientId, string secret, string teamId)
+            public static string CreateNewToken(string clientId, string secret, string teamId, string keyId)
             {
                 const string aud = "https://appleid.apple.com";
                 
@@ -507,7 +506,7 @@ namespace HlidacStatu.Web
                     Expires = now.AddMinutes(5), // expiry can be a maximum of 6 months - generate one per request or re-use until expiration
                     IssuedAt = now,
                     NotBefore = now,
-                    SigningCredentials = new SigningCredentials(new ECDsaSecurityKey(ecdsa), SecurityAlgorithms.EcdsaSha256)
+                    SigningCredentials = new SigningCredentials(new ECDsaSecurityKey(ecdsa) {KeyId = keyId}, SecurityAlgorithms.EcdsaSha256)
                 });
             }
         }
