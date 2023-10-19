@@ -328,11 +328,16 @@ namespace HlidacStatu.Web.Framework
             string xTooltip = "Rok",
             string yTitleLeft = "Hodnota (Kč)",
             string yTitleRight = "",
-            string tooltipFormat = null
+            string tooltipFormat = null,
+            bool showZerovalues = false
             )
         {
             string random = Guid.NewGuid().ToString("N");
             var sb = new System.Text.StringBuilder();
+            if (showZerovalues == false)
+            {
+                data.Data = data.Data.Where(m => m.Y > 0).ToArray();
+            }
 
             sb.AppendLine($"<div id='{random}' ></div>");
             sb.AppendLine("<script type='text/javascript'>");
