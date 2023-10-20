@@ -12,7 +12,9 @@ namespace HlidacStatu.Repositories
     {
          public static MonitoredTask Create(MonitoredTask monitoredTask)
         {
-
+            if (!string.IsNullOrEmpty(monitoredTask?.Exception))
+                if (monitoredTask.Exception.Length > 50000)
+                    monitoredTask.Exception = monitoredTask.Exception.Substring(0, 50000);
             using (DbEntities db = new DbEntities())
             {
                 _ = db.MonitoredTasks.Add(monitoredTask);
@@ -24,6 +26,10 @@ namespace HlidacStatu.Repositories
 
         public static async Task<MonitoredTask> CreateAsync(MonitoredTask monitoredTask)
         {
+            if (!string.IsNullOrEmpty(monitoredTask?.Exception))
+                if (monitoredTask.Exception.Length > 50000)
+                    monitoredTask.Exception = monitoredTask.Exception.Substring(0, 50000);
+
             using (DbEntities db = new DbEntities())
             {
                 _ = db.MonitoredTasks.Add(monitoredTask);
@@ -89,10 +95,14 @@ namespace HlidacStatu.Repositories
             else
                 except = exception?.ToString();
 
+            if (!string.IsNullOrEmpty(except))
+                if (except.Length > 50000)
+                    except = except.Substring(0, 50000);
+
             task.Progress = SetProgress(100);
             task.Finished = DateTime.Now;
             task.Success = success;
-            task.Exception = exception?.ToString();
+            task.Exception = except;
             task.ItemUpdated = DateTime.Now;
 
             using (DbEntities db = new DbEntities())
