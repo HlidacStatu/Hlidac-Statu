@@ -78,37 +78,7 @@ namespace HlidacStatu.Repositories
 
         public static async Task SaveRizeniAsync(Rizeni r) => await RizeniRepo.SaveAsync(r);
 
-        public static async Task<DokumentSeSpisovouZnackou> LoadDokumentAsync(string id, bool limitedView)
-        {
-            var client = await Manager.GetESClient_InsolvenceAsync();
-
-            try
-            {
-                ISearchResponse<Rizeni> data = await client.SearchAsync<Rizeni>(s => s
-                    .Source(sr => sr.Includes(r => r.Fields("dokumenty.*").Fields("spisovaZnacka")))
-                    .Query(q => q.Match(m => m.Field("dokumenty.id").Query(id)))); //TODO
-
-                if (data.IsValid == false)
-                    throw new ApplicationException(data.ServerError?.ToString() ?? "");
-
-                if (data.Total == 0)
-                    return null;
-
-                return data.Hits.Select(h => new DokumentSeSpisovouZnackou
-                {
-                    SpisovaZnacka = h.Source.SpisovaZnacka,
-                    UrlId = h.Source.NormalizedId(),
-                    Dokument = h.Source.Dokumenty.Single(d => d.Id == id),
-                    Rizeni = h.Source
-                }).First();
-            }
-            catch (Exception)
-            {
-                // TODO: handle error
-                throw;
-            }
-        }
-
+ 
         public static Task<InsolvenceSearchResult> NewFirmyVInsolvenciAsync(int count, bool limitedView) 
             => NewSubjektVInsolvenciAsync(count, "P", limitedView);
 

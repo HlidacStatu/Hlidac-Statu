@@ -36,8 +36,10 @@ namespace HlidacStatu.Entities.Insolvence
         public DateTime PosledniZmena { get; set; }
         [Keyword]
         public string Soud { get; set; }
+
         [Object]
         public List<Dokument> Dokumenty { get; set; }
+
         [Object]
         public List<Osoba> Dluznici { get; set; }
         [Object]

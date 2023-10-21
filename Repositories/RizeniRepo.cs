@@ -1,15 +1,11 @@
+using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Insolvence;
-using HlidacStatu.Repositories.ES;
-
 using Microsoft.EntityFrameworkCore;
-
 using Nest;
-
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Connectors;
 using Osoba = HlidacStatu.Entities.Insolvence.Osoba;
 
 namespace HlidacStatu.Repositories
@@ -134,9 +130,33 @@ namespace HlidacStatu.Repositories
             PrepareForSave(rizeni);
             if (forceOnRadarValue.HasValue)
                 rizeni.OnRadar = forceOnRadarValue.Value;
-            
+
+            //prepare SearchableDocuments
+            var existing = await SearchableDocumentRepo.AllIds(rizeni.SpisovaZnacka);
+            if (existing == null)
+            {
+                await SearchableDocumentRepo.SaveManyAsync(SearchableDocument.CreateSearchableDocuments(rizeni));
+            }
+            else if (existing.Length == 0)
+                await SearchableDocumentRepo.SaveManyAsync(SearchableDocument.CreateSearchableDocuments(rizeni));
+            else
+            {
+                //add missing
+                foreach (var doc in rizeni.Dokumenty)
+                {
+                    var sdocid = SearchableDocument.GetDocumentId(rizeni, doc);
+                    if (existing.Contains(sdocid) == false)
+                        await SearchableDocumentRepo.SaveAsync(SearchableDocument.CreateSearchableDocument(rizeni, doc));
+                }
+            };
+
+            foreach (var doc in rizeni.Dokumenty)
+            {
+                doc.PlainText = null;
+            }
+
             var res = await client.IndexAsync<Rizeni>(rizeni,
-                o => o.Id(rizeni.SpisovaZnacka)); //druhy parametr musi byt pole, ktere je unikatni
+            o => o.Id(rizeni.SpisovaZnacka)); //druhy parametr musi byt pole, ktere je unikatni
             if (!res.IsValid)
             {
                 lock (saveLockObj)
@@ -192,22 +212,22 @@ namespace HlidacStatu.Repositories
 
                     foreach (var td in rizeni.Dluznici)
                     {
-                        var d = ToIOsoba<Lib.Db.Insolvence.Dluznici>(rizeni.SpisovaZnacka,td);
+                        var d = ToIOsoba<Lib.Db.Insolvence.Dluznici>(rizeni.SpisovaZnacka, td);
                         idb.Dluznici.Add(d);
                     }
                     foreach (var td in rizeni.Veritele)
                     {
-                        var d = ToIOsoba<Lib.Db.Insolvence.Veritele>(rizeni.SpisovaZnacka,td);
+                        var d = ToIOsoba<Lib.Db.Insolvence.Veritele>(rizeni.SpisovaZnacka, td);
                         idb.Veritele.Add(d);
                     }
                     foreach (var td in rizeni.Spravci)
                     {
-                        var d = ToIOsoba<Lib.Db.Insolvence.Spravci>(rizeni.SpisovaZnacka,td);
+                        var d = ToIOsoba<Lib.Db.Insolvence.Spravci>(rizeni.SpisovaZnacka, td);
                         idb.Spravci.Add(d);
                     }
                     foreach (var td in rizeni.Dokumenty)
                     {
-                        var d = ToDbDokument(rizeni.SpisovaZnacka,td);
+                        var d = ToDbDokument(rizeni.SpisovaZnacka, td);
                         idb.Dokumenty.Add(d);
                     }
                 }
@@ -425,7 +445,7 @@ namespace HlidacStatu.Repositories
             return dd;
         }
 
-        private static T ToIOsoba<T>(string rizeniSpisovaZnacka,Osoba td)
+        private static T ToIOsoba<T>(string rizeniSpisovaZnacka, Osoba td)
             where T : Lib.Db.Insolvence.IOsoba, new()
         {
             Lib.Db.Insolvence.IOsoba d = new T();
@@ -449,7 +469,7 @@ namespace HlidacStatu.Repositories
             return (T)d;
         }
 
-        private static Lib.Db.Insolvence.Dokumenty ToDbDokument(string rizeniSpisovaZnacka,Dokument td)
+        private static Lib.Db.Insolvence.Dokumenty ToDbDokument(string rizeniSpisovaZnacka, Dokument td)
         {
             Lib.Db.Insolvence.Dokumenty d = new Lib.Db.Insolvence.Dokumenty();
             d.DatumVlozeni = td.DatumVlozeni < Entities.Insolvence.Rizeni.MinSqlDate

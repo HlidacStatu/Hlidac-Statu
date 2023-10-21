@@ -287,7 +287,7 @@ else
                     <td style="width:50px">
                         @if (item.Key.Lenght > 0)
                         {
-                            <a href="@Url.Action("TextDokumentu", "Insolvence", new { Id = item.Key.Id, qs = Context.Request.Query["qs"] })"><i class="far fa-lg fa-file-alt" alt="textová podoba dokumentu"></i></a>
+                            <a href="@Url.Action("TextDokumentu", "Insolvence", new { Id = HlidacStatu.Entities.Insolvence.SearchableDocument.GetDocumentId(Model.Rizeni,item.Key) , qs = Context.Request.Query["qs"] })"><i class="far fa-lg fa-file-alt" alt="textová podoba dokumentu"></i></a>
                         }
                     </td>
                     <td style="width:50px">

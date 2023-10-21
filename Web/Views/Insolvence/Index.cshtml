@@ -8,7 +8,7 @@
     DateTime dataForDate = (await InsolvenceRepo.Searching.SimpleSearchAsync("*", 1, 1,
             (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc,
             limitedView: false))
-        .ElasticResults.Hits.First().Source.PosledniZmena;
+        .ElasticResults.Hits.First().Source.Rizeni.PosledniZmena;
 
     ViewBag.Title = "Hlídač insolvencí";
     ViewBag.SubTitle = "k " + HlidacStatu.Util.RenderData.ToDate(dataForDate);

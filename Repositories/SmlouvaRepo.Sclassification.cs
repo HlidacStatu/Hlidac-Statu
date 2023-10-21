@@ -50,8 +50,7 @@ namespace HlidacStatu.Repositories
 
             string stemmerResponse = CallEndpoint("stemmer",
                 JsonConvert.SerializeObject(s, settings),
-                s.Id,
-                1000 * 60 * 30);
+                s.Id, TimeSpan.FromSeconds(180));
             try
             {
                 var jtoken = JToken.Parse(stemmerResponse);
@@ -146,8 +145,7 @@ namespace HlidacStatu.Repositories
             {
                 classifierResponse = CallEndpoint("classifier",
                     stems,
-                    s.Id,
-                    180000);
+                    s.Id, TimeSpan.FromSeconds(180));
             }
             catch
             {
@@ -155,8 +153,7 @@ namespace HlidacStatu.Repositories
                 stems = GetRawStems(s.Id, true);
                 classifierResponse = CallEndpoint("classifier",
                     stems,
-                    s.Id,
-                    180000);
+                    s.Id, TimeSpan.FromSeconds(180));
             }
 
             //string finalizerResponse = CallEndpoint("finalizer",
@@ -218,8 +215,7 @@ namespace HlidacStatu.Repositories
 
             var response = CallEndpoint("explain_json",
                 JsonConvert.SerializeObject(s, settings),
-                idSmlouvy,
-                1000 * 60 * 10);
+                idSmlouvy, TimeSpan.FromSeconds(180));
             return System.Text.RegularExpressions.Regex.Unescape(response);
         }
 
@@ -259,7 +255,7 @@ namespace HlidacStatu.Repositories
             await SmlouvaRepo.SaveAsync(smlouva);
         }
 
-        private static string CallEndpoint(string endpoint, string content, string id, int timeoutMs)
+        private static string CallEndpoint(string endpoint, string content, string id, TimeSpan timeout)
         {
             var url = classificationBaseUrl() + $"/{endpoint}?doc_id={id}";
             using (Devmasters.Net.HttpClient.URLContent request = new Devmasters.Net.HttpClient.URLContent(url))
@@ -267,7 +263,7 @@ namespace HlidacStatu.Repositories
                 request.Method = Devmasters.Net.HttpClient.MethodEnum.POST;
                 request.Tries = 3;
                 request.TimeInMsBetweenTries = 5000;
-                request.Timeout = timeoutMs;
+                request.Timeout = (int)timeout.TotalMilliseconds;
                 request.ContentType = "application/json; charset=utf-8";
                 request.RequestParams.RawContent = content;
                 Devmasters.Net.HttpClient.TextContentResult response = null;

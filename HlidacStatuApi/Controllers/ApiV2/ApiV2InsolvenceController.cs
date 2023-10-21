@@ -68,7 +68,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             else
             {
                 var filtered = result.ElasticResults.Hits
-                    .Select(m => m.Source)
+                    .Select(m => m.Source.Rizeni)
                     .ToArray();
 
                 var ret = new SearchResultDTO<Rizeni>(result.Total, result.Page, filtered);

@@ -11,6 +11,7 @@ namespace HlidacStatu.Entities.Insolvence
     {
 
 
+
         public string NormalizedId() => NormalizedId(SpisovaZnacka);
 
 

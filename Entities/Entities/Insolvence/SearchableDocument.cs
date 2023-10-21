@@ -21,14 +21,23 @@ namespace HlidacStatu.Entities.Insolvence
             }
             return res.ToArray();
         }
+        public static string GetDocumentId(Rizeni rizeni, Dokument dokument)
+        {
+            return GetDocumentId(rizeni.NormalizedId(), dokument.Id);
+        }
+        public static string GetDocumentId(string normalizedSpisovaZnacka, string dokumentId)
+        {
+            if (normalizedSpisovaZnacka.Contains(' '))
+                normalizedSpisovaZnacka = Rizeni.NormalizedId(normalizedSpisovaZnacka);
+            return normalizedSpisovaZnacka + "_" + dokumentId;
+        }
+
         public static SearchableDocument CreateSearchableDocument(Rizeni rizeni, Dokument dokument)
         {
-
-
             SearchableDocument sdoc = new SearchableDocument();
             _= dokument.DeepCloneTo(sdoc);
 
-            sdoc.RecordId = rizeni.NormalizedId() + "_" + dokument.Id; ;
+            sdoc.RecordId = GetDocumentId(rizeni,dokument);
             sdoc.SpisovaZnacka = rizeni.SpisovaZnacka;
             sdoc.Rizeni = rizeni.DeepClone();
             if (sdoc.Rizeni.Dokumenty!= null)

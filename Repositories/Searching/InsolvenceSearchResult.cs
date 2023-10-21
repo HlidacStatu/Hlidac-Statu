@@ -6,21 +6,24 @@ using System.Linq;
 
 namespace HlidacStatu.Repositories.Searching
 {
-    public class InsolvenceSearchResult : SearchDataResult<Rizeni>
+    public class InsolvenceSearchResult : SearchDataResult<SearchableDocument>
     {
         public InsolvenceSearchResult()
             : base(getVZOrderList)
         {
         }
 
-        public IEnumerable<Rizeni> Results
+        public IEnumerable<SearchableDocument> Results
         {
             get
             {
                 if (ElasticResults != null)
-                    return ElasticResults.Hits.Select(m => m.Source);
+                    return ElasticResults.Hits
+                        .Select(m => m.InnerHits["rec"].Documents<SearchableDocument>().FirstOrDefault())
+                        .Where(m=>m!=null)
+                        ;
                 else
-                    return new Rizeni[] { };
+                    return new SearchableDocument[] { };
             }
         }
 

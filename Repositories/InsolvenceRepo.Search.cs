@@ -1,14 +1,11 @@
+using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Insolvence;
-using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
-
 using Nest;
-
 using System;
 using System.Threading.Tasks;
-using HlidacStatu.Connectors;
 
 namespace HlidacStatu.Repositories
 {
@@ -105,7 +102,7 @@ namespace HlidacStatu.Repositories
             public static Task<InsolvenceSearchResult> SimpleSearchAsync(string query, int page, int pagesize, int order,
                 bool withHighlighting = false,
                 bool limitedView = true,
-                AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false) 
+                AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
                 => SimpleSearchAsync(new InsolvenceSearchResult()
                 {
                     Q = query,
@@ -117,10 +114,10 @@ namespace HlidacStatu.Repositories
                 }, withHighlighting, anyAggregation);
 
             public static async Task<InsolvenceSearchResult> SimpleSearchAsync(InsolvenceSearchResult search,
-                bool withHighlighting = false,
-                AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
+            bool withHighlighting = false,
+            AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
             {
-                var client = await Manager.GetESClient_InsolvenceAsync();
+                var client = await Manager.GetESClient_InsolvenceDocsAsync();
                 var page = search.Page - 1 < 0 ? 0 : search.Page - 1;
 
                 var sw = new Devmasters.DT.StopWatchEx();
@@ -129,10 +126,11 @@ namespace HlidacStatu.Repositories
                 search.Q = Tools.FixInvalidQuery(search.Q ?? "", queryShorcuts, queryOperators);
                 var sq = GetSimpleQuery(search);
 
-                ISearchResponse<Rizeni> res = null;
+                ISearchResponse<SearchableDocument> res = null;
                 try
                 {
-                    res = await client
+                    //old
+                    /*res = await client
                         .SearchAsync<Rizeni>(s => s
                             .Size(search.PageSize)
                             .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)
@@ -146,17 +144,67 @@ namespace HlidacStatu.Repositories
                             .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
                                 ? true
                                 : (bool?)null)
-                        );
+                        );*/
+                    //new with searchable docs
+                    /*POST /insolvencedocs/_search
+                    {
+                      "_source": false, 
+                      "query": {
+                        "query_string": {
+                          "query": "Vandrovec"
+                        }
+                      },
+                      "collapse": {
+                        "field": "spisovaZnacka",
+                        "inner_hits": {
+                          "name": "rec",
+                          "size": 1,
+                          "sort": [
+                            {
+                              "internalTopHit": "desc"
+                            }
+                          ]
+                        }
+                      }
+                    }*/
+
+                    res = await client
+    .SearchAsync<SearchableDocument>(s => s
+        .Size(search.PageSize)
+        .From(page * search.PageSize)
+        .Source(sr => sr.Excludes(r => r.Fields("dokumenty.plainText")))
+        .Query(q => sq)
+        .Collapse(c => c
+            .Field(f => f.SpisovaZnacka)
+            .InnerHits(ih => ih.Name("rec").Size(1))
+        )
+        //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
+        .Sort(ss => GetSort(search.Order))
+        .Highlight(h => Tools.GetHighlight<Rizeni>(withHighlighting))
+        .Aggregations(aggr => anyAggregation)
+        .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
+            ? true
+            : (bool?)null)
+    );
+
                     if (withHighlighting && res.Shards != null &&
                         res.Shards.Failed > 0) //if some error, do it again without highlighting
                     {
                         res = await client
-                            .SearchAsync<Rizeni>(s => s
+                            .SearchAsync<SearchableDocument>(s => s
                                 .Size(search.PageSize)
                                 .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)
                                 .From(page * search.PageSize)
-                                .Source(sr => sr.Excludes(r => r.Fields("dokumenty.plainText")))
+                                .Source(false)
                                 .Query(q => sq)
+                                .Collapse(c => c
+                                    .Field(f => f.SpisovaZnacka)
+                                    .InnerHits(ih => ih
+                                                .Name("rec")
+                                                .Size(1)
+                                                .Source(ss=>ss.Excludes(ex=>ex.Field(f=>f.PlainText)))
+                                                )
+                                )
                                 //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
                                 .Sort(ss => GetSort(search.Order))
                                 .Highlight(h => Tools.GetHighlight<Rizeni>(false))
@@ -172,7 +220,7 @@ namespace HlidacStatu.Repositories
                     AuditRepo.Add(Audit.Operations.Search, "", "", "Insolvence", "error", search.Q, null);
                     if (res != null && res.ServerError != null)
                     {
-                        Manager.LogQueryError<Rizeni>(res, "Exception, Orig query:"
+                        Manager.LogQueryError<SearchableDocument>(res, "Exception, Orig query:"
                                                            + search.OrigQuery + "   query:"
                                                            + search.Q
                                                            + "\n\n res:" + search.ElasticResults.ToString()
@@ -192,7 +240,7 @@ namespace HlidacStatu.Repositories
 
                 if (res.IsValid == false)
                 {
-                    Manager.LogQueryError<Rizeni>(res, "Exception, Orig query:"
+                    Manager.LogQueryError<SearchableDocument>(res, "Exception, Orig query:"
                                                        + search.OrigQuery + "   query:"
                                                        + search.Q
                                                        + "\n\n res:" + search.ElasticResults?.ToString()

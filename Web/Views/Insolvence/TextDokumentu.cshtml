@@ -1,8 +1,8 @@
-﻿@model HlidacStatu.Entities.Insolvence.DokumentSeSpisovouZnackou
+﻿@model HlidacStatu.Entities.Insolvence.SearchableDocument
 
 @{
 	ViewBag.Title = "Insolvenční řízení " + Model.SpisovaZnacka;
-	ViewBag.SubTitle = "Textová podoba dokumentu " + Model.Dokument.Popis + " ze dne " + Model.Dokument.DatumVlozeni.ToShortDateString();
+	ViewBag.SubTitle = "Textová podoba dokumentu " + Model.Popis + " ze dne " + Model.DatumVlozeni.ToShortDateString();
 }
 
 @section breadcrumb
@@ -10,8 +10,8 @@
 	<ol class="breadcrumb">
 		<li><a href="/">Hlídač Státu</a></li>
 		<li><a href="@Url.Action("Index", "Insolvence")">Hlídač Insolvencí</a></li>
-		<li><a href="@Url.Action("Rizeni", "Insolvence", new { id = Model.UrlId })">Insolvence @Model.SpisovaZnacka</a></li>
-		<li><a href="@Url.Action("Dokumenty", "Insolvence", new { id = Model.UrlId })">Dokumenty</a></li>
+		<li><a href="@Url.Action("Rizeni", "Insolvence", new { id = Model.Rizeni.NormalizedId() })">Insolvence @Model.SpisovaZnacka</a></li>
+		<li><a href="@Url.Action("Dokumenty", "Insolvence", new { id = Model.Rizeni.NormalizedId()})">Dokumenty</a></li>
 		<li class="active">@ViewBag.SubTitle</li>
 	</ol>
 }
@@ -25,14 +25,14 @@
 
 	<p>
 		<b>Upozornění</b>: Text dokumentu byl získán strojově a nemusí přesně odpovídat originálu. Zejména u strojově nečitelných dokumentů, kde jsme použili OCR.
-		<a href="@Model.Dokument.Url" target="_blank">Originální dokument stáhnete zde</a>
+		<a href="@Model.Url" target="_blank">Originální dokument stáhnete zde</a>
 	</p>
 
 	<hr />
 	<div class="row">
 		<div class="col-xs-12">
 			<pre>
-                @Html.Raw(Model.Dokument.PlainText)
+                @Html.Raw(Model.PlainText)
             </pre>
 		</div>
 

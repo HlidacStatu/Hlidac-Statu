@@ -40,7 +40,7 @@ namespace HlidacStatu.XLib.Watchdogs
             if (res.Total == 0)
                 return DateTime.Now;
             return res.ElasticResults.Hits.First().Source
-                .PosledniZmena; // ?? res.ElasticResults.Hits.First().Source.LastUpdated.Value;
+                .Rizeni.PosledniZmena; // ?? res.ElasticResults.Hits.First().Source.LastUpdated.Value;
         }
 
 

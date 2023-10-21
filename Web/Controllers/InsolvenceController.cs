@@ -154,7 +154,7 @@ namespace HlidacStatu.Web.Controllers
             }
 
 
-            var dokument = await InsolvenceRepo.LoadDokumentAsync(id, false);
+            var dokument = await SearchableDocumentRepo.GetAsync(id, false);
             if (dokument == null)
             {
                 return new NotFoundResult();

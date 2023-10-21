@@ -19,6 +19,7 @@
     <tbody>
         @foreach (var item in Model.Dokumenty.OrderByDescending(d => d.DatumVlozeni))
         {
+            //TODO na 
             string hlres = HlidacStatu.Repositories.Searching.Highlighter.HighlightContent(highlightingData, "dokumenty.plainText", item.PlainText);
         <tr>
             <td>
@@ -29,7 +30,7 @@
             <td style="width:80px">
                 @if (item.Lenght > 0)
                 {
-                    <a href="@Url.Action("TextDokumentu", "Insolvence", new { Id = item.Id, qs=Context.Request.Query["qs"] })"><i class="far fa-lg fa-file-alt" alt="textová podoba dokumentu"></i></a>
+                        <a href="@Url.Action("TextDokumentu", "Insolvence", new { Id = HlidacStatu.Entities.Insolvence.SearchableDocument.GetDocumentId(Model.SpisovaZnacka,item.Id), qs=Context.Request.Query["qs"] })"><i class="far fa-lg fa-file-alt" alt="textová podoba dokumentu"></i></a>
                 }
             </td>
             <td style="width:80px"><a href="@item.Url"><i class="far fa-lg fa-file-pdf" alt="Originál"></i></a></td>

@@ -49,6 +49,7 @@ namespace HlidacStatu.Web.Models
 
     public class DokumentListViewModel
     {
+        public string SpisovaZnacka { get; set; }
         public string Oddil { get; set; }
         public Dokument[] Dokumenty { get; set; }
         public IReadOnlyDictionary<string, IReadOnlyCollection<string>> HighlightingData { get; set; }
