@@ -60,29 +60,29 @@ namespace HlidacStatu.Repositories
                     new Holding("holdingspravce:", "icospravce:"),
 
                     new TransformPrefixWithValue("ico:",
-                        "(dluznici.iCO:${q} OR veritele.iCO:${q} OR spravci.iCO:${q}) ", null),
+						"(rizeni.dluznici.iCO:${q} OR rizeni.veritele.iCO:${q} OR rizeni.spravci.iCO:${q}) ", null),
                     new TransformPrefixWithValue("jmeno:",
-                        "(dluznici.plneJmeno:${q} OR veritele.plneJmeno:${q} OR spravci.plneJmeno:${q})", null),
+						"(rizeni.dluznici.plneJmeno:${q} OR rizeni.veritele.plneJmeno:${q} OR rizeni.spravci.plneJmeno:${q})", null),
 
-                    new TransformPrefix("icodluznik:", "dluznici.iCO:", null),
-                    new TransformPrefix("icoveritel:", "veritele.iCO:", null),
-                    new TransformPrefix("icospravce:", "spravci.iCO:", null),
-                    new TransformPrefix("jmenodluznik:", "dluznici.plneJmeno:", null),
-                    new TransformPrefix("jmenoveritel:", "veritele.plneJmeno:", null),
-                    new TransformPrefix("jmenospravce:", "spravci.plneJmeno:", null),
-                    new TransformPrefix("spisovaznacka:", "spisovaZnacka:", null),
-                    new TransformPrefix("id:", "spisovaZnacka:", null),
+                    new TransformPrefix("icodluznik:", "rizeni.dluznici.iCO:", null),
+                    new TransformPrefix("icoveritel:", "rizeni.veritele.iCO:", null),
+                    new TransformPrefix("icospravce:", "rizeni.spravci.iCO:", null),
+                    new TransformPrefix("jmenodluznik:", "rizeni.dluznici.plneJmeno:", null),
+                    new TransformPrefix("jmenoveritel:", "rizeni.veritele.plneJmeno:", null),
+                    new TransformPrefix("jmenospravce:", "rizeni.spravci.plneJmeno:", null),
+                    new TransformPrefix("spisovaznacka:", "rizeni.spisovaZnacka:", null),
+                    new TransformPrefix("id:", "rizeni.spisovaZnacka:", null),
 
-                    new TransformPrefix("zmeneno:", "posledniZmena:", "[<>]?[{\\[]+"),
-                    new TransformPrefixWithValue("zmeneno:", "posledniZmena:[${q} TO ${q}||+1d}", "\\d+"),
-                    new TransformPrefix("zahajeno:", "datumZalozeni:", "[<>]?[{\\[]+"),
-                    new TransformPrefixWithValue("zahajeno:", "datumZalozeni:[${q} TO ${q}||+1d}", "\\d+"),
+                    new TransformPrefix("zmeneno:", "rizeni.posledniZmena:", "[<>]?[{\\[]+"),
+                    new TransformPrefixWithValue("zmeneno:", "rizeni.posledniZmena:[${q} TO ${q}||+1d}", "\\d+"),
+                    new TransformPrefix("zahajeno:", "rizeni.datumZalozeni:", "[<>]?[{\\[]+"),
+                    new TransformPrefixWithValue("zahajeno:", "rizeni.datumZalozeni:[${q} TO ${q}||+1d}", "\\d+"),
 
-                    new TransformPrefix("stav:", "stav:", null),
-                    new TransformPrefix("text:", "dokumenty.plainText:", null),
-                    new TransformPrefix("texttypdokumentu:", "dokumenty.popis:", null),
-                    new TransformPrefix("typdokumentu:", "dokumenty.typUdalosti:", null),
-                    new TransformPrefix("oddil:", "dokumenty.oddil:", null),
+                    new TransformPrefix("stav:", "rizeni.stav:", null),
+                    new TransformPrefix("text:", "plainText:", null),
+                    new TransformPrefix("texttypdokumentu:", "popis:", null),
+                    new TransformPrefix("typdokumentu:", "typUdalosti:", null),
+                    new TransformPrefix("oddil:", "oddil:", null),
                 };
 
 
@@ -90,7 +90,7 @@ namespace HlidacStatu.Repositories
                 //check invalid query ( tag: missing value)
 
                 if (searchdata.LimitedView)
-                    modifiedQ = Query.ModifyQueryAND(modifiedQ, "onRadar:true", "NOT(odstraneny:true)");
+                    modifiedQ = Query.ModifyQueryAND(modifiedQ, "rizeni.onRadar:true", "NOT(rizeni.odstraneny:true)");
 
                 //var qc = Lib.Search.Tools.GetSimpleQuery<Rizeni>(modifiedQ, rules); ;
                 var qc = SimpleQueryCreator.GetSimpleQuery<Rizeni>(modifiedQ, irules);
@@ -172,7 +172,7 @@ namespace HlidacStatu.Repositories
     .SearchAsync<SearchableDocument>(s => s
         .Size(search.PageSize)
         .From(page * search.PageSize)
-        .Source(sr => sr.Excludes(r => r.Fields("dokumenty.plainText")))
+        .Source(sr => sr.Excludes(r => r.Fields("plainText")))
         .Query(q => sq)
         .Collapse(c => c
             .Field(f => f.SpisovaZnacka)
@@ -254,7 +254,7 @@ namespace HlidacStatu.Repositories
                 return search;
             }
 
-            public static SortDescriptor<Rizeni> GetSort(string sorder)
+            public static SortDescriptor<SearchableDocument> GetSort(string sorder)
             {
                 InsolvenceSearchResult.InsolvenceOrderResult order = InsolvenceSearchResult.InsolvenceOrderResult
                     .Relevance;
@@ -262,25 +262,25 @@ namespace HlidacStatu.Repositories
                 return GetSort(order);
             }
 
-            public static SortDescriptor<Rizeni> GetSort(InsolvenceSearchResult.InsolvenceOrderResult order)
+            public static SortDescriptor<SearchableDocument> GetSort(InsolvenceSearchResult.InsolvenceOrderResult order)
             {
-                SortDescriptor<Rizeni> s = new SortDescriptor<Rizeni>().Field(f => f.Field("_score").Descending());
+                SortDescriptor<SearchableDocument> s = new SortDescriptor<SearchableDocument>().Field(f => f.Field("_score").Descending());
                 switch (order)
                 {
                     case InsolvenceSearchResult.InsolvenceOrderResult.DateAddedDesc:
-                        s = new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.DatumZalozeni).Descending());
+                        s = new SortDescriptor<SearchableDocument>().Field(m => m.Field(f => f.Rizeni.DatumZalozeni).Descending());
                         break;
                     case InsolvenceSearchResult.InsolvenceOrderResult.DateAddedAsc:
-                        s = new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.DatumZalozeni).Ascending());
+                        s = new SortDescriptor<SearchableDocument>().Field(m => m.Field(f => f.Rizeni.DatumZalozeni).Ascending());
                         break;
                     case InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc:
-                        s = new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending());
+                        s = new SortDescriptor<SearchableDocument>().Field(m => m.Field(f => f.Rizeni.PosledniZmena).Descending());
                         break;
                     case InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateAsc:
-                        s = new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Ascending());
+                        s = new SortDescriptor<SearchableDocument>().Field(m => m.Field(f => f.Rizeni.PosledniZmena).Ascending());
                         break;
                     case InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll:
-                        s = new SortDescriptor<Rizeni>().Field(f => f.Field("_doc"));
+                        s = new SortDescriptor<SearchableDocument>().Field(f => f.Field("_doc"));
                         break;
                     case InsolvenceSearchResult.InsolvenceOrderResult.Relevance:
                     default:

@@ -15,9 +15,11 @@ namespace HlidacStatu.Entities.Insolvence
             var docs = rizeni.Dokumenty.ToList();
             rizeni.Dokumenty = null;
             List<SearchableDocument> res = new List<SearchableDocument>();
+            bool first = true;
             foreach (var d in docs)
             {
-                res.Add(CreateSearchableDocument(rizeni, d));
+                res.Add(CreateSearchableDocument(rizeni, d,first));
+                first = false;
             }
             return res.ToArray();
         }
@@ -32,7 +34,7 @@ namespace HlidacStatu.Entities.Insolvence
             return normalizedSpisovaZnacka + "_" + dokumentId;
         }
 
-        public static SearchableDocument CreateSearchableDocument(Rizeni rizeni, Dokument dokument)
+        public static SearchableDocument CreateSearchableDocument(Rizeni rizeni, Dokument dokument, bool fullRizeni)
         {
             SearchableDocument sdoc = new SearchableDocument();
             _= dokument.DeepCloneTo(sdoc);
@@ -44,8 +46,11 @@ namespace HlidacStatu.Entities.Insolvence
                 sdoc.Rizeni.Dokumenty = null;
 
             sdoc.internalVeriteleCount = sdoc.Rizeni.Veritele.Count;
-            sdoc.Rizeni.Veritele = sdoc.Rizeni.Veritele.Take(2).ToList();
-            
+            if (fullRizeni == false)
+                sdoc.Rizeni.Veritele = sdoc.Rizeni.Veritele.Take(2).ToList();
+            else
+                sdoc.internalVeriteleFullList = true;
+            sdoc.IsFullRecord = true;
             return sdoc;
         }
         public SearchableDocument() { }
@@ -60,6 +65,12 @@ namespace HlidacStatu.Entities.Insolvence
 
         [Nest.Number]
         public int internalVeriteleCount { get; set; } = 0;
+        [Nest.Boolean]
+        public bool internalVeriteleFullList { get; set; } = false;
+
+        [Object(Ignore = true)]
+        public bool IsFullRecord { get; set; } = false;
+
     }
 
 }

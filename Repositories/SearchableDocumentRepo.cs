@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace HlidacStatu.Repositories
 {
@@ -31,10 +30,12 @@ namespace HlidacStatu.Repositories
                                 )
                             )
                             .Size(9999)
-                            .Source(s=>s.Excludes(e=>e.Field(f=>f.PlainText)))
+                            .Source(s => s.Excludes(e => e.Field(f => f.PlainText)))
                         );
             if (res.IsValid)
-                return res.Hits.Select(m => m.Source).ToArray();
+                return res.Hits
+                    .Select(m => { var rec = m.Source; rec.IsFullRecord = includePrilohy; return rec; })
+                    .ToArray();
             else
                 return null;
         }
@@ -49,10 +50,15 @@ namespace HlidacStatu.Repositories
             var client = await Manager.GetESClient_InsolvenceDocsAsync();
             var res = includePrilohy
                 ? await client.GetAsync<SearchableDocument>(searchableDocId)
-                : await client.GetAsync<SearchableDocument>(searchableDocId, s => s.SourceExcludes(s=>s.PlainText));
+                : await client.GetAsync<SearchableDocument>(searchableDocId, s => s.SourceExcludes(s => s.PlainText));
 
             if (res.IsValid && res.Found)
-                return res.Source;
+            {
+
+                var ret = res.Source;
+                ret.IsFullRecord = includePrilohy;
+                return ret;
+            }
             else
                 return null;
         }
@@ -117,8 +123,13 @@ namespace HlidacStatu.Repositories
             if (sDocs.Count() == 0)
                 return;
 
+            if (sDocs.Any(m => m.IsFullRecord == false))
+                throw new ApplicationException("Cannot save partial SearchableDocument document ");
+
             if (client == null)
                 client = await Manager.GetESClient_InsolvenceDocsAsync();
+
+
 
             IEnumerable<SearchableDocument[]> chunks = sDocs.Chunk(100);
 
@@ -144,6 +155,9 @@ namespace HlidacStatu.Repositories
         }
         public static async Task SaveAsync(SearchableDocument sDoc, ElasticClient client = null)
         {
+            if (sDoc.IsFullRecord==false)
+                throw new ApplicationException("Cannot save partial SearchableDocument document ");
+
             if (client == null)
                 client = await Manager.GetESClient_InsolvenceDocsAsync();
 
