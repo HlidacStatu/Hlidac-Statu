@@ -18,17 +18,35 @@ namespace HlidacStatu.Repositories
 
             var res = await client.SearchAsync<SearchableDocument>(s => s
                     .Query(q => q
-                        .QueryString(qs => qs.Query($"spisovaZnacka:\"{spisovaZnacka}\" AND internalTopHit:1")
+                        .QueryString(qs => qs.Query($"spisovaZnacka:\"{spisovaZnacka}\"")
                     )
                 )
+                .Size(0)
             );
             if (res.IsValid)
                 return res.Total > 0;
             else
                 return false;
-
         }
+        public static async Task<long> HowMany(string spisovaZnacka)
+        {
 
+            var client = await Manager.GetESClient_InsolvenceDocsAsync();
+
+            var res = await client.SearchAsync<SearchableDocument>(s => s
+                    .Query(q => q
+                        .QueryString(qs => qs.Query($"spisovaZnacka:\"{spisovaZnacka}\"")
+                    )
+
+                )
+                .Size(0)
+                .TrackTotalHits(true)
+            );
+            if (res.IsValid)
+                return res.Total;
+            else
+                return 0;
+        }
         public static async Task SaveManyAsync(IEnumerable<SearchableDocument> sDocs, ElasticClient client = null, Action progressReport = null)
         {
             if (sDocs == null)
