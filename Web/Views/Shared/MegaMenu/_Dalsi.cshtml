@@ -78,20 +78,28 @@
                             {
                                 <div class="fw-bold mb-2">@group</div>
                                 <ul>
+                                    @if (group == "Rejstříky")
+                                    {
+                                        <li>
+                                            <a onclick="return trackOutLink(this,'megamenu');" href="/insolvence">Insolvence</a>
+                                        </li>
+
+                                    }
                                     @foreach (var ds in datasety.Where(m => m.Value == group))
                                     {
                                         var specificDataset = DataSet.CachedDatasets.Get(ds.Key);
                                         if (specificDataset != null)
                                         {
                                             <li>
-                                                <a href="/data/Index/@ds.Key">@specificDataset.RegistrationAsync().Result.name</a>
+                                                <a onclick="return trackOutLink(this,'megamenu');" href="/data/Index/@ds.Key">@specificDataset.RegistrationAsync().Result.name</a>
                                             </li>
                                         }
                                     }
+                                    
                                 </ul>
                             }
                             <div class="fw-bold mt-2">
-                                <a href="/data/" class="fw-bold">Všechny databáze</a>
+                                <a onclick="return trackOutLink(this,'megamenu');" href="/data/" class="fw-bold">Všechny databáze</a>
                             </div>
                         </div>
                     </li>
@@ -100,13 +108,13 @@
             </div>
             <div class="col-12 col-md-12 col-lg-3 py-4">
                 <p>
-                    <a href="https://www.watchdoganalytics.cz/?utm_source=megamenu&utm_medium=referral&utm_campaign=utm_campaign=permanent&utm_content=menuDalsi"><img src="/content/img/WatchdogAnalytics_logo_2_lines.svg" style="max-height:70px;" /></a>
+                    <a onclick="return trackOutLink(this,'megamenu');" href="https://www.watchdoganalytics.cz/?utm_source=megamenu&utm_medium=referral&utm_campaign=utm_campaign=permanent&utm_content=menuDalsi"><img src="/content/img/WatchdogAnalytics_logo_2_lines.svg" style="max-height:70px;" /></a>
                 </p>
                 <p>
                     Nejrozsáhlejší analýza <b>cen ICT služeb</b> na českém trhu. Přesná a aktuální, pouze ze <b>skutečně uzavřených smluv</b>.
                 </p>
                 <p>
-                    <a class="btn btn-warning btn-sm" href="https://www.watchdoganalytics.cz/?utm_source=megamenu&utm_medium=referral&utm_campaign=utm_campaign=permanent&utm_content=menuDalsi" role="button">Zobrazit detaily</a>
+                    <a onclick="return trackOutLink(this,'megamenu');" class="btn btn-warning btn-sm" href="https://www.watchdoganalytics.cz/?utm_source=megamenu&utm_medium=referral&utm_campaign=utm_campaign=permanent&utm_content=menuDalsi" role="button">Zobrazit detaily</a>
                 </p>
                 <div class="col d-flex align-items-start">
                     <div>
