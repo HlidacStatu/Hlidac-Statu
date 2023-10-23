@@ -291,7 +291,6 @@ namespace HlidacStatu.Connectors
                 indexName = $"{indexName}_{d.Year}-{CultureInfo.CurrentCulture.Calendar.GetWeekOfYear(d, CalendarWeekRule.FirstDay, DayOfWeek.Monday)}";
             }
             string cnnset = string.Format("{0}|{1}|{2}", indexName, timeOut, connectionLimit);
-            ConnectionSettings sett = GetElasticSearchConnectionSettings(indexName, timeOut, connectionLimit);
 
             //if (System.Diagnostics.Debugger.IsAttached)
             //    sett.Proxy(new Uri("http://127.0.0.1:8888"),"","");
@@ -306,6 +305,7 @@ namespace HlidacStatu.Connectors
                         //if (idxType.HasValue == false)
                         //    idxType = GetIndexTypeForDefaultIndexName(indexName);
 
+                        ConnectionSettings sett = GetElasticSearchConnectionSettings(indexName, timeOut, connectionLimit);
                         var _client = new ElasticClient(sett);
                         if (init)
                             await InitElasticSearchIndexAsync(_client, idxType);
