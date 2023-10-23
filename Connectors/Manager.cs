@@ -306,11 +306,11 @@ namespace HlidacStatu.Connectors
                         //    idxType = GetIndexTypeForDefaultIndexName(indexName);
 
                         ConnectionSettings sett = GetElasticSearchConnectionSettings(indexName, timeOut, connectionLimit);
-                        var _client = new ElasticClient(sett);
+                        var client = new ElasticClient(sett);
                         if (init)
-                            await InitElasticSearchIndexAsync(_client, idxType);
+                            await InitElasticSearchIndexAsync(client, idxType);
 
-                        _clients.TryAdd(cnnset, _client);
+                        _clients.TryAdd(cnnset, client);
                     }
                 }
                 finally
