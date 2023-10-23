@@ -328,18 +328,18 @@ namespace HlidacStatu.Connectors
 
             string esUrl = Devmasters.Config.GetWebConfigValue("ESConnection");
 
-            //var singlePool = new Elasticsearch.Net.SingleNodeConnectionPool(new Uri(esUrl.Split(';').First()));
-            var pool = new Elasticsearch.Net.StaticConnectionPool(esUrl
+            var singlePool = new Elasticsearch.Net.SingleNodeConnectionPool(new Uri(esUrl.Split(';').First()));
+/*            var pool = new Elasticsearch.Net.StaticConnectionPool(esUrl
                 .Split(';')
                 .Where(m => !string.IsNullOrWhiteSpace(m))
                 .Select(u => new Uri(u))
                 );
-
+*/
             //var pool = new Elasticsearch.Net.SniffingConnectionPool(esUrl
             //    .Split(';')
             //    .Where(m=>!string.IsNullOrWhiteSpace(m))
             //    .Select(u => new Uri(u)));
-            var settings = new ConnectionSettings(pool)
+            var settings = new ConnectionSettings(singlePool)
                 .DefaultIndex(indexName)
                 .DisableAutomaticProxyDetection(false)
                 .RequestTimeout(TimeSpan.FromMilliseconds(timeOut))
