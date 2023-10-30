@@ -10,10 +10,8 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.XLib
 @using HlidacStatu.XLib.Render;
-@using HlidacStatu.Entities
 @using HlidacStatu.Entities.Analysis;
 @using HlidacStatu.Entities.KIndex
-@using Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
     Layout = null;
@@ -699,6 +697,7 @@
 </div>
 <hr/>
 
+@* ----- Sponzoring -----*@
 @if (Model.IsSponzor() || HlidacStatu.Repositories.StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO))
 {
     <div>
@@ -711,17 +710,7 @@
                 v celkové výši @HlidacStatu.Util.RenderData.NicePriceHtml(Model.Sponzoring().Sum(m => m.Hodnota) ?? 0).
             </p>
         }
-        @if (HlidacStatu.Repositories.StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy.ContainsKey(Model.ICO))
-        {
-            <p>
-                Osoby @Html.Raw(HlidacStatu.Util.RenderData.RenderList(
-                          HlidacStatu.Repositories.StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get()
-                              .SoukromeFirmy[Model.ICO]
-                              .Select(m => Osoby.GetById.Get(m).FullNameWithYear()), format: "<b>{0}</b>")
-                          ),
-                spojené s @Model.Jmeno, také sponzorovali politické strany.
-            </p>
-        }
+        
         <a href="/subjekt/sponzoring/@Model.ICO" class="moreinfolink text-uppercase">
             <strong>Zobrazit podrobnosti o sponzoringu politických stran</strong>
         </a>
