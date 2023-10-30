@@ -80,9 +80,9 @@
                 @foreach (var os in StaticData.FirmySVazbamiNaPolitiky_nedavne_Cache.Get().SoukromeFirmy[Model.ICO])
                 {
                     var o = Osoby.GetById.Get(os);
-                    var sponz = o.Sponzoring().ToList();
+                    //var sponz = o.Sponzoring().ToList();
 
-                    var sponzorOsoba = o.SponzoringToHtml(itemTemplate: $"<li><a href='{o.GetUrl(true)}'>{o.FullName()}</a> {{0}}</li>", itemDelimeter:"", sponzoringFilter: s=>s.OsobaIdDarce == os || s.IcoDarce == Model.ICO);
+                    var sponzorOsoba = o.SponzoringToHtml(itemTemplate: $"<li><a href='{o.GetUrl(true)}'>{o.FullName()}</a> {{0}}</li>", itemDelimeter:"", sponzoringFilter: s=>s.OsobaIdDarce == os || s.IcoDarce == Model.ICO, withCompany: false);
 
                     @Html.Raw(sponzorOsoba);
 @*                    <li>

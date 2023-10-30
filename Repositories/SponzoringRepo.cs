@@ -50,7 +50,7 @@ namespace HlidacStatu.Repositories
             || (s.DarCelkem <= smallSponzoringThreshold && s.Rok >= minSmallSponzoringDate.Year);
 
 
-        public static List<Sponzoring> GetByDarce(int osobaId, Expression<Func<Sponzoring, bool>> predicate)
+        public static List<Sponzoring> GetByDarce(int osobaId, Expression<Func<Sponzoring, bool>> predicate, bool withCompany = true)
         {
             using (DbEntities db = new DbEntities())
             {
@@ -61,14 +61,17 @@ namespace HlidacStatu.Repositories
                     .Where(predicate)
                     .ToList();
 
-                //sponzoring z navazanych firem kdyz byl statutar
-                var firmySponzoring = Osoby.CachedFirmySponzoring.Get(osobaId)
-                    .AsQueryable()
-                    .Where(SponzoringLimitsPredicate)
-                    .Where(predicate)
-                    .ToList();
+                if (withCompany)
+                {
+                    //sponzoring z navazanych firem kdyz byl statutar
+                    var firmySponzoring = Osoby.CachedFirmySponzoring.Get(osobaId)
+                        .AsQueryable()
+                        .Where(SponzoringLimitsPredicate)
+                        .Where(predicate)
+                        .ToList();
 
-                osobySponzoring.AddRange(firmySponzoring);
+                    osobySponzoring.AddRange(firmySponzoring);
+                }
 
                 return osobySponzoring;
             }

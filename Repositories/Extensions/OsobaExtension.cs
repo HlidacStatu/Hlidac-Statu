@@ -31,11 +31,14 @@ namespace HlidacStatu.Extensions
             List<Task<Search.ISearchResult>> tasks = new()
             {
                 Helper.GeneralizeTask<Search.ISearchResult, SmlouvaSearchResult>(
-                    SmlouvaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, 0, cancellationToken: cts.Token)),
+                    SmlouvaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, 0,
+                        cancellationToken: cts.Token)),
                 Helper.GeneralizeTask<Search.ISearchResult, VerejnaZakazkaSearchData>(
-                    VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, null, 1, 1, "0", cancellationToken: cts.Token)),
+                    VerejnaZakazkaRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, null, 1, 1, "0",
+                        cancellationToken: cts.Token)),
                 Helper.GeneralizeTask<Search.ISearchResult, DotaceSearchResult>(
-                    DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, "0", cancellationToken: cts.Token)),
+                    DotaceRepo.Searching.SimpleSearchAsync("osobaid:" + osoba.NameId, 1, 1, "0",
+                        cancellationToken: cts.Token)),
             };
 
 
@@ -52,7 +55,6 @@ namespace HlidacStatu.Extensions
             }
 
             return false;
-
         }
 
         public static bool IsPolitikBasedOnEvents(this Osoba osoba)
@@ -151,10 +153,10 @@ namespace HlidacStatu.Extensions
         public static async Task<bool> NotInterestingToShowAsync(this Osoba osoba)
         {
             var showIt = osoba.StatusOsoby() == Osoba.StatusOsobyEnum.Politik
-                || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.ByvalyPolitik
-                || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.Sponzor
-                || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VysokyUrednik
-                || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VazbyNaPolitiky
+                         || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.ByvalyPolitik
+                         || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.Sponzor
+                         || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VysokyUrednik
+                         || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VazbyNaPolitiky
                 ;
             if (showIt)
                 return !showIt;
@@ -167,7 +169,8 @@ namespace HlidacStatu.Extensions
             if (showIt)
                 return !showIt;
 
-            showIt = showIt || osoba.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmySummary().Summary().PocetSmluv > 0;
+            showIt = showIt || osoba.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmySummary()
+                .Summary().PocetSmluv > 0;
             if (showIt)
                 return !showIt;
 
@@ -190,15 +193,15 @@ namespace HlidacStatu.Extensions
 
 
         public static string SponzoringToHtml(this Osoba osoba, int take = int.MaxValue, string template = "{0}",
-            string itemTemplate = "{0}", string itemDelimeter = "<br/>", Expression<Func<Sponzoring, bool>> sponzoringFilter = null)
+            string itemTemplate = "{0}", string itemDelimeter = "<br/>",
+            Expression<Func<Sponzoring, bool>> sponzoringFilter = null, bool withCompany = true)
         {
             Expression<Func<Sponzoring, bool>> all = e => true;
 
             sponzoringFilter = sponzoringFilter ?? all;
             return
                 string.Format(template, string.Join(itemDelimeter,
-                    osoba.Sponzoring().AsQueryable()
-                        .Where(sponzoringFilter)
+                    osoba.Sponzoring(sponzoringFilter, withCompany: withCompany).AsQueryable()
                         .OrderByDescending(s => s.DarovanoDne)
                         .Select(s => s.ToHtml(itemTemplate))
                         .Take(take))
@@ -245,7 +248,8 @@ namespace HlidacStatu.Extensions
             return events;
         }
 
-        public static IEnumerable<OsobaEvent> MergedEvents(this Osoba osoba, Expression<Func<OsobaEvent, bool>> predicate)
+        public static IEnumerable<OsobaEvent> MergedEvents(this Osoba osoba,
+            Expression<Func<OsobaEvent, bool>> predicate)
         {
             var events = osoba.NoFilteredEvents()
                 .Where(predicate)
@@ -265,6 +269,7 @@ namespace HlidacStatu.Extensions
                     }
                 }
             }
+
             //odstranit prázdné
             return events.Where(e => e != null);
         }
@@ -295,13 +300,13 @@ namespace HlidacStatu.Extensions
         {
             var fixedOrder = new List<int>()
             {
-                (int) OsobaEvent.Types.VolenaFunkce,
-                (int) OsobaEvent.Types.PolitickaExekutivni,
-                (int) OsobaEvent.Types.Politicka,
-                (int) OsobaEvent.Types.VerejnaSpravaJine,
-                (int) OsobaEvent.Types.VerejnaSpravaExekutivni,
-                (int) OsobaEvent.Types.Osobni,
-                (int) OsobaEvent.Types.Jine
+                (int)OsobaEvent.Types.VolenaFunkce,
+                (int)OsobaEvent.Types.PolitickaExekutivni,
+                (int)OsobaEvent.Types.Politicka,
+                (int)OsobaEvent.Types.VerejnaSpravaJine,
+                (int)OsobaEvent.Types.VerejnaSpravaExekutivni,
+                (int)OsobaEvent.Types.Osobni,
+                (int)OsobaEvent.Types.Jine
             };
 
             var events = osoba.MergedEvents(predicate).ToArray();
@@ -335,7 +340,6 @@ namespace HlidacStatu.Extensions
             return string.Format(template,
                 string.Join(itemDelimeter, evs)
             );
-
         }
 
 
@@ -348,12 +352,12 @@ namespace HlidacStatu.Extensions
 
         static Devmasters.Cache.Elastic.Manager<InfoFact[], Osoba> _cacheInfoFacts =
             Devmasters.Cache.Elastic.Manager<InfoFact[], Osoba>
-            .GetSafeInstance("Osoba_InfoFacts_v1_",
-                (obj) => InfoFactsAsync(obj).GetAwaiter().GetResult(),
-                TimeSpan.Zero,
-                Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
-                Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
-                keyValueSelector: obj => $"_infofacts_{obj.NameId}");
+                .GetSafeInstance("Osoba_InfoFacts_v1_",
+                    (obj) => InfoFactsAsync(obj).GetAwaiter().GetResult(),
+                    TimeSpan.Zero,
+                    Devmasters.Config.GetWebConfigValue("ESConnection").Split(';'),
+                    Devmasters.Config.GetWebConfigValue("ElasticCacheDbname"),
+                    keyValueSelector: obj => $"_infofacts_{obj.NameId}");
 
         public static InfoFact[] InfoFactsCached(this Osoba osoba, bool forceUpdateCache = false)
         {
@@ -369,19 +373,19 @@ namespace HlidacStatu.Extensions
         {
             int[] types =
             {
-                (int) OsobaEvent.Types.VolenaFunkce,
-                (int) OsobaEvent.Types.PolitickaExekutivni,
-                (int) OsobaEvent.Types.Politicka,
-                (int) OsobaEvent.Types.VerejnaSpravaJine,
-                (int) OsobaEvent.Types.VerejnaSpravaExekutivni,
-                (int) OsobaEvent.Types.Osobni,
-                (int) OsobaEvent.Types.Jine
+                (int)OsobaEvent.Types.VolenaFunkce,
+                (int)OsobaEvent.Types.PolitickaExekutivni,
+                (int)OsobaEvent.Types.Politicka,
+                (int)OsobaEvent.Types.VerejnaSpravaJine,
+                (int)OsobaEvent.Types.VerejnaSpravaExekutivni,
+                (int)OsobaEvent.Types.Osobni,
+                (int)OsobaEvent.Types.Jine
             };
 
             List<InfoFact> f = new List<InfoFact>();
             var stat = osoba.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny);
             StatisticsPerYear<Smlouva.Statistics.Data> soukrStat = stat.SoukromeFirmy.Values
-                    .AggregateStats(); //StatisticsSubjectPerYear<Smlouva.Statistics.Data>.
+                .AggregateStats(); //StatisticsSubjectPerYear<Smlouva.Statistics.Data>.
 
             int rok = DateTime.Now.Year;
             if (DateTime.Now.Month <= 2)
@@ -401,7 +405,6 @@ namespace HlidacStatu.Extensions
                 if (!string.IsNullOrEmpty(kdoje))
                     descr += ", " + kdoje + (kdoje.EndsWith(". ") ? "" : ". ");
                 f.Add(new InfoFact(descr, InfoFact.ImportanceLevel.Summary));
-
             }
 
             if (excludedImportanceLevels is null ||
@@ -451,13 +454,15 @@ namespace HlidacStatu.Extensions
                 !excludedImportanceLevels.Contains(InfoFact.ImportanceLevel.Medium))
             {
                 DateTime datumOd = new DateTime(DateTime.Now.Year - 10, 1, 1);
-                var sponzoringPrimy = osoba.Sponzoring(s => s.IcoPrijemce != null 
-                                                        && s.DarovanoDne >= datumOd
-                                                        && s.Typ != (int)Entities.Sponzoring.TypDaru.DarFirmy).ToList();
+                var sponzoringPrimy = osoba.Sponzoring(s => s.IcoPrijemce != null
+                                                            && s.DarovanoDne >= datumOd
+                                                            && s.Typ != (int)Entities.Sponzoring.TypDaru.DarFirmy)
+                    .ToList();
                 if (sponzoringPrimy != null && sponzoringPrimy.Count() > 0)
                 {
                     string[] strany = sponzoringPrimy.Select(m => m.IcoPrijemce).Distinct().ToArray();
-                    int[] roky = sponzoringPrimy.Select(m => m.DarovanoDne.Value.Year).Distinct().OrderBy(y => y).ToArray();
+                    int[] roky = sponzoringPrimy.Select(m => m.DarovanoDne.Value.Year).Distinct().OrderBy(y => y)
+                        .ToArray();
                     decimal celkem = sponzoringPrimy.Sum(m => m.Hodnota) ?? 0;
                     decimal top = sponzoringPrimy.Max(m => m.Hodnota) ?? 0;
                     string
@@ -477,22 +482,25 @@ namespace HlidacStatu.Extensions
                         , InfoFact.ImportanceLevel.Medium)
                     );
                 }
-                var sponzoringPresFirmu = osoba.Sponzoring(s => s.IcoPrijemce != null 
-                                                            && s.DarovanoDne >= datumOd
-                                                            && s.Typ == (int)Entities.Sponzoring.TypDaru.DarFirmy).ToList();
+
+                var sponzoringPresFirmu = osoba.Sponzoring(s => s.IcoPrijemce != null
+                                                                && s.DarovanoDne >= datumOd
+                                                                && s.Typ == (int)Entities.Sponzoring.TypDaru.DarFirmy)
+                    .ToList();
                 if (sponzoringPresFirmu != null && sponzoringPresFirmu.Count() > 0)
                 {
                     string[] strany = sponzoringPresFirmu.Select(m => m.IcoPrijemce).Distinct().ToArray();
-                    int[] roky = sponzoringPresFirmu.Select(m => m.DarovanoDne.Value.Year).Distinct().OrderBy(y => y).ToArray();
+                    int[] roky = sponzoringPresFirmu.Select(m => m.DarovanoDne.Value.Year).Distinct().OrderBy(y => y)
+                        .ToArray();
                     decimal celkem = sponzoringPresFirmu.Sum(m => m.Hodnota) ?? 0;
                     decimal top = sponzoringPresFirmu.Max(m => m.Hodnota) ?? 0;
                     string
                         prvniStrana =
                             FirmaRepo.FromIco(strany[0])
                                 .Jmeno;
-                    
+
                     f.Add(new InfoFact($"{osoba.FullName()} byl{(osoba.Muz() ? "" : "a")}"
-                                       + $" členem statutárního orgánu společnosti, která " 
+                                       + $" členem statutárního orgánu společnosti, která "
                                        + Plural.Get(roky.Count(), "v roce " + roky[0],
                                            $"mezi roky {roky.First()} - {roky.Last() - 2000}",
                                            $"mezi roky {roky.First()} - {roky.Last() - 2000}")
@@ -613,9 +621,10 @@ namespace HlidacStatu.Extensions
                 .ThenByDescending(o => o.Events_VerejnopravniUdalosti().Count());
         }
 
-        public static IEnumerable<Sponzoring> Sponzoring(this Osoba osoba, Expression<Func<Sponzoring, bool>> predicate)
+        public static IEnumerable<Sponzoring> Sponzoring(this Osoba osoba, Expression<Func<Sponzoring, bool>> predicate,
+            bool withCompany = true)
         {
-            return SponzoringRepo.GetByDarce(osoba.InternalId, predicate);
+            return SponzoringRepo.GetByDarce(osoba.InternalId, predicate, withCompany);
         }
     }
 }
