@@ -31,7 +31,7 @@
                     {
                         Name = "Rok",
                         CssClass = "number",
-                        HtmlRender = (x) => x.Rok.ToString(),
+                        HtmlRender = (x) => $"<a href=\"/subjekt/SponzoringDetail/{Model.ICO}?rok={x.Rok.ToString()}\">{x.Rok.ToString()}</a>",
                         TextRender = (x) => x.Rok.ToString()
 
                     },

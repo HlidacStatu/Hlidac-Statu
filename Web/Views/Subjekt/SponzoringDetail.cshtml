@@ -1,0 +1,76 @@
+﻿@model HlidacStatu.Entities.Firma
+@using System.Linq
+@using HlidacStatu.Extensions
+@using HlidacStatu.XLib.Render
+@using HlidacStatu.Repositories
+@using HlidacStatu.Entities
+
+@{
+    Layout = null;
+}
+
+@* První sloupec *@
+<div class="col-sm-7 col-xs-12 order-1">
+    <p class="text-muted sub-header-info">
+        Přehled jednotlivých finančních a nefinančních podpor politickým stranám. Podpory větší než 5000 Kč zobrazujeme po dobu 10 let, menší podpory po dobu 5 let.
+    </p>
+    
+    @{
+        var sponzoring = Model.Sponzoring()
+            .Where(m => m.Typ != (int)Sponzoring.TypDaru.DarFirmy)
+            .Where(m => m.DarovanoDne?.Year == ViewBag.Rok)
+            .ToList();
+        
+        var sponzoringData = new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>(
+            new[]
+            {
+                new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
+                {
+                    Name = "Rok",
+                    CssClass = "number",
+                    HtmlRender = (x) => x.Rok.ToString(),
+                    TextRender = (x) => x.Rok.ToString()
+                },
+                new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
+                {
+                    Name = "Politická strana",
+                    HtmlRender = (x) =>
+                    $"<a href=\"/subjekt/{x.Ico}\">{Firmy.GetJmeno(x.Ico)}</a>"
+                },
+                new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
+                {
+                    Name = "Celkem darovali",
+                    TextRender = (x) => $"{x.Dar.ToString("N0")} Kč",
+                    HtmlRender = (x) => $"{x.Dar.ToString("N0")}&nbsp;Kč",
+                    OrderValueRender = (x) => HlidacStatu.Util.RenderData.OrderValueFormat(x.Dar),
+                    CssClass = "number"
+                },
+                new ReportDataSource<(int Rok, string Ico, decimal Dar, string Poznamka)>.Column()
+                {
+                    Name = "Poznámka",
+                    HtmlRender = (x) => x.Poznamka,
+                    TextRender = (x) => x.Poznamka
+                },
+            });
+        foreach (var dar in sponzoring)
+        {
+            sponzoringData.AddRow((dar.DarovanoDne?.Year ?? 0,  dar.IcoPrijemce, dar.Hodnota ?? 0, dar.Popis));
+        }
+        sponzoringData.Title = "Přehled jednotlivých darů politickým stranám";
+    }
+    @if (sponzoring.Count > 0)
+    {
+        <div>
+            <h4>Přímé sponzorování politických stran</h4>
+            @Html.DataToHTMLTable(sponzoringData)
+        </div>
+    }
+    else
+    {
+        <p>
+            Tato firma žádnou politickou stranu v posledních 10 letech napřímo nesponzorovala.
+        </p>
+    }
+
+    <a href="@($"/subjekt/Sponzoring/{Model.ICO}")">Zpět na souhrn</a>
+</div>
