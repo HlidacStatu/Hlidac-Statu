@@ -79,13 +79,11 @@
     }
     @{
         laps.StopPreviousAndStartNextLap("sponzoring");
-        var sponzorOsobaNum = Model.Sponzoring().Count();
-        var sponzorOsoba = Model.SponzoringToHtml(
-        (sponzorOsobaNum <= listingNum + 1 ? listingNum + 1 : listingNum),
-        "<ul>{0}</ul>", "<li>{0}</li>", "");
-
+        var sponzoring = Model.Sponzoring().ToList();
+        var sponzoringPrimy = sponzoring.Where(s => s.Typ != (int)Sponzoring.TypDaru.DarFirmy).ToList();
+        var sponzoringFirmy = sponzoring.Where(s => s.Typ == (int)Sponzoring.TypDaru.DarFirmy).ToList();
     }
-    @if (sponzorOsobaNum > 0)
+    @if (sponzoring.Count > 0)
     {
         <div>
             <h4>
@@ -94,19 +92,55 @@
             <p class="text-muted sub-header-info">
                 Přehled finančních a nefinančních podpor politickým stranám. Podpory větší než 5000 Kč zobrazujeme po dobu 10 let, menší podpory po dobu 5 let.
             </p>
-            <p>
-                @Model.FullName() přímo či nepřímo @(Model.Muz() ? "podpořil" : "podpořila") politické strany celkem
-                <b>@Devmasters.Lang.CS.Plural.Get(sponzorOsobaNum,"jedním darem","{0} dary","{0} dary")</b>:
-                @Html.Raw(sponzorOsoba)
-            </p>
-            @if (sponzorOsobaNum > listingNum + 1)
+            
+            @if (sponzoringPrimy.Count > 0)
             {
-                <a asp-action="Sponzoring" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
-                    <strong>
-                        Zobrazit @Devmasters.Lang.CS.Plural.Get(sponzorOsobaNum,"dary","všechny {0} dary","všech {0} darů") politickým stranám
-                    </strong>
-                </a>
+                <p>
+                    @Model.FullName() přímo @(Model.Muz() ? "podpořil" : "podpořila") 
+                    <b>@Devmasters.Lang.CS.Plural.Get(sponzoringPrimy
+                           .Select(s => s.IcoPrijemce)
+                           .Distinct()
+                           .Count(),"jednu politickou stranu","{0} politické strany","{0} politických stran")</b> celkem
+                    <b>@Devmasters.Lang.CS.Plural.Get(sponzoringPrimy.Count,"jedním darem","{0} dary","{0} dary")</b>
+                    v hodnotě <b>@(sponzoringPrimy.Sum(s => s.Hodnota)?.ToString("N0"))&nbsp;Kč</b>.
+                </p>
+                
             }
+            else
+            {
+                <p>
+                    @Model.FullName() přímo @(Model.Muz() ? "nepodpořil" : "nepodpořila") žádnou politickou stranu.
+                </p>
+            }
+            
+            @if (sponzoringFirmy.Count > 0)
+            {
+                <p>
+                    @Devmasters.Lang.CS.Plural.Get(sponzoringFirmy
+                       .Select(s => s.IcoDarce)
+                       .Distinct()
+                       .Count(), "Společnost", "Společnosti", "Společnosti")
+                    ve kterých @Model.FullName() @(Model.Muz() ? "působil" : "působila")
+                    @Devmasters.Lang.CS.Plural.Get(sponzoringFirmy
+                       .Select(s => s.IcoDarce)
+                       .Distinct()
+                       .Count(), "podpořila", "podpořily", "podpořily")
+                    <b>@Devmasters.Lang.CS.Plural.Get(sponzoringFirmy
+                           .Select(s => s.IcoPrijemce)
+                           .Distinct()
+                           .Count(), "jednu politickou stranu", "{0} politické strany", "{0} politických stran")</b> celkem
+                    <b>@Devmasters.Lang.CS.Plural.Get(sponzoringFirmy.Count, "jedním darem", "{0} dary", "{0} dary")</b>
+                    v hodnotě <b>@(sponzoringFirmy.Sum(s => s.Hodnota)?.ToString("N0"))&nbsp;Kč</b>.
+                </p>
+                
+            }
+            
+            <a asp-action="Sponzoring" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
+                <strong>
+                    Zobrazit @Devmasters.Lang.CS.Plural.Get(sponzoring.Count,"dary","všechny {0} dary","všech {0} darů") politickým stranám
+                </strong>
+            </a>
+            
 
         </div>
         <hr />
