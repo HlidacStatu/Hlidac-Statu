@@ -4,11 +4,13 @@
 @* @using YamlDotNet.Core *@
 @typeparam TItem
 
+<div class="hlidac-autocomplete-overlay" style="display:@(IsAnyOptionItem || ShowHelpTips ? "flex" : "none")" @onclick="CloseOptions">
+</div>
 <div class="hlidac-autocomplete">
     <div class="input-group bg-white rounded-2">
         @foreach (var tagItem in TagItems)
         {
-            <div style="margin:4px 2px;" class="input-group-text position-relative pe-3 rounded-pill selected-element rounded-pill bg-primary-subtle border border-1 border-primary @(ReferenceEquals(tagItem, _currentlySelectedTag)? ActiveTag : "")">
+            <div style="margin:4px 2px;" class="input-group-text position-relative pe-3 rounded-pill selected-element rounded-pill bg-primary-subtle border border-1 border-primary @(ReferenceEquals(tagItem, _currentlySelectedTag) ? ActiveTag : "")">
                 @if (TagTemplate is null)
                 {
                     <span class="no-overflow">@GetTextFromItem(tagItem)</span>
@@ -43,7 +45,7 @@
             Hledat
         </button>
     </div>
-    
+
     @if (ShowHelpTips && string.IsNullOrWhiteSpace(InputBoxValue))
     {
         <div class="hlidac-autocomplete-list">
@@ -58,7 +60,7 @@
             </div>
         </div>
     }
-    
+
     @if (IsAnyOptionItem)
     {
         <div class="hlidac-autocomplete-list">
@@ -84,10 +86,10 @@
 
     [Parameter]
     public RenderFragment<TItem>? ItemTemplate { get; set; }
-    
+
     [Parameter]
     public RenderFragment<AutocompleteItem<TItem>>? TagTemplate { get; set; }
-    
+
     [Parameter]
     public RenderFragment<RenderFragment>? HelpTemplate { get; set; }
 
@@ -102,12 +104,12 @@
 
     [Parameter]
     public EventCallback<string> OnAutocompleteTextSelected { get; set; }
-    
+
     [Parameter]
     public List<AutocompleteItem<TItem>>? InputTags { get; set; }
-    
+
     [Parameter]
-    public List<RenderFragment>? HelpTips { get; set; } 
+    public List<RenderFragment>? HelpTips { get; set; }
 
     private ElementReference InputBoxElement { get; set; }
     private string? InputBoxValue { get; set; }
@@ -124,17 +126,19 @@
     private bool IsAnyOptionItem => OptionItems is not null && OptionItems.Count > 0;
     private bool ShowHelpTips { get; set; }
 
+    private string GrayboxDisplay { get; set; } = "none";
+
     private string InputBoxPlaceHolder
     {
-        get => TagItems.Count > 0 ? 
-            "Napište další vyhledávaný výraz, nebo stiskněte \"Hledat\"" : 
+        get => TagItems.Count > 0 ?
+            "Napište další vyhledávaný výraz, nebo stiskněte \"Hledat\"" :
             "Začněte psát jméno, kraj, IČO, firmu, politickou stranu, ...";
     }
 
 
     private int _selectedOption = -1;
-    
-    private const string ActiveTag = "border border-3 border-warning";
+
+        private const string ActiveTag = "border border-3 border-warning";
 
     protected override async Task OnParametersSetAsync()
     {
@@ -200,6 +204,7 @@
         OptionItems = null;
         _searchTask = null;
         _selectedOption = -1;
+        HideDefaultHintItems();
     }
 
     private void CancelRunningTask()
@@ -260,7 +265,7 @@
             case "Escape":
                 CancelRunningTask();
                 CloseOptions();
-                break;;
+                break;
             case "Enter" when IsInputboxEmpty:
                 await SubmitSearch();
                 break;
@@ -284,7 +289,7 @@
 
     private void GetNextTag()
     {
-        if(!TagExist)
+        if (!TagExist)
             return;
 
         if (_currentlySelectedTag is not null)
@@ -297,14 +302,13 @@
                 return;
             }
         }
-        
+
         _currentlySelectedTag = TagItems.First();
-        
     }
 
     private void GetPreviousTag()
     {
-        if(!TagExist)
+        if (!TagExist)
             return;
 
         if (_currentlySelectedTag is not null)
@@ -317,7 +321,7 @@
                 return;
             }
         }
-        
+
         _currentlySelectedTag = TagItems.Last();
     }
 
@@ -328,7 +332,7 @@
             TagItems.Remove(TagItems.Last());
             return;
         }
-        
+
         if (autocompleteItem is not null && TagItems.Contains(autocompleteItem))
         {
             TagItems.Remove(autocompleteItem);
@@ -349,10 +353,12 @@
     {
         ShowHelpTips = true;
     }
-    
+
     private void HideDefaultHintItems()
     {
         ShowHelpTips = false;
     }
+
+
 
 }

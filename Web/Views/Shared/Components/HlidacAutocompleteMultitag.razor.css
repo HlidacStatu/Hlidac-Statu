@@ -1,5 +1,5 @@
 .no-overflow {
-    overflow: hidden; 
+    overflow: hidden;
     text-overflow: ellipsis;
 }
 
@@ -10,3 +10,4 @@
 .input-group-newline {
     width: 100%;
 }
+
