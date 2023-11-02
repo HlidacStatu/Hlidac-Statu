@@ -47,7 +47,7 @@
                         }
                         else if (item.AktualniVazby(Relation.AktualnostType.Nedavny).Length > 2)
                         {
-                            <span>+ <a href="@(item.GetUrl())/vazby">@Devmasters.Lang.CS.Plural.Get(item.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny) - 2, "další vazba;další {0} vazby;dalších {0} vazeb")</a></span>
+                            <span>+ <a href="/osoba/vazby/@(item.NameId)">@Devmasters.Lang.CS.Plural.Get(item.PocetPodrizenychSubjektu(Relation.AktualnostType.Nedavny) - 2, "další vazba;další {0} vazby;dalších {0} vazeb")</a></span>
                         }
                         @Html.Raw("</ul>")
                         
