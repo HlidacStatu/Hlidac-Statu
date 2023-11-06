@@ -6,9 +6,13 @@ namespace HlidacStatu.DS.Api.Voice2Text
     public class Task
     {
         public long QId { get; set; }
+        public int Priority { get; set; } = 10;
+        public string CallerId { get; set; }
+        public string CallerTaskId{ get; set; }
+
 
         public string Source { get; set; }
-        public SourceOption SourceOptions { get; set; }
+        public Options SourceOptions { get; set; }
 
         public DateTime Created { get; set; }
 
@@ -31,9 +35,12 @@ namespace HlidacStatu.DS.Api.Voice2Text
     }
 
 
-    public class SourceOption
+    public class Options
     {
+
+        public WordcabTranscribe.SpeechToText.AudioRequestOptions audioOptions = null;
         public bool deleteFileAfterProcess { get; set; }
+
         public string datasetName { get; set; }
         public string itemId { get; set; }
     }

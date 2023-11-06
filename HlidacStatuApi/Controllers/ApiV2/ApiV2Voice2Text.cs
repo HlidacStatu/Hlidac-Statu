@@ -3,6 +3,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RazorEngine.Compilation.ImpromptuInterface;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace HlidacStatuApi.Controllers.ApiV2
@@ -26,23 +27,16 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns></returns>
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpPost("CreateTask")]
-        public async Task<ActionResult<long>> CreateTask(
-            string callerId, string callerTaskId,
-            string source,
-            int priority = 10,
-            string datasetName = null,
-            string dataSetItemId = null,
-            bool deleteAfterProcess = false
-            )
+        public async Task<ActionResult<long>> CreateTask([FromBody] HlidacStatu.DS.Api.Voice2Text.Task task)
         {
             var qv2t = new QVoiceToText();
-            qv2t.Priority = priority;
-            qv2t.Source = source;
-            if (datasetName != null || deleteAfterProcess == true)
-                qv2t.SetSourceOptions<HlidacStatu.DS.Api.Voice2Text.SourceOption>(new SourceOption() { datasetName = datasetName, itemId = dataSetItemId, deleteFileAfterProcess = deleteAfterProcess });
+            qv2t.Priority = task.Priority;
+            qv2t.Source = task.Source;
+            if (task.SourceOptions?.datasetName!= null || task.SourceOptions?.deleteFileAfterProcess == true)
+                qv2t.SetSourceOptions<HlidacStatu.DS.Api.Voice2Text.Options>(task.SourceOptions);
 
-            qv2t.CallerId = callerId;
-            qv2t.CallerTaskId = callerTaskId;
+            qv2t.CallerId = task.CallerId;
+            qv2t.CallerTaskId = task.CallerTaskId;
             await QVoiceToTextRepo.SaveAsync(qv2t);
             return qv2t.QId;
         }
@@ -74,7 +68,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 Created = q.Created,
                 Started = q.Started,
                 Source = q.Source,
-                SourceOptions = q.GetSourceOptions<SourceOption>()
+                SourceOptions = q.GetSourceOptions<HlidacStatu.DS.Api.Voice2Text.Options>()
             };
         }
 

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-
+using Devmasters.SpeechToText;
 namespace Vybory_PSP
 {
     public class Parse
@@ -256,7 +256,7 @@ namespace Vybory_PSP
                                     var blocks = mp3.CheckDownloadAndStartV2TOrGet(Parse.datasetname, j.Id + smp3id, rootUrl + fUrl);
                                     if (blocks != null)
                                     {
-                                        jmp3.DocumentPlainText = Devmasters.SpeechToText.VoiceToTextFormatter.TextWithTimestampsToText(blocks);
+                                        jmp3.DocumentPlainText = blocks.ToText(); // Devmasters.SpeechToText.VoiceToTextFormatter.TextWithTimestampsToText();
                                         jmp3.prepisAudia = blocks
                                             .Select(t => new jednani.mp3.blok() { sekundOdZacatku = (long)t.Start.TotalSeconds, text = t.Text })
                                             .ToArray();
