@@ -38,7 +38,7 @@ namespace HlidacStatu.DS.Api.Voice2Text
     public class Options
     {
 
-        public WordcabTranscribe.SpeechToText.AudioRequestOptions audioOptions = null;
+        public WordcabTranscribe.SpeechToText.AudioRequestOptions audioOptions { get; set; }
         public bool deleteFileAfterProcess { get; set; }
 
         public string datasetName { get; set; }

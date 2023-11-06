@@ -52,9 +52,9 @@ namespace HlidacStatu.Entities
             where T: class
         {
             if (data != null)
-                this.Source = System.Text.Json.JsonSerializer.Serialize(data);
+                this.SourceOptionsRaw = System.Text.Json.JsonSerializer.Serialize(data);
             else
-                this.Source = null;
+                this.SourceOptionsRaw = null;
 
         }
 

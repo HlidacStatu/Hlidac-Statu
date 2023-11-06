@@ -10,7 +10,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 {
 
     [SwaggerTag("Voice 2 Text")]
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [ApiExplorerSettings(IgnoreApi = false)]
     [Route("api/v2/voice2text")]
     public class ApiV2Voice2TextController : ControllerBase
     {
@@ -37,6 +37,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
             qv2t.CallerId = task.CallerId;
             qv2t.CallerTaskId = task.CallerTaskId;
+            qv2t.Status = (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.WaitingInQueue;
             await QVoiceToTextRepo.SaveAsync(qv2t);
             return qv2t.QId;
         }
