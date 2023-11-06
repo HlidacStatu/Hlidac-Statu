@@ -115,5 +115,21 @@ namespace HlidacStatu.Util
         }
 
 
+
+        public static bool HasPDFHeaderFast(byte[] data)
+        {
+            if (data == null)
+                return false;
+            if (data.Length <5) return false;
+
+            byte[] pdfheader = new byte[] { 37, 80, 68, 70 };
+            bool valid = true;
+            for (int i = 0; i < 4; i++)
+            {
+                valid = valid && data[i] == pdfheader[i];
+            }
+            return valid;
+        }
+
     }
 }
