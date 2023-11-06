@@ -9,6 +9,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 {
 
     [SwaggerTag("Voice 2 Text")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/v2/voice2text")]
     public class ApiV2Voice2TextController : ControllerBase
     {
