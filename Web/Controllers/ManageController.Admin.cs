@@ -56,6 +56,43 @@ namespace HlidacStatu.Web.Controllers
 
             return View(new Tuple<string, string, int>(s, p, page));
         }
+        
+        //adding just for test reasons
+        [Authorize(Roles = "canEditData,TableEditor")]
+        [HttpGet]
+        public async Task<ActionResult> ShowPrilohaTablesOnePageImg(string s, string p, int page)
+        {
+            Smlouva sml = await SmlouvaRepo.LoadAsync(s);
+            Smlouva.Priloha pr = sml?.Prilohy?.FirstOrDefault(m => m.hash.Value == p);
+            if (sml == null || pr == null)
+                return NotFound();
+
+            string fn = SmlouvaRepo.GetDownloadedPrilohaPath(pr,sml, HlidacStatu.Connectors.IO.PrilohaFile.RequestedFileType.PDF);
+            bool weHaveCopy = string.IsNullOrEmpty(fn)==false && System.IO.File.Exists(fn);
+            byte[] pdfBin = null;
+            if (weHaveCopy)
+                pdfBin = await System.IO.File.ReadAllBytesAsync(fn);
+            else
+            {
+                using (var wc = new System.Net.WebClient())
+                {
+                    pdfBin = wc.DownloadData(pr.odkaz);
+                }
+            }
+            if (pdfBin == null)
+                return NotFound();
+
+            //  prepare codec parameters
+
+            using (var _img = PDFtoImage.Conversion.ToImage(pdfBin, page: page - 1))
+            {
+                using (var stream = new MemoryStream())
+                {
+                    _img.Encode(stream, SkiaSharp.SKEncodedImageFormat.Jpeg, 90);
+                    return File(stream.ToArray(), "image/jpeg");
+                }
+            }
+        }
 
         [Authorize(Roles = "canEditData")]
         [HttpPost]
