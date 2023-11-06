@@ -7,7 +7,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace HlidacStatuApi.Controllers.ApiV2
 {
 
-    [SwaggerTag("Voice 2 Text")]
+    [SwaggerTag("Voice 2 Text Old")]
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("api/v2/internalq")]
     public class ApiV2InternalQController : ControllerBase
