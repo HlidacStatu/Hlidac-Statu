@@ -63,12 +63,13 @@ namespace HlidacStatu.Entities
         public string SourceOptionsRaw { get; set; }
 
         [Column("created", TypeName = "datetime")]
-        public DateTime Created { get; set; }
+        public DateTime Created { get; set; } = DateTime.Now;
 
         [Column("done", TypeName = "datetime")]
         public DateTime? Done { get; set; }
+
         [Column("started", TypeName = "datetime")]
-        public DateTime Started { get; set; } = DateTime.Now;
+        public DateTime? Started { get; set; } 
 
         [Column("lastUpdate", TypeName = "datetime")]
         public DateTime? LastUpdate { get; set; }
