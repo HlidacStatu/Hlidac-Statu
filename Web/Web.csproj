@@ -58,7 +58,7 @@
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="7.1.0" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="7.0.0" />
         <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="7.0.0" />
-        <PackageReference Include="Devmasters.Cache.Memcached" Version="4.5.1" />
+        <PackageReference Include="Devmasters.Cache.Memcached" Version="4.5.3" />
         <PackageReference Include="Devmasters.Core" Version="4.5.1" />
         <PackageReference Include="Devmasters.Lang" Version="4.5.1" />
         <PackageReference Include="Devmasters.Logging" Version="4.5.27" />
