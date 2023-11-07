@@ -59,7 +59,6 @@ namespace HlidacStatu.Connectors
 
         public static string defaultIndexName_VerejneZakazky = "verejnezakazky";
         public static string defaultIndexName_VerejneZakazkyNew = "verejnezakazky_new";
-        public static string defaultIndexName_DocumentHistory = "documenthistory";
         public static string defaultIndexName_ProfilZadavatele = "profilzadavatele";
         public static string defaultIndexName_VerejneZakazkyNaProfiluRaw = "verejnezakazkyprofilraw";
         public static string defaultIndexName_Firmy = "firmy";
@@ -168,11 +167,6 @@ namespace HlidacStatu.Connectors
             }
 
             return _clients[cnnset];
-        }
-        
-        public static Task<ElasticClient> GetESClient_DocumentHistoryAsync(int timeOut = 60000, int connectionLimit = 80)
-        {
-            return GetESClientAsync(defaultIndexName_DocumentHistory, timeOut, connectionLimit, IndexType.DocumentHistory);
         }
         
         public static Task<ElasticClient> GetESClient_VerejneZakazkyOldAsync(int timeOut = 60000, int connectionLimit = 80)

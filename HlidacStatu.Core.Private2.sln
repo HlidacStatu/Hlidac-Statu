@@ -188,6 +188,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Analysis.Page", "..\Hlidac-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AI", "..\Hlidac-Statu-Private\AI\AI.csproj", "{D0D40326-1297-4AE6-BEB2-8A744F772B6F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeleniumWebTest", "..\Hlidac-Statu-Private\SeleniumWebTest\SeleniumWebTest.csproj", "{E1E8DE5B-D9D5-4A31-BB41-9EF27B6EDBBB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -450,6 +452,10 @@ Global
 		{D0D40326-1297-4AE6-BEB2-8A744F772B6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0D40326-1297-4AE6-BEB2-8A744F772B6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0D40326-1297-4AE6-BEB2-8A744F772B6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1E8DE5B-D9D5-4A31-BB41-9EF27B6EDBBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1E8DE5B-D9D5-4A31-BB41-9EF27B6EDBBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1E8DE5B-D9D5-4A31-BB41-9EF27B6EDBBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1E8DE5B-D9D5-4A31-BB41-9EF27B6EDBBB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -531,6 +537,7 @@ Global
 		{65FC5E58-4EA0-4F6E-8E25-4876D37EBD9D} = {AF9C295F-FA98-4C4C-9A87-25F1792C9E3D}
 		{6B9E7196-0529-43BC-9B17-60D5E22A4669} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{D0D40326-1297-4AE6-BEB2-8A744F772B6F} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
+		{E1E8DE5B-D9D5-4A31-BB41-9EF27B6EDBBB} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}

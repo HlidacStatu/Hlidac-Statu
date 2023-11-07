@@ -111,9 +111,6 @@ namespace HlidacStatu.Repositories
 
                         try
                         {
-                            await DocumentHistoryRepo<VerejnaZakazka>.SaveAsync(storedDuplicate, storedDuplicate.Origin,
-                                firstVz.Id);
-
                             await elasticClient.DeleteByQueryAsync<VerejnaZakazka>(s => s.Query(q =>
                                 q.Term(t => t.Field(f => f.Id).Value(storedDuplicate.Id))));
                         }
@@ -127,18 +124,7 @@ namespace HlidacStatu.Repositories
                     firstVz = MergeVz(firstVz, newVZ); //počítá se s tím, že jsou dokumenty stažené
                     MergeDocuments(firstVz, newVZ.Dokumenty);
 
-                    try
-                    {
-                        await DocumentHistoryRepo<VerejnaZakazka>.SaveAsync(newVZ, newVZ.Origin, firstVz.Id);
-                    }
-                    catch (Exception e)
-                    {
-                        Consts.Logger.Error(
-                            $"VZ ERROR Merging ID:{firstVz.Id} with new VZ from {newVZ.Origin}.", e);
-                    }
-
                     newVZ = firstVz;
-
                 }
                 
                 // stáhnout dokumenty, které nemají checksum
