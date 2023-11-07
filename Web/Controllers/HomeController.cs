@@ -244,7 +244,7 @@ namespace HlidacStatu.Web.Controllers
                 }
             }
 
-            if (auth == false || (auth == true && User?.Identity?.IsAuthenticated == true))
+            if (auth == null || auth == false || (auth == true && User?.Identity?.IsAuthenticated == true))
             {
                 if (!string.IsNullOrEmpty(email) && Devmasters.TextUtil.IsValidEmail(email)
                     && !string.IsNullOrEmpty(to) && Devmasters.TextUtil.IsValidEmail(to)
