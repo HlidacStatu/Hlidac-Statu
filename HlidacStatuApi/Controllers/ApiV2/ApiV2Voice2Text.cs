@@ -1,9 +1,7 @@
-﻿using HlidacStatu.DS.Api.Voice2Text;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RazorEngine.Compilation.ImpromptuInterface;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace HlidacStatuApi.Controllers.ApiV2
@@ -15,37 +13,41 @@ namespace HlidacStatuApi.Controllers.ApiV2
     public class ApiV2Voice2TextController : ControllerBase
     {
         /// <summary>
-        /// Vytvori task a ulozi do fronty
+        /// Vytvori task a ulozi do fronty. Vrati id tasku
         /// </summary>
-        /// <param name="callerId">ID volajiciho</param>
-        /// <param name="callerTaskId">Interni ID pozadavku volajiciho</param>
-        /// <param name="source">URL nebo soubor co se zpracovat</param>
-        /// <param name="priority">priorita</param>
-        /// <param name="datasetName"></param>
-        /// <param name="dataSetItemId"></param>
-        /// <param name="deleteAfterProcess"></param>
+        /// <param name="task">Cislo id taasku</param>
         /// <returns></returns>
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpPost("CreateTask")]
-        public async Task<ActionResult<long>> CreateTask([FromBody] HlidacStatu.DS.Api.Voice2Text.Task task)
+        public async Task<ActionResult<string>> CreateTask([FromBody] HlidacStatu.DS.Api.Voice2Text.Task task)
         {
-            var qv2t = new QVoiceToText();
-            qv2t.Priority = task.Priority;
-            qv2t.Source = task.Source;
-            if (task.SourceOptions?.datasetName!= null || task.SourceOptions?.deleteFileAfterProcess == true)
-                qv2t.SetSourceOptions<HlidacStatu.DS.Api.Voice2Text.Options>(task.SourceOptions);
+            try
+            {
 
-            qv2t.CallerId = task.CallerId;
-            qv2t.CallerTaskId = task.CallerTaskId;
-            qv2t.Status = (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.WaitingInQueue;
-            await QVoiceToTextRepo.SaveAsync(qv2t);
-            return qv2t.QId;
+                var qv2t = new QVoiceToText();
+                qv2t.Priority = task.Priority;
+                qv2t.Source = task.Source;
+                if (task.SourceOptions?.datasetName != null || task.SourceOptions?.deleteFileAfterProcess == true)
+                    qv2t.SetSourceOptions<HlidacStatu.DS.Api.Voice2Text.Options>(task.SourceOptions);
+
+                qv2t.CallerId = task.CallerId;
+                qv2t.CallerTaskId = task.CallerTaskId;
+                qv2t.Status = (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.WaitingInQueue;
+                await QVoiceToTextRepo.SaveAsync(qv2t);
+                return qv2t.QId.ToString();
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
         }
+
+
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpGet("Check")]
-        public async Task<ActionResult<string>> Check()
+        public async Task<ActionResult> Check(int returnStatus = 200)
         {
-            return "OK";
+            return StatusCode(returnStatus, $"Returned status {returnStatus}");
         }
 
         /// <summary>
@@ -53,8 +55,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// </summary>
         /// <returns>taskid</returns>
         [Authorize(Roles = "Admin,InternalQ")]
-        [HttpGet("GetWaitingTask")]
-        public async Task<ActionResult<HlidacStatu.DS.Api.Voice2Text.Task>> GetWaitingTask()
+        [HttpGet("GetNextTask")]
+        public async Task<ActionResult<HlidacStatu.DS.Api.Voice2Text.Task>> GetNextTask()
         {
             var q = await QVoiceToTextRepo.GetNextToProcess();
 
@@ -79,13 +81,21 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns>taskid</returns>
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpPost("TaskDone")]
-        public async Task<ActionResult<string>> TaskDone([FromBody] HlidacStatu.DS.Api.Voice2Text.Task task)
+        public async Task<ActionResult> TaskDone([FromBody] HlidacStatu.DS.Api.Voice2Text.Task task)
         {
-            var q = await QVoiceToTextRepo.Finish(task.QId, task.Result, task.Status);
-            if (q == null)
-                return "Not found";
-            else
-                return $"OK";
+            try
+            {
+                var q = await QVoiceToTextRepo.Finish(task.QId, task.Result, task.Status);
+                if (q == null)
+                    return StatusCode(404);
+                else
+                    return StatusCode(200);
+
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"task {task.QId} : {e.Message}");
+            }
         }
 
     }

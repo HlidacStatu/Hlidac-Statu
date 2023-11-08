@@ -2,6 +2,8 @@
 {
     public class ApiResult
     {
+        public static ApiResult Ok() => new ApiResult() { Success = true };
+        public static ApiResult Error(string errorDescription, int errorCode) => new ApiResult() { Success=false, ErrorCode=errorCode, ErrorDescription=errorDescription };
         public ApiResult() { }
         public ApiResult(bool success) { this.Success = success; }
         public bool Success { get; set; } = true;
@@ -10,6 +12,8 @@
         public string ErrorDescription { get; set; } = "";
 
         public string Server { get; set; }
+
+
     }
 
     public class ApiResult<T> : ApiResult

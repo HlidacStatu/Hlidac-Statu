@@ -17,7 +17,7 @@ namespace HlidacStatu.DS.Api.Voice2Text
         public DateTime Created { get; set; }
 
         public DateTime? Done { get; set; }
-        public DateTime Started { get; set; } = DateTime.Now;
+        public DateTime? Started { get; set; } = DateTime.Now;
 
         public string Result { get; set; }
 
