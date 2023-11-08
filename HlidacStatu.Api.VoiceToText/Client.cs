@@ -1,5 +1,4 @@
 ﻿using Devmasters.Net.HttpClient;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Net.Http.Json;
@@ -46,11 +45,11 @@ namespace HlidacStatu.Api.VoiceToText
 
                 return id;
             }
-            catch (System.Net.Http.HttpRequestException e)
+            catch (Devmasters.Net.HttpClient.SimpleHttpClientException e)
             {
-                int statusCode = (int)e.StatusCode;
+                int statusCode = (int)e.HttpStatusNumber;
                 if (statusCode >= 500)
-                    throw new ApplicationException(e.Source);
+                    throw new ApplicationException(e.TextContent);
 
                 return "";
             }
@@ -63,32 +62,48 @@ namespace HlidacStatu.Api.VoiceToText
 
         public async Task<bool> TaskDoneAsync(HlidacStatu.DS.Api.Voice2Text.Task task)
         {
-            var json = System.Text.Json.JsonSerializer.Serialize<HlidacStatu.DS.Api.Voice2Text.Task>(task);
-            JsonContent form = JsonContent.Create<HlidacStatu.DS.Api.Voice2Text.Task>(task);
-            var res = await Simple.PostAsync<string>(
-                BaseApiUri.AbsoluteUri + "api/v2/voice2text/TaskDone",
-                form, continueOnCapturedContext: false,
-                    headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }
-            );
+            try
+            {
+                var json = System.Text.Json.JsonSerializer.Serialize<HlidacStatu.DS.Api.Voice2Text.Task>(task);
+                JsonContent form = JsonContent.Create<HlidacStatu.DS.Api.Voice2Text.Task>(task);
+                var res = await Simple.PostAsync<string>(
+                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/TaskDone",
+                    form, continueOnCapturedContext: false,
+                        headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }
+                );
 
-            return res == "OK";
+                return res == "OK";
+            }
+            catch (Devmasters.Net.HttpClient.SimpleHttpClientException e)
+            {
+                int statusCode = (int)e.HttpStatusNumber;
+                if (statusCode >= 500)
+                    throw new ApplicationException(e.TextContent);
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+
         }
         public async Task<bool> CheckAsync()
         {
             try
-            {
+            {   //
                 var res = await Simple.GetAsync<string>(
-                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/CreateTask?returnstatus=500", continueOnCapturedContext: false,
+                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/Check?returnstatus=500", continueOnCapturedContext: false,
                         headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }
                 );
 
                 return true;
 
             }
-            catch (System.Net.Http.HttpRequestException e)
+            catch (Devmasters.Net.HttpClient.SimpleHttpClientException e)
             {
-                int statusCode = (int)e.StatusCode;
-
+                int statusCode = (int)e.HttpStatusNumber;
+                var body = e.TextContent;
                 return false;
             }
             catch (Exception e)
@@ -97,7 +112,7 @@ namespace HlidacStatu.Api.VoiceToText
             }
         }
 
-            public async Task<HlidacStatu.DS.Api.Voice2Text.Task> GetNextTaskAsync()
+        public async Task<HlidacStatu.DS.Api.Voice2Text.Task> GetNextTaskAsync()
         {
             HlidacStatu.DS.Api.Voice2Text.Task task = null;
             try
