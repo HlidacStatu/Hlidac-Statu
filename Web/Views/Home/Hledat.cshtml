@@ -276,11 +276,18 @@ else if (Model.HasResults == false)
 }
 
 
-@for (int ipart = 1; ipart < paorder.Count; ipart++)
+@for (int ipart = 0; ipart < paorder.Count; ipart++)
 {
     var part = paorder[ipart];
 
-    if (part == nameof(VerejnaZakazkaSearchData))
+    if (part == nameof(SmlouvaSearchResult))
+    {
+        if (Model.HasSmlouvy)
+        {
+            htmlLinks.Add(new Tuple<string, string>(Url.Action("Hledat", "Home", Model.Smlouvy.ToRouteValues(1)), Devmasters.Lang.CS.Plural.Get(Model.Smlouvy.Total, "<b>jednu smlouvu</b>", "<b>{0} smlouvy</b>", "<b>{0} smluv</b>")));
+        }
+    }
+    else if (part == nameof(VerejnaZakazkaSearchData))
     {
         if (Model.HasVZ)
         {
@@ -344,15 +351,15 @@ else if (Model.HasResults == false)
     <div class="col-xs-12 col-sm-12">
         <div class="row">
 
-            <h4><span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> jsme nalezli ještě v těchto databázích</h4>
+            <h4><span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> jsme nalezli v těchto databázích</h4>
             @foreach (var items in htmlLinks.Chunk((htmlLinks.Count / 3) + 1))
             {
-                <div class="col-xs-6 col-sm-3">
-                    <ul>
+                <div class="col-xs-6 col-sm-3" >
+                    <ul style="list-style: none;margin-left: -10px;">
                         @foreach (var item in items)
                         {
                             <li>
-                                <a href="@item.Item1"><i class="far fa-angle-double-right"></i>&nbsp;@Html.Raw(item.Item2)</a>
+                                <i class="far fa-angle-double-right pe-2"></i><a href="@item.Item1">@Html.Raw(item.Item2)</a>
                             </li>
                         }
                     </ul>
@@ -372,17 +379,17 @@ else if (Model.HasResults == false)
     <div class="col-xs-12 col-sm-12">
         <div class="row">
             <h4>
-                <span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> se také vyskytuje v popisu, nebo názvu těchto datasetů
+                <span title="@Model.Query" class="emphasized">@Devmasters.TextUtil.ShortenText(Model.Query, 80, "...")</span> se také vyskytuje v popisu, nebo názvu těchto databází
             </h4>
              @foreach (var chunks in Model.DatasetRegistrations.Chunk((int)Math.Ceiling((Model.DatasetRegistrations.Count / 3d))))
              {
                  <div class="col-xs-6 col-sm-3">
-                     <ul>
+                    <ul style="list-style: none;margin-left: -10px;">
                          @foreach (var item in chunks)
                          {
                              var url = $"/data/Index/{item.datasetId}";
                              <li>
-                                 <a href="@url"><i class="far fa-angle-double-right"></i>&nbsp;@Html.Raw(item.name)</a>
+                                <i class="far fa-angle-double-right pe-2"></i><a href="@url">@Html.Raw(item.name)</a>
                              </li>
                          }
                      </ul>
@@ -486,7 +493,8 @@ else if (Model.HasResults == false)
             if (Model.HasVZ)
             {
                 viewRenderTimesInt = viewRenderTimes.StopPreviousAndStartNextLap("Result VZ");
-
+                //nacist vysledky, mam pouze pocet nalezenych
+                var vzRes = await HlidacStatu.Repositories.VerejnaZakazkaRepo.Searching.SimpleSearchAsync(Model.Query, null, 1, HlidacStatu.Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal, "0");
                 if (numOfVZ == 0)
                 {
                     <hr />
@@ -508,7 +516,7 @@ else if (Model.HasResults == false)
 
                     <div class="row" id="verejnezakazky">
                         <div class="col-xs-12">
-                            <partial name="../VerejneZakazky/_SearchResult" model="@Model.VZ" />
+                            <partial name="../VerejneZakazky/_SearchResult" model="@vzRes" />
                         </div>
                     </div>
                 }
@@ -751,11 +759,11 @@ else if (Model.HasResults == false)
                 @foreach (var items in htmlLinks.Chunk((htmlLinks.Count / 3) + 1))
                 {
                     <div class="col-xs-6 col-sm-3">
-                        <ul>
+                        <ul style="list-style: none;margin-left: -10px;">
                             @foreach (var item in items)
                             {
                                 <li>
-                                    <a href="@item.Item1"><i class="far fa-angle-double-right"></i>&nbsp;@Html.Raw(item.Item2)</a>
+                                    <i class="far fa-angle-double-right pe-2"></i><a href="@item.Item1">@Html.Raw(item.Item2)</a>
                                 </li>
                             }
                         </ul>
