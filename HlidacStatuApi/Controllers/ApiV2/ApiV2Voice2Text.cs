@@ -98,6 +98,63 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
         }
 
-    }
+        [Authorize(Roles = "Admin,InternalQ")]
+        [HttpPost("TaskDone")]
+        public async Task<ActionResult> SetTaskStatus(long qId, HlidacStatu.DS.Api.Voice2Text.Task.CheckState status)
+        {
+            try
+            {
+                var q = await QVoiceToTextRepo.SetStatus(qId, status);
+                if (q == null)
+                    return StatusCode(404);
+                else
+                    return StatusCode(200);
 
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"task {qId} : {e.Message}");
+            }
+        }
+
+        [Authorize(Roles = "Admin,InternalQ")]
+        [HttpPost("TaskDone")]
+        public async Task<ActionResult<HlidacStatu.DS.Api.Voice2Text.Task[]>> GetTasksByParameters(int maxItems, string? callerId, string? callerTaskId = null, HlidacStatu.DS.Api.Voice2Text.Task.CheckState? status = null)
+        {
+            if (maxItems > 1000)
+                maxItems = 1000;
+            try
+            {
+
+                QVoiceToText[] tasks = await QVoiceToTextRepo.GetByParameters(maxItems, callerId, callerTaskId, status);
+
+                var res = tasks.
+                    Select(m => new HlidacStatu.DS.Api.Voice2Text.Task()
+                    {
+                        CallerId = m.CallerId,
+                        CallerTaskId = m.CallerTaskId,
+                        Created = m.Created,
+                        Done = m.Done,
+                        Priority = m.Priority ?? 1,
+                        QId = m.QId,
+                        Result = m.Result,
+                        Source = m.Source,
+                        SourceOptions = m.GetSourceOptions<HlidacStatu.DS.Api.Voice2Text.Options>(),
+                        Started = m.Started,
+                        Status = ((HlidacStatu.DS.Api.Voice2Text.Task.CheckState)(m.Status ?? 0))
+
+                    })
+                    .ToArray();
+
+                return res;
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"GetTasksByParameters error, parameters maxItems:{maxItems};" 
+                    + $"callerId:{callerId};callerTaskId:{callerTaskId};status:{status}. Error {e.Message}");
+            }
+
+        }
+
+    }
 }

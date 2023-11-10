@@ -62,7 +62,7 @@ namespace HlidacStatu.Repositories
             }
             return q;
         }
-        public static async Task<QVoiceToText> SetStatus(int qId, HlidacStatu.DS.Api.Voice2Text.Task.CheckState status, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<QVoiceToText> SetStatus(long qId, HlidacStatu.DS.Api.Voice2Text.Task.CheckState status, CancellationToken cancellationToken = default(CancellationToken))
         {
             var q = await GetOnlySpecific(qId, cancellationToken);
             if (q != null)
@@ -74,13 +74,21 @@ namespace HlidacStatu.Repositories
             return q;
         }
 
-        public static async Task<QVoiceToText[]> GetByCaller(string callerId, string callerTaskId, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<QVoiceToText[]> GetByParameters(int maxItems = 1000, string? callerId=null, string? callerTaskId=null, HlidacStatu.DS.Api.Voice2Text.Task.CheckState? status=null, CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
             {
-                var tbl = await db.QVoiceToText
-                    .AsQueryable()
-                    .Where(m => m.CallerId == callerId && m.CallerTaskId == callerTaskId)
+                var query = db.QVoiceToText
+                    .AsQueryable();
+                if (!string.IsNullOrEmpty(callerId))
+                    query = query.Where(m => m.CallerId == callerId);
+                if (!string.IsNullOrEmpty(callerTaskId))
+                    query = query.Where(m => m.CallerTaskId == callerTaskId);
+                if (!string.IsNullOrEmpty(callerTaskId))
+                    query = query.Where(m => m.Status == (int)status.Value);
+
+                var tbl = await query
+                    .Take(maxItems)
                     .ToArrayAsync(cancellationToken);
 
                 return tbl;
