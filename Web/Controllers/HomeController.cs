@@ -141,14 +141,6 @@ namespace HlidacStatu.Web.Controllers
             }
         }
 
-        public async Task<ActionResult> NoveHledani(string q, string order)
-        {
-            var res = await XLib.Search
-                .GeneralSearchAsync(q, 1, Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal, false, order, this.User);
-
-            string viewName = "NoveHledani";
-            return View(viewName, res);
-        }
         
         public ActionResult Reporty()
         {
@@ -698,7 +690,7 @@ text zpravy: {txt}
             bool showBeta = User.Identity?.IsAuthenticated == true && User.IsInRole("BetaTester");
 
             var res = await XLib.Search
-                .GeneralSearchAsync(q, 1, Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal, showBeta, order, this.User);
+                .GeneralSearchAsync(q, 1, showBeta, order, this.User, smlouvySize: Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal,);
             AuditRepo.Add(
                 Audit.Operations.UserSearch
                 , User?.Identity?.Name

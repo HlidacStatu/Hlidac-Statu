@@ -24,18 +24,18 @@ namespace HlidacStatu.Api.VoiceToText
 
         public async Task<string> AddNewTaskAsync(HlidacStatu.DS.Api.Voice2Text.Options options, Uri source, string callerId, string callerTaskId, int priority)
         {
-            HlidacStatu.DS.Api.Voice2Text.Task task = new HlidacStatu.DS.Api.Voice2Text.Task()
-            {
-                CallerId = callerId,
-                CallerTaskId = callerTaskId,
-                Priority = priority,
-                Source = source.ToString(),
-                SourceOptions = options
-            };
-            var json = System.Text.Json.JsonSerializer.Serialize<HlidacStatu.DS.Api.Voice2Text.Task>(task);
-            JsonContent form = JsonContent.Create<HlidacStatu.DS.Api.Voice2Text.Task>(task);
             try
             {
+                HlidacStatu.DS.Api.Voice2Text.Task task = new HlidacStatu.DS.Api.Voice2Text.Task()
+                {
+                    CallerId = callerId,
+                    CallerTaskId = callerTaskId,
+                    Priority = priority,
+                    Source = source.ToString(),
+                    SourceOptions = options
+                };
+                var json = System.Text.Json.JsonSerializer.Serialize<HlidacStatu.DS.Api.Voice2Text.Task>(task);
+                JsonContent form = JsonContent.Create<HlidacStatu.DS.Api.Voice2Text.Task>(task);
 
                 var id = await Simple.PostAsync<string>(
                     BaseApiUri.AbsoluteUri + "api/v2/voice2text/CreateTask",
@@ -117,13 +117,16 @@ namespace HlidacStatu.Api.VoiceToText
             HlidacStatu.DS.Api.Voice2Text.Task task = null;
             try
             {
-                task = await Simple.GetAsync<HlidacStatu.DS.Api.Voice2Text.Task>(BaseApiUri.AbsoluteUri + "api/v2/voice2text/getnexttask");
+                task = await Simple.GetAsync<HlidacStatu.DS.Api.Voice2Text.Task>(
+                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/getnexttask",false,
+                    headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }
+                    );
 
                 return task;
             }
-            catch (System.Net.Http.HttpRequestException e)
+            catch (Devmasters.Net.HttpClient.SimpleHttpClientException e)
             {
-                int statusCode = (int)e.StatusCode;
+                int statusCode = (int)e.HttpStatusNumber;
                 if (statusCode >= 500)
                 {
                     throw;

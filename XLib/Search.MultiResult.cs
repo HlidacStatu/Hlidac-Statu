@@ -1,11 +1,10 @@
-﻿using HlidacStatu.Entities;
+﻿using HlidacStatu.Datasets;
+using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Datasets;
 
 namespace HlidacStatu.XLib
 {
@@ -23,7 +22,7 @@ namespace HlidacStatu.XLib
             public bool OsobaFtx = false;
             public Repositories.Searching.Search.GeneralResult<Firma> Firmy { get; set; } = null;
             public Datasets.Search.DatasetMultiResult Datasets { get; set; }
-            public InsolvenceSearchResult Insolvence { get; set; } = new ();
+            public InsolvenceSearchResult Insolvence { get; set; } = new();
             public DotaceSearchResult Dotace { get; set; } = null;
 
             public List<Registration> DatasetRegistrations { get; set; } = new();
@@ -129,8 +128,11 @@ namespace HlidacStatu.XLib
         }
 
         public static async Task<MultiResult> GeneralSearchAsync(
-            string query, int page = 1, int pageSize = 10, bool showBeta = false, string order = null,
-            System.Security.Principal.IPrincipal user = null)
+            string query, int page = 1, bool showBeta = false, string order = null,
+            System.Security.Principal.IPrincipal user = null,
+            int smlouvySize = 10, int vzSize = 0, int firmySize = 20, int osobySize = 10, int insolvenceSize = 0,
+            int dotaceSize = 0, int datasetSize = 0
+            )
         {
             MultiResult res = new MultiResult() { Query = query };
 
@@ -158,7 +160,7 @@ namespace HlidacStatu.XLib
                     {
                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                         sw.Start();
-                        res.Smlouvy = await SmlouvaRepo.Searching.SimpleSearchAsync(query, 1, pageSize, order,
+                        res.Smlouvy = await SmlouvaRepo.Searching.SimpleSearchAsync(query, 1, smlouvySize, order,
                             anyAggregation: new Nest.AggregationContainerDescriptor<Smlouva>().Sum("sumKc",
                                 m => m.Field(f => f.CalculatedPriceWithVATinCZK))
                         );
@@ -170,7 +172,7 @@ namespace HlidacStatu.XLib
                         Util.Consts.Logger.Error("MultiResult GeneralSearch for Smlouvy query" + query, e);
                     }
                 }));
-            
+
             taskList.Add(
                 Task.Run(async () =>
                 {
@@ -178,7 +180,7 @@ namespace HlidacStatu.XLib
                     {
                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                         sw.Start();
-                        res.Firmy = await FirmaRepo.Searching.SimpleSearchAsync(query, 0, 50);
+                        res.Firmy = await FirmaRepo.Searching.SimpleSearchAsync(query, 0, firmySize);
                         sw.Stop();
                         res.Firmy.ElapsedTime = sw.Elapsed;
                     }
@@ -187,7 +189,7 @@ namespace HlidacStatu.XLib
                         Util.Consts.Logger.Error("MultiResult GeneralSearch for Firmy query" + query, e);
                     }
                 }));
-            
+
             taskList.Add(
                 Task.Run(async () =>
                 {
@@ -195,7 +197,7 @@ namespace HlidacStatu.XLib
                     {
                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                         sw.Start();
-                        res.VZ = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(query, null, 1, pageSize, order);
+                        res.VZ = await VerejnaZakazkaRepo.Searching.SimpleSearchAsync(query, null, 1, vzSize, order);
                         sw.Stop();
                         res.VZ.ElapsedTime = sw.Elapsed;
                     }
@@ -204,7 +206,7 @@ namespace HlidacStatu.XLib
                         Util.Consts.Logger.Error("MultiResult GeneralSearch for Verejne zakazky query" + query, e);
                     }
                 }));
-            
+
             taskList.Add(
                 Task.Run(async () =>
                 {
@@ -212,7 +214,7 @@ namespace HlidacStatu.XLib
                     {
                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                         sw.Start();
-                        res.Osoby = await OsobaRepo.Searching.SimpleSearchAsync(query, 1, 10, OsobaRepo.Searching.OrderResult.Relevance);
+                        res.Osoby = await OsobaRepo.Searching.SimpleSearchAsync(query, 1, osobySize, OsobaRepo.Searching.OrderResult.Relevance);
                         sw.Stop();
                         res.Osoby.ElapsedTime = sw.Elapsed;
                     }
@@ -222,7 +224,7 @@ namespace HlidacStatu.XLib
                     }
                 }));
 
-            if (InsolvenceRepo.IsLimitedAccess(user)==false)
+            if (InsolvenceRepo.IsLimitedAccess(user) == false)
             {
                 taskList.Add(
                     Task.Run(async () =>
@@ -231,9 +233,14 @@ namespace HlidacStatu.XLib
                         {
                             Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                             sw.Start();
-                            var iqu = new InsolvenceSearchResult { Q = query, PageSize = pageSize, Order = order };
+                            var iqu = new InsolvenceSearchResult { Q = query, PageSize = insolvenceSize, Order = order };
                             res.Insolvence = iqu;
-                            res.Insolvence = await InsolvenceRepo.Searching.SimpleSearchAsync(new InsolvenceSearchResult { Q = query, PageSize = pageSize, Order = order });
+                            res.Insolvence = await InsolvenceRepo.Searching.SimpleSearchAsync(new InsolvenceSearchResult
+                            {
+                                Q = query,
+                                PageSize = insolvenceSize,
+                                Order = order
+                            });
                             sw.Stop();
                             res.Insolvence.ElapsedTime = sw.Elapsed;
                         }
@@ -252,7 +259,7 @@ namespace HlidacStatu.XLib
                         Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                         sw.Start();
                         res.Dotace = await DotaceRepo.Searching.SimpleSearchAsync(
-                                new DotaceSearchResult { Q = query, PageSize = pageSize, Order = order },
+                                new DotaceSearchResult { Q = query, Page = 1, PageSize = dotaceSize, Order = order },
                                 anyAggregation: new Nest.AggregationContainerDescriptor<Entities.Dotace.Dotace>().Sum("souhrn", s => s.Field(f => f.DotaceCelkem))
                             );
                         sw.Stop();
@@ -270,7 +277,7 @@ namespace HlidacStatu.XLib
                 {
                     try
                     {
-                        res.Datasets = await Datasets.Search.DatasetMultiResult.GeneralSearchAsync(query, null, 1, 5);
+                        res.Datasets = await Datasets.Search.DatasetMultiResult.GeneralSearchAsync(query, null, 1, datasetSize);
                         if (res.Datasets.Exceptions.Count > 0)
                         {
                             Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetMulti query " + query,
@@ -282,7 +289,7 @@ namespace HlidacStatu.XLib
                         Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetMulti query " + query, e);
                     }
                 }));
-            
+
             //hledání v názvech datasetů
             taskList.Add(
                 Task.Run(async () =>
