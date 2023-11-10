@@ -99,8 +99,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
 
         [Authorize(Roles = "Admin,InternalQ")]
-        [HttpPost("TaskDone")]
-        public async Task<ActionResult> SetTaskStatus(long qId, HlidacStatu.DS.Api.Voice2Text.Task.CheckState status)
+        [HttpGet("SetTaskStatus")]
+        public async Task<ActionResult> SetTaskStatus([FromQuery] long qId, [FromQuery] HlidacStatu.DS.Api.Voice2Text.Task.CheckState status)
         {
             try
             {
@@ -118,8 +118,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
         }
 
         [Authorize(Roles = "Admin,InternalQ")]
-        [HttpPost("TaskDone")]
-        public async Task<ActionResult<HlidacStatu.DS.Api.Voice2Text.Task[]>> GetTasksByParameters(int maxItems, string? callerId, string? callerTaskId = null, HlidacStatu.DS.Api.Voice2Text.Task.CheckState? status = null)
+        [HttpGet("GetTasks")]
+        public async Task<ActionResult<HlidacStatu.DS.Api.Voice2Text.Task[]>> GetTasks(
+            [FromQuery] int maxItems, [FromQuery] string? callerId, [FromQuery] string? callerTaskId = null, [FromQuery] HlidacStatu.DS.Api.Voice2Text.Task.CheckState? status = null)
         {
             if (maxItems > 1000)
                 maxItems = 1000;
@@ -150,7 +151,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception e)
             {
-                return StatusCode(500, $"GetTasksByParameters error, parameters maxItems:{maxItems};" 
+                return StatusCode(500, $"GetTasksByParameters error, parameters maxItems:{maxItems};"
                     + $"callerId:{callerId};callerTaskId:{callerTaskId};status:{status}. Error {e.Message}");
             }
 
