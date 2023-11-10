@@ -690,7 +690,7 @@ text zpravy: {txt}
             bool showBeta = User.Identity?.IsAuthenticated == true && User.IsInRole("BetaTester");
 
             var res = await XLib.Search
-                .GeneralSearchAsync(q, 1, showBeta, order, this.User, smlouvySize: Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal,);
+                .GeneralSearchAsync(q, 1, showBeta, order, this.User, smlouvySize: Repositories.Searching.SearchDataResult<object>.DefaultPageSizeGlobal);
             AuditRepo.Add(
                 Audit.Operations.UserSearch
                 , User?.Identity?.Name
