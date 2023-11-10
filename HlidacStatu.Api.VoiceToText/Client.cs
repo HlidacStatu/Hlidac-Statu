@@ -1,6 +1,7 @@
 ﻿using Devmasters.Net.HttpClient;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
@@ -118,7 +119,7 @@ namespace HlidacStatu.Api.VoiceToText
             try
             {
                 task = await Simple.GetAsync<HlidacStatu.DS.Api.Voice2Text.Task>(
-                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/getnexttask",false,
+                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/getnexttask", false,
                     headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }
                     );
 
@@ -143,5 +144,82 @@ namespace HlidacStatu.Api.VoiceToText
                 throw;
             }
         }
+
+
+        public async Task<HlidacStatu.DS.Api.Voice2Text.Task[]> GetTasksAsync(
+            int maxItems = 100, string? callerId = null, string? callerTaskId = null, HlidacStatu.DS.Api.Voice2Text.Task.CheckState? status = null)
+        {
+            HlidacStatu.DS.Api.Voice2Text.Task[] tasks = null;
+            try
+            {
+                string queryStr = $"?maxitems={maxItems}";
+                if (!string.IsNullOrEmpty(callerId))
+                    queryStr = queryStr + $"&callerId={WebUtility.UrlEncode(callerId ?? "")}";
+                if (!string.IsNullOrEmpty(callerTaskId))
+                    queryStr = queryStr + $"&callerTaskId={WebUtility.UrlEncode(callerTaskId ?? "")}";
+                if (status.HasValue)
+                    queryStr = queryStr + $"&status={WebUtility.UrlEncode(status?.ToString() ?? "")}";
+
+                tasks = await Simple.GetAsync<HlidacStatu.DS.Api.Voice2Text.Task[]>(
+                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/gettasks"+ queryStr, false,
+                    headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }
+                    ) ;
+
+                return tasks;
+            }
+            catch (Devmasters.Net.HttpClient.SimpleHttpClientException e)
+            {
+                int statusCode = (int)e.HttpStatusNumber;
+                if (statusCode >= 500)
+                {
+                    throw;
+                }
+                else if (statusCode >= 400)
+                {
+                    return null;
+                }
+                else
+                    return null;
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> SetTaskStatus(long qId, HlidacStatu.DS.Api.Voice2Text.Task.CheckState status)
+        {
+            try
+            {
+                _ = await Simple.GetAsync<HlidacStatu.DS.Api.Voice2Text.Task[]>(
+                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/gettasks"
+                        + $"?qid={qId}"
+                        + $"&status={WebUtility.UrlEncode(status.ToString())}"
+                    , false,
+                    headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }
+                    );
+
+                return true;
+            }
+            catch (Devmasters.Net.HttpClient.SimpleHttpClientException e)
+            {
+                int statusCode = (int)e.HttpStatusNumber;
+                if (statusCode >= 500)
+                {
+                    throw;
+                }
+                else if (statusCode >= 400)
+                {
+                    return false;
+                }
+                else
+                    return true;
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
+
     }
 }

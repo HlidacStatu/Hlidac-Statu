@@ -5,7 +5,7 @@
 		<AssemblyName>HlidacStatu.Api.VoiceToText</AssemblyName>
 		<RootNamespace>HlidacStatu.Api.VoiceToText</RootNamespace>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>1.1.0</Version>
+		<Version>2.3.2.0</Version>
 		<PackageReleaseNotes>Multitargeting .net6 + .net 7</PackageReleaseNotes>
 		<Description>HlidacStatu.Api.VoiceToText</Description>
 	</PropertyGroup>
