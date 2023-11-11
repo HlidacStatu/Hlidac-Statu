@@ -1,0 +1,9 @@
+﻿# Connect
+open ftpes://nuget:nunuget@10.10.100.103/ -certificate="*"
+
+put .\bin\Debug\*.nupkg / -latest -transfer=binary
+
+# Disconnect
+close
+# Connect as a different user
+exit
