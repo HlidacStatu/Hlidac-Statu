@@ -187,12 +187,12 @@ namespace HlidacStatu.Api.VoiceToText
             }
         }
 
-        public async Task<bool> SetTaskStatus(long qId, HlidacStatu.DS.Api.Voice2Text.Task.CheckState status)
+        public async Task<bool> SetTaskStatusAsync(long qId, HlidacStatu.DS.Api.Voice2Text.Task.CheckState status)
         {
             try
             {
                 _ = await Simple.GetAsync<HlidacStatu.DS.Api.Voice2Text.Task[]>(
-                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/gettasks"
+                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/SetTaskStatus"
                         + $"?qid={qId}"
                         + $"&status={WebUtility.UrlEncode(status.ToString())}"
                     , false,

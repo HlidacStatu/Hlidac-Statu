@@ -84,10 +84,11 @@ namespace HlidacStatu.Repositories
                     query = query.Where(m => m.CallerId == callerId);
                 if (!string.IsNullOrEmpty(callerTaskId))
                     query = query.Where(m => m.CallerTaskId == callerTaskId);
-                if (!string.IsNullOrEmpty(callerTaskId))
+                if (status.HasValue)
                     query = query.Where(m => m.Status == (int)status.Value);
 
                 var tbl = await query
+                    .OrderByDescending(o=>( o.LastUpdate ?? o.Created))
                     .Take(maxItems)
                     .ToArrayAsync(cancellationToken);
 

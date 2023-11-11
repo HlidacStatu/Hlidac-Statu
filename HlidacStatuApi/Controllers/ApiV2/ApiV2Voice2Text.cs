@@ -122,8 +122,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
         public async Task<ActionResult<HlidacStatu.DS.Api.Voice2Text.Task[]>> GetTasks(
             [FromQuery] int maxItems, [FromQuery] string? callerId, [FromQuery] string? callerTaskId = null, [FromQuery] HlidacStatu.DS.Api.Voice2Text.Task.CheckState? status = null)
         {
-            if (maxItems > 1000)
-                maxItems = 1000;
+
+            if (maxItems > 50000)
+                maxItems = 50000;
             try
             {
 
