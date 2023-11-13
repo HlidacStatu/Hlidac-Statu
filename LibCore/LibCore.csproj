@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Cache" Version="4.5.1" />
+      <PackageReference Include="Devmasters.Cache" Version="4.5.1.1" />
       <PackageReference Include="Devmasters.Core" Version="4.5.1" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.10" />
