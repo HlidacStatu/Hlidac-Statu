@@ -312,7 +312,7 @@
                                     <h4 class="font-monospace" title="@priloha.nazevSouboru">@Devmasters.TextUtil.ShortenTextInMiddle(priloha.nazevSouboru, 35)</h4>
                                     @if (weHaveCopy)
                                     {
-                                        if (this.User?.IsInRole("novinar") == true || this.User?.IsInRole("admin") == true)
+                                        if (this.User?.IsInRole("novinar") == true || this.User?.IsInRole("Admin") == true)
                                         {
                                             <a href="@(priloha.LocalCopyUrl(Model.Id, false, this.User.Identity.Name))" data-link="kopie">(naše kopie)</a>
                                             <b>!Pozor, tato smlouva byla zneplatněna a tato příloha není veřejně dostupná!</b>
