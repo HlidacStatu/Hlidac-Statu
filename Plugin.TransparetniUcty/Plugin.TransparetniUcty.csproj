@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-            <TargetFramework>net7.0</TargetFramework>
+            <TargetFramework>net8.0</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>HlidacStatu.Plugin.TransparetniUcty</RootNamespace>
     <AssemblyName>HlidacStatu.Plugin.TransparetniUcty</AssemblyName>
@@ -27,13 +27,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Devmasters.Net" Version="4.5.11.1" />
-    <PackageReference Include="EPPlus" Version="6.2.8" />
+    <PackageReference Include="EPPlus" Version="7.0.1" />
     <PackageReference Include="ExcelDataReader" Version="3.6.0" />
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.2" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Polly" Version="7.2.4" />
+    <PackageReference Include="Polly" Version="8.2.0" />
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
