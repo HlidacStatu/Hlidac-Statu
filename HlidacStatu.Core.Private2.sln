@@ -192,6 +192,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "HlidacStatuApi\Api.c
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StressWebTest", "..\Hlidac-Statu-Private\StressWebTest\StressWebTest.csproj", "{965D1DD7-A8A5-4616-B3E5-A543EA1A0CB9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HlidacStatu.Api.VoiceToText", "HlidacStatu.Api.VoiceToText\HlidacStatu.Api.VoiceToText.csproj", "{AED4D970-A52A-4AB5-B5B2-C8BCA175283F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -462,6 +464,10 @@ Global
 		{965D1DD7-A8A5-4616-B3E5-A543EA1A0CB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{965D1DD7-A8A5-4616-B3E5-A543EA1A0CB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{965D1DD7-A8A5-4616-B3E5-A543EA1A0CB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AED4D970-A52A-4AB5-B5B2-C8BCA175283F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AED4D970-A52A-4AB5-B5B2-C8BCA175283F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AED4D970-A52A-4AB5-B5B2-C8BCA175283F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AED4D970-A52A-4AB5-B5B2-C8BCA175283F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -545,6 +551,7 @@ Global
 		{E1E8DE5B-D9D5-4A31-BB41-9EF27B6EDBBB} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
 		{EC0242D1-735F-4C3A-8A85-55B9FFB120B9} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 		{965D1DD7-A8A5-4616-B3E5-A543EA1A0CB9} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
+		{AED4D970-A52A-4AB5-B5B2-C8BCA175283F} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}

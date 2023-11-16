@@ -324,16 +324,6 @@ void AddAllHealtChecks(IServiceCollection services, IConfiguration Configuration
             },
             "Cache disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
         )
-        .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.Couchbase, HlidacStatu.Web.HealthChecks.Couchbase.Options>(
-            new HlidacStatu.Web.HealthChecks.Couchbase.Options()
-            {
-                ServerUris = Devmasters.Config.GetWebConfigValue("CouchbaseServers").Split(','),
-                Bucket = Devmasters.Config.GetWebConfigValue("CouchbaseBucket"),
-                Username = Devmasters.Config.GetWebConfigValue("CouchbaseUsername"),
-                Password = Devmasters.Config.GetWebConfigValue("CouchbasePassword"),
-                Service = HlidacStatu.Web.HealthChecks.Couchbase.Service.KeyValue
-            },
-            "Couchbase", tags: new[] { "Cache" })
         .AddHealthCheckWithResponseTime(
             new global::HealthChecks.Network.SmtpHealthCheck(new global::HealthChecks.Network.SmtpHealthCheckOptions()
             {
