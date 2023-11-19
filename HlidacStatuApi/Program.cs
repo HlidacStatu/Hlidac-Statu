@@ -86,8 +86,6 @@ builder.Services.AddControllers()
 //swagger
 builder.Services.AddSwaggerGen(c =>
 {
-    c.CustomSchemaIds(type => type.FullName.Replace("+", "_").Replace("`","-"));
-
     c.SwaggerDoc("v2", new OpenApiInfo
     {
         Version = "v2",
