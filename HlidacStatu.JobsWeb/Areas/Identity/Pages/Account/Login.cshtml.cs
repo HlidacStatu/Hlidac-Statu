@@ -3,13 +3,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Util;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
+namespace WatchdogAnalytics.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class LoginModel : PageModel
@@ -78,7 +79,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    Util.Consts.Logger.Info("User logged in.");
+                    Consts.Logger.Info("User logged in.");
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -87,7 +88,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
                 }
                 if (result.IsLockedOut)
                 {
-                    Util.Consts.Logger.Warning("User account locked out.");
+                    Consts.Logger.Warning("User account locked out.");
                     return RedirectToPage("./Lockout");
                 }
                 else

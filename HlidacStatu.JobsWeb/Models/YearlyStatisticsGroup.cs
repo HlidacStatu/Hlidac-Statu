@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using HlidacStatu.Ceny.Services;
+using WatchdogAnalytics.Services;
 
-namespace HlidacStatu.Ceny.Models
+namespace WatchdogAnalytics.Models
 {
     public class YearlyStatisticsGroup
     {

@@ -1,12 +1,13 @@
 using System.Threading.Tasks;
-using HlidacStatu.Ceny.Models;
-using HlidacStatu.Ceny.Services;
+using HlidacStatu.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using WatchdogAnalytics.Models;
+using WatchdogAnalytics.Services;
 
-namespace HlidacStatu.Ceny.Pages
+namespace WatchdogAnalytics.Pages
 {
     /*[Authorize(Roles = "Admin")]*/
     public class AdvancedModel : PageModel
@@ -21,7 +22,7 @@ namespace HlidacStatu.Ceny.Pages
             var ad = await HttpContext.HasAccess();
             if (ad.Access == false)
                 return Redirect("/");
-            if (ad.AnalyzeLevel < Entities.CenyCustomer.AccessDetail.AccessDetailLevel.PRO)
+            if (ad.AnalyzeLevel < CenyCustomer.AccessDetail.AccessDetailLevel.PRO)
                 return Redirect($"/souhrn?{obor_rok.Value.UrlDecodedParams}");
 
             Key = HttpContext.TryFindKey();

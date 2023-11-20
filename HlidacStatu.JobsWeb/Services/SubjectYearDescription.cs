@@ -1,4 +1,4 @@
-﻿namespace HlidacStatu.Ceny.Services
+﻿namespace WatchdogAnalytics.Services
 {
     public static partial class JobService
     {

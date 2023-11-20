@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using HlidacStatu.Ceny.Services;
 using HlidacStatu.Entities;
+using HlidacStatu.Util;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -16,8 +16,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using WatchdogAnalytics.Services;
 
-namespace HlidacStatu.Ceny
+namespace WatchdogAnalytics
 {
     public class Startup
     {
@@ -33,8 +34,8 @@ namespace HlidacStatu.Ceny
         {
             Devmasters.Config.Init(Configuration);
 
-            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
-            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
+            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Consts.czCulture;
+            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Consts.csCulture;
 
             Task.Run(async () => await JobService.RecalculateAsync()).GetAwaiter().GetResult();
 

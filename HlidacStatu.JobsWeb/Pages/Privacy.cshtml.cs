@@ -4,7 +4,7 @@ using System.Net.Mail;
 using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HlidacStatu.Ceny.Pages
+namespace WatchdogAnalytics.Pages
 {
     [IgnoreAntiforgeryToken(Order = 1001)]
     public class PrivacyModel : PageModel

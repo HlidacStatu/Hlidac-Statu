@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HlidacStatu.Entities;
 using MathNet.Numerics.Statistics;
 
-namespace HlidacStatu.Ceny.Models
+namespace WatchdogAnalytics.Models
 {
     public class JobStatistics
     {
-        static Dictionary<string, IEnumerable<Entities.InDocJobNameDescription>> jobDescriptions =
-            new Dictionary<string, IEnumerable<Entities.InDocJobNameDescription>>();
+        static Dictionary<string, IEnumerable<InDocJobNameDescription>> jobDescriptions =
+            new Dictionary<string, IEnumerable<InDocJobNameDescription>>();
 
         static JobStatistics()
         {
-            using (var db = new Entities.DbEntities())
+            using (var db = new DbEntities())
             {
                 var subjects = db.InDocJobNameDescription.AsEnumerable().Select(m => m.Analyza.ToLower()).Distinct();
                 foreach (var subj in subjects.Where(m => !string.IsNullOrEmpty(m)))

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Util;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -11,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
+namespace WatchdogAnalytics.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class RegisterModel : PageModel
@@ -69,7 +70,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
-                    Util.Consts.Logger.Info("User created a new account with password.");
+                    Consts.Logger.Info("User created a new account with password.");
 
                     AspNetUserApiToken.CreateNew(user);
 

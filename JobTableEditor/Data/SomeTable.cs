@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
 
-namespace HlidacStatu.JobTableEditor.Data
+namespace JobTableEditor.Data
 {
     public class SomeTable
     {

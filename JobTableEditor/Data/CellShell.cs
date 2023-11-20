@@ -2,9 +2,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using HlidacStatu.DetectJobs;
-using HlidacStatu.JobTableEditor.Annotations;
+using JobTableEditor.Annotations;
 
-namespace HlidacStatu.JobTableEditor.Data
+namespace JobTableEditor.Data
 {
     public class CellShell : INotifyPropertyChanged
     {

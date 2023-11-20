@@ -8,7 +8,7 @@ using HlidacStatu.Entities.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace HlidacStatu.JobTableEditor.Data
+namespace JobTableEditor.Data
 {
     public class StatisticsService
     {

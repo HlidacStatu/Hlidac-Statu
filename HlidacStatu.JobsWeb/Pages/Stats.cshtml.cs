@@ -1,11 +1,11 @@
 using System.Threading.Tasks;
-using HlidacStatu.Ceny.Models;
-using HlidacStatu.Ceny.Services;
+using WatchdogAnalytics.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using WatchdogAnalytics.Models;
 
-namespace HlidacStatu.Ceny.Pages
+namespace WatchdogAnalytics.Pages
 {
     [Authorize(Roles = "Admin")]
     public class StatsModel : PageModel

@@ -1,7 +1,7 @@
 using System;
-using HlidacStatu.JobTableEditor.Components;
+using JobTableEditor.Components;
 
-namespace HlidacStatu.JobTableEditor.Data
+namespace JobTableEditor.Data
 {
     public class CellSwapper
     {

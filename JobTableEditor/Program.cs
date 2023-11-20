@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
-namespace HlidacStatu.JobTableEditor
+namespace JobTableEditor
 {
     public class Program
     {

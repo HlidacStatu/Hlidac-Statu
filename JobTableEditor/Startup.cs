@@ -1,9 +1,9 @@
 using System;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities;
-using HlidacStatu.JobTableEditor.Areas.Identity;
-using HlidacStatu.JobTableEditor.Data;
-
+using HlidacStatu.Util;
+using JobTableEditor.Areas.Identity;
+using JobTableEditor.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.DataProtection;
@@ -15,7 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace HlidacStatu.JobTableEditor
+namespace JobTableEditor
 {
     public class Startup
     {
@@ -32,8 +32,8 @@ namespace HlidacStatu.JobTableEditor
         {
             Devmasters.Config.Init(Configuration);
 
-            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
-            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
+            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Consts.czCulture;
+            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Consts.csCulture;
 
             
             string connectionString = Configuration.GetConnectionString("DefaultConnection");

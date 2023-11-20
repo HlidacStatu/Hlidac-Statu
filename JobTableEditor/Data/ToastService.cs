@@ -3,7 +3,7 @@ using System.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
-namespace HlidacStatu.JobTableEditor.Data
+namespace JobTableEditor.Data
 {
     public class ToastService 
     {

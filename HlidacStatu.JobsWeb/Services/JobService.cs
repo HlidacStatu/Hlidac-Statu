@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Ceny.Models;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Http;
+using WatchdogAnalytics.Models;
 
-namespace HlidacStatu.Ceny.Services
+namespace WatchdogAnalytics.Services
 {
     public static partial class JobService
     {
@@ -56,7 +56,7 @@ namespace HlidacStatu.Ceny.Services
                     .GroupBy(j => j.JobPk)
                     .Select(g =>
                     {
-                        Entities.Cena firstJobOverview = g.FirstOrDefault();
+                        Cena firstJobOverview = g.FirstOrDefault();
                         string[] tags = firstJobOverview.Tags?.Split("|",
                             StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
                         if (tags == null || tags.Length == 0 )

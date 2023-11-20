@@ -97,7 +97,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.DetectJobs", ".
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{ACC852FC-5016-48E7-80DF-ABD60A162FB8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.JobTableEditor", "HlidacStatu.JobTableEditor\HlidacStatu.JobTableEditor.csproj", "{EF59CD86-CAF1-439C-A76D-2FECC4897B7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JobTableEditor", "JobTableEditor\JobTableEditor.csproj", "{EF59CD86-CAF1-439C-A76D-2FECC4897B7B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Data.External.Tables", "Lib.Data.External.Tables\Lib.Data.External.Tables.csproj", "{956497F7-9609-442E-8AB1-5F0AEEBF8081}"
 EndProject
@@ -105,7 +105,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_solution items", "_solutio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Jobs", "Jobs", "{40841C9C-4BC4-4E32-AC3E-657E4A5FA1A0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Ceny", "HlidacStatu.JobsWeb\HlidacStatu.Ceny.csproj", "{A89C8C53-5F83-4EC8-BB06-F5CBB8BE1C28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchdogAnalytics", "HlidacStatu.JobsWeb\WatchdogAnalytics.csproj", "{A89C8C53-5F83-4EC8-BB06-F5CBB8BE1C28}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CamelotDockerAPI", "..\Hlidac-Statu-Private\Docker\CamelotDockerAPI\CamelotDockerAPI.csproj", "{FF971AF6-D7D0-4CFD-826E-4D784CDCEBEA}"
 EndProject
@@ -172,7 +172,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DockerSwarmHealthCheckAgent
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreOfficeDockerAPI", "..\Hlidac-Statu-Private\Docker\LibreOfficeDockerAPI\LibreOfficeDockerAPI.csproj", "{592769A0-9EFE-4815-9E38-5AC2B5F01473}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacAdmin", "..\Hlidac-Statu-Private\HlidacAdmin\HlidacAdmin.csproj", "{C9A7309C-D64A-4387-91A3-46C04CDDF0EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Admin", "..\Hlidac-Statu-Private\Admin\Admin.csproj", "{C9A7309C-D64A-4387-91A3-46C04CDDF0EC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutocompleteGenerator", "..\Hlidac-Statu-Private\AutocompleteGenerator\AutocompleteGenerator.csproj", "{EFAA0F2C-1D61-4B6C-B1F6-0DB2DD59BEB2}"
 EndProject

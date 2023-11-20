@@ -2,12 +2,13 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
+namespace WatchdogAnalytics.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class LoginWithRecoveryCodeModel : PageModel
@@ -66,17 +67,17 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
 
             if (result.Succeeded)
             {
-                Util.Consts.Logger.Info($"User with ID '{user.Id}' logged in with a recovery code.");
+                Consts.Logger.Info($"User with ID '{user.Id}' logged in with a recovery code.");
                 return LocalRedirect(returnUrl ?? Url.Content("~/"));
             }
             if (result.IsLockedOut)
             {
-                Util.Consts.Logger.Warning($"User with ID '{user.Id}' account locked out.");
+                Consts.Logger.Warning($"User with ID '{user.Id}' account locked out.");
                 return RedirectToPage("./Lockout");
             }
             else
             {
-                Util.Consts.Logger.Warning($"Invalid recovery code entered for user with ID '{user.Id}' ");
+                Consts.Logger.Warning($"Invalid recovery code entered for user with ID '{user.Id}' ");
                 ModelState.AddModelError(string.Empty, "Invalid recovery code entered.");
                 return Page();
             }

@@ -1,6 +1,6 @@
 using Devmasters;
 
-namespace HlidacStatu.Ceny.Helpers;
+namespace WatchdogAnalytics.Helpers;
 
 public static class Helpers
 {

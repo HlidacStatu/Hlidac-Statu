@@ -2,12 +2,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.XLib.Emails;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account.Manage
+namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
 {
     public partial class EmailModel : PageModel
     {
@@ -93,7 +94,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account.Manage
                     values: new { userId = userId, email = Input.NewEmail, code = code },
                     protocol: Request.Scheme);
 
-                var emailSender = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
+                var emailSender = EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
                 emailSender.Model.CallbackUrl = callbackUrl;
                 emailSender.To = email;
                 emailSender.SendMe();
@@ -130,7 +131,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account.Manage
                 values: new { area = "Identity", userId = userId, code = code },
                 protocol: Request.Scheme);
 
-            var emailSender = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
+            var emailSender = EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
             emailSender.Model.CallbackUrl = callbackUrl;
             emailSender.To = email;
             emailSender.SendMe();

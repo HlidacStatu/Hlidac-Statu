@@ -1,11 +1,12 @@
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
+namespace WatchdogAnalytics.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class LogoutModel : PageModel
@@ -20,7 +21,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnGet(string? returnUrl = null)
         {
             await _signInManager.SignOutAsync();
-            Util.Consts.Logger.Info("User logged out.");
+            Consts.Logger.Info("User logged out.");
             if(string.IsNullOrEmpty(returnUrl))
                 return RedirectToAction("Index", "Home");
             else
@@ -30,7 +31,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPost(string? returnUrl = null)
         {
             await _signInManager.SignOutAsync();
-            Util.Consts.Logger.Info("User logged out.");
+            Consts.Logger.Info("User logged out.");
             if(string.IsNullOrEmpty(returnUrl))
                 return RedirectToAction("Index", "Home");
             else
