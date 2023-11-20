@@ -26,8 +26,8 @@ namespace HlidacStatu.Datasets
                     )
                     return "datum a čas";
 
-                if (Type == typeof(Nullable<Devmasters.DT.Date>)
-                    || Type == typeof(Devmasters.DT.Date)
+                if (Type == typeof(Nullable<DateOnly>)
+                    || Type == typeof(DateOnly)
                     )
                     return "datum";
                 if (Type == typeof(string)
@@ -76,8 +76,8 @@ namespace HlidacStatu.Datasets
                     samples.Add(("[* TO 2020-04-23}", "do 23. dubna 2020 00:00, tzn. bez tohoto dne"));
                     samples.Add(("[2020-04-23 TO 2020-04-30]", "hodnota mezi 23 až 30. dubna včetně 30.dubna"));
                 }
-                if (Type == typeof(Nullable<Devmasters.DT.Date>)
-                    || Type == typeof(Devmasters.DT.Date)
+                if (Type == typeof(Nullable<DateOnly>)
+                    || Type == typeof(DateOnly)
                     )
                 {
                     samples.Add(("2020-04-23", "hodnota rovna 23. dubna 2020"));

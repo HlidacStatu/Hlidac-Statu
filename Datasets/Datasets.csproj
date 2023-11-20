@@ -7,14 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Cache.Memcached" Version="4.5.3.1" />
+      <PackageReference Include="Devmasters.Cache.Memcached" Version="5.0.0" />
       <PackageReference Include="Scriban" Version="5.9.0" />
       <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Connectors\Connectors.csproj" />
-      <ProjectReference Include="..\Plugin.TransparetniUcty\Plugin.TransparetniUcty.csproj" />
       <ProjectReference Include="..\Repositories\Repositories.csproj" />
     </ItemGroup>
 

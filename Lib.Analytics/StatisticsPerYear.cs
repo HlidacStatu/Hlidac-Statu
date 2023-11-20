@@ -1,25 +1,16 @@
-﻿using Newtonsoft.Json;
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace HlidacStatu.Lib.Analytics
 {
-    // !!!!! Michale, za žádnou cenu sem nedávej ToNiceString !!!! 
-    // Nebo začne bůh topit koťátka, dokud ti to nesmažu! :-D
 
-
-    [JsonObject]
     public class StatisticsPerYear<T> : IEnumerable<(int Year, T Value)>
         where T : CoreStat, IAddable<T>, new()
     {
-        [JsonProperty("Years")]
         protected Dictionary<int, T> Years { get; set; } = new Dictionary<int, T>();
-
-
-
+        
         /// <summary>
         /// Tenhle měsíc určuje, za který rok se AKTUÁLNÍ data mají zobrazovat.
         /// Pokud chceme pro nějakou datovou sadu nastavit sezónu jinak, je potřeba ho změnit

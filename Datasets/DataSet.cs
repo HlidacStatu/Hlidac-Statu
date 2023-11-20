@@ -429,7 +429,7 @@ namespace HlidacStatu.Datasets
                     if (schema.Format == "date-time")
                         ret.Type = typeof(Nullable<DateTime>);
                     else if (schema.Format == "date")
-                        ret.Type = typeof(Nullable<Devmasters.DT.Date>);
+                        ret.Type = typeof(Nullable<DateOnly>);
                     else
                         ret.Type = typeof(string);
                 }
@@ -455,7 +455,7 @@ namespace HlidacStatu.Datasets
                     if (schema.Format == "date" || schema.Format == "date-time")
                         ret.Type = typeof(DateTime);
                     else if (schema.Format == "date")
-                        ret.Type = typeof(Devmasters.DT.Date);
+                        ret.Type = typeof(DateOnly);
                     else
                         ret.Type = typeof(string);
                 }

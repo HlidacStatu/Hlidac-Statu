@@ -375,10 +375,10 @@ namespace HlidacStatu.Util
                     return null;
                 }
 
-                if (Nullable.GetUnderlyingType(t) == typeof(Devmasters.DT.Date))
+                if (Nullable.GetUnderlyingType(t) == typeof(DateOnly))
                 {
-                    if (Devmasters.DT.Date.TryParseExact((string)value, "yyyy-MM-dd",
-                        Consts.enCulture, System.Globalization.DateTimeStyles.AssumeLocal, out Devmasters.DT.Date date))
+                    if (DateOnly.TryParseExact((string)value, "yyyy-MM-dd",
+                        Consts.enCulture, System.Globalization.DateTimeStyles.AssumeLocal, out DateOnly date))
                     {
                         return date;
                     }
@@ -389,9 +389,10 @@ namespace HlidacStatu.Util
                 t = Nullable.GetUnderlyingType(t);
             }
 
-            if (t == typeof(Devmasters.DT.Date))
+            if (t == typeof(DateOnly))
             {
-                return new Devmasters.DT.Date((string)value);
+                return DateOnly.ParseExact((string)value, "yyyy-MM-dd",
+                    Consts.enCulture, System.Globalization.DateTimeStyles.AssumeLocal);
             }
             return Convert.ChangeType(value, t);
         }
