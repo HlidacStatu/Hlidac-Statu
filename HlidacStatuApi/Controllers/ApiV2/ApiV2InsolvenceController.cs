@@ -58,7 +58,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 || HttpContext.User.IsInRole("KomercniLicence")
             );
 
-            var result = await InsolvenceRepo.Searching.SimpleSearchAsync(dotaz, strana.Value,
+            var result = await InsolvenceRepo.Searching.SimpleFulltextSearchAsync(dotaz, strana.Value,
                 ApiV2Controller.DefaultResultPageSize, razeni.Value, false, isLimited);
 
             if (result.IsValid == false)

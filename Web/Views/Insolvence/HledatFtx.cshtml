@@ -1,0 +1,26 @@
+﻿@model HlidacStatu.Repositories.Searching.InsolvenceFulltextSearchResult
+@{
+
+    ViewBag.Title = "Hlídač insolvencí: Hledání";
+    ViewBag.SubTitle = Model?.Q;
+
+    ViewBag.ShowBookmarkUrl = true;
+
+}
+@section scripts
+{
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li><a href="/">Hlídač Státu</a></li>
+        <li><a href="@Url.Action("Index","Insolvence")">Hlídač Insolvencí</a></li>
+        <li>@ViewBag.SubTitle</li>
+    </ol>
+}
+<partial name="_SearchFormFtx" model="@Model"/>
+<partial name="_SearchResultFtx" model="@Model"/>
+
+
+

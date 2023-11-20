@@ -1,4 +1,4 @@
-@model HlidacStatu.Repositories.Searching.InsolvenceSearchResult
+@model HlidacStatu.Repositories.Searching.InsolvenceFulltextSearchResult
 
 <table class="table table-hover">
     <thead>
@@ -25,7 +25,7 @@
                     <add-bookmark item="item"></add-bookmark>&nbsp;
                     @if (LimitedAccess.IsAuthenticatedOrSearchCrawler(Context.Request))
                     {
-                        <a href="@item.GetUrl(true, Model.Q)">
+                        <a href="@item.Rizeni.GetUrl(true, Model.Q)">
                             <span class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">@item.SpisovaZnacka</span>
                             <span class="d-visible d-sm-none d-md-none d-lg-none d-lx-none">
                                 <i class="far fa-file-alt"></i>
@@ -34,7 +34,7 @@
                     }
                     else
                     {
-                            <a href='#' data-bs-toggle='modal' data-bs-target='#VZInfoAnon' data-url='/Insolvence/Rizeni/@item.NormalizedId()'>
+                            <a href='#' data-bs-toggle='modal' data-bs-target='#VZInfoAnon' data-url='/Insolvence/Rizeni/@item.Rizeni.NormalizedId()'>
                             <span class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">@item.SpisovaZnacka</span>
                             <span class="d-visible d-sm-none d-md-none d-lg-none d-lx-none">
                                 <i class="far fa-file-alt"></i>
@@ -44,53 +44,53 @@
                 </span>
             </td>
             <td>
-                    @if (item.Dluznici?.Count > 0)
+                    @if (item.Rizeni.Dluznici?.Count > 0)
                 {
-                        foreach (var o in item.Dluznici.Take(2))
+                        foreach (var o in item.Rizeni.Dluznici.Take(2))
                     {
                         <div>@(await Html.KIndexLabelLinkAsync(o.ICO))@Html.Raw(o.ToHtml(!string.IsNullOrEmpty(o.OsobaId)))</div>
                     }
-                        if (item.Dluznici.Count == 3)
+                        if (item.Rizeni.Dluznici.Count == 3)
                     {
-                            <div>@(await Html.KIndexLabelLinkAsync(item.Dluznici[2].ICO))@Html.Raw(item.Dluznici[2].ToHtml(!string.IsNullOrEmpty(item.Dluznici[2].OsobaId)))</div>
+                            <div>@(await Html.KIndexLabelLinkAsync(item.Rizeni.Dluznici[2].ICO))@Html.Raw(item.Rizeni.Dluznici[2].ToHtml(!string.IsNullOrEmpty(item.Rizeni.Dluznici[2].OsobaId)))</div>
                     }
-                        else if (item.Dluznici.Count > 3)
+                        else if (item.Rizeni.Dluznici.Count > 3)
                     {
-                            <div>@Devmasters.Lang.CS.Plural.Get(item.Dluznici.Count - 2, "a jeden další dlužník", "a další {0} dlužníci", "a dalších {0} dlužníků")</div>
+                            <div>@Devmasters.Lang.CS.Plural.Get(item.Rizeni.Dluznici.Count - 2, "a jeden další dlužník", "a další {0} dlužníci", "a dalších {0} dlužníků")</div>
                     }
                 }
             </td>
             <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">
-                    @if (item.Veritele?.Count > 0)
+                    @if (item.Rizeni.Veritele?.Count > 0)
                 {
-                        foreach (var o in item.Veritele.Take(2))
+                        foreach (var o in item.Rizeni.Veritele.Take(2))
                     {
                         <div>@(await Html.KIndexLabelLinkAsync(o.ICO))@Html.Raw(o.ToHtml(!string.IsNullOrEmpty(o.OsobaId)))</div>
                     }
-                    if (item.Veritele?.Count > 2)
+                    if (item.internalVeriteleCount > 2)
                     {
-                            <div>@Devmasters.Lang.CS.Plural.Get(item.Veritele.Count - 2, "a jeden další věřitel", "a další {0} věřitelé", "a dalších {0} věřitelů")</div>
+                            <div>@Devmasters.Lang.CS.Plural.Get(item.internalVeriteleCount - 2, "a jeden další věřitel", "a další {0} věřitelé", "a dalších {0} věřitelů")</div>
                     }
                 }
             </td>
             <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">
-                @(item.DatumZalozeni?.Date.ToString("d.MM.yyyy") ?? "Neznámé")
+                @(item.Rizeni.DatumZalozeni?.Date.ToString("d.MM.yyyy") ?? "Neznámé")
             </td>
             <td>
-                    @item.PosledniZmena.Date.ToString("d.MM.yyyy")
+                    @item.Rizeni.PosledniZmena.Date.ToString("d.MM.yyyy")
             </td>
 
             <td>
-                    <span title="@item.StavRizeniDetail()">@item.StavRizeni()</span>
+                    <span title="@item.Rizeni.StavRizeniDetail()">@item.Rizeni.StavRizeni()</span>
             </td>
             @if (Model.SmallRender == false)
             {
                 <td class="d-none d-sm-table-cell d-md-table-cell d-lg-table-cell d-xl-table-cell d-xxl-table-cell">
-                        <span>@item.SoudFullName()</span>
+                        <span>@item.Rizeni.SoudFullName()</span>
                 </td>
             }
         </tr>
     }
     </tbody>
 </table>
-<partial name="SearchResults/Pagination" model="@(new PaginationViewModel(Model, "/Insolvence/Hledat"))"/>
+<partial name="SearchResults/Pagination" model="@(new PaginationViewModel(Model, "/Insolvence/HledatFtx"))"/>

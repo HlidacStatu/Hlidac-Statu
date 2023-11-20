@@ -29,6 +29,40 @@ namespace HlidacStatu.Web.Controllers
             return View(model);
         }
 
+        public async Task<ActionResult> HledatFtx(Repositories.Searching.InsolvenceSearchResult model)
+        {
+            if (IsLimitedView())
+            {
+                AuditRepo.Add(
+                Audit.Operations.UserSearch
+                , User?.Identity?.Name
+                , HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString()
+                , "Insolvence"
+                , "no_access"
+                , model?.Q, null);
+                return RedirectToAction("PristupOmezen", "Insolvence");
+            }
+
+            model.LimitedView = IsLimitedView();
+            if (model == null || ModelState.IsValid == false || model.LimitedView)
+            {
+                return View(new Repositories.Searching.InsolvenceSearchResult());
+            }
+
+            Repositories.Searching.InsolvenceFulltextSearchResult res = await InsolvenceRepo.Searching.SimpleFulltextSearchAsync(new Repositories.Searching.InsolvenceFulltextSearchResult(model));
+
+            AuditRepo.Add(
+                Audit.Operations.UserSearch
+                , User?.Identity?.Name
+                , HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString()
+                , "Insolvence"
+                , res.IsValid ? "valid" : "invalid"
+                , res.Q, res.OrigQuery);
+
+            return View(res);
+        }
+
+
         public async Task<ActionResult> Hledat(Repositories.Searching.InsolvenceSearchResult model)
         {
             if (IsLimitedView())
@@ -39,7 +73,7 @@ namespace HlidacStatu.Web.Controllers
                 , HlidacStatu.Util.RealIpAddress.GetIp(HttpContext)?.ToString()
                 , "Insolvence"
                 , "no_access"
-                , model?.Q,null);
+                , model?.Q, null);
                 return RedirectToAction("PristupOmezen", "Insolvence");
             }
 
@@ -49,7 +83,7 @@ namespace HlidacStatu.Web.Controllers
                 return View(new Repositories.Searching.InsolvenceSearchResult());
             }
 
-            var res = await InsolvenceRepo.Searching.SimpleSearchAsync(model);
+            Repositories.Searching.InsolvenceSearchResult res = await InsolvenceRepo.Searching.SimpleSearchAsync(model);
 
             AuditRepo.Add(
                 Audit.Operations.UserSearch

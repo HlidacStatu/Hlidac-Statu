@@ -22,7 +22,7 @@ namespace HlidacStatu.XLib
             public bool OsobaFtx = false;
             public Repositories.Searching.Search.GeneralResult<Firma> Firmy { get; set; } = null;
             public Datasets.Search.DatasetMultiResult Datasets { get; set; }
-            public InsolvenceSearchResult Insolvence { get; set; } = new();
+            public InsolvenceFulltextSearchResult Insolvence { get; set; } = new();
             public DotaceSearchResult Dotace { get; set; } = null;
 
             public List<Registration> DatasetRegistrations { get; set; } = new();
@@ -233,9 +233,9 @@ namespace HlidacStatu.XLib
                         {
                             Devmasters.DT.StopWatchEx sw = new Devmasters.DT.StopWatchEx();
                             sw.Start();
-                            var iqu = new InsolvenceSearchResult { Q = query, PageSize = insolvenceSize, Order = order };
+                            var iqu = new InsolvenceFulltextSearchResult { Q = query, PageSize = insolvenceSize, Order = order };
                             res.Insolvence = iqu;
-                            res.Insolvence = await InsolvenceRepo.Searching.SimpleSearchAsync(new InsolvenceSearchResult
+                            res.Insolvence = await InsolvenceRepo.Searching.SimpleFulltextSearchAsync(new InsolvenceFulltextSearchResult
                             {
                                 Q = query,
                                 PageSize = insolvenceSize,

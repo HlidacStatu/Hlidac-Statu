@@ -69,7 +69,7 @@ Content-Type: text/html; charset=utf-8
     @if (Model.AddResults > 0)
     {
         <p>Zobrazujeme prvních 30 insolvencí, ale nalezli jsme jich celkem @Model.TotalTxt.<br /> 
-        Zde můžete <a href="https://www.hlidacstatu.cz/Insolvence/Hledat?Q=@(Html.Raw(System.Web.HttpUtility.UrlEncode(Model.SpecificQuery)))&utm_source=hlidac&utm_medium=emailtxt&utm_campaign=more">zobrazit všechny nalezené zakázky</a>
+        Zde můžete <a href="https://www.hlidacstatu.cz/Insolvence/HledatFtx?Q=@(Html.Raw(System.Web.HttpUtility.UrlEncode(Model.SpecificQuery)))&utm_source=hlidac&utm_medium=emailtxt&utm_campaign=more">zobrazit všechny nalezené zakázky</a>
         </p>
     }
 

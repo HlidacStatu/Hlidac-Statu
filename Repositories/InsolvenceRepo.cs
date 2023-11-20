@@ -87,7 +87,7 @@ namespace HlidacStatu.Repositories
 
         private static Task<InsolvenceSearchResult> NewSubjektVInsolvenciAsync(int count, string typ, bool limitedView)
         {
-            return InsolvenceRepo.Searching.SimpleSearchAsync("rizeni.dluznici.typ:" + typ, 1, count,
+            return InsolvenceRepo.Searching.SimpleSearchAsync("dluznici.typ:" + typ, 1, count,
                 (int)InsolvenceSearchResult.InsolvenceOrderResult.DateAddedDesc, false, limitedView, null);
         }
 

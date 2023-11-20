@@ -60,9 +60,74 @@ namespace HlidacStatu.Repositories
                     new Holding("holdingspravce:", "icospravce:"),
 
                     new TransformPrefixWithValue("ico:",
-						"(rizeni.dluznici.iCO:${q} OR rizeni.veritele.iCO:${q} OR rizeni.spravci.iCO:${q}) ", null),
+						"(dluznici.iCO:${q} OR veritele.iCO:${q} OR spravci.iCO:${q}) ", null),
                     new TransformPrefixWithValue("jmeno:",
-						"(rizeni.dluznici.plneJmeno:${q} OR rizeni.veritele.plneJmeno:${q} OR rizeni.spravci.plneJmeno:${q})", null),
+						"(dluznici.plneJmeno:${q} OR veritele.plneJmeno:${q} OR spravci.plneJmeno:${q})", null),
+
+                    new TransformPrefix("icodluznik:", "dluznici.iCO:", null),
+                    new TransformPrefix("icoveritel:", "veritele.iCO:", null),
+                    new TransformPrefix("icospravce:", "spravci.iCO:", null),
+                    new TransformPrefix("jmenodluznik:", "dluznici.plneJmeno:", null),
+                    new TransformPrefix("jmenoveritel:", "veritele.plneJmeno:", null),
+                    new TransformPrefix("jmenospravce:", "spravci.plneJmeno:", null),
+                    new TransformPrefix("spisovaznacka:", "spisovaZnacka:", null),
+                    new TransformPrefix("id:", "spisovaZnacka:", null),
+
+                    new TransformPrefix("zmeneno:", "posledniZmena:", "[<>]?[{\\[]+"),
+                    new TransformPrefixWithValue("zmeneno:", "posledniZmena:[${q} TO ${q}||+1d}", "\\d+"),
+                    new TransformPrefix("zahajeno:", "datumZalozeni:", "[<>]?[{\\[]+"),
+                    new TransformPrefixWithValue("zahajeno:", "datumZalozeni:[${q} TO ${q}||+1d}", "\\d+"),
+
+                    new TransformPrefix("stav:", "stav:", null),
+                    new TransformPrefix("text:", "plainText:", null),
+                    new TransformPrefix("texttypdokumentu:", "popis:", null),
+                    new TransformPrefix("typdokumentu:", "typUdalosti:", null),
+                    new TransformPrefix("oddil:", "oddil:", null),
+                };
+
+
+                string modifiedQ = query; // Search.Tools.FixInvalidQuery(query, queryShorcuts, queryOperators) ?? "";
+                //check invalid query ( tag: missing value)
+
+                if (searchdata.LimitedView)
+                    modifiedQ = Query.ModifyQueryAND(modifiedQ, "onRadar:true", "NOT(odstraneny:true)");
+                else if (modifiedQ.Contains("odstraneny:") == false)
+                {
+                    modifiedQ = Query.ModifyQueryAND(modifiedQ,"NOT(odstraneny:true)");
+                }
+
+                //var qc = Lib.Search.Tools.GetSimpleQuery<Rizeni>(modifiedQ, rules); ;
+                var qc = SimpleQueryCreator.GetSimpleQuery<Rizeni>(modifiedQ, irules);
+
+                return qc;
+            }
+
+
+            public static QueryContainer GetSimpleFulltextQuery(string query)
+            {
+                return GetSimpleQuery(new InsolvenceSearchResult() { Q = query, Page = 1 });
+            }
+
+            public static QueryContainer GetSimpleFulltextQuery(InsolvenceFulltextSearchResult searchdata)
+            {
+                var query = searchdata.Q;
+
+                IRule[] irules = new IRule[]
+                {
+                    new OsobaId("osobaid:", "ico:"),
+                    new OsobaId("osobaiddluznik:", "icodluznik:"),
+                    new OsobaId("osobaidveritel:", "icoveritel:"),
+                    new OsobaId("osobaidspravce:", "icospravce:"),
+
+                    new Holding("holding:", "ico:"),
+                    new Holding("holdindluznik:", "icoplatce:"),
+                    new Holding("holdingveritel:", "icoveritel:"),
+                    new Holding("holdingspravce:", "icospravce:"),
+
+                    new TransformPrefixWithValue("ico:",
+                        "(rizeni.dluznici.iCO:${q} OR rizeni.veritele.iCO:${q} OR rizeni.spravci.iCO:${q}) ", null),
+                    new TransformPrefixWithValue("jmeno:",
+                        "(rizeni.dluznici.plneJmeno:${q} OR rizeni.veritele.plneJmeno:${q} OR rizeni.spravci.plneJmeno:${q})", null),
 
                     new TransformPrefix("icodluznik:", "rizeni.dluznici.iCO:", null),
                     new TransformPrefix("icoveritel:", "rizeni.veritele.iCO:", null),
@@ -93,11 +158,10 @@ namespace HlidacStatu.Repositories
                     modifiedQ = Query.ModifyQueryAND(modifiedQ, "rizeni.onRadar:true", "NOT(rizeni.odstraneny:true)");
 
                 //var qc = Lib.Search.Tools.GetSimpleQuery<Rizeni>(modifiedQ, rules); ;
-                var qc = SimpleQueryCreator.GetSimpleQuery<Rizeni>(modifiedQ, irules);
+                var qc = SimpleQueryCreator.GetSimpleQuery<SearchableDocument>(modifiedQ, irules);
 
                 return qc;
             }
-
 
             public static Task<InsolvenceSearchResult> SimpleSearchAsync(string query, int page, int pagesize, int order,
                 bool withHighlighting = false,
@@ -117,6 +181,98 @@ namespace HlidacStatu.Repositories
             bool withHighlighting = false,
             AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
             {
+                var client = await Manager.GetESClient_InsolvenceAsync();
+                var page = search.Page - 1 < 0 ? 0 : search.Page - 1;
+
+                var sw = new Devmasters.DT.StopWatchEx();
+                sw.Start();
+
+                //check odstraneny
+
+                search.OrigQuery = search.Q;
+                search.Q = Tools.FixInvalidQuery(search.Q ?? "", queryShorcuts, queryOperators);
+                var sq = GetSimpleQuery(search);
+
+                ISearchResponse<Rizeni> res = null;
+                try
+                {
+                    
+                    res = await client
+                        .SearchAsync<Rizeni>(s => s
+                            .Size(search.PageSize)
+                            .ExpandWildcards(Elasticsearch.Net.ExpandWildcards.All)
+                            .From(page * search.PageSize)
+                            .Source(sr => sr.Excludes(r => r.Fields("dokumenty.plainText")))
+                            .Query(q => sq)
+                            //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
+                            .Sort(ss => GetSort(search.Order))
+                            .Highlight(h => Tools.GetHighlight<Rizeni>(withHighlighting))
+                            .Aggregations(aggr => anyAggregation)
+                            .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
+                                ? true
+                                : (bool?)null)
+                        );
+
+                }
+                catch (Exception e)
+                {
+                    AuditRepo.Add(Audit.Operations.Search, "", "", "Insolvence", "error", search.Q, null);
+                    if (res != null && res.ServerError != null)
+                    {
+                        Manager.LogQueryError<Rizeni>(res, "Exception, Orig query:"
+                                                           + search.OrigQuery + "   query:"
+                                                           + search.Q
+                                                           + "\n\n res:" + search.ElasticResults.ToString()
+                            , ex: e);
+                    }
+                    else
+                    {
+                        Util.Consts.Logger.Error("", e);
+                    }
+
+                    throw;
+                }
+
+                sw.Stop();
+                AuditRepo.Add(Audit.Operations.Search, "", "", "Insolvence", res.IsValid ? "valid" : "invalid",
+                    search.Q, null);
+
+                if (res.IsValid == false)
+                {
+                    Manager.LogQueryError<Rizeni>(res, "Exception, Orig query:"
+                                                       + search.OrigQuery + "   query:"
+                                                       + search.Q
+                                                       + "\n\n res:" + search.ElasticResults?.ToString()
+                    );
+                }
+
+                search.Total = res?.Total ?? 0;
+                search.IsValid = res?.IsValid ?? false;
+                search.ElasticResults = res;
+                search.ElapsedTime = sw.Elapsed;
+                return search;
+            }
+
+
+
+            public static Task<InsolvenceFulltextSearchResult> SimpleFulltextSearchAsync(string query, int page, int pagesize, int order,
+                bool withHighlighting = false,
+                bool limitedView = true,
+                AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
+                => SimpleFulltextSearchAsync(new InsolvenceFulltextSearchResult()
+                {
+                    Q = query,
+                    Page = page,
+                    PageSize = pagesize,
+                    LimitedView = limitedView,
+                    Order = order.ToString(),
+                    ExactNumOfResults = exactNumOfResults
+                }, withHighlighting, anyAggregation);
+
+            public static async Task<InsolvenceFulltextSearchResult> SimpleFulltextSearchAsync(InsolvenceFulltextSearchResult search,
+            bool withHighlighting = false,
+            AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
+            {
                 var client = await Manager.GetESClient_InsolvenceDocsAsync();
                 var page = search.Page - 1 < 0 ? 0 : search.Page - 1;
 
@@ -124,7 +280,7 @@ namespace HlidacStatu.Repositories
                 sw.Start();
                 search.OrigQuery = search.Q;
                 search.Q = Tools.FixInvalidQuery(search.Q ?? "", queryShorcuts, queryOperators);
-                var sq = GetSimpleQuery(search);
+                var sq = GetSimpleFulltextQuery(search);
 
                 ISearchResponse<SearchableDocument> res = null;
                 try
@@ -176,7 +332,8 @@ namespace HlidacStatu.Repositories
         .Query(q => sq)
         .Collapse(c => c
             .Field(f => f.SpisovaZnacka)
-            .InnerHits(ih => ih.Name("rec").Size(1))
+            .InnerHits(ih => ih.Name("rec").Size(1).Source(ss=>ss.Excludes(ex=>ex.Field(f=>f.PlainText))))
+            
         )
         //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
         .Sort(ss => GetSort(search.Order))
@@ -202,7 +359,7 @@ namespace HlidacStatu.Repositories
                                     .InnerHits(ih => ih
                                                 .Name("rec")
                                                 .Size(1)
-                                                .Source(ss=>ss.Excludes(ex=>ex.Field(f=>f.PlainText)))
+                                                .Source(ss => ss.Excludes(ex => ex.Field(f => f.PlainText)))
                                                 )
                                 )
                                 //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
@@ -253,6 +410,7 @@ namespace HlidacStatu.Repositories
                 search.ElapsedTime = sw.Elapsed;
                 return search;
             }
+
 
             public static SortDescriptor<SearchableDocument> GetSort(string sorder)
             {

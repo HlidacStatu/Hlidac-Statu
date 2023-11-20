@@ -1,4 +1,4 @@
-﻿@model HlidacStatu.Repositories.Searching.InsolvenceSearchResult
+﻿@model HlidacStatu.Repositories.Searching.InsolvenceFulltextSearchResult
 @using HlidacStatu.Entities
 
 @if (Model?.ElasticResults?.IsValid == false || Model.ElasticResults == null)
@@ -63,16 +63,17 @@ else
         <div class="row">
             <div class="col-xs-12">
                 <h3>
-                    Nalezené insolvence                    
-                    <small>
+                    Nalezené insolvence
+                    @* diky .Collapse.Innerhits nevime pocet nalezenych insolvenci
+                        <small>
                         @HlidacStatu.Util.RenderData.Vysledky.PocetVysledku(Model.ElasticResults.HitsMetadata.Total, false, HlidacStatu.Util.RenderData.CapitalizationStyle.FirstLetterUpperCap)
-                    </small> 
+                    </small> *@
                 </h3>
 
             </div>
         </div>
 
-        <partial name="SearchResults/SearchResultsInsolvence" model="Model"></partial>
+        <partial name="SearchResults/SearchResultsInsolvenceFtx" model="Model"></partial>
 
     }
 }
