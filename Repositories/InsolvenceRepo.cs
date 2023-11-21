@@ -80,7 +80,7 @@ namespace HlidacStatu.Repositories
 
  
         public static Task<InsolvenceSearchResult> NewFirmyVInsolvenciAsync(int count, bool limitedView) 
-            => NewSubjektVInsolvenciAsync(count, "P", limitedView);
+            => NewSubjektVInsolvenciAsync(count, "P OR dluznici.typ:PODNIKATEL", limitedView);
 
         public static Task<InsolvenceSearchResult> NewOsobyVInsolvenciAsync(int count, bool limitedView) 
             => NewSubjektVInsolvenciAsync(count, "F", limitedView);

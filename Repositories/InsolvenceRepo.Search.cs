@@ -60,9 +60,9 @@ namespace HlidacStatu.Repositories
                     new Holding("holdingspravce:", "icospravce:"),
 
                     new TransformPrefixWithValue("ico:",
-						"(dluznici.iCO:${q} OR veritele.iCO:${q} OR spravci.iCO:${q}) ", null),
+                        "(dluznici.iCO:${q} OR veritele.iCO:${q} OR spravci.iCO:${q}) ", null),
                     new TransformPrefixWithValue("jmeno:",
-						"(dluznici.plneJmeno:${q} OR veritele.plneJmeno:${q} OR spravci.plneJmeno:${q})", null),
+                        "(dluznici.plneJmeno:${q} OR veritele.plneJmeno:${q} OR spravci.plneJmeno:${q})", null),
 
                     new TransformPrefix("icodluznik:", "dluznici.iCO:", null),
                     new TransformPrefix("icoveritel:", "veritele.iCO:", null),
@@ -93,7 +93,7 @@ namespace HlidacStatu.Repositories
                     modifiedQ = Query.ModifyQueryAND(modifiedQ, "onRadar:true", "NOT(odstraneny:true)");
                 else if (modifiedQ.Contains("odstraneny:") == false)
                 {
-                    modifiedQ = Query.ModifyQueryAND(modifiedQ,"NOT(odstraneny:true)");
+                    modifiedQ = Query.ModifyQueryAND(modifiedQ, "NOT(odstraneny:true)");
                 }
 
                 //var qc = Lib.Search.Tools.GetSimpleQuery<Rizeni>(modifiedQ, rules); ;
@@ -196,7 +196,7 @@ namespace HlidacStatu.Repositories
                 ISearchResponse<Rizeni> res = null;
                 try
                 {
-                    
+
                     res = await client
                         .SearchAsync<Rizeni>(s => s
                             .Size(search.PageSize)
@@ -205,7 +205,7 @@ namespace HlidacStatu.Repositories
                             .Source(sr => sr.Excludes(r => r.Fields("dokumenty.plainText")))
                             .Query(q => sq)
                             //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
-                            .Sort(ss => GetSort(search.Order))
+                            .Sort(ss => InsolvenceSearchResult.GetSort(search.Order))
                             .Highlight(h => Tools.GetHighlight<Rizeni>(withHighlighting))
                             .Aggregations(aggr => anyAggregation)
                             .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
@@ -255,7 +255,8 @@ namespace HlidacStatu.Repositories
 
 
 
-            public static Task<InsolvenceFulltextSearchResult> SimpleFulltextSearchAsync(string query, int page, int pagesize, int order,
+            public static Task<InsolvenceFulltextSearchResult> SimpleFulltextSearchAsync(string query,
+                int page, int pagesize, int order,
                 bool withHighlighting = false,
                 bool limitedView = true,
                 AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
@@ -269,7 +270,8 @@ namespace HlidacStatu.Repositories
                     ExactNumOfResults = exactNumOfResults
                 }, withHighlighting, anyAggregation);
 
-            public static async Task<InsolvenceFulltextSearchResult> SimpleFulltextSearchAsync(InsolvenceFulltextSearchResult search,
+            public static async Task<InsolvenceFulltextSearchResult> SimpleFulltextSearchAsync(
+                InsolvenceFulltextSearchResult search,
             bool withHighlighting = false,
             AggregationContainerDescriptor<Rizeni> anyAggregation = null, bool exactNumOfResults = false)
             {
@@ -332,11 +334,11 @@ namespace HlidacStatu.Repositories
         .Query(q => sq)
         .Collapse(c => c
             .Field(f => f.SpisovaZnacka)
-            .InnerHits(ih => ih.Name("rec").Size(1).Source(ss=>ss.Excludes(ex=>ex.Field(f=>f.PlainText))))
-            
+            .InnerHits(ih => ih.Name("rec").Size(1).Source(ss => ss.Excludes(ex => ex.Field(f => f.PlainText))))
+
         )
         //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
-        .Sort(ss => GetSort(search.Order))
+        .Sort(ss => InsolvenceFulltextSearchResult.GetSort(search.Order))
         .Highlight(h => Tools.GetHighlight<Rizeni>(withHighlighting))
         .Aggregations(aggr => anyAggregation)
         .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
@@ -363,7 +365,7 @@ namespace HlidacStatu.Repositories
                                                 )
                                 )
                                 //.Sort(ss => new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending()))
-                                .Sort(ss => GetSort(search.Order))
+                                .Sort(ss => InsolvenceFulltextSearchResult.GetSort(search.Order))
                                 .Highlight(h => Tools.GetHighlight<Rizeni>(false))
                                 .Aggregations(aggr => anyAggregation)
                                 .TrackTotalHits(search.ExactNumOfResults || page * search.PageSize == 0
@@ -412,41 +414,6 @@ namespace HlidacStatu.Repositories
             }
 
 
-            public static SortDescriptor<SearchableDocument> GetSort(string sorder)
-            {
-                InsolvenceSearchResult.InsolvenceOrderResult order = InsolvenceSearchResult.InsolvenceOrderResult
-                    .Relevance;
-                Enum.TryParse<InsolvenceSearchResult.InsolvenceOrderResult>(sorder, out order);
-                return GetSort(order);
-            }
-
-            public static SortDescriptor<SearchableDocument> GetSort(InsolvenceSearchResult.InsolvenceOrderResult order)
-            {
-                SortDescriptor<SearchableDocument> s = new SortDescriptor<SearchableDocument>().Field(f => f.Field("_score").Descending());
-                switch (order)
-                {
-                    case InsolvenceSearchResult.InsolvenceOrderResult.DateAddedDesc:
-                        s = new SortDescriptor<SearchableDocument>().Field(m => m.Field(f => f.Rizeni.DatumZalozeni).Descending());
-                        break;
-                    case InsolvenceSearchResult.InsolvenceOrderResult.DateAddedAsc:
-                        s = new SortDescriptor<SearchableDocument>().Field(m => m.Field(f => f.Rizeni.DatumZalozeni).Ascending());
-                        break;
-                    case InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc:
-                        s = new SortDescriptor<SearchableDocument>().Field(m => m.Field(f => f.Rizeni.PosledniZmena).Descending());
-                        break;
-                    case InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateAsc:
-                        s = new SortDescriptor<SearchableDocument>().Field(m => m.Field(f => f.Rizeni.PosledniZmena).Ascending());
-                        break;
-                    case InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll:
-                        s = new SortDescriptor<SearchableDocument>().Field(f => f.Field("_doc"));
-                        break;
-                    case InsolvenceSearchResult.InsolvenceOrderResult.Relevance:
-                    default:
-                        break;
-                }
-
-                return s;
-            }
         }
     }
 }
