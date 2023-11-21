@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Hlidac-Statu-Private\MLUtils\MLUtil.csproj" />
       <ProjectReference Include="..\Entities\Entities.csproj" />
       <ProjectReference Include="..\Lib.Data.External\Lib.Data.External.csproj" />
       <ProjectReference Include="..\Util\Util.csproj" />

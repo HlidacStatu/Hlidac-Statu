@@ -20,6 +20,7 @@ using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Entities.Views;
 using HlidacStatu.Lib.Data.External.RPP;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
+using Microsoft.AspNetCore.Identity;
 
 namespace HlidacStatu.Extensions
 {
@@ -268,7 +269,7 @@ namespace HlidacStatu.Extensions
                 return res.ToArray();
             }
         }
-        public static async Task<(string jmeno, string prijmeni, DateTime? poslednizmena)[]> CeoFromRPPAsync(this Firma firma)
+        public static async Task<(string jmeno, string prijmeni, DateTime? poslednizmena)[]> CeosFromRPPAsync(this Firma firma)
         {
             List<(string jmeno, string prijmeni, DateTime? poslednizmena)> osoby = new List<(string jmeno, string prijmeni, DateTime? poslednizmena)>();
             var client = await Manager.GetESClient_RPP_OVMAsync();
@@ -288,7 +289,7 @@ namespace HlidacStatu.Extensions
             return osoby.ToArray();
 
         }
-        public static async Task<OVMFull.Osoba[]> CeoFromRPP_FullAsync(this Firma firma)
+        public static async Task<OVMFull.Osoba[]> CeosFromRPP_FullAsync(this Firma firma)
         {
             List<(string jmeno, string prijmeni, DateTime? poslednizmena)> osoby = new List<(string jmeno, string prijmeni, DateTime? poslednizmena)>();
             var client = await Manager.GetESClient_RPP_OVMAsync();
@@ -327,6 +328,29 @@ namespace HlidacStatu.Extensions
                     return (null, null, null);
 
                 return (lastCeo, ceoEvent.DatumOd, ceoEvent.AddInfo);
+            }
+        }
+        public static (Osoba Osoba, DateTime? From, string Role)[] Ceos(this Firma firma)
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                var ceoEvent = db.OsobaEvent.AsQueryable()
+                    .Where(oe => oe.Ceo == 1 && oe.Ico == firma.ICO)
+                    .Where(oe => oe.DatumDo == null || oe.DatumDo >= DateTime.Now)
+                    .Where(oe => oe.DatumOd != null && oe.DatumOd <= DateTime.Now)
+                    .OrderByDescending(oe => oe.DatumOd)
+                    .ToArray()
+                    .Select<OsobaEvent, (Osoba Osoba, DateTime? From, string Role)>(m=> 
+                    {
+                        var ret = (OsobaRepo.GetByInternalId(m.OsobaId), m.DatumOd, m.AddInfo);
+                        return ret;
+                        })
+                    .ToArray();
+
+                if (ceoEvent is null)
+                    return Array.Empty<(Osoba Osoba, DateTime? From, string Role)>();
+
+                return ceoEvent;
             }
         }
 
