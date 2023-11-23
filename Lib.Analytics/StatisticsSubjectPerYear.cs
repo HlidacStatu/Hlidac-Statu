@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace HlidacStatu.Lib.Analytics
 {
-    // !!!!! Michale, za žádnou cenu sem nedávej ToNiceString !!!! 
-    // Nebo začne bůh topit koťátka, dokud ti to nesmažu! :-D
-
+    [JsonConverter(typeof(StatisticsPerYearConverter))]
     public class StatisticsSubjectPerYear<T> : StatisticsPerYear<T>
         where T : CoreStat, IAddable<T>, new()
     {
         public string ICO { get; set; }
-
-
+        [JsonInclude]
+        private int _pokusek { get; set; }= 5;
+        
+        [JsonConstructor]
         public StatisticsSubjectPerYear()
         : base()
         { }
