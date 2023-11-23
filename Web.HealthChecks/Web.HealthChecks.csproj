@@ -16,7 +16,7 @@
 		<PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="7.0.0" />
 		<PackageReference Include="AspNetCore.HealthChecks.Uris" Version="7.0.0" />
 		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Extension" Version="8.0.3" />
-		<PackageReference Include="Devmasters.Core" Version="5.0.0" />
+		<PackageReference Include="Devmasters.Core" Version="5.0.1" />
 		<PackageReference Include="Docker.DotNet" Version="3.125.15" />
 		<PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.3.0.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.0" />
