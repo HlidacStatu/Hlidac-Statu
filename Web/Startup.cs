@@ -149,7 +149,7 @@ namespace HlidacStatu.Web
                     policyBuilder.WaitAndRetryAsync(
                         3, retryNumber => TimeSpan.FromMilliseconds(10)));
             
-            services.AddServerSideBlazor();
+            services.AddServerSideBlazor().AddInteractiveServerComponents();
 
             services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
 
@@ -276,7 +276,6 @@ namespace HlidacStatu.Web
             app.UseAuthorization();
 
             Util.Consts.Logger.Info("Starting web application {version}", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString());
-
             _ = app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -301,7 +300,9 @@ namespace HlidacStatu.Web
                     defaults: new { controller = "Data", action = "Index" });
 
                 endpoints.MapRazorPages();
-                endpoints.MapBlazorHub();
+                endpoints.MapRazorComponents<AutocompleteWrap>()
+                    .AddInteractiveServerRenderMode();
+                //endpoints.MapBlazorHub();
             });
 
         }
