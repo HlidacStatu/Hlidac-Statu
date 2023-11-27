@@ -46,7 +46,7 @@ namespace HlidacStatu.Web.Controllers
             model.LimitedView = IsLimitedView();
             if (model == null || ModelState.IsValid == false || model.LimitedView)
             {
-                return View(new Repositories.Searching.InsolvenceSearchResult());
+                return View(new Repositories.Searching.InsolvenceFulltextSearchResult());
             }
 
             Repositories.Searching.InsolvenceFulltextSearchResult res = await InsolvenceRepo.Searching.SimpleFulltextSearchAsync(new Repositories.Searching.InsolvenceFulltextSearchResult(model));
