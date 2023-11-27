@@ -303,7 +303,7 @@ namespace HlidacStatu.Repositories
                                          foreach (var i in res.ElasticResults.Hits.Select(m => m.Source))
                                          {
                                              bool addToList = false;
-                                             var pdluznici = i.Rizeni.Dluznici.Where(m => icos.Contains(m.ICO));
+                                             var pdluznici = i.Dluznici.Where(m => icos.Contains(m.ICO));
                                              if (pdluznici.Count() > 0)
                                              {
                                                  foreach (var pd in pdluznici)
@@ -312,7 +312,7 @@ namespace HlidacStatu.Repositories
                                                      var vazby = o.VazbyProICO(pd.ICO);
                                                      foreach (var v in vazby)
                                                      {
-                                                         if (Devmasters.DT.Util.IsOverlappingIntervals(i.Rizeni.DatumZalozeni, i.Rizeni.PosledniZmena, v.RelFrom, v.RelTo))
+                                                         if (Devmasters.DT.Util.IsOverlappingIntervals(i.DatumZalozeni, i.PosledniZmena, v.RelFrom, v.RelTo))
                                                          {
                                                              addToList = true;
                                                              goto addList;
@@ -322,7 +322,7 @@ namespace HlidacStatu.Repositories
                                              }
                                          addList:
                                              if (addToList)
-                                                 insolvenceIntoList.Add(i.Rizeni);
+                                                 insolvenceIntoList.Add(i);
                                          }
                                          if (insolvenceIntoList.Count() > 0)
                                          {

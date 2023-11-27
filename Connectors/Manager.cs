@@ -51,6 +51,7 @@ namespace HlidacStatu.Connectors
             RPP_ISVS,
             InDocTableCells,
             DocumentHistory,
+            SplitSmlouvy
         }
 
         public static string defaultIndexName = "hlidacsmluv";
@@ -85,6 +86,8 @@ namespace HlidacStatu.Connectors
         public static string defaultIndexName_RPP_Kategorie = "rpp_kategorie";
         public static string defaultIndexName_RPP_OVM = "rpp_ovm";
         public static string defaultIndexName_RPP_ISVS = "rpp_isvs";
+
+        public static string defaultIndexName_SplitSmlouvy = "SplitSmlouvy";
 
 
         private static SemaphoreSlim _clientSemaphore = new SemaphoreSlim(1, 1);
@@ -223,6 +226,11 @@ namespace HlidacStatu.Connectors
             return GetESClientAsync(defaultIndexName_InsolvenceDocs, timeOut, connectionLimit, IndexType.InsolvenceDocs);
         }
 
+        public static Task<ElasticClient> GetESClient_SplitSmlouvyAsync(int timeOut = 60000, int connectionLimit = 80)
+        {
+            return GetESClientAsync(defaultIndexName_SplitSmlouvy, timeOut, connectionLimit, IndexType.SplitSmlouvy);
+        }
+        
         //public static ElasticClient GetESClient_Uptime(int timeOut = 60000, int connectionLimit = 80)
         //{
         //    return GetESClient(defaultIndexName_Uptime, timeOut, connectionLimit, IndexType.UptimeItem);
@@ -550,6 +558,15 @@ namespace HlidacStatu.Connectors
                        .CreateAsync(indexName, i => i
                            .InitializeUsing(idxSt)
                            .Map<Entities.Insolvence.SearchableDocument>(map => map.AutoMap().DateDetection(false))
+                       );
+                    break;
+                case IndexType.SplitSmlouvy:
+                    idxSt.Settings.NumberOfShards = 2;
+                    idxSt.Settings.RefreshInterval = "15s";
+                    res = await client.Indices
+                       .CreateAsync(indexName, i => i
+                           .InitializeUsing(idxSt)
+                           .Map<HlidacStatu.MLUtil.Splitter.SplitSmlouva>(map => map.AutoMap().DateDetection(false))
                        );
                     break;
                 case IndexType.Dotace:

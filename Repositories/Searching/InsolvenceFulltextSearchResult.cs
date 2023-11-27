@@ -6,24 +6,41 @@ using System.Linq;
 
 namespace HlidacStatu.Repositories.Searching
 {
-    public class InsolvenceSearchResult : SearchDataResult<Rizeni>
+    public class InsolvenceFulltextSearchResult : SearchDataResult<SearchableDocument>
     {
-        public InsolvenceSearchResult()
+
+        public InsolvenceFulltextSearchResult(InsolvenceSearchResult query)
+        {
+            this.DataSource = query.DataSource;
+            this.Order = query.Order;
+            this.OrigQuery = query.OrigQuery;
+            this.Page = query.Page;
+            this.PageSize = query.PageSize;
+            this.LimitedView = query.LimitedView;   
+            this.Q = query.Q;
+            this.Query = query.Query;
+            this.OrderList = query.OrderList;
+            this.ShowWatchdog = query.ShowWatchdog;
+            this.SmallRender = query.SmallRender;            
+
+        }
+
+        public InsolvenceFulltextSearchResult()
             : base(getVZOrderList)
         {
         }
 
-        public IEnumerable<Rizeni> Results
+        public IEnumerable<SearchableDocument> Results
         {
             get
             {
                 if (ElasticResults != null)
                     return ElasticResults.Hits
-                        .Select(m => m.InnerHits["rec"].Documents<Rizeni>().FirstOrDefault())
-                        .Where(m=>m!=null)
+                        .Select(m => m.InnerHits["rec"].Documents<SearchableDocument>().FirstOrDefault())
+                        .Where(m => m != null)
                         ;
                 else
-                    return new Rizeni[] { };
+                    return new SearchableDocument[] { };
             }
         }
 
@@ -86,7 +103,7 @@ namespace HlidacStatu.Repositories.Searching
         }
 
 
-        public static SortDescriptor<Rizeni> GetSort(string sorder)
+        public static SortDescriptor<SearchableDocument> GetSort(string sorder)
         {
             InsolvenceSearchResult.InsolvenceOrderResult order = InsolvenceSearchResult.InsolvenceOrderResult
                 .Relevance;
@@ -94,25 +111,25 @@ namespace HlidacStatu.Repositories.Searching
             return GetSort(order);
         }
 
-        public static SortDescriptor<Rizeni> GetSort(InsolvenceSearchResult.InsolvenceOrderResult order)
+        public static SortDescriptor<SearchableDocument> GetSort(InsolvenceSearchResult.InsolvenceOrderResult order)
         {
-            SortDescriptor<Rizeni> s = new SortDescriptor<Rizeni>().Field(f => f.Field("_score").Descending());
+            SortDescriptor<SearchableDocument> s = new SortDescriptor<SearchableDocument>().Field(f => f.Field("_score").Descending());
             switch (order)
             {
                 case InsolvenceSearchResult.InsolvenceOrderResult.DateAddedDesc:
-                    s = new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.DatumZalozeni).Descending());
+                    s = new SortDescriptor<SearchableDocument>().Field(m => m.Field(f => f.Rizeni.DatumZalozeni).Descending());
                     break;
                 case InsolvenceSearchResult.InsolvenceOrderResult.DateAddedAsc:
-                    s = new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.DatumZalozeni).Ascending());
+                    s = new SortDescriptor<SearchableDocument>().Field(m => m.Field(f => f.Rizeni.DatumZalozeni).Ascending());
                     break;
                 case InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc:
-                    s = new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Descending());
+                    s = new SortDescriptor<SearchableDocument>().Field(m => m.Field(f => f.Rizeni.PosledniZmena).Descending());
                     break;
                 case InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateAsc:
-                    s = new SortDescriptor<Rizeni>().Field(m => m.Field(f => f.PosledniZmena).Ascending());
+                    s = new SortDescriptor<SearchableDocument>().Field(m => m.Field(f => f.Rizeni.PosledniZmena).Ascending());
                     break;
                 case InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll:
-                    s = new SortDescriptor<Rizeni>().Field(f => f.Field("_doc"));
+                    s = new SortDescriptor<SearchableDocument>().Field(f => f.Field("_doc"));
                     break;
                 case InsolvenceSearchResult.InsolvenceOrderResult.Relevance:
                 default:

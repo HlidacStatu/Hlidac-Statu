@@ -31,8 +31,8 @@ namespace HlidacStatu.XLib.Watchdogs
         {
             var query = "posledniZmena:" +
                         string.Format("[* TO {0}]", Repositories.Searching.Tools.ToElasticDate(toDate));
-            var res = await InsolvenceRepo.Searching.SimpleSearchAsync(query, 0, 1,
-                (int)Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.LatestUpdateDesc,
+            var res = await InsolvenceRepo.Searching.SimpleFulltextSearchAsync(query, 0, 1,
+                (int)Repositories.Searching.InsolvenceFulltextSearchResult.InsolvenceOrderResult.LatestUpdateDesc,
                 false, isLimited);
 
             if (res.IsValid == false)
@@ -163,7 +163,7 @@ namespace HlidacStatu.XLib.Watchdogs
 
             <tr><td colspan='6' height='30' style='line-height: 30px; min-height: 30px;'></td></tr>
             <tr><td colspan='6'>    
-                <a href='https://www.hlidacstatu.cz/insolvence/hledat?Q={{ html.url_encode model.SearchQuery }}&utm_source=hlidac&utm_medium=emailtxt&utm_campaign=more'>
+                <a href='https://www.hlidacstatu.cz/insolvence/hledatFtx?Q={{ html.url_encode model.SearchQuery }}&utm_source=hlidac&utm_medium=emailtxt&utm_campaign=more'>
                     {{ fn_Pluralize (model.Total - 5) '' 'Další nalezená insolvence' 'Další {0} nalezené insolvence' 'Dalších {0} nalezených insolvencí' }} 
                 </a>.
             </td></tr>

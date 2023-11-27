@@ -114,7 +114,7 @@ namespace HlidacStatu.Web.Controllers
     </g>
 </svg>
 ";
-        [ResponseCache(Duration = 60*60*2, Location = ResponseCacheLocation.Client, VaryByQueryKeys =new string[] {"*" })]
+        [ResponseCache(Duration = 60*10, Location = ResponseCacheLocation.Client, VaryByQueryKeys =new string[] {"*" })]
         public ActionResult Photo(string id, [FromQuery] Osoba.PhotoTypes phototype, [FromQuery] bool rnd, [FromQuery] string f)
         {
             //string noPhotoPath = $"Content{Path.DirectorySeparatorChar}Img{Path.DirectorySeparatorChar}personNoPhoto.png";

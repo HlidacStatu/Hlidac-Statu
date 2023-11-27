@@ -384,18 +384,18 @@
         laps.StopPreviousAndStartNextLap("insolvence");
     }
     @{
-        var oinsDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("rizeni.dluznici.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
-        var oinsVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("rizeni.veritele.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
-        var oinsSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync("rizeni.spravci.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var oinsDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("dluznici.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var oinsVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("veritele.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var oinsSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync("spravci.osobaId:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
 
         Dictionary<string, long> oinsolv = new();
         oinsolv.Add("dluznici|dlužník|dlužníka|dlužníkem", oinsDluznik.Total);
         oinsolv.Add("veritele|věřitel|věřitele|veřitelem", oinsVeritel.Total);
         oinsolv.Add("spravci|insolvenční správce|insolvenčního správce|insolvenčním správcem", oinsSpravce.Total);
 
-        var insDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("rizeni.odstraneny:false AND osobaIddluznik:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
-        var insVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("rizeni.odstraneny:false AND osobaIdveritel:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
-        var insSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync("rizeni.odstraneny:false AND osobaIdspravce:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var insDluznik = await InsolvenceRepo.Searching.SimpleSearchAsync("odstraneny:false AND osobaIddluznik:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var insVeritel = await InsolvenceRepo.Searching.SimpleSearchAsync("odstraneny:false AND osobaIdveritel:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
+        var insSpravce = await InsolvenceRepo.Searching.SimpleSearchAsync("odstraneny:false AND osobaIdspravce:" + Model.NameId, 1, 1, (int)HlidacStatu.Repositories.Searching.InsolvenceSearchResult.InsolvenceOrderResult.FastestForScroll, false, HlidacStatu.Web.Framework.InsolvenceLimitedView.IsLimited(this.User));
 
         Dictionary<string, long> insolv = new();
         insolv.Add("dluznik|dlužník|dlužníka|dlužníkem", insDluznik.Total);
@@ -433,6 +433,13 @@
                     </ul>
                 </p>
             }
+            else
+            {
+                <p>
+                    @Model.FullName() se osobně nevyskytuje v insolvenčním rejstříku.
+                </p>
+            }
+
             @if (insolv.Sum(m => m.Value) > 0)
             {
                 <p>

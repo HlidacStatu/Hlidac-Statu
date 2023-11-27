@@ -305,7 +305,7 @@ else if (Model.HasResults == false)
     {
         if (Model.HasInsolvence)
         {
-            htmlLinks.Add(new Tuple<string, string>(Url.Action("Hledat", "Insolvence", Model.Insolvence.ToRouteValues(1)), Devmasters.Lang.CS.Plural.Get(Model.Insolvence.Total, "<b>jednu insolvenci</b>", "<b>{0} insolvence</b>", "<b>{0} insolvencí</b>")));
+            htmlLinks.Add(new Tuple<string, string>(Url.Action("HledatFtx", "Insolvence", Model.Insolvence.ToRouteValues(1)), Devmasters.Lang.CS.Plural.Get(Model.Insolvence.Total, "<b>jednu insolvenci</b>", "<b>{0} insolvence</b>", "<b>{0} insolvencí</b>")));
         }
     }
     else if (part == nameof(OsobaSearchResult))
