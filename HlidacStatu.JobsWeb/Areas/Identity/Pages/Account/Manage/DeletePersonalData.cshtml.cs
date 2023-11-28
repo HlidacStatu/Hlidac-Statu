@@ -2,11 +2,12 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Util;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account.Manage
+namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
 {
     public class DeletePersonalDataModel : PageModel
     {
@@ -72,7 +73,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account.Manage
 
             await _signInManager.SignOutAsync();
 
-            Util.Consts.Logger.Info($"User with ID '{userId}' deleted themselves.");
+            Consts.Logger.Info($"User with ID '{userId}' deleted themselves.");
 
             return Redirect("~/");
         }

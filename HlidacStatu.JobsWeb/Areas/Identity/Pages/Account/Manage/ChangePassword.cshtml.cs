@@ -1,11 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Util;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account.Manage
+namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
 {
     public class ChangePasswordModel : PageModel
     {
@@ -86,7 +87,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            Util.Consts.Logger.Info("User changed their password successfully.");
+            Consts.Logger.Info("User changed their password successfully.");
             StatusMessage = "Your password has been changed.";
 
             return RedirectToPage();

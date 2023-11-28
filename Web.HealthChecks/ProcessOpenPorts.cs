@@ -1,4 +1,7 @@
-﻿
+﻿extern alias IPNetwork2;
+
+using IPNETWORK = IPNetwork2.System.Net.IPNetwork;
+
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 using System;
@@ -14,15 +17,13 @@ namespace HlidacStatu.Web.HealthChecks
 {
     public class ProcessOpenPorts : IHealthCheck
     {
-
-
-        static IPNetwork[] radWareIPs = new string[] {
+        static IPNETWORK[] radWareIPs = new string[] {
             "141.226.101.0/24",
             "66.22.0.0/17",
             "159.122.76.110",
             "141.226.97.0/24 "
             }
-            .Select(i => IPNetwork.Parse(i))
+            .Select(i => IPNETWORK.Parse(i))
             .ToArray();
 
         int warningThreshold = 4000;

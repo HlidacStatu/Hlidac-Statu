@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account.Manage
+namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
 {
     public static class ManageNavPages
     {

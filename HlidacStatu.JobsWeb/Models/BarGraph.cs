@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace HlidacStatu.Ceny.Models
+namespace WatchdogAnalytics.Models
 {
     public class BarGraph
     {

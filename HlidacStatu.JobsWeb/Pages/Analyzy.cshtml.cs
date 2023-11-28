@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace HlidacStatu.Ceny.Pages
+namespace WatchdogAnalytics.Pages
 {
     public class AnalyzyModel : PageModel
     {

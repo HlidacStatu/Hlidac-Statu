@@ -14,13 +14,13 @@
 
 	<ItemGroup>
 		<PackageReference Include="DeepCloner" Version="0.10.4" />
-		<PackageReference Include="Devmasters.DT" Version="4.5.3.1" />
-		<PackageReference Include="Devmasters.Enums" Version="4.5.1.1" />
-		<PackageReference Include="itext7" Version="8.0.1" />
+		<PackageReference Include="Devmasters.DT" Version="5.0.0" />
+		<PackageReference Include="Devmasters.Enums" Version="5.0.0" />
+		<PackageReference Include="itext7" Version="8.0.2" />
 		<PackageReference Include="MimeMapping" Version="2.0.0" />
 		<PackageReference Include="NEST" Version="7.17.5" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="WordcabTranscribe.SpeechToText" Version="4.5.23.1" />
+		<PackageReference Include="WordcabTranscribe.SpeechToText" Version="5.0.0" />
 	</ItemGroup>
 
 </Project>

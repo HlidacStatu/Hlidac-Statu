@@ -602,17 +602,7 @@ namespace HlidacStatu.Web.Controllers
                 allData: HttpContext.User.IsInRole("Admin"),
                 docsContent: true
             );
-            var s = Newtonsoft.Json.JsonConvert.SerializeObject(
-                smodel,
-                new Newtonsoft.Json.JsonSerializerSettings()
-                {
-                    Formatting = (Request.Query["nice"] == "1"
-                        ? Newtonsoft.Json.Formatting.Indented
-                        : Newtonsoft.Json.Formatting.None),
-                    //NullValueHandling = NullValueHandling.Ignore,         
-                    ContractResolver = new Util.FirstCaseLowercaseContractResolver()
-                }
-            );
+            var s = System.Text.Json.JsonSerializer.Serialize(smodel);
 
             return Content(s, "application/json");
         }

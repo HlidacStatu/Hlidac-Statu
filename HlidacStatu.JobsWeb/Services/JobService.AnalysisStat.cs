@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using HlidacStatu.Ceny.Models;
+using WatchdogAnalytics.Models;
 
-namespace HlidacStatu.Ceny.Services
+namespace WatchdogAnalytics.Services
 {
     public static partial class JobService
     {

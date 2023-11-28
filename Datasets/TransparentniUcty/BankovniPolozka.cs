@@ -4,30 +4,11 @@ using System.Threading.Tasks;
 
 namespace HlidacStatu.Datasets.TransparentniUcty
 {
-    public class BankovniPolozka : IEqualityComparer<BankovniPolozka>, Plugin.TransparetniUcty.IBankovniPolozka
+    public class BankovniPolozka : IEqualityComparer<BankovniPolozka>
     {
         private static DataSet _client =
             DataSet.CachedDatasets.Get("transparentni-ucty-transakce");
-
-        public BankovniPolozka() { }
-        public BankovniPolozka(Plugin.TransparetniUcty.IBankovniPolozka ip)
-        {
-            AddId = ip.AddId;
-            Castka = ip.Castka;
-            CisloProtiuctu = ip.CisloProtiuctu;
-            CisloUctu = ip.CisloUctu;
-            Datum = ip.Datum;
-            Id = ip.Id;
-            KS = ip.KS;
-            NazevProtiuctu = ip.NazevProtiuctu;
-            PopisTransakce = ip.PopisTransakce;
-            SS = ip.SS;
-            VS = ip.VS;
-            ZdrojUrl = ip.ZdrojUrl;
-            ZpravaProPrijemce = ip.ZpravaProPrijemce;
-
-        }
-
+        
         //idu,majitel,nazev,datum,protiucet,popis,valuta,typ,castka,poznamka
         public string Id { get; set; } = null;
 

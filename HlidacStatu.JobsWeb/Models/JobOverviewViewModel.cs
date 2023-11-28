@@ -1,4 +1,4 @@
-namespace HlidacStatu.Ceny.Models
+namespace WatchdogAnalytics.Models
 {
     public class JobOverviewViewModel
     {

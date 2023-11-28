@@ -44,12 +44,9 @@ namespace HlidacStatu.Repositories
 
             if (s == null)
                 return null;
-
-            var settings = new JsonSerializerSettings();
-            settings.ContractResolver = new Util.FirstCaseLowercaseContractResolver();
-
+            
             string stemmerResponse = CallEndpoint("stemmer",
-                JsonConvert.SerializeObject(s, settings),
+                System.Text.Json.JsonSerializer.Serialize(s),
                 s.Id, TimeSpan.FromSeconds(180));
             try
             {
@@ -131,9 +128,6 @@ namespace HlidacStatu.Repositories
             if (s.Prilohy.Any(m => m.EnoughExtractedText) == false)
                 return null;
 
-            var settings = new JsonSerializerSettings();
-            settings.ContractResolver = new Util.FirstCaseLowercaseContractResolver();
-
             var stems = GetRawStems(s.Id, rewriteStems);
             if (string.IsNullOrEmpty(stems))
             {
@@ -156,10 +150,6 @@ namespace HlidacStatu.Repositories
                     s.Id, TimeSpan.FromSeconds(180));
             }
 
-            //string finalizerResponse = CallEndpoint("finalizer",
-            //        classifierResponse,
-            //        s.Id,
-            //        30000);
 
             var jsonData = JObject.Parse(classifierResponse);
 
@@ -209,12 +199,9 @@ namespace HlidacStatu.Repositories
 
             if (s == null)
                 return null;
-
-            var settings = new JsonSerializerSettings();
-            settings.ContractResolver = new Util.FirstCaseLowercaseContractResolver();
-
+            
             var response = CallEndpoint("explain_json",
-                JsonConvert.SerializeObject(s, settings),
+                System.Text.Json.JsonSerializer.Serialize(s),
                 idSmlouvy, TimeSpan.FromSeconds(180));
             return System.Text.RegularExpressions.Regex.Unescape(response);
         }

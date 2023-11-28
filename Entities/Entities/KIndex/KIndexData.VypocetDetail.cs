@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text.Json.Serialization;
 using Devmasters.Enums;
 
 namespace HlidacStatu.Entities.KIndex
@@ -9,6 +10,12 @@ namespace HlidacStatu.Entities.KIndex
         {
             public class Radek
             {
+                [JsonConstructor]
+                public Radek()
+                {
+                    
+                }
+                
                 public Radek(KIndexParts velicina, decimal hodnota, decimal koef)
                 {
                     Velicina = (int)velicina;
@@ -17,9 +24,11 @@ namespace HlidacStatu.Entities.KIndex
                     Koeficient = koef;
                 }
 
+                [JsonIgnore]
                 [Nest.Object(Ignore = true)]
                 public string VelicinaLongName { get => ((KIndexParts)Velicina).ToNiceDisplayName(); }
 
+                [JsonIgnore]
                 [Nest.Object(Ignore = true)]
                 public KIndexParts VelicinaPart { get => (KIndexParts)Velicina; }
 

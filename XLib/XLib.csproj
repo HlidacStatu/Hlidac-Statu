@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-<TargetFramework>net7.0</TargetFramework>
+<TargetFramework>net8.0</TargetFramework>
         <AssemblyName>HlidacStatu.XLib</AssemblyName>
         <RootNamespace>HlidacStatu.XLib</RootNamespace>
     </PropertyGroup>
@@ -64,10 +64,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Devmasters.Cache.Memcached" Version="4.5.3.1" />
+      <PackageReference Include="Devmasters.Cache.Memcached" Version="5.0.1" />
       <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
-      <PackageReference Include="Scriban" Version="5.7.0" />
-      <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
+      <PackageReference Include="Scriban" Version="5.9.0" />
+      <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
     </ItemGroup>
 
 </Project>

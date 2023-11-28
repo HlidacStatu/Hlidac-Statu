@@ -35,7 +35,7 @@ namespace HlidacStatu.Api.VoiceToText
                     Source = source.ToString(),
                     SourceOptions = options
                 };
-                var json = System.Text.Json.JsonSerializer.Serialize<HlidacStatu.DS.Api.Voice2Text.Task>(task);
+
                 JsonContent form = JsonContent.Create<HlidacStatu.DS.Api.Voice2Text.Task>(task);
 
                 var id = await Simple.PostAsync<string>(
@@ -65,7 +65,6 @@ namespace HlidacStatu.Api.VoiceToText
         {
             try
             {
-                var json = System.Text.Json.JsonSerializer.Serialize<HlidacStatu.DS.Api.Voice2Text.Task>(task);
                 JsonContent form = JsonContent.Create<HlidacStatu.DS.Api.Voice2Text.Task>(task);
                 var res = await Simple.PostAsync<string>(
                     BaseApiUri.AbsoluteUri + "api/v2/voice2text/TaskDone",

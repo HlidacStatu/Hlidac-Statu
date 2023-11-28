@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 namespace HlidacStatu.Datasets.TransparentniUcty
 {
     public class BankovniUcet
-        : Plugin.TransparetniUcty.IBankovniUcet
     {
         private static DataSet _client =
             DataSet.CachedDatasets.Get("transparentni-ucty");

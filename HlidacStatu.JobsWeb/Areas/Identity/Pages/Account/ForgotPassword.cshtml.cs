@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.XLib.Emails;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
+namespace WatchdogAnalytics.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class ForgotPasswordModel : PageModel
@@ -52,7 +53,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
                     values: new { area = "Identity", code },
                     protocol: Request.Scheme);
 
-                var email = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("ResetPassword_WatchdogAnalytics");
+                var email = EmailMsg.CreateEmailMsgFromPostalTemplate("ResetPassword_WatchdogAnalytics");
                 email.Model.CallbackUrl = callbackUrl;
                 email.To = user.Email;
                 email.EmailFooterText = "";

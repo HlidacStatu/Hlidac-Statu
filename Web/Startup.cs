@@ -112,17 +112,17 @@ namespace HlidacStatu.Web
                     Version = "v2",
                     Title = "HlidacStatu Api V2.1.1",
                     Description = "REST API Hlídače státu",
-                    TermsOfService = new Uri("https://www.hlidacstatu.cz/texty/provoznipodminky/"),
+                    TermsOfService = new Uri("https://texty.hlidacstatu.cz/provoznipodminky/"),
                     Contact = new OpenApiContact
                     {
                         Name = "Hlídač státu",
                         Email = "podpora@hlidacstatu.cz",
-                        Url = new Uri("https://www.hlidacstatu.cz/texty/kontakt/"),
+                        Url = new Uri("https://texty.hlidacstatu.cz/kontakt/"),
                     },
                     License = new OpenApiLicense
                     {
                         Name = "CC BY 3.0 CZ",
-                        Url = new Uri("https://www.hlidacstatu.cz/texty/licence/"),
+                        Url = new Uri("https://texty.hlidacstatu.cz/licence/"),
                     }
                 });
 
@@ -149,7 +149,7 @@ namespace HlidacStatu.Web
                     policyBuilder.WaitAndRetryAsync(
                         3, retryNumber => TimeSpan.FromMilliseconds(10)));
             
-            services.AddServerSideBlazor();
+            services.AddServerSideBlazor().AddInteractiveServerComponents();
 
             services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
 
@@ -276,7 +276,6 @@ namespace HlidacStatu.Web
             app.UseAuthorization();
 
             Util.Consts.Logger.Info("Starting web application {version}", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString());
-
             _ = app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -301,7 +300,9 @@ namespace HlidacStatu.Web
                     defaults: new { controller = "Data", action = "Index" });
 
                 endpoints.MapRazorPages();
-                endpoints.MapBlazorHub();
+                endpoints.MapRazorComponents<AutocompleteWrap>()
+                    .AddInteractiveServerRenderMode();
+                //endpoints.MapBlazorHub();
             });
 
         }

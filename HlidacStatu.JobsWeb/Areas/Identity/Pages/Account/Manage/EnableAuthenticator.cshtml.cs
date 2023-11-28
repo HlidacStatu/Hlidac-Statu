@@ -4,11 +4,12 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Util;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account.Manage
+namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
 {
     public class EnableAuthenticatorModel : PageModel
     {
@@ -89,7 +90,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account.Manage
 
             await _userManager.SetTwoFactorEnabledAsync(user, true);
             var userId = await _userManager.GetUserIdAsync(user);
-            Util.Consts.Logger.Info($"User with ID '{userId}' has enabled 2FA with an authenticator app.");
+            Consts.Logger.Info($"User with ID '{userId}' has enabled 2FA with an authenticator app.");
 
             StatusMessage = "Your authenticator app has been verified.";
 

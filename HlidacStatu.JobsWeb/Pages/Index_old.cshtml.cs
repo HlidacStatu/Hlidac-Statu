@@ -1,8 +1,8 @@
-﻿using HlidacStatu.Ceny.Models;
-using HlidacStatu.Ceny.Services;
+﻿using WatchdogAnalytics.Services;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using WatchdogAnalytics.Models;
 
-namespace HlidacStatu.Ceny.Pages
+namespace WatchdogAnalytics.Pages
 {
     public class Index_oldModel : PageModel
     {

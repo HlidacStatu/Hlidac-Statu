@@ -1,0 +1,379 @@
+@using HlidacStatu.Entities
+@using HlidacStatu.DetectJobs
+@using Devmasters.Enums
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@using Microsoft.Extensions.Logging
+@using Nest
+
+@inject JobService JobService
+@inject ILogger<Modal> Logger
+@inject ToastService ToastService
+@inject IJSRuntime JSRuntime
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" @onclick="LoadJobs">
+    Save ✔
+</button>
+
+<!-- Modal -->
+
+@if (showModal)
+{
+    <div class="bodal" id="exampleModal" tabindex="-1">
+        <div class="modal-dialog bodal-fullscreen">
+            <div class="modal-content bodal-content-fullscreen">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Rekapitulace a uložení</h5>
+                    <button type="button" class="btn-close" @onclick="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <LinkToOriginal InDocTable="Table.InDocTable"></LinkToOriginal>
+                    <div class="recap">
+                        <table>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Job</th>
+                                    <th scope="col">
+                                        DPH
+                                        <select @onchange="ChangeVAT" class="form-select">
+                                            <option value="">- dph -</option>
+                                            <option value="10">10 %</option>
+                                            <option value="15">15 %</option>
+                                            <option value="21">21 %</option>
+                                        </select>
+                                    </th>
+                                    <th scope="col">Hodnota</th>
+                                    <th scope="col">Hodnota s DPH</th>
+                                    <th scope="col">
+                                        Jednotka
+                                        <select @onchange="ChangeUnit" class="form-select">
+                                            @foreach (var measureUnit in InDocJobs.GetSortedMeasureUnits())
+
+                                            {
+                                                <option value="@measureUnit">@measureUnit.ToNiceDisplayName()</option>
+                                            }
+                                        </select>
+                                    </th>
+                                    <th scope="col">
+                                        Počet jednotek
+                                        <input type="number" @onchange="ChangeUnitCount" class="form-control" autocomplete="off"/>
+                                    </th>
+                                    <th>Automatická kontrola</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var job in Table.FoundJobs)
+                                {
+                                    <tr>
+                                        <td>
+                                            <input type="text" @bind="@job.JobRaw" class="form-control" autocomplete="off"/>
+                                        </td>
+                                        <td>
+                                            <select @bind="@job.VAT" class="form-select">
+                                                <option value="">- dph -</option>
+                                                <option value="10">10 %</option>
+                                                <option value="15">15 %</option>
+                                                <option value="21">21 %</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" @bind="@job.Price" class="form-control" autocomplete="off">
+                                        </td>
+                                        <td>
+                                            <input type="number" @bind="@job.PriceVAT" class="form-control" autocomplete="off"/>
+                                        </td>
+                                        <td>
+                                            <select @bind="@job.Unit" class="form-select" autocomplete="off">
+                                                @foreach (var measureUnit in InDocJobs.GetSortedMeasureUnits())
+                                                {
+                                                    <option value="@measureUnit">@measureUnit.ToNiceDisplayName()</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" @bind="@job.UnitCount" class="form-control" autocomplete="off"/>
+                                        </td>
+                                        <td>
+                                            @if (!job.IsValid(out var chyby))
+                                            {
+                                                <p class="alert alert-danger" role="alert">
+                                                    @chyby.ToMarkupString()
+                                                </p>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </table>
+                    </div>
+                    <div class="category col-4">
+                        <h4>Vyberte kategorii smlouvy</h4>
+                        <select class="form-select" @onchange="SetAnalyzaOption">
+                            <option value="">--== Zvolte kategorii ==--</option>
+                            @foreach (var (name, niceName) in GetAnalyzaTypes())
+                            {
+                                <option Value="@name">@niceName</option>
+                            }
+                        </select>
+                        @if (!IsValidCategory(out var chyba))
+                        {
+                            <p class="alert alert-danger" role="alert">
+                                @chyba.Message
+                            </p>
+                        }
+
+                        @if (displayAnotherCategories)
+                        {
+                            <br/>
+                            <h4>Vybrali jste jinou kategorii, je potřeba doupřesnit</h4>
+                            <select class="form-select" @onchange="SetKlasifikaceManual">
+                                <option value="">--== Zvolte kategorii ==--</option>
+                                @foreach (var (name, niceName) in GetGeneralClassificationTypes())
+                                {
+                                    <option Value="@name">@niceName</option>
+                                }
+                            </select>
+                        }
+                    </div>
+                </div>
+                <div>
+                    @if (!IsEverythingValid())
+                    {
+                        <p class="alert alert-danger" role="alert">
+                            Ve formuláři jsou chyby.
+                        </p>
+                    }
+                </div>
+                <div class="modal-footer justify-content-start">
+                    <button type="button" class="btn btn-secondary" @onclick="Close">Zrušit změny</button>
+                    <button disabled="@(!isSaveEnabled)" type="button" class="btn btn-primary" @onclick="Save">Uložit změny</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public SomeTable Table { get; set; }
+
+    private bool showModal = false;
+    private bool displayAnotherCategories = false;
+    private bool isSaveEnabled = true;
+
+    private async Task Save()
+    {
+        bool isValid = IsEverythingValid();
+        if (!isValid
+            && !await ConfirmAlert(JSRuntime, "Ve formuláři jsou stále chyby. Chcete ho přesto uložit?"))
+        {
+            return;
+        }
+
+    //parent save
+        showModal = false;
+        await Table.Save();
+    }
+
+    private bool IsEverythingValid()
+    {
+        // do checks
+        isSaveEnabled = true;
+        Errors foundErrors = new Errors(); 
+        
+        if (Table.FoundJobs.Count == 0)
+            foundErrors.Add("Nenalezen žádný job.", Errors.MessageSeverity.Error);
+
+        if (!IsValidCategory(out var errorMessage))
+            foundErrors.Add(errorMessage);
+        
+        foreach (var job in Table.FoundJobs)
+        {
+            if (!job.IsValid(out var errors))
+            {
+                foundErrors.Add(errors);
+            }
+        }
+
+        if (foundErrors.HasErrors)
+        {
+            isSaveEnabled = false;
+            return false;
+        }
+
+        if (foundErrors.HasWarnings)
+            return false;
+        
+        return true;
+    }
+
+    private bool IsValidCategory(out Errors.ErrorMessage errorMessage)
+    {
+        if (string.IsNullOrWhiteSpace(Table.InDocTable.Analyza))
+        {
+            errorMessage = new ("Kategorie není vybrána.", Errors.MessageSeverity.Error);
+            return false;
+        }
+        errorMessage = null;
+        return true;
+    }
+
+    
+    private void LoadJobs()
+    {
+        Table.ParseJobs();
+    //todo Table.PrefillValues();
+        showModal = true;
+    }
+
+    private void RoundJobPricesToWholeNumbers()
+    {
+        foreach (var job in Table.FoundJobs)
+        {
+            if (job.Price != null)
+                job.Price = Math.Round(job.Price.Value, 0);
+            if (job.PriceVAT != null)
+                job.Price = Math.Round(job.PriceVAT.Value, 0);
+        }
+    }
+
+    private void ChangeUnit(ChangeEventArgs arg)
+    {
+        if (arg.Value is null)
+        {
+            return;
+        }
+        string unitName = (string)arg.Value;
+
+        var isDefined = Enum.IsDefined(typeof(InDocJobs.MeasureUnit), unitName);
+        if (isDefined)
+        {
+            var value = Enum.Parse<InDocJobs.MeasureUnit>(unitName, true);
+            foreach (var job in Table.FoundJobs)
+            {
+                job.Unit = value;
+            }
+        }
+    }
+
+    private async Task ChangeUnitCount(ChangeEventArgs arg)
+    {
+        try
+        {
+            var value = (string)arg.Value;
+            decimal? setUnitCount = null;
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                setUnitCount = decimal.Parse(value);
+            }
+
+            foreach (var job in Table.FoundJobs)
+            {
+                job.UnitCount = setUnitCount;
+            }
+        }
+        catch (Exception e)
+        {
+            await ToastService.CreateErrorToast("Problém", "Neočekávaný problém - nepodařilo se změnit počet jednotek.");
+            Logger.LogDebug(e, "ChangeUnitCount failed");
+        }
+    }
+
+    private async Task ChangeVAT(ChangeEventArgs arg)
+    {
+        try
+        {
+            var value = (string)arg.Value;
+            decimal? setVAT = null;
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                setVAT = decimal.Parse(value);
+            }
+
+            foreach (var job in Table.FoundJobs)
+            {
+                job.VAT = setVAT;
+            }
+        }
+        catch (Exception e)
+        {
+            await ToastService.CreateErrorToast("Problém", "Neočekávaný problém - nepodařilo se změnit hodnotu DPH.");
+            Logger.LogDebug(e, "ChangeVAT failed");
+        }
+    }
+
+    private void SetAnalyzaOption(ChangeEventArgs arg)
+    {
+        if (arg.Value is null)
+        {
+            return;
+        }
+        string analyzaOption = (string)arg.Value;
+
+        var isDefined = Enum.IsDefined(typeof(InDocTables.AnalyzaOption), analyzaOption);
+        if (isDefined)
+        {
+            Table.InDocTable.Analyza = analyzaOption;
+
+            var optionValue = Enum.Parse<InDocTables.AnalyzaOption>(analyzaOption, true);
+    //clear klasifikace manual first
+            Table.InDocTable.KlasifikaceManual = null;
+            displayAnotherCategories = optionValue == InDocTables.AnalyzaOption.Jine;
+        }
+    }
+
+    private void SetKlasifikaceManual(ChangeEventArgs arg)
+    {
+        if (arg.Value is null)
+        {
+            return;
+        }
+        string klasifikaceManual = (string)arg.Value;
+
+        var isDefined = Enum.IsDefined(typeof(Smlouva.SClassification.ClassificationsTypes), klasifikaceManual);
+        if (isDefined)
+        {
+            Table.InDocTable.KlasifikaceManual = klasifikaceManual;
+        }
+    }
+
+    private List<(string Name, string NiceName)> GetAnalyzaTypes()
+    {
+        var analyzaOptions = Enum.GetValues<InDocTables.AnalyzaOption>();
+
+        var result = analyzaOptions.Select(c => (Name: c.ToString("G"), NiceName: c.ToNiceDisplayName()))
+            .OrderBy(t => t.NiceName)
+            .ToList();
+
+
+        return result;
+    }
+
+    private List<(string Name, string NiceName)> GetGeneralClassificationTypes()
+    {
+        var classifications = Enum.GetValues<Smlouva.SClassification.ClassificationsTypes>();
+
+        var filtered = classifications.Where(c => c.ToString("G").EndsWith("_obecne"));
+
+        var result = filtered.Select(c => (Name: c.ToString("G"), NiceName: c.ToNiceDisplayName()))
+            .OrderBy(t => t.NiceName)
+            .ToList();
+
+
+        return result;
+    }
+
+    private void Close()
+    {
+        showModal = false;
+    }
+    
+    public static ValueTask<bool> ConfirmAlert(IJSRuntime jsRuntime, string message)
+    {
+        return jsRuntime.InvokeAsync<bool>("confirm", message);
+    }
+
+}

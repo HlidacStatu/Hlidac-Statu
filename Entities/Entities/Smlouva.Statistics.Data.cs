@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace HlidacStatu.Entities
 {
@@ -9,7 +10,7 @@ namespace HlidacStatu.Entities
     {
         public partial class Statistics
         {
-            public partial class Data : CoreStat, IAddable<Data>
+            public class Data : CoreStat, IAddable<Data>
             {
                 public long PocetSmluv { get; set; } = 0;
                 public decimal CelkovaHodnotaSmluv { get; set; } = 0;
@@ -33,19 +34,19 @@ namespace HlidacStatu.Entities
 
                 public Dictionary<int, SimpleStat> PoOblastech { get; set; } = new Dictionary<int, SimpleStat>();
 
-
+                [JsonIgnore]
                 public decimal PercentSmluvBezCeny => (PocetSmluv == 0 ? 0 : (decimal)PocetSmluvBezCeny / (decimal)PocetSmluv);
-
+                [JsonIgnore]
                 public decimal PercentSmluvBezSmluvniStrany => (PocetSmluv == 0 ? 0 : (decimal)PocetSmluvBezSmluvniStrany / (decimal)PocetSmluv);
-
+                [JsonIgnore]
                 public decimal PercentKcBezSmluvniStrany => (CelkovaHodnotaSmluv == 0 ? 0 : (decimal)SumKcSmluvBezSmluvniStrany / (decimal)CelkovaHodnotaSmluv);
-
+                [JsonIgnore]
                 public decimal PercentSmluvPolitiky => (PocetSmluv == 0 ? 0 : (decimal)PocetSmluvSponzorujiciFirmy / (decimal)PocetSmluv);
-
+                [JsonIgnore]
                 public decimal PercentKcSmluvPolitiky => (CelkovaHodnotaSmluv == 0 ? 0 : (decimal)SumKcSmluvSponzorujiciFirmy / (decimal)CelkovaHodnotaSmluv);
-
+                [JsonIgnore]
                 public decimal PercentSmluvULimitu => (PocetSmluv == 0 ? 0 : (decimal)PocetSmluvULimitu / (decimal)PocetSmluv);
-
+                [JsonIgnore]
                 public decimal PercentSmluvSeZasadnimNedostatkem => (PocetSmluv == 0 ? 0 : (decimal)PocetSmluvSeZasadnimNedostatkem / (decimal)PocetSmluv);
 
                 public Data Add(Data other)

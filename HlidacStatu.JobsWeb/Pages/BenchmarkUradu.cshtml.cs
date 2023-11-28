@@ -1,11 +1,11 @@
 using System.Threading.Tasks;
-using HlidacStatu.Ceny.Models;
-using HlidacStatu.Ceny.Services;
+using WatchdogAnalytics.Services;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using WatchdogAnalytics.Models;
 
-namespace HlidacStatu.Ceny.Pages
+namespace WatchdogAnalytics.Pages
 {
 
     public class BenchmarkUraduModel : PageModel

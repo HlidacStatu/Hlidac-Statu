@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.KIndex;
 
@@ -35,8 +36,10 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
         public int Rok { get; set; }
 
 
-        //private 
+        //private
+        [JsonConstructor]
         protected Statistics() { }
+        
         public static Statistics GetStatistics(int year)
         {
             var stat = KIndexStatTotal.Get().FirstOrDefault(m => m.Rok == year);

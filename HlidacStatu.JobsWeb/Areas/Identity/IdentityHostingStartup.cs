@@ -1,8 +1,8 @@
-using HlidacStatu.Ceny.Areas.Identity;
+using WatchdogAnalytics.Areas.Identity;
 using Microsoft.AspNetCore.Hosting;
 
 [assembly: HostingStartup(typeof(IdentityHostingStartup))]
-namespace HlidacStatu.Ceny.Areas.Identity
+namespace WatchdogAnalytics.Areas.Identity
 {
     public class IdentityHostingStartup : IHostingStartup
     {

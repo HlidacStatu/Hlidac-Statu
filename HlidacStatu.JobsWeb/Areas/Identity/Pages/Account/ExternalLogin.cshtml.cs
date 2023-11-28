@@ -3,13 +3,15 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Util;
+using HlidacStatu.XLib.Emails;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
+namespace WatchdogAnalytics.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class ExternalLoginModel : PageModel
@@ -74,7 +76,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                Util.Consts.Logger.Info($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
+                Consts.Logger.Info($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
                 return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
@@ -104,7 +106,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
                     }
                     
                     // send confirmation email
-                    Util.Consts.Logger.Info($"User created an account using {info.LoginProvider} provider.");
+                    Consts.Logger.Info($"User created an account using {info.LoginProvider} provider.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -115,7 +117,7 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code },
                         protocol: Request.Scheme);
 
-                    var emailTemplate = XLib.Emails.EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
+                    var emailTemplate = EmailMsg.CreateEmailMsgFromPostalTemplate("Register");
                     emailTemplate.Model.CallbackUrl = callbackUrl;
                     emailTemplate.To = user.Email;
                     emailTemplate.SendMe();

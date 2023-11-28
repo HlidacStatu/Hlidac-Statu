@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		        <TargetFramework>net7.0</TargetFramework>
+		        <TargetFramework>net8.0</TargetFramework>
 		<OutputType>Library</OutputType>
 		<RootNamespace>HlidacStatu.Util</RootNamespace>
 		<AssemblyName>HlidacStatu.Util</AssemblyName>
@@ -12,14 +12,15 @@
 		<CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Devmasters.Batch" Version="4.6.0.2" />
-		<PackageReference Include="Devmasters.Cache.AWS_S3" Version="4.5.2.1" />
-		<PackageReference Include="Devmasters.Collections" Version="4.5.1.1" />
-		<PackageReference Include="Devmasters.DT" Version="4.5.3.1" />
-		<PackageReference Include="Devmasters.Enums" Version="4.5.1.1" />
-		<PackageReference Include="Devmasters.IO" Version="4.5.4.1" />
-		<PackageReference Include="Devmasters.Logging" Version="4.5.28.1" />
-		<PackageReference Include="Devmasters.Net" Version="4.5.11.1" />
+		<PackageReference Include="Devmasters.Batch" Version="5.0.0" />
+		<PackageReference Include="Devmasters.Cache.AWS_S3" Version="5.0.1" />
+		<PackageReference Include="Devmasters.Collections" Version="5.0.0" />
+		<PackageReference Include="Devmasters.DT" Version="5.0.0" />
+		
+		<PackageReference Include="Devmasters.Enums" Version="5.0.0" />
+		<PackageReference Include="Devmasters.IO" Version="5.0.0" />
+		<PackageReference Include="Devmasters.Logging" Version="5.0.0" />
+		<PackageReference Include="Devmasters.Net" Version="5.0.2" />
 <!--		<PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" />-->
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
 		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
@@ -30,7 +31,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Mime-Detective.Definitions.Condensed" Version="23.6.1" />
+		<PackageReference Include="Mime-Detective.Definitions.Condensed" Version="23.10.1" />
 		<PackageReference Include="MimeMapping" Version="2.0.0" />
 		<PackageReference Include="NEST" Version="7.17.5" />
 		<PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
@@ -44,8 +45,5 @@
 	</ItemGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="ConnectionProviders\" />
 	</ItemGroup>
 </Project>

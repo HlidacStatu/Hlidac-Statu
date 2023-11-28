@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HlidacStatu.Ceny.Models
+namespace WatchdogAnalytics.Models
 {
     public class CompareDataModel
     {

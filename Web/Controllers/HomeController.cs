@@ -166,7 +166,7 @@ namespace HlidacStatu.Web.Controllers
 
         public ActionResult PridatSe()
         {
-            return RedirectPermanent("https://www.hlidacstatu.cz/texty/pridejte-se/");
+            return RedirectPermanent("https://texty.hlidacstatu.cz/pridejte-se/");
         }
 
 
@@ -434,7 +434,7 @@ text zpravy: {txt}
         }
         public ActionResult ORegistru()
         {
-            return RedirectPermanent("https://www.hlidacstatu.cz/texty/o-registru");
+            return RedirectPermanent("https://texty.hlidacstatu.cz/o-registru");
         }
 
         public ActionResult Afery()
@@ -725,7 +725,7 @@ text zpravy: {txt}
 
         public ActionResult Novinky()
         {
-            return RedirectPermanent("https://www.hlidacstatu.cz/texty");
+            return RedirectPermanent("https://texty.hlidacstatu.cz");
         }
         public ActionResult Napoveda()
         {

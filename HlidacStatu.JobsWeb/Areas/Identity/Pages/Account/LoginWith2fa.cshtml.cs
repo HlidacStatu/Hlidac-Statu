@@ -2,12 +2,13 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
+using HlidacStatu.Util;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
+namespace WatchdogAnalytics.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
     public class LoginWith2faModel : PageModel
@@ -75,17 +76,17 @@ namespace HlidacStatu.Ceny.Areas.Identity.Pages.Account
 
             if (result.Succeeded)
             {
-                Util.Consts.Logger.Info($"User with ID '{user.Id}' logged in with 2fa.");
+                Consts.Logger.Info($"User with ID '{user.Id}' logged in with 2fa.");
                 return LocalRedirect(returnUrl);
             }
             else if (result.IsLockedOut)
             {
-                Util.Consts.Logger.Warning($"User with ID '{user.Id}' account locked out.");
+                Consts.Logger.Warning($"User with ID '{user.Id}' account locked out.");
                 return RedirectToPage("./Lockout");
             }
             else
             {
-                Util.Consts.Logger.Warning($"Invalid authenticator code entered for user with ID '{user.Id}'.");
+                Consts.Logger.Warning($"Invalid authenticator code entered for user with ID '{user.Id}'.");
                 ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
                 return Page();
             }

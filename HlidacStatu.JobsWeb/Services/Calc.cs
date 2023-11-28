@@ -1,4 +1,4 @@
-﻿namespace HlidacStatu.Ceny.Services
+﻿namespace WatchdogAnalytics.Services
 {
     public class Calc
     {

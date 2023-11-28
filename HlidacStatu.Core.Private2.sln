@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Entities", "Entities\Entiti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Util", "Util\Util.csproj", "{95DA13FC-768F-4CD1-A38E-F5E6D5B31833}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.TransparetniUcty", "Plugin.TransparetniUcty\Plugin.TransparetniUcty.csproj", "{B4B31F50-DA24-4FF9-A82D-3F26FF5D664A}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.OCR.Api.Client", "Lib.OCR.Api.Client\Lib.OCR.Api.Client.csproj", "{C3E3826A-CCC3-4D59-867D-E5846A0D86B7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Data.External", "Lib.Data.External\Lib.Data.External.csproj", "{BC8BCFF6-21C9-4157-8C4C-1AA78020F216}"
@@ -99,7 +97,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.DetectJobs", ".
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docker", "Docker", "{ACC852FC-5016-48E7-80DF-ABD60A162FB8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.JobTableEditor", "HlidacStatu.JobTableEditor\HlidacStatu.JobTableEditor.csproj", "{EF59CD86-CAF1-439C-A76D-2FECC4897B7B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JobTableEditor", "JobTableEditor\JobTableEditor.csproj", "{EF59CD86-CAF1-439C-A76D-2FECC4897B7B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lib.Data.External.Tables", "Lib.Data.External.Tables\Lib.Data.External.Tables.csproj", "{956497F7-9609-442E-8AB1-5F0AEEBF8081}"
 EndProject
@@ -107,7 +105,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_solution items", "_solutio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Jobs", "Jobs", "{40841C9C-4BC4-4E32-AC3E-657E4A5FA1A0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacStatu.Ceny", "HlidacStatu.JobsWeb\HlidacStatu.Ceny.csproj", "{A89C8C53-5F83-4EC8-BB06-F5CBB8BE1C28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchdogAnalytics", "HlidacStatu.JobsWeb\WatchdogAnalytics.csproj", "{A89C8C53-5F83-4EC8-BB06-F5CBB8BE1C28}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CamelotDockerAPI", "..\Hlidac-Statu-Private\Docker\CamelotDockerAPI\CamelotDockerAPI.csproj", "{FF971AF6-D7D0-4CFD-826E-4D784CDCEBEA}"
 EndProject
@@ -174,7 +172,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DockerSwarmHealthCheckAgent
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreOfficeDockerAPI", "..\Hlidac-Statu-Private\Docker\LibreOfficeDockerAPI\LibreOfficeDockerAPI.csproj", "{592769A0-9EFE-4815-9E38-5AC2B5F01473}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HlidacAdmin", "..\Hlidac-Statu-Private\HlidacAdmin\HlidacAdmin.csproj", "{C9A7309C-D64A-4387-91A3-46C04CDDF0EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Admin", "..\Hlidac-Statu-Private\Admin\Admin.csproj", "{C9A7309C-D64A-4387-91A3-46C04CDDF0EC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutocompleteGenerator", "..\Hlidac-Statu-Private\AutocompleteGenerator\AutocompleteGenerator.csproj", "{EFAA0F2C-1D61-4B6C-B1F6-0DB2DD59BEB2}"
 EndProject
@@ -191,6 +189,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "HlidacStatuApi\Api.csproj", "{EC0242D1-735F-4C3A-8A85-55B9FFB120B9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StressWebTest", "..\Hlidac-Statu-Private\StressWebTest\StressWebTest.csproj", "{965D1DD7-A8A5-4616-B3E5-A543EA1A0CB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HlidacStatu.Api.VoiceToText", "HlidacStatu.Api.VoiceToText\HlidacStatu.Api.VoiceToText.csproj", "{AED4D970-A52A-4AB5-B5B2-C8BCA175283F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -214,10 +214,6 @@ Global
 		{95DA13FC-768F-4CD1-A38E-F5E6D5B31833}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95DA13FC-768F-4CD1-A38E-F5E6D5B31833}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95DA13FC-768F-4CD1-A38E-F5E6D5B31833}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B4B31F50-DA24-4FF9-A82D-3F26FF5D664A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B4B31F50-DA24-4FF9-A82D-3F26FF5D664A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B4B31F50-DA24-4FF9-A82D-3F26FF5D664A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B4B31F50-DA24-4FF9-A82D-3F26FF5D664A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C3E3826A-CCC3-4D59-867D-E5846A0D86B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C3E3826A-CCC3-4D59-867D-E5846A0D86B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3E3826A-CCC3-4D59-867D-E5846A0D86B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -462,6 +458,10 @@ Global
 		{965D1DD7-A8A5-4616-B3E5-A543EA1A0CB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{965D1DD7-A8A5-4616-B3E5-A543EA1A0CB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{965D1DD7-A8A5-4616-B3E5-A543EA1A0CB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AED4D970-A52A-4AB5-B5B2-C8BCA175283F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AED4D970-A52A-4AB5-B5B2-C8BCA175283F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AED4D970-A52A-4AB5-B5B2-C8BCA175283F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AED4D970-A52A-4AB5-B5B2-C8BCA175283F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -471,7 +471,6 @@ Global
 		{D2C52FF3-87BF-41E5-965C-120ABB4DED86} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{0A7396B2-1D98-4C1E-A56F-E81C1BD2C9EE} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{95DA13FC-768F-4CD1-A38E-F5E6D5B31833} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
-		{B4B31F50-DA24-4FF9-A82D-3F26FF5D664A} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{C3E3826A-CCC3-4D59-867D-E5846A0D86B7} = {584BE7E5-1233-4848-8C24-0A8A1D82ECC6}
 		{BC8BCFF6-21C9-4157-8C4C-1AA78020F216} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{CF14DA59-C871-464F-B621-6050B2F48980} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
@@ -545,6 +544,7 @@ Global
 		{E1E8DE5B-D9D5-4A31-BB41-9EF27B6EDBBB} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
 		{EC0242D1-735F-4C3A-8A85-55B9FFB120B9} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 		{965D1DD7-A8A5-4616-B3E5-A543EA1A0CB9} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
+		{AED4D970-A52A-4AB5-B5B2-C8BCA175283F} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
