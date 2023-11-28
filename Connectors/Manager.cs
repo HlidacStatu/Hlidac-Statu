@@ -518,7 +518,7 @@ namespace HlidacStatu.Connectors
 
             CreateIndexResponse res = null;
             var aliasName = client.ConnectionSettings.DefaultIndex;
-            var indexName = withAlias ? $"hs-{aliasName}-01" : aliasName;
+            var indexName = (withAlias ? $"hs-{aliasName}-01" : aliasName).ToLower();
             switch (idxTyp)
             {
                 case IndexType.VerejneZakazky:
