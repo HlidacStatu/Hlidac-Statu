@@ -50,7 +50,7 @@
       <Version>5.0.1</Version>
     </PackageReference>
     <PackageReference Include="Devmasters.Net">
-      <Version>5.0.1</Version>
+      <Version>5.0.2</Version>
     </PackageReference>
     <PackageReference Include="EntityFramework">
       <Version>6.4.4</Version>

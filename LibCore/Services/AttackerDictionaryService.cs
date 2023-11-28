@@ -25,6 +25,7 @@ namespace HlidacStatu.LibCore.Services
         }
 
         static Devmasters.Net.Crawlers.ICrawler radware = new RadwareNetwork();
+        private Devmasters.Net.Crawlers.ICrawler _radware = new RadwareNetwork();
 
 
         private class Attacker
