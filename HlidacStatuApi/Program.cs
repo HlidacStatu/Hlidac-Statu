@@ -1,19 +1,16 @@
 using Devmasters.Log;
 using Hangfire;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
-using HlidacStatuApi.Code;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
-using RazorEngine.Compilation.ImpromptuInterface.InvokeExt;
 
 string CORSPolicy = "from_hlidacstatu.cz";
 

@@ -4,7 +4,6 @@ using Devmasters.DT;
 using Devmasters.Enums;
 
 using HlidacStatu.Entities;
-using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
 

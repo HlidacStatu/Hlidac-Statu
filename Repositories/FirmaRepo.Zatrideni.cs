@@ -1,7 +1,6 @@
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
-using HlidacStatu.Repositories.ES;
 using HlidacStatu.Util;
 
 

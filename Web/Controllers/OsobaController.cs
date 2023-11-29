@@ -3,7 +3,6 @@ using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 
 namespace HlidacStatu.Web.Controllers
 {

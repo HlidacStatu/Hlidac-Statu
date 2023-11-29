@@ -1,8 +1,6 @@
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities.Logs;
-using HlidacStatu.Repositories.ES;
-
 using Nest;
 
 namespace HlidacStatu.Repositories

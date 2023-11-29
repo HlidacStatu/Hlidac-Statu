@@ -1,6 +1,4 @@
-﻿using Devmasters.Log;
-
-using NPOI.XWPF.UserModel;
+﻿using NPOI.XWPF.UserModel;
 
 using System;
 using System.Collections.Generic;

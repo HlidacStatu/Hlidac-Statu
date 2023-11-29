@@ -1,6 +1,4 @@
 using HlidacStatu.Entities.VZ;
-using HlidacStatu.Repositories.ES;
-
 using Nest;
 
 using System;

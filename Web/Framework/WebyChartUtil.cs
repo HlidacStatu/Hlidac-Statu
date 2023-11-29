@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using HlidacStatu.Repositories;
+﻿using HlidacStatu.Repositories;
 
 using Microsoft.AspNetCore.Html;
 

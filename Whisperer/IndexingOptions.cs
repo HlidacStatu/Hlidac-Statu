@@ -1,5 +1,3 @@
-using Lucene.Net.Analysis;
-
 namespace Whisperer;
 
 public class IndexingOptions<T> where T : IEquatable<T>

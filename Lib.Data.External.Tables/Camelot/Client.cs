@@ -1,5 +1,4 @@
-﻿using Devmasters.Log;
-using HlidacStatu.DS.Api;
+﻿using HlidacStatu.DS.Api;
 using System;
 using System.Threading.Tasks;
 

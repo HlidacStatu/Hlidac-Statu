@@ -1,5 +1,4 @@
 ﻿using HlidacStatu.Entities;
-using HlidacStatu.Repositories.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

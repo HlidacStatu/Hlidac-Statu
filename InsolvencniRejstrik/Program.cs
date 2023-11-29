@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using InsolvencniRejstrik.Fixes;
 using HlidacStatu.Entities.Insolvence;
  using HlidacStatu.LibCore.Extensions;
- using Microsoft.Extensions.Configuration;
 
  namespace InsolvencniRejstrik
 {

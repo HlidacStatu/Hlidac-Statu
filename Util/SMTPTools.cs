@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
-using System.Net.Mime;
 using System.Text;
 
 namespace HlidacStatu.Util

@@ -1,7 +1,5 @@
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WatchdogAnalytics.Models;

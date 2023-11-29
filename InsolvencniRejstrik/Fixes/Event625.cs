@@ -1,5 +1,4 @@
 ﻿using HlidacStatu.Entities.Insolvence;
-using HlidacStatu.Repositories.ES;
 using InsolvencniRejstrik.ByEvents;
 using System;
 using System.IO;

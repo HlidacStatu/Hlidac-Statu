@@ -1,7 +1,5 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.OsobyES;
-using HlidacStatu.Repositories.ES;
-
 using Nest;
 
 using System;

@@ -1,6 +1,5 @@
 using System.IO;
 using HlidacStatu.Entities;
-using MimeDetective.Storage;
 
 namespace HlidacStatu.Connectors.IO
 {

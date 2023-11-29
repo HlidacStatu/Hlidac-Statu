@@ -1,7 +1,4 @@
 using HlidacStatu.Entities.Dotace;
-using HlidacStatu.Repositories.ES;
-using HlidacStatu.Repositories.Searching;
-
 using Nest;
 
 using System;

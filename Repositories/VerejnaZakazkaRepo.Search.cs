@@ -1,6 +1,5 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.VZ;
-using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
 

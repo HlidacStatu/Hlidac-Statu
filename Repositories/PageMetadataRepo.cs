@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
-using HlidacStatu.Repositories.ES;
-
 using Nest;
 
 using static HlidacStatu.Repositories.Searching.Tools;

@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace HlidacStatu.Connectors.IO
 {
     public class VZPrilohaFile : DistributedFilePath<string>

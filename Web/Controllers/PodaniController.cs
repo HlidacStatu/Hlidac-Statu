@@ -1,11 +1,8 @@
-﻿using System;
-using System.IO;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Net.Mime;
 using HlidacStatu.Web.Models;
 using HlidacStatu.Web.Pdfs;
-using Microsoft.AspNetCore.Http;
 
 
 namespace HlidacStatu.Web.Controllers

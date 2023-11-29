@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using System.Net.Mail;
-using System;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WatchdogAnalytics.Pages

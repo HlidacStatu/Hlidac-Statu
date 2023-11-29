@@ -6,7 +6,6 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.Issues;
 using HlidacStatu.Extensions;
 using HlidacStatu.Repositories.Searching;
-using HlidacStatu.Repositories.Statistics;
 using Nest;
 
 using System;

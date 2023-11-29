@@ -2,7 +2,6 @@
 using HlidacStatu.DS.Api;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.ES;
 using HlidacStatu.Util;
 
 
@@ -22,7 +21,6 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace HlidacStatu.Datasets
 {

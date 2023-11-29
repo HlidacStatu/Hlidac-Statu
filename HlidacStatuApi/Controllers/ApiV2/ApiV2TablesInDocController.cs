@@ -1,6 +1,4 @@
 ﻿using HlidacStatu.Entities;
-using HlidacStatu.Repositories;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Data;

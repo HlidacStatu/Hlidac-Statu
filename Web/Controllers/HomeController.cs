@@ -15,7 +15,6 @@ using HlidacStatu.Extensions;
 using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Analysis;
-using HlidacStatu.Repositories.ES;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Framework;
 

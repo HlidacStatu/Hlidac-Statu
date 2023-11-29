@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using Devmasters.Log;
 using HlidacStatu.DS.Api;
 
 namespace HlidacStatu.Lib.Data.External

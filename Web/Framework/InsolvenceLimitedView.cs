@@ -1,6 +1,4 @@
 using HlidacStatu.Repositories;
-using Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis;
-using System.Linq;
 
 namespace HlidacStatu.Web.Framework
 {

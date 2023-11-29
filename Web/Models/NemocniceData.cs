@@ -1,6 +1,4 @@
-﻿using HlidacStatu.Repositories.ES;
-
-using Nest;
+﻿using Nest;
 
 using System;
 using System.Collections.Generic;

@@ -1,7 +1,6 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.XSD;
 using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.ES;
 using HlidacStatu.Util;
 
 using Nest;

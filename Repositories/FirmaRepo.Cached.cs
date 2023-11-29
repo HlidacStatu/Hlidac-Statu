@@ -1,6 +1,5 @@
 using Devmasters.Cache;
 using Devmasters.Cache.LocalMemory;
-using Devmasters.Log;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Util;

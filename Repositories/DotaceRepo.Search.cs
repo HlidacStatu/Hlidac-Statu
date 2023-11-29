@@ -2,7 +2,6 @@ using Devmasters;
 using Devmasters.DT;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Dotace;
-using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
 using Nest;

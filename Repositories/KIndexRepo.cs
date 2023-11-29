@@ -6,7 +6,6 @@ using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Util;
-using InfluxDB.Client.Api.Domain;
 using Nest;
 using Consts = HlidacStatu.Entities.KIndex.Consts;
 

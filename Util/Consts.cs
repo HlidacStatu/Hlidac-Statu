@@ -1,6 +1,4 @@
-﻿using Devmasters.Log;
-
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
 
 namespace HlidacStatu.Util

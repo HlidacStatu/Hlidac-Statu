@@ -2,9 +2,7 @@ using Devmasters;
 
 using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities.Analysis;
 using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.ES;
 using HlidacStatu.Repositories.Statistics;
 using HlidacStatu.Util;
 
@@ -20,7 +18,6 @@ using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Entities.Views;
 using HlidacStatu.Lib.Data.External.RPP;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
-using Microsoft.AspNetCore.Identity;
 
 namespace HlidacStatu.Extensions
 {

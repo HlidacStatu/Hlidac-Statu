@@ -1,6 +1,4 @@
-﻿using Devmasters.Log;
-
-namespace HlidacStatu.Plugin.Enhancers
+﻿namespace HlidacStatu.Plugin.Enhancers
 {
     public class Base
     {

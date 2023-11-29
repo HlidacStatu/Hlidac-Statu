@@ -1,6 +1,4 @@
-﻿using Devmasters.Log;
-
-namespace HlidacStatuApi.Code
+﻿namespace HlidacStatuApi.Code
 {
     public class Log
     {

@@ -3,7 +3,6 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.Insolvence;
 using HlidacStatu.Entities.VZ;
 using HlidacStatu.Repositories;
-using HlidacStatu.Repositories.ES;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

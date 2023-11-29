@@ -1,6 +1,4 @@
 using HlidacStatu.Entities;
-using HlidacStatu.Repositories.ES;
-
 using System;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;

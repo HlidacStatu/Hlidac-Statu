@@ -1,5 +1,3 @@
-using HlidacStatu.Repositories.ES;
-
 using Nest;
 
 using System;

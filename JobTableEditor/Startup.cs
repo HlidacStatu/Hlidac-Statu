@@ -1,6 +1,5 @@
 using System;
 using HlidacStatu.Entities;
-using HlidacStatu.Entities;
 using HlidacStatu.Util;
 using JobTableEditor.Areas.Identity;
 using JobTableEditor.Data;
