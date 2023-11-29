@@ -89,9 +89,6 @@
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Devmasters.Imaging" Version="4.5.22.2" />
     <PackageReference Include="EntityFramework" Version="6.4.4" />
-    <PackageReference Include="Enums.NET" Version="4.0.1" />
-    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
-    <PackageReference Include="Neo4j.Driver" Version="5.14.0" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="3.0.15" />
     <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
     <PackageReference Include="NitoAsyncEx.Context.StrongName" Version="1.1.0" />
