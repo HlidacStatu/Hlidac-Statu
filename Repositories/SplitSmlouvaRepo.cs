@@ -6,6 +6,18 @@ namespace HlidacStatu.Repositories
 {
     public class SplitSmlouvaRepo
     {
+        public static async Task<bool> ExistsAsync(string smlouvaId, string prilohaId)
+        {
+            Nest.ElasticClient client = await Manager.GetESClient_SplitSmlouvyAsync();
+
+            string id = SplitSmlouva.GetId(smlouvaId, prilohaId);
+            var res = await client.DocumentExistsAsync<SplitSmlouva>(id);
+            if (res.IsValid && res.Exists)
+                return true;
+            else
+                return false;
+        }
+
         public static async Task<SplitSmlouva> LoadAsync(string smlouvaId, string prilohaId)
         {
             Nest.ElasticClient client = await Manager.GetESClient_SplitSmlouvyAsync();
