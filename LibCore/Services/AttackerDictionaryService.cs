@@ -2,6 +2,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace HlidacStatu.LibCore.Services
 {
@@ -19,9 +21,14 @@ namespace HlidacStatu.LibCore.Services
                 "141.226.97.0/24"
             };
 
-            public override string[] HostName => null;
+            public override string[] HostNameRegex => null;
 
             public override string[] UserAgent => null;
+
+            public override async Task<bool> ReloadDefinitionsFromInternetAsync()
+            {
+                return true;
+            }
         }
 
         static Devmasters.Net.Crawlers.ICrawler radware = new RadwareNetwork();

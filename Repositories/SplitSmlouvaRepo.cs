@@ -22,7 +22,10 @@ namespace HlidacStatu.Repositories
             try
             {
                 var client = await Manager.GetESClient_SplitSmlouvyAsync();
-                await client.IndexAsync<SplitSmlouva>(item, m => m.Id(item.Id));
+                var res = await client.IndexAsync<SplitSmlouva>(item, m => m.Id(item.Id));
+
+                if (res.IsValid == false)
+                    HlidacStatu.Util.Consts.Logger.Error($"SplitSmlouvaRepo.Save error: {res.ServerError}",res.OriginalException );
 
             }
             catch (System.Exception e)

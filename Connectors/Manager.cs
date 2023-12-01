@@ -87,7 +87,7 @@ namespace HlidacStatu.Connectors
         public static string defaultIndexName_RPP_OVM = "rpp_ovm";
         public static string defaultIndexName_RPP_ISVS = "rpp_isvs";
 
-        public static string defaultIndexName_SplitSmlouvy = "SplitSmlouvy";
+        public static string defaultIndexName_SplitSmlouvy = "splitsmlouvy";
 
 
         private static SemaphoreSlim _clientSemaphore = new SemaphoreSlim(1, 1);
@@ -517,7 +517,7 @@ namespace HlidacStatu.Connectors
             idxSt.Settings = set;
 
             CreateIndexResponse res = null;
-            var aliasName = client.ConnectionSettings.DefaultIndex;
+            var aliasName = client.ConnectionSettings.DefaultIndex.ToLower();
             var indexName = (withAlias ? $"hs-{aliasName}-01" : aliasName).ToLower();
             switch (idxTyp)
             {
