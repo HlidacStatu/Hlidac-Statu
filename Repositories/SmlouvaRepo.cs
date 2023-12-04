@@ -247,9 +247,11 @@ namespace HlidacStatu.Repositories
         }
 
         static HashSet<string> ico_s_VazbouPolitik = new HashSet<string>(
-            StaticData.FirmySVazbamiNaPolitiky_vsechny_Cache.Get().SoukromeFirmy.Select(m => m.Key)
-                .Union(StaticData.SponzorujiciFirmy_Vsechny.Get().Select(m => m.IcoDarce))
+            StaticData.FirmySVazbamiNaPolitiky_vsechny_Cache.Get()?
+                .SoukromeFirmy.Select(m => m.Key)?
+                .Union(StaticData.SponzorujiciFirmy_Vsechny.Get().Select(m => m.IcoDarce))?
                 .Distinct()
+            ?? new string[] { }
         );
 
         static HashSet<string> ico_s_VazbouPolitikAktualni = new HashSet<string>(
