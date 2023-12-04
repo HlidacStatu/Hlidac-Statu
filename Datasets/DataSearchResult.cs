@@ -1,10 +1,9 @@
 ﻿using HlidacStatu.Repositories;
 using HlidacStatu.Repositories.Searching;
-
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HlidacStatu.Datasets
 {
@@ -89,7 +88,7 @@ namespace HlidacStatu.Datasets
             });
 
             var registration = DataSet.RegistrationAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-            
+
             for (int i = 0; i < registration.orderList.GetLength(0); i++)
             {
                 list.Add(new SelectListItem()
@@ -135,7 +134,7 @@ namespace HlidacStatu.Datasets
         {
             return new
             {
-                Q = Q,
+                Q = Q == "*" ? "" : Q, //nahrad *
                 Page = page,
                 Order = Order,
                 Id = DataSet.DatasetId
@@ -154,6 +153,8 @@ namespace HlidacStatu.Datasets
 
         public static string GetSearchUrlQueryString(string Q, SmlouvaRepo.Searching.OrderResult? order = null, int? page = null)
         {
+            if (Q == "*")
+                Q = "";
 
             string ret = string.Format("?Q={0}",
                System.Web.HttpUtility.UrlEncode(Q));
