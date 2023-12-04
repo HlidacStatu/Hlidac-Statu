@@ -56,7 +56,7 @@
             ).Total;
         <div class="col-xs-6 col-sm-4" style="padding:5px">
 
-            <a href="/verejnezakazky/hledat?q=*&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.Id.ToString())&order=1" class="list-group-item">
+            <a href="/verejnezakazky/hledat?q=&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.Id.ToString())&order=1" class="list-group-item">
                 <h4 class="list-group-item-heading">@obl.Name</h4>
                 <p class="list-group-item-text">
                     Celkem @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero((int)numAll, "<b>Žádná zakázka</b> za poslední roky", "<b>Jedna zakázka</b> za poslední roky", "<b>{0} zakázky</b> za poslední roky", "<b>{0} zakázek</b> za poslední roky"))
@@ -79,10 +79,10 @@
 <h2>Ukázky možností</h2>
 <ul>
     <li>
-        <a href="/verejnezakazky/hledat?Q=*&order=1">Poslední veřejné zakázky</a>
+        <a href="/verejnezakazky/hledat?q=&order=1">Poslední veřejné zakázky</a>
     </li>
     <li>
-        <a href="/verejnezakazky/hledat?Q=*%20oblast:IT&order=1">Poslední veřejné zakázky v oboru IT</a>
+        <a href="/verejnezakazky/hledat?q=%20oblast:IT&order=1">Poslední veřejné zakázky v oboru IT</a>
     </li>
     <li>
         <a href="/verejnezakazky/hledat?Q=ico%3A66002222&order=1">Poslední veřejné zakázky od Ministerstva pro místní rozvoj</a>

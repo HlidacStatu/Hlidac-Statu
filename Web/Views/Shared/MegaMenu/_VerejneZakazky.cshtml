@@ -56,7 +56,7 @@
                         vzCount = vzCount + obl.count;
 
                         <li class="list-group-item">
-                            <a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky/hledat?q=*&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.id.ToString())&order=1">@obl.name</a>
+                            <a onclick="return trackOutLink(this,'megamenu');" href="/verejnezakazky/hledat?q=&oblast=@VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.id.ToString())&order=1">@obl.name</a>
                         </li>
                     }
                     <li class="list-group-item">

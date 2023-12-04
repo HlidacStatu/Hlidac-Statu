@@ -569,7 +569,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
                     }).Total;
                             topVZ.Add(
                             new Tuple<string, string, long>(
-                            $"/verejnezakazky/hledat?q=*&oblast={VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.Id.ToString())}&order=1",
+                            $"/verejnezakazky/hledat?q=&oblast={VerejnaZakazkaRepo.Searching.NormalizeOblastValue(obl.Id.ToString())}&order=1",
                             $"{obl.Name} ({RenderData.NiceNumber(num3M)})",
                             num3M
                             )
@@ -591,8 +591,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fde54c', end
                     </div>
                     <div class="block-tags">
                         <a href="/verejnezakazky/hledat?Q=zverejneno%3A%5B@(DateTime.Now.Date.ToString("yyyy-MM-dd"))+TO+*%5D&Zahajeny=false&Oblast=&Order=4" class="tag">Největší zakázky za poslední měsíc</a>
-                        <a href="/verejnezakazky/hledat?Q=*%20oblast:IT&order=1" class="tag">Poslední  zakázky v oblasti IT</a>
-                        <a href="/verejnezakazky/hledat?Q=*&order=1" class="tag">Poslední veřejné zakázky</a>
+                        <a href="/verejnezakazky/hledat?q=%20oblast:IT&order=1" class="tag">Poslední  zakázky v oblasti IT</a>
+                        <a href="/verejnezakazky/hledat?q=&order=1" class="tag">Poslední veřejné zakázky</a>
                     </div>
                 </div>
 
