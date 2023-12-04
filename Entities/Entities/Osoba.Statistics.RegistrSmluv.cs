@@ -28,10 +28,10 @@ namespace HlidacStatu.Entities
                 public Dictionary<string, StatisticsSubjectPerYear<Smlouva.Statistics.Data>> SoukromeFirmy { get; set; }
 
                 //migrace: prasárna
-                public string[] _neziskovkyIcos = null;
-                public StatisticsPerYear<Smlouva.Statistics.Data> _soukromeFirmySummary = null;
-                public StatisticsPerYear<Smlouva.Statistics.Data> _statniFirmySummary = null;
-                public StatisticsPerYear<Smlouva.Statistics.Data> _neziskovkySummary = null;
+                public string[] _neziskovkyIcos { get; set; } = null;
+                public StatisticsPerYear<Smlouva.Statistics.Data> _soukromeFirmySummary { get; set; } = null;
+                public StatisticsPerYear<Smlouva.Statistics.Data> _statniFirmySummary { get; set; } = null;
+                public StatisticsPerYear<Smlouva.Statistics.Data> _neziskovkySummary { get; set; } = null;
 
 
             }

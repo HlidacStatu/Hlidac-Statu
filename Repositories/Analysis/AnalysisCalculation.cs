@@ -18,21 +18,21 @@ namespace HlidacStatu.Repositories.Analysis
 
         public class VazbyFiremNaPolitiky
         {
-            public Dictionary<string, List<int>> SoukromeFirmy = new Dictionary<string, List<int>>();
-            public Dictionary<string, List<int>> StatniFirmy = new Dictionary<string, List<int>>();
+            public Dictionary<string, List<int>> SoukromeFirmy { get; set; } = new Dictionary<string, List<int>>();
+            public Dictionary<string, List<int>> StatniFirmy { get; set; } = new Dictionary<string, List<int>>();
         }
 
         public class VazbyFiremNaUradyStat
         {
-            public IEnumerable<BasicDataForSubject<List<BasicData<string>>>> SoukromeFirmy =
+            public IEnumerable<BasicDataForSubject<List<BasicData<string>>>> SoukromeFirmy { get; set; } =
                 new List<BasicDataForSubject<List<BasicData<string>>>>();
-            public IEnumerable<BasicDataForSubject<List<BasicData<string>>>> StatniFirmy =
+            public IEnumerable<BasicDataForSubject<List<BasicData<string>>>> StatniFirmy { get; set; } =
                 new List<BasicDataForSubject<List<BasicData<string>>>>();
         }
         public class IcoSmlouvaMinMax
         {
-            public string ico;
-            public string jmeno;
+            public string ico { get; set; }
+            public string jmeno { get; set; }
             DateTime? _minUzavreni = null;
             public DateTime? minUzavreni
             {
@@ -43,7 +43,7 @@ namespace HlidacStatu.Repositories.Analysis
                     setDays();
                 }
             }
-            public DateTime? maxUzavreni;
+            public DateTime? maxUzavreni { get; set; }
 
             DateTime? _vznikIco = null;
             public DateTime? vznikIco
