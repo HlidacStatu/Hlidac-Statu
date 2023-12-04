@@ -18,8 +18,8 @@ namespace HlidacStatu.Repositories.Analysis
 
         public class VazbyFiremNaPolitiky
         {
-            public Dictionary<string, List<int>> SoukromeFirmy = null;
-            public Dictionary<string, List<int>> StatniFirmy = null;
+            public Dictionary<string, List<int>> SoukromeFirmy = new Dictionary<string, List<int>>();
+            public Dictionary<string, List<int>> StatniFirmy = new Dictionary<string, List<int>>();
         }
 
         public class VazbyFiremNaUradyStat
