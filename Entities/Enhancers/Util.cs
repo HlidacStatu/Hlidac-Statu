@@ -43,15 +43,19 @@ namespace HlidacStatu.Entities.Enhancers
                 try
                 {
                     if (false)
+                    /* creates exceptions in t3 
+                      Unable to load one or more of the requested types.
+                      Could not load type 'SqlGuidCaster' from assembly 'Microsoft.Data.SqlClient, Version=5.0.0.0, Culture=neutral, PublicKeyToken=23ec7fc2d6eaa4a5' because it contains an object field at offset 0 that is incorrectly aligned or overlapped by a non-object field.
+                     */
                     {
-                        types = AppDomain.CurrentDomain.GetAssemblies()
-                            .Union(dlls)
-                            .SelectMany(s => s.GetTypes())
-                            .Where(p =>
+                        var t1 = AppDomain.CurrentDomain.GetAssemblies().ToArray();
+                        var t2 = t1.Union(dlls).ToArray();
+                        var t3 = t2.SelectMany(s => s.GetTypes()).ToArray();
+                        var t4 = t3.Where(p =>
                                 typeI.IsAssignableFrom(p)
                                 && p.IsAbstract == false
-                                )
-                            .ToList();
+                                ).ToArray();
+                        types = t4.ToList();
                     }
                     types = dlls
                         .SelectMany(s => s.GetTypes())
@@ -63,6 +67,7 @@ namespace HlidacStatu.Entities.Enhancers
                 }
                 catch (System.Reflection.ReflectionTypeLoadException lex)
                 {
+
                     StringBuilder sb = new StringBuilder();
                     if (lex.LoaderExceptions != null)
                         foreach (Exception ex in lex.LoaderExceptions)
