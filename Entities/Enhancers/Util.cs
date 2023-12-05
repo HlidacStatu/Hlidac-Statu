@@ -42,15 +42,24 @@ namespace HlidacStatu.Entities.Enhancers
                 List<Type> types = null;
                 try
                 {
-                    types = AppDomain.CurrentDomain.GetAssemblies()
-                        .Union(dlls)
+                    if (false)
+                    {
+                        types = AppDomain.CurrentDomain.GetAssemblies()
+                            .Union(dlls)
+                            .SelectMany(s => s.GetTypes())
+                            .Where(p =>
+                                typeI.IsAssignableFrom(p)
+                                && p.IsAbstract == false
+                                )
+                            .ToList();
+                    }
+                    types = dlls
                         .SelectMany(s => s.GetTypes())
                         .Where(p =>
                             typeI.IsAssignableFrom(p)
                             && p.IsAbstract == false
                             )
                         .ToList();
-
                 }
                 catch (System.Reflection.ReflectionTypeLoadException lex)
                 {
