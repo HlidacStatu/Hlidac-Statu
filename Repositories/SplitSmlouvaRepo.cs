@@ -1,5 +1,8 @@
 ﻿using HlidacStatu.Connectors;
 using HlidacStatu.MLUtil.Splitter;
+using Nest;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Repositories
@@ -28,6 +31,27 @@ namespace HlidacStatu.Repositories
             else
                 return null;
         }
+        public static async Task<IEnumerable<SplitSmlouva>> SearchAsync(string elasticQueryString, int page, int pageSize = 20)
+        {
+            Nest.ElasticClient client = await Manager.GetESClient_SplitSmlouvyAsync();
+            var res = client.Search<SplitSmlouva>(s => s
+                .Size(pageSize)
+                .From(page * pageSize)
+                .Query(q=>q
+                    .QueryString(qs => qs
+                        .Query(elasticQueryString)
+                        .DefaultOperator(Operator.And)
+                    )
+                )
+            );
+
+            if (res.IsValid)
+                return res.Hits.Select(m => m.Source);
+            else
+                return null;
+
+        }
+
         public static async Task SaveAsync(SplitSmlouva item)
         {
 
