@@ -10,7 +10,8 @@ namespace HlidacStatu.XLib.Watchdogs
 {
     public class SingleEmailPerWatchdog
     {
-        public  static void SendWatchdogs(IEnumerable<WatchDog> watchdogs,
+        
+        public async static Task SendWatchdogsAsync(IEnumerable<WatchDog> watchdogs,
             bool force = false, string[] specificContacts = null,
             DateTime? fromSpecificDate = null, DateTime? toSpecificDate = null,
             string openingText = null,
@@ -26,16 +27,15 @@ namespace HlidacStatu.XLib.Watchdogs
 
             Util.Consts.Logger.Info($"SingleEmailPerWatchdog Start processing {watchdogs.Count()} watchdogs.");
 
-            Devmasters.Batch.Manager.DoActionForAll<WatchDog>(watchdogs,
-                (userWatchdog) =>
+            await Devmasters.Batch.Manager.DoActionForAllAsync<WatchDog>(watchdogs,
+               async (userWatchdog) =>
                 {
                     ApplicationUser user = userWatchdog.UnconfirmedUser();
 
                     Util.Consts.Logger.Info("SingleEmailPerWatchdog watchdog sending {userWatchdogId} to {email}.",
                         userWatchdog.Id, user.Email);
-                    Mail.SendStatus res = Mail.SendWatchdogAsync(userWatchdog, user,
-                        force, specificContacts, fromSpecificDate, toSpecificDate, openingText)
-                        .ConfigureAwait(false).GetAwaiter().GetResult();
+                    Mail.SendStatus res = await Mail.SendWatchdogAsync(userWatchdog, user,
+                        force, specificContacts, fromSpecificDate, toSpecificDate, openingText);
 
                     Util.Consts.Logger.Info("SingleEmailPerWatchdog watchdog {userWatchdogId} to {email} sent result {result}.",
                         userWatchdog.Id, user.Email, res.ToString());
