@@ -115,7 +115,8 @@ namespace HlidacStatu.Lib.Data.External.DatoveSchranky
 
         public static Osoba GetSubjektyForIco(string ico)
         {
-
+            if (Util.DataValidators.CheckCZICO(ico) == false)
+                return null;
             string req = @"<GetInfoRequest xmlns=""http://seznam.gov.cz/ovm/ws/v1""><Ico>{0}</Ico></GetInfoRequest>";
             var resp = GetResponse(string.Format(req, ico));
             return Osoba.GetOsoba(resp?.Osoba);
