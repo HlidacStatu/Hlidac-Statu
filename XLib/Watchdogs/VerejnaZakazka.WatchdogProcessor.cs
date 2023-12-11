@@ -90,7 +90,7 @@ namespace HlidacStatu.XLib.Watchdogs
         {{ for item in model.Items limit:5 }}
             <tr>
                 <td style='white-space: nowrap;'>
-                    <a href='https://www.hlidacstatu.cz/VerejneZakazky/Zakazka/{{ item.Id }}?qs={{html.url_encode model.SearchQuery}}&utm_source=hlidac&utm_medium=email&utm_campaign=detail'>{{item.EvidencniCisloZakazky}}</a>
+                    <a href='https://www.hlidacstatu.cz/VerejneZakazky/Zakazka/{{ item.Id }}?qs={{html.url_encode model.SearchQuery}}&utm_source=hlidac&utm_medium=email&utm_campaign=detail'>Detail</a>
                 </td>
                 <td>
                     {{ if (item.DatumUverejneni != null) ; fn_FormatDate item.DatumUverejneni 'dd.MM.yyyy' ; end }}

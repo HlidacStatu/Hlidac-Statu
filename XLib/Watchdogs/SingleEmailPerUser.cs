@@ -11,7 +11,7 @@ namespace HlidacStatu.XLib.Watchdogs
     public class SingleEmailPerUser
     {
 
-        public async static Task SendWatchdogsAsync(IEnumerable<WatchDog> watchdogs,
+        public static void SendWatchdogs(IEnumerable<WatchDog> watchdogs,
             bool force = false, string[] specificContacts = null,
             DateTime? fromSpecificDate = null, DateTime? toSpecificDate = null,
             string openingText = null,
@@ -41,8 +41,8 @@ namespace HlidacStatu.XLib.Watchdogs
             Util.Consts.Logger.Info($"SingleEmailPerUser {groupedByUserNoSpecContact.Count()} emails.");
 
 
-            await Devmasters.Batch.Manager.DoActionForAllAsync<KeyValuePair<string, WatchDog[]>>(groupedByUserNoSpecContact,
-                async (kv) =>
+            Devmasters.Batch.Manager.DoActionForAll<KeyValuePair<string, WatchDog[]>>(groupedByUserNoSpecContact,
+                (kv) =>
                 {
                     WatchDog[] userWatchdogs = kv.Value;
 
@@ -60,8 +60,9 @@ namespace HlidacStatu.XLib.Watchdogs
                     try
                     {
 
-                        res = await Mail.SendWatchdogsInOneEmailAsync(userWatchdogs, user,
-                        force, specificContacts, fromSpecificDate, toSpecificDate, openingText);
+                        res = Mail.SendWatchdogsInOneEmailAsync(userWatchdogs, user,
+                        force, specificContacts, fromSpecificDate, toSpecificDate, openingText)
+                        .ConfigureAwait(false).GetAwaiter().GetResult();
                     }
                     catch (Exception e)
                     {
