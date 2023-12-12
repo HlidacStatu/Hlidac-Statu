@@ -295,7 +295,7 @@ namespace HlidacStatu.Entities
                 kancelar_nabor = 11106,
                 [NiceDisplayName("Mobily, smart zařízení")]
                 kancelar_smart = 11107,
-                [NiceDisplayName("Knihy, časopisy, literatura (jejich nákup a prodej)")]
+                [NiceDisplayName("Knihy, časopisy, literatura")]
                 kancelar_literatura = 11108,
 
 
