@@ -27,12 +27,6 @@ namespace HlidacStatu.Repositories
         {
             //PrepareBeforeSaveAsync(firma).GetAwaiter().GetResult();
 
-            if (firma.ICO == "00000205" ||  firma.ICO== "205" || firma.ICO == "_t20ABmHW5w")
-            {
-                HlidacStatu.Util.Consts.Logger.Fatal("00000205 Save\n\n" + Devmasters.Log.StackReporter.GetCallingMethod(true));
-                HlidacStatu.Util.Consts.Logger.Debug("00000205 Save\n\n" + Devmasters.Log.StackReporter.GetCallingMethod(true));
-                System.IO.File.WriteAllText(@$"c:\!\save205_{DateTime.Now:yyyy-MM-dd_HH-mm-ss.fff}.log", "00000205 Save\n\n" + Devmasters.Log.StackReporter.GetCallingMethod(true));
-            }
 
             string sqlNACE = @"INSERT into firma_NACE(ico, nace) values(@ico,@nace)";
             string sqlDS = @"INSERT into firma_DS(ico, DatovaSchranka) values(@ico,@DatovaSchranka)";
