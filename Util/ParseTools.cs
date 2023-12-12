@@ -164,11 +164,7 @@ namespace HlidacStatu.Util
             if (DataValidators.IsFirmaIcoZahranicni(ico))
                 return ico;
             
-            ico = Devmasters.TextUtil.NormalizeToNumbersOnly(ico);
-            if (string.IsNullOrEmpty(ico))
-                return string.Empty;
-
-            return ico.PadLeft(8, '0');
+            return string.Empty;
             
         }
 
