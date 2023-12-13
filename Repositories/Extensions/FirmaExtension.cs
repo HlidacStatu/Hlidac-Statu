@@ -269,6 +269,10 @@ namespace HlidacStatu.Extensions
         public static async Task<(string jmeno, string prijmeni, DateTime? poslednizmena)[]> CeosFromRPPAsync(this Firma firma)
         {
             List<(string jmeno, string prijmeni, DateTime? poslednizmena)> osoby = new List<(string jmeno, string prijmeni, DateTime? poslednizmena)>();
+
+            if (firma.Valid == false || string.IsNullOrEmpty(firma.ICO)) 
+                return osoby.ToArray();
+
             var client = await Manager.GetESClient_RPP_OVMAsync();
             var rppReq = await client.GetAsync<HlidacStatu.Lib.Data.External.RPP.OVMFull>(firma.ICO);
             if (rppReq.Found && rppReq.Source.angazovaneOsoby?.Count() > 0)
