@@ -270,7 +270,6 @@ text zpravy: {txt}";
             // create a task, so user doesn't have to wait for anything
             _ = Task.Run(async () =>
             {
-
                 try
                 {
                     string subject = "Zprava z HlidacStatu.cz: " + typ;
@@ -295,7 +294,7 @@ text zpravy: {txt}
                 }
                 catch (Exception ex)
                 {
-                    Util.Consts.Logger.Fatal(string.Format("{0}|{1}|{2}", email, url, txt, ex));
+                    Util.Consts.Logger.Error($"error sending classification feedback {email}|{url}|{txt}", ex);
                 }
 
                 try
@@ -315,7 +314,7 @@ text zpravy: {txt}
                 }
                 catch (Exception ex)
                 {
-                    Util.Consts.Logger.Fatal($"Problem sending data to ClassificationFeedback queue. Message={ex}");
+                    Util.Consts.Logger.Error($"Problem sending data to ClassificationFeedback queue. Message={ex}");
                 }
 
 
