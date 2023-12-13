@@ -43,6 +43,12 @@
 
         <button class="btn btn-primary" @onclick="@(SubmitSearch)" style="margin-bottom:0;margin-top:0;padding-bottom:0">
             Hledat
+            @if (_showSpinner)
+            {
+                <span class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </span>
+            }
         </button>
     </div>
 
@@ -127,6 +133,8 @@
     private bool ShowHelpTips { get; set; }
 
     private string GrayboxDisplay { get; set; } = "none";
+    
+    private bool _showSpinner = false;
 
     private string InputBoxPlaceHolder
     {
@@ -345,6 +353,8 @@
     {
         //add what is in inputbox
         await SelectItemAsync(-1);
+        //spin it
+        _showSpinner = true;
         //notify parent, that we are done
         await OnAutocompleteSubmitted.InvokeAsync(TagItems);
     }
@@ -358,7 +368,5 @@
     {
         ShowHelpTips = false;
     }
-
-
-
+    
 }
