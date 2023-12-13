@@ -50,15 +50,15 @@ Cookie: _ga=GA1.2.1208733850.1580933391; JSessionID=R3890696782
 
          
          */
-        public ResultList<KategorieOVM> KategorieOVM()
+        public async Task<ResultList<KategorieOVM>> KategorieOVMAsync()
         {
 
             string payload = "{\"stav\":[\"SCHVALENO\",\"UKONCENO\"],\"primarni\":true}";
 
-            var json = CallAsync(root + "/AISP/rest/verejne/katovm?start=0&pocet=1000&razeni=-datumPosledniZmeny,-id",
+            var json = await CallAsync(root + "/AISP/rest/verejne/katovm?start=0&pocet=1000&razeni=-datumPosledniZmeny,-id",
                 payload,
                 "PUT"
-                ).Result;
+                );
 
             var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<KategorieOVM>>(json);
 
@@ -71,7 +71,7 @@ Cookie: _ga=GA1.2.1208733850.1580933391; JSessionID=R3890696782
             return res;
         }
 
-        public ResultList<OVMSimple> OVM_v_KategoriiOVM(KategorieOVM katOVM)
+        public async Task<ResultList<OVMSimple>> OVM_v_KategoriiOVMAsync(KategorieOVM katOVM)
         {
             List<OVMSimple> ovms = new List<OVMSimple>();
 
@@ -79,10 +79,10 @@ Cookie: _ga=GA1.2.1208733850.1580933391; JSessionID=R3890696782
             int from = 0;
             do
             {
-                var json = CallAsync(root + $"/AISP/rest/verejne/ovmkat/{katOVM.id}/ovmclenystrankovane?start={from}&pocet={step}&razeni=-id,-id",
+                var json = await CallAsync(root + $"/AISP/rest/verejne/ovmkat/{katOVM.id}/ovmclenystrankovane?start={from}&pocet={step}&razeni=-id,-id",
                     "{}",
                     "PUT"
-                    ).Result;
+                    );
 
                 var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<OVMSimple>>(json);
                 if (res == null)
@@ -104,7 +104,7 @@ Cookie: _ga=GA1.2.1208733850.1580933391; JSessionID=R3890696782
             };
         }
 
-        public ResultList<ISVS> ISVSList()
+        public async Task<ResultList<ISVS>> ISVSListAsync()
         {
             List<ISVS> ovms = new List<ISVS>();
 
@@ -112,10 +112,10 @@ Cookie: _ga=GA1.2.1208733850.1580933391; JSessionID=R3890696782
             int from = 0;
             do
             {
-                var json = CallAsync(root + $"/AISP/rest/verejne/isvs?start={from}&pocet={step}&razeni=-datumPosledniZmeny,-id",
+                var json = await CallAsync(root + $"/AISP/rest/verejne/isvs?start={from}&pocet={step}&razeni=-datumPosledniZmeny,-id",
                     "{\"stav\":[\"SCHVALENO\",\"UKONCENO\"],\"omezitPodlePrihlaseneho\":false,\"primarni\":false}",
                     "PUT"
-                    ).Result;
+                    );
 
                 var res = Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<ISVS>>(json);
                 if (res.seznam.Count() == 0)
@@ -135,33 +135,33 @@ Cookie: _ga=GA1.2.1208733850.1580933391; JSessionID=R3890696782
             };
         }
 
-        public ISVS ISVSDetail(int isvsId)
+        public async Task<ISVS> ISVSDetailAsync(int isvsId)
         {
-            var json = CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}",
+            var json = await CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}",
                 "",
                 "GET"
-                ).Result;
+                );
             var isvs = Newtonsoft.Json.JsonConvert.DeserializeObject<ISVS>(json);
 
-            json = CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/vypisvyuziti").Result;
+            json = await CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/vypisvyuziti");
             isvs.vyuzitiIS = Newtonsoft.Json.JsonConvert.DeserializeObject<ISVS.vypisvyuziti>(json);
 
-            json = CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/polozkystruktury").Result;
+            json = await CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/polozkystruktury");
             isvs.aplikacniCleneni = Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<ISVS.aplikacnicleneni>>(json)?.seznam?.ToArray();
 
-            json = CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/pp").Result;
+            json = await CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/pp");
             isvs.pravniPredpisy = Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<ISVS.pravnipredpisy>>(json)?.seznam?.ToArray();
 
-            json = CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/milniky").Result;
+            json = await CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/milniky");
             isvs.milnikyZivotnihoCyklu = Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<ISVS.milniky>>(json)?.seznam?.ToArray();
 
-            json = CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/gdpr").Result;
+            json = await CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/gdpr");
             isvs.Gdpr = Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<ISVS.gdpr>>(json)?.seznam?.ToArray();
 
-            json = CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/finance").Result;
+            json = await CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/finance");
             isvs.financniUdaje = Newtonsoft.Json.JsonConvert.DeserializeObject<ISVS.finance>(json);
 
-            json = CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/subjekty").Result;
+            json = await CallAsync(root + $"/AISP/rest/verejne/isvs/{isvsId}/subjekty");
             var subj = Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<ISVS.Subjekt>>(json)?.seznam?.ToArray();
             if (subj != null)
             {
@@ -175,37 +175,37 @@ Cookie: _ga=GA1.2.1208733850.1580933391; JSessionID=R3890696782
         }
 
 
-        public OVMFull OVMDetail(OVMSimple ovm)
+        public async Task<OVMFull> OVMDetailAsync(OVMSimple ovm)
         {
-            return OVMDetail(ovm.id);
+            return await OVMDetailAsync(ovm.id);
         }
-        public OVMFull OVMDetail(int ovmId)
+        public async Task<OVMFull> OVMDetailAsync(int ovmId)
         {
-            var json = CallAsync(root + $"/AISP/rest/verejne/ovm/{ovmId}/hlavniatributy",
+            var json = await CallAsync(root + $"/AISP/rest/verejne/ovm/{ovmId}/hlavniatributy",
                 "",
                 "GET"
-                ).Result;
+                );
             var ovm = Newtonsoft.Json.JsonConvert.DeserializeObject<OVMFull>(json);
 
-            json = CallAsync(root + $"/AISP/rest/verejne/ovm/{ovmId}/podrizenaovm",
+            json = await CallAsync(root + $"/AISP/rest/verejne/ovm/{ovmId}/podrizenaovm",
                 "",
                 "GET"
-                ).Result;
+                );
 
 
             ovm.podrizeneOVM = Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<OVMSimple.Ovm>>(json).seznam?.ToArray();
 
-            json = CallAsync(root + $"/AISP/rest/verejne/ovm/{ovmId}/osobyvcele",
+            json = await CallAsync(root + $"/AISP/rest/verejne/ovm/{ovmId}/osobyvcele",
                 "",
                 "GET"
-                ).Result;
+                );
 
             ovm.angazovaneOsoby = Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<OVMFull.Osoba>>(json).seznam?.ToArray();
 
-            json = CallAsync(root + $"/AISP/rest/verejne/ovm/{ovmId}/osobaros",
+            json = await CallAsync(root + $"/AISP/rest/verejne/ovm/{ovmId}/osobaros",
                 "",
                 "GET"
-                ).Result;
+                );
 
             var osobaros = Newtonsoft.Json.JsonConvert.DeserializeObject<osobaros>(json);
             ovm.kodPravnihoStavu = osobaros?.kodPravnihoStavu ?? 0;
@@ -213,10 +213,10 @@ Cookie: _ga=GA1.2.1208733850.1580933391; JSessionID=R3890696782
             ovm.verejnaProspesnost = osobaros?.verejnaProspesnost ?? false;
             ovm.angazovaneOsoby = osobaros?.angazovaneOsoby;
 
-            json = CallAsync(root + $"/AISP/rest/verejne/ovm/{ovmId}/seznamkatprirazenychkovm?start=0&pocet=1000&razeni=-id,-id",
+            json = await CallAsync(root + $"/AISP/rest/verejne/ovm/{ovmId}/seznamkatprirazenychkovm?start=0&pocet=1000&razeni=-id,-id",
                 "",
                 "GET"
-                ).Result;
+                );
             ovm.kategorie = Newtonsoft.Json.JsonConvert.DeserializeObject<ResultList<seznamkatprirazenychkovm>>(json)
                 .seznam?
                 .Select(m => m.kategorieOvm)
