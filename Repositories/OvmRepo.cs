@@ -103,6 +103,26 @@ namespace HlidacStatu.Repositories
                 return deb6;
             }
         }
+        public static List<string> AllIcosStatniOVM()
+        {
+            using var dbContext = new DbEntities();
+            return dbContext.OrganVerejneMoci.AsNoTracking()
+                .Where(o=>
+                    o.TypOvmId == 3 ||
+                    o.TypOvmId == 4 ||
+                    o.TypOvmId == 5 ||
+                    o.TypOvmId == 6 ||
+                    o.TypOvmId == 7 ||
+                    o.TypOvmId == 8 ||
+                    o.TypOvmId == 11 ||
+                    o.TypOvmId == 17 ||
+                    o.TypOvmId == 18 ||
+                    o.TypOvmId == 22 ||
+                    o.TypOvmId == 23 
+                    )
+                .Select(o => o.ICO)
+                .ToList();
+        }
 
         public static List<string> AllIcos()
         {
