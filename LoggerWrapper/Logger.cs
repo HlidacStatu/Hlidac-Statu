@@ -42,6 +42,15 @@ public class Logger
         Log.Warning(messageTemplate, parameters);
     }
     
+    public void Fatal(string messageTemplate, Exception exception, params object?[]? parameters)
+    {
+        Log.Fatal(exception, messageTemplate, parameters);
+    }
+    public void Fatal(string messageTemplate, params object?[]? parameters)
+    {
+        Log.Fatal(messageTemplate, parameters);
+    }
+    
     
     
 }

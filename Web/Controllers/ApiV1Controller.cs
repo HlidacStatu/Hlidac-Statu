@@ -201,11 +201,8 @@ namespace HlidacStatu.Web.Controllers
         [Authorize]
         public ActionResult Dump(string date, string datatype = "smlouvy")
         {
-            Util.Consts.Logger.Info(new Devmasters.Log.LogMessage()
-                .SetMessage("Downloading smlouvy.dump.zip")
-                .SetCustomKeyValue("UserId", User.Identity.Name)
-            );
-
+            Util.Consts.Logger.Info("Downloading smlouvy.dump.zip {UserId}", User.Identity.Name);
+                
             DateTime? specificDate = Devmasters.DT.Util.ToDateTime(date, "yyyy-MM-dd");
             string onlyfile = $"{datatype}.dump" +
                               (specificDate.HasValue ? "-" + specificDate.Value.ToString("yyyy-MM-dd") : "");

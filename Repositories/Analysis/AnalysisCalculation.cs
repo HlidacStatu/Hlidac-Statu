@@ -338,10 +338,8 @@ namespace HlidacStatu.Repositories.Analysis
             return ret;
         }
 
-        public static VazbyFiremNaPolitiky LoadFirmySVazbamiNaPolitiky(Relation.AktualnostType aktualnostVztahu, bool showProgress = false, Devmasters.Log.Logger logger = null)
+        public static VazbyFiremNaPolitiky LoadFirmySVazbamiNaPolitiky(Relation.AktualnostType aktualnostVztahu, bool showProgress = false)
         {
-            logger = logger ?? HlidacStatu.Util.Consts.Logger;
-
             Dictionary<string, List<int>> pol_SVazbami = new Dictionary<string, List<int>>();
             Dictionary<string, List<int>> pol_SVazbami_StatniFirmy = new Dictionary<string, List<int>>();
 
@@ -411,8 +409,7 @@ namespace HlidacStatu.Repositories.Analysis
                 }
                 catch (Exception e)
                 {
-                    logger.Error("LoadFirmySVazbamiNaPolitiky error for {osoba}", ex: e, p?.NameId);
-                    
+                    Util.Consts.Logger.Error("LoadFirmySVazbamiNaPolitiky error for {osoba}", e, p?.NameId);
                 }
 
                 return new ActionOutputData() { CancelRunning = false, Log = null };
