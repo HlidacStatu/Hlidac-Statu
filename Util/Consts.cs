@@ -29,7 +29,7 @@ namespace HlidacStatu.Util
         public static System.Globalization.CultureInfo csCulture = System.Globalization.CultureInfo.GetCultureInfo("cs");
         public static Random Rnd = new Random();
 
-        public static Devmasters.Log.Logger Logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu");
+        public static LoggerWrapper.Logger Logger;
 
     }
 }

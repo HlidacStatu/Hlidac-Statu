@@ -194,6 +194,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobTeacher", "..\Hlidac-Sta
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleHttpListener", "SimpleHttpListener\SimpleHttpListener.csproj", "{E1A93DE5-AABE-4640-89B4-9D08950F0792}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggerWrapper", "LoggerWrapper\LoggerWrapper.csproj", "{55AEFBEE-D0F6-49FB-9EA4-976BD2137068}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -468,6 +470,10 @@ Global
 		{E1A93DE5-AABE-4640-89B4-9D08950F0792}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1A93DE5-AABE-4640-89B4-9D08950F0792}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1A93DE5-AABE-4640-89B4-9D08950F0792}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55AEFBEE-D0F6-49FB-9EA4-976BD2137068}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55AEFBEE-D0F6-49FB-9EA4-976BD2137068}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55AEFBEE-D0F6-49FB-9EA4-976BD2137068}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55AEFBEE-D0F6-49FB-9EA4-976BD2137068}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -552,6 +558,7 @@ Global
 		{AED4D970-A52A-4AB5-B5B2-C8BCA175283F} = {87D50816-C7A9-4B83-A5E3-5EEE0265C2F5}
 		{F9CFAF48-2E93-4BF0-BE5A-3A8ED7089A1C} = {AF9C295F-FA98-4C4C-9A87-25F1792C9E3D}
 		{E1A93DE5-AABE-4640-89B4-9D08950F0792} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
+		{55AEFBEE-D0F6-49FB-9EA4-976BD2137068} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
