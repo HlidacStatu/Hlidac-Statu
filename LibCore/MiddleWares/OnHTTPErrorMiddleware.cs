@@ -1,11 +1,9 @@
-using Devmasters.Log;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
-
 using System;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.LibCore.MiddleWares
 {
@@ -14,14 +12,14 @@ namespace HlidacStatu.LibCore.MiddleWares
         public const string ItemKeyName = "errorPageCtx";
         public const string ItemKeyNameObj = "errorPageCtxObj";
         private readonly RequestDelegate _next;
-        private readonly Logger logger;
+        
+        private readonly ILogger _logger = Log.ForContext<OnHTTPErrorMiddleware>();
 
-        public OnHTTPErrorMiddleware(RequestDelegate next, Devmasters.Log.Logger logger)
+        public OnHTTPErrorMiddleware(RequestDelegate next)
         {
             _next = next;
-            logger = logger ?? HlidacStatu.Util.Consts.Logger;
-            this.logger = logger;
         }
+
         public async Task Invoke(HttpContext httpContext)
         {
             try
@@ -40,7 +38,8 @@ namespace HlidacStatu.LibCore.MiddleWares
                 else
                     httpContext.Items.Add(ItemKeyName, str);
 
-                logger.Error("Unhadled exception {middleware} {path}?{query}\n"+str,e, "OnHTTPErrorMidddleware",httpContext.Request.Path, httpContext.Request.QueryString);
+                _logger.Error(e, "Unhadled exception {middleware} {path}?{query}\n" + str, "OnHTTPErrorMidddleware",
+                    httpContext.Request.Path, httpContext.Request.QueryString);
 
                 throw;
             }
@@ -50,7 +49,8 @@ namespace HlidacStatu.LibCore.MiddleWares
                 try
                 {
                     var exceptionHandlerPathFeature = httpContext.Features.Get<IExceptionHandlerPathFeature>();
-                    var str = Devmasters.Net.WebContextLogger.LogFatalWebError(exceptionHandlerPathFeature?.Error, httpContext, true, "");
+                    var str = Devmasters.Net.WebContextLogger.LogFatalWebError(exceptionHandlerPathFeature?.Error,
+                        httpContext, true, "");
                     if (httpContext.Items.ContainsKey(ItemKeyName))
                     {
                         var prevStr = httpContext.Items[ItemKeyName] as string;
@@ -59,12 +59,14 @@ namespace HlidacStatu.LibCore.MiddleWares
                     else
                         httpContext.Items.Add(ItemKeyName, str);
 
-                    logger.Error("Unhadled exception >500 {middleware} {path}?{query}\n" + httpContext.Items[ItemKeyName], "OnHTTPErrorMidddleware", httpContext.Request.Path, httpContext.Request.QueryString);
+                    _logger.Error(
+                        "Unhadled exception > 500 {middleware} {path}?{query}\n" + httpContext.Items[ItemKeyName],
+                        "OnHTTPErrorMidddleware", httpContext.Request.Path, httpContext.Request.QueryString);
                 }
                 catch (Exception e)
                 {
-                    HlidacStatu.Util.Consts.Logger.Fatal(
-                        $"OnHTTPErrorMiddleware Invoke exc: {httpContext.Response.StatusCode} {httpContext.Request.Path}?{httpContext.Request.QueryString.ToString()}", e);
+                    _logger.Fatal(e,
+                        $"OnHTTPErrorMiddleware Invoke exc: {httpContext.Response.StatusCode} {httpContext.Request.Path}?{httpContext.Request.QueryString.ToString()}");
                 }
             }
             else if (httpContext.Response.StatusCode >= 400)
@@ -75,30 +77,28 @@ namespace HlidacStatu.LibCore.MiddleWares
                     if (httpContext.Items.ContainsKey(ItemKeyName))
                     {
                         var prevStr = httpContext.Items[ItemKeyName] as string;
-                        httpContext.Items[ItemKeyName] = prevStr + "\n\n====== Next404 =======" + str;                        
+                        httpContext.Items[ItemKeyName] = prevStr + "\n\n====== Next404 =======" + str;
                     }
                     else
                         httpContext.Items.Add(ItemKeyName, str);
 
-                    httpContext.Items[ItemKeyNameObj] = Devmasters.Net.WebContextLogger.Get404ErrorContextInfo(httpContext);
+                    httpContext.Items[ItemKeyNameObj] =
+                        Devmasters.Net.WebContextLogger.Get404ErrorContextInfo(httpContext);
                 }
                 catch (Exception e)
                 {
-                    HlidacStatu.Util.Consts.Logger.Fatal(
-                        $"OnHTTPErrorMiddleware Invoke exc: {httpContext.Response.StatusCode} {httpContext.Request.Path.ToString()}?{httpContext.Request.QueryString.ToString()}", e);
+                    _logger.Error(e,
+                        $"OnHTTPErrorMiddleware Invoke exc: {httpContext.Response.StatusCode} {httpContext.Request.Path.ToString()}?{httpContext.Request.QueryString.ToString()}");
                 }
             }
-            return;
         }
     }
 
     public static class OnHTTPErrorMiddlewareExtension
     {
-        public static IApplicationBuilder UseOnHTTPErrorMiddleware(this IApplicationBuilder builder, Devmasters.Log.Logger logger = null)
+        public static IApplicationBuilder UseOnHTTPErrorMiddleware(this IApplicationBuilder builder)
         {
-            return builder.UseMiddleware<OnHTTPErrorMiddleware>(logger);
+            return builder.UseMiddleware<OnHTTPErrorMiddleware>();
         }
     }
-
-
 }

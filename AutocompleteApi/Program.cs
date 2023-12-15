@@ -68,10 +68,8 @@ try
         ApplicationName = "AutocompleteApi",
         MinimumRequestTimeToTrackMs = 900
     });
-
-    var timeMeasureLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.AutocompleteApi.ResponseTimes");
-            
-    app.UseTimeMeasureMiddleware(timeMeasureLogger);
+    
+    app.UseTimeMeasureMiddleware();
     if (app.Environment.IsDevelopment())
     {
         app.UseDeveloperExceptionPage();
