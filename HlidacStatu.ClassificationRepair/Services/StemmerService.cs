@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Mime;
@@ -8,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.ClassificationRepair
 {
@@ -32,12 +31,11 @@ namespace HlidacStatu.ClassificationRepair
     public class StemmerService : IStemmerService
     {
         private readonly HttpClient _httpClient;
-        private readonly ILogger _logger;
+        private readonly ILogger _logger = Log.ForContext<StemmerService>();
 
-        public StemmerService(HttpClient httpClient, ILogger<StemmerService> logger)
+        public StemmerService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _logger = logger;
         }
 
         public async Task<IEnumerable<Explanation>> ExplainCategories(string text, CancellationToken cancellationToken)
@@ -56,7 +54,7 @@ namespace HlidacStatu.ClassificationRepair
                 });
                 return result;
             }
-            _logger.LogError($"Failed getting response from: {response.RequestMessage.RequestUri}. Klasifikator responded with statusCode=[{response.StatusCode}].");
+            _logger.Error($"Failed getting response from: {response.RequestMessage.RequestUri}. Klasifikator responded with statusCode=[{response.StatusCode}].");
             throw new HttpRequestException($"Klasifikator responded with statusCode=[{response.StatusCode}].");
         }
 
@@ -72,7 +70,7 @@ namespace HlidacStatu.ClassificationRepair
                 var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 return JsonSerializer.Deserialize<IEnumerable<string>>(json);
             }
-            _logger.LogError($"Failed getting response from: {response.RequestMessage.RequestUri}. Klasifikator responded with statusCode=[{response.StatusCode}].");
+            _logger.Error($"Failed getting response from: {response.RequestMessage.RequestUri}. Klasifikator responded with statusCode=[{response.StatusCode}].");
             throw new HttpRequestException($"Klasifikator responded with statusCode=[{response.StatusCode}].");
         }
 
@@ -86,7 +84,7 @@ namespace HlidacStatu.ClassificationRepair
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed getting response from: {new Uri(_httpClient.BaseAddress, uri)}.");
+                _logger.Error(ex, $"Failed getting response from: {new Uri(_httpClient.BaseAddress, uri)}.");
                 throw;
             }
         }
@@ -101,7 +99,7 @@ namespace HlidacStatu.ClassificationRepair
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed getting response from: {new Uri(_httpClient.BaseAddress, uri)}.");
+                _logger.Error(ex, $"Failed getting response from: {new Uri(_httpClient.BaseAddress, uri)}.");
                 throw;
             }
         }
