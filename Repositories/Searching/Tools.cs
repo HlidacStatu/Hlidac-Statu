@@ -419,7 +419,7 @@ namespace HlidacStatu.Repositories.Searching
                             }
                             catch (Exception e)
                             {
-                                Devmasters.Log.Logger.Root.Error("DoActionForQueryAsync action error", e);
+                                HlidacStatu.Util.Consts.Logger.Error("DoActionForQueryAsync action error", e);
                                 if (canceled)
                                     break;
 

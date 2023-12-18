@@ -61,7 +61,6 @@
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.11.54</Version>
     </PackageReference>
-    <PackageReference Include="log4net" Version="2.0.15" />
     <PackageReference Include="NDesk.Options">
       <Version>0.2.1</Version>
     </PackageReference>
@@ -90,6 +89,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="last_event_id.dat" />
+    <Content Update="Logger.serilog.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Entities\Entities.csproj" />

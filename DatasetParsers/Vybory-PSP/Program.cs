@@ -1,7 +1,11 @@
-﻿using HlidacStatu.Api.Dataset.Connector;
+﻿using System;
+using HlidacStatu.Api.Dataset.Connector;
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace Vybory_PSP
 {
@@ -15,7 +19,27 @@ namespace Vybory_PSP
         static void Main(string[] arguments)
         {
             dsc = new HlidacStatu.Api.Dataset.Connector.DatasetConnector(apikey);
+            
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional:true, reloadOnChange:false)
+                .AddJsonFile("Logger.serilog.json", optional: true, reloadOnChange: false)
+                .AddJsonFile("appsettings.Development.json", optional:true, reloadOnChange:false)
+                .AddEnvironmentVariables()
+                .AddCommandLine(arguments)
+                .Build();
+            
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .Enrich.WithProperty("hostname", Environment.GetEnvironmentVariable("HOSTNAME") ?? "unknown_hostname")
+                .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
+                .Enrich.WithProperty("application_name", System.Reflection.Assembly.GetEntryAssembly().GetName().Name)
+                .Enrich.WithProperty("application_path", new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).Directory.Name)
+                .Enrich.FromLogContext()
+                .WriteTo.Console()
+                .CreateLogger();
 
+            Log.Information($"Running Vybory-PSP with arguments {string.Join("|",arguments)}");
             //dsc.SetDeveleperUrl("http://local.hlidacstatu.cz/api/v1/");
             args = arguments
                 .Select(m => m.Split('='))
