@@ -1,6 +1,7 @@
 ﻿using HlidacStatu.DS.Api;
 using System;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
@@ -20,7 +21,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         private IApiConnection conn = null;
         public ClientLow cl = null;
 
-        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Camelot.Client.Simple");
+        private readonly ILogger _logger = Log.ForContext<SimpleClient>();
         public SimpleClient(IApiConnection connection,
             string pdfUrl, ClientLow.Commands command, HlidacStatu.DS.Api.TablesInDoc.Formats format = HlidacStatu.DS.Api.TablesInDoc.Formats.JSON, string pages = "all")
         {
@@ -45,21 +46,21 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     }
                     else if (res.ErrorCode == 429)
                     {
-                        logger.Debug($"try {i} Error 429 waiting because of {cl.ApiEndpoint}");
+                        _logger.Debug($"try {i} Error 429 waiting because of {cl.ApiEndpoint}");
                         cl.Dispose();
                         cl = new ClientLow(conn.GetEndpointUrl(), conn.GetApiKey());
                         System.Threading.Thread.Sleep(200 + 3000 * i);
                     }
                     else
                     {
-                        logger.Debug($"unexspected API response {cl.ApiEndpoint} {res.ErrorCode}:{res.ErrorDescription} ");
+                        _logger.Debug($"unexspected API response {cl.ApiEndpoint} {res.ErrorCode}:{res.ErrorDescription} ");
 
                         return res;
                     }
 
                 } //for
                 this.SessionId = null;
-                logger.Error($"no free resources");
+                _logger.Error($"no free resources");
                 return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>(false);
 
             }

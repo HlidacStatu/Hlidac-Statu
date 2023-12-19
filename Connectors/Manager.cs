@@ -15,15 +15,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Primitives;
 using Nest;
+using Serilog;
 
 namespace HlidacStatu.Connectors
 {
     public class Manager
     {
 
-        public static Devmasters.Log.Logger ESTraceLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.ES.Trace");
-        public static Devmasters.Log.Logger ESLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.ES");
-
+        private static readonly ILogger _logger = Log.ForContext<Manager>();
+        
         public enum IndexType
         {
             Smlouvy,
@@ -351,12 +351,12 @@ namespace HlidacStatu.Connectors
                     // log out the request and the request body, if one exists for the type of request
                     if (call.RequestBodyInBytes != null)
                     {
-                        ESTraceLogger.Debug($"{call.HttpMethod}\t{call.Uri}\t" +
+                        _logger.Debug($"{call.HttpMethod}\t{call.Uri}\t" +
                             $"{Encoding.UTF8.GetString(call.RequestBodyInBytes)}");
                     }
                     else
                     {
-                        ESTraceLogger.Debug($"{call.HttpMethod}\t{call.Uri}\t");
+                        _logger.Debug($"{call.HttpMethod}\t{call.Uri}\t");
                     }
 
                 })
@@ -835,19 +835,20 @@ namespace HlidacStatu.Connectors
             httpContext?.Request?.Headers?.TryGetValue("User-Agent", out browser);
 
             Elasticsearch.Net.ServerError serverErr = esReq.ServerError;
-            ESLogger.Error(new Devmasters.Log.LogMessage()
-                    .SetMessage("ES query error: " + text
+            _logger.Error(ex, "ES query error: " + text
                         + "\n\nCause:" + serverErr?.Error?.ToString()
                         + "\n\nDetail:" + esReq.DebugInformation
-                        + "\n\n\n"
-                        )
-                    .SetException(ex)
-                    .SetCustomKeyValue("URL", httpContext?.Request?.GetDisplayUrl())
-                    .SetCustomKeyValue("Stack-trace", Environment.StackTrace)
-                    .SetCustomKeyValue("Referer", httpContext?.Request?.GetTypedHeaders()?.Referer?.ToString())
-                    .SetCustomKeyValue("User-agent", browser.ToString())
-                    //následující řádek byl zkrácen pokud je hostname chtěný, je potřeba volat ještě něco takového: System.Net.Dns.GetHostEntry("127.0.0.1").HostName 
-                    .SetCustomKeyValue("IP", HlidacStatu.Util.RealIpAddress.GetIp(httpContext)?.ToString()) //+ " " + System.Web.HttpContext.Current?.Request?.UserHostName  
+                        + "\n\n"
+                        + "\nURL {URL}"
+                        + "\nStack-trace {Stack-trace}"
+                        + "\nReferer {Referer}"
+                        + "\nUser {User-agent}"
+                        + "\nIP {IP}",
+                    httpContext?.Request?.GetDisplayUrl(),
+                    Environment.StackTrace,
+                    httpContext?.Request?.GetTypedHeaders()?.Referer?.ToString(),
+                    browser.ToString(),
+                     HlidacStatu.Util.RealIpAddress.GetIp(httpContext)?.ToString()  
                     );
 
         }

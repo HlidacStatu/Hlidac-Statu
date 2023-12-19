@@ -5,9 +5,6 @@ namespace HlidacStatu.Lib.OCR
 {
     public static class DocTools
     {
-
-        public static Devmasters.Log.Logger baselogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.OCR");
-
         public static string OrigFilenameDelimiter = "_!_";
 
         public static string PrepareFilenameForOCR(string origFilename)

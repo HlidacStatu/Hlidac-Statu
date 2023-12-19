@@ -1,16 +1,15 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Web;
+using Serilog;
 
 namespace HlidacStatu.Web.Views.Shared.Components;
 
 public class AutocompleteErrorLogger : IErrorBoundaryLogger
 {
-    //private Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger<AutocompleteErrorLogger>();
-
     public ValueTask LogErrorAsync(Exception exception)
     {
-        Util.Consts.Logger.Error("During autocomplete usage an error occured.", exception);
+        Log.ForContext<AutocompleteErrorLogger>().Error(exception, "During autocomplete usage an error occured.");
         return ValueTask.CompletedTask;
     }
 }

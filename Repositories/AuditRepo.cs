@@ -7,13 +7,7 @@ namespace HlidacStatu.Repositories
     public static class AuditRepo
     {
 
-        private static Devmasters.Log.Logger auditLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.AuditLogger",
-            new LoggerConfiguration().MinimumLevel.Information()
-                .WriteTo.Http("http://10.10.150.203:5001",1024*1024,
-                                textFormatter:new Elastic.CommonSchema.Serilog.EcsTextFormatter(),
-                                batchFormatter:new Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter()
-                ),false
-            );
+        private static readonly ILogger _logger = Log.ForContext(typeof(AuditRepo));
 
         public static Audit Add<T>(Audit.Operations operation, string user, T newObj, T prevObj)
             where T : IAuditable
@@ -59,14 +53,14 @@ namespace HlidacStatu.Repositories
                     case Audit.Operations.Other:
                     case Audit.Operations.Search:
                     case Audit.Operations.UserSearch:
-                        auditLogger.Debug("{@audit}", a);
+                        _logger.Debug("{@audit}", a);
 
                         break;
                     case Audit.Operations.Call:
-                        auditLogger.Info("{@audit}", a);
+                        _logger.Information("{@audit}", a);
                         break;
                     case Audit.Operations.InvalidAccess:
-                        auditLogger.Warning("{@audit}", a);
+                        _logger.Warning("{@audit}", a);
                         break;
                     default:
                         break;
@@ -98,14 +92,14 @@ namespace HlidacStatu.Repositories
                         case Audit.Operations.Other:
                         case Audit.Operations.Search:
                         case Audit.Operations.UserSearch:
-                            auditLogger.Debug("{@audit}", audit);
+                            _logger.Debug("{@audit}", audit);
 
                             break;
                         case Audit.Operations.Call:
-                            auditLogger.Info("{@audit}", audit);
+                            _logger.Information("{@audit}", audit);
                             break;
                         case Audit.Operations.InvalidAccess:
-                            auditLogger.Warning("{@audit}", audit);
+                            _logger.Warning("{@audit}", audit);
                             break;
                         default:
                             break;

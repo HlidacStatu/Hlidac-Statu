@@ -539,7 +539,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                Manager.ESLogger.Error("Manager Save", e);
+                _logger.Error(e, "Manager Save");
             }
 
 
@@ -742,7 +742,7 @@ namespace HlidacStatu.Repositories
                             return res.Source;
                         else if (res.IsValid)
                         {
-                            Manager.ESLogger.Warning("Valid Req: Cannot load Smlouva Id " + idVerze +
+                            _logger.Warning("Valid Req: Cannot load Smlouva Id " + idVerze +
                                                      "\nDebug:" + res.DebugInformation);
                             //DirectDB.NoResult("delete from SmlouvyIds where id = @id", new System.Data.SqlClient.SqlParameter("id", idVerze));
                         }
@@ -752,7 +752,7 @@ namespace HlidacStatu.Repositories
                             return null;
                         else
                         {
-                            Manager.ESLogger.Error(
+                            _logger.Error(
                                 "Invalid Req: Cannot load Smlouva Id " + idVerze + "\n Debug:" + res.DebugInformation +
                                 " \nServerError:" + res.ServerError?.ToString(), res.OriginalException);
                         }
@@ -763,7 +763,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                Manager.ESLogger.Error("Cannot load Smlouva Id " + idVerze, e);
+                _logger.Error(e, "Cannot load Smlouva Id " + idVerze);
                 return null;
             }
         }

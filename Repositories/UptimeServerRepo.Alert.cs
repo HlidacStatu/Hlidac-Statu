@@ -1,21 +1,20 @@
 using System;
 using System.Linq;
 
-using Devmasters.Log;
-
 using HlidacStatu.Entities;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class UptimeServerRepo
     {
-        public static partial class Alert
+        public static class Alert
         {
-            static Logger loggerAlert = Devmasters.Log.Logger.CreateLogger("HlidacStatu.UptimeServerAlert");
+            private static readonly ILogger _logger = Log.ForContext(typeof(Alert));
 
             static Alert()
             {
-                loggerAlert.Info("Starting logger for UptimeServerAlert");
+                _logger.Information("Starting logger for UptimeServerAlert");
             }
             public enum AlertStatus
             {
@@ -48,10 +47,10 @@ namespace HlidacStatu.Repositories
                 {
                     case AlertStatus.NoData:
                     case AlertStatus.ToSlow:
-                        loggerAlert.Info("{server} -> {changedStatus} (slow)", serverLastSavedStatusInDb.PublicUrl, alertStatus);
+                        _logger.Information("{server} -> {changedStatus} (slow)", serverLastSavedStatusInDb.PublicUrl, alertStatus);
                         return alertStatus;
                     case AlertStatus.BackOkFromSlow:
-                        loggerAlert.Info("{server} -> {changedStatus} (backOkFromSlow)", serverLastSavedStatusInDb.PublicUrl, alertStatus);
+                        _logger.Information("{server} -> {changedStatus} (backOkFromSlow)", serverLastSavedStatusInDb.PublicUrl, alertStatus);
                         return alertStatus;
                     default:
                         break;
@@ -94,7 +93,7 @@ namespace HlidacStatu.Repositories
 
                         return alertStatus;
                     case AlertStatus.ToFail:
-                        loggerAlert.Warning("{server} -> {changedStatus} (fail)", serverLastSavedStatusInDb.PublicUrl, alertStatus);
+                        _logger.Warning("{server} -> {changedStatus} (fail)", serverLastSavedStatusInDb.PublicUrl, alertStatus);
                         if (
                             alertStatus.LengthOfFail.TotalMinutes > 4 
                             && (DateTime.Now - lastAlertSent).TotalHours > 2
@@ -116,7 +115,7 @@ namespace HlidacStatu.Repositories
                             && (DateTime.Now - lastAlertSent).TotalHours > 2
                             )
                         {
-                            loggerAlert.Warning("{server} -> {changedStatus} (backOk)", serverLastSavedStatusInDb.PublicUrl, alertStatus);
+                            _logger.Warning("{server} -> {changedStatus} (backOk)", serverLastSavedStatusInDb.PublicUrl, alertStatus);
                             UptimeServerRepo.SaveAlert(serverId, alertStatus.AlertStatus);
                             _ = twitter.NewTweetAsync($"Server {serverLastSavedStatusInDb.Name} byl nedostupný asi {lengthOfFailInMin}, nyní je opět dostupný. Více podrobností na {serverLastSavedStatusInDb.pageUrl}.")
                                 .ConfigureAwait(false).GetAwaiter().GetResult();

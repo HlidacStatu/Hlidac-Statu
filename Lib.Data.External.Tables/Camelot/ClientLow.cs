@@ -1,6 +1,7 @@
 ﻿using HlidacStatu.DS.Api;
 using System;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
@@ -21,7 +22,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 
         public string ApiEndpoint { get; private set; } = null;
 
-        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Camelot.Client.Low");
+        private readonly ILogger _logger = Log.ForContext<ClientLow>();
         private readonly string apiKey;
 
         public ClientLow(IApiConnection cnn)
@@ -55,7 +56,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
             catch (Exception e)
             {
-                logger.Error("StartSessionWithUrl API call error {apiEndpoint}", ex: e, propertyValues: ApiEndpoint);
+                _logger.Error(e, "StartSessionWithUrl API call error {apiEndpoint}", propertyValues: ApiEndpoint);
                 return new ApiResult<string>(false);
             }
         }
@@ -81,7 +82,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
             catch (Exception e)
             {
-                logger.Error("StartSessionWithUrl API call error {apiEndpoint}", ex: e, propertyValues: ApiEndpoint);
+                _logger.Error(e, "StartSessionWithUrl API call error {apiEndpoint}", propertyValues: ApiEndpoint);
                 return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>(false);
             }
         }
@@ -104,7 +105,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
             catch (Exception e)
             {
-                logger.Error("GetSession API call error {apiEndpoint}", ex: e, propertyValues: ApiEndpoint);
+                _logger.Error(e, "GetSession API call error {apiEndpoint}", propertyValues: ApiEndpoint);
                 return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>(false);
             }
         }
@@ -127,7 +128,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
             catch (Exception e)
             {
-                logger.Error("EndSession API call error {apiEndpoint}", ex: e, propertyValues: ApiEndpoint);
+                _logger.Error(e, "EndSession API call error {apiEndpoint}", propertyValues: ApiEndpoint);
                 return new ApiResult<HlidacStatu.DS.Api.TablesInDoc.ApiOldCamelotResult>(false);
             }
         }
@@ -148,7 +149,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
             catch (Exception e)
             {
-                logger.Error("Version API call error {apiEndpoint}", ex: e, propertyValues: ApiEndpoint);
+                _logger.Error(e, "Version API call error {apiEndpoint}", propertyValues: ApiEndpoint);
                 return new ApiResult<CamelotVersionData>(false);
             }
         }
@@ -170,7 +171,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             }
             catch (Exception e)
             {
-                logger.Error("Statistic API call error {apiEndpoint}", ex: e, propertyValues: new object[] { ApiEndpoint });
+                _logger.Error(e, "Statistic API call error {apiEndpoint}", propertyValues: new object[] { ApiEndpoint });
                 return new ApiResult<CamelotStatistics>(false);
             }
         }
