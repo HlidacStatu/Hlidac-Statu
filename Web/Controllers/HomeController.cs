@@ -23,7 +23,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-
+using Serilog;
 using Visit = HlidacStatu.Web.Framework.Visit;
 
 
@@ -31,6 +31,7 @@ namespace HlidacStatu.Web.Controllers
 {
     public partial class HomeController : Controller
     {
+        private readonly ILogger _logger = Log.ForContext<HomeController>();
 
         private readonly UserManager<ApplicationUser> _userManager;
         protected readonly IWebHostEnvironment _hostingEnvironment;
@@ -201,7 +202,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Info("VisitImg base64 encoding error", e);
+                _logger.Information(e, "VisitImg base64 encoding error");
             }
 
             return File(@"Content\Img\1x1.png", "image/png");
@@ -257,7 +258,7 @@ text zpravy: {txt}";
                     catch (Exception ex)
                     {
 
-                        Util.Consts.Logger.Fatal(string.Format("{0}|{1}|{2}", email, url, txt, ex));
+                        _logger.Fatal(string.Format("{0}|{1}|{2}", email, url, txt, ex));
                         return Content("");
                     }
                 }
@@ -294,7 +295,7 @@ text zpravy: {txt}
                 }
                 catch (Exception ex)
                 {
-                    Util.Consts.Logger.Error($"error sending classification feedback {email}|{url}|{txt}", ex);
+                    _logger.Error(ex, $"error sending classification feedback {email}|{url}|{txt}");
                 }
 
                 try
@@ -314,7 +315,7 @@ text zpravy: {txt}
                 }
                 catch (Exception ex)
                 {
-                    Util.Consts.Logger.Error($"Problem sending data to ClassificationFeedback queue. Message={ex}");
+                    _logger.Error($"Problem sending data to ClassificationFeedback queue. Message={ex}");
                 }
 
 
@@ -700,7 +701,7 @@ text zpravy: {txt}
             if (System.Diagnostics.Debugger.IsAttached ||
                 Devmasters.Config.GetWebConfigValue("LogSearchTimes") == "true")
             {
-                Util.Consts.Logger.Info($"Search times: {q}\n" + res.SearchTimesReport());
+                _logger.Information($"Search times: {q}\n" + res.SearchTimesReport());
 
                 var data = res.SearchTimes();
 
@@ -948,7 +949,7 @@ text zpravy: {txt}
                     }
                     catch (Exception e)
                     {
-                        Util.Consts.Logger.Info("VisitImg base64 encoding error", e);
+                        _logger.Information(e, "VisitImg base64 encoding error");
                     }
 
                 if (!vz.NotInterestingToShow())
@@ -1123,7 +1124,7 @@ text zpravy: {txt}
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("Manager Save", e);
+                _logger.Error(e, "Manager Save");
             }
             if (data == null || data.Length == 0)
                 return File(@"content\icons\largetile.png", "image/png");
@@ -1169,7 +1170,7 @@ text zpravy: {txt}
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Info("VisitImg base64 encoding error", e);
+                _logger.Information(e, "VisitImg base64 encoding error");
             }
 
             return Redirect(url);

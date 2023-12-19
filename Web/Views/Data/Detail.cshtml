@@ -80,7 +80,7 @@
             msg = Devmasters.RegexUtil.ReplaceWithRegex(msg, "", @".*: \s* error \s* CS\d{1,8}:");
 
             @Html.Raw($"<h2>Chyba v template - zpráva pro autora této databáze</h2><pre>{msg}</pre>")
-            HlidacStatu.Util.Consts.Logger.Warning("Detail_CustomdataTemplate", e);
+            Serilog.Log.Warning(e, "Detail_CustomdataTemplate");
 
             if (msg != "Interní chyba")
             {

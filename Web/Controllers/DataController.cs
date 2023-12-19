@@ -8,11 +8,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Web.Controllers
 {
     public partial class DataController : Controller
     {
+        private readonly ILogger _logger = Log.ForContext<DataController>();
 
         static Devmasters.Cache.LocalMemory.CacheAsync<Models.DatasetIndexStat[]> datasetIndexStatCache =
             new Devmasters.Cache.LocalMemory.CacheAsync<Models.DatasetIndexStat[]>(TimeSpan.FromMinutes(15), async (o) =>
@@ -349,7 +351,7 @@ namespace HlidacStatu.Web.Controllers
                     catch (Exception e)
                     {
 
-                        Util.Consts.Logger.Error("Dataset Detail Highligting query error ", e);
+                        _logger.Error(e, "Dataset Detail Highligting query error ");
                     }
 
                 }
@@ -359,7 +361,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (DataSetException ex)
             {
-                Util.Consts.Logger.Error("Dataset Detail", ex);
+                _logger.Error(ex, "Dataset Detail");
                 return RedirectToAction("index");
             }
 

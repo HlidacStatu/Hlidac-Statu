@@ -199,7 +199,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception ex)
             {
-                Util.Consts.Logger.Error("Dataset API", ex);
+                _logger.Error(ex, "Dataset API");
                 return Json(ApiResponseStatus.GeneralExceptionError(ex));
             }
         }
@@ -232,7 +232,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception ex)
             {
-                Util.Consts.Logger.Error("Dataset API", ex);
+                _logger.Error(ex, "Dataset API");
                 return Json(ApiResponseStatus.GeneralExceptionError(ex));
             }
         }
@@ -249,7 +249,7 @@ namespace HlidacStatu.Web.Controllers
 
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             var errorsStringified = string.Join(";\n", errors);
-            Util.Consts.Logger.Error($"Dataset API:\n {errorsStringified}");
+            _logger.Error($"Dataset API:\n {errorsStringified}");
             return Json(ApiResponseStatus.GeneralExceptionError(errorsStringified));
         }
 
@@ -278,7 +278,7 @@ namespace HlidacStatu.Web.Controllers
 
             var errors = ModelState.Values.SelectMany(v => v.Errors);
             var errorsStringified = string.Join(";\n", errors);
-            Util.Consts.Logger.Error($"Dataset API:\n {errorsStringified}");
+            _logger.Error($"Dataset API:\n {errorsStringified}");
             return Json(ApiResponseStatus.GeneralExceptionError(errorsStringified));
         }
 
@@ -313,7 +313,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception ex)
             {
-                Util.Consts.Logger.Error("Dataset API", ex);
+                _logger.Error(ex, "Dataset API");
                 return Json(ApiResponseStatus.GeneralExceptionError(ex));
             }
         }
@@ -348,7 +348,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception ex)
             {
-                Util.Consts.Logger.Error("Dataset API", ex);
+                _logger.Error(ex, "Dataset API");
                 return Json(ApiResponseStatus.GeneralExceptionError(ex));
             }
         }
@@ -536,7 +536,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception ex)
             {
-                Util.Consts.Logger.Error("Dataset API", ex);
+                _logger.Error(ex, "Dataset API");
                 return Json(ApiResponseStatus.GeneralExceptionError(ex));
             }
         }

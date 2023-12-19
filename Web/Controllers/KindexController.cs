@@ -16,12 +16,14 @@ using HlidacStatu.Entities.KIndex;
 using HlidacStatu.LibCore;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using HlidacStatu.Web.Framework;
+using Serilog;
 
 
 namespace HlidacStatu.Web.Controllers
 {
     public class KindexController : Controller
     {
+        private readonly ILogger _logger = Log.ForContext<KindexController>();
         public ActionResult Index()
         {
             return View();
@@ -209,7 +211,7 @@ text zpravy: {txt}";
                     }
                     catch (Exception ex)
                     {
-                        Util.Consts.Logger.Fatal($"Problem with SMTP. Message={ex}");
+                        _logger.Fatal($"Problem with SMTP. Message={ex}");
                     }
                 }
             });
@@ -236,11 +238,11 @@ text zpravy: {txt}";
             catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
             {
                 // canceled by user
-                Util.Consts.Logger.Info("Autocomplete canceled by user");
+                _logger.Information("Autocomplete canceled by user");
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { id });
+                _logger.Warning(e, "Autocomplete API problem.", new { id });
             }
             
             return NoContent();

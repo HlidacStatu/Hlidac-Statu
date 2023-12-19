@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Serilog;
 
 namespace HlidacStatu.Entities.Enhancers
 {
@@ -10,6 +11,7 @@ namespace HlidacStatu.Entities.Enhancers
 
         private static object objLock = new object();
         private static List<IEnhancer> enhancers = null;
+        private static readonly ILogger _logger = Log.ForContext(typeof(Util));
 
         public static List<IEnhancer> GetEnhancers(string moreFromPath = null)
         {
@@ -73,12 +75,12 @@ namespace HlidacStatu.Entities.Enhancers
                         foreach (Exception ex in lex.LoaderExceptions)
                             sb.AppendFormat("{0}\n----------------\n", ex.ToString());
 
-                    HlidacStatu.Util.Consts.Logger.Fatal("Cannot make list of enhancer instances, reason: " + sb.ToString(), lex);
+                    _logger.Fatal(lex, "Cannot make list of enhancer instances, reason: " + sb.ToString());
 
                 }
                 catch (Exception e)
                 {
-                    HlidacStatu.Util.Consts.Logger.Fatal("Cannot make list of enhancer instances ", e);
+                    _logger.Fatal(e, "Cannot make list of enhancer instances ");
 
                     throw;
                 }
@@ -95,7 +97,7 @@ namespace HlidacStatu.Entities.Enhancers
                             //parser.SetInstanceData(StaticData.CiziStaty);
                         }
 
-                        HlidacStatu.Util.Consts.Logger.Info("Creating instance of enhancer plugin " + type.FullName);
+                        _logger.Information("Creating instance of enhancer plugin " + type.FullName);
 
                     }
                     catch (Exception)

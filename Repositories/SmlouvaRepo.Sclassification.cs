@@ -54,7 +54,7 @@ namespace HlidacStatu.Repositories
             }
             catch (JsonReaderException e)
             {
-                Util.Consts.Logger.Error($"Stemmer returned incomplete json for {smlouvaId}", e);
+                _logger.Error(e, $"Stemmer returned incomplete json for {smlouvaId}");
                 throw;
             }
 
@@ -89,7 +89,7 @@ namespace HlidacStatu.Repositories
                 {
                     stemCacheManager.Set(sId, data);
                     oldStemCacheManager.Delete(key);
-                    Util.Consts.Logger.Debug("Deleting stems cache for " + sId);
+                    _logger.Debug("Deleting stems cache for " + sId);
 
                     return false;
                 }
@@ -116,7 +116,7 @@ namespace HlidacStatu.Repositories
 
         public static void InvalidateStemCache(string smlouvaId)
         {
-            Util.Consts.Logger.Debug("Deleting stems cache for " + smlouvaId);
+            _logger.Debug("Deleting stems cache for " + smlouvaId);
 
             stemCacheManager.Delete(smlouvaId);
         }
@@ -171,11 +171,11 @@ namespace HlidacStatu.Repositories
                         if (!data.ContainsKey(typ))
                             data.Add(typ, prob);
                         else if (typ == Smlouva.SClassification.ClassificationsTypes.OSTATNI)
-                            Util.Consts.Logger.Warning($"Classification type lookup failure : {key}");
+                            _logger.Warning($"Classification type lookup failure : {key}");
                     }
                     else
                     {
-                        Util.Consts.Logger.Warning("Classification type lookup failure - Invalid key " + key);
+                        _logger.Warning("Classification type lookup failure - Invalid key " + key);
                         if (!data.ContainsKey(Smlouva.SClassification.ClassificationsTypes.OSTATNI))
                             data.Add(Smlouva.SClassification.ClassificationsTypes.OSTATNI, prob);
                     }
@@ -260,14 +260,14 @@ namespace HlidacStatu.Repositories
                     sw.Start();
                     response = request.GetContent();
                     sw.Stop();
-                    Util.Consts.Logger.Debug($"Called classifier endpoint [{endpoint}] for {id} from {url} in {sw.ElapsedMilliseconds}ms.");
+                    _logger.Debug($"Called classifier endpoint [{endpoint}] for {id} from {url} in {sw.ElapsedMilliseconds}ms.");
 
                     return response.Text;
                 }
                 catch (Exception e)
                 {
                     sw.Stop();
-                    Util.Consts.Logger.Error($"Error classifier endpoint [{endpoint}] for {id} from {url} in {sw.ElapsedMilliseconds}ms, error {e.Message}", e);
+                    _logger.Error(e, $"Error classifier endpoint [{endpoint}] for {id} from {url} in {sw.ElapsedMilliseconds}ms, error {e.Message}");
                     throw;
                 }
             }

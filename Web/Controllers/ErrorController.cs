@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using Serilog;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -8,6 +9,7 @@ namespace HlidacStatu.Web.Controllers
     [Route("error")]
     public class ErrorController : Controller
     {
+        private readonly ILogger _logger = Log.ForContext<ErrorController>();
         [Route("500")]
         public IActionResult ApplicationError()
         {
@@ -15,7 +17,7 @@ namespace HlidacStatu.Web.Controllers
 
             string err = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyName] as string;
 
-            Util.Consts.Logger.Error($"500 - Server error on {exceptionHandlerPathFeature.Path}\n\n" + err);
+            _logger.Error($"500 - Server error on {exceptionHandlerPathFeature.Path}\n\n" + err);
 
             return View();
         }
@@ -25,11 +27,11 @@ namespace HlidacStatu.Web.Controllers
         {
             string err = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyName] as string;
             
-            Util.Consts.Logger.Warning($"HTTP 404 - Page not found.\n\n" + err);
+            _logger.Warning($"HTTP 404 - Page not found.\n\n" + err);
             var errObj = HttpContext.Items[HlidacStatu.LibCore.MiddleWares.OnHTTPErrorMiddleware.ItemKeyNameObj] as Dictionary<string, string>;
 
             if (errObj != null)
-                Util.Consts.Logger.Error("HTTP 404 - page not found, context {context}",errObj);
+                _logger.Error("HTTP 404 - page not found, context {context}",errObj);
 
             return View();
         }
@@ -44,7 +46,7 @@ namespace HlidacStatu.Web.Controllers
             {
                 originalPath = HttpContext.Items["originalPath"] as string;
             }
-            Util.Consts.Logger.Warning($"{code} error - [{originalPath}].\n\n" + err);
+            _logger.Warning($"{code} error - [{originalPath}].\n\n" + err);
 
             return View(code);
         }

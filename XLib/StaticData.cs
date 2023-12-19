@@ -2,6 +2,7 @@
 
 using System;
 using System.Net;
+using Serilog;
 
 namespace HlidacStatu.XLib
 {
@@ -11,7 +12,7 @@ namespace HlidacStatu.XLib
 
         static StaticData()
         {
-            Util.Consts.Logger.Info("Static data - LastBlogPosts");
+            Log.ForContext(typeof(StaticData)).Information("Static data - LastBlogPosts");
             LastBlogPosts = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<WpPost[]>(
                 TimeSpan.FromHours(3), (obj) =>
                 {

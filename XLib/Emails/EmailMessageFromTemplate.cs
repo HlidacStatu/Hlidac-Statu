@@ -3,11 +3,13 @@
 using System;
 using System.Net.Mail;
 using System.Text;
+using Serilog;
 
 namespace HlidacStatu.XLib.Emails
 {
     public class EmailMessageFromTemplate
     {
+        private readonly ILogger _logger = Log.ForContext<EmailMessageFromTemplate>();
         public EmailMessageFromTemplate(string htmltemplate, string texttemplate)
         {
             HtmlTemplate = htmltemplate;
@@ -34,7 +36,7 @@ namespace HlidacStatu.XLib.Emails
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("Scriban template render", e);
+                _logger.Error(e, "Scriban template render");
                 throw;
             }
         }
@@ -67,7 +69,7 @@ namespace HlidacStatu.XLib.Emails
                     using (SmtpClient smtp = new SmtpClient())
                     {
                         smtp.Host = Devmasters.Config.GetWebConfigValue("SmtpHost");
-                        Util.Consts.Logger.Info("Sending email to " + msg.To);
+                        _logger.Information("Sending email to " + msg.To);
                         //msg.Bcc.Add("michal@michalblaha.cz");
                         smtp.Send(msg);
                     }
@@ -76,7 +78,7 @@ namespace HlidacStatu.XLib.Emails
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("Send email", e);
+                _logger.Error(e, "Send email");
 #if DEBUG
                 throw;
 #endif
@@ -90,7 +92,7 @@ namespace HlidacStatu.XLib.Emails
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("Render text version", e);
+                _logger.Error(e, "Render text version");
                 throw;
             }
         }
@@ -103,7 +105,7 @@ namespace HlidacStatu.XLib.Emails
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("Render html version", e);
+                _logger.Error(e, "Render html version");
                 throw;
             }
         }

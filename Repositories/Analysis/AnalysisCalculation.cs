@@ -9,12 +9,14 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.Analysis;
 using HlidacStatu.Extensions;
 using Nest;
+using Serilog;
 using Manager = HlidacStatu.Connectors.Manager;
 
 namespace HlidacStatu.Repositories.Analysis
 {
     public class AnalysisCalculation
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(AnalysisCalculation));
 
         public class VazbyFiremNaPolitiky
         {
@@ -315,7 +317,7 @@ namespace HlidacStatu.Repositories.Analysis
                       }
                       catch (Exception e)
                       {
-                          Util.Consts.Logger.Error("ERROR UradyObchodujiciSFirmami_s_vazbouNaPolitiky", e);
+                          _logger.Error(e, "ERROR UradyObchodujiciSFirmami_s_vazbouNaPolitiky");
                       }
 
                         end:
@@ -409,7 +411,7 @@ namespace HlidacStatu.Repositories.Analysis
                 }
                 catch (Exception e)
                 {
-                    Util.Consts.Logger.Error("LoadFirmySVazbamiNaPolitiky error for {osoba}", e, p?.NameId);
+                    _logger.Error(e, "LoadFirmySVazbamiNaPolitiky error for {osoba}", p?.NameId);
                 }
 
                 return new ActionOutputData() { CancelRunning = false, Log = null };
@@ -483,7 +485,7 @@ namespace HlidacStatu.Repositories.Analysis
 
         public static async Task<IEnumerable<IcoSmlouvaMinMax>> GetFirmyCasovePodezreleZalozeneAsync(Action<string> logOutputFunc = null, Action<ActionProgressData> progressOutputFunc = null)
         {
-            Util.Consts.Logger.Debug("GetFirmyCasovePodezreleZalozene - getting all ico");
+            _logger.Debug("GetFirmyCasovePodezreleZalozene - getting all ico");
             var allIcos = FirmaRepo.AllIcoInRS();
             Dictionary<string, IcoSmlouvaMinMax> firmy = new Dictionary<string, IcoSmlouvaMinMax>();
             object lockFirmy = new object();
@@ -494,7 +496,7 @@ namespace HlidacStatu.Repositories.Analysis
                 );
 
 
-            Util.Consts.Logger.Debug("GetFirmyCasovePodezreleZalozene - getting first smlouva for all ico from ES");
+            _logger.Debug("GetFirmyCasovePodezreleZalozene - getting first smlouva for all ico from ES");
             await Devmasters.Batch.Manager.DoActionForAllAsync<string, object>(allIcos, async (ico, param) =>
             {
                 Firma ff = Firmy.Get(ico);
@@ -553,7 +555,7 @@ namespace HlidacStatu.Repositories.Analysis
             true, prefix: "GetFirmyCasovePodezreleZalozene ", monitor: new MonitoredTaskRepo.ForBatch()
             );
 
-            Util.Consts.Logger.Debug("GetFirmyCasovePodezreleZalozene - filter with close dates");
+            _logger.Debug("GetFirmyCasovePodezreleZalozene - filter with close dates");
 
             DateTime minDate = new DateTime(1990, 01, 01);
             var badF = firmy
@@ -564,7 +566,7 @@ namespace HlidacStatu.Repositories.Analysis
                 .ToArray();
             //.Take(100)
 
-            Util.Consts.Logger.Debug($"GetFirmyCasovePodezreleZalozene - returning {badF.Count()} records.");
+            _logger.Debug($"GetFirmyCasovePodezreleZalozene - returning {badF.Count()} records.");
 
             return badF;
         }

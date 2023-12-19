@@ -9,13 +9,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
 {
     public class DownloadPersonalDataModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
-
+        private readonly ILogger _logger = Log.ForContext<DownloadPersonalDataModel>();
+        
         public DownloadPersonalDataModel(
             UserManager<ApplicationUser> userManager)
         {
@@ -30,7 +32,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            Util.Consts.Logger.Info($"User with ID '{_userManager.GetUserId(User)}' asked for their personal data.");
+            _logger.Information($"User with ID '{_userManager.GetUserId(User)}' asked for their personal data.");
 
             // Only include personal data for download
             var personalData = new Dictionary<string, string>();

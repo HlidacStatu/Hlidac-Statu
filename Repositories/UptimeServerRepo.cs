@@ -10,11 +10,13 @@ using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Writes;
 
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class UptimeServerRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(UptimeServerRepo));
         public static string PatriPodUradJmeno(this UptimeServer server)
         {
             if (string.IsNullOrEmpty(server.ICO))
@@ -129,7 +131,7 @@ namespace HlidacStatu.Repositories
             {
                 Console.WriteLine("Times:\n" + swl.ToString());
 
-                HlidacStatu.Util.Consts.Logger.Error("UptimeServerRepo.SaveLastCheck error ", e);
+                _logger.Error(e, "UptimeServerRepo.SaveLastCheck error ");
                 throw;
             }
 

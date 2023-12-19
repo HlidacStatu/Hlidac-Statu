@@ -76,7 +76,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                Consts.Logger.Info($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
+                _logger.Information($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
                 return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
@@ -106,7 +106,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account
                     }
                     
                     // send confirmation email
-                    Consts.Logger.Info($"User created an account using {info.LoginProvider} provider.");
+                    _logger.Information($"User created an account using {info.LoginProvider} provider.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

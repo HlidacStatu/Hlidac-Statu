@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Web.Areas.Identity.Pages.Account
 {
@@ -16,6 +17,8 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
 
+        private readonly ILogger _logger = Log.ForContext<LoginWith2faModel>();
+        
         public LoginWith2faModel(SignInManager<ApplicationUser> signInManager)
         {
             _signInManager = signInManager;
@@ -77,17 +80,17 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
 
             if (result.Succeeded)
             {
-                Util.Consts.Logger.Info($"User with ID '{user.Id}' logged in with 2fa.");
+                _logger.Information($"User with ID '{user.Id}' logged in with 2fa.");
                 return LocalRedirect(returnUrl);
             }
             else if (result.IsLockedOut)
             {
-                Util.Consts.Logger.Warning($"User with ID '{user.Id}' account locked out.");
+                _logger.Warning($"User with ID '{user.Id}' account locked out.");
                 return RedirectToPage("./Lockout");
             }
             else
             {
-                Util.Consts.Logger.Warning($"Invalid authenticator code entered for user with ID '{user.Id}'.");
+                _logger.Warning($"Invalid authenticator code entered for user with ID '{user.Id}'.");
                 ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
                 return Page();
             }

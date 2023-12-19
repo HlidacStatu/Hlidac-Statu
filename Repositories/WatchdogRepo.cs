@@ -4,11 +4,14 @@ using Microsoft.EntityFrameworkCore;
 
 using System.Linq;
 using System.Net.Mail;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static class WatchdogRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(WatchdogRepo));
+
         public static void Delete(this WatchDog watchDog)
         {
             using (DbEntities db = new DbEntities())
@@ -96,7 +99,7 @@ namespace HlidacStatu.Repositories
                     using (SmtpClient smtp = new SmtpClient())
                     {
                         smtp.Host = Devmasters.Config.GetWebConfigValue("SmtpHost");
-                        Util.Consts.Logger.Info("Sending email to " + msg.To);
+                        _logger.Information("Sending email to " + msg.To);
                         msg.Bcc.Add("michal@michalblaha.cz");
                         smtp.Send(msg);
                     }

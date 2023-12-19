@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 
 namespace HlidacStatu.XLib.Render
 {
@@ -12,6 +13,8 @@ namespace HlidacStatu.XLib.Render
 
         private Dictionary<string, object> globalVariables { get; set; }
         private Scriban.Template xTemplate = null;
+        
+        private readonly ILogger _logger = Log.ForContext<ScribanT>();
 
         public ScribanT(string template, Dictionary<string, object> globalVar = null)
         {
@@ -67,9 +70,8 @@ namespace HlidacStatu.XLib.Render
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error($"ScribanT render error\nTemplate {template}\n\n"
-                   + Newtonsoft.Json.JsonConvert.SerializeObject(dmodel)
-                    , e);
+                _logger.Error(e, $"ScribanT render error\nTemplate {template}\n\n"
+                   + Newtonsoft.Json.JsonConvert.SerializeObject(dmodel));
                 throw;
             }
 

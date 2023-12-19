@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Serilog;
 
 namespace HlidacStatu.Entities.KIndex
 {
@@ -20,6 +21,7 @@ namespace HlidacStatu.Entities.KIndex
     }
     public class FinanceDataCalculator
     {
+        private static readonly ILogger _logger = Log.ForContext<FinanceDataCalculator>();
         public int Rok { get; set; }
 
         public string Ico { get; set; }
@@ -50,7 +52,7 @@ namespace HlidacStatu.Entities.KIndex
                 catch (Exception e)
                 {
                     obdobi = new Dictionary<int, int>();
-                    Util.Consts.Logger.Fatal("Loading from statnipokladna.cz", e);
+                    _logger.Fatal(e, "Loading from statnipokladna.cz");
                 }
             }
         }
@@ -122,7 +124,7 @@ namespace HlidacStatu.Entities.KIndex
             catch (Exception e)
             {
 
-                Util.Consts.Logger.Fatal("Getting data from statni pokladna ", e);
+                _logger.Fatal(e, "Getting data from statni pokladna ");
             }
             data.LastUpdated = DateTime.Now;
             return data;

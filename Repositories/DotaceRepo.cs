@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class DotaceRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(DotaceRepo));
 
         private static ElasticClient _dotaceClient = Manager.GetESClient_DotaceAsync()
             .ConfigureAwait(false).GetAwaiter().GetResult();
@@ -71,7 +73,7 @@ namespace HlidacStatu.Repositories
             if (result.Errors)
             {
                 var a = result.DebugInformation;
-                Util.Consts.Logger.Error($"Error when bulkSaving dotace to ES: {a}");
+                _logger.Error($"Error when bulkSaving dotace to ES: {a}");
             }
 
             return result.Errors;

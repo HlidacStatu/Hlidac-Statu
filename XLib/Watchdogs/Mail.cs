@@ -5,11 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
     public partial class Mail
     {
+        private static readonly ILogger _logger = Log.ForContext<Mail>();
+        
         public enum SendStatus
         {
             Sent,
@@ -117,7 +120,7 @@ namespace HlidacStatu.XLib.Watchdogs
                     }
                     catch (Exception ex)
                     {
-                        Util.Consts.Logger.Error("SingleEmailPerUserProcessor GetResults/RenderResults error", ex);
+                        _logger.Error(ex, "SingleEmailPerUserProcessor GetResults/RenderResults error");
                     }
                 }
                 if (wdParts.Count() > 0)

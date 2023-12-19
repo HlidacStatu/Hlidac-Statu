@@ -17,11 +17,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class SmlouvaRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(SmlouvaRepo));
         public static class Searching
         {
             public const int DefaultPageSize = 40;
@@ -345,7 +347,7 @@ bool withHighlighting = false, bool exactNumOfResults = false)
                     if (res != null && res.ServerError != null)
                         Manager.LogQueryError<Smlouva>(res);
                     else
-                        Util.Consts.Logger.Error("", e);
+                        _logger.Error(e, "");
                     throw;
                 }
 

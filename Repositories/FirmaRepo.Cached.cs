@@ -38,12 +38,12 @@ namespace HlidacStatu.Repositories
             AppDataPath = Init.WebAppDataPath;
             if (string.IsNullOrEmpty(AppDataPath))
             {
-                HlidacStatu.Util.Consts.Logger.Fatal("Not defined config App_Data_Path");
+                _logger.Fatal("Not defined config App_Data_Path");
                 throw new ArgumentNullException("App_Data_Path");
             }
 
             try { 
-            Consts.Logger.Info("Static data - Mestske_Firmy ");
+            _logger.Information("Static data - Mestske_Firmy ");
             VsechnyStatniMestskeFirmy = FirmaVlastnenaStatemRepo.IcaStatnichFirem().ToHashSet();
 
             VsechnyStatniMestskeFirmy25percs = FirmaVlastnenaStatemRepo.IcaStatnichFirem(25).ToHashSet();
@@ -51,7 +51,7 @@ namespace HlidacStatu.Repositories
 
             
             //zdroj https://www.czechpoint.cz/public/vyvojari/otevrena-data/
-            Consts.Logger.Info("Static data - DatoveSchranky ");
+            _logger.Information("Static data - DatoveSchranky ");
 
             foreach (var urad in OvmRepo.UradyOvm())
             {
@@ -61,7 +61,7 @@ namespace HlidacStatu.Repositories
             Urady_OVM.Add("00832227"); //Euroregion Neisse - Nisa - Nysa
 
 
-            Consts.Logger.Info("Static data - MinisterstvaCache");
+            _logger.Information("Static data - MinisterstvaCache");
             MinisterstvaCache = new Cache<IEnumerable<Firma>>(TimeSpan.FromHours(6), "StatData.Ministerstva",
                 (o) =>
                 {
@@ -136,7 +136,7 @@ namespace HlidacStatu.Repositories
                     return OvmRepo.OrganizacniSlozkyStatu().Select(m => Firmy.GetByDS(m.IdDS)).ToArray();
                 });
 
-            Util.Consts.Logger.Info("Static data - FirmyNazvyOnlyAscii");
+            _logger.Information("Static data - FirmyNazvyOnlyAscii");
 
             FirmyNazvyOnlyAscii =
                 new Devmasters.Cache.AWS_S3.Cache<
@@ -148,7 +148,7 @@ namespace HlidacStatu.Repositories
                     TimeSpan.Zero, "FirmyNazvyOnlyAscii",
                     (o) =>
                     {
-                        Util.Consts.Logger.Info("Static data - FirmyNazvyOnlyAscii starting generation");
+                        _logger.Information("Static data - FirmyNazvyOnlyAscii starting generation");
                         System.Collections.Concurrent.ConcurrentDictionary<string, string[]> res
                             = new System.Collections.Concurrent.ConcurrentDictionary<string, string[]>();
                         string cnnStr = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection");
@@ -176,14 +176,14 @@ namespace HlidacStatu.Repositories
                             }
                         }
 
-                        Util.Consts.Logger.Info("Static data - FirmyNazvyOnlyAscii generation finished");
+                        _logger.Information("Static data - FirmyNazvyOnlyAscii generation finished");
                         return res;
                     }
                 );
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Fatal("FirmaRepo static fatal exception", e);
+                _logger.Fatal(e, "FirmaRepo static fatal exception");
                 //System.IO.File.AppendAllText(@"c:\data\logs\fatal.txt", "\n\n"
                 //    + DateTime.Now.ToLongDateString()
                 //    + " "

@@ -4,11 +4,13 @@ using Nest;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public class SplitSmlouvaRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(SplitSmlouvaRepo));
         public static async Task<bool> ExistsAsync(string smlouvaId, string prilohaId)
         {
             Nest.ElasticClient client = await Manager.GetESClient_SplitSmlouvyAsync();
@@ -61,12 +63,12 @@ namespace HlidacStatu.Repositories
                 var res = await client.IndexAsync<SplitSmlouva>(item, m => m.Id(item.Id));
 
                 if (res.IsValid == false)
-                    HlidacStatu.Util.Consts.Logger.Error($"SplitSmlouvaRepo.Save error: {res.ServerError}",res.OriginalException );
+                    _logger.Error(res.OriginalException, $"SplitSmlouvaRepo.Save error: {res.ServerError}");
 
             }
             catch (System.Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error("SplitSmlouvaRepo.Save error ", e);
+                _logger.Error(e, "SplitSmlouvaRepo.Save error ");
                 throw;
             }
         }

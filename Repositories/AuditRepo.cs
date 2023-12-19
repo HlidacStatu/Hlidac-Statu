@@ -107,7 +107,7 @@ namespace HlidacStatu.Repositories
                 }
                 catch (Exception ex)
                 {
-                    HlidacStatu.Util.Consts.Logger.Error("Chyba při logování do auditu.", ex);
+                    _logger.Error(ex, "Chyba při logování do auditu.");
                     return null;
                 }
             }

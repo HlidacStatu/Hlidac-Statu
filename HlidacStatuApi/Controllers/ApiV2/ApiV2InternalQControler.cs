@@ -36,7 +36,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Fatal("Voice2TextNewTask", e);
+                _logger.Fatal(e, "Voice2TextNewTask");
                 throw;
             }
 
@@ -67,7 +67,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 }
                 catch (Exception e)
                 {
-                    HlidacStatu.Util.Consts.Logger.Fatal("Voice2TextGetTask", e);
+                    _logger.Fatal(e, "Voice2TextGetTask");
                     throw;
                 }
             }
@@ -105,7 +105,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Fatal("Voice2TextDone", e);
+                _logger.Fatal(e, "Voice2TextDone");
                 throw;
             }
 
@@ -140,7 +140,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Fatal("Voice2TextFailed", e);
+                _logger.Fatal(e, "Voice2TextFailed");
                 throw;
             }
 

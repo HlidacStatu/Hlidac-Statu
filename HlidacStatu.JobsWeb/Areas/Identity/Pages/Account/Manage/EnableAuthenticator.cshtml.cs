@@ -90,7 +90,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
 
             await _userManager.SetTwoFactorEnabledAsync(user, true);
             var userId = await _userManager.GetUserIdAsync(user);
-            Consts.Logger.Info($"User with ID '{userId}' has enabled 2FA with an authenticator app.");
+            _logger.Information($"User with ID '{userId}' has enabled 2FA with an authenticator app.");
 
             StatusMessage = "Your authenticator app has been verified.";
 

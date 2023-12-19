@@ -8,11 +8,14 @@ using System.Net.Mail;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using Serilog;
 
 namespace HlidacStatu.XLib.Emails
 {
     public class EmailMsg
     {
+        private readonly ILogger _logger = Log.ForContext<EmailMsg>();
+
         public EmailMsg(string htmltemplate, string texttemplate)
         {
             HtmlTemplate = htmltemplate;
@@ -51,7 +54,7 @@ namespace HlidacStatu.XLib.Emails
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("Razor template render", e);
+                _logger.Error(e, "Razor template render");
                 throw;
             }
 
@@ -89,7 +92,7 @@ namespace HlidacStatu.XLib.Emails
                     {
                         smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                         smtp.Host = Devmasters.Config.GetWebConfigValue("SmtpHost");
-                        Util.Consts.Logger.Info("Sending email to " + msg.To);
+                        _logger.Information("Sending email to " + msg.To);
                         //msg.Bcc.Add("michal@michalblaha.cz");
                         smtp.Send(msg);
                     }
@@ -98,7 +101,7 @@ namespace HlidacStatu.XLib.Emails
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("Send email", e);
+                _logger.Error(e, "Send email");
 #if DEBUG
                 throw;
 #endif
@@ -113,7 +116,7 @@ namespace HlidacStatu.XLib.Emails
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("Send email", e);
+                _logger.Error(e, "Send email");
                 throw;
             }
         }

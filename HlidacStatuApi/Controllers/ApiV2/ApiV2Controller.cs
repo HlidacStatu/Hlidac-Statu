@@ -78,7 +78,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             if (datatype.Contains("..") || datatype.Contains(Path.DirectorySeparatorChar))
             {
-                HlidacStatu.Util.Consts.Logger.Error("Wrong datatype name");
+                _logger.Error("Wrong datatype name");
                 return StatusCode(466);
 
             }
@@ -96,13 +96,13 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 }
                 catch (Exception e)
                 {
-                    HlidacStatu.Util.Consts.Logger.Error("DUMP exception?" + date, e);
+                    _logger.Error(e, "DUMP exception?" + date);
                     return StatusCode((int)HttpStatusCode.InternalServerError);
                 }
             }
             else
             {
-                HlidacStatu.Util.Consts.Logger.Error("API DUMP : not found file " + fn);
+                _logger.Error("API DUMP : not found file " + fn);
                 return NotFound($"Dump {datatype} for date:{date} nenalezen.");
             }
         }

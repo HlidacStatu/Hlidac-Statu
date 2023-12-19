@@ -21,7 +21,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnGet(string? returnUrl = null)
         {
             await _signInManager.SignOutAsync();
-            Consts.Logger.Info("User logged out.");
+            _logger.Information("User logged out.");
             if(string.IsNullOrEmpty(returnUrl))
                 return RedirectToAction("Index", "Home");
             else
@@ -31,7 +31,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPost(string? returnUrl = null)
         {
             await _signInManager.SignOutAsync();
-            Consts.Logger.Info("User logged out.");
+            _logger.Information("User logged out.");
             if(string.IsNullOrEmpty(returnUrl))
                 return RedirectToAction("Index", "Home");
             else

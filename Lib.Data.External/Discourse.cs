@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 using System;
+using Serilog;
 
 namespace HlidacStatu.Lib.Data.External
 {
@@ -16,6 +17,8 @@ namespace HlidacStatu.Lib.Data.External
 
         string apiUsername = "";
         string apiKey = "";
+        
+        private readonly ILogger _logger = Log.ForContext<Discourse>();
 
         private static string FixRootUrl(string url)
         {
@@ -109,7 +112,7 @@ Michal Bláha");
                 }
                 catch (Exception e)
                 {
-                    Util.Consts.Logger.Error("platforma invitation error", e);
+                    _logger.Error(e, "platforma invitation error");
                     return false;
                 }
             }
@@ -162,7 +165,7 @@ Michal Bláha");
                 }
                 catch (Exception e)
                 {
-                    Util.Consts.Logger.Error("PostToTopic error", e);
+                    _logger.Error(e, "PostToTopic error");
                     return false;
                 }
             }

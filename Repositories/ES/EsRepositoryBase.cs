@@ -62,13 +62,13 @@ namespace HlidacStatu.Repositories.ES
     //         if (!initialResponse.IsValid || string.IsNullOrEmpty(initialResponse.ScrollId))
     //         {
     //             var reason = initialResponse.ServerError.Error.Reason;
-    //             Consts.Logger.Error("GetAll: initialResponse is not valid. Reason: {reason}", reason);
+    //             _logger.Error("GetAll: initialResponse is not valid. Reason: {reason}", reason);
     //             throw new Exception(reason);
     //         }
     //
     //         if (!initialResponse.Documents.Any())
     //         {
-    //             Consts.Logger.Debug("Initial response has no documents.");
+    //             _logger.Debug("Initial response has no documents.");
     //         }
     //
     //         foreach (var documents in initialResponse.Documents)
@@ -85,7 +85,7 @@ namespace HlidacStatu.Repositories.ES
     //
     //             if (!loopingResponse.IsValid)
     //             {
-    //                 Consts.Logger.Error("GetAll: loopingResponse is not valid. Reason: {reason}"
+    //                 _logger.Error("GetAll: loopingResponse is not valid. Reason: {reason}"
     //                     , loopingResponse.ServerError.Error.Reason);
     //                 break;
     //             }
@@ -137,12 +137,12 @@ namespace HlidacStatu.Repositories.ES
     //             {
     //                 if (!response.SearchResponse.IsValid)
     //                 {
-    //                     Consts.Logger.Warning("Invalid response {response}", response.SearchResponse.DebugInformation);
+    //                     _logger.Warning("Invalid response {response}", response.SearchResponse.DebugInformation);
     //                 }
     //
     //                 if (!response.SearchResponse.Hits.Any())
     //                 {
-    //                     Consts.Logger.Warning("No results found in response {response}",
+    //                     _logger.Warning("No results found in response {response}",
     //                         response.SearchResponse.DebugInformation);
     //                 }
     //
@@ -152,7 +152,7 @@ namespace HlidacStatu.Repositories.ES
     //                     allIds.Add(id);
     //                 }
     //             },
-    //             onError: e => { Consts.Logger.Error("Scroll error occured", e); },
+    //             onError: e => { _logger.Error("Scroll error occured", e); },
     //             onCompleted: () => waitHandle.Set()
     //         );
     //
@@ -160,7 +160,7 @@ namespace HlidacStatu.Repositories.ES
     //
     //         waitHandle.WaitOne();
     //
-    //         Consts.Logger.Info("Loaded {idCount} Ids in total.", allIds.Count);
+    //         _logger.Info("Loaded {idCount} Ids in total.", allIds.Count);
     //
     //         return allIds;
     //     }
@@ -225,7 +225,7 @@ namespace HlidacStatu.Repositories.ES
     //                 }
     //                 else
     //                 {
-    //                     Util.Consts.Logger.Error("", e);
+    //                     _logger.Error("", e);
     //                 }
     //
     //                 throw;

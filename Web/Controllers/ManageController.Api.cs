@@ -53,7 +53,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("addreview API error", e);
+                _logger.Error(e, "addreview API error");
                 return Json("0");
             }
         }
@@ -248,7 +248,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error($"Export error:  id={id}, q={q}, h={h}, o={o}, ct={ct}, num={num}, ds={ds}", e);
+                _logger.Error(e, $"Export error:  id={id}, q={q}, h={h}, o={o}, ct={ct}, num={num}, ds={ds}");
                 return Content("Nastala chyba. Zkuste to pozdeji znovu", "text/plain");
             }
 
@@ -324,7 +324,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error($"Full export error:  q={q}, ds={ds}", e);
+                _logger.Error(e, $"Full export error:  q={q}, ds={ds}");
                 return Content("Nastala chyba. Zkuste to pozdeji znovu", "text/plain");
             }
 
@@ -385,7 +385,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("Manage.RemoveBookmark", e);
+                _logger.Error(e, "Manage.RemoveBookmark");
                 return Json("-1");
             }
         }
@@ -399,7 +399,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("Manage.RemoveBookmark", e);
+                _logger.Error(e, "Manage.RemoveBookmark");
                 return Json("-1");
             }
         }
@@ -436,7 +436,7 @@ namespace HlidacStatu.Web.Controllers
                     var dataSetId = dt.Replace("DataSet.", "");
                     if (DataSet.ExistsDataset(dataSetId) == false)
                     {
-                        Util.Consts.Logger.Error("AddWd - try to hack, wrong dataType = " + dataType + "." + dataSetId);
+                        _logger.Error("AddWd - try to hack, wrong dataType = " + dataType + "." + dataSetId);
                         throw new ArgumentOutOfRangeException("AddWd - try to hack, wrong dataType = " + dataType + "." + dataSetId);
                     }
                     wd.DataType = nameof(DataSet) + "." + dataSetId;
@@ -447,7 +447,7 @@ namespace HlidacStatu.Web.Controllers
                 }
                 else
                 {
-                    Util.Consts.Logger.Error("AddWd - try to hack, wrong dataType = " + dataType);
+                    _logger.Error("AddWd - try to hack, wrong dataType = " + dataType);
                     throw new ArgumentOutOfRangeException("AddWd - try to hack, wrong dataType = " + dataType);
                 }
                 if (!db.WatchDogs

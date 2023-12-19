@@ -3,11 +3,13 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static class UptimeSSLRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(UptimeSSLRepo));
 
         private static Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeSSL[]> uptimeSSlCache =
             new Devmasters.Cache.LocalMemory.AutoUpdatedCache<UptimeSSL[]>(TimeSpan.FromHours(2), (obj) =>
@@ -60,7 +62,7 @@ namespace HlidacStatu.Repositories
             }
             catch (System.Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error("UptimeServerRepo.SaveLastCheck error ", e);
+                _logger.Error(e, "UptimeServerRepo.SaveLastCheck error ");
                 throw;
             }
 

@@ -5,6 +5,7 @@ using HlidacStatu.Repositories.Searching;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.XLib
 {
@@ -127,6 +128,8 @@ namespace HlidacStatu.XLib
 
         }
 
+        private static readonly ILogger _logger = Log.ForContext<Search>();
+        
         public static async Task<MultiResult> GeneralSearchAsync(
             string query, int page = 1, bool showBeta = false, string order = null,
             System.Security.Principal.IPrincipal user = null,
@@ -169,7 +172,7 @@ namespace HlidacStatu.XLib
                     }
                     catch (System.Exception e)
                     {
-                        Util.Consts.Logger.Error("MultiResult GeneralSearch for Smlouvy query" + query, e);
+                        _logger.Error(e, "MultiResult GeneralSearch for Smlouvy query" + query);
                     }
                 }));
 
@@ -186,7 +189,7 @@ namespace HlidacStatu.XLib
                     }
                     catch (System.Exception e)
                     {
-                        Util.Consts.Logger.Error("MultiResult GeneralSearch for Firmy query" + query, e);
+                        _logger.Error(e, "MultiResult GeneralSearch for Firmy query" + query);
                     }
                 }));
 
@@ -203,7 +206,7 @@ namespace HlidacStatu.XLib
                     }
                     catch (System.Exception e)
                     {
-                        Util.Consts.Logger.Error("MultiResult GeneralSearch for Verejne zakazky query" + query, e);
+                        _logger.Error(e, "MultiResult GeneralSearch for Verejne zakazky query" + query);
                     }
                 }));
 
@@ -220,7 +223,7 @@ namespace HlidacStatu.XLib
                     }
                     catch (System.Exception e)
                     {
-                        Util.Consts.Logger.Error("MultiResult GeneralSearch for Osoba query" + query, e);
+                        _logger.Error(e, "MultiResult GeneralSearch for Osoba query" + query);
                     }
                 }));
 
@@ -246,7 +249,7 @@ namespace HlidacStatu.XLib
                         }
                         catch (System.Exception e)
                         {
-                            Util.Consts.Logger.Error("MultiResult GeneralSearch for insolvence query" + query, e);
+                            _logger.Error(e, "MultiResult GeneralSearch for insolvence query" + query);
                         }
                     }));
             }
@@ -268,7 +271,7 @@ namespace HlidacStatu.XLib
                     }
                     catch (System.Exception e)
                     {
-                        Util.Consts.Logger.Error("MultiResult GeneralSearch for insolvence query" + query, e);
+                        _logger.Error(e, "MultiResult GeneralSearch for insolvence query" + query);
                     }
                 }));
 
@@ -280,13 +283,12 @@ namespace HlidacStatu.XLib
                         res.Datasets = await Datasets.Search.DatasetMultiResult.GeneralSearchAsync(query, null, 1, datasetSize);
                         if (res.Datasets.Exceptions.Count > 0)
                         {
-                            Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetMulti query " + query,
-                                res.Datasets.GetExceptions());
+                            _logger.Error(res.Datasets.GetExceptions(), "MultiResult GeneralSearch for DatasetMulti query " + query);
                         }
                     }
                     catch (System.Exception e)
                     {
-                        Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetMulti query " + query, e);
+                        _logger.Error(e, "MultiResult GeneralSearch for DatasetMulti query " + query);
                     }
                 }));
 
@@ -300,7 +302,7 @@ namespace HlidacStatu.XLib
                     }
                     catch (System.Exception e)
                     {
-                        Util.Consts.Logger.Error("MultiResult GeneralSearch for DatasetRegistrations query " + query, e);
+                        _logger.Error(e, "MultiResult GeneralSearch for DatasetRegistrations query " + query);
                     }
                 }));
 

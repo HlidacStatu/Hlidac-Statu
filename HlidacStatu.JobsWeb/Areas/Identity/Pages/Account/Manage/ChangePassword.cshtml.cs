@@ -87,7 +87,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            Consts.Logger.Info("User changed their password successfully.");
+            _logger.Information("User changed their password successfully.");
             StatusMessage = "Your password has been changed.";
 
             return RedirectToPage();

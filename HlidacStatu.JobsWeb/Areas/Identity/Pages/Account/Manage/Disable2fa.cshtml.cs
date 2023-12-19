@@ -51,7 +51,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
                 throw new InvalidOperationException($"Unexpected error occurred disabling 2FA for user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            Consts.Logger.Info($"User with ID '{_userManager.GetUserId(User)}' has disabled 2fa.");
+            _logger.Information($"User with ID '{_userManager.GetUserId(User)}' has disabled 2fa.");
             StatusMessage = "2fa has been disabled. You can reenable 2fa when you setup an authenticator app";
             return RedirectToPage("./TwoFactorAuthentication");
         }

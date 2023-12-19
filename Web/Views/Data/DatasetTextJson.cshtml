@@ -32,7 +32,7 @@
         }
         catch (Exception e)
         {
-            HlidacStatu.Util.Consts.Logger.Error("datasetTextJson", e);
+            Serilog.Log.Error(e, "datasetTextJson");
             errors.Add($"Zaslaná data způsobila nečekanou chybu. Koukneme se na to. {e.Message}.");
             valid = false;
         }

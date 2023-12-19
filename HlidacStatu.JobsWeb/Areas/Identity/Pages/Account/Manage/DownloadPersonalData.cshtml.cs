@@ -29,7 +29,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            Consts.Logger.Info($"User with ID '{_userManager.GetUserId(User)}' asked for their personal data.");
+            _logger.Information($"User with ID '{_userManager.GetUserId(User)}' asked for their personal data.");
 
             // Only include personal data for download
             var personalData = new Dictionary<string, string>();

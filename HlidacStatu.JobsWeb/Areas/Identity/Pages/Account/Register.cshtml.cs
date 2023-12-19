@@ -68,7 +68,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
-                    Consts.Logger.Info("User created a new account with password.");
+                    _logger.Information("User created a new account with password.");
 
                     AspNetUserApiToken.CreateNew(user);
 

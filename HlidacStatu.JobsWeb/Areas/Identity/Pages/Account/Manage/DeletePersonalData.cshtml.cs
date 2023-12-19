@@ -73,7 +73,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
 
             await _signInManager.SignOutAsync();
 
-            Consts.Logger.Info($"User with ID '{userId}' deleted themselves.");
+            _logger.Information($"User with ID '{userId}' deleted themselves.");
 
             return Redirect("~/");
         }

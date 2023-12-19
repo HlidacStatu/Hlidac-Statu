@@ -100,7 +100,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception ex)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Dataset API", ex);
+                _logger.Error(ex, "Dataset API");
                 return BadRequest($"Obecná chyba - {ex.Message}");
             }
         }
@@ -151,7 +151,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception ex)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Dataset API", ex);
+                _logger.Error(ex, "Dataset API");
                 return BadRequest($"Obecná chyba - {ex.Message}");
             }
         }
@@ -194,7 +194,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception ex)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Dataset API", ex);
+                _logger.Error(ex, "Dataset API");
                 return BadRequest($"Obecná chyba - {ex.Message}");
             }
         }
@@ -231,7 +231,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception ex)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Dataset API", ex);
+                _logger.Error(ex, "Dataset API");
                 return BadRequest($"Obecná chyba - {ex.Message}");
             }
 
@@ -277,7 +277,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception ex)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Dataset API", ex);
+                _logger.Error(ex, "Dataset API");
                 return BadRequest($"Obecná chyba - {ex.Message}");
             }
         }
@@ -367,7 +367,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception ex)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Dataset API", ex);
+                _logger.Error(ex, "Dataset API");
                 return BadRequest($"Obecná chyba - {ex.Message}");
             }
         }
@@ -432,7 +432,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception ex)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Dataset API", ex);
+                _logger.Error(ex, "Dataset API");
                 return BadRequest($"Obecná chyba - {ex.Message}");
             }
             return results.Select(i => new DSItemResponseDTO() { id = i }).ToList();
@@ -466,7 +466,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception ex)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Dataset API", ex);
+                _logger.Error(ex, "Dataset API");
                 return BadRequest($"Obecná chyba - {ex.Message}");
             }
         }

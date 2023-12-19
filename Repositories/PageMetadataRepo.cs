@@ -5,13 +5,14 @@ using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
 using Nest;
-
+using Serilog;
 using static HlidacStatu.Repositories.Searching.Tools;
 
 namespace HlidacStatu.Repositories
 {
     public static class PageMetadataRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(PageMetadataRepo));
         public static async Task<bool> ExistsAsync(Smlouva smlouva, Smlouva.Priloha priloha, int stranka)
         {
             var id = PageMetadata.GetId(smlouva.Id, priloha?.UniqueHash(), stranka);
@@ -38,7 +39,7 @@ namespace HlidacStatu.Repositories
             }
             catch (System.Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error("PageMetadataRepo.Save error ", e);
+                _logger.Error(e, "PageMetadataRepo.Save error ");
                 throw;
             }
 

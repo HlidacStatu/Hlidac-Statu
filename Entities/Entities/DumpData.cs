@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using Serilog;
 
 namespace HlidacStatu.Entities
 {
@@ -11,6 +12,8 @@ namespace HlidacStatu.Entities
             No,
             WaitForData
         }
+        
+        private static readonly ILogger _logger = Log.ForContext<DumpData>();
 
         public static ShouldDownloadStatus ShouldDownload(XML.indexDump dump)
         {
@@ -91,7 +94,7 @@ namespace HlidacStatu.Entities
             catch (Exception e)
             {
 
-                Util.Consts.Logger.Error("SaveDumpProcessed error", e);
+                _logger.Error(e, "SaveDumpProcessed error");
             }
 
         }

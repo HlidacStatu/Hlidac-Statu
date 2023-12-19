@@ -61,7 +61,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
             var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
             RecoveryCodes = recoveryCodes.ToArray();
 
-            Consts.Logger.Info($"User with ID '{userId}' has generated new 2FA recovery codes.");
+            _logger.Information($"User with ID '{userId}' has generated new 2FA recovery codes.");
             StatusMessage = "You have generated new recovery codes.";
             return RedirectToPage("./ShowRecoveryCodes");
         }

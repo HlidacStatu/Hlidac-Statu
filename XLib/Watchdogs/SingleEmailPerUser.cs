@@ -5,11 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
     public class SingleEmailPerUser
     {
+        private static readonly ILogger _logger = Log.ForContext<SingleEmailPerUser>();
 
         public async static Task SendWatchdogsAsync(IEnumerable<WatchDog> watchdogs,
             bool force = false, string[] specificContacts = null,
@@ -25,7 +27,7 @@ namespace HlidacStatu.XLib.Watchdogs
                 && fromSpecificDate.HasValue == false
                 && toSpecificDate.HasValue == false;
 
-            Util.Consts.Logger.Info($"SingleEmailPerUser Start processing {watchdogs.Count()} watchdogs.");
+            _logger.Information($"SingleEmailPerUser Start processing {watchdogs.Count()} watchdogs.");
 
 
             Dictionary<string, WatchDog[]> groupedByUserNoSpecContact = watchdogs
@@ -38,7 +40,7 @@ namespace HlidacStatu.XLib.Watchdogs
                         )
                 .ToDictionary(k => k.key, v => v.val);
 
-            Util.Consts.Logger.Info($"SingleEmailPerUser {groupedByUserNoSpecContact.Count()} emails.");
+            _logger.Information($"SingleEmailPerUser {groupedByUserNoSpecContact.Count()} emails.");
 
 
             await Devmasters.Batch.Manager.DoActionForAllAsync<KeyValuePair<string, WatchDog[]>>(groupedByUserNoSpecContact,
@@ -54,7 +56,7 @@ namespace HlidacStatu.XLib.Watchdogs
                         .FirstOrDefault();
                     }
 
-                    Util.Consts.Logger.Info("SingleEmailPerUser watchdog {userWatchdogId} sending to {email}.",
+                    _logger.Information("SingleEmailPerUser watchdog {userWatchdogId} sending to {email}.",
                         string.Join(",", userWatchdogs.Select(m => m.Id.ToString())), user.Email);
                     Mail.SendStatus res= Mail.SendStatus.SendingError;
                     try
@@ -66,13 +68,13 @@ namespace HlidacStatu.XLib.Watchdogs
                     catch (Exception e)
                     {
                         res = Mail.SendStatus.SendingError;
-                        Util.Consts.Logger.Error("SingleEmailPerUser watchdog {userWatchdogId} to {email} sent results with {exception}.",e,
-                            string.Join(",", userWatchdogs.Select(m => m.Id.ToString())), user.Email, res.ToString(),e.ToString());
+                        _logger.Error(e,
+                            "SingleEmailPerUser watchdog {userWatchdogId} to {email} sent results with {exception}.", string.Join(",", userWatchdogs.Select(m => m.Id.ToString())), user.Email,res.ToString());
                     }
 
-                    Util.Consts.Logger.Info("SingleEmailPerUser watchdog {userWatchdogId} to {email} sent result {result}.",
+                    _logger.Information("SingleEmailPerUser watchdog {userWatchdogId} to {email} sent result {result}.",
                         string.Join(",",userWatchdogs.Select(m=>m.Id.ToString())), user.Email, res.ToString());
-                    //Util.Consts.Logger.Info($"SingleEmailPerUser {kv.Key} sent result {res.ToString()}.");
+                    //_logger.Information($"SingleEmailPerUser {kv.Key} sent result {res.ToString()}.");
 
                     return new Devmasters.Batch.ActionOutputData();
                 },
@@ -81,7 +83,7 @@ namespace HlidacStatu.XLib.Watchdogs
                , monitor: new MonitoredTaskRepo.ForBatch()
                 );
 
-            Util.Consts.Logger.Info($"SingleEmailPerUser Done processing {watchdogs.Count()} watchdogs.");
+            _logger.Information($"SingleEmailPerUser Done processing {watchdogs.Count()} watchdogs.");
 
         }
     }

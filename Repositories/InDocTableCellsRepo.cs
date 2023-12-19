@@ -3,11 +3,13 @@ using System;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using Nest;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static class InDocTableCellsRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(InDocTableCellsRepo));
  
         public static async Task<InDocTableCells> AddAsync(InDocTableCells cells)
         {
@@ -19,13 +21,13 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception ex)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Chyba při ukládání cells.", ex);
+                _logger.Error(ex, "Chyba při ukládání cells.");
                 return null;
             }
 
             if (!res.IsValid)
             {
-                HlidacStatu.Util.Consts.Logger.Error($"Chyba ukládání cells. {res.DebugInformation}");
+                _logger.Error($"Chyba ukládání cells. {res.DebugInformation}");
             }
 
             return cells;

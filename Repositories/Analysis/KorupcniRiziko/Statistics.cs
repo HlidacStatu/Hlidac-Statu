@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.KIndex;
+using Serilog;
 
 namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
 {
     public partial class Statistics
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(Statistics));
 
         static int[] Percentiles = new int[] { 1, 5, 10, 25, 33, 50, 66, 75, 90, 95, 99 };
 
@@ -131,7 +133,7 @@ namespace HlidacStatu.Repositories.Analysis.KorupcniRiziko
                         }
                         else
                         {
-                            Util.Consts.Logger.Error($"Record with ico [{m.ico}] is missing in KIndexCompanies cache file. Please reset cache.");
+                            _logger.Error($"Record with ico [{m.ico}] is missing in KIndexCompanies cache file. Please reset cache.");
                             subjectName = FirmaRepo.NameFromIco(m.ico);
                         }
                         return new SubjectWithKIndex()

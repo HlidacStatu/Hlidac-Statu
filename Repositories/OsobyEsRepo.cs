@@ -7,11 +7,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class OsobyEsRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(OsobyEsRepo));
+        
         private static readonly ElasticClient _esClient = Manager.GetESClient_OsobyAsync()
             .ConfigureAwait(false).GetAwaiter().GetResult();
 
@@ -28,7 +31,7 @@ namespace HlidacStatu.Repositories
             if (result.Errors)
             {
                 var a = result.DebugInformation;
-                Util.Consts.Logger.Error($"Error when bulkSaving osoby to ES: {a}");
+                _logger.Error($"Error when bulkSaving osoby to ES: {a}");
             }
         }
 

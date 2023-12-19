@@ -5,11 +5,14 @@ using HlidacStatu.Entities;
 
 using System;
 using System.Linq;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static class OsobaVazbyRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(OsobaVazbyRepo));
+        
         public static void AddOrUpdate(
             int osobaId, int vazbakOsobaId,
             int kod_angm, string funkce, decimal? share, DateTime? fromDate, DateTime? toDate, string zdroj = ""
@@ -69,7 +72,7 @@ namespace HlidacStatu.Repositories
                 }
                 catch (Exception e)
                 {
-                    Util.Consts.Logger.Error("", e);
+                    _logger.Error(e, "");
                     throw;
                 }
             }
@@ -168,7 +171,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("Vazby ERROR for " + osoba.NameId, e);
+                _logger.Error(e, "Vazby ERROR for " + osoba.NameId);
                 return Array.Empty<HlidacStatu.DS.Graphs.Graph.Edge>();
             }
         }

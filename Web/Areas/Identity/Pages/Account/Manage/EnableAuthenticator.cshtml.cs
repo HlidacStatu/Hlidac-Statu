@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
 {
@@ -18,6 +19,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
         private readonly UrlEncoder _urlEncoder;
 
         private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
+        private readonly ILogger _logger = Log.ForContext<EnableAuthenticatorModel>();
 
         public EnableAuthenticatorModel(
             UserManager<ApplicationUser> userManager,
@@ -91,7 +93,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
 
             await _userManager.SetTwoFactorEnabledAsync(user, true);
             var userId = await _userManager.GetUserIdAsync(user);
-            Util.Consts.Logger.Info($"User with ID '{userId}' has enabled 2FA with an authenticator app.");
+            _logger.Information($"User with ID '{userId}' has enabled 2FA with an authenticator app.");
 
             StatusMessage = "Your authenticator app has been verified.";
 

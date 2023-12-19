@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Serilog;
 
 namespace HlidacStatu.Entities.Issues
 {
@@ -10,6 +11,7 @@ namespace HlidacStatu.Entities.Issues
 
         private static object objLock = new object();
         private static List<IIssueAnalyzer> issueAnalyzers = null;
+        private static readonly ILogger _logger = Log.ForContext<Util>();
 
         public static string IssuesByLevelQuery(ImportanceLevel importanceLevel)
         {
@@ -106,12 +108,12 @@ namespace HlidacStatu.Entities.Issues
                         foreach (Exception ex in lex.LoaderExceptions)
                             sb.AppendFormat("{0}\n----------------\n", ex.ToString());
 
-                    HlidacStatu.Util.Consts.Logger.Fatal("Cannot make list of issueAnalyzer instances, reason: " + sb.ToString(), lex);
+                    _logger.Fatal(lex, "Cannot make list of issueAnalyzer instances, reason: " + sb.ToString());
 
                 }
                 catch (Exception e)
                 {
-                    HlidacStatu.Util.Consts.Logger.Fatal("Cannot make list of issueAnalyzer plugin instances ", e);
+                    _logger.Fatal(e, "Cannot make list of issueAnalyzer plugin instances ");
 
                     throw;
                 }
@@ -123,7 +125,7 @@ namespace HlidacStatu.Entities.Issues
                     {
                         IIssueAnalyzer parser = (IIssueAnalyzer)Activator.CreateInstance(type);
                         ps.Add(parser);
-                        HlidacStatu.Util.Consts.Logger.Info("Creating instance of issueAnalyzer plugin " + type.FullName);
+                        _logger.Information("Creating instance of issueAnalyzer plugin " + type.FullName);
 
                     }
                     catch (Exception)

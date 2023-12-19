@@ -76,17 +76,17 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account
 
             if (result.Succeeded)
             {
-                Consts.Logger.Info($"User with ID '{user.Id}' logged in with 2fa.");
+                _logger.Information($"User with ID '{user.Id}' logged in with 2fa.");
                 return LocalRedirect(returnUrl);
             }
             else if (result.IsLockedOut)
             {
-                Consts.Logger.Warning($"User with ID '{user.Id}' account locked out.");
+                _logger.Warning($"User with ID '{user.Id}' account locked out.");
                 return RedirectToPage("./Lockout");
             }
             else
             {
-                Consts.Logger.Warning($"Invalid authenticator code entered for user with ID '{user.Id}'.");
+                _logger.Warning($"Invalid authenticator code entered for user with ID '{user.Id}'.");
                 ModelState.AddModelError(string.Empty, "Invalid authenticator code.");
                 return Page();
             }

@@ -8,11 +8,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static class FirmaVazbyRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(FirmaVazbyRepo));
+        
         public static void AddOrUpdate(
             string vlastnikIco, string dcerinkaIco,
             int kod_angm, string funkce, decimal? share, DateTime? fromDate, DateTime? toDate
@@ -278,7 +281,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                Consts.Logger.Error("Vazby ERROR for " + firma.ICO, e);
+                _logger.Error(e, "Vazby ERROR for " + firma.ICO);
                 return Array.Empty<HlidacStatu.DS.Graphs.Graph.Edge>();
             }
         }

@@ -118,7 +118,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error($"_DataHost id ${id}", e);
+                _logger.Error(e, $"_DataHost id ${id}");
                 return BadRequest($"Interní chyba při načítání systému.");
             }
         }

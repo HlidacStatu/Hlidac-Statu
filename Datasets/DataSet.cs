@@ -21,12 +21,15 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using Serilog;
 
 namespace HlidacStatu.Datasets
 {
     public partial class DataSet
         : IBookmarkable
     {
+        private static readonly ILogger _logger = Log.ForContext<DataSet>();
+        
         public static volatile Devmasters.Cache.LocalMemory.Manager<DataSet, string> CachedDatasets
             = Devmasters.Cache.LocalMemory.Manager<DataSet, string>.GetSafeInstance("Datasets",
                 datasetId => { return new DataSet(datasetId); },
@@ -494,14 +497,14 @@ namespace HlidacStatu.Datasets
                         using (SmtpClient smtp = new SmtpClient())
                         {
                             smtp.Host = Devmasters.Config.GetWebConfigValue("SmtpHost");
-                            Consts.Logger.Info("Sending email to " + msg.To);
+                            _logger.Information("Sending email to " + msg.To);
                             smtp.Send(msg);
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    Consts.Logger.Error("Send email", e);
+                    _logger.Error(e, "Send email");
 #if DEBUG
                     throw;
 #endif
@@ -654,7 +657,7 @@ namespace HlidacStatu.Datasets
                     status.error.errorDetail = servererr.Error.ToString();
                 }
 
-                Consts.Logger.Error("AddData id:" + id + "\n" + tres.DebugInformation + "\n" +
+                _logger.Error("AddData id:" + id + "\n" + tres.DebugInformation + "\n" +
                                     servererr?.Error?.ToString());
 
                 throw new DataSetException(datasetId, status);
@@ -1251,7 +1254,7 @@ namespace HlidacStatu.Datasets
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Dataset.NumberOfRecordsAsync", e);
+                _logger.Error(e, "Dataset.NumberOfRecordsAsync");
                 return 0;
             }
 

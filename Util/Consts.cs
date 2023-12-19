@@ -34,8 +34,5 @@ namespace HlidacStatu.Util
         //todo: what to do here? IDK - we should get rid of devmasters log logger, since it can rewrite global logger
         public static Devmasters.Log.Logger LW = Devmasters.Log.Logger.CreateLogger("progress writer",
             new LoggerConfiguration().WriteTo.Console(), false);
-
-        public static LoggerWrapper.Logger Logger;
-
     }
 }

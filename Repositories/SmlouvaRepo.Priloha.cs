@@ -63,7 +63,7 @@ namespace HlidacStatu.Repositories
                         }
                         catch (Exception e)
                         {
-                            Util.Consts.Logger.Error(attUrl, e);
+                            _logger.Error(e, attUrl);
                         }
                     }
 
@@ -116,7 +116,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception)
             {
-                Util.Consts.Logger.Warning("invalid file name " + (att?.nazevSouboru ?? "(null)"));
+                _logger.Warning("invalid file name " + (att?.nazevSouboru ?? "(null)"));
             }
 
 
@@ -131,7 +131,7 @@ namespace HlidacStatu.Repositories
             {
                 try
                 {
-                    Util.Consts.Logger.Debug(
+                    _logger.Debug(
                         $"Downloading priloha {att.nazevSouboru} for smlouva {smlouva.Id} from URL {att.odkaz}");
                     byte[] data = null;
                     using (Devmasters.Net.HttpClient.URLContent web =
@@ -142,7 +142,7 @@ namespace HlidacStatu.Repositories
                         System.IO.File.WriteAllBytes(localFile, data);
                     }
 
-                    Util.Consts.Logger.Debug(
+                    _logger.Debug(
                         $"Downloaded priloha {att.nazevSouboru} for smlouva {smlouva.Id} from URL {att.odkaz}");
                 }
                 catch (Exception)
@@ -152,7 +152,7 @@ namespace HlidacStatu.Repositories
                         if (Uri.TryCreate(att.odkaz, UriKind.Absolute, out var _))
                         {
                             byte[] data = null;
-                            Util.Consts.Logger.Debug(
+                            _logger.Debug(
                                 $"Second try: Downloading priloha {att.nazevSouboru} for smlouva {smlouva.Id} from URL {att.odkaz}");
                             using (Devmasters.Net.HttpClient.URLContent web =
                                 new Devmasters.Net.HttpClient.URLContent(att.odkaz))
@@ -165,7 +165,7 @@ namespace HlidacStatu.Repositories
                                 System.IO.File.WriteAllBytes(localFile, data);
                             }
 
-                            Util.Consts.Logger.Debug(
+                            _logger.Debug(
                                 $"Second try: Downloaded priloha {att.nazevSouboru} for smlouva {smlouva.Id} from URL {att.odkaz}");
 
                         }
@@ -174,7 +174,7 @@ namespace HlidacStatu.Repositories
                     }
                     catch (Exception e)
                     {
-                        Util.Consts.Logger.Error(att.odkaz, e);
+                        _logger.Error(e, att.odkaz);
                         return null;
                     }
                 }
@@ -199,7 +199,7 @@ namespace HlidacStatu.Repositories
                     }
                     catch (Exception e)
                     {
-                        HlidacStatu.Util.Consts.Logger.Error("Cannot convert into PDF {localfile}", e, localFile);
+                        _logger.Error(e, "Cannot convert into PDF {localfile}", localFile);
                         return localFile;
                     }
                 }
@@ -247,7 +247,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Error in GetCopyOfDownloadedPrilohaPath {smlouvaId} {prilohaHash}", e, smlouva.Id, att.UniqueHash());
+                _logger.Error(e, "Error in GetCopyOfDownloadedPrilohaPath {smlouvaId} {prilohaHash}", smlouva.Id, att.UniqueHash());
                 throw;
             }
             finally

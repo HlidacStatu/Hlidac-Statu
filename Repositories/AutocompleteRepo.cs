@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
+using Serilog;
 using Consts = HlidacStatu.Util.Consts;
 
 namespace HlidacStatu.Repositories
@@ -21,8 +22,8 @@ namespace HlidacStatu.Repositories
     //migrace: tohle není repo - přestěhovat jinam => až budeme vytvářet samostatnou api
     public static class AutocompleteRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(AutocompleteRepo));
 
-        //static Devmasters.Batch.ActionProgressWriter progressWriter = new Devmasters.Batch.ActionProgressWriter(0.1f, Devmasters.Batch.ProgressWriters.ConsoleWriter_EndsIn);
 
         static bool debug = System.Diagnostics.Debugger.IsAttached;
         /// <summary>
@@ -51,13 +52,13 @@ namespace HlidacStatu.Repositories
                 {
                     try
                     {
-                        Consts.Logger.Info("GenerateAutocomplete Loading cities");
+                        _logger.Information("GenerateAutocomplete Loading cities");
                         cities = LoadCities(logOutputFunc,progressOutputFunc);
-                        Consts.Logger.Info("GenerateAutocomplete Loading cities done");
+                        _logger.Information("GenerateAutocomplete Loading cities done");
                     }
                     catch (Exception e)
                     {
-                        Consts.Logger.Error("GenerateAutocomplete Cities error ", e);
+                        _logger.Error(e, "GenerateAutocomplete Cities error ");
                     }
                 },
 
@@ -65,26 +66,26 @@ namespace HlidacStatu.Repositories
                 {
                     try
                     {
-                        Consts.Logger.Info("GenerateAutocomplete Loading companies");
+                        _logger.Information("GenerateAutocomplete Loading companies");
                         companies = LoadCompanies(logOutputFunc, progressOutputFunc);
-                        Consts.Logger.Info("GenerateAutocomplete Loading companies done");
+                        _logger.Information("GenerateAutocomplete Loading companies done");
                     }
                     catch (Exception e)
                     {
-                        Consts.Logger.Error("GenerateAutocomplete Companies error ", e);
+                        _logger.Error(e, "GenerateAutocomplete Companies error ");
                     }
                 },
                 () =>
                 {
                     try
                     {
-                        Consts.Logger.Info("GenerateAutocomplete Loading state companies");
+                        _logger.Information("GenerateAutocomplete Loading state companies");
                         stateCompanies = LoadStateCompanies();
-                        Consts.Logger.Info("GenerateAutocomplete Loading state companies done");
+                        _logger.Information("GenerateAutocomplete Loading state companies done");
                     }
                     catch (Exception e)
                     {
-                        Consts.Logger.Error("GenerateAutocomplete StateCompanies error ", e);
+                        _logger.Error(e, "GenerateAutocomplete StateCompanies error ");
                     }
                 },
 
@@ -92,13 +93,13 @@ namespace HlidacStatu.Repositories
                 {
                     try
                     {
-                        Consts.Logger.Info("GenerateAutocomplete Loading oblasti");
+                        _logger.Information("GenerateAutocomplete Loading oblasti");
                         oblasti = LoadOblasti();
-                        Consts.Logger.Info("GenerateAutocomplete Loading oblasti done");
+                        _logger.Information("GenerateAutocomplete Loading oblasti done");
                     }
                     catch (Exception e)
                     {
-                        Consts.Logger.Error("GenerateAutocomplete Oblasti error ", e);
+                        _logger.Error(e, "GenerateAutocomplete Oblasti error ");
                     }
                 },
 
@@ -106,13 +107,13 @@ namespace HlidacStatu.Repositories
                 {
                     try
                     {
-                        Consts.Logger.Info("GenerateAutocomplete Loading synonyms");
+                        _logger.Information("GenerateAutocomplete Loading synonyms");
                         synonyms = LoadSynonyms();
-                        Consts.Logger.Info("GenerateAutocomplete Loading synonyms done");
+                        _logger.Information("GenerateAutocomplete Loading synonyms done");
                     }
                     catch (Exception e)
                     {
-                        Consts.Logger.Error("GenerateAutocomplete Synonyms error ", e);
+                        _logger.Error(e, "GenerateAutocomplete Synonyms error ");
                     }
                 },
 
@@ -120,40 +121,40 @@ namespace HlidacStatu.Repositories
                 {
                     try
                     {
-                        Consts.Logger.Info("GenerateAutocomplete Loading operators");
+                        _logger.Information("GenerateAutocomplete Loading operators");
                         operators = LoadOperators();
-                        Consts.Logger.Info("GenerateAutocomplete Loading operators done");
+                        _logger.Information("GenerateAutocomplete Loading operators done");
                     }
                     catch (Exception e)
                     {
-                        Consts.Logger.Error("GenerateAutocomplete Operators error ", e);
+                        _logger.Error(e, "GenerateAutocomplete Operators error ");
                     }
                 }
             );
             
             try
             {
-                Consts.Logger.Info("GenerateAutocomplete Loading authorities");
+                _logger.Information("GenerateAutocomplete Loading authorities");
                 authorities = await LoadAuthoritiesAsync(logOutputFunc, progressOutputFunc);
-                Consts.Logger.Info("GenerateAutocomplete Loading authorities done");
+                _logger.Information("GenerateAutocomplete Loading authorities done");
             }
             catch (Exception e)
             {
-                Consts.Logger.Error("GenerateAutocomplete Authorities error ", e);
+                _logger.Error(e, "GenerateAutocomplete Authorities error ");
             }
             
             try
             {
-                Consts.Logger.Info("GenerateAutocomplete Loading people");
+                _logger.Information("GenerateAutocomplete Loading people");
                 people = await LoadPeopleAsync(logOutputFunc, progressOutputFunc);
-                Consts.Logger.Info("GenerateAutocomplete Loading people done");
+                _logger.Information("GenerateAutocomplete Loading people done");
             }
             catch (Exception e)
             {
-                Consts.Logger.Error("GenerateAutocomplete People error ", e);
+                _logger.Error(e, "GenerateAutocomplete People error ");
             }
             
-            Consts.Logger.Info("GenerateAutocomplete done");
+            _logger.Information("GenerateAutocomplete done");
 
             return companies
             .Concat(stateCompanies)

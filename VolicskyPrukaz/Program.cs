@@ -60,11 +60,11 @@ app.MapGet("/findAddress/{query}", async (string query,
         catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
         {
             // canceled by user
-            //Util.Consts.Logger.Info("Autocomplete canceled by user");
+            //_logger.Information("Autocomplete canceled by user");
         }
         catch (Exception e)
         {
-            //Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { query });
+            //_logger.Warning("Autocomplete API problem.", e, new { query });
         }
 
         return Results.NoContent();

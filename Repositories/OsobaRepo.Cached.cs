@@ -29,7 +29,7 @@ namespace HlidacStatu.Repositories
 
 
 
-            Consts.Logger.Info("Static data - Politici");
+            _logger.Information("Static data - Politici");
             Politici = new AutoUpdatedCache<List<Osoba>>(
                 TimeSpan.FromHours(36), "politiciOnly", (obj) =>
                 {

@@ -1,16 +1,16 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 
-
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Lib.Data.External.Tables
 {
     public static class SmlouvaPrilohaExtension
     {
-
+        private static readonly ILogger _logger = Log.ForContext(typeof(SmlouvaPrilohaExtension));
 
         public static async Task<HlidacStatu.DS.Api.TablesInDoc.Result[]> ParseTablesFromDocumentAsync(string smlouvaId, string prilohaId)
         {
@@ -23,7 +23,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 return null;
             if (string.IsNullOrEmpty(p.nazevSouboru))
             {
-                Util.Consts.Logger.Warning($"smlouva {smlouvaId} soubor {p.UniqueHash()} doesn't have nazevSouboru");
+                _logger.Warning($"smlouva {smlouvaId} soubor {p.UniqueHash()} doesn't have nazevSouboru");
                 return null;
             }
             return await ParseTablesFromDocumentAsync(s, p);
@@ -47,7 +47,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
                         HlidacStatu.DS.Api.TablesInDoc.Formats.JSON).Result;
 
                 sw.Stop();
-                Util.Consts.Logger.Debug($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} done in {sw.ElapsedMilliseconds}ms, found {myRes?.Sum(m => m.Tables?.Length ?? 0)} tables");
+                _logger.Debug($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} done in {sw.ElapsedMilliseconds}ms, found {myRes?.Sum(m => m.Tables?.Length ?? 0)} tables");
 
                 return myRes;
 
@@ -59,11 +59,11 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 {
                     foreach (var e in age.InnerExceptions)
                     {
-                        Util.Consts.Logger.Error($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms  {e.ToString()}", e);
+                        _logger.Error(e, $"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms  {e.ToString()}");
                     }
                 }
                 else
-                    Util.Consts.Logger.Error($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms {age.ToString()}", age);
+                    _logger.Error(age, $"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} errors GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms {age.ToString()}");
                 if (throwException)
                     throw;
                 else
@@ -72,7 +72,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
             catch (Exception e)
             {
                 sw.Stop();
-                Util.Consts.Logger.Error($"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} error GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms, {e.ToString()}", e);
+                _logger.Error(e, $"smlouva {smlouva.Id} soubor {priloha.UniqueHash()} error GetMaxTablesFromPDFAsync in {sw.ElapsedMilliseconds}ms, {e.ToString()}");
                 if (throwException)
                     throw;
                 else

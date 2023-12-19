@@ -716,7 +716,7 @@ namespace HlidacStatu.Web.Controllers
 
             if (errors?.Count > 0)
             {
-                Util.Consts.Logger.Error("ImportDataProcess exceptions \n"
+                _logger.Error("ImportDataProcess exceptions \n"
                     + errors.Select(m => m.Message).Aggregate((f, s) => f + "\n" + s));
             }
 

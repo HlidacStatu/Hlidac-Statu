@@ -4,11 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
+using Serilog;
 
 namespace HlidacStatu.Lib.Data.External.DatoveSchranky
 {
     public class ISDS
     {
+        private static readonly ILogger _logger = Log.ForContext<ISDS>();
 
         public class Osoba
         {
@@ -153,7 +155,7 @@ namespace HlidacStatu.Lib.Data.External.DatoveSchranky
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("GetDatoveSchranky request error", e);
+                _logger.Error(e, "GetDatoveSchranky request error");
                 return null;
             }
 

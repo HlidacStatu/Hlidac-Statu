@@ -20,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities.KIndex;
+using Serilog;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -27,6 +28,7 @@ namespace HlidacStatu.Web.Controllers
     public partial class ManageController : Controller
     {
         private readonly UserManager<Entities.ApplicationUser> _userManager;
+        private readonly ILogger _logger = Log.ForContext<ManageController>();
 
         public ManageController(UserManager<Entities.ApplicationUser> userManager, SignInManager<Entities.ApplicationUser> signInManager)
         {
@@ -581,7 +583,7 @@ namespace HlidacStatu.Web.Controllers
                     }
                     catch (Exception e)
                     {
-                        Util.Consts.Logger.Error("PhotoChange processing", e);
+                        _logger.Error(e, "PhotoChange processing");
                     }
 
                     ViewBag.Osoba = o;
@@ -684,7 +686,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("PhotoChange", e);
+                _logger.Error(e, "PhotoChange");
                 return View();
             }
             return View();

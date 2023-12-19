@@ -13,13 +13,15 @@ using HlidacStatu.Entities;
 using HlidacStatu.Util;
 
 using Nest;
-
+using Serilog;
 using Manager = HlidacStatu.Connectors.Manager;
 
 namespace HlidacStatu.Repositories.Searching
 {
     public static class Tools
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(Tools));
+        
         public const int MaxResultWindow = 10000;
 
         static string regexInvalidQueryTemplate = @"(^|\s|[(])(?<q>$operator$\s{1} (?<v>(\w{1,})) )($|\s|[)])";
@@ -315,7 +317,7 @@ namespace HlidacStatu.Repositories.Searching
                     }
                     catch (Exception ex)
                     {
-                        Consts.Logger.Error("Cannot read data from Elastic, skipping iteration" + currIteration, ex);
+                        _logger.Error(ex, "Cannot read data from Elastic, skipping iteration" + currIteration);
                         return;
                     }
                 }
@@ -374,7 +376,7 @@ namespace HlidacStatu.Repositories.Searching
                                 }
                                 catch (Exception e)
                                 {
-                                    Consts.Logger.Error("DoActionForAll action error", e);
+                                    _logger.Error(e, "DoActionForAll action error");
                                     cts.Cancel();
                                 }
                                 finally
@@ -419,7 +421,7 @@ namespace HlidacStatu.Repositories.Searching
                             }
                             catch (Exception e)
                             {
-                                HlidacStatu.Util.Consts.Logger.Error("DoActionForQueryAsync action error", e);
+                                _logger.Error(e, "DoActionForQueryAsync action error");
                                 if (canceled)
                                     break;
 
@@ -516,7 +518,7 @@ namespace HlidacStatu.Repositories.Searching
                 {
                     if (!response.SearchResponse.IsValid)
                     {
-                        HlidacStatu.Util.Consts.Logger.Warning("Invalid response {response}", response.SearchResponse.DebugInformation);
+                        _logger.Warning("Invalid response {response}", response.SearchResponse.DebugInformation);
                     }
 
                     foreach (var h in response.SearchResponse.Hits)
@@ -532,7 +534,7 @@ namespace HlidacStatu.Repositories.Searching
                 },
                 onError: e =>
                 {
-                    HlidacStatu.Util.Consts.Logger.Error("Scroll error occured cl:{client} q:{query}", e, sourceESClient.ConnectionSettings.DefaultIndex, query);
+                    _logger.Error(e, "Scroll error occured cl:{client} q:{query}", sourceESClient.ConnectionSettings.DefaultIndex, query);
                     res.ErrorOccurred = true;
                     res.Exception = e;
                     exceptions.Add(e);
@@ -608,7 +610,7 @@ namespace HlidacStatu.Repositories.Searching
                 {
                     if (!response.SearchResponse.IsValid)
                     {
-                        HlidacStatu.Util.Consts.Logger.Warning("Invalid response {response}", response.SearchResponse.DebugInformation);
+                        _logger.Warning("Invalid response {response}", response.SearchResponse.DebugInformation);
                     }
 
                     var ids = response.SearchResponse.Hits.Select(h => h.Id);
@@ -626,7 +628,7 @@ namespace HlidacStatu.Repositories.Searching
                 },
                 onError: e =>
                 {
-                    HlidacStatu.Util.Consts.Logger.Error("Scroll error occured cl:{client} q:{query}", e, sourceESClient.ConnectionSettings.DefaultIndex, query);
+                    _logger.Error(e, "Scroll error occured cl:{client} q:{query}", sourceESClient.ConnectionSettings.DefaultIndex, query);
                     res.ErrorOccurred = true;
                     res.Exception = e;
                     if (logOutputFunc != null)
