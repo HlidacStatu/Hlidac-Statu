@@ -1,16 +1,17 @@
 using System;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
-using HlidacStatu.Util;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog;
 
 namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
 {
     public class Disable2faModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger _logger = Log.ForContext<Disable2faModel>();
 
         public Disable2faModel(
             UserManager<ApplicationUser> userManager)

@@ -16,6 +16,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         public const int DefaultResultPageSize = 25;
         public const int MaxResultsFromES = 5000;
 
+        private readonly Serilog.ILogger _logger = Serilog.Log.ForContext<ApiV2Controller>();
         /*
         Atributy pro API
         [SwaggerOperation(Tags = new[] { "Beta" })] - zarazeni metody do jine skupiny metod, pouze na urovni methody

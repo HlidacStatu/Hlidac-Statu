@@ -12,6 +12,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
     [Route("api/v2/datasety")]
     public class ApiV2DatasetyController : ControllerBase
     {
+        private readonly Serilog.ILogger _logger = Serilog.Log.ForContext<ApiV2DatasetyController>();
         /// <summary>
         /// Načte seznam datasetů
         /// </summary>

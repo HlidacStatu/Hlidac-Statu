@@ -16,6 +16,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
     [Route("api/v2/firmy")]
     public class ApiV2FirmyController : ControllerBase
     {
+        private readonly Serilog.ILogger _logger = Serilog.Log.ForContext<ApiV2FirmyController>();
 
         /// <summary>
         /// Vyhledá firmu v databázi Hlídače státu.

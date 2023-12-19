@@ -12,6 +12,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
     [Route("api/v2/internalq")]
     public class ApiV2InternalQController : ControllerBase
     {
+        private readonly Serilog.ILogger _logger = Serilog.Log.ForContext<ApiV2InternalQController>();
+        
         /// <summary>
         ///  Vytvori novy task
         /// </summary>

@@ -10,6 +10,8 @@ namespace HlidacStatuApi.Code
         private readonly int _duration;
         private readonly string[] _queryKeys;
         private readonly bool _differAuth;
+        
+        private readonly Serilog.ILogger _logger = Serilog.Log.ForContext<HlidacCacheAttribute>();
 
         public HlidacCacheAttribute(int durationInSeconds, string queryKeys, bool differAuth)
         {

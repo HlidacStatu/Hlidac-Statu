@@ -3,13 +3,13 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
-using HlidacStatu.Util;
 using HlidacStatu.XLib.Emails;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using Serilog;
 
 namespace WatchdogAnalytics.Areas.Identity.Pages.Account
 {
@@ -18,6 +18,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger _logger = Log.ForContext<ExternalLoginModel>();
 
         public ExternalLoginModel(
             SignInManager<ApplicationUser> signInManager,
