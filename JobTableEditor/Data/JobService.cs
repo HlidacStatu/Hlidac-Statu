@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace JobTableEditor.Data
 {
@@ -15,12 +15,7 @@ namespace JobTableEditor.Data
     {
         //static readonly InTables it_inTables = new("IT", IT.Keywords, IT.OtherWords, IT.BlacklistedWords);
         
-        ILogger<JobService> _logger;
-
-        public JobService(ILogger<JobService> logger)
-        {
-            _logger = logger;
-        }
+        ILogger _logger = Log.ForContext<JobService>();
         
         public async Task<SomeTable> GetNewTable(string obor, string user, CancellationToken cancellationToken)
         {
@@ -52,7 +47,7 @@ namespace JobTableEditor.Data
             
             var wrapCellsTime = sw.ElapsedMilliseconds;
             int width = cells.Length > 0 ? cells[0].Length : 0;
-            _logger.LogDebug($"GetNewTable loading times - W:{width}, H:{cells.Length} - \nnfc: {getNextForCheckTime}ms \nttc: {tableToCellsTime}ms \ncwwn: {cellsWithWordsAndNumbersTime}ms \nwc: {wrapCellsTime}ms");
+            _logger.Debug($"GetNewTable loading times - W:{width}, H:{cells.Length} - \nnfc: {getNextForCheckTime}ms \nttc: {tableToCellsTime}ms \ncwwn: {cellsWithWordsAndNumbersTime}ms \nwc: {wrapCellsTime}ms");
             return st;
         }
 
@@ -139,7 +134,7 @@ namespace JobTableEditor.Data
             }
             catch (Exception e)
             {
-                _logger.LogDebug(e, $"Save jobs failed");
+                _logger.Error(e, "Save jobs failed");
                 Console.WriteLine(e);
                 throw;
             }

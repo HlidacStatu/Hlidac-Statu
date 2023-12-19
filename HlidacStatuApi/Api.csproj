@@ -41,4 +41,10 @@
 		</None>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Content Update="Logger.serilog.json">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
 </Project>

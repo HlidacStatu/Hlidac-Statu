@@ -1,4 +1,5 @@
 ﻿using HlidacStatu.Entities;
+using Serilog;
 
 namespace HlidacStatuApi.Code
 {
@@ -13,7 +14,7 @@ namespace HlidacStatuApi.Code
               sw.Start();
               var res = _availability(24);
               sw.Stop();
-              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} sec. Last record {date}", "updated", "uptimeServersCache1Day", sw.Elapsed.TotalSeconds, res.FirstOrDefault()?.Data?.Max(m=>m.Time));
+              Log.ForContext<Availability>().Information("{action} updated of {part} in {duration} sec. Last record {date}", "updated", "uptimeServersCache1Day", sw.Elapsed.TotalSeconds, res.FirstOrDefault()?.Data?.Max(m=>m.Time));
               return res.ToArray();
           });
 
@@ -31,7 +32,7 @@ namespace HlidacStatuApi.Code
               var res = _availability(7 * 24);
             #endif
               sw.Stop();
-              HlidacStatuApi.Code.Log.Logger.Info("{action} updated of {part} in {duration} sec. Last record {date}.", "updated", "uptimeServersCache7Days", sw.Elapsed.TotalSeconds, res.FirstOrDefault()?.Data?.Max(m => m.Time));
+              Log.ForContext<Availability>().Information("{action} updated of {part} in {duration} sec. Last record {date}.", "updated", "uptimeServersCache7Days", sw.Elapsed.TotalSeconds, res.FirstOrDefault()?.Data?.Max(m => m.Time));
               return res.ToArray();
 
           }
@@ -63,7 +64,7 @@ namespace HlidacStatuApi.Code
             }
             catch (Exception e)
             {
-                HlidacStatuApi.Code.Log.Logger.Error("Cannot read data from InfluxDb", e);
+                Log.ForContext<Availability>().Error(e, "Cannot read data from InfluxDb");
             }
 
             var zabList = items

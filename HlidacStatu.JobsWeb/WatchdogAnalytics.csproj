@@ -34,4 +34,10 @@
       <ProjectReference Include="..\Util\Util.csproj" />
       <ProjectReference Include="..\XLib\XLib.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="Logger.serilog.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
 </Project>

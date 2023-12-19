@@ -1,4 +1,4 @@
-{
+﻿{
   "Serilog": {
     "Using": [
       "Serilog.Sinks.Console",
@@ -14,18 +14,6 @@
       }
     },
     "WriteTo": [
-      {
-        "Name": "File",
-        "Args": {
-          "restrictedToMinimumLevel": "Warning",
-          "path": "c:/!/Logs/web.txt",
-          "formatter": "Elastic.CommonSchema.Serilog.EcsTextFormatter, Elastic.CommonSchema.Serilog",
-          "rollingInterval": "Day",
-          "fileSizeLimitBytes": null,
-          "retainedFileCountLimit": 9,
-          "shared": true
-        }
-      },
       {
         "Name": "Http",
         "Args": {

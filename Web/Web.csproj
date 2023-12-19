@@ -126,15 +126,14 @@
       <None Update="cs_CZ.stopwords">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="Logger.log4net">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 
 
     <ItemGroup>
       <None Include="..\.editorconfig" Link=".editorconfig" />
-      <None Include="Logger.serilog.json" />
+      <None Include="Logger.serilog.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 

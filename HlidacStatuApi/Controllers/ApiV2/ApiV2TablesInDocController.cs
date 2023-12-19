@@ -4,6 +4,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.Data;
 using System.Data.SqlClient;
 using static HlidacStatu.DS.Api.BlurredPage;
+using ILogger = Serilog.ILogger;
 
 namespace HlidacStatuApi.Controllers.ApiV2
 {
@@ -14,10 +15,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
     [Route("api/v2/tbls")]
     public class ApiV2TablesInDocController : ControllerBase
     {
-        static object lockObj = new object();
-        static ApiV2TablesInDocController()
-        {
-        }
+        private ILogger _logger = Serilog.Log.ForContext<ApiV2TablesInDocController>();
 
 
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -86,7 +84,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             CheckRoleRecord(this.User.Identity.Name);
 
-            HlidacStatuApi.Code.Log.Logger.Error(
+            _logger.Error(
                 "{action} {from} {user} {ip} {message}",
                 "RemoteLog",
                 "TablesInDocsMinion",
@@ -97,7 +95,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return StatusCode(200);
         }
 
-        private static void CheckRoleRecord(string username)
+        private void CheckRoleRecord(string username)
         {
             return;
             //check if user is in blurredAPIAccess roles
@@ -120,7 +118,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception e)
             {
-                HlidacStatuApi.Code.Log.Logger.Error("cannot add {username} to the role blurredAPIAccess", e, username);
+                _logger.Error(e, "cannot add {username} to the role blurredAPIAccess", username);
             }
 
         }
@@ -153,49 +151,5 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
             return res;
         }
-        ////[ApiExplorerSettings(IgnoreApi = true)]
-        //[Authorize()]
-        //[HttpGet("Stats2")]
-        //public async Task<ActionResult<BlurredPageAPIStatistics>> Stats2()
-        //{
-        //    if (!
-        //        (this.User?.IsInRole("Admin") == true || this.User?.Identity?.Name == "api@hlidacstatu.cz")
-        //        )
-        //        return StatusCode(403);
-
-        //    DateTime now = DateTime.Now;
-        //    var res = new BlurredPageAPIStatistics()
-        //    {
-        //        total = idsToProcess.Count,
-        //        currTaken = justInProcess.Count(),
-        //        totalFailed = justInProcess.Count(m => (now - m.Value.taken) > MAXDURATION_OF_TASK_IN_MIN)
-        //    };
-
-        //    res.runningSaveThreads = Interlocked.Read(ref runningSaveThreads);
-        //    res.savingPagesInThreads = Interlocked.Read(ref savingPagesInThreads);
-        //    res.activeTasks = justInProcess
-        //            .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new BlurredPageAPIStatistics.perItemStat<long>() { email = k, count = v.Count() })
-        //            .ToArray();
-
-        //    res.longestTasks = justInProcess.OrderByDescending(o => (now - o.Value.taken.Value).TotalSeconds)
-        //                    .Select(m => new BlurredPageAPIStatistics.perItemStat<decimal>() { email = m.Value.takenByUser, count = (decimal)(now - m.Value.taken.Value).TotalSeconds })
-        //                    .ToArray();
-        //    res.avgTaskLegth = justInProcess
-        //            .GroupBy(k => k.Value.takenByUser, v => v, (k, v) => new BlurredPageAPIStatistics.perItemStat<decimal>()
-        //            {
-        //                email = k,
-        //                count = (decimal)v.Average(a => (now - a.Value.taken.Value).TotalSeconds)
-        //            })
-        //            .OrderByDescending(o => o.count)
-        //            .ToArray();
-        //    savedInThread = Interlocked.Read(ref savedInThread);
-
-        //    return res;
-        //}
-
-
-
-
-
     }
 }

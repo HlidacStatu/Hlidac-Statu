@@ -1,4 +1,3 @@
-using Devmasters.Log;
 using Hangfire;
 using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Extensions;
@@ -11,6 +10,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using ILogger = Serilog.ILogger;
 
 string CORSPolicy = "from_hlidacstatu.cz";
 
@@ -24,10 +25,12 @@ Devmasters.Config.Init(builder.Configuration);
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.csCulture;
 
+ILogger logger = Log.ForContext<Program>();
+
 new Thread(
     () =>
     {
-        HlidacStatuApi.Code.Log.Logger.Info(
+        logger.Information(
             "{action} {code} for {part} init during start.",
             "starting",
             "thread",
@@ -37,7 +40,7 @@ new Thread(
         _ = HlidacStatuApi.Code.Availability.AllActiveServers24hoursStat();
         _ = HlidacStatuApi.Code.Availability.AllActiveServersWeekStat();
         sw.Stop();
-        HlidacStatuApi.Code.Log.Logger.Info(
+        logger.Information(
             "{action} thread for {part} init during start in {duration} sec.",
             "ends",
             "availability cache",
