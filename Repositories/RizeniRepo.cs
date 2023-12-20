@@ -6,12 +6,15 @@ using Nest;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 using Osoba = HlidacStatu.Entities.Insolvence.Osoba;
 
 namespace HlidacStatu.Repositories
 {
 	public static class RizeniRepo
 	{
+		
+		private static readonly ILogger _logger = Log.ForContext(typeof(RizeniRepo));
 
 		public static bool ExistInDb(Lib.Db.Insolvence.Rizeni rizeni)
 		{
@@ -418,7 +421,7 @@ namespace HlidacStatu.Repositories
 				{
 					if (idb.ChangeTracker.HasChanges())
 					{
-						HlidacStatu.Util.Consts.Logger.Info($"Updating Rizeni into DB {rizeni.SpisovaZnacka}, {idb.ChangeTracker.Entries().Count(m => m.State != EntityState.Unchanged)} changes.");
+						_logger.Information($"Updating Rizeni into DB {rizeni.SpisovaZnacka}, {idb.ChangeTracker.Entries().Count(m => m.State != EntityState.Unchanged)} changes.");
 					}
 					//idb.CommandTimeout = 120;
 					idb.SaveChanges();

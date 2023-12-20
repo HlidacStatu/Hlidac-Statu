@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using Devmasters.Log;
 using HlidacStatu.LibCore.Filters;
 using HlidacStatu.Web.Views.Shared.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -28,7 +27,6 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
 using Polly;
-using Serilog.Filters;
 
 namespace HlidacStatu.Web
 {
@@ -55,27 +53,7 @@ namespace HlidacStatu.Web
         {
             //inicializace statických proměnných
             Devmasters.Config.Init(Configuration);
-            var logdir2 = Devmasters.Config.GetWebConfigValue("SerilogBasePath");
-            if (string.IsNullOrEmpty(logdir2))
-                logdir2 = "/Data/Log/";
-            var logpath2 = Path.Combine(logdir2, "HlidacStatu/Web");
-            HlidacStatu.Util.Consts.Logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Web.Default",
-                Devmasters.Log.Logger.DefaultConfiguration()
-                    .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
-                    .Filter.ByExcluding(Matching.FromSource("HlidacStatu.Lib.ES.Trace") )
-                    .Filter.ByExcluding(Matching.FromSource("HlidacStatu.Lib.Data.External.InfluxDb.Trace"))
-                    .MinimumLevel.Information()
-                    .AddLogStash(new Uri("http://10.10.150.203:5000"))
-                    .AddFileLoggerFilePerLevel(logpath2, "/Data/Log/Api/slog.txt",
-                        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
-                        rollingInterval: Serilog.RollingInterval.Day,
-                        fileSizeLimitBytes: null,
-                        retainedFileCountLimit: 9,
-                        shared: true
-                    ));
             
-            HlidacStatu.Util.Consts.Logger.Info("{action} {code}.", "starting", "web");
-
 #if DEBUG
             //if (System.Diagnostics.Debugger.IsAttached)
             //    System.Net.Http.HttpClient.DefaultProxy = new System.Net.WebProxy("127.0.0.1", 8888);
@@ -184,10 +162,9 @@ namespace HlidacStatu.Web
                 ApplicationName = "WEB"
             });
             
-            var timeMeasureLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.PageTimes");
             
             //request time measurement with exception for /_blazor pages
-            app.UseTimeMeasureMiddleware(timeMeasureLogger, new List<string>() { "/_blazor" });
+            app.UseTimeMeasureMiddleware(new List<string>() { "/_blazor" });
                 
 
             if (Constants.IsDevelopment(env))
@@ -222,25 +199,7 @@ namespace HlidacStatu.Web
             app.UseStatusCodePagesWithReExecute("/error/{0}");
             app.UseHttpsRedirection();
 
-            var logdir2 = Devmasters.Config.GetWebConfigValue("SerilogBasePath");
-            if (string.IsNullOrEmpty(logdir2))
-                logdir2 = "/Data/Log/";
-            var logpath2 = Path.Combine(logdir2, "HlidacStatu/Web");
-            Devmasters.Log.Logger webExceptionLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Web.Exceptions",
-                Devmasters.Log.Logger.DefaultConfiguration()
-                    .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
-                    .Filter.ByExcluding(Matching.FromSource("HlidacStatu.Lib.ES.Trace") )
-                    .Filter.ByExcluding(Matching.FromSource("HlidacStatu.Lib.Data.External.InfluxDb.Trace"))
-                    .MinimumLevel.Information()
-                    .AddLogStash(new Uri("http://10.10.150.203:5000"))
-                    .AddFileLoggerFilePerLevel(logpath2, "/Data/Log/Api/slog.txt",
-                        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
-                        rollingInterval: Serilog.RollingInterval.Day,
-                        fileSizeLimitBytes: null,
-                        retainedFileCountLimit: 9,
-                        shared: true
-                    ));
-            app.UseOnHTTPErrorMiddleware(webExceptionLogger);
+            app.UseOnHTTPErrorMiddleware();
 
             app.UseStaticFiles();
 
@@ -293,8 +252,7 @@ namespace HlidacStatu.Web
             app.UseApiAuthenticationMiddleware();
             
             app.UseAuthorization();
-
-            Util.Consts.Logger.Info("Starting web application {version}", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString());
+            
             _ = app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

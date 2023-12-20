@@ -118,7 +118,7 @@ namespace HlidacStatu.Datasets
                 }
                 catch (Exception ex)
                 {
-                    HlidacStatu.Util.Consts.Logger.Error("Dataset API", ex);
+                    _logger.Error(ex, "Dataset API");
                     return ApiResponseStatus.GeneralExceptionError(ex);
                 }
             }
@@ -178,7 +178,7 @@ namespace HlidacStatu.Datasets
                 }
                 catch (Exception ex)
                 {
-                    HlidacStatu.Util.Consts.Logger.Error("Dataset API", ex);
+                    _logger.Error(ex, "Dataset API");
                     return ApiResponseStatus.GeneralExceptionError(ex);
                 }
             }

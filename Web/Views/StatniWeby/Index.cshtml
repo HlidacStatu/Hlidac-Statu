@@ -161,7 +161,7 @@
     }
     catch (Exception e)
     {
-        HlidacStatu.Util.Consts.Logger.Error("{page} error {exception}", "/statniweby", e);
+        Serilog.Log.Error(e, "{page} error {exception}", "/statniweby", e);
         topNedostupnosti24H = new HlidacStatu.Web.Models.Apiv2.NedostupnostModel[] { };
         topNedostupnostiW = new HlidacStatu.Web.Models.Apiv2.NedostupnostModel[] { };
     }

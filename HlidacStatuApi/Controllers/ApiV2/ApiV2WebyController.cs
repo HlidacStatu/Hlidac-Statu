@@ -6,7 +6,9 @@ using HlidacStatuApi.Code;
 using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Swashbuckle.AspNetCore.Annotations;
+using ILogger = Serilog.ILogger;
 
 namespace HlidacStatuApi.Controllers.ApiV2
 {
@@ -15,7 +17,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
     [Route("api/v2/Weby")]
     public class ApiV2WebyController : ControllerBase
     {
-
+        private readonly ILogger _logger = Log.ForContext<ApiV2WebyController>();
         /*
         Atributy pro API
         [SwaggerOperation(Tags = new[] { "Beta" })] - zarazeni metody do jine skupiny metod, pouze na urovni methody
@@ -118,7 +120,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error($"_DataHost id ${id}", e);
+                _logger.Error(e, $"_DataHost id ${id}");
                 return BadRequest($"Interní chyba při načítání systému.");
             }
         }

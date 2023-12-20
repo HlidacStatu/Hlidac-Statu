@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Web.Areas.Identity.Pages.Account
 {
@@ -18,6 +19,8 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        
+        private readonly ILogger _logger = Log.ForContext<LoginModel>();
 
         public LoginModel(SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager)
@@ -80,7 +83,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    Util.Consts.Logger.Info("User logged in.");
+                    _logger.Information("User logged in.");
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -89,7 +92,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
                 }
                 if (result.IsLockedOut)
                 {
-                    Util.Consts.Logger.Warning("User account locked out.");
+                    _logger.Warning("User account locked out.");
                     return RedirectToPage("./Lockout");
                 }
                 else

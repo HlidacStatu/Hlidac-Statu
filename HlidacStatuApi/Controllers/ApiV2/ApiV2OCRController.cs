@@ -8,6 +8,7 @@ using Newtonsoft.Json.Linq;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Data.SqlClient;
 using static HlidacStatu.DS.Api.BlurredPage;
+using ILogger = Serilog.ILogger;
 
 namespace HlidacStatuApi.Controllers.ApiV2
 {
@@ -18,13 +19,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
     [Route("api/v2/ocr")]
     public class ApiV2OCRController : ControllerBase
     {
-        static object lockObj = new object();
-        static ApiV2OCRController()
-        {
 
-        }
-
-
+        private ILogger _logger = Serilog.Log.ForContext<ApiV2OCRController>();
 
         static ItemToOcrQueue[] demodata = new ItemToOcrQueue[]
         {
@@ -316,7 +312,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception e)
             {
-                HlidacStatuApi.Code.Log.Logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", e, res.taskId, res.parentDocId, res.type);
+                _logger.Error(e, "Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
                 return StatusCode(500);
             }
             finally
@@ -324,13 +320,13 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 sw.Stop();
                 if (sw.ElapsedMilliseconds > 10000)
                 {
-                    HlidacStatuApi.Code.Log.Logger.Warning("Too log task {taskId} document {docId} of type {docType} elapsed {elapsed_ms}", res.taskId, res.parentDocId, res.type, sw.ElapsedMilliseconds);
+                    _logger.Warning("Too log task {taskId} document {docId} of type {docType} elapsed {elapsed_ms}", res.taskId, res.parentDocId, res.type, sw.ElapsedMilliseconds);
                 }
             }
             return StatusCode(200);
         }
 
-        public static void DoSave(HlidacStatu.DS.Api.OcrWork.Task res)
+        public void DoSave(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             try
             {
@@ -338,19 +334,19 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 switch (res.type)
                 {
                     case HlidacStatu.DS.Api.OcrWork.DocTypes.Smlouva:
-                        _ = _saveSmlouva(res).ConfigureAwait(false).GetAwaiter().GetResult();
+                        _ = SaveSmlouva(res).ConfigureAwait(false).GetAwaiter().GetResult();
                         ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
                         break;
                     case HlidacStatu.DS.Api.OcrWork.DocTypes.VerejnaZakazka:
-                        _ = _saveVZ(res).ConfigureAwait(false).GetAwaiter().GetResult();
+                        _ = SaveVZ(res).ConfigureAwait(false).GetAwaiter().GetResult();
                         ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
                         break;
                     case HlidacStatu.DS.Api.OcrWork.DocTypes.Dataset:
-                        _ = _saveDataset(res).ConfigureAwait(false).GetAwaiter().GetResult();
+                        _ = SaveDataset(res).ConfigureAwait(false).GetAwaiter().GetResult();
                         ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
                         break;
                     case HlidacStatu.DS.Api.OcrWork.DocTypes.Insolvence:
-                        _ = _saveInsolvence(res).ConfigureAwait(false).GetAwaiter().GetResult();
+                        _ = SaveInsolvence(res).ConfigureAwait(false).GetAwaiter().GetResult();
                         ItemToOcrQueue.SetDone(int.Parse(res.taskId), true);
                         break;
                     default:
@@ -359,12 +355,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception e)
             {
-                HlidacStatuApi.Code.Log.Logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", e, res.taskId, res.parentDocId, res.type);
+                _logger.Error(e, "Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
                 throw;
             }
 
         }
-        private static async Task<bool> _saveSmlouva(HlidacStatu.DS.Api.OcrWork.Task res)
+        private async Task<bool> SaveSmlouva(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             List<Smlouva.Priloha> newPrilohy = new List<Smlouva.Priloha>();
             bool changed = false;
@@ -372,7 +368,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             var sml = await SmlouvaRepo.LoadAsync(res.parentDocId);
             if (sml == null)
             {
-                HlidacStatuApi.Code.Log.Logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
+                _logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
                 return false;
             }
             foreach (var doc in res.docs)
@@ -390,7 +386,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 }
                 else
                 {
-                    HlidacStatuApi.Code.Log.Logger.Warning("Cannot find priloha {prilohaId} for smlouva {docId}", doc.prilohaId, res.parentDocId);
+                    _logger.Warning("Cannot find priloha {prilohaId} for smlouva {docId}", doc.prilohaId, res.parentDocId);
                     i = 0;
                     att = new Smlouva.Priloha();
                     newPrilohy.Add(att);
@@ -493,12 +489,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             return true;
         }
-        private static async Task<bool> _saveInsolvence(HlidacStatu.DS.Api.OcrWork.Task res)
+        private async Task<bool> SaveInsolvence(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             HlidacStatu.Entities.Insolvence.Rizeni? insolv = (await InsolvenceRepo.LoadFromEsAsync(res.parentDocId, true, false))?.Rizeni;
             if (insolv == null)
             {
-                HlidacStatuApi.Code.Log.Logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
+                _logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
                 return false;
             }
             foreach (var doc in res.docs)
@@ -518,12 +514,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
             await InsolvenceRepo.SaveRizeniAsync(insolv);
             return true;
         }
-        private static async Task<bool> _saveVZ(HlidacStatu.DS.Api.OcrWork.Task res)
+        private async Task<bool> SaveVZ(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             var vz = await VerejnaZakazkaRepo.LoadFromESAsync(res.parentDocId);
             if (vz == null)
             {
-                HlidacStatuApi.Code.Log.Logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
+                _logger.Error("Cannot save task {taskId} cannot find document {docId} of type {docType}", res.taskId, res.parentDocId, res.type);
                 return false;
             }
             foreach (var doc in res.docs)
@@ -548,25 +544,25 @@ namespace HlidacStatuApi.Controllers.ApiV2
             await VerejnaZakazkaRepo.UpsertAsync(vz, sendToOcr: false, updatePosledniZmena: false);
             return true;
         }
-        private static async Task<bool> _saveDataset(HlidacStatu.DS.Api.OcrWork.Task res)
+        private async Task<bool> SaveDataset(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             var task = ItemToOcrQueue.GetTask(Convert.ToInt32(res.taskId));
             if (task == null)
             {
-                HlidacStatuApi.Code.Log.Logger.Error("Cannot get task {taskId}.", res.taskId);
+                _logger.Error("Cannot get task {taskId}.", res.taskId);
                 return false;
             }
 
             var ds = DataSet.CachedDatasets.Get(task.ItemSubType.ToLower());
             if (ds == null)
             {
-                HlidacStatuApi.Code.Log.Logger.Error("Cannot get dataset {datasetname} from task {taskId}.", task.ItemSubType.ToLower(), res.taskId);
+                _logger.Error("Cannot get dataset {datasetname} from task {taskId}.", task.ItemSubType.ToLower(), res.taskId);
                 return false;
             }
             var item = await ds.GetDataObjAsync(task.ItemId);
             if (item == null)
             {
-                HlidacStatuApi.Code.Log.Logger.Error("Cannot get item {datasetitemid} dataset {datasetname} from task {taskId}.", task.ItemId, task.ItemSubType.ToLower(), res.taskId);
+                _logger.Error("Cannot get item {datasetitemid} dataset {datasetname} from task {taskId}.", task.ItemId, task.ItemSubType.ToLower(), res.taskId);
                 return false;
             }
 
@@ -611,7 +607,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             CheckRoleRecord(this.User.Identity.Name);
 
-            HlidacStatuApi.Code.Log.Logger.Error(
+            _logger.Error(
                 "{action} {from} {user} {ip} {message}",
                 "RemoteLog",
                 "TablesInDocsMinion",
@@ -622,7 +618,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return StatusCode(200);
         }
 
-        private static void CheckRoleRecord(string username)
+        private void CheckRoleRecord(string username)
         {
             return;
             //check if user is in blurredAPIAccess roles
@@ -645,7 +641,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
             catch (Exception e)
             {
-                HlidacStatuApi.Code.Log.Logger.Error("cannot add {username} to the role blurredAPIAccess", e, username);
+                _logger.Error(e, "cannot add {username} to the role blurredAPIAccess", username);
             }
 
         }

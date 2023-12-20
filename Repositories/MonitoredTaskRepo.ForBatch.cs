@@ -1,7 +1,7 @@
-﻿using Devmasters.Log;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using System;
 using System.Runtime.CompilerServices;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
@@ -10,12 +10,11 @@ namespace HlidacStatu.Repositories
         public class ForBatch : MonitoredTask, Devmasters.Batch.IMonitor, IDisposable
         {
             private bool disposedValue;
-            private readonly Logger logger;
+            private readonly ILogger _logger = Log.ForContext<ForBatch>();
 
             public ForBatch(
                 string application = null,
                 string part = null,
-                Devmasters.Log.Logger logger = null,
                 [CallerMemberName] string callerMemberName = "",
                 [CallerFilePath] string sourceFilePath = "",
                 [CallerLineNumber] int sourceLineNumber = 0
@@ -27,16 +26,14 @@ namespace HlidacStatu.Repositories
                     var fn = System.IO.Path.GetFileName(sourceFilePath);
                     this.Part = Devmasters.TextUtil.ShortenText($"{fn}: {callerMemberName} ({sourceLineNumber})", 500, "", "");
                 }
-
-                this.logger = logger;
             }
 
             public void Start()
             {
                 this.Started = DateTime.Now;
                 _ = MonitoredTaskRepo.Create(this);
-                if (logger != null)
-                    logger.Debug("Starting MonitoredTask in {application} {part}", this.Application, this.Part);
+                if (_logger != null)
+                    _logger.Debug("Starting MonitoredTask in {application} {part}", this.Application, this.Part);
             }
 
             public void SetProgress(decimal inPercent)
@@ -44,8 +41,8 @@ namespace HlidacStatu.Repositories
                 _ = MonitoredTaskRepo.SetProgress(this, inPercent);
                 if ((DateTime.Now - this.LastTimeProgressUpdated) > this.MinIntervalBetweenUpdates)
                 {
-                    if (logger != null)
-                        logger.Debug("MonitoredTask in {application} {part} task {progress} % completed", this.Application, this.Part, inPercent);
+                    if (_logger != null)
+                        _logger.Debug("MonitoredTask in {application} {part} task {progress} % completed", this.Application, this.Part, inPercent);
                 }
             }
 
@@ -53,16 +50,16 @@ namespace HlidacStatu.Repositories
             public void Finish(bool success, Exception exception)
             {
                 _ = MonitoredTaskRepo.Finish(this, success, exception);
-                if (logger != null)
-                    logger.Debug("MonitoredTask in {application} {part} finished", this.Application, this.Part);
+                if (_logger != null)
+                    _logger.Debug("MonitoredTask in {application} {part} finished", this.Application, this.Part);
             }
 
             public void Finish(params Exception[] exceptions)
             {
                 bool success = exceptions == null || exceptions.Length == 0;
                 _ = MonitoredTaskRepo.Finish(this, success , success ? null : new AggregateException(exceptions));
-                if (logger != null)
-                    logger.Debug("MonitoredTask in {application} {part} finished", this.Application, this.Part);
+                if (_logger != null)
+                    _logger.Debug("MonitoredTask in {application} {part} finished", this.Application, this.Part);
             }
 
             protected virtual void Dispose(bool disposing)

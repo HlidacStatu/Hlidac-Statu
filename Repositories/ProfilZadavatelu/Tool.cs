@@ -8,11 +8,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities.Logs;
 using Nest;
+using Serilog;
 
 namespace HlidacStatu.Repositories.ProfilZadavatelu
 {
     public static class Tool
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(Tool));
+        
         public static async Task ProcessProfilyZadavateluAsync(bool onlyWithErr, DateTime from, Action<string> outputWriter = null, Action<ActionProgressData> progressWriter = null)
         {
             var profily2 = new List<ProfilZadavatele>();
@@ -71,7 +74,7 @@ namespace HlidacStatu.Repositories.ProfilZadavatelu
             }
 
             Console.WriteLine("Let's go mining");
-            Util.Consts.Logger.Debug("ProfilyZadavatelu: Let's go mining num." + profily2.Count);
+            _logger.Debug("ProfilyZadavatelu: Let's go mining num." + profily2.Count);
             await Manager.DoActionForAllAsync<ProfilZadavatele>(Devmasters.Collections.Algorithms.RandomShuffle(profily2), async (p) =>
                 {
                     await parser.ProcessProfileZadavateluAsync(p, from);

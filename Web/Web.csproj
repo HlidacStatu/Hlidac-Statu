@@ -28,6 +28,10 @@
         <Compile Remove="NewFolder\**" />
         <None Remove="NewFolder\**" />
         <Content Remove="NewFolder\**" />
+        <Content Update="appsettings.Development.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+          <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </Content>
     </ItemGroup>
 
 <!--    Potom je potřeba nakopírovat obsah složky App_data a soubor _app_offline.htm -->
@@ -65,7 +69,6 @@
         
         <PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.3.0.2" />
         <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.396" />
-        <PackageReference Include="log4net" Version="2.0.15" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.0" />
@@ -127,15 +130,14 @@
       <None Update="cs_CZ.stopwords">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="Logger.log4net">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 
 
     <ItemGroup>
       <None Include="..\.editorconfig" Link=".editorconfig" />
-      <None Include="Logger.serilog.json" />
+      <None Include="Logger.serilog.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 

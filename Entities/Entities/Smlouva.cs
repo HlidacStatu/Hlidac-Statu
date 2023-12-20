@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using Serilog;
 
 namespace HlidacStatu.Entities
 {
@@ -20,7 +21,8 @@ namespace HlidacStatu.Entities
 
         object enhLock = new object();
         private Issues.Issue[] issues = new Issues.Issue[] { };
-        object lockInfoObj = new object();
+        private static readonly ILogger _logger = Log.ForContext<Smlouva>();
+        
         public Smlouva()
         { }
 

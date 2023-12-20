@@ -138,7 +138,7 @@ namespace HlidacStatu.Repositories
                     }
                     else
                     {
-                        Util.Consts.Logger.Error("", e);
+                        _logger.Error(e, "");
                     }
 
                     throw;

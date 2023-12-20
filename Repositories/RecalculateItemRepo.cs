@@ -6,12 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public class RecalculateItemRepo
     {
-        public static Devmasters.Log.Logger log = null;
+        private static ILogger _logger = Log.ForContext<RecalculateItemRepo>();
 
         //public const string RECALCULATIONQUEUENAME = "recalculation2Process";
         static Entities.RecalculateItemEqComparer comparer = new Entities.RecalculateItemEqComparer();
@@ -78,16 +79,16 @@ namespace HlidacStatu.Repositories
 
         start:
 
-            log.Info("{method} Starting with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, threads.Value);
+            _logger.Information("{method} Starting with {numOfThreads} threads", MethodBase.GetCurrentMethod().Name, threads.Value);
             if (debug)
-                log.Debug($"getting from queue {uniqueItems.Count()} items");
+                _logger.Debug($"getting from queue {uniqueItems.Count()} items");
 
 
             //var queueItems = GetFromProcessingQueueWithParents(threads.Value*threads.Value, threads.Value, outputWriter, progressWriter, debug);
             if (debug)
-                log.Debug($"got from queue {uniqueItems.Count()} items");
+                _logger.Debug($"got from queue {uniqueItems.Count()} items");
 
-            log.Info("{method} Starting Subjekt statistics recalculate for {count} subjects with {numOfThreads} threads",
+            _logger.Information("{method} Starting Subjekt statistics recalculate for {count} subjects with {numOfThreads} threads",
                 uniqueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt), MethodBase.GetCurrentMethod().Name, threads.Value);
             // rebuild cache for subjekt
 
@@ -97,10 +98,10 @@ namespace HlidacStatu.Repositories
                 item =>
                 {
                     if (debug)
-                        log.Debug($"start statistics firma {item.Id}");
+                        _logger.Debug($"start statistics firma {item.Id}");
                     RecalculateFirma(item);
                     if (debug)
-                        log.Debug($"end statistics firma {item.Id}");
+                        _logger.Debug($"end statistics firma {item.Id}");
 
                     return new Devmasters.Batch.ActionOutputData();
                 },
@@ -109,11 +110,11 @@ namespace HlidacStatu.Repositories
                 monitor: new MonitoredTaskRepo.ForBatch()
                 );
 
-            log.Info("{method} Starting Subjekt-Holding statistics recalculate for {count} subjects with {numOfThreads} threads",
+            _logger.Information("{method} Starting Subjekt-Holding statistics recalculate for {count} subjects with {numOfThreads} threads",
                 uniqueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Subjekt), MethodBase.GetCurrentMethod().Name, threads.Value);
 
 
-            log.Info("{method} Starting Osoba statistics recalculate for {count} subjects with {numOfThreads} threads",
+            _logger.Information("{method} Starting Osoba statistics recalculate for {count} subjects with {numOfThreads} threads",
                 uniqueItems.Count(m => m.ItemType == RecalculateItem.ItemTypeEnum.Person), MethodBase.GetCurrentMethod().Name, threads.Value);
             // rebuild cache for person 
             Devmasters.Batch.Manager.DoActionForAll<RecalculateItem>(
@@ -121,10 +122,10 @@ namespace HlidacStatu.Repositories
                 item =>
                 {
                     if (debug)
-                        log.Debug($"start statistics osoba {item.Id}");
+                        _logger.Debug($"start statistics osoba {item.Id}");
                     RecalculateOsoba(item);
                     if (debug)
-                        log.Debug($"end statistics osoba {item.Id}");
+                        _logger.Debug($"end statistics osoba {item.Id}");
 
                     return new Devmasters.Batch.ActionOutputData();
                 },
@@ -135,7 +136,7 @@ namespace HlidacStatu.Repositories
 
 
             if (debug)
-                log.Debug($"getting from queue {numFromQueue} items");
+                _logger.Debug($"getting from queue {numFromQueue} items");
             if (onlyIds)
                 uniqueItems.Clear();
             else
@@ -147,7 +148,7 @@ namespace HlidacStatu.Repositories
                 goto start;
 
 
-            log.Info("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
+            _logger.Information("Ends RecalculateTasks with {numOfThreads} threads", threads.Value);
 
         }
 
@@ -202,7 +203,7 @@ namespace HlidacStatu.Repositories
             else
                 list.Add(item);
 
-            log.Debug("{method} expanding " + item.ItemType.ToString() + " {name} to {count} items",
+            _logger.Debug("{method} expanding " + item.ItemType.ToString() + " {name} to {count} items",
                 MethodBase.GetCurrentMethod().Name, item.Id, list.Count);
 
             return list;
@@ -245,7 +246,7 @@ namespace HlidacStatu.Repositories
         private static List<RecalculateItem> FirmaForQueue(List<RecalculateItem> list,
             Firma f, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy, int deep)
         {
-            log?.Verbose("{method} expanding {ico} {subjekt} vazby, recursive deep {deep}, current list {count} items",
+            _logger?.Verbose("{method} expanding {ico} {subjekt} vazby, recursive deep {deep}, current list {count} items",
                     MethodBase.GetCurrentMethod().Name, f.ICO, f.Jmeno, deep, list.Count);
 
             //StackOverflow defense
@@ -362,10 +363,10 @@ namespace HlidacStatu.Repositories
             Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null, bool debug = false)
         {
             if (debug)
-                log?.Debug($"getting {count} from processing queue");
+                _logger?.Debug($"getting {count} from processing queue");
             IEnumerable<RecalculateItem> res = GetItemsFromProcessingQueue(count);
             if (debug)
-                log?.Debug($"got {res.Count()} from processing queue. Looking for parents");
+                _logger?.Debug($"got {res.Count()} from processing queue. Looking for parents");
 
             System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(res);
 
@@ -376,10 +377,10 @@ namespace HlidacStatu.Repositories
                     {
 
                         if (debug)
-                            log?.Debug($"GetFromProcessingQueueWithParents getting cascade for {item.UniqueKey}");
+                            _logger?.Debug($"GetFromProcessingQueueWithParents getting cascade for {item.UniqueKey}");
                         List<RecalculateItem> cascade = CascadeItems(item, ref list);
                         if (debug)
-                            log?.Debug($"GetFromProcessingQueueWithParents got cascade for {item.UniqueKey}");
+                            _logger?.Debug($"GetFromProcessingQueueWithParents got cascade for {item.UniqueKey}");
                         foreach (var i in cascade)
                         {
                             if (list.Contains(i, comparer) == false)
@@ -388,7 +389,7 @@ namespace HlidacStatu.Repositories
                     }
                     catch (Exception e)
                     {
-                        log?.Error("CascadeItems error", e);
+                        _logger?.Error(e, "CascadeItems error");
                         throw;
                     }
 
@@ -400,7 +401,7 @@ namespace HlidacStatu.Repositories
 
                 );
 
-            log?.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
+            _logger?.Debug("{method} gets {records} records containing parents and owners", MethodBase.GetCurrentMethod().Name, list.Count);
 
             return list.OrderBy(o => o.Created)
                 .Distinct(comparer)

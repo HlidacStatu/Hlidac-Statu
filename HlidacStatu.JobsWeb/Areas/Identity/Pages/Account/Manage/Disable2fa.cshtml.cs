@@ -1,16 +1,17 @@
 using System;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
-using HlidacStatu.Util;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog;
 
 namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
 {
     public class Disable2faModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger _logger = Log.ForContext<Disable2faModel>();
 
         public Disable2faModel(
             UserManager<ApplicationUser> userManager)
@@ -51,7 +52,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
                 throw new InvalidOperationException($"Unexpected error occurred disabling 2FA for user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            Consts.Logger.Info($"User with ID '{_userManager.GetUserId(User)}' has disabled 2fa.");
+            _logger.Information($"User with ID '{_userManager.GetUserId(User)}' has disabled 2fa.");
             StatusMessage = "2fa has been disabled. You can reenable 2fa when you setup an authenticator app";
             return RedirectToPage("./TwoFactorAuthentication");
         }

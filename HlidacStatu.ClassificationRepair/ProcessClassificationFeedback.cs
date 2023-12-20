@@ -1,30 +1,27 @@
 ﻿using HlidacStatu.Q.Messages;
 using HlidacStatu.Q.Subscriber;
 
-using Microsoft.Extensions.Logging;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.ClassificationRepair
 {
     public class ProcessClassificationFeedback : IMessageHandlerAsync<ClassificationFeedback>
     {
-        private readonly ILogger _logger;
+        private readonly ILogger _logger = Log.ForContext<ProcessClassificationFeedback>();
         private readonly IStemmerService _stemmer;
         private readonly IHlidacService _hlidac;
         private readonly IEmailService _email;
 
-        public ProcessClassificationFeedback(ILogger<ProcessClassificationFeedback> logger,
-                                             IStemmerService stemmerService,
+        public ProcessClassificationFeedback(IStemmerService stemmerService,
                                              IHlidacService hlidacService,
                                              IEmailService emailService)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _stemmer = stemmerService ?? throw new ArgumentNullException(nameof(stemmerService));
             _hlidac = hlidacService ?? throw new ArgumentNullException(nameof(hlidacService));
             _email = emailService ?? throw new ArgumentNullException(nameof(emailService));
@@ -34,7 +31,7 @@ namespace HlidacStatu.ClassificationRepair
         {
             try
             {
-                _logger.LogInformation($"New message with idSmlouvy={message.IdSmlouvy} accepted.");
+                _logger.Information($"New message with idSmlouvy={message.IdSmlouvy} accepted.");
 
                 var textySmlouvy = await _hlidac.GetTextSmlouvy(message.IdSmlouvy);
                 
@@ -56,11 +53,11 @@ namespace HlidacStatu.ClassificationRepair
                 await SendMail(message.FeedbackEmail, message.IdSmlouvy,
                     message.ProposedCategories, explainTask.Result,
                     missingNgrams);
-                _logger.LogInformation($"Message with idSmlouvy={message.IdSmlouvy} processed.");
+                _logger.Information($"Message with idSmlouvy={message.IdSmlouvy} processed.");
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex, $"Failed when processing idSmlouvy={message.IdSmlouvy}.");
+                _logger.Error(ex, $"Failed when processing idSmlouvy={message.IdSmlouvy}.");
                 throw;
             }
         }
@@ -68,7 +65,7 @@ namespace HlidacStatu.ClassificationRepair
         private async Task SendMail(string feedbackMail, string idSmlouvy,
             string proposedCategories, IEnumerable<Explanation> explainResult, IEnumerable<string> missingNgrams)
         {
-            _logger.LogInformation($"Sending email.");
+            _logger.Information($"Sending email.");
             string[] recipients = new string[]
             {
                 "michal@michalblaha.cz",
@@ -104,7 +101,7 @@ namespace HlidacStatu.ClassificationRepair
                 --- Konec zprávy ---";
 
             await _email.SendEmailAsync(recipients, subject, body, feedbackMail);
-            _logger.LogInformation($"Email sent.");
+            _logger.Information($"Email sent.");
         }
     }
 }

@@ -10,11 +10,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class VerejnaZakazkaRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(VerejnaZakazkaRepo));
         public static class Searching
         {
             public static IRule[] Rules = new IRule[]
@@ -387,7 +389,7 @@ namespace HlidacStatu.Repositories
                                                                    search.ElasticResults.ToString()
                             , ex: e);
                     else
-                        Util.Consts.Logger.Error("", e);
+                        _logger.Error(e, "");
                     throw;
                 }
 

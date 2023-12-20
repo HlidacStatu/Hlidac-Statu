@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Web.Areas.Identity.Pages.Account
 {
@@ -13,6 +14,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ILogger _logger = Log.ForContext<LogoutModel>();
 
         public LogoutModel(SignInManager<ApplicationUser> signInManager)
         {
@@ -22,7 +24,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnGet(string? returnUrl = null)
         {
             await _signInManager.SignOutAsync();
-            Util.Consts.Logger.Info("User logged out.");
+            _logger.Information("User logged out.");
             if(string.IsNullOrEmpty(returnUrl))
                 return RedirectToAction("Index", "Home");
             else
@@ -32,7 +34,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPost(string? returnUrl = null)
         {
             await _signInManager.SignOutAsync();
-            Util.Consts.Logger.Info("User logged out.");
+            _logger.Information("User logged out.");
             if(string.IsNullOrEmpty(returnUrl))
                 return RedirectToAction("Index", "Home");
             else

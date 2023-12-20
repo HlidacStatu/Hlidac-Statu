@@ -3,6 +3,7 @@ using System.IO;
 using HlidacStatu.LibCore.ConfigurationProviders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 
 namespace HlidacStatu.LibCore.Extensions;
 
@@ -15,6 +16,7 @@ public static class HlidacConfigExtensions
     /// Načte hodnotu environment z Environment variable 'HS_ENV';
     /// Pomocí těchto dvou proměnných načte konfigurační data z SQL (tabulka ConfigurationValues);
     /// Poté načte konfigurační data z appsettings.json (pokud existuje);
+    /// Poté načte konfigurační data z Logger.serilog.json (pokud existuje);
     /// Poté načte konfigurační data z appsettings.Development.json (pokud existuje);
     /// Poté načte konfigurační data z Environment Variables;
     /// -pozn.: později načtená konfigurační data mají vyšší prioritu;
@@ -34,9 +36,20 @@ public static class HlidacConfigExtensions
             config.Sources.Clear();
             config.AddMsSqlConfiguration(connectionString, environment, tag);
             config.AddJsonFile("appsettings.json", optional:true, reloadOnChange:false);
+            config.AddJsonFile("Logger.serilog.json", optional:true, reloadOnChange:false);
             config.AddJsonFile("appsettings.Development.json", optional:true, reloadOnChange:false);
             config.AddEnvironmentVariables();
-        });
+        }).UseSerilog((context, services, configuration) => configuration
+            .ReadFrom.Configuration(context.Configuration)
+            .ReadFrom.Services(services)
+            .Enrich.WithProperty("hostname", Environment.GetEnvironmentVariable("HOSTNAME") ?? "unknown_hostname")
+            .Enrich.WithMachineName()
+            .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
+            .Enrich.WithProperty("application_name", System.Reflection.Assembly.GetEntryAssembly().GetName().Name)
+            .Enrich.WithProperty("application_path", new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).DirectoryName)
+            .Enrich.WithClientIp()
+            .Enrich.FromLogContext()
+            .WriteTo.Console());;
     }
 
     /// <summary>
@@ -44,6 +57,7 @@ public static class HlidacConfigExtensions
     /// Načte hodnotu environment z appsettings.json ("HS_ENV");
     /// Pomocí těchto dvou proměnných načte konfigurační data z SQL (tabulka ConfigurationValues);
     /// Poté načte konfigurační data z appsettings.json (pokud existuje);
+    /// Poté načte konfigurační data z Logger.serilog.json (pokud existuje);
     /// Poté načte konfigurační data z Environment Variables;
     /// Poté načte konfigurační data z args[];
     /// -pozn.: později načtená konfigurační data mají vyšší prioritu;
@@ -68,11 +82,22 @@ public static class HlidacConfigExtensions
         {
             configuration.AddMsSqlConfiguration(connectionString, environment, tag);
             configuration.AddJsonFile("appsettings.json", optional:true, reloadOnChange:false);
+            configuration.AddJsonFile("Logger.serilog.json", optional: true, reloadOnChange: false);
             configuration.AddJsonFile("appsettings.Development.json", optional:true, reloadOnChange:false);
             configuration.AddJsonFile($"appsettings.{environment}.json", optional:true, reloadOnChange:false);
             configuration.AddEnvironmentVariables();
             configuration.AddCommandLine(args);
-        });
+        }).UseSerilog((context, services, configuration) => configuration
+            .ReadFrom.Configuration(context.Configuration)
+            .ReadFrom.Services(services)
+            .Enrich.WithProperty("hostname", Environment.GetEnvironmentVariable("HOSTNAME") ?? "unknown_hostname")
+            .Enrich.WithMachineName()
+            .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
+            .Enrich.WithProperty("application_name", System.Reflection.Assembly.GetEntryAssembly().GetName().Name)
+            .Enrich.WithProperty("application_path", new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).DirectoryName)
+            .Enrich.WithClientIp()
+            .Enrich.FromLogContext()
+            .WriteTo.Console());
     }
     
     /// <summary>
@@ -80,6 +105,7 @@ public static class HlidacConfigExtensions
     /// Načte hodnotu environment z appsettings.json ("HS_ENV");
     /// Pomocí těchto dvou proměnných načte konfigurační data z SQL (tabulka ConfigurationValues);
     /// Poté načte konfigurační data z appsettings.json (pokud existuje);
+    /// Poté načte konfigurační data z Logger.serilog.json (pokud existuje);
     /// Poté načte konfigurační data z appsettings.Development.json (pokud existuje);
     /// Poté načte konfigurační data z Environment Variables;
     /// Poté načte konfigurační data z args[];
@@ -100,15 +126,28 @@ public static class HlidacConfigExtensions
         if (string.IsNullOrWhiteSpace(environment))
             environment = FallbackEnvironment;
 
-        return new ConfigurationBuilder()
+        var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddMsSqlConfiguration(connectionString, environment, tag)
             .AddJsonFile("appsettings.json", optional:true, reloadOnChange:false)
+            .AddJsonFile("Logger.serilog.json", optional: true, reloadOnChange: false)
             .AddJsonFile("appsettings.Development.json", optional:true, reloadOnChange:false)
             .AddEnvironmentVariables()
             .AddCommandLine(args)
             .Build();
-    
+        
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(configuration)
+            .Enrich.WithProperty("hostname", Environment.GetEnvironmentVariable("HOSTNAME") ?? "unknown_hostname")
+            .Enrich.WithMachineName()
+            .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
+            .Enrich.WithProperty("application_name", System.Reflection.Assembly.GetEntryAssembly().GetName().Name)
+            .Enrich.WithProperty("application_path", new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).DirectoryName)
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .CreateLogger();
+
+        return configuration;
     }
 }
 

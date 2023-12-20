@@ -1,0 +1,28 @@
+﻿{
+  "Serilog": {
+    "Using": [
+      "Serilog.Sinks.Console",
+      "Serilog.Sinks.File",
+      "Serilog.Sinks.Http"
+    ],
+    "MinimumLevel": {
+      "Default": "Debug",
+      "Override": {
+        "Microsoft": "Error",
+        "Microsoft.Extensions": "Information",
+        "System": "Error"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "Http",
+        "Args": {
+          "requestUri": "http://10.10.150.203:5000",
+          "textFormatter": "Elastic.CommonSchema.Serilog.EcsTextFormatter, Elastic.CommonSchema.Serilog",
+          "batchFormatter": "Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter, Serilog.Sinks.Http",
+          "queueLimitBytes": 1048576
+        }
+      }
+    ]
+  }
+}

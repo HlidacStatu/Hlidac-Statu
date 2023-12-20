@@ -5,11 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.XLib.Watchdogs
 {
     public class SingleEmailPerWatchdog
     {
+        private static readonly ILogger _logger = Log.ForContext<SingleEmailPerWatchdog>();
         
         public async static Task SendWatchdogsAsync(IEnumerable<WatchDog> watchdogs,
             bool force = false, string[] specificContacts = null,
@@ -25,19 +27,19 @@ namespace HlidacStatu.XLib.Watchdogs
                 && fromSpecificDate.HasValue == false
                 && toSpecificDate.HasValue == false;
 
-            Util.Consts.Logger.Info($"SingleEmailPerWatchdog Start processing {watchdogs.Count()} watchdogs.");
+            _logger.Information($"SingleEmailPerWatchdog Start processing {watchdogs.Count()} watchdogs.");
 
             await Devmasters.Batch.Manager.DoActionForAllAsync<WatchDog>(watchdogs,
                async (userWatchdog) =>
                 {
                     ApplicationUser user = userWatchdog.UnconfirmedUser();
 
-                    Util.Consts.Logger.Info("SingleEmailPerWatchdog watchdog sending {userWatchdogId} to {email}.",
+                    _logger.Information("SingleEmailPerWatchdog watchdog sending {userWatchdogId} to {email}.",
                         userWatchdog.Id, user.Email);
                     Mail.SendStatus res = await Mail.SendWatchdogAsync(userWatchdog, user,
                         force, specificContacts, fromSpecificDate, toSpecificDate, openingText);
 
-                    Util.Consts.Logger.Info("SingleEmailPerWatchdog watchdog {userWatchdogId} to {email} sent result {result}.",
+                    _logger.Information("SingleEmailPerWatchdog watchdog {userWatchdogId} to {email} sent result {result}.",
                         userWatchdog.Id, user.Email, res.ToString());
 
                     return new Devmasters.Batch.ActionOutputData();
@@ -47,7 +49,7 @@ namespace HlidacStatu.XLib.Watchdogs
                 , monitor: new MonitoredTaskRepo.ForBatch()
                 ); 
 
-            Util.Consts.Logger.Info($"SingleEmailPerWatchdog Done processing {watchdogs.Count()} watchdogs.");
+            _logger.Information($"SingleEmailPerWatchdog Done processing {watchdogs.Count()} watchdogs.");
 
         }
     }

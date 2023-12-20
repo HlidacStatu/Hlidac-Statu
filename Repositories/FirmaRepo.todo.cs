@@ -130,7 +130,7 @@ namespace HlidacStatu.Repositories
                 }
                 catch (Exception e)
                 {
-                    Util.Consts.Logger.Error("Merk deserialization error " + url + " ? " + query, e);
+                    _logger.Error(e, "Merk deserialization error " + url + " ? " + query);
                     return new CoreCompanyStructure[] { };
                 }
             }
@@ -152,7 +152,7 @@ namespace HlidacStatu.Repositories
                     }
                     catch (Devmasters.Net.HttpClient.UrlContentException e)
                     {
-                        Util.Consts.Logger.Error("Merk request " + url, e);
+                        _logger.Error(e, "Merk request " + url);
                         //if (e.StatusCode == System.Net.HttpStatusCode.NotFound)
                         //    return string.Empty;
                         //else
@@ -162,7 +162,7 @@ namespace HlidacStatu.Repositories
                     }
                     catch (Exception e)
                     {
-                        Util.Consts.Logger.Error("Merk request " + url, e);
+                        _logger.Error(e, "Merk request " + url);
                         //Console.Write(e.ToString());
                         return emptyJson;
                     }

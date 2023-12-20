@@ -6,6 +6,7 @@ using MimeKit;
 
 using System;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.ClassificationRepair
 {
@@ -59,7 +60,7 @@ namespace HlidacStatu.ClassificationRepair
             }
             catch (Exception ex)
             {
-                // TODO: handle exception
+                Log.ForContext<EmailService>().Error(ex, "Sending email failed");
                 throw new InvalidOperationException(ex.Message);
             }
         }

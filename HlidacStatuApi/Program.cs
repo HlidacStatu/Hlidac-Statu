@@ -1,4 +1,3 @@
-using Devmasters.Log;
 using Hangfire;
 using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Extensions;
@@ -11,6 +10,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using ILogger = Serilog.ILogger;
 
 string CORSPolicy = "from_hlidacstatu.cz";
 
@@ -24,10 +25,12 @@ Devmasters.Config.Init(builder.Configuration);
 System.Globalization.CultureInfo.DefaultThreadCurrentCulture = HlidacStatu.Util.Consts.czCulture;
 System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = HlidacStatu.Util.Consts.csCulture;
 
+ILogger logger = Log.ForContext<Program>();
+
 new Thread(
     () =>
     {
-        HlidacStatuApi.Code.Log.Logger.Info(
+        logger.Information(
             "{action} {code} for {part} init during start.",
             "starting",
             "thread",
@@ -37,7 +40,7 @@ new Thread(
         _ = HlidacStatuApi.Code.Availability.AllActiveServers24hoursStat();
         _ = HlidacStatuApi.Code.Availability.AllActiveServersWeekStat();
         sw.Stop();
-        HlidacStatuApi.Code.Log.Logger.Info(
+        logger.Information(
             "{action} thread for {part} init during start in {duration} sec.",
             "ends",
             "availability cache",
@@ -154,9 +157,7 @@ app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
     ApplicationName = "HlidacstatuApi"
 });
 
-var timeMeasureLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Api.PageTimes");
-
-app.UseTimeMeasureMiddleware(timeMeasureLogger);
+app.UseTimeMeasureMiddleware();
 
 if (IsDevelopment(app.Environment))
 {
@@ -195,22 +196,8 @@ app.Use(async (context, next) =>
 #if !DEBUG
     app.UseHttpsRedirection();
 #endif
-var logdir2 = Devmasters.Config.GetWebConfigValue("SerilogBasePath");
-if (string.IsNullOrEmpty(logdir2))
-    logdir2 = "/Data/Log/";
-var logpath2 = Path.Combine(logdir2, "HlidacStatu/api");
-Devmasters.Log.Logger apiExceptionLogger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Api.Exceptions",
-    Devmasters.Log.Logger.DefaultConfiguration()
-        .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
-        .AddLogStash(new Uri("http://10.10.150.203:5000"))
-        .AddFileLoggerFilePerLevel(logpath2, "slog.txt",
-            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {SourceContext} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
-            rollingInterval: Serilog.RollingInterval.Day,
-            fileSizeLimitBytes: null,
-            retainedFileCountLimit: 9,
-            shared: true
-        ));
-app.UseOnHTTPErrorMiddleware(apiExceptionLogger);
+
+app.UseOnHTTPErrorMiddleware();
 
 
 app.UseCors(CORSPolicy);
@@ -242,21 +229,11 @@ if (_shouldRunHealthcheckFeature)
     {
         Predicate = _ => true,
     });
-    //app.UseHealthChecksUI(set =>
-    //    {
-    //        set.UIPath = "/status";
-    //        set.AsideMenuOpened = false;
-    //        set.AddCustomStylesheet("wwwroot\\content\\CustomHealthCheckUI.css");
-    //    }
-    //);
-
-
 }
 
+//todo: odstranit tohle, protože by to mělo fungovat jak to máme nakonfigurované v services.addhangfireserver
 app.UseHangfireServer();
-//GlobalJobFilters.Filters.Add(new ShortExpirationTimeAttribute());
 
-HlidacStatuApi.Code.Log.Logger.Info("{action} {code}.", "starting", "web API");
 app.Run();
 
 
@@ -361,21 +338,6 @@ void AddAllHealtChecks(IServiceCollection services, IConfiguration Configuration
                 Exclude = new string[] { "rozhodnuti-uohs", "veklep", "vyjadreni-politiku" },
                 Interval = HlidacStatu.Web.HealthChecks.DatasetyStatistika.IntervalEnum.Month
             }, "Statistiky malých databází", HealthStatus.Unhealthy, tags: new[] { "Data" })
-        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DockerContainer, HlidacStatu.Web.HealthChecks.DockerContainer.Options>(
-        //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.100.145").ConfigData,
-        //    "Docker .145", HealthStatus.Unhealthy, tags: new[] { "Docker" })
-        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DockerContainer, HlidacStatu.Web.HealthChecks.DockerContainer.Options>(
-        //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.100.146").ConfigData,
-        //    "Docker .146", HealthStatus.Unhealthy, tags: new[] { "Docker" })
-        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DockerContainer, HlidacStatu.Web.HealthChecks.DockerContainer.Options>(
-        //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.200").ConfigData,
-        //    "Docker .200", HealthStatus.Unhealthy, tags: new[] { "Docker" })
-        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DockerContainer, HlidacStatu.Web.HealthChecks.DockerContainer.Options>(
-        //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.201").ConfigData,
-        //    "Docker .201", HealthStatus.Unhealthy, tags: new[] { "Docker" })
-        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.DockerContainer, HlidacStatu.Web.HealthChecks.DockerContainer.Options>(
-        //    new HealthChecks.HCConfig<HealthChecks.DockerContainer.Options>(conf, "Docker.Containers.150.204").ConfigData,
-        //    "Docker .204", HealthStatus.Unhealthy, tags: new[] { "Docker" })
 
         .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.CamelotApis, HlidacStatu.Web.HealthChecks.CamelotApis.Options>(
             new HlidacStatu.Web.HealthChecks.HCConfig<HlidacStatu.Web.HealthChecks.CamelotApis.Options>(conf).ConfigData,
@@ -396,12 +358,6 @@ void AddAllHealtChecks(IServiceCollection services, IConfiguration Configuration
         .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ProxmoxVMs, HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(
             new HlidacStatu.Web.HealthChecks.HCConfig<HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.pve-hs-02-r720xd").ConfigData,
             "Proxmox pve-hs-02-r720xd (02.167)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
-        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ProxmoxVMs, HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(
-        //    new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.pve-nic-168").ConfigData,
-        //    "Proxmox pve-nic-168 (02.168)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
-        //.AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.ProxmoxVMs, HlidacStatu.Web.HealthChecks.ProxmoxVMs.Options>(
-        //new HealthChecks.HCConfig<HealthChecks.ProxmoxVMs.Options>(conf, "Proxmox.VM.hs-h-01").ConfigData,
-        //"Proxmox hs-h-01 (02.160)", HealthStatus.Unhealthy, tags: new[] { "VMs" })
         ;
 }
 

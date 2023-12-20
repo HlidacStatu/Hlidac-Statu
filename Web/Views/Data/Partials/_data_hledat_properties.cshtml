@@ -24,7 +24,7 @@
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error("", e);
+                Serilog.Log.Error(e, "");
                 continue;
             }
 

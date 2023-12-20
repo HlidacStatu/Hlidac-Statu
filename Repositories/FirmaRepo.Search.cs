@@ -103,7 +103,7 @@ namespace HlidacStatu.Repositories
                     if (res != null && res.ServerError != null)
                         Manager.LogQueryError<FirmaInElastic>(res, query);
                     else
-                        Consts.Logger.Error("", e);
+                        _logger.Error(e, "");
                     throw;
                 }
             }

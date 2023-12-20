@@ -11,14 +11,15 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.LibCore.MiddleWares
 {
     public class BannedIpsMiddleware
     {
-       
         private readonly RequestDelegate _next;
         private readonly Whitelist _whitelist;
+        private readonly ILogger _logger = Log.ForContext<BannedIpsMiddleware>();
 
         private readonly string[] _badWords = new[]
         {
@@ -57,7 +58,7 @@ namespace HlidacStatu.LibCore.MiddleWares
             // block banned ip
             if (IsBanned(remoteIp))
             {
-                Util.Consts.Logger.Info($"Remote IP [{remoteIp}] is banned.");
+                _logger.Information($"Remote IP [{remoteIp}] is banned.");
                 httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
                 httpContext.Response.Headers.Append("content-type", "text/html; charset=utf-8");
                 await httpContext.Response.WriteAsync(BannedResponse(remoteIp.ToString()), Encoding.UTF8);
@@ -91,7 +92,7 @@ namespace HlidacStatu.LibCore.MiddleWares
         private async Task BanIp(IPAddress? ipAddress, DateTime expiration, int lastStatusCode, string pathList)
         {
             var ipString = ipAddress?.ToString() ?? "_empty";
-            Util.Consts.Logger.Info($"Adding IP [{ipString}] to ban list.");
+            _logger.Information($"Adding IP [{ipString}] to ban list.");
             
             await BannedIpRepoCached.BanIpAsync(ipString, expiration, lastStatusCode, pathList);
         }

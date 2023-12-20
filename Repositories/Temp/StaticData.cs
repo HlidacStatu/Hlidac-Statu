@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
+using Serilog;
 using static HlidacStatu.Entities.Osoba.Statistics;
 
 namespace HlidacStatu.Repositories
@@ -18,6 +19,8 @@ namespace HlidacStatu.Repositories
 
     public static class StaticData
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(StaticData));
+        
         [Serializable]
         public class FirmaName
         {
@@ -247,7 +250,7 @@ namespace HlidacStatu.Repositories
                 if (initialized)
                     return;
 
-                Util.Consts.Logger.Info("Static data - Init start");
+                _logger.Information("Static data - Init start");
                 //TweetingManager = new SingletonManagerWithSetup<Data.External.TwitterPublisher, Tweetinvi.Models.TwitterCredentials>();
 
                 if (string.IsNullOrEmpty(appDataPath))
@@ -262,7 +265,7 @@ namespace HlidacStatu.Repositories
                 Directory.CreateDirectory(Dumps_Path);
 
 
-                Util.Consts.Logger.Info("Static data - NespolehlivyPlatciDPH ");
+                _logger.Information("Static data - NespolehlivyPlatciDPH ");
                 NespolehlivyPlatciDPH = new Devmasters.Cache.LocalMemory.Cache<Dictionary<string, NespolehlivyPlatceDPH>>
                     (TimeSpan.FromHours(12), "NespolehlivyPlatciDPH",
                     (o) =>
@@ -276,7 +279,7 @@ namespace HlidacStatu.Repositories
                         return data;
                     });
 
-                Util.Consts.Logger.Info("Static data - Insolvence_firem_politiku ");
+                _logger.Information("Static data - Insolvence_firem_politiku ");
                 Insolvence_firem_politiku_Cache = new Devmasters.Cache.AWS_S3.Cache<Tuple<Osoba.Statistics.RegistrSmluv, Entities.Insolvence.RizeniStatistic[]>[]>(
                     new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
                     Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
@@ -353,7 +356,7 @@ namespace HlidacStatu.Repositories
                      }
                     );
 
-                Util.Consts.Logger.Info("Static data - SponzorujiciFirmy_Vsechny ");
+                _logger.Information("Static data - SponzorujiciFirmy_Vsechny ");
 
 
                 SponzorujiciFirmy_Vsechny = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>>(
@@ -375,7 +378,7 @@ namespace HlidacStatu.Repositories
                                 }
                             );
 
-                Util.Consts.Logger.Info("Static data - SponzorujiciFirmy_nedavne");
+                _logger.Information("Static data - SponzorujiciFirmy_nedavne");
                 SponzorujiciFirmy_Nedavne = new Devmasters.Cache.LocalMemory.AutoUpdatedCache<List<Sponzoring>>(
                         TimeSpan.FromHours(3), (obj) =>
                         {
@@ -393,7 +396,7 @@ namespace HlidacStatu.Repositories
                 OsobaRepo.PolitickyAktivni.Get(); //force to load
                 SponzorujiciFirmy_Vsechny.Get(); //force to load
 
-                Util.Consts.Logger.Info("Static data - DarujmeStats");
+                _logger.Information("Static data - DarujmeStats");
 
                 DarujmeStats = new Devmasters.Cache.LocalMemory.Cache<Darujme.Stats>(
                         TimeSpan.FromHours(3), (obj) =>
@@ -420,14 +423,14 @@ namespace HlidacStatu.Repositories
                             }
                             catch (Exception e)
                             {
-                                Util.Consts.Logger.Error("Static data - DarujmeStats", e);
+                                _logger.Error(e, "Static data - DarujmeStats");
 
                                 return defData;
                             }
                         }
                     );
 
-                Util.Consts.Logger.Info("Static data - BasicStatisticData ");
+                _logger.Information("Static data - BasicStatisticData ");
                 BasicStatisticData = new Devmasters.Cache.LocalMemory.Cache<List<double>>(
                         TimeSpan.FromHours(6), (obj) =>
                         {
@@ -475,7 +478,7 @@ namespace HlidacStatu.Repositories
 
 
 
-                Util.Consts.Logger.Info("Static data - FirmySVazbamiNaPolitiky_*");
+                _logger.Information("Static data - FirmySVazbamiNaPolitiky_*");
                 FirmySVazbamiNaPolitiky_aktualni_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaPolitiky>
                    (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
                     Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
@@ -534,7 +537,7 @@ namespace HlidacStatu.Repositories
                     });
 
 
-                Util.Consts.Logger.Info("Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*");
+                _logger.Information("Static data - UradyObchodujiciSFirmami_s_vazbouNaPolitiky_*");
                 UradyObchodujiciSFirmami_s_vazbouNaPolitiky_aktualni_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
                     (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
                     Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
@@ -573,7 +576,7 @@ namespace HlidacStatu.Repositories
                     }
                     );
 
-                Util.Consts.Logger.Info("Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*");
+                _logger.Information("Static data - UradyObchodujiciSNespolehlivymiPlatciDPH_Cache*");
                 UradyObchodujiciSNespolehlivymiPlatciDPH_Cache = new Devmasters.Cache.AWS_S3.Cache<AnalysisCalculation.VazbyFiremNaUradyStat>
                     (new string[] { Devmasters.Config.GetWebConfigValue("Minio.Cache.Endpoint") },
                     Devmasters.Config.GetWebConfigValue("Minio.Cache.Bucket"),
@@ -678,7 +681,7 @@ namespace HlidacStatu.Repositories
                                     {
                                         if (string.IsNullOrEmpty(urad.idNadrizene))
                                         {
-                                            Util.Consts.Logger.Error($"Organizační struktura - nenalezena datová schránka [{urad.idDS}] úřadu [{urad.oznaceni}]");
+                                            _logger.Error($"Organizační struktura - nenalezena datová schránka [{urad.idDS}] úřadu [{urad.oznaceni}]");
                                             continue;
                                         }
 
@@ -688,14 +691,14 @@ namespace HlidacStatu.Repositories
 
                                         if (nadrizeny is null)
                                         {
-                                            Util.Consts.Logger.Error($"Nenalezen nadřízený úřad, ani datová schránka [{urad.idDS}] úřadu [{urad.oznaceni}]");
+                                            _logger.Error($"Nenalezen nadřízený úřad, ani datová schránka [{urad.idDS}] úřadu [{urad.oznaceni}]");
                                             continue;
                                         }
 
                                         f = FirmaRepo.FromDS(nadrizeny.idDS);
                                         if (f is null || !f.Valid)
                                         {
-                                            Util.Consts.Logger.Error($"Organizační struktura - nenalezena datová schránka [{nadrizeny.idDS}] nadřízeného úřadu [{nadrizeny.oznaceni}]");
+                                            _logger.Error($"Organizační struktura - nenalezena datová schránka [{nadrizeny.idDS}] nadřízeného úřadu [{nadrizeny.oznaceni}]");
                                             continue;
                                         }
                                     }
@@ -706,7 +709,7 @@ namespace HlidacStatu.Repositories
 
                                     if (sluzebniUrad is null)
                                     {
-                                        Util.Consts.Logger.Info($"Služební úřad [{urad.oznaceni}] nemá podřízené organizace.");
+                                        _logger.Information($"Služební úřad [{urad.oznaceni}] nemá podřízené organizace.");
                                         continue;
                                     }
 
@@ -728,7 +731,7 @@ namespace HlidacStatu.Repositories
                             }
                             catch (Exception ex)
                             {
-                                Util.Consts.Logger.Error($"Chyba záznamu při zpracování struktury úřadů. {ex}");
+                                _logger.Error($"Chyba záznamu při zpracování struktury úřadů. {ex}");
                             }
 
                             res.Urady = _organizaniStrukturyUradu;
@@ -738,14 +741,14 @@ namespace HlidacStatu.Repositories
                 }
                 catch (Exception ex)
                 {
-                    Util.Consts.Logger.Error($"Chyba při zpracování struktury úřadů. {ex}");
+                    _logger.Error($"Chyba při zpracování struktury úřadů. {ex}");
                 }
 
 
 
                 initialized = true;
             } //lock
-            Util.Consts.Logger.Info("Static data - Init DONE");
+            _logger.Information("Static data - Init DONE");
         }
 
         private static organizacni_struktura_sluzebnich_uradu ParseOssu()

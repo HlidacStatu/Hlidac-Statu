@@ -4,18 +4,19 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Serilog;
 
 namespace HlidacStatu.Lib.Data.External.Tables
 {
     public static class Word
     {
-        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.Data.External.Tables.Word");
+        private static readonly ILogger _logger = Log.ForContext(typeof(Word));
 
         public static HlidacStatu.DS.Api.TablesInDoc.Result[] GetTablesFromWord(Uri url, string filename)
         {
             if (filename?.EndsWith(".doc") == true)
             {
-                logger.Warning($"DOC is not supported {url.ToString()}");
+                _logger.Warning($"DOC is not supported {url.ToString()}");
                 return null;
             }
 
@@ -31,7 +32,7 @@ namespace HlidacStatu.Lib.Data.External.Tables
                 }
                 catch (Exception e)
                 {
-                    logger.Error($"GetTablesFromWord {url.ToString()}", e);
+                    _logger.Error(e, $"GetTablesFromWord {url.ToString()}");
                     throw;
                 }
                 finally
@@ -58,14 +59,14 @@ namespace HlidacStatu.Lib.Data.External.Tables
             }
             catch (Exception e)
             {
-                logger.Error($"GetTablesFromWord {fn}", e);
+                _logger.Error(e, $"GetTablesFromWord {fn}");
             }
             return null;
         }
         private static HlidacStatu.DS.Api.TablesInDoc.Result[] GetTablesFromWordDOC(string fn)
         {
             // not implemented
-            logger.Warning($"DOC is not supported {fn}");
+            _logger.Warning($"DOC is not supported {fn}");
             return null;
 
         }

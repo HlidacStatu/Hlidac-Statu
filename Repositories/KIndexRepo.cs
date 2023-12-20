@@ -7,12 +7,14 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.KIndex;
 using HlidacStatu.Util;
 using Nest;
+using Serilog;
 using Consts = HlidacStatu.Entities.KIndex.Consts;
 
 namespace HlidacStatu.Repositories;
 
 public static class KIndexRepo
 {
+    private static readonly ILogger _logger = Log.ForContext(typeof(KIndexRepo));
     private static string Best(KIndexData.Annual data, int year, string ico, out KIndexData.KIndexParts? usedPart)
     {
         usedPart = data.OrderedValuesFromBestForInfofacts(ico).FirstOrDefault();
@@ -247,7 +249,7 @@ public static class KIndexRepo
             }
             else
             {
-                Util.Consts.Logger.Error(origQuery, e);
+                _logger.Error(e, origQuery);
             }
         }
 
@@ -274,7 +276,7 @@ public static class KIndexRepo
             {
                 string origQuery = $"id:{id};";
                 AuditRepo.Add(Audit.Operations.Search, "", "", "KindexFeedback", "error", origQuery, null);
-                Util.Consts.Logger.Error(origQuery, e);
+                _logger.Error(e, origQuery);
             }
 
             return null;
@@ -330,7 +332,7 @@ public static class KIndexRepo
         var res = await client.IndexAsync<Backup>(b, o => o.Id(b.Id)); //druhy parametr musi byt pole, ktere je unikatni
         if (!res.IsValid)
         {
-            Util.Consts.Logger.Error("KIndex backup save error\n" + res.ServerError?.ToString());
+            _logger.Error("KIndex backup save error\n" + res.ServerError?.ToString());
             throw new ApplicationException(res.ServerError?.ToString());
         }
     }
@@ -397,7 +399,7 @@ public static class KIndexRepo
                 }
                 else
                 {
-                    Util.Consts.Logger.Error(origQuery, e);
+                    _logger.Error(e, origQuery);
                 }
             }
 
@@ -437,7 +439,7 @@ public static class KIndexRepo
                 }
                 else
                 {
-                    Util.Consts.Logger.Error(origQuery, e);
+                    _logger.Error(e, origQuery);
                 }
             }
 

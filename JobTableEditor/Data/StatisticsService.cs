@@ -6,20 +6,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Entities.Views;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace JobTableEditor.Data
 {
     public class StatisticsService
     {
-        ILogger<JobService> _logger;
-
-        public StatisticsService(ILogger<JobService> logger)
-        {
-            _logger = logger;
-        }
-        
-        
         public async Task<List<UserJobStatistics>> UserStatisticsAsync(DateTime date,
             CancellationToken cancellationToken = default)
         {

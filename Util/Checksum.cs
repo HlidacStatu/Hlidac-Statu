@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;
+using Serilog;
 
 
 namespace HlidacStatu.Util;
@@ -17,6 +18,7 @@ namespace HlidacStatu.Util;
 public class Checksum
 {
     private const string InvalidChecksum = "Invalid_";
+    private static readonly ILogger _logger = Log.ForContext(typeof(Checksum));
 
     private static AsyncRetryPolicy<HttpResponseMessage> _retryPolicy = HttpPolicyExtensions
         .HandleTransientHttpError()
@@ -29,7 +31,7 @@ public class Checksum
 
         if (!responseMessage.IsSuccessStatusCode)
         {
-            Consts.Logger.Warning($"Couldn't get {url}");
+            _logger.Warning($"Couldn't get {url}");
             return default;
         }
 
@@ -41,7 +43,7 @@ public class Checksum
         }
         catch (Exception e)
         {
-            Consts.Logger.Error($"Url: {url} can not process stream properly.", e);
+            _logger.Error(e, $"Url: {url} can not process stream properly.");
             throw;
         }
     }

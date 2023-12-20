@@ -105,7 +105,7 @@ namespace HlidacStatu.Datasets
                         catch (Exception e)
                         {
                             res.Exceptions.Add(e);
-                            //HlidacStatu.Util.Consts.Logger.Warning("DatasetMultiResult GeneralSearch for query" + query, e);
+                            //_logger.Warning("DatasetMultiResult GeneralSearch for query" + query, e);
                         }
 
                     });

@@ -4,15 +4,18 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using Serilog;
 
 namespace HlidacStatu.Connectors.External
 {
 
     public partial class RZP
     {
+        private static readonly ILogger _logger = Log.ForContext<RZP>();
+        
         public class Manager
         {
-
+            
             class req : RequestLimiter<string, string>
             {
                 public req()
@@ -108,12 +111,12 @@ Content-Type: text/xml
                             System.Threading.Thread.Sleep(5000);
                             goto start;
                         }
-                        Util.Consts.Logger.Error("RZP error", e);
+                        _logger.Error(e, "RZP error");
                         return null;
                     }
                     catch (Exception e)
                     {
-                        Util.Consts.Logger.Error("RZP error", e);
+                        _logger.Error(e, "RZP error");
                         return null;
                     }
 
@@ -155,7 +158,7 @@ Content-Type: text/xml
                 catch (Exception e)
                 {
 
-                    Util.Consts.Logger.Error("RZP RawSearchIco request error. Ico:" + ico, e);
+                    _logger.Error(e, "RZP RawSearchIco request error. Ico:" + ico);
                     return null;
                 }
 
@@ -177,7 +180,7 @@ Content-Type: text/xml
                 }
                 catch (Exception e)
                 {
-                    Util.Consts.Logger.Error("RZP RawSearchDetail request error. podnikatelId:" + podnikatelId, e);
+                    _logger.Error(e, "RZP RawSearchDetail request error. podnikatelId:" + podnikatelId);
                     return null;
 
                 }

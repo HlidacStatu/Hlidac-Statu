@@ -20,6 +20,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -28,6 +29,7 @@ namespace HlidacStatu.Web.Controllers
     public partial class ApiV1Controller : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger _logger = Log.ForContext<ApiV1Controller>();
 
         public ApiV1Controller(UserManager<ApplicationUser> userManager)
         {
@@ -201,11 +203,8 @@ namespace HlidacStatu.Web.Controllers
         [Authorize]
         public ActionResult Dump(string date, string datatype = "smlouvy")
         {
-            Util.Consts.Logger.Info(new Devmasters.Log.LogMessage()
-                .SetMessage("Downloading smlouvy.dump.zip")
-                .SetCustomKeyValue("UserId", User.Identity.Name)
-            );
-
+            _logger.Information("Downloading smlouvy.dump.zip {UserId}", User.Identity.Name);
+                
             DateTime? specificDate = Devmasters.DT.Util.ToDateTime(date, "yyyy-MM-dd");
             string onlyfile = $"{datatype}.dump" +
                               (specificDate.HasValue ? "-" + specificDate.Value.ToString("yyyy-MM-dd") : "");
@@ -246,7 +245,7 @@ namespace HlidacStatu.Web.Controllers
                         //ignore
                     }
                     else
-                        Util.Consts.Logger.Error("DUMP?" + date, wex);
+                        _logger.Error(wex, "DUMP?" + date);
                 }
 
                 return new EmptyResult();
@@ -254,7 +253,7 @@ namespace HlidacStatu.Web.Controllers
             }
             else
             {
-                Util.Consts.Logger.Error("API DUMP : not found file " + fn);
+                _logger.Error("API DUMP : not found file " + fn);
                 return new NotFoundResult();
             }
         }
@@ -391,7 +390,7 @@ namespace HlidacStatu.Web.Controllers
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("Status page error", e);
+                _logger.Error(e, "Status page error");
                 ViewBag.Error = e;
             }
 
@@ -494,11 +493,11 @@ namespace HlidacStatu.Web.Controllers
             catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
             {
                 // canceled by user
-                Util.Consts.Logger.Info("Autocomplete canceled by user");
+                _logger.Information("Autocomplete canceled by user");
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { q });
+                _logger.Warning(e, "Autocomplete API problem.", new { q });
             }
 
             return NoContent();
@@ -527,11 +526,11 @@ namespace HlidacStatu.Web.Controllers
             catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
             {
                 // canceled by user
-                Util.Consts.Logger.Info("Autocomplete canceled by user");
+                _logger.Information("Autocomplete canceled by user");
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { q });
+                _logger.Warning(e, "Autocomplete API problem.", new { q });
             }
 
             return NoContent();

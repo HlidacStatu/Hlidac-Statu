@@ -4,16 +4,17 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
-using HlidacStatu.Util;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog;
 
 namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
 {
     public class DownloadPersonalDataModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger _logger = Log.ForContext<DownloadPersonalDataModel>();
 
         public DownloadPersonalDataModel(
             UserManager<ApplicationUser> userManager)
@@ -29,7 +30,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            Consts.Logger.Info($"User with ID '{_userManager.GetUserId(User)}' asked for their personal data.");
+            _logger.Information($"User with ID '{_userManager.GetUserId(User)}' asked for their personal data.");
 
             // Only include personal data for download
             var personalData = new Dictionary<string, string>();

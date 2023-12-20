@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace HlidacStatu.Datasets
 {
@@ -14,6 +15,8 @@ namespace HlidacStatu.Datasets
         public static string DataSourcesDbName = "datasourcesdb";
 
         public static DataSetDB Instance = new DataSetDB();
+        
+        private readonly ILogger _logger = Log.ForContext<DataSetDB>();
 
 
         public static Devmasters.Cache.LocalMemory.AutoUpdatedCache<DataSet[]> AllDataSets =
@@ -246,7 +249,7 @@ namespace HlidacStatu.Datasets
                 }
                 catch (Exception e)
                 {
-                    HlidacStatu.Util.Consts.Logger.Info($"Current result is not serializable into {nameof(Registration)} class. Query [{query}]", e);
+                    _logger.Information(e, $"Current result is not serializable into {nameof(Registration)} class. Query [{query}]");
                 }
             }
 

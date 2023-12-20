@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using HlidacStatu.DS.Api;
+using Serilog;
 
 namespace HlidacStatu.Lib.Data.External.Tables.Camelot
 {
     //hloupe reseni
     public class ConnectionPool : IApiConnection
     {
-
         private class EndpointStatus
         {
             public string Url { get; set; }
@@ -18,14 +18,15 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             public CamelotStatistics Stats = null;
         }
 
-        System.Random rnd = new Random(666);
         private System.Collections.Concurrent.ConcurrentDictionary<Guid, EndpointStatus> pool =
             new System.Collections.Concurrent.ConcurrentDictionary<Guid, EndpointStatus>();
         private System.Timers.Timer timer = new System.Timers.Timer();
         bool insideTimer = false;
         private static object lockObj = new object();
         private static ConnectionPool instance = null;
-        //private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Camelot.Api.ConnectionPool");
+
+        private readonly ILogger _logger = Log.ForContext<ConnectionPool>();
+        
         public readonly string apiKey;
 
         private ConnectionPool()
@@ -87,7 +88,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     url = url.Substring(0, url.Length - 1);
                 if (Uri.TryCreate(url, UriKind.Absolute, out var xxx))
                 {
-                    Client.logger.Debug($"Added {url} into pool");
+                    _logger.Debug($"Added {url} into pool");
                     pool.TryAdd(Guid.NewGuid(), new EndpointStatus() { Url = url });
                 }
             }
@@ -110,7 +111,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                     using (Devmasters.Net.HttpClient.URLContent net = new Devmasters.Net.HttpClient.URLContent(url))
                     {
                         net.RequestParams.Headers.Add("Authorization", apiKey);
-                        Client.logger.Debug($"Testing {url} ");
+                        _logger.Debug($"Testing {url} ");
                         net.Tries = 1;
                         net.Timeout = 2000;
                         var stat = Newtonsoft.Json.JsonConvert.DeserializeObject<ApiResult<CamelotStatistics>>(net.GetContent().Text);
@@ -161,7 +162,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
                 throw new ApplicationException("No working api enpoint. All are dead");
             }
             else
-                Client.logger.Debug("GetEndpointUrl list:"
+                _logger.Debug("GetEndpointUrl list:"
                     + string.Join(";",liveUris.Select(m =>$"{m.Value.Url} thr:{m.Value.Stats.UsedThreadsPercent():P1}"))
                     );
 
@@ -173,7 +174,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         {
             if (pool.TryGetValue(id, out var item))
             {
-                Client.logger.Info($"Choosen {item.Url} used threads {item.Stats.UsedThreadsPercent():P1}.");
+                _logger.Information($"Choosen {item.Url} used threads {item.Stats.UsedThreadsPercent():P1}.");
                 item.Used = DateTime.Now;
             }
         }
@@ -181,7 +182,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
         {
             if (pool.TryGetValue(id, out var item))
             {
-                Client.logger.Info($"Url {item.Url} is live.  used threads {item.Stats.UsedThreadsPercent():P1}");
+                _logger.Information($"Url {item.Url} is live.  used threads {item.Stats.UsedThreadsPercent():P1}");
                 item.Ready = true;
                 item.Checked = DateTime.Now;
             }
@@ -193,7 +194,7 @@ namespace HlidacStatu.Lib.Data.External.Tables.Camelot
             {
                 if (pool.TryGetValue(kv.Key, out var item))
                 {
-                    Client.logger.Warning($"Url {url} is dead.");
+                    _logger.Warning($"Url {url} is dead.");
                     item.Ready = false;
                     item.Checked = DateTime.Now;
                 }

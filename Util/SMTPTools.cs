@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
+using Serilog;
 
 namespace HlidacStatu.Util
 {
     public static class SMTPTools
     {
-
+        private static readonly ILogger _logger = Log.ForContext(typeof(SMTPTools));
+        
         public class EmbeddedImage
         {
             public string ContentId { get; set; } = Guid.NewGuid().ToString("N");
@@ -81,7 +83,7 @@ namespace HlidacStatu.Util
                     using (SmtpClient smtp = new SmtpClient())
                     {
                         smtp.Host = Devmasters.Config.GetWebConfigValue("SmtpHost");
-                        Consts.Logger.Info("Util.SMTPTools.SendEmail sent email via {smtpserver} to {recipient}", smtp.Host, msg.To);
+                        _logger.Information("Util.SMTPTools.SendEmail sent email via {smtpserver} to {recipient}", smtp.Host, msg.To);
                         if (bccToAdmin)
                             msg.Bcc.Add("michal@michalblaha.cz");
                         smtp.Send(msg);
@@ -93,7 +95,7 @@ namespace HlidacStatu.Util
             catch (Exception e)
             {
 
-                Consts.Logger.Error("Util.SMTPTools.SendEmail sent email Error via {smtpserver} to {recipient}", e, Devmasters.Config.GetWebConfigValue("SmtpHost"), toEmail);
+                _logger.Error(e, "Util.SMTPTools.SendEmail sent email Error via {smtpserver} to {recipient}", Devmasters.Config.GetWebConfigValue("SmtpHost"), toEmail);
                 return false;
             }
 

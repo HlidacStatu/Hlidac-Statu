@@ -12,6 +12,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Web.Areas.Identity.Pages.Account
 {
@@ -20,6 +21,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger _logger = Log.ForContext<RegisterModel>();
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
@@ -71,7 +73,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
-                    Util.Consts.Logger.Info("User created a new account with password.");
+                    _logger.Information("User created a new account with password.");
 
                     AspNetUserApiToken.CreateNew(user);
 

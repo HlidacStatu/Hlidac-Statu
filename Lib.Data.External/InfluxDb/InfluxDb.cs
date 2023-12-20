@@ -4,14 +4,14 @@ using InfluxDB.Client.Writes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 
 namespace HlidacStatu.Lib.Data.External
 {
 
     public static class InfluxDb
     {
-        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.Data.External.InfluxDb");
-        private static Devmasters.Log.Logger loggerTrace = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.Data.External.InfluxDb.Trace");
+        private static readonly ILogger _logger = Log.ForContext(typeof(InfluxDb));
 
         public class ResponseItem
         {
@@ -45,8 +45,7 @@ namespace HlidacStatu.Lib.Data.External
                 }
             }
         }
-
-
+        
         public static bool AddPoints(string bucketName, string orgName, params PointData[] points)
         {
             if (points == null)
@@ -57,7 +56,6 @@ namespace HlidacStatu.Lib.Data.External
 
             try
             {
-
                 using (var writeApi = influxDbClient.GetWriteApi())
                 {
                     foreach (var point in points)
@@ -70,14 +68,11 @@ namespace HlidacStatu.Lib.Data.External
             }
             catch (Exception e)
             {
-                logger.Error("UptimeServerRepo.SaveLastCheck error ", e);
+                _logger.Error(e, "UptimeServerRepo.SaveLastCheck error ");
                 return false;
             }
-
-
         }
-
-
+        
         public static IEnumerable<ResponseItem> GetAvailbility(int[] serverIds, TimeSpan timeBack)
         {
             var sTimeBack = "";
@@ -120,7 +115,7 @@ namespace HlidacStatu.Lib.Data.External
 
                 try
                 {
-                    loggerTrace.Debug("Calling InfluxDB query {query} from time {timeBack}", query, timeBack);
+                    _logger.Debug("Calling InfluxDB query {query} from time {timeBack}", query, timeBack);
 
                     List<InfluxDB.Client.Core.Flux.Domain.FluxTable> res =
                         influxDbClient.GetQueryApi().QueryAsync(query, "hlidac")
@@ -130,7 +125,7 @@ namespace HlidacStatu.Lib.Data.External
                 }
                 catch (Exception e)
                 {
-                    logger.Error("InfluxDB query error\n{query}", e, query);
+                    _logger.Error(e, "InfluxDB query error\n{query}", query);
                     //throw;
                 }
             }
@@ -156,13 +151,7 @@ namespace HlidacStatu.Lib.Data.External
                 )
                 .ToArray();
 
-
-
             return items;
         }
-
-
-
-
     }
 }

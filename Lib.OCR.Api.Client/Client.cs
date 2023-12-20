@@ -3,6 +3,7 @@
 using System;
 using System.Threading.Tasks;
 using HlidacStatu.DS.Api;
+using Serilog;
 
 namespace HlidacStatu.Lib.OCR.Api
 {
@@ -34,7 +35,7 @@ namespace HlidacStatu.Lib.OCR.Api
             SkipOCR = 1
         }
 
-        public static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.Lib.OCR.Api.Client");
+        private readonly static ILogger _logger = Log.ForContext<Client>();
 
         public static TimeSpan defaultWaitingTime = TimeSpan.FromHours(1);
 
@@ -140,7 +141,7 @@ namespace HlidacStatu.Lib.OCR.Api
                         + "&restartIn=" + (int)(restartTaskAfterTime?.TotalSeconds ?? 0)
                         + "&callbackData=" + System.Net.WebUtility.UrlEncode(callBackDataString);
 
-                    logger.Debug($"TextFromUrlAsync calling OCR API for {url.AbsoluteUri} ");
+                    _logger.Debug($"TextFromUrlAsync calling OCR API for {url.AbsoluteUri} ");
 
                     fullUrl = ApiUrl + "addTask.ashx?" + param;
                     resbyte = await wc.DownloadDataTaskAsync(fullUrl);
@@ -153,10 +154,10 @@ namespace HlidacStatu.Lib.OCR.Api
                     }
                     else
                     {
-                        logger.Error($"ExtApi.TextFromUrlAsync API Exception\nUrl:{url.AbsoluteUri}\n content: " + res);
+                        _logger.Error($"ExtApi.TextFromUrlAsync API Exception\nUrl:{url.AbsoluteUri}\n content: " + res);
                         return new Result() { Id = taskId, IsValid = Result.ResultStatus.Invalid, Error = json["error"].Value<string>() };
                     }
-                    logger.Debug($"TextFromUrlAsync called OCR API taskid:{taskId} for {url.AbsoluteUri} ");
+                    _logger.Debug($"TextFromUrlAsync called OCR API taskid:{taskId} for {url.AbsoluteUri} ");
 
                 }
 
@@ -169,12 +170,12 @@ namespace HlidacStatu.Lib.OCR.Api
             }
             catch (System.Net.WebException e)
             {
-                logger.Debug($"called ext API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl, e);
+                _logger.Debug(e, $"called ext API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl);
                 throw new ApiException("called ext API ", e);
             }
             catch (Exception e)
             {
-                logger.Error($"exception API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl, e);
+                _logger.Error(e, $"exception API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl);
                 throw new ApiException("exception API TextFromFile  ", e);
             }
             finally
@@ -310,7 +311,7 @@ namespace HlidacStatu.Lib.OCR.Api
                     }
                     else
                     {
-                        logger.Error($"ExtApi.TextFromUrlAsync API Exception\nUrl:{url.AbsoluteUri}\n content: " + res);
+                        _logger.Error($"ExtApi.TextFromUrlAsync API Exception\nUrl:{url.AbsoluteUri}\n content: " + res);
                         return new Result() { Id = taskId, IsValid = Result.ResultStatus.Invalid, Error = json["error"].Value<string>() };
                     }
 
@@ -325,12 +326,12 @@ namespace HlidacStatu.Lib.OCR.Api
             }
             catch (System.Net.WebException e)
             {
-                logger.Debug($"called ext API TextFromFile {fullUrl}.\nResponse:{res} \n" + ApiUrl, e);
+                _logger.Debug(e, $"called ext API TextFromFile {fullUrl}.\nResponse:{res} \n" + ApiUrl);
                 throw new ApiException("called ext API ", e);
             }
             catch (Exception e)
             {
-                logger.Error($"exception API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl, e);
+                _logger.Error(e, $"exception API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl);
                 throw new ApiException("exception API TextFromFile  ", e);
             }
             finally
@@ -366,34 +367,34 @@ namespace HlidacStatu.Lib.OCR.Api
                         + "&callbackData=" + System.Net.WebUtility.UrlEncode(callBackDataString);
 
 
-                    logger.Debug("Uploading file for OCR " + "addTask.ashx?" + param);
+                    _logger.Debug("Uploading file for OCR " + "addTask.ashx?" + param);
                     fullUrl = ApiUrl + "addTask.ashx?" + param;
                     resbyte = wc.UploadFile(fullUrl, "POST", fileOnDisk);
-                    logger.Debug("Uploaded file for OCR " + "addTask.ashx?" + param);
+                    _logger.Debug("Uploaded file for OCR " + "addTask.ashx?" + param);
 
                     res = System.Text.Encoding.UTF8.GetString(resbyte);
                     JToken json = JToken.Parse(res);
 
                     if (json["taskid"] != null)
                     {
-                        logger.Debug("Uploaded into task " + json["taskid"].ToString() + " file for OCR " + "addTask.ashx?" + param);
+                        _logger.Debug("Uploaded into task " + json["taskid"].ToString() + " file for OCR " + "addTask.ashx?" + param);
                         return json["taskid"].ToString();
                     }
                     else
                     {
-                        logger.Error($"ExtApi.TextFromFile API Exception\nFile:{origFilename}\n content: " + res);
+                        _logger.Error($"ExtApi.TextFromFile API Exception\nFile:{origFilename}\n content: " + res);
                         throw new ApiException(res);
                     }
                 }
             }
             catch (System.Net.WebException e)
             {
-                logger.Debug($"called ext API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl, e);
+                _logger.Debug(e, $"called ext API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl);
                 throw new ApiException("called ext API ", e);
             }
             catch (Exception e)
             {
-                logger.Debug($"called ext API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl, e);
+                _logger.Debug(e, $"called ext API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl);
                 throw;
             }
         }
@@ -436,19 +437,19 @@ namespace HlidacStatu.Lib.OCR.Api
                     }
                     else
                     {
-                        logger.Error($"ExtApi.TextFromFileAsync API Exception\nFile:{origFilename}\n content: " + res);
+                        _logger.Error($"ExtApi.TextFromFileAsync API Exception\nFile:{origFilename}\n content: " + res);
                         throw new ApiException(res);
                     }
                 }
             }
             catch (System.Net.WebException e)
             {
-                logger.Debug($"called ext API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl, e);
+                _logger.Debug(e, $"called ext API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl);
                 throw new ApiException("called ext API ", e);
             }
             catch (Exception e)
             {
-                logger.Debug($"called ext API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl, e);
+                _logger.Debug(e, $"called ext API TextFromFile {fullUrl}.\nResponse: {res}\n" + ApiUrl);
                 throw;
             }
         }

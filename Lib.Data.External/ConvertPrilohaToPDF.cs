@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using HlidacStatu.DS.Api;
+using Serilog;
 
 namespace HlidacStatu.Lib.Data.External
 {
     public class ConvertPrilohaToPDF
     {
-        private static Devmasters.Log.Logger logger = Devmasters.Log.Logger.CreateLogger("HlidacStatu.ConvertPrilohaToPDF");
+        private static readonly ILogger _logger = Log.ForContext<ConvertPrilohaToPDF>();
 
 
         public static byte[] PrilohaToPDFfromFile(byte[] content, int maxTries = 10)
@@ -32,12 +33,12 @@ namespace HlidacStatu.Lib.Data.External
 
                 if (res.Success)
                 {
-                    logger.Info("Successfull conversion from {server}", res.Server);
+                    _logger.Information("Successfull conversion from {server}", res.Server);
                     return res.Data;
                 }
                 else
                 {
-                    logger.Error("Code {errorcode}. Cannot convert into PDF. Try {try}", res.ErrorCode, tries);
+                    _logger.Error("Code {errorcode}. Cannot convert into PDF. Try {try}", res.ErrorCode, tries);
                     if (tries < maxTries)
                     {
                         System.Threading.Thread.Sleep(1000 * tries);
@@ -45,7 +46,7 @@ namespace HlidacStatu.Lib.Data.External
                     }
                     else
                     {
-                        logger.Error("Code {errorcode}. Finally cannot convert into PDF. Try {try}", res.ErrorCode, tries);
+                        _logger.Error("Code {errorcode}. Finally cannot convert into PDF. Try {try}", res.ErrorCode, tries);
                         throw new ApplicationException($"{res.ErrorCode} {res.ErrorDescription}");
                     }
                 }
@@ -56,12 +57,12 @@ namespace HlidacStatu.Lib.Data.External
                 int statusCode = (int)e.StatusCode;
                 if (statusCode >= 500)
                 {
-                    logger.Error("Code {statuscode}. Cannot convert into PDF. Try {try}", e, statusCode, tries);
+                    _logger.Error(e, "Code {statuscode}. Cannot convert into PDF. Try {try}", statusCode, tries);
                     System.Threading.Thread.Sleep(1000 * tries);
                 }
                 else if (statusCode >= 400)
                 {
-                    logger.Error("Code {statuscode}. Cannot convert into PDF. Try {try}", e, statusCode, tries);
+                    _logger.Error(e, "Code {statuscode}. Cannot convert into PDF. Try {try}", statusCode, tries);
                     System.Threading.Thread.Sleep(1000 * tries);
 
                 }
@@ -69,7 +70,7 @@ namespace HlidacStatu.Lib.Data.External
                 if (tries < maxTries)
                     goto call;
 
-                logger.Error("Code {statuscode}. Finally cannot convert into PDF. Try {try}", e, statusCode, tries);
+                _logger.Error(e, "Code {statuscode}. Finally cannot convert into PDF. Try {try}", statusCode, tries);
                 return null;
             }
             catch (Exception e)
@@ -78,7 +79,7 @@ namespace HlidacStatu.Lib.Data.External
                 if (tries < maxTries)
                     goto call;
 
-                logger.Error(" Finally cannot convert into PDF. Try {try}", e, tries);
+                _logger.Error(e, " Finally cannot convert into PDF. Try {try}", tries);
                 return null;
             }
 

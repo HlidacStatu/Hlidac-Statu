@@ -3,13 +3,14 @@ using HlidacStatu.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using Serilog;
 using Rizeni = HlidacStatu.Entities.Insolvence.Rizeni;
 
 namespace HlidacStatu.Extensions
 {
     public static class RizeniExtension
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(RizeniExtension));
         public static bool OdstranenoZInsolvencnihoRejstriku(this Rizeni rizeni)
         {
             return OdstranenoZInsolvencnihoRejstriku(rizeni.UrlInIR());
@@ -38,7 +39,7 @@ namespace HlidacStatu.Extensions
             }
             catch (Exception e)
             {
-                Consts.Logger.Error("", e);
+                _logger.Error(e, "");
             }
 
             return false;

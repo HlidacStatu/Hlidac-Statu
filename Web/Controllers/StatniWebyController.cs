@@ -10,11 +10,13 @@ using HlidacStatu.Repositories;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Framework;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace HlidacStatu.Web.Controllers
 {
     public class StatniWebyController : Controller
     {
+        private readonly ILogger _logger = Log.ForContext<StatniWebyController>();
 
         [HlidacCache(60 * 60, "id;embed", false)]
         public ActionResult Index()
@@ -183,11 +185,11 @@ namespace HlidacStatu.Web.Controllers
             catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
             {
                 // canceled by user
-                Util.Consts.Logger.Info("Autocomplete canceled by user");
+                _logger.Information("Autocomplete canceled by user");
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { query });
+                _logger.Warning(e, "Autocomplete API problem.", new { query });
             }
             
             return NoContent();

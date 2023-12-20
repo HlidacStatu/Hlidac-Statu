@@ -10,11 +10,13 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class FirmaRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(FirmaRepo));
 
         private static async Task PrepareBeforeSaveAsync(Firma firma, bool updateLastUpdateValue = true)
         {
@@ -53,7 +55,7 @@ namespace HlidacStatu.Repositories
                     }
                     catch (Exception e)
                     {
-                        HlidacStatu.Util.Consts.Logger.Error($"Saving EntityFr firma {firma.ICO}", e);
+                        _logger.Error(e, $"Saving EntityFr firma {firma.ICO}");
                     }
 
 
@@ -94,7 +96,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error($"Saving firma {firma.ICO}", e);
+                _logger.Error(e, $"Saving firma {firma.ICO}");
             }
         }
 

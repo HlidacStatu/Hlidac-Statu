@@ -13,12 +13,14 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using static HlidacStatu.Entities.Osoba;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class OsobaRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(OsobaRepo));
         public static Osoba GetOrCreateNew(string titulPred, string jmeno, string prijmeni, string titulPo,
             string narozeni, Osoba.StatusOsobyEnum status, string user
         )
@@ -153,7 +155,7 @@ namespace HlidacStatu.Repositories
                 }
                 catch (Exception e)
                 {
-                    HlidacStatu.Util.Consts.Logger.Error($"Saving osoba {osoba.NameId}", e);
+                    _logger.Error(e, $"Saving osoba {osoba.NameId}");
                 }
 
                 if (externalIds != null)

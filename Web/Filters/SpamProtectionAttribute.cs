@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Serilog;
 
 namespace HlidacStatu.Web.Filters
 {
     public class SpamProtectionAttribute : TypeFilterAttribute
     {
+        private static readonly ILogger _logger = Log.ForContext<SpamProtectionAttribute>();
         public SpamProtectionAttribute(string name, string redirectToController, string redirectToAction) : base(typeof(SpamProtectionImpl))
         {
             // careful about correct ordering. It has to be the same as in the constructor below
@@ -32,7 +34,7 @@ namespace HlidacStatu.Web.Filters
                 if (IsInFormData(req) || IsInQueryData(req))// ||  await IsInBodyJson(req)) 
                 {
                     //context.HttpContext.Items.Add("honeypotTrapped", true);
-                    Util.Consts.Logger.Warning($"Detected bot from [{HlidacStatu.Util.RealIpAddress.GetIp(context.HttpContext)}]");
+                    _logger.Warning($"Detected bot from [{HlidacStatu.Util.RealIpAddress.GetIp(context.HttpContext)}]");
                     context.Result = _redirect;
                 }
             }

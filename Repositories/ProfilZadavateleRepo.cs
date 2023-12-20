@@ -5,11 +5,13 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static class ProfilZadavateleRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(ProfilZadavateleRepo));
         public static async Task SaveAsync(ProfilZadavatele profilZadavatele, ElasticClient client = null)
         {
             if (
@@ -71,7 +73,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("ERROR ProfilZadavatele.GetByIco for ICO " + ico, e);
+                _logger.Error(e, "ERROR ProfilZadavatele.GetByIco for ICO " + ico);
                 return new ProfilZadavatele[] { };
             }
         }

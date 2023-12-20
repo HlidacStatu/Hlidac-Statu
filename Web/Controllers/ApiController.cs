@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.LibCore;
 using HlidacStatu.Web.Framework;
+using Serilog;
 
 namespace HlidacStatu.Web.Controllers
 {
@@ -14,6 +15,7 @@ namespace HlidacStatu.Web.Controllers
     [Route("api/{action}/{_id?}/{_dataid?}")]
     public partial class ApiController : Controller
     {
+        private readonly ILogger _logger = Log.ForContext<ApiController>();
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IHttpClientFactory _httpClientFactory;
 
@@ -40,11 +42,11 @@ namespace HlidacStatu.Web.Controllers
             catch (Exception ex) when ( ex is OperationCanceledException || ex is TaskCanceledException)
             {
                 // canceled by user
-                Util.Consts.Logger.Info("Autocomplete canceled by user");
+                _logger.Information("Autocomplete canceled by user");
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { q });
+                _logger.Warning(e, "Autocomplete API problem.", new { q });
             }
             
             return NoContent();
@@ -68,11 +70,11 @@ namespace HlidacStatu.Web.Controllers
             catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
             {
                 // canceled by user
-                Util.Consts.Logger.Info("Autocomplete canceled by user");
+                _logger.Information("Autocomplete canceled by user");
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Warning("Autocomplete API problem.", e, new { q });
+                _logger.Warning(e, "Autocomplete API problem.", new { q });
             }
 
             return NoContent();

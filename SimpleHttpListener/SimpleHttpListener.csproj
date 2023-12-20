@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+
+        <!-- Publishing properties -->
+<!--        <PublishTrimmed>true</PublishTrimmed>-->
+<!--        <PublishSelfContained>true</PublishSelfContained>-->
+<!--        <PublishAot>true</PublishAot>-->
+        <ContainerFamily>jammy-chiseled</ContainerFamily>
+        <ContainerRepository>simple-http-listener</ContainerRepository>
+        <ContainerRuntimeIdentifier>linux-arm64</ContainerRuntimeIdentifier>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Net.Build.Containers" Version="8.0.100" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
+
+</Project>

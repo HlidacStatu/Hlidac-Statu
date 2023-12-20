@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
+using Serilog;
 
 namespace HlidacStatu.Web.Filters
 {
@@ -13,6 +14,8 @@ namespace HlidacStatu.Web.Filters
         private readonly long _duration;
         private readonly string[] _queryKeys;
         private readonly bool _differAuth;
+        
+        private static readonly ILogger _logger = Log.ForContext<HlidacCacheAttribute>();
 
 
         public HlidacCacheAttribute(long durationInSeconds, string queryKeys, bool differAuth)
@@ -29,7 +32,7 @@ namespace HlidacStatu.Web.Filters
 
             IMemoryCache? cacheService = (IMemoryCache)context.HttpContext.RequestServices.GetService(typeof(IMemoryCache));
             if (cacheService is null)
-                Util.Consts.Logger.Error("IMemoryCache service was not found - HlidacCacheAttribute.cs:29");
+                _logger.Error("IMemoryCache service was not found - HlidacCacheAttribute.cs:29");
 
             if (cacheService.TryGetValue(key, out IActionResult result))
             {
@@ -43,7 +46,7 @@ namespace HlidacStatu.Web.Filters
 
             IMemoryCache? cacheService = (IMemoryCache)context.HttpContext.RequestServices.GetService(typeof(IMemoryCache));
             if (cacheService is null)
-                Util.Consts.Logger.Error("IMemoryCache service was not found - HlidacCacheAttribute.cs:43");
+                _logger.Error("IMemoryCache service was not found - HlidacCacheAttribute.cs:43");
 
             if (System.Diagnostics.Debugger.IsAttached)
                 cacheService.Set(key, context.Result, TimeSpan.FromSeconds(2));

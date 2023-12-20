@@ -5,11 +5,13 @@ using HlidacStatu.Connectors;
 
 using System;
 using System.Linq;
+using Serilog;
 
 namespace HlidacStatu.Web.Framework
 {
     public static class RemoteUrlFromWebCache
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(RemoteUrlFromWebCache));
         static RemoteUrlFromWebCache()
         {
         }
@@ -35,7 +37,7 @@ namespace HlidacStatu.Web.Framework
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error($"Manager Save error from URL {ki.ValueForData}", e);
+                _logger.Error(e, $"Manager Save error from URL {ki.ValueForData}");
             }
 
             if (data == null || data.Length == 0)
@@ -86,7 +88,7 @@ namespace HlidacStatu.Web.Framework
             }
             catch (Exception e)
             {
-                Util.Consts.Logger.Error("WebShot GetData error", e);
+                _logger.Error(e, "WebShot GetData error");
                 return null;
             }
         }

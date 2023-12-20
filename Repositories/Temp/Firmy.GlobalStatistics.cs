@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using Manager = Devmasters.Batch.Manager;
 
 
@@ -23,6 +24,7 @@ namespace HlidacStatu.Repositories
         //Předtěhovat do tasku?
         public class GlobalStatistics
         {
+            private static readonly ILogger _logger = Log.ForContext(typeof(GlobalStatistics));
 
             static List<string> _vsechnyUrady = null;
             private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
@@ -44,7 +46,7 @@ namespace HlidacStatu.Repositories
 
                         var icos = new List<string>();
 
-                        Util.Consts.Logger.Info($"Loading ALL ICOS");
+                        _logger.Information($"Loading ALL ICOS");
 
                         icos.AddRange(FirmaRepo.KrajskeUradyCache.Get().Select(m => m.ICO));
                         icos.AddRange(FirmaRepo.MinisterstvaCache.Get().Select(m => m.ICO));
@@ -80,7 +82,7 @@ namespace HlidacStatu.Repositories
                             FirmaRepo.Zatrideni.Subjekty(Firma.Zatrideni.SubjektyObory.Vse).Select(m => m.Ico));
 
                         //nejvice utajujici smluvni strany
-                        Util.Consts.Logger.Info($"Loading ICOS utajujici smluvni strany");
+                        _logger.Information($"Loading ICOS utajujici smluvni strany");
                         AggregationContainerDescriptor<Smlouva> aggs = new AggregationContainerDescriptor<Smlouva>()
                             .Terms("perIco", m => m
                                 .Field("platce.ico")
@@ -110,7 +112,7 @@ namespace HlidacStatu.Repositories
                         }
 
                         //nejvice utajujici ceny
-                        Util.Consts.Logger.Info($"Loading ICOS utajujici ceny");
+                        _logger.Information($"Loading ICOS utajujici ceny");
                         aggs = new AggregationContainerDescriptor<Smlouva>()
                             .Terms("perIco", m => m
                                 .Field("platce.ico")
@@ -143,7 +145,7 @@ namespace HlidacStatu.Repositories
                             }
                         }
 
-                        Util.Consts.Logger.Info("Dohledani podrizenych organizaci");
+                        _logger.Information("Dohledani podrizenych organizaci");
                         //podrizene organizace
                         var allIcos = new System.Collections.Concurrent.ConcurrentBag<string>();
 

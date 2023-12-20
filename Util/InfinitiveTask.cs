@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Util
 {
     public class InfinitiveTask
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(InfinitiveTask));
         public enum TaskNextRunStatus
         {
             Continue,
@@ -32,7 +34,7 @@ namespace HlidacStatu.Util
             }
             catch (Exception e)
             {
-                Consts.Logger.Error("Run got exception ", e);
+                _logger.Error(e, "Run got exception ");
                 return;
 
                 //throw;
@@ -53,7 +55,7 @@ namespace HlidacStatu.Util
 
                     if (status == TaskNextRunStatus.Stop)
                     {
-                        Consts.Logger.Info($"InfinitiveTask.Run: ending {tag} because of status STOP");
+                        _logger.Information($"InfinitiveTask.Run: ending {tag} because of status STOP");
                         break;
                     }
                     Thread.Sleep(period);
@@ -62,14 +64,14 @@ namespace HlidacStatu.Util
             }
             catch (Exception e)
             {
-                Consts.Logger.Error("RunSync got exception ", e);
+                _logger.Error(e, "RunSync got exception ");
                 return;
 
                 //throw;
             }
             finally
             {
-                Consts.Logger.Info($"InfinitiveTask.Run: ended {tag} ");
+                _logger.Information($"InfinitiveTask.Run: ended {tag} ");
             }
         }
 

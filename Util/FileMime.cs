@@ -3,11 +3,14 @@ using MimeDetective.Storage;
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using Serilog;
 
 namespace HlidacStatu.Util
 {
     public static class FileMime
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(FileMime));
+
 
         static FileMime()
         {
@@ -59,7 +62,7 @@ namespace HlidacStatu.Util
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Cannost Inspect {filename}", e, filename);
+                _logger.Error(e, "Cannost Inspect {filename}", filename);
                 return null;
             }
 
@@ -87,7 +90,7 @@ namespace HlidacStatu.Util
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error("Cannost Inspect Pdf {filename}", e, filename);
+                _logger.Error(e, "Cannost Inspect Pdf {filename}", filename);
                 return false;
             }
 

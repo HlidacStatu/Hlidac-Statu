@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using Serilog;
 
 namespace HlidacStatu.Connectors
 {
     public class DirectDB
     {
+        private static readonly ILogger _logger = Log.ForContext<DirectDB>();
+        
         public static string DefaultCnnStr = Devmasters.Config.GetWebConfigValue("OldEFSqlConnection");
 
         public static T GetValue<T>(string sql, CommandType type = CommandType.Text, IDataParameter[] param = null, string cnnString = null)
@@ -68,7 +71,7 @@ namespace HlidacStatu.Connectors
                     {
                         paramStr = string.Join(";", param.Select(s => $"{s.ParameterName}={s.Value}"));
                     }
-                    Util.Consts.Logger.Error($"SQL error: {sql} Params:{paramStr}", e);
+                    _logger.Error(e, $"SQL error: {sql} Params:{paramStr}");
                     throw;
                 }
             }
@@ -181,7 +184,7 @@ namespace HlidacStatu.Connectors
                     {
                         paramStr = string.Join(";", param.Select(s => $"{s.ParameterName}={s.Value}"));
                     }
-                    Util.Consts.Logger.Error($"SQL error: {sql} Params:{paramStr}", e);
+                    _logger.Error(e, $"SQL error: {sql} Params:{paramStr}");
                     throw;
                 }
             }

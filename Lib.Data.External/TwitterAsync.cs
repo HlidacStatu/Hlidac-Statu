@@ -4,12 +4,15 @@ using System.Threading.Tasks;
 
 using LinqToTwitter;
 using LinqToTwitter.OAuth;
+using Serilog;
 
 namespace HlidacStatu.Lib.Data.External
 {
 
     public class Twitter
     {
+        private readonly ILogger _logger = Log.ForContext<Twitter>();
+        
         static SingleUserAuthorizer authHlidacW = new SingleUserAuthorizer
         {
             CredentialStore = new SingleUserInMemoryCredentialStore
@@ -74,7 +77,7 @@ namespace HlidacStatu.Lib.Data.External
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error("tweet creation. text {text}, error {error}", text, e);
+                _logger.Error("tweet creation. text {text}, error {error}", text, e);
                 return null;
             }
 
@@ -95,7 +98,7 @@ namespace HlidacStatu.Lib.Data.External
                 tweetId = await ReplyAsync(text, tweetId);
                 if (string.IsNullOrEmpty(tweetId))
                 {
-                    HlidacStatu.Util.Consts.Logger.Error("Error during tweet thread creation. all {texts}, error after {text}.",texts, text);
+                    _logger.Error("Error during tweet thread creation. all {texts}, error after {text}.",texts, text);
                     return null;
                 }
                 System.Threading.Thread.Sleep(20);
@@ -115,7 +118,7 @@ namespace HlidacStatu.Lib.Data.External
             }
             catch (Exception e)
             {
-                HlidacStatu.Util.Consts.Logger.Error("tweet reply. text {text}, error {error}", text, e);
+                _logger.Error("tweet reply. text {text}, error {error}", text, e);
                 return null;
             }
 

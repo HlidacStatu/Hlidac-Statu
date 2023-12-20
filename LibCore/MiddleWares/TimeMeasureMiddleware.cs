@@ -5,20 +5,19 @@ using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Devmasters.Log;
+using Serilog;
 
 namespace HlidacStatu.LibCore.MiddleWares
 {
     public class TimeMeasureMiddleware
     {
-        private readonly Logger _logger;
+        private readonly ILogger _logger = Log.ForContext<TimeMeasureMiddleware>();
         private readonly RequestDelegate _next;
         private readonly List<string> _exceptions;
 
-        public TimeMeasureMiddleware(RequestDelegate next, Devmasters.Log.Logger logger, List<string> exceptions)
+        public TimeMeasureMiddleware(RequestDelegate next, List<string> exceptions)
         {
             _next = next;
-            _logger = logger;
             _exceptions = exceptions;
         }
 
@@ -62,9 +61,9 @@ namespace HlidacStatu.LibCore.MiddleWares
 
     public static class TimeMeasureMiddlewareExtension
     {
-        public static IApplicationBuilder UseTimeMeasureMiddleware(this IApplicationBuilder builder, Devmasters.Log.Logger logger, List<string>? exceptions = null)
+        public static IApplicationBuilder UseTimeMeasureMiddleware(this IApplicationBuilder builder, List<string>? exceptions = null)
         {
-            return builder.UseMiddleware<TimeMeasureMiddleware>(logger, exceptions ?? new List<string>());
+            return builder.UseMiddleware<TimeMeasureMiddleware>(exceptions ?? new List<string>());
         }
     }
 }

@@ -10,6 +10,8 @@ namespace HlidacStatuApi.Code
         private readonly int _duration;
         private readonly string[] _queryKeys;
         private readonly bool _differAuth;
+        
+        private readonly Serilog.ILogger _logger = Serilog.Log.ForContext<HlidacCacheAttribute>();
 
         public HlidacCacheAttribute(int durationInSeconds, string queryKeys, bool differAuth)
         {
@@ -24,7 +26,7 @@ namespace HlidacStatuApi.Code
 
             IMemoryCache? cacheService = (IMemoryCache)context.HttpContext.RequestServices.GetService(typeof(IMemoryCache));
             if (cacheService is null)
-                HlidacStatu.Util.Consts.Logger.Error("IMemoryCache service was not found - HlidacCacheAttribute.cs:29");
+                _logger.Error("IMemoryCache service was not found - HlidacCacheAttribute.cs:29");
 
             if (cacheService.TryGetValue(key, out IActionResult result))
             {
@@ -38,7 +40,7 @@ namespace HlidacStatuApi.Code
 
             IMemoryCache? cacheService = (IMemoryCache)context.HttpContext.RequestServices.GetService(typeof(IMemoryCache));
             if (cacheService is null)
-                HlidacStatu.Util.Consts.Logger.Error("IMemoryCache service was not found - HlidacCacheAttribute.cs:43");
+                _logger.Error("IMemoryCache service was not found - HlidacCacheAttribute.cs:43");
 
             if (System.Diagnostics.Debugger.IsAttached)
                 cacheService.Set(key, context.Result, TimeSpan.FromSeconds(2));

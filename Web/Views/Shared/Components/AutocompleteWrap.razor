@@ -7,6 +7,7 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Util
 @using Microsoft.AspNetCore.WebUtilities
+@using Serilog
 @* @rendermode InteractiveServer *@
 
 @inject NavigationManager Navigation
@@ -245,6 +246,8 @@
     private List<AutocompleteItem<Autocomplete>>? InputTags { get; set; }
 
     private string _query;
+    
+    private readonly ILogger _logger = Log.ForContext<AutocompleteWrap>();
 
     private List<RenderFragment> HelpTips = new List<RenderFragment>()
     {
@@ -284,7 +287,7 @@
         }
         catch (Exception e)
         {
-            Util.Consts.Logger.Error($"During autocomplete usage an error occured. OnParametersSetAsync in Wrapper. query=[{uri?.Query}]", e);
+            _logger.Error(e, $"During autocomplete usage an error occured. OnParametersSetAsync in Wrapper. query=[{uri?.Query}]");
         }
     }
 
@@ -348,7 +351,7 @@
         catch (Exception e)
         {
             var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-            Util.Consts.Logger.Error($"During autocomplete usage an error occured. CreateAutocompleteItemFromQuery in Wrapper. Parsed query [{parsedQuery}], uri=[{uri}]", e);
+            _logger.Error(e, $"During autocomplete usage an error occured. CreateAutocompleteItemFromQuery in Wrapper. Parsed query [{parsedQuery}], uri=[{uri}]");
         }
 
         return new AutocompleteItem<Autocomplete>(parsedQuery);
@@ -396,7 +399,7 @@
         }
         catch (Exception e)
         {
-            Util.Consts.Logger.Error($"During autocomplete usage an error occured. OnSearch in Wrapper. Query was=[{query}]", e);
+            _logger.Error(e, $"During autocomplete usage an error occured. OnSearch in Wrapper. Query was=[{query}]");
         }
 
         return Enumerable.Empty<Autocomplete>().ToList();
@@ -414,7 +417,7 @@
         }
         catch (Exception e)
         {
-            Util.Consts.Logger.Error("During autocomplete usage an error occured. OnAutocompleteSubmitted in Wrapper.", e);
+            _logger.Error(e, "During autocomplete usage an error occured. OnAutocompleteSubmitted in Wrapper.");
         }
 
         return Task.CompletedTask;

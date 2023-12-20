@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
 {
@@ -15,6 +16,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
+        private readonly ILogger _logger = Log.ForContext<DeletePersonalDataModel>();
         public DeletePersonalDataModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager)
@@ -74,7 +76,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
 
             await _signInManager.SignOutAsync();
 
-            Util.Consts.Logger.Info($"User with ID '{userId}' deleted themselves.");
+            _logger.Information($"User with ID '{userId}' deleted themselves.");
 
             return Redirect("~/");
         }

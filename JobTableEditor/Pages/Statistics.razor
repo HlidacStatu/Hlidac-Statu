@@ -1,11 +1,8 @@
 ﻿@page "/statistics"
-@using Microsoft.Extensions.Logging
+
 @using HlidacStatu.Entities.Views
 
 @inject StatisticsService StatisticsService
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject NavigationManager NavigationManager
-@inject ILogger<TableEditor> Logger
 
 @attribute [Authorize(Roles = "Admin")]
 

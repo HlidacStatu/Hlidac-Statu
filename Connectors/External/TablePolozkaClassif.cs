@@ -7,12 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 
 namespace HlidacStatu.Connectors.External
 {
     public class TablePolozkaClassif
     {
         static string endpoint = "http://10.10.150.203:8001";
+        private static readonly ILogger _logger = Log.ForContext<TablePolozkaClassif>();
 
         static Dictionary<string, InDocTag> tags = null;
         static TablePolozkaClassif()
@@ -178,7 +180,7 @@ namespace HlidacStatu.Connectors.External
                 catch (Exception e)
                 {
                     sw.Stop();
-                    Util.Consts.Logger.Error($"Error classifier endpoint [{url}] for {text} in {sw.ElapsedMilliseconds}ms, error {e.Message}", e);
+                    _logger.Error(e, $"Error classifier endpoint [{url}] for {text} in {sw.ElapsedMilliseconds}ms, error {e.Message}");
                     throw;
                 }
             }

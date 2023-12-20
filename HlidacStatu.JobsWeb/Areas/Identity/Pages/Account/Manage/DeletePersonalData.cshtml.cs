@@ -2,10 +2,10 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
-using HlidacStatu.Util;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog;
 
 namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
 {
@@ -13,6 +13,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ILogger _logger = Log.ForContext<DeletePersonalDataModel>();
 
         public DeletePersonalDataModel(
             UserManager<ApplicationUser> userManager,
@@ -73,7 +74,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
 
             await _signInManager.SignOutAsync();
 
-            Consts.Logger.Info($"User with ID '{userId}' deleted themselves.");
+            _logger.Information($"User with ID '{userId}' deleted themselves.");
 
             return Redirect("~/");
         }

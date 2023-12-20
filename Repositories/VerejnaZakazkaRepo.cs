@@ -52,8 +52,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                Consts.Logger.Error(
-                    $"VZ ERROR Upserting ID:{incompleteVz.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(incompleteVz).Length}", e);
+                _logger.Error(e, $"VZ ERROR Upserting ID:{incompleteVz.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(incompleteVz).Length}");
             }
         }
 
@@ -115,8 +114,7 @@ namespace HlidacStatu.Repositories
                         }
                         catch (Exception e)
                         {
-                            Consts.Logger.Error(
-                                $"VZ ERROR Merging ID:{firstVz.Id} with ID:{storedDuplicate.Id}.", e);
+                            _logger.Error(e, $"VZ ERROR Merging ID:{firstVz.Id} with ID:{storedDuplicate.Id}.");
                         }
                     }
 
@@ -142,8 +140,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                Consts.Logger.Error(
-                    $"VZ ERROR Upserting ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}", e);
+                _logger.Error(e, $"VZ ERROR Upserting ID:{newVZ.Id} Size:{Newtonsoft.Json.JsonConvert.SerializeObject(newVZ).Length}");
             }
         }
 
@@ -397,7 +394,7 @@ namespace HlidacStatu.Repositories
                 }
                 catch (Exception e)
                 {
-                    Consts.Logger.Error("VZ - problem with storing file to hlidac storage", e);
+                    _logger.Error(e, "VZ - problem with storing file to hlidac storage");
                 }
                 finally
                 {
@@ -420,7 +417,7 @@ namespace HlidacStatu.Repositories
             
             if (!responseMessage.IsSuccessStatusCode)
             {
-                Consts.Logger.Error($"Url: {url} for VZ (id:{vzId}) returned {responseMessage.StatusCode} status code with reason phrase: {responseMessage.ReasonPhrase}.");
+                _logger.Error($"Url: {url} for VZ (id:{vzId}) returned {responseMessage.StatusCode} status code with reason phrase: {responseMessage.ReasonPhrase}.");
                 throw new Exception(
                     $"Can't download file for VZ (id:{vzId}). Http status code: {responseMessage.StatusCode}");
             }
@@ -435,7 +432,7 @@ namespace HlidacStatu.Repositories
             }
             catch (Exception e)
             {
-                Consts.Logger.Error($"Url: {url} for VZ (id:{vzId}) can not process stream properly.", e);
+                _logger.Error(e, $"Url: {url} for VZ (id:{vzId}) can not process stream properly.");
                 throw;
             }
         }
@@ -475,7 +472,7 @@ namespace HlidacStatu.Repositories
 
             if (!res.IsValid)
             {
-                Consts.Logger.Warning($"VZ problems with query. {res.DebugInformation}");
+                _logger.Warning($"VZ problems with query. {res.DebugInformation}");
                 return Enumerable.Empty<VerejnaZakazka>();
             }
             
@@ -503,7 +500,7 @@ namespace HlidacStatu.Repositories
 
             if (!res.IsValid)
             {
-                Consts.Logger.Warning($"VZ problems with query. {res.DebugInformation}");
+                _logger.Warning($"VZ problems with query. {res.DebugInformation}");
                 return null;
             }
             

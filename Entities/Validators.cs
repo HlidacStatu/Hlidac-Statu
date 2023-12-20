@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Serilog;
 
 namespace HlidacStatu.Entities
 {
@@ -53,8 +54,6 @@ namespace HlidacStatu.Entities
 
         static Validators()
         {
-            string webAppDataPath = Devmasters.Config.GetWebConfigValue("WebAppDataPath");
-
             Jmena = new HashSet<string>(jmenaCache.Get().Split("\n", StringSplitOptions.RemoveEmptyEntries)
                 .Select(m => TextUtil.RemoveDiacritics(m.ToLower().Trim()))
                 .Distinct());
@@ -70,7 +69,7 @@ namespace HlidacStatu.Entities
                 .Select(m => TextUtil.RemoveDiacritics(m.ToLower().Trim()))
                 .Distinct());
 
-            Util.Consts.Logger.Info("Static data - loading cpv_cs");
+            Log.ForContext(typeof(Validators)).Information("Static data - loading cpv_cs");
 
             using (StringReader r = new StringReader(cpvCache.Get()))
             {

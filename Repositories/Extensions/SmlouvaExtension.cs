@@ -11,11 +11,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
+using Serilog;
 
 namespace HlidacStatu.Extensions
 {
     public static class SmlouvaExtension
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(SmlouvaExtension));
+        
         public static InfoFact[] InfoFacts(this Smlouva smlouva)
         {
             List<InfoFact> f = new List<InfoFact>();
@@ -307,7 +310,7 @@ namespace HlidacStatu.Extensions
                 }
                 catch (Exception e)
                 {
-                    Consts.Logger.Error($"checking StavSmlouvyVRS id:{smlouva.Id} {smlouva.odkaz}", e);
+                    _logger.Error(e, $"checking StavSmlouvyVRS id:{smlouva.Id} {smlouva.odkaz}");
                     return null;
                 }
             }

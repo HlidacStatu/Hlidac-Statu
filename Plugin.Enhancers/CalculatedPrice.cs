@@ -4,6 +4,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.Enhancers;
 
 using System;
+using Serilog;
 
 namespace HlidacStatu.Plugin.Enhancers
 {
@@ -11,6 +12,7 @@ namespace HlidacStatu.Plugin.Enhancers
 
     public class CalculatedPrice : IEnhancer
     {
+        private readonly ILogger _logger = Log.ForContext<CalculatedPrice>();
         public int Priority => 1;
 
         public string Description
@@ -34,7 +36,7 @@ namespace HlidacStatu.Plugin.Enhancers
 
         public bool Update(ref Smlouva item)
         {
-            Base.Logger.Debug("Starting CalculatedPrice for " + item.Id);
+            _logger.Debug("Starting CalculatedPrice for " + item.Id);
             bool changed = false;
             if (item.hodnotaVcetneDph.HasValue && item.hodnotaVcetneDph != 0)
             {
@@ -69,7 +71,7 @@ namespace HlidacStatu.Plugin.Enhancers
                         changed = true;
                     }
                     else
-                        Base.Logger.Warning("Date: " + date.ToShortDateString() + " " + item.ciziMena.mena + " is unknown");
+                        _logger.Warning("Date: " + date.ToShortDateString() + " " + item.ciziMena.mena + " is unknown");
 
                 }
 
@@ -120,7 +122,7 @@ namespace HlidacStatu.Plugin.Enhancers
             }
             catch (Exception e)
             {
-                Base.Logger.Error("Date: " + date.ToShortDateString() + " " + currency + " is unknown", e);
+                _logger.Error(e, "Date: " + date.ToShortDateString() + " " + currency + " is unknown");
 
                 return 0;
             }

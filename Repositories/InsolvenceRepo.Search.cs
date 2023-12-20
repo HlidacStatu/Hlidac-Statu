@@ -6,11 +6,13 @@ using HlidacStatu.Repositories.Searching.Rules;
 using Nest;
 using System;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Repositories
 {
     public static partial class InsolvenceRepo
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(InsolvenceRepo));
         public static class Searching
         {
             static string[] queryShorcuts = new string[]
@@ -227,7 +229,7 @@ namespace HlidacStatu.Repositories
                     }
                     else
                     {
-                        Util.Consts.Logger.Error("", e);
+                        _logger.Error(e, "");
                     }
 
                     throw;
@@ -387,7 +389,7 @@ namespace HlidacStatu.Repositories
                     }
                     else
                     {
-                        Util.Consts.Logger.Error("", e);
+                        _logger.Error(e, "");
                     }
 
                     throw;

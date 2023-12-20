@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Serilog;
 
 namespace HlidacStatu.Entities
 {
@@ -42,7 +43,7 @@ namespace HlidacStatu.Entities
                         }
                         catch (Exception e)
                         {
-                            Util.Consts.Logger.Error("zabbix ZabbixIgnoreDataIntervals config error", e);
+                            Log.ForContext(typeof(HostAvailability)).Error(e, "zabbix ZabbixIgnoreDataIntervals config error");
                         }
                         finally
                         {

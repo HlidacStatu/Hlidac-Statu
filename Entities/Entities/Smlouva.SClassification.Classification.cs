@@ -36,14 +36,14 @@ namespace HlidacStatu.Entities
                     {
                         if (Devmasters.TextUtil.IsNumeric(t.ToString()))
                         {
-                            Util.Consts.Logger.Warning("Missing Classification value" + value);
+                            _logger.Warning("Missing Classification value" + value);
                             return "(neznámý)";
                         }
                         return t.ToNiceDisplayName();
                     }
                     else
                     {
-                        Util.Consts.Logger.Warning("Missing Classification value" + value);
+                        _logger.Warning("Missing Classification value" + value);
                         return "(neznámý)";
                     }
                 }

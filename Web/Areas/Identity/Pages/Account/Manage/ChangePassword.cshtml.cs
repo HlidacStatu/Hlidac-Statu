@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
 {
@@ -13,6 +14,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly ILogger _logger = Log.ForContext<ChangePasswordModel>();
 
         public ChangePasswordModel(
             UserManager<ApplicationUser> userManager,
@@ -88,7 +90,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            Util.Consts.Logger.Info("User changed their password successfully.");
+            _logger.Information("User changed their password successfully.");
             StatusMessage = "Your password has been changed.";
 
             return RedirectToPage();

@@ -10,6 +10,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace HlidacStatu.Web.Areas.Identity.Pages.Account
 {
@@ -18,6 +19,8 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
+        
+        private readonly ILogger _logger = Log.ForContext<ExternalLoginModel>();
 
         public ExternalLoginModel(
             SignInManager<ApplicationUser> signInManager,
@@ -76,7 +79,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                Util.Consts.Logger.Info($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
+                _logger.Information($"{info.Principal.Identity.Name} logged in with {info.LoginProvider} provider.");
                 return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
@@ -106,7 +109,7 @@ namespace HlidacStatu.Web.Areas.Identity.Pages.Account
                     }
                     
                     // send confirmation email
-                    Util.Consts.Logger.Info($"User created an account using {info.LoginProvider} provider.");
+                    _logger.Information($"User created an account using {info.LoginProvider} provider.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

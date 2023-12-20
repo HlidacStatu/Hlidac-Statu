@@ -55,7 +55,7 @@ namespace HlidacStatu.Web.Controllers
         //    }
         //    catch (Exception e)
         //    {
-        //        HlidacStatu.Util.Consts.Logger.Error($"_DataHost id ${id}", e);
+        //        _logger.Error($"_DataHost id ${id}", e);
         //        return Json(ApiResponseStatus.GeneralExceptionError(e));
         //    }
 

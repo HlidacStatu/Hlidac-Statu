@@ -2,16 +2,17 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
-using HlidacStatu.Util;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog;
 
 namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
 {
     public class GenerateRecoveryCodesModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger _logger = Log.ForContext<GenerateRecoveryCodesModel>();
 
         public GenerateRecoveryCodesModel(
             UserManager<ApplicationUser> userManager)
@@ -61,7 +62,7 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account.Manage
             var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
             RecoveryCodes = recoveryCodes.ToArray();
 
-            Consts.Logger.Info($"User with ID '{userId}' has generated new 2FA recovery codes.");
+            _logger.Information($"User with ID '{userId}' has generated new 2FA recovery codes.");
             StatusMessage = "You have generated new recovery codes.";
             return RedirectToPage("./ShowRecoveryCodes");
         }
