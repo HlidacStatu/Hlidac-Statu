@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using HlidacStatu.LibCore.ConfigurationProviders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -39,6 +42,7 @@ public static class HlidacConfigExtensions
             config.AddJsonFile("Logger.serilog.json", optional:true, reloadOnChange:false);
             config.AddJsonFile("appsettings.Development.json", optional:true, reloadOnChange:false);
             config.AddEnvironmentVariables();
+            
         }).UseSerilog((context, services, configuration) => configuration
             .ReadFrom.Configuration(context.Configuration)
             .ReadFrom.Services(services)
@@ -116,6 +120,7 @@ public static class HlidacConfigExtensions
     {
         IConfiguration preConfig = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", optional:true, reloadOnChange:false)
+            .AddJsonFile("Logger.serilog.json", optional: true, reloadOnChange: false)
             .AddJsonFile("appsettings.Development.json", optional:true, reloadOnChange:false)
             .Build();
         var connectionString = preConfig.GetConnectionString("DefaultConnection");
@@ -126,6 +131,22 @@ public static class HlidacConfigExtensions
         if (string.IsNullOrWhiteSpace(environment))
             environment = FallbackEnvironment;
 
+        //Change logpath for downloaders
+        string placeholder = "{appFolder}";
+        string pattern = @"Serilog:WriteTo:\d*:Args:path";
+        var logPathsToReplace = preConfig.AsEnumerable()
+            .Where(k => Regex.IsMatch(k.Key, pattern))
+            .Where(k => k.Value?.Contains(placeholder, StringComparison.InvariantCultureIgnoreCase) == true);
+
+        var directory = new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).DirectoryName;
+        var lastFolder = directory.Split(new[] { '/', '\\' },
+                StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Last();
+        
+        var overridenLogPaths = logPathsToReplace.Select(pair =>
+            new KeyValuePair<string, string?>(pair.Key, pair.Value.Replace(placeholder, lastFolder))
+        );
+        
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddMsSqlConfiguration(connectionString, environment, tag)
@@ -134,6 +155,7 @@ public static class HlidacConfigExtensions
             .AddJsonFile("appsettings.Development.json", optional:true, reloadOnChange:false)
             .AddEnvironmentVariables()
             .AddCommandLine(args)
+            .AddInMemoryCollection(overridenLogPaths)
             .Build();
         
         Log.Logger = new LoggerConfiguration()
