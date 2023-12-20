@@ -21,7 +21,7 @@
         <Content Update="appsettings.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
-        <Content Update="Logger.serilog.json">
+        <Content Update="logger.serilog.json">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>

@@ -134,7 +134,7 @@
 
     <ItemGroup>
       <None Include="..\.editorconfig" Link=".editorconfig" />
-      <None Include="Logger.serilog.json">
+      <None Include="logger.serilog.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

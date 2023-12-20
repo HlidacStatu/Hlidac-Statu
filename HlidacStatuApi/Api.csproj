@@ -42,7 +42,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Update="Logger.serilog.json">
+	  <Content Update="logger.serilog.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>

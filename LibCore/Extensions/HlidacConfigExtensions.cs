@@ -86,7 +86,7 @@ public static class HlidacConfigExtensions
         {
             configuration.AddMsSqlConfiguration(connectionString, environment, tag);
             configuration.AddJsonFile("appsettings.json", optional:true, reloadOnChange:false);
-            configuration.AddJsonFile("Logger.serilog.json", optional: true, reloadOnChange: false);
+            configuration.AddJsonFile("logger.serilog.json", optional: true, reloadOnChange: false);
             configuration.AddJsonFile("appsettings.Development.json", optional:true, reloadOnChange:false);
             configuration.AddJsonFile($"appsettings.{environment}.json", optional:true, reloadOnChange:false);
             configuration.AddEnvironmentVariables();
@@ -120,7 +120,7 @@ public static class HlidacConfigExtensions
     {
         IConfiguration preConfig = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", optional:true, reloadOnChange:false)
-            .AddJsonFile("Logger.serilog.json", optional: true, reloadOnChange: false)
+            .AddJsonFile("logger.serilog.json", optional: true, reloadOnChange: false)
             .AddJsonFile("appsettings.Development.json", optional:true, reloadOnChange:false)
             .Build();
         var connectionString = preConfig.GetConnectionString("DefaultConnection");
@@ -151,7 +151,7 @@ public static class HlidacConfigExtensions
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddMsSqlConfiguration(connectionString, environment, tag)
             .AddJsonFile("appsettings.json", optional:true, reloadOnChange:false)
-            .AddJsonFile("Logger.serilog.json", optional: true, reloadOnChange: false)
+            .AddJsonFile("logger.serilog.json", optional: true, reloadOnChange: false)
             .AddJsonFile("appsettings.Development.json", optional:true, reloadOnChange:false)
             .AddEnvironmentVariables()
             .AddCommandLine(args)

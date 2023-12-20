@@ -22,7 +22,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Logger.serilog.json">
+    <Content Include="logger.serilog.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
