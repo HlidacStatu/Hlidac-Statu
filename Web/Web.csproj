@@ -28,6 +28,10 @@
         <Compile Remove="NewFolder\**" />
         <None Remove="NewFolder\**" />
         <Content Remove="NewFolder\**" />
+        <Content Update="appsettings.Development.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+          <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+        </Content>
     </ItemGroup>
 
 <!--    Potom je potřeba nakopírovat obsah složky App_data a soubor _app_offline.htm -->
