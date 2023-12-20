@@ -85,9 +85,6 @@
     <Content Include="appsettings.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Logger.log4net">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
     <Resource Include="last_event_id.dat" />
     <Content Update="Logger.serilog.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -101,9 +98,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="last_event_id.dat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Logger.log4net">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

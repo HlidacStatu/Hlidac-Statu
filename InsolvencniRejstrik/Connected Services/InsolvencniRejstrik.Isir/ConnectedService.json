@@ -58,7 +58,6 @@
       "InfluxDB.Client.Core, {InfluxDB.Client.Core, 4.4.0}",
       "JsonSubTypes, {JsonSubTypes, 1.9.0}",
       "LinqToTwitter, {linqtotwitter, 6.15.0}",
-      "log4net, {log4net, 2.0.15}",
       "Microsoft.AspNetCore.Cryptography.Internal, {Microsoft.AspNetCore.Cryptography.Internal, 6.0.8}",
       "Microsoft.AspNetCore.Cryptography.KeyDerivation, {Microsoft.AspNetCore.Cryptography.KeyDerivation, 6.0.8}",
       "Microsoft.AspNetCore.DataProtection, {Microsoft.AspNetCore.DataProtection, 6.0.8}",

@@ -1,5 +1,4 @@
 ﻿using HlidacStatu.Entities.Insolvence;
-using log4net;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Serilog;
 
 namespace InsolvencniRejstrik.ByEvents
 {
@@ -22,8 +22,8 @@ namespace InsolvencniRejstrik.ByEvents
 		private readonly int ToEventId;
 		private readonly TaskFactory TaskFactory;
 
-		private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
+		private static readonly ILogger _logger = Log.ForContext<IsirWsConnector>();
+		
 		public IsirWsConnector(bool noCache, int toEventId, Stats stats, IRepository repository, IEventsRepository eventRepository, IWsClient wsClient)
 		{
 			GlobalStats = stats;
@@ -86,7 +86,7 @@ namespace InsolvencniRejstrik.ByEvents
 				catch (Exception e)
 				{
 					GlobalStats.WriteError("WS processor - " + e.Message, lastId);
-					Log.Error($"WS processor - {e.Message} (eventId: {lastId})", e);
+					_logger.Error(e, $"WS processor - {e.Message} (eventId: {lastId})");
 				}
 			}
 		}
@@ -221,7 +221,7 @@ namespace InsolvencniRejstrik.ByEvents
 {e.ToString()}
 {e.StackTrace}
 """);
-						Log.Error($"Message processor - {e.Message} (eventId: {item.Id})", e);
+						_logger.Error(e, $"Message processor - {e.Message} (eventId: {item.Id})");
 						File.AppendAllLines("failed_messages.dat", new[] { item.ToStringLine() });
 					}
 				}
@@ -278,7 +278,7 @@ namespace InsolvencniRejstrik.ByEvents
 				else if (osoby.Count(d => d.IdPuvodce == idPuvodce && d.IdOsoby == osobaId) > 1)
 				{
 					GlobalStats.WriteError($"Existuje vice osob se stejnym identifikatorem! (spis.znacka: {rizeni.SpisovaZnacka}, IdPuvodce: {idPuvodce}, IdOsoby: {osobaId})", eventId);
-					Log.Warn($"Existuje vice osob se stejnym identifikatorem! (spis.znacka: {rizeni.SpisovaZnacka}, IdPuvodce: {idPuvodce}, IdOsoby: {osobaId}) (eventId: {eventId}");
+					_logger.Warning($"Existuje vice osob se stejnym identifikatorem! (spis.znacka: {rizeni.SpisovaZnacka}, IdPuvodce: {idPuvodce}, IdOsoby: {osobaId}) (eventId: {eventId}");
 				}
 				return osoba;
 			}
@@ -307,7 +307,7 @@ namespace InsolvencniRejstrik.ByEvents
 				if (!int.TryParse(item.TypUdalosti, out typUdalosti))
 				{
 					GlobalStats.WriteError($"Nepodarilo se naparserovat typ udalosti ({item.TypUdalosti})", item.Id);
-					Log.Warn($"Nepodarilo se naparserovat typ udalosti '{item.TypUdalosti}' (eventId: {item.Id})");
+					_logger.Warning($"Nepodarilo se naparserovat typ udalosti '{item.TypUdalosti}' (eventId: {item.Id})");
 				}
 				document.TypUdalosti = typUdalosti;
 				document.Url = item.DokumentUrl;
