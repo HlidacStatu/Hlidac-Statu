@@ -57,10 +57,14 @@ namespace HlidacStatu.Repositories.Statistics
 
         public static StatisticsSubjectPerYear<Smlouva.Statistics.Data> GetStatistics(Firma firma, int? obor, bool forceUpdateCache = false)
         {
+            StatisticsSubjectPerYear<Smlouva.Statistics.Data> ret = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
+            if (string.IsNullOrWhiteSpace(firma.ICO))
+            {
+                return ret;
+            }
             if (forceUpdateCache)
                 _ = Task.Run(async () => await _smlouvaCache.DeleteAsync((firma, obor))).Wait(TimeSpan.FromSeconds(10));
 
-            StatisticsSubjectPerYear<Smlouva.Statistics.Data> ret = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
             _ = Task.Run(async () => { ret = await _smlouvaCache.GetAsync((firma, obor)); }).Wait(TimeSpan.FromSeconds(20));
             return ret;
         }
