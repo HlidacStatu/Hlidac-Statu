@@ -2,8 +2,6 @@ using Devmasters.Cache.LocalMemory;
 
 using HlidacStatu.Connectors;
 using HlidacStatu.Entities;
-using HlidacStatu.Util;
-
 using Microsoft.EntityFrameworkCore;
 
 using System;

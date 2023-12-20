@@ -19,7 +19,6 @@
 		
 		<PackageReference Include="Devmasters.Enums" Version="5.0.0" />
 		<PackageReference Include="Devmasters.IO" Version="5.0.0" />
-		<PackageReference Include="Devmasters.Logging" Version="5.0.0" />
 		<PackageReference Include="Devmasters.Net" Version="5.0.10" />
 <!--		<PackageReference Include="jnm2.ReferenceAssemblies.net35" Version="1.0.1" />-->
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

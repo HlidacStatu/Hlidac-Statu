@@ -10,8 +10,6 @@ using Devmasters;
 using Devmasters.Batch;
 
 using HlidacStatu.Entities;
-using HlidacStatu.Util;
-
 using Nest;
 using Serilog;
 using Manager = HlidacStatu.Connectors.Manager;

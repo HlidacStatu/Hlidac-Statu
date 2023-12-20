@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Serilog;
 
 namespace WatchdogAnalytics.Areas.Identity.Pages.Account
 {
@@ -11,7 +12,8 @@ namespace WatchdogAnalytics.Areas.Identity.Pages.Account
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
-
+        private readonly ILogger _logger = Log.ForContext<LogoutModel>();
+        
         public LogoutModel(SignInManager<ApplicationUser> signInManager)
         {
             _signInManager = signInManager;

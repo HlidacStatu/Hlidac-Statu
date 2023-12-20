@@ -1,8 +1,6 @@
-using System;
 using HlidacStatu.LibCore.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Serilog;
 
 namespace JobTableEditor
 {

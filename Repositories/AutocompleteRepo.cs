@@ -15,7 +15,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using Serilog;
-using Consts = HlidacStatu.Util.Consts;
 
 namespace HlidacStatu.Repositories
 {

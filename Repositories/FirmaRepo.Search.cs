@@ -3,8 +3,6 @@ using Devmasters;
 using HlidacStatu.Entities;
 using HlidacStatu.Repositories.Searching;
 using HlidacStatu.Repositories.Searching.Rules;
-using HlidacStatu.Util;
-
 using Nest;
 
 using System;

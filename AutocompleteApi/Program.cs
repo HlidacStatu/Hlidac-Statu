@@ -1,5 +1,4 @@
 using System;
-using Devmasters.Log;
 using HlidacStatu.AutocompleteApi.Services;
 using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.MiddleWares;
