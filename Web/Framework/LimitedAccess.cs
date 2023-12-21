@@ -29,7 +29,6 @@ namespace HlidacStatu.Web.Framework
 
         public static Devmasters.Net.Crawlers.ICrawler[] allCrawl = Devmasters.Net.Crawlers.Helper
             .AllCrawlers
-            .Union(new Devmasters.Net.Crawlers.ICrawler[] { new MyTestCrawlerRule() })
             .ToArray();
 
         public static bool IsAuthenticatedOrSearchCrawler(HttpRequest req)
