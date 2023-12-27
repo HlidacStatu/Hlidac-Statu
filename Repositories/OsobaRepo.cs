@@ -513,6 +513,46 @@ namespace HlidacStatu.Repositories
         }
 
 
+        public static async Task<List<Osoba>> PeopleWithAnyEventAsync(CancellationToken cancellationToken = default)
+        {
+            await using var db = new DbEntities();
+            FormattableString sql = $@"
+                select distinct * from osoba o
+                    where o.InternalId in 
+                    (
+	                    select distinct osobaid from osobaEvent
+                         union 
+                        SELECT InternalId
+                          from Osoba os
+                         where os.status = {(int)Osoba.StatusOsobyEnum.Sponzor}
+                        union
+                        SELECT InternalId
+                          from Osoba os
+                         where os.status = {(int)Osoba.StatusOsobyEnum.Politik}
+                        union
+                        SELECT InternalId
+                          from Osoba os
+                         where os.status = {(int)Osoba.StatusOsobyEnum.ByvalyPolitik}
+                        union
+                        SELECT InternalId
+                          from Osoba os
+                         where os.status = {(int)Osoba.StatusOsobyEnum.VazbyNaPolitiky}
+                        union
+                        SELECT InternalId
+                          from Osoba os
+                         where os.status = {(int)Osoba.StatusOsobyEnum.Sponzor}
+                        union
+                        SELECT InternalId
+                          from Osoba os
+                         where os.status = {(int)Osoba.StatusOsobyEnum.VysokyUrednik}
+                    ) 
+
+                ";
+            var results = await db.Osoba.FromSqlInterpolated(sql)
+                .ToListAsync(cancellationToken: cancellationToken);
+            return results;
+        }
+
         public static Osoba.JSON Export(this Osoba osoba, bool allData = false)
         {
             var t = osoba;
