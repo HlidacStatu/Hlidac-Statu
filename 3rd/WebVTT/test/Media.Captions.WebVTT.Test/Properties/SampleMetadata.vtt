@@ -1,0 +1,26 @@
+﻿WEBVTT
+
+NOTE
+Thanks to http://output.jsbin.com/mugibo
+
+1
+00:00:00.100 --> 00:00:07.342
+{
+ "type": "WikipediaPage",
+ "url": "https://en.wikipedia.org/wiki/Samurai_Pizza_Cats"
+}
+
+2
+00:07.810 --> 00:09.221
+{
+ "type": "WikipediaPage",
+ "url" :"http://samuraipizzacats.wikia.com/wiki/Samurai_Pizza_Cats_Wiki"
+}
+
+3
+00:11.441 --> 00:14.441
+{
+ "type": "LongLat",
+ "lat" : "36.198269",
+ "long": "137.2315355"
+}

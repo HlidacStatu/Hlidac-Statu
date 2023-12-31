@@ -1,0 +1,25 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34322.80
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Media.Captions.WebVTT", "Media.Captions.WebVTT.csproj", "{AFF6A8F4-B00F-414A-A08F-AE3903178BFC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AFF6A8F4-B00F-414A-A08F-AE3903178BFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFF6A8F4-B00F-414A-A08F-AE3903178BFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFF6A8F4-B00F-414A-A08F-AE3903178BFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFF6A8F4-B00F-414A-A08F-AE3903178BFC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1CC18E46-B26D-46FE-9063-DA8E7C4FE65E}
+	EndGlobalSection
+EndGlobal
