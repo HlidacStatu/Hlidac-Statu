@@ -139,7 +139,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     return StatusCode(404);
             }
 
-            if (task.docs.Length>50)
+            if (task.docs.Length > 50)
             {
                 //split task into more
                 ItemToOcrQueue secondItem = new ItemToOcrQueue()
@@ -149,12 +149,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     ItemSubType = item.ItemSubType,
                     ItemType = item.ItemType,
                     Options = item.Options,
-                    Priority= item.Priority,
-                    Started= null,
+                    Priority = item.Priority,
+                    Started = null,
                     Done = null,
                     WaitForPK = item.Pk
                 };
-                using (DbEntities db = new  DbEntities())
+                using (DbEntities db = new DbEntities())
                 {
                     db.ItemToOcrQueue.Add(secondItem);
                     db.SaveChanges();
@@ -326,7 +326,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return StatusCode(200);
         }
 
-        public void DoSave(HlidacStatu.DS.Api.OcrWork.Task res)
+
+        private void DoSave(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             try
             {
