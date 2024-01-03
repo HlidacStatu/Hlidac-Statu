@@ -189,6 +189,11 @@ app.Use(async (context, next) =>
         context.Response.Redirect("https://www.hlidacstatu.cz/api");
         return; // short circuit
     }
+    if (path.ToLower().StartsWith("/identity"))
+    {
+        context.Response.Redirect("https://www.hlidacstatu.cz"+path);
+        return; // short circuit
+    }
 
     await next(context);
 });
