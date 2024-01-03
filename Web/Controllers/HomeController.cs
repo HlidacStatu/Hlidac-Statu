@@ -126,7 +126,7 @@ namespace HlidacStatu.Web.Controllers
                 specialTime = true;
             if (now.Day == 1 && now.Month == 4 )
                 specialTime = true;
-            if (User?.IsInRole("Admin") == true)
+            if (false && User?.IsInRole("Admin") == true)
                 specialTime = true;
 
             string noPhoto = specialTime ? NoPhotoAnonymousSvg : NoPhotoSvg;
