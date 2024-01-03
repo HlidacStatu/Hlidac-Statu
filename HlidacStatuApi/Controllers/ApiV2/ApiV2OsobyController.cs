@@ -1,10 +1,10 @@
-﻿using System.Linq.Expressions;
-using HlidacStatu.Entities;
+﻿using HlidacStatu.Entities;
 using HlidacStatu.Repositories;
 using HlidacStatuApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Linq.Expressions;
 
 namespace HlidacStatuApi.Controllers.ApiV2
 {
@@ -64,8 +64,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 strana = 1;
             if (status == 1)
                 status = -1;
-            var osoby = await OsobaRepo.Searching.SimpleSearchAsync(ftxDotaz, 
-                strana.Value, 30, OsobaRepo.Searching.OrderResult.Relevance, osobaStatus:status);
+            var osoby = await OsobaRepo.Searching.SimpleSearchAsync(ftxDotaz,
+                strana.Value, 30, OsobaRepo.Searching.OrderResult.Relevance, osobaStatus: status);
 
             var result = osoby.Results.Select(o => new OsobaDTO(o)).ToList();
 
@@ -113,16 +113,14 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns></returns>
         [Authorize]
         [HttpGet("social")]
-        public ActionResult<List<OsobaSocialDTO>> OsobySocial([FromQuery] OsobaEvent.SocialNetwork[] typ)
+        public ActionResult<List<OsobaSocialDTO>> OsobySocial([FromQuery] OsobaEvent.SocialNetwork typ)
         {
 
-            var socials = (typ is null || typ.Length == 0)
-                ? Enum.GetNames(typeof(OsobaEvent.SocialNetwork))
-                : typ.Select(t => t.ToString("G"));
-
+            string social = typ.ToString();
             Expression<Func<OsobaEvent, bool>> socialNetworkFilter = e =>
                 e.Type == (int)OsobaEvent.Types.SocialniSite
-                && socials.Contains(e.Organizace);
+                && e.Organizace == social;
+
 
             var osobaSocialDTOs = OsobaRepo.GetByEvent(socialNetworkFilter)
                 .Select(o => new OsobaSocialDTO(o, socialNetworkFilter))
