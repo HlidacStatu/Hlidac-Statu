@@ -326,6 +326,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return StatusCode(200);
         }
 
+        //musi byt public kvuli                  _ = Hangfire.BackgroundJob.Enqueue(() => DoSave(res));
+
         [ApiExplorerSettings(IgnoreApi = true)]
         public void DoSave(HlidacStatu.DS.Api.OcrWork.Task res)
         {
