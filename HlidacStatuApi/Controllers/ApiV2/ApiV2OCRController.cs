@@ -326,8 +326,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
             return StatusCode(200);
         }
 
-
-        private void DoSave(HlidacStatu.DS.Api.OcrWork.Task res)
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public void DoSave(HlidacStatu.DS.Api.OcrWork.Task res)
         {
             try
             {
