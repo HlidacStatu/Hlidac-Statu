@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-
+using System.Threading.Tasks;
 using HlidacStatu.Entities;
 
 using InfluxDB.Client.Api.Domain;
@@ -145,6 +145,12 @@ namespace HlidacStatu.Repositories
                     .AsNoTracking()
                     .FirstOrDefault(m => m.Id == serverId);
             }
+        }
+        
+        public static async Task<List<UptimeServer>> AllUptimeServers()
+        {
+            await using var db = new DbEntities();
+            return await db.UptimeServers.ToListAsync();
         }
 
         public static UptimeServer Load(Uri uri)
@@ -292,5 +298,13 @@ namespace HlidacStatu.Repositories
             return _allActiveServersCache.Get();
         }
 
+        public static async Task DeleteAsync(UptimeServer uptimeServer)
+        {
+            if (uptimeServer is null)
+                return;
+        
+            await using var dbContext = new DbEntities();
+            dbContext.UptimeServers.Remove(uptimeServer);
+            await dbContext.SaveChangesAsync();        }
     }
 }
