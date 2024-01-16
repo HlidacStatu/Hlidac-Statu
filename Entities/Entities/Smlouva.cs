@@ -1,14 +1,12 @@
 ﻿using HlidacStatu.Entities.Issues;
 using HlidacStatu.Entities.XSD;
 using HlidacStatu.Util;
-
 using Nest;
-
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using Serilog;
 
 namespace HlidacStatu.Entities
 {
@@ -22,7 +20,7 @@ namespace HlidacStatu.Entities
         object enhLock = new object();
         private Issues.Issue[] issues = new Issues.Issue[] { };
         private static readonly ILogger _logger = Log.ForContext<Smlouva>();
-        
+
         public Smlouva()
         { }
 
@@ -223,7 +221,7 @@ namespace HlidacStatu.Entities
 
         [Text]
         public string predmet { get; set; }
-        
+
 
         public Subjekt[] Prijemce { get; set; }
         public Priloha[] Prilohy { get; set; }
@@ -354,10 +352,13 @@ namespace HlidacStatu.Entities
         {
             return GetUrl(local, string.Empty);
         }
-
         public string GetUrl(bool local, string foundWithQuery)
         {
-            string url = "/Detail/" + Id;// E49DE92B876B0C66C2F29457EB61C7B7
+            return GetUrl(this.Id, local, foundWithQuery);
+        }
+        public static string GetUrl(string id, bool local=true, string foundWithQuery=null)
+        {
+            string url = "/Detail/" + id;// E49DE92B876B0C66C2F29457EB61C7B7
             if (!string.IsNullOrEmpty(foundWithQuery))
                 url = url + "?qs=" + System.Net.WebUtility.UrlEncode(foundWithQuery);
 

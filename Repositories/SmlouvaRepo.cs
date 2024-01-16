@@ -15,6 +15,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities.KIndex;
 using Manager = HlidacStatu.Connectors.Manager;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 
 namespace HlidacStatu.Repositories
@@ -690,6 +692,74 @@ namespace HlidacStatu.Repositories
             }
             else
                 return res.Exists;
+        }
+
+        public static async Task<T> GetPartValueAsync<T>(string idVerze, string elasticPropertyPath, string jsonPath = null,
+        ElasticClient client = null)
+        //where T : class
+        {
+            var res = await GetPartValuesAsync<T>(idVerze, elasticPropertyPath, jsonPath, client);
+            if (res == null)
+                return default(T);
+            return res.FirstOrDefault<T>();
+        }
+        public static async Task<T[]> GetPartValuesAsync<T>(string idVerze, string elasticPropertyPath, string jsonPath = null,
+           ElasticClient client = null)
+           //where T : class
+        {
+            jsonPath = jsonPath ?? elasticPropertyPath;
+            bool specClient = client != null;
+            try
+            {
+                ElasticClient c = null;
+                if (specClient)
+                    c = client;
+                else
+                    c = await HlidacStatu.Connectors.Manager.GetESClientAsync();
+
+                //var res = c.Get<Smlouva>(idVerze);
+
+                var res = await c.GetAsync<Smlouva>(idVerze, s => s.SourceIncludes(elasticPropertyPath));
+
+                if (res.Found == false)
+                {
+                    if (specClient == false)
+                    {
+                        var c1 = await HlidacStatu.Connectors.Manager.GetESClient_SneplatneAsync();
+
+                        res = await c1.GetAsync<Smlouva>(idVerze, s => s.SourceIncludes(elasticPropertyPath));
+
+                        if (res.IsValid == false)
+                        {
+                            /*_logger.Warning("Valid Req: Cannot load Smlouva Id " + idVerze +
+                                                     "\nDebug:" + res.DebugInformation);*/
+                            //DirectDB.NoResult("delete from SmlouvyIds where id = @id", new System.Data.SqlClient.SqlParameter("id", idVerze));
+                        }
+                        else if (res.Found == false)
+                            return null;
+                        else if (res?.ServerError?.Status == 404)
+                            return null;
+
+                    }
+
+                }
+                if (res?.Source != null)
+                {
+                    JObject json = JObject.Parse(JsonConvert.SerializeObject(res.Source));
+                    //Type itemType = typeof(T).GetElementType();
+                    T[] foundProps = json.SelectTokens(jsonPath)
+                                .Select(m => m.Value<T>())
+                                .ToArray();
+
+                    return foundProps;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                //_logger.Error(e, "Cannot load Smlouva Id " + idVerze);
+                return null;
+            }
         }
 
 

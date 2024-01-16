@@ -380,37 +380,41 @@ text zpravy: {txt}
             if (string.IsNullOrEmpty(Id) || string.IsNullOrEmpty(hash))
                 return NotFound();
 
-            var model = await SmlouvaRepo.LoadAsync(Id);
-            if (model == null)
+            var exists = await SmlouvaRepo.ExistsZaznamAsync(Id);
+            if (exists == false)
+            {
+                return NotFound();
+            }
+            var hashlist = await SmlouvaRepo.GetPartValuesAsync<string>(Id, "prilohy.hash.value", "$.Prilohy..hash.Value");
+            var prilohaExists = hashlist.Any(h => h == hash);
+            if (prilohaExists == false)
             {
                 return NotFound();
             }
 
-            var priloha = model.Prilohy?.FirstOrDefault(m => m.UniqueHash() == hash);
-            if (priloha == null)
-            {
-                return NotFound();
-            }
-
-            if (model.znepristupnenaSmlouva())
+            var platnyZaznam = await SmlouvaRepo.GetPartValueAsync<bool>(Id, "platnyZaznam");
+            if (platnyZaznam==false)
             {
                 if (User.IsInRole("Admin") == false && secret != Devmasters.Config.GetWebConfigValue("LocalPrilohaUniversalSecret"))
                 {
                     if (string.IsNullOrEmpty(secret)) //pokus jak se dostat k znepristupnene priloze
-                        return Redirect(model.GetUrl(true)); //jdi na detail smlouvy
+                        return Redirect(Smlouva.GetUrl(Id,true)); //jdi na detail smlouvy
                     else if (User?.Identity?.IsAuthenticated == false) //neni zalogovany
-                        return Redirect(model.GetUrl(true)); //jdi na detail smlouvy
+                        return Redirect(Smlouva.GetUrl(Id,true)); //jdi na detail smlouvy
                     else if (User?.HasEmailConfirmed() == false)
                     {
-                        return Redirect(model.GetUrl(true)); //jdi na detail smlouvy
+                        return Redirect(Smlouva.GetUrl(Id,true)); //jdi na detail smlouvy
                     }
                     else
                     {
-                        if (priloha.LimitedAccessSecret(User?.Identity?.Name) != secret)
-                            return Redirect(model.GetUrl(true)); //jdi na detail smlouvy
+                        if (Smlouva.Priloha.LimitedAccessSecret(User?.Identity?.Name, hash) != secret)
+                            return Redirect(Smlouva.GetUrl(Id,true)); //jdi na detail smlouvy
                     }
                 }
             }
+            var model = await SmlouvaRepo.LoadAsync(Id, includePrilohy:false) ;
+            var priloha = model.Prilohy?.FirstOrDefault(m => m.UniqueHash() == hash);
+
             var fn = SmlouvaRepo.GetDownloadedPrilohaPath(priloha,model, 
                 forcePDF ? Connectors.IO.PrilohaFile.RequestedFileType.PDF : Connectors.IO.PrilohaFile.RequestedFileType.Original );
 
