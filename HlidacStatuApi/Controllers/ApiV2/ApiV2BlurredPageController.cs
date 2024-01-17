@@ -37,7 +37,12 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 );
 
             ulong? id = null;
+            next:
             var sq = q.GetAndAck(out id);
+            var platnyZaznam = await SmlouvaRepo.GetPartValueAsync<bool>(sq.smlouvaId, "platnyZaznam");
+            if (platnyZaznam == false)
+                goto next;
+
             if (sq == null)
                 return StatusCode(404);
 
