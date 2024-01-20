@@ -377,6 +377,7 @@ static bool IsDevelopment(IHostEnvironment hostEnvironment)
     return hostEnvironment.IsEnvironment("Petr") ||
            hostEnvironment.IsEnvironment("Michal") ||
            hostEnvironment.IsEnvironment("Development");
+}
 
 void AddIdentity(IServiceCollection services)
 {
