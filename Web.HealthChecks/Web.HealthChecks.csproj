@@ -6,33 +6,33 @@
     <RootNamespace>HlidacStatu.Web.HealthChecks</RootNamespace>
   </PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="7.0.0" />
-		<PackageReference Include="AspNetCore.HealthChecks.Network" Version="7.0.0" />
-		<PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="7.0.0" />
-		<PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="7.0.0" />
-		<PackageReference Include="AspNetCore.HealthChecks.System" Version="7.0.0" />
-		<PackageReference Include="AspNetCore.HealthChecks.UI" Version="7.0.2" />
-		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="7.1.0" />
-		<PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="7.0.0" />
-		<PackageReference Include="AspNetCore.HealthChecks.Uris" Version="7.0.0" />
-		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Extension" Version="8.0.3" />
+		<PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="8.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.Network" Version="8.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="8.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.System" Version="8.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.UI" Version="8.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="8.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.Uris" Version="8.0.0" />
+		<PackageReference Include="Corsinvest.ProxmoxVE.Api.Extension" Version="8.1.0" />
 		<PackageReference Include="Devmasters.Core" Version="5.0.1" />
 		<PackageReference Include="Docker.DotNet" Version="3.125.15" />
 		<PackageReference Include="HlidacStatu.Api.V2.Dataset" Version="2.3.0.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="8.0.1" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
-		<PackageReference Include="RabbitMQ.Client" Version="6.7.0" />
-		<PackageReference Include="IPNetwork2" Version="2.6.618">
+		<PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
+		<PackageReference Include="IPNetwork2" Version="3.0.643">
 <!--			This is hack => it uses ipnetwork from .net 8 now - hope it works-->
 			<Aliases>IPNetwork2</Aliases>
 		</PackageReference>

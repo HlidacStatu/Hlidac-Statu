@@ -1,6 +1,6 @@
 ﻿extern alias IPNetwork2;
 
-using IPNETWORK = IPNetwork2.System.Net.IPNetwork;
+using IPNETWORK = IPNetwork2.System.Net.IPNetwork2;
 
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
