@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using ILogger = Serilog.ILogger;
@@ -159,7 +160,7 @@ app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
 
 app.UseTimeMeasureMiddleware();
 
-if (IsDevelopment(app.Environment))
+if (true || IsDevelopment(app.Environment))
 {
     app.UseDeveloperExceptionPage();
 }
@@ -376,7 +377,6 @@ static bool IsDevelopment(IHostEnvironment hostEnvironment)
     return hostEnvironment.IsEnvironment("Petr") ||
            hostEnvironment.IsEnvironment("Michal") ||
            hostEnvironment.IsEnvironment("Development");
-}
 
 void AddIdentity(IServiceCollection services)
 {
