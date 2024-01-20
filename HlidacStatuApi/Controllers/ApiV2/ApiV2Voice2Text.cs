@@ -12,6 +12,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
     [Route("api/v2/voice2text")]
     public class ApiV2Voice2TextController : ControllerBase
     {
+        private readonly Serilog.ILogger _logger = Serilog.Log.ForContext<ApiV2FirmyController>();
+
         /// <summary>
         /// Vytvori task a ulozi do fronty. Vrati id tasku
         /// </summary>
@@ -85,7 +87,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             try
             {
-                var q = await QVoiceToTextRepo.Finish(task.QId, task.Result, task.Status);
+                string strResult = System.Text.Json.JsonSerializer.Serialize(task.Result);
+
+                var q = await QVoiceToTextRepo.Finish(task.QId, strResult, task.Status);
                 if (q == null)
                     return StatusCode(404);
                 else
@@ -117,6 +121,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
         }
 
+        static System.Text.Json.JsonSerializerOptions jsonSerOpt = new System.Text.Json.JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
+
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpGet("GetTasks")]
         public async Task<ActionResult<HlidacStatu.DS.Api.Voice2Text.Task[]>> GetTasks(
@@ -129,31 +135,39 @@ namespace HlidacStatuApi.Controllers.ApiV2
             {
 
                 QVoiceToText[] tasks = await QVoiceToTextRepo.GetByParameters(maxItems, callerId, callerTaskId, status);
-
-                var res = tasks.
-                    Select(m => new HlidacStatu.DS.Api.Voice2Text.Task()
+                var res = new List<HlidacStatu.DS.Api.Voice2Text.Task>();
+                foreach (var m in tasks) {
+                    try
                     {
-                        CallerId = m.CallerId,
-                        CallerTaskId = m.CallerTaskId,
-                        Created = m.Created,
-                        Done = m.Done,
-                        Priority = m.Priority ?? 1,
-                        QId = m.QId,
-                        Result = m.Result,
-                        Source = m.Source,
-                        SourceOptions = m.GetSourceOptions<HlidacStatu.DS.Api.Voice2Text.Options>(),
-                        Started = m.Started,
-                        Status = ((HlidacStatu.DS.Api.Voice2Text.Task.CheckState)(m.Status ?? 0))
+                        var r = new HlidacStatu.DS.Api.Voice2Text.Task()
+                        {
+                            CallerId = m.CallerId,
+                            CallerTaskId = m.CallerTaskId,
+                            Created = m.Created,
+                            Done = m.Done,
+                            Priority = m.Priority ?? 1,
+                            QId = m.QId,
+                            Result = System.Text.Json.JsonSerializer.Deserialize<Devmasters.SpeechToText.Term[]>(m.Result, jsonSerOpt),
+                            Source = m.Source,
+                            SourceOptions = m.GetSourceOptions<HlidacStatu.DS.Api.Voice2Text.Options>(),
+                            Started = m.Started,
+                            Status = ((HlidacStatu.DS.Api.Voice2Text.Task.CheckState)(m.Status ?? 0))
 
-                    })
-                    .ToArray();
+                        };
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Error(e, "Cannot deserialize task result for {QiD}", m.QId);
+                    }
+                }                    
 
-                return res;
+                return res.ToArray();
             }
             catch (Exception e)
             {
-                return StatusCode(500, $"GetTasksByParameters error, parameters maxItems:{maxItems};"
+                _logger.Error(e, "GetTasksByParameters error, parameters maxItems:{maxItems};"
                     + $"callerId:{callerId};callerTaskId:{callerTaskId};status:{status}. Error {e.Message}");
+                throw;
             }
 
         }

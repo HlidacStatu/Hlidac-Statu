@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		  <TargetFramework>net8.0</TargetFramework>
+		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
 		<AssemblyName>HlidacStatu.Api.VoiceToText</AssemblyName>
 		<RootNamespace>HlidacStatu.Api.VoiceToText</RootNamespace>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>2.4.0.0</Version>
-		<PackageReleaseNotes>target .net8</PackageReleaseNotes>
+		<Version>2.5.1.1</Version>
+		<PackageReleaseNotes>Removed reference to Wordcab.*</PackageReleaseNotes>
 		<Description>HlidacStatu.Api.VoiceToText</Description>
+		<Title>$(AssemblyName)</Title>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -17,8 +18,6 @@
 		<PackageReference Include="Devmasters.SpeechToText" Version="5.0.0" />
 
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-
-		<PackageReference Include="WordcabTranscribe.SpeechToText" Version="5.0.1" />
 	</ItemGroup>
 	
 	<ItemGroup>

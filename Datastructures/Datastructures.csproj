@@ -8,7 +8,7 @@
 		<OutputType>Library</OutputType>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<AssemblyVersion></AssemblyVersion>
-		<Version>2.3.2.0</Version>
+		<Version>2.5.2.0</Version>
 
 	</PropertyGroup>
 
@@ -16,11 +16,10 @@
 		<PackageReference Include="DeepCloner" Version="0.10.4" />
 		<PackageReference Include="Devmasters.DT" Version="5.0.0" />
 		<PackageReference Include="Devmasters.Enums" Version="5.0.0" />
-		<PackageReference Include="itext7" Version="8.0.2" />
+		<PackageReference Include="Devmasters.SpeechToText" Version="5.0.0" />
 		<PackageReference Include="MimeMapping" Version="2.0.0" />
 		<PackageReference Include="NEST" Version="7.17.5" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="WordcabTranscribe.SpeechToText" Version="5.0.1" />
 	</ItemGroup>
 
 </Project>
