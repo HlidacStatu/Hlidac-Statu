@@ -70,13 +70,23 @@ namespace HlidacStatu.Repositories
 
             var result = await _dotaceClient.IndexManyAsync(dotace);
 
-            if (result.Errors)
+            if (!result.IsValid || result.Errors)
             {
                 var a = result.DebugInformation;
                 _logger.Error($"Error when bulkSaving dotace to ES: {a}");
             }
 
             return result.Errors;
+        }
+        
+        public static async Task<bool> SemiBulkSaveAsync(List<Dotace> dotace)
+        {
+            foreach (var d in dotace)
+            {
+                await SaveAsync(d);
+            }
+
+            return true;
         }
         
         public static IAsyncEnumerable<Dotace> GetDotaceForIcoAsync(string ico)
