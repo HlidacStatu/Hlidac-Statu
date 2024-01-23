@@ -1,4 +1,5 @@
-﻿using HlidacStatu.Entities.Views;
+﻿using HlidacStatu.Entities.Entities;
+using HlidacStatu.Entities.Views;
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -256,6 +257,11 @@ namespace HlidacStatu.Entities
         public virtual DbSet<ConfigurationValue> ConfigurationValues { get; set; }
         
         public virtual DbSet<PlatUrednika> PlatyUredniku { get; set; }
+        
+        public virtual DbSet<PuOrganizace> PuOrganizace { get; set; }
+        public virtual DbSet<PuPlat> PuPlaty { get; set; }
+        public virtual DbSet<PuOranizaceMetadata> PuOranizaceMetadata { get; set; }
+        public virtual DbSet<PuOrganizaceTag> PuOrganizaceTags { get; set; }
 
         //views
         public DbSet<FindPersonDTO> FindPersonView { get; set; }

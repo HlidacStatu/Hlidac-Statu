@@ -198,6 +198,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3rd", "3rd", "{A9C52FA8-1F9
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Media.Captions.WebVTT", "3rd\WebVTT\src\Media.Captions.WebVTT\Media.Captions.WebVTT.csproj", "{F991F6F1-C00D-44E6-AF12-57DC795C75B1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatyUredniku", "PlatyUredniku\PlatyUredniku.csproj", "{B0B99AD2-69B1-4247-ADC3-5EF597831FC5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -476,6 +478,10 @@ Global
 		{F991F6F1-C00D-44E6-AF12-57DC795C75B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F991F6F1-C00D-44E6-AF12-57DC795C75B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F991F6F1-C00D-44E6-AF12-57DC795C75B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0B99AD2-69B1-4247-ADC3-5EF597831FC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0B99AD2-69B1-4247-ADC3-5EF597831FC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0B99AD2-69B1-4247-ADC3-5EF597831FC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0B99AD2-69B1-4247-ADC3-5EF597831FC5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -562,6 +568,7 @@ Global
 		{4090F31C-9466-41F1-A892-1B3EA15D505B} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{A9C52FA8-1F95-449B-9C04-7A01ABEFFD52} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{F991F6F1-C00D-44E6-AF12-57DC795C75B1} = {A9C52FA8-1F95-449B-9C04-7A01ABEFFD52}
+		{B0B99AD2-69B1-4247-ADC3-5EF597831FC5} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
