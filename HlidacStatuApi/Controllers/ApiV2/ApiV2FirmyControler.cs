@@ -128,17 +128,14 @@ namespace HlidacStatuApi.Controllers.ApiV2
         // /api/v2/firmy/social?typ=WWW&typ=Youtube
         [Authorize]
         [HttpGet("social")]
-        public ActionResult<List<FirmaSocialDTO>> Social([FromQuery] OsobaEvent.SocialNetwork[] typ)
+        public ActionResult<List<FirmaSocialDTO>> Social([FromQuery] OsobaEvent.SocialNetwork typ)
         {
 
-            var socials = (typ is null || typ.Length == 0)
-                ? Enum.GetNames(typeof(OsobaEvent.SocialNetwork))
-                : typ.Select(t => t.ToString("G"));
+            var social = typ.ToString("G");
 
             Expression<Func<OsobaEvent, bool>> socialNetworkFilter = e =>
                 e.Type == (int)OsobaEvent.Types.SocialniSite
-                //&& e.Ico.Length == 8
-                && socials.Contains(e.Organizace);
+                && e.Organizace == social;
 
             var events = OsobaEventRepo.GetByEvent(socialNetworkFilter)
                 .GroupBy(e => e.Ico)
