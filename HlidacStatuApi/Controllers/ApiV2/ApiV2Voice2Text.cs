@@ -131,6 +131,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
             if (maxItems > 50000)
                 maxItems = 50000;
+            if (maxItems < 1)
+                maxItems = 100;
             try
             {
 
@@ -154,6 +156,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                             Status = ((HlidacStatu.DS.Api.Voice2Text.Task.CheckState)(m.Status ?? 0))
 
                         };
+                        res.Add(r);
                     }
                     catch (Exception e)
                     {
