@@ -1,6 +1,7 @@
 using HlidacStatu.Entities;
 using HlidacStatu.LibCore.Extensions;
 using HlidacStatu.LibCore.MiddleWares;
+using HlidacStatu.LibCore.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
@@ -42,6 +43,9 @@ public class Program
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
             builder.Services.AddControllersWithViews();
             builder.Services.AddResponseCaching();
+            
+            builder.Services.AddSingleton<AttackerDictionaryService>();
+            builder.Services.AddHttpClient();
             
             builder.Services.AddServerSideBlazor().AddInteractiveServerComponents();
             // builder.Services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
@@ -87,6 +91,12 @@ public class Program
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+            
+            app.MapControllerRoute(
+                name: "home",
+                pattern: "{action=Index}/{id?}",
+                defaults: new { controller = "Home" });
+            
             app.MapRazorPages();
 
             app.Run();
@@ -172,7 +182,7 @@ public class Program
 
         services.ConfigureApplicationCookie(o =>
         {
-            o.Cookie.Domain = ".hlidacstatu.cz";
+            o.Cookie.Domain = ".platyuredniku.cz";
             o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
 
             o.Cookie.SameSite = SameSiteMode.Lax;

@@ -1,31 +1,30 @@
 using System.Diagnostics;
+using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using PlatyUredniku.Models;
 
 namespace PlatyUredniku.Controllers;
 
 public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
-
+    // private readonly ILogger<HomeController> _logger;
+   
     public IActionResult Index()
     {
         return View();
     }
-
-    public IActionResult Privacy()
+    
+    public async Task<IActionResult> Oblast(string oblast)
     {
+        
+
         return View();
     }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
+    public async Task<IActionResult> Detail(int id)
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-    }
+        var detail = await PuRepo.GetDetailEagerAsync(id);
+
+        return View(detail);
+    } 
+
 }

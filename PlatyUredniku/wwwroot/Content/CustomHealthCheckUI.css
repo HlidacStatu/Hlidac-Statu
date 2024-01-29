@@ -1,0 +1,7 @@
+﻿:root {
+    --logoImageUrl: url('/Content/Img/HlidacStatu-logo.png');
+    --bgAside: #003688;
+}
+.hc-aside-menu__item[href="#/webhooks"] {
+    display:none;
+}
