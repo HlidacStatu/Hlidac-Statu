@@ -172,7 +172,7 @@ public class Program
 
         services.ConfigureApplicationCookie(o =>
         {
-            o.Cookie.Domain = ".hlidacstatu.cz";
+            o.Cookie.Domain = ".platyuredniku.cz";
             o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
 
             o.Cookie.SameSite = SameSiteMode.Lax;

@@ -1,0 +1,26 @@
+<a id="back-to-top" href="#" class="btn btn-primary btn-lg back-to-top" role="button" title="Vrátit se na začátek stránky" data-bs-toggle="tooltip" data-placement="left"><i class="fas fa-chevron-up"></i></a>
+<div style="height: 32px"></div>
+
+<script>
+    $(document).ready(function () {
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 800) {
+                $('#back-to-top').fadeIn();
+                //$('#back-to-top').tooltip('show');
+            } else {
+                $('#back-to-top').tooltip('hide');
+                $('#back-to-top').fadeOut();
+            }
+        });
+        // scroll body to 0px on click
+        $('#back-to-top').click(function () {
+            $('#back-to-top').tooltip('hide');
+            $('body,html').animate({
+                scrollTop: 0
+            }, 800);
+            return false;
+        });
+
+
+    });
+</script>
