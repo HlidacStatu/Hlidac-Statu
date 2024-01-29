@@ -171,6 +171,7 @@
 
     <p style="padding-top:30px;">
     </p>
+    <h2>Podrobný výpis vazeb</h2>
     @{
         var data = Model.AktualniVazby(aktualnost)
         .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)

@@ -11,7 +11,40 @@
     {
         aktualnost = xen;
     }
+
+
+    var vazbyList = Model.AktualniVazby(aktualnost)
+        .Where(v => v.To != null && v.To.Type == HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company)
+        .GroupBy(f => f.To.Id, v => v, (ico, v) => new
+        {
+            ICO = ico,
+            FirmaName = v.First().To.PrintName(),//HlidacStatu.Lib.Data.External.FirmyDB.NameFromIco(ico, true),
+            VazbyPerIco = Model.VazbyProICO(ico)
+        });
+
+    System.Text.StringBuilder sb = new();
+    foreach (var v in vazbyList)
+    {
+        sb.AppendLine("$(\"a[data-link='vazby-" + v.ICO + "']\").popover({");
+        sb.AppendLine("placement: 'top',trigger: 'hover',title: 'Vazba osoby na firmu',");
+        sb.AppendLine($"content: '{Devmasters.TextUtil.RemoveHTML(Html.RenderVazby(v.VazbyPerIco).ToString())}'");
+        sb.AppendLine("});");
+        sb.AppendLine();
+        sb.AppendLine("$(\"i[data-link='vazby2-" + v.ICO + "']\").popover({");
+        sb.AppendLine("placement: 'top',trigger: 'hover',title: 'Vazba osoby na firmu',");
+        sb.AppendLine($"content: '{Devmasters.TextUtil.RemoveHTML(Html.RenderVazby(v.VazbyPerIco).ToString())}'");
+        sb.AppendLine("});");
+        sb.AppendLine();
+    }
+
+
 }
+<script>
+    $(document).ready(function() {
+        @Html.Raw(sb.ToString())
+    });
+</script>
+
 
 @* První sloupec *@
 <div class="col-sm-7 col-xs-12 order-1">
@@ -23,7 +56,12 @@
                 new()
                 {
                     Name = "Společnost",
-                    HtmlRender = (x) => $"<a href='/subjekt/{x.ico}'>{Firmy.GetJmeno(x.ico)}</a>",
+                    HtmlRender = (x) => {
+                        var vazbaNaIco = vazbyList.FirstOrDefault(m=>m.ICO == x.ico);
+                        var html = $"<a href='/subjekt/{x.ico}' data-link='vazby-{x.ico}'>{Firmy.GetJmeno(x.ico)}</a><i style='padding-left:5px;' class='fa-solid fa-circle-info' data-link='vazby2-{x.ico}'></i>";
+                        return html;
+                    }
+                    ,
                     TextRender = (x) => Firmy.GetJmeno(x.ico),
                 },
                 new()
