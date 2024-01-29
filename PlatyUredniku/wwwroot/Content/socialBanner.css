@@ -1,0 +1,74 @@
+﻿
+body, p, div, span {
+    font-family: 'Cabin', sans-serif;
+}
+
+h1, h2, h3, h4 {
+    margin-top:0;
+    padding-top:0;
+}
+
+.text-info {}
+.text-warning {}
+.text-danger {
+    color: "#d43b38";
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 10px;
+}
+
+li {
+margin-bottom:20px;
+}
+
+    li:before {
+        content: "●";
+        display: inline-block;
+        margin-left: -1.3em;
+        width: 1.3em;
+        color: blue;
+    }
+
+
+.mytxt {
+    color: white;
+}
+
+    .mytxt ul {
+        position: relative;
+        list-style: none;
+        margin-left: 0;
+        padding-left: 1.2em;
+    }
+
+        .mytxt ul li:before {
+            content: "●";
+            position: absolute;
+            left: 0;
+        }
+
+    .mytxt b {
+        font-weight: 700;
+        color: #F6C074;
+    }
+
+    .mytxt strong {
+        font-style: normal;
+        font-weight: 700;
+    }
+    .mytxt i {
+        font-style: italic;
+    }
+
+.picture {
+    width: 110px;
+    height: 110px;
+    background-size: cover;
+    background-position: center center;
+    border-radius: 60px;
+    position: absolute;
+}
+

@@ -20,8 +20,13 @@
     <ItemGroup>
       <AdditionalFiles Include="Views\Shared\Components\AutocompleteWrap.razor" />
       <AdditionalFiles Include="Views\Shared\Components\HlidacAutocompleteMultitag.razor" />
-      <AdditionalFiles Include="Views\Shared\Components\Hokus.razor" />
       <AdditionalFiles Include="Views\Shared\Components\_Imports.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="logger.serilog.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
