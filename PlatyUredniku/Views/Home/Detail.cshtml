@@ -9,7 +9,7 @@
         @foreach (var oblast in Model.OblastPath())
         {
             <li>
-                <a href="@Url.Action("Oblast", "Home", new { oblast })">@Model.PathName(oblast)</a>
+                <a href="@Url.Action("Oblast", "Home", new { oblast.Value })">@oblast.Key</a>
             </li>
         }
         <li class="active">@Model.Nazev</li>

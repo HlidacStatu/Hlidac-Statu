@@ -10,7 +10,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 [Table("PU_Organizace")]
 public class PuOrganizace
 {
-    private const char PathSplittingChar = '>';
+    public const char PathSplittingChar = '>';
     
     [Key]
     public int Id { get; set; }
@@ -28,26 +28,32 @@ public class PuOrganizace
     public virtual ICollection<PuPlat> Platy { get; set; }
     public virtual ICollection<PuOranizaceMetadata> Metadata { get; set; }
 
-    public string[] OblastPath() => PathSplitter(Oblast);
-    public string[] ZatrideniPath() => PathSplitter(Oblast);
+    
+    public KeyValuePair<string, string>[] OblastPath() => PathSplitter(Oblast);
+    public KeyValuePair<string, string>[] ZatrideniPath() => PathSplitter(Oblast);
 
-    public string PathName(string path) => path.Split(PathSplittingChar).LastOrDefault();
-
-    private string[] PathSplitter(string input)
+    public static string PathName(string path) => path.Split(PathSplittingChar).LastOrDefault();
+    
+    
+    /// <returns>Key == nazev, Value == cesta</returns>
+    public static KeyValuePair<string, string>[] PathSplitter(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
-            return Array.Empty<string>();
+            return Array.Empty<KeyValuePair<string, string>>();
         
         var splitted = input.Split(PathSplittingChar, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
-        List<string> result = new List<string>();
-        string current = string.Empty;
+        List<KeyValuePair<string, string>> paths = new();
+        
+        string currentPath = string.Empty;
         foreach (var split in splitted)
         {
-            current = $"{current}{PathSplittingChar}{split}";
-            result.Add(current);
+            currentPath = $"{currentPath}{PathSplittingChar}{split}";
+            paths.Add(new KeyValuePair<string, string>(split,currentPath));
         }
 
-        return result.ToArray();
+        return paths.ToArray();
     }
+    
+    
 }

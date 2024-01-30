@@ -1,1 +1,45 @@
-@model dynamic
+@using HlidacStatu.Entities.Entities
+@using HlidacStatu.Repositories
+@using MathNet.Numerics.Statistics;
+
+@model List<HlidacStatu.Entities.Entities.PuOrganizace>
+
+@{
+    string currentOblast = (string)ViewData["oblast"];
+    
+    var hrubeRocniPlaty = Model.SelectMany(o => o.Platy.Select(p => (double)p.HrubyRocniPlat)).ToList();
+
+    var minimalniPlat = hrubeRocniPlaty.Min();
+    var maximalniPlat = hrubeRocniPlaty.Max();
+    var dolniKvartil = hrubeRocniPlaty.LowerQuartile();
+    var median = hrubeRocniPlaty.Median();
+    var horniKvartil = hrubeRocniPlaty.UpperQuartile();
+
+    var organizace = Model.Where(o => o.Oblast == currentOblast).ToArray();
+
+    var oblasti = await PuRepo.GetFollowingOblastiAsync(currentOblast);
+        
+}
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Platy úřeníků</a>
+        </li>
+        @foreach (var oblast in PuOrganizace.PathSplitter(currentOblast))
+        {
+            if (oblast.Value == currentOblast)
+            {
+                <li class="active">@currentOblast</li>
+            }
+            else
+            {
+                <li>
+                    <a href="@Url.Action("Oblast", "Home", new { oblast.Value })">@oblast.Key</a>
+                </li>
+            }
+        }
+    </ol>
+}
+

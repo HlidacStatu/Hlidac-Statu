@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,9 +14,11 @@ public class HomeController : Controller
     
     public async Task<IActionResult> Oblast(string oblast)
     {
+        var organizace = await PuRepo.GetPlatyAsync(oblast);
         
+        ViewData["oblast"] = oblast;
 
-        return View();
+        return View(organizace);
     }
 
     public async Task<IActionResult> Detail(int id)
