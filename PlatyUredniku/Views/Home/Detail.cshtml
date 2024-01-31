@@ -26,54 +26,55 @@
         var platyGrouped = Model.Platy.GroupBy(p => p.Rok).OrderByDescending(pg => pg.Key).ToList();
     }
 
-    <div class="d-flex align-items-start">
-        <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-            @{
-                string classAttributes = "nav-link active";
+    <div class="card">
+        <div class="card-body">
 
-                foreach (var platGroup in platyGrouped)
-                {
-                    <button class="@classAttributes" id="year-@platGroup.Key-tab" data-bs-toggle="pill" data-bs-target="#year-@platGroup.Key" type="button" role="tab">@platGroup.Key</button>
-                    classAttributes = "nav-link";
-                }
-            }
-        </div>
-        <div class="tab-content" id="v-pills-tabContent">
-        @{
-            classAttributes = "tab-pane fade show active";
+            <div class="d-flex align-items-start">
+                <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
+                    @{
+                        string classAttributes = "nav-link active";
 
-            foreach (var platGroup in platyGrouped)
-            {
-                <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
-                    <table>
-                        <tr>
-                            <td>NazevPozice</td>
-                            <td>Rok</td>
-                            <td>Hrubý roční Plat</td>
-                            <td>NefinancniBonus</td>
-                            <td>PoznamkaPlat</td>
-                            <td>PoznamkaPozice</td>
-                        </tr>
-
-                        @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
+                        foreach (var platGroup in platyGrouped)
                         {
-                            <tr>
-                                <th>@plat.NazevPozice</th>
-                                <th>@plat.Rok</th>
-                                <th>@plat.HrubyRocniPlat.ToString("N0")&nbsp;Kč</th>
-                                <th>@plat.NefinancniBonus</th>
-                                <th>@plat.PoznamkaPlat</th>
-                                <th>@plat.PoznamkaPozice</th>
-                            </tr>
+                            <button class="@classAttributes" id="year-@platGroup.Key-tab" data-bs-toggle="pill" data-bs-target="#year-@platGroup.Key" type="button" role="tab">@platGroup.Key</button>
+                            classAttributes = "nav-link";
                         }
-                    </table>
+                    }
                 </div>
+                <div class="tab-content" id="v-pills-tabContent">
+                    @{
+                        classAttributes = "tab-pane fade show active";
 
-                classAttributes = "tab-pane";
-            }
-        }
+                        foreach (var platGroup in platyGrouped)
+                        {
+                            <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <th>NazevPozice</th>
+                                        <th>Hrubý roční Plat</th>
+                                        <th>NefinancniBonus</th>
+                                        <th>PoznamkaPlat</th>
+                                        <th>PoznamkaPozice</th>
+                                    </tr>
+
+                                    @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
+                                    {
+                                        <tr>
+                                            <td>@plat.NazevPozice</td>
+                                            <td>@plat.HrubyRocniPlat.ToString("N0")&nbsp;Kč</td>
+                                            <td>@plat.NefinancniBonus</td>
+                                            <td>@plat.PoznamkaPlat</td>
+                                            <td>@plat.PoznamkaPozice</td>
+                                        </tr>
+                                    }
+                                </table>
+                            </div>
+                            classAttributes = "tab-pane";
+                        }
+                    }
+                </div>
+            </div>
         </div>
     </div>
-
-
 </div>
