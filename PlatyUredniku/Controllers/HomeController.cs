@@ -1,3 +1,4 @@
+using HlidacStatu.Entities.Entities;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ public class HomeController : Controller
     {
         var organizace = await PuRepo.GetPlatyAsync(oblast);
         
+        ViewData["platy"] = organizace.SelectMany(o => o.Platy).ToList();;
         ViewData["oblast"] = oblast;
 
         return View(organizace);
@@ -24,7 +26,9 @@ public class HomeController : Controller
     public async Task<IActionResult> Detail(int id)
     {
         var detail = await PuRepo.GetDetailEagerAsync(id);
-
+        
+        ViewData["platy"] = detail.Platy.ToList();;
+        
         return View(detail);
     } 
 
