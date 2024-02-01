@@ -1,18 +1,19 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Devmasters.Enums;
 
 namespace HlidacStatu.Entities.Entities;
 
-[Table("PU_OranizaceMetadata")]
-public class PuOranizaceMetadata
+[Table("PU_OrganizaceMetadata")]
+public class PuOrganizaceMetadata
 {
     [Key]
     public int Id { get; set; }
     
     public int IdOrganizace { get; set; }
     public int Rok { get; set; }
-    public int? ZpusobKomunikace { get; set; }
+    public Komunikace? ZpusobKomunikace { get; set; }
     public bool? ZduvodneniMimoradnychOdmen { get; set; }
     public DateTime? DatumOdeslaniZadosti { get; set; }
     public DateTime? DatumPrijetiOdpovedi { get; set; }
@@ -21,4 +22,10 @@ public class PuOranizaceMetadata
     // Navigation properties
     [ForeignKey("IdOrganizace")]
     public virtual PuOrganizace Organizace { get; set; }
+
+    public enum Komunikace
+    {
+        [NiceDisplayName("datová schránka")] DatovaSchranka = 1,
+        [NiceDisplayName("e-mail")] Email = 2
+    }
 }

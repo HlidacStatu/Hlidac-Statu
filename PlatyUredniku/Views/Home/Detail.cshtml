@@ -9,7 +9,7 @@
         @foreach (var oblast in Model.OblastPath())
         {
             <li>
-                <a href="@Url.Action("Oblast", "Home", new { oblast.Value })">@oblast.Key</a>
+                <a asp-action="Oblast" asp-route-id="@oblast.Value">@oblast.Key</a>
             </li>
         }
         <li class="active">@Model.Nazev</li>
@@ -61,7 +61,7 @@
                                     @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
                                     {
                                         <tr>
-                                            <td>@plat.NazevPozice</td>
+                                            <td><a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a></td>
                                             <td>@plat.HrubyRocniPlat.ToString("N0")&nbsp;Kč</td>
                                             <td>@plat.NefinancniBonus</td>
                                             <td>@plat.PoznamkaPlat</td>

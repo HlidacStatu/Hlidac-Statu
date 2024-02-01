@@ -205,6 +205,7 @@ namespace HlidacStatu.Entities
                 _ = entity.Property(e => e.Created).HasDefaultValueSql("(getdate())");
             });
 
+            
 
         }
 
@@ -260,7 +261,7 @@ namespace HlidacStatu.Entities
         
         public virtual DbSet<PuOrganizace> PuOrganizace { get; set; }
         public virtual DbSet<PuPlat> PuPlaty { get; set; }
-        public virtual DbSet<PuOranizaceMetadata> PuOranizaceMetadata { get; set; }
+        public virtual DbSet<PuOrganizaceMetadata> PuOranizaceMetadata { get; set; }
         public virtual DbSet<PuOrganizaceTag> PuOrganizaceTags { get; set; }
 
         //views

@@ -26,7 +26,7 @@ public class PuOrganizace
     // Navigation properties
     public virtual ICollection<PuOrganizaceTag> Tags { get; set; }
     public virtual ICollection<PuPlat> Platy { get; set; }
-    public virtual ICollection<PuOranizaceMetadata> Metadata { get; set; }
+    public virtual ICollection<PuOrganizaceMetadata> Metadata { get; set; }
 
     
     public KeyValuePair<string, string>[] OblastPath() => PathSplitter(Oblast);
@@ -48,7 +48,14 @@ public class PuOrganizace
         string currentPath = string.Empty;
         foreach (var split in splitted)
         {
-            currentPath = $"{currentPath}{PathSplittingChar}{split}";
+            if (string.IsNullOrWhiteSpace(currentPath))
+            {
+                currentPath = split;
+            }
+            else
+            {
+                currentPath = $"{currentPath}{PathSplittingChar}{split}";
+            }
             paths.Add(new KeyValuePair<string, string>(split,currentPath));
         }
 

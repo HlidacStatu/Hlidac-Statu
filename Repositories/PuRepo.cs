@@ -62,8 +62,16 @@ public class PuRepo
 
         return results;
     }
-    
-    
-    
-   
+
+
+    public static async Task<PuPlat> GetPlatAsync(int id)
+    {
+        await using var db = new DbEntities();
+
+        return await db.PuPlaty
+            .AsNoTracking()
+            .Include(p => p.Organizace)
+            .Where(p => p.Id == id)
+            .FirstOrDefaultAsync();
+    }
 }

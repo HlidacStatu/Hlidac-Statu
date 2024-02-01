@@ -13,12 +13,12 @@ public class HomeController : Controller
         return View();
     }
     
-    public async Task<IActionResult> Oblast(string oblast)
+    public async Task<IActionResult> Oblast(string id)
     {
-        var organizace = await PuRepo.GetPlatyAsync(oblast);
+        var organizace = await PuRepo.GetPlatyAsync(id);
         
         ViewData["platy"] = organizace.SelectMany(o => o.Platy).ToList();;
-        ViewData["oblast"] = oblast;
+        ViewData["oblast"] = id;
 
         return View(organizace);
     }
@@ -30,6 +30,13 @@ public class HomeController : Controller
         ViewData["platy"] = detail.Platy.ToList();;
         
         return View(detail);
-    } 
+    }
+    
+    public async Task<IActionResult> Plat(int id)
+    {
+        var detail = await PuRepo.GetPlatAsync(id);
+        
+        return View(detail);
+    }
 
 }

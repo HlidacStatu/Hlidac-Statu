@@ -5,11 +5,10 @@
 
 @{
     string currentOblast = (string)ViewData["oblast"];
-    
+
     var organizace = Model.Where(o => o.Oblast == currentOblast).ToArray();
 
     var oblasti = await PuRepo.GetFollowingOblastiAsync(currentOblast);
-        
 }
 
 @section breadcrumb
@@ -27,10 +26,52 @@
             else
             {
                 <li>
-                    <a href="@Url.Action("Oblast", "Home", new { oblast.Value })">@oblast.Key</a>
+                    <a asp-action="Oblast" asp-route-id="@oblast.Value">@oblast.Key</a>
                 </li>
             }
         }
     </ol>
 }
 
+<div class="row">
+    <div class="col-6">
+        <h2>Instituce</h2>
+        <div class="list-group">
+            @foreach (var org in organizace)
+            {
+                <a asp-action="Detail" asp-route-id="@org.Id">@org.Nazev</a>
+            }
+        </div>
+
+    </div>
+    <div class="col-6">
+        <h2>Oblasti</h2>
+        <div class="row">
+            @{
+                int columnBreak = 0;
+
+                foreach (var oblast in oblasti)
+                {
+                    columnBreak++;
+                    var orgsInOblast = Model.Where(o => o.Oblast == oblast.Value).ToList();
+
+                    <div class="card col">
+                        <a asp-action="Oblast" asp-route-id="@oblast.Value">
+                            <div class="card-body">
+                                <h5 class="card-title">@oblast.Key</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">@orgsInOblast.Count</h6>
+                                <p class="card-text">Průměrný roční plat: @orgsInOblast.SelectMany(o => o.Platy).Average(p => p.HrubyRocniPlat).ToString("N0")&nbsp;Kč</p>
+
+                            </div>
+                        </a>
+                    </div>
+
+                    if (columnBreak % 2 == 0)
+                    {
+                        <div class="w-100 d-none d-md-block"></div>
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>

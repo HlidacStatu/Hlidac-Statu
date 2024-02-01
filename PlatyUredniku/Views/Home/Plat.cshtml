@@ -1,0 +1,53 @@
+@model HlidacStatu.Entities.Entities.PuPlat
+
+@section breadcrumb
+{
+    <ol class="breadcrumb">
+        <li>
+            <a href="/">Platy úřeníků</a>
+        </li>
+        @foreach (var oblast in Model.Organizace.OblastPath())
+        {
+            <li>
+                <a asp-action="Oblast" asp-route-id="@oblast.Value">@oblast.Key</a>
+            </li>
+        }
+        <li>
+            <a asp-action="Detail" asp-route-id="@Model.Organizace.Id">@Model.Organizace.Nazev</a>
+        </li>
+        <li class="active">@Model.NazevPozice <span class="small">(@Model.Rok)</span></li>
+    </ol>
+}
+
+<h3>@Model.NazevPozice</h3>
+<small>@Model.Rok</small>
+<small>@Model.Organizace.Nazev</small>
+
+<dl>
+    <dt>Hrubý roční plat včetně odměn</dt>
+    <dd>@Model.HrubyRocniPlat</dd>
+
+    <dt>Nefinanční bonus</dt>
+    <dd>@Model.NefinancniBonus</dd>
+
+    <dt>Poznámka k platu</dt>
+    <dd>@Model.PoznamkaPlat</dd>
+    
+    <dt>Poznámka k pozici</dt>
+    <dd>@Model.PoznamkaPlat</dd>
+    
+    <dt>Plat</dt>
+    <dd>@Model.Plat</dd>
+    
+    <dt>Odměny</dt>
+    <dd>@Model.Odmeny</dd>
+    
+    <dt>Úvazek</dt>
+    <dd>@Model.Uvazek</dd>
+    
+    <dt>Počet odpracovaných měsíců</dt>
+    <dd>@Model.PocetMesicu</dd>
+    
+    <dt>Je hlavounskou pozicí</dt>
+    <dd>@Model.JeHlavoun</dd>
+</dl>
