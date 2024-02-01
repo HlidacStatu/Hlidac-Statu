@@ -9,7 +9,7 @@
         @foreach (var oblast in Model.OblastPath())
         {
             <li>
-                <a href="@Url.Action("Oblast", "Home", new { oblast })">@Model.PathName(oblast)</a>
+                <a asp-action="Oblast" asp-route-id="@oblast.Value">@oblast.Key</a>
             </li>
         }
         <li class="active">@Model.Nazev</li>
@@ -21,39 +21,60 @@
     <small>IČO - @Model.Ico</small>
     <small>Datová schránka - @Model.DS</small>
     <p>@Model.Info</p>
-    
-    @foreach (var platGroup in Model.Platy.GroupBy(p => p.Rok).OrderBy(pg => pg.Key))
-    {
-        <p>@platGroup.Key</p>
-        <table>
-            <tr>
-                <td>NazevPozice</td>
-                <td>Rok</td>
-                <td>Plat</td>
-                <td>Odmeny</td>
-                <td>Uvazek</td>
-                <td>NefinancniBonus</td>
-                <td>PocetMesicu</td>
-                <td>PoznamkaPlat</td>
-                <td>PoznamkaPozice</td>
-            </tr>
-            
-            @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
-            {
-                <tr>
-                    <th>@plat.NazevPozice</th>
-                    <th>@plat.Rok</th>
-                    <th>@plat.Plat</th>
-                    <th>@plat.Odmeny</th>
-                    <th>@plat.Uvazek</th>
-                    <th>@plat.NefinancniBonus</th>
-                    <th>@plat.PocetMesicu</th>
-                    <th>@plat.PoznamkaPlat</th>
-                    <th>@plat.PoznamkaPozice</th>
-                </tr>
-            }
-        </table>
+
+    @{
+        var platyGrouped = Model.Platy.GroupBy(p => p.Rok).OrderByDescending(pg => pg.Key).ToList();
     }
-    
-    
+
+    <div class="card">
+        <div class="card-body">
+
+            <div class="d-flex align-items-start">
+                <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
+                    @{
+                        string classAttributes = "nav-link active";
+
+                        foreach (var platGroup in platyGrouped)
+                        {
+                            <button class="@classAttributes" id="year-@platGroup.Key-tab" data-bs-toggle="pill" data-bs-target="#year-@platGroup.Key" type="button" role="tab">@platGroup.Key</button>
+                            classAttributes = "nav-link";
+                        }
+                    }
+                </div>
+                <div class="tab-content" id="v-pills-tabContent">
+                    @{
+                        classAttributes = "tab-pane fade show active";
+
+                        foreach (var platGroup in platyGrouped)
+                        {
+                            <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <th>NazevPozice</th>
+                                        <th>Hrubý roční Plat</th>
+                                        <th>NefinancniBonus</th>
+                                        <th>PoznamkaPlat</th>
+                                        <th>PoznamkaPozice</th>
+                                    </tr>
+
+                                    @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
+                                    {
+                                        <tr>
+                                            <td><a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a></td>
+                                            <td>@plat.HrubyRocniPlat.ToString("N0")&nbsp;Kč</td>
+                                            <td>@plat.NefinancniBonus</td>
+                                            <td>@plat.PoznamkaPlat</td>
+                                            <td>@plat.PoznamkaPozice</td>
+                                        </tr>
+                                    }
+                                </table>
+                            </div>
+                            classAttributes = "tab-pane";
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

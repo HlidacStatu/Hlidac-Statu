@@ -177,73 +177,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbar-content">
 
-                <ul class="d-none d-lg-block navbar-nav mr-auto mb-2 mb-lg-0 mainmenu">
-                    <li class="nav-item mainmenu">
-                        <a class="nav-link active" aria-current="page" href="" onclick="return false;" style="visibility:hidden;cursor:pointer;">&nbsp;&nbsp;&nbsp;</a>
-                    </li>
-                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Úřady<br />a úředníci</a>
-                        @* Urady a urednici megacontent *@
-                        <div class="dropdown-menu shadow">
-                            
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Firmy, sponzoři,<br />politické strany</a>
-                        <div class="dropdown-menu shadow">
-                           
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Smlouvy<br />se státem</a>
-                        @* Smlouvy megacontent *@
-                        <div class="dropdown-menu shadow">
-                        
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Veřejné<br />zakázky</a>
-                        @* Verejne zakazky megacontent *@
-                        <div class="dropdown-menu shadow">
-                        
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Dotace a<br />další</a>
-                        <div class="dropdown-menu shadow">
-                        
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
-                        <a class="nav-link dropdown-toggle mainmenu" href="#" data-bs-toggle="dropdown" data-bs-auto-close="outside">Vše o Hlídači<br /><i class="fas fa-heart" style="color:red" aria-hidden="true"></i> Podpořte nás</a>
-                        <div class="dropdown-menu shadow">
-                            
-                        </div>
-                    </li>
-                </ul>
-                <ul class="d-lg-none navbar-nav mr-auto mb-2 mb-lg-0 list-group">
-                    <li class="nav-item list-group-item mainmenu fw-bold">
-                        <a href="/menupage/urady">Úřady a úředníci</a>
-                    </li>
-                    <li class="nav-item list-group-item mainmenu fw-bold">
-                        <a href="/menupage/firmy">
-                            Firmy, sponzoři,
-                            politické strany
-                        </a>
-                    </li>
-                    <li class="nav-item list-group-item mainmenu fw-bold">
-                        <a href="/menupage/smlouvy">Smlouvy státu</a>
-                    </li>
-                    <li class="nav-item list-group-item mainmenu fw-bold">
-                        <a href="/menupage/verejnezakazky">Veřejné zakázky</a>
-                    </li>
-                    <li class="nav-item list-group-item mainmenu fw-bold">
-                        <a href="/menupage/dalsi">Dotace a další</a>
-                    </li>
-                    <li class="nav-item list-group-item mainmenu fw-bold">
-                        <a href="/menupage/hlidac">Vše o Hlídači</a>
-                    </li>
-                </ul>
+               
             </div>
             <div class="d-none d-lg-flex rightmenu">
             </div>
@@ -277,9 +211,10 @@
     </div>
 
 
-
+    <partial name="_SummaryStripe" />
     <div class="container">
 
+        
         @if (IsSectionDefined("breadcrumb"))
         {
             @RenderSection("breadcrumb", required: false)

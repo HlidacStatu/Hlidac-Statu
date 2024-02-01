@@ -1,0 +1,48 @@
+@using HlidacStatu.Entities.Entities
+@using MathNet.Numerics.Statistics
+@{
+    List<PuPlat>? platy = null;
+    if (ViewData.ContainsKey("platy"))
+    {
+        platy = (List<PuPlat>?)ViewData["platy"];
+    }
+
+    if (platy is null || !platy.Any())
+        return;
+
+    var hrubeRocniPlaty = platy.Select(o => (double)o.HrubyRocniPlat).ToList();
+
+    var dolniKvartil = hrubeRocniPlaty.LowerQuartile();
+    var median = hrubeRocniPlaty.Median();
+    var horniKvartil = hrubeRocniPlaty.UpperQuartile();
+}
+
+@if (platy is not null && platy.Any())
+{
+    <div class="w-auto bg-warning-subtle p-5">
+        <div class="container">
+            <div class="row">
+
+                <div class="col">
+                    <figure>
+                        <h2 class="mb-0">@dolniKvartil.ToString("N0")&nbsp;Kč</h2>
+                        <figcaption>Průměr nejnižší čtvrtiny</figcaption>
+                    </figure>
+                </div>
+                <div class="col">
+                    <figure>
+                        <h2 class="mb-0">@median.ToString("N0")&nbsp;Kč</h2>
+                        <figcaption>Medián</figcaption>
+                    </figure>
+                </div>
+                <div class="col">
+                    <figure>
+                        <h2 class="mb-0">@horniKvartil.ToString("N0")&nbsp;Kč</h2>
+                        <figcaption>Průměr nejvyšší čtvrtiny</figcaption>
+                    </figure>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
