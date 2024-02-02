@@ -23,7 +23,7 @@ public class PuRepo
             .FirstOrDefaultAsync();
     }
     
-    public static async Task<List<PuOrganizace>> GetPlatyAsync(string oblast)
+    public static async Task<List<PuOrganizace>> GetOrganizacForOblasteAsync(string oblast)
     {
         await using var db = new DbEntities();
 
@@ -31,6 +31,20 @@ public class PuRepo
             .AsNoTracking()
             .Where(o => o.Oblast.StartsWith(oblast))
             .Include(o => o.Platy) // Include PuPlat
+            .ToListAsync();
+    }
+    
+    //todo: test it
+    public static async Task<List<PuOrganizace>> GetOrganizacForTagAsync(string tag)
+    {
+        await using var db = new DbEntities();
+
+        return await db.PuOrganizaceTags
+            .AsNoTracking()
+            .Where(t => t.Tag == tag)
+            .Include(t => t.Organizace)
+            .ThenInclude(t => t.Platy)
+            .Select(t => t.Organizace)
             .ToListAsync();
     }
     
@@ -73,5 +87,27 @@ public class PuRepo
             .Include(p => p.Organizace)
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync();
+    }
+    
+    public static async Task<List<PuPlat>> GetPlatyAsync(int rok)
+    {
+        await using var db = new DbEntities();
+
+        return await db.PuPlaty
+            .AsNoTracking()
+            .Where(p => p.Rok == rok)
+            .ToListAsync();
+    }
+    
+    public static async Task<List<string>> GetPrimalOblastiAsync()
+    {
+        await using var db = new DbEntities();
+        
+        var oblasti = await db.Database.SqlQuery<string>(@$"SELECT DISTINCT
+LEFT(Oblast, CHARINDEX({PuOrganizace.PathSplittingChar}, Oblast + {PuOrganizace.PathSplittingChar}) - 1) AS FirstPart
+FROM Pu_Organizace
+WHERE Oblast IS NOT NULL").ToListAsync();
+        
+        return oblasti;
     }
 }

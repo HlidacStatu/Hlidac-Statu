@@ -1,3 +1,4 @@
+@using Devmasters.Enums
 @model HlidacStatu.Entities.Entities.PuOrganizace
 
 @section breadcrumb
@@ -18,8 +19,8 @@
 
 <div>
     <h3>@Model.Nazev</h3>
-    <small>IČO - @Model.Ico</small>
-    <small>Datová schránka - @Model.DS</small>
+    <small>IČO - @Model.Ico</small><br/>
+    <small>Datová schránka - @Model.DS</small><br/>
     <p>@Model.Info</p>
 
     @{
@@ -76,5 +77,30 @@
                 </div>
             </div>
         </div>
+    </div>
+    
+    <div>
+        <h3>Metadata</h3>
+        @foreach (var metadataForYear in Model.Metadata)
+        {
+            <h4>za rok @metadataForYear.Rok</h4>
+            <dl>
+                <dt>Způsob komunikace</dt>
+                <dd>@metadataForYear.ZpusobKomunikace?.ToNiceDisplayName()</dd>
+
+                <dt>Datum odeslání žádosti</dt>
+                <dd>@metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy")</dd>
+
+                <dt>Datum přijetí odpovědi</dt>
+                <dd>@metadataForYear.DatumPrijetiOdpovedi?.ToString("dd.MM.yyyy")</dd>
+
+                <dt>Zdůvodnění mimořádných odměn</dt>
+                <dd>@(metadataForYear.ZduvodneniMimoradnychOdmen == true? "Ano" : "Ne")</dd>
+
+                <dt>Skrytá poznámka</dt>
+                <dd>@metadataForYear.SkrytaPoznamka</dd>
+
+            </dl>
+        }
     </div>
 </div>

@@ -1,6 +1,14 @@
-﻿@{
-    ViewData["Title"] = "Privacy Policy";
-}
-<h1>@ViewData["Title"]</h1>
+﻿@using HlidacStatu.Repositories
+<h1>Platy úředníků</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<p>Tady budou další stránky</p>
+
+<h3>Oblasti</h3>
+<ul>
+@foreach (var oblast in await PuRepo.GetPrimalOblastiAsync())
+{
+    <li>
+        <a asp-action="Oblast" asp-route-id="@oblast">@oblast</a>
+    </li>
+}
+</ul>

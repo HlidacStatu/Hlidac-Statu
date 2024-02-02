@@ -8,14 +8,16 @@ public class HomeController : Controller
 {
     // private readonly ILogger<HomeController> _logger;
    
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
+        ViewData["platy"] = await PuRepo.GetPlatyAsync(2022);
+        
         return View();
     }
     
     public async Task<IActionResult> Oblast(string id)
     {
-        var organizace = await PuRepo.GetPlatyAsync(id);
+        var organizace = await PuRepo.GetOrganizacForOblasteAsync(id);
         
         ViewData["platy"] = organizace.SelectMany(o => o.Platy).ToList();;
         ViewData["oblast"] = id;
