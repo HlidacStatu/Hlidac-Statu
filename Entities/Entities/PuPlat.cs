@@ -27,6 +27,6 @@ public class PuPlat
     [ForeignKey("IdOrganizace")]
     public virtual PuOrganizace Organizace { get; set; }
 
-    public decimal HrubyRocniPlat => (Plat ?? 0 + Odmeny ?? 0) * (12 / PocetMesicu ?? 12) * (1 / Uvazek ?? 1);
+    public decimal HrubyRocniPlat => ((Plat ?? 0) + (Odmeny ?? 0)) * (12 / PocetMesicu ?? 12) * (1 / Uvazek ?? 1);
     
 }
