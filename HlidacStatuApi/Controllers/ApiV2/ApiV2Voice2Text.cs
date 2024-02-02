@@ -35,8 +35,8 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 qv2t.CallerId = task.CallerId;
                 qv2t.CallerTaskId = task.CallerTaskId;
                 qv2t.Status = (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.WaitingInQueue;
-                await QVoiceToTextRepo.SaveAsync(qv2t);
-                return qv2t.QId.ToString();
+                var saved = await QVoiceToTextRepo.SaveAsync(qv2t);
+                return saved.QId.ToString();
             }
             catch (Exception e)
             {

@@ -11,6 +11,7 @@ using HlidacStatu.Lib.Analytics;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -70,8 +71,7 @@ namespace HlidacStatu.Repositories
         }
 
         public static List<HlidacStatu.DS.Graphs.Graph.Edge> vsechnyDcerineVazbyInternal(string ico, int level, bool goDeep, HlidacStatu.DS.Graphs.Graph.Edge parent,
-            ExcludeDataCol excludeICO = null, DateTime? datumOd = null, DateTime? datumDo = null, decimal minPodil = 0,
-            Relation.AktualnostType aktualnost = Relation.AktualnostType.Libovolny)
+            ExcludeDataCol excludeICO = null, DateTime? datumOd = null, DateTime? datumDo = null, decimal minPodil = 0)
         {
             string sql = $@"select vazbakIco, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from Firmavazby 
     where ico=@ico 
@@ -86,15 +86,14 @@ namespace HlidacStatu.Repositories
             };
 
             var rel = GetChildrenRelations(sql, HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company, ico, datumOd, datumDo,
-                p, level, goDeep, parent, excludeICO, minPodil, aktualnost);
+                p, level, goDeep, parent, excludeICO, minPodil);
             return rel;
         }
 
 
         public static List<HlidacStatu.DS.Graphs.Graph.Edge> vsechnyDcerineVazbyInternal(Osoba person, int level, bool goDeep, HlidacStatu.DS.Graphs.Graph.Edge parent,
             ExcludeDataCol excludeICO = null, IEnumerable<int> excludeOsobaId = null,
-            DateTime? datumOd = null, DateTime? datumDo = null, decimal minPodil = 0,
-            Relation.AktualnostType aktualnost = Relation.AktualnostType.Libovolny)
+            DateTime? datumOd = null, DateTime? datumDo = null, decimal minPodil = 0)
         {
             if (excludeOsobaId == null)
                 excludeOsobaId = new int[] { };
@@ -114,13 +113,21 @@ namespace HlidacStatu.Repositories
 
             var relForPerson = GetChildrenRelations(sql, HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, person.InternalId.ToString(),
                 datumOd, datumDo,
-                p, level, goDeep, parent, excludeICO, minPodil, aktualnost);
+                p, level, goDeep, parent, excludeICO, minPodil);
 
             var relForConnectedPersons = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
             using (DbEntities db = new DbEntities())
             {
-                var navazaneOsoby = db.OsobaVazby.AsQueryable()
-                    .Where(m => m.OsobaId == person.InternalId && m.VazbakOsobaId != null).ToList();
+                var navazaneOsoby = db.OsobaVazby.AsNoTracking()
+                    .Where(m => m.OsobaId == person.InternalId 
+                        && m.VazbakOsobaId != null
+                    )
+                    .ToArray() //get data from DB
+                    //filter by date
+                    .Where(o =>Devmasters.DT.Util.IsOverlappingIntervals(datumOd,datumDo,o.DatumOd,o.DatumDo)==true)
+                    .ToList();
+              
+
                 if (navazaneOsoby.Count > 0)
                     foreach (var ov in navazaneOsoby)
                     {
@@ -132,9 +139,9 @@ namespace HlidacStatu.Repositories
                         if (!excludeOsobaId.Contains(ov.VazbakOsobaId.Value))
                         {
                             Osoba o = Osoby.GetById.Get(ov.VazbakOsobaId.Value);
-                            excludeOsobaId = excludeOsobaId.Union(new int[] { ov.VazbakOsobaId.Value });
+                            excludeOsobaId = excludeOsobaId.Union(new int[] { ov.VazbakOsobaId.Value, ov.OsobaId }); //pridej obe osoby pro zamezeni kruhu pri vzajemnem provazani
                             var rel = vsechnyDcerineVazbyInternal(o, level + 1, true, parentRelFound,
-                                excludeOsobaId: excludeOsobaId, aktualnost: aktualnost);
+                                excludeOsobaId: excludeOsobaId);
                             relForConnectedPersons = HlidacStatu.DS.Graphs.Graph.Edge.Merge(relForConnectedPersons, rel);
                         }
                     }
@@ -191,7 +198,7 @@ namespace HlidacStatu.Repositories
         public static List<HlidacStatu.DS.Graphs.Graph.Edge> GetChildrenRelations(string sql,
             HlidacStatu.DS.Graphs.Graph.Node.NodeType nodeType, string nodeId, DateTime? datumOd, DateTime? datumDo,
             IDataParameter[] parameters, int level, bool goDeep,
-            HlidacStatu.DS.Graphs.Graph.Edge parent, ExcludeDataCol excludeICO, decimal minPodil, Relation.AktualnostType aktualnost)
+            HlidacStatu.DS.Graphs.Graph.Edge parent, ExcludeDataCol excludeICO, decimal minPodil)
         {
             if (excludeICO == null)
                 excludeICO = new ExcludeDataCol();
@@ -210,9 +217,7 @@ namespace HlidacStatu.Repositories
                         To = new HlidacStatu.DS.Graphs.Graph.Node() { Id = nodeId, Type = nodeType },
                         RelFrom = datumOd,
                         RelTo = datumDo,
-                        Distance = 0,
-                        Aktualnost= Relation.AktualnostType.Aktualni
-                    }
+                        Distance = 0                    }
                 );
             }
             //get zakladni informace o subj.
@@ -326,22 +331,22 @@ namespace HlidacStatu.Repositories
                     if (excludeICO.Contains(rel))
                         continue; //skip to the next
 
-                    if (rel.Aktualnost >= aktualnost)
-                        relations.Add(rel);
+                    relations.Add(rel);
                 }
             }
 
 
-            relations = HlidacStatu.DS.Graphs.Graph.Edge.GetLongestEdges(relations).ToList();
+            List<DS.Graphs.Graph.Edge> relationsWithLongestEdges = 
+                HlidacStatu.DS.Graphs.Graph.Edge.GetLongestEdges(relations).ToList();
 
-            if (goDeep && relations.Count > 0)
+            if (goDeep && relationsWithLongestEdges.Count > 0)
             {
                 level++;
                 List<HlidacStatu.DS.Graphs.Graph.Edge> deeperRels = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
                 List<HlidacStatu.DS.Graphs.Graph.Edge> excludeMore = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
                 if (parent != null)
                 {
-                    excludeMore = relations.ToList();
+                    excludeMore = relationsWithLongestEdges.ToList();
                 }
 
                 ////navazej na ten, ktery je nejdelsi
@@ -362,17 +367,17 @@ namespace HlidacStatu.Repositories
                 //});
 
 
-                foreach (var rel in relations.Where(m => m.Root == false))
+                foreach (var rel in relationsWithLongestEdges.Where(m => m.Root == false))
                 {
                     //old
                     deeperRels.AddRange(
                         vsechnyDcerineVazbyInternal(rel.To.Id, level, goDeep, rel,
                             excludeICO.AddItem(new ExcludeData(rel)),
-                            rel.RelFrom, rel.RelTo, minPodil, aktualnost)
+                            rel.RelFrom, rel.RelTo, minPodil)
                     );
                 }
 
-                relations.AddRange(deeperRels);
+                relationsWithLongestEdges.AddRange(deeperRels);
             }
 
             if (level == 0)
@@ -381,7 +386,7 @@ namespace HlidacStatu.Repositories
                 //TODO
             }
 
-            return relations;
+            return relationsWithLongestEdges;
         }
 
         private static HlidacStatu.DS.Graphs.Graph.Edge AngazovanostDataToEdge(AngazovanostData ang, HlidacStatu.DS.Graphs.Graph.Node fromNode, HlidacStatu.DS.Graphs.Graph.Node toNode, int distance)
@@ -547,6 +552,61 @@ namespace HlidacStatu.Repositories
                         new HlidacStatu.DS.Graphs.Graph.Node() { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Company, Id = ico },
                         -1
                     );
+                    ret.Add(rel);
+                }
+
+                return HlidacStatu.DS.Graphs.Graph.Edge.GetLongestEdges(ret);
+            }
+
+            return new HlidacStatu.DS.Graphs.Graph.Edge[] { };
+        }
+
+        public static IEnumerable<HlidacStatu.DS.Graphs.Graph.Edge> GetDirectParentRelationsOsoby(int osobaInternalId)
+        {
+            string sql = @"select OsobaID, datumOd, datumDo, typVazby, pojmenovaniVazby, podil from osobavazby 
+                        where VazbakOsobaId =@internalId
+                    ";
+
+            string cnnStr = Config.GetWebConfigValue("OldEFSqlConnection");
+
+            List<HlidacStatu.DS.Graphs.Graph.Edge> relations = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
+            //get zakladni informace o subj.
+
+            //find politician in the DB
+            var db = new PersistLib();
+            var sqlCall = DirectDB.GetRawSql(CommandType.Text, sql, new IDataParameter[]
+            {
+                new SqlParameter("internalId", osobaInternalId)
+            });
+            //string sqlFirma = "select top 1 stav_subjektu from firma where ico = @ico";
+
+            var ds = db.ExecuteDataset(cnnStr, CommandType.Text, sqlCall, null);
+
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                var parents = ds.Tables[0].AsEnumerable()
+                    .Select(dr => new AngazovanostData()
+                    {
+                        subjId = ((int)dr["osobaId"]).ToString(),
+                        subjname = "",
+                        NodeType = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person,
+                        fromDate = (DateTime?)PersistLib.IsNull(dr["datumOd"], null),
+                        toDate = (DateTime?)PersistLib.IsNull(dr["datumDo"], null),
+                        kod_ang = Convert.ToInt32(dr["typVazby"]),
+                        descr = (string)PersistLib.IsNull(dr["PojmenovaniVazby"], ""),
+                        podil = (decimal?)PersistLib.IsNull(dr["podil"], null)
+                    })
+                    .ToArray();
+                var ret = new List<HlidacStatu.DS.Graphs.Graph.Edge>();
+                for (int i = 0; i < parents.Length; i++)
+                {
+                    AngazovanostData ang = parents[i];
+                    var rel = AngazovanostDataToEdge(ang,
+                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, Id = ang.subjId },
+                        new HlidacStatu.DS.Graphs.Graph.Node() { Type = HlidacStatu.DS.Graphs.Graph.Node.NodeType.Person, Id = osobaInternalId.ToString() },
+                        -1
+                    );
+
                     ret.Add(rel);
                 }
 
@@ -810,6 +870,7 @@ namespace HlidacStatu.Repositories
                 var ex = new ExcludeData(r);
                 return items
                     .Where(m => m.parent?.UniqId == ex.parent?.UniqId && m.child?.UniqId == ex.child?.UniqId)
+                    //datum se prekryva
                     .Any(m => m.Mergable(ex));
             }
         }
@@ -987,7 +1048,7 @@ namespace HlidacStatu.Repositories
             return sb.ToString();
         }
 
-        public static string PrintName(this HlidacStatu.DS.Graphs.Graph.Node node, bool html = false)
+        public static string PrintName2(this HlidacStatu.DS.Graphs.Graph.Node node, bool html = false)
         {
             switch (node.Type)
             {

@@ -11,16 +11,23 @@ namespace HlidacStatu.Api.VoiceToText
     {
         static Uri defaultBaseUri = new Uri("https://api.hlidacstatu.cz");
 
+        public TimeSpan TimeOut { get; private set; }
         public Uri BaseApiUri { get; }
         public string ApiKey { get; }
 
         public Client(string apiKey)
-            : this(defaultBaseUri, apiKey)
-        { }
-        public Client(Uri baseApiUri, string apiKey)
+            : this(defaultBaseUri, apiKey, TimeSpan.FromSeconds(120))
+        {
+        }
+        public Client(string apiKey, TimeSpan timeOut)
+            : this(defaultBaseUri, apiKey, timeOut)
+        {
+        }
+        public Client(Uri baseApiUri, string apiKey,TimeSpan timeOut)
         {
             BaseApiUri = baseApiUri;
             ApiKey = apiKey;
+            TimeOut = timeOut;
         }
 
         public async Task<string> AddNewTaskAsync(HlidacStatu.DS.Api.Voice2Text.Options options, Uri source, string callerId, string callerTaskId, int priority)
@@ -41,7 +48,8 @@ namespace HlidacStatu.Api.VoiceToText
                 var id = await Simple.PostAsync<string>(
                     BaseApiUri.AbsoluteUri + "api/v2/voice2text/CreateTask",
                     form, continueOnCapturedContext: false,
-                        headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }
+                        headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }, 
+                        timeout: this.TimeOut
                 );
 
                 return id;
@@ -69,7 +77,8 @@ namespace HlidacStatu.Api.VoiceToText
                 var res = await Simple.PostAsync<string>(
                     BaseApiUri.AbsoluteUri + "api/v2/voice2text/TaskDone",
                     form, continueOnCapturedContext: false,
-                        headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }
+                        headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } },
+                        timeout: this.TimeOut
                 );
 
                 return res == "OK";
@@ -94,7 +103,8 @@ namespace HlidacStatu.Api.VoiceToText
             {   //
                 var res = await Simple.GetAsync<string>(
                     BaseApiUri.AbsoluteUri + "api/v2/voice2text/Check?returnstatus=500", continueOnCapturedContext: false,
-                        headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }
+                        headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } },
+                        timeout: this.TimeOut
                 );
 
                 return true;
@@ -119,7 +129,8 @@ namespace HlidacStatu.Api.VoiceToText
             {
                 task = await Simple.GetAsync<HlidacStatu.DS.Api.Voice2Text.Task>(
                     BaseApiUri.AbsoluteUri + "api/v2/voice2text/getnexttask", false,
-                    headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }
+                    headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } },
+                    timeout: this.TimeOut
                     );
 
                 return task;
@@ -161,8 +172,9 @@ namespace HlidacStatu.Api.VoiceToText
 
                 tasks = await Simple.GetAsync<HlidacStatu.DS.Api.Voice2Text.Task[]>(
                     BaseApiUri.AbsoluteUri + "api/v2/voice2text/gettasks"+ queryStr, false,
-                    headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }
-                    ) ;
+                    headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } },
+                        timeout: this.TimeOut
+                    );
 
                 return tasks;
             }
@@ -195,7 +207,8 @@ namespace HlidacStatu.Api.VoiceToText
                         + $"?qid={qId}"
                         + $"&status={WebUtility.UrlEncode(status.ToString())}"
                     , false,
-                    headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }
+                    headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } },
+                        timeout: this.TimeOut
                     );
 
                 return true;

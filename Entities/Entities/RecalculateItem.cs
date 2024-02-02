@@ -82,7 +82,7 @@ namespace HlidacStatu.Entities
 
 
         public DateTime? Started { get; set; } = null;
-        public DateTime? Done { get; set; } = null;
+        public DateTime? Finished { get; set; } = null;
 
         [Required]
         [StringLength(256)]

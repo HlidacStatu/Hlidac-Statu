@@ -51,6 +51,7 @@ namespace HlidacStatu.Entities
             SourceOfPhoto,
         }
 
+
         public StatusOsobyEnum StatusOsoby() { return (StatusOsobyEnum)Status; }
 
         [ShowNiceDisplayName()]

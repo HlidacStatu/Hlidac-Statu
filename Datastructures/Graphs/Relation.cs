@@ -1,6 +1,7 @@
 ﻿using Devmasters.Enums;
 
 using Force.DeepCloner;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -214,27 +215,40 @@ namespace HlidacStatu.DS.Graphs
             if (allRelations == null)
                 return new Graph.Edge[] { };
 
-            if (minAktualnost <= AktualnostType.Neaktualni)
-                return allRelations.ToArray();
+            DateTime? from = null ;
+            DateTime? to = DateTime.Now.Date.AddDays(1);
 
-            root.Aktualnost = minAktualnost;
+            switch (minAktualnost)
+            {
+                case AktualnostType.Aktualni:
+                    from = DateTime.Now.Date.AddDays(-2);
+                    break;
+                case AktualnostType.Nedavny:
+                    from = to - Relation.NedavnyVztahDelka;
+                    break;
+                case AktualnostType.Neaktualni:
+                case AktualnostType.Libovolny:
+                default:
+                    return allRelations.ToArray();
+            }
+
 
             //filter per distanceallRelations.First(m => m.Root == true)
             var filteredRels = _childrenVazby(root, 
                 allRelations.Where(m=>!m.Root).DeepClone(), 
                 new Graph.Edge[] { },
-                minAktualnost,0, allRelations.FirstOrDefault(m=>m.Root));
+                from,to,
+                0, allRelations.FirstOrDefault(m=>m.Root));
 
             //add root
             //var res = filteredRels.Prepend(root);
 
             return filteredRels
-                .Where(m => m.Aktualnost >= minAktualnost)
                 .ToArray();
         }
 
         private static Graph.Edge[] _childrenVazby(Graph.Edge parent, IEnumerable<Graph.Edge> vazby, 
-            IEnumerable<Graph.Edge> exclude, AktualnostType minAktualnost, int callDeep, Graph.Edge originalRoot)
+            IEnumerable<Graph.Edge> exclude, DateTime? from, DateTime? to, int callDeep, Graph.Edge originalRoot)
         {
             //AktualnostType akt = parent.Aktualnost;
             //if (minAktualnost >= parent.Aktualnost)
@@ -243,7 +257,7 @@ namespace HlidacStatu.DS.Graphs
 
             List<Graph.Edge> items = new List<Graph.Edge>();
 
-            if (callDeep > 100)
+            if (callDeep > 200)
             {
                 //primitive stackoverflow protection
                 //_logger.Error("_childrenVazby stackoverflow protection {@parentFrom}-{parentTo} {@originalRootFrom}-{@originalRootTo}", 
@@ -255,7 +269,7 @@ namespace HlidacStatu.DS.Graphs
         .Where(m =>
                 parent.To.UniqId == m.From.UniqId);
             var fVazby2b = fVazby2a
-                .Where(m=> m.Aktualnost >= minAktualnost);
+                .Where(m=> Devmasters.DT.Util.IsOverlappingIntervals(from,to,m.RelFrom,m.RelTo));
             var fVazby2c = fVazby2b 
                 .Where(m=> Devmasters.DT.Util.IsOverlappingIntervals(parent.RelFrom, parent.RelTo, m.RelFrom, m.RelTo))
                 .ToArray();
@@ -283,7 +297,7 @@ namespace HlidacStatu.DS.Graphs
                 items.Add(ch);
                 var chVazby = vazby;//.Where(m => ch.To.UniqId == m.From.UniqId && m.Distance == ch.Distance + 1).ToArray();
                 items.AddRange(
-                    _childrenVazby(ch, vazby, exclude.Concat(items), minAktualnost, callDeep+1, originalRoot)
+                    _childrenVazby(ch, vazby, exclude.Concat(items), from,to, callDeep+1, originalRoot)
                     );
             }
             return items.ToArray();

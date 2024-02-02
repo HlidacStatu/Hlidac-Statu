@@ -11,9 +11,20 @@ namespace HlidacStatu.Repositories
 {
     public class QVoiceToTextRepo
     {
-        public static async Task SaveAsync(QVoiceToText tbl, CancellationToken cancellationToken = default)
+        public static async Task<QVoiceToText> SaveAsync(QVoiceToText tbl, CancellationToken cancellationToken = default)
         {
             await using DbEntities db = new DbEntities();
+
+            var exists = db.QVoiceToText.FirstOrDefault(m=>
+                    m.CallerId == tbl.CallerId 
+                    && m.CallerTaskId==tbl.CallerId
+                    && m.Status == (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.WaitingInQueue
+                    );
+            if (exists != null)
+            {
+                return exists;
+            }
+
             db.QVoiceToText.Attach(tbl);
             if (tbl.QId == 0)
                 db.Entry(tbl).State = EntityState.Added;
@@ -21,6 +32,7 @@ namespace HlidacStatu.Repositories
                 db.Entry(tbl).State = EntityState.Modified;
 
             await db.SaveChangesAsync(cancellationToken);
+            return tbl;
         }
 
 

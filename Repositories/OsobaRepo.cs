@@ -2,9 +2,11 @@ using Devmasters;
 using Devmasters.Enums;
 using EnumsNET;
 using HlidacStatu.Connectors;
+using HlidacStatu.DS.Graphs;
 using HlidacStatu.Entities;
 using HlidacStatu.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +15,6 @@ using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Serilog;
 using static HlidacStatu.Entities.Osoba;
 
 namespace HlidacStatu.Repositories
@@ -64,6 +65,45 @@ namespace HlidacStatu.Repositories
                 return exiO;
             }
         }
+
+
+        public static Osoba[] ParentOsoby(this Osoba osoba, Relation.AktualnostType minAktualnost)
+        {
+            var _parents = _getAllParents(osoba.InternalId, minAktualnost)
+                    .Select(m => Osoby.GetById.Get(m))
+                    .Where(m => m != null)
+                    .ToArray();
+
+            return _parents;
+        }
+        public static HashSet<int> _getAllParents(int osobaInternalId, Relation.AktualnostType minAktualnost,
+    HashSet<int> currList = null)
+        {
+            currList = currList ?? new HashSet<int>();
+
+            HlidacStatu.DS.Graphs.Graph.Edge[] _parentF = Graph.GetDirectParentRelationsOsoby(osobaInternalId).ToArray();
+            var _parentVazby = _parentF
+                .Where(m => m.Aktualnost >= minAktualnost);
+
+            foreach (var f in _parentVazby)
+            {
+                if (currList.Contains(Convert.ToInt32(f.To.Id)))
+                {
+                    //skip
+                }
+                else
+                {
+                    currList.Add(Convert.ToInt32(f.From.Id));
+                    var newParents = _getAllParents(Convert.ToInt32(f.From.Id), minAktualnost, currList);
+                    foreach (var np in newParents)
+                    {
+                        currList.Add(np);
+                    }
+                }
+            }
+            return currList;
+        }
+
 
         public static string GetUniqueNamedId(Osoba osoba)
         {

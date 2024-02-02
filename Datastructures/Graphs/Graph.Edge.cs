@@ -1,28 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace HlidacStatu.DS.Graphs
 {
     public partial class Graph
     {
+        public class EdgeSimpleEqualityComparer : IEqualityComparer<Edge>
+        {
+            public bool Equals(Edge x, Edge y)
+            {
+                if (ReferenceEquals(x, y))
+                    return true;
+
+                if (x is null || y is null)
+                    return false;
+
+                return x.From?.UniqId == y.From?.UniqId
+                    && x.To?.UniqId == y.To?.UniqId
+                    && x.Distance == y.Distance;
+            }
+
+
+            public int GetHashCode([DisallowNull] Edge obj)
+            {
+                return obj.GetHashCode();
+            }
+
+        }
+
+
         [System.Diagnostics.DebuggerDisplay("{debuggerdisplay,nq}")]
         public partial class Edge : IComparable<Edge>
         {
-            [Obsolete("Tohle už nepoužíváme. Použij raději this.GetHashCode()")]
-            [Newtonsoft.Json.JsonIgnore]
-            public string UniqId
-            {
-                get
-                {
-                    var s = string.Format("{0} ==[{2} -> {3}]==> {1} {4}",
-                        From?.UniqId ?? "Ø", To?.UniqId ?? "Ø",
-                        RelFrom?.ToShortDateString() ?? "Ø", RelTo?.ToShortDateString() ?? "Ø",
-                        Root ? "root" : ""
-                        );
-                    return s;
-                }
-            }
             public bool Root { get; set; }
             public Node From { get; set; }
             public Node To { get; set; }
@@ -172,16 +183,18 @@ namespace HlidacStatu.DS.Graphs
             {
                 var longestE = new List<Edge>();
 
-                var uniqEdges = relations
-                    .Select(r => string.Join("|", r.From?.UniqId ?? "", r.To?.UniqId ?? "", r.Distance.ToString()))
-                    .Distinct();
+                var uniqEdges = relations.Distinct(new EdgeSimpleEqualityComparer());
+                    //.Select(r => string.Join("|", r.From?.UniqId ?? "", r.To?.UniqId ?? "", r.Distance.ToString()))
+                    //.Distinct();
 
                 foreach (var uniq in uniqEdges)
                 {
-                    var eParts = uniq.Split('|');
-
                     var le = GetLongestEdgesBetweenSameNodes(relations
-                                 .Where(r => (r.From?.UniqId ?? "") == eParts[0] && (r.To?.UniqId ?? "") == eParts[1] && r.Distance.ToString() == eParts[2]));
+                                 .Where(r => 
+                                    r.From?.UniqId == uniq.From?.UniqId 
+                                    && r.To?.UniqId == uniq.To?.UniqId 
+                                    && r.Distance == uniq.Distance)
+                                 );
 
                     if (le != null)
                         longestE.AddRange(le);
@@ -201,8 +214,9 @@ namespace HlidacStatu.DS.Graphs
                 var uniqEdges = relations
                     .Select(r => string.Join("|", r.From?.UniqId ?? "", r.To?.UniqId ?? "", r.Distance.ToString()))
                     .Distinct();
+
                 if (uniqEdges.Count() > 1)
-                    throw new ArgumentOutOfRangeException("only same nodes and distance in relations");
+                    throw new ArgumentOutOfRangeException("only same nodes and distance should be in relations");
 
                 //if rels without limits, take it
                 if (relations.Any(r => r.RelFrom.HasValue == false && r.RelTo.HasValue == false))
@@ -348,6 +362,7 @@ namespace HlidacStatu.DS.Graphs
 
                 //}
             }
+
         }
 
     }

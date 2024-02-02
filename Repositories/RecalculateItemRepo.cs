@@ -41,7 +41,7 @@ namespace HlidacStatu.Repositories
             IEnumerable<RecalculateItem> allItems = null;
             if (onlyIds)
             {
-                uniqueItems = ids
+                List<RecalculateItem> items = ids
                     .Select(m => new RecalculateItem()
                     {
                         StatisticsType = RecalculateItem.StatisticsTypeEnum.Smlouva,
@@ -58,6 +58,10 @@ namespace HlidacStatu.Repositories
                     )
                     .Distinct(comparer)
                     .ToList();
+                System.Collections.Concurrent.ConcurrentBag<RecalculateItem> list = new(items);
+
+                uniqueItems = items.SelectMany(m=> CascadeItems(m, ref list))
+                    .Distinct(comparer).ToList();
             }
             else
             {
@@ -191,7 +195,7 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        private static List<RecalculateItem> CascadeItems(RecalculateItem item, ref System.Collections.Concurrent.ConcurrentBag<RecalculateItem> alreadyOnList)
+        public static List<RecalculateItem> CascadeItems(RecalculateItem item, ref System.Collections.Concurrent.ConcurrentBag<RecalculateItem> alreadyOnList)
         {
             List<RecalculateItem> list = new List<RecalculateItem>(alreadyOnList);
             if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
@@ -199,6 +203,12 @@ namespace HlidacStatu.Repositories
                 var f = Firmy.Get(item.Id);
                 if (f?.Valid == true)
                     list.AddRange(FirmaForQueue(new List<RecalculateItem>(), f, item.StatisticsType, item.ProvokedBy, 0));
+            }
+            else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
+            {
+                var o = Osoby.GetById.Get(Convert.ToInt32(item.Id));
+                if (o != null)
+                    OsobaForQueue(new List<RecalculateItem>(), o, item.StatisticsType, item.ProvokedBy,0);
             }
             else
                 list.Add(item);
@@ -243,6 +253,44 @@ namespace HlidacStatu.Repositories
 
         }
 
+        private static List<RecalculateItem> OsobaForQueue(List<RecalculateItem> list,
+            int osobaInternalId, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy, int deep)
+        {
+            var o = Osoby.GetById.Get(osobaInternalId);
+            if (o != null)
+                return OsobaForQueue(list, o, statsType, provokeBy, deep);
+            else
+                return new List<RecalculateItem>();
+        }
+        private static List<RecalculateItem> OsobaForQueue(List<RecalculateItem> list,
+            Osoba o, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy, int deep)
+        {
+            _logger?.Verbose("{method} expanding {osoba} {jmeno} vazby, recursive deep {deep}, current list {count} items",
+                    MethodBase.GetCurrentMethod().Name, o.NameId, o.FullName(), deep, list.Count);
+
+            //StackOverflow defense
+            if (list.Count > 10_000)
+                return list;
+
+            var it = new RecalculateItem(o, statsType, provokeBy);
+            if (list.Contains(it, comparer) == false)
+                list.Add(it);
+
+            //StackOverflow defense
+            if (deep > 50)
+                return list;
+
+            var parents = o.ParentOsoby(DS.Graphs.Relation.AktualnostType.Nedavny);
+            foreach (var oo in parents)
+            {
+                var item = new RecalculateItem(oo, statsType, provokeBy);
+                if (list.Contains(item, comparer) == false)
+                    list.Add(item);
+            }
+
+            return list;
+        }
+
         private static List<RecalculateItem> FirmaForQueue(List<RecalculateItem> list,
             Firma f, RecalculateItem.StatisticsTypeEnum statsType, string provokeBy, int deep)
         {
@@ -274,7 +322,9 @@ namespace HlidacStatu.Repositories
             {
                 var item = new RecalculateItem(vaz.o, statsType, provokeBy);
                 if (list.Contains(item, comparer) == false)
-                    list.Add(item);
+                {
+                    list.AddRange(OsobaForQueue(list, vaz.o, statsType, provokeBy, deep+1));
+                }
             }
             return list;
         }
@@ -290,7 +340,7 @@ namespace HlidacStatu.Repositories
                 var dbItem = db.RecalculateItem.FirstOrDefault(m => m.Pk == pk);
                 if (dbItem == null) return false;
 
-                dbItem.Done = DateTime.Now;
+                dbItem.Finished = DateTime.Now;
 
                 _ = db.SaveChanges();
                 return true;
@@ -314,7 +364,7 @@ namespace HlidacStatu.Repositories
                                     m.Id == item.Id
                                     && m.ItemType == item.ItemType
                                     && m.StatisticsType == item.StatisticsType
-                                    && (m.Done == null)
+                                    && (m.Finished == null)
                                     );
                                 if (exists)
                                 {
@@ -360,7 +410,8 @@ namespace HlidacStatu.Repositories
         }
 
         public static IEnumerable<RecalculateItem> GetFromProcessingQueueWithParents(int count, int threads,
-            Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null, bool debug = false)
+            Action<string> outputWriter = null, Action<Devmasters.Batch.ActionProgressData> progressWriter = null,
+            bool debug = false)
         {
             if (debug)
                 _logger?.Debug($"getting {count} from processing queue");
