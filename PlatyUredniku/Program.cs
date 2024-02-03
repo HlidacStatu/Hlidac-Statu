@@ -17,6 +17,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.Host.ConfigureHostForWeb(args);
         
+
         //init statics and others
         Devmasters.Config.Init(builder.Configuration);
         // init logger
@@ -91,13 +92,14 @@ public class Program
             app.UseAuthorization();
 
             app.MapControllerRoute(
+                name: "onlyAction",
+                pattern: "{action=Index}/{id?}",
+                defaults: new { controller = "Home" });
+
+            app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             
-            app.MapControllerRoute(
-                name: "home",
-                pattern: "{action=Index}/{id?}",
-                defaults: new { controller = "Home" });
             
             app.MapRazorPages();
 
