@@ -28,12 +28,21 @@ public class HomeController : Controller
     public async Task<IActionResult> Detail(int id)
     {
         var detail = await PuRepo.GetDetailEagerAsync(id);
-        
         ViewData["platy"] = detail.Platy.ToList();;
-        
+
         return View(detail);
     }
-    
+    public async Task<IActionResult> Detail2(int id, int? rok = null)
+    {
+        var detail = await PuRepo.GetDetailEagerAsync(id);
+
+        ViewData["platy"] = detail.Platy.ToList(); ;
+        ViewData["rok"] = rok ?? (detail.Platy.Any() ? detail.Platy.Max(m=>m.Rok) : Util.DefaultYear);
+        ViewData["id"] = id;
+
+        return View(detail);
+    }
+
     public async Task<IActionResult> Plat(int id)
     {
         var detail = await PuRepo.GetPlatAsync(id);

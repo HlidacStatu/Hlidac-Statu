@@ -4,7 +4,7 @@
 {
     <ol class="breadcrumb">
         <li>
-            <a href="/">Platy úřeníků</a>
+            <a href="/">Platy úředníků</a>
         </li>
         @foreach (var oblast in Model.Organizace.OblastPath())
         {
@@ -18,36 +18,26 @@
         <li class="active">@Model.NazevPozice <span class="small">(@Model.Rok)</span></li>
     </ol>
 }
+<style>
 
-<h3>@Model.NazevPozice</h3>
-<small>@Model.Rok</small>
-<small>@Model.Organizace.Nazev</small>
+    .boxes h4 {
+        font-size: 24px;
+        font-weight: bold;
+        padding-top: 20px;
+    }
 
-<dl>
-    <dt>Hrubý roční plat včetně odměn</dt>
-    <dd>@Model.HrubyRocniPlat.ToString("N0")</dd>
+    .boxes p {
+        font-size: 16px;
+    }
 
-    <dt>Nefinanční bonus</dt>
-    <dd>@Model.NefinancniBonus</dd>
 
-    <dt>Poznámka k platu</dt>
-    <dd>@Model.PoznamkaPlat</dd>
-    
-    <dt>Poznámka k pozici</dt>
-    <dd>@Model.PoznamkaPlat</dd>
-    
-    <dt>Plat</dt>
-    <dd>@Model.Plat?.ToString("N0")</dd>
-    
-    <dt>Odměny</dt>
-    <dd>@Model.Odmeny?.ToString("N0")</dd>
-    
-    <dt>Úvazek</dt>
-    <dd>@Model.Uvazek?.ToString("N0")</dd>
-    
-    <dt>Počet odpracovaných měsíců</dt>
-    <dd>@Model.PocetMesicu?.ToString("N0")</dd>
-    
-    <dt>Je hlavounskou pozicí</dt>
-    <dd>@(Model.JeHlavoun == true? "Ano" : "Ne")</dd>
-</dl>
+    .boxes hr {
+        border-top: 3px dotted #E0E6ED;
+        margin-top: 24px;
+        margin-bottom: 14px;
+    }
+
+</style>
+
+
+<partial name="_platDetail" model="@Model" />

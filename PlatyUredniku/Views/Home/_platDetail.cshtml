@@ -1,0 +1,62 @@
+﻿@model HlidacStatu.Entities.Entities.PuPlat
+
+
+
+<div class="row boxes">
+
+
+    <h2>@Model.Organizace.Nazev</h2>
+    <h3>@Model.NazevPozice</h3>
+
+
+
+    <img src="https://user-images.githubusercontent.com/6562690/54934415-b4d25b80-4edb-11e9-8758-fb29ada50499.png" style="height:290px; width:80%" />
+    <h4>Odměna za rok @Model.Rok</h4>
+    <div>
+        <p>
+            <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
+            <b>Hrubý roční plat</b>
+            <span style="padding-left:40px;">
+                @HlidacStatu.Util.RenderData.NicePriceHtml(Model.HrubyRocniPlat)
+            </span>
+        </p>
+
+        @if (string.IsNullOrEmpty(Model.PoznamkaPlat) == false)
+        {
+            <p>
+                <i style="padding-right:20px;" aria-hidden="true">
+                    @Model.PoznamkaPlat
+                </i>
+            </p>
+        }
+        @if (Model.Odmeny.HasValue)
+        {
+            <p>
+                <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
+                <b>Odměny</b> <span style="padding-left:40px;">@HlidacStatu.Util.RenderData.NicePriceHtml(Model.Odmeny.Value)</span>
+            </p>
+        }
+        @if (string.IsNullOrEmpty(Model.NefinancniBonus) == false)
+        {
+            <p>
+                <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
+                <b>Nefinanční bonus</b> <span style="padding-left:40px;">@Model.NefinancniBonus</span>
+            </p>
+        }
+    </div>
+
+
+    <hr />
+
+    <h4>Pracovní poměr</h4>
+    @if (Model.JeHlavoun == true)
+    {
+        <p>
+            <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
+            <b>Pozice představeného/vedoucího organizace</b>
+        </p>
+    }
+    <p class="text-body-secondary"><b>Úvazek</b> <span style="padding-left:40px;">@HlidacStatu.Util.RenderData.NicePercent(Model.Uvazek)</span></p>
+    <p class="text-body-secondary"><b>Počet odpracovaných měsíců</b> <span style="padding-left:40px;">@HlidacStatu.Util.RenderData.NiceNumber(Model.PocetMesicu ?? 12)</span></p>
+
+</div>

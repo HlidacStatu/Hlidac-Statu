@@ -17,14 +17,67 @@
     </ol>
 }
 
-<div>
+<style>
+
+    .boxes h4 {
+        font-size: 24px;
+        font-weight: bold;
+        padding-top: 20px;
+    }
+
+    .boxes p {
+        font-size: 16px;
+    }
+
+
+    .boxes hr {
+        border-top: 3px dotted #E0E6ED;
+        margin-top: 24px;
+        margin-bottom: 14px;
+    }
+
+</style>
+
+
+@{
+    int rok = (int)ViewData["rok"];
+    string viewName = this.ViewContext.RouteData.Values["action"] as string;
+
+}
+<div class="row boxes">
+
     <h3>@Model.Nazev</h3>
     <small>IČO - @Model.Ico</small><br/>
     <small>Datová schránka - @Model.DS</small><br/>
     <p>@Model.Info</p>
 
+    <div>
+        <h3>Metadata</h3>
+        @foreach (var metadataForYear in Model.Metadata.Where(m=>m.Rok == rok))
+        {
+            <h4>za rok @metadataForYear.Rok</h4>
+            <dl>
+                <dt>Způsob komunikace</dt>
+                <dd>@metadataForYear.ZpusobKomunikace?.ToNiceDisplayName()</dd>
+
+                <dt>Datum odeslání žádosti</dt>
+                <dd>@metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy")</dd>
+
+                <dt>Datum přijetí odpovědi</dt>
+                <dd>@metadataForYear.DatumPrijetiOdpovedi?.ToString("dd.MM.yyyy")</dd>
+
+                <dt>Zdůvodnění mimořádných odměn</dt>
+                <dd>@(metadataForYear.ZduvodneniMimoradnychOdmen == true ? "Ano" : "Ne")</dd>
+
+                <dt>Skrytá poznámka</dt>
+                <dd>@metadataForYear.SkrytaPoznamka</dd>
+
+            </dl>
+        }
+    </div>
+
     @{
-        var platyGrouped = Model.Platy.GroupBy(p => p.Rok).OrderByDescending(pg => pg.Key).ToList();
+        var platyPoLetech = Model.Platy.GroupBy(p => p.Rok).OrderByDescending(pg => pg.Key).ToList();
     }
 
     <div class="card">
@@ -34,20 +87,20 @@
                 <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                     <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
                     @{
-                        string classAttributes = "nav-link active";
+                        string classAttributes = "nav-link";
 
-                        foreach (var platGroup in platyGrouped)
+                        foreach (var platRok in platyPoLetech)
                         {
-                            <button class="@classAttributes" id="year-@platGroup.Key-tab" data-bs-toggle="pill" data-bs-target="#year-@platGroup.Key" type="button" role="tab">@platGroup.Key</button>
-                            classAttributes = "nav-link";
+                            <a href="/@(viewName)/@(ViewData["id"])?rok=@(platRok.Key)" class="@classAttributes @((platRok.Key==rok) ? "active" : "")" >@platRok.Key</a>
+                            
                         }
                     }
                 </div>
-                <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-content" >
                     @{
                         classAttributes = "tab-pane fade show active";
 
-                        foreach (var platGroup in platyGrouped)
+                        foreach (var platGroup in platyPoLetech.Where(m=>m.Key == rok))
                         {
                             <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
                                 <table class="table table-striped">
@@ -78,29 +131,14 @@
             </div>
         </div>
     </div>
-    
-    <div>
-        <h3>Metadata</h3>
-        @foreach (var metadataForYear in Model.Metadata)
+
+
+    @foreach (var platGroup in platyPoLetech.Where(m=>m.Key == rok))
+    {
+        @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
         {
-            <h4>za rok @metadataForYear.Rok</h4>
-            <dl>
-                <dt>Způsob komunikace</dt>
-                <dd>@metadataForYear.ZpusobKomunikace?.ToNiceDisplayName()</dd>
-
-                <dt>Datum odeslání žádosti</dt>
-                <dd>@metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy")</dd>
-
-                <dt>Datum přijetí odpovědi</dt>
-                <dd>@metadataForYear.DatumPrijetiOdpovedi?.ToString("dd.MM.yyyy")</dd>
-
-                <dt>Zdůvodnění mimořádných odměn</dt>
-                <dd>@(metadataForYear.ZduvodneniMimoradnychOdmen == true? "Ano" : "Ne")</dd>
-
-                <dt>Skrytá poznámka</dt>
-                <dd>@metadataForYear.SkrytaPoznamka</dd>
-
-            </dl>
+            <hr />
+            <partial name="_platDetail" model="@plat" />
         }
-    </div>
+    }
 </div>
