@@ -56,6 +56,7 @@ namespace HlidacStatu.Repositories.Statistics
 
             foreach (var it in perIcoStat)
             {
+
                 if (it.f.PatrimStatu())
                     statni.Add(it.f.ICO, it.ss);
                 else

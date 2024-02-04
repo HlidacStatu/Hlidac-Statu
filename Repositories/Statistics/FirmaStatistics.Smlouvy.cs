@@ -62,10 +62,16 @@ namespace HlidacStatu.Repositories.Statistics
             {
                 return ret;
             }
-            if (forceUpdateCache)
-                _ = Task.Run(async () => await _smlouvaCache.DeleteAsync((firma, obor))).Wait(TimeSpan.FromSeconds(10));
+            /*            if (forceUpdateCache)
+                            _ = Task.Run(async () => await _smlouvaCache.DeleteAsync((firma, obor))).Wait(TimeSpan.FromSeconds(10));
 
-            _ = Task.Run(async () => { ret = await _smlouvaCache.GetAsync((firma, obor)); }).Wait(TimeSpan.FromSeconds(20));
+                        _ = Task.Run(async () => { ret = await _smlouvaCache.GetAsync((firma, obor)); }).Wait(TimeSpan.FromSeconds(20));
+            */
+            if (forceUpdateCache)
+                _smlouvaCache.DeleteAsync((firma, obor)).ConfigureAwait(false).GetAwaiter().GetResult();
+
+            ret = _smlouvaCache.GetAsync((firma, obor)).ConfigureAwait(false).GetAwaiter().GetResult();
+
             return ret;
         }
         public static void SetStatistics(Firma firma, int? obor, StatisticsSubjectPerYear<Smlouva.Statistics.Data> data)
@@ -87,6 +93,7 @@ namespace HlidacStatu.Repositories.Statistics
                     await SmlouvyStatistics.CalculateAsync($"ico:{f.ICO}")
                 );
 
+            res = res ?? new StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
             return res;
         }
 

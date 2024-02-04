@@ -347,7 +347,17 @@ namespace HlidacStatu.Extensions
         public static Osoba.Statistics.RegistrSmluv StatistikaRegistrSmluv(this Osoba osoba,
             Relation.AktualnostType minAktualnost, int? obor = null, bool forceUpdateCache = false)
         {
-            return OsobaStatistics.CachedStatistics(osoba, minAktualnost, obor, forceUpdateCache);
+            //temporary fix for null values
+
+            var ret = OsobaStatistics.CachedStatistics(osoba, minAktualnost, obor, forceUpdateCache);
+            foreach (var k in ret.SoukromeFirmy.Keys)
+                if (ret.SoukromeFirmy[k] == null)
+                    ret.SoukromeFirmy[k] = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
+            foreach (var k in ret.StatniFirmy.Keys)
+                if (ret.StatniFirmy[k] == null)
+                    ret.StatniFirmy[k] = new StatisticsSubjectPerYear<Smlouva.Statistics.Data>();
+
+            return ret;
         }
 
         static Devmasters.Cache.Elastic.Manager<InfoFact[], Osoba> _cacheInfoFacts =
