@@ -5,7 +5,7 @@
 		<AssemblyName>HlidacStatu.Api.VoiceToText</AssemblyName>
 		<RootNamespace>HlidacStatu.Api.VoiceToText</RootNamespace>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>2.5.2.0</Version>
+		<Version>2.5.3.0</Version>
 		<PackageReleaseNotes>Removed reference to Wordcab.*</PackageReleaseNotes>
 		<Description>HlidacStatu.Api.VoiceToText</Description>
 		<Title>$(AssemblyName)</Title>
@@ -15,7 +15,7 @@
 
 		<PackageReference Include="Devmasters.Net" Version="5.0.10" />
 
-		<PackageReference Include="Devmasters.SpeechToText" Version="5.0.0" />
+		<PackageReference Include="Devmasters.SpeechToText" Version="5.1.0" />
 
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>

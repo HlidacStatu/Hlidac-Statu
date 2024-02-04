@@ -11,7 +11,7 @@ namespace HlidacStatu.Repositories
 {
     public class QVoiceToTextRepo
     {
-        public static async Task<QVoiceToText> SaveAsync(QVoiceToText tbl, CancellationToken cancellationToken = default)
+        public static async Task<QVoiceToText> SaveAsync(QVoiceToText tbl, bool checkExisting = true, CancellationToken cancellationToken = default)
         {
             await using DbEntities db = new DbEntities();
 
@@ -20,7 +20,7 @@ namespace HlidacStatu.Repositories
                     && m.CallerTaskId==tbl.CallerId
                     && m.Status == (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.WaitingInQueue
                     );
-            if (exists != null)
+            if (checkExisting && exists != null)
             {
                 return exists;
             }
@@ -36,7 +36,7 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static async Task<QVoiceToText> GetNextToProcess(CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<QVoiceToText> GetNextToProcess(string processEngine, CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -52,6 +52,7 @@ namespace HlidacStatu.Repositories
 
                 tbl.Status = (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.InProgress;
                 tbl.Started = DateTime.Now;
+                tbl.ProcessEngine = processEngine;
 
                 await db.SaveChangesAsync(cancellationToken);
 
@@ -60,7 +61,10 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static async Task<QVoiceToText> Finish(long qId, string result, HlidacStatu.DS.Api.Voice2Text.Task.CheckState status, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<QVoiceToText> Finish(long qId, string result, 
+            string processEngine,
+            HlidacStatu.DS.Api.Voice2Text.Task.CheckState status, 
+            CancellationToken cancellationToken = default(CancellationToken))
         {
             var q = await GetOnlySpecific(qId, cancellationToken);
             if (q != null)
@@ -68,8 +72,9 @@ namespace HlidacStatu.Repositories
                 q.Status = (int)status;
                 q.Done = DateTime.Now;
                 q.Result = result;
+                q.ProcessEngine = processEngine;
                 q.LastUpdate = DateTime.Now;
-                await SaveAsync(q, cancellationToken);
+                await SaveAsync(q,cancellationToken: cancellationToken);
             }
             return q;
         }
@@ -80,7 +85,7 @@ namespace HlidacStatu.Repositories
             {
                 q.Status = (int)status;
                 q.LastUpdate = DateTime.Now;
-                await SaveAsync(q, cancellationToken);
+                await SaveAsync(q, cancellationToken: cancellationToken);
             }
             return q;
         }

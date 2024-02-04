@@ -83,5 +83,8 @@ namespace HlidacStatu.Entities
         [Column("priority")]
         public int? Priority { get; set; }
 
+        [Column("processEngine")]
+        public string ProcessEngine { get; set; }
+
     }
 }

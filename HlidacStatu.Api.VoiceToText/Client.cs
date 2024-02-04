@@ -122,13 +122,14 @@ namespace HlidacStatu.Api.VoiceToText
             }
         }
 
-        public async Task<HlidacStatu.DS.Api.Voice2Text.Task> GetNextTaskAsync()
+        public async Task<HlidacStatu.DS.Api.Voice2Text.Task> GetNextTaskAsync(string processEngine)
         {
             HlidacStatu.DS.Api.Voice2Text.Task task = null;
             try
             {
                 task = await Simple.GetAsync<HlidacStatu.DS.Api.Voice2Text.Task>(
-                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/getnexttask", false,
+                    BaseApiUri.AbsoluteUri + $"api/v2/voice2text/getnexttask?processEngine={System.Net.WebUtility.UrlEncode(processEngine)}", 
+                    false,
                     headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } },
                     timeout: this.TimeOut
                     );
@@ -232,6 +233,39 @@ namespace HlidacStatu.Api.VoiceToText
                 throw;
             }
         }
+        public async Task<bool> RestartTaskAsync(long qId, int? withPriority = null)
+        {
+            try
+            {
+                _ = await Simple.GetAsync<HlidacStatu.DS.Api.Voice2Text.Task[]>(
+                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/SetTaskStatus"
+                        + $"?qid={qId}"
+                        + (withPriority.HasValue ? $"&withPriority={withPriority.Value}" : "")
+                    , false,
+                    headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } },
+                        timeout: this.TimeOut
+                    ); ;
 
+                return true;
+            }
+            catch (Devmasters.Net.HttpClient.SimpleHttpClientException e)
+            {
+                int statusCode = (int)e.HttpStatusNumber;
+                if (statusCode >= 500)
+                {
+                    throw;
+                }
+                else if (statusCode >= 400)
+                {
+                    return false;
+                }
+                else
+                    return true;
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
     }
 }

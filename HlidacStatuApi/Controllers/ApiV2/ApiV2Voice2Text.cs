@@ -58,9 +58,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns>taskid</returns>
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpGet("GetNextTask")]
-        public async Task<ActionResult<HlidacStatu.DS.Api.Voice2Text.Task>> GetNextTask()
+        public async Task<ActionResult<HlidacStatu.DS.Api.Voice2Text.Task>> GetNextTask([FromQuery] string processEngine)
         {
-            var q = await QVoiceToTextRepo.GetNextToProcess();
+            var q = await QVoiceToTextRepo.GetNextToProcess(processEngine);
 
 
             if (q == null)
@@ -91,7 +91,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
                 string strResult = System.Text.Json.JsonSerializer.Serialize(task.Result);
 
-                var q = await QVoiceToTextRepo.Finish(task.QId, strResult, task.Status);
+                var q = await QVoiceToTextRepo.Finish(task.QId, strResult, task.ProcessEngine, task.Status);
                 if (q == null)
                     return StatusCode(404);
                 else
@@ -123,6 +123,33 @@ namespace HlidacStatuApi.Controllers.ApiV2
             }
         }
 
+        [Authorize(Roles = "Admin,InternalQ")]
+        [HttpGet("RestartTask")]
+        public async Task<ActionResult<string>> RestartTask([FromQuery] long qId, [FromQuery] int? withPriority = null)
+        {
+            try
+            {
+                var q = await QVoiceToTextRepo.GetOnlySpecific(qId);
+                if (q == null)
+                    return StatusCode(404);
+                else
+                {
+                    var nQ = new QVoiceToText();
+                    nQ.CallerId = q.CallerId;
+                    nQ.CallerTaskId = q.CallerTaskId;
+                    nQ.Priority = withPriority ?? q.Priority;
+                    nQ.Source = q.Source;
+                    nQ.SourceOptionsRaw = q.SourceOptionsRaw;
+                    nQ.Status = (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.WaitingInQueue;
+                    var saved = await QVoiceToTextRepo.SaveAsync(nQ,checkExisting:false);
+                    return saved.QId.ToString();
+                }
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"task {qId} : {e.Message}");
+            }
+        }
         static System.Text.Json.JsonSerializerOptions jsonSerOpt = new System.Text.Json.JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
 
         [Authorize(Roles = "Admin,InternalQ")]

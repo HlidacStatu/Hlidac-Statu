@@ -38,6 +38,8 @@ namespace HlidacStatu.DS.Api.Voice2Text
             Error = -1,
         }
 
+        public string ProcessEngine { get; set; }
+
     }
 
 
