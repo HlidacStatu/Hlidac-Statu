@@ -1,4 +1,5 @@
 ﻿using Devmasters.Net.HttpClient;
+using HlidacStatu.DS.Api;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -97,24 +98,24 @@ namespace HlidacStatu.Api.VoiceToText
             }
 
         }
-        public async Task<bool> CheckAsync()
+        public async Task<ApiResult> CheckAsync()
         {
             try
             {   //
                 var res = await Simple.GetAsync<string>(
-                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/Check?returnstatus=500", continueOnCapturedContext: false,
+                    BaseApiUri.AbsoluteUri + "api/v2/voice2text/Check", continueOnCapturedContext: false,
                         headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } },
                         timeout: this.TimeOut
                 );
 
-                return true;
+                return ApiResult.Ok();
 
             }
             catch (Devmasters.Net.HttpClient.SimpleHttpClientException e)
             {
                 int statusCode = (int)e.HttpStatusNumber;
                 var body = e.TextContent;
-                return false;
+                return ApiResult.Error(e.TextContent,statusCode);
             }
             catch (Exception e)
             {
