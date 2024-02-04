@@ -87,11 +87,9 @@ namespace HlidacStatuApi.Controllers.ApiV2
         {
             try
             {
-               
-
                 string strResult = System.Text.Json.JsonSerializer.Serialize(task.Result);
 
-                var q = await QVoiceToTextRepo.Finish(task.QId, strResult, task.ProcessEngine, task.Status);
+                var q = await QVoiceToTextRepo.Finish(task.QId, strResult, task.Status);
                 if (q == null)
                     return StatusCode(404);
                 else

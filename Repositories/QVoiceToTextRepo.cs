@@ -62,7 +62,6 @@ namespace HlidacStatu.Repositories
 
 
         public static async Task<QVoiceToText> Finish(long qId, string result, 
-            string processEngine,
             HlidacStatu.DS.Api.Voice2Text.Task.CheckState status, 
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -72,7 +71,6 @@ namespace HlidacStatu.Repositories
                 q.Status = (int)status;
                 q.Done = DateTime.Now;
                 q.Result = result;
-                q.ProcessEngine = processEngine;
                 q.LastUpdate = DateTime.Now;
                 await SaveAsync(q,cancellationToken: cancellationToken);
             }
