@@ -11,28 +11,6 @@
     var oblasti = await PuRepo.GetFollowingOblastiAsync(currentOblast);
 }
 
-@section breadcrumb
-{
-    <ol class="breadcrumb">
-        <li>
-            <a href="/">Platy úředníků</a>
-        </li>
-        @foreach (var oblast in PuOrganizace.PathSplitter(currentOblast))
-        {
-            if (oblast.Value == currentOblast)
-            {
-                <li class="active">@currentOblast</li>
-            }
-            else
-            {
-                <li>
-                    <a asp-action="Oblast" asp-route-id="@oblast.Value">@oblast.Key</a>
-                </li>
-            }
-        }
-    </ol>
-}
-
 <div class="row">
     <div class="col-6">
         <h2>Instituce</h2>

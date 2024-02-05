@@ -210,17 +210,9 @@
 
     </div>
 
-
+    <partial name="_ContextStripe" />
     <partial name="_SummaryStripe" />
     <div class="container">
-
-        
-        @if (IsSectionDefined("breadcrumb"))
-        {
-            @RenderSection("breadcrumb", required: false)
-        }
-
-        
         @RenderBody()
     </div>
 

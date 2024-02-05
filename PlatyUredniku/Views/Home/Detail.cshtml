@@ -1,21 +1,7 @@
 @using Devmasters.Enums
 @model HlidacStatu.Entities.Entities.PuOrganizace
 
-@section breadcrumb
-{
-    <ol class="breadcrumb">
-        <li>
-            <a href="/">Platy úředníků</a>
-        </li>
-        @foreach (var oblast in Model.OblastPath())
-        {
-            <li>
-                <a asp-action="Oblast" asp-route-id="@oblast.Value">@oblast.Key</a>
-            </li>
-        }
-        <li class="active">@Model.Nazev</li>
-    </ol>
-}
+
 
 <div>
     <h3>@Model.Nazev</h3>

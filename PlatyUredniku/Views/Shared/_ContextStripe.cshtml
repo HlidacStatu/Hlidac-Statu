@@ -1,0 +1,43 @@
+@using PlatyUredniku.Models
+@{
+    List<Breadcrumb>? breadcrumbs = (List<Breadcrumb>?) ViewData["breadcrumbs"];
+}
+
+<div class="w-auto p-5">
+    <div class="container">
+        @if (breadcrumbs is not null)
+        {
+            <ol class="breadcrumb">
+                <li>
+                    <a href="/">Platy úředníků</a>
+                </li>
+                @foreach (var breadcrumb in breadcrumbs.SkipLast(1))
+                {
+                    <li>
+                        <a asp-action="@breadcrumb.Action" asp-route-id="@breadcrumb.Id" asp-route-year="@(breadcrumb.Year)">@breadcrumb.Name</a>
+                    </li>
+                }
+                @{
+                    var activeBreadcrumb = breadcrumbs.LastOrDefault();
+                    if (activeBreadcrumb?.Year is null)
+                    {
+                        <li class="active">@activeBreadcrumb?.Name</li>
+                    }
+                    else
+                    {
+                        <li class="active">@activeBreadcrumb.Name <span class="small">(@activeBreadcrumb.Year)</span></li>
+                    }
+                }
+                
+                
+            </ol>
+            
+        }
+        
+        <h2>
+            @ViewData["context"]
+        </h2>
+        
+    </div>
+</div>
+
