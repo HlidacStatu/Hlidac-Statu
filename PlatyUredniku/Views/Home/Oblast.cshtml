@@ -32,7 +32,7 @@
                     columnBreak++;
                     var orgsInOblast = Model.Where(o => o.Oblast == oblast.Value).ToList();
 
-                    <div class="card col" style="background-image: url('/oblast.png')">
+                    <div class="card col m-1" style="background-image: url('/oblast.png'); height: 150px">
                         <a asp-action="Oblast" asp-route-id="@oblast.Value">
                             <div class="card-body">
                                 <h5 class="card-title">@oblast.Key</h5>
