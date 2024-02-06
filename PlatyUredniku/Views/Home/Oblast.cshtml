@@ -9,7 +9,17 @@
 
     var oblasti = await PuRepo.GetFollowingOblastiAsync(currentOblast);
 }
+<div class="row">
+    <div class="col-6">
+        <h3 class="pt-5">V této oblasti/podoblasti máme @organizace.Length institucí s 
+            @organizace.SelectMany(o => o.Platy).Count(p => p.Rok == Util.DefaultYear) typy pozic.</h3>
 
+    </div>
+    <div class="col-6 bg-warning-subtle p-5">
+        <h3>@Model.SelectMany(o => o.Platy).Where(p => p.Rok == Util.DefaultYear && p.JeHlavoun == true).Average(p => p.HrubyMesicniPlat).ToString("N0")</h3>
+        <p>Průměr nejvyšších představitelů úřadů oblasti</p>
+    </div>
+</div>
 <div class="row">
     <div class="col-6">
         <h2>Instituce</h2>
