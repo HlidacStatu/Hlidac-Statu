@@ -1,4 +1,3 @@
-@using HlidacStatu.Entities.Entities
 @using HlidacStatu.Repositories
 
 @model List<HlidacStatu.Entities.Entities.PuOrganizace>
@@ -10,29 +9,17 @@
 
     var oblasti = await PuRepo.GetFollowingOblastiAsync(currentOblast);
 }
+<div class="row">
+    <div class="col-6">
+        <h3 class="pt-5">V této oblasti/podoblasti máme @organizace.Length institucí s 
+            @organizace.SelectMany(o => o.Platy).Count(p => p.Rok == Util.DefaultYear) typy pozic.</h3>
 
-@section breadcrumb
-{
-    <ol class="breadcrumb">
-        <li>
-            <a href="/">Platy úředníků</a>
-        </li>
-        @foreach (var oblast in PuOrganizace.PathSplitter(currentOblast))
-        {
-            if (oblast.Value == currentOblast)
-            {
-                <li class="active">@currentOblast</li>
-            }
-            else
-            {
-                <li>
-                    <a asp-action="Oblast" asp-route-id="@oblast.Value">@oblast.Key</a>
-                </li>
-            }
-        }
-    </ol>
-}
-
+    </div>
+    <div class="col-6 bg-warning-subtle p-5">
+        <h3>@Model.SelectMany(o => o.Platy).Where(p => p.Rok == Util.DefaultYear && p.JeHlavoun == true).Average(p => p.HrubyMesicniPlat).ToString("N0")</h3>
+        <p>Průměr nejvyšších představitelů úřadů oblasti</p>
+    </div>
+</div>
 <div class="row">
     <div class="col-6">
         <h2>Instituce</h2>
@@ -55,12 +42,12 @@
                     columnBreak++;
                     var orgsInOblast = Model.Where(o => o.Oblast == oblast.Value).ToList();
 
-                    <div class="card col">
+                    <div class="card col m-1" style="background-image: url('/oblast.png'); height: 150px">
                         <a asp-action="Oblast" asp-route-id="@oblast.Value">
                             <div class="card-body">
                                 <h5 class="card-title">@oblast.Key</h5>
                                 <h6 class="card-subtitle mb-2 text-muted">@orgsInOblast.Count</h6>
-                                <p class="card-text">Průměrný roční plat: @orgsInOblast.SelectMany(o => o.Platy).Average(p => p.HrubyRocniPlat).ToString("N0")&nbsp;Kč</p>
+                                <p class="card-text">Průměrný roční plat: @orgsInOblast.SelectMany(o => o.Platy).Average(p => p.HrubyMesicniPlat).ToString("N0")&nbsp;Kč</p>
 
                             </div>
                         </a>

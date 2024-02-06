@@ -56,16 +56,18 @@ public class PuRepo
             .AsNoTracking()
             .Where(o => o.Oblast.StartsWith(oblast))
             .Where(o => o.Oblast.Length >= oblast.Length + 1) // vybrat pokračující oblasti, odstranit končící
-            .Select(o => o.Oblast.Substring(oblast.Length + 1) // odstranit základ a odstranit oddělovač '>'
-                .Split(PuOrganizace.PathSplittingChar,
-                    StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-                .FirstOrDefault()) // vzít jen následující element
+            .Select(o => o.Oblast.Substring(oblast.Length + 1)) // vzít jen následující element
             .Distinct()
             .ToListAsync();
 
+        var oblastiCleaned = oblasti.Select(o => o.Split(PuOrganizace.PathSplittingChar,
+                    StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .FirstOrDefault())
+            .Distinct(); // split nefunguje v selectu správně, proto očišťujeme až zde
+        
         List<KeyValuePair<string, string>> results = new();
         
-        foreach (var nextOblast in oblasti)
+        foreach (var nextOblast in oblastiCleaned) //musíme distinct tady, protože se split provádí až po 
         {
             if(string.IsNullOrWhiteSpace(nextOblast))
                 continue;
@@ -109,5 +111,18 @@ FROM Pu_Organizace
 WHERE Oblast IS NOT NULL").ToListAsync();
         
         return oblasti;
+    }
+
+    public static async Task<List<PuPlat>> GetPoziceDlePlatuAsync(int rangeMin, int rangeMax, int year)
+    {
+        await using var db = new DbEntities();
+
+        return await db.PuPlaty
+            .AsNoTracking()
+            .Where(p => p.Rok == year)
+            .Where(p => (((p.Plat ?? 0) + (p.Odmeny ?? 0)) * (1 / p.Uvazek ?? 1) / (p.PocetMesicu ?? 12)) >= rangeMin)
+            .Where(p => (((p.Plat ?? 0) + (p.Odmeny ?? 0)) * (1 / p.Uvazek ?? 1) / (p.PocetMesicu ?? 12)) <= rangeMax)
+            .Include(p => p.Organizace)
+            .ToListAsync();
     }
 }

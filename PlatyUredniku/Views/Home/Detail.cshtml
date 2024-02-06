@@ -1,21 +1,7 @@
 @using Devmasters.Enums
 @model HlidacStatu.Entities.Entities.PuOrganizace
 
-@section breadcrumb
-{
-    <ol class="breadcrumb">
-        <li>
-            <a href="/">Platy úředníků</a>
-        </li>
-        @foreach (var oblast in Model.OblastPath())
-        {
-            <li>
-                <a asp-action="Oblast" asp-route-id="@oblast.Value">@oblast.Key</a>
-            </li>
-        }
-        <li class="active">@Model.Nazev</li>
-    </ol>
-}
+
 
 <div>
     <h3>@Model.Nazev</h3>
@@ -23,84 +9,104 @@
     <small>Datová schránka - @Model.DS</small><br/>
     <p>@Model.Info</p>
 
-    @{
-        var platyGrouped = Model.Platy.GroupBy(p => p.Rok).OrderByDescending(pg => pg.Key).ToList();
-    }
-
-    <div class="card">
-        <div class="card-body">
-
-            <div class="d-flex align-items-start">
-                <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                    <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
-                    @{
-                        string classAttributes = "nav-link active";
-
-                        foreach (var platGroup in platyGrouped)
-                        {
-                            <button class="@classAttributes" id="year-@platGroup.Key-tab" data-bs-toggle="pill" data-bs-target="#year-@platGroup.Key" type="button" role="tab">@platGroup.Key</button>
-                            classAttributes = "nav-link";
-                        }
-                    }
-                </div>
-                <div class="tab-content" id="v-pills-tabContent">
-                    @{
-                        classAttributes = "tab-pane fade show active";
-
-                        foreach (var platGroup in platyGrouped)
-                        {
-                            <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
-                                <table class="table table-striped">
-                                    <tr>
-                                        <th>NazevPozice</th>
-                                        <th>Hrubý roční Plat</th>
-                                        <th>NefinancniBonus</th>
-                                        <th>PoznamkaPlat</th>
-                                        <th>PoznamkaPozice</th>
-                                    </tr>
-
-                                    @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
+    
+    <div class="row">
+        
+        <div class="col-10">
+            @{
+                    var platyGrouped = Model.Platy.GroupBy(p => p.Rok).OrderByDescending(pg => pg.Key).ToList();
+                }
+            
+                <div class="card">
+                    <div class="card-body">
+            
+                        <div class="d-flex align-items-start">
+                            <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                                <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
+                                @{
+                                    string classAttributes = "nav-link active";
+            
+                                    foreach (var platGroup in platyGrouped)
                                     {
-                                        <tr>
-                                            <td><a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a></td>
-                                            <td>@plat.HrubyRocniPlat.ToString("N0")&nbsp;Kč</td>
-                                            <td>@plat.NefinancniBonus</td>
-                                            <td>@plat.PoznamkaPlat</td>
-                                            <td>@plat.PoznamkaPozice</td>
-                                        </tr>
+                                        <button class="@classAttributes" id="year-@platGroup.Key-tab" data-bs-toggle="pill" data-bs-target="#year-@platGroup.Key" type="button" role="tab">@platGroup.Key</button>
+                                        classAttributes = "nav-link";
                                     }
-                                </table>
+                                }
                             </div>
-                            classAttributes = "tab-pane";
-                        }
+                            <div class="tab-content" id="v-pills-tabContent">
+                                @{
+                                    classAttributes = "tab-pane fade show active";
+            
+                                    foreach (var platGroup in platyGrouped)
+                                    {
+                                        <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
+                                            <table class="table table-striped">
+                                                <tr>
+                                                    <th>NazevPozice</th>
+                                                    <th>Hrubý měsíční plat</th>
+                                                    <th>NefinancniBonus</th>
+                                                    <th>PoznamkaPlat</th>
+                                                    <th>PoznamkaPozice</th>
+                                                </tr>
+            
+                                                @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
+                                                {
+                                                    <tr>
+                                                        <td><a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a></td>
+                                                        <td>@plat.HrubyMesicniPlat.ToString("N0")&nbsp;Kč</td>
+                                                        <td>@plat.NefinancniBonus</td>
+                                                        <td>@plat.PoznamkaPlat</td>
+                                                        <td>@plat.PoznamkaPozice</td>
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </div>
+                                        classAttributes = "tab-pane";
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3>Metadata</h3>
+                    @foreach (var metadataForYear in Model.Metadata)
+                    {
+                        <h4>za rok @metadataForYear.Rok</h4>
+                        <dl>
+                            <dt>Způsob komunikace</dt>
+                            <dd>@metadataForYear.ZpusobKomunikace?.ToNiceDisplayName()</dd>
+            
+                            <dt>Datum odeslání žádosti</dt>
+                            <dd>@metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy")</dd>
+            
+                            <dt>Datum přijetí odpovědi</dt>
+                            <dd>@metadataForYear.DatumPrijetiOdpovedi?.ToString("dd.MM.yyyy")</dd>
+            
+                            <dt>Zdůvodnění mimořádných odměn</dt>
+                            <dd>@(metadataForYear.ZduvodneniMimoradnychOdmen == true? "Ano" : "Ne")</dd>
+            
+                            <dt>Skrytá poznámka</dt>
+                            <dd>@metadataForYear.SkrytaPoznamka</dd>
+            
+                        </dl>
                     }
                 </div>
+        </div>
+        <div class="col-2">
+            <div style="width: 100px; height: 100px; border-radius: 50%; border: 8px solid; border-color: green green green red; transform: rotate(45deg);">
+                
+            </div>
+            <p>poskytnuto 70 % platů</p>
+            
+            <div style="width: 100px; height: 100px; border-radius: 50%; border: 8px solid orange;"></div>
+            <p>komunikuje datovkou</p>
+            
+            <div class="d-flex align-items-center" style="width: 100px; height: 100px; border-radius: 50%; background-color: rosybrown;">
+                <span class="text-center">poslední odpověď trvala xx dní</span>
             </div>
         </div>
-    </div>
     
-    <div>
-        <h3>Metadata</h3>
-        @foreach (var metadataForYear in Model.Metadata)
-        {
-            <h4>za rok @metadataForYear.Rok</h4>
-            <dl>
-                <dt>Způsob komunikace</dt>
-                <dd>@metadataForYear.ZpusobKomunikace?.ToNiceDisplayName()</dd>
-
-                <dt>Datum odeslání žádosti</dt>
-                <dd>@metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy")</dd>
-
-                <dt>Datum přijetí odpovědi</dt>
-                <dd>@metadataForYear.DatumPrijetiOdpovedi?.ToString("dd.MM.yyyy")</dd>
-
-                <dt>Zdůvodnění mimořádných odměn</dt>
-                <dd>@(metadataForYear.ZduvodneniMimoradnychOdmen == true? "Ano" : "Ne")</dd>
-
-                <dt>Skrytá poznámka</dt>
-                <dd>@metadataForYear.SkrytaPoznamka</dd>
-
-            </dl>
-        }
     </div>
-</div>
+    </div>

@@ -1,0 +1,24 @@
+@model System.Collections.Generic.List<string>
+
+<div class="row">
+    @{
+        int columnBreak = 0;
+
+        foreach (var oblast in Model)
+        {
+            columnBreak++;
+            <div class="card col m-1" style="background-image: url('/oblast.png'); height: 150px">
+                <a asp-action="Oblast" asp-route-id="@oblast">
+                    <div class="card-body">
+                        <h5 class="card-title">@oblast</h5>
+                    </div>
+                </a>
+            </div>
+
+            if (columnBreak % 4 == 0)
+            {
+                <div class="w-100 d-none d-md-block"></div>
+            }
+        }
+    }
+</div>

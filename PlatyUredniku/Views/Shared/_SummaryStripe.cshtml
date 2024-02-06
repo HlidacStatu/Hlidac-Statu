@@ -10,11 +10,11 @@
     if (platy is null || !platy.Any())
         return;
 
-    var hrubeRocniPlaty = platy.Select(o => (double)o.HrubyRocniPlat).ToList();
+    var hrubeMesicniPlaty = platy.Select(o => (double)o.HrubyMesicniPlat).ToList();
 
-    var dolniKvartil = hrubeRocniPlaty.LowerQuartile();
-    var median = hrubeRocniPlaty.Median();
-    var horniKvartil = hrubeRocniPlaty.UpperQuartile();
+    var minimum = hrubeMesicniPlaty.Minimum();
+    var median = hrubeMesicniPlaty.Median();
+    var maximum = hrubeMesicniPlaty.Maximum();
 }
 
 @if (platy is not null && platy.Any())
@@ -25,8 +25,8 @@
 
                 <div class="col">
                     <figure>
-                        <h2 class="mb-0">@dolniKvartil.ToString("N0")&nbsp;Kč</h2>
-                        <figcaption>Průměr nejnižší čtvrtiny</figcaption>
+                        <h2 class="mb-0">@minimum.ToString("N0")&nbsp;Kč</h2>
+                        <figcaption>Nejnižší plat</figcaption>
                     </figure>
                 </div>
                 <div class="col">
@@ -37,8 +37,8 @@
                 </div>
                 <div class="col">
                     <figure>
-                        <h2 class="mb-0">@horniKvartil.ToString("N0")&nbsp;Kč</h2>
-                        <figcaption>Průměr nejvyšší čtvrtiny</figcaption>
+                        <h2 class="mb-0">@maximum.ToString("N0")&nbsp;Kč</h2>
+                        <figcaption>Nejvyšší plat</figcaption>
                     </figure>
                 </div>
 
