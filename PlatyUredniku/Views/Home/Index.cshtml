@@ -1,14 +1,20 @@
-﻿@using HlidacStatu.Repositories
-<h1>Platy úředníků</h1>
+﻿<div class="row">
+    <div class="col bg-warning-subtle p-5 m-3">
+        <a asp-action="Oblasti">
+            <h4>Procházet dle oblastí</h4>
+        </a>
+    </div>
+    
+    <div class="col bg-warning-subtle p-5 m-3">
+        <a asp-action="Detail" asp-route-id="98">
+            <h4>Organizace dne</h4>
+            <p>Krajské ředitelství policie Středočeského kraje</p>
+        </a>
+    </div>
+</div>
 
-<p>Tady budou další stránky</p>
-
-<h3>Oblasti</h3>
-<ul>
-@foreach (var oblast in await PuRepo.GetPrimalOblastiAsync())
-{
-    <li>
-        <a asp-action="Oblast" asp-route-id="@oblast">@oblast</a>
-    </li>
-}
-</ul>
+<h3>Filtrace dle platu</h3>
+<a asp-action="DlePlatu" asp-route-id="1" class="btn btn-dark">0 - 20 000,-</a>
+<a asp-action="DlePlatu" asp-route-id="2" class="btn btn-dark">20 000 - 40 000,-</a>
+<a asp-action="DlePlatu" asp-route-id="3" class="btn btn-dark">40 000 - 70 000,-</a>
+<a asp-action="DlePlatu" asp-route-id="4" class="btn btn-dark">70 000,- a více</a>

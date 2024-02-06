@@ -110,4 +110,17 @@ WHERE Oblast IS NOT NULL").ToListAsync();
         
         return oblasti;
     }
+
+    public static async Task<List<PuPlat>> GetPoziceDlePlatuAsync(int rangeMin, int rangeMax, int year)
+    {
+        await using var db = new DbEntities();
+
+        return await db.PuPlaty
+            .AsNoTracking()
+            .Where(p => p.Rok == year)
+            .Where(p => (((p.Plat ?? 0) + (p.Odmeny ?? 0)) * (1 / p.Uvazek ?? 1) / (p.PocetMesicu ?? 12)) >= rangeMin)
+            .Where(p => (((p.Plat ?? 0) + (p.Odmeny ?? 0)) * (1 / p.Uvazek ?? 1) / (p.PocetMesicu ?? 12)) <= rangeMax)
+            .Include(p => p.Organizace)
+            .ToListAsync();
+    }
 }

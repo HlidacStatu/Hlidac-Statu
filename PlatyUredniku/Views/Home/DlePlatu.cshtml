@@ -1,0 +1,15 @@
+@model List<HlidacStatu.Entities.Entities.PuPlat>
+
+<ul class="list-group">
+    @foreach (var plat in Model.OrderByDescending(p => p.HrubyMesicniPlat))
+    {
+        <li class="list-group-item">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">@plat.Organizace.Nazev</h5>
+                <small>@plat.NefinancniBonus</small>
+            </div>
+            <p class="mb-1">@plat.NazevPozice</p>
+            <small>@plat.HrubyMesicniPlat.ToString("N0")</small>
+        </li>
+    }
+</ul>

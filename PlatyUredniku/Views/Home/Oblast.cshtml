@@ -1,4 +1,3 @@
-@using HlidacStatu.Entities.Entities
 @using HlidacStatu.Repositories
 
 @model List<HlidacStatu.Entities.Entities.PuOrganizace>
@@ -33,12 +32,12 @@
                     columnBreak++;
                     var orgsInOblast = Model.Where(o => o.Oblast == oblast.Value).ToList();
 
-                    <div class="card col">
+                    <div class="card col" style="background-image: url('/oblast.png')">
                         <a asp-action="Oblast" asp-route-id="@oblast.Value">
                             <div class="card-body">
                                 <h5 class="card-title">@oblast.Key</h5>
                                 <h6 class="card-subtitle mb-2 text-muted">@orgsInOblast.Count</h6>
-                                <p class="card-text">Průměrný roční plat: @orgsInOblast.SelectMany(o => o.Platy).Average(p => p.HrubyRocniPlat).ToString("N0")&nbsp;Kč</p>
+                                <p class="card-text">Průměrný roční plat: @orgsInOblast.SelectMany(o => o.Platy).Average(p => p.HrubyMesicniPlat).ToString("N0")&nbsp;Kč</p>
 
                             </div>
                         </a>

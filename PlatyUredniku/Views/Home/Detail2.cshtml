@@ -90,7 +90,7 @@
                                 <table class="table table-striped">
                                     <tr>
                                         <th>NazevPozice</th>
-                                        <th>Hrubý roční Plat</th>
+                                        <th>Hrubý měsíční Plat</th>
                                         <th>NefinancniBonus</th>
                                         <th>PoznamkaPlat</th>
                                         <th>PoznamkaPozice</th>
@@ -100,7 +100,7 @@
                                     {
                                         <tr>
                                             <td><a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a></td>
-                                            <td>@plat.HrubyRocniPlat.ToString("N0")&nbsp;Kč</td>
+                                            <td>@plat.HrubyMesicniPlat.ToString("N0")&nbsp;Kč</td>
                                             <td>@plat.NefinancniBonus</td>
                                             <td>@plat.PoznamkaPlat</td>
                                             <td>@plat.PoznamkaPozice</td>
