@@ -26,6 +26,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
             try
             {
 
+
                 var qv2t = new QVoiceToText();
                 qv2t.Priority = task.Priority;
                 qv2t.Source = task.Source;
@@ -139,7 +140,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                     nQ.Source = q.Source;
                     nQ.SourceOptionsRaw = q.SourceOptionsRaw;
                     nQ.Status = (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.WaitingInQueue;
-                    var saved = await QVoiceToTextRepo.SaveAsync(nQ,checkExisting:false);
+                    var saved = await QVoiceToTextRepo.SaveAsync(nQ);
                     return saved.QId.ToString();
                 }
             }

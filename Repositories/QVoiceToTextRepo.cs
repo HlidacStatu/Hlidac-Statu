@@ -15,15 +15,16 @@ namespace HlidacStatu.Repositories
         {
             await using DbEntities db = new DbEntities();
 
-            var exists = db.QVoiceToText.FirstOrDefault(m=>
-                    m.CallerId == tbl.CallerId 
-                    && m.CallerTaskId==tbl.CallerId
+            var exists = db.QVoiceToText.AsNoTracking().FirstOrDefault(m =>
+                    m.CallerId == tbl.CallerId
+                    && m.CallerTaskId == tbl.CallerTaskId
                     && m.Status == (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.WaitingInQueue
                     );
+
+
             if (checkExisting && exists != null)
-            {
-                return exists;
-            }
+                tbl.QId= exists.QId;
+                
 
             db.QVoiceToText.Attach(tbl);
             if (tbl.QId == 0)
@@ -61,8 +62,8 @@ namespace HlidacStatu.Repositories
         }
 
 
-        public static async Task<QVoiceToText> Finish(long qId, string result, 
-            HlidacStatu.DS.Api.Voice2Text.Task.CheckState status, 
+        public static async Task<QVoiceToText> Finish(long qId, string result,
+            HlidacStatu.DS.Api.Voice2Text.Task.CheckState status,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             var q = await GetOnlySpecific(qId, cancellationToken);
@@ -72,7 +73,7 @@ namespace HlidacStatu.Repositories
                 q.Done = DateTime.Now;
                 q.Result = result;
                 q.LastUpdate = DateTime.Now;
-                await SaveAsync(q,cancellationToken: cancellationToken);
+                await SaveAsync(q, cancellationToken: cancellationToken);
             }
             return q;
         }
@@ -88,7 +89,7 @@ namespace HlidacStatu.Repositories
             return q;
         }
 
-        public static async Task<QVoiceToText[]> GetByParameters(int maxItems = 1000, string? callerId=null, string? callerTaskId=null, HlidacStatu.DS.Api.Voice2Text.Task.CheckState? status=null, CancellationToken cancellationToken = default(CancellationToken))
+        public static async Task<QVoiceToText[]> GetByParameters(int maxItems = 1000, string? callerId = null, string? callerTaskId = null, HlidacStatu.DS.Api.Voice2Text.Task.CheckState? status = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             await using (DbEntities db = new DbEntities())
             {
@@ -102,7 +103,7 @@ namespace HlidacStatu.Repositories
                     query = query.Where(m => m.Status == (int)status.Value);
 
                 var tbl = await query
-                    .OrderByDescending(o=>( o.LastUpdate ?? o.Created))
+                    .OrderByDescending(o => (o.LastUpdate ?? o.Created))
                     .Take(maxItems)
                     .ToArrayAsync(cancellationToken);
 
