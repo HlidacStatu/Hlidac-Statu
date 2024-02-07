@@ -8,27 +8,6 @@
 </div>
 <div class="hlidac-autocomplete">
     <div class="input-group bg-white rounded-2">
-        @foreach (var tagItem in TagItems)
-        {
-            <div style="margin:4px 2px;" class="input-group-text position-relative pe-3 rounded-pill selected-element rounded-pill bg-primary-subtle border border-1 border-primary @(ReferenceEquals(tagItem, _currentlySelectedTag) ? ActiveTag : "")">
-                @if (TagTemplate is null)
-                {
-                    <span class="no-overflow">@GetTextFromItem(tagItem)</span>
-                }
-                else
-                {
-                    @TagTemplate(tagItem)
-                }
-                <button class="btn btn-sm position-absolute top-0 pt-0 pe-0" style="right:7px"
-                        @onclick="@(() => RemoveSelectedTag(tagItem))">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-        }
-        @if (TagItems.Count > 2)
-        {
-            <div class="input-group-newline"></div>
-        }
         <input @ref="InputBoxElement"
                id="autocompleteInputBox"
                type="text"
@@ -41,15 +20,13 @@
                @onkeydown="OnInputKeyDown"
                @onclick="@ShowDefaultHintItems"/>
 
-        <button class="btn btn-primary" @onclick="@(SubmitSearch)" style="margin-bottom:0;margin-top:0;padding-bottom:0">
-            Hledat
             @if (_showSpinner)
             {
                 <span class="spinner-border spinner-border-sm text-light align-middle mb-1 ms-1" role="status">
                   <span class="visually-hidden">Loading...</span>
                 </span>
             }
-        </button>
+        
     </div>
 
     @if (ShowHelpTips && string.IsNullOrWhiteSpace(InputBoxValue))
@@ -93,8 +70,7 @@
     [Parameter]
     public RenderFragment<TItem>? ItemTemplate { get; set; }
 
-    [Parameter]
-    public RenderFragment<AutocompleteItem<TItem>>? TagTemplate { get; set; }
+    
 
     [Parameter]
     public RenderFragment<RenderFragment>? HelpTemplate { get; set; }
@@ -106,13 +82,10 @@
     public Func<TItem, string> TextSelector { get; set; } = null!;
 
     [Parameter]
-    public EventCallback<List<AutocompleteItem<TItem>>> OnAutocompleteSubmitted { get; set; }
+    public EventCallback<AutocompleteItem<TItem>> OnAutocompleteSubmitted { get; set; }
 
     [Parameter]
     public EventCallback<string> OnAutocompleteTextSelected { get; set; }
-
-    [Parameter]
-    public List<AutocompleteItem<TItem>>? InputTags { get; set; }
 
     [Parameter]
     public List<RenderFragment>? HelpTips { get; set; }
@@ -120,11 +93,7 @@
     private ElementReference InputBoxElement { get; set; }
     private string? InputBoxValue { get; set; }
     private bool IsInputboxEmpty => string.IsNullOrEmpty(InputBoxValue);
-
-    private List<AutocompleteItem<TItem>> TagItems { get; set; } = new();
-    private AutocompleteItem<TItem>? _currentlySelectedTag = null;
-    private bool TagExist => TagItems.Any();
-
+    
     private CancellationTokenSource? _cts;
     private Task<List<TItem>>? _searchTask;
 
@@ -138,9 +107,7 @@
 
     private string InputBoxPlaceHolder
     {
-        get => TagItems.Count > 0 ?
-            "Napište další vyhledávaný výraz, nebo stiskněte \"Hledat\"" :
-            "Začněte psát jméno, kraj, IČO, firmu, politickou stranu, ...";
+        get => "Začněte psát jméno, kraj, IČO, firmu, politickou stranu, ...";
     }
 
 
@@ -151,14 +118,6 @@
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-
-        if (!TagExist && InputTags is not null && InputTags.Any())
-        {
-            foreach (var inputTag in InputTags)
-            {
-                TagItems.Add(inputTag);
-            }
-        }
 
         if (TextSelector is null)
             throw new ArgumentNullException(nameof(TextSelector));
@@ -198,7 +157,7 @@
 
             var data = await _searchTask;
 
-            if (!_searchTask?.IsCanceled == true)
+            if (_searchTask?.IsCanceled == false)
                 OptionItems = data;
         }
         catch (Exception e)
@@ -235,22 +194,21 @@
 
     private async Task SelectItemAsync(int option)
     {
+
         if (!IsAnyOptionItem || option == -1)
         {
-            if (!IsInputboxEmpty)
-                TagItems.Add(new AutocompleteItem<TItem>(InputBoxValue));
+            CloseOptions();
+            return;
         }
 
         if (IsAnyOptionItem && option >= 0 && option <= OptionItems.Count)
         {
-            TagItems.Add(new AutocompleteItem<TItem>(OptionItems[option]));
+            var result = new AutocompleteItem<TItem>(OptionItems[option]);
+            InputBoxValue = result.Text;
+            await SubmitSearch(result);
         }
-
+        
         CloseOptions();
-
-    //cleanup input box and focus on it
-        InputBoxValue = "";
-        await InputBoxElement.FocusAsync();
     }
 
     private async Task OnInputKeyDown(KeyboardEventArgs eventArgs)
@@ -275,88 +233,23 @@
                 CloseOptions();
                 break;
             case "Enter" when IsInputboxEmpty:
-                await SubmitSearch();
                 break;
             case "Enter":
                 await SelectItemAsync(_selectedOption);
                 break;
-            case "Backspace" when IsInputboxEmpty:
-                RemoveSelectedTag(_currentlySelectedTag);
-                break;
-            case "ArrowLeft" when IsInputboxEmpty:
-                GetPreviousTag();
-                break;
-            case "ArrowRight" when IsInputboxEmpty:
-                GetNextTag();
-                break;
             default:
-                _currentlySelectedTag = null;
                 break;
         }
     }
+    
 
-    private void GetNextTag()
+    private async Task SubmitSearch(AutocompleteItem<TItem> selectedItem)
     {
-        if (!TagExist)
-            return;
-
-        if (_currentlySelectedTag is not null)
-        {
-            var index = TagItems.FindIndex(m => ReferenceEquals(m, _currentlySelectedTag));
-            index++;
-            if (index < TagItems.Count)
-            {
-                _currentlySelectedTag = TagItems[index];
-                return;
-            }
-        }
-
-        _currentlySelectedTag = TagItems.First();
-    }
-
-    private void GetPreviousTag()
-    {
-        if (!TagExist)
-            return;
-
-        if (_currentlySelectedTag is not null)
-        {
-            var index = TagItems.FindIndex(m => ReferenceEquals(m, _currentlySelectedTag));
-            index--;
-            if (index >= 0)
-            {
-                _currentlySelectedTag = TagItems[index];
-                return;
-            }
-        }
-
-        _currentlySelectedTag = TagItems.Last();
-    }
-
-    private void RemoveSelectedTag(AutocompleteItem<TItem>? autocompleteItem = null)
-    {
-        if (autocompleteItem is null && TagExist)
-        {
-            TagItems.Remove(TagItems.Last());
-            return;
-        }
-
-        if (autocompleteItem is not null && TagItems.Contains(autocompleteItem))
-        {
-            TagItems.Remove(autocompleteItem);
-            _currentlySelectedTag = null;
-            return;
-        }
-    }
-
-    private async Task SubmitSearch()
-    {
-        //add what is in inputbox
-        await SelectItemAsync(-1);
+        
         //spin it
         _showSpinner = true;
         //notify parent, that we are done
-        await OnAutocompleteSubmitted.InvokeAsync(TagItems);
+        await OnAutocompleteSubmitted.InvokeAsync(selectedItem);
     }
 
     private void ShowDefaultHintItems()

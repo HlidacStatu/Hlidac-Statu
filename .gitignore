@@ -397,3 +397,6 @@ AutocompleteApi/AutocompleteBasicIndexes
 
 .DS_Store
 Web/HlidacStatu/Web.PageTimes/Warn/*
+
+PlatyUredniku/AutocompleteCache_False/
+PlatyUredniku/AutocompleteCache_True/

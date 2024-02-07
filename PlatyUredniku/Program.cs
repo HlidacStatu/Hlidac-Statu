@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using PlatyUredniku.Services;
+using PlatyUredniku.Views.Shared.Components;
 using Serilog;
 
 namespace PlatyUredniku;
@@ -47,6 +49,10 @@ public class Program
             
             builder.Services.AddSingleton<AttackerDictionaryService>();
             builder.Services.AddHttpClient();
+
+            builder.Services.AddSingleton<AutocompleteCacheService>();
+            builder.Services.AddHostedService<AutocompleteTimer>();
+
             
             builder.Services.AddServerSideBlazor().AddInteractiveServerComponents();
             // builder.Services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
@@ -102,6 +108,8 @@ public class Program
             
             
             app.MapRazorPages();
+            app.MapRazorComponents<AutocompleteWrap>()
+                .AddInteractiveServerRenderMode();
 
             app.Run();
         }

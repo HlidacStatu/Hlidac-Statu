@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.1" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.1" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.1" />
         <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.396" />
@@ -16,6 +17,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\LibCore\LibCore.csproj" />
+      <ProjectReference Include="..\Whisperer\Whisperer.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -28,10 +30,23 @@
       <None Include="logger.serilog.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Remove="AutocompleteCache_False\**" />
+      <None Remove="AutocompleteCache_True\**" />
     </ItemGroup>
 
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="Areas\Identity\Pages\_ViewStart.cshtml" />
+      <Compile Remove="AutocompleteCache_False\**" />
+      <Compile Remove="AutocompleteCache_True\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="AutocompleteCache_False\**" />
+      <EmbeddedResource Remove="AutocompleteCache_True\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="AutocompleteCache_False\**" />
+      <Content Remove="AutocompleteCache_True\**" />
     </ItemGroup>
 
 </Project>

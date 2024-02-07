@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities;
+using HlidacStatu.Util;
 using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories;
@@ -125,4 +126,6 @@ WHERE Oblast IS NOT NULL").ToListAsync();
             .Include(p => p.Organizace)
             .ToListAsync();
     }
+
+    
 }

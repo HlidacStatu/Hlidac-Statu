@@ -1,16 +1,12 @@
 @using HlidacStatu.Entities
 @using System.Threading
-@using System.Text.Json
-@using System.Web
 @using HlidacStatu.Entities.KIndex
-@using HlidacStatu.Extensions
-@using HlidacStatu.Repositories
-@using HlidacStatu.Util
-@using Microsoft.AspNetCore.WebUtilities
+@using PlatyUredniku.Services
 @using Serilog
 @* @rendermode InteractiveServer *@
 
 @inject NavigationManager Navigation
+@inject AutocompleteCacheService AutocompleteService
 
 <style>
 .hlidac-autocomplete {
@@ -123,26 +119,8 @@
                 <HlidacAutocompleteMultitag SearchFuncAsync="@((s, token) => OnSearch(s, token))"
                                             OnAutocompleteSubmitted="@(OnAutocompleteSubmitted)"
                                             TextSelector="@((autocomplete) => autocomplete?.RenderText())"
-                                            InputTags="InputTags"
                                             HelpTips="HelpTips"
                                             TItem="Autocomplete">
-                    <TagTemplate>
-                        @if (context.Value is null)
-                        {
-                            <span style="overflow:hidden; text-overflow:ellipsis;">@context.Text</span>
-                        }
-                        else
-                        {
-                            if (context.Value.Category is Autocomplete.CategoryEnum.Hint)
-                            {
-                                <span style="overflow:hidden; text-overflow:ellipsis;">@(CategoryToPicture(context.Value.Category))&nbsp;@context.Value.Id</span>
-                            }
-                            else
-                            {
-                                <span style="overflow:hidden; text-overflow:ellipsis;">@(CategoryToPicture(context.Value.Category))&nbsp;@context.Value.RenderText()</span>
-                            }
-                        }
-                    </TagTemplate>
                     <HelpTemplate>
                         <div class="list-group-item d-flex align-items-center justify-content-start">
                             <div class="hs-avatar small">
@@ -242,9 +220,7 @@
 
     [Parameter]
     public string SearchPath { get; set; }
-
-    private List<AutocompleteItem<Autocomplete>>? InputTags { get; set; }
-
+    
     private string _query;
     
     private readonly ILogger _logger = Log.ForContext<AutocompleteWrap>();
@@ -263,156 +239,34 @@
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-
-        Uri? uri = null;
-
-        try
-        {
-            uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var q))
-            {
-                _query = q;
-
-                if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("qtl", out var qtl))
-                {
-                    var parsedQueries = ParseTools.ParseQueryStringWithOffsets(q, qtl);
-                    InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
-                }
-                else
-                {
-                    var parsedQueries = ParseTools.ParseQueryStringWithoutOffsets(q);
-                    InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            _logger.Error(e, $"During autocomplete usage an error occured. OnParametersSetAsync in Wrapper. query=[{uri?.Query}]");
-        }
     }
 
-    private List<AutocompleteItem<Autocomplete>> CreateAutocompleteItemsFromparsedQueries(List<string>? parsedQueries)
-    {
-        if (parsedQueries is null)
-            return Enumerable.Empty<AutocompleteItem<Autocomplete>>().ToList();
-        return parsedQueries.AsParallel().Select(CreateAutocompleteItemFromQuery).ToList();
-    }
-
-    private AutocompleteItem<Autocomplete> CreateAutocompleteItemFromQuery(string parsedQuery)
+    private Task<List<Autocomplete>> OnSearch(string query, CancellationToken cancellationToken)
     {
         try
         {
-            if (parsedQuery.StartsWith("osobaid:", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var osoba = OsobaRepo.GetByNameId(parsedQuery.Substring(8));
-                if (osoba is not null)
-                {
-                    return new AutocompleteItem<Autocomplete>(new Autocomplete()
-                    {
-                        Id = parsedQuery,
-                        Text = osoba.FullName(),
-                        Category = Autocomplete.CategoryEnum.Person
-                    });
-                }
-            }
-            else if (parsedQuery.StartsWith("ico:", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var firma = FirmaRepo.FromIco(parsedQuery.Substring(4));
-                if (firma is not null)
-                {
-                    Autocomplete.CategoryEnum kategorie = Autocomplete.CategoryEnum.Company;
-                    if (firma.TypSubjektu == Firma.TypSubjektuEnum.Obec)
-                    {
-                        kategorie = Autocomplete.CategoryEnum.City;
-                    }
-                    else if (firma.Kod_PF > 110 && firma.JsemOVM() && firma.IsInRS == 1)
-                    {
-                        kategorie = Autocomplete.CategoryEnum.Authority;
-                    }
-
-                    return new AutocompleteItem<Autocomplete>(new Autocomplete()
-                    {
-                        Id = parsedQuery,
-                        Text = firma.Jmeno,
-                        Category = kategorie
-                    });
-                }
-            }
-            else if (parsedQuery.StartsWith("oblast:", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return new AutocompleteItem<Autocomplete>(new Autocomplete()
-                {
-                    Id = parsedQuery,
-                    Text = parsedQuery,
-                    Category = Autocomplete.CategoryEnum.Oblast
-                });
-            }
-        }
-        catch (Exception e)
-        {
-            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-            _logger.Error(e, $"During autocomplete usage an error occured. CreateAutocompleteItemFromQuery in Wrapper. Parsed query [{parsedQuery}], uri=[{uri}]");
-        }
-
-        return new AutocompleteItem<Autocomplete>(parsedQuery);
-    }
-
-
-    private async Task<List<Autocomplete>> OnSearch(string query, CancellationToken cancellationToken)
-    {
-        JsonSerializerOptions? _jsonSerializerOptions = new()
-        {
-            PropertyNameCaseInsensitive = true
-        };
-        
-        var autocompletePath = $"/autocomplete/autocomplete?q={HttpUtility.UrlEncode(query)}";
-
-        var uri = new Uri($"{Endpoint}{autocompletePath}");
-
-        try
-        {
-            using var response = await HttpClient.GetAsync(uri, cancellationToken);
-
-            _ = response.EnsureSuccessStatusCode();
-
-
-            var datastream = await response.Content.ReadAsStreamAsync(cancellationToken);
-
-            var autocomplete = await JsonSerializer.DeserializeAsync<List<Autocomplete>>(datastream,
-                cancellationToken: cancellationToken,
-                options: _jsonSerializerOptions);
-
-    // add hint
-            autocomplete.Insert(0, new Autocomplete()
-            {
-                Text = "Vyhledat text",
-                Id = query,
-                ImageElement = "<i class=\"fa-solid fa-magnifying-glass\"></i>",
-                Category = Autocomplete.CategoryEnum.Hint
-            });
-
-            return autocomplete;
+            return Task.FromResult(AutocompleteService.Search(query).ToList());
         }
         catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
         {
-    // canceled by user (writing more letters), do not need catch here
+            // canceled by user (writing more letters), do not need catch here
         }
         catch (Exception e)
         {
             _logger.Error(e, $"During autocomplete usage an error occured. OnSearch in Wrapper. Query was=[{query}]");
         }
 
-        return Enumerable.Empty<Autocomplete>().ToList();
+        return Task.FromResult(Enumerable.Empty<Autocomplete>().ToList());
     }
 
-    private Task OnAutocompleteSubmitted(List<AutocompleteItem<Autocomplete>> autocomplete)
+    private Task OnAutocompleteSubmitted(AutocompleteItem<Autocomplete> autocomplete)
     {
         try
         {
-            (string qs, string qtl) = ParseTools.CreateQueryWithOffsets(
-                autocomplete.Select(i => i.Value?.Id ?? i.Text ?? "").ToList());
-
-            string url = $"{Navigation.BaseUri}{SearchPath}?q={HttpUtility.UrlEncode(qs)}&qtl={qtl}";
+            string? url = autocomplete.Value?.Id;
+            if (string.IsNullOrWhiteSpace(url))
+                return Task.CompletedTask;
+            
             Navigation.NavigateTo(url, true);
         }
         catch (Exception e)
@@ -423,19 +277,6 @@
         return Task.CompletedTask;
     }
 
-    private RenderFragment CategoryToPicture(Autocomplete.CategoryEnum categoryEnum) => categoryEnum switch
-    {
-        Autocomplete.CategoryEnum.Company => @<i class='fas fa-industry-alt fa-xs text-muted'></i>,
-        Autocomplete.CategoryEnum.StateCompany => @<i class='fas fa-industry-alt fa-xs text-muted'></i>,
-        Autocomplete.CategoryEnum.Authority => @<i class='fas fa-university fa-xs text-muted'></i>,
-        Autocomplete.CategoryEnum.City => @<i class='fas fa-city fa-xs text-muted'></i>,
-        Autocomplete.CategoryEnum.Person => @<i class="fa-duotone fa-user-secret fa-xs text-muted"></i>,
-        Autocomplete.CategoryEnum.Operator => @<i class="fa-solid fa-circle-small fa-xs text-muted"></i>,
-        Autocomplete.CategoryEnum.Synonym => @<i class="fa-regular fa-hashtag fa-xs text-muted"></i>,
-        Autocomplete.CategoryEnum.Oblast => @<i class="fa-regular fa-tag fa-xs text-muted"></i>,
-        Autocomplete.CategoryEnum.Hint => @<i class="fa-solid fa-magnifying-glass fa-xs text-muted"></i>,
-        _ => @<i class="fa-regular fa-alien-8bit"></i>
-        };
-
+   
 
 }
