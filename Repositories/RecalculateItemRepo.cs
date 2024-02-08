@@ -320,7 +320,7 @@ namespace HlidacStatu.Repositories
             {
                 var ff_it = new RecalculateItem(ff, statsType, provokeBy);
                 if (list.Contains(ff_it, comparer) == false)
-                    FirmaForQueue(list, ff, statsType, provokeBy, deep + 1);
+                    list = list.Union(FirmaForQueue(list, ff, statsType, provokeBy, deep + 1), comparer).ToList();
             }
 
             var os_parents = f.Osoby_v_OR(DS.Graphs.Relation.AktualnostType.Nedavny);
@@ -329,7 +329,7 @@ namespace HlidacStatu.Repositories
                 var item = new RecalculateItem(vaz.o, statsType, provokeBy);
                 if (list.Contains(item, comparer) == false)
                 {
-                    list.AddRange(OsobaForQueue(list, vaz.o, statsType, provokeBy, deep+1));
+                    list = list.Union(OsobaForQueue(list, vaz.o, statsType, provokeBy, deep+1),comparer).ToList();
                 }
             }
             return list;
