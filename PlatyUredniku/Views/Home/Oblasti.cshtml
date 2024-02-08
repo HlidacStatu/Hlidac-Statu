@@ -1,24 +1,43 @@
 @model System.Collections.Generic.List<string>
 
 <div class="row">
-    @{
-        int columnBreak = 0;
-
-        foreach (var oblast in Model)
-        {
-            columnBreak++;
-            <div class="card col m-1" style="background-image: url('/content/img/oblast2.png'); height: 150px">
-                <a asp-action="Oblast" asp-route-id="@oblast">
-                    <div class="card-body">
-                        <h5 class="card-title">@oblast</h5>
-                    </div>
-                </a>
-            </div>
-
-            if (columnBreak % 4 == 0)
+    <div class="col-6">
+        @{
+            foreach (var oblast in Model)
             {
-                <div class="w-100 d-none d-md-block"></div>
+                <div class="card m-1">
+                    <a asp-action="Oblast" asp-route-id="@oblast">
+                        <div class="card-body">
+                            <h5 class="card-title">@oblast</h5>
+                            <p class="card-subtitle ms-2 text-muted">
+                                Oblast obsahuje 4 podoblasti a celkem 69 institucí.
+                            </p>
+                        </div>
+                    </a>
+                </div>
             }
         }
-    }
+    </div>
+
+    <div class="col-6">
+        <table class="table table-new table-new--dotted table-hover">
+            <tbody>
+            @foreach (var oblast in Model)
+            {
+                <tr>
+                    <td>
+                        <h4>
+                            <a asp-action="Oblast" asp-route-id="@oblast">
+                                @oblast
+                            </a>
+                        </h4>
+                    </td>
+                    <td>
+                        Oblast obsahuje 4 podoblasti a celkem 69 institucí.
+                    </td>
+                </tr>    
+            }
+            </tbody>
+        </table>
+    </div>
 </div>
