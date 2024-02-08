@@ -1,16 +1,17 @@
+using HlidacStatu.Entities;
+using HlidacStatu.Entities.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using HlidacStatu.Entities;
-using HlidacStatu.Entities.Entities;
-using HlidacStatu.Util;
-using Microsoft.EntityFrameworkCore;
 
 namespace HlidacStatu.Repositories;
 
-public class PuRepo
+public static class PuRepo
 {
+    public const int DefaultYear = 2022;
+
     public static async Task<PuOrganizace> GetDetailEagerAsync(int id)
     {
         await using var db = new DbEntities();
@@ -23,7 +24,12 @@ public class PuRepo
             .Include(o => o.Metadata) // Include PuOranizaceMetadata
             .FirstOrDefaultAsync();
     }
-    
+
+    public static List<PuPlat> Rok(this ICollection<PuPlat> platy, int rok = DefaultYear)
+    {
+        return platy?.Where(m => m.Rok == rok).ToList();
+    }
+
     public static async Task<List<PuOrganizace>> GetOrganizaceForOblastiAsync(string oblast)
     {
         await using var db = new DbEntities();
@@ -34,7 +40,7 @@ public class PuRepo
             .Include(o => o.Platy) // Include PuPlat
             .ToListAsync();
     }
-    
+
     //todo: test it
     public static async Task<List<PuOrganizace>> GetOrganizacForTagAsync(string tag)
     {
@@ -48,7 +54,7 @@ public class PuRepo
             .Select(t => t.Organizace)
             .ToListAsync();
     }
-    
+
     public static async Task<List<KeyValuePair<string, string>>> GetFollowingOblastiAsync(string oblast)
     {
         await using var db = new DbEntities();
@@ -65,15 +71,15 @@ public class PuRepo
                     StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
                 .FirstOrDefault())
             .Distinct(); // split nefunguje v selectu správně, proto očišťujeme až zde
-        
+
         List<KeyValuePair<string, string>> results = new();
-        
+
         foreach (var nextOblast in oblastiCleaned) //musíme distinct tady, protože se split provádí až po 
         {
-            if(string.IsNullOrWhiteSpace(nextOblast))
+            if (string.IsNullOrWhiteSpace(nextOblast))
                 continue;
-            
-            results.Add(new KeyValuePair<string, string>(nextOblast,$"{oblast}{PuOrganizace.PathSplittingChar}{nextOblast}"));
+
+            results.Add(new KeyValuePair<string, string>(nextOblast, $"{oblast}{PuOrganizace.PathSplittingChar}{nextOblast}"));
 
         }
 
@@ -91,7 +97,7 @@ public class PuRepo
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync();
     }
-    
+
     public static async Task<List<PuPlat>> GetPlatyAsync(int rok)
     {
         await using var db = new DbEntities();
@@ -101,17 +107,17 @@ public class PuRepo
             .Where(p => p.Rok == rok)
             .ToListAsync();
     }
-    
+
     public static async Task<List<string>> GetPrimalOblastiAsync()
     {
         await using var db = new DbEntities();
-        
+
         var oblasti = await db.Database.SqlQuery<string>(@$"SELECT DISTINCT
             LEFT(Oblast, CHARINDEX({PuOrganizace.PathSplittingChar}, Oblast + {PuOrganizace.PathSplittingChar}) - 1) AS FirstPart
             FROM Pu_Organizace
             WHERE Oblast IS NOT NULL")
         .ToListAsync();
-        
+
         return oblasti;
     }
 
@@ -128,5 +134,5 @@ public class PuRepo
             .ToListAsync();
     }
 
-    
+
 }

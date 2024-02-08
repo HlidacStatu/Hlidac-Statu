@@ -6,6 +6,5 @@
         { 
         }
 
-        public const int DefaultYear = 2022;
     }
 }

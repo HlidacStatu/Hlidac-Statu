@@ -10,7 +10,7 @@ public class HomeController : Controller
    
     public async Task<IActionResult> Index()
     {
-        ViewData["platy"] = await PuRepo.GetPlatyAsync(Util.DefaultYear);
+        ViewData["platy"] = await PuRepo.GetPlatyAsync(PuRepo.DefaultYear);
         
         return View();
     }
@@ -26,7 +26,7 @@ public class HomeController : Controller
         };
 
         
-        var platy = await PuRepo.GetPoziceDlePlatuAsync(range.Min, range.Max, Util.DefaultYear);
+        var platy = await PuRepo.GetPoziceDlePlatuAsync(range.Min, range.Max, PuRepo.DefaultYear);
 
         ViewData["platy"] = platy;
 
@@ -86,7 +86,7 @@ public class HomeController : Controller
         return View(oblasti);
     }
 
-    public async Task<IActionResult> Detail(int id, int rok = Util.DefaultYear )
+    public async Task<IActionResult> Detail(int id, int rok = PuRepo.DefaultYear )
     {
         var detail = await PuRepo.GetDetailEagerAsync(id);
         ViewData["platy"] = detail.Platy.ToList();
@@ -116,7 +116,7 @@ public class HomeController : Controller
         var detail = await PuRepo.GetDetailEagerAsync(id);
 
         ViewData["platy"] = detail.Platy.ToList();
-        ViewData["rok"] = rok ?? (detail.Platy.Any() ? detail.Platy.Max(m=>m.Rok) : Util.DefaultYear);
+        ViewData["rok"] = rok ?? (detail.Platy.Any() ? detail.Platy.Max(m=>m.Rok) : PuRepo.DefaultYear);
         ViewData["id"] = id;
         
         List<Breadcrumb> breadcrumbs = detail.OblastPath()
