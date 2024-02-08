@@ -106,7 +106,7 @@ public class AutocompleteCacheService
                 Text = $"{o}",
                 PriorityMultiplier = 1,
                 Type = "oblast",
-                ImageElement = $"<i class='fas fa-university'></i>",
+                ImageElement = $"<i class=\"fa-regular fa-flatbread\"></i>",
                 Description = $"{o}",
                 Category = Autocomplete.CategoryEnum.Oblast,
             })
