@@ -4,10 +4,11 @@
 
 @{
     string currentOblast = (string)ViewData["oblast"];
+    string currentPodOblast = (string)ViewData["podoblast"];
 
-    var organizace = Model.Where(o => o.Oblast == currentOblast).ToArray();
+    var organizace = Model.Where(o => o.Oblast == currentOblast && o.PodOblast == currentPodOblast).ToArray();
 
-    var oblasti = await PuRepo.GetFollowingOblastiAsync(currentOblast);
+    var podoblasti = await PuRepo.GetPodoblastiAsync(currentOblast);
 
     var platyHlavounu = Model.SelectMany(o => o.Platy).Where(p => p.Rok == PuRepo.DefaultYear && p.JeHlavoun == true)
         .ToList();
@@ -63,18 +64,18 @@
         }
 
     </div>
-    @if (oblasti is not null && oblasti.Any())
+    @if (podoblasti is not null && podoblasti.Any())
     {
         <div class="col-12">
             <h2>Oblasti</h2>
 
                 @{
 
-                    foreach (var oblast in oblasti)
+                    foreach (var podoblast in podoblasti)
                     {
-                        var orgsInOblast = Model.Where(o => o.Oblast == oblast.Value).ToList();
+                        var orgsInOblast = Model.Where(o => o.Oblast == currentOblast && o.PodOblast == podoblast).ToList();
 
-                        <h2>@oblast.Value</h2>
+                        <h2>@podoblast</h2>
                     <table class="table table-new table-new--dotted table-hover">
                         <tbody>
                             @foreach (var org in orgsInOblast)

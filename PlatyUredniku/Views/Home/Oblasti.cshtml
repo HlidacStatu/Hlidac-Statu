@@ -1,4 +1,4 @@
-@model System.Collections.Generic.List<string>
+@model List<string>
 
 <div class="row">
 
@@ -11,14 +11,14 @@
                     <tr>
                         <td>
                             <h4>
-                                <a asp-action="Oblast" asp-route-id="@oblast">
+                                <a asp-action="Oblast" asp-route-oblast="@oblast">
                                     @oblast
                                 </a>
                             </h4>
                         </td>
                         <td>
                             @{
-                                var instituce = await HlidacStatu.Repositories.PuRepo.GetOrganizaceForOblastiAsync(oblast);
+                                var instituce = await HlidacStatu.Repositories.PuRepo.GetOrganizaceForOblastiAsync(oblast, null);
                                 var sample = ".";
                                 if (instituce.Count > 1)
                                 {
