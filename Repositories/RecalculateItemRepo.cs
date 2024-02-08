@@ -148,6 +148,7 @@ namespace HlidacStatu.Repositories
             {
                 allItems = GetFromProcessingQueueWithParents(numFromQueue, threads.Value,
                     outputWriter, progressWriter, debug);
+                uniqueItems = allItems.ToList();
             }
             if (uniqueItems.Count > 0)
                 goto start;
