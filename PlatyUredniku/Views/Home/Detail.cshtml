@@ -1,13 +1,18 @@
 @using Devmasters.Enums
 @model HlidacStatu.Entities.Entities.PuOrganizace
 
-
-
 <div>
     <h3>@Model.Nazev</h3>
     <small>IČO - @Model.Ico</small><br/>
     <small>Datová schránka - @Model.DS</small><br/>
     <p>@Model.Info</p>
+    <h6>
+        Tagy (zatím hardcoded)
+        <span class="badge bg-secondary">Policie</span>
+        <span class="badge bg-secondary">Ředitelství</span>
+        <span class="badge bg-secondary">TAG3</span>
+        <span class="badge bg-secondary">TAG4</span>
+    </h6>
 
     
     <div class="row">
