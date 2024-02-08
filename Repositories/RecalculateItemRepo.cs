@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Serilog;
+using Devmasters.Collections;
 
 namespace HlidacStatu.Repositories
 {
@@ -195,23 +196,27 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static List<RecalculateItem> CascadeItems(RecalculateItem item, ref System.Collections.Concurrent.ConcurrentBag<RecalculateItem> alreadyOnList)
+        public static List<RecalculateItem> CascadeItems(RecalculateItem item, 
+            ref System.Collections.Concurrent.ConcurrentBag<RecalculateItem> alreadyOnList)
         {
+            
             List<RecalculateItem> list = new List<RecalculateItem>(alreadyOnList);
             if (item.ItemType == RecalculateItem.ItemTypeEnum.Subjekt)
             {
                 var f = Firmy.Get(item.Id);
                 if (f?.Valid == true)
-                    list.AddRange(FirmaForQueue(new List<RecalculateItem>(), f, item.StatisticsType, item.ProvokedBy, 0));
+                    list = list.Union(FirmaForQueue(new List<RecalculateItem>(), f, item.StatisticsType, item.ProvokedBy, 0), comparer)
+                        .ToList();
             }
             else if (item.ItemType == RecalculateItem.ItemTypeEnum.Person)
             {
                 var o = Osoby.GetById.Get(Convert.ToInt32(item.Id));
                 if (o != null)
-                    OsobaForQueue(new List<RecalculateItem>(), o, item.StatisticsType, item.ProvokedBy,0);
+                    list = list.Union(OsobaForQueue(new List<RecalculateItem>(), o, item.StatisticsType, item.ProvokedBy,0), comparer)
+                        .ToList();
             }
             else
-                list.Add(item);
+                list = list.Union(new[] { item },comparer).ToList();
 
             _logger.Debug("{method} expanding " + item.ItemType.ToString() + " {name} to {count} items",
                 MethodBase.GetCurrentMethod().Name, item.Id, list.Count);
@@ -472,9 +477,12 @@ namespace HlidacStatu.Repositories
                     .Take(count)
                     .ToArray();
 
-                foreach (var i in res)
+                foreach (var batch in res.Split(1000))
                 {
-                    db.Database.ExecuteSql($"update recalculateItemQueue set started=getdate() where pk={i.Pk}");
+                    var ids = string.Join(",", batch.Select(m=>m.Pk));
+                    var sql = $"update recalculateItemQueue set started=getdate() where pk in ({ids})";
+                    db.Database.ExecuteSqlRaw(sql);
+
                 }
                 return res;
 

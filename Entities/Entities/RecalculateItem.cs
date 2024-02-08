@@ -25,7 +25,11 @@ namespace HlidacStatu.Entities
                 return false;
             }
 
-            return x.UniqueKey == y.UniqueKey;
+            //ItemType}_{Id}_{StatisticsType
+            return x.ItemType == y.ItemType
+                && x.Id == y.Id
+                && x.StatisticsType == y.StatisticsType;
+                
         }
 
         public int GetHashCode([DisallowNull] RecalculateItem obj)
