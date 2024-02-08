@@ -48,7 +48,7 @@ public class HomeController : Controller
     
     public async Task<IActionResult> Oblast(string id)
     {
-        var organizace = await PuRepo.GetOrganizacForOblasteAsync(id);
+        var organizace = await PuRepo.GetOrganizaceForOblastiAsync(id);
         
         ViewData["platy"] = organizace.SelectMany(o => o.Platy).ToList();;
         ViewData["oblast"] = id;

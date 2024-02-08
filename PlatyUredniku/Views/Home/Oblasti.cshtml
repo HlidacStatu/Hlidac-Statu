@@ -1,42 +1,34 @@
 @model System.Collections.Generic.List<string>
 
 <div class="row">
-    <div class="col-6">
-        @{
-            foreach (var oblast in Model)
-            {
-                <div class="card m-1">
-                    <a asp-action="Oblast" asp-route-id="@oblast">
-                        <div class="card-body">
-                            <h5 class="card-title">@oblast</h5>
-                            <p class="card-subtitle ms-2 text-muted">
-                                Oblast obsahuje 4 podoblasti a celkem 69 institucí.
-                            </p>
-                        </div>
-                    </a>
-                </div>
-            }
-        }
-    </div>
 
-    <div class="col-6">
+
+    <div class="col-12">
         <table class="table table-new table-new--dotted table-hover">
             <tbody>
-            @foreach (var oblast in Model)
-            {
-                <tr>
-                    <td>
-                        <h4>
-                            <a asp-action="Oblast" asp-route-id="@oblast">
-                                @oblast
-                            </a>
-                        </h4>
-                    </td>
-                    <td>
-                        Oblast obsahuje 4 podoblasti a celkem 69 institucí.
-                    </td>
-                </tr>    
-            }
+                @foreach (var oblast in Model)
+                {
+                    <tr>
+                        <td>
+                            <h4>
+                                <a asp-action="Oblast" asp-route-id="@oblast">
+                                    @oblast
+                                </a>
+                            </h4>
+                        </td>
+                        <td>
+                            @{
+                                var instituce = await HlidacStatu.Repositories.PuRepo.GetOrganizaceForOblastiAsync(oblast);
+                                var sample = ".";
+                                if (instituce.Count > 1)
+                                {
+                                    sample = $" jako např. {instituce[0].Nazev}, {instituce[1].Nazev} a další.";
+                                }
+                            }
+                            Oblast obsahuje celkem <b>@(instituce.Count)</b> institucí@(sample)
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>

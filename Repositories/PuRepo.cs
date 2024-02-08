@@ -24,7 +24,7 @@ public class PuRepo
             .FirstOrDefaultAsync();
     }
     
-    public static async Task<List<PuOrganizace>> GetOrganizacForOblasteAsync(string oblast)
+    public static async Task<List<PuOrganizace>> GetOrganizaceForOblastiAsync(string oblast)
     {
         await using var db = new DbEntities();
 
@@ -107,9 +107,10 @@ public class PuRepo
         await using var db = new DbEntities();
         
         var oblasti = await db.Database.SqlQuery<string>(@$"SELECT DISTINCT
-LEFT(Oblast, CHARINDEX({PuOrganizace.PathSplittingChar}, Oblast + {PuOrganizace.PathSplittingChar}) - 1) AS FirstPart
-FROM Pu_Organizace
-WHERE Oblast IS NOT NULL").ToListAsync();
+            LEFT(Oblast, CHARINDEX({PuOrganizace.PathSplittingChar}, Oblast + {PuOrganizace.PathSplittingChar}) - 1) AS FirstPart
+            FROM Pu_Organizace
+            WHERE Oblast IS NOT NULL")
+        .ToListAsync();
         
         return oblasti;
     }
