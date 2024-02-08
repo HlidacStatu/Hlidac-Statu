@@ -42,7 +42,7 @@
             <table class="table table-new table-new--dotted table-hover">
                 <tbody>
 
-                    @foreach (var org in organizace)
+                    @foreach (var org in organizace.OrderBy(o=>o.Nazev))
                     {
                         var platy = org.Platy.Rok().Count > 1 ? $", <i class='fa-solid fa-money-bills'></i> {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Min(m => m.HrubyMesicniPlat))} - {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Max(m => m.HrubyMesicniPlat))}" : ".";
                         <tr>
@@ -70,15 +70,14 @@
             <h2>Oblasti</h2>
 
                 @{
-
-                    foreach (var podoblast in podoblasti)
+                foreach (var podoblast in podoblasti.OrderBy(o => o))
                     {
                         var orgsInOblast = Model.Where(o => o.Oblast == currentOblast && o.PodOblast == podoblast).ToList();
 
                         <h2>@podoblast</h2>
                     <table class="table table-new table-new--dotted table-hover">
                         <tbody>
-                            @foreach (var org in orgsInOblast)
+                            @foreach (var org in orgsInOblast.OrderBy(o => o.Nazev))
                             {
                                 var platy = org.Platy.Rok().Count > 1 ? $", <i class='fa-solid fa-money-bills'></i> {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Min(m => m.HrubyMesicniPlat))} - {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Max(m => m.HrubyMesicniPlat))}" : ".";
                                 <tr>

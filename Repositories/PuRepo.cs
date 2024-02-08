@@ -68,6 +68,7 @@ public static class PuRepo
             .AsNoTracking()
             .Where(o => o.Oblast.Equals(oblast))
             .Select(o => o.PodOblast)
+            .Where(s=>!string.IsNullOrWhiteSpace(s))
             .Distinct()
             .ToListAsync();
 
