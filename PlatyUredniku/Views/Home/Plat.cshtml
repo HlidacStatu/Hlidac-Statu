@@ -57,7 +57,7 @@
 
     </div>
     <div class="col-2">
-        @if (Model.JeHlavoun == true && string.IsNullOrWhiteSpace(Model.Organizace.Ico))
+        @if (Model.JeHlavoun == true && !string.IsNullOrWhiteSpace(Model.Organizace.Ico))
         {
             var ceos = OsobaEventRepo.GetCeos(Model.Organizace.Ico, new DateTime(Model.Rok, 1, 1), new DateTime(Model.Rok, 12, 31));
             if (ceos is not null && ceos.Length > 0)
