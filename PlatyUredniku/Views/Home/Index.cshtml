@@ -1,20 +1,49 @@
 ﻿<div class="row">
-    <div class="col bg-warning-subtle p-5 m-3">
+    <div class="col">
         <a asp-action="Oblasti">
-            <h4>Procházet dle oblastí</h4>
+            <div class="card text-bg-secondary mb-3" style="max-width: 18rem;">
+                <div class="card-header">Přehled úřadů</div>
+                <div class="card-body">
+                    <h5 class="card-title">Všechny rozdělené do skupin</h5>
+                    <p class="card-text">Seznam všech úřadů a firem, kterých jsme se na platy ptali.</p>
+                </div>
+            </div>
         </a>
     </div>
-    
-    <div class="col bg-warning-subtle p-5 m-3">
-        <a asp-action="Detail" asp-route-id="98">
-            <h4>Organizace dne</h4>
-            <p>Krajské ředitelství policie Středočeského kraje</p>
+    <div class="col">
+        <a asp-action="Oblasti">
+            <div class="card text-bg-secondary mb-3" style="max-width: 18rem;">
+                <div class="card-header">Organizace dne</div>
+                <div class="card-body">
+                    <h5 class="card-title">Předseda Ústavního soudu</h5>
+                    <p class="card-text">Má hrubý plat 232 000 Kč měsíčně včetně odměn.</p>
+                </div>
+            </div>
         </a>
     </div>
+    <div class="col">
+        <div class="card text-bg-secondary mb-3" style="max-width: 18rem;">
+            <div class="card-header">Přehledy podle platu</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="1" >Platy nižší než má pokladní</a></li>
+                <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="2">Nižší než průměrné platy</a></li>
+                <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="3">Vyšší než průměrné platy</a></li>
+                <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="4">Nejvyšší platy</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-bg-secondary mb-3" style="max-width: 18rem;">
+            <div class="card-header">Analýzy a porovnání</div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="1">Porovnání ředitelských platů</a></li>
+                <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="2">Porovnání podle oblastí</a></li>
+                <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="3">Vyšší než průměrné platy</a></li>
+                <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="4">Nejvyšší platy</a></li>
+            </ul>
+        </div>
+    </div>
+
+
 </div>
 
-<h3>Filtrace dle platu</h3>
-<a asp-action="DlePlatu" asp-route-id="1" class="btn btn-dark">0 - 20 000,-</a>
-<a asp-action="DlePlatu" asp-route-id="2" class="btn btn-dark">20 000 - 40 000,-</a>
-<a asp-action="DlePlatu" asp-route-id="3" class="btn btn-dark">40 000 - 70 000,-</a>
-<a asp-action="DlePlatu" asp-route-id="4" class="btn btn-dark">70 000,- a více</a>
