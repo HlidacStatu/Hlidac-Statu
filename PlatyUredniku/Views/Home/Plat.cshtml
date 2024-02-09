@@ -1,3 +1,5 @@
+@using HlidacStatu.Repositories
+@using HlidacStatu.Entities
 @model HlidacStatu.Entities.Entities.PuPlat
 
 <div class="row" xmlns="http://www.w3.org/1999/html">
@@ -55,23 +57,30 @@
 
     </div>
     <div class="col-2">
-        @if (Model.JeHlavoun == true)
+        @if (Model.JeHlavoun == true && string.IsNullOrWhiteSpace(Model.Organizace.Ico))
         {
-            <div>
-                <div>
-                    <div class="person-profile-thumb">
-                        <div class="photo">
-                            <div class="profile-picture border" style="background-image: url('/Content/img/personNoPhoto.png')"></div>
+            var ceos = OsobaEventRepo.GetCeos(Model.Organizace.Ico, new DateTime(Model.Rok, 1, 1), new DateTime(Model.Rok, 12, 31));
+            if (ceos is not null && ceos.Length > 0)
+            {
+                foreach (var ceo in ceos)
+                {
+                    <div>
+                        <div>
+                            <div class="person-profile-thumb">
+                                <div class="photo">
+                                    <div class="profile-picture border" style="background-image: url('@ceo.Osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)')"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="py-0 my-0 lead">
+                                <a href="@ceo.Osoba.GetUrl(false)">@ceo.Osoba.FullName()</a>
+                            </p>
+                            <p class="py-0 my-0">@Html.Raw(ceo.Osoba.NarozeniYear(true))</p>
                         </div>
                     </div>
-                </div>
-                <div>
-                    <p class="py-0 my-0 lead">
-                        <a href="/osoba/adam-jakishe">Mimoň z Mimoňova</a>
-                    </p>
-                    <p class="py-0 my-0">&nbsp;(*1985)</p>
-                </div>
-            </div>
+                }
+            }
         }
     </div>
 </div>
