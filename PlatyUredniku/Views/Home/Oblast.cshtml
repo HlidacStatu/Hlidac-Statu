@@ -6,7 +6,7 @@
     string currentOblast = (string)ViewData["oblast"];
     string currentPodOblast = (string)ViewData["podoblast"];
 
-    var organizace = Model.Where(o => o.Oblast == currentOblast && o.PodOblast == currentPodOblast).ToArray();
+    var organizace = Model.Where(o => o.Oblast == currentOblast && (string.IsNullOrEmpty(currentPodOblast) || o.PodOblast == currentPodOblast)).ToArray();
 
     var podoblasti = await PuRepo.GetPodoblastiAsync(currentOblast);
 
