@@ -59,6 +59,7 @@ public static class PuRepo
             .Select(t => t.Organizace)
             .ToListAsync();
     }
+    
 
     public static async Task<List<string>> GetPodoblastiAsync(string oblast)
     {

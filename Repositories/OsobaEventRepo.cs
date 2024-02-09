@@ -67,6 +67,32 @@ namespace HlidacStatu.Repositories
             
             return query.ToList();
         }
+        
+        public static (Osoba Osoba, DateTime? From, DateTime? To, string Role)[] GetCeos(string ico, DateTime? from = null, DateTime? to = null)
+        {
+            using (DbEntities db = new DbEntities())
+            {
+                var ceoQuery = db.OsobaEvent.AsQueryable()
+                    .Where(oe => oe.Ceo == 1 && oe.Ico == ico);
+
+                if (from is not null)
+                    ceoQuery = ceoQuery.Where(oe => oe.DatumDo == null || oe.DatumDo >= from);
+
+                if (to is not null)
+                    ceoQuery = ceoQuery.Where(oe => oe.DatumOd == null || oe.DatumOd <= to);
+                
+                var ceoEvent = ceoQuery
+                    .OrderByDescending(oe => oe.DatumOd)
+                    .ToArray()
+                    .Select(m => (OsobaRepo.GetByInternalId(m.OsobaId), m.DatumOd, m.DatumDo, m.AddInfo))
+                    .ToArray();
+
+                if (ceoEvent is null)
+                    return Array.Empty<(Osoba Osoba, DateTime? From, DateTime? To, string Role)>();
+
+                return ceoEvent;
+            }
+        }
 
         // tohle by ještě sneslo optimalizaci - ale až budou k dispozici data
         public static IEnumerable<string> GetAddInfos(string jmeno, int? eventTypeId, int maxNumOfResults = 1500)

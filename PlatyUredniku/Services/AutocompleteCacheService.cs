@@ -1,4 +1,5 @@
 using HlidacStatu.Entities;
+using HlidacStatu.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Whisperer;
 
@@ -38,12 +39,12 @@ public class AutocompleteCacheService
             .Select(s => s.Document);
     }
 
-    public async Task RefreshAutocompleteDataAsync(CancellationToken stoppingToken)
+    public async Task RefreshAutocompleteDataAsync(CancellationToken cancellationToken)
     {
         _alternateDirectory = !_alternateDirectory; //switch dir
 
         var index = new Index<Autocomplete>(TempDirectory);
-        var autocompleteData = await LoadDataForAutocompleteAsync(stoppingToken);
+        var autocompleteData = await LoadDataForAutocompleteAsync(cancellationToken);
         index.AddDocuments(autocompleteData,
             textSelector: ts => $"{ts.Text} {ts.AdditionalHiddenSearchText}",
             boostSelector: bs => bs.PriorityMultiplier);
@@ -51,7 +52,7 @@ public class AutocompleteCacheService
         var oldCache = AutocompleteCache;
         AutocompleteCache = index;
 
-        await Task.Delay(5_000, stoppingToken); //safe wait until old queries are done
+        await Task.Delay(5_000, cancellationToken); //safe wait until old queries are done
         oldCache?.DeleteDocuments();
         oldCache?.Dispose();
     }
@@ -62,14 +63,16 @@ public class AutocompleteCacheService
 
         var organizaceTask = LoadOrganizace(cancellationToken);
         var oblastTask = LoadOblasti(cancellationToken);
+        var ceoTask = LoadCeos(cancellationToken);
 
-        await Task.WhenAll(organizaceTask, oblastTask);
+        await Task.WhenAll(organizaceTask, oblastTask, ceoTask);
 
         if (cancellationToken.IsCancellationRequested)
             return Enumerable.Empty<Autocomplete>().ToList();
 
         results.AddRange(organizaceTask.Result);
         results.AddRange(oblastTask.Result);
+        results.AddRange(ceoTask.Result);
 
         return results;
     }
@@ -93,7 +96,7 @@ public class AutocompleteCacheService
             .ToListAsync(cancellationToken: cancellationToken);
     }
     
-    private async Task<List<Autocomplete>> LoadOblasti(CancellationToken stoppingToken)
+    private async Task<List<Autocomplete>> LoadOblasti(CancellationToken cancellationToken)
     {
         await using var db = new DbEntities();
 
@@ -110,6 +113,49 @@ public class AutocompleteCacheService
                 Description = $"{o}",
                 Category = Autocomplete.CategoryEnum.Oblast,
             })
-            .ToListAsync(cancellationToken: stoppingToken);
+            .ToListAsync(cancellationToken: cancellationToken);
+    }
+    
+    private async Task<List<Autocomplete>> LoadCeos(CancellationToken cancellationToken)
+    {
+        await using var db = new DbEntities();
+
+        var platy = await db.PuPlaty.AsNoTracking()
+            .Where(p => p.JeHlavoun == true)
+            .Where(p => p.Rok == PuRepo.DefaultYear)
+            .Include( p => p.Organizace)
+            .Where(p => p.Organizace.Ico != null)
+            .ToListAsync(cancellationToken: cancellationToken);
+
+        DateTime fromDate = new DateTime(PuRepo.DefaultYear, 1, 1);
+        DateTime toDate = new DateTime(PuRepo.DefaultYear, 12, 31);
+
+        var results = new List<Autocomplete>();
+        foreach (var plat in platy)
+        {
+            if(cancellationToken.IsCancellationRequested)
+                break;
+            
+            if(string.IsNullOrWhiteSpace(plat.Organizace.Ico))
+                continue;
+
+            var autocomplete = OsobaEventRepo.GetCeos(plat.Organizace.Ico, fromDate, toDate)
+                .Select(o => new Autocomplete()
+                {
+                    Id = $"/plat/{plat.Id}",
+                    Text = $"{o.Osoba.Jmeno} {o.Osoba.Prijmeni}{Osoba.AppendTitle(o.Osoba.TitulPred, o.Osoba.TitulPo)}",
+                    PriorityMultiplier = 1,
+                    Type = "osoba",
+                    ImageElement = $"<img src='{o.Osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />",
+                    Description = $"{plat.Organizace.Nazev} - {plat.NazevPozice}",
+                    Category = Autocomplete.CategoryEnum.Person,
+                })
+                .ToList();
+            results.AddRange(autocomplete);
+
+
+        }
+
+        return results;
     }
 }

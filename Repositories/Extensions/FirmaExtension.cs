@@ -307,10 +307,7 @@ namespace HlidacStatu.Extensions
         }
 
 
-        /// <summary>
-        /// Find last known CEO
-        /// </summary>
-        /// <returns></returns>
+        [Obsolete("Use OsobaEventRepo.GetCeos or FirmaExtension.Ceos and work it from there. This one might be faulty")]
         public static (Osoba Osoba, DateTime? From, string Role) Ceo(this Firma firma)
         {
             using (DbEntities db = new DbEntities())
@@ -332,28 +329,9 @@ namespace HlidacStatu.Extensions
                 return (lastCeo, ceoEvent.DatumOd, ceoEvent.AddInfo);
             }
         }
-        public static (Osoba Osoba, DateTime? From, string Role)[] Ceos(this Firma firma)
+        public static (Osoba Osoba, DateTime? From, DateTime? To, string Role)[] Ceos(this Firma firma, DateTime? fromDate, DateTime? toDate)
         {
-            using (DbEntities db = new DbEntities())
-            {
-                var ceoEvent = db.OsobaEvent.AsQueryable()
-                    .Where(oe => oe.Ceo == 1 && oe.Ico == firma.ICO)
-                    .Where(oe => oe.DatumDo == null || oe.DatumDo >= DateTime.Now)
-                    .Where(oe => oe.DatumOd != null && oe.DatumOd <= DateTime.Now)
-                    .OrderByDescending(oe => oe.DatumOd)
-                    .ToArray()
-                    .Select<OsobaEvent, (Osoba Osoba, DateTime? From, string Role)>(m=> 
-                    {
-                        var ret = (OsobaRepo.GetByInternalId(m.OsobaId), m.DatumOd, m.AddInfo);
-                        return ret;
-                        })
-                    .ToArray();
-
-                if (ceoEvent is null)
-                    return Array.Empty<(Osoba Osoba, DateTime? From, string Role)>();
-
-                return ceoEvent;
-            }
+            return OsobaEventRepo.GetCeos(firma.ICO, fromDate, toDate);
         }
 
         public static IEnumerable<string> IcosInHolding(this Firma firma, Relation.AktualnostType aktualnost)
