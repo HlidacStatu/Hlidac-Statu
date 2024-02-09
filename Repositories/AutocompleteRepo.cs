@@ -407,7 +407,7 @@ namespace HlidacStatu.Repositories
                         synonyms[0] = new Autocomplete()
                         {
                             Id = $"osobaid:{o.NameId}",
-                            Text = $"{o.Jmeno} {o.Prijmeni}{AppendTitle(o.TitulPred, o.TitulPo)}",
+                            Text = $"{o.Jmeno} {o.Prijmeni}{Osoba.AppendTitle(o.TitulPred, o.TitulPo)}",
                             PriorityMultiplier = priority,
                             Type = o.StatusOsoby().ToNiceDisplayName(),
                             ImageElement = $"<img src='{o.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />",
@@ -418,7 +418,7 @@ namespace HlidacStatu.Repositories
                         };
  
                         synonyms[1] = synonyms[0].Clone();
-                        synonyms[1].Text = $"{o.Prijmeni} {o.Jmeno}{AppendTitle(o.TitulPred, o.TitulPo)}";
+                        synonyms[1].Text = $"{o.Prijmeni} {o.Jmeno}{Osoba.AppendTitle(o.TitulPred, o.TitulPo)}";
 
                         await semaphoreLock.WaitAsync();
                         try
@@ -440,21 +440,7 @@ namespace HlidacStatu.Repositories
             return results;
         }
 
-        private static string AppendTitle(string titulPred, string titulPo)
-        {
-            var check = (titulPred + titulPo).Trim();
-            if (string.IsNullOrWhiteSpace(check))
-                return "";
-
-            var sb = new StringBuilder();
-            sb.Append(" (");
-            sb.Append(titulPred);
-            sb.Append(" ");
-            sb.Append(titulPo);
-            sb.Append(")");
-
-            return sb.ToString();
-        }
+        
 
         private static IEnumerable<Autocomplete> LoadOblasti()
         {

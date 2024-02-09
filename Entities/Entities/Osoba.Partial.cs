@@ -4,6 +4,7 @@ using HlidacStatu.DS.Graphs;
 using HlidacStatu.DS.Graphs2;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text;
 
 namespace HlidacStatu.Entities
 {
@@ -301,7 +302,21 @@ namespace HlidacStatu.Entities
 
 
 
+        public static string AppendTitle(string titulPred, string titulPo)
+        {
+            var check = (titulPred + titulPo).Trim();
+            if (string.IsNullOrWhiteSpace(check))
+                return "";
 
+            var sb = new StringBuilder();
+            sb.Append(" (");
+            sb.Append(titulPred);
+            sb.Append(" ");
+            sb.Append(titulPo);
+            sb.Append(")");
+
+            return sb.ToString();
+        }
 
     }
 }
