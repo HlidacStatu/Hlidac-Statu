@@ -1,5 +1,8 @@
-﻿@using Devmasters.Enums
-@model (HlidacStatu.Entities.Entities.PuPlat plat, HlidacStatu.Entities.Entities.PuOrganizace organizace)
+﻿@model (HlidacStatu.Entities.Entities.PuPlat plat, HlidacStatu.Entities.Entities.PuOrganizace organizace)
+
+@using Devmasters.Enums
+@using HlidacStatu.Lib.Web.UI
+
 
 @{
     var plat = Model.plat;
@@ -22,7 +25,7 @@
     <p class="text-body-secondary"><b>Úvazek</b> <mark>@HlidacStatu.Util.RenderData.NicePercent(plat.Uvazek, 0)</mark></p>
     <p class="text-body-secondary"><b>Počet odpracovaných měsíců</b> <mark>@HlidacStatu.Util.RenderData.NiceNumber(plat.PocetMesicu ?? 12)</mark></p>
     <h4>Odměna za rok @plat.Rok</h4>
-    <div>
+    <div class="col">
         <p>
             <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
             <b>Celkový příjem za rok @plat.Rok včetně odměn</b>
@@ -62,6 +65,13 @@
                 <b>Nefinanční bonus</b> <span style="padding-left:40px;">@plat.NefinancniBonus</span>
             </p>
         }
+    </div>
+    <div class="col">
+        @Html.SemiCircleDonut(new Tuple<string, decimal>[]{ 
+                new Tuple<string, decimal>("Plat",plat.Plat.Value),
+                new Tuple<string, decimal>("Odměna",plat.Odmeny ?? 0),
+            },
+            "Poměr základního platu a odměny","Kč",200)
     </div>
 
 

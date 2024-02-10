@@ -1,5 +1,6 @@
 ﻿@using System.Net.Http
 @using Microsoft.AspNetCore.Http.Extensions
+@using HlidacStatu.Lib.Web.UI
 
 @inject IHttpClientFactory HttpClientFactory
 
@@ -7,16 +8,16 @@
     string title = ViewBag.Title;
     if (string.IsNullOrEmpty(title))
     {
-        title = "Hlídač státu. Hlídame je, protože si to zaslouží.";
+        title = "Platy úředníků. Veřejná kontrola odměňování ve státní správě a státních firmách.";
     }
     else
     {
-        title = title + " - " + "Hlídač státu.";
+        title = title + " - " + "Platy úředníků.";
     }
-    string description = "Hlídač státu - veřejná kontrola státních a veřejných institucí. Veřejnoprospěšný projekt. Hlídač smluv a registr smluv. Hlídač Webů.";
+    string description = "Platy úředníků - veřejná kontrola odměňování nejvyšších státních úředníků a top managementu státních firem. Projekt Hlídače státu.";
     if (!string.IsNullOrEmpty(ViewBag.Description))
     {
-        description = ViewBag.Description + " Hlídač státu.";
+        description = ViewBag.Description + " Platy úředníků.";
     }
 }
 <!DOCTYPE html>
@@ -28,8 +29,8 @@
     <title>@title</title>
     <link rel="canonical" href="https://platyuredniku.hlidacstatu.cz@(Context.Request.GetEncodedPathAndQuery())" />
     <meta name="description" content="@description" />
-    <meta name="author" content="Michal Bláha" />
-    <meta name="keywords" content="e-gov, e-government, efektivita státu, efektivní stát, Registr smluv, Hlídač státu, HlidacStatu, HlidacSmluv, Hlídač smluv, politici, smlouvy státu">
+    <meta name="author" content="Hlídač státu" />
+    <meta name="keywords" content="e-gov, e-government, platy úředníků, platy ministrů, platy ve státní správě, odměny úředníků">
 
     @{
         string urlfirst = $"{Context.Request.Scheme}://{Context.Request.Host}";
@@ -106,17 +107,20 @@
 
     <script src="~/bundles/jquery"></script>
     <script src="~/bundles/scriptbundle"></script>
+    <script src="~/bundles/highcharts8"></script>
     <link rel="stylesheet" href="~/content/bundled.css" />
     <script src="~/bundles/modernizr"></script>
 
     <!-- Matomo Tag Manager -->
-    <script>
-        var _mtm = window._mtm = window._mtm || [];
-        _mtm.push({ 'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start' });
-        var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
-        g.async = true; g.src = 'https://ma.hlidacstatu.cz/js/container_rZ3U6hIe.js'; s.parentNode.insertBefore(g, s);
-    </script>
-    <!-- End Matomo Tag Manager -->
+<script>
+  var _mtm = window._mtm = window._mtm || [];
+  _mtm.push({'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start'});
+  (function() {
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src='https://ma.hlidacstatu.cz/js/container_fFYgkYZS.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Tag Manager -->
 
     <script>
         function closeMegaMenu(el) {
@@ -127,12 +131,7 @@
 
     </script>
     @RenderSection("Scripts", required: false)
-    
-    <link href="/scripts/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="/scripts/select2-bootstrap.min.css" />
-    <script src="/scripts/select2.full.min.js"></script>
-    <link rel="stylesheet" href="/Content/select2-search-over.css" />
-    
+        
     <!-- Blazor -->
     <base href="~/" />
     <script src="_framework/blazor.web.js"></script>

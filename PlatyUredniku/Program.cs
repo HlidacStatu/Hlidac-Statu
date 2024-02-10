@@ -156,7 +156,7 @@ public class Program
                     "Scripts/highcharts.global.options.js");
 
                 pipeline.AddJavaScriptBundle("/bundles/highcharts8",
-                    "Scripts/Highcharts-8/js/highcharts.js",
+                    "Scripts/Highcharts-8/highcharts.js",
                     "Scripts/highcharts.global.options.js");
 
                 pipeline.AddJavaScriptBundle("/bundles/typeahead",
