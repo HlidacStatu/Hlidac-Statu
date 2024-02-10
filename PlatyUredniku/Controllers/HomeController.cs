@@ -96,7 +96,7 @@ public class HomeController : Controller
         return View(oblasti);
     }
 
-    public async Task<IActionResult> Detail(int id, int rok = PuRepo.DefaultYear)
+    public async Task<IActionResult> Detail2(int id, int rok = PuRepo.DefaultYear)
     {
         var detail = await PuRepo.GetDetailEagerAsync(id);
         ViewData["platy"] = detail.Platy.ToList();
@@ -132,7 +132,7 @@ public class HomeController : Controller
         return View(detail);
     }
 
-    public async Task<IActionResult> Detail2(int id, int? rok = null)
+    public async Task<IActionResult> Detail(int id, int? rok = null)
     {
         var detail = await PuRepo.GetDetailEagerAsync(id);
 

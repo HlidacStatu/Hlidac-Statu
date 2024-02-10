@@ -1,62 +1,69 @@
-﻿@model HlidacStatu.Entities.Entities.PuPlat
+﻿@using Devmasters.Enums
+@model (HlidacStatu.Entities.Entities.PuPlat plat, HlidacStatu.Entities.Entities.PuOrganizace organizace)
 
+@{
+    var plat = Model.plat;
+    var org = Model.organizace;
+}
 
+<div class="row boxes" id="plat@(plat.Id)">
 
-<div class="row boxes">
-
-
-    <h2>@Model.Organizace.Nazev</h2>
-    <h3>@Model.NazevPozice</h3>
-
-
-
-    <img src="https://user-images.githubusercontent.com/6562690/54934415-b4d25b80-4edb-11e9-8758-fb29ada50499.png" style="height:290px; width:80%" />
-    <h4>Odměna za rok @Model.Rok</h4>
-    <div>
-        <p>
-            <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
-            <b>Hrubý měsíční plat</b>
-            <span style="padding-left:40px;">
-                @HlidacStatu.Util.RenderData.NicePriceHtml(Model.HrubyMesicniPlat)
-            </span>
-        </p>
-
-        @if (string.IsNullOrEmpty(Model.PoznamkaPlat) == false)
-        {
-            <p>
-                <i style="padding-right:20px;" aria-hidden="true">
-                    @Model.PoznamkaPlat
-                </i>
-            </p>
-        }
-        @if (Model.Odmeny.HasValue)
-        {
-            <p>
-                <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
-                <b>Odměny</b> <span style="padding-left:40px;">@HlidacStatu.Util.RenderData.NicePriceHtml(Model.Odmeny.Value)</span>
-            </p>
-        }
-        @if (string.IsNullOrEmpty(Model.NefinancniBonus) == false)
-        {
-            <p>
-                <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
-                <b>Nefinanční bonus</b> <span style="padding-left:40px;">@Model.NefinancniBonus</span>
-            </p>
-        }
-    </div>
-
-
-    <hr />
-
-    <h4>Pracovní poměr</h4>
-    @if (Model.JeHlavoun == true)
+    <h3>@plat.NazevPozice</h3>
+    @if (plat.JeHlavoun == true)
     {
         <p>
             <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
             <b>Pozice představeného/vedoucího organizace</b>
         </p>
+        <img src="https://user-images.githubusercontent.com/6562690/54934415-b4d25b80-4edb-11e9-8758-fb29ada50499.png" style="height:290px; width:80%" />
     }
-    <p class="text-body-secondary"><b>Úvazek</b> <span style="padding-left:40px;">@HlidacStatu.Util.RenderData.NicePercent(Model.Uvazek)</span></p>
-    <p class="text-body-secondary"><b>Počet odpracovaných měsíců</b> <span style="padding-left:40px;">@HlidacStatu.Util.RenderData.NiceNumber(Model.PocetMesicu ?? 12)</span></p>
+
+    <h4>Pracovní poměr</h4>
+    <p class="text-body-secondary"><b>Úvazek</b> <mark>@HlidacStatu.Util.RenderData.NicePercent(plat.Uvazek, 0)</mark></p>
+    <p class="text-body-secondary"><b>Počet odpracovaných měsíců</b> <mark>@HlidacStatu.Util.RenderData.NiceNumber(plat.PocetMesicu ?? 12)</mark></p>
+    <h4>Odměna za rok @plat.Rok</h4>
+    <div>
+        <p>
+            <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
+            <b>Celkový příjem za rok @plat.Rok včetně odměn</b>
+            
+                <mark>
+                    @HlidacStatu.Util.RenderData.NicePriceHtml(plat.CelkovyRocniPlat)</mark>
+                @if (plat.Odmeny.HasValue)
+                {
+                    <span>
+                        
+                        , z toho <b>odměny</b> <mark>@HlidacStatu.Util.RenderData.NicePriceHtml(plat.Odmeny.Value)</mark>
+                    </span>
+                }
+
+            </span>
+        </p>
+        <p>
+        <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
+        <b>Přepočtený měsíční plat</b>
+        <mark>
+            @HlidacStatu.Util.RenderData.NicePriceHtml(plat.HrubyMesicniPlat)
+        </mark>
+        </p>
+
+        @if (string.IsNullOrEmpty(plat.PoznamkaPlat) == false)
+        {
+            <p>
+                <i style="padding-right:20px;" aria-hidden="true">
+                    @plat.PoznamkaPlat
+                </i>
+            </p>
+        }
+        @if (string.IsNullOrEmpty(plat.NefinancniBonus) == false)
+        {
+            <p>
+                <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
+                <b>Nefinanční bonus</b> <span style="padding-left:40px;">@plat.NefinancniBonus</span>
+            </p>
+        }
+    </div>
+
+
 
 </div>
