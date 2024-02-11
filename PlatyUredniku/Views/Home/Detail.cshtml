@@ -36,36 +36,51 @@
     string currUrlWithoutYear = $"/{viewName}/{ViewData["id"]}";
     string currUrlWithYear = $"{currUrlWithoutYear}?rok={rok}";
 
+    var metadataForYear = Model.Metadata.FirstOrDefault(m => m.Rok == rok);
 }
 <div class="row boxes">
 
-    <h3>@Model.Nazev</h3>
-    <small>IČO - @Model.Ico</small><br/>
-    <small>Datová schránka - @Model.DS</small><br/>
-    <p>@Model.Info</p>
-
-    <div>
-        <h3>Metadata</h3>
-        @foreach (var metadataForYear in Model.Metadata.Where(m=>m.Rok == rok))
+    <div class="px-4 py-5" id="hanging-icons">
+        <h2 class="pb-2 border-bottom">@Model.Nazev</h2>
+        <p>
+            IČO: @Model.Ico <br />
+            Datová schránka: @Model.DS <br />
+            <a href="https://www.hlidacstatu.cz/subjekt/@(Model.Ico)">Více informací o subjektu</a>
+        </p>
+        
+        @if(metadataForYear != null)
         {
-            <h4>za rok @metadataForYear.Rok</h4>
-            <dl>
-                <dt>Způsob komunikace</dt>
-                <dd>@metadataForYear.ZpusobKomunikace?.ToNiceDisplayName()</dd>
+            <h4>Detaily komunikace ohledně platů za rok @metadataForYear.Rok</h4>
+            <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+                <div class="col d-flex align-items-start">
+                    <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                        <svg class="bi" width="1em" height="1em"><use xlink:href="#toggles2"></use></svg>
+                    </div>
+                    <div>
+                        <h3 class="fs-2 text-body-emphasis">Doba trvání</h3>
+                        <p>
+                            Žádost o výši platů jsme odeslali @(metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy"))
+                            @if (metadataForYear.DatumPrijetiOdpovedi.HasValue)
+                            {
+                                <span>a odpověď obdrželi po
+                                    @(Devmasters.Lang.CS.Plural.Get((int)(metadataForYear.DatumPrijetiOdpovedi.Value-metadataForYear.DatumOdeslaniZadosti.Value).TotalDays,"jednom dni","{0} dnech","{0} dnech")).
+                                </span>
+                            }
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col d-flex align-items-start">
+                    <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                        <svg class="bi" width="1em" height="1em"><use xlink:href="#cpu-fill"></use></svg>
+                    </div>
+                    <div>
+                        <h3 class="fs-2 text-body-emphasis">Zdůvodnění mimořádných odměn</h3>
+                        <p>Součástí naší žádosti byl požadavek na zaslání odůvodnění mimořádných odměn pracovníků. Toto odůvodnění jsme @(metadataForYear.ZduvodneniMimoradnychOdmen == true ? "dostali" : "nedostali").</p>
+                    </div>
+                </div>
+            </div>
 
-                <dt>Datum odeslání žádosti</dt>
-                <dd>@metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy")</dd>
-
-                <dt>Datum přijetí odpovědi</dt>
-                <dd>@metadataForYear.DatumPrijetiOdpovedi?.ToString("dd.MM.yyyy")</dd>
-
-                <dt>Zdůvodnění mimořádných odměn</dt>
-                <dd>@(metadataForYear.ZduvodneniMimoradnychOdmen == true ? "Ano" : "Ne")</dd>
-
-                <dt>Skrytá poznámka</dt>
-                <dd>@metadataForYear.SkrytaPoznamka</dd>
-
-            </dl>
         }
     </div>
 

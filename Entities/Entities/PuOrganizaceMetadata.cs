@@ -23,6 +23,7 @@ public class PuOrganizaceMetadata
     [ForeignKey("IdOrganizace")]
     public virtual PuOrganizace Organizace { get; set; }
 
+    [ShowNiceDisplayName()]
     public enum Komunikace
     {
         [NiceDisplayName("datová schránka")] DatovaSchranka = 1,
