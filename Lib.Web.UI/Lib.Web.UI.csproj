@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hlidac-statu\XLib\XLib.csproj" />
+    <ProjectReference Include="..\XLib\XLib.csproj" />
   </ItemGroup>
 
 </Project>
