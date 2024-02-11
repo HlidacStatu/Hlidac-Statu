@@ -3,9 +3,10 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <UserSecretsId>aspnet-PlatyUredniku-CDBD91C6-CE60-4F51-93CF-128B527169E1</UserSecretsId>
-    </PropertyGroup>
+		<GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
+		<UserSecretsId>aspnet-PlatyUredniku-CDBD91C6-CE60-4F51-93CF-128B527169E1</UserSecretsId>
+		<AssemblyName>HlidacStatu.PlatyUredniku</AssemblyName>
+	</PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="MathNet.Numerics" Version="5.0.0" />

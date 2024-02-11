@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Serilog;
+using System;
+using System.Threading.Tasks;
 
 namespace PlatyUredniku.Views.Shared.Components;
 

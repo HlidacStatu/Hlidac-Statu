@@ -1,3 +1,8 @@
+using Microsoft.Extensions.Hosting;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
 namespace PlatyUredniku.Services;
 
 public class AutocompleteTimer : BackgroundService

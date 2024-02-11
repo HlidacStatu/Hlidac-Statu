@@ -2,6 +2,9 @@ using HlidacStatu.Entities.Entities;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using PlatyUredniku.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PlatyUredniku.Controllers;
 

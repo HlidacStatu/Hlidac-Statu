@@ -1,7 +1,9 @@
 ﻿@model (HlidacStatu.Entities.Entities.PuPlat plat, HlidacStatu.Entities.Entities.PuOrganizace organizace)
 
 @using Devmasters.Enums
+@using HlidacStatu.Entities
 @using HlidacStatu.Lib.Web.UI
+@using HlidacStatu.Repositories
 
 
 @{
@@ -14,6 +16,33 @@
     <h3>@plat.NazevPozice</h3>
     @if (plat.JeHlavoun == true)
     {
+        <div class="col-2">
+            @if (!string.IsNullOrWhiteSpace(plat.Organizace.Ico))
+            {
+                var ceos = OsobaEventRepo.GetCeos(plat.Organizace.Ico, new DateTime(plat.Rok, 1, 1), new DateTime(plat.Rok, 12, 31));
+                if (ceos is not null && ceos.Length > 0)
+                {
+                    foreach (var ceo in ceos)
+                    {
+                        <div>
+                            <div>
+                                <div class="person-profile-thumb">
+                                    <div class="photo">
+                                        <div class="profile-picture border" style="background-image: url('@ceo.Osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)')"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="py-0 my-0 lead">
+                                    <a href="@ceo.Osoba.GetUrl(false)">@ceo.Osoba.FullName()</a>
+                                </p>
+                                <p class="py-0 my-0">@Html.Raw(ceo.Osoba.NarozeniYear(true))</p>
+                            </div>
+                        </div>
+                    }
+                }
+            }
+        </div>
         <p>
             <i class="fas fa-exclamation-circle" style="padding-right:20px;" aria-hidden="true"></i>
             <b>Pozice představeného/vedoucího organizace</b>
