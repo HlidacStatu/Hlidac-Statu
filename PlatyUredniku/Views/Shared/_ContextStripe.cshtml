@@ -13,21 +13,15 @@
             @foreach (var breadcrumb in breadcrumbs.SkipLast(1))
             {
                 <li>
-                    <a asp-action="@breadcrumb.Action" asp-route-id="@breadcrumb.Id" asp-route-year="@(breadcrumb.Year)">@breadcrumb.Name</a>
+                    <a href="@breadcrumb.Link">@breadcrumb.Name</a>
                 </li>
             }
             @{
                 var activeBreadcrumb = breadcrumbs.LastOrDefault();
-                if (activeBreadcrumb?.Year is null)
-                {
-                    <li class="active">@activeBreadcrumb?.Name</li>
-                }
-                else
-                {
-                    <li class="active">
-                        @activeBreadcrumb.Name <span class="small">(@activeBreadcrumb.Year)</span>
-                    </li>
-                }
+                <li class="active">
+                    @activeBreadcrumb?.Name
+                </li>
+            
             }
         </ol>
     </div>

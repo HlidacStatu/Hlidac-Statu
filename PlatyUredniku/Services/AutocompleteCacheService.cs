@@ -107,16 +107,16 @@ public class AutocompleteCacheService
         await using var db = new DbEntities();
 
         return await db.PuOrganizace.AsNoTracking()
-            .Select(o => o.Oblast)
+            .Select(o => new {o.Oblast, o.PodOblast})
             .Distinct()
             .Select(o => new Autocomplete()
             {
-                Id = $"/oblast/{o}",
-                Text = $"{o}",
+                Id = $"/oblast?oblast={o.Oblast}",
+                Text = $"{o.Oblast} {o.PodOblast}",
                 PriorityMultiplier = 1,
                 Type = "oblast",
                 ImageElement = $"<i class=\"fa-regular fa-flatbread\"></i>",
-                Description = $"{o}",
+                Description = $"{o} {o.PodOblast}",
                 Category = Autocomplete.CategoryEnum.Oblast,
             })
             .ToListAsync(cancellationToken: cancellationToken);

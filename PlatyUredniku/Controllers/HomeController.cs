@@ -1,4 +1,3 @@
-using HlidacStatu.Entities.Entities;
 using HlidacStatu.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using PlatyUredniku.Models;
@@ -36,9 +35,8 @@ public class HomeController : Controller
         {
             new Breadcrumb()
             {
-                Action = nameof(DlePlatu),
                 Name = $"Dle platu ({range.Min} - {range.Max})",
-                Id = id.ToString()
+                Link = $"{nameof(DlePlatu)}/{id}"
             }
         };
 
@@ -61,18 +59,15 @@ public class HomeController : Controller
         {
             new Breadcrumb()
             {
+                Name = nameof(Oblasti),
+                Link = $"{nameof(Oblasti)}"
+            },
+            new Breadcrumb()
+            {
                 Name = oblast,
-                Action = nameof(Oblast),
-                Id = oblast
+                Link = $"{nameof(Oblast)}?oblast={oblast}"
             }
         };
-        if (!string.IsNullOrWhiteSpace(podoblast))
-            breadcrumbs.Add(new Breadcrumb()
-            {
-                Name = podoblast,
-                Action = nameof(Oblast),
-                Id = podoblast
-            });
 
         ViewData["breadcrumbs"] = breadcrumbs;
         ViewData["context"] = $"{oblast} > {podoblast}";
@@ -82,15 +77,14 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Oblasti()
     {
-        var oblasti = await PuRepo.GetPrimalOblasti();
+        var oblasti = await PuRepo.GetPrimalOblastiAsync();
 
         List<Breadcrumb> breadcrumbs = new()
         {
             new Breadcrumb()
             {
-                Action = nameof(Oblasti),
                 Name = nameof(Oblasti),
-                Id = ""
+                Link = $"{nameof(Oblasti)}"
             }
         };
 
@@ -108,26 +102,20 @@ public class HomeController : Controller
         {
             new Breadcrumb()
             {
+                Name = nameof(Oblasti),
+                Link = $"{nameof(Oblasti)}"
+            },
+            new Breadcrumb()
+            {
                 Name = detail.Oblast,
-                Action = nameof(Oblast),
-                Id = detail.Oblast,
+                Link = $"{nameof(Oblast)}?oblast={detail.Oblast}"
+            },
+            new Breadcrumb()
+            {
+                Name = $"{detail.Nazev} ({rok})",
+                Link = $"{nameof(Detail2)}/{id}?rok={rok}"
             }
         };
-        if (!string.IsNullOrWhiteSpace(detail.PodOblast))
-            breadcrumbs.Add(new Breadcrumb()
-            {
-                Name = detail.PodOblast,
-                Action = nameof(Oblast),
-                Id = detail.PodOblast
-            });
-
-        breadcrumbs.Add(new Breadcrumb()
-        {
-            Name = detail.Nazev,
-            Action = nameof(Detail),
-            Id = id.ToString(),
-            Year = rok
-        });
 
         ViewData["breadcrumbs"] = breadcrumbs;
         ViewData["context"] = detail.Nazev;
@@ -144,29 +132,24 @@ public class HomeController : Controller
         ViewData["id"] = id;
 
         List<Breadcrumb> breadcrumbs = new()
-        {
+        {new Breadcrumb()
+            {
+                Name = nameof(Oblasti),
+                Link = $"{nameof(Oblasti)}"
+            },
             new Breadcrumb()
             {
                 Name = detail.Oblast,
-                Action = nameof(Oblast),
-                Id = detail.Oblast,
-            }
-        };
-        if (!string.IsNullOrWhiteSpace(detail.PodOblast))
-            breadcrumbs.Add(new Breadcrumb()
+                Link = $"{nameof(Oblast)}?oblast={detail.Oblast}"
+            },
+            new Breadcrumb()
             {
-                Name = detail.PodOblast,
-                Action = nameof(Oblast),
-                Id = detail.PodOblast
-            });
-        breadcrumbs.Add(new Breadcrumb()
-        {
-            Name = detail.Nazev,
-            Action = nameof(Detail2),
-            Id = id.ToString(),
-            Year = rok
-        });
-
+                Name = $"{detail.Nazev} ({rok})",
+                Link = $"{nameof(Detail)}/{id}?rok={rok}"
+            }
+            
+        };
+        
         ViewData["breadcrumbs"] = breadcrumbs;
         ViewData["context"] = detail.Nazev;
 
@@ -181,36 +164,34 @@ public class HomeController : Controller
         {
             new Breadcrumb()
             {
+                Name = nameof(Oblasti),
+                Link = $"{nameof(Oblasti)}"
+            },
+            new Breadcrumb()
+            {
                 Name = detail.Organizace.Oblast,
-                Action = nameof(Oblast),
-                Id = detail.Organizace.Oblast,
+                Link = $"{nameof(Oblast)}?oblast={detail.Organizace.Oblast}"
+            },
+            new Breadcrumb()
+            {
+                Name = $"{detail.Organizace.Nazev} ({detail.Rok})",
+                Link = $"{nameof(Detail2)}/{id}?rok={detail.Rok}"
+            },
+            new Breadcrumb()
+            {
+                Name = detail.NazevPozice,
+                Link = $"{nameof(Plat)}/{id}"
             }
         };
-        if (!string.IsNullOrWhiteSpace(detail.Organizace.PodOblast))
-            breadcrumbs.Add(new Breadcrumb()
-            {
-                Name = detail.Organizace.PodOblast,
-                Action = nameof(Oblast),
-                Id = detail.Organizace.PodOblast
-            });
-        breadcrumbs.Add(new Breadcrumb()
-        {
-            Name = detail.Organizace.Nazev,
-            Action = nameof(Detail),
-            Id = detail.Organizace.Id.ToString(),
-            Year = detail.Rok
-        });
-        breadcrumbs.Add(new Breadcrumb()
-        {
-            Name = detail.NazevPozice,
-            Action = nameof(Plat),
-            Id = id.ToString(),
-            Year = detail.Rok
-        });
 
         ViewData["breadcrumbs"] = breadcrumbs;
         ViewData["context"] = $"{detail.NazevPozice} v organizaci {detail.Organizace.Nazev}";
 
         return View(detail);
+    }
+
+    public IActionResult Statistiky()
+    {
+        return View();
     }
 }

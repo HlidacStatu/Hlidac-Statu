@@ -153,7 +153,7 @@ public static class PuRepo
             .ToListAsync();
     }
 
-    public static async Task<List<string>> GetPrimalOblasti()
+    public static async Task<List<string>> GetPrimalOblastiAsync()
     {
         await using var db = new DbEntities();
 
