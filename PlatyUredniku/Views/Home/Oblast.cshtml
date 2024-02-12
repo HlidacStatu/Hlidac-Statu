@@ -6,9 +6,7 @@
     string currentOblast = (string)ViewData["oblast"];
     string currentPodOblast = (string)ViewData["podoblast"];
 
-    var organizace = Model.Where(o => o.Oblast == currentOblast && (string.IsNullOrEmpty(currentPodOblast) || o.PodOblast == currentPodOblast)).ToArray();
-
-    var podoblasti = await PuRepo.GetPodoblastiAsync(currentOblast);
+    var organizace = Model.GroupBy(o => o.PodOblast);
 
     var platyHlavounu = Model.SelectMany(o => o.Platy).Where(p => p.Rok == PuRepo.DefaultYear && p.JeHlavoun == true)
         .ToList();
@@ -17,11 +15,11 @@
 }
 <div class="row">
     <div class="col-6">
-        @if (organizace is not null && organizace.Any())
+        @if (Model is not null && Model.Any())
         {
             <h3 class="pt-5">
-                V této oblasti / podoblasti máme @organizace.Length institucí s
-                @organizace.SelectMany(o => o.Platy).Count(p => p.Rok == PuRepo.DefaultYear) typy pozic.
+                V této oblasti máme @Model.Count institucí s
+                @Model.SelectMany(o => o.Platy).Count(p => p.Rok == PuRepo.DefaultYear) typy pozic.
             </h3>
         }
 
@@ -33,71 +31,48 @@
             <p>Průměr nejvyšších představitelů úřadů oblasti</p>
         </div>
     }
-</div>
-<div class="row">
-    <div class="col-12">
-        @if (organizace is not null && organizace.Any())
-        {
-            <h2>Instituce</h2>
-            <table class="table table-new table-new--dotted table-hover">
-                <tbody>
 
-                    @foreach (var org in organizace.OrderBy(o=>o.Nazev))
-                    {
-                        var platy = org.Platy.Rok().Count > 1 ? $", <i class='fa-solid fa-money-bills'></i> {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Min(m => m.HrubyMesicniPlat))} - {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Max(m => m.HrubyMesicniPlat))}" : ".";
-                        <tr>
-                            <td style="width:50%">
-                                <h4><a asp-action="Detail" asp-route-id="@org.Id">@org.Nazev</a></h4>
-                            </td>
-                            <td style="width:50%">
-                                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(org.Platy.Rok().Count,
-                                         "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Nedostali jsme žádný plat</span>",
-                                         "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme jeden plat jedné pozice",
-                                         $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platy{platy}",
-                                         $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platů{platy}")
-                                ).
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-
-    </div>
-    @if (podoblasti is not null && podoblasti.Any())
+    @if (organizace is not null && organizace.Any())
     {
         <div class="col-12">
             <h2>Oblasti</h2>
 
-                @{
-                foreach (var podoblast in podoblasti.OrderBy(o => o))
-                    {
-                        var orgsInOblast = Model.Where(o => o.Oblast == currentOblast && o.PodOblast == podoblast).ToList();
 
-                        <h2>@podoblast</h2>
-                    <table class="table table-new table-new--dotted table-hover">
-                        <tbody>
-                            @foreach (var org in orgsInOblast.OrderBy(o => o.Nazev))
-                            {
-                                var platy = org.Platy.Rok().Count > 1 ? $", <i class='fa-solid fa-money-bills'></i> {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Min(m => m.HrubyMesicniPlat))} - {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Max(m => m.HrubyMesicniPlat))}" : ".";
-                                <tr>
-                                    <td style="width:50%">
-                                        <h4><a asp-action="Detail" asp-route-id="@org.Id">@org.Nazev</a></h4>
-                                    </td>
-                                    <td style="width:50%">
-                                        @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(org.Platy.Rok().Count,
-                                             "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Nedostali jsme žádný plat</span>",
-                                             "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme jeden plat jedné pozice",
-                                             $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platy{platy}",
-                                             $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platů{platy}")
-                                             ).
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+            @foreach (var podoblast in organizace.OrderBy(o => o.Key))
+            {
+                if (string.IsNullOrWhiteSpace(podoblast.Key))
+                {
+                    <h2>Organizace dále nezařazené</h2>
                 }
+                else
+                {
+                    <h2>@podoblast.Key</h2>
                 }
+                <table class="table table-new table-new--dotted table-hover">
+                    <tbody>
+                    @foreach (var org in podoblast.OrderBy(o => o.Nazev))
+                    {
+                        var platy = org.Platy.Rok().Count > 1 ? $", <i class='fa-solid fa-money-bills'></i> {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Min(m => m.HrubyMesicniPlat))} - {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Max(m => m.HrubyMesicniPlat))}" : ".";
+                        <tr>
+                            <td style="width:50%">
+                                <h4>
+                                    <a asp-action="Detail" asp-route-id="@org.Id">@org.Nazev</a>
+                                </h4>
+                            </td>
+                            <td style="width:50%">
+                                @Html.Raw(Devmasters.Lang.CS.Plural.GetWithZero(org.Platy.Rok().Count,
+                                    "<span class='text-danger'><i class='fa-solid fa-circle-xmark'></i> Nedostali jsme žádný plat</span>",
+                                    "<span class='text-warning'><i class='fa-solid fa-circle-exclamation'></i></span> Evidujeme jeden plat jedné pozice",
+                                    $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platy{platy}",
+                                    $"<span class='text-success'><i class='fa-solid fa-badge-check'></span></i> {{0}} platů{platy}")
+                                ).
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+
         </div>
     }
 </div>
