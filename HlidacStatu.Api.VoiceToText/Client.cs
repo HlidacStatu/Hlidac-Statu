@@ -31,7 +31,7 @@ namespace HlidacStatu.Api.VoiceToText
             TimeOut = timeOut;
         }
 
-        public async Task<string> AddNewTaskAsync(HlidacStatu.DS.Api.Voice2Text.Options options, Uri source, string callerId, string callerTaskId, int priority)
+        public async Task<long> AddNewTaskAsync(HlidacStatu.DS.Api.Voice2Text.Options options, Uri source, string callerId, string callerTaskId, int priority)
         {
             try
             {
@@ -46,7 +46,7 @@ namespace HlidacStatu.Api.VoiceToText
 
                 JsonContent form = JsonContent.Create<HlidacStatu.DS.Api.Voice2Text.Task>(task);
 
-                var id = await Simple.PostAsync<string>(
+                var id = await Simple.PostAsync<long>(
                     BaseApiUri.AbsoluteUri + "api/v2/voice2text/CreateTask",
                     form, continueOnCapturedContext: false,
                         headers: new Dictionary<string, string>() { { "Authorization", this.ApiKey } }, 
@@ -61,7 +61,7 @@ namespace HlidacStatu.Api.VoiceToText
                 if (statusCode >= 500)
                     throw new ApplicationException(e.TextContent);
 
-                return "";
+                return 0;
             }
             catch (Exception e)
             {

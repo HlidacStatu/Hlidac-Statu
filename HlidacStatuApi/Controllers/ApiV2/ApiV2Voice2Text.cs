@@ -21,7 +21,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
         /// <returns></returns>
         [Authorize(Roles = "Admin,InternalQ")]
         [HttpPost("CreateTask")]
-        public async Task<ActionResult<string>> CreateTask([FromBody] HlidacStatu.DS.Api.Voice2Text.Task task)
+        public async Task<ActionResult<long>> CreateTask([FromBody] HlidacStatu.DS.Api.Voice2Text.Task task)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace HlidacStatuApi.Controllers.ApiV2
                 qv2t.CallerTaskId = task.CallerTaskId;
                 qv2t.Status = (int)HlidacStatu.DS.Api.Voice2Text.Task.CheckState.WaitingInQueue;
                 var saved = await QVoiceToTextRepo.SaveAsync(qv2t);
-                return saved.QId.ToString();
+                return saved.QId;
             }
             catch (Exception e)
             {

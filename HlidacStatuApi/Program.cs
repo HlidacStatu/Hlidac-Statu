@@ -160,7 +160,7 @@ app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
 
 app.UseTimeMeasureMiddleware();
 
-if (true || IsDevelopment(app.Environment))
+if (IsDevelopment(app.Environment))
 {
     app.UseDeveloperExceptionPage();
 }
