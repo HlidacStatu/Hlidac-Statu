@@ -164,6 +164,7 @@ public class Program
 
                 pipeline.AddJavaScriptBundle("/bundles/highcharts8",
                     "Scripts/Highcharts-8/highcharts.js",
+                    "Scripts/Highcharts-8/highcharts-more.js",
                     "Scripts/highcharts.global.options.js");
 
                 pipeline.AddJavaScriptBundle("/bundles/typeahead",

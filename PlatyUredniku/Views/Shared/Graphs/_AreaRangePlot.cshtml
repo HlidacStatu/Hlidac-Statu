@@ -1,0 +1,82 @@
+@model PlatyUredniku.Models.AreaRangePlot
+
+@{
+    string chartId = HlidacStatu.Util.Consts.Rnd.Next(999).ToString("000");
+}
+
+<figure class="highcharts-figure">
+    <div id="chart-container-@chartId"></div>
+
+    <div class="text-muted">Popis grafu</div>
+
+
+    <p class="highcharts-description">
+        Další popis grafu
+    </p>
+
+
+</figure>
+
+<script>    
+    Highcharts.chart('chart-container-@(chartId)', {
+        title: {
+            text: '@Html.Raw(Model.Title)',
+            align: 'left'
+        },
+        subtitle: {
+            text: '@Html.Raw(Model.Subtitle)',
+            align: 'left'
+        },
+        xAxis: {
+            type: 'datetime'
+        },
+        yAxis: {
+            labels: {
+                format: '{value:,.0f} Kč'
+            }
+        },
+        tooltip: {
+            crosshairs: true,
+            shared: true,
+            valueSuffix: ' Kč'
+        },
+        plotOptions: {
+            series: {
+                pointStart: Date.UTC(@Model.FirstYear, 1, 1),
+                pointIntervalUnit: 'year'
+            }
+        },
+        series: [
+            {
+            name: 'Plat šéfa',
+            data: @Model.DrawCeoSalaries(),
+            zIndex: 1,
+            marker: {
+                lineWidth: 2,
+                lineColor: Highcharts.getOptions().colors[5]
+            }
+        }, {
+            name: 'Median',
+            data: @Model.DrawMedians(),
+            zIndex: 1,
+            marker: {
+                fillColor: 'white',
+                lineWidth: 2,
+                lineColor: Highcharts.getOptions().colors[0]
+            }
+        }, {
+            name: 'Range',
+            data: @Model.DrawMinMaxes(),
+            type: 'arearange',
+            lineWidth: 0,
+            linkedTo: ':previous',
+            color: Highcharts.getOptions().colors[0],
+            fillOpacity: 0.3,
+            zIndex: 0,
+            marker: {
+                enabled: false
+            }
+        }]
+    });
+
+</script>

@@ -1,4 +1,5 @@
-@using Devmasters.Enums
+@using MathNet.Numerics.Statistics
+@using PlatyUredniku.Models
 @model HlidacStatu.Entities.Entities.PuOrganizace
 
 @section scripts
@@ -47,6 +48,34 @@
             Datová schránka: @Model.DS <br />
             <a href="https://www.hlidacstatu.cz/subjekt/@(Model.Ico)">Více informací o subjektu</a>
         </p>
+        
+        @{
+            var hrubePlatyPoLetech = Model.Platy
+                .GroupBy(p => p.Rok, p => (double) p.HrubyMesicniPlat)
+                .OrderBy(k => k.Key)
+                .ToList();
+
+            var mediany = hrubePlatyPoLetech.Select(p => p.Median()).ToArray();
+            var minmaxes = hrubePlatyPoLetech.Select(p => new [] {p.Min(), p.Max()}).ToArray();
+            var ceoSalaries = Model.Platy
+                .Where(p=> p.JeHlavoun == true)
+                .GroupBy(p => p.Rok, p => (double) p.HrubyMesicniPlat)
+                .OrderBy(k => k.Key)
+                .Select(g => g.Sum())
+                .ToArray();
+            
+            
+            var graphData = new AreaRangePlot()
+            {
+                FirstYear = Model.Platy.Min(p => p.Rok),
+                Title = "Vývoj platů",
+                Subtitle = "vývoj průměrného platu po letech",
+                Medians = mediany,
+                MinMaxes = minmaxes,
+                CeoSalaries = ceoSalaries
+            };
+        }
+        <partial name="Graphs/_AreaRangePlot" model="graphData"/>
         
         @if(metadataForYear != null)
         {
