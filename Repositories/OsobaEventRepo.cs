@@ -291,7 +291,9 @@ namespace HlidacStatu.Repositories
                     .Where(ev =>
                         ev.OsobaId == osoba.InternalId
                         && ev.Ico == CeoOf.ICO
-                        && ev.Ceo == 1)
+                        && ev.Ceo == 1
+                        && ev.DatumOd == dateFrom
+                        && ev.DatumDo == dateTo)
                     .FirstOrDefault();
                 if (exists != null)
                 {
