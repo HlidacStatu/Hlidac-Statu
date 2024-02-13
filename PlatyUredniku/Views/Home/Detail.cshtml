@@ -1,4 +1,5 @@
 @using MathNet.Numerics.Statistics
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using PlatyUredniku.Models
 @model HlidacStatu.Entities.Entities.PuOrganizace
 
@@ -50,32 +51,49 @@
         </p>
         
         @{
-            var hrubePlatyPoLetech = Model.Platy
-                .GroupBy(p => p.Rok, p => (double) p.HrubyMesicniPlat)
+            var salariesYearly = Model.Platy
+                .GroupBy(p => p.Rok, p => p)
                 .OrderBy(k => k.Key)
-                .ToList();
+                .ToDictionary(g => g.Key, g => g.Select(x => x).ToList());
 
-            var mediany = hrubePlatyPoLetech.Select(p => p.Median()).ToArray();
-            var minmaxes = hrubePlatyPoLetech.Select(p => new [] {p.Min(), p.Max()}).ToArray();
-            var ceoSalaries = Model.Platy
-                .Where(p=> p.JeHlavoun == true)
-                .GroupBy(p => p.Rok, p => (double) p.HrubyMesicniPlat)
-                .OrderBy(k => k.Key)
-                .Select(g => g.Sum())
-                .ToArray();
-            
-            
-            var graphData = new AreaRangePlot()
+            if (salariesYearly.Any())
             {
-                FirstYear = Model.Platy.Min(p => p.Rok),
-                Title = "Vývoj platů",
-                Subtitle = "vývoj průměrného platu po letech",
-                Medians = mediany,
-                MinMaxes = minmaxes,
-                CeoSalaries = ceoSalaries
-            };
+                Dictionary<int, AreaRangePlot.PlotData?> plotData = new();
+                
+                for (int year = salariesYearly.Keys.Min(); year <= salariesYearly.Keys.Max(); year++)
+                {
+                    AreaRangePlot.PlotData? dataForYear = new AreaRangePlot.PlotData();
+                    
+                    if (salariesYearly.TryGetValue(year, out var platyForYear))
+                    {
+                        var hrubeMesicniPlaty = platyForYear
+                            .Select(p => (double)p.HrubyMesicniPlat)
+                            .ToList();
+                        dataForYear.Median = hrubeMesicniPlaty?.Median() ?? null;
+                        dataForYear.Min = hrubeMesicniPlaty?.Min() ?? null;
+                        dataForYear.Max = hrubeMesicniPlaty?.Max() ?? null; 
+                        
+                        var hrubeMesicniPlatyCeo = platyForYear
+                            .Where(p=> p.JeHlavoun == true)
+                            .Select(p => (double)p.HrubyMesicniPlat);
+                        dataForYear.Ceo = hrubeMesicniPlatyCeo?.Sum() ?? null;
+
+                    }
+                    
+                    plotData.Add(year, dataForYear);
+                }
+                
+                var graphData = new AreaRangePlot()
+                {
+                    Title = "Vývoj platů",
+                    Subtitle = "vývoj průměrného platu po letech",
+                    Values = plotData
+                };
+                <partial name="Graphs/_AreaRangePlot" model="graphData"/>
+                
+            }
+            
         }
-        <partial name="Graphs/_AreaRangePlot" model="graphData"/>
         
         @if(metadataForYear != null)
         {
