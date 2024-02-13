@@ -76,8 +76,10 @@
                         var hrubeMesicniPlatyCeo = platyForYear
                             .Where(p=> p.JeHlavoun == true)
                             .Select(p => (double)p.HrubyMesicniPlat);
-                        dataForYear.Ceo = hrubeMesicniPlatyCeo?.Sum() ?? null;
-
+                        if (hrubeMesicniPlatyCeo.Any())
+                        {
+                            dataForYear.Ceo = hrubeMesicniPlatyCeo.Average();
+                        }
                     }
                     
                     plotData.Add(year, dataForYear);

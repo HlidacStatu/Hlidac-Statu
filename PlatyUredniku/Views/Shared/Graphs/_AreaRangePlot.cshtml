@@ -52,14 +52,11 @@
         series: [
             {
             name: 'Plat šéfa',
+            color: 'red',
             data: @Model.DrawCeoSalaries(),
-            zIndex: 1,
-            marker: {
-                lineWidth: 2,
-                lineColor: Highcharts.getOptions().colors[5]
-            }
+            zIndex: 1
         }, {
-            name: 'Median',
+            name: 'Medián',
             data: @Model.DrawMedians(),
             zIndex: 1,
             marker: {
@@ -68,7 +65,7 @@
                 lineColor: Highcharts.getOptions().colors[0]
             }
         }, {
-            name: 'Range',
+            name: 'Rozsah',
             data: @Model.DrawMinMaxes(),
             type: 'arearange',
             lineWidth: 0,
