@@ -175,7 +175,24 @@
                 </div>
             </button>
             <div class="collapse navbar-collapse" id="navbar-content">
-
+                <ul class="d-none d-lg-block navbar-nav mr-auto mb-2 mb-lg-0 mainmenu">
+                    <li class="nav-item mainmenu">
+                        <a class="nav-link active" aria-current="page" href="" onclick="return false;" style="visibility:hidden;cursor:pointer;">&nbsp;&nbsp;&nbsp;</a>
+                    </li>
+                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
+                        <a asp-controller="Texty" asp-action="OProjektu" class="nav-link mainmenu">O projektu</a>
+                    </li>
+                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
+                        <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu" class="nav-link mainmenu">Jak určuje platy st. zaměstnanců zákon?</a>
+                    </li>
+                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
+                        <a asp-controller="Texty" asp-action="Nejvyssi" class="nav-link mainmenu">A co ti nejvyšší?</a>
+                    </li>
+                    <li class="nav-item dropdown dropdown-mega position-static mainmenu">
+                        <a asp-controller="Texty" asp-action="Aktuality" class="nav-link mainmenu">Aktuality</a>
+                    </li>
+                    
+                </ul>
                
             </div>
             <div class="d-none d-lg-flex rightmenu">
