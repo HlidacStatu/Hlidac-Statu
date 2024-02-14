@@ -1,4 +1,4 @@
-@model List<string>
+@model string[]
 
 <div class="row">
 
@@ -6,19 +6,19 @@
     <div class="col-12">
         <table class="table table-new table-new--dotted table-hover">
             <tbody>
-                @foreach (var oblast in Model)
+                @foreach (var tag in Model)
                 {
                     <tr>
                         <td>
                             <h4>
-                                <a asp-action="Oblast" asp-route-oblast="@oblast">
-                                    @oblast
+                                <a asp-action="Oblast" asp-route-id="@tag">
+                                    @tag
                                 </a>
                             </h4>
                         </td>
                         <td>
                             @{
-                                var instituce = await HlidacStatu.Repositories.PuRepo.GetOrganizaceForOblastiAsync(oblast, null);
+                                var instituce = await HlidacStatu.Repositories.PuRepo.GetOrganizaceForTagAsync(tag);
                                 var sample = ".";
                                 if (instituce.Count > 1)
                                 {

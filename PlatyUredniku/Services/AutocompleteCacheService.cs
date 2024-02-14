@@ -106,17 +106,18 @@ public class AutocompleteCacheService
     {
         await using var db = new DbEntities();
 
-        return await db.PuOrganizace.AsNoTracking()
-            .Select(o => new {o.Oblast, o.PodOblast})
+        return await db.PuOrganizaceTags.AsNoTracking()
+            .Select(t => t.Tag)
             .Distinct()
-            .Select(o => new Autocomplete()
+            .Select(tag => new Autocomplete()
             {
-                Id = $"/oblast?oblast={o.Oblast}",
-                Text = $"{o.Oblast} {o.PodOblast}",
-                PriorityMultiplier = 1,
+                Id = $"/oblast/{tag}",
+                Text = $"{tag}",
+                AdditionalHiddenSearchText = $"tag # oblast {tag}",
+                PriorityMultiplier = 1.2f,
                 Type = "oblast",
-                ImageElement = $"<i class=\"fa-regular fa-flatbread\"></i>",
-                Description = $"{o} {o.PodOblast}",
+                ImageElement = $"<i class=\"fa-duotone fa-hashtag\"></i>",
+                Description = $"Vyhledat všechny instituce s tagem #{tag}",
                 Category = Autocomplete.CategoryEnum.Oblast,
             })
             .ToListAsync(cancellationToken: cancellationToken);

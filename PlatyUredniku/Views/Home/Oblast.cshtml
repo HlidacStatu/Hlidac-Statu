@@ -3,11 +3,6 @@
 @model List<HlidacStatu.Entities.Entities.PuOrganizace>
 
 @{
-    string currentOblast = (string)ViewData["oblast"];
-    string currentPodOblast = (string)ViewData["podoblast"];
-
-    var organizace = Model.GroupBy(o => o.PodOblast);
-
     var platyHlavounu = Model.SelectMany(o => o.Platy).Where(p => p.Rok == PuRepo.DefaultYear && p.JeHlavoun == true)
         .ToList();
 
@@ -32,25 +27,14 @@
         </div>
     }
 
-    @if (organizace is not null && organizace.Any())
+    @if (Model is not null && Model.Any())
     {
         <div class="col-12">
-            <h2>Oblasti</h2>
+            <h2>Organizace</h2>
 
-
-            @foreach (var podoblast in organizace.OrderBy(o => o.Key))
-            {
-                if (string.IsNullOrWhiteSpace(podoblast.Key))
-                {
-                    <h2>Organizace dále nezařazené</h2>
-                }
-                else
-                {
-                    <h2>@podoblast.Key</h2>
-                }
                 <table class="table table-new table-new--dotted table-hover">
                     <tbody>
-                    @foreach (var org in podoblast.OrderBy(o => o.Nazev))
+                    @foreach (var org in Model.OrderBy(o => o.Nazev))
                     {
                         var platy = org.Platy.Rok().Count > 1 ? $", <i class='fa-solid fa-money-bills'></i> {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Min(m => m.HrubyMesicniPlat))} - {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Max(m => m.HrubyMesicniPlat))}" : ".";
                         <tr>
@@ -71,7 +55,7 @@
                     }
                     </tbody>
                 </table>
-            }
+            
 
         </div>
     }

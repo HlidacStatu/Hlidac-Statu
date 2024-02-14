@@ -5,13 +5,11 @@
 
 @section scripts
 {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-
 }
 
 <style>
-
     .boxes h4 {
         font-size: 24px;
         font-weight: bold;
@@ -22,15 +20,12 @@
         font-size: 16px;
     }
 
-
     .boxes hr {
         border-top: 3px dotted #E0E6ED;
         margin-top: 24px;
         margin-bottom: 14px;
     }
-
 </style>
-
 
 @{
     int rok = (int)ViewData["rok"];
@@ -45,11 +40,19 @@
     <div class="px-4 py-5" id="hanging-icons">
         <h2 class="pb-2 border-bottom">@Model.Nazev</h2>
         <p>
-            IČO: @Model.Ico <br />
-            Datová schránka: @Model.DS <br />
+            IČO: @Model.Ico <br/>
+            Datová schránka: @Model.DS <br/>
             <a href="https://www.hlidacstatu.cz/subjekt/@(Model.Ico)">Více informací o subjektu</a>
         </p>
-        
+        <h5>
+            @foreach (var tag in Model.Tags)
+            {
+                <a asp-action="Oblast" asp-route-id="@tag.Tag" class="badge bg-primary">
+                    <i class="fa-solid fa-hashtag"></i>&nbsp;@tag.Tag
+                </a>
+            }
+        </h5>
+
         @{
             var salariesYearly = Model.Platy
                 .GroupBy(p => p.Rok, p => p)
@@ -59,11 +62,11 @@
             if (salariesYearly.Any())
             {
                 Dictionary<int, AreaRangePlot.PlotData?> plotData = new();
-                
+
                 for (int year = salariesYearly.Keys.Min(); year <= salariesYearly.Keys.Max(); year++)
                 {
                     AreaRangePlot.PlotData? dataForYear = new AreaRangePlot.PlotData();
-                    
+
                     if (salariesYearly.TryGetValue(year, out var platyForYear))
                     {
                         var hrubeMesicniPlaty = platyForYear
@@ -71,20 +74,20 @@
                             .ToList();
                         dataForYear.Median = hrubeMesicniPlaty?.Median() ?? null;
                         dataForYear.Min = hrubeMesicniPlaty?.Min() ?? null;
-                        dataForYear.Max = hrubeMesicniPlaty?.Max() ?? null; 
-                        
+                        dataForYear.Max = hrubeMesicniPlaty?.Max() ?? null;
+
                         var hrubeMesicniPlatyCeo = platyForYear
-                            .Where(p=> p.JeHlavoun == true)
+                            .Where(p => p.JeHlavoun == true)
                             .Select(p => (double)p.HrubyMesicniPlat);
                         if (hrubeMesicniPlatyCeo.Any())
                         {
                             dataForYear.Ceo = hrubeMesicniPlatyCeo.Average();
                         }
                     }
-                    
+
                     plotData.Add(year, dataForYear);
                 }
-                
+
                 var graphData = new AreaRangePlot()
                 {
                     Title = "Vývoj platů",
@@ -92,18 +95,18 @@
                     Values = plotData
                 };
                 <partial name="Graphs/_AreaRangePlot" model="graphData"/>
-                
             }
-            
         }
-        
-        @if(metadataForYear != null)
+
+        @if (metadataForYear != null)
         {
             <h4>Detaily komunikace ohledně platů za rok @metadataForYear.Rok</h4>
             <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
                 <div class="col d-flex align-items-start">
                     <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                        <svg class="bi" width="1em" height="1em"><use xlink:href="#toggles2"></use></svg>
+                        <svg class="bi" width="1em" height="1em">
+                            <use xlink:href="#toggles2"></use>
+                        </svg>
                     </div>
                     <div>
                         <h3 class="fs-2 text-body-emphasis">Doba trvání</h3>
@@ -111,17 +114,20 @@
                             Žádost o výši platů jsme odeslali @(metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy"))
                             @if (metadataForYear.DatumPrijetiOdpovedi.HasValue)
                             {
-                                <span>a odpověď obdrželi po
-                                    @(Devmasters.Lang.CS.Plural.Get((int)(metadataForYear.DatumPrijetiOdpovedi.Value-metadataForYear.DatumOdeslaniZadosti.Value).TotalDays,"jednom dni","{0} dnech","{0} dnech")).
+                                <span>
+                                    a odpověď obdrželi po
+                                    @(Devmasters.Lang.CS.Plural.Get((int)(metadataForYear.DatumPrijetiOdpovedi.Value - metadataForYear.DatumOdeslaniZadosti.Value).TotalDays, "jednom dni", "{0} dnech", "{0} dnech")).
                                 </span>
                             }
                         </p>
                     </div>
                 </div>
-                
+
                 <div class="col d-flex align-items-start">
                     <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                        <svg class="bi" width="1em" height="1em"><use xlink:href="#cpu-fill"></use></svg>
+                        <svg class="bi" width="1em" height="1em">
+                            <use xlink:href="#cpu-fill"></use>
+                        </svg>
                     </div>
                     <div>
                         <h3 class="fs-2 text-body-emphasis">Zdůvodnění mimořádných odměn</h3>
@@ -129,7 +135,6 @@
                     </div>
                 </div>
             </div>
-
         }
     </div>
 
@@ -148,16 +153,15 @@
 
                         foreach (var platRok in platyPoLetech)
                         {
-                            <a href="/@(viewName)/@(ViewData["id"])?rok=@(platRok.Key)" class="@classAttributes @((platRok.Key==rok) ? "active" : "")" >@platRok.Key</a>
-                            
+                            <a href="/@(viewName)/@(ViewData["id"])?rok=@(platRok.Key)" class="@classAttributes @((platRok.Key == rok) ? "active" : "")">@platRok.Key</a>
                         }
                     }
                 </div>
-                <div class="tab-content" >
+                <div class="tab-content">
                     @{
                         classAttributes = "tab-pane fade show active";
 
-                        foreach (var platGroup in platyPoLetech.Where(m=>m.Key == rok))
+                        foreach (var platGroup in platyPoLetech.Where(m => m.Key == rok))
                         {
                             <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
                                 <script>
@@ -175,11 +179,11 @@
                                 </script>
 
                                 <table class="table table-striped" id="tblSum_@rok">
-                                <thead>
+                                    <thead>
                                     <tr>
                                         <th>NazevPozice</th>
-                                        <th>Celkový roční<br />příjem</th>
-                                        <th>Přepočtený průměrný<br />měsíční plat</th>
+                                        <th>Celkový roční<br/>příjem</th>
+                                        <th>Přepočtený průměrný<br/>měsíční plat</th>
                                         <th>NefinancniBonus</th>
                                         <th>Detail</th>
                                     </tr>
@@ -188,11 +192,17 @@
                                     @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
                                     {
                                         <tr>
-                                            <td><a href="@(currUrlWithYear)#plat@(plat.Id)">@plat.NazevPozice</a></td>
-                                                <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlat))" style="number">@HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlat)</td>
-                                                <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlat))">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlat)</td>
+                                            <td>
+                                                <a href="@(currUrlWithYear)#plat@(plat.Id)">@plat.NazevPozice</a>
+                                            </td>
+                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlat))" style="number">@HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlat)</td>
+                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlat))">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlat)</td>
                                             <td>@plat.NefinancniBonus</td>
-                                            <td><a href="@(currUrlWithYear)#plat@(plat.Id)"><i class="fa-regular fa-memo-circle-info"></i></a></td>
+                                            <td>
+                                                <a href="@(currUrlWithYear)#plat@(plat.Id)">
+                                                    <i class="fa-regular fa-memo-circle-info"></i>
+                                                </a>
+                                            </td>
                                         </tr>
                                     }
                                     </tbody>
@@ -207,12 +217,12 @@
     </div>
 
 
-    @foreach (var platGroup in platyPoLetech.Where(m=>m.Key == rok))
+    @foreach (var platGroup in platyPoLetech.Where(m => m.Key == rok))
     {
         @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
         {
-            <hr />
-            <partial name="_platDetail" model="(@plat, @Model)" />
+            <hr/>
+            <partial name="_platDetail" model="(@plat, @Model)"/>
         }
     }
 </div>

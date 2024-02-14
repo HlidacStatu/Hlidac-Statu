@@ -1,7 +1,6 @@
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +10,28 @@ namespace HlidacStatu.Repositories;
 public static class PuRepo
 {
     public const int DefaultYear = 2022;
+
+    public static readonly string[] MainTags =
+    [
+        "bezpečnost",
+        "centrální a kontrolní instituce",
+        "doprava",
+        "finance",
+        "justice",
+        "kultura",
+        "ministerstvo",
+        "nemocnice",
+        "práce",
+        "průmysl a obchod",
+        "služby",
+        "společnost",
+        "výzkum",
+        "vzdělávání",
+        "zdravotnictví",
+        "zemědělství",
+        "životní prostředí",
+        "ostatní"
+    ];
 
     public static async Task<PuRokOrganizaceStat> GetGlobalStatAsync(int rok = DefaultYear)
     {
@@ -98,52 +119,18 @@ public static class PuRepo
         return platy?.Where(m => m.Rok == rok).ToList();
     }
 
-    public static async Task<List<PuOrganizace>> GetOrganizaceForOblastiAsync(string oblast, string podoblast)
-    {
-        await using var db = new DbEntities();
-
-        var query = db.PuOrganizace
-            .AsNoTracking()
-            .Where(o => o.Oblast.Equals(oblast));
-        
-        if(!string.IsNullOrWhiteSpace(podoblast))
-            query = query.Where(o => o.PodOblast.Equals(podoblast));
-        
-        return await query 
-            .Include(o => o.Platy) // Include PuPlat
-            .ToListAsync();
-    }
-
-    //todo: test it
-    public static async Task<List<PuOrganizace>> GetOrganizacForTagAsync(string tag)
+    public static async Task<List<PuOrganizace>> GetOrganizaceForTagAsync(string tag)
     {
         await using var db = new DbEntities();
 
         return await db.PuOrganizaceTags
             .AsNoTracking()
-            .Where(t => t.Tag == tag)
+            .Where(t => t.Tag.Equals(tag))
             .Include(t => t.Organizace)
-            .ThenInclude(t => t.Platy)
+            .ThenInclude(o => o.Platy)
             .Select(t => t.Organizace)
             .ToListAsync();
     }
-    
-
-    public static async Task<List<string>> GetPodoblastiAsync(string oblast)
-    {
-        await using var db = new DbEntities();
-
-        var podoblasti = await db.PuOrganizace
-            .AsNoTracking()
-            .Where(o => o.Oblast.Equals(oblast))
-            .Select(o => o.PodOblast)
-            .Where(s=>!string.IsNullOrWhiteSpace(s))
-            .Distinct()
-            .ToListAsync();
-
-        return podoblasti;
-    }
-
 
     public static async Task<PuPlat> GetPlatAsync(int id)
     {
@@ -164,19 +151,6 @@ public static class PuRepo
             .AsNoTracking()
             .Where(p => p.Rok == rok)
             .ToListAsync();
-    }
-
-    public static async Task<List<string>> GetPrimalOblastiAsync()
-    {
-        await using var db = new DbEntities();
-
-        var oblasti = await db.PuOrganizace
-            .AsNoTracking()
-            .Select(o => o.Oblast)
-            .Distinct()
-        .ToListAsync();
-
-        return oblasti;
     }
 
     public static async Task<List<PuPlat>> GetPoziceDlePlatuAsync(int rangeMin, int rangeMax, int year)
