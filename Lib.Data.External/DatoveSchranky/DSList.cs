@@ -12,7 +12,7 @@ namespace HlidacStatu.Lib.Data.External.DatoveSchranky
     public class DSList
     {
 
-
+       
         public static IEnumerable<(string ico, string ds, string parentDS, string dsName)> UpdateListDS()
         {
             List<listBox> dsL = new List<listBox>();
@@ -45,7 +45,7 @@ namespace HlidacStatu.Lib.Data.External.DatoveSchranky
             }
 
             return dsL.Select(
-                m => (m.ico, m.id, m.hierarchy?.masterId, m?.name?.tradeName)
+                m => (HlidacStatu.Util.ParseTools.NormalizeIco(m.ico), m.id, m.hierarchy?.masterId, m?.name?.tradeName)
                 );
 
         }

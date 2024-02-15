@@ -31,7 +31,7 @@ namespace HlidacStatu.Repositories
 
 
             string sqlNACE = @"INSERT into firma_NACE(ico, nace) values(@ico,@nace)";
-            string sqlDS = @"INSERT into firma_DS(ico, DatovaSchranka) values(@ico,@DatovaSchranka)";
+            //string sqlDS = @"INSERT into firma_DS(ico, DatovaSchranka) values(@ico,@DatovaSchranka)";
 
             try
             {
@@ -59,7 +59,7 @@ namespace HlidacStatu.Repositories
                     }
 
 
-                    if (firma.DatovaSchranka != null)
+/*                    if (firma.DatovaSchranka != null)
                     {
                         HlidacStatu.Connectors.DirectDB.NoResult("delete from firma_DS where ico=@ico",
                             new IDataParameter[]
@@ -74,7 +74,7 @@ namespace HlidacStatu.Repositories
                                 new SqlParameter("DatovaSchranka", ds),
                             });
                         }
-                    }
+                    }*/
 
                     if (firma.NACE != null)
                     {

@@ -163,9 +163,13 @@ namespace HlidacStatu.Util
 
             if (DataValidators.IsFirmaIcoZahranicni(ico))
                 return ico;
-            
+
+            ico = ico.PadLeft(8, '0');
+
             if (DataValidators.CheckCZICO(ico)==false)
                 return string.Empty;
+
+
 
             return ico;
         }
