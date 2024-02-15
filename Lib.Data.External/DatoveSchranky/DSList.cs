@@ -54,7 +54,9 @@ namespace HlidacStatu.Lib.Data.External.DatoveSchranky
             }
 
             return dsL.Select(
-                m => (HlidacStatu.Util.ParseTools.NormalizeIco(m.ico), m.id, m.hierarchy?.masterId, m?.name?.tradeName)
+                m => (
+                string.IsNullOrEmpty(m.ico) ? HlidacStatu.Util.ParseTools.NormalizeIco(m.idOVM) : HlidacStatu.Util.ParseTools.NormalizeIco(m.ico), 
+                m.id, m.hierarchy?.masterId, m?.name?.tradeName)
                 );
 
         }
