@@ -22,7 +22,7 @@ namespace HlidacStatu.Lib.Data.External.DatoveSchranky
             "https://www.mojedatovaschranka.cz/sds/datafile?format=xml&service=seznam_ds_ovm",
             "https://www.mojedatovaschranka.cz/sds/datafile?format=xml&service=seznam_ds_po",
             "https://www.mojedatovaschranka.cz/sds/datafile?format=xml&service=seznam_ds_pfo",
-            "https://www.mojedatovaschranka.cz/sds/datafile?format=xml&service=seznam_ds_fo",
+            //"https://www.mojedatovaschranka.cz/sds/datafile?format=xml&service=seznam_ds_fo",
             };
 
             var serializer = new XmlSerializer(typeof(list), "http://seznam.gov.cz/ovm/datafile/seznam_ds/v1");
