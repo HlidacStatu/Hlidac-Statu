@@ -30,17 +30,6 @@ public class HomeController : Controller
         var platy = await PuRepo.GetPoziceDlePlatuAsync(range.Min, range.Max, PuRepo.DefaultYear);
 
         ViewData["platy"] = platy;
-
-        List<Breadcrumb> breadcrumbs = new()
-        {
-            new Breadcrumb()
-            {
-                Name = $"Dle platu ({range.Min} - {range.Max})",
-                Link = $"{nameof(DlePlatu)}/{id}"
-            }
-        };
-
-        ViewData["breadcrumbs"] = breadcrumbs;
         ViewData["context"] = $"Dle platů {range.Min} - {range.Max},-";
 
         return View(platy);
@@ -51,24 +40,7 @@ public class HomeController : Controller
         var organizace = await PuRepo.GetOrganizaceForTagAsync(id);
 
         ViewData["platy"] = organizace.SelectMany(o => o.Platy).ToList();
-
         ViewData["oblast"] = id;
-
-        List<Breadcrumb> breadcrumbs = new()
-        {
-            new Breadcrumb()
-            {
-                Name = nameof(Oblasti),
-                Link = $"{nameof(Oblasti)}"
-            },
-            new Breadcrumb()
-            {
-                Name = id,
-                Link = $"{nameof(Oblast)}/{id}"
-            }
-        };
-
-        ViewData["breadcrumbs"] = breadcrumbs;
         ViewData["context"] = $"{id}";
 
         return View(organizace);
@@ -92,64 +64,22 @@ public class HomeController : Controller
         return View(oblasti);
     }
 
-    public async Task<IActionResult> Detail2(int id, int rok = PuRepo.DefaultYear)
+    public async Task<IActionResult> Detail2(string id, int rok = PuRepo.DefaultYear)
     {
-        var detail = await PuRepo.GetDetailEagerAsync(id);
+        var detail = await PuRepo.GetFullDetailAsync(id);
         ViewData["platy"] = detail.Platy.ToList();
-
-        List<Breadcrumb> breadcrumbs = new()
-        {
-            new Breadcrumb()
-            {
-                Name = nameof(Oblasti),
-                Link = $"{nameof(Oblasti)}"
-            },
-            new Breadcrumb()
-            {
-                Name = detail.Oblast,
-                Link = $"{nameof(Oblast)}/{detail.Oblast}"
-            },
-            new Breadcrumb()
-            {
-                Name = $"{detail.Nazev} ({rok})",
-                Link = $"{nameof(Detail2)}/{id}?rok={rok}"
-            }
-        };
-
-        ViewData["breadcrumbs"] = breadcrumbs;
         ViewData["context"] = detail.Nazev;
 
         return View(detail);
     }
 
-    public async Task<IActionResult> Detail(int id, int? rok = null)
+    public async Task<IActionResult> Detail(string id, int? rok = null)
     {
-        var detail = await PuRepo.GetDetailEagerAsync(id);
+        var detail = await PuRepo.GetFullDetailAsync(id);
 
         ViewData["platy"] = detail.Platy.ToList();
         ViewData["rok"] = rok ?? (detail.Platy.Any() ? detail.Platy.Max(m => m.Rok) : PuRepo.DefaultYear);
         ViewData["id"] = id;
-
-        List<Breadcrumb> breadcrumbs = new()
-        {new Breadcrumb()
-            {
-                Name = nameof(Oblasti),
-                Link = $"{nameof(Oblasti)}"
-            },
-            new Breadcrumb()
-            {
-                Name = detail.Oblast,
-                Link = $"{nameof(Oblast)}/{detail.Oblast}"
-            },
-            new Breadcrumb()
-            {
-                Name = $"{detail.Nazev} ({rok})",
-                Link = $"{nameof(Detail)}/{id}?rok={rok}"
-            }
-            
-        };
-        
-        ViewData["breadcrumbs"] = breadcrumbs;
         ViewData["context"] = detail.Nazev;
 
         return View(detail);
@@ -158,32 +88,6 @@ public class HomeController : Controller
     public async Task<IActionResult> Plat(int id)
     {
         var detail = await PuRepo.GetPlatAsync(id);
-
-        List<Breadcrumb> breadcrumbs = new()
-        {
-            new Breadcrumb()
-            {
-                Name = nameof(Oblasti),
-                Link = $"{nameof(Oblasti)}"
-            },
-            new Breadcrumb()
-            {
-                Name = detail.Organizace.Oblast,
-                Link = $"{nameof(Oblast)}/{detail.Organizace.Oblast}"
-            },
-            new Breadcrumb()
-            {
-                Name = $"{detail.Organizace.Nazev} ({detail.Rok})",
-                Link = $"{nameof(Detail2)}/{id}?rok={detail.Rok}"
-            },
-            new Breadcrumb()
-            {
-                Name = detail.NazevPozice,
-                Link = $"{nameof(Plat)}/{id}"
-            }
-        };
-
-        ViewData["breadcrumbs"] = breadcrumbs;
         ViewData["context"] = $"{detail.NazevPozice} v organizaci {detail.Organizace.Nazev}";
 
         return View(detail);

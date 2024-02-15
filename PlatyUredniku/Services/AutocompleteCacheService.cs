@@ -90,7 +90,7 @@ public class AutocompleteCacheService
         return await db.PuOrganizace.AsNoTracking()
             .Select(o => new Autocomplete()
             {
-                Id = $"/detail/{o.Id}",
+                Id = $"/detail/{o.DS}",
                 Text = $"{o.Nazev}",
                 AdditionalHiddenSearchText = $"{o.Ico} {o.DS}",
                 PriorityMultiplier = 1,
