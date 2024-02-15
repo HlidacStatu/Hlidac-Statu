@@ -19,7 +19,7 @@
             </p>
 
             <p class="fw-bold">
-                Celkově si tak pozice @Model.NazevPozice v instituci @Model.Organizace.Nazev měsíčně může přijít na
+                Celkově si tak pozice @Model.NazevPozice v instituci @Model.Organizace.FirmaDs.DsSubjName měsíčně může přijít na
                 cca. “ = 66 430 + 39% - daň - soc. zdr. “ čistého výdělku <small class="small fw-light">fakt budeme počítat čistej?</small>
             </p>
         }
@@ -57,9 +57,9 @@
 
     </div>
     <div class="col-2">
-        @if (Model.JeHlavoun == true && !string.IsNullOrWhiteSpace(Model.Organizace.Ico))
+        @if (Model.JeHlavoun == true && !string.IsNullOrWhiteSpace(Model.Organizace.FirmaDs.Ico))
         {
-            var ceos = OsobaEventRepo.GetCeos(Model.Organizace.Ico, new DateTime(Model.Rok, 1, 1), new DateTime(Model.Rok, 12, 31));
+            var ceos = OsobaEventRepo.GetCeos(Model.Organizace.FirmaDs.Ico, new DateTime(Model.Rok, 1, 1), new DateTime(Model.Rok, 12, 31));
             if (ceos is not null && ceos.Length > 0)
             {
                 foreach (var ceo in ceos)

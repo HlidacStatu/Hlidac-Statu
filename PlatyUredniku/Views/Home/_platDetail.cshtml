@@ -17,9 +17,9 @@
     @if (plat.JeHlavoun == true)
     {
         <div class="col-2">
-            @if (!string.IsNullOrWhiteSpace(plat.Organizace.Ico))
+            @if (!string.IsNullOrWhiteSpace(plat.Organizace.FirmaDs.Ico))
             {
-                var ceos = OsobaEventRepo.GetCeos(plat.Organizace.Ico, new DateTime(plat.Rok, 1, 1), new DateTime(plat.Rok, 12, 31));
+                var ceos = OsobaEventRepo.GetCeos(plat.Organizace.FirmaDs.Ico, new DateTime(plat.Rok, 1, 1), new DateTime(plat.Rok, 12, 31));
                 if (ceos is not null && ceos.Length > 0)
                 {
                     foreach (var ceo in ceos)

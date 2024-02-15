@@ -88,11 +88,12 @@ public class AutocompleteCacheService
         await using var db = new DbEntities();
 
         return await db.PuOrganizace.AsNoTracking()
+            .Include(o => o.FirmaDs)
             .Select(o => new Autocomplete()
             {
                 Id = $"/detail/{o.DS}",
-                Text = $"{o.Nazev}",
-                AdditionalHiddenSearchText = $"{o.Ico} {o.DS}",
+                Text = $"{o.FirmaDs.DsSubjName}",
+                AdditionalHiddenSearchText = $"{o.FirmaDs.Ico} {o.DS}",
                 PriorityMultiplier = 1,
                 Type = "instituce",
                 ImageElement = $"<i class='fas fa-university'></i>",
@@ -131,7 +132,8 @@ public class AutocompleteCacheService
             .Where(p => p.JeHlavoun == true)
             .Where(p => p.Rok == PuRepo.DefaultYear)
             .Include( p => p.Organizace)
-            .Where(p => p.Organizace.Ico != null)
+            .ThenInclude(o => o.FirmaDs)
+            .Where(p => p.Organizace.FirmaDs.Ico != null)
             .ToListAsync(cancellationToken: cancellationToken);
 
         DateTime fromDate = new DateTime(PuRepo.DefaultYear, 1, 1);
@@ -143,10 +145,10 @@ public class AutocompleteCacheService
             if(cancellationToken.IsCancellationRequested)
                 break;
             
-            if(string.IsNullOrWhiteSpace(plat.Organizace.Ico))
+            if(string.IsNullOrWhiteSpace(plat.Organizace.FirmaDs.Ico))
                 continue;
 
-            var autocomplete = OsobaEventRepo.GetCeos(plat.Organizace.Ico, fromDate, toDate)
+            var autocomplete = OsobaEventRepo.GetCeos(plat.Organizace.FirmaDs.Ico, fromDate, toDate)
                 .Select(o => new Autocomplete()
                 {
                     Id = $"/plat/{plat.Id}",
@@ -154,7 +156,7 @@ public class AutocompleteCacheService
                     PriorityMultiplier = 1,
                     Type = "osoba",
                     ImageElement = $"<img src='{o.Osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />",
-                    Description = $"{plat.Organizace.Nazev} - {plat.NazevPozice}",
+                    Description = $"{plat.Organizace.FirmaDs.DsSubjName} - {plat.NazevPozice}",
                     Category = Autocomplete.CategoryEnum.Person,
                 })
                 .ToList();

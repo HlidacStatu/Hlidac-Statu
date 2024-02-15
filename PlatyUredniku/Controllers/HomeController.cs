@@ -68,7 +68,7 @@ public class HomeController : Controller
     {
         var detail = await PuRepo.GetFullDetailAsync(id);
         ViewData["platy"] = detail.Platy.ToList();
-        ViewData["context"] = detail.Nazev;
+        ViewData["context"] = detail.FirmaDs.DsSubjName;
 
         return View(detail);
     }
@@ -80,7 +80,7 @@ public class HomeController : Controller
         ViewData["platy"] = detail.Platy.ToList();
         ViewData["rok"] = rok ?? (detail.Platy.Any() ? detail.Platy.Max(m => m.Rok) : PuRepo.DefaultYear);
         ViewData["id"] = id;
-        ViewData["context"] = detail.Nazev;
+        ViewData["context"] = detail.FirmaDs.DsSubjName;
 
         return View(detail);
     }
@@ -88,7 +88,7 @@ public class HomeController : Controller
     public async Task<IActionResult> Plat(int id)
     {
         var detail = await PuRepo.GetPlatAsync(id);
-        ViewData["context"] = $"{detail.NazevPozice} v organizaci {detail.Organizace.Nazev}";
+        ViewData["context"] = $"{detail.NazevPozice} v organizaci {detail.Organizace.FirmaDs.DsSubjName}";
 
         return View(detail);
     }

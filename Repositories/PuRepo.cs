@@ -96,9 +96,10 @@ public static class PuRepo
         return await db.PuOrganizace
             .AsNoTracking()
             .Where(pu => pu.DS == datovaSchranka)
-            .Include(o => o.Tags) // Include PuOrganizaceTags
+            .Include(o => o.Metadata)
+            .Include(o => o.Tags)
+            .Include(o => o.FirmaDs)
             .Include(o => o.Platy) // Include PuPlat
-            .Include(o => o.Metadata) // Include PuOranizaceMetadata
             .FirstOrDefaultAsync();
     }
 
@@ -106,7 +107,7 @@ public static class PuRepo
     {
         return platy?.Where(m => m.Rok == rok).ToList();
     }
-
+    
     public static async Task<List<PuOrganizace>> GetOrganizaceForTagAsync(string tag)
     {
         await using var db = new DbEntities();
@@ -114,8 +115,9 @@ public static class PuRepo
         return await db.PuOrganizaceTags
             .AsNoTracking()
             .Where(t => t.Tag.Equals(tag))
-            .Include(t => t.Organizace)
-            .ThenInclude(o => o.Platy)
+            .Include(t => t.Organizace).ThenInclude(o => o.FirmaDs)
+            .Include(t => t.Organizace).ThenInclude(o => o.Platy)
+            .Include(t => t.Organizace).ThenInclude(o => o.Metadata)
             .Select(t => t.Organizace)
             .ToListAsync();
     }
@@ -127,6 +129,7 @@ public static class PuRepo
         return await db.PuPlaty
             .AsNoTracking()
             .Include(p => p.Organizace)
+            .ThenInclude(o => o.FirmaDs)
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync();
     }
