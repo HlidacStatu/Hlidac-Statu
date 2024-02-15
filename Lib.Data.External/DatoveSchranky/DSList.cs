@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Serilog.Core;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -28,19 +29,27 @@ namespace HlidacStatu.Lib.Data.External.DatoveSchranky
             var wc = new WebClient();
             foreach (var url in urls)
             {
-                wc.Headers[HttpRequestHeader.AcceptEncoding] = "gzip";
-                var responseStream = new GZipStream(wc.OpenRead(url), CompressionMode.Decompress);
-                var wcreader = new StreamReader(responseStream);
-                var xmls = wcreader.ReadToEnd();
-                //var xmls = wc.DownloadString(url);
-                using (TextReader reader = new StringReader(xmls))
+                try
                 {
-                    var dsFromXML = (list)serializer.Deserialize(reader);
-                    if (dsFromXML.box?.Count() > 0)
+                    wc.Headers[HttpRequestHeader.AcceptEncoding] = "gzip";
+                    var responseStream = new GZipStream(wc.OpenRead(url), CompressionMode.Decompress);
+                    var wcreader = new StreamReader(responseStream);
+                    var xmls = wcreader.ReadToEnd();
+                    //var xmls = wc.DownloadString(url);
+                    using (TextReader reader = new StringReader(xmls))
                     {
-                        dsL.AddRange(dsFromXML.box);
-                    }
+                        var dsFromXML = (list)serializer.Deserialize(reader);
+                        if (dsFromXML.box?.Count() > 0)
+                        {
+                            dsL.AddRange(dsFromXML.box);
+                        }
 
+                    }
+                }
+                catch (System.Exception e)
+                {
+
+                    Serilog.Log.Error(e, "Cannot read data datove schranky from {url} ", url);
                 }
             }
 
