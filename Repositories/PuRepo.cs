@@ -89,25 +89,13 @@ public static class PuRepo
         return stat;
     }
 
-    public static async Task<PuOrganizace> GetDetailEagerByDatovkaAsync(string datovaSchranka)
+    public static async Task<PuOrganizace> GetFullDetailAsync(string datovaSchranka)
     {
         await using var db = new DbEntities();
 
         return await db.PuOrganizace
             .AsNoTracking()
             .Where(pu => pu.DS == datovaSchranka)
-            .Include(o => o.Tags) // Include PuOrganizaceTags
-            .Include(o => o.Platy) // Include PuPlat
-            .Include(o => o.Metadata) // Include PuOranizaceMetadata
-            .FirstOrDefaultAsync();
-    }
-    public static async Task<PuOrganizace> GetDetailEagerAsync(int id)
-    {
-        await using var db = new DbEntities();
-
-        return await db.PuOrganizace
-            .AsNoTracking()
-            .Where(pu => pu.Id == id)
             .Include(o => o.Tags) // Include PuOrganizaceTags
             .Include(o => o.Platy) // Include PuPlat
             .Include(o => o.Metadata) // Include PuOranizaceMetadata
