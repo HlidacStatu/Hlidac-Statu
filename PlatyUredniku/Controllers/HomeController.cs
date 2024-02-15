@@ -46,14 +46,13 @@ public class HomeController : Controller
         return View(platy);
     }
 
-    public async Task<IActionResult> Oblast(string oblast, string? podoblast = null)
+    public async Task<IActionResult> Oblast(string id)
     {
-        var organizace = await PuRepo.GetOrganizaceForOblastiAsync(oblast, podoblast);
+        var organizace = await PuRepo.GetOrganizaceForTagAsync(id);
 
         ViewData["platy"] = organizace.SelectMany(o => o.Platy).ToList();
 
-        ViewData["oblast"] = oblast;
-        ViewData["podoblast"] = podoblast;
+        ViewData["oblast"] = id;
 
         List<Breadcrumb> breadcrumbs = new()
         {
@@ -64,20 +63,20 @@ public class HomeController : Controller
             },
             new Breadcrumb()
             {
-                Name = oblast,
-                Link = $"{nameof(Oblast)}?oblast={oblast}"
+                Name = id,
+                Link = $"{nameof(Oblast)}/{id}"
             }
         };
 
         ViewData["breadcrumbs"] = breadcrumbs;
-        ViewData["context"] = $"{oblast} > {podoblast}";
+        ViewData["context"] = $"{id}";
 
         return View(organizace);
     }
 
     public async Task<IActionResult> Oblasti()
     {
-        var oblasti = await PuRepo.GetPrimalOblastiAsync();
+        var oblasti = PuRepo.MainTags;
 
         List<Breadcrumb> breadcrumbs = new()
         {
@@ -108,7 +107,7 @@ public class HomeController : Controller
             new Breadcrumb()
             {
                 Name = detail.Oblast,
-                Link = $"{nameof(Oblast)}?oblast={detail.Oblast}"
+                Link = $"{nameof(Oblast)}/{detail.Oblast}"
             },
             new Breadcrumb()
             {
@@ -140,7 +139,7 @@ public class HomeController : Controller
             new Breadcrumb()
             {
                 Name = detail.Oblast,
-                Link = $"{nameof(Oblast)}?oblast={detail.Oblast}"
+                Link = $"{nameof(Oblast)}/{detail.Oblast}"
             },
             new Breadcrumb()
             {
@@ -170,7 +169,7 @@ public class HomeController : Controller
             new Breadcrumb()
             {
                 Name = detail.Organizace.Oblast,
-                Link = $"{nameof(Oblast)}?oblast={detail.Organizace.Oblast}"
+                Link = $"{nameof(Oblast)}/{detail.Organizace.Oblast}"
             },
             new Breadcrumb()
             {
