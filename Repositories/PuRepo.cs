@@ -1,3 +1,4 @@
+using System;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -155,6 +156,32 @@ public static class PuRepo
             .Where(p => (((p.Plat ?? 0) + (p.Odmeny ?? 0)) * (1 / p.Uvazek ?? 1) / (p.PocetMesicu ?? 12)) <= rangeMax)
             .Include(p => p.Organizace)
             .ToListAsync();
+    }
+    
+    public static async Task UpsertOrganizaceAsync(PuOrganizace organizace)
+    {
+        await using var dbContext = new DbEntities();
+
+        if (string.IsNullOrWhiteSpace(organizace.DS))
+        {
+            throw new Exception("Chybí vyplněná datová schránka");
+        }
+
+        organizace.DS = organizace.DS.Trim();
+
+        var original = await dbContext.PuOrganizace.FirstOrDefaultAsync(o => o.DS == organizace.DS);
+
+        if (original is null)
+        {
+            dbContext.PuOrganizace.Add(organizace);
+        }
+        else
+        {
+            original.Info = organizace.Info;
+            original.HiddenNote = organizace.HiddenNote;
+        }
+        
+        await dbContext.SaveChangesAsync();
     }
 
 
