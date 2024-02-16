@@ -170,6 +170,14 @@ public static class PuRepo
         organizace.DS = organizace.DS.Trim();
 
         var original = await dbContext.PuOrganizace.FirstOrDefaultAsync(o => o.DS == organizace.DS);
+        
+        var metadata = organizace.Metadata;
+        organizace.Metadata = null;
+        var tagy = organizace.Tags;
+        organizace.Tags = null;
+        var platy = organizace.Platy;
+        organizace.Platy = null;
+        original.FirmaDs = null;
 
         if (original is null)
         {
@@ -179,6 +187,85 @@ public static class PuRepo
         {
             original.Info = organizace.Info;
             original.HiddenNote = organizace.HiddenNote;
+        }
+        
+        await dbContext.SaveChangesAsync();
+
+        
+        if (metadata is not null)
+        {
+            //upsert metadata
+        }
+
+        if (tagy is not null)
+        {
+            
+        }
+
+        if (platy is not null)
+        {
+            foreach (var plat in platy)
+            {
+                await UpsertPlatAsync(plat);
+            }
+        }
+        
+        
+    }
+    
+    public static async Task UpsertPlatAsync(PuPlat plat)
+    {
+        await using var dbContext = new DbEntities();
+
+        if (string.IsNullOrWhiteSpace(plat.NazevPozice))
+        {
+            throw new Exception("Chybí vyplněný název pozice");
+        }
+        
+        if (plat.Rok == 0)
+        {
+            throw new Exception("Chybí vyplněný rok pozice");
+        }
+        
+        if (plat.IdOrganizace == 0)
+        {
+            throw new Exception("Chybí vyplněné id organizace");
+        }
+        
+        plat.NazevPozice = plat.NazevPozice.Trim();
+
+        PuPlat origPlat;
+
+        if (plat.Id == 0)
+        {
+            origPlat = await dbContext.PuPlaty
+                .FirstOrDefaultAsync(p => p.IdOrganizace == plat.IdOrganizace 
+                                     && p.Rok == plat.Rok 
+                                     && p.NazevPozice == plat.NazevPozice);
+        }
+        else
+        {
+            origPlat = await dbContext.PuPlaty
+                .FirstOrDefaultAsync(p => p.Id == plat.Id);
+        }
+        
+        if (origPlat is null)
+        {
+            dbContext.PuPlaty.Add(plat);
+        }
+        else
+        {
+            origPlat.NazevPozice = plat.NazevPozice;
+            origPlat.Plat = plat.Plat;
+            origPlat.Odmeny = plat.Odmeny;
+            origPlat.Uvazek = plat.Uvazek;
+            origPlat.DisplayOrder = plat.DisplayOrder;
+            origPlat.JeHlavoun = plat.JeHlavoun;
+            origPlat.NefinancniBonus = plat.NefinancniBonus;
+            origPlat.PocetMesicu = plat.PocetMesicu;
+            origPlat.PoznamkaPlat = plat.PoznamkaPlat;
+            origPlat.PoznamkaPozice = plat.PoznamkaPozice;
+            origPlat.SkrytaPoznamka = plat.SkrytaPoznamka;
         }
         
         await dbContext.SaveChangesAsync();
