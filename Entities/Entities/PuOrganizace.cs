@@ -12,8 +12,8 @@ public class PuOrganizace
     public int Id { get; set; }
 
     public string DS { get; set; }
-    // public string Ico => FirmaDs?.Ico;
-    // public string Nazev => FirmaDs?.DsSubjName;
+    public string Ico => FirmaDs?.Ico;
+    public string Nazev => FirmaDs?.DsSubjName;
     public string Info { get; set; }
     public string HiddenNote { get; set; }
     public string Zatrideni { get; set; }

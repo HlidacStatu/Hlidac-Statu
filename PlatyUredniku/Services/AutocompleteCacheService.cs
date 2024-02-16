@@ -92,8 +92,8 @@ public class AutocompleteCacheService
             .Select(o => new Autocomplete()
             {
                 Id = $"/detail/{o.DS}",
-                Text = $"{o.FirmaDs.DsSubjName}",
-                AdditionalHiddenSearchText = $"{o.FirmaDs.Ico} {o.DS}",
+                Text = $"{o.Nazev}",
+                AdditionalHiddenSearchText = $"{o.Ico} {o.DS}",
                 PriorityMultiplier = 1,
                 Type = "instituce",
                 ImageElement = $"<i class='fas fa-university'></i>",
@@ -156,7 +156,7 @@ public class AutocompleteCacheService
                     PriorityMultiplier = 1,
                     Type = "osoba",
                     ImageElement = $"<img src='{o.Osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)}' />",
-                    Description = $"{plat.Organizace.FirmaDs.DsSubjName} - {plat.NazevPozice}",
+                    Description = $"{plat.Organizace.Nazev} - {plat.NazevPozice}",
                     Category = Autocomplete.CategoryEnum.Person,
                 })
                 .ToList();

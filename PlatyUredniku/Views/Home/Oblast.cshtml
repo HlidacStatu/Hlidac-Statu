@@ -34,13 +34,13 @@
 
                 <table class="table table-new table-new--dotted table-hover">
                     <tbody>
-                    @foreach (var org in Model.OrderBy(o => o.FirmaDs.DsSubjName))
+                    @foreach (var org in Model.OrderBy(o => o.Nazev))
                     {
                         var platy = org.Platy.Rok().Count > 1 ? $", <i class='fa-solid fa-money-bills'></i> {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Min(m => m.HrubyMesicniPlat))} - {HlidacStatu.Util.RenderData.NicePrice(org.Platy.Rok().Max(m => m.HrubyMesicniPlat))}" : ".";
                         <tr>
                             <td style="width:50%">
                                 <h4>
-                                    <a asp-action="Detail" asp-route-id="@org.DS">@org.FirmaDs.DsSubjName</a>
+                                    <a asp-action="Detail" asp-route-id="@org.DS">@org.Nazev</a>
                                 </h4>
                             </td>
                             <td style="width:50%">

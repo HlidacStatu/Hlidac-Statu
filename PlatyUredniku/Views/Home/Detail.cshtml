@@ -38,11 +38,11 @@
 <div class="row boxes">
 
     <div class="px-4 py-5" id="hanging-icons">
-        <h2 class="pb-2 border-bottom">@Model.FirmaDs.DsSubjName</h2>
+        <h2 class="pb-2 border-bottom">@Model.Nazev</h2>
         <p>
-            IČO: @Model.FirmaDs.Ico <br/>
+            IČO: @Model.Ico <br/>
             Datová schránka: @Model.DS <br/>
-            <a href="https://www.hlidacstatu.cz/subjekt/@(Model.FirmaDs.Ico)">Více informací o subjektu</a>
+            <a href="https://www.hlidacstatu.cz/subjekt/@(Model.Ico)">Více informací o subjektu</a>
         </p>
         <h5>
             @foreach (var tag in Model.Tags)
