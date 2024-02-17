@@ -177,7 +177,9 @@ else
         }
     }
     app.UseBannedIpsMiddleware(whitelist); // tohle nechci při developmentu :) 
-    app.UseExceptionHandler("/Error/500");
+
+    app.UseDeveloperExceptionPage();
+    //app.UseExceptionHandler("/Error/500");
 }
 
 // redirect to apikey landing page
