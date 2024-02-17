@@ -202,6 +202,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatyUredniku", "PlatyUredn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.Web.UI", "Lib.Web.UI\Lib.Web.UI.csproj", "{31F30A0C-0DA0-4092-9960-F6187A7FBF35}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatisticRecalculator", "..\Hlidac-Statu-Private\Docker\StatisticRecalculator\StatisticRecalculator.csproj", "{2E3DDD53-FA56-4240-9214-5AD6F555C37C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -488,6 +490,10 @@ Global
 		{31F30A0C-0DA0-4092-9960-F6187A7FBF35}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31F30A0C-0DA0-4092-9960-F6187A7FBF35}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31F30A0C-0DA0-4092-9960-F6187A7FBF35}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E3DDD53-FA56-4240-9214-5AD6F555C37C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E3DDD53-FA56-4240-9214-5AD6F555C37C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E3DDD53-FA56-4240-9214-5AD6F555C37C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E3DDD53-FA56-4240-9214-5AD6F555C37C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -576,6 +582,7 @@ Global
 		{F991F6F1-C00D-44E6-AF12-57DC795C75B1} = {A9C52FA8-1F95-449B-9C04-7A01ABEFFD52}
 		{B0B99AD2-69B1-4247-ADC3-5EF597831FC5} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 		{31F30A0C-0DA0-4092-9960-F6187A7FBF35} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
+		{2E3DDD53-FA56-4240-9214-5AD6F555C37C} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}
