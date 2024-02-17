@@ -9,29 +9,29 @@ namespace HlidacStatu.LibCore.Services
     public class AttackerDictionaryService
     {
 
-        private class RadwareNetwork : Devmasters.Net.Crawlers.CrawlerBase
-        {
-            public override string Name => "RadwareNetwork";
-
-            public override string[] IP => new string[] {
-                "141.226.101.0/24",
-                "66.22.0.0/17",
-                "159.122.76.110",
-                "141.226.97.0/24"
-            };
-
-            public override string[] HostNameRegex => null;
-
-            public override string[] UserAgent => null;
-
-            public override async Task<bool> ReloadDefinitionsFromInternetAsync()
-            {
-                return true;
-            }
-        }
-
-        static Devmasters.Net.Crawlers.ICrawler radware = new RadwareNetwork();
-        private Devmasters.Net.Crawlers.ICrawler _radware = new RadwareNetwork();
+        // private class RadwareNetwork : Devmasters.Net.Crawlers.CrawlerBase
+        // {
+        //     public override string Name => "RadwareNetwork";
+        //
+        //     public override string[] IP => new string[] {
+        //         "141.226.101.0/24",
+        //         "66.22.0.0/17",
+        //         "159.122.76.110",
+        //         "141.226.97.0/24"
+        //     };
+        //
+        //     public override string[] HostNameRegex => null;
+        //
+        //     public override string[] UserAgent => null;
+        //
+        //     public override async Task<bool> ReloadDefinitionsFromInternetAsync()
+        //     {
+        //         return true;
+        //     }
+        // }
+        //
+        // static Devmasters.Net.Crawlers.ICrawler radware = new RadwareNetwork();
+        // private Devmasters.Net.Crawlers.ICrawler _radware = new RadwareNetwork();
 
 
         private class Attacker
@@ -59,8 +59,8 @@ namespace HlidacStatu.LibCore.Services
                 return false;
 
             //whitelisted Radware Ips
-            if (radware.IsItCrawler(IpToString(ipAddress), ""))
-                return false;
+            // if (radware.IsItCrawler(IpToString(ipAddress), ""))
+            //     return false;
 
             var ipString = IpToString(ipAddress);
             if (ipString.StartsWith("10.10"))
