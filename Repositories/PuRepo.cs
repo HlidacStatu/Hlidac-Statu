@@ -39,12 +39,12 @@ public static class PuRepo
         await using var db = new DbEntities();
 
         PuRokOrganizaceStat stat = new PuRokOrganizaceStat();
-        stat.PocetOslovenych= await db.PuOrganizaceMetadata
+        stat.PocetOslovenych = await db.PuOrganizaceMetadata
             .CountAsync(m => m.DatumOdeslaniZadosti.HasValue && m.Rok == rok);
 
         stat.PocetCoPoslaliPlat = await db.PuPlaty
             .Where(m => m.Rok == rok)
-            .Select(m=>m.IdOrganizace)
+            .Select(m => m.IdOrganizace)
             .Distinct()
             .CountAsync();
 
@@ -61,31 +61,33 @@ public static class PuRepo
             .Where(m => m.Rok == rok && m.JeHlavoun == true)
             .Select(m => new { mplat = m.HrubyMesicniPlat, plat = m, org = m.Organizace })
             .ToArray()
-            .OrderBy(o=>o.mplat)
+            .OrderBy(o => o.mplat)
             .ToArray();
 
 
-        stat.PercentilyPlatu = new Dictionary<int, decimal>() {
-            {1, HlidacStatu.Util.MathTools.PercentileCont(0.01m,platyRok.Select(m=>m.mplat))},
-            {5, HlidacStatu.Util.MathTools.PercentileCont(0.05m,platyRok.Select(m=>m.mplat))},
-            {10, HlidacStatu.Util.MathTools.PercentileCont(0.10m,platyRok.Select(m=>m.mplat))},
-            {25, HlidacStatu.Util.MathTools.PercentileCont(0.25m,platyRok.Select(m=>m.mplat))},
-            {50, HlidacStatu.Util.MathTools.PercentileCont(0.50m,platyRok.Select(m=>m.mplat))},
-            {75, HlidacStatu.Util.MathTools.PercentileCont(0.75m,platyRok.Select(m=>m.mplat))},
-            {90, HlidacStatu.Util.MathTools.PercentileCont(0.90m,platyRok.Select(m=>m.mplat))},
-            {95, HlidacStatu.Util.MathTools.PercentileCont(0.95m,platyRok.Select(m=>m.mplat))},
-            {99, HlidacStatu.Util.MathTools.PercentileCont(0.99m,platyRok.Select(m=>m.mplat))},
+        stat.PercentilyPlatu = new Dictionary<int, decimal>()
+        {
+            { 1, HlidacStatu.Util.MathTools.PercentileCont(0.01m, platyRok.Select(m => m.mplat)) },
+            { 5, HlidacStatu.Util.MathTools.PercentileCont(0.05m, platyRok.Select(m => m.mplat)) },
+            { 10, HlidacStatu.Util.MathTools.PercentileCont(0.10m, platyRok.Select(m => m.mplat)) },
+            { 25, HlidacStatu.Util.MathTools.PercentileCont(0.25m, platyRok.Select(m => m.mplat)) },
+            { 50, HlidacStatu.Util.MathTools.PercentileCont(0.50m, platyRok.Select(m => m.mplat)) },
+            { 75, HlidacStatu.Util.MathTools.PercentileCont(0.75m, platyRok.Select(m => m.mplat)) },
+            { 90, HlidacStatu.Util.MathTools.PercentileCont(0.90m, platyRok.Select(m => m.mplat)) },
+            { 95, HlidacStatu.Util.MathTools.PercentileCont(0.95m, platyRok.Select(m => m.mplat)) },
+            { 99, HlidacStatu.Util.MathTools.PercentileCont(0.99m, platyRok.Select(m => m.mplat)) },
         };
-        stat.PercentilyPlatuHlavounu = new Dictionary<int, decimal>() {
-            {1, HlidacStatu.Util.MathTools.PercentileCont(0.01m,platyRokHlavouni.Select(m=>m.mplat))},
-            {5, HlidacStatu.Util.MathTools.PercentileCont(0.05m,platyRokHlavouni.Select(m=>m.mplat))},
-            {10, HlidacStatu.Util.MathTools.PercentileCont(0.10m,platyRokHlavouni.Select(m=>m.mplat))},
-            {25, HlidacStatu.Util.MathTools.PercentileCont(0.25m,platyRokHlavouni.Select(m=>m.mplat))},
-            {50, HlidacStatu.Util.MathTools.PercentileCont(0.50m,platyRokHlavouni.Select(m=>m.mplat))},
-            {75, HlidacStatu.Util.MathTools.PercentileCont(0.75m,platyRokHlavouni.Select(m=>m.mplat))},
-            {90, HlidacStatu.Util.MathTools.PercentileCont(0.90m,platyRokHlavouni.Select(m=>m.mplat))},
-            {95, HlidacStatu.Util.MathTools.PercentileCont(0.95m,platyRokHlavouni.Select(m=>m.mplat))},
-            {99, HlidacStatu.Util.MathTools.PercentileCont(0.99m,platyRokHlavouni.Select(m=>m.mplat))},
+        stat.PercentilyPlatuHlavounu = new Dictionary<int, decimal>()
+        {
+            { 1, HlidacStatu.Util.MathTools.PercentileCont(0.01m, platyRokHlavouni.Select(m => m.mplat)) },
+            { 5, HlidacStatu.Util.MathTools.PercentileCont(0.05m, platyRokHlavouni.Select(m => m.mplat)) },
+            { 10, HlidacStatu.Util.MathTools.PercentileCont(0.10m, platyRokHlavouni.Select(m => m.mplat)) },
+            { 25, HlidacStatu.Util.MathTools.PercentileCont(0.25m, platyRokHlavouni.Select(m => m.mplat)) },
+            { 50, HlidacStatu.Util.MathTools.PercentileCont(0.50m, platyRokHlavouni.Select(m => m.mplat)) },
+            { 75, HlidacStatu.Util.MathTools.PercentileCont(0.75m, platyRokHlavouni.Select(m => m.mplat)) },
+            { 90, HlidacStatu.Util.MathTools.PercentileCont(0.90m, platyRokHlavouni.Select(m => m.mplat)) },
+            { 95, HlidacStatu.Util.MathTools.PercentileCont(0.95m, platyRokHlavouni.Select(m => m.mplat)) },
+            { 99, HlidacStatu.Util.MathTools.PercentileCont(0.99m, platyRokHlavouni.Select(m => m.mplat)) },
         };
         return stat;
     }
@@ -108,7 +110,7 @@ public static class PuRepo
     {
         return platy?.Where(m => m.Rok == rok).ToList();
     }
-    
+
     public static async Task<List<PuOrganizace>> GetOrganizaceForTagAsync(string tag)
     {
         await using var db = new DbEntities();
@@ -134,6 +136,18 @@ public static class PuRepo
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync();
     }
+    
+    public static async Task<PuPlat> GetPlatAsync(int idOrganizace, int rok, string nazevPozice)
+    {
+        await using var db = new DbEntities();
+
+        return await db.PuPlaty
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.IdOrganizace == idOrganizace
+                                      && p.Rok == rok
+                                      && p.NazevPozice == nazevPozice);
+    }
+    
 
     public static async Task<List<PuPlat>> GetPlatyAsync(int rok)
     {
@@ -157,7 +171,7 @@ public static class PuRepo
             .Include(p => p.Organizace)
             .ToListAsync();
     }
-    
+
     public static async Task UpsertOrganizaceAsync(PuOrganizace organizace)
     {
         await using var dbContext = new DbEntities();
@@ -170,7 +184,7 @@ public static class PuRepo
         organizace.DS = organizace.DS.Trim();
 
         var original = await dbContext.PuOrganizace.FirstOrDefaultAsync(o => o.DS == organizace.DS);
-        
+
         var metadata = organizace.Metadata;
         organizace.Metadata = null;
         var tagy = organizace.Tags;
@@ -179,7 +193,7 @@ public static class PuRepo
         organizace.Platy = null;
         original.FirmaDs = null;
 
-        if (original is null)
+        if (original is null || original.Id == 0)
         {
             dbContext.PuOrganizace.Add(organizace);
         }
@@ -188,18 +202,24 @@ public static class PuRepo
             original.Info = organizace.Info;
             original.HiddenNote = organizace.HiddenNote;
         }
-        
+
         await dbContext.SaveChangesAsync();
 
-        
+
         if (metadata is not null)
         {
-            //upsert metadata
+            foreach (var metadatum in metadata)
+            {
+                await UpsertMetadataAsync(metadatum);
+            }
         }
 
         if (tagy is not null)
         {
-            
+            foreach (var tag in tagy)
+            {
+                await UpsertTagAsync(tag);
+            }
         }
 
         if (platy is not null)
@@ -209,46 +229,124 @@ public static class PuRepo
                 await UpsertPlatAsync(plat);
             }
         }
-        
-        
     }
-    
+
+    public static async Task UpsertMetadataAsync(PuOrganizaceMetadata metadatum)
+    {
+        if (metadatum.Rok == 0)
+        {
+            throw new Exception("Chybí vyplněný rok");
+        }
+
+        if (metadatum.IdOrganizace == 0)
+        {
+            throw new Exception("Chybí vyplněné id organizace");
+        }
+
+        PuOrganizaceMetadata origMetadata;
+
+        await using var dbContext = new DbEntities();
+        if (metadatum.Id == 0)
+        {
+            origMetadata = await dbContext.PuOrganizaceMetadata
+                .FirstOrDefaultAsync(p => p.IdOrganizace == metadatum.IdOrganizace
+                                          && p.Rok == metadatum.Rok);
+        }
+        else
+        {
+            origMetadata = await dbContext.PuOrganizaceMetadata
+                .FirstOrDefaultAsync(p => p.Id == metadatum.Id);
+        }
+
+        if (origMetadata is null)
+        {
+            dbContext.PuOrganizaceMetadata.Add(metadatum);
+        }
+        else
+        {
+            origMetadata.ZpusobKomunikace = metadatum.ZpusobKomunikace;
+            origMetadata.DatumOdeslaniZadosti = metadatum.DatumOdeslaniZadosti;
+            origMetadata.DatumPrijetiOdpovedi = metadatum.DatumPrijetiOdpovedi;
+            origMetadata.ZduvodneniMimoradnychOdmen = metadatum.ZduvodneniMimoradnychOdmen;
+            origMetadata.SkrytaPoznamka = metadatum.SkrytaPoznamka;
+        }
+
+        await dbContext.SaveChangesAsync();
+    }
+
+    public static async Task UpsertTagAsync(PuOrganizaceTag tag)
+    {
+        if (string.IsNullOrWhiteSpace(tag.Tag))
+        {
+            throw new Exception("Chybí název tagu");
+        }
+
+        if (tag.IdOrganizace == 0)
+        {
+            throw new Exception("Chybí id organizace");
+        }
+
+        PuOrganizaceTag origTag;
+        tag.Tag = tag.Tag.Trim();
+        await using var dbContext = new DbEntities();
+        if (tag.Id == 0)
+        {
+            origTag = await dbContext.PuOrganizaceTags
+                .FirstOrDefaultAsync(t => t.IdOrganizace == tag.IdOrganizace && t.Tag == tag.Tag);
+        }
+        else
+        {
+            origTag = await dbContext.PuOrganizaceTags
+                .FirstOrDefaultAsync(t => t.Id == tag.Id);
+        }
+
+        if (origTag is null || origTag.Id == 0)
+        {
+            dbContext.PuOrganizaceTags.Add(tag);
+        }
+        else
+        {
+            origTag.Tag = tag.Tag;
+        }
+
+        await dbContext.SaveChangesAsync();
+    }
+
     public static async Task UpsertPlatAsync(PuPlat plat)
     {
-        await using var dbContext = new DbEntities();
-
         if (string.IsNullOrWhiteSpace(plat.NazevPozice))
         {
             throw new Exception("Chybí vyplněný název pozice");
         }
-        
+
         if (plat.Rok == 0)
         {
             throw new Exception("Chybí vyplněný rok pozice");
         }
-        
+
         if (plat.IdOrganizace == 0)
         {
             throw new Exception("Chybí vyplněné id organizace");
         }
-        
+
         plat.NazevPozice = plat.NazevPozice.Trim();
 
         PuPlat origPlat;
 
+        await using var dbContext = new DbEntities();
         if (plat.Id == 0)
         {
             origPlat = await dbContext.PuPlaty
-                .FirstOrDefaultAsync(p => p.IdOrganizace == plat.IdOrganizace 
-                                     && p.Rok == plat.Rok 
-                                     && p.NazevPozice == plat.NazevPozice);
+                .FirstOrDefaultAsync(p => p.IdOrganizace == plat.IdOrganizace
+                                          && p.Rok == plat.Rok
+                                          && p.NazevPozice == plat.NazevPozice);
         }
         else
         {
             origPlat = await dbContext.PuPlaty
                 .FirstOrDefaultAsync(p => p.Id == plat.Id);
         }
-        
+
         if (origPlat is null)
         {
             dbContext.PuPlaty.Add(plat);
@@ -267,9 +365,8 @@ public static class PuRepo
             origPlat.PoznamkaPozice = plat.PoznamkaPozice;
             origPlat.SkrytaPoznamka = plat.SkrytaPoznamka;
         }
-        
+
         await dbContext.SaveChangesAsync();
     }
-
 
 }
