@@ -26,7 +26,7 @@ public class PuOrganizaceMetadata
     [ShowNiceDisplayName()]
     public enum Komunikace
     {
-        [NiceDisplayName("datová schránka")] DatovaSchranka = 1,
-        [NiceDisplayName("e-mail")] Email = 2
+        [NiceDisplayName("datová schránka")] [Display(Name="datová schránka", Description = "komunikuje datovou schránkou")]DatovaSchranka = 1,
+        [NiceDisplayName("e-mail")] [Display(Name="e-mail", Description = "komunikuje emailem")]Email = 2
     }
 }
