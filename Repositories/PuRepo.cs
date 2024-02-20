@@ -182,17 +182,17 @@ public static class PuRepo
         }
 
         organizace.DS = organizace.DS.Trim();
-
-        var original = await dbContext.PuOrganizace.FirstOrDefaultAsync(o => o.DS == organizace.DS);
-
+        
+        // null navigation properties in organizace, because we will add them manually
         var metadata = organizace.Metadata;
         organizace.Metadata = null;
         var tagy = organizace.Tags;
         organizace.Tags = null;
         var platy = organizace.Platy;
         organizace.Platy = null;
-        original.FirmaDs = null;
+        organizace.FirmaDs = null;
 
+        var original = await dbContext.PuOrganizace.FirstOrDefaultAsync(o => o.DS == organizace.DS);
         if (original is null || original.Id == 0)
         {
             dbContext.PuOrganizace.Add(organizace);
