@@ -127,12 +127,12 @@ namespace HlidacStatu.Web
                     "System disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
                 )
                 .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.IISConnections, HlidacStatu.Web.HealthChecks.IISConnections.Options>(
-                    new HealthChecks.IISConnections.Options() {  AppPoolNameFilter="", CountWarningThreshold = 20, CountErrorThreshold = 50  },
+                    new HealthChecks.IISConnections.Options() {  AppPoolNameFilter= "net6-wwwHS", CountWarningThreshold = 20, CountErrorThreshold = 50  },
                         "IIS open requests",
                         tags: new[] { "Web server" }
                         )
                 .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.IISConnections, HlidacStatu.Web.HealthChecks.IISConnections.Options>(
-                    new HealthChecks.IISConnections.Options() { AppPoolNameFilter = "", StartsWithFilter="_blazor" },
+                    new HealthChecks.IISConnections.Options() { AppPoolNameFilter = "net6-wwwHS", StartsWithFilter="_blazor" },
                         "Blazor open requests",
                         tags: new[] { "Web server" }
                         )
