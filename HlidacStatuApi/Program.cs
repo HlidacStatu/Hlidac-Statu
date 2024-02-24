@@ -12,6 +12,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using static Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterCephStatus;
 using ILogger = Serilog.ILogger;
 
 string CORSPolicy = "from_hlidacstatu.cz";
@@ -127,17 +128,36 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, HlidacStatuApi.Code.SpecificApiAuthorizationMiddlewareResultHandler>();
 
 
-bool _shouldRunHealthcheckFeature = false;
-string healthcheckFeatureOption = Devmasters.Config.GetWebConfigValue("RunHealthcheckFeature");
-_shouldRunHealthcheckFeature = !string.IsNullOrWhiteSpace(healthcheckFeatureOption) &&
-                               healthcheckFeatureOption == "true";
+_ = builder.Services
+    .AddHealthChecks()
+    .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 50000,
+        name: "Web server využitá pamět",
+        tags: new[] { "Web server", "process", "memory" })
+    .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.NetworkDiskStorage, HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options>(
+        new HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options()
+        {
+            UNCPath = "c:\\",
+            DegradedMinimumFreeMegabytes = 20 * 1024, //20G 
+            UnHealthtMinimumFreeMegabytes = 5 * 1024 //5GB
+        },
+        "System disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
+    )
+    .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.IISConnections, HlidacStatu.Web.HealthChecks.IISConnections.Options>(
+        new HlidacStatu.Web.HealthChecks.IISConnections.Options() { AppPoolNameFilter = "", CountWarningThreshold = 20, CountErrorThreshold = 50 },
+            "IIS open requests",
+            tags: new[] { "Web server" }
+            )
+    .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.NetworkDiskStorage, HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options>(
+        new HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options()
+        {
+            UNCPath = Devmasters.Config.GetWebConfigValue("FileCachePath"),
+            DegradedMinimumFreeMegabytes = 20 * 1024, //20G 
+            UnHealthtMinimumFreeMegabytes = 5 * 1024 //5GB
+        },
+        "Cache disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
+    );
 
-if (_shouldRunHealthcheckFeature)
-{
-    AddAllHealtChecks(builder.Services, builder.Configuration);
-
-}
-_= builder.Services.AddHangfire(configuration => configuration
+_ = builder.Services.AddHangfire(configuration => configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
@@ -219,25 +239,27 @@ app.UseSwaggerUI(c =>
     c.EnableTryItOutByDefault();
 });
 
+_ = app.UseRouting();
+
 app.UseAuthentication();
 app.UseApiAuthenticationMiddleware();
 
 app.UseAuthorization();
 
+_ = app.UseEndpoints(endpoints => {
+    endpoints.MapHealthChecks("/health"
+            , new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+            {
+                Predicate = _ => true,
+                ResponseWriter = global::HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
+
+            }
+        ).WithMetadata(new AuthorizeAttribute() { Roles = "Admin" });
+});
+
+
 app.MapControllers();
 
-
-if (_shouldRunHealthcheckFeature)
-{
-    app.UseHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
-    {
-        Predicate = _ => true,
-        ResponseWriter = global::HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
-    }).UseHealthChecks("/_health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
-    {
-        Predicate = _ => true,
-    });
-}
 
 //todo: odstranit tohle, protože by to mělo fungovat jak to máme nakonfigurované v services.addhangfireserver
 app.UseHangfireServer();
