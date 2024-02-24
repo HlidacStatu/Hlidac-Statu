@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 
 // inicializace
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureHostForDocker();
 var logger = Log.ForContext<Program>();
 

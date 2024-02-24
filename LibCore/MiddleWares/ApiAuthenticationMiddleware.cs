@@ -25,7 +25,10 @@ namespace HlidacStatu.LibCore.MiddleWares
         public async Task Invoke(HttpContext context)
         {
             var userName = context.User.Identity.Name;
-            if (string.IsNullOrEmpty(userName) && context.Request.Path.StartsWithSegments("/api"))
+            if (string.IsNullOrEmpty(userName) 
+                && 
+                (context.Request.Path.StartsWithSegments("/api") || context.Request.Path.StartsWithSegments("/health"))
+                )
             {
                 var authToken = context.GetAuthToken();
                 authToken = authToken.Replace("Token ", "").Trim();

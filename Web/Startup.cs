@@ -1,32 +1,31 @@
 using HlidacStatu.Entities;
+using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
 using HlidacStatu.Web.Filters;
 using HlidacStatu.Web.Framework;
-
+using HlidacStatu.Web.Views.Shared.Components;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-
+using Polly;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
-using HlidacStatu.LibCore.Filters;
-using HlidacStatu.Web.Views.Shared.Components;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.IdentityModel.Tokens;
-
-using Polly;
 
 namespace HlidacStatu.Web
 {
@@ -53,7 +52,7 @@ namespace HlidacStatu.Web
         {
             //inicializace statických proměnných
             Devmasters.Config.Init(Configuration);
-            
+
 #if DEBUG
             //if (System.Diagnostics.Debugger.IsAttached)
             //    System.Net.Http.HttpClient.DefaultProxy = new System.Net.WebProxy("127.0.0.1", 8888);
@@ -63,21 +62,21 @@ namespace HlidacStatu.Web
             System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
 
 
-           DBUpgrades.DBUpgrader.UpgradeDatabases(Connectors.DirectDB.DefaultCnnStr);
+            DBUpgrades.DBUpgrader.UpgradeDatabases(Connectors.DirectDB.DefaultCnnStr);
 
 
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             // for scoped services (mainly for identity)
-            services.AddDbContext<DbEntities>(options =>
+            _= services.AddDbContext<DbEntities>(options =>
                 options.UseSqlServer(connectionString));
-            services.AddDatabaseDeveloperPageExceptionFilter();
-            
+            _ = services.AddDatabaseDeveloperPageExceptionFilter();
+
             // Add a DbContext to store your Database Keys
-            services.AddDbContext<HlidacKeysContext>(options =>
+            _ = services.AddDbContext<HlidacKeysContext>(options =>
                 options.UseSqlServer(connectionString));
 
             // using Microsoft.AspNetCore.DataProtection;
-            services.AddDataProtection()
+            _ = services.AddDataProtection()
                 .PersistKeysToDbContext<HlidacKeysContext>()
                 .SetApplicationName("HlidacStatu");
 
@@ -86,69 +85,66 @@ namespace HlidacStatu.Web
 
             if (Constants.IsDevelopment(WebHostEnvironment))
             {
-                services.AddControllersWithViews()
+                _ = services.AddControllersWithViews()
                     .AddNewtonsoftJson()
                     .AddRazorRuntimeCompilation();
             }
             else
             {
-                services.AddControllersWithViews()
+                _ = services.AddControllersWithViews()
                     .AddNewtonsoftJson();
             }
 
-            services.AddRazorPages()
+            _ = services.AddRazorPages()
                 .AddMvcOptions(options =>
                     options.Filters.Add<SpamProtectionRazor>());
 
-            services.AddSingleton<AttackerDictionaryService>();
+            _ = services.AddSingleton<AttackerDictionaryService>();
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v2", new OpenApiInfo
-                {
-                    Version = "v2",
-                    Title = "HlidacStatu Api V2.1.1",
-                    Description = "REST API Hlídače státu",
-                    TermsOfService = new Uri("https://texty.hlidacstatu.cz/provoznipodminky/"),
-                    Contact = new OpenApiContact
-                    {
-                        Name = "Hlídač státu",
-                        Email = "podpora@hlidacstatu.cz",
-                        Url = new Uri("https://texty.hlidacstatu.cz/kontakt/"),
-                    },
-                    License = new OpenApiLicense
-                    {
-                        Name = "CC BY 3.0 CZ",
-                        Url = new Uri("https://texty.hlidacstatu.cz/licence/"),
-                    }
-                });
+            _ = services.AddResponseCaching();
 
-                c.AddSecurityDefinition("apiKey", new OpenApiSecurityScheme()
-                {
-                    Type = SecuritySchemeType.ApiKey,
-                    Description = "API Key Authentication",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Scheme = "apiKey"
-                });
-                c.OperationFilter<ApiAuthHeaderParameter>();
-
-                // Set the comments path for the Swagger JSON and UI.
-                var xmlFile = "HlidacStatu.Web.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
-            });
-
-            services.AddResponseCaching();
-
-            services.AddHttpClient(Constants.DefaultHttpClient)
+            _ = services.AddHttpClient(Constants.DefaultHttpClient)
                 .AddTransientHttpErrorPolicy(policyBuilder =>
                     policyBuilder.WaitAndRetryAsync(
                         3, retryNumber => TimeSpan.FromMilliseconds(10)));
-            
-            services.AddServerSideBlazor().AddInteractiveServerComponents();
 
-            services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
+            _ = services.AddServerSideBlazor().AddInteractiveServerComponents();
+
+            _ = services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
+
+            _ = services
+                .AddHealthChecks()
+                .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 50000,
+                    name: "Web server využitá pamět",
+                    tags: new[] { "Web server", "process", "memory" })
+                .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.NetworkDiskStorage, HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options>(
+                    new HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options()
+                    {
+                        UNCPath = "c:\\",
+                        DegradedMinimumFreeMegabytes = 20 * 1024, //20G 
+                        UnHealthtMinimumFreeMegabytes = 5 * 1024 //5GB
+                    },
+                    "System disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
+                )
+                .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.IISConnections, HlidacStatu.Web.HealthChecks.IISConnections.Options>(
+                    new HealthChecks.IISConnections.Options() {  AppPoolNameFilter="", CountWarningThreshold = 20, CountErrorThreshold = 50  },
+                        "IIS open requests",
+                        tags: new[] { "Web server" }
+                        )
+                .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.IISConnections, HlidacStatu.Web.HealthChecks.IISConnections.Options>(
+                    new HealthChecks.IISConnections.Options() { AppPoolNameFilter = "", StartsWithFilter="_blazor" },
+                        "Blazor open requests",
+                        tags: new[] { "Web server" }
+                        )
+                .AddHealthCheckWithOptions<HlidacStatu.Web.HealthChecks.NetworkDiskStorage, HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options>(
+                    new HlidacStatu.Web.HealthChecks.NetworkDiskStorage.Options()
+                    {
+                        UNCPath = Devmasters.Config.GetWebConfigValue("FileCachePath"),
+                        DegradedMinimumFreeMegabytes = 20 * 1024, //20G 
+                        UnHealthtMinimumFreeMegabytes = 5 * 1024 //5GB
+                    },
+                    "Cache disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
+                );
 
         }
 
@@ -158,14 +154,14 @@ namespace HlidacStatu.Web
         {
             app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
             {
-                LimitToPaths = new List<string> {"/api"},
+                LimitToPaths = new List<string> { "/api" },
                 ApplicationName = "WEB"
             });
-            
-            
+
+
             //request time measurement with exception for /_blazor pages
             app.UseTimeMeasureMiddleware(new List<string>() { "/_blazor" });
-                
+
 
             if (Constants.IsDevelopment(env))
             {
@@ -188,7 +184,7 @@ namespace HlidacStatu.Web
                         whitelist.IpAddresses.Add(ip);
                     }
                 }
-                
+
                 app.UseBannedIpsMiddleware(whitelist); // tohle nechci při developmentu :) 
                 app.UseExceptionHandler("/Error/500");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
@@ -203,13 +199,6 @@ namespace HlidacStatu.Web
 
             app.UseStaticFiles();
 
-            app.UseSwagger();
-            
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v2/swagger.json", "API V2");
-                //c.RoutePrefix = "api/v2/swagger";
-            });
 
 
             //redirect rules
@@ -223,36 +212,55 @@ namespace HlidacStatu.Web
                     context.Response.Redirect("https://www.hlidacstatu.cz/Identity" + url + context.Request.QueryString.Value);
                     return;   // short circuit
                 }
-                
+
                 if (url?.ToLower()?.StartsWith("/cenypracehlidac") == true)
                 {
-                    context.Response.Redirect("https://www.WatchdogAnalytics.cz/?"+context.Request.QueryString);
+                    context.Response.Redirect("https://www.WatchdogAnalytics.cz/?" + context.Request.QueryString);
                     return;   // short circuit
                 }
-                
+
                 if (url?.ToLower()?.StartsWith("/jobtableeditor") == true)
                 {
                     context.Response.Redirect("https://jobtableeditor.hlidacstatu.cz/");
                     return;   // short circuit
                 }
 
-                if (url?.ToLower()?.StartsWith("/health") == true)
+/*                if (url?.ToLower()?.StartsWith("/health") == true)
                 {
                     await context.Response.WriteAsJsonAsync<Models.HealthCheckStatusModel>(Models.HealthCheckStatusModel.CurrentData.Get());
                     return;
                 }
-
+*/
                 await next(context);
             });
+            _ = app.UseRouting();
+            _ = app.UseResponseCaching();
 
-            app.UseRouting();
-            app.UseResponseCaching();
 
-            app.UseAuthentication();
-            app.UseApiAuthenticationMiddleware();
-            
-            app.UseAuthorization();
-            
+
+            /*app.UseHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+            {
+                Predicate = _ => true,
+                ResponseWriter = global::HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
+                
+            });*/
+
+
+            _ = app.UseAuthentication();
+            _ = app.UseApiAuthenticationMiddleware();
+            _ = app.UseAuthorization();
+
+            _ = app.UseEndpoints(endpoints => {
+                endpoints.MapHealthChecks("/health"
+                        , new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+                        {
+                            Predicate = _ => true,
+                            ResponseWriter = global::HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
+
+                        }
+                    ).WithMetadata(new AuthorizeAttribute() { Roles = "Admin" });
+            });
+
             _ = app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -281,6 +289,7 @@ namespace HlidacStatu.Web
                     .AddInteractiveServerRenderMode();
                 //endpoints.MapBlazorHub();
             });
+
 
         }
 
@@ -355,14 +364,14 @@ namespace HlidacStatu.Web
             // this is needed because passwords are stored with old hashes
             services.Configure<PasswordHasherOptions>(options =>
                 options.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV2);
-            
+
             // 401 and 403 responses instead of redirects for api - for [Authorize] attribute
             services.ConfigureApplicationCookie(o =>
             {
-                o.Cookie.Domain = ".hlidacstatu.cz"; 
+                o.Cookie.Domain = ".hlidacstatu.cz";
                 o.Cookie.Name = "HlidacLoginCookie"; // Name of cookie     
                 o.LoginPath = "/Identity/Account/Login"; // Path for the redirect to user login page    
-              
+
                 o.Cookie.SameSite = SameSiteMode.Lax;
                 o.Events = new CookieAuthenticationEvents()
                 {
@@ -385,14 +394,14 @@ namespace HlidacStatu.Web
                         {
                             ctx.Response.StatusCode = 403;
                         }
-                    
+
                         ctx.Response.StatusCode = 403;
-                    
+
                         return Task.CompletedTask;
                     }
                 };
             });
-            
+
             //add third party authentication
             services.AddAuthentication()
                 .AddGoogle(options =>
@@ -408,29 +417,29 @@ namespace HlidacStatu.Web
                     string secret = appleAuthSetting["Secret"];
                     string teamId = appleAuthSetting["TeamId"];
                     string keyId = appleAuthSetting["KeyId"];
-                    
+
                     options.ClientId = clientId; // Service ID
-                    
+
                     options.Authority = "https://appleid.apple.com"; // disco doc: https://appleid.apple.com/.well-known/openid-configuration
-                
+
                     options.CallbackPath = "/signin-apple"; // corresponding to your redirect URI
-                
+
                     options.ResponseType = "code id_token"; // hybrid flow due to lack of PKCE support
                     options.ResponseMode = "form_post"; // form post due to prevent PII in the URL
                     options.DisableTelemetry = true;
-                
+
                     options.Scope.Clear(); // apple does not support the profile scope
                     options.Scope.Add("openid");
                     options.Scope.Add("email");
                     options.Scope.Add("name");
-                
+
                     // custom client secret generation - secret can be re-used for up to 6 months
                     options.Events.OnAuthorizationCodeReceived = context =>
                     {
                         context.TokenEndpointRequest.ClientSecret = TokenGenerator.CreateNewToken(clientId, secret, teamId, keyId);
                         return Task.CompletedTask;
                     };
-                
+
                     options.UsePkce = false; // apple does not currently support PKCE (April 2021)
                 })
                 .AddOpenIdConnect("mojeid", options =>
@@ -438,40 +447,40 @@ namespace HlidacStatu.Web
                     IConfigurationSection mojeidAuthSetting = Configuration.GetSection("Authentication:MojeId");
                     options.ClientId = mojeidAuthSetting["Id"]; // id, které dostaneme po registraci
                     options.ClientSecret = mojeidAuthSetting["Secret"]; // heslo, které dostaneme po registraci
-                    
+
                     options.Authority = "https://mojeid.cz/oidc/"; // issuer
-                    //options.Authority = "https://mojeid.regtest.nic.cz/oidc/"; // issuer
-                    
+                                                                   //options.Authority = "https://mojeid.regtest.nic.cz/oidc/"; // issuer
+
                     options.CallbackPath = "/signin-mojeid"; //unikátní endpoint na hlídači - zatím nevím k čemu
-                    
+
                     options.ResponseType = "code"; // typ flow (https://www.scottbrady91.com/openid-connect/openid-connect-flows)
                     options.ResponseMode = "form_post"; // form post due to prevent PII in the URL
-                    
+
                     options.DisableTelemetry = true;
-                
+
                     options.SaveTokens = true; // ? upřímně nevím
                     options.UsePkce = true; // ? upřímně nevím
-                    
+
                     // claimy, které chceme získat z userinfoendpointu
                     options.Scope.Clear();
                     options.Scope.Add("openid");
                     options.Scope.Add("email");
                     //options.Scope.Add("name");
-                    
+
                     options.GetClaimsFromUserInfoEndpoint = true; // získá data o jménu, emailu - věcech ze scope
-                    
+
                 });
-            
+
         }
-        
+
         private static class TokenGenerator
         {
             public static string CreateNewToken(string clientId, string secret, string teamId, string keyId)
             {
                 const string aud = "https://appleid.apple.com";
-                
+
                 var now = DateTime.UtcNow;
-            
+
                 var ecdsa = ECDsa.Create();
                 ecdsa?.ImportPkcs8PrivateKey(Convert.FromBase64String(secret), out _);
 
@@ -480,15 +489,15 @@ namespace HlidacStatu.Web
                 {
                     Issuer = teamId,
                     Audience = aud,
-                    Claims = new Dictionary<string, object> {{"sub", clientId}},
+                    Claims = new Dictionary<string, object> { { "sub", clientId } },
                     Expires = now.AddMinutes(5), // expiry can be a maximum of 6 months - generate one per request or re-use until expiration
                     IssuedAt = now,
                     NotBefore = now,
-                    SigningCredentials = new SigningCredentials(new ECDsaSecurityKey(ecdsa) {KeyId = keyId}, SecurityAlgorithms.EcdsaSha256)
+                    SigningCredentials = new SigningCredentials(new ECDsaSecurityKey(ecdsa) { KeyId = keyId }, SecurityAlgorithms.EcdsaSha256)
                 });
             }
         }
-        
+
 
     }
 }
