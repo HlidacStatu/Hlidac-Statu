@@ -155,7 +155,9 @@ _ = builder.Services
             UnHealthtMinimumFreeMegabytes = 5 * 1024 //5GB
         },
         "Cache disk", HealthStatus.Unhealthy, tags: new[] { "Web server" }
-    );
+        )
+    
+    ;
 
 _ = builder.Services.AddHangfire(configuration => configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)

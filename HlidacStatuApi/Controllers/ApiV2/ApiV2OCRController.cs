@@ -1,13 +1,14 @@
 ﻿using Devmasters.Collections;
 using HlidacStatu.Datasets;
+using HlidacStatu.DS.Api;
 using HlidacStatu.Entities;
 using HlidacStatu.Entities.Enhancers;
 using HlidacStatu.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Data.SqlClient;
-using static HlidacStatu.DS.Api.BlurredPage;
 using ILogger = Serilog.ILogger;
 
 namespace HlidacStatuApi.Controllers.ApiV2
@@ -651,28 +652,33 @@ namespace HlidacStatuApi.Controllers.ApiV2
 
 
         //[ApiExplorerSettings(IgnoreApi = true)]
-        //[Authorize(Roles = "blurredAPIAccess")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("AddTask")]
-        public async Task<ActionResult<bool>> AddTask(string id, bool force = true)
+        public async Task<ActionResult<bool>> AddTask(OcrWork.DocTypes itemType, string itemId, string itemSubType = null,
+            OcrWork.TaskPriority priority = OcrWork.TaskPriority.Standard,
+            OcrWork.TaskOptions options = null)
         {
-            return await HlidacStatu.Lib.Data.External.Tables.TablesInDocs.Minion.CreateNewTaskAsync(id, force);
+            ItemToOcrQueue.AddNewTask(itemType,itemId, itemSubType, priority, options);
+            return true;
         }
 
         //[ApiExplorerSettings(IgnoreApi = true)]
         //[Authorize(Roles = "blurredAPIAccess")]
         [HttpGet("Stats")]
-        public async Task<ActionResult<BlurredPageAPIStatistics>> Stats()
+        public async Task<ActionResult<OCRStatistics>> Stats()
         {
-            using HlidacStatu.Q.Simple.Queue<BpTask> q = new HlidacStatu.Q.Simple.Queue<BpTask>(
-                BlurredPageProcessingQueueName,
-                Devmasters.Config.GetWebConfigValue("RabbitMqConnectionString")
-            );
+            long OCRQueueWaiting = HlidacStatu.Connectors.DirectDB.GetValue<int>("select count(*) from ItemToOcrQueue with (nolock) where started is null");
+            long OCRQueueRunning = HlidacStatu.Connectors.DirectDB.GetValue<int>("select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is null"); ;
+            long OCRProcessing = HlidacStatu.Connectors.DirectDB.GetValue<int>("select count(*) from ItemToOcrQueue with (nolock) where started is not null and done is not null");
 
 
             DateTime now = DateTime.Now;
-            var res = new BlurredPageAPIStatistics()
+            var res = new OCRStatistics()
             {
-                total = q.MessageCount()
+                waiting = OCRQueueWaiting,
+                processing = OCRQueueRunning,
+                done = OCRProcessing,
+                total = OCRProcessing + OCRQueueRunning + OCRQueueWaiting
             };
 
             return res;

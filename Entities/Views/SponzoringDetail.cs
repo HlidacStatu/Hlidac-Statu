@@ -17,7 +17,7 @@ public class SponzoringDetail
     public string IcoPrijemce { get; set; }
     [JsonConverter(typeof(StringEnumConverter))]
     public Sponzoring.TypDaru TypDaru { get; set; }
-    public decimal HodnotaDaru { get; set; }
+    public decimal? HodnotaDaru { get; set; }
     public string Popis { get; set; }
     public DateTime? DarovanoDne { get; set; }
 }
