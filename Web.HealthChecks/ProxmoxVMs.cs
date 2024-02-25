@@ -48,7 +48,7 @@ namespace HlidacStatu.Web.HealthChecks
             this.options = options;
         }
 
-        public Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
+        public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -59,11 +59,11 @@ namespace HlidacStatu.Web.HealthChecks
 
                 client.ApiToken = this.options.ApiToken;
 
-                var resp = client.Nodes[this.options.NodeName].Qemu.Vmlist()?.Result;
+                var resp = await client.Nodes[this.options.NodeName].Qemu.Vmlist();
                 if (resp.ResponseInError == false && resp.IsSuccessStatusCode)
                 {
                     VM[] allVMs = JsonConvert.DeserializeObject<VM[]>(JsonConvert.SerializeObject(resp.Response.data));
-                    foreach (var vm in this.options.ExpectedRunningVMs)
+                    foreach (var vm in (this.options.ExpectedRunningVMs ?? Array.Empty<string>()))
                     {
                         if (allVMs.Any(m => m.name.Equals(vm, StringComparison.InvariantCultureIgnoreCase)) == false)
                         {
@@ -81,7 +81,7 @@ namespace HlidacStatu.Web.HealthChecks
                             .Where(m => m.status == "running")
                             .Any(m => m.name.Equals(vm, StringComparison.InvariantCultureIgnoreCase)) == true)
                         {
-                            result.AppendLine($"VM '{vm}' is running");
+                            //result.AppendLine($"VM '{vm}' is running");
                         }
                         else
                         {
@@ -95,22 +95,23 @@ namespace HlidacStatu.Web.HealthChecks
                         .Where(m=>m.status=="running")
                         .Select(m => m.name)
                         .Except(this.options.ExpectedRunningVMs, System.StringComparer.InvariantCultureIgnoreCase);
-                    if (nonListedVM.Count()>0)
-                        result.AppendLine($"Other running VMs: {string.Join(',', nonListedVM)}");
+                    
+                    //if (nonListedVM.Count()>0)
+                    //    result.AppendLine($"Other running VMs: {string.Join(',', nonListedVM)}");
 
                     if (bad)
-                        return Task.FromResult(HealthCheckResult.Degraded(result.ToString()));
+                        return HealthCheckResult.Degraded(result.ToString());
                     else
-                        return Task.FromResult(HealthCheckResult.Healthy(result.ToString()));
+                        return HealthCheckResult.Healthy(result.ToString());
                 }
                 else
-                    return Task.FromResult(HealthCheckResult.Unhealthy());
+                    return HealthCheckResult.Unhealthy();
 
 
             }
             catch (Exception e)
             {
-                return Task.FromResult(HealthCheckResult.Unhealthy(exception: e));
+                return HealthCheckResult.Unhealthy(exception: e);
             }
 
         }
