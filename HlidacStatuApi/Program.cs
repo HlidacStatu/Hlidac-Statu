@@ -256,7 +256,7 @@ _ = app.UseEndpoints(endpoints => {
                 ResponseWriter = global::HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
 
             }
-        ).WithMetadata(new AuthorizeAttribute() { Roles = "Admin" });
+        ).WithMetadata(new AuthorizeAttribute() { Roles = "PrivateApi" });
 });
 
 
