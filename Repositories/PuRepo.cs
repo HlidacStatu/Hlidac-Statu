@@ -158,6 +158,18 @@ public static class PuRepo
             .Where(p => p.Rok == rok)
             .ToListAsync();
     }
+    
+    public static async Task<List<PuPlat>> GetPlatyWithOrganizaceForYearAsync(int rok)
+    {
+        await using var db = new DbEntities();
+
+        return await db.PuPlaty
+            .AsNoTracking()
+            .Include(p => p.Organizace)
+            .ThenInclude(o => o.FirmaDs)
+            .Where(p => p.Rok == rok)
+            .ToListAsync();
+    }
 
     public static async Task<List<PuPlat>> GetPoziceDlePlatuAsync(int rangeMin, int rangeMax, int year)
     {

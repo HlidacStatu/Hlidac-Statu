@@ -1,0 +1,50 @@
+@model PlatyUredniku.Models.ExportModalViewModel
+@{
+    string modalid = "export-modal";
+}
+
+<a href="#" role="button" data-bs-toggle="modal" data-bs-target="#modal@(modalid)">
+    <span class="small">Exportovat výsledky</span>
+</a> <!-- Modal -->
+<div class="modal fade" id="modal@(modalid)" tabindex="-1" role="dialog" aria-labelledby="modal@(modalid)">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Export</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Export výsledků.
+                </p>
+                <p class="small text-muted">
+                    CSV soubor je kódováný v UTF-8.
+                </p>
+
+                <p>
+                    <a asp-controller="Home" asp-action="Export"
+                       asp-route-type="excel"
+                       asp-route-rok="@Model.Rok"
+                       asp-route-datovaSchranka="@Model.DatovaSchranka"
+                       role="button"
+                       class="btn btn-primary btn-sm"
+                       target="_blank">
+                        Export do Excelu
+                    </a>
+                    <a asp-controller="Home" asp-action="Export"
+                       asp-route-type="tsv"
+                       asp-route-rok="@Model.Rok"
+                       asp-route-datovaSchranka="@Model.DatovaSchranka"
+                       role="button"
+                       class="btn btn-primary btn-sm"
+                       target="_blank">
+                        Do CSV odděleného tabulátorem
+                    </a>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-bs-dismiss="modal">Zavřít</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Dynamic;
+using HlidacStatu.Entities.Dotace;
 
 namespace HlidacStatu.Entities.Entities;
 
@@ -63,4 +65,19 @@ public class PuPlat
     public decimal HrubyMesicniPlat => ((Plat ?? 0) + (Odmeny ?? 0)) * (1 / Uvazek ?? 1) / (PocetMesicu ?? 12);
 
     public decimal CelkovyRocniPlat => (Plat ?? 0) + (Odmeny ?? 0);
+    
+    public ExpandoObject FlatExport()
+    {
+        dynamic v = new ExpandoObject();
+        v.Organizace = Organizace.Nazev;
+        v.Rok = Rok;
+        v.Pozice = NazevPozice;
+        v.Plat = Plat;
+        v.Odmeny = Odmeny;
+        v.PocetMesicu = PocetMesicu;
+        v.Uvazek = Uvazek;
+        v.NefinancniBonus = NefinancniBonus;
+
+        return v;
+    }
 }

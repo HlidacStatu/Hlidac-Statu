@@ -195,7 +195,7 @@
                                             <td>
                                                 <a href="@(currUrlWithYear)#plat@(plat.Id)">@plat.NazevPozice</a>
                                             </td>
-                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlat))" style="number">@HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlat)</td>
+                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlat))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlat)</td>
                                             <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlat))">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlat)</td>
                                             <td>@plat.NefinancniBonus</td>
                                             <td>
@@ -215,6 +215,8 @@
             </div>
         </div>
     </div>
+    
+    <partial name="ExportModal" model="@(new ExportModalViewModel(){DatovaSchranka = Model.DS})"/>
 
 
     @foreach (var platGroup in platyPoLetech.Where(m => m.Key == rok))

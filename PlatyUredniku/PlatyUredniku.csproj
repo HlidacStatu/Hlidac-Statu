@@ -17,6 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\HlidacStatu.ExportData\HlidacStatu.ExportData.csproj" />
       <ProjectReference Include="..\Lib.Web.UI\Lib.Web.UI.csproj" />
       <ProjectReference Include="..\LibCore\LibCore.csproj" />
       <ProjectReference Include="..\Whisperer\Whisperer.csproj" />

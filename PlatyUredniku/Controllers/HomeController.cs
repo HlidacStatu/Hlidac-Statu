@@ -97,4 +97,52 @@ public class HomeController : Controller
     {
         return View();
     }
+
+    public async Task<IActionResult> Export(string type, string datovaSchranka, int? rok)
+    {
+        List<dynamic> data = new List<dynamic>();
+        byte[] rawData = null;
+        string contentType = "";
+        string filename = "";
+        
+        if (rok is not null)
+        {
+            var platy = await PuRepo.GetPlatyWithOrganizaceForYearAsync(rok.Value);
+            foreach (var plat in platy)
+            {
+                data.Add(plat.FlatExport());
+            }
+            
+        }
+        else if (!string.IsNullOrWhiteSpace(datovaSchranka))
+        {
+            var detail = await PuRepo.GetFullDetailAsync(datovaSchranka);
+            foreach (var plat in detail.Platy)
+            {
+                data.Add(plat.FlatExport());
+            }
+        }
+        else
+        {
+            return NoContent();
+        }
+        
+        switch (type)
+        {
+            case "excel":
+                rawData = new HlidacStatu.ExportData.Excel().ExportData(new HlidacStatu.ExportData.Data(data));
+                contentType = "application/vnd.ms-excel";
+                filename = "export.xlsx";
+                break;
+            case "tsv":
+                rawData = new HlidacStatu.ExportData.TabDelimited().ExportData(new HlidacStatu.ExportData.Data(data));
+                contentType = "text/tab-separated-values";
+                filename = "export.tsv";
+                break;
+            default:
+                return NoContent();
+        }
+
+        return File(rawData, contentType, filename);
+    }
 }
