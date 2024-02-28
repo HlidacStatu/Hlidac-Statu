@@ -3,23 +3,50 @@
     string modalid = "export-modal";
 }
 
-<a href="#" role="button" data-bs-toggle="modal" data-bs-target="#modal@(modalid)">
+<a href="#" class="btn btn-sm btn-primary" role="button" data-bs-toggle="modal" data-bs-target="#modal@(modalid)">
     <span class="small">Exportovat výsledky</span>
 </a> <!-- Modal -->
 <div class="modal fade" id="modal@(modalid)" tabindex="-1" role="dialog" aria-labelledby="modal@(modalid)">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Export</h4>
+                <h4 class="modal-title">@Model.Titulek</h4>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>
-                    Export výsledků.
-                </p>
-                <p class="small text-muted">
-                    CSV soubor je kódováný v UTF-8.
-                </p>
+                <div class="col-12">
+                    <blockquote>
+                        <div class="alert alert-warning">Toto je zkrácené, snadno srozumitelné znění plného textu licenčních podmínek.&nbsp;<a href="https://creativecommons.org/licenses/by/3.0/cz/legalcode">Plný text licenčních podmínek naleznete zde</a>. Tato zjednodušená verze nenahrazuje plný text licence.</div>
+                    </blockquote>
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <h3>Dílo a obsah tohoto serveru smíte:</h3>
+                            <ul>
+                                <li><strong>Sdílet</strong>&nbsp;— rozmnožovat a distribuovat materiál prostřednictvím jakéhokoli média v jakémkoli formátu</li>
+                                <li><strong>Upravit</strong>&nbsp;— remixovat, změnit a vyjít z původního díla pro jakýkoliv účel, a to i komerční.</li>
+                                <li>Poskytovatel licence nemůže odvolat tato oprávnění do té doby, dokud dodržujete licenční podmínky.</li>
+                            </ul>
+                            <h3>Za těchto podmínek</h3>
+                            <ul>
+                                <li>
+                                    <strong>Uveďte původ</strong> (na internetu plný, funkční internetový odkaz na&nbsp;odpovídající server či stránku)<br>
+                                    —&nbsp;Je Vaší povinností uvést autorství, poskytnout s dílem odkaz na licenci a vyznačit Vámi provedené změny. Toho můžete docílit jakýmkoli rozumným způsobem, nicméně nikdy ne způsobem naznačujícím, že by poskytovatel licence schvaloval nebo podporoval Vás nebo Váš způsob užití díla.
+                                </li>
+                                <li>
+                                    <strong>Žádná další omezení z vaší strany</strong><br>
+                                    —&nbsp;Nesmíte použít právní omezení nebo účinné technické prostředky ochrany&nbsp;, které by omezovaly ostatní v možnostech poskytnutých touto licencí či omezili další použítí těchto dat.
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="panel-footer">
+                            <a href="https://creativecommons.org/licenses/by/3.0/cz/legalcode">Plný text licenčních podmínek</a>.<br>
+                            Pokud máte pochyby či vám tato licence nevyhovuje,&nbsp;<a href="https://texty.hlidacstatu.cz/Kontakt">kontaktujte nás</a>.
+                        </div>
+                    </div>
+                    <div class="panel-footer"></div>
+                    <h2 class="panel-footer">Komerční licence</h2>
+                    <p>Pokud vám výše uvedená licence&nbsp;CC BY 3.0 CZ&nbsp;nevyhovuje,&nbsp;&nbsp;<a href="https://texty.hlidacstatu.cz/Kontakt">kontaktujte nás</a>&nbsp;pro&nbsp;nalezení jiné, více vyhovující formy či licence.</p>
+                </div>
 
                 <p>
                     <a asp-controller="Home" asp-action="Export"

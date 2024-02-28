@@ -216,7 +216,7 @@
         </div>
     </div>
     
-    <partial name="ExportModal" model="@(new ExportModalViewModel(){DatovaSchranka = Model.DS})"/>
+    <partial name="ExportModal" model="@(new ExportModalViewModel(){DatovaSchranka = Model.DS, Titulek=$"Export dat pro {Model.Nazev}"})"/>
 
 
     @foreach (var platGroup in platyPoLetech.Where(m => m.Key == rok))
