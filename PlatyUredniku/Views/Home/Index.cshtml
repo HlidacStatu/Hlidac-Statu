@@ -1,23 +1,118 @@
-﻿<div class="row">
+﻿@{
+    var stats = await HlidacStatu.Repositories.PuRepo.GetGlobalStatAsync();
+}
+
+<div class="watcher-blocks">
+
+    <div class="watcher-blocks__wrapper">
+
+
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3 class="new-title">
+                    Platy úředníků v @(HlidacStatu.Repositories.PuRepo.DefaultYear)
+                </h3>
+            </div>
+            <div class="block-col ">
+                <p>
+                    Za 2022 jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
+                    a plat nám poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
+                </p>
+                <p>
+                    Polovina představených úřadů má plat nižší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[50])),
+                    čtvrtina má plat vyšší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[75])) měsíčně včetně odměn.
+                </p>
+                <p>
+                    <a class="btn btn-primary btn-sm" href="/oblasti">Přehled platů v organizacích</a>
+                </p>
+            </div>
+
+
+        </div>
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3 class="new-title">
+                    Organizace dne
+                </h3>
+                <h4>Předseda Ústavního soudu</h4>
+                <p>Má hrubý plat 232 000 Kč měsíčně včetně odměn. Plat v roce 2023 je o 3 % vyšší než v roce předchozím.</p>
+            </div>
+
+        </div>
+
+
+
+
+        <div class="watcher-block">
+            <div class="watcher__title">
+                <h3 class="new-title">
+                    Žebříčky
+                </h3>
+            </div>
+            <div class="block-col ">
+                <div class="card text-bg-light mb-3">
+                    <div class="card-header">Přehledy podle platu</div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="1">Platy nižší než má pokladní</a></li>
+                        <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="2">Nižší než průměrné platy</a></li>
+                        <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="3">Vyšší než průměrné platy</a></li>
+                        <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="4">Nejvyšší platy</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        <div class="watcher-block">
+
+            <div class="watcher__title">
+                <h3 class="new-title">
+                    Analýzy a porovnání
+                </h3>
+            </div>
+            <div class="block-col ">
+                <div class="card text-bg-light mb-3">
+                    <div class="card-header">Analýzy a porovnání</div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="1">Porovnání ředitelských platů</a></li>
+                        <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="2">Porovnání podle oblastí</a></li>
+                        <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="3">Vyšší než průměrné platy</a></li>
+                        <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="4">Nejvyšší platy</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+
+<div class="row">
+
+
+
     <div class="col">
-        @{
-            var stats = await HlidacStatu.Repositories.PuRepo.GetGlobalStatAsync();
-        }
         <a asp-action="Statistiky">
-            <div class="card text-bg-light mb-3" >
+            <div class="card text-bg-light mb-3">
                 <div class="card-header">Statistiky za rok @(HlidacStatu.Repositories.PuRepo.DefaultYear)</div>
                 <div class="card-body">
-                    <p class="card-text">Za 2022 jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací 
-                        a plat nám poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.</p>
-                    <p class="card-text">Polovina představených úřadů má plat nižší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[50])), 
-                        čtvrtina má plat vyšší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[75])) měsíčně včetně odměn.</p>
+                    <p class="card-text">
+                        Za 2022 jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
+                        a plat nám poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
+                    </p>
+                    <p class="card-text">
+                        Polovina představených úřadů má plat nižší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[50])),
+                        čtvrtina má plat vyšší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[75])) měsíčně včetně odměn.
+                    </p>
                 </div>
             </div>
         </a>
     </div>
     <div class="col">
         <a asp-action="Oblasti">
-            <div class="card text-bg-light mb-3" >
+            <div class="card text-bg-light mb-3">
                 <div class="card-header">Přehled úřadů</div>
                 <div class="card-body">
                     <h5 class="card-title">Všechny rozdělené do skupin</h5>
@@ -28,7 +123,7 @@
     </div>
     <div class="col">
         <a asp-action="Oblasti">
-            <div class="card text-bg-light mb-3" >
+            <div class="card text-bg-light mb-3">
                 <div class="card-header">Organizace dne</div>
                 <div class="card-body">
                     <h5 class="card-title">Předseda Ústavního soudu</h5>
@@ -38,10 +133,10 @@
         </a>
     </div>
     <div class="col">
-        <div class="card text-bg-light mb-3" >
+        <div class="card text-bg-light mb-3">
             <div class="card-header">Přehledy podle platu</div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="1" >Platy nižší než má pokladní</a></li>
+                <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="1">Platy nižší než má pokladní</a></li>
                 <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="2">Nižší než průměrné platy</a></li>
                 <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="3">Vyšší než průměrné platy</a></li>
                 <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="4">Nejvyšší platy</a></li>
@@ -49,7 +144,7 @@
         </div>
     </div>
     <div class="col">
-        <div class="card text-bg-light mb-3" >
+        <div class="card text-bg-light mb-3">
             <div class="card-header">Analýzy a porovnání</div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><a asp-action="DlePlatu" asp-route-id="1">Porovnání ředitelských platů</a></li>
