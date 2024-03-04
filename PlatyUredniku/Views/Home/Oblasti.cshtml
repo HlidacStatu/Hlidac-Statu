@@ -1,4 +1,10 @@
-@model string[]
+@using System.Diagnostics
+@model Dictionary<string, List<HlidacStatu.Entities.Entities.PuOrganizace>>
+
+@{
+    var sw = new Stopwatch();
+    sw.Start();
+}
 
 <div class="row">
 
@@ -6,30 +12,37 @@
     <div class="col-12">
         <table class="table table-new table-new--dotted table-hover">
             <tbody>
-                @foreach (var tag in Model)
-                {
-                    <tr>
-                        <td>
-                            <h4>
-                                <a asp-action="Oblast" asp-route-id="@tag">
-                                    @tag
-                                </a>
-                            </h4>
-                        </td>
-                        <td>
-                            @{
-                                var instituce = await HlidacStatu.Repositories.PuRepo.GetOrganizaceForTagAsync(tag);
-                                var sample = ".";
-                                if (instituce.Count > 1)
-                                {
-                                    sample = $" jako např. {instituce[0].Nazev}, {instituce[1].Nazev} a další.";
-                                }
+            @foreach (var kvp in Model)
+            {
+                <tr>
+                    <td>
+                        <h4>
+                            <a asp-action="Oblast" asp-route-id="@kvp.Key">
+                                @kvp.Key
+                            </a>
+                        </h4>
+                    </td>
+                    <td>
+                        @{
+                            var instituce = kvp.Value;
+                            var sample = ".";
+                            if (instituce.Count > 1)
+                            {
+                                sample = $" jako např. {instituce[0].Nazev}, {instituce[1].Nazev} a další.";
                             }
-                            Oblast obsahuje celkem <b>@(instituce.Count)</b> institucí@(sample)
-                        </td>
-                    </tr>
-                }
+                        }
+                        Oblast obsahuje celkem <b>@(instituce.Count)</b> institucí@(sample)
+                    </td>
+                </tr>
+            }
             </tbody>
         </table>
     </div>
 </div>
+
+@{
+    sw.Stop();
+}
+
+<p>Time view = @sw.ElapsedMilliseconds</p>
+<p>Time ctrlr = @ViewData["sw"]</p>

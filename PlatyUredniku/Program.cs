@@ -16,6 +16,8 @@ using PlatyUredniku.Views.Shared.Components;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using PlatyUredniku.Cache;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace PlatyUredniku;
 
@@ -59,6 +61,9 @@ public class Program
 
             builder.Services.AddSingleton<AutocompleteCacheService>();
             builder.Services.AddHostedService<AutocompleteTimer>();
+
+            builder.Services.AddFusionCache()
+                .WithDefaultEntryOptions(CachingOptions.Default);
 
             
             builder.Services.AddServerSideBlazor().AddInteractiveServerComponents();
@@ -112,7 +117,6 @@ public class Program
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
-            
             
             app.MapRazorPages();
             app.MapRazorComponents<AutocompleteWrap>()

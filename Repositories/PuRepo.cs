@@ -111,18 +111,22 @@ public static class PuRepo
         return platy?.Where(m => m.Rok == rok).ToList();
     }
 
-    public static async Task<List<PuOrganizace>> GetOrganizaceForTagAsync(string tag)
+    public static async Task<List<PuOrganizace>> GetOrganizaceForTagAsync(string tag, int limit = 0)
     {
         await using var db = new DbEntities();
 
-        return await db.PuOrganizaceTags
+        var query = db.PuOrganizaceTags
             .AsNoTracking()
             .Where(t => t.Tag.Equals(tag))
             .Include(t => t.Organizace).ThenInclude(o => o.FirmaDs)
-            .Include(t => t.Organizace).ThenInclude(o => o.Platy)
             .Include(t => t.Organizace).ThenInclude(o => o.Metadata)
-            .Select(t => t.Organizace)
-            .ToListAsync();
+            .Include(t => t.Organizace).ThenInclude(o => o.Platy)
+            .Select(t => t.Organizace);
+        
+        if(limit > 0)
+            query = query.Take(limit);
+        
+        return await query.ToListAsync();
     }
 
     public static async Task<PuPlat> GetPlatAsync(int id)

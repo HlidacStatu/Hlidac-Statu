@@ -221,7 +221,7 @@
 
     @foreach (var platGroup in platyPoLetech.Where(m => m.Key == rok))
     {
-        @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
+        foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
         {
             <hr/>
             <partial name="_platDetail" model="(@plat, @Model)"/>
