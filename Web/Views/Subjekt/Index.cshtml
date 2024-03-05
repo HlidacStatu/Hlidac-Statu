@@ -384,7 +384,8 @@
         jak z věstníku veřejných zakázek, tak z profilů zadavatelů.
     </p>
     @{
-        var profilyZadavatele = (await ProfilZadavateleRepo.GetByIcoAsync(Model.ICO));
+        var profilyZadavatele = (await ProfilZadavateleRepo.GetByIcoAsync(Model.ICO))
+            .DistinctBy(pz => pz.Url?.Trim());
         var vzStat = Model.StatistikaVerejneZakazky();
         Dictionary<string, long> vzakaz = new();
         vzakaz.Add("dodavatel|dodavatel|dodavatele|dodavatelem", vzStat.Summary().PocetJakoDodavatel);
