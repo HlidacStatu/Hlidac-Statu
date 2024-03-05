@@ -65,12 +65,8 @@ namespace HlidacStatu.Web.Framework
 
 
 
-        public static bool IsDevelopment(IHostEnvironment hostEnvironment)
+        public static bool IsDevelopment()
         {
-            if (hostEnvironment == null)
-            {
-                throw new ArgumentNullException(nameof(hostEnvironment));
-            }
 #if DEBUG
             return true;
 #else

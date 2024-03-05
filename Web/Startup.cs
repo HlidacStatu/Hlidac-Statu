@@ -1,5 +1,4 @@
 using HlidacStatu.Entities;
-using HlidacStatu.LibCore.Filters;
 using HlidacStatu.LibCore.MiddleWares;
 using HlidacStatu.LibCore.Services;
 using HlidacStatu.Web.Filters;
@@ -10,7 +9,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,100 +17,69 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Polly;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace HlidacStatu.Web
 {
-    public class Startup
+    public static class Startup
     {
-
-        public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
-        {
-            Configuration = configuration;
-            WebHostEnvironment = webHostEnvironment;
-
-#if DEBUG
-            //dont check ssl for local debugging with local api
-            System.Net.ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
-#endif
-
-        }
-
-        public IWebHostEnvironment WebHostEnvironment { get; }
-        public IConfiguration Configuration { get; }
-
         //Globální konfiguraci a nastavení sem
-        public void ConfigureServices(IServiceCollection services)
+        public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
-            //inicializace statických proměnných
-            Devmasters.Config.Init(Configuration);
-
-#if DEBUG
-            //if (System.Diagnostics.Debugger.IsAttached)
-            //    System.Net.Http.HttpClient.DefaultProxy = new System.Net.WebProxy("127.0.0.1", 8888);
-#endif
-
-            System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Util.Consts.czCulture;
-            System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = Util.Consts.csCulture;
-
-
-            DBUpgrades.DBUpgrader.UpgradeDatabases(Connectors.DirectDB.DefaultCnnStr);
-
-
-            string connectionString = Configuration.GetConnectionString("DefaultConnection");
+            string connectionString = configuration.GetConnectionString("DefaultConnection");
             // for scoped services (mainly for identity)
-            _= services.AddDbContext<DbEntities>(options =>
+            services.AddDbContext<DbEntities>(options =>
                 options.UseSqlServer(connectionString));
-            _ = services.AddDatabaseDeveloperPageExceptionFilter();
+            services.AddDatabaseDeveloperPageExceptionFilter();
 
             // Add a DbContext to store your Database Keys
-            _ = services.AddDbContext<HlidacKeysContext>(options =>
+            services.AddDbContext<HlidacKeysContext>(options =>
                 options.UseSqlServer(connectionString));
 
             // using Microsoft.AspNetCore.DataProtection;
-            _ = services.AddDataProtection()
+            services.AddDataProtection()
                 .PersistKeysToDbContext<HlidacKeysContext>()
                 .SetApplicationName("HlidacStatu");
 
-            AddIdentity(services);
+            AddIdentity(services, configuration);
             AddBundling(services);
 
-            if (Constants.IsDevelopment(WebHostEnvironment))
+            if (Constants.IsDevelopment())
             {
-                _ = services.AddControllersWithViews()
+                services.AddControllersWithViews()
                     .AddNewtonsoftJson()
                     .AddRazorRuntimeCompilation();
             }
             else
             {
-                _ = services.AddControllersWithViews()
+                services.AddControllersWithViews()
                     .AddNewtonsoftJson();
             }
 
-            _ = services.AddRazorPages()
+            services.AddRazorPages()
                 .AddMvcOptions(options =>
                     options.Filters.Add<SpamProtectionRazor>());
 
-            _ = services.AddSingleton<AttackerDictionaryService>();
+            services.AddSingleton<AttackerDictionaryService>();
 
-            _ = services.AddResponseCaching();
+            services.AddResponseCaching();
 
-            _ = services.AddHttpClient(Constants.DefaultHttpClient)
+            services.AddHttpClient(Constants.DefaultHttpClient)
                 .AddTransientHttpErrorPolicy(policyBuilder =>
                     policyBuilder.WaitAndRetryAsync(
                         3, retryNumber => TimeSpan.FromMilliseconds(10)));
 
-            _ = services.AddServerSideBlazor().AddInteractiveServerComponents();
+            services.AddRazorComponents()
+                .AddInteractiveServerComponents()
+                .AddInteractiveWebAssemblyComponents();
 
-            _ = services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
+            services.AddScoped<IErrorBoundaryLogger, AutocompleteErrorLogger>();
 
-            _ = services
+            services
                 .AddHealthChecks()
                 .AddProcessAllocatedMemoryHealthCheck(maximumMegabytesAllocated: 50000,
                     name: "Web server využitá pamět",
@@ -150,7 +117,7 @@ namespace HlidacStatu.Web
 
         //Nastavení, jak budou zpracovány požadavky (Middleware).
         //!Záleží na pořadí
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public static void ConfigurePipeline(this IApplicationBuilder app)
         {
             app.UseRequestTrackMiddleware(new RequestTrackMiddleware.Options()
             {
@@ -158,12 +125,9 @@ namespace HlidacStatu.Web
                 ApplicationName = "WEB"
             });
 
-
-            //request time measurement with exception for /_blazor pages
-            app.UseTimeMeasureMiddleware(new List<string>() { "/_blazor" });
-
-
-            if (Constants.IsDevelopment(env))
+            app.UseTimeMeasureMiddleware(exceptions: new List<string>() { "/_blazor" });
+            
+            if (Constants.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseMigrationsEndPoint();
@@ -198,11 +162,9 @@ namespace HlidacStatu.Web
             app.UseOnHTTPErrorMiddleware();
 
             app.UseStaticFiles();
-
-
-
+            
             //redirect rules
-            _ = app.Use(async (context, next) =>
+            app.Use(async (context, next) =>
             {
                 var url = context.Request.Path.Value;
 
@@ -224,33 +186,17 @@ namespace HlidacStatu.Web
                     context.Response.Redirect("https://jobtableeditor.hlidacstatu.cz/");
                     return;   // short circuit
                 }
-
-/*                if (url?.ToLower()?.StartsWith("/health") == true)
-                {
-                    await context.Response.WriteAsJsonAsync<Models.HealthCheckStatusModel>(Models.HealthCheckStatusModel.CurrentData.Get());
-                    return;
-                }
-*/
+                
                 await next(context);
             });
-            _ = app.UseRouting();
-            _ = app.UseResponseCaching();
+            app.UseRouting();
+            app.UseResponseCaching();
 
+            app.UseAuthentication();
+            app.UseApiAuthenticationMiddleware();
+            app.UseAuthorization();
 
-
-            /*app.UseHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
-            {
-                Predicate = _ => true,
-                ResponseWriter = global::HealthChecks.UI.Client.UIResponseWriter.WriteHealthCheckUIResponse
-                
-            });*/
-
-
-            _ = app.UseAuthentication();
-            _ = app.UseApiAuthenticationMiddleware();
-            _ = app.UseAuthorization();
-
-            _ = app.UseEndpoints(endpoints => {
+            app.UseEndpoints(endpoints => {
                 endpoints.MapHealthChecks("/health"
                         , new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
                         {
@@ -261,7 +207,7 @@ namespace HlidacStatu.Web
                     ).WithMetadata(new AuthorizeAttribute() { Roles = "PrivateApi" });
             });
 
-            _ = app.UseEndpoints(endpoints =>
+            app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
@@ -286,16 +232,14 @@ namespace HlidacStatu.Web
 
                 endpoints.MapRazorPages();
                 endpoints.MapRazorComponents<AutocompleteWrap>()
-                    .AddInteractiveServerRenderMode();
-                //endpoints.MapBlazorHub();
+                    .AddInteractiveServerRenderMode()
+                    .AddInteractiveWebAssemblyRenderMode();
             });
-
-
         }
 
-        private void AddBundling(IServiceCollection services)
+        private static void AddBundling(IServiceCollection services)
         {
-            _ = services.AddWebOptimizer(pipeline =>
+            services.AddWebOptimizer(pipeline =>
             {
                 string[] cssPaths = new[]
                 {
@@ -335,15 +279,13 @@ namespace HlidacStatu.Web
                 pipeline.AddJavaScriptBundle("/bundles/typeahead",
                     "Scripts/typeahead.bundle.min.js",
                     "Scripts/bloodhound.min.js");
-
-                // pipeline.MinifyJsFiles(new NUglify.JavaScript.CodeSettings() { MinifyCode = Constants.IsDevelopment(WebHostEnvironment)==false });
             });
         }
 
 
-        private void AddIdentity(IServiceCollection services)
+        private static void AddIdentity(IServiceCollection services, IConfiguration configuration)
         {
-            _ = services.AddDefaultIdentity<ApplicationUser>(options =>
+            services.AddDefaultIdentity<ApplicationUser>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
 
@@ -406,13 +348,13 @@ namespace HlidacStatu.Web
             services.AddAuthentication()
                 .AddGoogle(options =>
                 {
-                    IConfigurationSection googleAuthSetting = Configuration.GetSection("Authentication:Google");
+                    IConfigurationSection googleAuthSetting = configuration.GetSection("Authentication:Google");
                     options.ClientId = googleAuthSetting["Id"];
                     options.ClientSecret = googleAuthSetting["Secret"];
                 })
                 .AddOpenIdConnect("apple", options =>  // taken from https://github.com/scottbrady91/AspNetCore-SignInWithApple-Example/blob/main/ScottBrady91.SignInWithApple.Example/Startup.cs
                 {
-                    IConfigurationSection appleAuthSetting = Configuration.GetSection("Authentication:Apple");
+                    IConfigurationSection appleAuthSetting = configuration.GetSection("Authentication:Apple");
                     string clientId = appleAuthSetting["Id"];
                     string secret = appleAuthSetting["Secret"];
                     string teamId = appleAuthSetting["TeamId"];
@@ -444,7 +386,7 @@ namespace HlidacStatu.Web
                 })
                 .AddOpenIdConnect("mojeid", options =>
                 {
-                    IConfigurationSection mojeidAuthSetting = Configuration.GetSection("Authentication:MojeId");
+                    IConfigurationSection mojeidAuthSetting = configuration.GetSection("Authentication:MojeId");
                     options.ClientId = mojeidAuthSetting["Id"]; // id, které dostaneme po registraci
                     options.ClientSecret = mojeidAuthSetting["Secret"]; // heslo, které dostaneme po registraci
 

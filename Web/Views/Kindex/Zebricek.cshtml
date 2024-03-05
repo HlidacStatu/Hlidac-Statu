@@ -1,5 +1,4 @@
 ﻿@model  (string id,int rok,string group,string kraj)
-@inject IWebHostEnvironment webHostEnvironment
 @using Devmasters.Enums
 @using HlidacStatu.Entities
 @using HlidacStatu.Entities.KIndex
@@ -61,7 +60,7 @@
     }
 </style>
 
-<cache expires-after="@(Constants.IsDevelopment(webHostEnvironment) ? Constants.CachedActionLength.NoCache : Constants.CachedActionLength.Cache24H)" 
+<cache expires-after="@(Constants.IsDevelopment() ? Constants.CachedActionLength.NoCache : Constants.CachedActionLength.Cache24H)" 
        vary-by="@($"{id}_{Model.rok}_{Model.group}_{Model.kraj}_{part}")">
     @{        
         

@@ -206,6 +206,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatisticRecalculator", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoiceToTextManager", "..\Hlidac-Statu-Private\Docker\VoiceToTextManager\VoiceToTextManager.csproj", "{9F70746D-4334-410A-AE7E-C96B7DFF4CF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WasmComponents", "WasmComponents\WasmComponents.csproj", "{F237785A-55A4-4D17-B7DD-3899DFA99019}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -500,6 +502,10 @@ Global
 		{9F70746D-4334-410A-AE7E-C96B7DFF4CF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F70746D-4334-410A-AE7E-C96B7DFF4CF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F70746D-4334-410A-AE7E-C96B7DFF4CF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F237785A-55A4-4D17-B7DD-3899DFA99019}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F237785A-55A4-4D17-B7DD-3899DFA99019}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F237785A-55A4-4D17-B7DD-3899DFA99019}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F237785A-55A4-4D17-B7DD-3899DFA99019}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -590,6 +596,7 @@ Global
 		{31F30A0C-0DA0-4092-9960-F6187A7FBF35} = {44E67082-D88E-41AE-AF07-4739BDC44B2D}
 		{2E3DDD53-FA56-4240-9214-5AD6F555C37C} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
 		{9F70746D-4334-410A-AE7E-C96B7DFF4CF2} = {ACC852FC-5016-48E7-80DF-ABD60A162FB8}
+		{F237785A-55A4-4D17-B7DD-3899DFA99019} = {034892EA-BACB-4BDE-8161-6F8DB0166FB5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {17143448-F5EA-41D1-886F-00E63AE50798}

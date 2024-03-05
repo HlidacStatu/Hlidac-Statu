@@ -8,6 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Devmasters.Log;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 
 namespace HlidacStatu.LibCore.Extensions;
 
@@ -85,6 +87,7 @@ public static class HlidacConfigExtensions
     /// -pozn.: později načtená konfigurační data mají vyšší prioritu;
     /// (args[] > Environment > appsettings.json > SQL ConfigurationValues)
     /// </summary>
+    [Obsolete]
     public static IHostBuilder ConfigureHostForWeb(this IHostBuilder hostBuilder, string[] args, string? tag = null)
     {
         IConfiguration preConfig = new ConfigurationBuilder()
@@ -110,6 +113,55 @@ public static class HlidacConfigExtensions
             configuration.AddEnvironmentVariables();
             configuration.AddCommandLine(args);
         }).UseSerilog((context, services, configuration) => configuration
+            .ReadFrom.Configuration(context.Configuration)
+            .ReadFrom.Services(services)
+            .Enrich.WithProperty("hostname", Environment.GetEnvironmentVariable("HOSTNAME") ?? "unknown_hostname")
+            .Enrich.WithMachineName()
+            .Enrich.WithProperty("codeversion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString())
+            .Enrich.WithProperty("application_name", System.Reflection.Assembly.GetEntryAssembly().GetName().Name)
+            .Enrich.WithProperty("application_path", new FileInfo(System.Reflection.Assembly.GetEntryAssembly().Location).DirectoryName)
+            .Enrich.WithClientIp()
+            .Enrich.FromLogContext()
+            .WriteTo.Console());
+    }
+    
+    /// <summary>
+    /// Načte sql connection string z appsettings.json ("ConnectionStrings:DefaultConnection");
+    /// Načte hodnotu environment z appsettings.json ("HS_ENV");
+    /// Pomocí těchto dvou proměnných načte konfigurační data z SQL (tabulka ConfigurationValues);
+    /// Poté načte konfigurační data z appsettings.json (pokud existuje);
+    /// Poté načte konfigurační data z Logger.serilog.json (pokud existuje);
+    /// Poté načte konfigurační data z Environment Variables;
+    /// Poté načte konfigurační data z args[];
+    /// -pozn.: později načtená konfigurační data mají vyšší prioritu;
+    /// (args[] > Environment > appsettings.json > SQL ConfigurationValues)
+    /// </summary>
+    public static void ConfigureHostForWeb(this WebApplicationBuilder webBuilder, string[] args, string? tag = null)
+    {
+        IConfiguration preConfig = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+            .AddJsonFile("appsettings.develop.json", optional: true, reloadOnChange: false)
+            .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: false)
+            .Build();
+        var connectionString = preConfig.GetConnectionString("DefaultConnection");
+        var environment = preConfig.GetValue<string>("HS_ENV");
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new Exception("ConnectionStrings:DefaultConnection from appsettings.json is missing");
+        if (string.IsNullOrWhiteSpace(environment))
+            environment = FallbackEnvironment;
+
+        var builderConfiguration = webBuilder.Configuration;
+        
+        builderConfiguration.AddMsSqlConfiguration(connectionString, environment, tag);
+        builderConfiguration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: false);
+        builderConfiguration.AddJsonFile("logger.serilog.json", optional: true, reloadOnChange: false);
+        builderConfiguration.AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: false);
+        builderConfiguration.AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: false);
+        builderConfiguration.AddEnvironmentVariables();
+        builderConfiguration.AddCommandLine(args);
+        
+        webBuilder.Host.UseSerilog((context, services, configuration) => configuration
             .ReadFrom.Configuration(context.Configuration)
             .ReadFrom.Services(services)
             .Enrich.WithProperty("hostname", Environment.GetEnvironmentVariable("HOSTNAME") ?? "unknown_hostname")

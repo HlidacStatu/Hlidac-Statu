@@ -14,3 +14,27 @@
 <p>Tyto stránky nejsou veřejné a jakékoliv funkcionality zde jsou čistě experimentální</p>
 
 <a asp-controller="Dotace" asp-action="Detail" asp-route-id="cedr-d1ef6b2cca84c00aef79042b21b84961b0e197c4">dotace</a>
+
+<h3>server render</h3>
+<div>
+    <component type="typeof(WasmComponents.Components.Counter)" render-mode="Server"/>
+</div>
+<h3>static render</h3>
+<div>
+    <component type="typeof(WasmComponents.Components.Counter)" render-mode="Static"/>
+</div>
+
+<h3>server pre render</h3>
+<div>
+    <component type="typeof(WasmComponents.Components.Counter)" render-mode="ServerPrerendered"/>
+</div>
+
+<h3>wasm render</h3>
+<div>
+    <component type="typeof(WasmComponents.Components.Counter)" render-mode="WebAssembly"/>
+</div>
+
+<h3>wasm prerender</h3>
+<div>
+    <component type="typeof(WasmComponents.Components.Counter)" render-mode="WebAssemblyPrerendered"/>
+</div>

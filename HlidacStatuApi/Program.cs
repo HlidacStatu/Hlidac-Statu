@@ -9,16 +9,14 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using static Corsinvest.ProxmoxVE.Api.Shared.Models.Cluster.ClusterCephStatus;
 using ILogger = Serilog.ILogger;
 
 string CORSPolicy = "from_hlidacstatu.cz";
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Host.ConfigureHostForWeb(args);
+builder.ConfigureHostForWeb(args);
 
 //init statics and others
 Devmasters.Config.Init(builder.Configuration);

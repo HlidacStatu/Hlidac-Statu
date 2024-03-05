@@ -355,11 +355,11 @@
 
             <div class="header__search">
                 @(await Html.RenderComponentAsync<HlidacStatu.Web.Views.Shared.Components.AutocompleteWrap>(
-                        RenderMode.Server, new { 
-                            Endpoint = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint"), 
-                            HttpClient = HttpClientFactory.CreateClient(),
-                            SearchPath = "novehledani"
-                        }))
+                    RenderMode.Server, new { 
+                        Endpoint = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint"), 
+                        HttpClient = HttpClientFactory.CreateClient(),
+                        SearchPath = "novehledani"
+                    }))
             </div>
 
         </div>
