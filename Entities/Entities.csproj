@@ -16,6 +16,7 @@
       <PackageReference Include="Devmasters.IO" Version="5.0.0" />
       <PackageReference Include="Devmasters.Lang" Version="5.0.0" />
       <PackageReference Include="Enums.NET" Version="4.0.2" />
+      <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.2" />
       <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="8.0.1" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1">

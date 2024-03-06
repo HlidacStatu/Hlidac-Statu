@@ -24,6 +24,7 @@
       <PackageReference Include="Devmasters.Cache.Elastic" Version="5.0.2" />
       <PackageReference Include="Devmasters.Cache.Memcached" Version="5.0.1" />
       <PackageReference Include="InfluxDB.Client" Version="4.14.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.TagHelpers" Version="2.2.0" />
       <PackageReference Include="NEST" Version="7.17.5" />
       <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
       <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />

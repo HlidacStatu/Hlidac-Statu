@@ -1,9 +1,7 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Web;
 using Serilog;
 
-namespace HlidacStatu.Web.Views.Shared.Components;
+namespace WasmComponents.Components.Autocomplete;
 
 public class AutocompleteErrorLogger : IErrorBoundaryLogger
 {

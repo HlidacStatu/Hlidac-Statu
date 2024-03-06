@@ -9,7 +9,10 @@
 @using Microsoft.Extensions.Primitives
 @using HlidacStatu.Repositories
 @using HlidacStatu.Repositories.Searching;
+@using HlidacStatu.Web.TagHelpers
 @using HlidacStatu.XLib.Render
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using WasmComponents.Components.Autocomplete
 
 
 
@@ -354,12 +357,12 @@
             <!-- desktop menu items only -->
 
             <div class="header__search">
-                @(await Html.RenderComponentAsync<HlidacStatu.Web.Views.Shared.Components.AutocompleteWrap>(
-                    RenderMode.Server, new { 
-                        Endpoint = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint"), 
-                        HttpClient = HttpClientFactory.CreateClient(),
-                        SearchPath = "novehledani"
-                    }))
+                <component type="typeof(AutocompleteWrap)" render-mode="ServerPrerendered" 
+                           params-Endpoint="@(Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint"))"
+                           params-HttpClient="@(HttpClientFactory.CreateClient())"
+                           params-SearchPath="@("hledat")"
+                           />
+                
             </div>
 
         </div>

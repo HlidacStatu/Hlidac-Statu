@@ -33,7 +33,4 @@
     <Compile Remove="TextMiner.ToDelete.cs" />
   </ItemGroup>
   <PropertyGroup />
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
 </Project>

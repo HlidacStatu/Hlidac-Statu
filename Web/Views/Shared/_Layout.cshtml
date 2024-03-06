@@ -4,6 +4,7 @@
 @using HlidacStatu.Entities
 @using Microsoft.AspNetCore.Http.Extensions
 @using Microsoft.Extensions.Primitives
+@using WasmComponents.Components.Autocomplete
 
 @inject IHttpClientFactory HttpClientFactory
 
@@ -470,13 +471,12 @@
         <div class="header__content header__content--compact  d-print-none">
             <div class="header__search">
                 <div id="new-search-input">
-                    @(await Html.RenderComponentAsync<HlidacStatu.Web.Views.Shared.Components.AutocompleteWrap>(
-                        RenderMode.ServerPrerendered, new
-                        {
-                            Endpoint = Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint"),
-                            HttpClient = HttpClientFactory.CreateClient(),
-                            SearchPath = "hledat"
-                        }))
+                    <component type="typeof(AutocompleteWrap)" render-mode="ServerPrerendered" 
+                       param-Endpoint="@(Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint"))"
+                       param-HttpClient="@(HttpClientFactory.CreateClient())"
+                       param-SearchPath="@("hledat")"
+                       />
+                    
                 </div>
 
 

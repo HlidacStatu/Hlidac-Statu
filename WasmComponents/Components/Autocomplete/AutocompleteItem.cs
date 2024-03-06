@@ -1,4 +1,4 @@
-namespace HlidacStatu.Web.Views.Shared.Components;
+namespace WasmComponents.Components.Autocomplete;
 
 public class AutocompleteItem<T>
 {

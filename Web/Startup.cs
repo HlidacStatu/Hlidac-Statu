@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using WasmComponents.Components.Autocomplete;
 
 namespace HlidacStatu.Web
 {
