@@ -68,7 +68,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.SetIsOriginAllowedToAllowWildcardSubdomains()
-                  .WithOrigins("https://*.hlidacstatu.cz")
+                  .WithOrigins("https://*.hlidacstatu.cz", "http://*.hlidacstatu.cz")
                   .AllowAnyMethod()
                   .AllowCredentials()
                   .AllowAnyHeader()
@@ -227,10 +227,6 @@ app.Use(async (context, next) =>
 
 app.UseOnHTTPErrorMiddleware();
 
-
-app.UseCors(CORSPolicy);
-
-
 app.UseSwagger();
 
 app.UseSwaggerUI(c =>
@@ -239,14 +235,15 @@ app.UseSwaggerUI(c =>
     c.EnableTryItOutByDefault();
 });
 
-_ = app.UseRouting();
+app.UseRouting();
 
 app.UseAuthentication();
 app.UseApiAuthenticationMiddleware();
-
 app.UseAuthorization();
 
-_ = app.UseEndpoints(endpoints => {
+app.UseCors(CORSPolicy);
+
+app.UseEndpoints(endpoints => {
     endpoints.MapHealthChecks("/health"
             , new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
             {

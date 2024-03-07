@@ -70,7 +70,7 @@ namespace HlidacStatu.Web.Framework
 #if DEBUG
             return true;
 #else
-            return hostEnvironment.IsEnvironment("Petr") || hostEnvironment.IsEnvironment("Michal");
+            return false;
 #endif
         }
 

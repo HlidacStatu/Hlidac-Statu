@@ -6,6 +6,8 @@
         <Nullable>enable</Nullable>
         <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
         <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+        <PublishTrimmed>true</PublishTrimmed>
+        <TrimMode>full</TrimMode>
     </PropertyGroup>
 
     <ItemGroup>

@@ -28,6 +28,7 @@ namespace HlidacStatu.Web
 {
     public static class Startup
     {
+        private const string CORSPolicy = "from_hlidacstatu.cz";
         //Globální konfiguraci a nastavení sem
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
@@ -45,6 +46,21 @@ namespace HlidacStatu.Web
             services.AddDataProtection()
                 .PersistKeysToDbContext<HlidacKeysContext>()
                 .SetApplicationName("HlidacStatu");
+            
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: CORSPolicy,
+                    policy =>
+                    {
+                        policy.SetIsOriginAllowedToAllowWildcardSubdomains()
+                            .WithOrigins("https://*.hlidacstatu.cz", "http://*.hlidacstatu.cz")
+                            .AllowAnyMethod()
+                            .AllowCredentials()
+                            .AllowAnyHeader()
+                            .Build();
+                    });
+            });
+
 
             AddIdentity(services, configuration);
             AddBundling(services);
@@ -196,6 +212,8 @@ namespace HlidacStatu.Web
             app.UseAuthentication();
             app.UseApiAuthenticationMiddleware();
             app.UseAuthorization();
+            
+            app.UseCors(CORSPolicy);
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapHealthChecks("/health"

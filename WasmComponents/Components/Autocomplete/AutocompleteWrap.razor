@@ -1,14 +1,13 @@
+@rendermode InteractiveWebAssembly
+
 @using HlidacStatu.Entities
 @using System.Threading
 @using System.Text.Json
 @using System.Web
-@using HlidacStatu.Entities.KIndex
-@using HlidacStatu.Util
 @using Microsoft.AspNetCore.WebUtilities
-@using Serilog
-@* @rendermode InteractiveServer *@
 
 @inject NavigationManager Navigation
+@inject HttpClient HttpClient
 
 <style>
 .hlidac-autocomplete {
@@ -168,10 +167,9 @@
                                     <h6 class="fw-bold mb-0">
                                         @if (!string.IsNullOrWhiteSpace(context.KIndex))
                                         {
-                                            if (Enum.TryParse<KIndexData.KIndexLabelValues>(context.KIndex, out var KindexLabel))
-                                            {
-                                                @((MarkupString)KIndexData.KindexImageIcon(KindexLabel, "height: 20px; vertical-align: text-bottom; margin-right: 5px;"))
-                                            }
+                                            <img src="@($"/Content/kindex/hranate/icon{context.KIndex}.svg")" 
+                                                 class="kindex" 
+                                                 style="height: 20px; vertical-align: text-bottom; margin-right: 5px;">
                                         }
                                         @context.RenderText()
                                     </h6>
@@ -235,8 +233,8 @@
     [Parameter]
     public string Endpoint { get; set; }
 
-    [Parameter]
-    public HttpClient HttpClient { get; set; }
+    // [Parameter]
+    // public HttpClient HttpClient { get; set; }
 
     [Parameter]
     public string SearchPath { get; set; }
@@ -245,7 +243,7 @@
 
     private string _query;
     
-    private readonly ILogger _logger = Log.ForContext<AutocompleteWrap>();
+    // private readonly ILogger _logger = Log.ForContext<AutocompleteWrap>();
 
     private List<RenderFragment> HelpTips = new List<RenderFragment>()
     {
@@ -273,19 +271,19 @@
 
                 if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("qtl", out var qtl))
                 {
-                    var parsedQueries = ParseTools.ParseQueryStringWithOffsets(q, qtl);
+                    var parsedQueries = Helpers.ParseQueryStringWithOffsets(q, qtl);
                     InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
                 }
                 else
                 {
-                    var parsedQueries = ParseTools.ParseQueryStringWithoutOffsets(q);
+                    var parsedQueries = Helpers.ParseQueryStringWithoutOffsets(q);
                     InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
                 }
             }
         }
         catch (Exception e)
         {
-            _logger.Error(e, $"During autocomplete usage an error occured. OnParametersSetAsync in Wrapper. query=[{uri?.Query}]");
+            // _logger.Error(e, $"During autocomplete usage an error occured. OnParametersSetAsync in Wrapper. query=[{uri?.Query}]");
         }
     }
 
@@ -397,7 +395,7 @@
         }
         catch (Exception e)
         {
-            _logger.Error(e, $"During autocomplete usage an error occured. OnSearch in Wrapper. Query was=[{query}]");
+            // _logger.Error(e, $"During autocomplete usage an error occured. OnSearch in Wrapper. Query was=[{query}]");
         }
 
         return Enumerable.Empty<Autocomplete>().ToList();
@@ -407,7 +405,7 @@
     {
         try
         {
-            (string qs, string qtl) = ParseTools.CreateQueryWithOffsets(
+            (string qs, string qtl) = Helpers.CreateQueryWithOffsets(
                 autocomplete.Select(i => i.Value?.Id ?? i.Text ?? "").ToList());
 
             string url = $"{Navigation.BaseUri}{SearchPath}?q={HttpUtility.UrlEncode(qs)}&qtl={qtl}";
@@ -415,7 +413,7 @@
         }
         catch (Exception e)
         {
-            _logger.Error(e, "During autocomplete usage an error occured. OnAutocompleteSubmitted in Wrapper.");
+            // _logger.Error(e, "During autocomplete usage an error occured. OnAutocompleteSubmitted in Wrapper.");
         }
 
         return Task.CompletedTask;

@@ -358,8 +358,7 @@
 
             <div class="header__search">
                 <component type="typeof(AutocompleteWrap)" render-mode="ServerPrerendered" 
-                           params-Endpoint="@(Devmasters.Config.GetWebConfigValue("AutocompleteEndpoint"))"
-                           params-HttpClient="@(HttpClientFactory.CreateClient())"
+                           params-Endpoint="@("https://ac.hlidacstatu.cz")"
                            params-SearchPath="@("hledat")"
                            />
                 

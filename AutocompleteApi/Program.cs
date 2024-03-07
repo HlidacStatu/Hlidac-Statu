@@ -7,6 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
+
+string CORSPolicy = "from_hlidacstatu.cz";
+
 // inicializace
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Host.ConfigureHostForDocker();
@@ -32,6 +35,21 @@ try
     builder.Services.AddSingleton<IndexCache>();
     builder.Services.AddControllers();
     builder.Services.AddHttpClient();
+    
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(name: CORSPolicy,
+            policy =>
+            {
+                policy.SetIsOriginAllowedToAllowWildcardSubdomains()
+                    .WithOrigins("https://*.hlidacstatu.cz", "http://*.hlidacstatu.cz")
+                    .AllowAnyMethod()
+                    .AllowCredentials()
+                    .AllowAnyHeader()
+                    .Build();
+            });
+    });
+
     logger.Information("Services configured");
 
     var app = builder.Build();
@@ -48,6 +66,8 @@ try
     }
 
     app.UseRouting();
+    
+    app.UseCors(CORSPolicy);
 
     app.MapControllers();
     
