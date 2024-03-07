@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HlidacStatu.Entities
+﻿namespace MinimalEntities
 {
     public class Autocomplete : IEquatable<Autocomplete>
     {

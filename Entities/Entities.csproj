@@ -34,6 +34,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Datastructures\Datastructures.csproj" />
       <ProjectReference Include="..\Lib.Analytics\Lib.Analytics.csproj" />
+      <ProjectReference Include="..\MinimalEntities\MinimalEntities.csproj" />
     </ItemGroup>
 
 

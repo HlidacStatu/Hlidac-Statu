@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
+using MinimalEntities;
 using Serilog;
 
 namespace HlidacStatu.Repositories

@@ -12,6 +12,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.Views;
 using HlidacStatu.LibCore.Enums;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
+using MinimalEntities;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Retry;

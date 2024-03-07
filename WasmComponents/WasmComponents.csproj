@@ -12,11 +12,11 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.2" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Entities\Entities.csproj" />
+      <ProjectReference Include="..\MinimalEntities\MinimalEntities.csproj" />
     </ItemGroup>
+    
     
 </Project>

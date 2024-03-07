@@ -1,10 +1,9 @@
-@rendermode InteractiveWebAssembly
+@rendermode InteractiveAuto
 
-@using HlidacStatu.Entities
 @using System.Threading
 @using System.Text.Json
 @using System.Web
-@using Microsoft.AspNetCore.WebUtilities
+@using MinimalEntities
 
 @inject NavigationManager Navigation
 @inject HttpClient HttpClient
@@ -218,7 +217,7 @@
 
     <div class="connection-error">
         <form class="header__search__input-wrapper" method="get" style="visibility:visible">
-            <input value="@_query" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
+            <input value="@Query" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
             <button class="header__search__btn" formaction="/hledat">Hledat</button>
         </form>
         <a class="btn btn-warning btn-sm" href="javascript:window.location.reload()" style="margin-bottom:0;margin-top:0;padding-bottom:0">
@@ -233,17 +232,20 @@
     [Parameter]
     public string Endpoint { get; set; }
 
-    // [Parameter]
-    // public HttpClient HttpClient { get; set; }
-
     [Parameter]
     public string SearchPath { get; set; }
 
+    [Parameter]
+    public string InputTagsJson { get; set; }
+    
     private List<AutocompleteItem<Autocomplete>>? InputTags { get; set; }
 
-    private string _query;
+    private string? Query { get; set; }
     
-    // private readonly ILogger _logger = Log.ForContext<AutocompleteWrap>();
+    JsonSerializerOptions? _jsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     private List<RenderFragment> HelpTips = new List<RenderFragment>()
     {
@@ -254,112 +256,42 @@
         new RenderFragment(@<span>Víte přesný výraz? Dejte ho do uvozovek a my hledáme přesnou shodu. <span class="badge rounded-pill bg-secondary">"Zelená úsporám"</span></span>),
         new RenderFragment(@<span><a href="/napoveda">Podrobnější návod na hledání najdete kliknutím zde</a></span>)
     };
-
-
-    protected override async Task OnParametersSetAsync()
+    
+    public override Task SetParametersAsync(ParameterView parameters)
     {
-        await base.OnParametersSetAsync();
-
-        Uri? uri = null;
-
-        try
+        foreach (var parameter in parameters)
         {
-            uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("q", out var q))
+            switch (parameter.Name)
             {
-                _query = q;
-
-                if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("qtl", out var qtl))
-                {
-                    var parsedQueries = Helpers.ParseQueryStringWithOffsets(q, qtl);
-                    InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
-                }
-                else
-                {
-                    var parsedQueries = Helpers.ParseQueryStringWithoutOffsets(q);
-                    InputTags = CreateAutocompleteItemsFromparsedQueries(parsedQueries);
-                }
+                case nameof(Endpoint):
+                    Endpoint = (string)parameter.Value;
+                    break;
+                case nameof(SearchPath):
+                    SearchPath = (string)parameter.Value;
+                    break;
+                case nameof(InputTagsJson):
+                    InputTags = JsonSerializer.Deserialize<List<AutocompleteItem<Autocomplete>>>((string)parameter.Value,
+                        options: _jsonSerializerOptions);
+                    break;
             }
         }
-        catch (Exception e)
+
+        return base.SetParametersAsync(ParameterView.Empty);
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        if (InputTags?.Any() == true)
         {
-            // _logger.Error(e, $"During autocomplete usage an error occured. OnParametersSetAsync in Wrapper. query=[{uri?.Query}]");
+            Query = string.Join(" ", InputTags.Select(it => it.Value?.Id));
         }
+        
+        return Task.CompletedTask;
     }
-
-    private List<AutocompleteItem<Autocomplete>> CreateAutocompleteItemsFromparsedQueries(List<string>? parsedQueries)
-    {
-        if (parsedQueries is null)
-            return Enumerable.Empty<AutocompleteItem<Autocomplete>>().ToList();
-        return parsedQueries.AsParallel().Select(CreateAutocompleteItemFromQuery).ToList();
-    }
-
-    private AutocompleteItem<Autocomplete> CreateAutocompleteItemFromQuery(string parsedQuery)
-    {
-        // try
-        // {
-        //     if (parsedQuery.StartsWith("osobaid:", StringComparison.InvariantCultureIgnoreCase))
-        //     {
-        //         var osoba = OsobaRepo.GetByNameId(parsedQuery.Substring(8));
-        //         if (osoba is not null)
-        //         {
-        //             return new AutocompleteItem<Autocomplete>(new Autocomplete()
-        //             {
-        //                 Id = parsedQuery,
-        //                 Text = osoba.FullName(),
-        //                 Category = Autocomplete.CategoryEnum.Person
-        //             });
-        //         }
-        //     }
-        //     else if (parsedQuery.StartsWith("ico:", StringComparison.InvariantCultureIgnoreCase))
-        //     {
-        //         var firma = FirmaRepo.FromIco(parsedQuery.Substring(4));
-        //         if (firma is not null)
-        //         {
-        //             Autocomplete.CategoryEnum kategorie = Autocomplete.CategoryEnum.Company;
-        //             if (firma.TypSubjektu == Firma.TypSubjektuEnum.Obec)
-        //             {
-        //                 kategorie = Autocomplete.CategoryEnum.City;
-        //             }
-        //             else if (firma.Kod_PF > 110 && firma.JsemOVM() && firma.IsInRS == 1)
-        //             {
-        //                 kategorie = Autocomplete.CategoryEnum.Authority;
-        //             }
-        //
-        //             return new AutocompleteItem<Autocomplete>(new Autocomplete()
-        //             {
-        //                 Id = parsedQuery,
-        //                 Text = firma.Jmeno,
-        //                 Category = kategorie
-        //             });
-        //         }
-        //     }
-        //     else if (parsedQuery.StartsWith("oblast:", StringComparison.InvariantCultureIgnoreCase))
-        //     {
-        //         return new AutocompleteItem<Autocomplete>(new Autocomplete()
-        //         {
-        //             Id = parsedQuery,
-        //             Text = parsedQuery,
-        //             Category = Autocomplete.CategoryEnum.Oblast
-        //         });
-        //     }
-        // }
-        // catch (Exception e)
-        // {
-        //     var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-        //     _logger.Error(e, $"During autocomplete usage an error occured. CreateAutocompleteItemFromQuery in Wrapper. Parsed query [{parsedQuery}], uri=[{uri}]");
-        // }
-
-        return new AutocompleteItem<Autocomplete>(parsedQuery);
-    }
-
 
     private async Task<List<Autocomplete>?> OnSearch(string query, CancellationToken cancellationToken)
     {
-        JsonSerializerOptions? _jsonSerializerOptions = new()
-        {
-            PropertyNameCaseInsensitive = true
-        };
+        
         
         var autocompletePath = $"/autocomplete/autocomplete?q={HttpUtility.UrlEncode(query)}";
 

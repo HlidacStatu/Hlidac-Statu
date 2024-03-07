@@ -5,6 +5,7 @@ using HlidacStatu.Entities;
 using HlidacStatu.Entities.Views;
 using HlidacStatu.Repositories.Analysis.KorupcniRiziko;
 using Microsoft.AspNetCore.Mvc;
+using MinimalEntities;
 
 namespace HlidacStatu.AutocompleteApi.Controllers
 {

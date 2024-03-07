@@ -2,6 +2,10 @@ namespace WasmComponents.Components.Autocomplete;
 
 public class AutocompleteItem<T>
 {
+    public AutocompleteItem()
+    {
+    }
+    
     public T? Value { get; set; }
     public string? Text { get; set; }
 
