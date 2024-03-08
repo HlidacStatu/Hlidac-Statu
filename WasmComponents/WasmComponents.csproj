@@ -6,13 +6,13 @@
         <Nullable>enable</Nullable>
         <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
         <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
-        <PublishTrimmed>true</PublishTrimmed>
-        <TrimMode>full</TrimMode>
-        <BlazorLinkOnBuild>true</BlazorLinkOnBuild>
-        <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
-        <BlazorWebAssemblyPreserveCollationData>false</BlazorWebAssemblyPreserveCollationData>
-        <InvariantGlobalization>true</InvariantGlobalization>
-        <RunAOTCompilation>true</RunAOTCompilation>
+<!--        <PublishTrimmed>true</PublishTrimmed>-->
+<!--        <TrimMode>full</TrimMode>-->
+<!--        <BlazorLinkOnBuild>true</BlazorLinkOnBuild>-->
+<!--        <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>-->
+<!--        <BlazorWebAssemblyPreserveCollationData>false</BlazorWebAssemblyPreserveCollationData>-->
+<!--        <InvariantGlobalization>true</InvariantGlobalization>-->
+<!--        <RunAOTCompilation>true</RunAOTCompilation>-->
     </PropertyGroup>
 
     <ItemGroup>
