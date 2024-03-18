@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Html;
 
 namespace HlidacStatu.Util
 {
@@ -129,13 +130,13 @@ namespace HlidacStatu.Util
                 return ShortNicePrice(number, valueIfZero, mena, html, showDecimal, MaxScale.Jeden);
         }
 
-        public static MarkupString NicePriceHtml(decimal number, string valueIfZero = "0 {0}", string mena = "Kč", bool shortFormat = false, ShowDecimalVal showDecimal = ShowDecimalVal.Hide)
+        public static IHtmlContent NicePriceHtml(decimal number, string valueIfZero = "0 {0}", string mena = "Kč", bool shortFormat = false, ShowDecimalVal showDecimal = ShowDecimalVal.Hide)
         {
             var result = shortFormat
                 ? ShortNicePrice(number, valueIfZero, mena, html: true, showDecimal)
                 : ShortNicePrice(number, valueIfZero, mena, html: true, showDecimal, MaxScale.Jeden);
 
-            return new MarkupString(result);
+            return new HtmlString(result);
 
         }
 
