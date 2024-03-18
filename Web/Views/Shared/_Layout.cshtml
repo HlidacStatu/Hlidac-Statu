@@ -471,7 +471,12 @@
     {
         <div class="header__content header__content--compact  d-print-none">
             <div class="header__search">
-                <div id="new-search-input">
+                <form class="header__search__input-wrapper old-search-input" id="old-search-input" method="get" style="visibility:visible">
+                    <input value="@ViewBag.Query" id="Q" name="Q" type="text" class="header__search__input" placeholder="Smluvní strana, Název instituce, Jméno osoby, IČO, téma smlouvy …">
+                    <button class="header__search__btn" formaction="/hledat">Hledat</button>
+                </form>
+                
+                <div id="new-search-input" class="new-search-input">
                     @{
                         var query = this.Context.Request.Query;
                         var inputTags = AutocompleteHelper.CreateInputTags(query);
@@ -487,6 +492,12 @@
 
 
                 <div>
+                    <button class="header__search__hint btn btn-link new-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
+                        <i class="fas fa-blind"></i> Přepnout na vyhledávání bez našeptávače
+                    </button>
+                    <button class="header__search__hint btn btn-link old-search-input" style="margin-right: 5px; text-decoration: none; padding-top: 2px; font-size: 15px;color:#FFBF66">
+                        <i class="fas fa-baby"></i> Přepnout na vyhledávání s našeptávačem
+                    </button>
                     <a class="header__search__hint" style="padding-top:2px;font-size:15px;text-decoration:none;" href="/napoveda">
                         <i class="fa-regular fa-question-square" style=""></i> Nápověda jak vyhledávat
                     </a>
