@@ -134,6 +134,21 @@
                         <p>Součástí naší žádosti byl požadavek na zaslání odůvodnění mimořádných odměn pracovníků. Toto odůvodnění jsme @(metadataForYear.ZduvodneniMimoradnychOdmen == true ? "dostali" : "nedostali").</p>
                     </div>
                 </div>
+                
+                @if (!string.IsNullOrWhiteSpace(metadataForYear.SkrytaPoznamka))
+                {
+                    <div class="col d-flex align-items-start">
+                        <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                            <svg class="bi" width="1em" height="1em">
+                                <use xlink:href="#cpu-fill"></use>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="fs-2 text-body-emphasis">Poznámka úřadu k platům</h3>
+                            <p>@metadataForYear.SkrytaPoznamka</p>
+                        </div>
+                    </div>
+                }
             </div>
         }
     </div>
