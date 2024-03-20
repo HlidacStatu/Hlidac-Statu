@@ -63,7 +63,11 @@ namespace HlidacStatu.Repositories
         {
             if (string.IsNullOrEmpty(ICO))
                 return Firma.LoadError;
-            var f = instanceByIco.Get(Util.ParseTools.NormalizeIco(ICO));
+
+            string normalizedIco = Util.ParseTools.NormalizeIco(ICO);
+            if(string.IsNullOrWhiteSpace(normalizedIco))
+                return Firma.LoadError;
+            var f = instanceByIco.Get(normalizedIco);
             if (f == null)
                 return Firma.LoadError;
             else
