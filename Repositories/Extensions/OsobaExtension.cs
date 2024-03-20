@@ -150,36 +150,7 @@ namespace HlidacStatu.Extensions
             return false;
         }
 
-        public static async Task<bool> NotInterestingToShowAsync(this Osoba osoba)
-        {
-            var showIt = osoba.StatusOsoby() == Osoba.StatusOsobyEnum.Politik
-                         || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.ByvalyPolitik
-                         || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.Sponzor
-                         || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VysokyUrednik
-                         || osoba.StatusOsoby() == Osoba.StatusOsobyEnum.VazbyNaPolitiky
-                ;
-            if (showIt)
-                return !showIt;
-
-            showIt = showIt || await osoba.MaVztahySeStatemAsync();
-            if (showIt)
-                return !showIt;
-
-            showIt = showIt || osoba.IsSponzor();
-            if (showIt)
-                return !showIt;
-
-            showIt = showIt || osoba.StatistikaRegistrSmluv(Relation.AktualnostType.Nedavny).SoukromeFirmySummary()
-                .Summary().PocetSmluv > 0;
-            if (showIt)
-                return !showIt;
-
-
-            if (osoba.NameId == "radek-jonke")
-                return true;
-
-            return !showIt;
-        }
+        
 
         public static bool IsSponzor(this Osoba osoba)
         {
@@ -408,7 +379,7 @@ namespace HlidacStatu.Extensions
                 !excludedImportanceLevels.Contains(InfoFact.ImportanceLevel.Summary))
             {
                 var descr = "";
-                if (await osoba.NotInterestingToShowAsync())
+                if (osoba.StatusOsoby() == Osoba.StatusOsobyEnum.NeniPolitik)
                     descr = $"<b>{osoba.FullName()}</b>";
                 else
                     descr = $"<b>{osoba.FullNameWithYear()}</b>";
@@ -582,8 +553,7 @@ namespace HlidacStatu.Extensions
             }
 
             var infoFacts = f.OrderByDescending(o => o.Level).ToArray();
-
-
+            
             return infoFacts;
         }
 

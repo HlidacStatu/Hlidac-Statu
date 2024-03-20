@@ -281,11 +281,11 @@ namespace HlidacStatu.Connectors
             return GetESClientAsync(defaultIndexName_KindexFeedback, timeOut, connectionLimit, IndexType.KindexFeedback);
         }
 
-        static string dataSourceIndexNamePrefix = "data_";
+        public const string DataSourceIndexNamePrefix = "data_";
         public static async Task<ElasticClient> GetESClientAsync(string indexName, int timeOut = 60000, int connectionLimit = 80, IndexType? idxType = null, bool init = true)
         {
             if (idxType == IndexType.DataSource)
-                indexName = dataSourceIndexNamePrefix + indexName;
+                indexName = DataSourceIndexNamePrefix + indexName;
             else if (indexName == defaultIndexName_Audit)
             {
                 //audit_Year-weekInYear

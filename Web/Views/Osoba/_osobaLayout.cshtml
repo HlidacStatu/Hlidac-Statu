@@ -1,5 +1,4 @@
-﻿@using HlidacStatu.DS.Graphs
-@using HlidacStatu.Extensions;
+﻿@using HlidacStatu.Extensions;
 @using HlidacStatu.Repositories
 
 
@@ -8,47 +7,49 @@
 @{
     ViewBag.Title = Model.title;
     ViewBag.HideTitle = true;
-
-    ViewBag.SocialShareTitle = $"{Model.osoba.FullNameWithYear()}";
-    ViewBag.SocialShareText = HlidacStatu.Util.InfoFact.RenderInfoFacts(Model.osoba.InfoFactsCached(), 4, true, true, ", ");
-    ViewBag.SocialShareType = "article";
-    ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId;
-    ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"
-                + "<meta property=\"og:image:height\" content=\"1080\" />"
-                + "<meta property=\"og:image:type\" content=\"image/png\" />";
-
-
-    Relation.AktualnostType? aktualnost = ViewBag.Aktualnost;
+    
+    if (Model.viewName != "NoInfo")
+    {
+        ViewBag.SocialShareTitle = $"{Model.osoba.FullNameWithYear()}";
+        ViewBag.SocialShareText = HlidacStatu.Util.InfoFact.RenderInfoFacts(Model.osoba.InfoFactsCached(), 4, true, true, ", ");
+        ViewBag.SocialShareType = "article";
+        ViewBag.SocialImage = $"https://www.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId;
+        ViewBag.OpenGraphMore = "<meta property=\"og:image:width\" content=\"1920\" />\n"
+                                + "<meta property=\"og:image:height\" content=\"1080\" />"
+                                + "<meta property=\"og:image:type\" content=\"image/png\" />";
+    }
 }
+
 @section metatags
 {
 
-    @if (Model.osoba != null
-        && HlidacStatu.Web.Framework.Constants.DontIndexOsoby.Contains(Model.osoba.NameId.ToLower()))
+    @if ((Model.osoba != null && Constants.DontIndexOsoby.Contains(Model.osoba.NameId.ToLower()))
+         || Model.viewName == "NoInfo")
     {
         <meta name="robots" content="noindex, noarchive">
     }
 }
+
 @section breadcrumb
 {
 
     @{
         var items = new List<Schema.NET.IListItem>()
-{
+        {
             new Schema.NET.ListItem()
             {
                 Item = new Schema.NET.WebPage()
                 {
-                    Name="Hlídač státu",
-                    Url= new Uri( "https://www.hlidacstatu.cz"),
-                    Id=new Uri( "https://www.hlidacstatu.cz")
+                    Name = "Hlídač státu",
+                    Url = new Uri("https://www.hlidacstatu.cz"),
+                    Id = new Uri("https://www.hlidacstatu.cz")
                 }
             },
             new Schema.NET.ListItem()
             {
                 Item = new Schema.NET.WebPage()
                 {
-                    Name="Osoby",
+                    Name = "Osoby",
                     Id = new Uri("https://www.hlidacstatu.cz/osoby/")
                 }
             }
@@ -59,18 +60,19 @@
             {
                 Item = new Schema.NET.Person()
                 {
-                    Name = Model.osoba.FullNameWithYear(),
+                    Name = (Model.viewName != "NoInfo") ? Model.osoba.FullNameWithYear() : Model.osoba.NameId,
                     Description = HlidacStatu.Util.InfoFact.RenderInfoFacts(Model.osoba.InfoFactsCached(), 4, true, true, ", "),
                     FamilyName = Model.osoba.Prijmeni,
                     GivenName = Model.osoba.Jmeno,
-                            Image = Model.osoba.HasPhoto() ? new Uri(Model.osoba.GetPhotoUrl(false, HlidacStatu.Entities.Osoba.PhotoTypes.NoBackground)) : null,
-                    Brand = new Schema.NET.Brand(){
-                        Name= Model.osoba.CurrentPoliticalParty(),                       
+                    Image = Model.osoba.HasPhoto() ? new Uri(Model.osoba.GetPhotoUrl(false, HlidacStatu.Entities.Osoba.PhotoTypes.NoBackground)) : null,
+                    Brand = new Schema.NET.Brand()
+                    {
+                        Name = Model.osoba.CurrentPoliticalParty(),
                     },
                     Url = new Uri("https://www.hlidacstatu.cz/osoba/" + Model.osoba.NameId),
                     Id = new Uri("https://www.hlidacstatu.cz/osoba/" + Model.osoba.NameId)
                 }
-            }) ;
+            });
             items.Add(new Schema.NET.ListItem()
             {
                 Item = new Schema.NET.WebPage()
@@ -85,7 +87,7 @@
             {
                 Item = new Schema.NET.Person()
                 {
-                    Name = Model.osoba.FullNameWithYear(),
+                    Name = (Model.viewName != "NoInfo") ? Model.osoba.FullNameWithYear() : Model.osoba.NameId,
                     Id = new Uri("https://www.hlidacstatu.cz/osoba/" + Model.osoba.NameId)
                 }
             });
@@ -95,24 +97,11 @@
     }
 
     @Html.RenderBreadcrumb(breadCr)
-    @*<ol class="breadcrumb">
-        <li><a href="/">Hlídač Státu</a></li>
-        <li>Osoby</li>
-        @if (Model.viewName.ToLower() != "index")
-        {
-            <li><a href="/osoba/@Model.osoba.NameId">@Model.osoba.FullNameWithYear()</a></li>
-            <li class="active">@ViewBag.Title</li>
-        }
-        else
-        {
-            <li class="active">@Model.osoba.FullNameWithYear()</li>
-        }
-    </ol>*@
 }
 
 @section scripts
 {
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.css"/>
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
     <script src="~/bundles/highcharts"></script>
     <script src="/scripts/highcharts-6/highcharts-more.js"></script>
@@ -121,12 +110,15 @@
     @* Přidá barevnou paletu ke grafům *@
     @Html.GraphTheme()
 }
+
 @section onlyembed
 {
-
-    <a href="@Model.osoba.GetUrl(false)" target="_top">
-    <img src="@($"https://www.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId)" style="width:95%;height:auto;max-width:@(ViewBag.MaxWidth)px" />
-    </a>
+    @if (Model.viewName != "NoInfo")
+    {
+        <a href="@Model.osoba.GetUrl(false)" target="_top">
+            <img src="@($"https://www.hlidacstatu.cz/socialbanner/osoba?d={DateTime.Now.ToString("yyMMdd")}&v=" + Model.osoba.NameId)" style="width:95%;height:auto;max-width:@(ViewBag.MaxWidth)px"/>
+        </a>
+    }
 }
 
 <style>
@@ -181,19 +173,19 @@
 </style>
 
 
-
 <div class="head">
     <h3>
         <add-bookmark name="@(ViewBag.Title + " " + ViewBag.SubTitle)" item="@Model.osoba" style="font-size:0.7em;vertical-align:top;"></add-bookmark>
-        @if (await Model.osoba.NotInterestingToShowAsync())
+        @if (Model.viewName == "NoInfo")
         {
-            <span>@Model.osoba.FullName()</span>
+            <span>@Model.osoba.NameId</span>
         }
         else
         {
             <span>@Model.osoba.FullNameWithYear()</span>
             
         }
+
         @if (this.User?.IsInRole("canEditData") == true)
         {
             <a href="https://admin.hlidacstatu.cz/EventEditor/@Model.osoba.InternalId" target="_blank" style="font-size:0.8em">
@@ -202,22 +194,28 @@
         }
     </h3>
 </div>
-<hr />
+<hr/>
 
 
 <div class="row boxes">
     @* Pravý sloupec *@
-    <cache expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}_{User.Identity.IsAuthenticated}")">
-        <partial name="RightColumn" model="@Model.osoba" />
-    </cache>
+    <div class="col-sm-4 col-xs-12 order-md-3 order-sm-0">
+    @if (Model.viewName != "NoInfo")
+    {
+        <cache expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}_{User.Identity.IsAuthenticated}")">
+            <partial name="RightColumn" model="@Model.osoba"/>
+        </cache>
+    }
+    </div>
 
     @* Prázdný sloupec *@
     <div class="col-sm-1 order-2"></div>
     <cache enabled="@(!Html.IsDebug())" expires-after="@Constants.CachedActionLength.Cache12H" vary-by="@($"{Model.osoba.NameId}_{Model.viewName}_{User.Identity.IsAuthenticated}_{this.Context.Request.QueryString.ToString()}")">
         @{
             if (!Html.IsDebug())
-            {<text>
-                <!-- cached -->
+            {
+                <text>
+                    <!-- cached -->
                 </text>
             }
             else
@@ -227,7 +225,7 @@
                 </text>
             }
         }
-        <partial name="@Model.viewName" model="@Model.osoba" />
+        <partial name="@Model.viewName" model="@Model.osoba"/>
     </cache>
 
 </div>

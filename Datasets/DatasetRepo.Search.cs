@@ -8,6 +8,7 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using HlidacStatu.Connectors;
 
@@ -73,6 +74,73 @@ namespace HlidacStatu.Datasets
                     .Select(p => $"{p}:{value}")
                     .Aggregate((f, s) => f + " OR " + s);
                 return $"( {q} )";
+            }
+            
+            public static async Task<bool> CheckIfAnyRecordExistAsync(string query, IEnumerable<DataSet> datasets = null)
+            {
+                
+                [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_ContainedQuery")]
+                static extern IQuery GetContainedQuery(QueryContainer c);
+                
+                static string UnpackQueryContainer(QueryContainer qc)
+                {
+                    try
+                    {
+                        var cq = GetContainedQuery(qc);
+                        var queryStringQuery = (IQueryStringQuery)(QueryStringQueryDescriptor<object>)cq;
+                        return queryStringQuery.Query;
+                    }
+                    catch (Exception e)
+                    {
+                        return qc.GetHashCode().ToString();
+                    }
+                }
+                
+                if (string.IsNullOrEmpty(query))
+                    return false;
+
+                datasets ??= DataSetDB.ProductionDataSets.Get();
+
+                var esClient = await Manager.GetESClientAsync();
+
+                var esQuery = Repositories.Searching.Tools.FixInvalidQuery(query, QueryShorcuts, QueryOperators);
+
+                List<QueryContainer> queryContainers = new();
+                foreach (var ds in datasets)
+                {
+                    QueryContainer qc = await GetSimpleQueryAsync(ds, esQuery);
+                    queryContainers.Add(qc);
+                }
+                
+                // get distinct query containers by its queries
+                // also remove nonexisting icos 
+                queryContainers = queryContainers
+                    .Where(qc => !UnpackQueryContainer(qc).Contains("ico:noone", StringComparison.InvariantCultureIgnoreCase))
+                    .DistinctBy(UnpackQueryContainer).ToList();
+
+                string indexes = string.Join(",", datasets.Select(ds => $"{Manager.DataSourceIndexNamePrefix}{ds.DatasetId}"));
+                
+                var combinedQuery = new BoolQuery
+                {
+                    Should = queryContainers // Using Must, but you can use Should, MustNot, or Filter depending on your needs
+                };
+                
+                var response = await esClient.SearchAsync<dynamic>(s => s
+                        .Index(indexes) // Specify the indexes you want to search across
+                        .Query(q => combinedQuery)
+                        .Size(0) // We're only interested in the existence of documents, not the documents themselves
+                );
+
+                if (response.Total > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+                
+
             }
 
             public static async Task<DataSearchResult> SearchDataAsync(DataSet ds, string queryString, int page, int pageSize,

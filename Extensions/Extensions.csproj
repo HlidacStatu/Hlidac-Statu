@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>HlidacStatu.Extensions</AssemblyName>
+        <RootNamespace>HlidacStatu.Extensions</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Datasets\Datasets.csproj" />
+      <ProjectReference Include="..\Repositories\Repositories.csproj" />
+    </ItemGroup>
+
+</Project>

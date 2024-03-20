@@ -101,6 +101,7 @@
       <ProjectReference Include="..\DBUpgrader\DBUpgrader.csproj" />
       <ProjectReference Include="..\DetectFaces\DetectFaces.csproj" />
       <ProjectReference Include="..\Entities\Entities.csproj" />
+      <ProjectReference Include="..\Extensions\Extensions.csproj" />
       
       <ProjectReference Include="..\HlidacStatu.ExportData\HlidacStatu.ExportData.csproj" />
       <ProjectReference Include="..\HlidacStatu.Q.Messages\HlidacStatu.Q.Messages.csproj" />

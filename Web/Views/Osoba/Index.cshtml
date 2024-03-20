@@ -228,12 +228,9 @@
                     @if (statistics.SoukromeFirmy.Count > listingNum + 1)
                     {
                     <p>
-                            @if ((await Model.NotInterestingToShowAsync()) == false)
-                            {
-                            <a asp-action="Vazby" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
-                                <strong>Ukázat všechny</strong>
-                            </a>
-                            }
+                        <a asp-action="Vazby" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
+                            <strong>Ukázat všechny</strong>
+                        </a>
                     </p>
                     }
 
@@ -310,12 +307,11 @@
                     </ul>
                 </p>
             }
-            @if ((await Model.NotInterestingToShowAsync()) == false)
-            {
-                <a asp-action="Vazby" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
-                    <strong>Zobrazit podrobnosti</strong>
-                </a>
-            }
+            
+            <a asp-action="Vazby" asp-route-id="@Model.NameId" class="moreinfolink text-uppercase">
+                <strong>Zobrazit podrobnosti</strong>
+            </a>
+        
         </div>
         <hr />
     }
@@ -518,10 +514,6 @@
 
     @{
         var datasetsToSearch = DataSetDB.ProductionDataSets.Get();
-        if (await Model.NotInterestingToShowAsync())
-        {
-            datasetsToSearch = datasetsToSearch.Where(m => m.DatasetId != "skutecni-majitele").ToArray();
-        }
         var dsQuery = $"( OsobaId:{Model.NameId} ) ";
         var dsSearch = await HlidacStatu.Datasets.Search.DatasetMultiResult.GeneralSearchAsync(dsQuery,
         datasets: datasetsToSearch,

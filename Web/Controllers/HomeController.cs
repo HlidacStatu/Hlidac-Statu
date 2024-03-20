@@ -23,7 +23,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using Nest;
 using Serilog;
 using Visit = HlidacStatu.Web.Framework.Visit;
 
@@ -994,7 +993,7 @@ text zpravy: {txt}
                 Osoba o = Osoby.GetByNameId.Get(v);
                 if (o != null)
                 {
-                    if (!(await o.NotInterestingToShowAsync()))
+                    if (await o.IsInterestingToShowAsync())
                     {
                         var social = new ImageBannerCoreData()
                         {
