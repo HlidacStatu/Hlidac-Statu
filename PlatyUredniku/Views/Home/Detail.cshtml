@@ -7,37 +7,24 @@
 {
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"/>
     <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script>
+        function adjustDataTablesWidth() {
+                $.fn.dataTable.tables({visible: true, api: true}).columns.adjust();   
+            }
+    </script>
 }
-
-<style>
-    .boxes h4 {
-        font-size: 24px;
-        font-weight: bold;
-        padding-top: 20px;
-    }
-
-    .boxes p {
-        font-size: 16px;
-    }
-
-    .boxes hr {
-        border-top: 3px dotted #E0E6ED;
-        margin-top: 24px;
-        margin-bottom: 14px;
-    }
-</style>
 
 @{
     int rok = (int)ViewData["rok"];
     string viewName = this.ViewContext.RouteData.Values["action"] as string;
-    string currUrlWithoutYear = $"/{viewName}/{ViewData["id"]}";
-    string currUrlWithYear = $"{currUrlWithoutYear}?rok={rok}";
 
     var metadataForYear = Model.Metadata.FirstOrDefault(m => m.Rok == rok);
 }
-<div class="row boxes">
 
-    <div class="px-4 py-5" id="hanging-icons">
+<section class="centered-block">
+    <div>
+
+
         <h2 class="pb-2 border-bottom">@Model.Nazev</h2>
         <p>
             IČO: @Model.Ico <br/>
@@ -97,9 +84,13 @@
                 <partial name="Graphs/_AreaRangePlot" model="graphData"/>
             }
         }
+    </div>
+</section>
 
-        @if (metadataForYear != null)
-        {
+@if (metadataForYear != null)
+{
+    <section class="centered-block">
+        <div>
             <h4>Detaily komunikace ohledně platů za rok @metadataForYear.Rok</h4>
             <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
                 <div class="col d-flex align-items-start">
@@ -134,7 +125,7 @@
                         <p>Součástí naší žádosti byl požadavek na zaslání odůvodnění mimořádných odměn pracovníků. Toto odůvodnění jsme @(metadataForYear.ZduvodneniMimoradnychOdmen == true ? "dostali" : "nedostali").</p>
                     </div>
                 </div>
-                
+
                 @if (!string.IsNullOrWhiteSpace(metadataForYear.SkrytaPoznamka))
                 {
                     <div class="col d-flex align-items-start">
@@ -150,97 +141,102 @@
                     </div>
                 }
             </div>
-        }
-    </div>
+        </div>
+    </section>
+}
 
-    @{
-        var platyPoLetech = Model.Platy.GroupBy(p => p.Rok).OrderByDescending(pg => pg.Key).ToList();
-    }
+@{
+    var platyPoLetech = Model.Platy.GroupBy(p => p.Rok).OrderByDescending(pg => pg.Key).ToList();
+}
 
-    <div class="card">
-        <div class="card-body">
+<section class="top-block">
 
-            <div class="d-flex align-items-start">
-                <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                    <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
-                    @{
-                        string classAttributes = "nav-link";
 
-                        foreach (var platRok in platyPoLetech)
-                        {
-                            <a href="/@(viewName)/@(ViewData["id"])?rok=@(platRok.Key)" class="@classAttributes @((platRok.Key == rok) ? "active" : "")">@platRok.Key</a>
-                        }
-                    }
-                </div>
-                <div class="tab-content">
-                    @{
-                        classAttributes = "tab-pane fade show active";
+    <div>
+        <div class="nav flex-row nav-pills me-3" id="v-pills-tab" role="tablist">
+            <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
+            @{
+                string classAttributes = "nav-link active";
 
-                        foreach (var platGroup in platyPoLetech.Where(m => m.Key == rok))
-                        {
-                            <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
-                                <script>
+                foreach (var platRok in platyPoLetech)
+                {
+                    <button class="@classAttributes"
+                            id="year-@platRok.Key-tab"
+                            data-bs-toggle="pill"
+                            data-bs-target="#year-@platRok.Key"
+                            type="button"
+                            role="tab"
+                            onclick="adjustDataTablesWidth()">
+                        @platRok.Key
+                    </button>
+
+                    classAttributes = "nav-link";
+                }
+            }
+        </div>
+        <div class="tab-content width-75vp">
+            @{
+                classAttributes = "tab-pane width-75vp fade show active";
+
+                foreach (var platGroup in platyPoLetech)
+                {
+                    <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
+                        <script>
                                     $(document).ready(function () {
-                                        $('#tblSum_@rok').DataTable(
+                                        $('#tblSum_@platGroup.Key').DataTable(
                                             {
                                                 'language': {
                                                     'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
                                                 },
+                                                "searching": false,
                                                 "paging": false,
                                                 "ordering": true,
                                                 "order": [],
+                                                "scrollCollapse": true,
+                                                "scrollY": '50vh',
                                                 "info": false
                                             });
                                     });
                                 </script>
 
-                                <table class="table table-striped" id="tblSum_@rok">
-                                    <thead>
-                                    <tr>
-                                        <th>NazevPozice</th>
-                                        <th>Celkový roční<br/>příjem</th>
-                                        <th>Přepočtený průměrný<br/>měsíční plat</th>
-                                        <th>NefinancniBonus</th>
-                                        <th>Detail</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
-                                    {
-                                        <tr>
-                                            <td>
-                                                <a href="@(currUrlWithYear)#plat@(plat.Id)">@plat.NazevPozice</a>
-                                            </td>
-                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlat))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlat)</td>
-                                            <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlat))">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlat)</td>
-                                            <td>@plat.NefinancniBonus</td>
-                                            <td>
-                                                <a href="@(currUrlWithYear)#plat@(plat.Id)">
-                                                    <i class="fa-regular fa-memo-circle-info"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    }
-                                    </tbody>
-                                </table>
-                            </div>
-                            classAttributes = "tab-pane";
-                        }
-                    }
-                </div>
-            </div>
+                        <table class="table table-striped" id="tblSum_@platGroup.Key">
+                            <thead>
+                            <tr>
+                                <th>Název pozice</th>
+                                <th>Celkový roční<br/>příjem</th>
+                                <th>Přepočtený průměrný<br/>měsíční plat</th>
+                                <th>Nefinanční bonus</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-action="Plat" asp-route-id="@plat.Id">@plat.NazevPozice</a>
+                                    </td>
+                                    <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.CelkovyRocniPlat))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.CelkovyRocniPlat)</td>
+                                    <td data-order="@(HlidacStatu.Util.RenderData.OrderValueFormat(plat.HrubyMesicniPlat))" class="number">@HlidacStatu.Util.RenderData.NicePrice(plat.HrubyMesicniPlat)</td>
+                                    <td>@plat.NefinancniBonus</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                    classAttributes = "tab-pane width-75vp";
+                }
+            }
         </div>
+        <partial name="ExportModal" model="@(new ExportModalViewModel() { DatovaSchranka = Model.DS, Titulek = $"Export dat pro {Model.Nazev}" })"/>
     </div>
-    
-    <partial name="ExportModal" model="@(new ExportModalViewModel(){DatovaSchranka = Model.DS, Titulek=$"Export dat pro {Model.Nazev}"})"/>
+</section>
 
 
-    @foreach (var platGroup in platyPoLetech.Where(m => m.Key == rok))
+@foreach (var platGroup in platyPoLetech.Where(m => m.Key == rok))
+{
+    foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
     {
-        foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
-        {
-            <hr/>
-            <partial name="_platDetail" model="(@plat, @Model)"/>
-        }
+        <hr/>
+        <partial name="_platDetail" model="(@plat, @Model)"/>
     }
-</div>
+}

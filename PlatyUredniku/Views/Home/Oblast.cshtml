@@ -8,29 +8,30 @@
 
     string? prumerHlavounu = platyHlavounu.Any() ? platyHlavounu.Average(p => p.HrubyMesicniPlat).ToString("N0") : null;
 }
-<div class="row">
-    <div class="col-6">
-        @if (Model is not null && Model.Any())
+<section class="centered-block">
+    <div class="row">
+        <div class="col-6">
+            @if (Model is not null && Model.Any())
+            {
+                <h3 class="pt-5">
+                    V této oblasti máme @Model.Count institucí s
+                    @Model.SelectMany(o => o.Platy).Count(p => p.Rok == PuRepo.DefaultYear) typy pozic.
+                </h3>
+            }
+
+        </div>
+        @if (prumerHlavounu is not null)
         {
-            <h3 class="pt-5">
-                V této oblasti máme @Model.Count institucí s
-                @Model.SelectMany(o => o.Platy).Count(p => p.Rok == PuRepo.DefaultYear) typy pozic.
-            </h3>
+            <div class="col-6 bg-warning-subtle p-5">
+                <h3>@prumerHlavounu</h3>
+                <p>Průměr nejvyšších představitelů úřadů oblasti</p>
+            </div>
         }
 
-    </div>
-    @if (prumerHlavounu is not null)
-    {
-        <div class="col-6 bg-warning-subtle p-5">
-            <h3>@prumerHlavounu</h3>
-            <p>Průměr nejvyšších představitelů úřadů oblasti</p>
-        </div>
-    }
-
-    @if (Model is not null && Model.Any())
-    {
-        <div class="col-12">
-            <h2>Organizace</h2>
+        @if (Model is not null && Model.Any())
+        {
+            <div class="col-12">
+                <h2>Organizace</h2>
 
                 <table class="table table-new table-new--dotted table-hover">
                     <tbody>
@@ -55,8 +56,9 @@
                     }
                     </tbody>
                 </table>
-            
 
-        </div>
-    }
-</div>
+
+            </div>
+        }
+    </div>
+</section>

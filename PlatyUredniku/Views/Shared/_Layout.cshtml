@@ -1,6 +1,5 @@
 ﻿@using System.Net.Http
 @using Microsoft.AspNetCore.Http.Extensions
-@using HlidacStatu.Lib.Web.UI
 
 @inject IHttpClientFactory HttpClientFactory
 
@@ -14,6 +13,7 @@
     {
         title = title + " - " + "Platy úředníků.";
     }
+
     string description = "Platy úředníků - veřejná kontrola odměňování nejvyšších státních úředníků a top managementu státních firem. Projekt Hlídače státu.";
     if (!string.IsNullOrEmpty(ViewBag.Description))
     {
@@ -23,13 +23,13 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>@title</title>
-    <link rel="canonical" href="https://platyuredniku.hlidacstatu.cz@(Context.Request.GetEncodedPathAndQuery())" />
-    <meta name="description" content="@description" />
-    <meta name="author" content="Hlídač státu" />
+    <link rel="canonical" href="https://platyuredniku.hlidacstatu.cz@(Context.Request.GetEncodedPathAndQuery())"/>
+    <meta name="description" content="@description"/>
+    <meta name="author" content="Hlídač státu"/>
     <meta name="keywords" content="e-gov, e-government, platy úředníků, platy ministrů, platy ve státní správě, odměny úředníků">
 
     @{
@@ -54,7 +54,7 @@
         }
     }
 
-    <link rel="shortcut icon" href="/content/icons/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/content/icons/favicon.ico" type="image/x-icon"/>
     <link rel="apple-touch-icon" sizes="57x57" href="/content/icons/apple-touch-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/content/icons/apple-touch-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="/content/icons/apple-touch-icon-72x72.png">
@@ -68,51 +68,51 @@
     <link rel="icon" type="image/png" href="/content/icons/favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="/content/icons/favicon-96x96.png" sizes="96x96">
     <link rel="icon" type="image/png" href="/content/icons/android-chrome-192x192.png" sizes="192x192">
-    <meta name="msapplication-square70x70logo" content="/content/icons/smalltile.png" />
-    <meta name="msapplication-square150x150logo" content="/content/icons/mediumtile.png" />
-    <meta name="msapplication-wide310x150logo" content="/content/icons/widetile.png" />
-    <meta name="msapplication-square310x310logo" content="/content/icons/largetile.png" />
+    <meta name="msapplication-square70x70logo" content="/content/icons/smalltile.png"/>
+    <meta name="msapplication-square150x150logo" content="/content/icons/mediumtile.png"/>
+    <meta name="msapplication-wide310x150logo" content="/content/icons/widetile.png"/>
+    <meta name="msapplication-square310x310logo" content="/content/icons/largetile.png"/>
 
-    <meta name="twitter:site" content="HlidacStatu" />
-    <meta property="fb:app_id" content="803455203348459" />
-    <meta property="og:title" content="@socialTitle" />
-    <meta property="og:url" content="@url" />
-    <meta property="og:site_name" content="Hlídač Státu" />
-    <meta property="og:type" content="@type" />
-    <meta property="og:description" content="@text" />
-    <meta property="og:image" content="@Html.Raw(img.Trim())" />
-    <meta name="twitter:image" content="@Html.Raw(img.Trim())" />
+    <meta name="twitter:site" content="HlidacStatu"/>
+    <meta property="fb:app_id" content="803455203348459"/>
+    <meta property="og:title" content="@socialTitle"/>
+    <meta property="og:url" content="@url"/>
+    <meta property="og:site_name" content="Hlídač Státu"/>
+    <meta property="og:type" content="@type"/>
+    <meta property="og:description" content="@text"/>
+    <meta property="og:image" content="@Html.Raw(img.Trim())"/>
+    <meta name="twitter:image" content="@Html.Raw(img.Trim())"/>
     @if (img != defaultSocialImg)
     {
-        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:card" content="summary_large_image"/>
     }
     @if (ViewBag.OpenGraphMore != null)
     {
         @Html.Raw(ViewBag.OpenGraphMore)
     }
-    <meta property="og:hlidac_html" content="@socialhtml" />
-    <meta property="og:hlidac_footer" content="@socialfooter" />
-    <meta property="og:hlidac_subfooter" content="@socialsubfooter" />
-    <meta property="og:hlidac_footerimg" content="@socialfooterimg" />
+    <meta property="og:hlidac_html" content="@socialhtml"/>
+    <meta property="og:hlidac_footer" content="@socialfooter"/>
+    <meta property="og:hlidac_subfooter" content="@socialsubfooter"/>
+    <meta property="og:hlidac_footerimg" content="@socialfooterimg"/>
 
     @RenderSection("metatags", required: false)
 
     <link rel="stylesheet" href="~/css/bootstrap.min.css">
     <script src="~/js/bootstrap.bundle.min.js"></script>
 
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&amp;subset=latin-ext" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css?family=Cabin:400,400i,600,700&amp;subset=latin-ext" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700&amp;subset=latin-ext" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css?family=Cabin:400,400i,600,700&amp;subset=latin-ext" rel="stylesheet"/>
 
     <script src="https://kit.fontawesome.com/a0fc082c81.js" crossorigin="anonymous"></script>
 
     <script src="~/bundles/jquery"></script>
     <script src="~/bundles/scriptbundle"></script>
     <script src="~/bundles/highcharts8"></script>
-    <link rel="stylesheet" href="~/content/bundled.css" />
+    <link rel="stylesheet" href="~/content/bundled.css"/>
     <script src="~/bundles/modernizr"></script>
 
     <!-- Matomo Tag Manager -->
-<script>
+    <script>
   var _mtm = window._mtm = window._mtm || [];
   _mtm.push({'mtm.startTime': (new Date().getTime()), 'event': 'mtm.Start'});
   (function() {
@@ -120,7 +120,7 @@
     g.async=true; g.src='https://ma.hlidacstatu.cz/js/container_fFYgkYZS.js'; s.parentNode.insertBefore(g,s);
   })();
 </script>
-<!-- End Matomo Tag Manager -->
+    <!-- End Matomo Tag Manager -->
 
     <script>
         function closeMegaMenu(el) {
@@ -131,19 +131,53 @@
 
     </script>
     @RenderSection("Scripts", required: false)
-        
+
     <!-- Blazor -->
-    <base href="~/" />
+    <base href="~/"/>
     <script src="_framework/blazor.web.js"></script>
 </head>
 <body class="new-body">
-    <!-- ##head## -->
-    <style>
-        .navbar.hlidac .nav-item {
-            line-height: 1.2em;
-        }
-
-    </style>
+<!-- ##head## -->
+<style>
+    .navbar.hlidac .nav-item {
+        line-height: 1.2em;
+    }
+    
+    .sticky-head {
+        max-height: 16vh;
+        position: sticky;
+        top: 0;
+    }
+    
+    #scroller {
+        max-height: 84vh;
+        scroll-snap-type: y mandatory;
+        overflow-y: scroll;
+    }
+    
+    section {
+      min-height: 84vh;
+      width: 100vw;
+      scroll-snap-align: start;
+    }
+    
+    .width-75vp {
+        width: 75vw;
+    }
+    
+    .centered-block {
+        display: flex;
+        align-items: center;
+        justify-content: center;       
+    }
+    
+    .top-block {
+        display: flex; 
+        justify-content: center; 
+        padding-top: 50px;
+    }
+</style>
+<div class="sticky-head">
     <nav class="navbar navbar-expand-lg navbar-light shadow hlidac">
         <div class="container-fluid">
             <a class="navbar-brand" href="/" style="margin-right:1em;">
@@ -152,16 +186,19 @@
                         <g id="Page-2" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                             <g id="06-DOBRA" transform="translate(-31.000000, -18.000000)">
                                 <g id="Group" transform="translate(31.000000, 18.000000)">
-                                    <path d="M34.7926176,43 L34.7926176,25.8136542 C34.7926176,19.2536826 29.4005716,14.55625 22.8156981,14.55625 L22.7226406,14.55625 C16.137767,14.55625 10.4707785,19.2536826 10.4707785,25.8136542 L10.4707785,43 L34.7926176,43 Z" id="Fill-1" fill="#25272D" />
-                                    <path d="M30.6778527,27.9431372 C29.1549094,27.5784772 26.5447427,27.4633214 24.731801,27.9431372 C22.9188592,28.422953 22.6712952,30.9140119 24.731801,30.9140119 C26.7923068,30.9140119 32.200796,28.3077972 30.6778527,27.9431372 Z" id="Oval" fill="#266cae" />
-                                    <path d="M21.7334082,27.9431372 C20.2104649,27.5784772 17.6002983,27.4633214 15.7873565,27.9431372 C13.9744148,28.422953 13.7268507,30.9140119 15.7873565,30.9140119 C17.8478623,30.9140119 23.2563515,28.3077972 21.7334082,27.9431372 Z" id="Oval" fill="#266cae" transform="translate(18.166667, 29.269506) scale(-1, 1) translate(-18.166667, -29.269506) " />
-                                    <path d="M23.1340731,0.78903332 C22.7184471,0.423872614 22.0477586,0.424188294 21.6368425,0.78903332 L0.744673078,19.3388181 C0.333401493,19.7039788 0.245239258,20.3678589 0.557111502,20.8356673 L1.4428885,22.1643327 C1.75057268,22.625859 2.33675444,22.7031399 2.74956077,22.3392375 L22.3815156,5.03302363 L42.2405567,22.3392375 C42.6593161,22.7041666 43.2441756,22.6321411 43.5562369,22.1643327 L44.4425508,20.8356673 C44.7504215,20.374141 44.6627092,19.7036631 44.2474425,19.3388181 L23.1340731,0.78903332 Z" id="Combined-Shape" fill="#25272D" />
+                                    <path d="M34.7926176,43 L34.7926176,25.8136542 C34.7926176,19.2536826 29.4005716,14.55625 22.8156981,14.55625 L22.7226406,14.55625 C16.137767,14.55625 10.4707785,19.2536826 10.4707785,25.8136542 L10.4707785,43 L34.7926176,43 Z" id="Fill-1" fill="#25272D"/>
+                                    <path d="M30.6778527,27.9431372 C29.1549094,27.5784772 26.5447427,27.4633214 24.731801,27.9431372 C22.9188592,28.422953 22.6712952,30.9140119 24.731801,30.9140119 C26.7923068,30.9140119 32.200796,28.3077972 30.6778527,27.9431372 Z" id="Oval" fill="#266cae"/>
+                                    <path d="M21.7334082,27.9431372 C20.2104649,27.5784772 17.6002983,27.4633214 15.7873565,27.9431372 C13.9744148,28.422953 13.7268507,30.9140119 15.7873565,30.9140119 C17.8478623,30.9140119 23.2563515,28.3077972 21.7334082,27.9431372 Z" id="Oval" fill="#266cae" transform="translate(18.166667, 29.269506) scale(-1, 1) translate(-18.166667, -29.269506) "/>
+                                    <path d="M23.1340731,0.78903332 C22.7184471,0.423872614 22.0477586,0.424188294 21.6368425,0.78903332 L0.744673078,19.3388181 C0.333401493,19.7039788 0.245239258,20.3678589 0.557111502,20.8356673 L1.4428885,22.1643327 C1.75057268,22.625859 2.33675444,22.7031399 2.74956077,22.3392375 L22.3815156,5.03302363 L42.2405567,22.3392375 C42.6593161,22.7041666 43.2441756,22.6321411 43.5562369,22.1643327 L44.4425508,20.8356673 C44.7504215,20.374141 44.6627092,19.7036631 44.2474425,19.3388181 L23.1340731,0.78903332 Z" id="Combined-Shape" fill="#25272D"/>
                                 </g>
                             </g>
                         </g>
                     </svg>
                     <div style="float: right;line-height: 1.2em;">
-                        <div>Hlídač</div><div><strong>státu</strong></div>
+                        <div>Hlídač</div>
+                        <div>
+                            <strong>státu</strong>
+                        </div>
                     </div>
                 </a>
             </a>
@@ -191,15 +228,15 @@
                     <li class="nav-item dropdown dropdown-mega position-static mainmenu">
                         <a asp-controller="Texty" asp-action="Aktuality" class="nav-link mainmenu">Aktuality</a>
                     </li>
-                    
+
                 </ul>
-               
+
             </div>
             <div class="d-none d-lg-flex rightmenu">
             </div>
         </div>
     </nav>
-    
+
     <!-- ##autocomplete## -->
     <div class="header__content header__content--compact  d-print-none">
         <div class="header__search">
@@ -214,20 +251,20 @@
             </div>
         </div>
     </div>
+</div>
 
-    <partial name="_ContextStripe" />
-    <partial name="_SummaryStripe" />
-    <div class="container">
-        @RenderBody()
-    </div>
 
-    <partial name="BackToTop" />
+@* <partial name="_ContextStripe" /> *@
+@* <partial name="_SummaryStripe" /> *@
+<div id="scroller">
+    @RenderBody()
 
-    <partial name="_Footer" />
+@* <partial name="BackToTop"/> *@
+    <partial name="_Footer"/>
+</div>
+@await RenderSectionAsync("footerscripts", required: false)
+<!-- render-scripts -->
+<render-scripts></render-scripts>
 
-    @await RenderSectionAsync("footerscripts", required: false)
-    <!-- render-scripts -->
-    <render-scripts></render-scripts>
-    
 </body>
 </html>
