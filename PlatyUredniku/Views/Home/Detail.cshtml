@@ -16,9 +16,6 @@
 
 @{
     int rok = (int)ViewData["rok"];
-    string viewName = this.ViewContext.RouteData.Values["action"] as string;
-
-    var metadataForYear = Model.Metadata.FirstOrDefault(m => m.Rok == rok);
 }
 
 <section class="centered-block">
@@ -87,58 +84,92 @@
     </div>
 </section>
 
-@if (metadataForYear != null)
+@if (Model.Metadata.Any())
 {
-    <section class="centered-block">
+    <section class="top-block">
         <div>
-            <h4>Detaily komunikace ohledně platů za rok @metadataForYear.Rok</h4>
-            <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-                <div class="col d-flex align-items-start">
-                    <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                        <svg class="bi" width="1em" height="1em">
-                            <use xlink:href="#toggles2"></use>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="fs-2 text-body-emphasis">Doba trvání</h3>
-                        <p>
-                            Žádost o výši platů jsme odeslali @(metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy"))
-                            @if (metadataForYear.DatumPrijetiOdpovedi.HasValue)
-                            {
-                                <span>
-                                    a odpověď obdrželi po
-                                    @(Devmasters.Lang.CS.Plural.Get((int)(metadataForYear.DatumPrijetiOdpovedi.Value - metadataForYear.DatumOdeslaniZadosti.Value).TotalDays, "jednom dni", "{0} dnech", "{0} dnech")).
-                                </span>
-                            }
-                        </p>
-                    </div>
-                </div>
+            <h3>Detaily komunikace instituce ohledně platů</h3>
+            <div class="nav flex-row nav-pills my-5" id="v-meta-pills-tab" role="tablist">
+                <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
+                @{
+                    string metadataClassAttributes = "nav-link active";
 
-                <div class="col d-flex align-items-start">
-                    <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                        <svg class="bi" width="1em" height="1em">
-                            <use xlink:href="#cpu-fill"></use>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="fs-2 text-body-emphasis">Zdůvodnění mimořádných odměn</h3>
-                        <p>Součástí naší žádosti byl požadavek na zaslání odůvodnění mimořádných odměn pracovníků. Toto odůvodnění jsme @(metadataForYear.ZduvodneniMimoradnychOdmen == true ? "dostali" : "nedostali").</p>
-                    </div>
-                </div>
+                    foreach (var metadata in Model.Metadata.OrderByDescending(m => m.Rok))
+                    {
+                        <button class="@metadataClassAttributes"
+                                id="meta-year-@metadata.Rok-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#meta-year-@metadata.Rok"
+                                type="button"
+                                role="tab">
+                            @metadata.Rok
+                        </button>
 
-                @if (!string.IsNullOrWhiteSpace(metadataForYear.SkrytaPoznamka))
-                {
-                    <div class="col d-flex align-items-start">
-                        <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
-                            <svg class="bi" width="1em" height="1em">
-                                <use xlink:href="#cpu-fill"></use>
-                            </svg>
+                        metadataClassAttributes = "nav-link";
+                    }
+                }
+            </div>
+            <div class="tab-content width-75vp">
+                @{
+                    metadataClassAttributes = "tab-pane width-75vp fade show active";
+
+                    foreach (var metadataForYear in Model.Metadata.OrderByDescending(m => m.Rok))
+                    {
+                        <div class="@metadataClassAttributes" id="meta-year-@metadataForYear.Rok" role="tabpanel">
+                            <div>
+                                <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+                                    <div class="col d-flex align-items-start">
+                                        <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                                            <svg class="bi" width="1em" height="1em">
+                                                <use xlink:href="#toggles2"></use>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="fw-bold">Doba trvání</h4>
+                                            <p>
+                                                Žádost o výši platů jsme odeslali @(metadataForYear.DatumOdeslaniZadosti?.ToString("dd.MM.yyyy"))
+                                                @if (metadataForYear.DatumPrijetiOdpovedi.HasValue)
+                                                {
+                                                    <span>
+                                                        a odpověď obdrželi po
+                                                        @(Devmasters.Lang.CS.Plural.Get((int)(metadataForYear.DatumPrijetiOdpovedi.Value - metadataForYear.DatumOdeslaniZadosti.Value).TotalDays, "jednom dni", "{0} dnech", "{0} dnech")).
+                                                    </span>
+                                                }
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="col d-flex align-items-start">
+                                        <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                                            <svg class="bi" width="1em" height="1em">
+                                                <use xlink:href="#cpu-fill"></use>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h4 class="fw-bold">Zdůvodnění mimořádných odměn</h4>
+                                            <p>Součástí naší žádosti byl požadavek na zaslání odůvodnění mimořádných odměn pracovníků. Toto odůvodnění jsme @(metadataForYear.ZduvodneniMimoradnychOdmen == true ? "dostali" : "nedostali").</p>
+                                        </div>
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(metadataForYear.SkrytaPoznamka))
+                                    {
+                                        <div class="col d-flex align-items-start">
+                                            <div class="icon-square text-body-emphasis bg-body-secondary d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 me-3">
+                                                <svg class="bi" width="1em" height="1em">
+                                                    <use xlink:href="#cpu-fill"></use>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <h4 class="fw-bold">Poznámka úřadu k platům</h4>
+                                                <p>@metadataForYear.SkrytaPoznamka</p>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="fs-2 text-body-emphasis">Poznámka úřadu k platům</h3>
-                            <p>@metadataForYear.SkrytaPoznamka</p>
-                        </div>
-                    </div>
+                        metadataClassAttributes = "tab-pane width-75vp";
+                    }
                 }
             </div>
         </div>
@@ -150,10 +181,9 @@
 }
 
 <section class="top-block">
-
-
     <div>
-        <div class="nav flex-row nav-pills me-3" id="v-pills-tab" role="tablist">
+        <h3>Přehled platů</h3>
+        <div class="nav flex-row nav-pills my-5" id="v-pills-tab" role="tablist">
             <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
             @{
                 string classAttributes = "nav-link active";
@@ -182,22 +212,22 @@
                 {
                     <div class="@classAttributes" id="year-@platGroup.Key" role="tabpanel">
                         <script>
-                                    $(document).ready(function () {
-                                        $('#tblSum_@platGroup.Key').DataTable(
-                                            {
-                                                'language': {
-                                                    'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
-                                                },
-                                                "searching": false,
-                                                "paging": false,
-                                                "ordering": true,
-                                                "order": [],
-                                                "scrollCollapse": true,
-                                                "scrollY": '50vh',
-                                                "info": false
-                                            });
+                            $(document).ready(function () {
+                                $('#tblSum_@platGroup.Key').DataTable(
+                                    {
+                                        'language': {
+                                            'url': '//cdn.datatables.net/plug-ins/1.13.4/i18n/cs.json'
+                                        },
+                                        "searching": false,
+                                        "paging": false,
+                                        "ordering": true,
+                                        "order": [],
+                                        "scrollCollapse": true,
+                                        "scrollY": '50vh',
+                                        "info": false
                                     });
-                                </script>
+                            });
+                        </script>
 
                         <table class="table table-striped" id="tblSum_@platGroup.Key">
                             <thead>
@@ -230,13 +260,3 @@
         <partial name="ExportModal" model="@(new ExportModalViewModel() { DatovaSchranka = Model.DS, Titulek = $"Export dat pro {Model.Nazev}" })"/>
     </div>
 </section>
-
-
-@foreach (var platGroup in platyPoLetech.Where(m => m.Key == rok))
-{
-    foreach (var plat in platGroup.OrderBy(p => p.DisplayOrder).ThenBy(p => p.NazevPozice))
-    {
-        <hr/>
-        <partial name="_platDetail" model="(@plat, @Model)"/>
-    }
-}
