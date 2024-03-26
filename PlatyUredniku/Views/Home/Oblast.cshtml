@@ -8,9 +8,9 @@
 
     string? prumerHlavounu = platyHlavounu.Any() ? platyHlavounu.Average(p => p.HrubyMesicniPlat).ToString("N0") : null;
 }
-<section class="centered-block">
-    <div class="row">
-        <div class="col-6">
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
+        <div>
             @if (Model is not null && Model.Any())
             {
                 <h3 class="pt-5">
@@ -20,17 +20,10 @@
             }
 
         </div>
-        @if (prumerHlavounu is not null)
-        {
-            <div class="col-6 bg-warning-subtle p-5">
-                <h3>@prumerHlavounu</h3>
-                <p>Průměr nejvyšších představitelů úřadů oblasti</p>
-            </div>
-        }
 
         @if (Model is not null && Model.Any())
         {
-            <div class="col-12">
+            <div>
                 <h2>Organizace</h2>
 
                 <table class="table table-new table-new--dotted table-hover">

@@ -18,8 +18,8 @@
     int rok = (int)ViewData["rok"];
 }
 
-<section class="centered-block">
-    <div>
+<section class="d-flex align-items-center justify-content-center">
+    <div class="container">
 
 
         <h2 class="pb-2 border-bottom">@Model.Nazev</h2>
@@ -86,8 +86,8 @@
 
 @if (Model.Metadata.Any())
 {
-    <section class="top-block">
-        <div>
+    <section class="d-flex justify-content-center alter-bg-color">
+        <div class="container">
             <h3>Detaily komunikace instituce ohledně platů</h3>
             <div class="nav flex-row nav-pills my-5" id="v-meta-pills-tab" role="tablist">
                 <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>
@@ -160,7 +160,7 @@
                                                 </svg>
                                             </div>
                                             <div>
-                                                <h4 class="fw-bold">Poznámka úřadu k platům</h4>
+                                                <h4 class="fw-bold">Poznámka Hlídače</h4>
                                                 <p>@metadataForYear.SkrytaPoznamka</p>
                                             </div>
                                         </div>
@@ -180,8 +180,8 @@
     var platyPoLetech = Model.Platy.GroupBy(p => p.Rok).OrderByDescending(pg => pg.Key).ToList();
 }
 
-<section class="top-block">
-    <div>
+<section class="d-flex justify-content-center @(Model.Metadata.Any()? "":"alter-bg-color")">
+    <div class="container">
         <h3>Přehled platů</h3>
         <div class="nav flex-row nav-pills my-5" id="v-pills-tab" role="tablist">
             <button class="nav-link disabled" type="button" disabled="disabled">Rok</button>

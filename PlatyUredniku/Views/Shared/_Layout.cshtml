@@ -143,41 +143,19 @@
         line-height: 1.2em;
     }
     
-    .sticky-head {
-        max-height: 16vh;
-        position: sticky;
-        top: 0;
-    }
-    
-    #scroller {
-        max-height: 84vh;
-        scroll-snap-type: y mandatory;
-        overflow-y: scroll;
-    }
-    
     section {
-      min-height: 84vh;
-      width: 100vw;
-      scroll-snap-align: start;
+      min-height: 50vh;
+      padding-top: 4rem;
+      padding-bottom: 1rem;
     }
     
-    .width-75vp {
-        width: 75vw;
+    .alter-bg-color {
+        background: #f2f5f7;
     }
     
-    .centered-block {
-        display: flex;
-        align-items: center;
-        justify-content: center;       
-    }
     
-    .top-block {
-        display: flex; 
-        justify-content: center; 
-        padding-top: 50px;
-    }
 </style>
-<div class="sticky-head">
+<div>
     <nav class="navbar navbar-expand-lg navbar-light shadow hlidac">
         <div class="container-fluid">
             <a class="navbar-brand" href="/" style="margin-right:1em;">
@@ -253,15 +231,12 @@
     </div>
 </div>
 
-
-@* <partial name="_ContextStripe" /> *@
-@* <partial name="_SummaryStripe" /> *@
-<div id="scroller">
+<div>
     @RenderBody()
 
 @* <partial name="BackToTop"/> *@
-    <partial name="_Footer"/>
 </div>
+<partial name="_Footer"/>
 @await RenderSectionAsync("footerscripts", required: false)
 <!-- render-scripts -->
 <render-scripts></render-scripts>
