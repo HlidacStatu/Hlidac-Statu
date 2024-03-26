@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Devmasters.Collections;
 
 namespace HlidacStatu.Repositories;
 
@@ -99,6 +100,23 @@ public static class PuRepo
         return await db.PuOrganizace
             .AsNoTracking()
             .Where(pu => pu.DS == datovaSchranka)
+            .Include(o => o.Metadata)
+            .Include(o => o.Tags)
+            .Include(o => o.FirmaDs)
+            .Include(o => o.Platy) // Include PuPlat
+            .FirstOrDefaultAsync();
+    }
+    
+    public static async Task<PuOrganizace> GetOrganizationOfTheDayAsync()
+    {
+        await using var db = new DbEntities();
+
+        var orgs = await db.PuOrganizace.ToListAsync();
+        var tip = orgs.TipOfTheDay();
+
+        return await db.PuOrganizace
+            .AsNoTracking()
+            .Where(pu => pu.DS == tip.DS)
             .Include(o => o.Metadata)
             .Include(o => o.Tags)
             .Include(o => o.FirmaDs)

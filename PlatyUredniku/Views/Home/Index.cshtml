@@ -1,17 +1,26 @@
-﻿@{
-    var stats = await HlidacStatu.Repositories.PuRepo.GetGlobalStatAsync();
+﻿@using HlidacStatu.Repositories
+@{
+    var stats = await PuRepo.GetGlobalStatAsync();
+
+    var organizationOfTheDay = await PuRepo.GetOrganizationOfTheDayAsync();
+    var ceoOfTheDay = organizationOfTheDay.Platy.FirstOrDefault(p => p.JeHlavoun == true && p.Rok == PuRepo.DefaultYear);
 }
 
 <section class="d-flex align-items-center justify-content-center">
     <div class="container">
         <h3 class="new-title">
-            Platy úředníků v @(HlidacStatu.Repositories.PuRepo.DefaultYear)
+            Platy úředníků v @PuRepo.DefaultYear
         </h3>
-        <p>
+        <p class="fs-5">
+            V mnoha demokratických zemích je běžné, že veřejnost může kontrolovat odměňování těch, kteří hospodaří s penězi daňových poplatníků.
+            Informace o platech a odměnách vedoucích úřadů, státních podniků či příspěvkových organizací v ČR, ale veřejně dostupné či snadno dohledatelné nejsou.
+            Proto jsme tu my! Využíváme zákona o svobodném přístupu k informacím a na platy a odměny se ptáme. 
+        </p>
+        <p class="fs-5">
             Za 2022 jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
             a plat nám poskytlo @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetCoPoslaliPlat)) z nich.
         </p>
-        <p>
+        <p class="fs-5" style="display: none">
             Polovina představených úřadů má plat nižší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[50])),
             čtvrtina má plat vyšší než @(HlidacStatu.Util.RenderData.NicePrice(stats.PercentilyPlatuHlavounu[75])) měsíčně včetně odměn.
         </p>
@@ -25,13 +34,40 @@
     <div class="container">
 
         <h3 class="new-title">
-            Organizace dne
+            Organizací dne je - @organizationOfTheDay.Nazev 
         </h3>
-        <h4>Předseda Ústavního soudu</h4>
+        <h5>
+            Najdete ji v kategoriích: 
+            @foreach (var tag in organizationOfTheDay.Tags)
+            {
+                <a asp-action="Oblast" asp-route-id="@tag.Tag" class="badge bg-primary">
+                    <i class="fa-solid fa-hashtag"></i>&nbsp;@tag.Tag
+                </a>
+            }
+        </h5>
+        <br/>
+        
+        @if (ceoOfTheDay is not null)
+        {
+            <h5></h5>
+            <p class="fs-5">
+                Nejvyšším představitelem organizace je <strong>@ceoOfTheDay.NazevPozice</strong>.
+                Jeho hrubý měsíční plat je @HlidacStatu.Util.RenderData.NicePrice(ceoOfTheDay.HrubyMesicniPlat).
+            </p>
+            
+        }
 
-        <p>Má hrubý plat 232 000 Kč měsíčně včetně odměn. Plat v roce 2023 je o 3 % vyšší než v roce předchozím.</p>
+        <p class="fs-5">
+            Platy a odměny jsou stanoveny 
+            <a asp-controller="Texty" asp-action="PlatyStatnichZamestnancu">nařízením vlády</a> 
+            nebo 
+            <a asp-controller="Texty" asp-action="Nejvyssi">zákonem</a>.
+        </p>
         <p>
-            <a class="btn btn-primary btn-sm" href="/detail/z2tadw5">Ústavní soud - všechny platy</a>
+            <a asp-action="Detail" 
+               asp-route-id="@organizationOfTheDay.DS" 
+               asp-route-rok="@PuRepo.DefaultYear" 
+               class="btn btn-primary btn-sm">@organizationOfTheDay.Nazev</a>
         </p>
 
     </div>
@@ -100,7 +136,7 @@
     <div class="col">
         <a asp-action="Statistiky">
             <div class="card text-bg-light mb-3">
-                <div class="card-header">Statistiky za rok @(HlidacStatu.Repositories.PuRepo.DefaultYear)</div>
+                <div class="card-header">Statistiky za rok @PuRepo.DefaultYear</div>
                 <div class="card-body">
                     <p class="card-text">
                         Za 2022 jsme žádali o platy @(HlidacStatu.Util.RenderData.NiceNumber(stats.PocetOslovenych)) organizací
