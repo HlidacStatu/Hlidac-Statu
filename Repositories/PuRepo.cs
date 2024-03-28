@@ -124,7 +124,7 @@ public static class PuRepo
             .FirstOrDefaultAsync();
     }
 
-    public static List<PuPlat> Rok(this ICollection<PuPlat> platy, int rok = DefaultYear)
+    public static List<PuPlat> AktualniRok(this ICollection<PuPlat> platy, int rok = DefaultYear)
     {
         return platy?.Where(m => m.Rok == rok).ToList();
     }
