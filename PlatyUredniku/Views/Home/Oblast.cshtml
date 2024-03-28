@@ -24,8 +24,8 @@
             <div>
                 @if (Model is not null && Model.Any())
                 {
-                    <h3 class="pt-5">
-                        Oblast @ViewData["oblast"] obsahuje @goodOrgs.Count institucí, které poskytli platy.
+                    <h3 class="pb-5">
+                        Oblast @ViewData["oblast"] obsahuje @goodOrgs.Count institucí, které v roce @PuRepo.DefaultYear poskytli platy.
                     </h3>
                 }
             </div>
@@ -68,8 +68,8 @@
             <div>
                 @if (Model is not null && Model.Any())
                 {
-                    <h3 class="pt-5">
-                        Oblast @ViewData["oblast"] obsahuje @badOrgs.Count institucí, které odmítli poskytnout platy.
+                    <h3 class="pb-5">
+                        Oblast @ViewData["oblast"] obsahuje @badOrgs.Count institucí, které v roce @PuRepo.DefaultYear odmítli poskytnout platy.
                     </h3>
                 }
             </div>
