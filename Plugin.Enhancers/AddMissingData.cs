@@ -152,10 +152,10 @@ namespace HlidacStatu.Plugin.Enhancers
                     else
                     {
                         //malinko uprav nazev, zrus koncovku  aposledni carku
-                        string modifNazev = Firma.JmenoBezKoncovky(subj.nazev);
+                        string modifNazev = Firma.JmenoBezKoncovky(subj.nazev) + "%";
 
 
-                        f = FirmaRepo.FromName(modifNazev, true);
+                        f = FirmaRepo.FromName(modifNazev,false, true);
                         if (Firma.IsValid(f))
                         {
                             subj.ico = f.ICO;

@@ -115,10 +115,10 @@ namespace HlidacStatu.Repositories
             return f;
         }
 
-        public static Firma FromName(string jmeno, bool getMissingFromExternal = false)
+        public static Firma FromName(string jmeno, bool getMissingFromExternal = false, bool wildcards = false)
         {
-            Firma f = FromName(jmeno);
-            if (f != null)
+            Firma f = FromNameFirstItem(jmeno, wildcards);
+            if (f.Valid)
                 return f;
 
             else if (getMissingFromExternal)
@@ -200,8 +200,11 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static Firma FromIco(string ico, bool loadAllData = true)
+        public static Firma FromIco(string ico, bool loadInvalidIco = false)
         {
+            if (Util.DataValidators.CheckCZICO(ico) == false && loadInvalidIco == false)
+                return Firma.NotFound;
+
             Firma f = new Firma();
             using (DbEntities db = new DbEntities())
             {
@@ -232,9 +235,13 @@ namespace HlidacStatu.Repositories
             }
         }
 
-        public static Firma FromName(string jmeno)
+        public static Firma FromNameFirstItem(string jmeno, bool wildcards = false)
         {
-            var res = AllFromExactName(jmeno);
+            IEnumerable<Firma> res = null;
+            if (wildcards)
+                res = AllFromNameWildcards(jmeno);
+            else
+                res = AllFromExactName(jmeno);
             return res.FirstOrDefault(Firma.NotFound);
             
         }
@@ -369,6 +376,10 @@ namespace HlidacStatu.Repositories
 
         public static string NameFromIco(string ico, bool IcoIfNotFound = false)
         {
+            if (string.IsNullOrEmpty(ico))
+                return string.Empty;
+
+
             using (PersistLib p = new PersistLib())
             {
                 string sql = @"select jmeno from Firma where ico = @ico";
