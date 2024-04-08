@@ -235,12 +235,19 @@
             </div>
         </div>
     </div>
+
+    @if (IsSectionDefined("breadcrumbs"))
+    {
+        <div class="bg-primary">
+            @await RenderSectionAsync("breadcrumbs", required: false)
+        </div>
+    }
 </div>
 
 <div>
     @RenderBody()
 
-@* <partial name="BackToTop"/> *@
+    @* <partial name="BackToTop"/> *@
 </div>
 <partial name="_Footer"/>
 @await RenderSectionAsync("footerscripts", required: false)

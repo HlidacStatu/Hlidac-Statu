@@ -50,7 +50,7 @@ namespace HlidacStatu.Repositories
 
         }
 
-        static InDocJobNames FindSimilar(string subject, string jobraw)
+        public static InDocJobNames FindSimilar(string subject, string jobraw)
         {
             string subjectNormalized = subject?.ToUpper() ?? ""; 
             jobraw = NormalizeTextNoDiacriticsLower(jobraw);
@@ -89,6 +89,20 @@ namespace HlidacStatu.Repositories
                 var found = await db.InDocJobs.AsNoTracking().AsAsyncEnumerable().FirstOrDefaultAsync(m => m.Pk == jobPk);
                 return found;
             }
+        }
+        
+        public static bool IsTableHavingItJob(long tablePk)
+        {
+            using DbEntities db = new DbEntities();
+            
+            var job = db.InDocJobs.AsNoTracking().FirstOrDefault(j => j.TablePk == tablePk);
+            if (job is not null)
+            {
+                return (job.Unit == InDocJobs.MeasureUnit.Day || job.Unit == InDocJobs.MeasureUnit.Hour)
+                       && job.PriceVATCalculated is not null;
+            }
+                
+            return false;
         }
 
 
