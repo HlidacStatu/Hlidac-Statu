@@ -153,8 +153,8 @@ public static class PuRepo
 
         return await db.PuPlaty
             .AsNoTracking()
-            .Include(p => p.Organizace)
-            .ThenInclude(o => o.FirmaDs)
+            .Include(p => p.Organizace).ThenInclude(o => o.FirmaDs)
+            .Include(p => p.Organizace).ThenInclude(o => o.Tags)
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync();
     }

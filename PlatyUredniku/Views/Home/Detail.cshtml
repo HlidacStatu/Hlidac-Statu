@@ -14,8 +14,20 @@
     </script>
 }
 
-@{
-    int rok = (int)ViewData["rok"];
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Oblasti">Oblasti</a>
+        </li>
+        <li>
+            <a asp-action="Oblast" asp-route-id="@ViewData["mainTag"]">Oblast: #@ViewData["mainTag"]</a>
+        </li>
+        <li class="active">@Model.Nazev</li>
+    </ol>
 }
 
 <section class="d-flex align-items-center justify-content-center">

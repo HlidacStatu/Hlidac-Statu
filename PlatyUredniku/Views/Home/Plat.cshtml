@@ -2,6 +2,25 @@
 @using HlidacStatu.Entities
 @model HlidacStatu.Entities.Entities.PuPlat
 
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Oblasti">Oblasti</a>
+        </li>
+        <li>
+            <a asp-action="Oblast" asp-route-id="@ViewData["mainTag"]">Oblast: #@ViewData["mainTag"]</a>
+        </li>
+        <li>
+            <a asp-action="Detail" asp-route-id="@Model.Organizace.DS">@Model.Organizace.Nazev</a>
+        </li>
+        <li class="active">@Model.NazevPozice (@Model.Rok)</li>
+    </ol>
+}
 <section class="d-flex justify-content-center">
     <div class="container">
         <h3>@Model.NazevPozice</h3>

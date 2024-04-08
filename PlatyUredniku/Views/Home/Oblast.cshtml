@@ -22,6 +22,20 @@
     var platyMax = aktualniPlaty.Max(p => p.HrubyMesicniPlat);
     var platyLength = platyMax - platyMin;
 }
+
+@section breadcrumbs
+{
+    <ol class="breadcrumb">
+        <li>
+            <a asp-action="Index">Platy úředníků</a>
+        </li>
+        <li>
+            <a asp-action="Oblasti">Oblasti</a>
+        </li>
+        <li class="active">Oblast: #@ViewData["oblast"]</li>
+    </ol>
+}
+
 @if (goodOrgs.Any())
 {
     <section class="d-flex align-items-center justify-content-center">
@@ -59,7 +73,7 @@
                                     var minimalniPlatOrganizace = org.Platy.AktualniRok().Min(m => m.HrubyMesicniPlat);
                                     var maximalniPlatOrganizace = org.Platy.AktualniRok().Max(m => m.HrubyMesicniPlat);
                                     var startPer = Math.Round((minimalniPlatOrganizace - platyMin) / platyLength * 100);
-                                    var endPer = Math.Round((maximalniPlatOrganizace - minimalniPlatOrganizace ) / platyLength * 100);
+                                    var endPer = Math.Round((maximalniPlatOrganizace - minimalniPlatOrganizace) / platyLength * 100);
                                     if (endPer == 0)
                                         endPer = 1;
                                     var minimalniPlatAsString = HlidacStatu.Util.RenderData.NicePrice(minimalniPlatOrganizace).Replace(" ", "&nbsp;");
@@ -70,7 +84,8 @@
                                          style="width: 100%;height: 1rem;background: linear-gradient(90deg, hsl(216deg 100% 87%) 0%, hsl(216deg 100% 26.67%) 100%);">
                                         <div class="bg-light" style="width: @startPer%;height: 1rem"></div>
                                         <div class="bg-transparent rounded-pill position-relative"
-                                             style="width: @endPer%;height: 1rem;"></div>
+                                             style="width: @endPer%;height: 1rem;">
+                                        </div>
                                         <div class="bg-light" style="width: @(100 - endPer - startPer)%;height: 1rem"></div>
                                     </div>
                                     <div class="d-flex justify-content-between">

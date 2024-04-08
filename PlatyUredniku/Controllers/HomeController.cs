@@ -120,7 +120,8 @@ public class HomeController : Controller
             $"{nameof(PuRepo.GetFullDetailAsync)}_{id}",
             _ => PuRepo.GetFullDetailAsync(id)
         );
-
+        
+        ViewData["mainTag"] = detail.Tags.FirstOrDefault(t => PuRepo.MainTags.Contains(t.Tag))?.Tag;
         ViewData["platy"] = detail.Platy.ToList();
         ViewData["rok"] = rok ?? (detail.Platy.Any() ? detail.Platy.Max(m => m.Rok) : PuRepo.DefaultYear);
         ViewData["id"] = id;
@@ -136,6 +137,7 @@ public class HomeController : Controller
             _ => PuRepo.GetPlatAsync(id)
         );
         
+        ViewData["mainTag"] = detail.Organizace.Tags.FirstOrDefault(t => PuRepo.MainTags.Contains(t.Tag))?.Tag;
         ViewData["context"] = $"{detail.NazevPozice} v organizaci {detail.Organizace.FirmaDs.DsSubjName}";
 
         return View(detail);
