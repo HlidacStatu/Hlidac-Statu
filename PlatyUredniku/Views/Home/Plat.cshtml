@@ -1,5 +1,7 @@
 @using HlidacStatu.Repositories
 @using HlidacStatu.Entities
+@using HlidacStatu.Lib.Web.UI
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model HlidacStatu.Entities.Entities.PuPlat
 
 
@@ -21,86 +23,115 @@
         <li class="active">@Model.NazevPozice (@Model.Rok)</li>
     </ol>
 }
+
 <section class="d-flex justify-content-center">
     <div class="container">
-        <h3>@Model.NazevPozice</h3>
-        <h4><i class="fa-regular fa-building-columns"></i>&nbsp;@Model.Organizace.Nazev</h4>
-        <h4>V roce @Model.Rok</h4>
-        <div class="row">
-            <div class="col-10">
-                <br/>
+        <div>
+            <h3 class="fw-bold">@Model.NazevPozice</h3>
+            <div class="d-flex">
 
-                @if (Model.Plat is not null && Model.Plat != 0)
-                {
-                    var platMesicne = Model.Plat / 12;
-                    var odmenyMesicne = Model.Odmeny / 12;
-                    var osobniOhodnoceni = (platMesicne + odmenyMesicne) / platMesicne * 100 - 100;
-
-                    <p>
-                        U této pozice odhadujeme nárůst měsíčně o @osobniOhodnoceni?.ToString("N0") % osobním ohodnocením.
-                        Roční odměna až @Model.Odmeny?.ToString("N0"),-
-                    </p>
-
-                    <p class="fw-bold">
-                        Celkově si tak pozice @Model.NazevPozice v instituci @Model.Organizace.Nazev měsíčně může přijít na
-                        cca. “ = 66 430 + 39% - daň - soc. zdr. “ čistého výdělku <small class="small fw-light">fakt budeme počítat čistej?</small>
-                    </p>
-                }
-
-                <br/>
-                <p>Detailní informace</p>
-                <dl>
-                    <dt>Hrubý měsíční plat včetně odměn</dt>
-                    <dd>@Model.HrubyMesicniPlat.ToString("N0")</dd>
-
-                    <dt>Nefinanční bonus</dt>
-                    <dd>@Model.NefinancniBonus</dd>
-
-                    <dt>Roční hrubý plat</dt>
-                    <dd>@Model.Plat?.ToString("N0")</dd>
-
-                    <dt>Roční hrubé odměny</dt>
-                    <dd>@Model.Odmeny?.ToString("N0")</dd>
-
-                    <dt>Úvazek</dt>
-                    <dd>@Model.Uvazek?.ToString("N0")</dd>
-
-                    <dt>Počet odpracovaných měsíců</dt>
-                    <dd>@Model.PocetMesicu?.ToString("N0")</dd>
-
-                    <dt>Je ředitelskou pozicí</dt>
-                    <dd>@(Model.JeHlavoun == true ? "Ano" : "Ne")</dd>
-                </dl>
-
-            </div>
-            <div class="col-2">
-                @if (Model.JeHlavoun == true && !string.IsNullOrWhiteSpace(Model.Organizace.Ico))
-                {
-                    var ceos = OsobaEventRepo.GetCeos(Model.Organizace.Ico, new DateTime(Model.Rok, 1, 1), new DateTime(Model.Rok, 12, 31));
-                    if (ceos is not null && ceos.Length > 0)
+                <div class="me-3">
+                    @if (Model.JeHlavoun == true && !string.IsNullOrWhiteSpace(Model.Organizace.Ico))
                     {
-                        foreach (var ceo in ceos)
+                        var ceos = OsobaEventRepo.GetCeos(Model.Organizace.Ico, new DateTime(Model.Rok, 1, 1), new DateTime(Model.Rok, 12, 31));
+                        if (ceos is not null && ceos.Length > 0)
                         {
-                            <div>
-                                <div>
-                                    <div class="person-profile-thumb">
-                                        <div class="photo">
-                                            <div class="profile-picture border" style="background-image: url('@ceo.Osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)')"></div>
+                            foreach (var ceo in ceos)
+                            {
+                                <div class="d-flex">
+                                    <div>
+                                        <div class="person-profile-thumb">
+                                            <div class="photo">
+                                                <div class="profile-picture border" style="background-image: url('@ceo.Osoba.GetPhotoUrl(false, Osoba.PhotoTypes.NoBackground)')"></div>
+                                            </div>
                                         </div>
                                     </div>
+                                    <div class="mt-1">
+                                        <p class="py-0 my-0 lead fw-bold">
+                                            <a href="@ceo.Osoba.GetUrl(false)">@ceo.Osoba.FullName()</a>
+                                        </p>
+                                        <h4 class="mt-3 fw-bold"><i class="fa-regular fa-building-columns"></i>&nbsp;@Model.Organizace.Nazev</h4>
+                                        <h4 class="mt-3 fw-bold">V roce @Model.Rok</h4>
+                                        <p style="display: none" class="py-0 my-0">@Html.Raw(ceo.Osoba.NarozeniYear(true))</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p class="py-0 my-0 lead">
-                                        <a href="@ceo.Osoba.GetUrl(false)">@ceo.Osoba.FullName()</a>
-                                    </p>
-                                    <p class="py-0 my-0">@Html.Raw(ceo.Osoba.NarozeniYear(true))</p>
-                                </div>
-                            </div>
+                            }
                         }
                     }
-                }
+                </div>
+                <div>
+                    
+                </div>
             </div>
         </div>
+
+
+        @if (Model.Plat is not null && Model.Plat != 0)
+        {
+            var platMesicne = (Model.Plat ?? 0) / (Model.PocetMesicu ?? 12);
+            var odmenyMesicne = (Model.Odmeny ?? 0) / (Model.PocetMesicu ?? 12);
+            var osobniOhodnoceni = (platMesicne + odmenyMesicne) / platMesicne * 100 - 100;
+
+            <div class="row mt-5">
+                <div class="col">
+                    <p>
+                        Celkově si pozice @Model.NazevPozice v instituci @Model.Organizace.Nazev za rok
+                        @Model.Rok přišla na <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(Model.HrubyMesicniPlat)</strong> hrubého měsíčně.
+                    </p>
+                    <p class="mt-2">
+                        Z toho hrubý měsíční plat byl <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(platMesicne)</strong> a přepočtené měsíční odměny
+                        <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(odmenyMesicne)</strong>
+                    </p>
+
+                    <p class="mt-5">
+                        U této pozice odhadujeme nárůst měsíčně o <strong>@osobniOhodnoceni.ToString("N0") %</strong> osobním ohodnocením.
+                        @if (Model.Odmeny.HasValue)
+                        {
+                            <span>Roční odměna činí až <strong>@HlidacStatu.Util.RenderData.NicePriceHtml(Model.Odmeny.Value)</strong></span>
+                        }
+                    </p>
+
+
+                </div>
+                <div class="col">
+                    @Html.SemiCircleDonut(new Tuple<string, decimal>[]
+                        {
+                            new Tuple<string, decimal>("Plat", Model.Plat.Value),
+                            new Tuple<string, decimal>("Odměna", Model.Odmeny ?? 0),
+                        },
+                        "Poměr základního platu a odměny", "Kč", 200)
+                </div>
+            </div>
+        }
+
+
+    </div>
+</section>
+<section class="d-flex alter-bg-color">
+    <div class="container">
+        <h3>Detailní informace</h3>
+        <dl>
+            <dt>Hrubý měsíční plat včetně odměn</dt>
+            <dd>@Model.HrubyMesicniPlat.ToString("N0")</dd>
+
+            <dt>Nefinanční bonus</dt>
+            <dd>@Model.NefinancniBonus</dd>
+
+            <dt>Roční hrubý plat</dt>
+            <dd>@Model.Plat?.ToString("N0")</dd>
+
+            <dt>Roční hrubé odměny</dt>
+            <dd>@Model.Odmeny?.ToString("N0")</dd>
+
+            <dt>Úvazek</dt>
+            <dd>@Model.Uvazek?.ToString("N0")</dd>
+
+            <dt>Počet odpracovaných měsíců</dt>
+            <dd>@Model.PocetMesicu?.ToString("N0")</dd>
+
+            <dt>Je ředitelskou pozicí</dt>
+            <dd>@(Model.JeHlavoun == true ? "Ano" : "Ne")</dd>
+        </dl>
     </div>
 
 </section>
