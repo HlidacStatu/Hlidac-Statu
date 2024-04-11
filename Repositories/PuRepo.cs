@@ -25,6 +25,7 @@ public static class PuRepo
         "nemocnice",
         "práce",
         "průmysl a obchod",
+        "rozvoj",
         "služby",
         "společnost",
         "výzkum",
