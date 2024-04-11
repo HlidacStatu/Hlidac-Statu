@@ -104,7 +104,8 @@
     <link href="https://fonts.googleapis.com/css?family=Cabin:400,400i,600,700&amp;subset=latin-ext" rel="stylesheet"/>
 
     <script src="https://kit.fontawesome.com/a0fc082c81.js" crossorigin="anonymous"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.8/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    
     <script src="~/bundles/jquery"></script>
     <script src="~/bundles/scriptbundle"></script>
     <script src="~/bundles/highcharts8"></script>
@@ -123,6 +124,7 @@
     <!-- End Matomo Tag Manager -->
 
     <script>
+
         function closeMegaMenu(el) {
             var navItem = $(el).closest('.dropdown-menu.shadow').prev('a');
             var dd = new bootstrap.Dropdown(navItem[0]);
@@ -253,6 +255,10 @@
 @await RenderSectionAsync("footerscripts", required: false)
 <!-- render-scripts -->
 <render-scripts></render-scripts>
-
+<script>
+    //BS tooltip init
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+</script>
 </body>
 </html>
